@@ -24,7 +24,6 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
         $values = explode(',', $userInput);
         $values = array_unique($values);
         return $values;
-
     }
 
     /**

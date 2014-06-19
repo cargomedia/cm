@@ -31,7 +31,7 @@ class CM_FormField_SetTest extends CMTest_TestCase {
         $this->assertSame($userInputGood, $parsedInput);
 
         $userInputTainted = array(32, 23, 132);
-        $parsedInput = $field->parseUserInput($userInputTainted );
+        $parsedInput = $field->parseUserInput($userInputTainted);
         $field->validate($environment, $parsedInput);
         $this->assertSame(array(32), $parsedInput);
     }

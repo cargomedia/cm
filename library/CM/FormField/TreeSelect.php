@@ -1,12 +1,11 @@
 <?php
 
-class CM_FormField_TreeSelect extends CM_FormField_Abstract
-{
+class CM_FormField_TreeSelect extends CM_FormField_Abstract {
+
     /** @var CM_Tree_Abstract */
     protected $_tree;
 
-    protected function _initialize()
-    {
+    protected function _initialize() {
         $this->_tree = $this->_params->getObject('tree', 'CM_Tree_Abstract');
         parent::_initialize();
     }
@@ -16,8 +15,7 @@ class CM_FormField_TreeSelect extends CM_FormField_Abstract
      * @param CM_Tree_Abstract        $userInput
      * @throws CM_Exception_FormFieldValidation
      */
-    public function validate(CM_Frontend_Environment $environment, $userInput)
-    {
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (!$userInput instanceof CM_Tree_Abstract) {
             throw new CM_Exception_FormFieldValidation('Expected a CM_Tree_Abstract instance.');
         }
@@ -27,8 +25,7 @@ class CM_FormField_TreeSelect extends CM_FormField_Abstract
         }
     }
 
-    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse)
-    {
+    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
         $viewResponse->set('tree', $this->_tree);
     }
 }

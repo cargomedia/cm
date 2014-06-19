@@ -2,7 +2,6 @@
 
 class CM_FormField_CaptchaTest extends CMTest_TestCase {
 
-
     /**
      * @expectedException CM_Exception_FormFieldValidation
      */

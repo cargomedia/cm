@@ -1,9 +1,8 @@
 <?php
 
-class CM_FormField_SuggestOneTest extends CMTest_TestCase
-{
-    public function testParseUserInput()
-    {
+class CM_FormField_SuggestOneTest extends CMTest_TestCase {
+
+    public function testParseUserInput() {
         $field = $this->getMockForAbstractClass('CM_FormField_SuggestOne');
 
         $parsedInput = $field->parseUserInput('foo');
