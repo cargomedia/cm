@@ -2,9 +2,6 @@
 
 class CM_Model_Splittest extends CM_Model_Abstract {
 
-    /** @var bool */
-    private $_withoutPersistence;
-
     /** @var array|null */
     private $_variationWeightList;
 
@@ -81,9 +78,6 @@ class CM_Model_Splittest extends CM_Model_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function setVariationWeightList(array $variationWeightList) {
-        if ($this->_withoutPersistence) {
-            return;
-        }
         if (empty($variationWeightList)) {
             throw new CM_Exception_Invalid('Empty variation weight list');
         }
