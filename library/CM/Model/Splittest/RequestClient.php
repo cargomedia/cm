@@ -32,7 +32,12 @@ class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
      * @return bool
      */
     public static function isVariationFixtureStatic($splittestName, CM_Request_Abstract $request, $variationName) {
-        return static::_isVariationFixtureStatic($splittestName, $request, $variationName);
+        /** @var CM_Model_Splittest_RequestClient $splittest */
+        $splittest = static::_getSplittest($splittestName);
+        if (!$splittest) {
+            return false;
+        }
+        return $splittest->isVariationFixture($request, $variationName);
     }
 
     /**

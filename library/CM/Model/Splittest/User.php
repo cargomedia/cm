@@ -26,7 +26,12 @@ class CM_Model_Splittest_User extends CM_Model_Splittest {
      * @return bool
      */
     public static function isVariationFixtureStatic($splittestName, CM_Model_User $user, $variationName) {
-        return static::_isVariationFixtureStatic($splittestName, $user, $variationName);
+        /** @var CM_Model_Splittest_User $splittest */
+        $splittest = static::_getSplittest($splittestName);
+        if (!$splittest) {
+            return false;
+        }
+        return $splittest->isVariationFixture($user, $variationName);
     }
 
     /**

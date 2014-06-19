@@ -302,22 +302,8 @@ class CM_Model_Splittest extends CM_Model_Abstract {
     }
 
     /**
-     * @param string $splittestName
-     * @param mixed  $fixtureSource
-     * @param string $variationName
-     * @return bool
-     */
-    protected static function _isVariationFixtureStatic($splittestName, $fixtureSource, $variationName) {
-        $splittest = static::_getSplittest($splittestName);
-        if (!$splittest) {
-            return false;
-        }
-        return $splittest->isVariationFixture($fixtureSource, $variationName);
-    }
-
-    /**
-     * @param $name
-     * @return CM_Model_Splittest|null
+     * @param string $name
+     * @return static|null
      */
     protected static function _getSplittest($name) {
         if (!self::exists($name)) {
