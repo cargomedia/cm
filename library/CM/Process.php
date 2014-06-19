@@ -181,7 +181,6 @@ class CM_Process {
                         CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
                         usleep(self::RESPAWN_TIMEOUT * 1000000);
                         $callback = isset($this->_terminationCallbackList[$pid]) ? $this->_terminationCallbackList[$pid] : null;
-                        $callback = null;
                         $this->_fork($forkHandler->getWorkload(), $forkHandlerSequence, $callback);
                     }
                     $this->executeTerminationCallback($pid);
