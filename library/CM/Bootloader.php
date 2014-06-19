@@ -112,7 +112,7 @@ class CM_Bootloader {
         return array_keys($this->_getModulePaths());
     }
 
-    public function reloadNamespacePaths() {
+    public function reloadModulePaths() {
         $cacheKey = CM_CacheConst::Modules;
         $cache = new CM_Cache_Storage_Apc();
         $cache->delete($cacheKey);
