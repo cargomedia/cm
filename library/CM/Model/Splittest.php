@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Class CM_Model_Splittest
- * @method bool isVariationFixture($fixtureSource, $variationName)
- * @method setConversion($fixtureSource, $weight)
- */
 class CM_Model_Splittest extends CM_Model_Abstract {
 
     /** @var bool */

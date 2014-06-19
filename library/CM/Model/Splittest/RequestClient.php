@@ -46,6 +46,10 @@ class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
      * @param float|null          $weight
      */
     public static function setConversionStatic($splittestName, CM_Request_Abstract $request, $weight = null) {
-        static::_setConversionStatic($splittestName, $request, $weight);
+        /** @var CM_Model_Splittest_RequestClient $splittest */
+        $splittest = static::_getSplittest($splittestName);
+        if ($splittest) {
+            $splittest->setConversion($request, $weight);
+        }
     }
 }

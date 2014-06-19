@@ -40,6 +40,10 @@ class CM_Model_Splittest_User extends CM_Model_Splittest {
      * @param float|null    $weight
      */
     public static function setConversionStatic($splittestName, CM_Model_User $user, $weight = null) {
-        static::_setConversionStatic($splittestName, $user, $weight);
+        /** @var CM_Model_Splittest_User $splittest */
+        $splittest = static::_getSplittest($splittestName);
+        if ($splittest) {
+            $splittest->setConversion($user, $weight);
+        }
     }
 }
