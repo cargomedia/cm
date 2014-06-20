@@ -10,7 +10,7 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
         $site = $this->getMockSite('CM_Site_Abstract');
         $render = new CM_Frontend_Render($site);
         $layoutMock = $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
-        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock');
+        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
         $renderAdapter = new CM_RenderAdapter_Layout($render, $pageMock);
         $html = new CMTest_TH_Html($renderAdapter->fetch());
@@ -26,12 +26,12 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
 
         $serviceManager = CM_Service_Manager::getInstance();
         $serviceManager->unregister('kissmetrics');
-        $serviceManager->register('kissmetrics', 'CM_Service_KissMetrics', array('km123'));
+        $serviceManager->register('kissmetrics', 'CMService_KissMetrics_Client', array('km123'));
 
         $site = $this->getMockSite('CM_Site_Abstract', null, array('url' => 'http://www.example.com'));
         $render = new CM_Frontend_Render($site);
         $layoutMock = $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
-        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock');
+        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
         $renderAdapter = new CM_RenderAdapter_Layout($render, $pageMock);
         $html = new CMTest_TH_Html($renderAdapter->fetch());
@@ -51,7 +51,7 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
 
         $serviceManager = CM_Service_Manager::getInstance();
         $serviceManager->unregister('kissmetrics');
-        $serviceManager->register('kissmetrics', 'CM_Service_KissMetrics', array('km123'));
+        $serviceManager->register('kissmetrics', 'CMService_KissMetrics_Client', array('km123'));
 
         $site = $this->getMockSite('CM_Site_Abstract', null, array('url' => 'http://www.example.com'));
         $viewer = $this->getMock('CM_Model_User', array('getIdRaw', 'getVisible'));
@@ -60,7 +60,7 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
         /** @var CM_Model_User $viewer */
         $render = new CM_Frontend_Render($site, $viewer);
         $layoutMock = $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
-        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock');
+        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
         $renderAdapter = new CM_RenderAdapter_Layout($render, $pageMock);
         $html = new CMTest_TH_Html($renderAdapter->fetch());

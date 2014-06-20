@@ -155,7 +155,7 @@ class CM_Frontend_GlobalResponse {
         $html .= '});' . PHP_EOL;
         $html .= '</script>' . PHP_EOL;
         $html .= $this->getTracking()->getHtml($render->getEnvironment()->getSite());
-        /** @var CM_Service_KissMetrics $kissMetrics */
+        /** @var CMService_KissMetrics_Client $kissMetrics */
         $kissMetrics = CM_Service_Manager::getInstance()->get('kissmetrics');
         $kissMetrics->setViewer($render->getViewer());
         $html .= $kissMetrics->getHtml();

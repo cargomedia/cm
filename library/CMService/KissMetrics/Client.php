@@ -1,6 +1,6 @@
 <?php
 
-class CM_Service_KissMetrics {
+class CMService_KissMetrics_Client {
 
     /** @var string */
     protected $_code;
@@ -101,7 +101,7 @@ EOF;
         if (null === $propertyList) {
             $propertyList = array();
         }
-        $trackEventJob = new CM_Service_KissMetrics_TrackEventJob();
+        $trackEventJob = new CMService_KissMetrics_TrackEventJob();
         $trackEventJob->queue(array(
             'code'         => $this->_code,
             'userId'       => $this->_userId,
