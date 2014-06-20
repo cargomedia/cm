@@ -5,6 +5,9 @@ class CM_Clockwork_Manager {
     /** @var CM_Clockwork_Event[] */
     private $_events;
 
+    /** @var CM_Clockwork_Event[] */
+    private $_eventsRunning = array();
+
     /** @var CM_Clockwork_Persistence */
     private $_persistence;
 
@@ -34,23 +37,38 @@ class CM_Clockwork_Manager {
 
     public function start() {
         while (true) {
-            $this->runEvents();
+            $this->runEvents(true);
             sleep(1);
         }
     }
 
-    public function runEvents() {
+    public function runEvents($noWaitOnEventExecution = null) {
+        $process = CM_Process::getInstance();
+        if ($noWaitOnEventExecution) {
+            $process->listenForChildren();
+        }
+        $noWaitOnEventExecution = (boolean) $noWaitOnEventExecution;
         /** @var CM_Clockwork_Event[] $eventsToRun */
         $eventsToRun = array();
         foreach ($this->_events as $event) {
             $lastRuntime = $this->_persistence->getLastRunTime($event);
-            if ($event->shouldRun($lastRuntime)) {
+            if ($event->shouldRun($lastRuntime) && !$this->_isRunning($event)) {
                 $eventsToRun[] = $event;
             }
         }
         foreach ($eventsToRun as $event) {
-            $event->run();
-            $this->_persistence->setRuntime($event, $this->_getCurrentDateTime());
+            $this->_markRunning($event);
+            $process->fork(function () use ($event) {
+                $event->run();
+                return array('thisRun' => $this->_getCurrentDateTime(), 'nextRun' => $event->getNextRun());
+            }, function (CM_Process_WorkloadResult $result) use ($event) {
+                $this->_markStopped($event);
+                $event->setNextRun($result->getResult()['nextRun']);
+                $this->_persistence->setRuntime($event, $result->getResult()['thisRun']);
+            });
+        }
+        if (!$noWaitOnEventExecution) {
+            $process->waitForChildren();
         }
     }
 
@@ -63,5 +81,31 @@ class CM_Clockwork_Manager {
 
     protected function _getCurrentDateTime() {
         return new DateTime();
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     * @return boolean
+     */
+    protected function _isRunning(CM_Clockwork_Event $event) {
+        return array_key_exists($event->getName(), $this->_eventsRunning);
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     */
+    protected function _markStopped(CM_Clockwork_Event $event) {
+        if ($this->_isRunning($event)) {
+            unset($this->_eventsRunning[$event->getName()]);
+        }
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     */
+    protected function _markRunning(CM_Clockwork_Event $event) {
+        if (!$this->_isRunning($event)) {
+            $this->_eventsRunning[$event->getName()] = $event;
+        }
     }
 }

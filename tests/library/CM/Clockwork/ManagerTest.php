@@ -2,34 +2,51 @@
 
 class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
-    public function testRunEventsFor() {
-        $manager = new CM_Clockwork_Manager();
-        $counter = array(
-            '1'  => 0,
-            '2'  => 0,
-            '5'  => 0,
-            '60' => 0,
-        );
-        $currently = new DateTime();
-        $this->_createEvent($manager, $currently, new DateInterval('PT1S'), $counter, 'event1');
-        $this->_createEvent($manager, $currently, new DateInterval('PT2S'), $counter, 'event2');
-        $this->_createEvent($manager, $currently, new DateInterval('PT5S'), $counter, 'event3');
-        $this->_createEvent($manager, $currently, new DateInterval('PT60S'), $counter, 'event4');
+    /** @var resource */
+    public static $_file;
 
-        for ($i = 0; $i < 100; $i++) {
-            $currently->add(new DateInterval('PT1S'));
-            $manager->runEvents();
+    public static function setupBeforeClass() {
+        parent::setUpBeforeClass();
+        self::$_file = tmpfile();
+    }
+
+    public static function tearDownAfterClass() {
+        fclose(self::$_file);
+        parent::tearDownAfterClass();
+    }
+
+    public function testRunEventsFor() {
+        $currently = new DateTime();
+        $timeContainer = new DateTimeContainer();
+
+        $manager = $this->getMockBuilder('CM_Clockwork_Manager')->setMethods(array('_getCurrentDateTime'))->getMockForAbstractClass();
+        $manager->expects($this->any())->method('_getCurrentDateTime')->will($this->returnCallback(function() use ($currently) {
+            return $currently;
+        }));
+        /** @var CM_Clockwork_Manager $manager */
+
+        $this->_createEvent($manager, $timeContainer, $currently, new DateInterval('PT1S'), 'event1');
+        $this->_createEvent($manager, $timeContainer, $currently, new DateInterval('PT2S'), 'event2');
+        $this->_createEvent($manager, $timeContainer, $currently, new DateInterval('PT5S'), 'event3');
+        $this->_createEvent($manager, $timeContainer, $currently, new DateInterval('PT15S'), 'event4');
+
+        for($i = 1; $i <= 20; $i++) {
+            $manager->runEvents(true);
+            self::timeForward($currently, $timeContainer, 1);
+            usleep(100 * 1000);
         }
+        CM_Process::getInstance()->waitForChildren();
         $this->assertSame(array(
-            '1'  => 100,
-            '2'  => 50,
-            '5'  => 20,
-            '60' => 2,
-        ), $counter);
+            'event1'  => 20,
+            'event2'  => 10,
+            'event3'  => 4,
+            'event4' => 2,
+        ), $this->getCounter());
     }
 
     public function testRunEventsPersistence() {
         $currently = new DateTime();
+        $timeContainer = new DateTimeContainer();
         $context = 'foo';
         $adapter = $this->getMockBuilder('CM_Clockwork_PersistenceAdapter_Abstract')->disableOriginalConstructor()->setMethods(array('load', 'save'))
             ->getMockForAbstractClass();
@@ -47,18 +64,17 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager->expects($this->any())->method('_getCurrentDateTime')->will($this->returnCallback(function() use ($currently) {
             return $currently;
         }));
+        /** @var CM_Clockwork_Manager $manager */
         $manager->setPersistence(new CM_Clockwork_Persistence($context, $adapter));
-        $counter = array(
-            '1'  => 0,
-            '2'  => 0,
-        );
-        $this->_createEvent($manager, $currently, new DateInterval('PT1S'), $counter, 'event1');
-        $this->_createEvent($manager, $currently, new DateInterval('PT2S'), $counter, 'event2');
+        $this->_createEvent($manager, $timeContainer, $currently, new DateInterval('PT1S'), 'event1');
+        $this->_createEvent($manager, $timeContainer, $currently, new DateInterval('PT2S'), 'event2');
 
-        for ($i = 0; $i < 6; $i++) {
-            $currently->add(new DateInterval('PT1S'));
-            $manager->runEvents();
+        for ($i = 1; $i <= 6; $i++) {
+            self::timeForward($currently, $timeContainer, 1);
+            $manager->runEvents(true);
+            usleep(100 * 1000);
         }
+        CM_Process::getInstance()->waitForChildren();
     }
 
     /**
@@ -75,22 +91,91 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
     /**
      * @param CM_Clockwork_Manager $manager
-     * @param DateTime             $timeReference
+     * @param DateTimeContainer    $timeReferenceContainer
+     * @param DateTime             $start
      * @param DateInterval         $interval
-     * @param array                $counter
      * @param string               $name
      */
-    private function _createEvent(CM_Clockwork_Manager $manager, DateTime $timeReference, DateInterval $interval, &$counter, $name) {
-        $callback = function () use (&$counter, $interval) {
-            $key = $interval->s;
-            $counter[$key]++;
+    private function _createEvent(CM_Clockwork_Manager $manager, DateTimeContainer $timeReferenceContainer, DateTime $start, DateInterval $interval, $name) {
+        $callback = function () use ($name) {
+            CM_Clockwork_ManagerTest::incCounter($name);
         };
-        $event = $this->getMockBuilder('CM_Clockwork_Event')->setMethods(array('_getCurrentDateTime'))->setConstructorArgs(array($name, $interval, new DateTime()))->getMock();
-        $event->expects($this->any())->method('_getCurrentDateTime')->will($this->returnCallback(function () use ($timeReference) {
-            return clone $timeReference;
-        }));
-        /** @var CM_Clockwork_Event $event */
+        $event = new CM_Clockwork_EventMock($name, $interval, $start);
+        $event->setCurrentDateTime($timeReferenceContainer);
         $event->registerCallback($callback);
         $manager->registerEvent($event);
     }
+
+    protected static function timeForward(DateTime $time, DateTimeContainer $container, $secs) {
+        $time->add(new DateInterval('PT' . $secs . 'S'));
+        $container->setDate($time);
+    }
+
+    /**
+     * @param string $message
+     */
+    public static function writeln($message) {
+        print "$message\n";
+        fwrite(self::$_file, "$message\n");
+    }
+
+    public static function incCounter($name) {
+        fwrite(self::$_file, "$name\n");
+    }
+
+    public function getCounter() {
+        rewind(self::$_file);
+        $fileContent = fread(self::$_file, 8192);
+        //        return unserialize($fileContent);
+        $counter = array();
+        foreach (explode("\n", $fileContent) as $line) {
+            if (strlen($line)) {
+                $counter[$line] = isset($counter[$line]) ? $counter[$line] + 1 : 1;
+            }
+        }
+        ksort($counter);
+        return $counter;
+    }
 }
+
+class CM_Clockwork_EventMock extends CM_Clockwork_Event {
+
+    /** @var DateTimeContainer */
+    private $_container;
+
+    /**
+     * @param DateTimeContainer $container
+     */
+    public function setCurrentDateTime(DateTimeContainer $container) {
+        $this->_container = $container;
+    }
+
+    /**
+     * @return DateTime
+     */
+    protected function _getCurrentDateTime() {
+        return $this->_container->getDateTime();
+    }
+}
+
+class DateTimeContainer {
+
+    /** @var string */
+    private $_dateString;
+
+    /**
+     * @param DateTime $dateTime
+     */
+    public function setDate(DateTime $dateTime) {
+        $this->_dateString = $dateTime->format('Y-m-d H:i:s');
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getDateTime() {
+        return new DateTime($this->_dateString);
+    }
+}
+
+

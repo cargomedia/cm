@@ -38,6 +38,20 @@ class CM_Clockwork_Event {
     }
 
     /**
+     * @return DateTime|null
+     */
+    public function getNextRun() {
+        return clone $this->_nextRun;
+    }
+
+    /**
+     * @param DateTime $nextRun
+     */
+    public function setNextRun(DateTime $nextRun) {
+        $this->_nextRun = clone $nextRun;
+    }
+
+    /**
      * @param DateTime $lastRuntime
      * @return bool
      */
@@ -69,7 +83,7 @@ class CM_Clockwork_Event {
         }
         $nextRun = $this->_getCurrentDateTime();
         $nextRun->add($this->_interval);
-        $this->_nextRun = $nextRun;
+        $this->setNextRun($nextRun);
     }
 
     /**
