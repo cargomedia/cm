@@ -26,8 +26,8 @@ class smarty_function_viewTemplateTest extends CMTest_TestCase {
         $render->getGlobalResponse()->treeExpand($componentViewResponse);
         $render->getGlobalResponse()->treeExpand($formViewResponse);
 
-        $render->parseTemplateContent('{viewTemplate file="jar" bar="bar"}', ['foo' => 'foo']);
-        $render->parseTemplateContent('{viewTemplate view="CM_Component_Abstract" file="foo"}');
+        $render->parseTemplateContent('{viewTemplate name="jar" bar="bar"}', ['foo' => 'foo']);
+        $render->parseTemplateContent('{viewTemplate view="CM_Component_Abstract" name="foo"}');
 
         $this->assertSame(2, $method->getCallCount());
     }

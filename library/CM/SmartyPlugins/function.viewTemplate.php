@@ -13,8 +13,8 @@ function smarty_function_viewTemplate(array $params, Smarty_Internal_Template $t
         throw new CM_Exception_Invalid('Cannot find parent `CM_View_Abstract` view response.');
     }
 
-    $tplName = (string) $params['file'];
-    unset($params['file']);
+    $tplName = (string) $params['name'];
+    unset($params['name']);
     $variables = array_merge($template->getTemplateVars(), $params);
     return $render->fetchViewTemplate($viewResponse->getView(), $tplName, $variables);
 }
