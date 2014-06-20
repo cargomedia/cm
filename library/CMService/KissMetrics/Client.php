@@ -36,19 +36,7 @@ class CMService_KissMetrics_Client {
         $html = '<script type="text/javascript">';
         $html .= 'var _kmq = _kmq || [];';
         $html .= "var _kmk = _kmk || '" . $this->getCode() . "';";
-        $html .= $this->getJs();
-        $html .= '</script>';
-        return $html;
-    }
-
-    /**
-     * @return string
-     */
-    public function getJs() {
-        if (!$this->enabled()) {
-            return '';
-        }
-        $js = <<<EOF
+        $html .= <<<EOF
 function _kms(u) {
   setTimeout(function() {
     var d = document, f = d.getElementsByTagName('script')[0], s = d.createElement('script');
@@ -61,6 +49,19 @@ function _kms(u) {
 _kms('//i.kissmetrics.com/i.js');
 _kms('//doug1izaerwt3.cloudfront.net/' + _kmk + '.1.js');
 EOF;
+        $html .= $this->getJs();
+        $html .= '</script>';
+        return $html;
+    }
+
+    /**
+     * @return string
+     */
+    public function getJs() {
+        if (!$this->enabled()) {
+            return '';
+        }
+        $js = '';
         if (null !== $this->_userId) {
             $js .= "_kmq.push(['identify', " . $this->_userId . "]);";
         }

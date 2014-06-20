@@ -139,7 +139,9 @@ class CM_Frontend_GlobalResponse {
      * @return string
      */
     public function getJs() {
-        $operations = array_filter([$this->_getJs(), $this->getTracking()->getJs()]);
+        /** @var CMService_KissMetrics_Client $kissMetrics */
+        $kissMetrics = CM_Service_Manager::getInstance()->get('kissmetrics');
+        $operations = array_filter([$this->_getJs(), $this->getTracking()->getJs(), $kissMetrics->getJs()]);
         $code = implode(PHP_EOL, $operations);
         return $code;
     }
