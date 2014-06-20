@@ -78,14 +78,6 @@ EOF;
     }
 
     /**
-     * @param CM_Model_User|null $viewer
-     */
-    public function setViewer(CM_Model_User $viewer = null) {
-        $userId = $viewer ? $viewer->getId() : null;
-        $this->setUserId($userId);
-    }
-
-    /**
      * @param string     $event
      * @param array|null $propertyList
      * @throws CM_Exception_Invalid

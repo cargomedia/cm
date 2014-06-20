@@ -157,7 +157,7 @@ class CM_Frontend_GlobalResponse {
         $html .= $this->getTracking()->getHtml($render->getEnvironment()->getSite());
         /** @var CMService_KissMetrics_Client $kissMetrics */
         $kissMetrics = CM_Service_Manager::getInstance()->get('kissmetrics');
-        $kissMetrics->setViewer($render->getViewer());
+        $kissMetrics->setUserId($render->getViewer()->getId());
         $html .= $kissMetrics->getHtml();
         return $html;
     }

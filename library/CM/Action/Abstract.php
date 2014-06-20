@@ -384,7 +384,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         if ($this->_trackingEnabled && $this->getActor()) {
             /** @var CMService_KissMetrics_Client $kissMetrics */
             $kissMetrics = CM_Service_Manager::getInstance()->get('kissmetrics');
-            $kissMetrics->setViewer($this->getActor());
+            $kissMetrics->setUserId($this->getActor()->getId());
             $kissMetrics->track($this->_getTrackingEventName(), $this->_trackingPropertyList);
         }
     }
