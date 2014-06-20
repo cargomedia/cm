@@ -101,8 +101,12 @@ EOF;
         if (null === $propertyList) {
             $propertyList = array();
         }
-        KM::init($this->_code);
-        KM::identify($this->_userId);
-        KM::record($event, $propertyList);
+        $trackEventJob = new CM_Service_KissMetrics_TrackEventJob();
+        $trackEventJob->queue(array(
+            'code'         => $this->_code,
+            'userId'       => $this->_userId,
+            'event'        => $event,
+            'propertyList' => $propertyList,
+        ));
     }
 }
