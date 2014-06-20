@@ -18,12 +18,13 @@ class CM_Process {
     }
 
     /**
-     * @param int|null $pid
+     * @param int|null                                                   $pid
+     * @param CM_Process_WorkloadResult|CM_Process_WorkloadResult[]|null $workLoadResult
      */
-    public function executeTerminationCallback($pid = null) {
+    public function executeTerminationCallback($pid = null, $workLoadResult = null) {
         $pid = ($pid !== null) ? (int) $pid : 0;
         if (isset($this->_terminationCallbackList[$pid])) {
-            $this->_terminationCallbackList[$pid]();
+            $this->_terminationCallbackList[$pid]($workLoadResult);
             unset($this->_terminationCallbackList[$pid]);
         }
     }
@@ -183,11 +184,11 @@ class CM_Process {
                         $callback = isset($this->_terminationCallbackList[$pid]) ? $this->_terminationCallbackList[$pid] : null;
                         $this->_fork($forkHandler->getWorkload(), $forkHandlerSequence, $callback);
                     }
-                    $this->executeTerminationCallback($pid);
+                    $this->executeTerminationCallback($pid, $workloadResultList[$forkHandlerSequence]);
                 }
             } while (!empty($this->_forkHandlerList) && $pid > 0);
         }
-        $this->executeTerminationCallback();
+        $this->executeTerminationCallback(0, $workloadResultList);
 
         ksort($workloadResultList);
         return $workloadResultList;
