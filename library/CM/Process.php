@@ -49,6 +49,15 @@ class CM_Process {
     }
 
     /**
+     * @param int $processId
+     * @return bool
+     */
+    public function isRunning($processId) {
+        $processId = (int) $processId;
+        return (false !== posix_getsid($processId));
+    }
+
+    /**
      * @param int $signal
      */
     public function killChildren($signal) {
@@ -90,16 +99,6 @@ class CM_Process {
         ksort($workloadResultList);
         return $workloadResultList;
     }
-
-    /**
-     * @param int $processId
-     * @return bool
-     */
-    public function isRunning($processId) {
-        $processId = (int) $processId;
-        return (false !== posix_getsid($processId));
-    }
-
 
     /**
      * @return CM_Process
