@@ -86,11 +86,8 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
      * @return string
      */
     public function transform($text) {
-        $cacheKey = CM_CacheConst::Usertext . '_text:' . md5($text);
+        $cacheKey = $this->_getCacheKey($text);
         $cache = CM_Cache_Local::getInstance();
-        if (0 !== count($this->_getFilters())) {
-            $cacheKey .= '_filter:' . call_user_func_array(array($cache, 'key'), $this->_getFilters());
-        }
         if (($result = $cache->get($cacheKey)) === false) {
             $result = $text;
             foreach ($this->_getFilters() as $filter) {
@@ -99,6 +96,23 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
             $cache->set($cacheKey, $result);
         }
         return $result;
+    }
+
+    /**
+     * @param string $text
+     * @return string
+     */
+    protected function _getCacheKey($text) {
+        $cacheKey = CM_CacheConst::Usertext . '_text:' . md5($text);
+        $filterList = $this->_getFilters();
+        if (0 !== count($filterList)) {
+            $cacheKeyListFilter = array_map(function (CM_Usertext_Filter_Interface $filter) {
+                return $filter->getCacheKey();
+            }, $filterList);
+            $cache = CM_Cache_Local::getInstance();
+            $cacheKey .= '_filter:' . $cache->key($cacheKeyListFilter);
+        }
+        return $cacheKey;
     }
 
     private function _clearFilters() {

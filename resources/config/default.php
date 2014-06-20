@@ -42,14 +42,7 @@ return function (CM_Config_Node $config) {
         )),
     );
 
-    $config->CM_Db_Db->db = 'cm';
-    $config->CM_Db_Db->username = 'root';
-    $config->CM_Db_Db->password = '';
-    $config->CM_Db_Db->server = array('host' => 'localhost', 'port' => 3306);
-    $config->CM_Db_Db->serversRead = array();
-    $config->CM_Db_Db->serversReadEnabled = true;
     $config->CM_Db_Db->delayedEnabled = true;
-    $config->CM_Db_Db->reconnectTimeout = 300;
 
     $config->CM_Model_User->class = 'CM_Model_User';
 
@@ -103,6 +96,24 @@ return function (CM_Config_Node $config) {
     $config->CMService_Newrelic->appName = 'CM Application';
 
     $config->services = array();
+
+    $config->services['databases'] = array(
+        'class' => 'CM_Service_Databases',
+    );
+
+    $config->services['database-master'] = array(
+        'class'     => 'CM_Db_Client',
+        'arguments' => array(
+            array(
+                'host'             => 'localhost',
+                'port'             => 3306,
+                'username'         => 'root',
+                'password'         => '',
+                'db'               => 'cm',
+                'reconnectTimeout' => 300
+            )
+        )
+    );
 
     $config->services['MongoDb'] = array(
         'class'     => 'CM_Service_MongoDb',

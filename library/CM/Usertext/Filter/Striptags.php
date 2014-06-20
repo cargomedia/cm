@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Filter_Striptags implements CM_Usertext_Filter_Interface {
+class CM_Usertext_Filter_Striptags extends CM_Usertext_Filter_Abstract {
 
     /** @var string[] */
     private $_allowedTags;
@@ -10,6 +10,10 @@ class CM_Usertext_Filter_Striptags implements CM_Usertext_Filter_Interface {
      */
     function __construct($allowedTags = null) {
         $this->_allowedTags = (array) $allowedTags;
+    }
+
+    public function getCacheKey() {
+        return parent::getCacheKey() + array('_allowedTags' => $this->_allowedTags);
     }
 
     public function transform($text, CM_Frontend_Render $render) {

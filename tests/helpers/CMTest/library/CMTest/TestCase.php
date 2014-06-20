@@ -374,9 +374,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param string              $message
      * @param boolean             $ignoreCase
      * @param boolean             $checkForObjectIdentity
+     * @param bool                $checkForNonObjectIdentity
      * @throws CM_Exception_Invalid
      */
-    public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
+    public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
         if ($needle instanceof CM_Comparable) {
             if (!(is_array($haystack) || $haystack instanceof Traversable)) {
                 throw new CM_Exception_Invalid('Haystack is not traversable.');
@@ -390,7 +391,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             }
             self::assertTrue($match, 'Needle not contained.');
         } else {
-            parent::assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
+            parent::assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
         }
     }
 
@@ -400,9 +401,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param string              $message
      * @param boolean             $ignoreCase
      * @param boolean             $checkForObjectIdentity
+     * @param bool                $checkForNonObjectIdentity
      * @throws CM_Exception_Invalid
      */
-    public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
+    public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
         if ($needle instanceof CM_Comparable) {
             if (!(is_array($haystack) || $haystack instanceof Traversable)) {
                 throw new CM_Exception_Invalid('Haystack is not traversable.');
@@ -416,7 +418,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             }
             self::assertFalse($match, 'Needle contained.');
         } else {
-            parent::assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
+            parent::assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
         }
     }
 

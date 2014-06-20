@@ -150,4 +150,14 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $render = new CM_Frontend_Render();
         $this->assertNull($render->getViewer());
     }
+
+    public function testParseTemplateContent() {
+        $viewer = CM_Model_User::createStatic();
+        $render = new CM_Frontend_Render();
+        $render->getEnvironment()->setViewer($viewer);
+
+        $content = '{$viewer->getId()} {$foo} normal-text';
+        $expected = $viewer->getId() . ' bar normal-text';
+        $this->assertSame($expected, $render->parseTemplateContent($content, ['foo' => 'bar']));
+    }
 }
