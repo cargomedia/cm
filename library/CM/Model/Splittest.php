@@ -5,6 +5,9 @@ class CM_Model_Splittest extends CM_Model_Abstract {
     /** @var bool */
     private $_withoutPersistence;
 
+    /** @var array|null */
+    private $_variationWeightList;
+
     /**
      * @param string $name
      */
@@ -72,6 +75,38 @@ class CM_Model_Splittest extends CM_Model_Abstract {
             throw new CM_Exception('Splittest `' . $this->getId() . '` has no variations');
         }
         return $variationBest;
+    }
+
+    /**
+     * @param array $variationWeightList
+     * @throws CM_Exception_Invalid
+     */
+    public function setVariationWeightList(array $variationWeightList) {
+        if ($this->_withoutPersistence) {
+            return;
+        }
+        if (empty($variationWeightList)) {
+            throw new CM_Exception_Invalid('Empty variation weight list');
+        }
+        $variationList = $this->getVariations();
+        $this->_variationWeightList = array();
+        foreach ($variationWeightList as $variationName => $variationWeight) {
+            $variationName = (string) $variationName;
+            $variationWeight = (float) $variationWeight;
+            $variation = $variationList->findByName($variationName);
+            if (!$variation) {
+                throw new CM_Exception_Invalid('There is no variation `' . $variationName . '` in split test `' . $this->getName() . '`');
+            }
+            if ($variationWeight < 0) {
+                throw new CM_Exception_Invalid('Split test variation weight `' . $variationWeight . '` should be positive');
+            }
+            if ($variation->getEnabled() && ($variationWeight > 0)) {
+                $this->_variationWeightList[$variationName] = $variationWeight;
+            }
+        }
+        if (empty($this->_variationWeightList)) {
+            throw new CM_Exception_Invalid('At least one enabled split test variation should have a positive weight');
+        }
     }
 
     public function flush() {
@@ -200,10 +235,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
         }
 
         if (!array_key_exists($this->getId(), $variationFixtureList)) {
-            $variation = $this->getVariationsEnabled()->getItemRand();
-            if (!$variation) {
-                throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
-            }
+            $variation = $this->_getVariationRandom();
             CM_Db_Db::replace('cm_splittestVariation_fixture',
                 array('splittestId' => $this->getId(), $columnId => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
             $variationFixtureList[$this->getId()] = $variation->getName();
@@ -215,5 +247,36 @@ class CM_Model_Splittest extends CM_Model_Abstract {
         }
 
         return $variationFixtureList[$this->getId()];
+    }
+
+    /**
+     * @throws CM_Exception_Invalid
+     * @return CM_Model_SplittestVariation
+     */
+    protected function _getVariationRandom() {
+        if (!isset($this->_variationWeightList)) {
+            $variation = $this->getVariationsEnabled()->getItemRand();
+        } else {
+            $variationList = array();
+            $variationWeightList = array();
+            /** @var CM_Model_SplittestVariation $variation */
+            foreach ($this->getVariationsEnabled()->getItems() as $variation) {
+                $variationName = $variation->getName();
+                if (isset($this->_variationWeightList[$variationName])) {
+                    $variationList[] = $variation;
+                    $variationWeightList[] = $this->_variationWeightList[$variationName];
+                }
+            }
+            if (empty($variationList)) {
+                $variation = null;
+            } else {
+                $weightedRandom = new CM_WeightedRandom($variationList, $variationWeightList);
+                $variation = $weightedRandom->lookup();
+            }
+        }
+        if (!$variation) {
+            throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
+        }
+        return $variation;
     }
 }

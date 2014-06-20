@@ -3,18 +3,26 @@
 class CM_Db_ClientTest extends CMTest_TestCase {
 
     public function testConstruct() {
-        $config = CM_Config::get()->CM_Db_Db;
-        $client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password);
+        $config = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getConfig();
+        unset($config['db']);
+        $client = new CM_Db_Client($config);
+        $this->assertFalse($client->isConnected());
+        $client->connect();
         $this->assertTrue($client->isConnected());
     }
 
     public function testConstructSelectDb() {
-        $config = CM_Config::get()->CM_Db_Db;
-        $client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
+        $config = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getConfig();
+        $client = new CM_Db_Client($config);
+        $this->assertFalse($client->isConnected());
+        $client->connect();
         $this->assertTrue($client->isConnected());
 
+        $config = $client->getConfig();
+        $config['db'] = 'nonexistent';
+        $client = new CM_Db_Client($config);
         try {
-            new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, 'nonexistent');
+            $client->connect();
             $this->fail('Could select nonexistent DB');
         } catch (CM_Db_Exception $e) {
             $this->assertContains('nonexistent', $e->getMessage());
@@ -22,8 +30,11 @@ class CM_Db_ClientTest extends CMTest_TestCase {
     }
 
     public function testConnectDisconnect() {
-        $config = CM_Config::get()->CM_Db_Db;
-        $client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password);
+        $config = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getConfig();
+        unset($config['db']);
+        $client = new CM_Db_Client($config);
+        $this->assertFalse($client->isConnected());
+        $client->connect();
         $this->assertTrue($client->isConnected());
 
         $client->disconnect();
@@ -38,8 +49,7 @@ class CM_Db_ClientTest extends CMTest_TestCase {
     }
 
     public function testGetLastInsertId() {
-        $config = CM_Config::get()->CM_Db_Db;
-        $client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
+        $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
         $client->createStatement('CREATE TABLE `test` (`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`))')->execute();
         $this->assertSame(null, $client->getLastInsertId());
 
@@ -50,8 +60,10 @@ class CM_Db_ClientTest extends CMTest_TestCase {
     }
 
     public function testReconnectTimeout() {
-        $config = CM_Config::get()->CM_Db_Db;
-        $client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db, 5);
+        $config = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getConfig();
+        $config['reconnectTimeout'] = 5;
+        $client = new CM_Db_Client($config);
+        $client->connect();
         $firstTime = $client->getLastConnect();
         $timeForward = 100;
         CMTest_TH::timeForward($timeForward);

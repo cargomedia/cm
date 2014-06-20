@@ -4,17 +4,20 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
      * @param string|null $indexName
+     * @param bool|null   $skipIfExist
      */
-    public function create($indexName = null) {
+    public function create($indexName = null, $skipIfExist = null) {
         if (null !== $indexName) {
             $indexes = array($this->_getIndex($indexName));
         } else {
             $indexes = $this->_getIndexes();
         }
         foreach ($indexes as $index) {
-            $this->_getStreamError()->writeln('Creating index `' . $index->getIndex()->getName() . '`...');
-            $index->createVersioned();
-            $index->getIndex()->refresh();
+            if (!$index->getIndex()->exists() || !$skipIfExist) {
+                $this->_getStreamError()->writeln('Creating elasticsearch index `' . $index->getIndex()->getName() . '`…');
+                $index->createVersioned();
+                $index->getIndex()->refresh();
+            }
         }
     }
 
@@ -33,7 +36,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
             $indexes = $this->_getIndexes($host, $port);
         }
         foreach ($indexes as $index) {
-            $this->_getStreamError()->writeln('Updating index `' . $index->getIndex()->getName() . '`...');
+            $this->_getStreamError()->writeln('Updating elasticsearch index `' . $index->getIndex()->getName() . '`...');
             $indexName = $index->getIndex()->getName();
             $key = 'Search.Updates_' . $index->getType()->getName();
             try {
@@ -65,7 +68,10 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
             $indexes = $this->_getIndexes();
         }
         foreach ($indexes as $index) {
-            $index->getIndex()->delete();
+            if ($index->getIndex()->exists()) {
+                $this->_getOutput()->writeln('Deleting elasticsearch index `' . $index->getIndex()->getName() . '`…');
+                $index->getIndex()->delete();
+            }
         }
     }
 

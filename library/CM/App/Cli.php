@@ -7,6 +7,8 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         $this->setupFilesystem();
         $this->_getStreamError()->writeln('Setting up database…');
         $this->setupDatabase();
+        $this->_getStreamError()->writeln('Setting up elasticsearch indexes…');
+        $this->setupElasticsearch();
         $this->_getStreamError()->writeln('Setting up translations…');
         $this->setupTranslations();
     }
@@ -17,6 +19,11 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 
     public function setupDatabase() {
         CM_App::getInstance()->setupDatabase();
+    }
+
+    public function setupElasticsearch() {
+        $searchCli = new CM_Elasticsearch_Index_Cli($this->_getInput(), $this->_getOutput());
+        $searchCli->create(null, true);
     }
 
     public function setupTranslations() {
