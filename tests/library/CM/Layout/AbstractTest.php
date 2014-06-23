@@ -4,6 +4,11 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearConfig();
+        $serviceManager = CM_Service_Manager::getInstance();
+        $serviceManager->unregister('tracking-googleanalytics');
+        $serviceManager->registerWithArray('tracking-googleanalytics', CM_Config::get()->services['tracking-googleanalytics']);
+        $serviceManager->unregister('tracking-kissmetrics');
+        $serviceManager->registerWithArray('tracking-kissmetrics', CM_Config::get()->services['tracking-kissmetrics']);
     }
 
     public function testTrackingDisabled() {
@@ -20,13 +25,13 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
     }
 
     public function testTrackingGuest() {
-        $config = CM_Config::get();
-        $config->CM_Tracking_Abstract->enabled = true;
-        $config->CM_Tracking_Abstract->code = 'ga123';
+        $serviceManager = CM_Service_Manager::getInstance();
+        $serviceManager->unregister('tracking-googleanalytics');
+        $serviceManager->register('tracking-googleanalytics', 'CMService_GoogleAnalytics_Client', array('ga123'));
 
         $serviceManager = CM_Service_Manager::getInstance();
-        $serviceManager->unregister('kissmetrics');
-        $serviceManager->register('kissmetrics', 'CMService_KissMetrics_Client', array('km123'));
+        $serviceManager->unregister('tracking-kissmetrics');
+        $serviceManager->register('tracking-kissmetrics', 'CMService_KissMetrics_Client', array('km123'));
 
         $site = $this->getMockSite('CM_Site_Abstract', null, array('url' => 'http://www.example.com'));
         $render = new CM_Frontend_Render($site);
@@ -45,13 +50,13 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
     }
 
     public function testTrackingViewer() {
-        $config = CM_Config::get();
-        $config->CM_Tracking_Abstract->enabled = true;
-        $config->CM_Tracking_Abstract->code = 'ga123';
+        $serviceManager = CM_Service_Manager::getInstance();
+        $serviceManager->unregister('tracking-googleanalytics');
+        $serviceManager->register('tracking-googleanalytics', 'CMService_GoogleAnalytics_Client', array('ga123'));
 
         $serviceManager = CM_Service_Manager::getInstance();
-        $serviceManager->unregister('kissmetrics');
-        $serviceManager->register('kissmetrics', 'CMService_KissMetrics_Client', array('km123'));
+        $serviceManager->unregister('tracking-kissmetrics');
+        $serviceManager->register('tracking-kissmetrics', 'CMService_KissMetrics_Client', array('km123'));
 
         $site = $this->getMockSite('CM_Site_Abstract', null, array('url' => 'http://www.example.com'));
         $viewer = $this->getMock('CM_Model_User', array('getIdRaw', 'getVisible'));

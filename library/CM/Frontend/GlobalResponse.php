@@ -20,9 +20,6 @@ class CM_Frontend_GlobalResponse {
     /** @var CM_Frontend_JavascriptContainer */
     protected $_onloadReadyJs;
 
-    /** @var CM_Tracking_Abstract|null */
-    private $_tracking;
-
     public function __construct() {
         $this->_onloadHeaderJs = new CM_Frontend_JavascriptContainer();
         $this->_onloadPrepareJs = new CM_Frontend_JavascriptContainer();
@@ -98,16 +95,6 @@ class CM_Frontend_GlobalResponse {
     }
 
     /**
-     * @return CM_Tracking_Abstract
-     */
-    public function getTracking() {
-        if (null === $this->_tracking) {
-            $this->_tracking = CM_Tracking_Abstract::factory();
-        }
-        return $this->_tracking;
-    }
-
-    /**
      * @return CM_Frontend_JavascriptContainer
      */
     public function getOnloadHeaderJs() {
@@ -139,9 +126,9 @@ class CM_Frontend_GlobalResponse {
      * @return string
      */
     public function getJs() {
-        /** @var CMService_KissMetrics_Client $kissMetrics */
-        $kissMetrics = CM_Service_Manager::getInstance()->get('kissmetrics');
-        $operations = array_filter([$this->_getJs(), $this->getTracking()->getJs(), $kissMetrics->getJs()]);
+        /** @var CM_Service_Trackings $trackings */
+        $trackings = CM_Service_Manager::getInstance()->get('trackings');
+        $operations = array_filter([$this->_getJs(), $trackings->getJs()]);
         $code = implode(PHP_EOL, $operations);
         return $code;
     }
@@ -156,11 +143,17 @@ class CM_Frontend_GlobalResponse {
         $html .= $this->_getJs();
         $html .= '});' . PHP_EOL;
         $html .= '</script>' . PHP_EOL;
-        $html .= $this->getTracking()->getHtml($render->getEnvironment()->getSite());
+        /** @var CMService_GoogleAnalytics_Client $googleAnalytics */
+        $googleAnalytics = CM_Service_Manager::getInstance()->get('tracking-googleanalytics');
+        $googleAnalytics->setSite($render->getEnvironment()->getSite());
         /** @var CMService_KissMetrics_Client $kissMetrics */
-        $kissMetrics = CM_Service_Manager::getInstance()->get('kissmetrics');
-        $kissMetrics->setUserId($render->getViewer()->getId());
-        $html .= $kissMetrics->getHtml();
+        $kissMetrics = CM_Service_Manager::getInstance()->get('tracking-kissmetrics');
+        if ($viewer = $render->getViewer()) {
+            $kissMetrics->setUserId($viewer->getId());
+        }
+        /** @var CM_Service_Trackings $trackings */
+        $trackings = CM_Service_Manager::getInstance()->get('trackings');
+        $html .= $trackings->getHtml();
         return $html;
     }
 
