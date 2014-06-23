@@ -8,10 +8,6 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Site_Abstract->class = null;
 
-    $config->CM_Tracking_Abstract->class = 'CM_Tracking';
-    $config->CM_Tracking_Abstract->enabled = false;
-    $config->CM_Tracking_Abstract->code = '';
-
     $config->CM_Splittesting_Abstract->enabled = false;
 
     $config->CM_Elasticsearch_Client->enabled = true;
@@ -162,7 +158,20 @@ return function (CM_Config_Node $config) {
         ))
     );
 
-    $config->services['kissmetrics'] = array(
+    $config->services['trackings'] = array(
+        'class'     => 'CM_Service_Trackings',
+        'arguments' => array(array(
+            'tracking-googleanalytics',
+            'tracking-kissmetrics',
+        ))
+    );
+
+    $config->services['tracking-googleanalytics'] = array(
+        'class'     => 'CMService_GoogleAnalytics_Client',
+        'arguments' => array('')
+    );
+
+    $config->services['tracking-kissmetrics'] = array(
         'class'     => 'CMService_KissMetrics_Client',
         'arguments' => array('')
     );
