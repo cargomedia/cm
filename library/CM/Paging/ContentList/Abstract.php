@@ -56,8 +56,16 @@ abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract impleme
      * @param int $type
      * @return CM_Paging_ContentList_Abstract
      */
-    static public function factory($type) {
+    public static function factory($type) {
         $className = self::_getClassName($type);
         return new $className();
+    }
+
+    public function toArray() {
+        return array('type' => static::getTypeStatic());
+    }
+
+    public static function fromArray(array $array) {
+        return static::factory($array['type']);
     }
 }
