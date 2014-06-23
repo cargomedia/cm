@@ -168,6 +168,13 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     }
 
     /**
+     * @return array
+     */
+    public function getTrackingPropertyList() {
+        return $this->_trackingPropertyList;
+    }
+
+    /**
      * @return int
      */
     public function getVerb() {
@@ -357,20 +364,13 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
      * @return string
      */
     public function getLabel() {
-        return $this->getName() . ' ' . $this->getVerbName();
+        $actionName = CM_Util::uncamelize(str_replace('_', '', preg_replace('#\\A[^_]++_[^_]++_#', '', get_called_class())), ' ');
+        $verbName = str_replace('_', ' ', $this->getVerbName());
+        return ucfirst(strtolower($actionName . ' ' . $verbName));
     }
 
     protected function _disableTracking() {
         $this->_trackingEnabled = false;
-    }
-
-    /**
-     * @return string
-     */
-    protected function _getTrackingEventName() {
-        $actionName = CM_Util::uncamelize(str_replace('_', '', preg_replace('#\\A[^_]++_[^_]++_#', '', get_called_class())), ' ');
-        $verbName = str_replace('_', ' ', $this->getVerbName());
-        return strtolower($actionName . ' ' . $verbName);
     }
 
     /**
@@ -384,8 +384,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         if ($this->_trackingEnabled && $this->getActor()) {
             /** @var CMService_KissMetrics_Client $kissMetrics */
             $kissMetrics = CM_Service_Manager::getInstance()->get('kissmetrics');
-            $kissMetrics->setUserId($this->getActor()->getId());
-            $kissMetrics->track($this->_getTrackingEventName(), $this->_trackingPropertyList);
+            $kissMetrics->track($this);
         }
     }
 

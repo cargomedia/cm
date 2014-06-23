@@ -127,10 +127,11 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         $this->assertSame(1, $transgressionList->getCount());
     }
 
-    public function testGetTrackingEventName() {
-        $user = CMTest_TH::createUser();
-        $action = new CM_Action_Email(CM_Action_Abstract::VIEW, $user);
-        $method = CMTest_TH::getProtectedMethod('CM_Action_Email', '_getTrackingEventName');
-        $this->assertSame('email view', $method->invoke($action));
+    public function testGetLabel() {
+        $userMock = $this->getMock('CM_Model_User');
+        $actionMock = $this->getMockForAbstractClass('CM_Action_Abstract',
+            array(CM_Action_Abstract::VIEW, $userMock), 'CM_Action_EmailNotification_Reminder');
+        /** @var CM_Action_Abstract $actionMock */
+        $this->assertSame('Email notification reminder view', $actionMock->getLabel());
     }
 }

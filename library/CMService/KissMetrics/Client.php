@@ -79,27 +79,25 @@ EOF;
     }
 
     /**
-     * @param string     $event
-     * @param array|null $propertyList
-     * @throws CM_Exception_Invalid
+     * @param CM_Action_Abstract $action
      */
-    public function track($event, array $propertyList = null) {
+    public function track(CM_Action_Abstract $action) {
         if (!$this->enabled()) {
             return;
         }
         if (null === $this->_userId) {
-            throw new CM_Exception_Invalid('Cannot track event without a user id');
-        }
-        $event = (string) $event;
-        if (null === $propertyList) {
-            $propertyList = array();
+            if ($actor = $action->getActor()) {
+                $this->setUserId($actor->getId());
+            } else {
+                return;
+            }
         }
         $trackEventJob = new CMService_KissMetrics_TrackEventJob();
         $trackEventJob->queue(array(
             'code'         => $this->_code,
             'userId'       => $this->_userId,
-            'event'        => $event,
-            'propertyList' => $propertyList,
+            'event'        => $action->getLabel(),
+            'propertyList' => $action->getTrackingPropertyList(),
         ));
     }
 }
