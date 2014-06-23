@@ -3,7 +3,6 @@
 class CM_Layout_AbstractTest extends CMTest_TestCase {
 
     public function tearDown() {
-        CMTest_TH::clearConfig();
         $serviceManager = CM_Service_Manager::getInstance();
         $serviceManager->unregister('tracking-googleanalytics');
         $serviceManager->registerWithArray('tracking-googleanalytics', CM_Config::get()->services['tracking-googleanalytics']);
