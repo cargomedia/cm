@@ -1,13 +1,16 @@
 <?php
 
-class CM_Frontend_JavascriptContainer_View  extends CM_Frontend_JavascriptContainer {
+class CM_Frontend_JavascriptContainer_View extends CM_Frontend_JavascriptContainer {
 
     /**
      * @param string $name
      * @param mixed  $value
      */
     public function setProperty($name, $value) {
-        $this->append("this.{$name} = " . CM_Params::encode($value, true) . ';');
+        $encodedValue = CM_Params::encode($value, true);
+        if (null !== $encodedValue) {
+            $this->append("this.{$name} = " . $encodedValue . ';');
+        }
     }
 
     /**
