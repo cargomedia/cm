@@ -52,6 +52,10 @@ abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract impleme
         return false;
     }
 
+    public function toArray() {
+        return array('type' => static::getTypeStatic());
+    }
+
     /**
      * @param int $type
      * @return CM_Paging_ContentList_Abstract
@@ -59,10 +63,6 @@ abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract impleme
     public static function factory($type) {
         $className = self::_getClassName($type);
         return new $className();
-    }
-
-    public function toArray() {
-        return array('type' => static::getTypeStatic());
     }
 
     public static function fromArray(array $array) {
