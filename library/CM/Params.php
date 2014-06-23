@@ -467,9 +467,6 @@ class CM_Params extends CM_Class_Abstract {
     public static function encode($value, $json = null) {
         if (is_array($value)) {
             $value = array_map('self::encode', $value);
-            $value = array_filter($value, function ($element) {
-                return null !== $element;
-            });
         }
         if ($value instanceof CM_ArrayConvertible) {
             $array = $value->toArray();
@@ -478,7 +475,7 @@ class CM_Params extends CM_Class_Abstract {
         }
         if ($json) {
             if (is_object($value)) {
-                return null;
+                return 'null';
             }
             $value = json_encode($value);
             if (json_last_error() > 0) {
