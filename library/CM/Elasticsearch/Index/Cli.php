@@ -69,7 +69,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
         }
         foreach ($indexes as $index) {
             if ($index->getIndex()->exists()) {
-                $this->_getOutput()->writeln('Deleting elasticsearch index `' . $index->getIndex()->getName() . '`…');
+                $this->_getStreamError()->writeln('Deleting elasticsearch index `' . $index->getIndex()->getName() . '`…');
                 $index->getIndex()->delete();
             }
         }
