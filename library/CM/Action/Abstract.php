@@ -365,8 +365,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
      */
     public function getLabel() {
         $actionName = CM_Util::uncamelize(str_replace('_', '', preg_replace('#\\A[^_]++_[^_]++_#', '', get_called_class())), ' ');
-        $verbName = str_replace('_', ' ', $this->getVerbName());
-        return ucfirst(strtolower($actionName . ' ' . $verbName));
+        $verbName = strtolower(str_replace('_', ' ', $this->getVerbName()));
+        return ucwords($actionName . ' ' . $verbName);
     }
 
     protected function _disableTracking() {
@@ -381,10 +381,10 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     }
 
     protected function _track() {
-        if ($this->_trackingEnabled && $this->getActor()) {
-            /** @var CMService_KissMetrics_Client $kissMetrics */
-            $kissMetrics = CM_Service_Manager::getInstance()->get('kissmetrics');
-            $kissMetrics->track($this);
+        if ($this->_trackingEnabled) {
+            /** @var CM_Service_Trackings $trackings */
+            $trackings = CM_Service_Manager::getInstance()->get('trackings');
+            $trackings->track($this);
         }
     }
 
