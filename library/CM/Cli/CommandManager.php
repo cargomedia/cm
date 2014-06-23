@@ -121,7 +121,7 @@ class CM_Cli_CommandManager {
         foreach ($result->fetchAll() as $row) {
             $commandName = $row['commandName'];
             $processId = (int) $row['processId'];
-            if ($process::isRunning($processId)) {
+            if ($process->isRunning($processId)) {
                 CM_Db_Db::update('cm_cli_command_manager_process', array('timeoutStamp' => $timeoutStamp), array('commandName' => $commandName));
             } else {
                 CM_Db_Db::delete('cm_cli_command_manager_process', array('commandName' => $commandName));

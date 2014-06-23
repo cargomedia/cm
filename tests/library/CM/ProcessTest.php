@@ -1,5 +1,7 @@
 <?php
 
+require_once dirname(dirname(__DIR__)) . '/bootstrap.php'; // Bootstrap the test explicitly when running in a separate process
+
 class CM_ProcessTest extends CMTest_TestCase {
 
     /** @var resource */
@@ -13,11 +15,6 @@ class CM_ProcessTest extends CMTest_TestCase {
     public static function tearDownAfterClass() {
         fclose(self::$_file);
         parent::tearDownAfterClass();
-    }
-
-    public function runBare() {
-        require_once dirname(dirname(__DIR__)) . '/bootstrap.php'; // Bootstrap the test explicitly when running in a separate process
-        parent::runBare();
     }
 
     /**
