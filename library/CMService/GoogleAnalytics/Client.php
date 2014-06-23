@@ -1,6 +1,6 @@
 <?php
 
-class CMService_GoogleAnalytics_Client extends CM_Service_Tracking_Abstract {
+class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInterface {
 
     /** @var string */
     protected $_code;

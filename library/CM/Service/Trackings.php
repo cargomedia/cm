@@ -1,6 +1,6 @@
 <?php
 
-class CM_Service_Trackings extends CM_Service_Tracking_Abstract {
+class CM_Service_Trackings implements CM_Service_Tracking_ClientInterface {
 
     /** @var string[] */
     protected $_trackingServiceList;
@@ -35,7 +35,7 @@ class CM_Service_Trackings extends CM_Service_Tracking_Abstract {
     }
 
     /**
-     * @return CM_Service_Tracking_Abstract[]
+     * @return CM_Service_Tracking_ClientInterface[]
      */
     protected function _getTrackingServiceList() {
         return array_map(function ($trackingService) {
