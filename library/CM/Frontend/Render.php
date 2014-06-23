@@ -123,7 +123,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
         }
 
         if ($needed) {
-            throw new CM_Exception_Invalid('Cannot find `' . $template . '` in namespaces `' . implode('`, `', $moduleList) . '` and themes `' .
+            throw new CM_Exception_Invalid('Cannot find `' . $template . '` in modules `' . implode('`, `', $moduleList) . '` and themes `' .
                 implode('`, `', $this->getSite()->getThemes()) . '`');
         }
         return null;
