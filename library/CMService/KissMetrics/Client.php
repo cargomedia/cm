@@ -1,6 +1,6 @@
 <?php
 
-class CMService_KissMetrics_Client {
+class CMService_KissMetrics_Client extends CM_Service_Tracking_Abstract {
 
     /** @var string */
     protected $_code;
@@ -19,7 +19,7 @@ class CMService_KissMetrics_Client {
      * @return boolean
      */
     public function enabled() {
-        return '' !== $this->_code;
+        return '' !== $this->getCode();
     }
 
     /**
@@ -62,10 +62,17 @@ EOF;
             return '';
         }
         $js = '';
-        if (null !== $this->_userId) {
-            $js .= "_kmq.push(['identify', " . $this->_userId . "]);";
+        if (null !== $this->getUserId()) {
+            $js .= "_kmq.push(['identify', " . $this->getUserId() . "]);";
         }
         return $js;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getUserId() {
+        return $this->_userId;
     }
 
     /**
@@ -85,7 +92,7 @@ EOF;
         if (!$this->enabled()) {
             return;
         }
-        if (null === $this->_userId) {
+        if (null === $this->getUserId()) {
             if ($actor = $action->getActor()) {
                 $this->setUserId($actor->getId());
             } else {
@@ -94,8 +101,8 @@ EOF;
         }
         $trackEventJob = new CMService_KissMetrics_TrackEventJob();
         $trackEventJob->queue(array(
-            'code'         => $this->_code,
-            'userId'       => $this->_userId,
+            'code'         => $this->getCode(),
+            'userId'       => $this->getUserId(),
             'event'        => $action->getLabel(),
             'propertyList' => $action->getTrackingPropertyList(),
         ));
