@@ -22,7 +22,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public function setupElasticsearch() {
-        $searchCli = new CM_Elasticsearch_Index_Cli($this->_getInput(), $this->_getOutput());
+        $searchCli = new CM_Elasticsearch_Index_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
         $searchCli->create(null, true);
     }
 
