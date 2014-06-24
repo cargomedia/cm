@@ -6,7 +6,6 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
     private $_test;
 
     public function setUp() {
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
         $this->_test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
     }
 

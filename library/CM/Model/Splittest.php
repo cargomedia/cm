@@ -2,9 +2,6 @@
 
 class CM_Model_Splittest extends CM_Model_Abstract {
 
-    /** @var bool */
-    private $_withoutPersistence;
-
     /** @var array|null */
     private $_variationWeightList;
 
@@ -12,7 +9,6 @@ class CM_Model_Splittest extends CM_Model_Abstract {
      * @param string $name
      */
     public function __construct($name) {
-        $this->_withoutPersistence = !empty(self::_getConfig()->withoutPersistence);
         $this->_construct(array('name' => $name));
     }
 
@@ -82,9 +78,6 @@ class CM_Model_Splittest extends CM_Model_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function setVariationWeightList(array $variationWeightList) {
-        if ($this->_withoutPersistence) {
-            return;
-        }
         if (empty($variationWeightList)) {
             throw new CM_Exception_Invalid('Empty variation weight list');
         }
@@ -128,9 +121,6 @@ class CM_Model_Splittest extends CM_Model_Abstract {
     }
 
     protected function _loadData() {
-        if ($this->_withoutPersistence) {
-            return array('createStamp' => 0);
-        }
         $data = CM_Db_Db::select('cm_splittest', '*', array('name' => $this->getName()))->fetch();
         if ($data) {
             $data['variations'] = CM_Db_Db::select('cm_splittestVariation',
@@ -160,18 +150,18 @@ class CM_Model_Splittest extends CM_Model_Abstract {
     }
 
     protected function _onDeleteBefore() {
-        if ($this->_withoutPersistence) {
-            return;
-        }
         CM_Db_Db::delete('cm_splittestVariation', array('splittestId' => $this->getId()));
         CM_Db_Db::delete('cm_splittestVariation_fixture', array('splittestId' => $this->getId()));
     }
 
     protected function _onDelete() {
-        if ($this->_withoutPersistence) {
-            return;
-        }
         CM_Db_Db::delete('cm_splittest', array('id' => $this->getId()));
+    }
+
+    protected function _getContainingCacheables() {
+        $containingCacheables = parent::_getContainingCacheables();
+        $containingCacheables[] = new CM_Paging_Splittest_All();
+        return $containingCacheables;
     }
 
     /**
@@ -180,9 +170,6 @@ class CM_Model_Splittest extends CM_Model_Abstract {
      * @throws CM_Exception_Invalid
      */
     protected function _setConversion(CM_Splittest_Fixture $fixture, $weight = null) {
-        if ($this->_withoutPersistence) {
-            return;
-        }
         if (null === $weight) {
             $weight = 1;
         }
@@ -204,9 +191,6 @@ class CM_Model_Splittest extends CM_Model_Abstract {
      * @return bool
      */
     protected function _isVariationFixture(CM_Splittest_Fixture $fixture, $variationName) {
-        if ($this->_withoutPersistence) {
-            return false;
-        }
         return ($variationName == $this->_getVariationFixture($fixture));
     }
 
@@ -216,9 +200,6 @@ class CM_Model_Splittest extends CM_Model_Abstract {
      * @return string
      */
     protected function _getVariationFixture(CM_Splittest_Fixture $fixture) {
-        if ($this->_withoutPersistence) {
-            return '';
-        }
         $columnId = $fixture->getColumnId();
         $fixtureId = $fixture->getId();
 
@@ -278,5 +259,35 @@ class CM_Model_Splittest extends CM_Model_Abstract {
             throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
         }
         return $variation;
+    }
+
+    /**
+     * @param string   $name
+     * @param string[] $variations
+     * @return static
+     */
+    public static function create($name, array $variations) {
+        return static::createStatic(['name' => (string) $name, 'variations' => (array) $variations]);
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public static function exists($name) {
+        $paging = new CM_Paging_Splittest_All();
+        return $paging->contains($name);
+    }
+
+    /**
+     * @param string $name
+     * @return static|null
+     */
+    protected static function _getSplittest($name) {
+        if (!self::exists($name)) {
+            return null;
+        }
+        $className = get_called_class();
+        return new $className($name);
     }
 }

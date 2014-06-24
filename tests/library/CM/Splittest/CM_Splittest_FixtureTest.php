@@ -37,8 +37,6 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
     }
 
     public function testSetUserForRequestClient_userGetsFirstRequestClientVariation() {
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
-
         /** @var CM_Model_Splittest_RequestClient_Mock $splittestRequestClient */
         $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::createStatic(array('name' => 'foo', 'variations' => range(1, 100)));
         /** @var CM_Model_Splittest_User_Mock $splittestUser */
@@ -62,7 +60,6 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
     }
 
     public function testSetUserForRequestClient_usersFromSameClientGetSameVariation() {
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 
         /** @var CM_Model_Splittest_RequestClient_Mock $splittestRequestClient */
         $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::createStatic(array('name' => 'foo', 'variations' => range(1, 100)));
@@ -87,7 +84,6 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
     }
 
     public function testSetUserForRequestClient_onLogin() {
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 
         /** @var CM_Model_Splittest_RequestClient_Mock $splittestRequestClient */
         $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::createStatic(array('name' => 'foo', 'variations' => range(1, 100)));
@@ -106,7 +102,6 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
     }
 
     public function testSetUserForRequestClient_userConversionAfterLogin() {
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 
         /** @var CM_Model_Splittest_RequestClient_Mock $splittestRequestClient */
         $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::createStatic(array('name' => 'foo', 'variations' => array('v')));
@@ -166,7 +161,6 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
     }
 
     public function testSetUserForRequestClient_userConversionBeforeLogin() {
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 
         /** @var CM_Model_Splittest_RequestClient_Mock $splittestRequestClient */
         $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::createStatic(array('name' => 'foo', 'variations' => array('v')));
