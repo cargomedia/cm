@@ -122,13 +122,7 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
 
     protected function _clearTracking() {
         $serviceManager = CM_Service_Manager::getInstance();
-        foreach (array(
-                     'tracking-googleanalytics',
-                     'tracking-kissmetrics',
-                     'trackings',
-                 ) as $serviceName) {
-            $serviceManager->unregister($serviceName);
-            $serviceManager->registerWithArray($serviceName, CM_Config::get()->services[$serviceName]);
-        }
+        $serviceManager->unregister('trackings');
+        $serviceManager->registerWithArray('trackings', CM_Config::get()->services['trackings']);
     }
 }
