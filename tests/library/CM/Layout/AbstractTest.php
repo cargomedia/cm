@@ -69,13 +69,16 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
         $serviceManager->register('tracking-googleanalytics', 'CMService_GoogleAnalytics_Client', array($codeGoogleAnalytics));
         $serviceManager->unregister('tracking-kissmetrics');
         $serviceManager->register('tracking-kissmetrics', 'CMService_KissMetrics_Client', array($codeKissMetrics));
+        $serviceManager->unregister('trackings');
+        $serviceManager->register('trackings', 'CM_Service_Trackings', array(array('tracking-googleanalytics', 'tracking-kissmetrics')));
     }
 
     protected function _clearTracking() {
         $serviceManager = CM_Service_Manager::getInstance();
         foreach (array(
                      'tracking-googleanalytics',
-                     'tracking-kissmetrics'
+                     'tracking-kissmetrics',
+                     'trackings',
                  ) as $serviceName) {
             $serviceManager->unregister($serviceName);
             $serviceManager->registerWithArray($serviceName, CM_Config::get()->services[$serviceName]);

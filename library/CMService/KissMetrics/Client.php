@@ -16,9 +16,6 @@ class CMService_KissMetrics_Client implements CM_Service_Tracking_ClientInterfac
     }
 
     public function getHtml(CM_Frontend_Environment $environment) {
-        if (!$this->_enabled()) {
-            return '';
-        }
         $html = '<script type="text/javascript">';
         $html .= 'var _kmq = _kmq || [];';
         $html .= "var _kmk = _kmk || '" . $this->_getCode() . "';";
@@ -44,9 +41,6 @@ EOF;
      * @return string
      */
     public function getJs() {
-        if (!$this->_enabled()) {
-            return '';
-        }
         $js = '';
         if (null !== $this->_getUserId()) {
             $js .= "_kmq.push(['identify', " . $this->_getUserId() . "]);";
@@ -68,9 +62,6 @@ EOF;
      * @param CM_Action_Abstract $action
      */
     public function trackAction(CM_Action_Abstract $action) {
-        if (!$this->_enabled()) {
-            return;
-        }
         if (null === $this->_getUserId() && $actor = $action->getActor()) {
             $this->setUserId($actor->getId());
         }
@@ -88,7 +79,7 @@ EOF;
      * @param array  $propertyList
      */
     public function trackEvent($eventName, array $propertyList) {
-        if (!$this->_enabled() || null === $this->_getUserId()) {
+        if (null === $this->_getUserId()) {
             return;
         }
         $eventName = (string) $eventName;
@@ -101,13 +92,6 @@ EOF;
         if ($viewer = $environment->getViewer()) {
             $this->setUserId($viewer->getId());
         }
-    }
-
-    /**
-     * @return boolean
-     */
-    protected function _enabled() {
-        return '' !== $this->_getCode();
     }
 
     /**

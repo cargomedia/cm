@@ -160,10 +160,7 @@ return function (CM_Config_Node $config) {
 
     $config->services['trackings'] = array(
         'class'     => 'CM_Service_Trackings',
-        'arguments' => array(array(
-            'tracking-googleanalytics',
-            'tracking-kissmetrics',
-        ))
+        'arguments' => array(array())
     );
 
     $config->services['tracking-googleanalytics'] = array(

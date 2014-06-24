@@ -56,9 +56,6 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
      * @return string
      */
     public function getJs() {
-        if (!$this->_enabled()) {
-            return '';
-        }
         $js = '';
         foreach ($this->_pageviews as $pageview) {
             if (null === $pageview) {
@@ -86,9 +83,6 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     }
 
     public function getHtml(CM_Frontend_Environment $environment) {
-        if (!$this->_enabled()) {
-            return '';
-        }
         $html = '<script type="text/javascript">';
         $html .= 'var _gaq = _gaq || [];';
         $html .= "_gaq.push(['_setAccount', '" . $this->_getCode() . "']);";
@@ -112,13 +106,6 @@ EOT;
 
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
         $this->addPageView($path);
-    }
-
-    /**
-     * @return boolean
-     */
-    protected function _enabled() {
-        return '' !== $this->_getCode();
     }
 
     /**
