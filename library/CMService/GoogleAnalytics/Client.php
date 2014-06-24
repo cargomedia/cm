@@ -28,7 +28,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     /**
      * @param string $path
      */
-    public function addPageview($path) {
+    public function addPageView($path) {
         $this->_pageviews[] = $path;
     }
 
@@ -102,7 +102,7 @@ EOT;
     /**
      * @param string|null $path
      */
-    public function setPageview($path = null) {
+    public function setPageView($path = null) {
         $this->_pageviews = array($path);
     }
 
@@ -110,7 +110,7 @@ EOT;
     }
 
     public function trackPageView(CM_Frontend_Environment $environment) {
-        $this->setPageview();
+        $this->setPageView();
     }
 
     /**
