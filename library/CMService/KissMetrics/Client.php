@@ -88,7 +88,7 @@ EOF;
     /**
      * @param CM_Action_Abstract $action
      */
-    public function track(CM_Action_Abstract $action) {
+    public function trackAction(CM_Action_Abstract $action) {
         if (!$this->enabled()) {
             return;
         }

@@ -15,5 +15,5 @@ interface CM_Service_Tracking_ClientInterface {
     /**
      * @param CM_Action_Abstract $action
      */
-    public function track(CM_Action_Abstract $action);
+    public function trackAction(CM_Action_Abstract $action);
 }

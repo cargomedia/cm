@@ -28,9 +28,9 @@ class CM_Service_Trackings implements CM_Service_Tracking_ClientInterface {
         return $js;
     }
 
-    public function track(CM_Action_Abstract $action) {
+    public function trackAction(CM_Action_Abstract $action) {
         foreach ($this->_getTrackingServiceList() as $trackingService) {
-            $trackingService->track($action);
+            $trackingService->trackAction($action);
         }
     }
 

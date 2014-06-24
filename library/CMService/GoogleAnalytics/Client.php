@@ -141,7 +141,7 @@ EOT;
         $this->_pageviews = array($path);
     }
 
-    public function track(CM_Action_Abstract $action) {
+    public function trackAction(CM_Action_Abstract $action) {
     }
 
     /**

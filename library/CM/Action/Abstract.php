@@ -384,7 +384,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         if ($this->_trackingEnabled) {
             /** @var CM_Service_Trackings $trackings */
             $trackings = CM_Service_Manager::getInstance()->get('trackings');
-            $trackings->track($this);
+            $trackings->trackAction($this);
         }
     }
 
