@@ -143,9 +143,6 @@ class CM_Frontend_GlobalResponse {
         $html .= $this->_getJs();
         $html .= '});' . PHP_EOL;
         $html .= '</script>' . PHP_EOL;
-        /** @var CMService_KissMetrics_Client $kissMetrics */
-        $kissMetrics = CM_Service_Manager::getInstance()->get('tracking-kissmetrics');
-        $kissMetrics->trackPageView($render->getEnvironment());
         /** @var CM_Service_Trackings $trackings */
         $trackings = CM_Service_Manager::getInstance()->get('trackings');
         $html .= $trackings->getHtml($render->getEnvironment());

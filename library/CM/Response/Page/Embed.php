@@ -34,9 +34,9 @@ class CM_Response_Page_Embed extends CM_Response_Page {
     }
 
     protected function _process() {
-        /** @var CMService_GoogleAnalytics_Client $googleAnalytics */
-        $googleAnalytics = CM_Service_Manager::getInstance()->get('tracking-googleanalytics');
-        $googleAnalytics->trackPageview($this->getRequest());
+        /** @var CM_Service_Trackings $trackings */
+        $trackings = CM_Service_Manager::getInstance()->get('trackings');
+        $trackings->trackPageView($this->getRender()->getEnvironment());
         $html = $this->_processPageLoop($this->getRequest());
 
         $this->_setContent($html);

@@ -102,9 +102,9 @@ class CM_Response_Page extends CM_Response_Abstract {
             $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
         }
         if (!$this->getRedirectUrl()) {
-            /** @var CMService_GoogleAnalytics_Client $googleAnalytics */
-            $googleAnalytics = CM_Service_Manager::getInstance()->get('tracking-googleanalytics');
-            $googleAnalytics->trackPageview($this->getRequest());
+            /** @var CM_Service_Trackings $trackings */
+            $trackings = CM_Service_Manager::getInstance()->get('trackings');
+            $trackings->trackPageView($this->getRender()->getEnvironment());
             $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);
         }
