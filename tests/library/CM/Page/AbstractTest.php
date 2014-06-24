@@ -2,6 +2,10 @@
 
 class CM_Page_AbstractTest extends CMTest_TestCase {
 
+    public function tearDown() {
+        $this->_clearTracking();
+    }
+
     public function testGetClassnameByPath() {
         $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getNamespaces'))->getMock();
         $site->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('Foo', 'Bar')));
@@ -57,5 +61,71 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
         $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Foo_Page_Test', false);
 
         $this->assertEquals('Bar_Layout_Default', get_class($page->getLayout($environment)));
+    }
+
+    public function testTrackingDisabled() {
+        $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
+        $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock_Tracking');
+        /** @var CM_Model_User $viewer */
+        $request = new CM_Request_Get('/mock/tracking', array('host' => 'www.default.dev'));
+        $response = new CM_Response_Page($request);
+        $response->process();
+        $js = $response->getRender()->getGlobalResponse()->getJs();
+
+        $this->assertNotContains("_gaq.push(['_trackPageview'", $js);
+        $this->assertNotContains("_kmq.push(['identify'", $js);
+    }
+
+    public function testTrackingGuest() {
+        $this->_configureTracking('ga123', 'km123');
+
+        $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
+        $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock_Tracking');
+        /** @var CM_Model_User $viewer */
+        $request = new CM_Request_Get('/mock/tracking', array('host' => 'www.default.dev'));
+        $response = new CM_Response_Page($request);
+        $response->process();
+        $js = $response->getRender()->getGlobalResponse()->getJs();
+
+        $this->assertContains("_gaq.push(['_trackPageview']);", $js);
+        $this->assertNotContains("_kmq.push(['identify'", $js);
+    }
+
+    public function testTrackingViewer() {
+        $this->_configureTracking('ga123', 'km123');
+
+        $viewer = $this->getMock('CM_Model_User', array('getIdRaw', 'getVisible', 'getLanguage'));
+        $viewer->expects($this->any())->method('getIdRaw')->will($this->returnValue(array('id' => '1')));
+        $viewer->expects($this->any())->method('getVisible')->will($this->returnValue(false));
+        $viewer->expects($this->any())->method('getLanguage')->will($this->returnValue(null));
+        $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
+        $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock_Tracking');
+        /** @var CM_Model_User $viewer */
+        $request = new CM_Request_Get('/mock/tracking', array('host' => 'www.default.dev'), null, $viewer);
+        $response = new CM_Response_Page($request);
+        $response->process();
+        $js = $response->getRender()->getGlobalResponse()->getJs();
+
+        $this->assertContains("_gaq.push(['_trackPageview']);", $js);
+        $this->assertContains("_kmq.push(['identify', 1]);", $js);
+    }
+
+    protected function _configureTracking($codeGoogleAnalytics, $codeKissMetrics) {
+        $serviceManager = CM_Service_Manager::getInstance();
+        $serviceManager->unregister('tracking-googleanalytics');
+        $serviceManager->register('tracking-googleanalytics', 'CMService_GoogleAnalytics_Client', array($codeGoogleAnalytics));
+        $serviceManager->unregister('tracking-kissmetrics');
+        $serviceManager->register('tracking-kissmetrics', 'CMService_KissMetrics_Client', array($codeKissMetrics));
+    }
+
+    protected function _clearTracking() {
+        $serviceManager = CM_Service_Manager::getInstance();
+        foreach (array(
+                     'tracking-googleanalytics',
+                     'tracking-kissmetrics'
+                 ) as $serviceName) {
+            $serviceManager->unregister($serviceName);
+            $serviceManager->registerWithArray($serviceName, CM_Config::get()->services[$serviceName]);
+        }
     }
 }

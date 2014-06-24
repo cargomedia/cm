@@ -3,59 +3,44 @@
 class CM_Layout_AbstractTest extends CMTest_TestCase {
 
     public function tearDown() {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $serviceManager->unregister('tracking-googleanalytics');
-        $serviceManager->registerWithArray('tracking-googleanalytics', CM_Config::get()->services['tracking-googleanalytics']);
-        $serviceManager->unregister('tracking-kissmetrics');
-        $serviceManager->registerWithArray('tracking-kissmetrics', CM_Config::get()->services['tracking-kissmetrics']);
+        $this->_clearTracking();
     }
 
     public function testTrackingDisabled() {
         $site = $this->getMockSite('CM_Site_Abstract');
         $render = new CM_Frontend_Render($site);
-        $layoutMock = $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
+        $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
         $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
         $renderAdapter = new CM_RenderAdapter_Layout($render, $pageMock);
-        $html = new CMTest_TH_Html($renderAdapter->fetch());
+        $html = $renderAdapter->fetch();
 
-        $this->assertNotContains('var _gaq = _gaq || [];', $html->getHtml());
-        $this->assertNotContains('var _kmq = _kmq || [];', $html->getHtml());
+        $this->assertNotContains('var _gaq = _gaq || [];', $html);
+        $this->assertNotContains('var _kmq = _kmq || [];', $html);
     }
 
     public function testTrackingGuest() {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $serviceManager->unregister('tracking-googleanalytics');
-        $serviceManager->register('tracking-googleanalytics', 'CMService_GoogleAnalytics_Client', array('ga123'));
+        $this->_configureTracking('ga123', 'km123');
 
-        $serviceManager = CM_Service_Manager::getInstance();
-        $serviceManager->unregister('tracking-kissmetrics');
-        $serviceManager->register('tracking-kissmetrics', 'CMService_KissMetrics_Client', array('km123'));
-
-        $site = $this->getMockSite('CM_Site_Abstract', null, array('url' => 'http://www.example.com'));
-        $render = new CM_Frontend_Render($site);
-        $layoutMock = $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
+        $siteMock = $this->getMockSite('CM_Site_Abstract', null, array('url' => 'http://www.example.com'));
+        $render = new CM_Frontend_Render($siteMock);
+        $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
         $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
         $renderAdapter = new CM_RenderAdapter_Layout($render, $pageMock);
-        $html = new CMTest_TH_Html($renderAdapter->fetch());
+        $html = $renderAdapter->fetch();
 
-        $this->assertContains('var _gaq = _gaq || [];', $html->getHtml());
-        $this->assertContains("_gaq.push(['_setAccount', 'ga123']);", $html->getHtml());
-        $this->assertContains("_gaq.push(['_setDomainName', 'www.example.com']);", $html->getHtml());
-        $this->assertContains('var _kmq = _kmq || [];', $html->getHtml());
-        $this->assertContains("var _kmk = _kmk || 'km123';", $html->getHtml());
-        $this->assertNotContains("_kmq.push(['identify',", $html->getHtml());
+        $this->assertContains('var _gaq = _gaq || [];', $html);
+        $this->assertContains("_gaq.push(['_setAccount', 'ga123']);", $html);
+        $this->assertContains("_gaq.push(['_setDomainName', 'www.example.com']);", $html);
+        $this->assertNotContains("_gaq.push(['_trackPageview'", $html);
+        $this->assertContains('var _kmq = _kmq || [];', $html);
+        $this->assertContains("var _kmk = _kmk || 'km123';", $html);
+        $this->assertNotContains("_kmq.push(['identify'", $html);
     }
 
     public function testTrackingViewer() {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $serviceManager->unregister('tracking-googleanalytics');
-        $serviceManager->register('tracking-googleanalytics', 'CMService_GoogleAnalytics_Client', array('ga123'));
-
-        $serviceManager = CM_Service_Manager::getInstance();
-        $serviceManager->unregister('tracking-kissmetrics');
-        $serviceManager->register('tracking-kissmetrics', 'CMService_KissMetrics_Client', array('km123'));
+        $this->_configureTracking('ga123', 'km123');
 
         $site = $this->getMockSite('CM_Site_Abstract', null, array('url' => 'http://www.example.com'));
         $viewer = $this->getMock('CM_Model_User', array('getIdRaw', 'getVisible'));
@@ -63,17 +48,37 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
         $viewer->expects($this->any())->method('getVisible')->will($this->returnValue(false));
         /** @var CM_Model_User $viewer */
         $render = new CM_Frontend_Render($site, $viewer);
-        $layoutMock = $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
+        $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
         $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
         $renderAdapter = new CM_RenderAdapter_Layout($render, $pageMock);
-        $html = new CMTest_TH_Html($renderAdapter->fetch());
+        $html = $renderAdapter->fetch();
 
-        $this->assertContains('var _gaq = _gaq || [];', $html->getHtml());
-        $this->assertContains("_gaq.push(['_setAccount', 'ga123']);", $html->getHtml());
-        $this->assertContains("_gaq.push(['_setDomainName', 'www.example.com']);", $html->getHtml());
-        $this->assertContains('var _kmq = _kmq || [];', $html->getHtml());
-        $this->assertContains("var _kmk = _kmk || 'km123';", $html->getHtml());
-        $this->assertContains("_kmq.push(['identify', 1]);", $html->getHtml());
+        $this->assertContains('var _gaq = _gaq || [];', $html);
+        $this->assertContains("_gaq.push(['_setAccount', 'ga123']);", $html);
+        $this->assertContains("_gaq.push(['_setDomainName', 'www.example.com']);", $html);
+        $this->assertNotContains("_gaq.push(['_trackPageview'", $html);
+        $this->assertContains('var _kmq = _kmq || [];', $html);
+        $this->assertContains("var _kmk = _kmk || 'km123';", $html);
+        $this->assertNotContains("_kmq.push(['identify'", $html);
+    }
+
+    protected function _configureTracking($codeGoogleAnalytics, $codeKissMetrics) {
+        $serviceManager = CM_Service_Manager::getInstance();
+        $serviceManager->unregister('tracking-googleanalytics');
+        $serviceManager->register('tracking-googleanalytics', 'CMService_GoogleAnalytics_Client', array($codeGoogleAnalytics));
+        $serviceManager->unregister('tracking-kissmetrics');
+        $serviceManager->register('tracking-kissmetrics', 'CMService_KissMetrics_Client', array($codeKissMetrics));
+    }
+
+    protected function _clearTracking() {
+        $serviceManager = CM_Service_Manager::getInstance();
+        foreach (array(
+                     'tracking-googleanalytics',
+                     'tracking-kissmetrics'
+                 ) as $serviceName) {
+            $serviceManager->unregister($serviceName);
+            $serviceManager->registerWithArray($serviceName, CM_Config::get()->services[$serviceName]);
+        }
     }
 }
