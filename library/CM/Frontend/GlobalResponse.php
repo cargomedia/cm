@@ -126,8 +126,7 @@ class CM_Frontend_GlobalResponse {
      * @return string
      */
     public function getJs() {
-        $trackings = CM_Service_Manager::getInstance()->getTrackings();
-        $operations = array_filter([$this->_getJs(), $trackings->getJs()]);
+        $operations = array_filter([$this->_getJs(), CM_Service_Manager::getInstance()->getTrackings()->getJs()]);
         $code = implode(PHP_EOL, $operations);
         return $code;
     }
@@ -142,8 +141,7 @@ class CM_Frontend_GlobalResponse {
         $html .= $this->_getJs();
         $html .= '});' . PHP_EOL;
         $html .= '</script>' . PHP_EOL;
-        $trackings = CM_Service_Manager::getInstance()->getTrackings();
-        $html .= $trackings->getHtml($render->getEnvironment());
+        $html .= CM_Service_Manager::getInstance()->getTrackings()->getHtml($render->getEnvironment());
         return $html;
     }
 

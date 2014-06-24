@@ -34,8 +34,7 @@ class CM_Response_Page_Embed extends CM_Response_Page {
     }
 
     protected function _process() {
-        $trackings = CM_Service_Manager::getInstance()->getTrackings();
-        $trackings->trackPageView($this->getRender()->getEnvironment());
+        CM_Service_Manager::getInstance()->getTrackings()->trackPageView($this->getRender()->getEnvironment());
         $html = $this->_processPageLoop($this->getRequest());
 
         $this->_setContent($html);

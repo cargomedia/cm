@@ -382,8 +382,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
     protected function _track() {
         if ($this->_trackingEnabled) {
-            $trackings = CM_Service_Manager::getInstance()->getTrackings();
-            $trackings->trackAction($this);
+            CM_Service_Manager::getInstance()->getTrackings()->trackAction($this);
         }
     }
 

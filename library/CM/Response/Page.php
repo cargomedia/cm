@@ -102,8 +102,7 @@ class CM_Response_Page extends CM_Response_Abstract {
             $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
         }
         if (!$this->getRedirectUrl()) {
-            $trackings = CM_Service_Manager::getInstance()->getTrackings();
-            $trackings->trackPageView($this->getRender()->getEnvironment());
+            CM_Service_Manager::getInstance()->getTrackings()->trackPageView($this->getRender()->getEnvironment());
             $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);
         }
