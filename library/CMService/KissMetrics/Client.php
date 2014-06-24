@@ -100,7 +100,7 @@ EOF;
         KM::record($eventName, $propertyList);
     }
 
-    public function trackPageView(CM_Frontend_Environment $environment) {
+    public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
         if ($viewer = $environment->getViewer()) {
             $this->setUserId($viewer->getId());
         }

@@ -99,18 +99,11 @@ EOT;
         return $html;
     }
 
-    /**
-     * @param string|null $path
-     */
-    public function setPageView($path = null) {
-        $this->_pageviews = array($path);
-    }
-
     public function trackAction(CM_Action_Abstract $action) {
     }
 
-    public function trackPageView(CM_Frontend_Environment $environment) {
-        $this->setPageView();
+    public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
+        $this->addPageView($path);
     }
 
     /**
