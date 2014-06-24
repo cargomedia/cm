@@ -148,9 +148,7 @@ class CM_Frontend_GlobalResponse {
         $googleAnalytics->setSite($render->getEnvironment()->getSite());
         /** @var CMService_KissMetrics_Client $kissMetrics */
         $kissMetrics = CM_Service_Manager::getInstance()->get('tracking-kissmetrics');
-        if ($viewer = $render->getViewer()) {
-            $kissMetrics->setUserId($viewer->getId());
-        }
+        $kissMetrics->trackPageView($render->getEnvironment());
         /** @var CM_Service_Trackings $trackings */
         $trackings = CM_Service_Manager::getInstance()->get('trackings');
         $html .= $trackings->getHtml();

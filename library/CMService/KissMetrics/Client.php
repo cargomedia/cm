@@ -107,4 +107,10 @@ EOF;
             'propertyList' => $action->getTrackingPropertyList(),
         ));
     }
+
+    public function trackPageView(CM_Frontend_Environment $environment) {
+        if ($viewer = $environment->getViewer()) {
+            $this->setUserId($viewer->getId());
+        }
+    }
 }

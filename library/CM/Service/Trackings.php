@@ -34,6 +34,12 @@ class CM_Service_Trackings implements CM_Service_Tracking_ClientInterface {
         }
     }
 
+    public function trackPageView(CM_Frontend_Environment $environment) {
+        foreach ($this->_getTrackingServiceList() as $trackingService) {
+            $trackingService->trackPageView($environment);
+        }
+    }
+
     /**
      * @return CM_Service_Tracking_ClientInterface[]
      */

@@ -144,10 +144,7 @@ EOT;
     public function trackAction(CM_Action_Abstract $action) {
     }
 
-    /**
-     * @param CM_Request_Abstract $request
-     */
-    public function trackPageview(CM_Request_Abstract $request) {
+    public function trackPageView(CM_Frontend_Environment $environment) {
         $this->setPageview();
     }
 }
