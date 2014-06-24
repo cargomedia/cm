@@ -76,6 +76,7 @@ EOF;
         }
         $trackEventJob = new CMService_KissMetrics_TrackEventJob();
         $trackEventJob->queue(array(
+            'code'         => $this->_getCode(),
             'userId'       => $this->_getUserId(),
             'eventName'    => $action->getLabel(),
             'propertyList' => $action->getTrackingPropertyList(),
