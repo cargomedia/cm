@@ -475,11 +475,12 @@ class CM_Params extends CM_Class_Abstract {
         }
         if ($json) {
             if (is_object($value)) {
-                return 'null';
-            }
-            $value = json_encode($value);
-            if (json_last_error() > 0) {
-                throw new CM_Exception_Invalid('Cannot json_encode value `' . CM_Util::var_line($value) . '`.');
+                $value = 'null';
+            } else {
+                $value = json_encode($value);
+                if (json_last_error() > 0) {
+                    throw new CM_Exception_Invalid('Cannot json_encode value `' . CM_Util::var_line($value) . '`.');
+                }
             }
         }
         return $value;
