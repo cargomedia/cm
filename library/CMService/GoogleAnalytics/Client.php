@@ -26,10 +26,18 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     }
 
     /**
-     * @param string $path
+     * @param string|null $path
      */
-    public function addPageView($path) {
-        $this->_pageviews[] = $path;
+    public function addPageView($path = null) {
+        if (null !== $path) {
+            $path = (string) $path;
+        }
+        if ($this->_pageviews === array(null)) {
+            $this->_pageviews = array();
+        }
+        if (null !== $path || empty($this->_pageviews)) {
+            $this->_pageviews[] = $path;
+        }
     }
 
     /**
@@ -53,7 +61,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
         }
         $js = '';
         foreach ($this->_pageviews as $pageview) {
-            if (empty($pageview)) {
+            if (null === $pageview) {
                 $js .= "_gaq.push(['_trackPageview']);";
             } else {
                 $js .= "_gaq.push(['_trackPageview', '" . $pageview . "']);";
