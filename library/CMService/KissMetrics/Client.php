@@ -55,6 +55,16 @@ EOF;
     }
 
     /**
+     * @param int|null $userId
+     */
+    public function setUserId($userId) {
+        if (null !== $userId) {
+            $userId = (int) $userId;
+        }
+        $this->_userId = $userId;
+    }
+
+    /**
      * @param CM_Action_Abstract $action
      */
     public function trackAction(CM_Action_Abstract $action) {
@@ -63,23 +73,36 @@ EOF;
         }
         if (null === $this->_getUserId()) {
             if ($actor = $action->getActor()) {
-                $this->_setUserId($actor->getId());
+                $this->setUserId($actor->getId());
             } else {
                 return;
             }
         }
         $trackEventJob = new CMService_KissMetrics_TrackEventJob();
         $trackEventJob->queue(array(
-            'code'         => $this->_getCode(),
             'userId'       => $this->_getUserId(),
-            'event'        => $action->getLabel(),
+            'eventName'    => $action->getLabel(),
             'propertyList' => $action->getTrackingPropertyList(),
         ));
     }
 
+    /**
+     * @param string $eventName
+     * @param array  $propertyList
+     */
+    public function trackEvent($eventName, array $propertyList) {
+        if (!$this->_enabled() || null === $this->_getUserId()) {
+            return;
+        }
+        $eventName = (string) $eventName;
+        KM::init($this->_getCode());
+        KM::identify($this->_getUserId());
+        KM::record($eventName, $propertyList);
+    }
+
     public function trackPageView(CM_Frontend_Environment $environment) {
         if ($viewer = $environment->getViewer()) {
-            $this->_setUserId($viewer->getId());
+            $this->setUserId($viewer->getId());
         }
     }
 
@@ -102,15 +125,5 @@ EOF;
      */
     protected function _getUserId() {
         return $this->_userId;
-    }
-
-    /**
-     * @param int|null $userId
-     */
-    protected function _setUserId($userId) {
-        if (null !== $userId) {
-            $userId = (int) $userId;
-        }
-        $this->_userId = $userId;
     }
 }

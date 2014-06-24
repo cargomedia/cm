@@ -3,12 +3,12 @@
 class CMService_KissMetrics_TrackEventJob extends CM_Jobdistribution_Job_Abstract {
 
     protected function _execute(CM_Params $params) {
-        $code = $params->getString('code');
         $userId = $params->getInt('userId');
-        $event = $params->getString('event');
+        $eventName = $params->getString('eventName');
         $propertyList = $params->getArray('propertyList');
-        KM::init($code);
-        KM::identify($userId);
-        KM::record($event, $propertyList);
+        /** @var CMService_KissMetrics_Client $kissMetricsClient */
+        $kissMetricsClient = CM_Service_Manager::getInstance()->get('tracking-kissmetrics');
+        $kissMetricsClient->setUserId($userId);
+        $kissMetricsClient->trackEvent($eventName, $propertyList);
     }
 }
