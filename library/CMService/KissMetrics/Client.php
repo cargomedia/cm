@@ -15,7 +15,7 @@ class CMService_KissMetrics_Client implements CM_Service_Tracking_ClientInterfac
         $this->_code = (string) $code;
     }
 
-    public function getHtml() {
+    public function getHtml(CM_Frontend_Environment $environment) {
         if (!$this->_enabled()) {
             return '';
         }

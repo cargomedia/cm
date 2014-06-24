@@ -12,10 +12,10 @@ class CM_Service_Trackings implements CM_Service_Tracking_ClientInterface {
         $this->_trackingServiceList = $trackingServiceList;
     }
 
-    public function getHtml() {
+    public function getHtml(CM_Frontend_Environment $environment) {
         $html = '';
         foreach ($this->_getTrackingServiceList() as $trackingService) {
-            $html .= $trackingService->getHtml();
+            $html .= $trackingService->getHtml($environment);
         }
         return $html;
     }

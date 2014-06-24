@@ -5,9 +5,6 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     /** @var string */
     protected $_code;
 
-    /** @var CM_Site_Abstract|null */
-    protected $_site;
-
     /** @var array */
     protected $_pageviews = array(), $_orders = array(), $_customVars = array();
 
@@ -48,27 +45,12 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     }
 
     /**
-     * @return boolean
-     */
-    public function enabled() {
-        return '' !== $this->getCode();
-    }
-
-    /**
-     * @return string
-     */
-    public function getCode() {
-        return $this->_code;
-    }
-
-    /**
      * @return string
      */
     public function getJs() {
-        if (!$this->enabled()) {
+        if (!$this->_enabled()) {
             return '';
         }
-
         $js = '';
         foreach ($this->_pageviews as $pageview) {
             if (empty($pageview)) {
@@ -95,17 +77,14 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
         return $js;
     }
 
-    public function getHtml() {
-        if (!$this->enabled()) {
+    public function getHtml(CM_Frontend_Environment $environment) {
+        if (!$this->_enabled()) {
             return '';
         }
-
         $html = '<script type="text/javascript">';
         $html .= 'var _gaq = _gaq || [];';
-        $html .= "_gaq.push(['_setAccount', '" . $this->getCode() . "']);";
-        if ($this->_site) {
-            $html .= "_gaq.push(['_setDomainName', '" . $this->_site->getHost() . "']);";
-        }
+        $html .= "_gaq.push(['_setAccount', '" . $this->_getCode() . "']);";
+        $html .= "_gaq.push(['_setDomainName', '" . $environment->getSite()->getHost() . "']);";
         $html .= $this->getJs();
 
         $html .= <<<EOT
@@ -121,20 +100,6 @@ EOT;
     }
 
     /**
-     * @return CM_Site_Abstract|null
-     */
-    public function getSite() {
-        return $this->_site;
-    }
-
-    /**
-     * @param CM_Site_Abstract|null $site
-     */
-    public function setSite(CM_Site_Abstract $site = null) {
-        $this->_site = $site;
-    }
-
-    /**
      * @param string|null $path
      */
     public function setPageview($path = null) {
@@ -146,5 +111,19 @@ EOT;
 
     public function trackPageView(CM_Frontend_Environment $environment) {
         $this->setPageview();
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function _enabled() {
+        return '' !== $this->_getCode();
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getCode() {
+        return $this->_code;
     }
 }

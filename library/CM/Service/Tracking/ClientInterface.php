@@ -3,9 +3,10 @@
 interface CM_Service_Tracking_ClientInterface {
 
     /**
+     * @param CM_Frontend_Environment $environment
      * @return string
      */
-    public function getHtml();
+    public function getHtml(CM_Frontend_Environment $environment);
 
     /**
      * @return string
