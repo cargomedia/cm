@@ -3,13 +3,13 @@
 class CM_Service_Trackings implements CM_Service_Tracking_ClientInterface {
 
     /** @var string[] */
-    protected $_trackingServiceList;
+    protected $_trackingServiceNameList;
 
     /**
-     * @param string[] $trackingServiceList
+     * @param string[] $trackingServiceNameList
      */
-    public function __construct(array $trackingServiceList) {
-        $this->_trackingServiceList = $trackingServiceList;
+    public function __construct(array $trackingServiceNameList) {
+        $this->_trackingServiceNameList = $trackingServiceNameList;
     }
 
     public function getHtml(CM_Frontend_Environment $environment) {
@@ -44,8 +44,8 @@ class CM_Service_Trackings implements CM_Service_Tracking_ClientInterface {
      * @return CM_Service_Tracking_ClientInterface[]
      */
     protected function _getTrackingServiceList() {
-        return array_map(function ($trackingService) {
-            return CM_Service_Manager::getInstance()->get($trackingService);
-        }, $this->_trackingServiceList);
+        return array_map(function ($trackingServiceName) {
+            return CM_Service_Manager::getInstance()->get($trackingServiceName);
+        }, $this->_trackingServiceNameList);
     }
 }
