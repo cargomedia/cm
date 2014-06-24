@@ -15,27 +15,13 @@ class CMService_KissMetrics_Client implements CM_Service_Tracking_ClientInterfac
         $this->_code = (string) $code;
     }
 
-    /**
-     * @return boolean
-     */
-    public function enabled() {
-        return '' !== $this->getCode();
-    }
-
-    /**
-     * @return string
-     */
-    public function getCode() {
-        return $this->_code;
-    }
-
     public function getHtml() {
-        if (!$this->enabled()) {
+        if (!$this->_enabled()) {
             return '';
         }
         $html = '<script type="text/javascript">';
         $html .= 'var _kmq = _kmq || [];';
-        $html .= "var _kmk = _kmk || '" . $this->getCode() . "';";
+        $html .= "var _kmk = _kmk || '" . $this->_getCode() . "';";
         $html .= <<<EOF
 function _kms(u) {
   setTimeout(function() {
@@ -58,51 +44,34 @@ EOF;
      * @return string
      */
     public function getJs() {
-        if (!$this->enabled()) {
+        if (!$this->_enabled()) {
             return '';
         }
         $js = '';
-        if (null !== $this->getUserId()) {
-            $js .= "_kmq.push(['identify', " . $this->getUserId() . "]);";
+        if (null !== $this->_getUserId()) {
+            $js .= "_kmq.push(['identify', " . $this->_getUserId() . "]);";
         }
         return $js;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getUserId() {
-        return $this->_userId;
-    }
-
-    /**
-     * @param int|null $userId
-     */
-    public function setUserId($userId) {
-        if (null !== $userId) {
-            $userId = (int) $userId;
-        }
-        $this->_userId = $userId;
     }
 
     /**
      * @param CM_Action_Abstract $action
      */
     public function trackAction(CM_Action_Abstract $action) {
-        if (!$this->enabled()) {
+        if (!$this->_enabled()) {
             return;
         }
-        if (null === $this->getUserId()) {
+        if (null === $this->_getUserId()) {
             if ($actor = $action->getActor()) {
-                $this->setUserId($actor->getId());
+                $this->_setUserId($actor->getId());
             } else {
                 return;
             }
         }
         $trackEventJob = new CMService_KissMetrics_TrackEventJob();
         $trackEventJob->queue(array(
-            'code'         => $this->getCode(),
-            'userId'       => $this->getUserId(),
+            'code'         => $this->_getCode(),
+            'userId'       => $this->_getUserId(),
             'event'        => $action->getLabel(),
             'propertyList' => $action->getTrackingPropertyList(),
         ));
@@ -110,7 +79,38 @@ EOF;
 
     public function trackPageView(CM_Frontend_Environment $environment) {
         if ($viewer = $environment->getViewer()) {
-            $this->setUserId($viewer->getId());
+            $this->_setUserId($viewer->getId());
         }
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function _enabled() {
+        return '' !== $this->_getCode();
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getCode() {
+        return $this->_code;
+    }
+
+    /**
+     * @return int|null
+     */
+    protected function _getUserId() {
+        return $this->_userId;
+    }
+
+    /**
+     * @param int|null $userId
+     */
+    protected function _setUserId($userId) {
+        if (null !== $userId) {
+            $userId = (int) $userId;
+        }
+        $this->_userId = $userId;
     }
 }
