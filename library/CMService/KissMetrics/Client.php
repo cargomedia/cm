@@ -71,12 +71,8 @@ EOF;
         if (!$this->_enabled()) {
             return;
         }
-        if (null === $this->_getUserId()) {
-            if ($actor = $action->getActor()) {
-                $this->setUserId($actor->getId());
-            } else {
-                return;
-            }
+        if (null === $this->_getUserId() && $actor = $action->getActor()) {
+            $this->setUserId($actor->getId());
         }
         $trackEventJob = new CMService_KissMetrics_TrackEventJob();
         $trackEventJob->queue(array(
