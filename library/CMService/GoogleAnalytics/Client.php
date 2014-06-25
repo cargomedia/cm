@@ -22,7 +22,11 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
      * @param int    $scope 1 (visitor-level), 2 (session-level), or 3 (page-level)
      */
     public function addCustomVar($index, $name, $value, $scope) {
-        $this->_customVars[] = array('index' => (int) $index, 'name' => (string) $name, 'value' => (string) $value, 'scope' => (int) $scope);
+        $index = (int) $index;
+        $name = (string) $name;
+        $value = (string) $value;
+        $scope = (int) $scope;
+        $this->_customVars[] = array('index' => $index, 'name' => $name, 'value' => $value, 'scope' => $scope);
     }
 
     /**
