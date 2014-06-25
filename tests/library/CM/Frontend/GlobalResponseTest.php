@@ -6,7 +6,7 @@ class CM_Frontend_GlobalResponseTest extends CMTest_TestCase {
      * @expectedException CM_Exception_Invalid
      */
     public function testGetTreeRootEmpty() {
-        $frontend = new CM_Frontend_GlobalResponse();
+        $frontend = new CM_Frontend_GlobalResponse(new CM_Frontend_Render());
         $frontend->getTreeRoot();
     }
 
@@ -14,12 +14,12 @@ class CM_Frontend_GlobalResponseTest extends CMTest_TestCase {
      * @expectedException CM_Exception_Invalid
      */
     public function testGetTreeCurrentEmpty() {
-        $frontend = new CM_Frontend_GlobalResponse();
+        $frontend = new CM_Frontend_GlobalResponse(new CM_Frontend_Render());
         $frontend->getTreeCurrent();
     }
 
     public function testTree() {
-        $frontend = new CM_Frontend_GlobalResponse();
+        $frontend = new CM_Frontend_GlobalResponse(new CM_Frontend_Render());
 
         $view = $this->getMockBuilder('CM_View_Abstract')->getMockForAbstractClass();
         /** @var CM_View_Abstract $view */
@@ -58,7 +58,7 @@ class CM_Frontend_GlobalResponseTest extends CMTest_TestCase {
      * @expectedExceptionMessage No current tree node set
      */
     public function testTreeCollapseCollapsedRoot() {
-        $frontend = new CM_Frontend_GlobalResponse();
+        $frontend = new CM_Frontend_GlobalResponse(new CM_Frontend_Render());
         $view = $this->getMockBuilder('CM_View_Abstract')->getMockForAbstractClass();
         /** @var CM_View_Abstract $view */
 
@@ -73,7 +73,7 @@ class CM_Frontend_GlobalResponseTest extends CMTest_TestCase {
      * @expectedExceptionMessage No current tree node set
      */
     public function testTreeExpandCollapsedRoot() {
-        $frontend = new CM_Frontend_GlobalResponse();
+        $frontend = new CM_Frontend_GlobalResponse(new CM_Frontend_Render());
         $view = $this->getMockBuilder('CM_View_Abstract')->getMockForAbstractClass();
         /** @var CM_View_Abstract $view */
 
@@ -91,7 +91,7 @@ class CM_Frontend_GlobalResponseTest extends CMTest_TestCase {
         $component = $this->getMockBuilder('CM_Component_Abstract')->getMockForAbstractClass();
         /** @var CM_Component_Abstract $component */
 
-        $frontend = new CM_Frontend_GlobalResponse();
+        $frontend = new CM_Frontend_GlobalResponse(new CM_Frontend_Render());
 
         $viewResponse1 = new CM_Frontend_ViewResponse($layout);
         $frontend->treeExpand($viewResponse1);
