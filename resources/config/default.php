@@ -162,4 +162,14 @@ return function (CM_Config_Node $config) {
         'class'     => 'CM_Service_Trackings',
         'arguments' => array(array())
     );
+
+    $config->services['tracking-googleanalytics'] = array(
+        'class'     => 'CMService_GoogleAnalytics_Client',
+        'arguments' => array('my-web-property-id')
+    );
+
+    $config->services['tracking-kissmetrics'] = array(
+        'class'     => 'CMService_KissMetrics_Client',
+        'arguments' => array('my-api-key')
+    );
 };
