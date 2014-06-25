@@ -32,10 +32,10 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
         if (null !== $path) {
             $path = (string) $path;
         }
-        if ($this->_pageviews === array(null)) {
+        if ($this->_getPageViews() === array(null)) {
             $this->_pageviews = array();
         }
-        if (null !== $path || empty($this->_pageviews)) {
+        if (null !== $path || 0 === count($this->_getPageViews())) {
             $this->_pageviews[] = $path;
         }
     }
@@ -57,7 +57,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
      */
     public function getJs() {
         $js = '';
-        foreach ($this->_pageviews as $pageview) {
+        foreach ($this->_getPageViews() as $pageview) {
             if (null === $pageview) {
                 $js .= "_gaq.push(['_trackPageview']);";
             } else {
@@ -113,5 +113,12 @@ EOT;
      */
     protected function _getCode() {
         return $this->_code;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getPageViews() {
+        return $this->_pageviews;
     }
 }
