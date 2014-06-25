@@ -1,6 +1,6 @@
 <?php
 
-class CM_Frontend_Render extends CM_Class_Abstract {
+class CM_Frontend_Render extends CM_Service_ManagerAware {
 
     /** @var CM_Frontend_GlobalResponse|null */
     private $_js;
@@ -21,13 +21,14 @@ class CM_Frontend_Render extends CM_Class_Abstract {
     private static $_smarty;
 
     /**
-     * @param CM_Site_Abstract|null  $site
-     * @param CM_Model_User|null     $viewer
-     * @param CM_Model_Language|null $language
-     * @param boolean|null           $languageRewrite
-     * @param CM_Model_Location|null $location
+     * @param CM_Site_Abstract|null   $site
+     * @param CM_Model_User|null      $viewer
+     * @param CM_Model_Language|null  $language
+     * @param boolean|null            $languageRewrite
+     * @param CM_Model_Location|null  $location
+     * @param CM_Service_Manager|null $serviceManager
      */
-    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, $languageRewrite = null, CM_Model_Location $location = null) {
+    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, $languageRewrite = null, CM_Model_Location $location = null, CM_Service_Manager $serviceManager = null) {
         if (!$language) {
             $language = CM_Model_Language::findDefault();
         }
@@ -46,6 +47,10 @@ class CM_Frontend_Render extends CM_Class_Abstract {
         }
         $this->_environment = $environment;
         $this->_languageRewrite = (bool) $languageRewrite;
+        if (null === $serviceManager) {
+            $serviceManager = CM_Service_Manager::getInstance();
+        }
+        $this->setServiceManager($serviceManager);
     }
 
     /**
@@ -67,14 +72,14 @@ class CM_Frontend_Render extends CM_Class_Abstract {
      */
     public function getGlobalResponse() {
         if (null === $this->_js) {
-            $this->_js = new CM_Frontend_GlobalResponse();
+            $this->_js = new CM_Frontend_GlobalResponse($this);
         }
         return $this->_js;
     }
 
     /**
-     * @param string     $path
-     * @param array|null $variables
+     * @param string        $path
+     * @param array|null    $variables
      * @param string[]|null $compileId
      * @return string
      */

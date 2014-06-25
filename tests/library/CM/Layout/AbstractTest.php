@@ -2,10 +2,6 @@
 
 class CM_Layout_AbstractTest extends CMTest_TestCase {
 
-    public function tearDown() {
-        $this->_clearTracking();
-    }
-
     public function testTrackingDisabled() {
         $site = $this->getMockSite('CM_Site_Abstract');
         $render = new CM_Frontend_Render($site);
@@ -20,10 +16,8 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
     }
 
     public function testTrackingGuest() {
-        $this->_configureTracking('ga123', 'km123');
-
         $siteMock = $this->getMockSite('CM_Site_Abstract', null, array('url' => 'http://www.example.com'));
-        $render = new CM_Frontend_Render($siteMock);
+        $render = new CM_Frontend_Render($siteMock, null, null, null, null, $this->_getServiceManager('ga123', 'km123'));
         $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
         $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
@@ -40,14 +34,12 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
     }
 
     public function testTrackingViewer() {
-        $this->_configureTracking('ga123', 'km123');
-
         $site = $this->getMockSite('CM_Site_Abstract', null, array('url' => 'http://www.example.com'));
         $viewer = $this->getMock('CM_Model_User', array('getIdRaw', 'getVisible'));
         $viewer->expects($this->any())->method('getIdRaw')->will($this->returnValue(array('id' => '1')));
         $viewer->expects($this->any())->method('getVisible')->will($this->returnValue(false));
         /** @var CM_Model_User $viewer */
-        $render = new CM_Frontend_Render($site, $viewer);
+        $render = new CM_Frontend_Render($site, $viewer, null, null, null, $this->_getServiceManager('ga123', 'km123'));
         $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
         $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
@@ -63,20 +55,17 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
         $this->assertNotContains("_kmq.push(['identify'", $html);
     }
 
-    protected function _configureTracking($codeGoogleAnalytics, $codeKissMetrics) {
-        $this->_clearTracking();
-        $serviceManager = CM_Service_Manager::getInstance();
+    /**
+     * @param string $codeGoogleAnalytics
+     * @param string $codeKissMetrics
+     * @return CM_Service_Manager
+     */
+    protected function _getServiceManager($codeGoogleAnalytics, $codeKissMetrics) {
+        $serviceManager = new CM_Service_Manager();
         $serviceManager->register('tracking-googleanalytics-test', 'CMService_GoogleAnalytics_Client', array($codeGoogleAnalytics));
         $serviceManager->register('tracking-kissmetrics-test', 'CMService_KissMetrics_Client', array($codeKissMetrics));
         $serviceManager->unregister('trackings');
         $serviceManager->register('trackings', 'CM_Service_Trackings', array(array('tracking-googleanalytics-test', 'tracking-kissmetrics-test')));
-    }
-
-    protected function _clearTracking() {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $serviceManager->unregister('tracking-googleanalytics-test');
-        $serviceManager->unregister('tracking-kissmetrics-test');
-        $serviceManager->unregister('trackings');
-        $serviceManager->registerWithArray('trackings', CM_Config::get()->services['trackings']);
+        return $serviceManager;
     }
 }

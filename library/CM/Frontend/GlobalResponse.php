@@ -20,7 +20,11 @@ class CM_Frontend_GlobalResponse {
     /** @var CM_Frontend_JavascriptContainer */
     protected $_onloadReadyJs;
 
-    public function __construct() {
+    /** @var CM_Frontend_Render */
+    protected $_render;
+
+    public function __construct(CM_Frontend_Render $render) {
+        $this->_render = $render;
         $this->_onloadHeaderJs = new CM_Frontend_JavascriptContainer();
         $this->_onloadPrepareJs = new CM_Frontend_JavascriptContainer();
         $this->_onloadJs = new CM_Frontend_JavascriptContainer();
@@ -126,22 +130,21 @@ class CM_Frontend_GlobalResponse {
      * @return string
      */
     public function getJs() {
-        $operations = array_filter([$this->_getJs(), CM_Service_Manager::getInstance()->getTrackings()->getJs()]);
+        $operations = array_filter([$this->_getJs(), $this->_render->getServiceManager()->getTrackings()->getJs()]);
         $code = implode(PHP_EOL, $operations);
         return $code;
     }
 
     /**
-     * @param CM_Frontend_Render $render
      * @return string
      */
-    public function getHtml(CM_Frontend_Render $render) {
+    public function getHtml() {
         $html = '<script type="text/javascript">' . PHP_EOL;
         $html .= '$(function() {' . PHP_EOL;
         $html .= $this->_getJs();
         $html .= '});' . PHP_EOL;
         $html .= '</script>' . PHP_EOL;
-        $html .= CM_Service_Manager::getInstance()->getTrackings()->getHtml($render->getEnvironment());
+        $html .= $this->_render->getServiceManager()->getTrackings()->getHtml($this->_render->getEnvironment());
         return $html;
     }
 

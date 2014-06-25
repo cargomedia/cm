@@ -1,6 +1,6 @@
 <?php
 
-class CM_Service_Trackings implements CM_Service_Tracking_ClientInterface {
+class CM_Service_Trackings extends CM_Service_ManagerAware implements CM_Service_Tracking_ClientInterface {
 
     /** @var string[] */
     protected $_trackingServiceNameList;
@@ -45,7 +45,7 @@ class CM_Service_Trackings implements CM_Service_Tracking_ClientInterface {
      */
     protected function _getTrackingServiceList() {
         return array_map(function ($trackingServiceName) {
-            return CM_Service_Manager::getInstance()->get($trackingServiceName, 'CM_Service_Tracking_ClientInterface');
+            return $this->getServiceManager()->get($trackingServiceName, 'CM_Service_Tracking_ClientInterface');
         }, $this->_trackingServiceNameList);
     }
 }
