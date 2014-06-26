@@ -20,11 +20,7 @@ class CM_Frontend_GlobalResponse {
     /** @var CM_Frontend_JavascriptContainer */
     protected $_onloadReadyJs;
 
-    /** @var CM_Frontend_Render */
-    protected $_render;
-
-    public function __construct(CM_Frontend_Render $render) {
-        $this->_render = $render;
+    public function __construct() {
         $this->_onloadHeaderJs = new CM_Frontend_JavascriptContainer();
         $this->_onloadPrepareJs = new CM_Frontend_JavascriptContainer();
         $this->_onloadJs = new CM_Frontend_JavascriptContainer();

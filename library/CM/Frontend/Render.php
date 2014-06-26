@@ -74,7 +74,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      */
     public function getGlobalResponse() {
         if (null === $this->_js) {
-            $this->_js = new CM_Frontend_GlobalResponse($this);
+            $this->_js = new CM_Frontend_GlobalResponse();
         }
         return $this->_js;
     }
