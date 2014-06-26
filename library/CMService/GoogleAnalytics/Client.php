@@ -61,11 +61,11 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
      */
     public function getJs() {
         $js = '';
-        foreach ($this->_getPageViews() as $pageview) {
-            if (null === $pageview) {
+        foreach ($this->_getPageViews() as $pageView) {
+            if (null === $pageView) {
                 $js .= "_gaq.push(['_trackPageview']);";
             } else {
-                $js .= "_gaq.push(['_trackPageview', '" . $pageview . "']);";
+                $js .= "_gaq.push(['_trackPageview', '" . $pageView . "']);";
             }
         }
         foreach ($this->_orders as $orderId => $products) {
