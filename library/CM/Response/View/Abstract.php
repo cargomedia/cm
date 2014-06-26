@@ -85,7 +85,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
         $frontend = $responsePage->getRender()->getGlobalResponse();
         $html = $responsePage->getContent();
-        $js = $frontend->getJs();
+        $js = implode(PHP_EOL, array_filter([$frontend->getJs(), $response->getRender()->getServiceManager()->getTrackings()->getJs()]));
         $autoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
         $frontend->clear();
