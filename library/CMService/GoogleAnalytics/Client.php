@@ -6,7 +6,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     protected $_code;
 
     /** @var array */
-    protected $_pageviews = array(), $_orders = array(), $_customVars = array();
+    protected $_pageViews = array(), $_orders = array(), $_customVars = array();
 
     /**
      * @param string $code
@@ -37,10 +37,10 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
             $path = (string) $path;
         }
         if ($this->_getPageViews() === array(null)) {
-            $this->_pageviews = array();
+            $this->_pageViews = array();
         }
         if (null !== $path || 0 === count($this->_getPageViews())) {
-            $this->_pageviews[] = $path;
+            $this->_pageViews[] = $path;
         }
     }
 
@@ -123,6 +123,6 @@ EOT;
      * @return array
      */
     protected function _getPageViews() {
-        return $this->_pageviews;
+        return $this->_pageViews;
     }
 }
