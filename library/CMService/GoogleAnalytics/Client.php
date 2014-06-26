@@ -26,7 +26,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
         $name = (string) $name;
         $value = (string) $value;
         $scope = (int) $scope;
-        $this->_customVars[] = array('index' => $index, 'name' => $name, 'value' => $value, 'scope' => $scope);
+        $this->_customVars[$index] = array('index' => $index, 'name' => $name, 'value' => $value, 'scope' => $scope);
     }
 
     /**
