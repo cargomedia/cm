@@ -93,13 +93,13 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
         $html .= "_gaq.push(['_setDomainName', '" . $environment->getSite()->getHost() . "']);";
         $html .= $this->getJs();
 
-        $html .= <<<EOT
+        $html .= <<<EOF
 (function() {
 var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
 ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
-EOT;
+EOF;
         $html .= '</script>';
 
         return $html;
