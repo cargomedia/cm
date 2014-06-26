@@ -47,7 +47,6 @@ class CM_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessTrackingDisabled() {
-        $site = CM_Site_Abstract::factory();
         /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock5');
         $response->process();
@@ -58,7 +57,6 @@ class CM_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessTrackingGuest() {
-        $site = CM_Site_Abstract::factory();
         /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock5');
         $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
@@ -79,7 +77,6 @@ class CM_Response_PageTest extends CMTest_TestCase {
         $viewer->expects($this->any())->method('getIdRaw')->will($this->returnValue(array('id' => '1')));
         $viewer->expects($this->any())->method('getVisible')->will($this->returnValue(false));
         $viewer->expects($this->any())->method('getLanguage')->will($this->returnValue(null));
-        $site = CM_Site_Abstract::factory();
         /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock5', null, $viewer);
         $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
