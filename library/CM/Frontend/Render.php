@@ -1,6 +1,8 @@
 <?php
 
-class CM_Frontend_Render extends CM_Service_ManagerAware {
+class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var CM_Frontend_GlobalResponse|null */
     private $_js;
