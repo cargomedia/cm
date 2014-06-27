@@ -126,4 +126,12 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         $this->assertSame(4, $actionList->getCount());
         $this->assertSame(1, $transgressionList->getCount());
     }
+
+    public function testGetLabel() {
+        $userMock = $this->getMock('CM_Model_User');
+        $argumentList = array(CM_Action_Abstract::VIEW, $userMock);
+        $actionMock = $this->getMockForAbstractClass('CM_Action_Abstract', $argumentList, 'CM_Action_EmailNotification_Reminder');
+        /** @var CM_Action_Abstract $actionMock */
+        $this->assertSame('Email Notification Reminder View', $actionMock->getLabel());
+    }
 }

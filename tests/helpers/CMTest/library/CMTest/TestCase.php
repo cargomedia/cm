@@ -370,7 +370,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param mixed|CM_Comparable $needle
-     * @param Traversable         $haystack
+     * @param Traversable|string  $haystack
      * @param string              $message
      * @param boolean             $ignoreCase
      * @param boolean             $checkForObjectIdentity
