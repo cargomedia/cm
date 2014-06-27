@@ -33,7 +33,7 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
     public function runUpdate($version, $namespace = null) {
         $versionBumps = CM_App::getInstance()->runUpdateScript($namespace, $version);
         if ($versionBumps > 0) {
-            $db = CM_Config::get()->CM_Db_Db->db;
+            $db = CM_Db_Db::getClient()->getDb();
             CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
         }
     }
