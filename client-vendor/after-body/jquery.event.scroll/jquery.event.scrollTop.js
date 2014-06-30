@@ -17,31 +17,11 @@
     return false;
   };
 
-  var handler = function(event) {
+  var handler = _.throttle(function(event) {
     event.type = 'scrollTop';
     var element = this;
-    var data = $.data(element);
-
-    clearTimeout(data.scrollTimeout);
-    var now = (new Date()).getTime();
-    if (!data.scrollStart) {
-      data.scrollStart = now;
-    }
-    var startTimeout = true;
-    if ((now - data.scrollStart) > checkDelay) {
-      data.scrollStart = now;
-      if (checkScrollHeight(element, event)) {
-        startTimeout = false;
-      }
-    }
-
-    if (startTimeout) {
-      data.scrollTimeout = setTimeout(function() {
-        data.scrollStart = null;
-        checkScrollHeight(element, event);
-      }, checkDelay);
-    }
-  };
+    checkScrollHeight(element, event);
+  }, checkDelay);
 
   $.event.special.scrollTop = {
     add: function(handleObj) {
