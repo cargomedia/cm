@@ -12,14 +12,14 @@
     var distanceFromBottom = scrollHeight - innerHeight - $this.scrollTop();
     var distanceMin = innerHeight * preloadMultiple;
     if (distanceFromBottom < distanceMin) {
-      $(this).trigger('scrollEnd', [event]);
+      $(this).trigger('scrollBottom', [event]);
       return true;
     }
     return false;
   };
 
   var handler = function(event) {
-    event.type = 'scrollEnd';
+    event.type = 'scrollBottom';
     var element = this;
     var data = $.data(element);
 
@@ -44,7 +44,7 @@
     }
   };
 
-  $.event.special.scrollEnd = {
+  $.event.special.scrollBottom = {
     add: function(handleObj) {
       jQuery.event.add(this, 'scroll', handler);
       jQuery.event.add(this, 'touchmove', handler);
