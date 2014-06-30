@@ -474,7 +474,11 @@ class CM_Params extends CM_Class_Abstract {
             $value = array_merge($array, array('_class' => get_class($value)));
         }
         if ($json) {
-            $value = self::jsonEncode($value);
+            if (is_object($value)) {
+                $value = 'null';
+            } else {
+                $value = self::jsonEncode($value);
+            }
         }
         return $value;
     }
@@ -510,16 +514,11 @@ class CM_Params extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      */
     public static function jsonEncode($value) {
-        if (is_object($value)) {
-            $value = 'null';
-            return $value;
-        } else {
-            $value = json_encode($value);
-            if (json_last_error() > 0) {
-                throw new CM_Exception_Invalid('Cannot json_encode value `' . CM_Util::var_line($value) . '`.');
-            }
-            return $value;
+        $value = json_encode($value);
+        if (json_last_error() > 0) {
+            throw new CM_Exception_Invalid('Cannot json_encode value `' . CM_Util::var_line($value) . '`.');
         }
+        return $value;
     }
 
     /**
