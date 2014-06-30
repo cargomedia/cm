@@ -474,14 +474,7 @@ class CM_Params extends CM_Class_Abstract {
             $value = array_merge($array, array('_class' => get_class($value)));
         }
         if ($json) {
-            if (is_object($value)) {
-                $value = 'null';
-            } else {
-                $value = json_encode($value);
-                if (json_last_error() > 0) {
-                    throw new CM_Exception_Invalid('Cannot json_encode value `' . CM_Util::var_line($value) . '`.');
-                }
-            }
+            $value = self::jsonEncode($value);
         }
         return $value;
     }
@@ -494,11 +487,7 @@ class CM_Params extends CM_Class_Abstract {
      */
     public static function decode($value, $json = null) {
         if ($json) {
-            $valueString = (string) $value;
-            $value = json_decode($valueString, true);
-            if (json_last_error() > 0) {
-                throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString . '`.');
-            }
+            $value = self::jsonDecode($value);
         }
         if (is_array($value) && isset($value['_class'])) {
             // CM_ArrayConvertible
@@ -511,6 +500,38 @@ class CM_Params extends CM_Class_Abstract {
         }
         if (is_array($value)) {
             $value = array_map('self::decode', $value);
+        }
+        return $value;
+    }
+
+    /**
+     * @param mixed $value
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    public static function jsonEncode($value) {
+        if (is_object($value)) {
+            $value = 'null';
+            return $value;
+        } else {
+            $value = json_encode($value);
+            if (json_last_error() > 0) {
+                throw new CM_Exception_Invalid('Cannot json_encode value `' . CM_Util::var_line($value) . '`.');
+            }
+            return $value;
+        }
+    }
+
+    /**
+     * @param string $value
+     * @return mixed
+     * @throws CM_Exception_Invalid
+     */
+    public static function jsonDecode($value) {
+        $valueString = (string) $value;
+        $value = json_decode($valueString, true);
+        if (json_last_error() > 0) {
+            throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString . '`.');
         }
         return $value;
     }
