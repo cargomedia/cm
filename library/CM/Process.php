@@ -55,6 +55,15 @@ class CM_Process {
     }
 
     /**
+     * @param int $processId
+     * @return bool
+     */
+    public function isRunning($processId) {
+        $processId = (int) $processId;
+        return (false !== posix_getsid($processId));
+    }
+
+    /**
      * @param int $signal
      */
     public function killChildren($signal) {
@@ -90,15 +99,6 @@ class CM_Process {
             $instance = new self();
         }
         return $instance;
-    }
-
-    /**
-     * @param int $processId
-     * @return bool
-     */
-    public static function isRunning($processId) {
-        $processId = (int) $processId;
-        return (false !== posix_getsid($processId));
     }
 
     /**

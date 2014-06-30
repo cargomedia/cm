@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract implements CM_Typed {
+abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract implements CM_Typed, CM_ArrayConvertible {
 
     /**
      * @var int
@@ -52,12 +52,20 @@ abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract impleme
         return false;
     }
 
+    public function toArray() {
+        return array('type' => static::getTypeStatic());
+    }
+
     /**
      * @param int $type
      * @return CM_Paging_ContentList_Abstract
      */
-    static public function factory($type) {
+    public static function factory($type) {
         $className = self::_getClassName($type);
         return new $className();
+    }
+
+    public static function fromArray(array $array) {
+        return static::factory($array['type']);
     }
 }

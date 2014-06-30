@@ -2,8 +2,8 @@
 
 class CM_Model_Splittest_UserTest extends CMTest_TestCase {
 
-    public function setUp() {
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
+    public function tearDown() {
+        CMTest_TH::clearEnv();
     }
 
     public function testIsVariationFixture() {
@@ -16,8 +16,6 @@ class CM_Model_Splittest_UserTest extends CMTest_TestCase {
             $isVariationUser1 = $test->isVariationFixture($user, 'v1');
             $this->assertSame($isVariationUser1, $test->isVariationFixture($user, 'v1'));
         }
-
-        $test->delete();
     }
 
     public function testSetConversion() {
@@ -36,7 +34,31 @@ class CM_Model_Splittest_UserTest extends CMTest_TestCase {
         $this->assertSame(1, $variation->getConversionCount(true));
         $test->setConversion($user2, 2.5);
         $this->assertSame(1.75, $variation->getConversionRate(true));
+    }
 
-        $test->delete();
+    public function testIsVariationFixtureStatic() {
+        $user = CMTest_TH::createUser();
+        $this->assertFalse(CM_Model_Splittest_User::isVariationFixtureStatic('foo', $user, 'bar'));
+        CM_Model_Splittest_User::create('foo', ['bar']);
+        $this->assertTrue(CM_Model_Splittest_User::isVariationFixtureStatic('foo', $user, 'bar'));
+    }
+
+    public function testSetConversionStatic() {
+        $user1 = CMTest_TH::createUser();
+        $user2 = CMTest_TH::createUser();
+
+        CM_Model_Splittest_User::setConversionStatic('foo', $user1);
+        $splittest = CM_Model_Splittest_User::create('foo', ['bar']);
+
+        /** @var CM_Model_SplittestVariation $variation */
+        $variation = $splittest->getVariations()->getItem(0);
+        $splittest->isVariationFixture($user1, 'bar');
+        $splittest->isVariationFixture($user2, 'bar');
+
+        $this->assertSame(0, $variation->getConversionCount(true));
+        CM_Model_Splittest_User::setConversionStatic('foo', $user1);
+        $this->assertSame(1, $variation->getConversionCount(true));
+        CM_Model_Splittest_User::setConversionStatic('foo', $user2, 2.5);
+        $this->assertSame(1.75, $variation->getConversionRate(true));
     }
 }

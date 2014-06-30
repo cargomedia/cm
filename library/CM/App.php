@@ -29,29 +29,26 @@ class CM_App {
 
     /**
      * @param boolean|null $forceReload
-     * @throws CM_Exception_Invalid
      */
     public function setupDatabase($forceReload = null) {
-        $configDb = CM_Config::get()->CM_Db_Db;
-        if (!$configDb->db) {
-            throw new CM_Exception_Invalid('No database name configured');
-        }
-        $client = new CM_Db_Client($configDb->server['host'], $configDb->server['port'], $configDb->username, $configDb->password);
+        $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+        $db = $client->getDb();
+        $client->setDb(null);
 
         if ($forceReload) {
-            $client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($configDb->db))->execute();
+            $client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($db))->execute();
         }
 
-        $databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($configDb->db))->fetch();
+        $databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($db))->fetch();
         if (!$databaseExists) {
-            $client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($configDb->db))->execute();
+            $client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($db))->execute();
         }
 
-        $client->setDb($configDb->db);
+        $client->setDb($db);
         $tables = $client->createStatement('SHOW TABLES')->execute()->fetchAll();
         if (0 === count($tables)) {
             foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-                CM_Db_Db::runDump($configDb->db, $dump);
+                CM_Db_Db::runDump($db, $dump);
             }
             $app = CM_App::getInstance();
             foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
@@ -160,7 +157,7 @@ class CM_App {
             $versionBumps += ($version - $versionStart);
         }
         if ($versionBumps > 0) {
-            $db = CM_Config::get()->CM_Db_Db->db;
+            $db = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getDb();
             CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
         }
         return $versionBumps;

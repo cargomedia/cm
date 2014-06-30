@@ -2,6 +2,8 @@
 
 abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
+    use \Mocka\MockaTrait;
+
     public function runBare() {
         if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
             $siteDefault = $this->getMockSite(null, null, array(
@@ -60,7 +62,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         );
         $configuration = array_merge($defaultConfiguration, (array) $configuration);
 
-        $site = $this->getMockForAbstractClass($classname, array(), $classname . '_Mock' . $type, true, true, true, $methods);
+        $mockClassname = $classname . '_Mock' . $type . '_' . uniqid();
+        $site = $this->getMockForAbstractClass($classname, array(), $mockClassname, true, true, true, $methods);
         $siteClassName = get_class($site);
         $config->CM_Site_Abstract->types[$type] = $siteClassName;
         $config->$siteClassName = new stdClass;
@@ -304,8 +307,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         if (count($haystacks) < count($needles)) {
             self::fail('not enough elements to compare each');
         }
-        for ($i = 0; $i < count($needles); $i++) {
-            self::assertContains($needles[$i], $haystacks[$i]);
+        foreach ($needles as $key => $value) {
+            self::assertContains($value, $haystacks[$key]);
         }
     }
 
@@ -367,13 +370,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param mixed|CM_Comparable $needle
-     * @param Traversable         $haystack
+     * @param Traversable|string  $haystack
      * @param string              $message
      * @param boolean             $ignoreCase
      * @param boolean             $checkForObjectIdentity
+     * @param bool                $checkForNonObjectIdentity
      * @throws CM_Exception_Invalid
      */
-    public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
+    public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
         if ($needle instanceof CM_Comparable) {
             if (!(is_array($haystack) || $haystack instanceof Traversable)) {
                 throw new CM_Exception_Invalid('Haystack is not traversable.');
@@ -387,7 +391,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             }
             self::assertTrue($match, 'Needle not contained.');
         } else {
-            parent::assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
+            parent::assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
         }
     }
 
@@ -397,9 +401,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param string              $message
      * @param boolean             $ignoreCase
      * @param boolean             $checkForObjectIdentity
+     * @param bool                $checkForNonObjectIdentity
      * @throws CM_Exception_Invalid
      */
-    public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
+    public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
         if ($needle instanceof CM_Comparable) {
             if (!(is_array($haystack) || $haystack instanceof Traversable)) {
                 throw new CM_Exception_Invalid('Haystack is not traversable.');
@@ -413,7 +418,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             }
             self::assertFalse($match, 'Needle contained.');
         } else {
-            parent::assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
+            parent::assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
         }
     }
 

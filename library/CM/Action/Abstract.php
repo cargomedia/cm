@@ -27,6 +27,12 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     /** @var array */
     protected $_ignoreLogging = array();
 
+    /** @var bool */
+    private $_trackingEnabled = true;
+
+    /** @var array */
+    private $_trackingPropertyList = array();
+
     /**
      * @param string            $verbName
      * @param CM_Model_User|int $actor
@@ -43,6 +49,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         if (method_exists($this, $methodName)) {
             call_user_func_array(array($this, $methodName), $arguments);
         }
+
+        $this->_track();
     }
 
     /**
@@ -157,6 +165,13 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
      */
     public function getIp() {
         return $this->_ip;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTrackingPropertyList() {
+        return $this->_trackingPropertyList;
     }
 
     /**
@@ -349,7 +364,26 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
      * @return string
      */
     public function getLabel() {
-        return $this->getName() . ' ' . $this->getVerbName();
+        $actionName = CM_Util::uncamelize(str_replace('_', '', preg_replace('#\\A[^_]++_[^_]++_#', '', get_called_class())), ' ');
+        $verbName = strtolower(str_replace('_', ' ', $this->getVerbName()));
+        return ucwords($actionName . ' ' . $verbName);
+    }
+
+    protected function _disableTracking() {
+        $this->_trackingEnabled = false;
+    }
+
+    /**
+     * @param array $trackingPropertyList
+     */
+    protected function _setTrackingPropertyList(array $trackingPropertyList) {
+        $this->_trackingPropertyList = $trackingPropertyList;
+    }
+
+    protected function _track() {
+        if ($this->_trackingEnabled) {
+            CM_Service_Manager::getInstance()->getTrackings()->trackAction($this);
+        }
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
+class CM_Usertext_Filter_Emoticon extends CM_Usertext_Filter_Abstract {
 
     const PATTERN_FALSE_SMILEY = '(\p{N}\s*+%|(\(|\p{N}|\p{L}\p{M}*+)[38BO])';
 
@@ -14,6 +14,10 @@ class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
         if (null !== $fixedHeight) {
             $this->_fixedHeight = (int) $fixedHeight;
         }
+    }
+
+    public function getCacheKey() {
+        return parent::getCacheKey() + array('_fixedHeight' => $this->_fixedHeight);
     }
 
     public function transform($text, CM_Frontend_Render $render) {
