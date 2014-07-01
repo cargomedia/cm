@@ -100,7 +100,7 @@ class CM_App {
         foreach ($assetList as $asset) {
             $asset->get(true);
         }
-        CM_Bootloader::getInstance()->getNamespaces();
+        CM_Bootloader::getInstance()->getModules();
     }
 
     /**
@@ -191,8 +191,8 @@ class CM_App {
      */
     private function _getUpdateScriptPaths() {
         $paths = array();
-        foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-            $paths[$namespace] = CM_Util::getNamespacePath($namespace) . 'resources/db/update/';
+        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
+            $paths[$moduleName] = CM_Util::getModulePath($moduleName) . 'resources/db/update/';
         }
 
         $rootPath = DIR_ROOT . 'resources/db/update/';
@@ -205,18 +205,18 @@ class CM_App {
 
     /**
      * @param int         $version
-     * @param string|null $namespace
+     * @param string|null $moduleName
      * @return string
      * @throws CM_Exception_Invalid
      */
-    private function _getUpdateScriptPath($version, $namespace = null) {
+    private function _getUpdateScriptPath($version, $moduleName = null) {
         $path = DIR_ROOT;
-        if ($namespace) {
-            $path = CM_Util::getNamespacePath($namespace);
+        if ($moduleName) {
+            $path = CM_Util::getModulePath($moduleName);
         }
         $file = new CM_File($path . 'resources/db/update/' . $version . '.php');
         if (!$file->getExists()) {
-            throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $namespace . '` namespace.');
+            throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $moduleName . '` namespace.');
         }
         return $file->getPath();
     }

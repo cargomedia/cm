@@ -1,6 +1,6 @@
 <?php
 
-require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.button.php';
+require_once CM_Util::getModulePath('CM') . 'library/CM/SmartyPlugins/function.button.php';
 
 class smarty_function_buttonTest extends CMTest_TestCase {
 
