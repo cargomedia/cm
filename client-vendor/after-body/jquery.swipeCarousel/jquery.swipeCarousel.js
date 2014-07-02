@@ -29,7 +29,7 @@
       dragMinDistance: 20,
       swipeVelocityX: 0.1
     });
-    _.bindAll(this, 'setPaneDimensions', 'onKeydown', 'onHammer');
+    _.bindAll(this, '_setPaneDimensions', '_onKeydown', '_onHammer');
     this.initialized = false;
   };
 
@@ -64,11 +64,11 @@
       }
 
       this.$element.addClass('swipeCarousel');
-      this.setPaneDimensions();
+      this._setPaneDimensions();
       this.showPane(this.current_pane, null, true);
-      $(window).on('load resize orientationchange', this.setPaneDimensions);
-      $(window).on('keydown', this.onKeydown);
-      this.hammer.on('release dragleft dragright swipeleft swiperight', this.onHammer);
+      $(window).on('load resize orientationchange', this._setPaneDimensions);
+      $(window).on('keydown', this._onKeydown);
+      this.hammer.on('release dragleft dragright swipeleft swiperight', this._onHammer);
       this.initialized = true;
     },
 
@@ -77,9 +77,9 @@
         return;
       }
 
-      $(window).off('load resize orientationchange', this.setPaneDimensions);
-      $(window).off('keydown', this.onKeydown);
-      this.hammer.off('release dragleft dragright swipeleft swiperight', this.onHammer);
+      $(window).off('load resize orientationchange', this._setPaneDimensions);
+      $(window).off('keydown', this._onKeydown);
+      this.hammer.off('release dragleft dragright swipeleft swiperight', this._onHammer);
       this.initialized = false;
     },
 
@@ -109,14 +109,14 @@
       this.current_pane = index;
 
       var offset = -((100 / this.pane_count) * this.current_pane);
-      this.setContainerOffset(offset, !skipAnimation);
+      this._setContainerOffset(offset, !skipAnimation);
 
       if (change) {
-        this.onChange(eventData);
+        this._onChange(eventData);
       }
     },
 
-    setPaneDimensions: function() {
+    _setPaneDimensions: function() {
       this.pane_width = this.$element.width();
       var self = this;
       this.$panes.each(function() {
@@ -130,7 +130,7 @@
      * @param {Number} percent
      * @param {Boolean} animate
      */
-    setContainerOffset: function(percent, animate) {
+    _setContainerOffset: function(percent, animate) {
       this.$container.removeClass('animate');
       if (animate) {
         this.$container.addClass('animate');
@@ -146,7 +146,7 @@
     /**
      * @param {Object} eventData
      */
-    onChange: function(eventData) {
+    _onChange: function(eventData) {
       var $pane_current = this.$panes.eq(this.current_pane);
       this.$panes.removeClass('active');
       $pane_current.addClass('active');
@@ -160,7 +160,7 @@
     /**
      * @param {Event} event
      */
-    onKeydown: function(event) {
+    _onKeydown: function(event) {
       if (event.which === cm.keyCode.LEFT && !$(event.target).is(':input')) {
         this.showPrevious();
       }
@@ -172,7 +172,7 @@
     /**
      * @param {Hammer.event} event
      */
-    onHammer: function(event) {
+    _onHammer: function(event) {
       // disable browser scrolling
       event.gesture.preventDefault();
 
@@ -188,7 +188,7 @@
             drag_offset *= .4;
           }
 
-          this.setContainerOffset(drag_offset + pane_offset, false);
+          this._setContainerOffset(drag_offset + pane_offset, false);
           break;
 
         case 'swipeleft':
