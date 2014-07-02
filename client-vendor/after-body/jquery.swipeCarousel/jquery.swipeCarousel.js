@@ -157,7 +157,6 @@
      * @param {Event} event
      */
     onKeydown: function(event) {
-      console.log('key', event.keyCode);
       if (event.which === cm.keyCode.LEFT && !$(event.target).is(':input')) {
         this.showPrevious();
       }
