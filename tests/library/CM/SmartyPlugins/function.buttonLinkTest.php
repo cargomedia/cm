@@ -1,6 +1,6 @@
 <?php
 
-require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.button_link.php';
+require_once CM_Util::getModulePath('CM') . 'library/CM/SmartyPlugins/function.button_link.php';
 
 class smarty_function_button_linkTest extends CMTest_TestCase {
 
@@ -18,10 +18,10 @@ class smarty_function_button_linkTest extends CMTest_TestCase {
 
     public function testRender() {
         $params = array(
-            'action'      => 'Create',
-            'label'       => 'Some text <br /> with html tags',
-            'theme'       => 'highlight',
-            'class'       => 'button-large',
+            'action' => 'Create',
+            'label'  => 'Some text <br /> with html tags',
+            'theme'  => 'highlight',
+            'class'  => 'button-large',
         );
 
         $this->_assertContains('value="Some text <br /> with html tags"', array_merge($params, array('isHtmlLabel' => true)));

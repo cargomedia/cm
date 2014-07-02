@@ -58,7 +58,12 @@ class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
             if ($this->_group) {
                 $query .= ' GROUP BY ' . $this->_group;
             }
-            $result = CM_Db_Db::exec($query, $this->_parameters, $this->_dbSlave);
+            if ($this->_dbSlave) {
+                $client = CM_Service_Manager::getInstance()->getDatabases()->getRead();
+            } else {
+                $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+            }
+            $result = CM_Db_Db::exec($query, $this->_parameters, null, $client);
             if ($this->_group) {
                 $count = (int) count($result->fetchAll());
             } else {
@@ -88,7 +93,12 @@ class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
             if ($offset !== null && $count !== null) {
                 $query .= ' LIMIT ' . $offset . ',' . $count;
             }
-            $result = CM_Db_Db::exec($query, $this->_parameters, $this->_dbSlave);
+            if ($this->_dbSlave) {
+                $client = CM_Service_Manager::getInstance()->getDatabases()->getRead();
+            } else {
+                $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+            }
+            $result = CM_Db_Db::exec($query, $this->_parameters, null, $client);
             $items = $result->fetchAll();
             $this->_cacheSet($cacheKey, $items);
         }

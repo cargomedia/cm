@@ -1,6 +1,6 @@
 <?php
 
-require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.resourceUrl.php';
+require_once CM_Util::getModulePath('CM') . 'library/CM/SmartyPlugins/function.resourceUrl.php';
 
 class smarty_function_resourceUrlTest extends CMTest_TestCase {
 

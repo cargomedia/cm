@@ -37,13 +37,13 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
             $render->getUrlPage($page, array('userId' => 15, 'foo' => 'bar')));
     }
 
-    public function testGetUrlPageInvalidNamespace() {
+    public function testGetUrlPageInvalidModule() {
         $render = new CM_Frontend_Render();
 
-        $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'INVALIDNAMESPACE_Page_Test', false);
+        $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'INVALIDMODULE_Page_Test', false);
         try {
-            $render->getUrlPage('INVALIDNAMESPACE_Page_Test');
-            $this->fail('Can compute path of page with invalid namespace');
+            $render->getUrlPage('INVALIDMODULE_Page_Test');
+            $this->fail('Can compute path of page with invalid module');
         } catch (CM_Exception_Invalid $ex) {
             $this->assertTrue(true);
         }
@@ -149,5 +149,15 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
         $render = new CM_Frontend_Render();
         $this->assertNull($render->getViewer());
+    }
+
+    public function testParseTemplateContent() {
+        $viewer = CM_Model_User::createStatic();
+        $render = new CM_Frontend_Render();
+        $render->getEnvironment()->setViewer($viewer);
+
+        $content = '{$viewer->getId()} {$foo} normal-text';
+        $expected = $viewer->getId() . ' bar normal-text';
+        $this->assertSame($expected, $render->parseTemplateContent($content, ['foo' => 'bar']));
     }
 }

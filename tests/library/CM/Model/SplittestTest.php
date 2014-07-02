@@ -2,10 +2,6 @@
 
 class CM_Model_SplittestTest extends CMTest_TestCase {
 
-    public function setUp() {
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
-    }
-
     public function tearDown() {
         $splittestList = new CM_Paging_Splittest_All();
         foreach ($splittestList as $splittest) {
@@ -212,26 +208,12 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $this->assertSame(0, $v1);
     }
 
-    public function testWithoutPersistence() {
-        $user = CMTest_TH::createUser();
-        $fixture = new CM_Splittest_Fixture($user);
-
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = true;
-        $test = new CM_Model_Splittest_Mock('notExisting');
-
-        $this->assertFalse($test->isVariationFixture($fixture, 'bar'));
-        $this->assertSame('', $test->getVariationFixture($fixture));
-        $test->setConversion($fixture);
-
-        CMTest_TH::clearConfig();
-    }
-
-    public function testWithoutPersistenceDelete() {
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = true;
-        $test = new CM_Model_Splittest_Mock('foo');
-        $test->delete();
-
-        CMTest_TH::clearConfig();
+    public function testExists() {
+        $this->assertFalse(CM_Model_Splittest::exists('foo'));
+        $splittest = CM_Model_Splittest::create('foo', ['bar']);
+        $this->assertTrue(CM_Model_Splittest::exists('foo'));
+        $splittest->delete();
+        $this->assertFalse(CM_Model_Splittest::exists('foo'));
     }
 }
 

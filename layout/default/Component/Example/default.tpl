@@ -13,25 +13,25 @@
 <div class="tabs-content">
   {block name="tabs-content"}
     <div>
-      {viewTemplate file='tabs/example' foo=$foo now=$now}
+      {viewTemplate name='tabs/example' foo=$foo now=$now}
     </div>
     <div>
       {code language="html5"}{load file='Component/Example/tabs/menus.tpl' namespace='CM' parse=false}{/code}
-      {viewTemplate file='tabs/menus'}
+      {viewTemplate name='tabs/menus'}
     </div>
     <div>
       {code language="html5"}{load file='Component/Example/tabs/buttons.tpl' namespace='CM' parse=false}{/code}
-      {viewTemplate file='tabs/buttons'}
+      {viewTemplate name='tabs/buttons'}
     </div>
     <div>
       {code language="html5"}{load file='Component/Example/tabs/forms.tpl' namespace='CM' parse=false}{/code}
-      {viewTemplate file='tabs/forms'}
+      {viewTemplate name='tabs/forms'}
     </div>
     <div>
-      {viewTemplate file='tabs/variables' colorStyles=$colorStyles}
+      {viewTemplate name='tabs/variables' colorStyles=$colorStyles}
     </div>
     <div>
-      {viewTemplate file='tabs/icons' icons=$icons}
+      {viewTemplate name='tabs/icons' icons=$icons}
     </div>
     <div>
       {viewTemplate file='tabs/styleguide'}

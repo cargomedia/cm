@@ -6,7 +6,7 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $log = $this->getMockBuilder('CM_Paging_Log_Error')->setMethods(array('add'))->disableOriginalConstructor()->getMock();
         $log->expects($this->once())->method('add')->will($this->returnValue(null));
 
-        $exception = $this->getMockBuilder('CM_Exception')->setMethods(array('getLog', 'getMetaInfo'))->disableOriginalConstructor()->getMock();
+        $exception = $this->getMockBuilder('CM_Exception')->setMethods(array('getLog', 'getMetaInfo'))->getMock();
         $exception->expects($this->any())->method('getLog')->will($this->returnValue($log));
         $exception->expects($this->any())->method('getMetaInfo')->will($this->returnValue(array()));
 
@@ -20,7 +20,7 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $log = $this->getMockBuilder('CM_Paging_Log_Error')->setMethods(array('add'))->disableOriginalConstructor()->getMock();
         $log->expects($this->any())->method('add')->will($this->throwException(new Exception('foo')));
 
-        $exception = $this->getMockBuilder('CM_Exception')->setMethods(array('getLog', 'getMetaInfo'))->disableOriginalConstructor()->getMock();
+        $exception = $this->getMockBuilder('CM_Exception')->setMethods(array('getLog', 'getMetaInfo'))->getMock();
         $exception->expects($this->any())->method('getLog')->will($this->returnValue($log));
         $exception->expects($this->any())->method('getMetaInfo')->will($this->returnValue(array()));
 

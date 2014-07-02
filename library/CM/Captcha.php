@@ -16,7 +16,7 @@ class CM_Captcha {
         if (!$this->_text) {
             throw new CM_Exception_Nonexistent('Invalid captcha id `' . $id . '`', null, array('severity' => CM_Exception::WARN));
         }
-        $this->_fontPath = CM_Util::getNamespacePath('CM') . 'resources/font/comicsans.ttf';
+        $this->_fontPath = CM_Util::getModulePath('CM') . 'resources/font/comicsans.ttf';
     }
 
     /**

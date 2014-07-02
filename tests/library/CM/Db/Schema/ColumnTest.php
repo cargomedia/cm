@@ -19,13 +19,14 @@ class CM_Db_Schema_ColumnTest extends CMTest_TestCase {
 				`enumWithDefault` ENUM(\'yes\', \'no\') default \'no\',
 				PRIMARY KEY (`id`)
 			)');
-        self::$_columnId = new CM_Db_Schema_Column(CMTest_TH::getDbClient(), 'cm_db_schema_columntest', 'id');
-        self::$_columnIntNoSize = new CM_Db_Schema_Column(CMTest_TH::getDbClient(), 'cm_db_schema_columntest', 'intNoSize');
-        self::$_columnIntWithDefault = new CM_Db_Schema_Column(CMTest_TH::getDbClient(), 'cm_db_schema_columntest', 'intWithDefault');
-        self::$_columnVarchar = new CM_Db_Schema_Column(CMTest_TH::getDbClient(), 'cm_db_schema_columntest', 'varchar');
-        self::$_columnTextNoSize = new CM_Db_Schema_Column(CMTest_TH::getDbClient(), 'cm_db_schema_columntest', 'textNoSize');
-        self::$_columnEnum = new CM_Db_Schema_Column(CMTest_TH::getDbClient(), 'cm_db_schema_columntest', 'enum');
-        self::$_columnEnumWithDefault = new CM_Db_Schema_Column(CMTest_TH::getDbClient(), 'cm_db_schema_columntest', 'enumWithDefault');
+        $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+        self::$_columnId = new CM_Db_Schema_Column($client, 'cm_db_schema_columntest', 'id');
+        self::$_columnIntNoSize = new CM_Db_Schema_Column($client, 'cm_db_schema_columntest', 'intNoSize');
+        self::$_columnIntWithDefault = new CM_Db_Schema_Column($client, 'cm_db_schema_columntest', 'intWithDefault');
+        self::$_columnVarchar = new CM_Db_Schema_Column($client, 'cm_db_schema_columntest', 'varchar');
+        self::$_columnTextNoSize = new CM_Db_Schema_Column($client, 'cm_db_schema_columntest', 'textNoSize');
+        self::$_columnEnum = new CM_Db_Schema_Column($client, 'cm_db_schema_columntest', 'enum');
+        self::$_columnEnumWithDefault = new CM_Db_Schema_Column($client, 'cm_db_schema_columntest', 'enumWithDefault');
     }
 
     public function testSize() {

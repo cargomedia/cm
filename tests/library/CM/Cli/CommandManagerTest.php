@@ -117,7 +117,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
     public function testMonitorSynchronizedCommands() {
         $processMock = $this->getMock('CM_Process', array('getHostId', 'isRunning'), array(), '', false);
         $processMock->expects($this->any())->method('getHostId')->will($this->returnValue(1));
-        $processMock->staticExpects($this->any())->method('isRunning')->will($this->returnCallback(function ($processId) {
+        $processMock->expects($this->any())->method('isRunning')->will($this->returnCallback(function ($processId) {
             return $processId !== 3;
         }));
         $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('_getProcess'));

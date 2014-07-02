@@ -19,14 +19,22 @@ class CM_Db_Statement {
 
     /**
      * @param array|null $parameters
+     * @param bool|null  $disableQueryBuffering
      * @throws CM_Db_Exception
      * @return CM_Db_Result
      */
-    public function execute(array $parameters = null) {
+    public function execute(array $parameters = null, $disableQueryBuffering = null) {
+        $disableQueryBuffering = (bool) $disableQueryBuffering;
         $retryCount = 1;
         for ($try = 0; true; $try++) {
             try {
+                if ($disableQueryBuffering) {
+                    $this->_client->setBuffered(false);
+                }
                 @$this->_pdoStatement->execute($parameters);
+                if ($disableQueryBuffering) {
+                    $this->_client->setBuffered(true);
+                }
                 CM_Debug::getInstance()->incStats('mysql', $this->getQueryString());
                 return new CM_Db_Result($this->_pdoStatement);
             } catch (PDOException $e) {

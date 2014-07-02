@@ -8,8 +8,8 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
     public function iconRefresh() {
         /** @var CM_File[] $svgFileList */
         $svgFileList = array();
-        foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-            $iconPath = CM_Util::getNamespacePath($namespace) . 'layout/default/resource/img/icon/';
+        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
+            $iconPath = CM_Util::getModulePath($moduleName) . 'layout/default/resource/img/icon/';
             foreach (glob($iconPath . '*.svg') as $svgPath) {
                 $svgFile = new CM_File($svgPath);
                 $svgFileList[strtolower($svgFile->getFileName())] = $svgFile;
@@ -46,8 +46,8 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
     public function emoticonRefresh() {
         $emoticonList = array();
 
-        foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-            $emoticonPath = CM_Util::getNamespacePath($namespace) . 'layout/default/resource/img/emoticon/';
+        foreach (CM_Bootloader::getInstance()->getModules() as $namespace) {
+            $emoticonPath = CM_Util::getModulePath($namespace) . 'layout/default/resource/img/emoticon/';
             $paths = glob($emoticonPath . '*');
             foreach ($paths as $path) {
                 $file = new CM_File($path);

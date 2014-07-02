@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Filter_Markdown_UserContent implements CM_Usertext_Filter_Interface, CM_Service_ManagerAwareInterface {
+class CM_Usertext_Filter_Markdown_UserContent extends CM_Usertext_Filter_Abstract implements CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
 
@@ -12,6 +12,10 @@ class CM_Usertext_Filter_Markdown_UserContent implements CM_Usertext_Filter_Inte
             $serviceManager = CM_Service_Manager::getInstance();
         }
         $this->setServiceManager($serviceManager);
+    }
+
+    public function getCacheKey() {
+        return parent::getCacheKey() + array('_url' => $this->getServiceManager()->getUserContent()->getUrl('formatter'));
     }
 
     public function transform($text, CM_Frontend_Render $render) {
