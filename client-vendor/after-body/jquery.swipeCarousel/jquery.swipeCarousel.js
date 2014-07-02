@@ -27,7 +27,7 @@
     this.hammer = new Hammer(this.$element[0], {
       dragLockToAxis: true,
       dragMinDistance: 20,
-      swipeVelocityX: 0.3
+      swipeVelocityX: 0.1
     });
     _.bindAll(this, 'setPaneDimensions', 'onKeydown', 'onHammer');
     this.initialized = false;

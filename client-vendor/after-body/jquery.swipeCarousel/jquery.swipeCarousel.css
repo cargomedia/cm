@@ -24,10 +24,10 @@
 
 .swipeCarousel > ul.animate {
   /* see http://stackoverflow.com/questions/13782277/css3-transforms-and-transitions-webkit/13782443#13782443 */
-  -webkit-transition: -webkit-transform .2s;
-  -moz-transition: -moz-transform .2s;
-  -o-transition: -o-transform .2s;
-  transition: transform .2s;
+  -webkit-transition: -webkit-transform .25s;
+  -moz-transition: -moz-transform .25s;
+  -o-transition: -o-transform .25s;
+  transition: transform .25s;
 }
 
 .swipeCarousel > ul > li {
