@@ -1,14 +1,15 @@
 {
-	"classPrefix" : "",
-	"options": [
-		"setClasses",
-		"html5printshiv"
-	],
-	"feature-detects": [
-		"test/history",
-		"test/svg",
-		"test/forms/fileinput",
-		"test/dom/classlist",
-		"test/requestanimationframe"
-	]
+  "classPrefix" : "",
+  "options": [
+    "setClasses",
+    "html5printshiv"
+  ],
+  "feature-detects": [
+    "test/history",
+    "test/svg",
+    "test/forms/fileinput",
+    "test/dom/classlist",
+    "test/requestanimationframe",
+    "test/css/transforms3d"
+  ]
 }
