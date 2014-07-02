@@ -158,10 +158,10 @@
      */
     onKeydown: function(event) {
       if (event.which === cm.keyCode.LEFT && !$(event.target).is(':input')) {
-        this.showPrevious();
+        this.showPrevious(true);
       }
       if (event.which === cm.keyCode.RIGHT && !$(event.target).is(':input')) {
-        this.showNext();
+        this.showNext(true);
       }
     },
 
