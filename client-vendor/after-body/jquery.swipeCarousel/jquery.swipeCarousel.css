@@ -23,10 +23,11 @@
 }
 
 .swipeCarousel > ul.animate {
-  -webkit-transition: all .2s;
-  -moz-transition: all .2s;
-  -o-transition: all .2s;
-  transition: all .2s;
+  /* see http://stackoverflow.com/questions/13782277/css3-transforms-and-transitions-webkit/13782443#13782443 */
+  -webkit-transition: -webkit-transform .2s;
+  -moz-transition: -moz-transform .2s;
+  -o-transition: -o-transform .2s;
+  transition: transform .2s;
 }
 
 .swipeCarousel > ul > li {
