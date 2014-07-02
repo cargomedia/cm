@@ -184,7 +184,7 @@
             drag_offset *= .4;
           }
 
-          this.setContainerOffset(drag_offset + pane_offset, true);
+          this.setContainerOffset(drag_offset + pane_offset, false);
           break;
 
         case 'swipeleft':
