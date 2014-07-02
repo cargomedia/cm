@@ -25,7 +25,9 @@
     this.pane_width = 0;
     this.pane_count = this.$panes.length;
     this.hammer = new Hammer(this.$element[0], {
-      dragLockToAxis: true
+      dragLockToAxis: true,
+      dragMinDistance: 20,
+      swipeVelocityX: 0.3
     });
     _.bindAll(this, 'setPaneDimensions', 'onKeydown', 'onHammer');
     this.initialized = false;
