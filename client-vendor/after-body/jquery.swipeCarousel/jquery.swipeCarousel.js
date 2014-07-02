@@ -65,7 +65,7 @@
 
       this.$element.addClass('swipeCarousel');
       this.setPaneDimensions();
-      this.showPane(this.current_pane, true, true);
+      this.showPane(this.current_pane, null, true);
       $(window).on('load resize orientationchange', this.setPaneDimensions);
       $(window).on('keydown', this.onKeydown);
       this.hammer.on('release dragleft dragright swipeleft swiperight', this.onHammer);
@@ -84,26 +84,27 @@
     },
 
     /**
-     * @param {Boolean} [triggerChangeEvent]
+     * @param {Object} [eventData]
      */
-    showNext: function(triggerChangeEvent) {
-      this.showPane(this.current_pane + 1, triggerChangeEvent);
+    showNext: function(eventData) {
+      this.showPane(this.current_pane + 1, eventData);
     },
 
     /**
-     * @param {Boolean} [triggerChangeEvent]
+     * @param {Object} [eventData]
      */
-    showPrevious: function(triggerChangeEvent) {
-      this.showPane(this.current_pane - 1, triggerChangeEvent);
+    showPrevious: function(eventData) {
+      this.showPane(this.current_pane - 1, eventData);
     },
 
     /**
      * @param {Number} index
-     * @param {Boolean} [triggerChangeEvent]
+     * @param {Object} [eventData]
      * @param {Boolean} [skipAnimation]
      */
-    showPane: function(index, triggerChangeEvent, skipAnimation) {
+    showPane: function(index, eventData, skipAnimation) {
       index = Math.max(0, Math.min(index, this.pane_count - 1));
+      eventData = eventData || {};
       var change = this.current_pane != index;
       this.current_pane = index;
 
@@ -111,7 +112,7 @@
       this.setContainerOffset(offset, !skipAnimation);
 
       if (change) {
-        this.onChange(triggerChangeEvent);
+        this.onChange(eventData);
       }
     },
 
@@ -143,18 +144,17 @@
     },
 
     /**
-     * @param {Boolean} triggerChangeEvent
+     * @param {Object} eventData
      */
-    onChange: function(triggerChangeEvent) {
+    onChange: function(eventData) {
       var $pane_current = this.$panes.eq(this.current_pane);
       this.$panes.removeClass('active');
       $pane_current.addClass('active');
-      if (triggerChangeEvent) {
-        this.$element.trigger('swipeCarousel-change', {
-          index: this.current_pane,
-          element: $pane_current.get(0)
-        });
-      }
+      _.extend(eventData, {
+        index: this.current_pane,
+        element: $pane_current.get(0)
+      });
+      this.$element.trigger('swipeCarousel-change', eventData);
     },
 
     /**
@@ -162,10 +162,10 @@
      */
     onKeydown: function(event) {
       if (event.which === cm.keyCode.LEFT && !$(event.target).is(':input')) {
-        this.showPrevious(true);
+        this.showPrevious();
       }
       if (event.which === cm.keyCode.RIGHT && !$(event.target).is(':input')) {
-        this.showNext(true);
+        this.showNext();
       }
     },
 
@@ -192,12 +192,12 @@
           break;
 
         case 'swipeleft':
-          this.showNext(true);
+          this.showNext();
           event.gesture.stopDetect();
           break;
 
         case 'swiperight':
-          this.showPrevious(true);
+          this.showPrevious();
           event.gesture.stopDetect();
           break;
 
@@ -205,12 +205,12 @@
           // more then 50% moved, navigate
           if (Math.abs(event.gesture.deltaX) > this.pane_width / 2) {
             if (event.gesture.direction == 'right') {
-              this.showPrevious(true);
+              this.showPrevious();
             } else {
-              this.showNext(true);
+              this.showNext();
             }
           } else {
-            this.showPane(this.current_pane, true);
+            this.showPane(this.current_pane);
           }
           break;
       }
