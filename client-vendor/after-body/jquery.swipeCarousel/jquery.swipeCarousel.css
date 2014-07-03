@@ -7,6 +7,9 @@
 }
 
 .swipeCarousel > ul {
+  margin: 0;
+  padding: 0;
+
   overflow: hidden;
   -webkit-backface-visibility: hidden;
   -webkit-transform-style: preserve-3d;
@@ -31,6 +34,7 @@
 }
 
 .swipeCarousel > ul > li {
+  display: block;
   float: left;
 
   overflow: hidden;
