@@ -164,6 +164,13 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         return true;
     }
 
+    /**
+     * @return bool
+     */
+    public function isTrackingEnabled() {
+        return $this->_trackingEnabled;
+    }
+
     public function prepare() {
         $arguments = func_get_args();
         if (!call_user_func_array(array($this, '_isAllowed'), $arguments)) {
