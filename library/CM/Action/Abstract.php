@@ -24,8 +24,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     /** @var int|null */
     protected $_ip = null;
 
-    /** @var array */
-    protected $_ignoreLogging = array();
+    /** @var bool */
+    private $_actionLimitsEnabled = true;
 
     /** @var bool */
     private $_trackingEnabled = true;
@@ -92,22 +92,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         if (!call_user_func_array(array($this, '_isAllowed'), $arguments)) {
             throw new CM_Exception_NotAllowed('Action not allowed', null, array('messagePublic' => 'The content you tried to interact with has become private.'));
         }
-        $role = null;
-        $actionLimitList = $this->getActionLimitsTransgressed();
-        foreach ($actionLimitList as $actionLimitData) {
-            /** @var CM_Model_ActionLimit_Abstract $actionLimit */
-            $actionLimit = $actionLimitData['actionLimit'];
-            $role = $actionLimitData['role'];
-            $isFirst = $this->_isFirstActionLimit($actionLimit, $role);
-            if ($isFirst) {
-                $this->_log($actionLimit);
-            }
-            $actionLimit->overshoot($this, $role, $isFirst);
-            if (!$actionLimit->getOvershootAllowed()) {
-                throw new CM_Exception_NotAllowed('ActionLimit `' . $actionLimit->getType() . '` breached.');
-            }
-        }
-        $this->_log();
+        $this->_checkActionLimits();
         $this->_prepare();
     }
 
@@ -188,6 +173,28 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         return new CM_Paging_ActionLimit_Action($this);
     }
 
+    private function _checkActionLimits() {
+        if (!$this->_actionLimitsEnabled) {
+            return;
+        }
+        $role = null;
+        $actionLimitList = $this->getActionLimitsTransgressed();
+        foreach ($actionLimitList as $actionLimitData) {
+            /** @var CM_Model_ActionLimit_Abstract $actionLimit */
+            $actionLimit = $actionLimitData['actionLimit'];
+            $role = $actionLimitData['role'];
+            $isFirst = $this->_isFirstActionLimit($actionLimit, $role);
+            if ($isFirst) {
+                $this->_log($actionLimit);
+            }
+            $actionLimit->overshoot($this, $role, $isFirst);
+            if (!$actionLimit->getOvershootAllowed()) {
+                throw new CM_Exception_NotAllowed('ActionLimit `' . $actionLimit->getType() . '` breached.');
+            }
+        }
+        $this->_log();
+    }
+
     /**
      * @param CM_Model_ActionLimit_Abstract $actionLimit
      * @param int                           $role
@@ -216,13 +223,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
      * @param int|null $within
      * @param int|null $upperBound
      * @return CM_Paging_Action_Ip|CM_Paging_Action_User
-     * @throws CM_Exception_Invalid
      */
     private function _getSiblings($within = null, $upperBound = null) {
-        if (in_array($this->getVerb(), $this->_ignoreLogging)) {
-            throw new CM_Exception_Invalid(
-                'Looking for actions of verb `' . $this->getVerb() . '` on actionType `' . $this->getType() . '` that is not being logged.');
-        }
         if ($this->getActor()) {
             return $this->getActor()->getActions($this->getType(), $this->getVerb(), $within, $upperBound);
         } else {
@@ -234,13 +236,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
      * @param int $actionLimitType OPTIONAL
      * @param int $period          OPTIONAL
      * @return CM_Paging_Transgression_Ip|CM_Paging_Transgression_User
-     * @throws CM_Exception_Invalid
      */
     private function _getTransgressions($actionLimitType = null, $period = null) {
-        if (in_array($this->getVerb(), $this->_ignoreLogging)) {
-            throw new CM_Exception_Invalid(
-                'Looking for transgressions of verb `' . $this->getVerb() . '` on actionType `' . $this->getType() . '` that is not being logged.');
-        }
         if ($this->getActor()) {
             return $this->getActor()->getTransgressions($this->getType(), $this->getVerb(), $actionLimitType, $period);
         } else {
@@ -252,12 +249,10 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
      * @param CM_Model_ActionLimit_Abstract|null $actionLimit
      */
     private function _log(CM_Model_ActionLimit_Abstract $actionLimit = null) {
-        if (!in_array($this->getVerb(), $this->_ignoreLogging)) {
-            if ($actionLimit) {
-                $this->_getTransgressions()->add($this, $actionLimit->getType());
-            } else {
-                $this->_getSiblings()->add($this);
-            }
+        if ($actionLimit) {
+            $this->_getTransgressions()->add($this, $actionLimit->getType());
+        } else {
+            $this->_getSiblings()->add($this);
         }
     }
 
