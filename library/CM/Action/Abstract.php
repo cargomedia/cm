@@ -44,6 +44,10 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
     abstract protected function _prepare();
 
+    public function disableActionLimits() {
+        $this->_actionLimitsEnabled = false;
+    }
+
     /**
      * @return array ['actionLimit' => CM_Model_ActionLimit_Abstract, 'role' => int]
      */
