@@ -48,6 +48,10 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         $this->_actionLimitsEnabled = false;
     }
 
+    public function disableTracking() {
+        $this->_trackingEnabled = false;
+    }
+
     /**
      * @return array ['actionLimit' => CM_Model_ActionLimit_Abstract, 'role' => int]
      */
@@ -171,10 +175,6 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
     public function toArray() {
         return array('actor' => $this->getActor(), 'verb' => $this->getVerb(), 'type' => $this->getType());
-    }
-
-    protected function _disableTracking() {
-        $this->_trackingEnabled = false;
     }
 
     /**
