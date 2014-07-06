@@ -13,9 +13,7 @@
     var distanceMin = innerHeight * preloadMultiple;
     if (distanceFromTop < distanceMin) {
       $(this).trigger('scrollTop', [event]);
-      return true;
     }
-    return false;
   }, checkDelay);
 
   $.event.special.scrollTop = {
@@ -38,9 +36,7 @@
     var distanceMin = innerHeight * preloadMultiple;
     if (distanceFromBottom < distanceMin) {
       $(this).trigger('scrollBottom', [event]);
-      return true;
     }
-    return false;
   }, checkDelay);
 
   $.event.special.scrollBottom = {
