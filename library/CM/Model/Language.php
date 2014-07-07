@@ -45,24 +45,26 @@ class CM_Model_Language extends CM_Model_Abstract {
         $cache = CM_Cache_Local::getInstance();
         if ($skipCacheLocal || false === ($translations = $cache->get($cacheKey))) {
             $translations = $this->getTranslations()->getAssociativeArray();
-
             if (!$skipCacheLocal) {
                 $cache->set($cacheKey, $translations);
             }
         }
 
-        // Check if translation exists and if variables provided match the ones in database
         if (!array_key_exists($phrase, $translations)) {
-            static::_setKey($phrase, $variableNames);
-            $this->_change();
-        } elseif ($variableNames !== null) {
+            CM_Model_LanguageKey::create($phrase, $variableNames);
+            return $this->getTranslation($phrase, $variableNames, $skipCacheLocal);
+        }
+
+        if ($variableNames !== null) {
             sort($variableNames);
             if ($variableNames !== $translations[$phrase]['variables']) {
-                static::_setKey($phrase, $variableNames);
-                $this->_change();
+                $languageKey = CM_Model_LanguageKey::findByName($phrase);
+                $languageKey->setVariables($variableNames);
+                $languageKey->commit();
+                return $this->getTranslation($phrase, $variableNames, $skipCacheLocal);
             }
         }
-        // Getting value from backup language if backup is present and value does not exist
+
         if (!isset($translations[$phrase]['value'])) {
             if (!$this->getBackup()) {
                 return $phrase;
@@ -78,23 +80,7 @@ class CM_Model_Language extends CM_Model_Abstract {
      * @param array|null  $variables
      */
     public function setTranslation($phrase, $value = null, array $variables = null) {
-        if (null === $value) {
-            $value = $phrase;
-        }
-
-        $languageKeyId = static::_setKey($phrase, $variables);
-        CM_Db_Db::insert('cm_languageValue',
-            array('value' => $value, 'languageKeyId' => $languageKeyId, 'languageId' => $this->getId()), null, array('value' => $value));
-        $this->_change();
-    }
-
-    /**
-     * @param string $phrase
-     */
-    public function unsetTranslation($phrase) {
-        $languageKeyId = static::_setKey($phrase);
-        CM_Db_Db::delete('cm_languageValue', array('languageKeyId' => $languageKeyId, 'languageId' => $this->getId()));
-        $this->_change();
+        $this->getTranslations()->set($phrase, $value, $variables);
     }
 
     /**
@@ -147,11 +133,6 @@ class CM_Model_Language extends CM_Model_Abstract {
         return CM_Db_Db::select('cm_language', '*', array('id' => $this->getId()))->fetch();
     }
 
-    protected function _onChange() {
-        $cacheKey = CM_CacheConst::Language_Translations . '_languageId:' . $this->getId();
-        CM_Cache_Local::getInstance()->delete($cacheKey);
-    }
-
     protected function _getContainingCacheables() {
         $cacheables = parent::_getContainingCacheables();
         $cacheables[] = new CM_Paging_Language_All();
@@ -169,10 +150,6 @@ class CM_Model_Language extends CM_Model_Abstract {
         CM_Db_Db::delete('cm_language', array('id' => $this->getId()));
     }
 
-    protected function _onDeleteAfter() {
-        self::changeAll();
-    }
-
     /**
      * @param string $name
      * @param string $abbreviation
@@ -185,13 +162,6 @@ class CM_Model_Language extends CM_Model_Abstract {
             'abbreviation' => (string) $abbreviation,
             'enabled'      => (bool) $enabled,
         ));
-    }
-
-    public static function changeAll() {
-        /** @var CM_Model_Language $language */
-        foreach (new CM_Paging_Language_All() as $language) {
-            $language->_change();
-        }
     }
 
     /**
@@ -224,20 +194,6 @@ class CM_Model_Language extends CM_Model_Abstract {
     }
 
     /**
-     * @param string $phrase
-     */
-    public static function deleteKey($phrase) {
-        $phrase = (string) $phrase;
-        $languageKeyId = CM_Db_Db::select('cm_languageKey', 'id', array('name' => $phrase))->fetchColumn();
-        if (!$languageKeyId) {
-            return;
-        }
-        CM_Db_Db::delete('cm_languageValue', array('languageKeyId' => $languageKeyId));
-        CM_Db_Db::delete('cm_languageKey', array('id' => $languageKeyId));
-        self::changeAll();
-    }
-
-    /**
      * @return CM_Tree_Language
      */
     public static function getTree() {
@@ -248,45 +204,6 @@ class CM_Model_Language extends CM_Model_Abstract {
             $cache->set($cacheKey, $tree);
         }
         return $tree;
-    }
-
-    /**
-     * @param string $phrase
-     * @return boolean
-     */
-    public static function hasKey($phrase) {
-        $phrase = (string) $phrase;
-        return (boolean) CM_Db_Db::count('cm_languageKey', array('name' => $phrase));
-    }
-
-    /**
-     * @param string      $phrase
-     * @param string|null $phraseNew
-     * @param array|null  $variableNamesNew
-     * @throws CM_Exception_Nonexistent
-     * @throws CM_Exception_Duplicate
-     */
-    public static function updateKey($phrase, $phraseNew = null, array $variableNamesNew = null) {
-        $phrase = (string) $phrase;
-        if (!CM_Db_Db::count('cm_languageKey', array('name' => $phrase))) {
-            throw new CM_Exception_Nonexistent('LanguageKey `' . $phrase . '` does not exist');
-        }
-
-        if ($variableNamesNew !== null) {
-            $variableNamesNew = json_encode($variableNamesNew);
-        }
-
-        if (null !== $phraseNew) {
-            $phraseNew = (string) $phraseNew;
-            if (CM_Db_Db::count('cm_languageKey', array('name' => $phraseNew))) {
-                throw new CM_Exception_Duplicate('LanguageKey `' . $phraseNew . '` already exists');
-            }
-
-            CM_Db_Db::update('cm_languageKey', array('name' => $phraseNew, 'variables' => $variableNamesNew), array('name' => $phrase));
-        } else {
-            CM_Db_Db::update('cm_languageKey', array('variables' => $variableNamesNew), array('name' => $phrase));
-        }
-        self::changeAll();
     }
 
     /**
@@ -305,12 +222,12 @@ class CM_Model_Language extends CM_Model_Abstract {
      * @throws CM_Exception_Invalid
      */
     public static function rpc_requestTranslationJs($languageKey) {
-        $javascript = CM_Db_Db::select('cm_languageKey', 'javascript', array('name' => $languageKey))->fetchColumn();
+        $javascript = CM_Db_Db::select('cm_model_languageKey', 'javascript', array('name' => $languageKey))->fetchColumn();
         if ($javascript === false) {
             throw new CM_Exception_Invalid('Language key `' . $languageKey . '` not found');
         }
         if ($javascript == 0) {
-            CM_Db_Db::update('cm_languageKey', array('javascript' => 1), array('name' => $languageKey));
+            CM_Db_Db::update('cm_model_languageKey', array('javascript' => 1), array('name' => $languageKey));
             self::updateVersionJavascript();
         }
     }
@@ -325,64 +242,5 @@ class CM_Model_Language extends CM_Model_Abstract {
             'backupId'     => $backupId,
         ));
         return new static($id);
-    }
-
-    /**
-     * @param string $phrase
-     * @param array|null $variableNames
-     * @return int
-     */
-    private static function _setKey($phrase, array $variableNames = null) {
-        $phrase = (string) $phrase;
-        $languageKeyId = CM_Db_Db::select('cm_languageKey', 'id', array('name' => $phrase), 'id ASC')->fetchColumn();
-        if (!$languageKeyId) {
-            $languageKeyId = CM_Db_Db::insert('cm_languageKey', array('name' => $phrase));
-
-            // check if the language Key is double inserted because of high load
-            $languageKeyIdList = CM_Db_Db::select('cm_languageKey', 'id', array('name' => $phrase), 'id ASC')->fetchAllColumn();
-            if (1 < count($languageKeyIdList)) {
-                $languageKeyId = array_shift($languageKeyIdList);
-                CM_Db_Db::exec("DELETE FROM `cm_languageKey` WHERE `name` = ? AND `id` != ?", array($phrase, $languageKeyId));
-            }
-
-            self::changeAll();
-        }
-        if (null !== $variableNames) {
-            self::_setKeyVariables($phrase, $variableNames);
-        }
-        return $languageKeyId;
-    }
-
-    /**
-     * @param string $phrase
-     * @param array  $variableNames
-     * @throws CM_Exception_Invalid
-     * @throws CM_Exception_Duplicate
-     */
-    private static function _setKeyVariables($phrase, array $variableNames) {
-        $languageKeyParams = CM_Db_Db::select('cm_languageKey', array('id', 'updateCountResetVersion', 'updateCount'),
-            array('name' => $phrase))->fetch();
-        if (!$languageKeyParams) {
-            throw new CM_Exception_Invalid('Language key `' . $phrase . '` was not found');
-        }
-        $languageKeyId = $languageKeyParams['id'];
-        $updateCount = $languageKeyParams['updateCount'] + 1;
-        $deployVersion = CM_App::getInstance()->getDeployVersion();
-        if ($deployVersion > $languageKeyParams['updateCountResetVersion']) {
-            $updateCount = 1;
-        }
-        CM_Db_Db::update('cm_languageKey', array('updateCountResetVersion' => $deployVersion,
-                                                 'updateCount'             => $updateCount), array('name' => $phrase));
-        if ($updateCount > 50) {
-            throw new CM_Exception_Invalid('Variables for languageKey `' . $phrase . '` have been already updated over 50 times since release');
-        }
-
-        if (count($variableNames) !== count(array_unique($variableNames))) {
-            throw new CM_Exception_Duplicate('Duplicate variable name declaration `' . json_encode($variableNames) . '`');
-        }
-
-        CM_Db_Db::update('cm_languageKey', array('variables' => json_encode($variableNames)), array('id' => $languageKeyId));
-
-        self::changeAll();
     }
 }

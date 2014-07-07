@@ -81,10 +81,10 @@ CREATE TABLE `cm_language` (
   KEY `enabled` (`enabled`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_languageKey`;
+DROP TABLE IF EXISTS `cm_model_languageKey`;
 
 
-CREATE TABLE `cm_languageKey` (
+CREATE TABLE `cm_model_languageKey` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `variables` text CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
