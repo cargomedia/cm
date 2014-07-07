@@ -85,19 +85,48 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
         $msg = (string) $msg;
         $values = array('type' => $this->getType(), 'msg' => $msg, 'timeStamp' => time());
         if ($metaInfo) {
-            $values['metaInfo'] = serialize($metaInfo);
+            $values['metaInfo'] = $this->_serialize($metaInfo);
         }
         CM_Db_Db::insertDelayed('cm_log', $values);
     }
 
     protected function _processItem($item) {
         if (!empty($item['metaInfo'])) {
-            $metaInfo = @unserialize($item['metaInfo']);
+            $metaInfo = $this->_unserialize($item['metaInfo']);
             if (false === $metaInfo) {
                 $metaInfo = null;
             }
             $item['metaInfo'] = $metaInfo;
         }
         return $item;
+    }
+
+    /**
+     * @param mixed $value
+     * @return string
+     */
+    protected function _serialize($value) {
+        if (is_array($value)) {
+            foreach ($value as &$element) {
+                $element = $this->_serialize($element);
+            }
+        } elseif($value instanceof CM_Model_Abstract) {
+            $value = CM_Util::varDump($value);
+        }
+        return serialize($value);
+    }
+
+    /**
+     * @param $value
+     * @return mixed
+     */
+    protected function _unserialize($value) {
+        $result = @unserialize($value);
+        if (is_array($result)) {
+            foreach ($result as &$element) {
+                $element = $this->_unserialize($element);
+            }
+        }
+        return $result;
     }
 }
