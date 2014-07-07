@@ -138,7 +138,6 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         ));
         $render = new CM_Frontend_Render(null, null, $language);
         $language->setTranslation('abc {$variable}', 'translated stuff is {$variable}');
-        CM_Model_Language::changeAll();
         $this->assertSame('translated stuff is cool', $render->getTranslation('abc {$variable}', array('variable' => 'cool')));
     }
 

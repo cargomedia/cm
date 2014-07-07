@@ -62,13 +62,12 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
         $this->assertNull($language->getBackup());
     }
 
+    /**
+     * @expectedException CM_Exception_InvalidParam
+     * @expectedExceptionMessage `name`
+     */
     public function testCreateWithoutName() {
-        try {
-            CM_Model_Language::createStatic(array('abbreviation' => 'de',));
-            $this->fail('Could create language without name');
-        } catch (CM_Exception_InvalidParam $e) {
-            $this->assertContains('`name`', $e->getMessage());
-        }
+        CM_Model_Language::createStatic(array('abbreviation' => 'de',));
     }
 
     public function testCreateWithDuplicateAbbreviation() {
@@ -125,28 +124,6 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
         $this->assertNull(CM_Model_Language::findByAbbreviation('random-not-existing-abbreviation'));
     }
 
-    public function testDeleteKey() {
-        $key = 'languageKey';
-        $this->_language->setTranslation($key, 'abc');
-        $languageKeyId = CM_Db_Db::select('cm_languageKey', 'id', array('name' => $key))->fetchColumn();
-        $this->assertSame(array($key => array('value' => 'abc', 'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
-
-        CM_Model_Language::deleteKey($key);
-        $this->assertSame(array(), $this->_language->getTranslations()->getAssociativeArray());
-        $this->assertSame(0, CM_Db_Db::count('cm_languageKey', array('name' => $key)));
-        $this->assertSame(0, CM_Db_Db::count('cm_languageValue', array(
-            'languageKeyId' => $languageKeyId,
-            'languageId'    => $this->_language->getId(),
-        )));
-    }
-
-    public function testUnsetTranslation() {
-        $this->_language->setTranslation('phrase', 'abc');
-        $this->assertSame('abc', $this->_language->getTranslation('phrase', null, true));
-        $this->_language->unsetTranslation('phrase');
-        $this->assertSame('phrase', $this->_language->getTranslation('phrase', null, true));
-    }
-
     public function testGetTranslationWithBackup() {
         /** @var CM_Model_Language $backedUpLanguage */
         $backedUpLanguage = CM_Model_Language::createStatic(array(
@@ -169,13 +146,6 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
         ));
         $this->assertTrue($this->_language->isBackingUp($backedUpLanguage));
         $this->assertFalse($backedUpLanguage->isBackingUp($this->_language));
-    }
-
-    public function testHasKey() {
-        $language = $this->_language;
-        $this->assertFalse(CM_Model_Language::hasKey('foo'));
-        $language->setTranslation('foo', 'true');
-        $this->assertTrue(CM_Model_Language::hasKey('foo'));
     }
 
     public function testFindDefault() {
@@ -217,38 +187,5 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
         } catch (CM_Exception $e) {
             $this->assertContains('Duplicate variable name declaration', $e->getMessage());
         }
-    }
-
-    public function testUpdateKey() {
-        $this->_language->setTranslation('someKey', 'value');
-        CM_Model_Language::updateKey('someKey', 'otherKey');
-        $this->assertSame(array('otherKey' => array('value'     => 'value',
-                                                    'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
-
-        $this->_language->setTranslation('thirdKey', 'its value');
-        try {
-            CM_Model_Language::updateKey('thirdKey', 'otherKey');
-            $this->fail('Should throw exception in duplicate update value');
-        } catch (CM_Exception_Duplicate $e) {
-            $this->assertSame(array(
-                'otherKey' => array('value' => 'value', 'variables' => array()),
-                'thirdKey' => array('value' => 'its value', 'variables' => array()),
-            ), $this->_language->getTranslations()->getAssociativeArray());
-        }
-
-        try {
-            CM_Model_Language::updateKey('nonExistentKey', 'otherKey');
-            $this->fail('Should throw exception in nonexistent value');
-        } catch (CM_Exception_Nonexistent $e) {
-            $this->assertTrue(true);
-        }
-
-        $this->_language->setTranslation('variableKey', 'value', array('foo', 'bar'));
-        CM_Model_Language::updateKey('variableKey', null, array('foo', 'bar', 'more'));
-        $this->assertSame(array(
-            'otherKey'    => array('value' => 'value', 'variables' => array()),
-            'thirdKey'    => array('value' => 'its value', 'variables' => array()),
-            'variableKey' => array('value' => 'value', 'variables' => array('bar', 'foo', 'more')),
-        ), $this->_language->getTranslations()->getAssociativeArray());
     }
 }
