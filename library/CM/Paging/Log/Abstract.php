@@ -122,6 +122,9 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
      */
     protected function _unserialize($value) {
         $result = @unserialize($value);
+        if (false === $result) {
+            return $value;
+        }
         if (is_array($result)) {
             foreach ($result as &$element) {
                 $element = $this->_unserialize($element);
