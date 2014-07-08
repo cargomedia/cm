@@ -8,25 +8,24 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function setVariables(array $variables = null) {
-        $previousVariables = null;
-        if ($previousVariables) {
+        $previousVariables = array();
+        if ($this->_has('variables')) {
             $previousVariables = $this->getVariables();
         }
-        if (null !== $previousVariables && $previousVariables !== $variables) {
-            $this->_increaseUpdateCount();
-        }
-
         $variables = (array) $variables;
-        $variablesEncoded = json_encode($variables);
-        $this->_set('variables', $variablesEncoded);
+        if ($previousVariables !== $variables) {
+            $variablesEncoded = json_encode($variables);
+            $this->_set('variables', $variablesEncoded);
 
-        if ($this->_has('updateCount') && $this->_get('updateCount') > 50) {
-            $message = [
-                'Variables for languageKey `' . $this->_get('name') . '` have been updated over 50 times since release.',
-                'Previous variables: `' . var_export($previousVariables, true) . '`',
-                'Current variables: `' . var_export($variables, true) . '`',
-            ];
-            throw new CM_Exception_Invalid(join(PHP_EOL, $message));
+            $this->_increaseUpdateCount();
+            if ($this->_has('updateCount') && $this->_get('updateCount') > 50) {
+                $message = [
+                    'Variables for languageKey `' . $this->_get('name') . '` have been updated over 50 times since release.',
+                    'Previous variables: `' . var_export($previousVariables, true) . '`',
+                    'Current variables: `' . var_export($variables, true) . '`',
+                ];
+                throw new CM_Exception_Invalid(join(PHP_EOL, $message));
+            }
         }
     }
 
@@ -34,6 +33,9 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      * @return string[]
      */
     public function getVariables() {
+        if (!$this->_has('variables')) {
+            return array();
+        }
         $variablesEncoded = $this->_get('variables');
         return json_decode($variablesEncoded, true);
     }

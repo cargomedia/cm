@@ -145,19 +145,6 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
         $this->assertNull(CM_Model_Language::findDefault());
     }
 
-    public function testGetTranslationWithDifferentVariableNamesLoop() {
-        $this->_language->getTranslation('sameKey', array('oneVariable'), true);
-        try {
-            for ($i = 0; $i < 25; $i++) {
-                $this->_language->getTranslation('sameKey', array('oneVariable', 'secondOne'), true);
-                $this->_language->getTranslation('sameKey', array('oneVariable'), true);
-            }
-            $this->fail('Did not throw exception after ' . ($i * 2) . ' changes');
-        } catch (CM_Exception_Invalid $e) {
-            $this->assertContains('`sameKey`', $e->getMessage());
-        }
-    }
-
     public function testGetTranslationWithDifferentVariableNamesAndKeysLoop() {
         for ($i = 0; $i < 5; $i++) {
             $this->_language->getTranslation('myKey', array('oneVariable'), true);
