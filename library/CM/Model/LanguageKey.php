@@ -20,7 +20,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
         $variablesEncoded = json_encode($variables);
         $this->_set('variables', $variablesEncoded);
 
-        if ($this->_get('updateCount') > 50) {
+        if ($this->_has('updateCount') && $this->_get('updateCount') > 50) {
             $message = [
                 'Variables for languageKey `' . $this->_get('name') . '` have been updated over 50 times since release.',
                 'Previous variables: `' . var_export($previousVariables, true) . '`',
