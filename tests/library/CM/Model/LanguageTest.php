@@ -6,8 +6,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
     protected $_language;
 
     public function setUp() {
-        $languageId = CM_Db_Db::insert('cm_language', array('name' => 'English', 'abbreviation' => 'EN', 'enabled' => 1));
-        $this->_language = new CM_Model_Language($languageId);
+        $this->_language = CM_Model_Language::create('English', 'en', true);
     }
 
     public function tearDown() {
@@ -80,16 +79,15 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
     }
 
     public function testDelete() {
-        /** @var CM_Model_Language $backedUpLanguage */
-        $backedUpLanguage = CM_Model_Language::createStatic(array(
-            'name'         => 'Backed up language',
-            'abbreviation' => 'bul',
-            'enabled'      => true,
-            'backup'       => $this->_language,
-        ));
-        $this->_language->delete();
+        $backupLanguage = CM_Model_Language::create('Backup', 'bu', true);
+        $backedUpLanguage = CM_Model_Language::create('Backed up', 'bdu', true, $backupLanguage);
+
+        $backupLanguageId = $backupLanguage->getId();
+
+        CMTest_TH::reinstantiateModel($backupLanguage);
+        $backupLanguage->delete();
         try {
-            new CM_Model_Language($this->_language->getId());
+            new CM_Model_Language($backupLanguageId);
             $this->fail('Language has not been deleted');
         } catch (CM_Exception_Nonexistent $e) {
             $this->assertContains('CM_Model_Language', $e->getMessage());
@@ -98,21 +96,10 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
         $this->assertNull($backedUpLanguage->getBackup());
     }
 
-    public function testSetData() {
-        $this->_language->setData('Polish', 'pl', false);
-        $this->assertSame('Polish', $this->_language->getName());
-        $this->assertSame('pl', $this->_language->getAbbreviation());
-        $this->assertSame(false, $this->_language->getEnabled());
-    }
-
-    public function testSetDataDuplicateAbbreviation() {
-        CM_Model_Language::createStatic(array(
-            'name'         => 'Another',
-            'abbreviation' => 'pl',
-            'enabled'      => true
-        ));
+    public function testSetAbbreviationDuplicate() {
+        CM_Model_Language::create('Polish', 'pl', true);
         try {
-            $this->_language->setData('Polish', 'pl', false);
+            CM_Model_Language::create('Another', 'pl', true);
             $this->fail('Could set language with duplicate abbreviation');
         } catch (CM_Exception $e) {
             $this->assertContains('Duplicate entry', $e->getMessage());
@@ -151,7 +138,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
     public function testFindDefault() {
         $this->assertEquals($this->_language, CM_Model_Language::findDefault());
 
-        $this->_language->setData($this->_language->getName(), $this->_language->getAbbreviation(), false);
+        $this->_language->setEnabled(false);
         $this->assertEquals($this->_language, CM_Model_Language::findDefault());
 
         CM_Cache_Local::getInstance()->flush();
@@ -178,14 +165,5 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
             $this->_language->getTranslation('myKéy', array('oneVariable', 'thirdOne'), true);
         }
         $this->assertTrue(true);
-    }
-
-    public function testGetTranslationDuplicateVariableNames() {
-        try {
-            $this->_language->getTranslation('someKey', array('foo', 'bar', 'foo'));
-            $this->fail('Should throw exception on duplicate key add');
-        } catch (CM_Exception $e) {
-            $this->assertContains('Duplicate variable name declaration', $e->getMessage());
-        }
     }
 }

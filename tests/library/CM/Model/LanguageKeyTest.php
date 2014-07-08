@@ -16,8 +16,8 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         $languageKey = CM_Model_LanguageKey::findByName('foo');
         $languageKey->delete();
 
-        $this->assertSame(array(), $this->_language->getTranslations()->getAssociativeArray());
-        $this->assertSame(0, CM_Db_Db::count('cm_model_languageKey', array('name' => 'foo')));
+        $this->assertSame(array(), $language->getTranslations()->getAssociativeArray());
+        $this->assertSame(0, CM_Db_Db::count('cm_model_languagekey', array('name' => 'foo')));
         $this->assertSame(0, CM_Db_Db::count('cm_languageValue', array(
             'languageKeyId' => $languageKey->getId(),
             'languageId'    => $language->getId(),
