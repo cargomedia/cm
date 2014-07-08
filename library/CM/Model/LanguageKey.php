@@ -6,6 +6,9 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      * @param string[]|null $variables
      */
     public function setVariables(array $variables = null) {
+        if ($this->_has('variables') && $this->getVariables() !== $variables) {
+            $this->_increaseUpdateCount();
+        }
         $variables = (array) $variables;
         $variablesEncoded = json_encode($variables);
         $this->_set('variables', $variablesEncoded);
@@ -17,6 +20,19 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     public function getVariables() {
         $variablesEncoded = $this->_get('variables');
         return json_decode($variablesEncoded, true);
+    }
+
+    protected function _increaseUpdateCount() {
+        $updateCount = 0;
+        if ($this->_has('updateCount')) {
+            $updateCount = $this->_get('updateCount');
+        }
+        $updateCount++;
+        if ($updateCount >= 50) {
+            throw new CM_Exception_Invalid('Variables for languageKey `' . $this->_get('name') .
+                '` have been already updated over 50 times since release');
+        }
+        $this->_set('updateCount', $updateCount);
     }
 
     protected function _onChange() {
@@ -59,7 +75,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      */
     public static function findByName($name) {
         $name = (string) $name;
-        $languageKeyId = CM_Db_Db::select('cm_model_languageKey', 'id', array('name' => $name), 'id ASC')->fetchColumn();
+        $languageKeyId = CM_Db_Db::select('cm_model_languagekey', 'id', array('name' => $name), 'id ASC')->fetchColumn();
         if (!$languageKeyId) {
             return null;
         }
@@ -91,7 +107,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      */
     public static function exists($name) {
         $name = (string) $name;
-        return (boolean) CM_Db_Db::count('cm_model_languageKey', array('name' => $name));
+        return (boolean) CM_Db_Db::count('cm_model_languagekey', array('name' => $name));
     }
 
     /**
@@ -107,10 +123,10 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      */
     public static function clearDuplicates($name) {
         $name = (string) $name;
-        $languageKeyIdList = CM_Db_Db::select('cm_model_languageKey', 'id', array('name' => $name), 'id ASC')->fetchAllColumn();
+        $languageKeyIdList = CM_Db_Db::select('cm_model_languagekey', 'id', array('name' => $name), 'id ASC')->fetchAllColumn();
         if (count($languageKeyIdList) > 1) {
             $languageKeyId = array_shift($languageKeyIdList);
-            CM_Db_Db::exec("DELETE FROM `cm_model_languageKey` WHERE `name` = ? AND `id` != ?", array($name, $languageKeyId));
+            CM_Db_Db::exec("DELETE FROM `cm_model_languagekey` WHERE `name` = ? AND `id` != ?", array($name, $languageKeyId));
         }
     }
 
