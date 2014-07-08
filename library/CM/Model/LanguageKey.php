@@ -4,14 +4,30 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
 
     /**
      * @param string[]|null $variables
+     * @throws CM_Exception
+     * @throws CM_Exception_Invalid
      */
     public function setVariables(array $variables = null) {
-        if ($this->_has('variables') && $this->getVariables() !== $variables) {
+        $previousVariables = null;
+        if ($previousVariables) {
+            $previousVariables = $this->getVariables();
+        }
+        if (null !== $previousVariables && $previousVariables !== $variables) {
             $this->_increaseUpdateCount();
         }
+
         $variables = (array) $variables;
         $variablesEncoded = json_encode($variables);
         $this->_set('variables', $variablesEncoded);
+
+        if ($this->_get('updateCount') > 50) {
+            $message = [
+                'Variables for languageKey `' . $this->_get('name') . '` have been updated over 50 times since release.',
+                'Previous variables: `' . var_export($previousVariables, true) . '`',
+                'Current variables: `' . var_export($variables, true) . '`',
+            ];
+            throw new CM_Exception_Invalid(join(PHP_EOL, $message));
+        }
     }
 
     /**
@@ -20,19 +36,6 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     public function getVariables() {
         $variablesEncoded = $this->_get('variables');
         return json_decode($variablesEncoded, true);
-    }
-
-    protected function _increaseUpdateCount() {
-        $updateCount = 0;
-        if ($this->_has('updateCount')) {
-            $updateCount = $this->_get('updateCount');
-        }
-        $updateCount++;
-        if ($updateCount >= 50) {
-            throw new CM_Exception_Invalid('Variables for languageKey `' . $this->_get('name') .
-                '` have been already updated over 50 times since release');
-        }
-        $this->_set('updateCount', $updateCount);
     }
 
     protected function _onChange() {
@@ -50,6 +53,14 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
             'updateCount'             => array('type' => 'int', 'optional' => true),
             'javascript'              => array('type' => 'int'),
         ));
+    }
+
+    protected function _increaseUpdateCount() {
+        $updateCount = 0;
+        if ($this->_has('updateCount')) {
+            $updateCount = $this->_get('updateCount');
+        }
+        $this->_set('updateCount', $updateCount + 1);
     }
 
     protected function _onDeleteBefore() {
