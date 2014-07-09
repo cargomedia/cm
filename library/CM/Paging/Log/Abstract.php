@@ -92,7 +92,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
 
     protected function _processItem($item) {
         if (!empty($item['metaInfo'])) {
-            $metaInfo = $this->_unserialize($item['metaInfo']);
+            $metaInfo = $this->_unserialize($item['metaInfo'], true);
             if (false === $metaInfo) {
                 $metaInfo = null;
             }
@@ -118,16 +118,16 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
 
     /**
      * @param $value
-     * @return mixed
+     * @return mixed|null
      */
-    protected function _unserialize($value) {
+    protected function _unserialize($value, $returnNull) {
         $result = @unserialize($value);
         if (false === $result) {
-            return $value;
+            return $returnNull ? null : $value;
         }
         if (is_array($result)) {
             foreach ($result as &$element) {
-                $element = $this->_unserialize($element);
+                $element = $this->_unserialize($element, false);
             }
         }
         return $result;

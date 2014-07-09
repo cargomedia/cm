@@ -34,9 +34,7 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
         /** @var CM_Paging_Log_Abstract $paging */
         $paging->__construct();
 
-        $add = CMTest_TH::getProtectedMethod('CM_Paging_Log_Abstract', '_add');
-        $stringTooLongForDb = str_repeat('x', 99999);
-        $add->invoke($paging, 'foo', array('meta1' => $stringTooLongForDb));
+        CM_Db_Db::insert('cm_log', array('msg' => 'foo', 'metaInfo' => str_ireplace('{', '/', serialize(array('foo' => 'bar'))), 'timeStamp' => time(), 'type' => 14));
 
         $items = $paging->getItems();
         $this->assertSame(1, count($items));
