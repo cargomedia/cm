@@ -60,13 +60,23 @@ class CM_Util {
     }
 
     /**
-     * @param string $pattern OPTIONAL
-     * @param string $path    OPTIONAL
+     * @param string|null $pattern
+     * @param string|null $path
+     * @return array
+     */
+    public static function glob($pattern = '*', $path = './') {
+        $files = glob($path . $pattern, GLOB_NOSORT);
+        sort($files); // glob's sort is not reliable (locale dependent?)
+        return $files;
+    }
+
+    /**
+     * @param string|null $pattern
+     * @param string|null $path
      * @return array
      */
     public static function rglob($pattern = '*', $path = './') {
-        $files = glob($path . $pattern, GLOB_NOSORT);
-        sort($files); // glob's sort is not reliable (locale dependent?)
+        $files = self::glob($pattern, $path);
         $paths = glob($path . '*', GLOB_NOSORT | GLOB_MARK | GLOB_ONLYDIR);
         sort($paths);
         foreach ($paths as $path) {
