@@ -60,8 +60,9 @@ class CM_Util {
     }
 
     /**
-     * @param string|null $pattern
-     * @param string|null $path
+     * @param string|null  $pattern
+     * @param string|null  $path
+     * @param boolean|null $expandBraces
      * @return array
      */
     public static function glob($pattern = '*', $path = './', $expandBraces = null) {
@@ -75,8 +76,9 @@ class CM_Util {
     }
 
     /**
-     * @param string|null $pattern
-     * @param string|null $path
+     * @param string|null  $pattern
+     * @param string|null  $path
+     * @param boolean|null $expandBraces
      * @return array
      */
     public static function rglob($pattern = '*', $path = './', $expandBraces = null) {
@@ -298,7 +300,7 @@ class CM_Util {
     }
 
     /**
-     * @param string $name
+     * @param string    $name
      * @param bool|null $relative
      * @return string
      */
