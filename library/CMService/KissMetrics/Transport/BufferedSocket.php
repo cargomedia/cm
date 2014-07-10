@@ -58,7 +58,9 @@ class CMService_KissMetrics_Transport_BufferedSocket implements \KISSmetrics\Tra
                 foreach ($batch as $i => $url) {
                     $connection = ($indexLast === $i) ? 'Close' : 'Keep-Alive';
                     $request = "GET $url HTTP/1.1\r\nHost: {$this->_host}\r\nConnection: $connection\r\n\r\n";
-                    fwrite($socket, $request);
+                    if (!fwrite($socket, $request)) {
+                        throw new \KISSmetrics\Transport\TransportException('Could not submit the query: ' . $url);
+                    }
                 }
                 fclose($socket);
             }
