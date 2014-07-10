@@ -64,8 +64,12 @@ class CM_Util {
      * @param string|null $path
      * @return array
      */
-    public static function glob($pattern = '*', $path = './') {
-        $files = glob($path . $pattern, GLOB_NOSORT);
+    public static function glob($pattern = '*', $path = './', $expandBraces = null) {
+        $options = GLOB_NOSORT;
+        if ($expandBraces) {
+            $options |= GLOB_BRACE;
+        }
+        $files = glob($path . $pattern, $options);
         sort($files); // glob's sort is not reliable (locale dependent?)
         return $files;
     }
@@ -75,12 +79,12 @@ class CM_Util {
      * @param string|null $path
      * @return array
      */
-    public static function rglob($pattern = '*', $path = './') {
-        $files = self::glob($pattern, $path);
+    public static function rglob($pattern = '*', $path = './', $expandBraces = null) {
+        $files = self::glob($pattern, $path, $expandBraces);
         $paths = glob($path . '*', GLOB_NOSORT | GLOB_MARK | GLOB_ONLYDIR);
         sort($paths);
         foreach ($paths as $path) {
-            $files = array_merge($files, self::rglob($pattern, $path));
+            $files = array_merge($files, self::rglob($pattern, $path, $expandBraces));
         }
         return $files;
     }
