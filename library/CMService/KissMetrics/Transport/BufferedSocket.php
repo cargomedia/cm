@@ -8,7 +8,7 @@ class CMService_KissMetrics_Transport_BufferedSocket implements \KISSmetrics\Tra
     /** @var string */
     protected $_host;
 
-    /** @var integer */
+    /** @var int */
     protected $_port, $_batchSize;
 
     /**  @var float */
@@ -17,7 +17,7 @@ class CMService_KissMetrics_Transport_BufferedSocket implements \KISSmetrics\Tra
     /**
      * @param CM_File $buffer
      * @param string  $host
-     * @param integer $port
+     * @param int     $port
      * @param float   $timeout
      * @param int     $batchSize
      */
@@ -27,8 +27,6 @@ class CMService_KissMetrics_Transport_BufferedSocket implements \KISSmetrics\Tra
         $this->_port = (int) $port;
         $this->_timeout = (float) $timeout;
         $this->_batchSize = (int) $batchSize;
-        $this->_nextSocketId = 0;
-        $this->_socketList = array();
     }
 
     public function submitData(array $dataList) {
@@ -42,25 +40,24 @@ class CMService_KissMetrics_Transport_BufferedSocket implements \KISSmetrics\Tra
             $url = '/' . $data[0] . '?' . $query;
             $this->_buffer->appendLine($url);
         }
+        // Flush at random to mitigate concurrency issues
         if (1 === mt_rand(1, $this->_batchSize)) {
             $content = $this->_buffer->read();
             $this->_buffer->truncate();
             $socket = null;
-            foreach (array_chunk(explode(PHP_EOL, $content), $this->_batchSize) as $urlList) {
+            $urlList = explode(PHP_EOL, $content);
+            array_pop($urlList);
+            $batchList = array_chunk($urlList, $this->_batchSize);
+            foreach ($batchList as $batch) {
                 $socket = @fsockopen($this->_host, $this->_port, $errno, $errstr, $this->_timeout);
                 if (!$socket) {
                     throw new \KISSmetrics\Transport\TransportException('Cannot connect to the KISSmetrics server: ' . $errstr);
                 }
                 stream_set_blocking($socket, 0);
-                $indexLast = count($urlList) - 1;
-                foreach ($urlList as $i => $url) {
-                    $request = 'GET ' . $url . ' HTTP/1.1' . "\r\n";
-                    $request .= 'Host: ' . $this->_host . "\r\n";
-                    if ($i === $indexLast) {
-                        $request .= 'Connection: Close' . "\r\n\r\n";
-                    } else {
-                        $request .= 'Connection: Keep-Alive' . "\r\n\r\n";
-                    }
+                $indexLast = count($batch) - 1;
+                foreach ($batch as $i => $url) {
+                    $connection = ($indexLast === $i) ? 'Close' : 'Keep-Alive';
+                    $request = "GET $url HTTP/1.1\r\nHost: {$this->_host}\r\nConnection: $connection\r\n\r\n";
                     fwrite($socket, $request);
                 }
                 fclose($socket);
