@@ -83,9 +83,9 @@ EOF;
             return;
         }
         $eventName = (string) $eventName;
-        KM::init($this->_getCode());
-        KM::identify($this->_getUserId());
-        KM::record($eventName, $propertyList);
+        $kissMetrics = new \KISSmetrics\Client($this->_getCode(), CMService_KissMetrics_Transport_BufferedSocket::initDefault());
+        $kissMetrics->identify($this->_getUserId())->record($eventName, $propertyList);
+        $kissMetrics->submit();
     }
 
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
