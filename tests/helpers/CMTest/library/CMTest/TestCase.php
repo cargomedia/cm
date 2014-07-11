@@ -93,57 +93,18 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         if ($environment && $environment->hasViewer()) {
             $request->getSession()->setUser($environment->getViewer());
         }
-
-        $response = new CM_Response_View_Ajax($request);
-        $response->process();
-        return $response;
+        return $this->processRequest($request);
     }
 
     /**
-     * @param string               $formClassName
-     * @param string               $actionName
-     * @param array                $data
-     * @param string|null          $componentClassName Component that uses that form
-     * @param CM_Model_User|null   $viewer
-     * @param array|null           $componentParams
-     * @param CM_Request_Post|null $request
-     * @param int|null             $siteId
-     * @param string|null          $languageAbbreviation
+     * @param CM_FormAction_Abstract   $action
+     * @param array                    $data
+     * @param CM_Frontend_ViewResponse $scopeComponent
      * @return CM_Response_View_Form
      */
-    public function getResponseForm($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null, array $componentParams = null, &$request = null, $siteId = null, $languageAbbreviation = null) {
-        if (null === $componentParams) {
-            $componentParams = array();
-        }
-        if (null === $siteId) {
-            $siteId = 'null';
-        }
-        if (null !== $languageAbbreviation) {
-            $languageAbbreviation .= '/';
-        }
-        $session = new CM_Session();
-        if ($viewer) {
-            $session->setUser($viewer);
-        }
-        $headers = array('Cookie' => 'sessionId=' . $session->getId());
-        $server = array('remote_addr' => '1.2.3.4');
-        unset($session); // Make sure session is stored persistently
-
-        $viewArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
-        $componentArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
-        $body = CM_Params::encode(array(
-            'viewInfoList' => array(
-                'CM_Component_Abstract' => $componentArray,
-                'CM_View_Abstract'      => $viewArray,
-            ),
-            'actionName'   => $actionName,
-            'data'         => $data,
-        ), true);
-        $request = new CM_Request_Post('/form/' . $languageAbbreviation . $siteId, $headers, $server, $body);
-
-        $response = new CM_Response_View_Form($request);
-        $response->process();
-        return $response;
+    public function getResponseFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+        $request = $this->createRequestFormAction($action, $data, $scopeComponent);
+        return $this->processRequest($request);
     }
 
     /**
@@ -194,19 +155,19 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $form = $action->getForm();
         $scopeView = new CM_Frontend_ViewResponse($form);
         $query = array(
-            'data'         => (array) $data,
-            'actionName'   => $actionName,
+            'data'       => (array) $data,
+            'actionName' => $actionName,
         );
         return $this->createRequest('/form/null', $query, $scopeView, $scopeComponent);
     }
 
     /**
-     * @param string        $uri
-     * @param CM_Model_User $viewer
+     * @param CM_Request_Abstract $request
+     * @param CM_Model_User|null  $viewer
+     * @internal param string $uri
      * @return CM_Response_Abstract
      */
-    public function processRequest($uri, CM_Model_User $viewer = null) {
-        $request = CM_Request_Abstract::factory('GET', $uri);
+    public function processRequest(CM_Request_Abstract $request, CM_Model_User $viewer = null) {
         if ($viewer) {
             $request->getSession()->setUser($viewer);
         }
