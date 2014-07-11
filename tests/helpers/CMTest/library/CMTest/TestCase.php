@@ -77,37 +77,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param string                        $methodName
-     * @param array                         $params
-     * @param CM_Frontend_ViewResponse      $scopeView
-     * @param CM_Frontend_ViewResponse|null $scopeComponent
-     * @param CM_Frontend_Environment|null  $environment
-     * @return CM_Response_View_Ajax
-     */
-    public function getResponseAjax($methodName, array $params, CM_Frontend_ViewResponse $scopeView, CM_Frontend_ViewResponse $scopeComponent = null, CM_Frontend_Environment $environment = null) {
-        $body = array(
-            'method' => (string) $methodName,
-            'params' => $params,
-        );
-        $request = $this->createRequest('/ajax/null', $body, $scopeView, $scopeComponent);
-        if ($environment && $environment->hasViewer()) {
-            $request->getSession()->setUser($environment->getViewer());
-        }
-        return $this->processRequest($request);
-    }
-
-    /**
-     * @param CM_FormAction_Abstract   $action
-     * @param array                    $data
-     * @param CM_Frontend_ViewResponse $scopeComponent
-     * @return CM_Response_View_Form
-     */
-    public function getResponseFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeComponent = null) {
-        $request = $this->createRequestFormAction($action, $data, $scopeComponent);
-        return $this->processRequest($request);
-    }
-
-    /**
      * @param string                        $url
      * @param array|null                    $query
      * @param CM_Frontend_ViewResponse|null $scopeView
@@ -146,8 +115,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_FormAction_Abstract $action
-     * @param array|null             $data
+     * @param CM_FormAction_Abstract        $action
+     * @param array|null                    $data
+     * @param CM_Frontend_ViewResponse|null $scopeComponent
      * @return CM_Request_Post|PHPUnit_Framework_MockObject_MockObject
      */
     public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeComponent = null) {
@@ -164,7 +134,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     /**
      * @param CM_Request_Abstract $request
      * @param CM_Model_User|null  $viewer
-     * @internal param string $uri
      * @return CM_Response_Abstract
      */
     public function processRequest(CM_Request_Abstract $request, CM_Model_User $viewer = null) {
@@ -174,6 +143,37 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $response = CM_Response_Abstract::factory($request);
         $response->process();
         return $response;
+    }
+
+    /**
+     * @param string                        $methodName
+     * @param array                         $params
+     * @param CM_Frontend_ViewResponse      $scopeView
+     * @param CM_Frontend_ViewResponse|null $scopeComponent
+     * @param CM_Frontend_Environment|null  $environment
+     * @return CM_Response_View_Ajax
+     */
+    public function getResponseAjax($methodName, array $params, CM_Frontend_ViewResponse $scopeView, CM_Frontend_ViewResponse $scopeComponent = null, CM_Frontend_Environment $environment = null) {
+        $body = array(
+            'method' => (string) $methodName,
+            'params' => $params,
+        );
+        $request = $this->createRequest('/ajax/null', $body, $scopeView, $scopeComponent);
+        if ($environment && $environment->hasViewer()) {
+            $request->getSession()->setUser($environment->getViewer());
+        }
+        return $this->processRequest($request);
+    }
+
+    /**
+     * @param CM_FormAction_Abstract   $action
+     * @param array                    $data
+     * @param CM_Frontend_ViewResponse $scopeComponent
+     * @return CM_Response_View_Form
+     */
+    public function getResponseFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+        $request = $this->createRequestFormAction($action, $data, $scopeComponent);
+        return $this->processRequest($request);
     }
 
     /**
