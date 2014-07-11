@@ -125,17 +125,12 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
         $splitfeature2->delete();
     }
 
-    public function testGetEnabledByName() {
-        $user = CMTest_TH::createUser();
-        $this->assertFalse(CM_Model_Splitfeature::getEnabledByName('foo', $user));
+    public function testFind() {
+        $this->assertNull(CM_Model_Splitfeature::find('foo'));
 
         CM_Cache_Local::getInstance()->flush();
-        CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 0));
-        $this->assertFalse(CM_Model_Splitfeature::getEnabledByName('foo', $user));
-
-        CM_Cache_Local::getInstance()->flush();
-        CM_Model_Splitfeature::createStatic(array('name' => 'bar', 'percentage' => 100));
-        $this->assertTrue(CM_Model_Splitfeature::getEnabledByName('bar', $user));
+        $splitfeature = CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 0));
+        $this->assertEquals($splitfeature, CM_Model_Splitfeature::find('foo'));
     }
 
     /**

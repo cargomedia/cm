@@ -125,6 +125,15 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
     }
 
     /**
+     * @param string $name
+     * @return CM_Model_Splitfeature|null
+     */
+    public static function find($name) {
+        $splitfeatureList = new CM_Paging_Splitfeature_All();
+        return $splitfeatureList->find($name);
+    }
+
+    /**
      * @param string        $name
      * @param CM_Model_User $user
      * @return bool
