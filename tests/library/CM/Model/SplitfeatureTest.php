@@ -2,10 +2,6 @@
 
 class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 
-    public function setUp() {
-        CM_Config::get()->CM_Model_Splitfeature->withoutPersistence = false;
-    }
-
     public function testCreate() {
         $splitfeature = CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 50));
         $this->assertInstanceOf('CM_Model_Splitfeature', $splitfeature);
@@ -127,18 +123,6 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 
         $splitfeature->delete();
         $splitfeature2->delete();
-    }
-
-    public function testGetFixtureCount() {
-        CM_Config::get()->CM_Model_Splitfeature->withoutPersistence = true;
-        $user = CMTest_TH::createUser();
-
-        $splitfeature = new CM_Model_Splitfeature('Nonexistent');
-        $this->assertFalse($splitfeature->getEnabled($user));
-        $this->assertSame(0, $splitfeature->getFixtureCount());
-        $splitfeature->setPercentage(50);
-
-        CMTest_TH::clearConfig();
     }
 
     public function testGetEnabledByName() {

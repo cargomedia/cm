@@ -2,14 +2,10 @@
 
 class CM_Model_Splitfeature extends CM_Model_Abstract {
 
-    /** @var bool */
-    private $_withoutPersistence;
-
     /**
      * @param string $name
      */
     public function __construct($name) {
-        $this->_withoutPersistence = !empty(self::_getConfig()->withoutPersistence);
         $this->_construct(array('name' => $name));
     }
 
@@ -41,9 +37,6 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
      * @param int $percentage
      */
     public function setPercentage($percentage) {
-        if ($this->_withoutPersistence) {
-            return;
-        }
         $percentage = $this->_checkPercentage($percentage);
 
         CM_Db_Db::update('cm_splitfeature', array('percentage' => $percentage), array('id' => $this->getId()));
@@ -56,9 +49,6 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
      * @return boolean
      */
     public function getEnabled(CM_Model_User $user) {
-        if ($this->_withoutPersistence) {
-            return false;
-        }
         $cacheKey = CM_CacheConst::SplitFeature_Fixtures . '_userId:' . $user->getId();
         $cacheWrite = false;
         $cache = CM_Cache_Local::getInstance();
@@ -85,9 +75,6 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
      * @return int
      */
     public function getFixtureCount() {
-        if ($this->_withoutPersistence) {
-            return 0;
-        }
         return CM_Db_Db::count('cm_splitfeature_fixture', array('splitfeatureId' => $this->getId()));
     }
 
@@ -101,9 +88,6 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
     }
 
     protected function _loadData() {
-        if ($this->_withoutPersistence) {
-            return array();
-        }
         $data = CM_Db_Db::select('cm_splitfeature', '*', array('name' => $this->getName()))->fetch();
         return $data;
     }
