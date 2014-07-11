@@ -133,6 +133,15 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
         $this->assertEquals($splitfeature, CM_Model_Splitfeature::find('foo'));
     }
 
+    public function testFindChildClass() {
+        CM_Model_Splitfeature::createStatic(array('name' => 'bar', 'percentage' => 0));
+        $mockClass = $this->mockClass('CM_Model_Splitfeature');
+        /** @var CM_Model_Splitfeature $className */
+        $className = $mockClass->getClassName();
+
+        $this->assertInstanceOf($className, $className::find('bar'));
+    }
+
     /**
      * @param CM_Model_User[]       $userList
      * @param CM_Model_Splitfeature $splitfeature
