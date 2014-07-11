@@ -85,26 +85,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @return CM_Response_View_Ajax
      */
     public function getResponseAjax($methodName, array $params, CM_Frontend_ViewResponse $scopeView, CM_Frontend_ViewResponse $scopeComponent = null, CM_Frontend_Environment $environment = null) {
-        $methodName = (string) $methodName;
-        $getViewInfo = function (CM_Frontend_ViewResponse $viewResponse) {
-            return array(
-                'id'        => $viewResponse->getAutoId(),
-                'className' => get_class($viewResponse->getView()),
-                'params'    => $viewResponse->getView()->getParams()->getAllOriginal()
-            );
-        };
-        $viewInfoList = array_map($getViewInfo,
-            array_filter([
-                'CM_View_Abstract'      => $scopeView,
-                'CM_Component_Abstract' => $scopeComponent,
-            ])
-        );
         $body = array(
-            'method'       => $methodName,
-            'params'       => $params,
-            'viewInfoList' => $viewInfoList,
+            'method' => (string) $methodName,
+            'params' => $params,
         );
-        $request = new CM_Request_Post('/ajax/null', null, null, CM_Params::encode($body, true));
+        $request = $this->createRequest('/ajax/null', $body, $scopeView, $scopeComponent);
         if ($environment && $environment->hasViewer()) {
             $request->getSession()->setUser($environment->getViewer());
         }
@@ -162,17 +147,41 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param string $url
-     * @param array  $query
-     * @return CM_Request_Post|PHPUnit_Framework_MockObject_MockObject
+     * @param string                        $url
+     * @param array|null                    $query
+     * @param CM_Frontend_ViewResponse|null $scopeView
+     * @param CM_Frontend_ViewResponse|null $scopeComponent
+     * @return CM_Request_Post|\Mocka\ClassTrait
+     * @throws Mocka\Exception
      */
-    public function createRequest($url, array $query = null) {
+    public function createRequest($url, array $query = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
         $url = (string) $url;
-        $ip = '16909060';
-        $request = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs(array($url))->setMethods(array('getQuery', 'getIp'))->getMock();
-        $request->expects($this->any())->method('getQuery')->will($this->returnValue($query));
-        $request->expects($this->any())->method('getIp')->will($this->returnValue($ip));
-        return $request;
+        $query = (array) $query;
+        $getViewInfo = function (CM_Frontend_ViewResponse $viewResponse) {
+            return array(
+                'id'        => $viewResponse->getAutoId(),
+                'className' => get_class($viewResponse->getView()),
+                'params'    => $viewResponse->getView()->getParams()->getAllOriginal()
+            );
+        };
+        $viewInfoList = array_map($getViewInfo,
+            array_filter([
+                'CM_View_Abstract'      => $scopeView,
+                'CM_Component_Abstract' => $scopeComponent,
+            ])
+        );
+        if ($viewInfoList) {
+            $query['viewInfoList'] = $viewInfoList;
+        }
+
+        $mockClass = $this->mockClass('CM_Request_Post');
+        $mockClass->mockMethod('getQuery')->set(function () use ($query) {
+            return $query;
+        });
+        $mockClass->mockMethod('getIp')->set(function () {
+            return '16909060';
+        });
+        return $mockClass->newInstance([$url]);
     }
 
     /**
@@ -180,21 +189,15 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param array|null             $data
      * @return CM_Request_Post|PHPUnit_Framework_MockObject_MockObject
      */
-    public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null) {
+    public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeComponent = null) {
         $actionName = $action->getName();
         $form = $action->getForm();
+        $scopeView = new CM_Frontend_ViewResponse($form);
         $query = array(
             'data'         => (array) $data,
             'actionName'   => $actionName,
-            'viewInfoList' => array(
-                'CM_View_Abstract' => array(
-                    'className' => get_class($form),
-                    'params'    => $form->getParams()->getAll(),
-                    'id'        => 'uniqueId'
-                )
-            )
         );
-        return $this->createRequest('/form/null', $query);
+        return $this->createRequest('/form/null', $query, $scopeView, $scopeComponent);
     }
 
     /**
