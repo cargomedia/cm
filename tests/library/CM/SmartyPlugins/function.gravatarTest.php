@@ -1,6 +1,6 @@
 <?php
 
-require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.gravatar.php';
+require_once CM_Util::getModulePath('CM') . 'library/CM/SmartyPlugins/function.gravatar.php';
 
 class smarty_function_gravatarTest extends CMTest_TestCase {
 

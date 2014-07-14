@@ -1,6 +1,6 @@
 <?php
 
-class CM_Frontend_JavascriptContainer_View  extends CM_Frontend_JavascriptContainer {
+class CM_Frontend_JavascriptContainer_View extends CM_Frontend_JavascriptContainer {
 
     /**
      * @param string $name

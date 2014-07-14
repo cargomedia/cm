@@ -18,7 +18,7 @@ class CM_UtilTest extends CMTest_TestCase {
             'CM_Paging_Action_User'     => 'CM/Paging/Action/User.php',
         );
         foreach ($classPaths as $className => &$path) {
-            $path = CM_Util::getNamespacePath(CM_Util::getNamespace($className)) . 'library/' . $path;
+            $path = CM_Util::getModulePath(CM_Util::getNamespace($className)) . 'library/' . $path;
         }
         $paths = array_reverse($classPaths);
         $this->assertSame(array_flip($classPaths), CM_Util::getClasses($paths));

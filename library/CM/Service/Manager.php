@@ -157,6 +157,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Service_Trackings
+     */
+    public function getTrackings() {
+        return $this->get('trackings', 'CM_Service_Trackings');
+    }
+
+    /**
      * @return CM_Service_UserContent
      */
     public function getUserContent() {

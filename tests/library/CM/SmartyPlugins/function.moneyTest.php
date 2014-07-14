@@ -1,6 +1,6 @@
 <?php
 
-require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.money.php';
+require_once CM_Util::getModulePath('CM') . 'library/CM/SmartyPlugins/function.money.php';
 
 class smarty_function_moneyTest extends CMTest_TestCase {
 

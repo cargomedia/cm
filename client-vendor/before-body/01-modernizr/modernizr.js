@@ -41,8 +41,9 @@
       // synchronous tests. I would leave it out, but the code
       // to *disallow* sync tests in the real version of this
       // function is actually larger than this.
+      var self = this;
       setTimeout(function() {
-        cb(this[test]);
+        cb(self[test]);
       }, 0);
     },
 
@@ -177,12 +178,12 @@
   var html5;
 
   /**
-   * @preserve HTML5 Shiv v3.6.2pre | @afarkas @jdalton @jon_neal @rem | MIT/GPL2 Licensed
-   */
+  * @preserve HTML5 Shiv prev3.7.1 | @afarkas @jdalton @jon_neal @rem | MIT/GPL2 Licensed
+  */
   ;(function(window, document) {
   /*jshint evil:true */
     /** version */
-    var version = '3.6.2';
+    var version = '3.7.0';
 
     /** Preset options */
     var options = window.html5 || {};
@@ -210,21 +211,21 @@
 
     (function() {
       try {
-        var a = document.createElement('a');
-        a.innerHTML = '<xyz></xyz>';
-        //if the hidden property is implemented we can assume, that the browser supports basic HTML5 Styles
-        supportsHtml5Styles = ('hidden' in a);
+          var a = document.createElement('a');
+          a.innerHTML = '<xyz></xyz>';
+          //if the hidden property is implemented we can assume, that the browser supports basic HTML5 Styles
+          supportsHtml5Styles = ('hidden' in a);
 
-        supportsUnknownElements = a.childNodes.length == 1 || (function() {
-          // assign a false positive if unable to shiv
-          (document.createElement)('a');
-          var frag = document.createDocumentFragment();
-          return (
-            typeof frag.cloneNode == 'undefined' ||
-            typeof frag.createDocumentFragment == 'undefined' ||
-            typeof frag.createElement == 'undefined'
-          );
-        }());
+          supportsUnknownElements = a.childNodes.length == 1 || (function() {
+            // assign a false positive if unable to shiv
+            (document.createElement)('a');
+            var frag = document.createDocumentFragment();
+            return (
+              typeof frag.cloneNode == 'undefined' ||
+              typeof frag.createDocumentFragment == 'undefined' ||
+              typeof frag.createElement == 'undefined'
+            );
+          }());
       } catch(e) {
         // assign a false positive if detection fails => unable to shiv
         supportsHtml5Styles = true;
@@ -269,10 +270,10 @@
     function getExpandoData(ownerDocument) {
       var data = expandoData[ownerDocument[expando]];
       if (!data) {
-        data = {};
-        expanID++;
-        ownerDocument[expando] = expanID;
-        expandoData[expanID] = data;
+          data = {};
+          expanID++;
+          ownerDocument[expando] = expanID;
+          expandoData[expanID] = data;
       }
       return data;
     }
@@ -286,22 +287,22 @@
      */
     function createElement(nodeName, ownerDocument, data){
       if (!ownerDocument) {
-        ownerDocument = document;
+          ownerDocument = document;
       }
       if(supportsUnknownElements){
-        return ownerDocument.createElement(nodeName);
+          return ownerDocument.createElement(nodeName);
       }
       if (!data) {
-        data = getExpandoData(ownerDocument);
+          data = getExpandoData(ownerDocument);
       }
       var node;
 
       if (data.cache[nodeName]) {
-        node = data.cache[nodeName].cloneNode();
+          node = data.cache[nodeName].cloneNode();
       } else if (saveClones.test(nodeName)) {
-        node = (data.cache[nodeName] = data.createElem(nodeName)).cloneNode();
+          node = (data.cache[nodeName] = data.createElem(nodeName)).cloneNode();
       } else {
-        node = data.createElem(nodeName);
+          node = data.createElem(nodeName);
       }
 
       // Avoid adding some elements to fragments in IE < 9 because
@@ -311,7 +312,7 @@
       //   a 403 response, will cause the tab/window to crash
       // * Script elements appended to fragments will execute when their `src`
       //   or `text` property is set
-      return node.canHaveChildren && !reSkip.test(nodeName) ? data.frag.appendChild(node) : node;
+      return node.canHaveChildren && !reSkip.test(nodeName) && !node.tagUrn ? data.frag.appendChild(node) : node;
     }
 
     /**
@@ -322,10 +323,10 @@
      */
     function createDocumentFragment(ownerDocument, data){
       if (!ownerDocument) {
-        ownerDocument = document;
+          ownerDocument = document;
       }
       if(supportsUnknownElements){
-        return ownerDocument.createDocumentFragment();
+          return ownerDocument.createDocumentFragment();
       }
       data = data || getExpandoData(ownerDocument);
       var clone = data.frag.cloneNode(),
@@ -333,7 +334,7 @@
           elems = getElements(),
           l = elems.length;
       for(;i<l;i++){
-        clone.createElement(elems[i]);
+          clone.createElement(elems[i]);
       }
       return clone;
     }
@@ -346,17 +347,17 @@
      */
     function shivMethods(ownerDocument, data) {
       if (!data.cache) {
-        data.cache = {};
-        data.createElem = ownerDocument.createElement;
-        data.createFrag = ownerDocument.createDocumentFragment;
-        data.frag = data.createFrag();
+          data.cache = {};
+          data.createElem = ownerDocument.createElement;
+          data.createFrag = ownerDocument.createDocumentFragment;
+          data.frag = data.createFrag();
       }
 
 
       ownerDocument.createElement = function(nodeName) {
         //abort shiv
         if (!html5.shivMethods) {
-          return data.createElem(nodeName);
+            return data.createElem(nodeName);
         }
         return createElement(nodeName, ownerDocument, data);
       };
@@ -365,7 +366,7 @@
         'var n=f.cloneNode(),c=n.createElement;' +
         'h.shivMethods&&(' +
           // unroll the `createElement` calls
-          getElements().join().replace(/\w+/g, function(nodeName) {
+          getElements().join().replace(/[\w\-:]+/g, function(nodeName) {
             data.createElem(nodeName);
             data.frag.createElement(nodeName);
             return 'c("' + nodeName + '")';
@@ -384,16 +385,18 @@
      */
     function shivDocument(ownerDocument) {
       if (!ownerDocument) {
-        ownerDocument = document;
+          ownerDocument = document;
       }
       var data = getExpandoData(ownerDocument);
 
       if (html5.shivCSS && !supportsHtml5Styles && !data.hasCSS) {
         data.hasCSS = !!addStyleSheet(ownerDocument,
           // corrects block display not defined in IE6/7/8/9
-          'article,aside,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}' +
+          'article,aside,dialog,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}' +
           // adds styling not present in IE6/7/8/9
-          'mark{background:#FF0;color:#000}'
+          'mark{background:#FF0;color:#000}' +
+          // hides non-rendered elements
+          'template{display:none}'
         );
       }
       if (!supportsUnknownElements) {
@@ -413,14 +416,14 @@
      * // options can be changed before the script is included
      * html5 = { 'elements': 'mark section', 'shivCSS': false, 'shivMethods': false };
      */
-    html5 = {
+    var html5 = {
 
       /**
        * An array or space separated string of node names of the elements to shiv.
        * @memberOf html5
        * @type Array|String
        */
-      'elements': options.elements || 'abbr article aside audio bdi canvas data datalist details figcaption figure footer header hgroup main mark meter nav output progress section summary time video',
+      'elements': options.elements || 'abbr article aside audio bdi canvas data datalist details dialog figcaption figure footer header hgroup main mark meter nav output picture progress section summary template time video',
 
       /**
        * current version of html5shiv
@@ -673,6 +676,7 @@
     shivPrint(document);
 
   }(this, document));
+
   
 /*!
 {
@@ -750,7 +754,8 @@ Detects support for SVG in `<embed>` or `<object>` elements.
   "name": "input[file] Attribute",
   "property": "fileinput",
   "caniuse" : "forms",
-  "tags": ["file", "forms", "input"]
+  "tags": ["file", "forms", "input"],
+  "builderAliases": ["forms_fileinput"]
 }
 !*/
 /* DOC
@@ -774,6 +779,7 @@ E.g. iOS < 6 and some android version don't support this
   "caniuse": "classlist",
   "property": "classlist",
   "tags": ["dom"],
+  "builderAliases": ["dataview_api"],
   "notes": [{
     "name": "MDN Docs",
     "href": "https://developer.mozilla.org/en/DOM/element.classList"
@@ -952,6 +958,15 @@ E.g. iOS < 6 and some android version don't support this
   }
   ;
 
+  // Helper function for converting kebab-case to camelCase,
+  // e.g. box-sizing -> boxSizing
+  function cssToDOM( name ) {
+    return name.replace(/([a-z])-([a-z])/g, function(str, m1, m2) {
+      return m1 + m2.toUpperCase();
+    }).replace(/^-/, '');
+  }
+  ;
+
   // testProps is a generic CSS / DOM property test.
 
   // In testing support for a given CSS property, it's legit to test:
@@ -963,12 +978,7 @@ E.g. iOS < 6 and some android version don't support this
   // on our modernizr element, but instead just testing undefined vs
   // empty string.
 
-  // Because the testing of the CSS property names (with "-", as
-  // opposed to the camelCase DOM properties) is non-portable and
-  // non-standard but works in WebKit and IE (but not Gecko or Opera),
-  // we explicitly reject properties with dashes so that authors
-  // developing in WebKit or IE first don't end up with
-  // browser-specific content by accident.
+  // Property names can be provided in either camelCase or kebab-case.
 
   function testProps( props, prefixed, value, skipValueTest ) {
     skipValueTest = is(skipValueTest, 'undefined') ? false : skipValueTest;
@@ -1006,7 +1016,11 @@ E.g. iOS < 6 and some android version don't support this
       prop = props[i];
       before = mStyle.style[prop];
 
-      if ( !contains(prop, '-') && mStyle.style[prop] !== undefined ) {
+      if (contains(prop, '-')) {
+        prop = cssToDOM(prop);
+      }
+
+      if ( mStyle.style[prop] !== undefined ) {
 
         // If value to test has been passed in, do a set-and-check test.
         // 0 (integer) is a valid property value, so check that `value` isn't
@@ -1046,51 +1060,10 @@ E.g. iOS < 6 and some android version don't support this
   ModernizrProto._domPrefixes = domPrefixes;
   
 
-  var slice = classes.slice;
-  
-
-  // Adapted from ES5-shim https://github.com/kriskowal/es5-shim/blob/master/es5-shim.js
-  // es5.github.com/#x15.3.4.5
-
-  if (!Function.prototype.bind) {
-    Function.prototype.bind = function bind(that) {
-
-      var target = this;
-
-      if (typeof target != 'function') {
-        throw new TypeError();
-      }
-
-      var args = slice.call(arguments, 1);
-      var bound = function() {
-
-        if (this instanceof bound) {
-
-          var F = function(){};
-          F.prototype = target.prototype;
-          var self = new F();
-
-          var result = target.apply(
-            self,
-            args.concat(slice.call(arguments))
-          );
-          if (Object(result) === result) {
-            return result;
-          }
-          return self;
-
-        } else {
-
-          return target.apply(
-            that,
-            args.concat(slice.call(arguments))
-          );
-
-        }
-
-      };
-
-      return bound;
+  // Change the function's scope.
+  function fnBind(fn, that) {
+    return function() {
+      return fn.apply(that, arguments);
     };
   }
 
@@ -1111,11 +1084,10 @@ E.g. iOS < 6 and some android version don't support this
 
         item = obj[props[i]];
 
-        // let's bind a function (and it has a bind method -- certain native objects that report that they are a
-        // function don't [such as webkitAudioContext])
-        if (is(item, 'function') && 'bind' in item){
-          // default to autobind unless override
-          return item.bind(elem || obj);
+        // let's bind a function
+        if (is(item, 'function')) {
+          // bind to obj unless overriden
+          return fnBind(item, elem || obj);
         }
 
         // return the unbound function or obj or value
@@ -1157,14 +1129,50 @@ E.g. iOS < 6 and some android version don't support this
 
   
 
-  // Helper function for converting kebab-case to camelCase,
-  // e.g. box-sizing -> boxSizing
-  function cssToDOM( name ) {
-    return name.replace(/([a-z])-([a-z])/g, function(str, m1, m2) {
-      return m1 + m2.toUpperCase();
-    }).replace(/^-/, '');
-  }
-  ;
+  // List of property values to set for css tests. See ticket #21
+  var prefixes = (ModernizrProto._config.usePrefixes ? ' -webkit- -moz- -o- -ms- '.split(' ') : []);
+
+  // expose these for the plugin API. Look in the source for how to join() them against your input
+  ModernizrProto._prefixes = prefixes;
+
+  
+
+  /**
+   * atRule returns a given CSS property at-rule (eg @keyframes), possibly in
+   * some prefixed form, or false, in the case of an unsupported rule
+   *
+   * @param prop - String naming the property to test
+   */
+
+  var atRule = function(prop) {
+    var length = prefixes.length;
+    var cssrule = window.CSSRule;
+    var rule;
+
+    // remove literal @ from begining of provided property
+    prop = prop.replace(/^@/,'');
+
+    // CSSRules use underscores instead of dashes
+    rule = prop.replace(/-/g,'_').toUpperCase() + '_RULE';
+
+    if (rule in cssrule) {
+      return '@' + prop;
+    }
+
+    for ( var i = 0; i < length; i++ ) {
+      // prefixes gives us something like -o-, and we want O_
+      var prefix = prefixes[i];
+      var thisRule = prefix.toUpperCase() + '_' + rule;
+
+      if (thisRule in cssrule) {
+        return '@-' + prefix.toLowerCase() + '-' + prop;
+      }
+    }
+
+    return false;
+  };
+
+  
 
   // Modernizr.prefixed() returns the prefixed or nonprefixed property name variant of your input
   // Modernizr.prefixed('boxSizing') // 'MozBoxSizing'
@@ -1182,8 +1190,12 @@ E.g. iOS < 6 and some android version don't support this
   //     transEndEventName = transEndEventNames[ Modernizr.prefixed('transition') ];
 
   var prefixed = ModernizrProto.prefixed = function( prop, obj, elem ) {
-    // Convert kebab-case to camelCase
+    if (prop.indexOf('@') === 0) {
+      return atRule(prop);
+    }
+
     if (prop.indexOf('-') != -1) {
+      // Convert kebab-case to camelCase
       prop = cssToDOM(prop);
     }
     if (!obj) {
@@ -1215,6 +1227,118 @@ Detects support for the `window.requestAnimationFrame` API, for offloading anima
 */
 
   Modernizr.addTest('requestanimationframe', !!prefixed('requestAnimationFrame', window), { aliases: ['raf'] });
+
+
+  /**
+   * testAllProps determines whether a given CSS property, in some prefixed
+   * form, is supported by the browser. It can optionally be given a value; in
+   * which case testAllProps will only return true if the browser supports that
+   * value for the named property; this latter case will use native detection
+   * (via window.CSS.supports) if available. A boolean can be passed as a 3rd
+   * parameter to skip the value check when native detection isn't available,
+   * to improve performance when simply testing for support of a property.
+   *
+   * @param prop - String naming the property to test (either camelCase or
+   *               kebab-case)
+   * @param value - [optional] String of the value to test
+   * @param skipValueTest - [optional] Whether to skip testing that the value
+   *                        is supported when using non-native detection
+   *                        (default: false)
+   */
+  function testAllProps (prop, value, skipValueTest) {
+    return testPropsAll(prop, undefined, undefined, value, skipValueTest);
+  }
+  ModernizrProto.testAllProps = testAllProps;
+  
+
+  var testStyles = ModernizrProto.testStyles = injectElementWithStyles;
+  
+/*!
+{
+  "name": "CSS Transforms 3D",
+  "property": "csstransforms3d",
+  "caniuse": "transforms3d",
+  "tags": ["css"],
+  "warnings": [
+    "Chrome may occassionally fail this test on some systems; more info: https://code.google.com/p/chromium/issues/detail?id=129004"
+  ]
+}
+!*/
+
+  Modernizr.addTest('csstransforms3d', function() {
+    var ret = !!testAllProps('perspective', '1px', true);
+    var usePrefix = Modernizr._config.usePrefixes;
+
+    // Webkit's 3D transforms are passed off to the browser's own graphics renderer.
+    //   It works fine in Safari on Leopard and Snow Leopard, but not in Chrome in
+    //   some conditions. As a result, Webkit typically recognizes the syntax but
+    //   will sometimes throw a false positive, thus we must do a more thorough check:
+    if ( ret && (!usePrefix || 'webkitPerspective' in docElement.style )) {
+
+      // Webkit allows this media query to succeed only if the feature is enabled.
+      // `@media (transform-3d),(-webkit-transform-3d){ ... }`
+      // If loaded inside the body tag and the test element inherits any padding, margin or borders it will fail #740
+      var mq = '@media (transform-3d)';
+      if (usePrefix ) mq += ',(-webkit-transform-3d)';
+      mq += '{#modernizr{left:9px;position:absolute;height:5px;margin:0;padding:0;border:0}}';
+
+      testStyles(mq, function( elem ) {
+        ret = elem.offsetLeft === 9 && elem.offsetHeight === 5;
+      });
+    }
+
+    return ret;
+  });
+
+/*!
+{
+  "name": "Touch Events",
+  "property": "touchevents",
+  "caniuse" : "touch",
+  "tags": ["media", "attribute"],
+  "notes": [{
+    "name": "Touch Events spec",
+    "href": "http://www.w3.org/TR/2013/WD-touch-events-20130124/"
+  }],
+  "warnings": [
+    "Indicates if the browser supports the Touch Events spec, and does not necessarily reflect a touchscreen device"
+  ],
+  "knownBugs": [
+    "False-positive on some configurations of Nokia N900",
+    "False-positive on some BlackBerry 6.0 builds – https://github.com/Modernizr/Modernizr/issues/372#issuecomment-3112695"
+  ]
+}
+!*/
+/* DOC
+Indicates if the browser supports the W3C Touch Events API.
+
+This *does not* necessarily reflect a touchscreen device:
+
+* Older touchscreen devices only emulate mouse events
+* Modern IE touch devices implement the Pointer Events API instead: use `Modernizr.pointerevents` to detect support for that
+* Some browsers & OS setups may enable touch APIs when no touchscreen is connected
+* Future browsers may implement other event models for touch interactions
+
+See this article: [You Can't Detect A Touchscreen](http://www.stucox.com/blog/you-cant-detect-a-touchscreen/).
+
+It's recommended to bind both mouse and touch/pointer events simultaneously – see [this HTML5 Rocks tutorial](http://www.html5rocks.com/en/mobile/touchandmouse/).
+
+This test will also return `true` for Firefox 4 Multitouch support.
+*/
+
+  // Chrome (desktop) used to lie about its support on this, but that has since been rectified: http://crbug.com/36415
+  Modernizr.addTest('touchevents', function() {
+    var bool;
+    if(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
+      bool = true;
+    } else {
+      var query = ['@media (',prefixes.join('touch-enabled),('),'heartz',')','{#modernizr{top:9px;position:absolute}}'].join('');
+      testStyles(query, function( node ) {
+        bool = node.offsetTop === 9;
+      });
+    }
+    return bool;
+  });
 
 
   // Run each test

@@ -24,4 +24,32 @@ class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
         }
         $this->_setConversion(new CM_Splittest_Fixture($request), $weight);
     }
+
+    /**
+     * @param string              $splittestName
+     * @param CM_Request_Abstract $request
+     * @param string              $variationName
+     * @return bool
+     */
+    public static function isVariationFixtureStatic($splittestName, CM_Request_Abstract $request, $variationName) {
+        /** @var CM_Model_Splittest_RequestClient $splittest */
+        $splittest = static::_getSplittest($splittestName);
+        if (!$splittest) {
+            return false;
+        }
+        return $splittest->isVariationFixture($request, $variationName);
+    }
+
+    /**
+     * @param string              $splittestName
+     * @param CM_Request_Abstract $request
+     * @param float|null          $weight
+     */
+    public static function setConversionStatic($splittestName, CM_Request_Abstract $request, $weight = null) {
+        /** @var CM_Model_Splittest_RequestClient $splittest */
+        $splittest = static::_getSplittest($splittestName);
+        if ($splittest) {
+            $splittest->setConversion($request, $weight);
+        }
+    }
 }

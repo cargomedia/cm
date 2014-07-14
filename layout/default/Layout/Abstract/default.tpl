@@ -58,7 +58,8 @@
     {if $render->getLanguage()}
       {resourceJs file="translations/{CM_Model_Language::getVersionJavascript()}.js" type="library"}
     {/if}
-    {$render->getGlobalResponse()->getHtml($render)}
+    {$render->getGlobalResponse()->getHtml()}
+    {$render->getServiceManager()->getTrackings()->getHtml($render->getEnvironment())}
     {block name='body-end'}{/block}
   </body>
 </html>

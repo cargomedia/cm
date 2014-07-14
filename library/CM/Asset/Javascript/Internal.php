@@ -16,10 +16,10 @@ class CM_Asset_Javascript_Internal extends CM_Asset_Javascript_Abstract {
      * @throws CM_Exception_Invalid
      */
     private function _getAppClassName(CM_Site_Abstract $site) {
-        foreach ($site->getNamespaces() as $namespace) {
-            $file = new CM_File(DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'library/' . $namespace . '/App.js');
+        foreach ($site->getModules() as $moduleName) {
+            $file = new CM_File(DIR_ROOT . CM_Bootloader::getInstance()->getModulePath($moduleName) . 'library/' . $moduleName . '/App.js');
             if ($file->getExists()) {
-                return $namespace . '_App';
+                return $moduleName . '_App';
             }
         }
         throw new CM_Exception_Invalid('No App class found');
