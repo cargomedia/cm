@@ -6,6 +6,38 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         CMTest_TH::clearDb();
     }
 
+    public function testCreate() {
+        $languageKey = CM_Model_LanguageKey::create('foo', ['bar']);
+        $this->assertTrue(CM_Model_LanguageKey::exists('foo'));
+        $this->assertSame(['bar'], $languageKey->getVariables());
+    }
+
+    public function testSetGetVariables() {
+        $languageKey = CM_Model_LanguageKey::create('foo');
+        $this->assertSame([], $languageKey->getVariables());
+        $this->assertSame(0, $this->forceInvokeMethod($languageKey, '_getUpdateCount'));
+
+        $languageKey->setVariables(['foo']);
+        $this->assertSame(['foo'], $languageKey->getVariables());
+        $this->assertSame(1, $this->forceInvokeMethod($languageKey, '_getUpdateCount'));
+
+        $languageKey->setVariables(['foo']);
+        $this->assertSame(['foo'], $languageKey->getVariables());
+        $this->assertSame(1, $this->forceInvokeMethod($languageKey, '_getUpdateCount'));
+
+        $languageKey->setVariables(['foo', 'bar']);
+        $this->assertSame(['bar', 'foo'], $languageKey->getVariables());
+        $this->assertSame(2, $this->forceInvokeMethod($languageKey, '_getUpdateCount'));
+
+        $languageKey->setVariables(['bar', 'foo']);
+        $this->assertSame(['bar', 'foo'], $languageKey->getVariables());
+        $this->assertSame(2, $this->forceInvokeMethod($languageKey, '_getUpdateCount'));
+
+        $languageKey->setVariables(null);
+        $this->assertSame([], $languageKey->getVariables());
+        $this->assertSame(3, $this->forceInvokeMethod($languageKey, '_getUpdateCount'));
+    }
+
     public function testExists() {
         $this->assertFalse(CM_Model_LanguageKey::exists('foo'));
         CM_Model_LanguageKey::create('foo');
