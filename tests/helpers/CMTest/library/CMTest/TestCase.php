@@ -170,10 +170,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @return CM_Response_Abstract|\Mocka\ClassTrait
      */
     public function getResponse(CM_Request_Abstract $request) {
-        $responseOriginal = CM_Response_Abstract::factory($request);
-        /** @var CM_Response_Abstract $response */
-        $response = $this->mockClass(get_class($responseOriginal))->newInstance([$request]);
-        return $response;
+        $className = CM_Response_Abstract::getResponseClassName($request);
+        return $this->mockClass($className)->newInstance([$request]);
     }
 
     /**
