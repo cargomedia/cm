@@ -240,16 +240,4 @@ class CM_Model_Language extends CM_Model_Abstract {
     public static function getPersistenceClass() {
         return 'CM_Model_StorageAdapter_Database';
     }
-
-    protected static function _createStatic(array $data) {
-        $params = CM_Params::factory($data);
-        $backupId = ($params->has('backup')) ? $params->getLanguage('backup')->getId() : null;
-        $id = CM_Db_Db::insert('cm_model_language', array(
-            'name'         => $params->getString('name'),
-            'abbreviation' => $params->getString('abbreviation'),
-            'enabled'      => $params->getBoolean('enabled'),
-            'backupId'     => $backupId,
-        ));
-        return new static($id);
-    }
 }
