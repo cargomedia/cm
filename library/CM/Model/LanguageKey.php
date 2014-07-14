@@ -44,9 +44,6 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      * @return int
      */
     protected function _getUpdateCount() {
-        if ($this->_has('updateCount')) {
-            return 0;
-        }
         return $this->_get('updateCount');
     }
 
@@ -62,7 +59,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
             'name'                    => array('type' => 'string'),
             'variables'               => array('type' => 'string', 'optional' => true),
             'updateCountResetVersion' => array('type' => 'int', 'optional' => true),
-            'updateCount'             => array('type' => 'int', 'optional' => true),
+            'updateCount' => array('type' => 'int'),
             'javascript'              => array('type' => 'int'),
         ));
     }
@@ -83,6 +80,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     public static function create($name, array $variables = null) {
         $languageKey = new self();
         $languageKey->_set('name', $name);
+        $languageKey->_set('updateCount', 0);
         $languageKey->setVariables($variables);
         $languageKey->commit();
         return $languageKey;
