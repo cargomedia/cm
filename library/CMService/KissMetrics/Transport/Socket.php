@@ -24,9 +24,6 @@ class CMService_KissMetrics_Transport_Socket implements \KISSmetrics\Transport\T
             if (!self::$_socket) {
                 throw new \KISSmetrics\Transport\TransportException('Could not connect to the KISSmetrics server: ' . $errstr);
             }
-            if (!@stream_set_blocking(self::$_socket, 0)) {
-                throw new \KISSmetrics\Transport\TransportException('Could not switch the connection to the KISSmetrics server to non-blocking mode');
-            }
         }
         return self::$_socket;
     }
@@ -38,15 +35,19 @@ class CMService_KissMetrics_Transport_Socket implements \KISSmetrics\Transport\T
     protected function _sendRequest($request) {
         $retryCount = 1;
         for ($try = 0; true; $try++) {
-            if (@fwrite($this->_getSocket(), $request)) {
-                break;
+            for ($byteCountSent = 0; $byteCountSent < strlen($request); $byteCountSent += $byteCount) {
+                $byteCount = @fwrite($this->_getSocket(), substr($request, $byteCountSent));
+                if (false === $byteCount) {
+                    if ($try < $retryCount) {
+                        self::$_socket = null;
+                        continue 2;
+                    } else {
+                        throw new \KISSmetrics\Transport\TransportException('Could not send the request (retried ' . $try . 'x): ' .
+                            preg_replace('/\s+/', ' ', trim($request)));
+                    }
+                }
             }
-            if ($try < $retryCount) {
-                self::$_socket = null;
-            } else {
-                throw new \KISSmetrics\Transport\TransportException('Could not send the request (retried ' . $try . 'x): ' .
-                    preg_replace('/\s+/', ' ', trim($request)));
-            }
+            break;
         }
     }
 }
