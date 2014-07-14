@@ -117,13 +117,24 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     /**
      * @param CM_FormAction_Abstract        $action
      * @param array|null                    $data
+     * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
-     * @return CM_Request_Post|PHPUnit_Framework_MockObject_MockObject
+     * @throws CM_Exception_Invalid
+     * @return CM_Request_Post|\Mocka\ClassTrait
      */
-    public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+    public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
         $actionName = $action->getName();
         $form = $action->getForm();
-        $scopeView = new CM_Frontend_ViewResponse($form);
+        if (null === $scopeView) {
+            $scopeView = new CM_Frontend_ViewResponse($form);
+        }
+        if ($scopeView->getView() !== $form) {
+            throw new CM_Exception_Invalid('Action\'s form and ViewResponse\'s view must match');
+        }
+        if (null === $scopeComponent) {
+            $component = $this->mockClass('CM_Component_Abstract')->newInstance();
+            $scopeComponent = new CM_Frontend_ViewResponse($component);
+        }
         $query = array(
             'data'       => (array) $data,
             'actionName' => $actionName,
@@ -132,29 +143,56 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @param CM_Component_Abstract         $component
+     * @param string                        $methodName
+     * @param array|null                    $params
+     * @param CM_Frontend_ViewResponse|null $scopeView
+     * @param CM_Frontend_ViewResponse|null $scopeComponent
+     * @return CM_Request_Post|\Mocka\ClassTrait
+     */
+    public function createRequestAjax(CM_Component_Abstract $component, $methodName, array $params = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+        $viewResponseComponent = new CM_Frontend_ViewResponse($component);
+        if (null === $scopeView) {
+            $scopeView = $viewResponseComponent;
+        }
+        if (null === $scopeComponent) {
+            $scopeComponent = $viewResponseComponent;
+        }
+        $query = array(
+            'method' => (string) $methodName,
+            'params' => (array) $params,
+        );
+        return $this->createRequest('/ajax/null', $query, $scopeView, $scopeComponent);
+    }
+
+    /**
      * @param CM_Request_Abstract $request
-     * @return CM_Response_Abstract
+     * @return CM_Response_Abstract|\Mocka\ClassTrait
+     */
+    public function getResponse(CM_Request_Abstract $request) {
+        $className = CM_Response_Abstract::getResponseClassName($request);
+        return $this->mockClass($className)->newInstance([$request]);
+    }
+
+    /**
+     * @param CM_Request_Abstract $request
+     * @return CM_Response_Abstract|\Mocka\ClassTrait
      */
     public function processRequest(CM_Request_Abstract $request) {
-        $response = CM_Response_Abstract::factory($request);
+        $response = $this->getResponse($request);
         $response->process();
         return $response;
     }
 
     /**
-     * @param string                        $methodName
-     * @param array                         $params
-     * @param CM_Frontend_ViewResponse      $scopeView
-     * @param CM_Frontend_ViewResponse|null $scopeComponent
-     * @param CM_Frontend_Environment|null  $environment
+     * @param CM_Component_Abstract        $component
+     * @param string                       $methodName
+     * @param array|null                   $params
+     * @param CM_Frontend_Environment|null $environment
      * @return CM_Response_View_Ajax
      */
-    public function getResponseAjax($methodName, array $params, CM_Frontend_ViewResponse $scopeView, CM_Frontend_ViewResponse $scopeComponent = null, CM_Frontend_Environment $environment = null) {
-        $body = array(
-            'method' => (string) $methodName,
-            'params' => $params,
-        );
-        $request = $this->createRequest('/ajax/null', $body, $scopeView, $scopeComponent);
+    public function getResponseAjax(CM_Component_Abstract $component, $methodName, array $params = null, CM_Frontend_Environment $environment = null) {
+        $request = $this->createRequestAjax($component, $methodName, $params);
         if ($environment) {
             $request->mockMethod('getViewer')->set(function () use ($environment) {
                 return $environment->getViewer();
