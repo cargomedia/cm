@@ -14,7 +14,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
         }
         $variables = (array) $variables;
         if ($previousVariables !== $variables) {
-            $variablesEncoded = json_encode($variables);
+            $variablesEncoded = CM_Params::jsonEncode($variables);
             $this->_set('variables', $variablesEncoded);
 
             $this->_increaseUpdateCount();
@@ -37,7 +37,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
             return array();
         }
         $variablesEncoded = $this->_get('variables');
-        return json_decode($variablesEncoded, true);
+        return CM_Params::jsonDecode($variablesEncoded);
     }
 
     /**
