@@ -6,7 +6,6 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
 
     /**
      * @param string[]|null $variables
-     * @throws CM_Exception
      * @throws CM_Exception_Invalid
      */
     public function setVariables(array $variables = null) {
@@ -59,7 +58,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
             'name'                    => array('type' => 'string'),
             'variables'               => array('type' => 'string', 'optional' => true),
             'updateCountResetVersion' => array('type' => 'int', 'optional' => true),
-            'updateCount' => array('type' => 'int'),
+            'updateCount'             => array('type' => 'int'),
             'javascript'              => array('type' => 'int'),
         ));
     }
