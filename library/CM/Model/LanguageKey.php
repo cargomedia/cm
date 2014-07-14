@@ -18,7 +18,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
             $this->_set('variables', $variablesEncoded);
 
             $this->_increaseUpdateCount();
-            if ($this->_has('updateCount') && $this->_get('updateCount') > 50) {
+            if ($this->_getUpdateCount() > 50) {
                 $message = [
                     'Variables for languageKey `' . $this->_get('name') . '` have been updated over 50 times since release.',
                     'Previous variables: `' . var_export($previousVariables, true) . '`',
@@ -40,6 +40,16 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
         return json_decode($variablesEncoded, true);
     }
 
+    /**
+     * @return int
+     */
+    protected function _getUpdateCount() {
+        if ($this->_has('updateCount')) {
+            return 0;
+        }
+        return $this->_get('updateCount');
+    }
+
     protected function _onChange() {
         /** @var CM_Model_Language $language */
         foreach (new CM_Paging_Language_All() as $language) {
@@ -58,11 +68,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     }
 
     protected function _increaseUpdateCount() {
-        $updateCount = 0;
-        if ($this->_has('updateCount')) {
-            $updateCount = $this->_get('updateCount');
-        }
-        $this->_set('updateCount', $updateCount + 1);
+        $this->_set('updateCount', $this->_getUpdateCount() + 1);
     }
 
     protected function _onDeleteBefore() {
