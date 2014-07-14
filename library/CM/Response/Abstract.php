@@ -30,10 +30,10 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
      * @param CM_Request_Abstract $request
      */
     public function __construct(CM_Request_Abstract $request) {
-        $this->_request = $request;
-        $responseType = $request->popPathPart();
-        $language = $request->popPathLanguage();
-        $this->_site = $request->popPathSite();
+        $this->_request = clone $request;
+        $responseType = $this->_request->popPathPart();
+        $language = $this->_request->popPathLanguage();
+        $this->_site = $this->_request->popPathSite();
     }
 
     abstract protected function _process();
