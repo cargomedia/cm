@@ -133,13 +133,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Request_Abstract $request
-     * @param CM_Model_User|null  $viewer
      * @return CM_Response_Abstract
      */
-    public function processRequest(CM_Request_Abstract $request, CM_Model_User $viewer = null) {
-        if ($viewer) {
-            $request->getSession()->setUser($viewer);
-        }
+    public function processRequest(CM_Request_Abstract $request) {
         $response = CM_Response_Abstract::factory($request);
         $response->process();
         return $response;
