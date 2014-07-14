@@ -130,10 +130,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
      */
     public static function find($name) {
         $splitfeatureList = new CM_Paging_Splitfeature_All();
-        if (!$splitfeatureList->contains($name)) {
-            return null;
-        }
-        return new static($name);
+        return $splitfeatureList->find($name);
     }
 
     /**
