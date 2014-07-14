@@ -118,7 +118,7 @@ class CMTest_TH {
                 $abbreviation = self::_randStr(5);
             } while (CM_Model_Language::findByAbbreviation($abbreviation));
         }
-        return CM_Model_Language::createStatic(array('name' => 'English', 'abbreviation' => $abbreviation, 'enabled' => 1));
+        return CM_Model_Language::create('English', $abbreviation, true);
     }
 
     /**

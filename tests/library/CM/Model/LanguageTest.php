@@ -51,8 +51,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
     }
 
     public function testCreate() {
-        /** @var CM_Model_Language $language */
-        $language = CM_Model_Language::createStatic(array('name' => 'Deutsch', 'abbreviation' => 'de', 'enabled' => true));
+        $language = CM_Model_Language::create('Deutsch', 'de', true);
 
         $this->assertInstanceOf('CM_Model_Language', $language);
         $this->assertSame('Deutsch', $language->getName());
@@ -61,17 +60,9 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
         $this->assertNull($language->getBackup());
     }
 
-    /**
-     * @expectedException CM_Exception_InvalidParam
-     * @expectedExceptionMessage `name`
-     */
-    public function testCreateWithoutName() {
-        CM_Model_Language::createStatic(array('abbreviation' => 'de',));
-    }
-
     public function testCreateWithDuplicateAbbreviation() {
         try {
-            CM_Model_Language::createStatic(array('name' => 'Another one', 'abbreviation' => $this->_language->getAbbreviation(), 'enabled' => true));
+            CM_Model_Language::create('Another one', $this->_language->getAbbreviation(), true);
             $this->fail('Could create language with duplicate abbreviation');
         } catch (CM_Exception $e) {
             $this->assertContains('Duplicate entry', $e->getMessage());
@@ -112,25 +103,13 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
     }
 
     public function testGetTranslationWithBackup() {
-        /** @var CM_Model_Language $backedUpLanguage */
-        $backedUpLanguage = CM_Model_Language::createStatic(array(
-            'name'         => 'Backed up language',
-            'abbreviation' => 'bul',
-            'enabled'      => true,
-            'backup'       => $this->_language
-        ));
+        $backedUpLanguage = CM_Model_Language::create('Backed up language', 'bul', true, $this->_language);
         $this->_language->setTranslation('phrase', 'abc');
         $this->assertSame('abc', $backedUpLanguage->getTranslation('phrase'));
     }
 
     public function testIsBackingUp() {
-        /** @var CM_Model_Language $backedUpLanguage */
-        $backedUpLanguage = CM_Model_Language::createStatic(array(
-            'name'         => 'Backed up language',
-            'abbreviation' => 'bul',
-            'enabled'      => true,
-            'backup'       => $this->_language
-        ));
+        $backedUpLanguage = CM_Model_Language::create('Backed up language', 'bul', true, $this->_language);
         $this->assertTrue($this->_language->isBackingUp($backedUpLanguage));
         $this->assertFalse($backedUpLanguage->isBackingUp($this->_language));
     }
