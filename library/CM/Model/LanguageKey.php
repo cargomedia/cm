@@ -2,6 +2,8 @@
 
 class CM_Model_LanguageKey extends CM_Model_Abstract {
 
+    const MAX_UPDATE_COUNT = 50;
+
     /**
      * @param string[]|null $variables
      * @throws CM_Exception
@@ -15,9 +17,10 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
             $this->_set('variables', $variablesEncoded);
 
             $this->_increaseUpdateCount();
-            if ($this->_getUpdateCount() > 50) {
+            if ($this->_getUpdateCount() > self::MAX_UPDATE_COUNT) {
                 $message = [
-                    'Variables for languageKey `' . $this->_get('name') . '` have been updated over 50 times since release.',
+                    'Variables for languageKey `' . $this->_get('name') . '` have been updated over ' . self::MAX_UPDATE_COUNT .
+                    ' times since release.',
                     'Previous variables: `' . CM_Util::var_line($previousVariables) . '`',
                     'Current variables: `' . CM_Util::var_line($variables) . '`',
                 ];
