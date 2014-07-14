@@ -155,8 +155,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             'params' => $params,
         );
         $request = $this->createRequest('/ajax/null', $body, $scopeView, $scopeComponent);
-        if ($environment && $environment->hasViewer()) {
-            $request->getSession()->setUser($environment->getViewer());
+        if ($environment) {
+            $request->mockMethod('getViewer')->set(function () use ($environment) {
+                return $environment->getViewer();
+            });
         }
         return $this->processRequest($request);
     }
