@@ -11,6 +11,8 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     public function setVariables(array $variables = null) {
         $previousVariables = $this->getVariables();
         $variables = (array) $variables;
+        $variables = array_values($variables);
+        sort($variables);
         if ($previousVariables !== $variables) {
             $variablesEncoded = CM_Params::jsonEncode($variables);
             $this->_set('variables', $variablesEncoded);
