@@ -69,17 +69,19 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
     }
 
     public function testFindByName() {
-        $languageKey = CM_Model_LanguageKey::create('foo');
-        $this->assertEquals($languageKey, CM_Model_LanguageKey::findByName('foo'));
-    }
-
-    public function testReplace() {
         $languageKey1 = CM_Model_LanguageKey::create('foo');
         $languageKey2 = CM_Model_LanguageKey::create('foo');
         $this->assertRow('cm_model_languagekey', ['name' => 'foo'], 2);
+        $this->assertEquals($languageKey1, CM_Model_LanguageKey::findByName('foo'));
+        $this->assertRow('cm_model_languagekey', ['name' => 'foo'], 1);
+    }
+
+    public function testReplace() {
+        $languageKey = CM_Model_LanguageKey::create('foo');
+        $this->assertRow('cm_model_languagekey', ['name' => 'foo'], 1);
         $languageKeyReplaced = CM_Model_LanguageKey::replace('foo', ['foo']);
         $this->assertRow('cm_model_languagekey', ['name' => 'foo'], 1);
-        $this->assertEquals($languageKey1, $languageKeyReplaced);
+        $this->assertEquals($languageKey, $languageKeyReplaced);
         $this->assertSame(['foo'], $languageKeyReplaced->getVariables());
     }
 
@@ -94,13 +96,5 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         $this->assertTrue(CM_Model_LanguageKey::exists('foo'));
         CM_Model_LanguageKey::deleteByName('foo');
         $this->assertFalse(CM_Model_LanguageKey::exists('foo'));
-    }
-
-    public function testClearDuplicates() {
-        CM_Model_LanguageKey::create('foo');
-        CM_Model_LanguageKey::create('foo');
-        $this->assertRow('cm_model_languagekey', ['name' => 'foo'], 2);
-        CM_Model_LanguageKey::clearDuplicates('foo');
-        $this->assertRow('cm_model_languagekey', ['name' => 'foo'], 1);
     }
 }

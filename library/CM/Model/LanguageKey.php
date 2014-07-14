@@ -93,9 +93,13 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      */
     public static function findByName($name) {
         $name = (string) $name;
-        $languageKeyId = CM_Db_Db::select('cm_model_languagekey', 'id', array('name' => $name), 'id ASC')->fetchColumn();
-        if (!$languageKeyId) {
+        $languageKeyIdList = CM_Db_Db::select('cm_model_languagekey', 'id', array('name' => $name), 'id ASC')->fetchAllColumn();
+        if (count($languageKeyIdList) === 0) {
             return null;
+        }
+        $languageKeyId = array_shift($languageKeyIdList);
+        if (count($languageKeyIdList) > 0) {
+            CM_Db_Db::exec("DELETE FROM `cm_model_languagekey` WHERE `name` = ? AND `id` != ?", array($name, $languageKeyId));
         }
         return new self($languageKeyId);
     }
@@ -109,8 +113,6 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
         $languageKey = self::findByName($name);
         if (!$languageKey) {
             self::create($name, $variableNames);
-            // check if the language Key is double inserted because of high load
-            self::clearDuplicates($name);
             $languageKey = self::findByName($name);
         }
         if (null !== $variableNames) {
