@@ -2,9 +2,6 @@
 
 class CM_Model_Language extends CM_Model_Abstract {
 
-    /** @var CM_Model_Language|null $_backup */
-    private $_backup;
-
     /**
      * @return string
      */
@@ -48,7 +45,7 @@ class CM_Model_Language extends CM_Model_Abstract {
     }
 
     /**
-     * @param string $phrase
+     * @param string     $phrase
      * @param array|null $variableNames
      * @param bool|null  $skipCacheLocal
      * @return string
@@ -74,7 +71,6 @@ class CM_Model_Language extends CM_Model_Abstract {
             if ($variableNames !== $translations[$phrase]['variables']) {
                 $languageKey = CM_Model_LanguageKey::findByName($phrase);
                 $languageKey->setVariables($variableNames);
-                $languageKey->commit();
                 return $this->getTranslation($phrase, $variableNames, $skipCacheLocal);
             }
         }
@@ -89,7 +85,7 @@ class CM_Model_Language extends CM_Model_Abstract {
     }
 
     /**
-     * @param string $phrase
+     * @param string      $phrase
      * @param string|null $value
      * @param array|null  $variables
      */
