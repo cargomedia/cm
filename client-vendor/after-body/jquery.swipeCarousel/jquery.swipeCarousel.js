@@ -4,26 +4,111 @@
  */
 (function(window, $) {
 
+  var defaults = {
+    contentIdList: null
+  };
+
+  /**
+   * @param {Array} array
+   * @param {Number} indexOffset
+   * @constructor
+   */
+  var CircularList = function CircularList(array, indexOffset) {
+    this.array = array;
+    this.indexOffset = indexOffset;
+  };
+
+  CircularList.prototype = {
+    /**
+     * @param {Number} index
+     * @return {*}
+     */
+    get: function(index) {
+      index = (this.indexOffset + index) % this.array.length;
+      return this.array[index];
+    },
+
+    /**
+     * @return {Array}
+     */
+    getAll: function() {
+      return this.array;
+    },
+
+    /**
+     * @param {Number} direction
+     */
+    rotate: function(direction) {
+      this.indexOffset += direction;
+    }
+  };
+
   /**
    * @param {jQuery} $element
+   * @param {Object} [options]
+   * @constructor
    * @return {SwipeCarousel}
    */
-  var SwipeCarousel = function($element) {
+  var SwipeCarousel = function($element, options) {
+    options = _.defaults(options || {}, defaults);
+
     this.$element = $element;
-    this.$container = $element.find('>ul');
+
+    this.$container = $element.find('> ul');
     if (0 == this.$container.length) {
-      throw new Error('Cannot find carousel container');
+      throw new Error('Cannot find container');
     }
-    this.$panes = $element.find('>ul>li');
-    if (0 == this.$panes.length) {
-      throw new Error('Cannot find carousel panes');
+
+    var $containerChildren = this.$container.children();
+    var $panelActive;
+
+    if (options.contentIdList) {
+      // Populate from contentIdList
+      this.contentList = _.map(options.contentIdList, function(contentId) {
+        return {'id': contentId, 'element': null};
+      });
+
+      // Add existing DOM element to contentList
+      if ($containerChildren.length !== 1) {
+        throw new Error('Expecting exactly one panel present.');
+      }
+      var $containerChild = $containerChildren.first();
+      var contentId = $containerChild.data('gallery-content-id');
+      if ('undefined' === typeof contentId) {
+        throw new Error('Missing `gallery-content-id` data attribute');
+      }
+      var contentItem = this._getContentById(contentId);
+      contentItem['element'] = $containerChild.children();
+      $panelActive = $containerChild;
+
+    } else {
+      // Populate from DOM
+      this.contentList = _.map($containerChildren, function(containerChild) {
+        var $containerChild = $(containerChild);
+        var contentId = $containerChild.data('gallery-content-id');
+        if ('undefined' === typeof contentId) {
+          contentId = null;
+        }
+        $panelActive = $containerChild;
+        return {'id': contentId, 'element': $containerChild.children()};
+      });
     }
-    this.current_pane = this.$panes.filter('.active').index();
-    if (-1 == this.current_pane) {
-      this.current_pane = 0;
+
+    if (0 == this.contentList.length) {
+      throw new Error('Empty contentList');
     }
+
+    if (0 == $panelActive.prev().length) {
+      $panelActive.before($('<li />'));
+    }
+    if (0 == $panelActive.next().length) {
+      $panelActive.after($('<li />'));
+    }
+    var $panelList = $panelActive.prev().add($panelActive).add($panelActive.next());
+    this.panelList = new CircularList($panelList.toArray(), 1);
+    $panelActive.siblings().not($panelList).detach();
+
     this.pane_width = 0;
-    this.pane_count = this.$panes.length;
     this.hammer = new Hammer(this.$element[0], {
       dragLockToAxis: true,
       dragMinDistance: 20,
@@ -40,17 +125,17 @@
     /** @type jQuery */
     $container: null,
 
-    /** @type jQuery */
-    $panes: null,
+    /** @type CircularList */
+    panelList: null,
+
+    /** @type Array */
+    contentList: null,
 
     /** @type Number */
-    current_pane: null,
+    position: null,
 
     /** @type Number */
     pane_width: null,
-
-    /** @type Number */
-    pane_count: null,
 
     /** @type Hammer */
     hammer: null,
@@ -65,7 +150,7 @@
 
       this.$element.addClass('swipeCarousel');
       this._setPaneDimensions();
-      this.showPane(this.current_pane, null, true);
+      this.showPane(this.position, null, true);
       $(window).on('load resize orientationchange', this._setPaneDimensions);
       $(window).on('keydown', this._onKeydown);
       this.hammer.on('release dragleft dragright swipeleft swiperight', this._onHammer);
@@ -87,14 +172,14 @@
      * @param {Object} [eventData]
      */
     showNext: function(eventData) {
-      this.showPane(this.current_pane + 1, eventData);
+      this.showPane(this.position + 1, eventData);
     },
 
     /**
      * @param {Object} [eventData]
      */
     showPrevious: function(eventData) {
-      this.showPane(this.current_pane - 1, eventData);
+      this.showPane(this.position - 1, eventData);
     },
 
     /**
@@ -103,12 +188,12 @@
      * @param {Boolean} [skipAnimation]
      */
     showPane: function(index, eventData, skipAnimation) {
-      index = Math.max(0, Math.min(index, this.pane_count - 1));
+      index = Math.max(0, Math.min(index, this.contentList.length - 1));
       eventData = eventData || {};
-      var change = this.current_pane != index;
-      this.current_pane = index;
+      var change = this.position != index;
+      this.position = index;
 
-      var offset = -((100 / this.pane_count) * this.current_pane);
+      var offset = 13;
       this._setContainerOffset(offset, !skipAnimation);
 
       if (change) {
@@ -116,13 +201,23 @@
       }
     },
 
+    /**
+     * @param {*} id
+     * @return Object
+     */
+    _getContentById: function(id) {
+      var contentItem = _.findWhere(this.contentList, {'id': id});
+      if (!contentItem) {
+        throw new Error('Cannot find contentItem with id `' + id + '`.');
+      }
+      return contentItem;
+    },
+
     _setPaneDimensions: function() {
-      this.pane_width = this.$element.width();
-      var self = this;
-      this.$panes.each(function() {
-        $(this).outerWidth(self.pane_width);
-      });
-      this.$container.width(this.pane_width * this.pane_count);
+      this.pane_width = this.$element.width() * 0.3;
+      _.each(this.panelList.getAll(), function(panel) {
+        $(panel).outerWidth(this.pane_width);
+      }, this);
     },
 
     /**
@@ -147,11 +242,12 @@
      * @param {Object} eventData
      */
     _onChange: function(eventData) {
-      var $pane_current = this.$panes.eq(this.current_pane);
-      this.$panes.removeClass('active');
+      return;
+      var $pane_current = this.panelList.get(0);
+      this.panelList.removeClass('active');
       $pane_current.addClass('active');
       _.extend(eventData, {
-        index: this.current_pane,
+        index: this.position,
         element: $pane_current.get(0)
       });
       this.$element.trigger('swipeCarousel-change', eventData);
@@ -180,15 +276,14 @@
         case 'dragright':
         case 'dragleft':
           // stick to the finger
-          var pane_offset = -(100 / this.pane_count) * this.current_pane;
-          var drag_offset = ((100 / this.pane_width) * event.gesture.deltaX) / this.pane_count;
+          var drag_offset = ((100 / this.pane_width) * event.gesture.deltaX);
 
           // slow down at the first and last pane
-          if ((this.current_pane == 0 && event.gesture.direction == 'right') || (this.current_pane == this.pane_count - 1 && event.gesture.direction == 'left')) {
+          if ((this.position == 0 && event.gesture.direction == 'right') || (this.position == this.contentList.length - 1 && event.gesture.direction == 'left')) {
             drag_offset *= .4;
           }
 
-          this._setContainerOffset(drag_offset + pane_offset, false);
+          this._setContainerOffset(drag_offset, false);
           break;
 
         case 'swipeleft':
@@ -210,7 +305,7 @@
               this.showNext();
             }
           } else {
-            this.showPane(this.current_pane);
+            this.showPane(this.position);
           }
           break;
       }
@@ -219,15 +314,20 @@
 
   /**
    * @param {String} [action]
+   * @param {Object} [options]
    * @return {jQuery}
    */
-  $.fn.swipeCarousel = function(action) {
+  $.fn.swipeCarousel = function(action, options) {
+    if ('object' === typeof action) {
+      options = action;
+    }
+
     return this.each(function() {
       var $self = $(this);
       var swipeCarousel = $self.data('swipeCarousel');
 
       if (!swipeCarousel) {
-        swipeCarousel = new SwipeCarousel($self);
+        swipeCarousel = new SwipeCarousel($self, options);
         $self.data('swipeCarousel', swipeCarousel);
       }
 
