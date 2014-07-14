@@ -233,16 +233,25 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 
     /**
      * @param CM_Request_Abstract $request
-     * @return CM_Response_Abstract
+     * @return CM_Response_Abstract|string
      */
-    public static function factory(CM_Request_Abstract $request) {
+    public static function getResponseClassName(CM_Request_Abstract $request) {
         /** @var $responseClass CM_Response_Abstract */
         foreach (array_reverse(self::getClassChildren()) as $responseClass) {
             if ($responseClass::match($request)) {
-                return new $responseClass($request);
+                return $responseClass;
             }
         }
-        return new CM_Response_Page($request);
+        return 'CM_Response_Page';
+    }
+
+    /**
+     * @param CM_Request_Abstract $request
+     * @return CM_Response_Abstract
+     */
+    public static function factory(CM_Request_Abstract $request) {
+        $className = self::getResponseClassName($request);
+        return new $className($request);
     }
 
     /**
