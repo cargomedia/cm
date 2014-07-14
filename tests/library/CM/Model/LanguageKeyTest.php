@@ -2,6 +2,10 @@
 
 class CM_Model_LanguageKeyTest extends CMTest_TestCase {
 
+    public function tearDown() {
+        CMTest_TH::clearDb();
+    }
+
     public function testExists() {
         $this->assertFalse(CM_Model_LanguageKey::exists('foo'));
         CM_Model_LanguageKey::create('foo');
@@ -36,5 +40,13 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         } catch (CM_Exception_Invalid $e) {
             $this->assertContains('`foo`', $e->getMessage());
         }
+    }
+
+    public function testClearDuplicates() {
+        CM_Model_LanguageKey::create('foo');
+        CM_Model_LanguageKey::create('foo');
+        $this->assertRow('cm_model_languagekey', ['name' => 'foo'], 2);
+        CM_Model_LanguageKey::clearDuplicates('foo');
+        $this->assertRow('cm_model_languagekey', ['name' => 'foo'], 1);
     }
 }
