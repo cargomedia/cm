@@ -8,10 +8,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function setVariables(array $variables = null) {
-        $previousVariables = array();
-        if ($this->_has('variables')) {
-            $previousVariables = $this->getVariables();
-        }
+        $previousVariables = $this->getVariables();
         $variables = (array) $variables;
         if ($previousVariables !== $variables) {
             $variablesEncoded = CM_Params::jsonEncode($variables);
@@ -21,8 +18,8 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
             if ($this->_getUpdateCount() > 50) {
                 $message = [
                     'Variables for languageKey `' . $this->_get('name') . '` have been updated over 50 times since release.',
-                    'Previous variables: `' . var_export($previousVariables, true) . '`',
-                    'Current variables: `' . var_export($variables, true) . '`',
+                    'Previous variables: `' . CM_Util::var_line($previousVariables) . '`',
+                    'Current variables: `' . CM_Util::var_line($variables) . '`',
                 ];
                 throw new CM_Exception_Invalid(join(PHP_EOL, $message));
             }
