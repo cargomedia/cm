@@ -1,5 +1,5 @@
 <?php
-
+require_once dirname(dirname(dirname(__DIR__))) . '/bootstrap.php'; // Bootstrap the test explicitly when running in a separate process
 use Mocka\Mocka;
 
 class CM_Clockwork_ManagerTest extends CMTest_TestCase {
@@ -17,6 +17,10 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         parent::tearDownAfterClass();
     }
 
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function testRunEventsFor() {
         $currently = new DateTime();
 
@@ -45,6 +49,10 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         ), $this->getCounter());
     }
 
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function testRunEventsPersistence() {
         $currently = new DateTime();
         $context = 'foo';
