@@ -3,7 +3,7 @@
 abstract class CM_OutputStream_Stream_Abstract extends CM_OutputStream_Abstract {
 
     /** @var string */
-    private $_stream;
+    protected $_stream;
 
     /**
      * @param string $stream
@@ -13,7 +13,7 @@ abstract class CM_OutputStream_Stream_Abstract extends CM_OutputStream_Abstract 
     }
 
     public function write($message) {
-        $stream = fopen($this->_stream, 'w');
+        $stream = fopen($this->_stream, 'a');
         fwrite($stream, $message);
         fclose($stream);
     }
