@@ -49,5 +49,36 @@ class CMService_KissMetrics_Transport_Socket implements \KISSmetrics\Transport\T
             }
             break;
         }
+        $response = '';
+        while (true) {
+            $responseChunk = @fread($this->_getSocket(), 1000);
+            if (false === $responseChunk) {
+                throw new \KISSmetrics\Transport\TransportException('Could not read response from the KISSmetrics server for the request ' .
+                    CM_Util::var_line(str_replace("\r", '', $request)));
+            }
+            $response .= $responseChunk;
+            $lengthHeader = strpos($response, "\r\n\r\n");
+            if (false === $lengthHeader) {
+                continue;
+            }
+            $headerRaw = substr($response, 0, $lengthHeader);
+            $headerList = explode("\r\n", $headerRaw);
+            if ('HTTP/1.1 200 OK' !== $headerList[0]) {
+                throw new \KISSmetrics\Transport\TransportException('KISSmetrics server error: ' .
+                    CM_Util::var_line(str_replace("\r", '', $response)));
+            }
+            foreach ($headerList as $header) {
+                if (preg_match('#\\AContent-Length:\\s*+(\\d++)\\z#i', $header, $matches)) {
+                    $contentLength = (int) $matches[1];
+                    $body = substr($response, $lengthHeader + 4);
+                    if (strlen($body) < $contentLength) {
+                        continue 2;
+                    }
+                    break 2;
+                }
+            }
+            throw new \KISSmetrics\Transport\TransportException('Could not find content length: ' .
+                CM_Util::var_line(str_replace("\r", '', $response)));
+        }
     }
 }
