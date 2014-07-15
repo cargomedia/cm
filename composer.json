@@ -15,7 +15,8 @@
     "lstrojny/functional-php": "1.0.0-alpha2",
     "aws/aws-sdk-php": "~2.6.0",
     "nicmart/tree": "~0.2.0",
-    "kissmetrics/kissmetrics-php": "dev-master"
+    "kissmetrics/kissmetrics-php": "dev-master",
+    "guzzlehttp/guzzle": "4.*"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.1.3",

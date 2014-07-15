@@ -83,7 +83,7 @@ EOF;
             return;
         }
         $eventName = (string) $eventName;
-        $kissMetrics = new \KISSmetrics\Client($this->_getCode(), new CMService_KissMetrics_Transport_Socket());
+        $kissMetrics = new \KISSmetrics\Client($this->_getCode(), new CMService_KissMetrics_Transport_GuzzleHttp());
         $kissMetrics->identify($this->_getUserId())->record($eventName, $propertyList);
         $kissMetrics->submit();
     }
