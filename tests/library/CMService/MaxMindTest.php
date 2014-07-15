@@ -2,12 +2,22 @@
 
 class CMService_MaxMindTest extends CMTest_TestCase {
 
+    /** @var CM_OutputStream_Abstract */
+    protected $_errorStream;
+
+    /** @var CM_OutputStream_File */
+    protected $_outputStream;
+
     public function setUp() {
         CM_Db_Db::exec('ALTER TABLE cm_model_location_ip AUTO_INCREMENT = 1');
         CM_Db_Db::exec('ALTER TABLE cm_model_location_zip AUTO_INCREMENT = 1');
         CM_Db_Db::exec('ALTER TABLE cm_model_location_city AUTO_INCREMENT = 1');
         CM_Db_Db::exec('ALTER TABLE cm_model_location_state AUTO_INCREMENT = 1');
         CM_Db_Db::exec('ALTER TABLE cm_model_location_country AUTO_INCREMENT = 1');
+        $this->_errorStream = new CM_OutputStream_Null();
+        $file = new CM_File('/CM_OutputStream_File-' . uniqid(), CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
+        $file->truncate();
+        $this->_outputStream = new CM_OutputStream_File($file);
     }
 
     public function tearDown() {
@@ -3099,7 +3109,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266586368, 'ipEnd' => 266586623),
             )
         );
-        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/3 \\(33%\\)\\s++2/3 \\(67%\\)\\s++3/3 \\(100%\\)\\s++Updating IP blocks database…#');
+        $this->assertSame(false, strpos($this->_outputStream->read(), 'Overlapping IP blocks:'));
     }
 
     public function testOverlappingIpBlocks_sameIpStart() {
@@ -3136,7 +3146,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266586368, 'ipEnd' => 266586623),
             )
         );
-        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/3 \\(33%\\)\\s++2/3 \\(67%\\)\\s++3/3 \\(100%\\)\\s++Overlapping IP blocks:\\s++! 33555968-33556223 and 33555968-33556243\\s++\\*#');
+        $this->assertNotSame(false, strpos($this->_outputStream->read(), "Overlapping IP blocks:\n ! 33555968-33556223 and 33555968-33556243\n\n *"));
     }
 
     public function testOverlappingIpBlocks_inclusion() {
@@ -3173,7 +3183,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
             )
         );
-        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/4 \\(25%\\)\\s++2/4 \\(50%\\)\\s++3/4 \\(75%\\)\\s++4/4 \\(100%\\)\\s++Overlapping IP blocks:\\s++! 266578176-266578431 and 266578200-266578400\\s++! 33555968-33556223 and 33556000-33556200\\s++\\*#');
+        $this->assertNotSame(false, strpos($this->_outputStream->read(), "Overlapping IP blocks:\n ! 266578176-266578431 and 266578200-266578400\n ! 33555968-33556223 and 33556000-33556200\n\n *"));
     }
 
     public function testOverlappingIpBlocks_overlapping() {
@@ -3210,7 +3220,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
             )
         );
-        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/4 \\(25%\\)\\s++2/4 \\(50%\\)\\s++3/4 \\(75%\\)\\s++4/4 \\(100%\\)\\s++Overlapping IP blocks:\\s++! 266578176-266578431 and 266578200-266578500\\s++! 33555968-33556223 and 33556000-33557000\\s++\\*#');
+        $this->assertNotSame(false, strpos($this->_outputStream->read(), "Overlapping IP blocks:\n ! 266578176-266578431 and 266578200-266578500\n ! 33555968-33556223 and 33556000-33557000\n\n *"));
     }
 
     /**
@@ -3381,7 +3391,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
     protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock, $regionListLegacyMock) {
         $maxMind = $this->getMock('CMService_MaxMind',
             array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData', '_getRegionListLegacy'),
-            array(null, new CM_OutputStream_Stream_Output(), null, true));
+            array(null, $this->_outputStream, $this->_errorStream, null, true));
         $maxMind->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
         $maxMind->expects($this->any())->method('_getRegionData')->will($this->returnValue($regionDataMock));
         $maxMind->expects($this->any())->method('_getLocationData')->will($this->returnValue($locationDataMock));

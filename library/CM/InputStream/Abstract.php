@@ -3,7 +3,7 @@
 abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
 
     /** @var CM_OutputStream_Interface */
-    protected $_outputStream;
+    protected $_streamOutput;
 
     /**
      * @param string|null $hint
@@ -12,8 +12,8 @@ abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
     abstract protected function _read($hint = null);
 
     public function __construct() {
-        if (null === $this->_outputStream) {
-            $this->_outputStream = new CM_OutputStream_Null();
+        if (null === $this->_streamOutput) {
+            $this->_streamOutput = new CM_OutputStream_Null();
         }
     }
 
@@ -46,7 +46,7 @@ abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
     /**
      * @return CM_OutputStream_Interface
      */
-    protected function _getOutputStream() {
-        return $this->_outputStream;
+    protected function _getStreamOutput() {
+        return $this->_streamOutput;
     }
 }
