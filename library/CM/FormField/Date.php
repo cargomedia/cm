@@ -8,12 +8,6 @@ class CM_FormField_Date extends CM_FormField_Abstract {
     /** @var int */
     protected $_yearLast;
 
-    protected function _initialize() {
-        $this->_yearFirst = $this->_params->getInt('yearFirst', date('Y') - 100);
-        $this->_yearLast = $this->_params->getInt('yearLast', date('Y'));
-        parent::_initialize();
-    }
-
     public function parseUserInput($userInput) {
         try {
             $dd = (int) $userInput['day'];
@@ -64,5 +58,11 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 
     public function isEmpty($userInput) {
         return empty($userInput['day']) || empty($userInput['month']) || empty($userInput['year']);
+    }
+
+    protected function _initialize() {
+        $this->_yearFirst = $this->_params->getInt('yearFirst', date('Y') - 100);
+        $this->_yearLast = $this->_params->getInt('yearLast', date('Y'));
+        parent::_initialize();
     }
 }
