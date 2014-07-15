@@ -14,7 +14,10 @@ abstract class CM_FormField_SuggestOne extends CM_FormField_Suggest {
 
     public function parseUserInput($userInput) {
         $values = parent::parseUserInput($userInput);
-        return $values ? reset($values) : null;
+        if (count($values) > 1) {
+            throw new CM_Exception_FormFieldValidation('Too many elements.');
+        }
+        return $values[0];
     }
 
     /**

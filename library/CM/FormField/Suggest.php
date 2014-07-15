@@ -20,6 +20,10 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
         $viewResponse->set('placeholder', $renderParams->has('placeholder') ? $renderParams->getString('placeholder') : null);
     }
 
+    /**
+     * @param $userInput
+     * @return array
+     */
     public function parseUserInput($userInput) {
         $values = explode(',', $userInput);
         $values = array_unique($values);
