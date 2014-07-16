@@ -60,7 +60,7 @@ class CM_Process {
     public function killChildren() {
         $signal = SIGTERM;
         $timeStart = microtime(true);
-        $timeoutKill = 5;
+        $timeoutKill = 30;
         $timeoutReached = false;
         $timeOutput = $timeStart;
 
