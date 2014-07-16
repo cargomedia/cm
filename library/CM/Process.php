@@ -64,7 +64,7 @@ class CM_Process {
         $timeoutReached = false;
         $timeOutput = $timeStart;
 
-        for ($try = 0; !empty($this->_forkHandlerList); $try++) {
+        while (!empty($this->_forkHandlerList)) {
             $timeNow = microtime(true);
             $timePassed = $timeNow - $timeStart;
 
@@ -85,9 +85,7 @@ class CM_Process {
                 posix_kill($forkHandler->getPid(), $signal);
             }
 
-            if ($try > 1) {
-                usleep(1000000 * 0.5);
-            }
+            usleep(1000000 * 0.05);
 
             foreach ($this->_forkHandlerList as $forkHandler) {
                 $pid = pcntl_waitpid($forkHandler->getPid(), $status, WNOHANG);
