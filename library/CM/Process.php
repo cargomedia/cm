@@ -57,10 +57,16 @@ class CM_Process {
         return (false !== posix_getsid($processId));
     }
 
-    public function killChildren() {
+    /**
+     * @param float|null $timeoutKill
+     */
+    public function killChildren($timeoutKill = null) {
+        if (null === $timeoutKill) {
+            $timeoutKill = 30;
+        }
+        $timeoutKill = (float) $timeoutKill;
         $signal = SIGTERM;
         $timeStart = microtime(true);
-        $timeoutKill = 30;
         $timeoutReached = false;
         $timeOutput = $timeStart;
 

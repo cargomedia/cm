@@ -120,6 +120,39 @@ Parent terminated.
     }
 
     /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testKillChildrenSigKill() {
+        $loopEcho = function () {
+            while (true) {
+                usleep(50 * 1000);
+                echo "hello\n";
+            }
+        };
+        $loopEchoStayingAlive = function () {
+            pcntl_signal(SIGTERM, function () {
+            }, false);
+            while (true) {
+                usleep(50 * 1000);
+                echo "hello\n";
+            }
+        };
+
+        $process = CM_Process::getInstance();
+        $process->fork($loopEcho);
+        $process->fork($loopEchoStayingAlive);
+        $pidListBefore = $this->_getChildrenPidList();
+
+        $timeStart = microtime(true);
+        $process->killChildren(0.5);
+
+        $this->assertCount(2, $pidListBefore);
+        $this->assertCount(0, $this->_getChildrenPidList());
+        $this->assertSameTime(0.5, microtime(true) - $timeStart, 0.1);
+    }
+
+    /**
      * @param string $message
      */
     public static function writeln($message) {
