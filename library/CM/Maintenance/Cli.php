@@ -10,14 +10,14 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function start() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
-        $this->_clockworkManager->setPersistence(new CM_Clockwork_Persistence('maintenance-start', new CM_Clockwork_PersistenceAdapter_File()));
+        $this->_clockworkManager->setPersistence(new CM_Clockwork_Persistence('maintenance-start'));
         $this->_registerCallbacks();
         $this->_clockworkManager->start();
     }
 
     public function startLocal() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
-        $this->_clockworkManager->setPersistence(new CM_Clockwork_Persistence('maintenance-start-local', new CM_Clockwork_PersistenceAdapter_File()));
+        $this->_clockworkManager->setPersistence(new CM_Clockwork_Persistence('maintenance-start-local'));
         $this->_registerCallbacksLocal();
         $this->_clockworkManager->start();
     }

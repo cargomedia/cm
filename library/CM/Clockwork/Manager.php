@@ -10,7 +10,7 @@ class CM_Clockwork_Manager {
 
     public function __construct() {
         $this->_events = array();
-        $this->_persistence = new CM_Clockwork_Persistence_Noop();
+        $this->_persistence = new CM_Clockwork_Persistence_None();
     }
 
     /**
@@ -43,7 +43,7 @@ class CM_Clockwork_Manager {
         /** @var CM_Clockwork_Event[] $eventsToRun */
         $eventsToRun = array();
         foreach ($this->_events as $event) {
-            $lastRuntime = $this->_persistence->getLastRunTime($event);
+            $lastRuntime = $this->_persistence->getLastRuntime($event);
             if ($event->shouldRun($lastRuntime)) {
                 $eventsToRun[] = $event;
             }
