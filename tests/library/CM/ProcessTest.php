@@ -134,7 +134,6 @@ Parent terminated.
     private function _getChildrenPidList() {
         $psCommand = 'ps axo pid,ppid,args';
         $psOutput = CM_Util::exec($psCommand);
-        pcntl_wait($status, WNOHANG);
         if (false === preg_match_all('/^\s+(?<pid>\d+)\s+(?<ppid>\d+)\s+(?<args>.+)$/m', $psOutput, $matches, PREG_SET_ORDER)) {
             throw new CM_Exception('Cannot parse ps output `' . $psOutput . '`.');
         }
