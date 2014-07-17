@@ -88,8 +88,8 @@ class CM_Process {
                 if ($timeoutReached) {
                     $logError = new CM_Paging_Log_Error();
                     $logError->add($message, [
-                        'pid'   => $this->getProcessId(),
-                        'argv ' => join(' ', $this->getArgv()),
+                        'pid'  => $this->getProcessId(),
+                        'argv' => join(' ', $this->getArgv()),
                     ]);
                 }
                 $timeOutput = $timeNow;
