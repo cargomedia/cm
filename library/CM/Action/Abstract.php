@@ -216,6 +216,16 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     }
 
     /**
+     * @param string $property
+     * @param string $value
+     */
+    protected function _setTrackingProperty($property, $value) {
+        $property = (string) $property;
+        $value = (string) $value;
+        $this->_trackingPropertyList[$property] = $value;
+    }
+
+    /**
      * @param array $trackingPropertyList
      */
     protected function _setTrackingPropertyList(array $trackingPropertyList) {
