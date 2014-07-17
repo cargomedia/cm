@@ -113,9 +113,9 @@ Parent terminated.
         $process->fork($loopEcho);
         $process->fork($loopEcho);
 
-        $this->assertCount(2, $this->_getChildrenPidList());
-
+        $pidListBefore = $this->_getChildrenPidList();
         $process->killChildren();
+        $this->assertCount(2, $pidListBefore);
         $this->assertCount(0, $this->_getChildrenPidList());
     }
 
@@ -153,7 +153,7 @@ Parent terminated.
         $this->assertSameTime(0.5, microtime(true) - $timeStart, 0.1);
 
         $logError = new CM_Paging_Log_Error();
-        $this->assertSame(1,$logError->getCount());
+        $this->assertSame(1, $logError->getCount());
         $this->assertContains('killing with signal `9`', $logError->getItem(0)['msg']);
     }
 
@@ -172,7 +172,7 @@ Parent terminated.
     private function _getChildrenPidList() {
         $psCommand = 'ps axo pid,ppid,args';
         $psOutput = CM_Util::exec($psCommand);
-        if (false === preg_match_all('/^\s+(?<pid>\d+)\s+(?<ppid>\d+)\s+(?<args>.+)$/m', $psOutput, $matches, PREG_SET_ORDER)) {
+        if (false === preg_match_all('/^\s*(?<pid>\d+)\s+(?<ppid>\d+)\s+(?<args>.+)$/m', $psOutput, $matches, PREG_SET_ORDER)) {
             throw new CM_Exception('Cannot parse ps output `' . $psOutput . '`.');
         }
         $pid = CM_Process::getInstance()->getProcessId();
