@@ -79,11 +79,18 @@ class CM_Process {
                 $timeoutReached = true;
             }
             if ($timeNow > $timeOutput + 2 || $timeoutReached) {
-                echo join(' ', [
-                        count($this->_forkHandlerList) . ' children remaining',
-                        'after ' . round($timePassed, 1) . ' seconds,',
-                        'killing with signal `' . $signal . '`...',
-                    ]) . PHP_EOL;
+                $message = join(' ', [
+                    count($this->_forkHandlerList) . ' children remaining',
+                    'after ' . round($timePassed, 1) . ' seconds,',
+                    'killing with signal `' . $signal . '`...',
+                ]);
+                echo $message . PHP_EOL;
+                if ($timeoutReached) {
+                    $logError = new CM_Paging_Log_Error();
+                    $logError->add($message, [
+                        'pid' => $this->getProcessId(),
+                    ]);
+                }
                 $timeOutput = $timeNow;
             }
 
