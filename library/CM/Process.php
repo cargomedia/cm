@@ -88,7 +88,8 @@ class CM_Process {
                 if ($timeoutReached) {
                     $logError = new CM_Paging_Log_Error();
                     $logError->add($message, [
-                        'pid' => $this->getProcessId(),
+                        'pid'   => $this->getProcessId(),
+                        'argv ' => join(' ', $this->getArgv()),
                     ]);
                 }
                 $timeOutput = $timeNow;
@@ -144,6 +145,13 @@ class CM_Process {
 
         ksort($workloadResultList);
         return $workloadResultList;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getArgv() {
+        return $_SERVER['argv'];
     }
 
     /**
