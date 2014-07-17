@@ -130,8 +130,9 @@ Parent terminated.
                 echo "hello\n";
             }
         };
-        $loopEchoStayingAlive = function () {
+        $loopEchoStayinAlive = function () {
             pcntl_signal(SIGTERM, function () {
+                echo "Well, you can tell by the way I use my walk\n I'm a woman's man, no time to talk\n";
             }, false);
             while (true) {
                 usleep(50 * 1000);
@@ -141,7 +142,7 @@ Parent terminated.
 
         $process = CM_Process::getInstance();
         $process->fork($loopEcho);
-        $process->fork($loopEchoStayingAlive);
+        $process->fork($loopEchoStayinAlive);
         $pidListBefore = $this->_getChildrenPidList();
 
         $timeStart = microtime(true);
