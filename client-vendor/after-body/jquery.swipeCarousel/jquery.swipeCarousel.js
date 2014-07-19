@@ -133,7 +133,7 @@
 
       this.$element.addClass('swipeCarousel');
       this._setPaneDimensions();
-      this._renderPane(this.position, true);
+      this._renderPanels(this.position, true);
       $(window).on('load resize orientationchange', this._setPaneDimensions);
       $(window).on('keydown', this._onKeydown);
       this.hammer.on('release dragleft dragright swipeleft swiperight', this._onHammer);
@@ -175,7 +175,7 @@
       eventData = eventData || {};
       if (this.position != position) {
         this.position = position;
-        this._renderPane(position, skipAnimation);
+        this._renderPanels(position, skipAnimation);
         this._onChange(eventData);
       }
     },
@@ -257,7 +257,7 @@
      * @param {Number} position
      * @param {Boolean} skipAnimation
      */
-    _renderPane: function(position, skipAnimation) {
+    _renderPanels: function(position, skipAnimation) {
       var offset = 13;
       this._setContainerOffset(offset, !skipAnimation);
 
