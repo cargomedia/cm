@@ -270,8 +270,15 @@
             panel['element'].append(content['element']);
           }
         }
-        panel['content'] = null;
+        panel['content'] = content;
       }
+    },
+
+    /**
+     * @param {Number} direction
+     */
+    _movePanel: function(direction) {
+      // todo - Faster panel rendering for moving +1/-1
     },
 
     /**
