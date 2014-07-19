@@ -75,66 +75,9 @@
     var $containerChildren = this.$container.children();
 
     if (options.contentIdList) {
-      // Extract existing DOM element
-      if ($containerChildren.length !== 1) {
-        throw new Error('Expecting exactly one container child present.');
-      }
-      var $containerChild = $containerChildren.first();
-      var contentId = $containerChild.data('gallery-content-id');
-      if ('undefined' === typeof contentId) {
-        throw new Error('Missing `gallery-content-id` data attribute');
-      }
-      var position = options.contentIdList.indexOf(contentId);
-      if (-1 === position) {
-        throw new Error('DOM content-id `' + contentId + '` is not present in contentIdList');
-      }
-
-      // Populate contentList from contentIdList
-      this.contentList = _.map(options.contentIdList, function(contentIdListItem) {
-        var element = null;
-        if (contentId == contentIdListItem) {
-          element = $containerChild.children()
-        }
-        return {id: contentIdListItem, element: element};
-      });
-
-      // Use existing DOM element as panel 0
-      var panelItem = this.panelList.get(0);
-      panelItem['element'] = $containerChild;
-      panelItem['content'] = this.contentList[position];
-      this.position = position;
-
+      this._constructFromContentIdList($containerChildren, options.contentIdList);
     } else {
-      if ($containerChildren.length === 0) {
-        throw new Error('Expecting at least one container child.');
-      }
-
-      var position = $containerChildren.filter('.active').index();
-      if (-1 === position) {
-        position = 0;
-      }
-
-      this.contentList = [];
-      _.each($containerChildren, function(containerChild, index) {
-        // Populate contentList from DOM
-        var $containerChild = $(containerChild);
-        var contentId = $containerChild.data('gallery-content-id');
-        if ('undefined' === typeof contentId) {
-          contentId = null;
-        }
-        this.contentList[index] = {id: contentId, element: $containerChild.children()};
-
-        // Populate panelList from DOM
-        if (Math.abs(index - position) <= 1) {
-          var panelItem = this.panelList.get(index - position);
-          panelItem['element'] = $containerChild;
-          panelItem['content'] = this.contentList[index];
-        } else {
-          $containerChild.detach();
-        }
-      }, this);
-
-      this.position = position;
+      this._constructFromDom($containerChildren);
     }
 
     var $panelActive = this.panelList.get(0)['element'];
@@ -236,6 +179,77 @@
         this._renderPane(position, skipAnimation);
         this._onChange(eventData);
       }
+    },
+
+    /**
+     * @param {jQuery} $containerChildren
+     * @param {Array} contentIdList
+     */
+    _constructFromContentIdList: function($containerChildren, contentIdList) {
+      // Extract existing DOM element
+      if ($containerChildren.length !== 1) {
+        throw new Error('Expecting exactly one container child present.');
+      }
+      var $containerChild = $containerChildren.first();
+      var contentId = $containerChild.data('gallery-content-id');
+      if ('undefined' === typeof contentId) {
+        throw new Error('Missing `gallery-content-id` data attribute');
+      }
+      var position = contentIdList.indexOf(contentId);
+      if (-1 === position) {
+        throw new Error('DOM content-id `' + contentId + '` is not present in contentIdList');
+      }
+
+      // Populate contentList from contentIdList
+      this.contentList = _.map(contentIdList, function(contentIdListItem) {
+        var element = null;
+        if (contentId == contentIdListItem) {
+          element = $containerChild.children()
+        }
+        return {id: contentIdListItem, element: element};
+      });
+
+      // Use existing DOM element as panel 0
+      var panelItem = this.panelList.get(0);
+      panelItem['element'] = $containerChild;
+      panelItem['content'] = this.contentList[position];
+      this.position = position;
+    },
+
+    /**
+     * @param {jQuery} $containerChildren
+     */
+    _constructFromDom: function($containerChildren) {
+      if ($containerChildren.length === 0) {
+        throw new Error('Expecting at least one container child.');
+      }
+
+      var position = $containerChildren.filter('.active').index();
+      if (-1 === position) {
+        position = 0;
+      }
+
+      this.contentList = [];
+      _.each($containerChildren, function(containerChild, index) {
+        // Populate contentList from DOM
+        var $containerChild = $(containerChild);
+        var contentId = $containerChild.data('gallery-content-id');
+        if ('undefined' === typeof contentId) {
+          contentId = null;
+        }
+        this.contentList[index] = {id: contentId, element: $containerChild.children()};
+
+        // Populate panelList from DOM
+        if (Math.abs(index - position) <= 1) {
+          var panelItem = this.panelList.get(index - position);
+          panelItem['element'] = $containerChild;
+          panelItem['content'] = this.contentList[index];
+        } else {
+          $containerChild.detach();
+        }
+      }, this);
+
+      this.position = position;
     },
 
     /**
