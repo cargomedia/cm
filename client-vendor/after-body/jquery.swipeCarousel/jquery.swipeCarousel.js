@@ -191,6 +191,7 @@
       }
       var $containerChild = $containerChildren.first();
       var contentId = $containerChild.data('gallery-content-id');
+      $containerChild.removeAttr('data-gallery-content-id');
       if ('undefined' === typeof contentId) {
         throw new Error('Missing `gallery-content-id` data attribute');
       }
@@ -233,6 +234,7 @@
         // Populate contentList from DOM
         var $containerChild = $(containerChild);
         var contentId = $containerChild.data('gallery-content-id');
+        $containerChild.removeAttr('data-gallery-content-id');
         if ('undefined' === typeof contentId) {
           contentId = null;
         }
@@ -259,12 +261,16 @@
       var offset = 13;
       this._setContainerOffset(offset, !skipAnimation);
 
-      var $panelPrevious = $(this.panelList.get(-1));
-      if (0 == position) {
-        $panelPrevious.hide();
-      } else {
-        $panelPrevious.show();
-
+      for (var positionOffset = -1; positionOffset <= 1; positionOffset++) {
+        var content = this.contentList[position + positionOffset] || null;
+        var panel = this.panelList.get(positionOffset);
+        if ((content || panel['content']) && (content !== panel['content'])) {
+          panel['element'].children().detach();
+          if (content) {
+            panel['element'].append(content['element']);
+          }
+        }
+        panel['content'] = null;
       }
     },
 
