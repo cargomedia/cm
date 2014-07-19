@@ -183,15 +183,15 @@
     },
 
     /**
-     * @param {Number} index
+     * @param {Number} position
      * @param {Object} [eventData]
      * @param {Boolean} [skipAnimation]
      */
-    showPane: function(index, eventData, skipAnimation) {
-      index = Math.max(0, Math.min(index, this.contentList.length - 1));
+    showPane: function(position, eventData, skipAnimation) {
+      position = Math.max(0, Math.min(position, this.contentList.length - 1));
       eventData = eventData || {};
-      var change = this.position != index;
-      this.position = index;
+      var change = this.position != position;
+      this.position = position;
 
       var offset = 13;
       this._setContainerOffset(offset, !skipAnimation);
