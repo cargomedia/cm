@@ -54,7 +54,6 @@
    * @param {jQuery} $element
    * @param {Object} [options]
    * @constructor
-   * @return {SwipeCarousel}
    */
   var SwipeCarousel = function($element, options) {
     options = _.defaults(options || {}, defaults);
@@ -134,7 +133,7 @@
 
       this.$element.addClass('swipeCarousel');
       this._setPaneDimensions();
-      this._renderPane(this.position, null, true);
+      this._renderPane(this.position, true);
       $(window).on('load resize orientationchange', this._setPaneDimensions);
       $(window).on('keydown', this._onKeydown);
       this.hammer.on('release dragleft dragright swipeleft swiperight', this._onHammer);
