@@ -24,8 +24,7 @@
      * @return {*}
      */
     get: function(index) {
-      index = (this.indexOffset + index) % this.array.length;
-      return this.array[index];
+      return this.array[this._normalizeIndex(index)];
     },
 
     /**
@@ -40,6 +39,14 @@
      */
     rotate: function(direction) {
       this.indexOffset += direction;
+    },
+
+    /**
+     * @param {Number} index
+     * @return {Number}
+     */
+    _normalizeIndex: function(index) {
+      return (this.indexOffset + index) % this.array.length;
     }
   };
 
@@ -59,54 +66,88 @@
       throw new Error('Cannot find container');
     }
 
+    this.panelList = new CircularList([
+      {element: null, content: null},
+      {element: null, content: null},
+      {element: null, content: null}
+    ], 1);
+
     var $containerChildren = this.$container.children();
-    var $panelActive;
 
     if (options.contentIdList) {
-      // Populate from contentIdList
-      this.contentList = _.map(options.contentIdList, function(contentId) {
-        return {'id': contentId, 'element': null};
-      });
-
-      // Add existing DOM element to contentList
+      // Extract existing DOM element
       if ($containerChildren.length !== 1) {
-        throw new Error('Expecting exactly one panel present.');
+        throw new Error('Expecting exactly one container child present.');
       }
       var $containerChild = $containerChildren.first();
       var contentId = $containerChild.data('gallery-content-id');
       if ('undefined' === typeof contentId) {
         throw new Error('Missing `gallery-content-id` data attribute');
       }
-      var contentItem = this._getContentById(contentId);
-      contentItem['element'] = $containerChild.children();
-      $panelActive = $containerChild;
+      var position = options.contentIdList.indexOf(contentId);
+      if (-1 === position) {
+        throw new Error('DOM content-id `' + contentId + '` is not present in contentIdList');
+      }
+
+      // Populate contentList from contentIdList
+      this.contentList = _.map(options.contentIdList, function(contentIdListItem) {
+        var element = null;
+        if (contentId == contentIdListItem) {
+          element = $containerChild.children()
+        }
+        return {id: contentIdListItem, element: element};
+      });
+
+      // Use existing DOM element as panel 0
+      var panelItem = this.panelList.get(0);
+      panelItem['element'] = $containerChild;
+      panelItem['content'] = this.contentList[position];
+      this.position = position;
 
     } else {
-      // Populate from DOM
-      this.contentList = _.map($containerChildren, function(containerChild) {
+      if ($containerChildren.length === 0) {
+        throw new Error('Expecting at least one container child.');
+      }
+
+      var position = $containerChildren.filter('.active').index();
+      if (-1 === position) {
+        position = 0;
+      }
+
+      this.contentList = [];
+      _.each($containerChildren, function(containerChild, index) {
+        // Populate contentList from DOM
         var $containerChild = $(containerChild);
         var contentId = $containerChild.data('gallery-content-id');
         if ('undefined' === typeof contentId) {
           contentId = null;
         }
-        $panelActive = $containerChild;
-        return {'id': contentId, 'element': $containerChild.children()};
-      });
+        this.contentList[index] = {id: contentId, element: $containerChild.children()};
+
+        // Populate panelList from DOM
+        if (Math.abs(index - position) <= 1) {
+          var panelItem = this.panelList.get(index - position);
+          panelItem['element'] = $containerChild;
+          panelItem['content'] = this.contentList[index];
+        } else {
+          $containerChild.detach();
+        }
+      }, this);
+
+      this.position = position;
     }
 
-    if (0 == this.contentList.length) {
-      throw new Error('Empty contentList');
+    var $panelActive = this.panelList.get(0)['element'];
+    if (null === this.panelList.get(-1)['element']) {
+      this.panelList.get(-1)['element'] = $('<li />').insertBefore($panelActive);
+    }
+    if (null === this.panelList.get(+1)['element']) {
+      this.panelList.get(+1)['element'] = $('<li />').insertAfter($panelActive);
     }
 
-    if (0 == $panelActive.prev().length) {
-      $panelActive.before($('<li />'));
-    }
-    if (0 == $panelActive.next().length) {
-      $panelActive.after($('<li />'));
-    }
-    var $panelList = $panelActive.prev().add($panelActive).add($panelActive.next());
-    this.panelList = new CircularList($panelList.toArray(), 1);
-    $panelActive.siblings().not($panelList).detach();
+    console.log(this.position);
+    console.log(this.panelList.getAll());
+    console.log(this.contentList);
 
     this.pane_width = 0;
     this.hammer = new Hammer(this.$element[0], {
@@ -150,7 +191,7 @@
 
       this.$element.addClass('swipeCarousel');
       this._setPaneDimensions();
-      this.showPane(this.position, null, true);
+      this._renderPane(this.position, null, true);
       $(window).on('load resize orientationchange', this._setPaneDimensions);
       $(window).on('keydown', this._onKeydown);
       this.hammer.on('release dragleft dragright swipeleft swiperight', this._onHammer);
@@ -190,27 +231,54 @@
     showPane: function(position, eventData, skipAnimation) {
       position = Math.max(0, Math.min(position, this.contentList.length - 1));
       eventData = eventData || {};
-      var change = this.position != position;
-      this.position = position;
-
-      var offset = 13;
-      this._setContainerOffset(offset, !skipAnimation);
-
-      if (change) {
+      if (this.position != position) {
+        this.position = position;
+        this._renderPane(position, skipAnimation);
         this._onChange(eventData);
       }
     },
 
     /**
-     * @param {*} id
-     * @return Object
+     * @param {Number} position
+     * @param {Boolean} skipAnimation
      */
-    _getContentById: function(id) {
-      var contentItem = _.findWhere(this.contentList, {'id': id});
+    _renderPane: function(position, skipAnimation) {
+      var offset = 13;
+      this._setContainerOffset(offset, !skipAnimation);
+
+      var $panelPrevious = $(this.panelList.get(-1));
+      if (0 == position) {
+        $panelPrevious.hide();
+      } else {
+        $panelPrevious.show();
+
+      }
+    },
+
+    /**
+     * @param {Number} position
+     * @returns Object
+     */
+    _getContent: function(position) {
+      var contentItem = this.contentList[position];
       if (!contentItem) {
-        throw new Error('Cannot find contentItem with id `' + id + '`.');
+        throw new Error('Cannot find contentItem with position `' + position + '`.');
       }
       return contentItem;
+    },
+
+    /**
+     * @param {Number} position
+     * @return Promise
+     */
+    _getContentElement: function(position) {
+      var contentItem = this._getContent(position);
+      if (contentItem['element']) {
+        return $.Deferred().resolve(contentItem['element']).promise();
+      } else {
+        // todo
+        return $.Deferred().resolve($('<div>hello</div>')[0]).promise();
+      }
     },
 
     _setPaneDimensions: function() {
