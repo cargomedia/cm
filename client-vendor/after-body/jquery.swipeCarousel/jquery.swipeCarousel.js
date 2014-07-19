@@ -221,21 +221,29 @@
     },
 
     /**
-     *
+     * @param {jQuery} $element
+     * @param {Number} percent
+     * @param {Boolean} animate
+     */
+    _setElementOffset: function($element, percent, animate) {
+      $element.removeClass('animate');
+      if (animate) {
+        $element.addClass('animate');
+      }
+
+      if (Modernizr.csstransforms3d) {
+        $element.css('transform', 'translate3d(' + percent + '%,0,0) scale3d(1,1,1)');
+      } else {
+        $element.css('transform', 'translate(' + percent + '%,0)');
+      }
+    },
+
+    /**
      * @param {Number} percent
      * @param {Boolean} animate
      */
     _setContainerOffset: function(percent, animate) {
-      this.$container.removeClass('animate');
-      if (animate) {
-        this.$container.addClass('animate');
-      }
-
-      if (Modernizr.csstransforms3d) {
-        this.$container.css('transform', 'translate3d(' + percent + '%,0,0) scale3d(1,1,1)');
-      } else {
-        this.$container.css('transform', 'translate(' + percent + '%,0)');
-      }
+      this._setElementOffset(this.$container, percent, animate);
     },
 
     /**
