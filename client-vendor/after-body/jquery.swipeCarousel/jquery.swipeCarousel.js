@@ -21,7 +21,7 @@
   };
 
   /**
-   * View panel (<li>) which will eventually contain a Content
+   * View panel (<li>) which will eventually contain Content's element
    *
    * @param {jQuery} element
    * @param {Content|Null} [content]
