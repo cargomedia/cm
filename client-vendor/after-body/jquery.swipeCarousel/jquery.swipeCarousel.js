@@ -258,7 +258,7 @@
      * @param {Boolean} skipAnimation
      */
     _renderPanels: function(position, skipAnimation) {
-      var offset = 13;
+      var offset = 0.13;
       this._setContainerOffset(offset, !skipAnimation);
 
       for (var positionOffset = -1; positionOffset <= 1; positionOffset++) {
@@ -316,28 +316,28 @@
 
     /**
      * @param {jQuery} $element
-     * @param {Number} percent
+     * @param {Number} offsetRate
      * @param {Boolean} animate
      */
-    _setElementOffset: function($element, percent, animate) {
+    _setElementOffset: function($element, offsetRate, animate) {
       $element.removeClass('animate');
       if (animate) {
         $element.addClass('animate');
       }
 
       if (Modernizr.csstransforms3d) {
-        $element.css('transform', 'translate3d(' + percent + '%,0,0) scale3d(1,1,1)');
+        $element.css('transform', 'translate3d(' + (offsetRate * 100) + '%,0,0) scale3d(1,1,1)');
       } else {
-        $element.css('transform', 'translate(' + percent + '%,0)');
+        $element.css('transform', 'translate(' + (offsetRate * 100) + '%,0)');
       }
     },
 
     /**
-     * @param {Number} percent
+     * @param {Number} offsetRate
      * @param {Boolean} animate
      */
-    _setContainerOffset: function(percent, animate) {
-      this._setElementOffset(this.$container, percent, animate);
+    _setContainerOffset: function(offsetRate, animate) {
+      this._setElementOffset(this.$container, offsetRate, animate);
     },
 
     /**
@@ -378,7 +378,7 @@
         case 'dragright':
         case 'dragleft':
           // stick to the finger
-          var drag_offset = ((100 / this.pane_width) * event.gesture.deltaX);
+          var drag_offset = ((1 / this.pane_width) * event.gesture.deltaX);
 
           // slow down at the first and last pane
           if ((this.position == 0 && event.gesture.direction == 'right') || (this.position == this.contentList.length - 1 && event.gesture.direction == 'left')) {
