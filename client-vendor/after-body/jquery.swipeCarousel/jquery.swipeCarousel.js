@@ -9,6 +9,30 @@
   };
 
   /**
+   * Item of content of the gallery
+   *
+   * @param {Number} id
+   * @param {jQuery|Null} [element]
+   * @constructor
+   */
+  var Content = function Content(id, element) {
+    this.id = id;
+    this.element = element || null;
+  };
+
+  /**
+   * View panel (<li>) which will eventually contain a Content
+   *
+   * @param {jQuery} element
+   * @param {Content|Null} [content]
+   * @constructor
+   */
+  var Panel = function Content(element, content) {
+    this.element = element;
+    this.content = content || null;
+  };
+
+  /**
    * @param {Array} array
    * @param {Number} indexOffset
    * @constructor
@@ -66,9 +90,7 @@
     }
 
     this.panelList = new CircularList([
-      {element: null, content: null},
-      {element: null, content: null},
-      {element: null, content: null}
+      new Panel(null, null), new Panel(null, null), new Panel(null, null)
     ], 1);
     this.panelOffsetList = _.range(-1, 2);
 
@@ -80,12 +102,12 @@
       this._constructFromDom($containerChildren);
     }
 
-    var $panelActive = this.panelList.get(0)['element'];
-    if (null === this.panelList.get(-1)['element']) {
-      this.panelList.get(-1)['element'] = $('<li />').insertBefore($panelActive);
+    var $panelActive = this.panelList.get(0).element;
+    if (null === this.panelList.get(-1).element) {
+      this.panelList.get(-1).element = $('<li />').insertBefore($panelActive);
     }
-    if (null === this.panelList.get(+1)['element']) {
-      this.panelList.get(+1)['element'] = $('<li />').insertAfter($panelActive);
+    if (null === this.panelList.get(+1).element) {
+      this.panelList.get(+1).element = $('<li />').insertAfter($panelActive);
     }
 
     console.log(this.position);
@@ -115,7 +137,7 @@
     /** @type Array */
     panelOffsetList: null,
 
-    /** @type Array */
+    /** @type Content[] */
     contentList: null,
 
     /** @type Number */
@@ -209,13 +231,13 @@
         if (contentId == contentIdListItem) {
           element = $containerChild.children()
         }
-        return {id: contentIdListItem, element: element};
+        return new Content(contentIdListItem, element);
       });
 
       // Use existing DOM element as panel 0
-      var panelItem = this.panelList.get(0);
-      panelItem['element'] = $containerChild;
-      panelItem['content'] = this.contentList[position];
+      var panel = this.panelList.get(0);
+      panel.element = $containerChild;
+      panel.content = this.contentList[position];
       this.position = position;
     },
 
@@ -241,13 +263,13 @@
         if ('undefined' === typeof contentId) {
           contentId = null;
         }
-        this.contentList[index] = {id: contentId, element: $containerChild.children()};
+        this.contentList[index] = new Content(contentId, $containerChild.children());
 
         // Populate panelList from DOM
         if (Math.abs(index - position) <= 1) {
-          var panelItem = this.panelList.get(index - position);
-          panelItem['element'] = $containerChild;
-          panelItem['content'] = this.contentList[index];
+          var panel = this.panelList.get(index - position);
+          panel.element = $containerChild;
+          panel.content = this.contentList[index];
         } else {
           $containerChild.detach();
         }
@@ -263,13 +285,13 @@
       _.each(this.panelOffsetList, function(positionOffset) {
         var content = this.contentList[position + positionOffset] || null;
         var panel = this.panelList.get(positionOffset);
-        if ((content || panel['content']) && (content !== panel['content'])) {
-          panel['element'].children().detach();
+        if ((content || panel.content) && (content !== panel.content)) {
+          panel.element.children().detach();
           if (content) {
-            panel['element'].append(content['element']);
+            panel.element.append(content.element);
           }
         }
-        panel['content'] = content;
+        panel.content = content;
       }, this);
       this._resetPanelPositions();
     },
@@ -285,23 +307,22 @@
       this._setElementOffset(this.$container, -1 / 3, false);
       _.each(this.panelOffsetList, function(positionOffset, index) {
         var panel = this.panelList.get(positionOffset);
-        this._setElementOffset(panel['element'], index, false);
-        panel['element'].toggleClass('active', 0 === positionOffset);
+        this._setElementOffset(panel.element, index, false);
+        panel.element.toggleClass('active', 0 === positionOffset);
       }, this);
     },
 
 
     _setPanelDimensions: function() {
       this.panelWidth = this.$element.width();
-      console.log('this.panelWidth ', this.panelWidth);
       _.each(this.panelList.getAll(), function(panel) {
-        panel['element'].outerWidth(this.panelWidth);
+        panel.element.outerWidth(this.panelWidth);
       }, this);
     },
 
     /**
      * @param {Number} position
-     * @returns Object
+     * @returns Content
      */
     _getContent: function(position) {
       var contentItem = this.contentList[position];
@@ -316,9 +337,9 @@
      * @return Promise
      */
     _getContentElement: function(position) {
-      var contentItem = this._getContent(position);
-      if (contentItem['element']) {
-        return $.Deferred().resolve(contentItem['element']).promise();
+      var content = this._getContent(position);
+      if (content.element) {
+        return $.Deferred().resolve(content.element).promise();
       } else {
         // todo
         return $.Deferred().resolve($('<div>hello</div>')[0]).promise();
@@ -389,7 +410,8 @@
         case 'dragright':
         case 'dragleft':
           // stick to the finger
-          var drag_offset = ((1 / this.panelWidth) * event.gesture.deltaX);
+          console.log(event.gesture.deltaX, (event.gesture.deltaX / this.panelWidth));
+          var drag_offset = (-1 / 3) + (event.gesture.deltaX / this.panelWidth);
 
           // slow down at the first and last pane
           if ((this.position == 0 && event.gesture.direction == 'right') || (this.position == this.contentList.length - 1 && event.gesture.direction == 'left')) {
