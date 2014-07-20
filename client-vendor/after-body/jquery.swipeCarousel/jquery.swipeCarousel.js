@@ -213,7 +213,7 @@
      * @param {Number} position
      * @param {Object} [eventData]
      */
-    showPane: function(position, eventData) {
+    showPosition: function(position, eventData) {
       position = this._normalizePosition(position);
       eventData = eventData || {};
       if (this.position != position) {
