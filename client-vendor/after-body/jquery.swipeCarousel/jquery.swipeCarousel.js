@@ -204,7 +204,10 @@
       if (this.position != position) {
         this.position = position;
         this.panelList.rotate(direction);
-        this._renderContentIntoPanels(position);
+        var self = this;
+        this._setContainerOffset(-direction, true).done(function() {
+          self._renderContentIntoPanels(position);
+        });
         this._onChange(eventData);
       }
     },
@@ -322,7 +325,7 @@
     },
 
     _resetPanelPositions: function() {
-      this._setElementOffset(this.$container, -1 / 3, false);
+      this._setContainerOffset(0, false);
       _.each(this.panelOffsetList, function(positionOffset, index) {
         var panel = this.panelList.get(positionOffset);
         this._setElementOffset(panel.element, index, false);
@@ -367,40 +370,38 @@
      * @param {jQuery} $element
      * @param {Number} offsetRate
      * @param {Boolean} animate
+     * @return Promise
      */
     _setElementOffset: function($element, offsetRate, animate) {
-      $element.removeClass('animate');
-      if (animate) {
-        $element.addClass('animate');
-      }
+      var deferred = $.Deferred();
 
-      if (Modernizr.csstransforms3d) {
-        $element.css('transform', 'translate3d(' + (offsetRate * 100) + '%,0,0) scale3d(1,1,1)');
-      } else {
-        $element.css('transform', 'translate(' + (offsetRate * 100) + '%,0)');
-      }
+      $element.transition({x: (offsetRate * 100) + '%'}, {
+        duration: animate ? 200 : 0,
+        complete: function() {
+          deferred.resolve();
+        }
+      });
+
+      return deferred.promise();
     },
 
     /**
      * @param {Number} offsetRate (-1: panel left, 0: middle panel, 1: panel right)
      * @param {Boolean} animate
+     * @return Promise
      */
     _setContainerOffset: function(offsetRate, animate) {
       offsetRate = (-1 / 3) + offsetRate * (1 / 3);
-      this._setElementOffset(this.$container, offsetRate, animate);
+      return this._setElementOffset(this.$container, offsetRate, animate);
     },
 
     /**
      * @param {Object} eventData
      */
     _onChange: function(eventData) {
-      return;
-      var $pane_current = this.panelList.get(0);
-      this.panelList.removeClass('active');
-      $pane_current.addClass('active');
       _.extend(eventData, {
         index: this.position,
-        element: $pane_current.get(0)
+        element: this.panelList.get(0).content.element
       });
       this.$element.trigger('swipeCarousel-change', eventData);
     },
@@ -457,6 +458,7 @@
               this.showNext();
             }
           } else {
+            // todo check
             this._setContainerOffset(0, true);
           }
           break;
