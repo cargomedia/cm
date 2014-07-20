@@ -181,14 +181,32 @@
      * @param {Object} [eventData]
      */
     showNext: function(eventData) {
-      this.showPane(this.position + 1, eventData);
+      this.showRotate(+1, eventData);
     },
 
     /**
      * @param {Object} [eventData]
      */
     showPrevious: function(eventData) {
-      this.showPane(this.position - 1, eventData);
+      this.showRotate(-1, eventData);
+    },
+
+    /**
+     * @param {Number} direction
+     * @param {Object} [eventData]
+     */
+    showRotate: function(direction, eventData) {
+      if (Math.abs(direction) > 1) {
+        throw new Error('Unexpected direction `' + direction + '`.');
+      }
+      var position = this._normalizePosition(this.position + direction);
+      eventData = eventData || {};
+      if (this.position != position) {
+        this.position = position;
+        this.panelList.rotate(direction);
+        this._renderContentIntoPanels(position);
+        this._onChange(eventData);
+      }
     },
 
     /**
@@ -196,7 +214,7 @@
      * @param {Object} [eventData]
      */
     showPane: function(position, eventData) {
-      position = Math.max(0, Math.min(position, this.contentList.length - 1));
+      position = this._normalizePosition(position);
       eventData = eventData || {};
       if (this.position != position) {
         this.position = position;
@@ -281,6 +299,13 @@
     /**
      * @param {Number} position
      */
+    _normalizePosition: function(position) {
+      return Math.max(0, Math.min(position, this.contentList.length - 1));
+    },
+
+    /**
+     * @param {Number} position
+     */
     _renderContentIntoPanels: function(position) {
       _.each(this.panelOffsetList, function(positionOffset) {
         var content = this.contentList[position + positionOffset] || null;
@@ -296,13 +321,6 @@
       this._resetPanelPositions();
     },
 
-    /**
-     * @param {Number} direction
-     */
-    _moveContent: function(direction) {
-      // todo - Faster panel rendering for moving content +1/-1
-    },
-
     _resetPanelPositions: function() {
       this._setElementOffset(this.$container, -1 / 3, false);
       _.each(this.panelOffsetList, function(positionOffset, index) {
@@ -311,7 +329,6 @@
         panel.element.toggleClass('active', 0 === positionOffset);
       }, this);
     },
-
 
     _setPanelDimensions: function() {
       this.panelWidth = this.$element.width();
