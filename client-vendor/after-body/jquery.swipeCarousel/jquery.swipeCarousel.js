@@ -27,32 +27,34 @@
    * @param {Content|Null} [content]
    * @constructor
    */
-  var Panel = function Content(element, content) {
+  var Panel = function Panel(element, content) {
     this.element = element;
     this.content = content || null;
   };
 
   /**
-   * @param {Array} array
+   * Circular list of panels
+   *
+   * @param {Panel[]} array
    * @param {Number} indexOffset
    * @constructor
    */
-  var CircularList = function CircularList(array, indexOffset) {
+  var PanelList = function PanelList(array, indexOffset) {
     this.array = array;
     this.indexOffset = indexOffset;
   };
 
-  CircularList.prototype = {
+  PanelList.prototype = {
     /**
      * @param {Number} index
-     * @return {*}
+     * @return {Panel}
      */
     get: function(index) {
       return this.array[this._normalizeIndex(index)];
     },
 
     /**
-     * @return {Array}
+     * @return {Panel[]}
      */
     getAll: function() {
       return this.array;
@@ -89,7 +91,7 @@
       throw new Error('Cannot find container');
     }
 
-    this.panelList = new CircularList([
+    this.panelList = new PanelList([
       new Panel(null, null), new Panel(null, null), new Panel(null, null)
     ], 1);
     this.panelOffsetList = _.range(-1, 2);
@@ -131,7 +133,7 @@
     /** @type jQuery */
     $container: null,
 
-    /** @type CircularList */
+    /** @type PanelList */
     panelList: null,
 
     /** @type Array */
