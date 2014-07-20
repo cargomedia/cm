@@ -133,7 +133,7 @@
 
       this.$element.addClass('swipeCarousel');
       this._setPaneDimensions();
-      this._renderContentIntoPanels(this.position, true);
+      this._renderContentIntoPanels(this.position);
       $(window).on('load resize orientationchange', this._setPaneDimensions);
       $(window).on('keydown', this._onKeydown);
       this.hammer.on('release dragleft dragright swipeleft swiperight', this._onHammer);
@@ -168,14 +168,13 @@
     /**
      * @param {Number} position
      * @param {Object} [eventData]
-     * @param {Boolean} [skipAnimation]
      */
-    showPane: function(position, eventData, skipAnimation) {
+    showPane: function(position, eventData) {
       position = Math.max(0, Math.min(position, this.contentList.length - 1));
       eventData = eventData || {};
       if (this.position != position) {
         this.position = position;
-        this._renderContentIntoPanels(position, skipAnimation);
+        this._renderContentIntoPanels(position);
         this._onChange(eventData);
       }
     },
@@ -255,12 +254,8 @@
 
     /**
      * @param {Number} position
-     * @param {Boolean} skipAnimation
      */
-    _renderContentIntoPanels: function(position, skipAnimation) {
-      var offset = 0.13;
-      this._setContainerOffset(offset, !skipAnimation);
-
+    _renderContentIntoPanels: function(position) {
       for (var positionOffset = -1; positionOffset <= 1; positionOffset++) {
         var content = this.contentList[position + positionOffset] || null;
         var panel = this.panelList.get(positionOffset);
