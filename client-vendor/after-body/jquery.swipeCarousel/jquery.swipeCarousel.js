@@ -70,6 +70,7 @@
       {element: null, content: null},
       {element: null, content: null}
     ], 1);
+    this.panelOffsetList = _.range(-1, 2);
 
     var $containerChildren = this.$container.children();
 
@@ -91,13 +92,13 @@
     console.log(this.panelList.getAll());
     console.log(this.contentList);
 
-    this.pane_width = 0;
+    this.panelWidth = 0;
     this.hammer = new Hammer(this.$element[0], {
       dragLockToAxis: true,
       dragMinDistance: 20,
       swipeVelocityX: 0.1
     });
-    _.bindAll(this, '_setPaneDimensions', '_onKeydown', '_onHammer');
+    _.bindAll(this, '_setPanelDimensions', '_onKeydown', '_onHammer');
     this.initialized = false;
   };
 
@@ -112,13 +113,16 @@
     panelList: null,
 
     /** @type Array */
+    panelOffsetList: null,
+
+    /** @type Array */
     contentList: null,
 
     /** @type Number */
     position: null,
 
     /** @type Number */
-    pane_width: null,
+    panelWidth: null,
 
     /** @type Hammer */
     hammer: null,
@@ -132,9 +136,9 @@
       }
 
       this.$element.addClass('swipeCarousel');
-      this._setPaneDimensions();
+      this._setPanelDimensions();
       this._renderContentIntoPanels(this.position);
-      $(window).on('load resize orientationchange', this._setPaneDimensions);
+      $(window).on('load resize orientationchange', this._setPanelDimensions);
       $(window).on('keydown', this._onKeydown);
       this.hammer.on('release dragleft dragright swipeleft swiperight', this._onHammer);
       this.initialized = true;
@@ -145,7 +149,7 @@
         return;
       }
 
-      $(window).off('load resize orientationchange', this._setPaneDimensions);
+      $(window).off('load resize orientationchange', this._setPanelDimensions);
       $(window).off('keydown', this._onKeydown);
       this.hammer.off('release dragleft dragright swipeleft swiperight', this._onHammer);
       this.initialized = false;
@@ -256,7 +260,7 @@
      * @param {Number} position
      */
     _renderContentIntoPanels: function(position) {
-      for (var positionOffset = -1; positionOffset <= 1; positionOffset++) {
+      _.each(this.panelOffsetList, function(positionOffset) {
         var content = this.contentList[position + positionOffset] || null;
         var panel = this.panelList.get(positionOffset);
         if ((content || panel['content']) && (content !== panel['content'])) {
@@ -266,7 +270,8 @@
           }
         }
         panel['content'] = content;
-      }
+      }, this);
+      this._resetPanelPositions();
     },
 
     /**
@@ -274,6 +279,23 @@
      */
     _moveContent: function(direction) {
       // todo - Faster panel rendering for moving content +1/-1
+    },
+
+    _resetPanelPositions: function() {
+      this._setElementOffset(this.$container, -1 / 3, false);
+      _.each(this.panelOffsetList, function(positionOffset, index) {
+        var panel = this.panelList.get(positionOffset);
+        this._setElementOffset(panel['element'], index, false);
+      }, this);
+    },
+
+
+    _setPanelDimensions: function() {
+      this.panelWidth = this.$element.width();
+      console.log('this.panelWidth ', this.panelWidth);
+      _.each(this.panelList.getAll(), function(panel) {
+        panel['element'].outerWidth(this.panelWidth);
+      }, this);
     },
 
     /**
@@ -300,13 +322,6 @@
         // todo
         return $.Deferred().resolve($('<div>hello</div>')[0]).promise();
       }
-    },
-
-    _setPaneDimensions: function() {
-      this.pane_width = this.$element.width() * 0.3;
-      _.each(this.panelList.getAll(), function(panel) {
-        $(panel).outerWidth(this.pane_width);
-      }, this);
     },
 
     /**
@@ -373,7 +388,7 @@
         case 'dragright':
         case 'dragleft':
           // stick to the finger
-          var drag_offset = ((1 / this.pane_width) * event.gesture.deltaX);
+          var drag_offset = ((1 / this.panelWidth) * event.gesture.deltaX);
 
           // slow down at the first and last pane
           if ((this.position == 0 && event.gesture.direction == 'right') || (this.position == this.contentList.length - 1 && event.gesture.direction == 'left')) {
@@ -395,7 +410,7 @@
 
         case 'release':
           // more then 50% moved, navigate
-          if (Math.abs(event.gesture.deltaX) > this.pane_width / 2) {
+          if (Math.abs(event.gesture.deltaX) > this.panelWidth / 2) {
             if (event.gesture.direction == 'right') {
               this.showPrevious();
             } else {
