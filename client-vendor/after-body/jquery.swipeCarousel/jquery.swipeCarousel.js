@@ -365,10 +365,11 @@
     },
 
     /**
-     * @param {Number} offsetRate
+     * @param {Number} offsetRate (-1: panel left, 0: middle panel, 1: panel right)
      * @param {Boolean} animate
      */
     _setContainerOffset: function(offsetRate, animate) {
+      offsetRate = (-1 / 3) + offsetRate * (1 / 3);
       this._setElementOffset(this.$container, offsetRate, animate);
     },
 
@@ -410,8 +411,7 @@
         case 'dragright':
         case 'dragleft':
           // stick to the finger
-          console.log(event.gesture.deltaX, (event.gesture.deltaX / this.panelWidth));
-          var drag_offset = (-1 / 3) + (event.gesture.deltaX / this.panelWidth);
+          var drag_offset = event.gesture.deltaX / this.panelWidth;
 
           // slow down at the first and last pane
           if ((this.position == 0 && event.gesture.direction == 'right') || (this.position == this.contentList.length - 1 && event.gesture.direction == 'left')) {
@@ -440,7 +440,7 @@
               this.showNext();
             }
           } else {
-            this.showPane(this.position);
+            this._setContainerOffset(0, true);
           }
           break;
       }
