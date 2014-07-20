@@ -23,12 +23,12 @@
   /**
    * View panel (<li>) which will eventually contain Content's element
    *
-   * @param {jQuery} element
+   * @param {jQuery|Null} [element]
    * @param {Content|Null} [content]
    * @constructor
    */
   var Panel = function Panel(element, content) {
-    this.element = element;
+    this.element = element || null;
     this.content = content || null;
   };
 
@@ -91,9 +91,7 @@
       throw new Error('Cannot find container');
     }
 
-    this.panelList = new PanelList([
-      new Panel(null, null), new Panel(null, null), new Panel(null, null)
-    ], 1);
+    this.panelList = new PanelList([new Panel(), new Panel(), new Panel()], 1);
     this.panelOffsetList = _.range(-1, 2);
 
     var $containerChildren = this.$container.children();
