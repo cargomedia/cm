@@ -405,7 +405,7 @@
     _onChange: function(eventData) {
       _.extend(eventData, {
         index: this.position,
-        element: this.panelList.get(0).content.element
+        element: this.contentList[this.position].element
       });
       this.$element.trigger('swipeCarousel-change', eventData);
     },
