@@ -286,6 +286,7 @@
       _.each(this.panelOffsetList, function(positionOffset, index) {
         var panel = this.panelList.get(positionOffset);
         this._setElementOffset(panel['element'], index, false);
+        panel['element'].toggleClass('active', 0 === positionOffset);
       }, this);
     },
 
