@@ -1,6 +1,10 @@
 /**
  * @author CM
  * Based on https://github.com/EightMedia/hammer.js/blob/master/tests/manual/carousel.html
+ *
+ * Requires:
+ * - Underscore.js
+ * - jquery.Transit
  */
 (function(window, $) {
 
