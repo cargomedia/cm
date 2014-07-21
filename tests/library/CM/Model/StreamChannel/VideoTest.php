@@ -118,6 +118,18 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
         }
     }
 
+    public function testOnUnpublishDelete() {
+        $streamChannel = CMTest_TH::createStreamChannel();
+        $streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
+        try {
+            $streamChannel->onUnpublish($streamPublish);
+            new CM_Model_StreamChannelArchive_Video($streamChannel->getId());
+            $streamPublish->delete();
+        } catch (CM_Exception_Nonexistent $ex) {
+            $this->fail('Could not delete CM_Model_Stream_Publish.');
+        }
+    }
+
     public function testGetThumbnails() {
         /** @var CM_Model_StreamChannel_Video $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
