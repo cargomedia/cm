@@ -2,6 +2,9 @@
 
 class CM_Response_Upload extends CM_Response_Abstract {
 
+    /** @var CM_Request_Post */
+    protected $_request;
+
     /**
      * Max file size allowed by the ser
      *
@@ -20,8 +23,8 @@ class CM_Response_Upload extends CM_Response_Abstract {
     );
 
     public function __construct(CM_Request_Post $request) {
-        $request->setBodyEncoding(CM_Request_Post::ENCODING_NONE);
         parent::__construct($request);
+        $this->_request->setBodyEncoding(CM_Request_Post::ENCODING_NONE);
     }
 
     protected function _process() {
