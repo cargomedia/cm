@@ -129,8 +129,6 @@ class CM_Process {
             if (-1 === $pid) {
                 throw new CM_Exception('Waiting on child processes failed');
             }
-            var_dump($workloadResultList);
-            die();
             $forkHandlerSequence = $this->_getForkHandlerSequenceByPid($pid);
             $forkHandler = $this->_forkHandlerList[$forkHandlerSequence];
             $workloadResultList[$forkHandlerSequence] = $forkHandler->receiveWorkloadResult();
