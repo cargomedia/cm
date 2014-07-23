@@ -5,11 +5,23 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
     /** @var string */
     protected $_code;
 
+    /** @var bool */
+    protected $_disallowInvalid, $_disallowDisposable;
+
+    /** @var float */
+    protected $_disallowUnknownThreshold;
+
     /**
      * @param string $code
+     * @param bool   $disallowInvalid
+     * @param bool   $disallowDisposable
+     * @param float  $disallowUnknownThreshold
      */
-    public function __construct($code) {
+    public function __construct($code, $disallowInvalid, $disallowDisposable, $disallowUnknownThreshold) {
         $this->_code = (string) $code;
+        $this->_disallowInvalid = (bool) $disallowInvalid;
+        $this->_disallowDisposable = (bool) $disallowDisposable;
+        $this->_disallowUnknownThreshold = (float) $disallowUnknownThreshold;
     }
 
     public function isValid($email) {
@@ -18,13 +30,13 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
             return false;
         }
         $response = $this->_getResponse($email);
-        if ('invalid' === $response['result']) {
+        if ($this->_disallowInvalid && 'invalid' === $response['result']) {
             return false;
         }
-        if ('true' === $response['disposable']) {
+        if ($this->_disallowDisposable && 'true' === $response['disposable']) {
             return false;
         }
-        if ('true' === $response['accept_all'] && $response['sendex'] < 0.2) {
+        if ($response['sendex'] < $this->_disallowUnknownThreshold && ('true' === $response['accept_all'] || 'unknown' === $response['result'])) {
             return false;
         }
         return true;
