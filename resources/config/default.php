@@ -174,7 +174,7 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['email-verification'] = array(
-        'class'     => 'CM_Service_EmailVerification_Default',
+        'class'     => 'CM_Service_EmailVerification_Standard',
         'arguments' => array()
     );
 };

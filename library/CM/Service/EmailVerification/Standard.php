@@ -1,6 +1,6 @@
 <?php
 
-class CM_Service_EmailVerification_Default implements CM_Service_EmailVerification_ClientInterface {
+class CM_Service_EmailVerification_Standard implements CM_Service_EmailVerification_ClientInterface {
 
     public function isValid($email) {
         $email = (string) $email;
