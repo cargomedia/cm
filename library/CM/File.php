@@ -110,6 +110,12 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
     }
 
     /**
+     * @param boolean|null $recursive
+     */
+    public function listFiles($recursive = null) {
+    }
+
+    /**
      * @return string
      */
     public function read() {
