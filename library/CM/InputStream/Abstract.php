@@ -17,13 +17,6 @@ abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
         }
     }
 
-    /**
-     * @param string      $hint
-     * @param string[]    $values
-     * @param string|null $default
-     * @return mixed
-     * @throws CM_Exception_Invalid
-     */
     public function select($hint, array $values, $default = null) {
         if (null !== $default && !in_array($default, $values, true)) {
             throw new CM_Exception_Invalid('Invalid default value');
