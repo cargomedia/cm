@@ -17,22 +17,45 @@ abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
         }
     }
 
-    public function confirm($hint = null, $default = null) {
-        $allowedValues = array('y' => true, 'n' => false);
-        $options = array();
-        foreach ($allowedValues as $label => $value) {
+    /**
+     * @param string      $hint
+     * @param array       $values
+     * @param string|null $default
+     * @return mixed
+     * @throws CM_Exception_Invalid
+     */
+    public function select($hint, array $values, $default = null) {
+        if (null !== $default && !array_key_exists($default, $values)) {
+            throw new CM_Exception_Invalid('Invalid default value');
+        }
+
+        if (!$values) {
+            throw new CM_Exception_Invalid('Not enough values');
+        }
+
+        $labels = array();
+        foreach ($values as $label => $value) {
             if ($label === $default) {
                 $label = strtoupper($label);
             }
-            $options[] = $label;
+            $labels[] = $label;
         }
-        do {
-            $label = $this->read($hint . ' (' . implode('/', $options) . ')', $default);
-        } while (!array_key_exists($label, $allowedValues));
-        return $allowedValues[$label];
+        $hint .= ' (' . join('/', $labels) . ')';
+
+        $label = $this->read($hint, $default, function ($label) use ($values) {
+            if (!array_key_exists($label, $values)) {
+                throw new CM_InputStream_InvalidValueException();
+            }
+        });
+        return $values[$label];
+    }
+
+    public function confirm($hint = null, $default = null) {
+        return $this->select($hint, ['y' => true, 'n' => false], $default);
     }
 
     public function read($hint = null, $default = null, Closure $validateCallback = null) {
+        $originalHint = $hint;
         if (null !== $hint) {
             $hint .= ' ';
         }
@@ -45,7 +68,7 @@ abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
                 $validateCallback($value);
             } catch (CM_InputStream_InvalidValueException $e) {
                 $this->_getStreamOutput()->writeln($e->getMessage());
-                $value = $this->read($hint, $default, $validateCallback);
+                $value = $this->read($originalHint, $default, $validateCallback);
             }
         }
         return $value;

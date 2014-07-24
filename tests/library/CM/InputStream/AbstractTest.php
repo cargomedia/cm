@@ -43,11 +43,11 @@ class CM_InputStream_AbstractTest extends CMTest_TestCase {
     }
 
     public function testConfirm() {
-        $input = $this->getMockBuilder('CM_InputStream_Abstract')->setMethods(array('read'))->getMockForAbstractClass();
-        $input->expects($this->exactly(3))->method('read')->with('Hint (y/n)', 'default')->will($this->onConsecutiveCalls('invalid value', 'y', 'n'));
+        $input = $this->getMockBuilder('CM_InputStream_Abstract')->setMethods(array('_read'))->getMockForAbstractClass();
+        $input->expects($this->exactly(3))->method('_read')->with('Hint (Y/n) ')->will($this->onConsecutiveCalls('invalid value', 'y', 'n'));
 
         /** @var $input CM_InputStream_Abstract */
-        $this->assertTrue($input->confirm('Hint', 'default'));
-        $this->assertFalse($input->confirm('Hint', 'default'));
+        $this->assertTrue($input->confirm('Hint', 'y'));
+        $this->assertFalse($input->confirm('Hint', 'y'));
     }
 }
