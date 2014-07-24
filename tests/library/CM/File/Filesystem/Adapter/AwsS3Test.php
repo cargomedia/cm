@@ -77,7 +77,7 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
             setMethods(array('getIterator'))->getMock();
         $clientMock->expects($this->once())->method('getIterator')->with('ListObjects', array(
             'Bucket' => 'bucket',
-            'Prefix' => 'bar/foo',
+            'Prefix' => 'bar/foo/',
         ))->will($this->returnValue(array(
                 array('Key' => '/bar/foo/object1'),
                 array('Key' => '/bar/foo/object2'),
