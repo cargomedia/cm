@@ -19,6 +19,20 @@ class CM_InputStream_AbstractTest extends CMTest_TestCase {
         $this->assertSame(2, $readMethod->getCallCount());
     }
 
+    public function testReadWithValidateCallback() {
+        $input = $this->mockClass('CM_InputStream_Abstract')->newInstance();
+        $readMethod = $input->mockMethod('_read')
+            ->at(0, 'foo')
+            ->at(1, 'bar');
+        /** @var $input CM_InputStream_Abstract */
+        $this->assertSame('bar', $input->read('hint', null, function ($value) {
+            if ($value !== 'bar') {
+                throw new CM_InputStream_InvalidValueException();
+            }
+        }));
+        $this->assertSame(2, $readMethod->getCallCount());
+    }
+
     public function testConfirm() {
         $input = $this->getMockBuilder('CM_InputStream_Abstract')->setMethods(array('read'))->getMockForAbstractClass();
         $input->expects($this->exactly(3))->method('read')->with('Hint (y/n)', 'default')->will($this->onConsecutiveCalls('invalid value', 'y', 'n'));

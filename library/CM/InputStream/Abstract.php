@@ -32,13 +32,21 @@ abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
         return $allowedValues[$label];
     }
 
-    public function read($hint = null, $default = null) {
+    public function read($hint = null, $default = null, Closure $validateCallback = null) {
         if (null !== $hint) {
             $hint .= ' ';
         }
         $value = $this->_read($hint);
         if (!$value && null !== $default) {
             $value = $default;
+        }
+        if (null !== $validateCallback) {
+            try {
+                $validateCallback($value);
+            } catch (CM_InputStream_InvalidValueException $e) {
+                $this->_getStreamOutput()->writeln($e->getMessage());
+                $value = $this->read($hint, $default, $validateCallback);
+            }
         }
         return $value;
     }
