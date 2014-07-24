@@ -30,6 +30,9 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
             return false;
         }
         $response = $this->_getResponse($email);
+        if (null === $response) {
+            return true;
+        }
         if ($this->_disallowInvalid && 'invalid' === $response['result']) {
             return false;
         }
@@ -51,11 +54,14 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
 
     /**
      * @param string $email
-     * @return mixed
+     * @return array|null
      */
     protected function _getResponse($email) {
         $kickBox = new \Kickbox\Client($this->_getCode());
         $response = $kickBox->kickbox()->verify($email);
+        if ($response->code !== 200) {
+            return null;
+        }
         return CM_Params::jsonDecode($response->body);
     }
 }

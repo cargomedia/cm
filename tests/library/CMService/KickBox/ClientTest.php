@@ -9,6 +9,12 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
         $this->assertFalse($kickBoxMock->isValid('invalid email@example.com'));
     }
 
+    public function testNoCredits() {
+        $responseMock = null;
+        $kickBoxMock = $this->_getKickBoxMock(true, true, 0.2, $responseMock);
+        $this->assertTrue($kickBoxMock->isValid('test@example.com'));
+    }
+
     public function testInvalid() {
         $responseMock = array('result' => 'invalid', 'disposable' => 'false', 'accept_all' => 'false', 'sendex' => 0.2);
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.2, $responseMock);
@@ -48,15 +54,19 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
     }
 
     /**
-     * @param bool  $disallowInvalid
-     * @param bool  $disallowDisposable
-     * @param float $disallowUnknownThreshold
-     * @param array $responseMock
+     * @param bool       $disallowInvalid
+     * @param bool       $disallowDisposable
+     * @param float      $disallowUnknownThreshold
+     * @param array|null $responseMock
      * @return CMService_KickBox_Client
      */
-    protected function _getKickBoxMock($disallowInvalid, $disallowDisposable, $disallowUnknownThreshold, array $responseMock) {
-        $kickBoxMock = $this->getMock('CMService_KickBox_Client', array('_getResponse'), array('', $disallowInvalid, $disallowDisposable,
-            $disallowUnknownThreshold));
+    protected function _getKickBoxMock($disallowInvalid, $disallowDisposable, $disallowUnknownThreshold, $responseMock) {
+        $kickBoxMock = $this->getMock('CMService_KickBox_Client', array('_getResponse'), array(
+            '',
+            $disallowInvalid,
+            $disallowDisposable,
+            $disallowUnknownThreshold
+        ));
         $kickBoxMock->expects($this->once())->method('_getResponse')->will($this->returnValue($responseMock));
         return $kickBoxMock;
     }
