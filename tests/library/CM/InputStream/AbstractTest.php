@@ -43,11 +43,29 @@ class CM_InputStream_AbstractTest extends CMTest_TestCase {
     }
 
     public function testConfirm() {
-        $input = $this->getMockBuilder('CM_InputStream_Abstract')->setMethods(array('_read'))->getMockForAbstractClass();
-        $input->expects($this->exactly(3))->method('_read')->with('Hint (Y/n) ')->will($this->onConsecutiveCalls('invalid value', 'y', 'n'));
+        $input = $this->mockClass('CM_InputStream_Abstract')->newInstance();
+        $readMethod = $input->mockMethod('_read')
+            ->at(0, function ($hint) {
+                $this->assertSame('Hint (Y/n) ', $hint);
+                return 'invalid value';
+            })
+            ->at(1, function ($hint) {
+                $this->assertSame('Hint (Y/n) ', $hint);
+                return 'y';
+            })
+            ->at(2, function ($hint) {
+                $this->assertSame('Hint (Y/n) ', $hint);
+                return 'n';
+            })
+            ->at(3, function ($hint) {
+                $this->assertSame('Hint (y/N) ', $hint);
+                return '';
+            });
 
         /** @var $input CM_InputStream_Abstract */
         $this->assertTrue($input->confirm('Hint', 'y'));
         $this->assertFalse($input->confirm('Hint', 'y'));
+        $this->assertFalse($input->confirm('Hint', 'n'));
+        $this->assertSame(4, $readMethod->getCallCount());
     }
 }
