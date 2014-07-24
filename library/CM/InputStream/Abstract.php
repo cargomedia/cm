@@ -19,39 +19,41 @@ abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
 
     /**
      * @param string      $hint
-     * @param array       $values
+     * @param string[]    $values
      * @param string|null $default
      * @return mixed
      * @throws CM_Exception_Invalid
      */
     public function select($hint, array $values, $default = null) {
-        if (null !== $default && !array_key_exists($default, $values)) {
+        if (null !== $default && !in_array($default, $values, true)) {
             throw new CM_Exception_Invalid('Invalid default value');
         }
-
         if (!$values) {
             throw new CM_Exception_Invalid('Not enough values');
         }
 
-        $labels = array();
-        foreach ($values as $label => $value) {
-            if ($label === $default) {
-                $label = strtoupper($label);
+        $labels = array_map(function ($value) use ($default) {
+            if ($value === $default) {
+                $value = strtoupper($value);
             }
-            $labels[] = $label;
-        }
+            return $value;
+        }, $values);
         $hint .= ' (' . join('/', $labels) . ')';
 
-        $label = $this->read($hint, $default, function ($label) use ($values) {
-            if (!array_key_exists($label, $values)) {
+        return $this->read($hint, $default, function ($label) use ($values) {
+            if (!in_array($label, $values, true)) {
                 throw new CM_InputStream_InvalidValueException();
             }
         });
-        return $values[$label];
     }
 
     public function confirm($hint = null, $default = null) {
-        return $this->select($hint, ['y' => true, 'n' => false], $default);
+        $options = [
+            'y' => true,
+            'n' => false,
+        ];
+        $label = $this->select($hint, array_keys($options), $default);
+        return $options[$label];
     }
 
     public function read($hint = null, $default = null, Closure $validateCallback = null) {
