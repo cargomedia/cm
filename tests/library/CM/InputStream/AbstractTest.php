@@ -3,7 +3,7 @@
 class CM_InputStream_AbstractTest extends CMTest_TestCase {
 
     public function testRead() {
-        $input = $this->mockClass('CM_InputStream_Abstract')->newInstance();
+        $input = $this->mockObject('CM_InputStream_Abstract');
         $readMethod = $input->mockMethod('_read')
             ->at(0, function ($hint) {
                 $this->assertSame('Hint ', $hint);
@@ -20,12 +20,12 @@ class CM_InputStream_AbstractTest extends CMTest_TestCase {
     }
 
     public function testReadWithValidateCallback() {
-        $output = $this->mockClass('CM_OutputStream_Abstract')->newInstance();
+        $output = $this->mockObject('CM_OutputStream_Abstract');
         $writeMethod = $output->mockMethod('writeln')->set(function ($content) {
             $this->assertSame('message', $content);
         });
 
-        $input = $this->mockClass('CM_InputStream_Abstract')->newInstance();
+        $input = $this->mockObject('CM_InputStream_Abstract');
         $input->mockMethod('_getStreamOutput')->set($output);
         $readMethod = $input->mockMethod('_read')
             ->at(0, 'foo')
@@ -43,7 +43,7 @@ class CM_InputStream_AbstractTest extends CMTest_TestCase {
     }
 
     public function testConfirm() {
-        $input = $this->mockClass('CM_InputStream_Abstract')->newInstance();
+        $input = $this->mockObject('CM_InputStream_Abstract');
         $readMethod = $input->mockMethod('_read')
             ->at(0, function ($hint) {
                 $this->assertSame('Hint (Y/n) ', $hint);
@@ -64,6 +64,7 @@ class CM_InputStream_AbstractTest extends CMTest_TestCase {
 
         /** @var $input CM_InputStream_Abstract */
         $this->assertTrue($input->confirm('Hint', 'y'));
+        $this->assertSame(2, $readMethod->getCallCount());
         $this->assertFalse($input->confirm('Hint', 'y'));
         $this->assertFalse($input->confirm('Hint', 'n'));
         $this->assertSame(4, $readMethod->getCallCount());
