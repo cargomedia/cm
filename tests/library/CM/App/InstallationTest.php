@@ -32,8 +32,7 @@ class CM_App_InstallationTest extends CMTest_TestCase {
         /** @var \Composer\Package\CompletePackage $package4 */
 
         $composerPackages = array($package1, $package2, $package3, $package4);
-        $installation = $this->getMockBuilder('CM_App_Installation')
-            ->setMethods(array('_getComposerPackages', '_getComposerVendorDir'))->disableOriginalConstructor()->getMock();
+        $installation = $this->getMockBuilder('CM_App_Installation')->disableOriginalConstructor()->setMethods(array('_getComposerPackages', '_getComposerVendorDir'))->getMock();
         $installation->expects($this->any())->method('_getComposerPackages')->will($this->returnValue($composerPackages));
         $installation->expects($this->any())->method('_getComposerVendorDir')->will($this->returnValue('vendor/'));
         /** @var CM_App_Installation $installation */
@@ -46,6 +45,23 @@ class CM_App_InstallationTest extends CMTest_TestCase {
         $this->assertSame($package2->getName(), $packages[2]->getName());
     }
 
+    public function testGetPackageFromComposerPackageMissingExtra() {
+        $composerPackage = $this->getMockBuilder('\Composer\Package\CompletePackage')
+            ->setMethods(array('getName', 'getPrettyName', 'getExtra'))->disableOriginalConstructor()->getMock();
+        $composerPackage->expects($this->any())->method('getName')->will($this->returnValue('foo'));
+        $composerPackage->expects($this->any())->method('getPrettyName')->will($this->returnValue('foo'));
+        $composerPackage->expects($this->any())->method('getExtra')->will($this->returnValue(array()));
+        /** @var \Composer\Package\CompletePackage $composerPackage */
+
+        $installation = $this->getMockBuilder('CM_App_Installation')->disableOriginalConstructor()->setMethods(array('_getComposerVendorDir'))->getMock();
+        $installation->expects($this->any())->method('_getComposerVendorDir')->will($this->returnValue('vendor/'));
+
+        $method = CMTest_TH::getProtectedMethod('CM_App_Installation', '_getPackageFromComposerPackage');
+        /** @var CM_App_Package $package */
+        $package = $method->invoke($installation, $composerPackage);
+        $this->assertSame(array(), $package->getModules());
+    }
+
     public function testGetModulePaths() {
         $package1 = new CM_App_Package('foo', 'foo/');
         $package1->addModule('foo-foo', 'foo/');
@@ -55,7 +71,7 @@ class CM_App_InstallationTest extends CMTest_TestCase {
         $package2->addModule('bar-foo', 'foo/');
         $package2->addModule('bar-bar', 'bar/');
 
-        $installation = $this->getMockBuilder('CM_App_Installation')->setMethods(array('getPackages'))->disableOriginalConstructor()->getMock();
+        $installation = $this->getMockBuilder('CM_App_Installation')->disableOriginalConstructor()->setMethods(array('getPackages'))->getMock();
         $installation->expects($this->any())->method('getPackages')->will($this->returnValue(array($package1, $package2)));
         /** @var CM_App_Installation $installation */
 
