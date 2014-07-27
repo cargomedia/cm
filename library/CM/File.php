@@ -318,7 +318,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
      * @return CM_File_Filesystem
      */
     public static function getFilesystemDefault() {
-        global $filesystem;
+        static $filesystem;
         if (null === $filesystem) {
             $adapter = new CM_File_Filesystem_Adapter_Local();
             $filesystem = new CM_File_Filesystem($adapter);
