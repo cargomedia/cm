@@ -2,6 +2,9 @@
 
 class CM_CacheConst {
 
+    // _email:X
+    const KickBox_isValid = 'KickBox_isValid';
+
     // _tag:X
     const Tag_Version = 'Tag_Version';
 

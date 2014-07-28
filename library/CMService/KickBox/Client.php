@@ -29,20 +29,25 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
         if (false === filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return false;
         }
-        $response = $this->_getResponse($email);
-        if (null === $response) {
-            return true;
+        $key = CM_CacheConst::KickBox_isValid . '_email:' . $email;
+        $cache = CM_Cache_Shared::getInstance();
+        if (false === ($isValid = $cache->get($key))) {
+            $response = $this->_getResponse($email);
+            if (null === $response) {
+                return true;
+            }
+            if (
+                ($this->_disallowInvalid && 'invalid' === $response['result']) ||
+                ($this->_disallowDisposable && 'true' === $response['disposable']) ||
+                ($response['sendex'] < $this->_disallowUnknownThreshold && ('true' === $response['accept_all'] || 'unknown' === $response['result']))
+            ) {
+                $isValid = 0;
+            } else {
+                $isValid = 1;
+            }
+            $cache->set($key, $isValid);
         }
-        if ($this->_disallowInvalid && 'invalid' === $response['result']) {
-            return false;
-        }
-        if ($this->_disallowDisposable && 'true' === $response['disposable']) {
-            return false;
-        }
-        if ($response['sendex'] < $this->_disallowUnknownThreshold && ('true' === $response['accept_all'] || 'unknown' === $response['result'])) {
-            return false;
-        }
-        return true;
+        return (bool) $isValid;
     }
 
     /**
