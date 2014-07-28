@@ -32,6 +32,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     public function insert($collection, array $object) {
         CM_Debug::getInstance()->incStats('mongo', "insert to {$collection}");
         $ref = & $object;
+
         return $this->_getCollection($collection)->insert($ref);
     }
 
@@ -60,6 +61,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         $criteria = (array) $criteria;
         $projection = (array) $projection;
         CM_Debug::getInstance()->incStats('mongo', "find in {$collection}: " . serialize(array('fields' => $projection) + $criteria));
+
         return $this->_getCollection($collection)->find($criteria, $projection);
     }
 
@@ -75,6 +77,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         $limit = (int) $limit;
         $offset = (int) $offset;
         CM_Debug::getInstance()->incStats('mongo', "count in {$collection}: " . serialize($criteria));
+
         return $this->_getCollection($collection)->count($criteria, $limit, $offset);
     }
 
@@ -84,6 +87,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     public function drop($collection) {
         CM_Debug::getInstance()->incStats('mongo', "drop {$collection}: ");
+
         return $this->_getCollection($collection)->drop();
     }
 
@@ -97,6 +101,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     public function update($collection, array $criteria, array $newObject, array $options = null) {
         $options = (array) $options;
         CM_Debug::getInstance()->incStats('mongo', "Update {$collection}");
+
         return $this->_getCollection($collection)->update($criteria, $newObject, $options);
     }
 
@@ -114,8 +119,8 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
 
     /**
      * @param string $collection
-     * @param array $keys
-     * @param array $options
+     * @param array  $keys
+     * @param array  $options
      * @return mixed
      */
     public function createIndex($collection, array $keys, array $options = null) {
@@ -132,8 +137,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         return $this->_getDatabase()->command(array("deleteIndexes" => $collection, "index" => $indexName));
     }
 
-    public function getIndexInfo($collection)
-    {
+    public function getIndexInfo($collection) {
         return $this->_getCollection($collection)->getIndexInfo();
     }
 
@@ -151,6 +155,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         if (null === $this->_client) {
             $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
         }
+
         return $this->_client;
     }
 
@@ -160,6 +165,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     protected function _getDatabase() {
         $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
+
         return $this->_getClient()->selectDB($dbName);
     }
 
