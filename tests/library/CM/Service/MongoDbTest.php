@@ -29,9 +29,14 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
 
         $collectionName = $this->_getEmptyCollectionName('update2');
         $mongoDb->insert($collectionName, array('messageId'  => 1,
-                                                'recipients' => array(array('userId' => 1, 'read' => 0), array('userId' => 2, 'read' => 0))
+                                                'recipients' => array(
+                                                    array('userId' => 1, 'read' => 0),
+                                                    array('userId' => 2, 'read' => 0)
+                                                )
         ));
-        $mongoDb->update($collectionName, array('messageId' => 1, 'recipients.userId' => 2), array('$set' => array('recipients.$.read' => 1)));
+        $mongoDb->update($collectionName, array('messageId'         => 1,
+                                                'recipients.userId' => 2),
+            array('$set' => array('recipients.$.read' => 1)));
 
         $message = $mongoDb->findOne($collectionName, array('messageId' => 1));
         $this->assertNotEmpty($message);
@@ -106,9 +111,8 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
 
         $indexInfoList = $mongoDb->getIndexInfo($collectionName);
         $this->assertCount(2, $indexInfoList);
-        $this->assertArrayHasKey(1, $indexInfoList);
-        $this->assertArrayHasKey('indexedField', $indexInfoList[1]['key']);
         $this->assertSame($indexInfoList[1]['key']['indexedField'], 1);
+        $this->assertSame($indexInfoList[1]['name'], $indexName);
 
         $mongoDb->deleteIndex($collectionName, $indexName);
         $indexInfoList = $mongoDb->getIndexInfo($collectionName);
