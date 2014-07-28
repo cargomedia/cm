@@ -86,19 +86,13 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
             'Bucket' => $this->_bucket,
             'Prefix' => $pathPrefix,
         );
-        $iteratorOptions = array(
-            'return_prefixes' => true,
-        );
         if ($noRecursion) {
             $commandOptions['Delimiter'] = '/';
         }
 
         $keys = array();
-        foreach ($this->_client->getIterator('ListObjects', $commandOptions, $iteratorOptions) as $file) {
-            $key = array_key_exists('Key', $file) ? $file['Key'] : $file['Prefix'];
-            if ($key !== $pathPrefix) {
-                $keys[] = $this->_getRelativePath($key);
-            }
+        foreach ($this->_client->getIterator('ListObjects', $commandOptions) as $file) {
+            $keys[] = $this->_getRelativePath($file['Key']);
         }
 
         return array('files' => $keys, 'dirs' => array());
