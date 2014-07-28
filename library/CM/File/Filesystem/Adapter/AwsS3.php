@@ -81,7 +81,7 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
     }
 
     public function listByPrefix($pathPrefix, $noRecursion = null) {
-        $pathPrefix = rtrim($this->_getAbsolutePath($pathPrefix), '/') . '/';  // force trailing slash for input-output consistency
+        $pathPrefix = $this->_getAbsolutePath($pathPrefix) . '/';  // force trailing slash for input-output consistency
         $commandOptions = array(
             'Bucket' => $this->_bucket,
             'Prefix' => $pathPrefix,
