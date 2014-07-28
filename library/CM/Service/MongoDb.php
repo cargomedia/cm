@@ -121,7 +121,13 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param string $collection
      * @param array  $keys
      * @param array  $options
-     * @return mixed
+     * @return bool
+     *
+     * @throws MongoException
+     * @throws MongoDuplicateKeyException
+     * @throws MongoResultException
+     * @throws MongoCursorException
+     * @throws MongoCursorTimeoutException
      */
     public function createIndex($collection, array $keys, array $options = null) {
         $options = (array) $options;
@@ -137,6 +143,10 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         return $this->_getDatabase()->command(array("deleteIndexes" => $collection, "index" => $indexName));
     }
 
+    /**
+     * @param string $collection
+     * @return array
+     */
     public function getIndexInfo($collection) {
         return $this->_getCollection($collection)->getIndexInfo();
     }
