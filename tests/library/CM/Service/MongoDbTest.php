@@ -29,7 +29,8 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
 
         $collectionName = $this->_getEmptyCollectionName('update2');
         $mongoDb->insert($collectionName, array('messageId'  => 1,
-                                                'recipients' => array(array('userId' => 1, 'read' => 0), array('userId' => 2, 'read' => 0))));
+                                                'recipients' => array(array('userId' => 1, 'read' => 0), array('userId' => 2, 'read' => 0))
+        ));
         $mongoDb->update($collectionName, array('messageId' => 1, 'recipients.userId' => 2), array('$set' => array('recipients.$.read' => 1)));
 
         $message = $mongoDb->findOne($collectionName, array('messageId' => 1));
@@ -97,8 +98,26 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $this->assertSame(0, $mongoDb->find($collectionName, array('userId' => 2))->count());
     }
 
+    public function testCreateDeleteIndex() {
+        $indexName = 'foo';
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = $this->_getEmptyCollectionName('createDeleteIndex');
+        $mongoDb->createIndex($collectionName, array('indexedField' => 1), array('name' => $indexName));
+
+        $indexInfoList = $mongoDb->getIndexInfo($collectionName);
+        $this->assertCount(2, $indexInfoList);
+        $this->assertArrayHasKey(1, $indexInfoList);
+        $this->assertArrayHasKey('indexedField', $indexInfoList[1]['key']);
+        $this->assertSame($indexInfoList[1]['key']['indexedField'], 1);
+
+        $mongoDb->deleteIndex($collectionName, $indexName);
+        $indexInfoList = $mongoDb->getIndexInfo($collectionName);
+        $this->assertCount(1, $indexInfoList);
+    }
+
     /**
      * Generate a name of a collection and ensure it's empty
+     *
      * @param string $testName
      * @return string
      */
@@ -106,6 +125,7 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $collectionName = $this->_collectionPrefix . $testName;
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $mongoDb->drop($collectionName);
+
         return $collectionName;
     }
 }
