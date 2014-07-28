@@ -79,6 +79,7 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
             'Bucket' => 'bucket',
             'Prefix' => 'bar/foo/',
         ))->will($this->returnValue(array(
+            array('Key' => 'bar/foo/'),
             array('Key' => '/bar/foo/object1'),
             array('Key' => '/bar/foo/object2'),
         )));
@@ -99,6 +100,7 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
             'Prefix'    => 'bar/foo/',
             'Delimiter' => '/'
         ))->will($this->returnValue(array(
+            array('Key' => 'bar/foo/'),
             array('Key' => '/bar/foo/object1'),
             array('Key' => '/bar/foo/object2'),
         )));

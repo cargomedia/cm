@@ -81,9 +81,10 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
     }
 
     public function listByPrefix($pathPrefix, $noRecursion = null) {
+        $pathPrefix = rtrim($this->_getAbsolutePath($pathPrefix), '/') . '/';  // force trailing slash for input-output consistency
         $commandOptions = array(
             'Bucket' => $this->_bucket,
-            'Prefix' => rtrim($this->_getAbsolutePath($pathPrefix), '/') . '/', // force trailing slash or noRecursion won't work
+            'Prefix' => $pathPrefix,
         );
         $iteratorOptions = array(
             'return_prefixes' => true,
@@ -95,7 +96,9 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         $keys = array();
         foreach ($this->_client->getIterator('ListObjects', $commandOptions, $iteratorOptions) as $file) {
             $key = array_key_exists('Key', $file) ? $file['Key'] : $file['Prefix'];
-            $keys[] = $this->_getRelativePath($key);
+            if ($key !== $pathPrefix) {
+                $keys[] = $this->_getRelativePath($key);
+            }
         }
 
         return array('files' => $keys, 'dirs' => array());
