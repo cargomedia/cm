@@ -112,6 +112,20 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         return $this->_getCollection($collection)->remove($criteria, $options);
     }
 
+    public function createIndex($collection, array $keys, array $options = null) {
+        $options = (array) $options;
+        return $this->_getCollection($collection)->createIndex($keys, $options);
+    }
+
+    public function deleteIndex($collection, $indexName) {
+        return $this->_getDatabase()->command(array("deleteIndexes" => $collection, "index" => $indexName));
+    }
+
+    public function getIndexInfo($collection)
+    {
+        return $this->_getCollection($collection)->getIndexInfo();
+    }
+
     /**
      * @return string
      */
