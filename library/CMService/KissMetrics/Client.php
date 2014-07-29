@@ -129,7 +129,7 @@ EOF;
             CM_Splittest_Fixture::TYPE_REQUEST_CLIENT => 'clientId',
             CM_Splittest_Fixture::TYPE_USER           => 'userId',
         );
-        $typeFixture = $typeFixtureList[$fixture->getType()];
+        $typeFixture = $typeFixtureList[$fixture->getFixtureType()];
         $trackEventJob = new CMService_KissMetrics_TrackEventJob();
         $trackEventJob->queue(array(
             'code'         => $this->_getCode(),

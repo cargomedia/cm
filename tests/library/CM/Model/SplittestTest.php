@@ -95,6 +95,54 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $this->assertFalse($test->isVariationFixture($fixture, 'noVariation'));
     }
 
+    public function testTracking_RequestClient() {
+        $request = $this->getMockForAbstractClass('CM_Request_Abstract', array(''), '', true, true, true, array('getClientId'));
+        $request->expects($this->any())->method('getClientId')->will($this->returnValue(1));
+        /** @var CM_Request_Abstract $request */
+        $fixture = new CM_Splittest_Fixture($request);
+
+        /** @var CM_Model_Splittest_Mock $test */
+        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo1', 'variations' => array('v1')));
+        /** @var CM_Model_SplittestVariation $variation */
+        $variation = $test->getVariations()->getItem(0);
+        $variation->getName(); // Fill data
+
+        $kissMetrics = $this->getMock('CMService_KissMetrics_Client', array('trackSplittest'), array('km123'));
+        $kissMetrics->expects($this->once())->method('trackSplittest')->with($this->equalTo($variation), $fixture);
+
+        $serviceManager = new CM_Service_Manager();
+        $serviceManager->registerInstance('tracking-kissmetrics-test', $kissMetrics);
+        $serviceManager->unregister('trackings');
+        $serviceManager->register('trackings', 'CM_Service_Trackings', array(array('tracking-kissmetrics-test')));
+
+        $test->setServiceManager($serviceManager);
+
+        $test->getVariationFixture($fixture);
+    }
+
+    public function testTracking_User() {
+        $user = CMTest_TH::createUser();
+        $fixture = new CM_Splittest_Fixture($user);
+
+        /** @var CM_Model_Splittest_Mock $test */
+        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo1', 'variations' => array('v1')));
+        /** @var CM_Model_SplittestVariation $variation */
+        $variation = $test->getVariations()->getItem(0);
+        $variation->getName(); // Fill data
+
+        $kissMetrics = $this->getMock('CMService_KissMetrics_Client', array('trackSplittest'), array('km123'));
+        $kissMetrics->expects($this->once())->method('trackSplittest')->with($this->equalTo($variation), $fixture);
+
+        $serviceManager = new CM_Service_Manager();
+        $serviceManager->registerInstance('tracking-kissmetrics-test', $kissMetrics);
+        $serviceManager->unregister('trackings');
+        $serviceManager->register('trackings', 'CM_Service_Trackings', array(array('tracking-kissmetrics-test')));
+
+        $test->setServiceManager($serviceManager);
+
+        $test->getVariationFixture($fixture);
+    }
+
     public function testWeightedSplittest() {
         $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
         $test->setVariationWeightList(array('v1' => .3, 'v2' => .7));
