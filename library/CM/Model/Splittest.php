@@ -221,6 +221,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
                 array('splittestId' => $this->getId(), $columnId => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
             $variationFixtureList[$this->getId()] = $variation->getName();
             $cacheWrite = true;
+            CM_Service_Manager::getInstance()->getTrackings()->trackSplittest($variation, $fixture);
         }
 
         if ($cacheWrite) {
