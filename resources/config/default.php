@@ -172,4 +172,9 @@ return function (CM_Config_Node $config) {
         'class'     => 'CMService_KissMetrics_Client',
         'arguments' => array('my-api-key')
     );
+
+    $config->services['email-verification'] = array(
+        'class'     => 'CM_Service_EmailVerification_Standard',
+        'arguments' => array()
+    );
 };
