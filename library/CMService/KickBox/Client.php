@@ -29,7 +29,10 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
         if (false === filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return false;
         }
-        $key = CM_CacheConst::KickBox_isValid . '_email:' . $email;
+        $key = CM_CacheConst::KickBox_isValid . '_email:' . $email .
+            '_invalid:' . $this->_disallowInvalid .
+            '_disposable:' . $this->_disallowDisposable .
+            '_threshold:' . $this->_disallowUnknownThreshold;
         $cache = CM_Cache_Shared::getInstance();
         if (false === ($isValid = $cache->get($key))) {
             $response = $this->_getResponse($email);
