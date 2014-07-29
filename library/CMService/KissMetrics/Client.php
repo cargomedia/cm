@@ -97,12 +97,19 @@ EOF;
      * @param array  $propertyList
      */
     public function trackEvent($eventName, array $propertyList) {
-        if (null === $this->_getUserId()) {
+        $clientId = $this->_getClientId();
+        $userId = $this->_getUserId();
+        if (null === $clientId && null === $userId) {
             return;
         }
         $eventName = (string) $eventName;
         $kissMetrics = new \KISSmetrics\Client($this->_getCode(), new CMService_KissMetrics_Transport_GuzzleHttp());
-        $kissMetrics->identify($this->_getUserId())->record($eventName, $propertyList);
+        if (null !== $userId) {
+            $kissMetrics->identify($userId);
+        } else {
+            $kissMetrics->identify('c' . $clientId);
+        }
+        $kissMetrics->record($eventName, $propertyList);
         $kissMetrics->submit();
     }
 
@@ -113,6 +120,23 @@ EOF;
         if ($viewer = $environment->getViewer()) {
             $this->setUserId($viewer->getId());
         }
+    }
+
+    public function trackSplittest(CM_Model_SplittestVariation $variation, CM_Splittest_Fixture $fixture) {
+        $nameSplittest = $variation->getSplittest()->getName();
+        $nameVariation = $variation->getName();
+        $typeFixtureList = array(
+            CM_Splittest_Fixture::TYPE_REQUEST_CLIENT => 'clientId',
+            CM_Splittest_Fixture::TYPE_USER           => 'userId',
+        );
+        $typeFixture = $typeFixtureList[$fixture->getType()];
+        $trackEventJob = new CMService_KissMetrics_TrackEventJob();
+        $trackEventJob->queue(array(
+            'code'         => $this->_getCode(),
+            $typeFixture   => $fixture->getId(),
+            'eventName'    => 'Split Test',
+            'propertyList' => array('Split Test ' . $nameSplittest => $nameVariation),
+        ));
     }
 
     /**

@@ -112,6 +112,9 @@ EOF;
         $this->addPageView($path);
     }
 
+    public function trackSplittest(CM_Model_SplittestVariation $variation, CM_Splittest_Fixture $fixture) {
+    }
+
     /**
      * @return string
      */
