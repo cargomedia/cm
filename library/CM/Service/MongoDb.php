@@ -37,7 +37,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
 
     /**
      * @param string $collection
-     * @param array $a
+     * @param array[] $a
      * @return mixed
      *
      * @throws MongoException
