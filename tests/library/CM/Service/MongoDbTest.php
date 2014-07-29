@@ -14,6 +14,20 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $this->assertSame($res['name'], $name);
     }
 
+    public function testBatchInsert() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = $this->_getEmptyCollectionName('batchInsert');
+        $mongoDb->batchInsert($collectionName, array(
+                array('userId' => 1 , 'name' => 'Bob'),
+                array('userId' => 2, 'name' => 'Alice'),
+            )
+        );
+        $res = $mongoDb->findOne($collectionName, array('userId' => 1));
+        $this->assertSame($res['name'], 'Bob');
+        $res = $mongoDb->findOne($collectionName, array('userId' => 2));
+        $this->assertSame($res['name'], 'Alice');
+    }
+
     public function testUpdate() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = $this->_getEmptyCollectionName('update');
