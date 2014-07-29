@@ -195,6 +195,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
             if (isset($terminationCallback)) {
                 $terminationCallback();
             }
+            return array();
         };
         $processMock->expects($this->any())->method('waitForChildren')->with($keepAliveExpected, $this->anything())->will($this->returnCallback($waitForChildrenMock));
         return $processMock;
