@@ -36,7 +36,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
-     * @param string $collection
+     * @param string  $collection
      * @param array[] $objectList
      * @return mixed
      *
@@ -155,7 +155,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @return MongoCollection
      */
     protected function _getCollection($collection) {
-        $collection = (string)$collection;
+        $collection = (string) $collection;
         return $this->_getDatabase()->selectCollection($collection);
     }
 }
