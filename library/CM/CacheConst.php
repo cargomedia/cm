@@ -2,9 +2,6 @@
 
 class CM_CacheConst {
 
-    // _email:X_invalid:X_disposable:X_threshold:X
-    const KickBox_isValid = 'KickBox_isValid';
-
     // _tag:X
     const Tag_Version = 'Tag_Version';
 
