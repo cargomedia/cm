@@ -110,6 +110,17 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
     }
 
     /**
+     * @param boolean|null $noRecursion
+     * @return CM_File[]
+     */
+    public function listFiles($noRecursion = null) {
+        $result = $this->_filesystem->listByPrefix($this->getPath(), $noRecursion);
+        return \Functional\map(array_merge($result['dirs'], $result['files']), function ($path) {
+            return new CM_File($path, $this->_filesystem);
+        });
+    }
+
+    /**
      * @return string
      */
     public function read() {
