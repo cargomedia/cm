@@ -6,7 +6,7 @@ class CMService_KissMetrics_Client implements CM_Service_Tracking_ClientInterfac
     protected $_code;
 
     /** @var int|null */
-    protected $_userId;
+    protected $_clientId, $_userId;
 
     /**
      * @param string $code
@@ -42,10 +42,28 @@ EOF;
      */
     public function getJs() {
         $js = '';
-        if (null !== $this->_getUserId()) {
-            $js .= "_kmq.push(['identify', " . $this->_getUserId() . "]);";
+        $clientId = $this->_getClientId();
+        if (null !== $clientId) {
+            $js .= "_kmq.push(['identify', 'c" . $clientId . "']);";
+        }
+        $userId = $this->_getUserId();
+        if (null !== $userId) {
+            $js .= "_kmq.push(['identify', " . $userId . "]);";
+        }
+        if (null !== $clientId && null !== $userId) {
+            $js .= "_kmq.push(['alias', 'c" . $clientId . "', " . $userId . "]);";
         }
         return $js;
+    }
+
+    /**
+     * @param int|null $clientId
+     */
+    public function setClientId($clientId) {
+        if (null !== $clientId) {
+            $clientId = (int) $clientId;
+        }
+        $this->_clientId = $clientId;
     }
 
     /**
@@ -89,9 +107,19 @@ EOF;
     }
 
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
+        if (CM_Request_Abstract::hasInstance()) {
+            $this->setClientId(CM_Request_Abstract::getInstance()->getClientId());
+        }
         if ($viewer = $environment->getViewer()) {
             $this->setUserId($viewer->getId());
         }
+    }
+
+    /**
+     * @return int|null
+     */
+    protected function _getClientId() {
+        return $this->_clientId;
     }
 
     /**
