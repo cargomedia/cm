@@ -6,13 +6,6 @@ class CM_Response_Page_Embed extends CM_Response_Page {
     private $_title;
 
     /**
-     * @param CM_Request_Abstract $request
-     */
-    public function __construct(CM_Request_Abstract $request) {
-        parent::__construct($request);
-    }
-
-    /**
      * @throws CM_Exception_Invalid
      * @return string
      */

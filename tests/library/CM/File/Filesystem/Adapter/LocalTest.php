@@ -228,6 +228,7 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
         $pathList = array(
             'foo/bar2',
             'foo/foobar/bar',
+            'foo/foobar/foo/bar',
             'foo/bar',
         );
         foreach ($pathList as $path) {
@@ -238,11 +239,13 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
 
         $this->assertSame(array(
             'files' => array(
+                'foo/foobar/foo/bar',
                 'foo/foobar/bar',
                 'foo/bar',
                 'foo/bar2',
             ),
             'dirs'  => array(
+                'foo/foobar/foo',
                 'foo/foobar',
                 'foo',
             ),
@@ -250,14 +253,34 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
 
         $this->assertSame(array(
             'files' => array(
+                'foo/foobar/foo/bar',
                 'foo/foobar/bar',
+                'foo/bar',
+                'foo/bar2',
+            ),
+            'dirs'  => array(
+                'foo/foobar/foo',
+                'foo/foobar',
+            ),
+        ), $this->_adapter->listByPrefix('/foo'));
+
+        $this->assertSame(array(
+            'files' => array(
+            ),
+            'dirs'  => array(
+                'foo',
+            ),
+        ), $this->_adapter->listByPrefix('', true));
+
+        $this->assertSame(array(
+            'files' => array(
                 'foo/bar',
                 'foo/bar2',
             ),
             'dirs'  => array(
                 'foo/foobar',
             ),
-        ), $this->_adapter->listByPrefix('/foo'));
+        ), $this->_adapter->listByPrefix('/foo', true));
     }
 
     public function testListByPrefixDoNotFollowSymlinks() {
