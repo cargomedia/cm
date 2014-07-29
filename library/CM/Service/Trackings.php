@@ -40,9 +40,9 @@ class CM_Service_Trackings extends CM_Service_ManagerAware implements CM_Service
         }
     }
 
-    public function trackSplittest(CM_Model_SplittestVariation $variation, CM_Splittest_Fixture $fixture) {
+    public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
         foreach ($this->_getTrackingServiceList() as $trackingService) {
-            $trackingService->trackSplittest($variation, $fixture);
+            $trackingService->trackSplittest($fixture, $variation);
         }
     }
 

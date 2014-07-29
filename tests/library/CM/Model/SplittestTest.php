@@ -108,7 +108,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $variation->getName(); // Fill data
 
         $kissMetrics = $this->getMock('CMService_KissMetrics_Client', array('trackSplittest'), array('km123'));
-        $kissMetrics->expects($this->once())->method('trackSplittest')->with($this->equalTo($variation), $fixture);
+        $kissMetrics->expects($this->once())->method('trackSplittest')->with($fixture, $this->equalTo($variation));
 
         $serviceManager = new CM_Service_Manager();
         $serviceManager->registerInstance('tracking-kissmetrics-test', $kissMetrics);
@@ -131,7 +131,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $variation->getName(); // Fill data
 
         $kissMetrics = $this->getMock('CMService_KissMetrics_Client', array('trackSplittest'), array('km123'));
-        $kissMetrics->expects($this->once())->method('trackSplittest')->with($this->equalTo($variation), $fixture);
+        $kissMetrics->expects($this->once())->method('trackSplittest')->with($fixture, $this->equalTo($variation));
 
         $serviceManager = new CM_Service_Manager();
         $serviceManager->registerInstance('tracking-kissmetrics-test', $kissMetrics);
