@@ -155,6 +155,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @return MongoCollection
      */
     protected function _getCollection($collection) {
+        $collection = (string)$collection;
         return $this->_getDatabase()->selectCollection($collection);
     }
 }
