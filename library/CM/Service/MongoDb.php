@@ -36,6 +36,16 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
+     * @param string $collection
+     * @param array $a
+     * @return mixed
+     */
+    public function batchInsert($collection, array $a) {
+        CM_Debug::getInstance()->incStats('mongo', "batch insert to {$collection}");
+        return $this->_getCollection($collection)->batchInsert($a);
+    }
+
+    /**
      * @param string     $collection
      * @param array|null $criteria
      * @param array|null $projection
