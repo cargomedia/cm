@@ -70,7 +70,7 @@ EOF;
      */
     public function setRequestClientId($requestClientId) {
         $requestClientId = (int) $requestClientId;
-        $this->_addIdentity('c' . $requestClientId);
+        $this->_addIdentity('Guest ' . $requestClientId);
     }
 
     /**
@@ -159,7 +159,7 @@ EOF;
         $trackEventJob->queue(array(
             'code'         => $this->_getCode(),
             'identityList' => $this->_getIdentityList(),
-            'propertyList' => array('Split Test ' . $nameSplittest => $nameVariation),
+            'propertyList' => array('Splittest ' . $nameSplittest => $nameVariation),
         ));
     }
 
