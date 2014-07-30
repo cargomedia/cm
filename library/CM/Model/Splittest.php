@@ -1,15 +1,22 @@
 <?php
 
-class CM_Model_Splittest extends CM_Model_Abstract {
+class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var array|null */
     private $_variationWeightList;
 
     /**
-     * @param string $name
+     * @param string             $name
+     * @param CM_Service_Manager $serviceManager
      */
-    public function __construct($name) {
+    public function __construct($name, CM_Service_Manager $serviceManager = null) {
         $this->_construct(array('name' => $name));
+        if (null === $serviceManager) {
+            $serviceManager = CM_Service_Manager::getInstance();
+        }
+        $this->setServiceManager($serviceManager);
     }
 
     /**
@@ -221,6 +228,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
                 array('splittestId' => $this->getId(), $columnId => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
             $variationFixtureList[$this->getId()] = $variation->getName();
             $cacheWrite = true;
+            $this->getServiceManager()->getTrackings()->trackSplittest($fixture, $variation);
         }
 
         if ($cacheWrite) {
