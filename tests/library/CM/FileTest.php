@@ -135,53 +135,38 @@ class CM_FileTest extends CMTest_TestCase {
     public function testListFiles() {
         $adapter = $this->mockObject('CM_File_Filesystem_Adapter');
         $fs = new CM_File_Filesystem($adapter);
-        $file = new CM_File('foo/', $fs);
-        $adapter->mockMethod('equals')->set(function (CM_File_FileSystem_Adapter $other) use ($adapter) {
+        $file = new CM_File('foo', $fs);
+        $adapter->mockMethod('equals')->set(function(CM_File_FileSystem_Adapter $other) use($adapter) {
             return $adapter === $other;
         });
         $adapter->mockMethod('listByPrefix')->set(function ($path, $noRecursion) use ($file) {
-            $this->assertSame('foo/', $path);
+            $this->assertSame($file->getPath(), $path);
             $this->assertNull($noRecursion);
             return [
-                'dirs'  =>
+                'dirs'   =>
                     [
-                        $path . 'foo/',
-                        $path . 'bar/',
+                        $path . '/foo/',
+                        $path . '/bar/',
                     ],
                 'files' =>
                     [
-                        $path . 'foo/bar',
-                        $path . 'bar/foo',
-                        $path . 'foo.bar',
-                        $path . 'bar.foo',
+                        $path . '/foo/bar',
+                        $path . '/bar/foo',
+                        $path . '/foo.bar',
+                        $path . '/bar.foo',
                     ]
             ];
         });
+        $filePath = $file->getPath();
         $expected = [
-            new CM_File('foo/foo/', $fs),
-            new CM_File('foo/bar/', $fs),
-            new CM_File('foo/foo/bar', $fs),
-            new CM_File('foo/bar/foo', $fs),
-            new CM_File('foo/foo.bar', $fs),
-            new CM_File('foo/bar.foo', $fs),
+            new CM_File($filePath . '/foo/', $fs),
+            new CM_File($filePath . '/bar/', $fs),
+            new CM_File($filePath . '/foo/bar', $fs),
+            new CM_File($filePath . '/bar/foo', $fs),
+            new CM_File($filePath . '/foo.bar', $fs),
+            new CM_File($filePath . '/bar.foo', $fs),
         ];
         $this->assertEquals($expected, $file->listFiles());
-    }
-
-    public function testListFilesNoRecursion() {
-        $adapter = $this->getMockBuilder('CM_File_Filesystem_Adapter')->setMethods(array('listByPrefix'))->getMockForAbstractClass();
-        $fs = new CM_File_Filesystem($adapter);
-        $file = new CM_File('foo/', $fs);
-        $adapter->expects($this->any())->method('listByPrefix')->with('foo/', true)->will($this->returnValue(array('dirs'  => array(),'files' => array())));
-        $this->assertSame([], $file->listFiles(null, true));
-    }
-
-    public function testListFilesWithPrefix() {
-        $adapter = $this->getMockBuilder('CM_File_Filesystem_Adapter')->setMethods(array('listByPrefix'))->getMockForAbstractClass();
-        $fs = new CM_File_Filesystem($adapter);
-        $file = new CM_File('foo/', $fs);
-        $adapter->expects($this->any())->method('listByPrefix')->with('foo/bar')->will($this->returnValue(array('dirs'  => array(),'files' => array())));
-        $this->assertSame([], $file->listFiles('bar'));
     }
 
     public function testRead() {
