@@ -5,8 +5,8 @@ class CMService_KissMetrics_Client implements CM_Service_Tracking_ClientInterfac
     /** @var string */
     protected $_code;
 
-    /** @var int|null */
-    protected $_requestClientId, $_userId;
+    /** @var string[] */
+    protected $_identityList = array();
 
     /**
      * @param string $code
@@ -43,10 +43,10 @@ EOF;
     public function getJs() {
         $js = '';
         $identityList = $this->_getIdentityList();
-        if (!empty($identityList)) {
-            foreach ($identityList as $identity) {
-                $js .= "_kmq.push(['identify', '{$identity}']);";
-            }
+        foreach ($identityList as $identity) {
+            $js .= "_kmq.push(['identify', '{$identity}']);";
+        }
+        if (count($identityList) > 1) {
             $identity = array_shift($identityList);
             foreach ($identityList as $identityOld) {
                 $js .= "_kmq.push(['alias', '{$identityOld}', '{$identity}']);";
@@ -56,36 +56,42 @@ EOF;
     }
 
     /**
-     * @param int|null $requestClientId
+     * @param string[] $identityList
      */
-    public function setRequestClientId($requestClientId) {
-        if (null !== $requestClientId) {
-            $requestClientId = (int) $requestClientId;
-        }
-        $this->_requestClientId = $requestClientId;
+    public function setIdentityList(array $identityList) {
+        array_walk($identityList, function (&$identity) {
+            $identity = (string) $identity;
+        });
+        $this->_identityList = $identityList;
     }
 
     /**
-     * @param int|null $userId
+     * @param int $requestClientId
+     */
+    public function setRequestClientId($requestClientId) {
+        $requestClientId = (int) $requestClientId;
+        $this->_addIdentity('c' . $requestClientId);
+    }
+
+    /**
+     * @param int $userId
      */
     public function setUserId($userId) {
-        if (null !== $userId) {
-            $userId = (int) $userId;
-        }
-        $this->_userId = $userId;
+        $userId = (int) $userId;
+        $this->_addIdentity($userId);
     }
 
     /**
      * @param CM_Action_Abstract $action
      */
     public function trackAction(CM_Action_Abstract $action) {
-        if (null === $this->_getUserId() && $actor = $action->getActor()) {
+        if (0 === count($this->_getIdentityList()) && $actor = $action->getActor()) {
             $this->setUserId($actor->getId());
         }
         $trackEventJob = new CMService_KissMetrics_TrackEventJob();
         $trackEventJob->queue(array(
             'code'         => $this->_getCode(),
-            'userId'       => $this->_getUserId(),
+            'identityList' => $this->_getIdentityList(),
             'eventName'    => $action->getLabel(),
             'propertyList' => $action->getTrackingPropertyList(),
         ));
@@ -141,17 +147,28 @@ EOF;
     public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
         $nameSplittest = $variation->getSplittest()->getName();
         $nameVariation = $variation->getName();
-        $typeFixtureList = array(
-            CM_Splittest_Fixture::TYPE_REQUEST_CLIENT => 'requestClientId',
-            CM_Splittest_Fixture::TYPE_USER           => 'userId',
-        );
-        $typeFixture = $typeFixtureList[$fixture->getFixtureType()];
+        switch ($fixture->getFixtureType()) {
+            case CM_Splittest_Fixture::TYPE_REQUEST_CLIENT:
+                $this->setRequestClientId($fixture->getId());
+                break;
+            case CM_Splittest_Fixture::TYPE_USER:
+                $this->setUserId($fixture->getId());
+                break;
+        }
         $trackEventJob = new CMService_KissMetrics_TrackPropertyListJob();
         $trackEventJob->queue(array(
             'code'         => $this->_getCode(),
-            $typeFixture   => $fixture->getId(),
+            'identityList' => $this->_getIdentityList(),
             'propertyList' => array('Split Test ' . $nameSplittest => $nameVariation),
         ));
+    }
+
+    /**
+     * @param string $identity
+     */
+    protected function _addIdentity($identity) {
+        $identity = (string) $identity;
+        $this->_identityList[] = $identity;
     }
 
     /**
@@ -165,29 +182,6 @@ EOF;
      * @return string[]
      */
     protected function _getIdentityList() {
-        $identityList = array();
-        $userId = $this->_getUserId();
-        if (null !== $userId) {
-            $identityList[] = (string) $userId;
-        }
-        $requestClientId = $this->_getRequestClientId();
-        if (null !== $requestClientId) {
-            $identityList[] = 'c' . $requestClientId;
-        }
-        return $identityList;
-    }
-
-    /**
-     * @return int|null
-     */
-    protected function _getRequestClientId() {
-        return $this->_requestClientId;
-    }
-
-    /**
-     * @return int|null
-     */
-    protected function _getUserId() {
-        return $this->_userId;
+        return $this->_identityList;
     }
 }
