@@ -31,6 +31,7 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
         $this->assertContains('var _kmq = _kmq || [];', $html);
         $this->assertContains("var _kmk = _kmk || 'km123';", $html);
         $this->assertNotContains("_kmq.push(['identify'", $html);
+        $this->assertNotContains("_kmq.push(['alias'", $html);
     }
 
     public function testTrackingViewer() {
@@ -53,6 +54,7 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
         $this->assertContains('var _kmq = _kmq || [];', $html);
         $this->assertContains("var _kmk = _kmk || 'km123';", $html);
         $this->assertNotContains("_kmq.push(['identify'", $html);
+        $this->assertNotContains("_kmq.push(['alias'", $html);
     }
 
     /**

@@ -181,7 +181,7 @@ CREATE TABLE `cm_log` (
   `type` int(10) unsigned NOT NULL,
   `msg` varchar(5000) NOT NULL,
   `timeStamp` int(10) unsigned NOT NULL,
-  `metaInfo` varchar(5000) DEFAULT NULL,
+  `metaInfo` text,
   PRIMARY KEY (`id`),
   KEY `type` (`type`,`timeStamp`),
   KEY `msg` (`msg`(333))

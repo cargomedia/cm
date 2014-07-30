@@ -299,7 +299,7 @@ class CMTest_TH {
     public static function callProtectedMethod($objectOrClassName, $methodName, array $args = null) {
         $args = (array) $args;
         $context = null;
-        if (is_object($context)) {
+        if (is_object($objectOrClassName)) {
             $context = $objectOrClassName;
         }
         $reflectionMethod = new ReflectionMethod($objectOrClassName, $methodName);
