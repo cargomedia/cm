@@ -43,4 +43,11 @@ class CM_Response_AbstractTest extends CMTest_TestCase {
         $headers = $response->getHeaders();
         $this->assertSame('Set-Cookie: foo=; Expires=Wed, 31-Dec-1969 06:00:01 US/Central; Path=/', $headers[0]);
     }
+
+    public function testRequestCloning() {
+        $request = new CM_Request_Get('/type/null');
+        $response = $this->mockObject('CM_Response_Abstract', [$request]);
+        /** @var CM_Response_Abstract $response */
+        $this->assertNotEquals($request, $response->getRequest());
+    }
 }
