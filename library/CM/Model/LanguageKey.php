@@ -45,6 +45,10 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      * @return int
      */
     protected function _getUpdateCount() {
+        $deployVersion = CM_App::getInstance()->getDeployVersion();
+        if ($deployVersion > $this->_get('updateCountResetVersion')) {
+            return 0;
+        }
         return $this->_get('updateCount');
     }
 
@@ -66,7 +70,13 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     }
 
     protected function _increaseUpdateCount() {
-        $this->_set('updateCount', $this->_getUpdateCount() + 1);
+        $data = [
+            'updateCount' => $this->_getUpdateCount() + 1
+        ];
+        if (CM_App::getInstance()->getDeployVersion() > $this->_get('updateCountResetVersion')) {
+            $data['updateCountResetVersion'] = CM_App::getInstance()->getDeployVersion();
+        }
+        $this->_set($data);
     }
 
     protected function _onDeleteBefore() {
