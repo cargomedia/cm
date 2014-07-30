@@ -3,13 +3,13 @@
 class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 
     public function setup() {
-        $this->_getOutput()->writeln('Setting up filesystem…');
+        $this->_getStreamError()->writeln('Setting up filesystem…');
         $this->setupFilesystem();
-        $this->_getOutput()->writeln('Setting up database…');
+        $this->_getStreamError()->writeln('Setting up database…');
         $this->setupDatabase();
-        $this->_getOutput()->writeln('Setting up elasticsearch indexes…');
+        $this->_getStreamError()->writeln('Setting up elasticsearch indexes…');
         $this->setupElasticsearch();
-        $this->_getOutput()->writeln('Setting up translations…');
+        $this->_getStreamError()->writeln('Setting up translations…');
         $this->setupTranslations();
     }
 
@@ -25,7 +25,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
      * @param bool|null $reload
      */
     public function setupElasticsearch($reload = null) {
-        $searchCli = new CM_Elasticsearch_Index_Cli($this->_getInput(), $this->_getOutput());
+        $searchCli = new CM_Elasticsearch_Index_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
         $searchCli->create(null, !$reload);
     }
 
@@ -34,7 +34,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public function fillCaches() {
-        $this->_getOutput()->writeln('Warming up caches…');
+        $this->_getStreamError()->writeln('Warming up caches…');
         CM_App::getInstance()->fillCaches();
     }
 
@@ -42,7 +42,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         $this->setup();
         $this->setDeployVersion();
 
-        $dbCli = new CM_Db_Cli($this->_getInput(), $this->_getOutput());
+        $dbCli = new CM_Db_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
         $dbCli->runUpdates();
     }
 
@@ -56,10 +56,10 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         $classTypesConfig = $generator->generateConfigClassTypes();
         $actionVerbsConfig = $generator->generateConfigActionVerbs();
         foreach ($generator->getClassTypesRemoved() as $classRemoved) {
-            $this->_getOutput()->writeln('Removed `' . $classRemoved . '`');
+            $this->_getStreamOutput()->writeln('Removed `' . $classRemoved . '`');
         }
         foreach ($generator->getClassTypesAdded() as $type => $classAdded) {
-            $this->_getOutput()->writeln('Added `' . $classAdded . '` with type `' . $type . '`');
+            $this->_getStreamOutput()->writeln('Added `' . $classAdded . '` with type `' . $type . '`');
         }
 
         // Create model class types and action verbs config PHP
@@ -71,14 +71,14 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         $configPhp->appendLine($indent($classTypesConfig));
         $configPhp->appendLine($indent($actionVerbsConfig));
         $configPhp->appendLine('};');
-        $this->_getOutput()->writeln('Created `' . $configPhp->getPath() . '`');
+        $this->_getStreamOutput()->writeln('Created `' . $configPhp->getPath() . '`');
 
         // Create model class types and action verbs config JS
         $configJs = CM_File::create(DIR_ROOT . 'resources/config/js/internal.js');
         $classTypes = $generator->getNamespaceTypes();
         $configJs->appendLine('cm.model.types = ' . CM_Params::encode(array_flip($classTypes['CM_Model_Abstract']), true) . ';');
         $configJs->appendLine('cm.action.types = ' . CM_Params::encode(array_flip($classTypes['CM_Action_Abstract']), true) . ';');
-        $this->_getOutput()->writeln('Created `' . $configJs->getPath() . '`');
+        $this->_getStreamOutput()->writeln('Created `' . $configJs->getPath() . '`');
     }
 
     /**

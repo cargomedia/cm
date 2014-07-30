@@ -50,11 +50,12 @@ abstract class CM_File_Filesystem_Adapter implements CM_Comparable {
     abstract public function delete($path);
 
     /**
-     * @param string $pathPrefix
+     * @param string       $pathPrefix
+     * @param boolean|null $noRecursion
      * @return array [files => string[], dirs => string[]]
      * @throws CM_Exception
      */
-    abstract public function listByPrefix($pathPrefix);
+    abstract public function listByPrefix($pathPrefix, $noRecursion = null);
 
     /**
      * @param string $sourcePath

@@ -19,7 +19,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
         if (0 === count($svgFileList)) {
             throw new CM_Exception_Invalid('Cannot process `0` icons');
         }
-        $this->_getOutput()->writeln('Processing ' . count($svgFileList) . ' unique icons...');
+        $this->_getStreamError()->writeln('Processing ' . count($svgFileList) . ' unique icons...');
 
         $dirWork = CM_File::createTmpDir();
         foreach ($svgFileList as $fontFile) {
@@ -40,7 +40,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
         }
 
         $dirWork->delete(true);
-        $this->_getOutput()->writeln('Created web-font and stylesheet.');
+        $this->_getStreamOutput()->writeln('Created web-font and stylesheet.');
     }
 
     public function emoticonRefresh() {
@@ -62,7 +62,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
         }
 
         CM_Db_Db::insertIgnore('cm_emoticon', array('code', 'file'), $insertList);
-        $this->_getOutput()->writeln('Updated ' . count($insertList) . ' emoticons.');
+        $this->_getStreamOutput()->writeln('Updated ' . count($insertList) . ' emoticons.');
 
         $this->_checkEmoticonValidity();
     }
@@ -72,7 +72,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
         $codes = array();
         foreach ($paging as $emoticon) {
             if (false !== array_search('', $emoticon['codes'])) {
-                $this->_getOutput()->writeln('WARNING: Empty emoticon with ID `' . $emoticon['id'] . '`.');
+                $this->_getStreamError()->writeln('WARNING: Empty emoticon with ID `' . $emoticon['id'] . '`.');
                 return;
             }
             $codes = array_merge($codes, $emoticon['codes']);
@@ -80,7 +80,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
         for ($i = 0; $i < count($codes); $i++) {
             for ($j = $i + 1; $j < count($codes); $j++) {
                 if (false !== strpos($codes[$i], $codes[$j]) || false !== strpos($codes[$j], $codes[$i])) {
-                    $this->_getOutput()->writeln('WARNING: Emoticon intersection: `' . $codes[$i] . '` <-> `' . $codes[$j] . '`.');
+                    $this->_getStreamError()->writeln('WARNING: Emoticon intersection: `' . $codes[$i] . '` <-> `' . $codes[$j] . '`.');
                 }
             }
         }

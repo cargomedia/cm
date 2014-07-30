@@ -80,14 +80,18 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         }
     }
 
-    public function listByPrefix($pathPrefix) {
-        $options = array(
+    public function listByPrefix($pathPrefix, $noRecursion = null) {
+        $pathPrefix = $this->_getAbsolutePath($pathPrefix) . '/';  // force trailing slash for input-output consistency
+        $commandOptions = array(
             'Bucket' => $this->_bucket,
-            'Prefix' => $this->_getAbsolutePath($pathPrefix),
+            'Prefix' => $pathPrefix,
         );
+        if ($noRecursion) {
+            $commandOptions['Delimiter'] = '/';
+        }
 
         $keys = array();
-        foreach ($this->_client->getIterator('ListObjects', $options) as $file) {
+        foreach ($this->_client->getIterator('ListObjects', $commandOptions) as $file) {
             $keys[] = $this->_getRelativePath($file['Key']);
         }
 

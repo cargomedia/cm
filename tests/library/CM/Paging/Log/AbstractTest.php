@@ -14,13 +14,14 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
 
         $add = CMTest_TH::getProtectedMethod('CM_Paging_Log_Abstract', '_add');
         $add->invoke($paging, 'foo');
-        $add->invoke($paging, 'bar', array('meta1' => 12));
+        $obj = CMTest_TH::createUser();
+        $add->invoke($paging, 'bar', array('meta1' => 12, 'meta2' => $obj));
 
         $items = $paging->getItems();
         $this->assertSame(2, count($items));
 
         $this->assertSame('bar', $items[0]['msg']);
-        $this->assertSame(array('meta1' => 12), $items[0]['metaInfo']);
+        $this->assertSame(array('meta1' => 12, 'meta2' => CM_Util::varDump($obj)), $items[0]['metaInfo']);
 
         $this->assertSame('foo', $items[1]['msg']);
         $this->assertSame(null, $items[1]['metaInfo']);
@@ -33,9 +34,7 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
         /** @var CM_Paging_Log_Abstract $paging */
         $paging->__construct();
 
-        $add = CMTest_TH::getProtectedMethod('CM_Paging_Log_Abstract', '_add');
-        $stringTooLongForDb = str_repeat('x', 99999);
-        $add->invoke($paging, 'foo', array('meta1' => $stringTooLongForDb));
+        CM_Db_Db::insert('cm_log', array('msg' => 'foo', 'metaInfo' => str_ireplace('{', '/', serialize(array('foo' => 'bar'))), 'timeStamp' => time(), 'type' => 14));
 
         $items = $paging->getItems();
         $this->assertSame(1, count($items));

@@ -58,11 +58,58 @@ class CM_Process {
     }
 
     /**
-     * @param int $signal
+     * @param float|null $timeoutKill
      */
-    public function killChildren($signal) {
-        foreach ($this->_forkHandlerList as $forkHandler) {
-            posix_kill($forkHandler->getPid(), $signal);
+    public function killChildren($timeoutKill = null) {
+        if (null === $timeoutKill) {
+            $timeoutKill = 30;
+        }
+        $timeoutKill = (float) $timeoutKill;
+        $signal = SIGTERM;
+        $timeStart = microtime(true);
+        $timeoutReached = false;
+        $timeOutput = $timeStart;
+
+        while (!empty($this->_forkHandlerList)) {
+            $timeNow = microtime(true);
+            $timePassed = $timeNow - $timeStart;
+
+            if ($timePassed > $timeoutKill) {
+                $signal = SIGKILL;
+                $timeoutReached = true;
+            }
+            if ($timeNow > $timeOutput + 2 || $timeoutReached) {
+                $message = join(' ', [
+                    count($this->_forkHandlerList) . ' children remaining',
+                    'after ' . round($timePassed, 1) . ' seconds,',
+                    'killing with signal `' . $signal . '`...',
+                ]);
+                echo $message . PHP_EOL;
+                if ($timeoutReached) {
+                    $logError = new CM_Paging_Log_Error();
+                    $logError->add($message, [
+                        'pid'  => $this->getProcessId(),
+                        'argv' => join(' ', $this->getArgv()),
+                    ]);
+                }
+                $timeOutput = $timeNow;
+            }
+
+            foreach ($this->_forkHandlerList as $forkHandler) {
+                posix_kill($forkHandler->getPid(), $signal);
+            }
+
+            usleep(1000000 * 0.05);
+
+            foreach ($this->_forkHandlerList as $forkHandler) {
+                $pid = pcntl_waitpid($forkHandler->getPid(), $status, WNOHANG);
+                if ($pid > 0 || !$this->isRunning($pid)) {
+                    $forkHandlerSequence = $this->_getForkHandlerSequenceByPid($forkHandler->getPid());
+                    $forkHandler = $this->_forkHandlerList[$forkHandlerSequence];
+                    $forkHandler->closeIpcStream();
+                    unset($this->_forkHandlerList[$forkHandlerSequence]);
+                }
+            }
         }
     }
 
@@ -101,6 +148,13 @@ class CM_Process {
     }
 
     /**
+     * @return string[]
+     */
+    public function getArgv() {
+        return $_SERVER['argv'];
+    }
+
+    /**
      * @return CM_Process
      */
     public static function getInstance() {
@@ -121,7 +175,6 @@ class CM_Process {
         if (false === $sockets) {
             throw new CM_Exception('Cannot open stream socket pair');
         }
-
         $pid = pcntl_fork();
         if ($pid === -1) {
             throw new CM_Exception('Could not spawn child process');
@@ -144,7 +197,7 @@ class CM_Process {
     private function _installSignalHandlers() {
         $process = $this;
         $handler = function ($signal) use ($process) {
-            $process->killChildren($signal);
+            $process->killChildren();
             $process->executeTerminationCallback();
             exit(0);
         };
