@@ -118,11 +118,11 @@ EOF;
     }
 
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
-        if (CM_Request_Abstract::hasInstance()) {
-            $this->setRequestClientId(CM_Request_Abstract::getInstance()->getClientId());
-        }
         if ($viewer = $environment->getViewer()) {
             $this->setUserId($viewer->getId());
+        }
+        if (CM_Request_Abstract::hasInstance()) {
+            $this->setRequestClientId(CM_Request_Abstract::getInstance()->getClientId());
         }
     }
 
