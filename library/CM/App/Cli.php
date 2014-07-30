@@ -21,9 +21,12 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         CM_App::getInstance()->setupDatabase();
     }
 
-    public function setupElasticsearch() {
+    /**
+     * @param bool|null $reload
+     */
+    public function setupElasticsearch($reload = null) {
         $searchCli = new CM_Elasticsearch_Index_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
-        $searchCli->create(null, true);
+        $searchCli->create(null, !$reload);
     }
 
     public function setupTranslations() {
