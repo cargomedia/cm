@@ -70,9 +70,13 @@ class CM_Exception extends Exception {
     }
 
     /**
+     * @param boolean|null $raw
      * @return string[]
      */
-    public function getMetaInfo() {
+    public function getMetaInfo($raw = null) {
+        if ($raw) {
+            return $this->_metaInfo;
+        }
         return Functional\map($this->_metaInfo, function ($value) {
             return CM_Util::varDump($value);
         });

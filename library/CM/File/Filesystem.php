@@ -53,6 +53,15 @@ class CM_File_Filesystem implements CM_Comparable {
     }
 
     /**
+     * @param string       $path
+     * @param boolean|null $noRecursion
+     * @return array [files => string[], dirs => string[]]
+     */
+    public function listByPrefix($path, $noRecursion = null) {
+        return $this->_adapter->listByPrefix($path, $noRecursion);
+    }
+
+    /**
      * @param string $sourcePath
      * @param string $targetPath
      */

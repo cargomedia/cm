@@ -132,6 +132,43 @@ class CM_FileTest extends CMTest_TestCase {
         $this->assertSame('image/jpeg', $file->getMimeType());
     }
 
+    public function testListFiles() {
+        $adapter = $this->mockObject('CM_File_Filesystem_Adapter');
+        $fs = new CM_File_Filesystem($adapter);
+        $file = new CM_File('foo', $fs);
+        $adapter->mockMethod('equals')->set(function(CM_File_FileSystem_Adapter $other) use($adapter) {
+            return $adapter === $other;
+        });
+        $adapter->mockMethod('listByPrefix')->set(function ($path, $noRecursion) use ($file) {
+            $this->assertSame($file->getPath(), $path);
+            $this->assertNull($noRecursion);
+            return [
+                'dirs'   =>
+                    [
+                        $path . '/foo/',
+                        $path . '/bar/',
+                    ],
+                'files' =>
+                    [
+                        $path . '/foo/bar',
+                        $path . '/bar/foo',
+                        $path . '/foo.bar',
+                        $path . '/bar.foo',
+                    ]
+            ];
+        });
+        $filePath = $file->getPath();
+        $expected = [
+            new CM_File($filePath . '/foo/', $fs),
+            new CM_File($filePath . '/bar/', $fs),
+            new CM_File($filePath . '/foo/bar', $fs),
+            new CM_File($filePath . '/bar/foo', $fs),
+            new CM_File($filePath . '/foo.bar', $fs),
+            new CM_File($filePath . '/bar.foo', $fs),
+        ];
+        $this->assertEquals($expected, $file->listFiles());
+    }
+
     public function testRead() {
         $file = CM_File::createTmp(null, 'hello');
         $this->assertSame('hello', $file->read());

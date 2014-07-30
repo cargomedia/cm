@@ -5,8 +5,8 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
     public function testLoadPage() {
         $viewer = CMTest_TH::createUser();
         $environment = new CM_Frontend_Environment(null, $viewer);
-        $scopeView = new CM_Frontend_ViewResponse(new CM_Page_View_Ajax_Test_Mock());
-        $response = $this->getResponseAjax('loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath()], $scopeView, null, $environment);
+        $component = new CM_Page_View_Ajax_Test_Mock();
+        $response = $this->getResponseAjax($component, 'loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath()], $environment);
 
         $this->assertViewResponseSuccess($response);
         $responseContent = CM_Params::decode($response->getContent(), true);
@@ -20,14 +20,15 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageRedirectExternal() {
-        $scopeView = new CM_Frontend_ViewResponse(new CM_Page_View_Ajax_Test_Mock());
-        $response = $this->getResponseAjax('loadPage', ['path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()], $scopeView);
+        $response = $this->getResponseAjax(new CM_Page_View_Ajax_Test_Mock(), 'loadPage', ['path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()]);
         $this->assertViewResponseSuccess($response, array('redirectExternal' => 'http://www.foo.bar'));
     }
 
     public function testReloadComponent() {
-        $scopeView = new CM_Frontend_ViewResponse(new CM_Component_Notfound([]));
-        $response = $this->getResponseAjax('reloadComponent', array('foo' => 'bar'), $scopeView, $scopeView);
+        $component = new CM_Component_Notfound([]);
+        $scopeView = new CM_Frontend_ViewResponse($component);
+        $request = $this->createRequestAjax($component, 'reloadComponent', ['foo' => 'bar'], $scopeView, $scopeView);
+        $response = $this->processRequest($request);
         $this->assertViewResponseSuccess($response);
 
         $frontend = $response->getRender()->getGlobalResponse();
@@ -45,8 +46,7 @@ EOL;
     }
 
     public function testLoadComponent() {
-        $scopeView = new CM_Frontend_ViewResponse(new CM_Component_Graph());
-        $response = $this->getResponseAjax('loadComponent', ['className' => 'CM_Component_Graph', 'series' => []], $scopeView);
+        $response = $this->getResponseAjax(new CM_Component_Graph(), 'loadComponent', ['className' => 'CM_Component_Graph', 'series' => []]);
         $this->assertViewResponseSuccess($response);
         $successContent = CM_Params::decode($response->getContent(), true)['success'];
 
