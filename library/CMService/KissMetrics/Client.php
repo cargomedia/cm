@@ -59,10 +59,10 @@ EOF;
      * @param string[] $identityList
      */
     public function setIdentityList(array $identityList) {
-        array_walk($identityList, function (&$identity) {
-            $identity = (string) $identity;
-        });
-        $this->_identityList = $identityList;
+        $this->_identityList = array();
+        foreach ($identityList as $identity) {
+            $this->_addIdentity($identity);
+        }
     }
 
     /**
