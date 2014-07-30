@@ -3,13 +3,13 @@
 class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 
     public function setup() {
-        $this->_getStreamError()->writeln('Setting up filesystem…');
+        $this->_getStreamOutput()->writeln('Setting up filesystem…');
         $this->setupFilesystem();
-        $this->_getStreamError()->writeln('Setting up database…');
+        $this->_getStreamOutput()->writeln('Setting up database…');
         $this->setupDatabase();
-        $this->_getStreamError()->writeln('Setting up elasticsearch indexes…');
+        $this->_getStreamOutput()->writeln('Setting up elasticsearch indexes…');
         $this->setupElasticsearch();
-        $this->_getStreamError()->writeln('Setting up translations…');
+        $this->_getStreamOutput()->writeln('Setting up translations…');
         $this->setupTranslations();
     }
 
@@ -31,7 +31,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public function fillCaches() {
-        $this->_getStreamError()->writeln('Warming up caches…');
+        $this->_getStreamOutput()->writeln('Warming up caches…');
         CM_App::getInstance()->fillCaches();
     }
 

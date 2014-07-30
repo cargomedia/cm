@@ -14,7 +14,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
         }
         foreach ($indexes as $index) {
             if (!$index->getIndex()->exists() || !$skipIfExist) {
-                $this->_getStreamError()->writeln('Creating elasticsearch index `' . $index->getIndex()->getName() . '`…');
+                $this->_getStreamOutput()->writeln('Creating elasticsearch index `' . $index->getIndex()->getName() . '`…');
                 $index->createVersioned();
                 $index->getIndex()->refresh();
             }
@@ -36,7 +36,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
             $indexes = $this->_getIndexes($host, $port);
         }
         foreach ($indexes as $index) {
-            $this->_getStreamError()->writeln('Updating elasticsearch index `' . $index->getIndex()->getName() . '`...');
+            $this->_getStreamOutput()->writeln('Updating elasticsearch index `' . $index->getIndex()->getName() . '`...');
             $indexName = $index->getIndex()->getName();
             $key = 'Search.Updates_' . $index->getType()->getName();
             try {
@@ -69,7 +69,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
         }
         foreach ($indexes as $index) {
             if ($index->getIndex()->exists()) {
-                $this->_getStreamError()->writeln('Deleting elasticsearch index `' . $index->getIndex()->getName() . '`…');
+                $this->_getStreamOutput()->writeln('Deleting elasticsearch index `' . $index->getIndex()->getName() . '`…');
                 $index->getIndex()->delete();
             }
         }
