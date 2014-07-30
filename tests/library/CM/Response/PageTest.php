@@ -94,8 +94,8 @@ class CM_Response_PageTest extends CMTest_TestCase {
         $this->assertContains("var _kmk = _kmk || 'km123';", $html);
         $clientId = CM_Request_Abstract::getInstance()->getClientId();
         $this->assertContains("_kmq.push(['identify', 'c{$clientId}']);", $html);
-        $this->assertContains("_kmq.push(['identify', 1]);", $html);
-        $this->assertContains("_kmq.push(['alias', 'c{$clientId}', 1]);", $html);
+        $this->assertContains("_kmq.push(['identify', '1']);", $html);
+        $this->assertContains("_kmq.push(['alias', 'c{$clientId}', '1']);", $html);
     }
 
     /**

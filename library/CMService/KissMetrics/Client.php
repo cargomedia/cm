@@ -42,16 +42,15 @@ EOF;
      */
     public function getJs() {
         $js = '';
-        $requestClientId = $this->_getRequestClientId();
-        if (null !== $requestClientId) {
-            $js .= "_kmq.push(['identify', 'c" . $requestClientId . "']);";
-        }
-        $userId = $this->_getUserId();
-        if (null !== $userId) {
-            $js .= "_kmq.push(['identify', " . $userId . "]);";
-        }
-        if (null !== $requestClientId && null !== $userId) {
-            $js .= "_kmq.push(['alias', 'c" . $requestClientId . "', " . $userId . "]);";
+        $identityList = $this->_getIdentityList();
+        if (!empty($identityList)) {
+            foreach ($identityList as $identity) {
+                $js .= "_kmq.push(['identify', '{$identity}']);";
+            }
+            $identity = array_shift($identityList);
+            foreach ($identityList as $identityOld) {
+                $js .= "_kmq.push(['alias', '{$identityOld}', '{$identity}']);";
+            }
         }
         return $js;
     }
@@ -105,8 +104,8 @@ EOF;
         $kissMetrics = new \KISSmetrics\Client($this->_getCode(), new CMService_KissMetrics_Transport_GuzzleHttp());
         $identity = array_shift($identityList);
         $kissMetrics->identify($identity);
-        foreach ($identityList as $identity) {
-            $kissMetrics->alias($identity);
+        foreach ($identityList as $identityOld) {
+            $kissMetrics->alias($identityOld);
         }
         $kissMetrics->record($eventName, $propertyList);
         $kissMetrics->submit();
@@ -132,8 +131,8 @@ EOF;
         $kissMetrics = new \KISSmetrics\Client($this->_getCode(), new CMService_KissMetrics_Transport_GuzzleHttp());
         $identity = array_shift($identityList);
         $kissMetrics->identify($identity);
-        foreach ($identityList as $identity) {
-            $kissMetrics->alias($identity);
+        foreach ($identityList as $identityOld) {
+            $kissMetrics->alias($identityOld);
         }
         $kissMetrics->set($propertyList);
         $kissMetrics->submit();
