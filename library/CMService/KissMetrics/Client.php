@@ -97,17 +97,16 @@ EOF;
      * @param array  $propertyList
      */
     public function trackEvent($eventName, array $propertyList) {
-        $requestClientId = $this->_getRequestClientId();
-        $userId = $this->_getUserId();
-        if (null === $requestClientId && null === $userId) {
+        $identityList = $this->_getIdentityList();
+        if (empty($identityList)) {
             return;
         }
         $eventName = (string) $eventName;
         $kissMetrics = new \KISSmetrics\Client($this->_getCode(), new CMService_KissMetrics_Transport_GuzzleHttp());
-        if (null !== $userId) {
-            $kissMetrics->identify($userId);
-        } else {
-            $kissMetrics->identify('c' . $requestClientId);
+        $identity = array_shift($identityList);
+        $kissMetrics->identify($identity);
+        foreach ($identityList as $identity) {
+            $kissMetrics->alias($identity);
         }
         $kissMetrics->record($eventName, $propertyList);
         $kissMetrics->submit();
@@ -126,16 +125,15 @@ EOF;
      * @param array $propertyList
      */
     public function trackPropertyList(array $propertyList) {
-        $requestClientId = $this->_getRequestClientId();
-        $userId = $this->_getUserId();
-        if (null === $requestClientId && null === $userId) {
+        $identityList = $this->_getIdentityList();
+        if (empty($identityList)) {
             return;
         }
         $kissMetrics = new \KISSmetrics\Client($this->_getCode(), new CMService_KissMetrics_Transport_GuzzleHttp());
-        if (null !== $userId) {
-            $kissMetrics->identify($userId);
-        } else {
-            $kissMetrics->identify('c' . $requestClientId);
+        $identity = array_shift($identityList);
+        $kissMetrics->identify($identity);
+        foreach ($identityList as $identity) {
+            $kissMetrics->alias($identity);
         }
         $kissMetrics->set($propertyList);
         $kissMetrics->submit();
@@ -162,6 +160,22 @@ EOF;
      */
     protected function _getCode() {
         return $this->_code;
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function _getIdentityList() {
+        $identityList = array();
+        $userId = $this->_getUserId();
+        if (null !== $userId) {
+            $identityList[] = (string) $userId;
+        }
+        $requestClientId = $this->_getRequestClientId();
+        if (null !== $requestClientId) {
+            $identityList[] = 'c' . $requestClientId;
+        }
+        return $identityList;
     }
 
     /**
