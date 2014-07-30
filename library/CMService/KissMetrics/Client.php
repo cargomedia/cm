@@ -6,7 +6,7 @@ class CMService_KissMetrics_Client implements CM_Service_Tracking_ClientInterfac
     protected $_code;
 
     /** @var int|null */
-    protected $_clientId, $_userId;
+    protected $_requestClientId, $_userId;
 
     /**
      * @param string $code
@@ -42,28 +42,28 @@ EOF;
      */
     public function getJs() {
         $js = '';
-        $clientId = $this->_getClientId();
-        if (null !== $clientId) {
-            $js .= "_kmq.push(['identify', 'c" . $clientId . "']);";
+        $requestClientId = $this->_getRequestClientId();
+        if (null !== $requestClientId) {
+            $js .= "_kmq.push(['identify', 'c" . $requestClientId . "']);";
         }
         $userId = $this->_getUserId();
         if (null !== $userId) {
             $js .= "_kmq.push(['identify', " . $userId . "]);";
         }
-        if (null !== $clientId && null !== $userId) {
-            $js .= "_kmq.push(['alias', 'c" . $clientId . "', " . $userId . "]);";
+        if (null !== $requestClientId && null !== $userId) {
+            $js .= "_kmq.push(['alias', 'c" . $requestClientId . "', " . $userId . "]);";
         }
         return $js;
     }
 
     /**
-     * @param int|null $clientId
+     * @param int|null $requestClientId
      */
-    public function setClientId($clientId) {
-        if (null !== $clientId) {
-            $clientId = (int) $clientId;
+    public function setRequestClientId($requestClientId) {
+        if (null !== $requestClientId) {
+            $requestClientId = (int) $requestClientId;
         }
-        $this->_clientId = $clientId;
+        $this->_requestClientId = $requestClientId;
     }
 
     /**
@@ -97,9 +97,9 @@ EOF;
      * @param array  $propertyList
      */
     public function trackEvent($eventName, array $propertyList) {
-        $clientId = $this->_getClientId();
+        $requestClientId = $this->_getRequestClientId();
         $userId = $this->_getUserId();
-        if (null === $clientId && null === $userId) {
+        if (null === $requestClientId && null === $userId) {
             return;
         }
         $eventName = (string) $eventName;
@@ -107,7 +107,7 @@ EOF;
         if (null !== $userId) {
             $kissMetrics->identify($userId);
         } else {
-            $kissMetrics->identify('c' . $clientId);
+            $kissMetrics->identify('c' . $requestClientId);
         }
         $kissMetrics->record($eventName, $propertyList);
         $kissMetrics->submit();
@@ -115,7 +115,7 @@ EOF;
 
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
         if (CM_Request_Abstract::hasInstance()) {
-            $this->setClientId(CM_Request_Abstract::getInstance()->getClientId());
+            $this->setRequestClientId(CM_Request_Abstract::getInstance()->getClientId());
         }
         if ($viewer = $environment->getViewer()) {
             $this->setUserId($viewer->getId());
@@ -126,7 +126,7 @@ EOF;
         $nameSplittest = $variation->getSplittest()->getName();
         $nameVariation = $variation->getName();
         $typeFixtureList = array(
-            CM_Splittest_Fixture::TYPE_REQUEST_CLIENT => 'clientId',
+            CM_Splittest_Fixture::TYPE_REQUEST_CLIENT => 'requestClientId',
             CM_Splittest_Fixture::TYPE_USER           => 'userId',
         );
         $typeFixture = $typeFixtureList[$fixture->getFixtureType()];
@@ -140,17 +140,17 @@ EOF;
     }
 
     /**
-     * @return int|null
-     */
-    protected function _getClientId() {
-        return $this->_clientId;
-    }
-
-    /**
      * @return string
      */
     protected function _getCode() {
         return $this->_code;
+    }
+
+    /**
+     * @return int|null
+     */
+    protected function _getRequestClientId() {
+        return $this->_requestClientId;
     }
 
     /**
