@@ -8,8 +8,8 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
     private $_variationWeightList;
 
     /**
-     * @param CM_Service_Manager $serviceManager
      * @param string             $name
+     * @param CM_Service_Manager $serviceManager
      */
     public function __construct($name, CM_Service_Manager $serviceManager = null) {
         $this->_construct(array('name' => $name));
