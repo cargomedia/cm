@@ -291,6 +291,23 @@ class CMTest_TH {
     }
 
     /**
+     * @param string|object $objectOrClassName
+     * @param string        $methodName
+     * @param array|null    $args
+     * @return mixed
+     */
+    public static function callProtectedMethod($objectOrClassName, $methodName, array $args = null) {
+        $args = (array) $args;
+        $context = null;
+        if (is_object($context)) {
+            $context = $objectOrClassName;
+        }
+        $reflectionMethod = new ReflectionMethod($objectOrClassName, $methodName);
+        $reflectionMethod->setAccessible(true);
+        return $reflectionMethod->invokeArgs($context, $args);
+    }
+
+    /**
      * @param int    $length
      * @param string $charset
      * @return string
