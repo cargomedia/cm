@@ -143,22 +143,9 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         CM_Db_Db::truncate('cm_cli_command_manager_process');
     }
 
-    public function testRunForkSingleFail() {
-        $workloadResultMock = $this->mockClass('CM_Process_WorkloadResult');
-        $workloadResultMock->mockMethod('isSuccess')
-            ->at(0, 0)
-            ->at(1, 1)
-            ->at(2, 0)
-            ->at(3, 0);
-
-        $process = $this->mockObject('CM_Process');
-        $process->mockMethod('waitForChildren')->set([
-            $workloadResultMock->newInstanceWithoutConstructor(),
-            $workloadResultMock->newInstanceWithoutConstructor(),
-            $workloadResultMock->newInstanceWithoutConstructor(),
-            $workloadResultMock->newInstanceWithoutConstructor(),
-        ]);
-        $process->mockMethod('fork');
+    public function testRunExitCode() {
+        $processMock = $this->mockClass('CM_Process');
+        $processMock->mockMethod('fork');
 
         $command = $this->mockClass('CM_Cli_Command')->newInstanceWithoutConstructor();
         $command->mockMethod('getSynchronized');
@@ -166,11 +153,45 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
 
         $commandManager = $this->mockObject('CM_Cli_CommandManager');
         $commandManager->mockMethod('_getCommand')->set($command);
-        $commandManager->mockMethod('_getProcess')->set($process);
+        $commandManager->mockMethod('_getProcess')
+            ->at(0, function () use ($processMock) {
+                $workloadResult = $this->mockClass('CM_Process_WorkloadResult')->newInstanceWithoutConstructor();
+                $workloadResult->mockMethod('isSuccess')
+                    ->at(0, true)
+                    ->at(1, true)
+                    ->at(2, true)
+                    ->at(3, true);
+
+                $processSuccess = $processMock->newInstance();
+                $processSuccess->mockMethod('waitForChildren')->set([
+                    $workloadResult,
+                    $workloadResult,
+                    $workloadResult,
+                    $workloadResult,
+                ]);
+                return $processSuccess;
+            })
+            ->at(1, function () use ($processMock) {
+                $workloadResult = $this->mockClass('CM_Process_WorkloadResult')->newInstanceWithoutConstructor();
+                $workloadResult->mockMethod('isSuccess')
+                    ->at(0, true)
+                    ->at(1, false)
+                    ->at(2, true)
+                    ->at(3, true);
+
+                $processFailure = $processMock->newInstance();
+                $processFailure->mockMethod('waitForChildren')->set([
+                    $workloadResult,
+                    $workloadResult,
+                    $workloadResult,
+                    $workloadResult,
+                ]);
+                return $processFailure;
+            });
 
         /** @var CM_Cli_CommandManager $commandManager */
-        $arguments = new CM_Cli_Arguments(['bin/cm', 'foo', 'bar']);
-        $this->assertSame(1, $commandManager->run($arguments));
+        $this->assertSame(0, $commandManager->run(new CM_Cli_Arguments(['bin/cm', 'foo', 'bar'])));
+        $this->assertSame(1, $commandManager->run(new CM_Cli_Arguments(['bin/cm', 'foo', 'bar'])));
     }
 
     /**
