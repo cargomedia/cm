@@ -180,10 +180,10 @@ class CM_Cli_CommandManager {
                 $process->fork($workload);
             }
             $resultList = $process->waitForChildren($command->getKeepalive(), $terminationCallback);
-            $failedResultList = array_filter($resultList, function (CM_Process_WorkloadResult $result) {
+            $failure = Functional\some($resultList, function (CM_Process_WorkloadResult $result) {
                 return !$result->isSuccess();
             });
-            if ($failedResultList) {
+            if ($failure) {
                 return 1;
             }
             return 0;

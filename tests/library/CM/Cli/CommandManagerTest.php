@@ -143,6 +143,36 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         CM_Db_Db::truncate('cm_cli_command_manager_process');
     }
 
+    public function testRunForkSingleFail() {
+        $workloadResultMock = $this->mockClass('CM_Process_WorkloadResult');
+        $workloadResultMock->mockMethod('isSuccess')
+            ->at(0, 0)
+            ->at(1, 1)
+            ->at(2, 0)
+            ->at(3, 0);
+
+        $process = $this->mockObject('CM_Process');
+        $process->mockMethod('waitForChildren')->set([
+            $workloadResultMock->newInstanceWithoutConstructor(),
+            $workloadResultMock->newInstanceWithoutConstructor(),
+            $workloadResultMock->newInstanceWithoutConstructor(),
+            $workloadResultMock->newInstanceWithoutConstructor(),
+        ]);
+        $process->mockMethod('fork');
+
+        $command = $this->mockClass('CM_Cli_Command')->newInstanceWithoutConstructor();
+        $command->mockMethod('getSynchronized');
+        $command->mockMethod('getKeepalive');
+
+        $commandManager = $this->mockObject('CM_Cli_CommandManager');
+        $commandManager->mockMethod('_getCommand')->set($command);
+        $commandManager->mockMethod('_getProcess')->set($process);
+
+        /** @var CM_Cli_CommandManager $commandManager */
+        $arguments = new CM_Cli_Arguments(['bin/cm', 'foo', 'bar']);
+        $this->assertSame(1, $commandManager->run($arguments));
+    }
+
     /**
      * @param CM_Cli_Command $commandMock
      * @param string|null    $errorMessageExpected
