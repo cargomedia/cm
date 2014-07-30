@@ -95,7 +95,9 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
             '',
         ));
         $targetPath = DIR_ROOT . 'resources/config/deploy.php';
-        CM_File::create($targetPath, $sourceCode);
+        $configFile = new CM_File($targetPath);
+        $configFile->ensureParentDirectory();
+        $configFile->write($sourceCode);
     }
 
     public static function getPackageName() {
