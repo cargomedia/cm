@@ -31,16 +31,14 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     public function insert($collection, array $object) {
         CM_Debug::getInstance()->incStats('mongo', "insert to {$collection}");
-        $ref = & $object;
-        return $this->_getCollection($collection)->insert($ref);
+        //$ref = & $object;
+        return $this->_getCollection($collection)->insert($object);
     }
 
     /**
      * @param string  $collection
      * @param array[] $objectList
      * @return mixed
-     *
-     * @throws MongoException
      */
     public function batchInsert($collection, array $objectList) {
         CM_Debug::getInstance()->incStats('mongo', "batch insert to {$collection}");
