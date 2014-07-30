@@ -105,10 +105,4 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
         sort($item['variables']);
         return $item;
     }
-
-    public function _change() {
-        parent::_change();
-        $cacheKey = CM_CacheConst::Language_Translations . '_languageId:' . $this->_language->getId();
-        CM_Cache_Local::getInstance()->delete($cacheKey);
-    }
 }

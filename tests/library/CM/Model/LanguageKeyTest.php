@@ -97,4 +97,18 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         CM_Model_LanguageKey::deleteByName('foo');
         $this->assertFalse(CM_Model_LanguageKey::exists('foo'));
     }
+
+    public function testIncreaseUpdateCountNewDeploy() {
+        $now = time();
+        $languageKey = $this->mockObject('CM_Model_LanguageKey');
+        $languageKey->mockMethod('_getDeployVersion')->set($now + 1);
+        /** @var CM_Model_LanguageKey $languageKey */
+        $languageKey->_set([
+            'updateCountResetVersion' => $now,
+            'updateCount'             => 5,
+        ]);
+        CMTest_TH::callProtectedMethod($languageKey, '_increaseUpdateCount');
+        $this->assertSame($now + 1, $languageKey->_get('updateCountResetVersion'));
+        $this->assertSame(1, $languageKey->_get('updateCount'));
+    }
 }

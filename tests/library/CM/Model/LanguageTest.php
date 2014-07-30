@@ -12,17 +12,19 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
         $this->assertSame(array('keyFirst' => array('value'     => null,
                                                     'variables' => array())), $language->getTranslations()->getAssociativeArray());
 
-        $language->getTranslation('keyFirst'); // Fill APC
+        $language->getTranslation('keyFirst');
         $language->setTranslation('keyFirst', 'abc');
-        $this->assertSame('abc', $language->getTranslation('keyFirst'));
+        $this->assertSame('keyFirst', $language->getTranslation('keyFirst'));
         $this->assertSame(array('keyFirst' => array('value'     => 'abc',
                                                     'variables' => array())), $language->getTranslations()->getAssociativeArray());
+        CM_Cache_Local::getInstance()->flush();
+        $this->assertSame('abc', $language->getTranslation('keyFirst'));
 
         $this->assertSame('abc', $language->getTranslation('keyFirst', array('variable')));
         $this->assertSame(array('keyFirst' => array('value'     => 'abc',
                                                     'variables' => array('variable'))), $language->getTranslations()->getAssociativeArray());
 
-        $language->getTranslation('keyFirst'); // Fill APC
+        $language->getTranslation('keyFirst');
         $language->setTranslation('keyFirst', 'xyz', array('another'));
         $this->assertSame(array('keyFirst' => array('value'     => 'xyz',
                                                     'variables' => array('another'))), $language->getTranslations()->getAssociativeArray());

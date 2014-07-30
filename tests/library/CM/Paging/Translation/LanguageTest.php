@@ -8,6 +8,7 @@ class CM_Paging_Translation_LanguageTest extends CMTest_TestCase {
         $paging->set('phrase', 'abc');
         $this->assertSame('abc', $paging->get('phrase', null, true));
         $paging->remove('phrase');
+        $paging->_change();
         $this->assertNull($paging->get('phrase', null, true));
     }
 }

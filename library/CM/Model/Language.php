@@ -63,7 +63,10 @@ class CM_Model_Language extends CM_Model_Abstract {
 
         if (!array_key_exists($phrase, $translations)) {
             CM_Model_LanguageKey::create($phrase, $variableNames);
-            return $this->getTranslation($phrase, $variableNames, $skipCacheLocal);
+            $translations[$phrase] = ['value' => $phrase, 'variables' => $variableNames];
+            if (!$skipCacheLocal) {
+                $cache->set($cacheKey, $translations);
+            }
         }
 
         if ($variableNames !== null) {
@@ -71,7 +74,10 @@ class CM_Model_Language extends CM_Model_Abstract {
             if ($variableNames !== $translations[$phrase]['variables']) {
                 $languageKey = CM_Model_LanguageKey::findByName($phrase);
                 $languageKey->setVariables($variableNames);
-                return $this->getTranslation($phrase, $variableNames, $skipCacheLocal);
+                $translations[$phrase]['variables'] = $variableNames;
+                if (!$skipCacheLocal) {
+                    $cache->set($cacheKey, $translations);
+                }
             }
         }
 

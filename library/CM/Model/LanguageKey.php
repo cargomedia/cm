@@ -45,18 +45,10 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      * @return int
      */
     protected function _getUpdateCount() {
-        $deployVersion = CM_App::getInstance()->getDeployVersion();
-        if ($deployVersion > $this->_get('updateCountResetVersion')) {
+        if ($this->_getDeployVersion() > $this->_get('updateCountResetVersion')) {
             return 0;
         }
         return $this->_get('updateCount');
-    }
-
-    protected function _onChange() {
-        /** @var CM_Model_Language $language */
-        foreach (new CM_Paging_Language_All() as $language) {
-            $language->getTranslations()->_change();
-        }
     }
 
     protected function _getSchema() {
@@ -73,14 +65,29 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
         $data = [
             'updateCount' => $this->_getUpdateCount() + 1
         ];
-        if (CM_App::getInstance()->getDeployVersion() > $this->_get('updateCountResetVersion')) {
-            $data['updateCountResetVersion'] = CM_App::getInstance()->getDeployVersion();
+        if ($this->_getDeployVersion() > $this->_get('updateCountResetVersion')) {
+            $data['updateCountResetVersion'] = $this->_getDeployVersion();
         }
         $this->_set($data);
     }
 
+    /**
+     * @return int
+     */
+    protected function _getDeployVersion() {
+        return CM_App::getInstance()->getDeployVersion();
+    }
+
     protected function _onDeleteBefore() {
         CM_Db_Db::delete('cm_languageValue', array('languageKeyId' => $this->getId()));
+    }
+
+    protected function _getContainingCacheables() {
+        $cacheables = parent::_getContainingCacheables();
+        foreach (new CM_Paging_Language_All() as $language) {
+            $cacheables[] = new CM_Paging_Translation_Language($language);
+        }
+        return $cacheables;
     }
 
     /**
@@ -90,8 +97,11 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      */
     public static function create($name, array $variables = null) {
         $languageKey = new self();
-        $languageKey->_set('name', $name);
-        $languageKey->_set('updateCount', 0);
+        $languageKey->_set([
+            'name'                    => $name,
+            'updateCount'             => 0,
+            'updateCountResetVersion' => 0
+        ]);
         $languageKey->setVariables($variables);
         $languageKey->commit();
         return $languageKey;
