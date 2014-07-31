@@ -30,7 +30,6 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     protected function _getDatabase() {
         $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
-
         return $this->_getClient()->selectDB($dbName);
     }
 
@@ -165,12 +164,6 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param array  $keys
      * @param array  $options
      * @return bool
-     *
-     * @throws MongoException
-     * @throws MongoDuplicateKeyException
-     * @throws MongoResultException
-     * @throws MongoCursorException
-     * @throws MongoCursorTimeoutException
      *
      * @see http://php.net/manual/en/mongocollection.createindex.php
      */
