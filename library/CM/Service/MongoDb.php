@@ -179,7 +179,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     protected function _checkIndexOperationForError($result) {
         if (true !== $result && empty($result['ok'])) {
-            throw new CM_Exception('Error creating mongoDB index');
+            throw new CM_Exception('Index operation failed.');
         }
     }
 
