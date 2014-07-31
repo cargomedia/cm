@@ -25,9 +25,32 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
+     * @return MongoDB
+     * @throws CM_Exception_Nonexistent
+     */
+    protected function _getDatabase() {
+        $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
+
+        return $this->_getClient()->selectDB($dbName);
+    }
+
+    /**
+     * @return MongoClient
+     */
+    protected function _getClient() {
+        if (null === $this->_client) {
+            $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
+        }
+
+        return $this->_client;
+    }
+
+    /**
      * @param string $collection
      * @param array  $object
      * @return array|bool
+     *
+     * @see http://php.net/manual/en/mongocollection.insert.php
      */
     public function insert($collection, array $object) {
         CM_Debug::getInstance()->incStats('mongo', "insert to {$collection}");
@@ -37,10 +60,20 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
+     * @param string $collection
+     * @return MongoCollection
+     */
+    protected function _getCollection($collection) {
+        return $this->_getDatabase()->selectCollection($collection);
+    }
+
+    /**
      * @param string     $collection
      * @param array|null $criteria
      * @param array|null $projection
      * @return array
+     *
+     * @see http://php.net/manual/en/mongocollection.findone.php
      */
     public function findOne($collection, array $criteria = null, array $projection = null) {
         $criteria = (array) $criteria;
@@ -56,6 +89,8 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param array|null $criteria
      * @param array|null $projection
      * @return MongoCursor
+     *
+     * @see http://php.net/manual/en/mongocollection.find.php
      */
     public function find($collection, array $criteria = null, array $projection = null) {
         $criteria = (array) $criteria;
@@ -71,6 +106,8 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param int|null   $limit
      * @param int|null   $offset
      * @return int
+     *
+     * @see http://php.net/manual/en/mongocollection.count.php
      */
     public function count($collection, array $criteria = null, $limit = null, $offset = null) {
         $criteria = (array) $criteria;
@@ -84,6 +121,8 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     /**
      * @param string $collection
      * @return array
+     *
+     * @see http://php.net/manual/en/mongocollection.drop.php
      */
     public function drop($collection) {
         CM_Debug::getInstance()->incStats('mongo', "drop {$collection}: ");
@@ -97,6 +136,8 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param array      $newObject
      * @param array|null $options
      * @return MongoCursor
+     *
+     * @see http://php.net/manual/en/mongocollection.update.php
      */
     public function update($collection, array $criteria, array $newObject, array $options = null) {
         $options = (array) $options;
@@ -110,6 +151,8 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param array      $criteria
      * @param array|null $options
      * @return mixed
+     *
+     * @see http://php.net/manual/en/mongocollection.remove.php
      */
     public function remove($collection, array $criteria, array $options = null) {
         $options = (array) $options;
@@ -128,6 +171,8 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @throws MongoResultException
      * @throws MongoCursorException
      * @throws MongoCursorTimeoutException
+     *
+     * @see http://php.net/manual/en/mongocollection.createindex.php
      */
     public function createIndex($collection, array $keys, array $options = null) {
         $options = (array) $options;
@@ -138,6 +183,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param string $collection
      * @param string $indexName
      * @return array
+     *
      */
     public function deleteIndex($collection, $indexName) {
         return $this->_getDatabase()->command(array("deleteIndexes" => $collection, "index" => $indexName));
@@ -146,6 +192,8 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     /**
      * @param string $collection
      * @return array
+     *
+     * @see http://php.net/manual/en/mongocollection.getindexinfo.php
      */
     public function getIndexInfo($collection) {
         return $this->_getCollection($collection)->getIndexInfo();
@@ -156,34 +204,5 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     public function getNewId() {
         return (string) new MongoId();
-    }
-
-    /**
-     * @return MongoClient
-     */
-    protected function _getClient() {
-        if (null === $this->_client) {
-            $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
-        }
-
-        return $this->_client;
-    }
-
-    /**
-     * @return MongoDB
-     * @throws CM_Exception_Nonexistent
-     */
-    protected function _getDatabase() {
-        $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
-
-        return $this->_getClient()->selectDB($dbName);
-    }
-
-    /**
-     * @param string $collection
-     * @return MongoCollection
-     */
-    protected function _getCollection($collection) {
-        return $this->_getDatabase()->selectCollection($collection);
     }
 }
