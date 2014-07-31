@@ -23,8 +23,10 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
     private function _getEmptyCollectionName($testName) {
         $collectionName = $this->_collectionPrefix . $testName;
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $mongoDb->drop($collectionName);
-
+        try {
+            $mongoDb->drop($collectionName);
+        } catch (CM_Exception $e) {
+        }
         return $collectionName;
     }
 

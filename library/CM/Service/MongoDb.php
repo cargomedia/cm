@@ -54,7 +54,9 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         CM_Debug::getInstance()->incStats('mongo', "insert to {$collection}");
         $ref = & $object;
 
-        return $this->_getCollection($collection)->insert($ref);
+        $result = $this->_getCollection($collection)->insert($ref);
+        $this->_checkResultForError($result);
+        return $result;
     }
 
     /**
@@ -125,7 +127,9 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     public function drop($collection) {
         CM_Debug::getInstance()->incStats('mongo', "drop {$collection}: ");
 
-        return $this->_getCollection($collection)->drop();
+        $result = $this->_getCollection($collection)->drop();
+        $this->_checkResultForError($result);
+        return $result;
     }
 
     /**
@@ -141,7 +145,9 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         $options = (array) $options;
         CM_Debug::getInstance()->incStats('mongo', "Update {$collection}");
 
-        return $this->_getCollection($collection)->update($criteria, $newObject, $options);
+        $result = $this->_getCollection($collection)->update($criteria, $newObject, $options);
+        $this->_checkResultForError($result);
+        return $result;
     }
 
     /**
@@ -155,7 +161,9 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     public function remove($collection, array $criteria, array $options = null) {
         $options = (array) $options;
         CM_Debug::getInstance()->incStats('mongo', "remove from {$collection}");
-        return $this->_getCollection($collection)->remove($criteria, $options);
+        $result = $this->_getCollection($collection)->remove($criteria, $options);
+        $this->_checkResultForError($result);
+        return $result;
     }
 
     /**
@@ -169,7 +177,22 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     public function createIndex($collection, array $keys, array $options = null) {
         $options = (array) $options;
         $result = $this->_getCollection($collection)->createIndex($keys, $options);
-        $this->_checkIndexOperationForError($result);
+        $this->_checkResultForError($result);
+        return $result;
+    }
+
+    /**
+     * @param string $collection
+     * @param array  $keys
+     * @param array  $options
+     * @return mixed
+     *
+     * @see MongoCollection::createIndex
+     */
+    public function createIndex($collection, array $keys, array $options = null) {
+        $options = (array) $options;
+        $result = $this->_getCollection($collection)->createIndex($keys, $options);
+        $this->_checkResultForError($result);
         return $result;
     }
 
@@ -177,7 +200,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param array|bool $result
      * @throws CM_Exception
      */
-    protected function _checkIndexOperationForError($result) {
+    protected function _checkResultForError($result) {
         if (true !== $result && empty($result['ok'])) {
             throw new CM_Exception('Index operation failed.');
         }
@@ -191,7 +214,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     public function deleteIndex($collection, $indexName) {
         $result = $this->_getDatabase()->command(array("deleteIndexes" => $collection, "index" => $indexName));
-        $this->_checkIndexOperationForError($result);
+        $this->_checkResultForError($result);
         return $result;
     }
 
