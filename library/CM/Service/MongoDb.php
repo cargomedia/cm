@@ -68,6 +68,16 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
+     * @param array|bool $result
+     * @throws CM_Exception
+     */
+    protected function _checkResultForError($result) {
+        if (true !== $result && empty($result['ok'])) {
+            throw new CM_Exception('Index operation failed.');
+        }
+    }
+
+    /**
      * @param string     $collection
      * @param array|null $criteria
      * @param array|null $projection
@@ -179,31 +189,6 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         $result = $this->_getCollection($collection)->createIndex($keys, $options);
         $this->_checkResultForError($result);
         return $result;
-    }
-
-    /**
-     * @param string $collection
-     * @param array  $keys
-     * @param array  $options
-     * @return mixed
-     *
-     * @see MongoCollection::createIndex
-     */
-    public function createIndex($collection, array $keys, array $options = null) {
-        $options = (array) $options;
-        $result = $this->_getCollection($collection)->createIndex($keys, $options);
-        $this->_checkResultForError($result);
-        return $result;
-    }
-
-    /**
-     * @param array|bool $result
-     * @throws CM_Exception
-     */
-    protected function _checkResultForError($result) {
-        if (true !== $result && empty($result['ok'])) {
-            throw new CM_Exception('Index operation failed.');
-        }
     }
 
     /**
