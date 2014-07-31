@@ -10,8 +10,6 @@ return function (CM_Config_Node $config) {
 
     $config->classConfigCacheEnabled = false;
 
-    $config->CM_Model_Splitfeature->withoutPersistence = true;
-
     $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
 
     $config->services['database-master'] =

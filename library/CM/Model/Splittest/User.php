@@ -27,7 +27,7 @@ class CM_Model_Splittest_User extends CM_Model_Splittest {
      */
     public static function isVariationFixtureStatic($splittestName, CM_Model_User $user, $variationName) {
         /** @var CM_Model_Splittest_User $splittest */
-        $splittest = static::_getSplittest($splittestName);
+        $splittest = static::find($splittestName);
         if (!$splittest) {
             return false;
         }
@@ -41,7 +41,7 @@ class CM_Model_Splittest_User extends CM_Model_Splittest {
      */
     public static function setConversionStatic($splittestName, CM_Model_User $user, $weight = null) {
         /** @var CM_Model_Splittest_User $splittest */
-        $splittest = static::_getSplittest($splittestName);
+        $splittest = static::find($splittestName);
         if ($splittest) {
             $splittest->setConversion($user, $weight);
         }

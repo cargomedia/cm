@@ -33,7 +33,7 @@ class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
      */
     public static function isVariationFixtureStatic($splittestName, CM_Request_Abstract $request, $variationName) {
         /** @var CM_Model_Splittest_RequestClient $splittest */
-        $splittest = static::_getSplittest($splittestName);
+        $splittest = static::find($splittestName);
         if (!$splittest) {
             return false;
         }
@@ -47,7 +47,7 @@ class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
      */
     public static function setConversionStatic($splittestName, CM_Request_Abstract $request, $weight = null) {
         /** @var CM_Model_Splittest_RequestClient $splittest */
-        $splittest = static::_getSplittest($splittestName);
+        $splittest = static::find($splittestName);
         if ($splittest) {
             $splittest->setConversion($request, $weight);
         }
