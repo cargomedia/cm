@@ -14,6 +14,20 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $this->assertSame($res['name'], $name);
     }
 
+    /**
+     * Generate a name of a collection and ensure it's empty
+     *
+     * @param string $testName
+     * @return string
+     */
+    private function _getEmptyCollectionName($testName) {
+        $collectionName = $this->_collectionPrefix . $testName;
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $mongoDb->drop($collectionName);
+
+        return $collectionName;
+    }
+
     public function testUpdate() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = $this->_getEmptyCollectionName('update');
@@ -120,16 +134,11 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
     }
 
     /**
-     * Generate a name of a collection and ensure it's empty
-     *
-     * @param string $testName
-     * @return string
+     * @expectedException CM_Exception
      */
-    private function _getEmptyCollectionName($testName) {
-        $collectionName = $this->_collectionPrefix . $testName;
+    public function testDeleteNonExistentIndex() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $mongoDb->drop($collectionName);
-
-        return $collectionName;
+        $collectionName = $this->_getEmptyCollectionName('deleteNonExistentIndex');
+        $mongoDb->deleteIndex($collectionName, 'foo');
     }
 }
