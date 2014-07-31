@@ -7,16 +7,6 @@ class CM_ProcessTest extends CMTest_TestCase {
     /** @var resource */
     protected static $_file;
 
-    public static function setupBeforeClass() {
-        parent::setUpBeforeClass();
-        self::$_file = tmpfile();
-    }
-
-    public static function tearDownAfterClass() {
-        fclose(self::$_file);
-        parent::tearDownAfterClass();
-    }
-
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
@@ -66,6 +56,14 @@ Parent terminated.
         rewind(self::$_file);
         $outputFileActual = fread(self::$_file, 8192);
         $this->assertEquals($outputFileExpected, $outputFileActual);
+    }
+
+    /**
+     * @param string $message
+     */
+    public static function writeln($message) {
+        print "$message\n";
+        fwrite(self::$_file, "$message\n");
     }
 
     /**
@@ -120,6 +118,26 @@ Parent terminated.
     }
 
     /**
+     * @return int[]
+     * @throws CM_Exception
+     */
+    private function _getChildrenPidList() {
+        $psCommand = 'ps axo pid,ppid,args';
+        $psOutput = CM_Util::exec($psCommand);
+        if (false === preg_match_all('/^\s*(?<pid>\d+)\s+(?<ppid>\d+)\s+(?<args>.+)$/m', $psOutput, $matches, PREG_SET_ORDER)) {
+            throw new CM_Exception('Cannot parse ps output `' . $psOutput . '`.');
+        }
+        $pid = CM_Process::getInstance()->getProcessId();
+        $pidList = array();
+        foreach ($matches as $match) {
+            if ($match['ppid'] == $pid && false === strpos($match['args'], $psCommand)) {
+                $pidList[] = (int) $match['pid'];
+            }
+        }
+        return $pidList;
+    }
+
+    /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
@@ -150,38 +168,20 @@ Parent terminated.
 
         $this->assertCount(2, $pidListBefore);
         $this->assertCount(0, $this->_getChildrenPidList());
-        $this->assertSameTime(0.5, microtime(true) - $timeStart, 0.1);
+        $this->assertSameTime(0.5, microtime(true) - $timeStart, 0.15);
 
         $logError = new CM_Paging_Log_Error();
         $this->assertSame(1, $logError->getCount());
         $this->assertContains('killing with signal `9`', $logError->getItem(0)['msg']);
     }
 
-    /**
-     * @param string $message
-     */
-    public static function writeln($message) {
-        print "$message\n";
-        fwrite(self::$_file, "$message\n");
+    public static function setupBeforeClass() {
+        parent::setUpBeforeClass();
+        self::$_file = tmpfile();
     }
 
-    /**
-     * @return int[]
-     * @throws CM_Exception
-     */
-    private function _getChildrenPidList() {
-        $psCommand = 'ps axo pid,ppid,args';
-        $psOutput = CM_Util::exec($psCommand);
-        if (false === preg_match_all('/^\s*(?<pid>\d+)\s+(?<ppid>\d+)\s+(?<args>.+)$/m', $psOutput, $matches, PREG_SET_ORDER)) {
-            throw new CM_Exception('Cannot parse ps output `' . $psOutput . '`.');
-        }
-        $pid = CM_Process::getInstance()->getProcessId();
-        $pidList = array();
-        foreach ($matches as $match) {
-            if ($match['ppid'] == $pid && false === strpos($match['args'], $psCommand)) {
-                $pidList[] = (int) $match['pid'];
-            }
-        }
-        return $pidList;
+    public static function tearDownAfterClass() {
+        fclose(self::$_file);
+        parent::tearDownAfterClass();
     }
 }
