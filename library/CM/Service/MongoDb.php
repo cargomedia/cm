@@ -26,7 +26,6 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
 
     /**
      * @return MongoDB
-     * @throws CM_Exception_Nonexistent
      */
     protected function _getDatabase() {
         $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
