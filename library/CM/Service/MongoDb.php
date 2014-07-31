@@ -162,13 +162,25 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param string $collection
      * @param array  $keys
      * @param array  $options
-     * @return bool
+     * @return mixed
      *
      * @see http://php.net/manual/en/mongocollection.createindex.php
      */
     public function createIndex($collection, array $keys, array $options = null) {
         $options = (array) $options;
-        return $this->_getCollection($collection)->createIndex($keys, $options);
+        $result = $this->_getCollection($collection)->createIndex($keys, $options);
+        $this->_checkIndexOperationForError($result);
+        return $result;
+    }
+
+    /**
+     * @param array|bool $result
+     * @throws CM_Exception
+     */
+    protected function _checkIndexOperationForError($result) {
+        if (true !== $result && empty($result['ok'])) {
+            throw new CM_Exception('Error creating mongoDB index');
+        }
     }
 
     /**
@@ -178,7 +190,9 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      *
      */
     public function deleteIndex($collection, $indexName) {
-        return $this->_getDatabase()->command(array("deleteIndexes" => $collection, "index" => $indexName));
+        $result = $this->_getDatabase()->command(array("deleteIndexes" => $collection, "index" => $indexName));
+        $this->_checkIndexOperationForError($result);
+        return $result;
     }
 
     /**
