@@ -171,7 +171,7 @@
       this._renderContentIntoPanels(this.position);
       $(window).on('load resize orientationchange', this._setPanelDimensions);
       $(window).on('keydown', this._onKeydown);
-      this.hammer.on('release dragleft dragright swipeleft swiperight', this._onHammer);
+      this.hammer.on('dragleft dragright dragend swipeleft swiperight', this._onHammer);
       this.initialized = true;
     },
 
@@ -182,7 +182,7 @@
 
       $(window).off('load resize orientationchange', this._setPanelDimensions);
       $(window).off('keydown', this._onKeydown);
-      this.hammer.off('release dragleft dragright swipeleft swiperight', this._onHammer);
+      this.hammer.off('dragleft dragright dragend swipeleft swiperight', this._onHammer);
       this.initialized = false;
     },
 
@@ -474,7 +474,7 @@
           event.gesture.stopDetect();
           break;
 
-        case 'release':
+        case 'dragend':
           // more then 50% moved, navigate
           if (Math.abs(event.gesture.deltaX) > this.panelWidth / 2) {
             if (event.gesture.direction == 'right') {
@@ -483,8 +483,6 @@
               this.showNext();
             }
           } else {
-            // todo check
-            console.log('hammer release');
             this._setContainerOffset(0, true);
           }
           break;
