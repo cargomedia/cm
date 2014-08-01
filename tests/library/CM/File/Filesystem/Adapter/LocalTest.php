@@ -281,6 +281,16 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
                 'foo/foobar',
             ),
         ), $this->_adapter->listByPrefix('/foo', true));
+
+        $this->assertSame(array(
+            'files' => array(
+                'foo/bar',
+                'foo/bar2',
+            ),
+            'dirs'  => array(
+                'foo/foobar',
+            ),
+        ), $this->_adapter->listByPrefix('/foo/', true));
     }
 
     public function testListByPrefixDoNotFollowSymlinks() {

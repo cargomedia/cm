@@ -67,9 +67,9 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
     protected function _getResponse($email) {
         $kickBox = new \Kickbox\Client($this->_getCode());
         $response = $kickBox->kickbox()->verify($email);
-        if ($response->code !== 200) {
+        if ($response->code !== 200 || !is_array($response->body)) {
             return null;
         }
-        return CM_Params::jsonDecode($response->body);
+        return $response->body;
     }
 }

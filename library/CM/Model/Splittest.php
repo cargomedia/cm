@@ -291,7 +291,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
      * @param string $name
      * @return static|null
      */
-    protected static function _getSplittest($name) {
+    public static function find($name) {
         if (!self::exists($name)) {
             return null;
         }

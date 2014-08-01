@@ -2,10 +2,6 @@
 
 class CM_Paging_Splitfeature_AllTest extends CMTest_TestCase {
 
-    public function setUp() {
-        CM_Config::get()->CM_Model_Splitfeature->withoutPersistence = false;
-    }
-
     public function testPaging() {
         CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 50));
         CM_Model_Splitfeature::createStatic(array('name' => 'bar', 'percentage' => 10));
