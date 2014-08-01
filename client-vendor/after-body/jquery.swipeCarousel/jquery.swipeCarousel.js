@@ -119,10 +119,9 @@
     console.log(this.contentList);
 
     this.panelWidth = 0;
+    this.containerOffset = 0;
     this.hammer = new Hammer(this.$element[0], {
-      dragLockToAxis: true,
-      dragMinDistance: 20,
-      swipeVelocityX: 0.1
+      dragLockToAxis: true, dragMinDistance: 20, swipeVelocityX: 0.1
     });
     _.bindAll(this, '_setPanelDimensions', '_onKeydown', '_onHammer');
     this.initialized = false;
@@ -146,6 +145,12 @@
 
     /** @type Number */
     position: null,
+
+    /** @type Number */
+    containerOffset: null,
+
+    /** @type jQuery.Deferred */
+    showRotateDeferred: null,
 
     /** @type Number */
     panelWidth: null,
@@ -209,8 +214,13 @@
         this.position = position;
         this.panelList.rotate(direction);
         var self = this;
-        this._setContainerOffset(-direction, true).done(function() {
+        if (this.showRotateDeferred) {
+          this.showRotateDeferred.reject();
+        }
+        this.showRotateDeferred = this._addContainerOffset(-direction, true);
+        this.showRotateDeferred.done(function() {
           self._renderContentIntoPanels(position);
+          console.log('showRotate done');
         });
         this._onChange(eventData);
       }
@@ -374,28 +384,39 @@
      * @param {jQuery} $element
      * @param {Number} offsetRate
      * @param {Boolean} animate
-     * @return Promise
+     * @return jQuery.Deferred
      */
     _setElementOffset: function($element, offsetRate, animate) {
       var deferred = $.Deferred();
 
       $element.transition({x: (offsetRate * 100) + '%'}, {
-        duration: animate ? 200 : 0,
+        duration: animate ? 3000 : 0,
         complete: function() {
           deferred.resolve();
         }
       });
 
-      return deferred.promise();
+      return deferred;
     },
 
     /**
-     * @param {Number} offsetRate (-1: panel left, 0: middle panel, 1: panel right)
+     * @param {Number} offset (-1: panel left, 0: middle panel, 1: panel right)
      * @param {Boolean} animate
-     * @return Promise
+     * @return jQuery.Deferred
      */
-    _setContainerOffset: function(offsetRate, animate) {
-      offsetRate = (-1 / 3) + offsetRate * (1 / 3);
+    _addContainerOffset: function(offset, animate) {
+      return this._setContainerOffset(this.containerOffset + offset, animate);
+    },
+
+    /**
+     * @param {Number} offset (-1: panel left, 0: middle panel, 1: panel right)
+     * @param {Boolean} animate
+     * @return jQuery.Deferred
+     */
+    _setContainerOffset: function(offset, animate) {
+      this.containerOffset = Math.min(1, Math.max(-1, offset));
+      console.log('_setContainerOffset', this.containerOffset);
+      var offsetRate = (-1 / 3) + this.containerOffset * (1 / 3);
       return this._setElementOffset(this.$container, offsetRate, animate);
     },
 
@@ -463,6 +484,7 @@
             }
           } else {
             // todo check
+            console.log('hammer release');
             this._setContainerOffset(0, true);
           }
           break;
