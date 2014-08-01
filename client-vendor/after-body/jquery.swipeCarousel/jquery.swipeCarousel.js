@@ -120,9 +120,14 @@
 
     this.panelWidth = 0;
     this.containerOffset = 0;
-    this.hammer = new Hammer(this.$element[0], {
-      dragLockToAxis: true, dragMinDistance: 20, swipeVelocityX: 0.1
+
+    this.hammer = new Hammer.Manager(this.$element[0], {
+      recognizers: [
+        [Hammer.Swipe,{ direction: Hammer.DIRECTION_HORIZONTAL, velocity: 0.1 }],
+        [Hammer.Pan, { direction: Hammer.DIRECTION_HORIZONTAL, threshold: 20 }, ['swipe']]
+      ]
     });
+
     _.bindAll(this, '_setPanelDimensions', '_onKeydown', '_onHammer');
     this.initialized = false;
   };
@@ -171,7 +176,7 @@
       this._renderContentIntoPanels(this.position);
       $(window).on('load resize orientationchange', this._setPanelDimensions);
       $(window).on('keydown', this._onKeydown);
-      this.hammer.on('dragleft dragright dragend swipeleft swiperight', this._onHammer);
+      this.hammer.on('panleft panright panend swipeleft swiperight', this._onHammer);
       this.initialized = true;
     },
 
@@ -182,7 +187,7 @@
 
       $(window).off('load resize orientationchange', this._setPanelDimensions);
       $(window).off('keydown', this._onKeydown);
-      this.hammer.off('dragleft dragright dragend swipeleft swiperight', this._onHammer);
+      this.hammer.off('panleft panright panend swipeleft swiperight', this._onHammer);
       this.initialized = false;
     },
 
@@ -415,7 +420,6 @@
      */
     _setContainerOffset: function(offset, animate) {
       this.containerOffset = Math.min(1, Math.max(-1, offset));
-      console.log('_setContainerOffset', this.containerOffset);
       var offsetRate = (-1 / 3) + this.containerOffset * (1 / 3);
       return this._setElementOffset(this.$container, offsetRate, animate);
     },
@@ -447,17 +451,16 @@
      * @param {Hammer.event} event
      */
     _onHammer: function(event) {
-      // disable browser scrolling
-      event.gesture.preventDefault();
+      event.preventDefault();
 
       switch (event.type) {
-        case 'dragright':
-        case 'dragleft':
+        case 'panright':
+        case 'panleft':
           // stick to the finger
-          var drag_offset = event.gesture.deltaX / this.panelWidth;
+          var drag_offset = event.deltaX / this.panelWidth;
 
           // slow down at the first and last pane
-          if ((this.position == 0 && event.gesture.direction == 'right') || (this.position == this.contentList.length - 1 && event.gesture.direction == 'left')) {
+          if ((this.position == 0 && event.deltaX > 0) || (this.position == this.contentList.length - 1 && event.deltaX < 0)) {
             drag_offset *= .4;
           }
 
@@ -466,18 +469,18 @@
 
         case 'swipeleft':
           this.showNext();
-          event.gesture.stopDetect();
+          this.hammer.stop(true);
           break;
 
         case 'swiperight':
           this.showPrevious();
-          event.gesture.stopDetect();
+          this.hammer.stop(true);
           break;
 
-        case 'dragend':
+        case 'panend':
           // more then 50% moved, navigate
-          if (Math.abs(event.gesture.deltaX) > this.panelWidth / 2) {
-            if (event.gesture.direction == 'right') {
+          if (Math.abs(event.deltaX) > this.panelWidth / 2) {
+            if (event.direction == Hammer.DIRECTION_RIGHT) {
               this.showPrevious();
             } else {
               this.showNext();
