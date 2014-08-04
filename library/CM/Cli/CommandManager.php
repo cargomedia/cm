@@ -14,10 +14,7 @@ class CM_Cli_CommandManager {
     private $_streamInput;
 
     /** @var CM_OutputStream_Interface */
-    private $_streamOutput;
-
-    /** @var CM_OutputStream_Interface */
-    private $_streamError;
+    private $_streamOutput, $_streamError;
 
     public function __construct() {
         $this->_commands = array();
@@ -63,6 +60,7 @@ class CM_Cli_CommandManager {
         $forks = (int) $forks;
         if ($quiet) {
             $this->_setStreamOutput(new CM_OutputStream_Null());
+            $this->_setStreamError(new CM_OutputStream_Null());
         }
         if ($quietWarnings) {
             CM_Bootloader::getInstance()->getExceptionHandler()->setPrintSeverityMin(CM_Exception::ERROR);
@@ -170,9 +168,10 @@ class CM_Cli_CommandManager {
             $transactionName = 'cm ' . $packageName . ' ' . $methodName;
             $streamInput = $this->_streamInput;
             $streamOutput = $this->_streamOutput;
-            $workload = function () use ($transactionName, $command, $arguments, $streamInput, $streamOutput) {
+            $streamError = $this->_streamError;
+            $workload = function () use ($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError) {
                 CMService_Newrelic::getInstance()->startTransaction($transactionName);
-                $command->run($arguments, $streamInput, $streamOutput);
+                $command->run($arguments, $streamInput, $streamOutput, $streamError);
             };
 
             $forks = max($this->_forks, 1);
@@ -278,23 +277,23 @@ class CM_Cli_CommandManager {
     }
 
     /**
-     * @param CM_InputStream_Interface $input
+     * @param CM_InputStream_Interface $streamInput
      */
-    private function _setStreamInput(CM_InputStream_Interface $input) {
-        $this->_streamInput = $input;
+    private function _setStreamInput(CM_InputStream_Interface $streamInput) {
+        $this->_streamInput = $streamInput;
     }
 
     /**
-     * @param CM_OutputStream_Interface $output
+     * @param CM_OutputStream_Interface $streamOutput
      */
-    private function _setStreamOutput(CM_OutputStream_Interface $output) {
-        $this->_streamOutput = $output;
+    private function _setStreamOutput(CM_OutputStream_Interface $streamOutput) {
+        $this->_streamOutput = $streamOutput;
     }
 
     /**
-     * @param CM_OutputStream_Interface $output
+     * @param CM_OutputStream_Interface $streamError
      */
-    private function _setStreamError(CM_OutputStream_Interface $output) {
-        $this->_streamError = $output;
+    private function _setStreamError(CM_OutputStream_Interface $streamError) {
+        $this->_streamError = $streamError;
     }
 }

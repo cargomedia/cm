@@ -99,10 +99,89 @@ Parent terminated.
     }
 
     /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testKillChildren() {
+        $loopEcho = function () {
+            while (true) {
+                usleep(50 * 1000);
+                echo "hello\n";
+            }
+        };
+        $process = CM_Process::getInstance();
+        $process->fork($loopEcho);
+        $process->fork($loopEcho);
+
+        $pidListBefore = $this->_getChildrenPidList();
+        $process->killChildren();
+        $this->assertCount(2, $pidListBefore);
+        $this->assertCount(0, $this->_getChildrenPidList());
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testKillChildrenSigKill() {
+        $loopEcho = function () {
+            while (true) {
+                usleep(50 * 1000);
+                echo "hello\n";
+            }
+        };
+        $loopEchoStayinAlive = function () {
+            pcntl_signal(SIGTERM, function () {
+                echo "Well, you can tell by the way I use my walk\n I'm a woman's man, no time to talk\n";
+            }, false);
+            while (true) {
+                usleep(50 * 1000);
+                echo "hello\n";
+            }
+        };
+
+        $process = CM_Process::getInstance();
+        $process->fork($loopEcho);
+        $process->fork($loopEchoStayinAlive);
+        $pidListBefore = $this->_getChildrenPidList();
+
+        $timeStart = microtime(true);
+        $process->killChildren(0.5);
+
+        $this->assertCount(2, $pidListBefore);
+        $this->assertCount(0, $this->_getChildrenPidList());
+        $this->assertSameTime(0.5, microtime(true) - $timeStart, 0.1);
+
+        $logError = new CM_Paging_Log_Error();
+        $this->assertSame(1, $logError->getCount());
+        $this->assertContains('killing with signal `9`', $logError->getItem(0)['msg']);
+    }
+
+    /**
      * @param string $message
      */
     public static function writeln($message) {
         print "$message\n";
         fwrite(self::$_file, "$message\n");
+    }
+
+    /**
+     * @return int[]
+     * @throws CM_Exception
+     */
+    private function _getChildrenPidList() {
+        $psCommand = 'ps axo pid,ppid,args';
+        $psOutput = CM_Util::exec($psCommand);
+        if (false === preg_match_all('/^\s*(?<pid>\d+)\s+(?<ppid>\d+)\s+(?<args>.+)$/m', $psOutput, $matches, PREG_SET_ORDER)) {
+            throw new CM_Exception('Cannot parse ps output `' . $psOutput . '`.');
+        }
+        $pid = CM_Process::getInstance()->getProcessId();
+        $pidList = array();
+        foreach ($matches as $match) {
+            if ($match['ppid'] == $pid && false === strpos($match['args'], $psCommand)) {
+                $pidList[] = (int) $match['pid'];
+            }
+        }
+        return $pidList;
     }
 }
