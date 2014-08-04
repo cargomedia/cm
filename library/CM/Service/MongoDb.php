@@ -198,7 +198,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      *
      */
     public function deleteIndex($collection, $indexName) {
-        $result = $this->_getDatabase()->command(array("deleteIndexes" => $collection, "index" => $indexName));
+        $result = $this->_getDatabase()->command(array('deleteIndexes' => $collection, 'index' => $indexName));
         $this->_checkResultForError($result);
         return $result;
     }
