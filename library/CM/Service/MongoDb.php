@@ -73,7 +73,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     protected function _checkResultForError($result) {
         if (true !== $result && empty($result['ok'])) {
-            throw new CM_Exception('Index operation failed.');
+            throw new CM_Exception('MongoDB operation failed.');
         }
     }
 
