@@ -23,11 +23,20 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
     private function _getEmptyCollectionName($testName) {
         $collectionName = $this->_collectionPrefix . $testName;
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        try {
+        if ($mongoDb->collectionExists($testName)) {
             $mongoDb->drop($collectionName);
-        } catch (CM_Exception $e) {
         }
         return $collectionName;
+    }
+
+    public function testCollectionExists() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $nonExistentCollectionName = md5(uniqid());
+        $this->assertFalse($mongoDb->collectionExists($nonExistentCollectionName));
+
+        $existingCollectionName = $this->_getEmptyCollectionName('foo');
+        $mongoDb->insert($existingCollectionName, array('foo' => 'bar'));
+        $this->assertTrue($mongoDb->collectionExists($existingCollectionName));
     }
 
     public function testUpdate() {

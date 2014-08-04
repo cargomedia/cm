@@ -16,34 +16,6 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
-     * @return string[]
-     */
-    public function listCollectionNames() {
-        return array_map(function (MongoCollection $collection) {
-            return $collection->getName();
-        }, $this->_getDatabase()->listCollections());
-    }
-
-    /**
-     * @return MongoDB
-     */
-    protected function _getDatabase() {
-        $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
-        return $this->_getClient()->selectDB($dbName);
-    }
-
-    /**
-     * @return MongoClient
-     */
-    protected function _getClient() {
-        if (null === $this->_client) {
-            $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
-        }
-
-        return $this->_client;
-    }
-
-    /**
      * @param string $collection
      * @param array  $object
      * @return array|bool
@@ -65,6 +37,25 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     protected function _getCollection($collection) {
         return $this->_getDatabase()->selectCollection($collection);
+    }
+
+    /**
+     * @return MongoDB
+     */
+    protected function _getDatabase() {
+        $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
+        return $this->_getClient()->selectDB($dbName);
+    }
+
+    /**
+     * @return MongoClient
+     */
+    protected function _getClient() {
+        if (null === $this->_client) {
+            $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
+        }
+
+        return $this->_client;
     }
 
     /**
@@ -218,5 +209,22 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     public function getNewId() {
         return (string) new MongoId();
+    }
+
+    /**
+     * @param string $collection
+     * @return bool
+     */
+    public function collectionExists($collection) {
+        return in_array($collection, $this->listCollectionNames());
+    }
+
+    /**
+     * @return string[]
+     */
+    public function listCollectionNames() {
+        return array_map(function (MongoCollection $collection) {
+            return $collection->getName();
+        }, $this->_getDatabase()->listCollections());
     }
 }
