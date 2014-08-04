@@ -89,7 +89,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         $criteria = (array) $criteria;
         $projection = (array) $projection;
         CM_Debug::getInstance()->incStats('mongo',
-            "findOne in {$collection}: " . serialize(array('projection' => $projection) + $criteria));
+            "findOne in {$collection}: " . CM_Util::var_line(array('projection' => $projection) + $criteria));
 
         return $this->_getCollection($collection)->findOne($criteria, $projection);
     }
@@ -105,7 +105,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     public function find($collection, array $criteria = null, array $projection = null) {
         $criteria = (array) $criteria;
         $projection = (array) $projection;
-        CM_Debug::getInstance()->incStats('mongo', "find in {$collection}: " . serialize(array('fields' => $projection) + $criteria));
+        CM_Debug::getInstance()->incStats('mongo', "find in {$collection}: " . CM_Util::var_line(array('fields' => $projection) + $criteria));
 
         return $this->_getCollection($collection)->find($criteria, $projection);
     }
@@ -123,7 +123,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         $criteria = (array) $criteria;
         $limit = (int) $limit;
         $offset = (int) $offset;
-        CM_Debug::getInstance()->incStats('mongo', "count in {$collection}: " . serialize($criteria));
+        CM_Debug::getInstance()->incStats('mongo', "count in {$collection}: " . CM_Util::var_line($criteria));
 
         return $this->_getCollection($collection)->count($criteria, $limit, $offset);
     }
