@@ -32,43 +32,6 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
-     * @param string $collection
-     * @return MongoCollection
-     */
-    protected function _getCollection($collection) {
-        return $this->_getDatabase()->selectCollection($collection);
-    }
-
-    /**
-     * @return MongoDB
-     */
-    protected function _getDatabase() {
-        $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
-        return $this->_getClient()->selectDB($dbName);
-    }
-
-    /**
-     * @return MongoClient
-     */
-    protected function _getClient() {
-        if (null === $this->_client) {
-            $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
-        }
-
-        return $this->_client;
-    }
-
-    /**
-     * @param array|bool $result
-     * @throws CM_Exception
-     */
-    protected function _checkResultForError($result) {
-        if (true !== $result && empty($result['ok'])) {
-            throw new CM_Exception('MongoDB operation failed.');
-        }
-    }
-
-    /**
      * @param string     $collection
      * @param array|null $criteria
      * @param array|null $projection
@@ -226,5 +189,42 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         return array_map(function (MongoCollection $collection) {
             return $collection->getName();
         }, $this->_getDatabase()->listCollections());
+    }
+
+    /**
+     * @param string $collection
+     * @return MongoCollection
+     */
+    protected function _getCollection($collection) {
+        return $this->_getDatabase()->selectCollection($collection);
+    }
+
+    /**
+     * @return MongoDB
+     */
+    protected function _getDatabase() {
+        $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
+        return $this->_getClient()->selectDB($dbName);
+    }
+
+    /**
+     * @return MongoClient
+     */
+    protected function _getClient() {
+        if (null === $this->_client) {
+            $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
+        }
+
+        return $this->_client;
+    }
+
+    /**
+     * @param array|bool $result
+     * @throws CM_Exception
+     */
+    protected function _checkResultForError($result) {
+        if (true !== $result && empty($result['ok'])) {
+            throw new CM_Exception('MongoDB operation failed.');
+        }
     }
 }
