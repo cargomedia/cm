@@ -81,7 +81,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param string     $collection
      * @param array|null $criteria
      * @param array|null $projection
-     * @return array
+     * @return array|null
      *
      * @see MongoCollection::findOne
      */
@@ -135,7 +135,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @see MongoCollection::drop
      */
     public function drop($collection) {
-        CM_Debug::getInstance()->incStats('mongo', "drop {$collection}: ");
+        CM_Debug::getInstance()->incStats('mongo', "drop {$collection}");
 
         $result = $this->_getCollection($collection)->drop();
         $this->_checkResultForError($result);
