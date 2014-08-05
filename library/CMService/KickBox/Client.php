@@ -68,8 +68,22 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
         $kickBox = new \Kickbox\Client($this->_getCode());
         $response = $kickBox->kickbox()->verify($email);
         if ($response->code !== 200 || !is_array($response->body)) {
+            $exception = new CM_Exception('KickBox exception', array(
+                'code'    => $response->code,
+                'headers' => $response->headers,
+                'body'    => $response->body,
+            ));
+            $exception->setSeverity(CM_Exception::WARN);
+            $this->_handleException($exception);
             return null;
         }
         return $response->body;
+    }
+
+    /**
+     * @param CM_Exception $exception
+     */
+    protected function _handleException(CM_Exception $exception) {
+        CM_Bootloader::getInstance()->getExceptionHandler()->handleException($exception);
     }
 }
