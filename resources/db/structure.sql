@@ -14,7 +14,7 @@ CREATE TABLE `cm_action` (
   `interval` int(10) unsigned NOT NULL DEFAULT '1',
   KEY `actorId` (`actorId`),
   KEY `ip` (`ip`),
-  KEY `` (`verb`),
+  KEY `action` (`verb`),
   KEY `createStamp` (`createStamp`),
   KEY `modelType` (`type`),
   KEY `actionLimitType` (`actionLimitType`),
@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `cm_actionLimit`;
 
 
 CREATE TABLE `cm_actionLimit` (
-  `actionType` int(10) DEFAULT NULL,
+  `actionType` tinyint(3) DEFAULT NULL,
   `actionVerb` tinyint(3) DEFAULT NULL,
   `type` int(10) unsigned NOT NULL,
   `role` tinyint(3) unsigned DEFAULT NULL,
