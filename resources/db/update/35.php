@@ -1,3 +1,3 @@
 <?php
 
-CM_Db_Db::exec('ALTER TABLE `cm_actionLimit` CHANGE COLUMN `actionType` `actionType` INT NULL DEFAULT NULL');
+CM_Db_Db::exec('ALTER TABLE `cm_actionLimit` CHANGE COLUMN `actionType` `actionType` INT UNSIGNED DEFAULT NULL');
