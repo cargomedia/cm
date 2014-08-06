@@ -35,7 +35,7 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
             '_threshold:' . $this->_disallowUnknownThreshold;
         $cache = CM_Cache_Shared::getInstance();
         if (false === ($isValid = $cache->get($key))) {
-            $response = $this->_getResponse($email);
+            $response = $this->_getResponseBody($email);
             if (null === $response) {
                 return true;
             }
@@ -62,11 +62,19 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
 
     /**
      * @param string $email
-     * @return array|null
+     * @return \Kickbox\HttpClient\Response
      */
     protected function _getResponse($email) {
         $kickBox = new \Kickbox\Client($this->_getCode());
-        $response = $kickBox->kickbox()->verify($email);
+        return $kickBox->kickbox()->verify($email);
+    }
+
+    /**
+     * @param string $email
+     * @return array|null
+     */
+    protected function _getResponseBody($email) {
+        $response = $this->_getResponse($email);
         if ($response->code !== 200 || !is_array($response->body)) {
             $exception = new CM_Exception('KickBox exception', array(
                 'email'   => $email,
