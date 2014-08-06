@@ -42,6 +42,17 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     }
 
     /**
+     * @return bool
+     */
+    public function getJavascript() {
+        return $this->_get('javascript');
+    }
+
+    public function enableJavascript() {
+        $this->_set('javascript', true);
+    }
+
+    /**
      * @return int
      */
     protected function _getUpdateCount() {
@@ -57,7 +68,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
             'variables'               => array('type' => 'string', 'optional' => true),
             'updateCountResetVersion' => array('type' => 'int', 'optional' => true),
             'updateCount'             => array('type' => 'int'),
-            'javascript'              => array('type' => 'int'),
+            'javascript' => array('type' => 'bool'),
         ));
     }
 
@@ -100,7 +111,8 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
         $languageKey->_set([
             'name'                    => $name,
             'updateCount'             => 0,
-            'updateCountResetVersion' => 0
+            'updateCountResetVersion' => 0,
+            'javascript'              => false,
         ]);
         $languageKey->setVariables($variables);
         $languageKey->commit();
