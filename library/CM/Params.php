@@ -509,12 +509,17 @@ class CM_Params extends CM_Class_Abstract {
     }
 
     /**
-     * @param mixed $value
-     * @return string
+     * @param mixed     $value
+     * @param bool|null $prettyPrint
      * @throws CM_Exception_Invalid
+     * @return string
      */
-    public static function jsonEncode($value) {
-        $value = json_encode($value);
+    public static function jsonEncode($value, $prettyPrint = null) {
+        $options = 0;
+        if ($prettyPrint) {
+            $options = $options | JSON_PRETTY_PRINT;
+        }
+        $value = json_encode($value, $options);
         if (json_last_error() > 0) {
             throw new CM_Exception_Invalid('Cannot json_encode value `' . CM_Util::var_line($value) . '`.');
         }
