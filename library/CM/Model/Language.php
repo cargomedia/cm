@@ -51,22 +51,19 @@ class CM_Model_Language extends CM_Model_Abstract {
      * @return string
      */
     public function getTranslation($phrase, array $variableNames = null, $skipCacheLocal = null) {
+        $writeCache = false;
         $phrase = (string) $phrase;
         $cacheKey = CM_CacheConst::Language_Translations . '_languageId:' . $this->getId();
         $cache = CM_Cache_Local::getInstance();
         if ($skipCacheLocal || false === ($translations = $cache->get($cacheKey))) {
             $translations = $this->getTranslations()->getAssociativeArray();
-            if (!$skipCacheLocal) {
-                $cache->set($cacheKey, $translations);
-            }
+            $writeCache = true;
         }
 
         if (!array_key_exists($phrase, $translations)) {
             CM_Model_LanguageKey::create($phrase, $variableNames);
             $translations[$phrase] = ['value' => $phrase, 'variables' => $variableNames];
-            if (!$skipCacheLocal) {
-                $cache->set($cacheKey, $translations);
-            }
+            $writeCache = true;
         }
 
         if ($variableNames !== null) {
@@ -75,10 +72,12 @@ class CM_Model_Language extends CM_Model_Abstract {
                 $languageKey = CM_Model_LanguageKey::findByName($phrase);
                 $languageKey->setVariables($variableNames);
                 $translations[$phrase]['variables'] = $variableNames;
-                if (!$skipCacheLocal) {
-                    $cache->set($cacheKey, $translations);
-                }
+                $writeCache = true;
             }
+        }
+
+        if ($writeCache && !$skipCacheLocal) {
+            $cache->set($cacheKey, $translations);
         }
 
         if (!isset($translations[$phrase]['value'])) {
