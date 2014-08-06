@@ -127,4 +127,21 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
         }
         $this->assertTrue(true);
     }
+
+    public function testRpcRequestTranslationJs() {
+        $languageKey = CM_Model_LanguageKey::create('foo');
+        $this->assertFalse($languageKey->getJavascript());
+
+        CM_Model_Language::rpc_requestTranslationJs('foo');
+        $languageKey = CM_Model_LanguageKey::findByName('foo');
+        $this->assertTrue($languageKey->getJavascript());
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     * @expectedExceptionMessage Language key `foo` not found
+     */
+    public function testRpcRequestTranslationJsNonExistentKey() {
+        CM_Model_Language::rpc_requestTranslationJs('foo');
+    }
 }
