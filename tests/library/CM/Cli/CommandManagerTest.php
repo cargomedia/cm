@@ -155,36 +155,22 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManager->mockMethod('_getCommand')->set($command);
         $commandManager->mockMethod('_getProcess')
             ->at(0, function () use ($processMock) {
-                $workloadResult = $this->mockClass('CM_Process_WorkloadResult')->newInstanceWithoutConstructor();
-                $workloadResult->mockMethod('isSuccess')
-                    ->at(0, true)
-                    ->at(1, true)
-                    ->at(2, true)
-                    ->at(3, true);
-
                 $processSuccess = $processMock->newInstance();
                 $processSuccess->mockMethod('waitForChildren')->set([
-                    $workloadResult,
-                    $workloadResult,
-                    $workloadResult,
-                    $workloadResult,
+                    new CM_Process_WorkloadResult(true),
+                    new CM_Process_WorkloadResult(true),
+                    new CM_Process_WorkloadResult(true),
+                    new CM_Process_WorkloadResult(true),
                 ]);
                 return $processSuccess;
             })
             ->at(1, function () use ($processMock) {
-                $workloadResult = $this->mockClass('CM_Process_WorkloadResult')->newInstanceWithoutConstructor();
-                $workloadResult->mockMethod('isSuccess')
-                    ->at(0, true)
-                    ->at(1, false)
-                    ->at(2, true)
-                    ->at(3, true);
-
                 $processFailure = $processMock->newInstance();
                 $processFailure->mockMethod('waitForChildren')->set([
-                    $workloadResult,
-                    $workloadResult,
-                    $workloadResult,
-                    $workloadResult,
+                    new CM_Process_WorkloadResult(true),
+                    new CM_Process_WorkloadResult(false, new Exception('Workload failed')),
+                    new CM_Process_WorkloadResult(true),
+                    new CM_Process_WorkloadResult(true),
                 ]);
                 return $processFailure;
             });
