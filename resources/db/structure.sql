@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `cm_actionLimit`;
 
 
 CREATE TABLE `cm_actionLimit` (
-  `actionType` tinyint(3) DEFAULT NULL,
+  `actionType` int(10) unsigned DEFAULT NULL,
   `actionVerb` tinyint(3) DEFAULT NULL,
   `type` int(10) unsigned NOT NULL,
   `role` tinyint(3) unsigned DEFAULT NULL,

@@ -150,6 +150,7 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         if ($this->_isLink($pathPrefix)) {
             return;
         }
+        $pathPrefix = CM_File_Filesystem::normalizePath($pathPrefix);
         $pathPrefixAbsolute = $this->_getAbsolutePath($pathPrefix);
         $filenameList = @scandir($pathPrefixAbsolute);
         if (false === $filenameList) {

@@ -244,4 +244,22 @@ class CM_ParamsTest extends CMTest_TestCase {
         $params = new CM_Params(array('foo' => 'hello'));
         $params->getParams('foo');
     }
+
+    public function testJsonEncode() {
+        $actual = CM_Params::jsonEncode(['foo' => 'bar']);
+        $this->assertSame('{"foo":"bar"}', $actual);
+    }
+
+    public function testJsonEncodePrettyPrint() {
+        $actual = CM_Params::jsonEncode(['foo' => 'bar'], true);
+        $this->assertSame('{' . "\n" . '    "foo": "bar"' . "\n" . '}', $actual);
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testJsonEncodeInvalid() {
+        $resource = fopen(sys_get_temp_dir(), 'r');
+        CM_Params::jsonEncode(['foo' => $resource]);
+    }
 }

@@ -35,7 +35,14 @@ class CM_Elasticsearch_Client extends CM_Class_Abstract {
             $search->addIndex($type->getIndex());
             $search->addType($type->getType());
         }
-        $response = $this->_client->request($search->getPath(), 'GET', $data);
+        try {
+            $response = $this->_client->request($search->getPath(), 'GET', $data);
+        } catch (Elastica\Exception\ConnectionException $ex) {
+            foreach ($this->_client->getConnections() as $connection) {
+                $connection->setEnabled();
+            }
+            throw $ex;
+        }
         return $response->getData();
     }
 
