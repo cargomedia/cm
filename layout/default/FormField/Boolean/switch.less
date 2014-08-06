@@ -5,6 +5,7 @@ input[type=checkbox] {
     margin-left: 0;
 
     .handle {
+      .box-sizing(border-box);
       position: relative;
       display: inline-block;
       width: 2 * @sizeSwitch + 5px;
@@ -33,6 +34,7 @@ input[type=checkbox] {
       }
 
       &:after {
+        .box-sizing(border-box);
         left: 0;
         content: '';
         width: @sizeSwitch - 6px;
