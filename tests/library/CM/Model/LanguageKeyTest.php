@@ -40,13 +40,12 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
 
     public function testSetVariablesWithDifferentVariablesLoop() {
         $languageKey = CM_Model_LanguageKey::create('foo');
-        for ($i = 0; $i < 25; $i++) {
-            $languageKey->setVariables(array('oneVariable', 'secondOne'));
-            $languageKey->setVariables(array('oneVariable'));
+        for ($i = 0; $i < CM_Model_LanguageKey::MAX_UPDATE_COUNT; $i++) {
+            $languageKey->setVariables(['variable' . $i]);
         }
         try {
-            $languageKey->setVariables(array('oneVariable', 'secondOne'));
-            $this->fail('Did not throw exception after ' . ($i * 2) . ' changes');
+            $languageKey->setVariables(['variable']);
+            $this->fail('Did not throw exception after ' . (CM_Model_LanguageKey::MAX_UPDATE_COUNT) . ' changes');
         } catch (CM_Exception_Invalid $e) {
             $this->assertContains('`foo`', $e->getMessage());
         }
