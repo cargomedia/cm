@@ -68,7 +68,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
             'variables'               => array('type' => 'string', 'optional' => true),
             'updateCountResetVersion' => array('type' => 'int', 'optional' => true),
             'updateCount'             => array('type' => 'int'),
-            'javascript' => array('type' => 'bool'),
+            'javascript'              => array('type' => 'bool'),
         ));
     }
 
@@ -168,18 +168,6 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     public static function deleteByName($name) {
         $languageKey = self::findByName($name);
         $languageKey->delete();
-    }
-
-    /**
-     * @param string $name
-     */
-    public static function clearDuplicates($name) {
-        $name = (string) $name;
-        $languageKeyIdList = CM_Db_Db::select('cm_model_languagekey', 'id', array('name' => $name), 'id ASC')->fetchAllColumn();
-        if (count($languageKeyIdList) > 1) {
-            $languageKeyId = array_shift($languageKeyIdList);
-            CM_Db_Db::exec("DELETE FROM `cm_model_languagekey` WHERE `name` = ? AND `id` != ?", array($name, $languageKeyId));
-        }
     }
 
     public static function getPersistenceClass() {
