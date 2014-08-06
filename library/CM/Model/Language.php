@@ -228,16 +228,16 @@ class CM_Model_Language extends CM_Model_Abstract {
     }
 
     /**
-     * @param string $languageKey
+     * @param string $phrase
      * @throws CM_Exception_Invalid
      */
-    public static function rpc_requestTranslationJs($languageKey) {
-        $javascript = CM_Db_Db::select('cm_model_languagekey', 'javascript', array('name' => $languageKey))->fetchColumn();
-        if ($javascript === false) {
-            throw new CM_Exception_Invalid('Language key `' . $languageKey . '` not found');
+    public static function rpc_requestTranslationJs($phrase) {
+        $languageKey = CM_Model_LanguageKey::findByName($phrase);
+        if (!$languageKey) {
+            throw new CM_Exception_Invalid('Language key `' . $phrase . '` not found');
         }
-        if ($javascript == 0) {
-            CM_Db_Db::update('cm_model_languagekey', array('javascript' => 1), array('name' => $languageKey));
+        if (!$languageKey->getJavascript()) {
+            $languageKey->enableJavascript();
             self::updateVersionJavascript();
         }
     }
