@@ -36,6 +36,16 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
+     * @param string  $collection
+     * @param array[] $objectList
+     * @return mixed
+     */
+    public function batchInsert($collection, array $objectList) {
+        CM_Debug::getInstance()->incStats('mongo', "batch insert to {$collection}");
+        return $this->_getCollection($collection)->batchInsert($objectList);
+    }
+
+    /**
      * @param string     $collection
      * @param array|null $criteria
      * @param array|null $projection
@@ -143,6 +153,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @return MongoCollection
      */
     protected function _getCollection($collection) {
+        $collection = (string) $collection;
         return $this->_getDatabase()->selectCollection($collection);
     }
 }
