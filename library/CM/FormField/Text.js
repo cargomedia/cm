@@ -14,6 +14,9 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
     },
     'focus input, textarea': function() {
       this.trigger('focus');
+    },
+    'change input, textarea': function() {
+      this.triggerChange();
     }
   },
 
@@ -33,7 +36,14 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
     return this.getInput().is(':focus');
   },
 
-  enableTriggerChange: function() {
+  triggerChange: function() {
+    if (this._skipTriggerChange) {
+      return;
+    }
+    this.trigger('change');
+  },
+
+  enableTriggerChangeOnInput: function() {
     var self = this;
     var $input = this.getInput();
     var valueLast = $input.val();
@@ -41,9 +51,7 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
       var value = this.value;
       if (value != valueLast) {
         valueLast = value;
-        if (!self._skipTriggerChange) {
-          self.trigger('change');
-        }
+        this.triggerChange();
       }
     };
     // `propertychange` and `keyup` needed for IE9
