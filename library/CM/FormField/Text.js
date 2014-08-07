@@ -8,6 +8,9 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
   /** @type Boolean */
   _skipTriggerChange: false,
 
+  /** @type String */
+  _valueLast: null,
+
   events: {
     'blur input, textarea': function() {
       this.trigger('blur');
@@ -18,6 +21,10 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
     'change input, textarea': function() {
       this.triggerChange();
     }
+  },
+
+  ready: function() {
+    this._valueLast = this.getInput().val();
   },
 
   /**
@@ -40,21 +47,15 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
     if (this._skipTriggerChange) {
       return;
     }
-    this.trigger('change');
+    var valueCurrent = this.getInput().val();
+    if (this._valueLast !== valueCurrent) {
+      this._valueLast = valueCurrent;
+      this.trigger('change');
+    }
   },
 
   enableTriggerChangeOnInput: function() {
-    var self = this;
-    var $input = this.getInput();
-    var valueLast = $input.val();
-    var callback = function() {
-      var value = this.value;
-      if (value != valueLast) {
-        valueLast = value;
-        this.triggerChange();
-      }
-    };
     // `propertychange` and `keyup` needed for IE9
-    $input.on('input propertychange keyup', callback);
+    this.getInput().on('input propertychange keyup', this.triggerChange.bind(this));
   }
 });
