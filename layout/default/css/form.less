@@ -1,5 +1,6 @@
 .textinput {
   .appearance(none);
+  .box-sizing(border-box);
   width: 100%;
   height: @heightInputText;
   overflow: hidden;
@@ -54,6 +55,7 @@ textarea.textinput {
 .placeholder(lighten(@colorFgSubtle, 10));
 
 .button {
+  .box-sizing(border-box);
   width: auto;
   height: @sizeButton;
   line-height: @sizeButton - 2px;
@@ -208,6 +210,7 @@ input[type=checkbox], input[type=radio] {
     margin-left: @sizeCheckbox+4px;
 
     &:before {
+      .box-sizing(border-box);
       position: absolute;
       content: "";
       display: block;
@@ -268,12 +271,14 @@ input[type=checkbox] {
 }
 
 .formField, .formAction {
+  .box-sizing(border-box);
   max-width: 100%;
   padding: 6px;
 }
 
 .formField {
   > label {
+    .box-sizing(border-box);
     color: @colorFgLinkSubtle;
     font-weight: bold;
     padding-left: 2px;

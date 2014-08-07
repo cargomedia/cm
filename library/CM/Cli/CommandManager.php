@@ -179,7 +179,13 @@ class CM_Cli_CommandManager {
             for ($i = 0; $i < $forks; $i++) {
                 $process->fork($workload);
             }
-            $process->waitForChildren($command->getKeepalive(), $terminationCallback);
+            $resultList = $process->waitForChildren($command->getKeepalive(), $terminationCallback);
+            $failure = Functional\some($resultList, function (CM_Process_WorkloadResult $result) {
+                return !$result->isSuccess();
+            });
+            if ($failure) {
+                return 1;
+            }
             return 0;
         } catch (CM_Cli_Exception_InvalidArguments $e) {
             $this->_outputError('ERROR: ' . $e->getMessage() . PHP_EOL);
