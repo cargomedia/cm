@@ -213,6 +213,24 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @param object|string $objectOrClass
+     * @param string        $methodName
+     * @param array|null    $arguments
+     * @return mixed
+     */
+    public function forceInvokeMethod($objectOrClass, $methodName, array $arguments = null) {
+        $context = null;
+        if (is_object($objectOrClass)) {
+            $context = $objectOrClass;
+        }
+        $arguments = (array) $arguments;
+        $reflectionClass = new ReflectionClass($objectOrClass);
+        $reflectionMethod = $reflectionClass->getMethod($methodName);
+        $reflectionMethod->setAccessible(true);
+        return $reflectionMethod->invokeArgs($context, $arguments);
+    }
+
+    /**
      * @param string     $pageClass
      * @param array|null $params
      * @return CM_Page_Abstract
