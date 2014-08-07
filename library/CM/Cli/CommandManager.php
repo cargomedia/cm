@@ -181,7 +181,6 @@ class CM_Cli_CommandManager {
             }
             $resultList = $process->waitForChildren($command->getKeepalive(), $terminationCallback);
             $failure = Functional\some($resultList, function (CM_Process_WorkloadResult $result) {
-
                 return !$result->isSuccess();
             });
             if ($failure) {
