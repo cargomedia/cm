@@ -143,6 +143,43 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         CM_Db_Db::truncate('cm_cli_command_manager_process');
     }
 
+    public function testRunExitCode() {
+        $processMock = $this->mockClass('CM_Process');
+        $processMock->mockMethod('fork');
+
+        $command = $this->mockClass('CM_Cli_Command')->newInstanceWithoutConstructor();
+        $command->mockMethod('getSynchronized');
+        $command->mockMethod('getKeepalive');
+
+        $commandManager = $this->mockObject('CM_Cli_CommandManager');
+        $commandManager->mockMethod('_getCommand')->set($command);
+        $commandManager->mockMethod('_getProcess')
+            ->at(0, function () use ($processMock) {
+                $processSuccess = $processMock->newInstance();
+                $processSuccess->mockMethod('waitForChildren')->set([
+                    new CM_Process_WorkloadResult(true),
+                    new CM_Process_WorkloadResult(true),
+                    new CM_Process_WorkloadResult(true),
+                    new CM_Process_WorkloadResult(true),
+                ]);
+                return $processSuccess;
+            })
+            ->at(1, function () use ($processMock) {
+                $processFailure = $processMock->newInstance();
+                $processFailure->mockMethod('waitForChildren')->set([
+                    new CM_Process_WorkloadResult(true),
+                    new CM_Process_WorkloadResult(false, new Exception('Workload failed')),
+                    new CM_Process_WorkloadResult(true),
+                    new CM_Process_WorkloadResult(true),
+                ]);
+                return $processFailure;
+            });
+
+        /** @var CM_Cli_CommandManager $commandManager */
+        $this->assertSame(0, $commandManager->run(new CM_Cli_Arguments(['bin/cm', 'foo', 'bar'])));
+        $this->assertSame(1, $commandManager->run(new CM_Cli_Arguments(['bin/cm', 'foo', 'bar'])));
+    }
+
     /**
      * @param CM_Cli_Command $commandMock
      * @param string|null    $errorMessageExpected
@@ -195,6 +232,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
             if (isset($terminationCallback)) {
                 $terminationCallback();
             }
+            return array();
         };
         $processMock->expects($this->any())->method('waitForChildren')->with($keepAliveExpected, $this->anything())->will($this->returnCallback($waitForChildrenMock));
         return $processMock;
