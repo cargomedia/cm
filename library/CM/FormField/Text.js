@@ -44,13 +44,12 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
   },
 
   triggerChange: function() {
-    if (this._skipTriggerChange) {
-      return;
-    }
     var valueCurrent = this.getInput().val();
     if (this._valueLast !== valueCurrent) {
       this._valueLast = valueCurrent;
-      this.trigger('change');
+      if (!this._skipTriggerChange) {
+        this.trigger('change');
+      }
     }
   },
 
