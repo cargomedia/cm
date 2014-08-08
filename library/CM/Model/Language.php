@@ -61,6 +61,20 @@ class CM_Model_Language extends CM_Model_Abstract {
     }
 
     /**
+     * @param CM_Model_Language $language
+     * @return bool
+     */
+    public function isBackingUp(CM_Model_Language $language) {
+        while (!is_null($language)) {
+            if ($this->equals($language)) {
+                return true;
+            }
+            $language = $language->getBackup();
+        }
+        return false;
+    }
+
+    /**
      * @return CM_Paging_Translation_Language
      */
     public function getTranslations() {
@@ -119,20 +133,6 @@ class CM_Model_Language extends CM_Model_Abstract {
      */
     public function setTranslation($phrase, $value = null, array $variables = null) {
         $this->getTranslations()->set($phrase, $value, $variables);
-    }
-
-    /**
-     * @param CM_Model_Language $language
-     * @return bool
-     */
-    public function isBackingUp(CM_Model_Language $language) {
-        while (!is_null($language)) {
-            if ($this->equals($language)) {
-                return true;
-            }
-            $language = $language->getBackup();
-        }
-        return false;
     }
 
     public function toArray() {
