@@ -5,6 +5,24 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     const MAX_UPDATE_COUNT = 50;
 
     /**
+     * @return string
+     */
+    public function getName() {
+        return $this->_get('name');
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getVariables() {
+        if (!$this->_has('variables')) {
+            return array();
+        }
+        $variablesEncoded = $this->_get('variables');
+        return CM_Params::jsonDecode($variablesEncoded);
+    }
+
+    /**
      * @param string[]|null $variables
      * @throws CM_Exception_Invalid
      */
@@ -20,25 +38,13 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
             $this->_increaseUpdateCount();
             if ($this->_getUpdateCount() > self::MAX_UPDATE_COUNT) {
                 $message = [
-                    'Variables for languageKey `' . $this->_get('name') . '` have been updated over ' . self::MAX_UPDATE_COUNT .
-                    ' times since release.',
+                    'Variables for languageKey `' . $this->getName() . '` have been updated over ' . self::MAX_UPDATE_COUNT . ' times since release.',
                     'Previous variables: `' . CM_Util::var_line($previousVariables) . '`',
                     'Current variables: `' . CM_Util::var_line($variables) . '`',
                 ];
                 throw new CM_Exception_Invalid(join(PHP_EOL, $message));
             }
         }
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getVariables() {
-        if (!$this->_has('variables')) {
-            return array();
-        }
-        $variablesEncoded = $this->_get('variables');
-        return CM_Params::jsonDecode($variablesEncoded);
     }
 
     /**
@@ -62,16 +68,6 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
         return $this->_get('updateCount');
     }
 
-    protected function _getSchema() {
-        return new CM_Model_Schema_Definition(array(
-            'name'                    => array('type' => 'string'),
-            'variables'               => array('type' => 'string', 'optional' => true),
-            'updateCountResetVersion' => array('type' => 'int', 'optional' => true),
-            'updateCount'             => array('type' => 'int'),
-            'javascript'              => array('type' => 'bool'),
-        ));
-    }
-
     protected function _increaseUpdateCount() {
         $data = [
             'updateCount' => $this->_getUpdateCount() + 1
@@ -89,6 +85,16 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
         return CM_App::getInstance()->getDeployVersion();
     }
 
+    protected function _getSchema() {
+        return new CM_Model_Schema_Definition(array(
+            'name'                    => array('type' => 'string'),
+            'variables'               => array('type' => 'string', 'optional' => true),
+            'updateCountResetVersion' => array('type' => 'int', 'optional' => true),
+            'updateCount'             => array('type' => 'int'),
+            'javascript'              => array('type' => 'bool'),
+        ));
+    }
+
     protected function _onDeleteBefore() {
         CM_Db_Db::delete('cm_languageValue', array('languageKeyId' => $this->getId()));
     }
@@ -97,8 +103,14 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
         $cacheables = parent::_getContainingCacheables();
         foreach (new CM_Paging_Language_All() as $language) {
             $cacheables[] = new CM_Paging_Translation_Language($language);
+            $cacheables[] = new CM_Paging_Translation_Language($language);
         }
         return $cacheables;
+    }
+
+    protected function _changeContainingCacheables() {
+        parent::_changeContainingCacheables();
+        CM_Cache_Local::getInstance()->delete(CM_CacheConst::LanguageKey_Tree);
     }
 
     /**
@@ -172,5 +184,18 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
 
     public static function getPersistenceClass() {
         return 'CM_Model_StorageAdapter_Database';
+    }
+
+    /**
+     * @return CM_Tree_Language
+     */
+    public static function getTree() {
+        $cacheKey = CM_CacheConst::LanguageKey_Tree;
+        $cache = CM_Cache_Local::getInstance();
+        if (false === ($tree = $cache->get($cacheKey))) {
+            $tree = new CM_Tree_Language();
+            $cache->set($cacheKey, $tree);
+        }
+        return $tree;
     }
 }

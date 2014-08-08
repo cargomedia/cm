@@ -57,7 +57,6 @@ class CM_Model_Language extends CM_Model_Abstract {
      */
     public function setBackup(CM_Model_Language $language = null) {
         $this->_set('backupId', $language);
-        $this->_change();
     }
 
     /**
@@ -215,19 +214,6 @@ class CM_Model_Language extends CM_Model_Abstract {
             return null;
         }
         return new static($languageId);
-    }
-
-    /**
-     * @return CM_Tree_Language
-     */
-    public static function getTree() {
-        $cacheKey = CM_CacheConst::Language_Tree;
-        $cache = CM_Cache_Local::getInstance();
-        if (false === ($tree = $cache->get($cacheKey))) {
-            $tree = new CM_Tree_Language();
-            $cache->set($cacheKey, $tree);
-        }
-        return $tree;
     }
 
     /**
