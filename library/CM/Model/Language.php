@@ -64,7 +64,7 @@ class CM_Model_Language extends CM_Model_Abstract {
      * @return bool
      */
     public function isBackingUp(CM_Model_Language $language) {
-        while (!is_null($language)) {
+        while (null !== $language) {
             if ($this->equals($language)) {
                 return true;
             }
