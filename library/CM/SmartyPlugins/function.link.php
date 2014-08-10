@@ -32,6 +32,10 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
     unset($params['data']);
 
     $href = 'javascript:;';
+    if (isset($params['href'])) {
+        $href = (string) $params['href'];
+    }
+    unset($params['href']);
     if (isset($params['page'])) {
         $href = smarty_function_linkUrl($params, $template);
     }
