@@ -97,6 +97,11 @@ class smarty_function_linkTest extends CMTest_TestCase {
         ));
     }
 
+    public function testHref() {
+        $expected = '<a href="http://www.example.com/foo" class="link hasLabel"><span class="label">http://www.example.com/foo</span></a>';
+        $this->_assertSame($expected, array('href' => 'http://www.example.com/foo'));
+    }
+
     /**
      * @param string $expected
      * @param array  $params
