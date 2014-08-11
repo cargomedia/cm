@@ -53,7 +53,6 @@ class CM_Model_Language extends CM_Model_Abstract {
 
     /**
      * @param CM_Model_Language|null $language
-     * @throws CM_Exception_Invalid
      */
     public function setBackup(CM_Model_Language $language = null) {
         $this->_set('backupId', $language);
@@ -65,10 +64,10 @@ class CM_Model_Language extends CM_Model_Abstract {
      */
     public function isBackingUp(CM_Model_Language $language) {
         while (null !== $language) {
+            $language = $language->getBackup();
             if ($this->equals($language)) {
                 return true;
             }
-            $language = $language->getBackup();
         }
         return false;
     }

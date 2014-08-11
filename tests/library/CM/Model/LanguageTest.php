@@ -105,6 +105,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
         $backedUpLanguage = CM_Model_Language::create('Polish', 'pl', true, $language);
         $this->assertTrue($language->isBackingUp($backedUpLanguage));
         $this->assertFalse($backedUpLanguage->isBackingUp($language));
+        $this->assertFalse($language->isBackingUp($language));
     }
 
     public function testFindDefault() {

@@ -103,7 +103,6 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
         $cacheables = parent::_getContainingCacheables();
         foreach (new CM_Paging_Language_All() as $language) {
             $cacheables[] = new CM_Paging_Translation_Language($language);
-            $cacheables[] = new CM_Paging_Translation_Language($language);
         }
         return $cacheables;
     }
