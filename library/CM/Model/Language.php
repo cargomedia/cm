@@ -10,10 +10,24 @@ class CM_Model_Language extends CM_Model_Abstract {
     }
 
     /**
+     * @param string $name
+     */
+    public function setName($name) {
+        $this->_set('name', $name);
+    }
+
+    /**
      * @return string
      */
     public function getAbbreviation() {
         return $this->_get('abbreviation');
+    }
+
+    /**
+     * @param string $abbreviation
+     */
+    public function setAbbreviation($abbreviation) {
+        $this->_set('abbreviation', $abbreviation);
     }
 
     /**
@@ -35,6 +49,27 @@ class CM_Model_Language extends CM_Model_Abstract {
      */
     public function getBackup() {
         return $this->_get('backupId');
+    }
+
+    /**
+     * @param CM_Model_Language|null $language
+     */
+    public function setBackup(CM_Model_Language $language = null) {
+        $this->_set('backupId', $language);
+    }
+
+    /**
+     * @param CM_Model_Language $language
+     * @return bool
+     */
+    public function isBackingUp(CM_Model_Language $language) {
+        while (null !== $language) {
+            $language = $language->getBackup();
+            if ($this->equals($language)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -96,29 +131,6 @@ class CM_Model_Language extends CM_Model_Abstract {
      */
     public function setTranslation($phrase, $value = null, array $variables = null) {
         $this->getTranslations()->set($phrase, $value, $variables);
-    }
-
-    /**
-     * @param CM_Model_Language|null $language
-     * @throws CM_Exception_Invalid
-     */
-    public function setBackup(CM_Model_Language $language = null) {
-        $this->_set('backupId', $language);
-        $this->_change();
-    }
-
-    /**
-     * @param CM_Model_Language $language
-     * @return bool
-     */
-    public function isBackingUp(CM_Model_Language $language) {
-        while (!is_null($language)) {
-            if ($this->equals($language)) {
-                return true;
-            }
-            $language = $language->getBackup();
-        }
-        return false;
     }
 
     public function toArray() {
@@ -201,19 +213,6 @@ class CM_Model_Language extends CM_Model_Abstract {
             return null;
         }
         return new static($languageId);
-    }
-
-    /**
-     * @return CM_Tree_Language
-     */
-    public static function getTree() {
-        $cacheKey = CM_CacheConst::Language_Tree;
-        $cache = CM_Cache_Local::getInstance();
-        if (false === ($tree = $cache->get($cacheKey))) {
-            $tree = new CM_Tree_Language();
-            $cache->set($cacheKey, $tree);
-        }
-        return $tree;
     }
 
     /**

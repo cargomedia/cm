@@ -110,4 +110,10 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         $this->assertSame($now + 1, $languageKey->_get('updateCountResetVersion'));
         $this->assertSame(1, $languageKey->_get('updateCount'));
     }
+
+    public function testGetTreeCaching() {
+        $this->assertNull(CM_Model_LanguageKey::getTree()->findNodeById('.foo'));
+        CM_Model_LanguageKey::create('.foo');
+        $this->assertNotNull(CM_Model_LanguageKey::getTree()->findNodeById('.foo'));
+    }
 }
