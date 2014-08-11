@@ -15,9 +15,9 @@ class CM_Asset_Css extends CM_Asset_Abstract {
     private $_children = array();
 
     /**
-     * @param CM_Frontend_Render   $render
-     * @param string|null $content
-     * @param string|null $prefix
+     * @param CM_Frontend_Render $render
+     * @param string|null        $content
+     * @param string|null        $prefix
      */
     public function __construct(CM_Frontend_Render $render, $content = null, $prefix = null) {
         $this->_render = $render;
@@ -77,24 +77,35 @@ class CM_Asset_Css extends CM_Asset_Abstract {
         }
         $cache = new CM_Cache_Storage_File();
         if (false === ($contentTransformed = $cache->get($cacheKey))) {
-            $lessCompiler = new lessc();
-            $lessCompiler->registerFunction('image', function ($arg) use ($render) {
-                /** @var CM_Frontend_Render $render */
-                list($type, $delimiter, $values) = $arg;
-                return array('function', 'url', array('string', $delimiter, array($render->getUrlResource('layout', 'img/' . $values[0]))));
-            });
-            $lessCompiler->registerFunction('urlFont', function ($arg) use ($render) {
-                /** @var CM_Frontend_Render $render */
-                list($type, $delimiter, $values) = $arg;
-                return array($type, $delimiter, array($render->getUrlStatic('/font/' . $values[0])));
-            });
-            if ($compress) {
-                $lessCompiler->setFormatter('compressed');
-            }
-            $contentTransformed = $lessCompiler->compile($this->_getMixins() . $content);
+            $contentTransformed = $this->_compileLess($content, $compress);
             $cache->set($cacheKey, $contentTransformed);
         }
         return $contentTransformed;
+    }
+
+    /**
+     * @param string $content
+     * @param bool   $compress
+     * @return string
+     */
+    private function _compileLess($content, $compress) {
+        $render = $this->_render;
+
+        $lessCompiler = new lessc();
+        $lessCompiler->registerFunction('image', function ($arg) use ($render) {
+            /** @var CM_Frontend_Render $render */
+            list($type, $delimiter, $values) = $arg;
+            return array('function', 'url', array('string', $delimiter, array($render->getUrlResource('layout', 'img/' . $values[0]))));
+        });
+        $lessCompiler->registerFunction('urlFont', function ($arg) use ($render) {
+            /** @var CM_Frontend_Render $render */
+            list($type, $delimiter, $values) = $arg;
+            return array($type, $delimiter, array($render->getUrlStatic('/font/' . $values[0])));
+        });
+        if ($compress) {
+            $lessCompiler->setFormatter('compressed');
+        }
+        return $lessCompiler->compile($this->_getMixins() . $content);
     }
 
     /**
