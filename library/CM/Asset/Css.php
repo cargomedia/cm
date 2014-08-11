@@ -115,7 +115,7 @@ class CM_Asset_Css extends CM_Asset_Abstract {
         if ($compress) {
             $lessCompiler->setFormatter('compressed');
         }
-        return $lessCompiler->compile($this->_getMixins() . $content);
+        return $lessCompiler->compile($content);
     }
 
     /**
@@ -130,22 +130,5 @@ class CM_Asset_Css extends CM_Asset_Abstract {
             $args[] = $this->_autoprefixerBrowsers;
         }
         return CM_Util::exec($command, null, $content);
-    }
-
-    /**
-     * @return string
-     */
-    private function _getMixins() {
-        $mixins = <<< 'EOD'
-.gradient(@direction, @color1, @color2, @pos1: 0%, @pos2: 100%) when (@direction = horizontal) and (iscolor(@color1)) and (iscolor(@color2)) {
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
-	background-image: linear-gradient(to right,@color1 @pos1,@color2 @pos2);
-}
-.gradient(@direction, @color1, @color2, @pos1: 0%, @pos2: 100%) when (@direction = vertical) and (iscolor(@color1)) and (iscolor(@color2)) {
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
-	background-image: linear-gradient(to bottom,@color1 @pos1,@color2 @pos2);
-}
-EOD;
-        return $mixins;
     }
 }

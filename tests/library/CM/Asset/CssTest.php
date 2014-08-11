@@ -89,63 +89,27 @@ EOD;
 .foo #bar {
   color: blue;
 }
-
 EOD;
         $this->assertEquals(trim($expected), $css->get());
     }
 
-    public function testLinearGradient() {
+    public function testAutoprefixer() {
         $render = new CM_Frontend_Render();
-        //horizontal
         $css = <<<'EOD'
 .foo {
-	.gradient(horizontal, #000000, rgba(30, 50,30, 0.4), 15%);
+	transition: transform 1s;
 }
 EOD;
         $expected = <<<'EOD'
 .foo {
-  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=#ff000000,endColorstr=#661e321e);
-  background-image: -webkit-linear-gradient(left, #000000 15%, rgba(30,50,30,0.4) 100%);
-  background-image: linear-gradient(to right,#000000 15%,rgba(30,50,30,0.4) 100%);
+  -webkit-transition: -webkit-transform 1s;
+          transition: transform 1s;
 }
-
 EOD;
         $css = new CM_Asset_Css($render, $css, [
             'autoprefixerBrowsers' => 'Safari 6',
         ]);
         $this->assertSame(trim($expected), $css->get());
-
-        //vertical
-        $css = <<<'EOD'
-.foo {
-	.gradient(vertical, #000000, rgba(30, 50,30, 0.4));
-}
-EOD;
-        $expected = <<<'EOD'
-.foo {
-  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ff000000,endColorstr=#661e321e);
-  background-image: -webkit-linear-gradient(top, #000000 0%, rgba(30,50,30,0.4) 100%);
-  background-image: linear-gradient(to bottom,#000000 0%,rgba(30,50,30,0.4) 100%);
-}
-
-EOD;
-        $css = new CM_Asset_Css($render, $css, [
-            'autoprefixerBrowsers' => 'Safari 6',
-        ]);
-        $this->assertSame(trim($expected), $css->get());
-
-        //illegal parameters
-        $css = <<<'EOD'
-.foo {
-	.gradient(vertical, foo, rgba(30, 50,30, 0.4));
-	.gradient(vertical, #000000, foo);
-	.gradient(horizontal, foo, rgba(30, 50,30, 0.4));
-	.gradient(horizontal, #000000, foo);
-	.gradient(foo, #000000, rgba(30, 50,30, 0.4));
-}
-EOD;
-        $css = new CM_Asset_Css($render, $css);
-        $this->assertSame('', $css->get());
     }
 
     public function testMedia() {
