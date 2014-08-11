@@ -14,18 +14,25 @@ class CM_Asset_Css extends CM_Asset_Abstract {
     /** @var CM_Asset_Css[] */
     private $_children = array();
 
+    /** @var string|null */
+    private $_autoprefixerBrowsers = null;
+
     /**
      * @param CM_Frontend_Render $render
      * @param string|null        $content
-     * @param string|null        $prefix
+     * @param array|null         $options
      */
-    public function __construct(CM_Frontend_Render $render, $content = null, $prefix = null) {
+    public function __construct(CM_Frontend_Render $render, $content = null, array $options = null) {
         $this->_render = $render;
         if (null !== $content) {
             $this->_content = (string) $content;
         }
-        if (null !== $prefix) {
-            $this->_prefix = (string) $prefix;
+        $options = (array) $options;
+        if (isset($options['prefix'])) {
+            $this->_prefix = (string) $options['prefix'];
+        }
+        if (isset($options['autoprefixerBrowsers'])) {
+            $this->_autoprefixerBrowsers = (string) $options['autoprefixerBrowsers'];
         }
     }
 
@@ -34,7 +41,7 @@ class CM_Asset_Css extends CM_Asset_Abstract {
      * @param string|null $prefix
      */
     public function add($content, $prefix = null) {
-        $this->_children[] = new self($this->_render, $content, $prefix);
+        $this->_children[] = new self($this->_render, $content, ['prefix' => $prefix]);
     }
 
     public function get($compress = null) {
@@ -77,7 +84,10 @@ class CM_Asset_Css extends CM_Asset_Abstract {
         }
         $cache = new CM_Cache_Storage_File();
         if (false === ($contentTransformed = $cache->get($cacheKey))) {
-            $contentTransformed = $this->_compileLess($content, $compress);
+            $contentTransformed = $content;
+            $contentTransformed = $this->_compileLess($contentTransformed, $compress);
+            $contentTransformed = $this->_compileAutoprefixer($contentTransformed);
+            $contentTransformed = trim($contentTransformed);
             $cache->set($cacheKey, $contentTransformed);
         }
         return $contentTransformed;
@@ -109,50 +119,31 @@ class CM_Asset_Css extends CM_Asset_Abstract {
     }
 
     /**
+     * @param string $content
+     * @return string
+     */
+    private function _compileAutoprefixer($content) {
+        $command = 'autoprefixer';
+        $args = [];
+        if (null !== $this->_autoprefixerBrowsers) {
+            $args[] = '--browsers';
+            $args[] = $this->_autoprefixerBrowsers;
+        }
+        return CM_Util::exec($command, null, $content);
+    }
+
+    /**
      * @return string
      */
     private function _getMixins() {
         $mixins = <<< 'EOD'
 .gradient(@direction, @color1, @color2, @pos1: 0%, @pos2: 100%) when (@direction = horizontal) and (iscolor(@color1)) and (iscolor(@color2)) {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
-	background-image: linear-gradient(left,@color1 @pos1,@color2 @pos2);
-	background-image: -moz-linear-gradient(left,@color1 @pos1,@color2 @pos2);
-	background-image: -webkit-linear-gradient(left,@color1 @pos1,@color2 @pos2);
-	background-image: -o-linear-gradient(left,@color1 @pos1,@color2 @pos2);
-	background-image: -ms-linear-gradient(left,@color1 @pos1,@color2 @pos2);
-	background-image: -webkit-gradient(linear,left top,right top,color-stop(@pos1, @color1),color-stop(@pos2, @color2));
+	background-image: linear-gradient(to right,@color1 @pos1,@color2 @pos2);
 }
 .gradient(@direction, @color1, @color2, @pos1: 0%, @pos2: 100%) when (@direction = vertical) and (iscolor(@color1)) and (iscolor(@color2)) {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
-	background-image: linear-gradient(top,@color1 @pos1,@color2 @pos2);
-	background-image: -moz-linear-gradient(top,@color1 @pos1,@color2 @pos2);
-	background-image: -webkit-linear-gradient(top,@color1 @pos1,@color2 @pos2);
-	background-image: -o-linear-gradient(top,@color1 @pos1,@color2 @pos2);
-	background-image: -ms-linear-gradient(top,@color1 @pos1,@color2 @pos2);
-	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(@pos1, @color1),color-stop(@pos2, @color2));
-}
-.box-sizing(@args...) {
-	box-sizing: @args;
-	-moz-box-sizing: @args;
-	-webkit-box-sizing: @args;
-}
-.user-select(@args...) {
-	user-select: @args;
-	-moz-user-select: @args;
-	-ms-user-select: @args;
-	-webkit-user-select: @args;
-}
-.transform(@args...) {
-	transform: @args;
-	-moz-transform: @args;
-	-o-transform: @args;
-	-ms-transform: @args;
-	-webkit-transform: @args;
-}
-.transition(@args...) {
-	transition: @args;
-	-moz-transition: @args;
-	-webkit-transition: @args;
+	background-image: linear-gradient(to bottom,@color1 @pos1,@color2 @pos2);
 }
 EOD;
         return $mixins;
