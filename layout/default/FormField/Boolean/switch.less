@@ -5,7 +5,7 @@ input[type=checkbox] {
     margin-left: 0;
 
     .handle {
-      .box-sizing(border-box);
+      box-sizing: border-box;
       position: relative;
       display: inline-block;
       width: 2 * @sizeSwitch + 5px;
@@ -34,7 +34,7 @@ input[type=checkbox] {
       }
 
       &:after {
-        .box-sizing(border-box);
+        box-sizing: border-box;
         left: 0;
         content: '';
         width: @sizeSwitch - 6px;
@@ -43,8 +43,8 @@ input[type=checkbox] {
         border: 1px solid @colorBg;
         border-radius: 50%;
         background-color: lighten(@colorFgSubtle, 10);
-        .transform(translateX(0));
-        .transition(200ms);
+        transform: translateX(0);
+        transition: 200ms;
       }
     }
 
@@ -65,7 +65,7 @@ input[type=checkbox] {
     }
 
     &:after {
-      .transform(translateX(@sizeSwitch + 4px));
+      transform: translateX(@sizeSwitch + 4px);
       background-color: lighten(@colorNotice, 30);
     }
   }

@@ -149,33 +149,16 @@
   }
 }
 
-// Vendor prefixing
-.appearance(@value) {
-  -webkit-appearance: @value;
-  -moz-appearance: @value;
-  appearance: @value;
-}
-
 .animation(@name, @duration: 300ms, @timing-function: ease, @delay: 0s, @iteration-count: 1, @direction: normal, @fill-mode: none) {
-  -webkit-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
   animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 }
 
-.background-size(@value) {
-  -webkit-background-size: @value;
-  background-size: @value;
+.gradient(@direction, @color1, @color2, @pos1: 0%, @pos2: 100%) when (@direction = horizontal) and (iscolor(@color1)) and (iscolor(@color2)) {
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
+  background-image: linear-gradient(to right,@color1 @pos1,@color2 @pos2);
 }
 
-.hyphens(@arg) {
-  -webkit-hyphens: @arg;
-  -moz-hyphens: @arg;
-  hyphens: @arg;
-}
-
-.transform-origin (@x:center, @y:center) {
-  -webkit-transform-origin: @x @y;
-  -moz-transform-origin: @x @y;
-  -ms-transform-origin: @x @y;
-  -o-transform-origin: @x @y;
-  transform-origin: @x @y;
+.gradient(@direction, @color1, @color2, @pos1: 0%, @pos2: 100%) when (@direction = vertical) and (iscolor(@color1)) and (iscolor(@color2)) {
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
+  background-image: linear-gradient(to bottom,@color1 @pos1,@color2 @pos2);
 }
