@@ -9,14 +9,14 @@
     "smarty/smarty": "3.1.16",
     "leafo/lessphp": "0.3.*",
     "easybook/geshi": "1.0.8.11",
-    "ruflin/Elastica": "v1.1.1.1",
+    "ruflin/Elastica": "v1.3.0.0",
     "phpmailer/phpmailer": "5.2.6",
     "michelf/php-markdown": "1.4.0",
     "lstrojny/functional-php": "1.0.0-alpha2",
     "aws/aws-sdk-php": "~2.6.0",
     "nicmart/tree": "~0.2.0",
     "kissmetrics/kissmetrics-php": "~0.1.0",
-    "guzzlehttp/guzzle": "~4.1.2",
+    "guzzlehttp/guzzle": "~4.1.7",
     "kickbox/kickbox": "~1.0.3"
   },
   "require-dev": {

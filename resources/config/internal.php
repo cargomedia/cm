@@ -28,6 +28,7 @@ return function (CM_Config_Node $config) {
     $config->CM_Model_Abstract->types[28] = 'CM_Model_Location_Country';
     $config->CM_Model_Abstract->types[29] = 'CM_Model_Location_State';
     $config->CM_Model_Abstract->types[30] = 'CM_Model_Location_Zip';
+    $config->CM_Model_Abstract->types[31] = 'CM_Model_LanguageKey';
     
     $config->CM_Paging_ContentList_Abstract->types = array();
     $config->CM_Paging_ContentList_Abstract->types[19] = 'CM_Paging_ContentList_Badwords';
@@ -75,8 +76,9 @@ return function (CM_Config_Node $config) {
     $config->CM_Model_Location_Country->type = 28;
     $config->CM_Model_Location_State->type = 29;
     $config->CM_Model_Location_Zip->type = 30;
+    $config->CM_Model_LanguageKey->type = 31;
     
-    $config->CM_Class_Abstract->typesMaxValue = 30;
+    $config->CM_Class_Abstract->typesMaxValue = 31;
     
     $config->CM_Action_Abstract->verbs = array();
     $config->CM_Action_Abstract->verbs[CM_Action_Abstract::CREATE] = 1;

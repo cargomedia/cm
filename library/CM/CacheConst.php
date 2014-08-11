@@ -62,7 +62,7 @@ class CM_CacheConst {
 
     const Language_Default = 'Language_Default';
 
-    const Language_Tree = 'Language_Tree';
+    const LanguageKey_Tree = 'LanguageKey_Tree';
 
     // _className:X_abstracts:X
     const ClassChildren = 'ClassChildren';

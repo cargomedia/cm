@@ -24,14 +24,20 @@
 
     scrollBottom: function() {
       this.each(function() {
-        var scrollHeight;
-        if (this === document) {
-          scrollHeight = $(document.body).prop('scrollHeight');
-        } else {
-          scrollHeight = $(this).prop('scrollHeight');
-        }
-        $(this).scrollTop(scrollHeight);
+        $(this).scrollTop($(this).getScrollHeight());
       });
+    },
+
+    getScrollHeight: function() {
+      if (0 === this.length) {
+        return null;
+      }
+      var element = this[0];
+      if (element === document || element === window) {
+        return $(document.body).prop('scrollHeight');
+      } else {
+        return this.prop('scrollHeight');
+      }
     },
 
     scrollTo: function(target) {

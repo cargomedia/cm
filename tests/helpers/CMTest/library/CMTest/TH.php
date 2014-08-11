@@ -118,7 +118,7 @@ class CMTest_TH {
                 $abbreviation = self::_randStr(5);
             } while (CM_Model_Language::findByAbbreviation($abbreviation));
         }
-        return CM_Model_Language::createStatic(array('name' => 'English', 'abbreviation' => $abbreviation, 'enabled' => 1));
+        return CM_Model_Language::create('English', $abbreviation, true);
     }
 
     /**
@@ -288,6 +288,23 @@ class CMTest_TH {
         $method = $class->getMethod($methodName);
         $method->setAccessible(true);
         return $method;
+    }
+
+    /**
+     * @param string|object $objectOrClassName
+     * @param string        $methodName
+     * @param array|null    $args
+     * @return mixed
+     */
+    public static function callProtectedMethod($objectOrClassName, $methodName, array $args = null) {
+        $args = (array) $args;
+        $context = null;
+        if (is_object($objectOrClassName)) {
+            $context = $objectOrClassName;
+        }
+        $reflectionMethod = new ReflectionMethod($objectOrClassName, $methodName);
+        $reflectionMethod->setAccessible(true);
+        return $reflectionMethod->invokeArgs($context, $args);
     }
 
     /**

@@ -130,15 +130,9 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $this->assertSame('abc ', $render->getTranslation('abc {$variable}'));
         $this->assertSame('abc ', $render->getTranslation('abc {$variable}', array('foo' => 'bar')));
 
-        /** @var CM_Model_Language $language */
-        $language = CM_Model_Language::createStatic(array(
-            'name'         => 'Test language',
-            'abbreviation' => 'test',
-            'enabled'      => true
-        ));
+        $language = CM_Model_Language::create('Test language', 'test', true);
         $render = new CM_Frontend_Render(null, null, $language);
         $language->setTranslation('abc {$variable}', 'translated stuff is {$variable}');
-        CM_Model_Language::changeAll();
         $this->assertSame('translated stuff is cool', $render->getTranslation('abc {$variable}', array('variable' => 'cool')));
     }
 
