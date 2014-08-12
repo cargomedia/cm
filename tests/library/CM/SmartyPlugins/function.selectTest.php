@@ -120,7 +120,7 @@ class smarty_function_selectTest extends CMTest_TestCase {
 
     /**
      * @param array $params
-     * @return CMTest_TH_Html
+     * @return CM_Dom_NodeList
      */
     private function _createSelect(array $params) {
         $smarty = new Smarty();
@@ -128,6 +128,6 @@ class smarty_function_selectTest extends CMTest_TestCase {
         $template = $smarty->createTemplate('string:');
         $template->assignGlobal('render', $render);
         $html = smarty_function_select($params, $template);
-        return new CMTest_TH_Html($html);
+        return new CM_Dom_NodeList($html);
     }
 }
