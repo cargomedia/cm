@@ -281,6 +281,20 @@ class CM_Db_Db extends CM_Class_Abstract {
     }
 
     /**
+     * @param string $table
+     * @param string $column
+     * @return int
+     */
+    public static function incrementAndFetchColumn($table, $column) {
+        $client = self::getClient();
+        $result = self::exec(
+            'UPDATE ' . $client->quoteIdentifier($table) . ' SET ' . $client->quoteIdentifier($column) . ' = LAST_INSERT_ID(' .
+            $client->quoteIdentifier($column) . ' + 1); SELECT LAST_INSERT_ID() AS ' . $client->quoteIdentifier($column) . ';');
+        $result->nextRowset();
+        return (int) $result->fetchColumn('counter');
+    }
+
+    /**
      * @param array|null  $tables
      * @param bool|null   $skipData
      * @param bool|null   $skipStructure
