@@ -235,6 +235,14 @@ CREATE TABLE `cm_requestClient` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_requestCounter`;
+
+
+CREATE TABLE `cm_requestCounter` (
+  `counter` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`counter`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `cm_role`;
 
 
