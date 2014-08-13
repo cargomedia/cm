@@ -1,3 +1,3 @@
 <?php
 
-CM_Model_Language::deleteKey('Upload Photos');
+CM_Model_LanguageKey::deleteByName('Upload Photos');

@@ -2,6 +2,8 @@
 
 abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
+    use \Mocka\MockaTrait;
+
     public function runBare() {
         if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
             $siteDefault = $this->getMockSite(null, null, array(
@@ -60,7 +62,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         );
         $configuration = array_merge($defaultConfiguration, (array) $configuration);
 
-        $site = $this->getMockForAbstractClass($classname, array(), $classname . '_Mock' . $type, true, true, true, $methods);
+        $mockClassname = $classname . '_Mock' . $type . '_' . uniqid();
+        $site = $this->getMockForAbstractClass($classname, array(), $mockClassname, true, true, true, $methods);
         $siteClassName = get_class($site);
         $config->CM_Site_Abstract->types[$type] = $siteClassName;
         $config->$siteClassName = new stdClass;
@@ -74,15 +77,16 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param string                        $methodName
-     * @param array                         $params
-     * @param CM_Frontend_ViewResponse      $scopeView
+     * @param string                        $url
+     * @param array|null                    $query
+     * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
-     * @param CM_Frontend_Environment|null  $environment
-     * @return CM_Response_View_Ajax
+     * @return CM_Request_Post|\Mocka\ClassTrait
+     * @throws Mocka\Exception
      */
-    public function getResponseAjax($methodName, array $params, CM_Frontend_ViewResponse $scopeView, CM_Frontend_ViewResponse $scopeComponent = null, CM_Frontend_Environment $environment = null) {
-        $methodName = (string) $methodName;
+    public function createRequest($url, array $query = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+        $url = (string) $url;
+        $query = (array) $query;
         $getViewInfo = function (CM_Frontend_ViewResponse $viewResponse) {
             return array(
                 'id'        => $viewResponse->getAutoId(),
@@ -96,117 +100,134 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
                 'CM_Component_Abstract' => $scopeComponent,
             ])
         );
-        $body = array(
-            'method'       => $methodName,
-            'params'       => $params,
-            'viewInfoList' => $viewInfoList,
-        );
-        $request = new CM_Request_Post('/ajax/null', null, null, CM_Params::encode($body, true));
-        if ($environment && $environment->hasViewer()) {
-            $request->getSession()->setUser($environment->getViewer());
+        if ($viewInfoList) {
+            $query['viewInfoList'] = $viewInfoList;
         }
 
-        $response = new CM_Response_View_Ajax($request);
-        $response->process();
-        return $response;
+        $mockClass = $this->mockClass('CM_Request_Post');
+        $mockClass->mockMethod('getQuery')->set(function () use ($query) {
+            return $query;
+        });
+        $mockClass->mockMethod('getIp')->set(function () {
+            return '16909060';
+        });
+        return $mockClass->newInstance([$url]);
     }
 
     /**
-     * @param string               $formClassName
-     * @param string               $actionName
-     * @param array                $data
-     * @param string|null          $componentClassName Component that uses that form
-     * @param CM_Model_User|null   $viewer
-     * @param array|null           $componentParams
-     * @param CM_Request_Post|null $request
-     * @param int|null             $siteId
-     * @param string|null          $languageAbbreviation
-     * @return CM_Response_View_Form
+     * @param CM_FormAction_Abstract        $action
+     * @param array|null                    $data
+     * @param CM_Frontend_ViewResponse|null $scopeView
+     * @param CM_Frontend_ViewResponse|null $scopeComponent
+     * @throws CM_Exception_Invalid
+     * @return CM_Request_Post|\Mocka\ClassTrait
      */
-    public function getResponseForm($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null, array $componentParams = null, &$request = null, $siteId = null, $languageAbbreviation = null) {
-        if (null === $componentParams) {
-            $componentParams = array();
-        }
-        if (null === $siteId) {
-            $siteId = 'null';
-        }
-        if (null !== $languageAbbreviation) {
-            $languageAbbreviation .= '/';
-        }
-        $session = new CM_Session();
-        if ($viewer) {
-            $session->setUser($viewer);
-        }
-        $headers = array('Cookie' => 'sessionId=' . $session->getId());
-        $server = array('remote_addr' => '1.2.3.4');
-        unset($session); // Make sure session is stored persistently
-
-        $viewArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
-        $componentArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
-        $body = CM_Params::encode(array(
-            'viewInfoList' => array(
-                'CM_Component_Abstract' => $componentArray,
-                'CM_View_Abstract'      => $viewArray,
-            ),
-            'actionName'   => $actionName,
-            'data'         => $data,
-        ), true);
-        $request = new CM_Request_Post('/form/' . $languageAbbreviation . $siteId, $headers, $server, $body);
-
-        $response = new CM_Response_View_Form($request);
-        $response->process();
-        return $response;
-    }
-
-    /**
-     * @param string $url
-     * @param array  $query
-     * @return CM_Request_Post|PHPUnit_Framework_MockObject_MockObject
-     */
-    public function createRequest($url, array $query = null) {
-        $url = (string) $url;
-        $ip = '16909060';
-        $request = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs(array($url))->setMethods(array('getQuery', 'getIp'))->getMock();
-        $request->expects($this->any())->method('getQuery')->will($this->returnValue($query));
-        $request->expects($this->any())->method('getIp')->will($this->returnValue($ip));
-        return $request;
-    }
-
-    /**
-     * @param CM_FormAction_Abstract $action
-     * @param array|null             $data
-     * @return CM_Request_Post|PHPUnit_Framework_MockObject_MockObject
-     */
-    public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null) {
+    public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
         $actionName = $action->getName();
         $form = $action->getForm();
+        if (null === $scopeView) {
+            $scopeView = new CM_Frontend_ViewResponse($form);
+        }
+        if ($scopeView->getView() !== $form) {
+            throw new CM_Exception_Invalid('Action\'s form and ViewResponse\'s view must match');
+        }
+        if (null === $scopeComponent) {
+            $component = $this->mockClass('CM_Component_Abstract')->newInstance();
+            $scopeComponent = new CM_Frontend_ViewResponse($component);
+        }
         $query = array(
-            'data'         => (array) $data,
-            'actionName'   => $actionName,
-            'viewInfoList' => array(
-                'CM_View_Abstract' => array(
-                    'className' => get_class($form),
-                    'params'    => $form->getParams()->getAll(),
-                    'id'        => 'uniqueId'
-                )
-            )
+            'data'       => (array) $data,
+            'actionName' => $actionName,
         );
-        return $this->createRequest('/form/null', $query);
+        return $this->createRequest('/form/null', $query, $scopeView, $scopeComponent);
     }
 
     /**
-     * @param string        $uri
-     * @param CM_Model_User $viewer
-     * @return CM_Response_Abstract
+     * @param CM_Component_Abstract         $component
+     * @param string                        $methodName
+     * @param array|null                    $params
+     * @param CM_Frontend_ViewResponse|null $scopeView
+     * @param CM_Frontend_ViewResponse|null $scopeComponent
+     * @return CM_Request_Post|\Mocka\ClassTrait
      */
-    public function processRequest($uri, CM_Model_User $viewer = null) {
-        $request = CM_Request_Abstract::factory('GET', $uri);
-        if ($viewer) {
-            $request->getSession()->setUser($viewer);
+    public function createRequestAjax(CM_Component_Abstract $component, $methodName, array $params = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+        $viewResponseComponent = new CM_Frontend_ViewResponse($component);
+        if (null === $scopeView) {
+            $scopeView = $viewResponseComponent;
         }
-        $response = CM_Response_Abstract::factory($request);
+        if (null === $scopeComponent) {
+            $scopeComponent = $viewResponseComponent;
+        }
+        $query = array(
+            'method' => (string) $methodName,
+            'params' => (array) $params,
+        );
+        return $this->createRequest('/ajax/null', $query, $scopeView, $scopeComponent);
+    }
+
+    /**
+     * @param CM_Request_Abstract $request
+     * @return CM_Response_Abstract|\Mocka\ClassTrait
+     */
+    public function getResponse(CM_Request_Abstract $request) {
+        $className = CM_Response_Abstract::getResponseClassName($request);
+        return $this->mockClass($className)->newInstance([$request]);
+    }
+
+    /**
+     * @param CM_Request_Abstract $request
+     * @return CM_Response_Abstract|\Mocka\ClassTrait
+     */
+    public function processRequest(CM_Request_Abstract $request) {
+        $response = $this->getResponse($request);
         $response->process();
         return $response;
+    }
+
+    /**
+     * @param CM_Component_Abstract        $component
+     * @param string                       $methodName
+     * @param array|null                   $params
+     * @param CM_Frontend_Environment|null $environment
+     * @return CM_Response_View_Ajax
+     */
+    public function getResponseAjax(CM_Component_Abstract $component, $methodName, array $params = null, CM_Frontend_Environment $environment = null) {
+        $request = $this->createRequestAjax($component, $methodName, $params);
+        if ($environment) {
+            $request->mockMethod('getViewer')->set(function () use ($environment) {
+                return $environment->getViewer();
+            });
+        }
+        return $this->processRequest($request);
+    }
+
+    /**
+     * @param CM_FormAction_Abstract   $action
+     * @param array                    $data
+     * @param CM_Frontend_ViewResponse $scopeComponent
+     * @return CM_Response_View_Form
+     */
+    public function getResponseFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+        $request = $this->createRequestFormAction($action, $data, $scopeComponent);
+        return $this->processRequest($request);
+    }
+
+    /**
+     * @param object|string $objectOrClass
+     * @param string        $methodName
+     * @param array|null    $arguments
+     * @return mixed
+     */
+    public function forceInvokeMethod($objectOrClass, $methodName, array $arguments = null) {
+        $context = null;
+        if (is_object($objectOrClass)) {
+            $context = $objectOrClass;
+        }
+        $arguments = (array) $arguments;
+        $reflectionClass = new ReflectionClass($objectOrClass);
+        $reflectionMethod = $reflectionClass->getMethod($methodName);
+        $reflectionMethod->setAccessible(true);
+        return $reflectionMethod->invokeArgs($context, $arguments);
     }
 
     /**
@@ -304,8 +325,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         if (count($haystacks) < count($needles)) {
             self::fail('not enough elements to compare each');
         }
-        for ($i = 0; $i < count($needles); $i++) {
-            self::assertContains($needles[$i], $haystacks[$i]);
+        foreach ($needles as $key => $value) {
+            self::assertContains($value, $haystacks[$key]);
         }
     }
 
@@ -367,13 +388,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param mixed|CM_Comparable $needle
-     * @param Traversable         $haystack
+     * @param Traversable|string  $haystack
      * @param string              $message
      * @param boolean             $ignoreCase
      * @param boolean             $checkForObjectIdentity
+     * @param bool                $checkForNonObjectIdentity
      * @throws CM_Exception_Invalid
      */
-    public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
+    public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
         if ($needle instanceof CM_Comparable) {
             if (!(is_array($haystack) || $haystack instanceof Traversable)) {
                 throw new CM_Exception_Invalid('Haystack is not traversable.');
@@ -387,7 +409,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             }
             self::assertTrue($match, 'Needle not contained.');
         } else {
-            parent::assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
+            parent::assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
         }
     }
 
@@ -397,9 +419,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param string              $message
      * @param boolean             $ignoreCase
      * @param boolean             $checkForObjectIdentity
+     * @param bool                $checkForNonObjectIdentity
      * @throws CM_Exception_Invalid
      */
-    public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
+    public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
         if ($needle instanceof CM_Comparable) {
             if (!(is_array($haystack) || $haystack instanceof Traversable)) {
                 throw new CM_Exception_Invalid('Haystack is not traversable.');
@@ -413,7 +436,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             }
             self::assertFalse($match, 'Needle contained.');
         } else {
-            parent::assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
+            parent::assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
         }
     }
 

@@ -49,7 +49,7 @@
       }
 
       &.active > a {
-        .transform(translate(1px, 1px));
+        transform: translate(1px, 1px);
         background-color: @colorBgEmphasize3;
       }
     }
@@ -58,6 +58,7 @@
   > li {
     display: inline-block;
     position: relative;
+    margin-bottom: 2px;
     white-space: nowrap;
 
     &:not(:first-child) {
@@ -102,6 +103,7 @@
         background-color: @colorBg;
         box-shadow: none;
         z-index: auto;
+        font-weight: bold;
 
         .icon {
           color: @colorFgHeading;

@@ -28,6 +28,7 @@ return function (CM_Config_Node $config) {
     $config->CM_Model_Abstract->types[28] = 'CM_Model_Location_Country';
     $config->CM_Model_Abstract->types[29] = 'CM_Model_Location_State';
     $config->CM_Model_Abstract->types[30] = 'CM_Model_Location_Zip';
+    $config->CM_Model_Abstract->types[31] = 'CM_Model_LanguageKey';
     
     $config->CM_Paging_ContentList_Abstract->types = array();
     $config->CM_Paging_ContentList_Abstract->types[19] = 'CM_Paging_ContentList_Badwords';
@@ -46,8 +47,38 @@ return function (CM_Config_Node $config) {
     $config->CM_Stream_Adapter_Abstract->types[26] = 'CM_Stream_Adapter_Video_Wowza';
     
     
-    $config->CM_Mail->type = 1;$config->CM_Mail_Welcome->type = 2;$config->CM_Action_Email->type = 3;$config->CM_Model_Language->type = 5;$config->CM_Model_Location->type = 6;$config->CM_Model_Splitfeature->type = 7;$config->CM_Model_Splittest->type = 8;$config->CM_Model_SplittestVariation->type = 9;$config->CM_Model_User->type = 10;$config->CM_Model_Splittest_RequestClient->type = 11;$config->CM_Model_Splittest_User->type = 12;$config->CM_Model_Stream_Publish->type = 13;$config->CM_Model_Stream_Subscribe->type = 14;$config->CM_Model_StreamChannel_Message->type = 15;$config->CM_Model_StreamChannel_Video->type = 16;$config->CM_Model_StreamChannel_Message_User->type = 17;$config->CM_Model_StreamChannelArchive_Video->type = 18;$config->CM_Paging_ContentList_Badwords->type = 19;$config->CM_Paging_Log_Error->type = 20;$config->CM_Paging_Log_Fatal->type = 21;$config->CM_Paging_Log_JsError->type = 22;$config->CM_Paging_Log_Mail->type = 23;$config->CM_Paging_Log_Warn->type = 24;$config->CM_Stream_Adapter_Message_SocketRedis->type = 25;$config->CM_Stream_Adapter_Video_Wowza->type = 26;$config->CM_Model_Location_City->type = 27;$config->CM_Model_Location_Country->type = 28;$config->CM_Model_Location_State->type = 29;$config->CM_Model_Location_Zip->type = 30;
-    $config->CM_Class_Abstract->typesMaxValue = 30;
+    $config->CM_Mail->type = 1;
+    $config->CM_Mail_Welcome->type = 2;
+    $config->CM_Action_Email->type = 3;
+    $config->CM_Model_Language->type = 5;
+    $config->CM_Model_Location->type = 6;
+    $config->CM_Model_Splitfeature->type = 7;
+    $config->CM_Model_Splittest->type = 8;
+    $config->CM_Model_SplittestVariation->type = 9;
+    $config->CM_Model_User->type = 10;
+    $config->CM_Model_Splittest_RequestClient->type = 11;
+    $config->CM_Model_Splittest_User->type = 12;
+    $config->CM_Model_Stream_Publish->type = 13;
+    $config->CM_Model_Stream_Subscribe->type = 14;
+    $config->CM_Model_StreamChannel_Message->type = 15;
+    $config->CM_Model_StreamChannel_Video->type = 16;
+    $config->CM_Model_StreamChannel_Message_User->type = 17;
+    $config->CM_Model_StreamChannelArchive_Video->type = 18;
+    $config->CM_Paging_ContentList_Badwords->type = 19;
+    $config->CM_Paging_Log_Error->type = 20;
+    $config->CM_Paging_Log_Fatal->type = 21;
+    $config->CM_Paging_Log_JsError->type = 22;
+    $config->CM_Paging_Log_Mail->type = 23;
+    $config->CM_Paging_Log_Warn->type = 24;
+    $config->CM_Stream_Adapter_Message_SocketRedis->type = 25;
+    $config->CM_Stream_Adapter_Video_Wowza->type = 26;
+    $config->CM_Model_Location_City->type = 27;
+    $config->CM_Model_Location_Country->type = 28;
+    $config->CM_Model_Location_State->type = 29;
+    $config->CM_Model_Location_Zip->type = 30;
+    $config->CM_Model_LanguageKey->type = 31;
+    
+    $config->CM_Class_Abstract->typesMaxValue = 31;
     
     $config->CM_Action_Abstract->verbs = array();
     $config->CM_Action_Abstract->verbs[CM_Action_Abstract::CREATE] = 1;

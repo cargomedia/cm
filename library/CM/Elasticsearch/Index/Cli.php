@@ -4,36 +4,39 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
      * @param string|null $indexName
+     * @param bool|null   $skipIfExist
      */
-    public function create($indexName = null) {
-        if ($indexName) {
+    public function create($indexName = null, $skipIfExist = null) {
+        if (null !== $indexName) {
             $indexes = array($this->_getIndex($indexName));
         } else {
             $indexes = $this->_getIndexes();
         }
         foreach ($indexes as $index) {
-            $this->_getOutput()->writeln('Creating index `' . $index->getIndex()->getName() . '`...');
-            $index->createVersioned();
-            $index->getIndex()->refresh();
+            if (!$index->getIndex()->exists() || !$skipIfExist) {
+                $this->_getStreamOutput()->writeln('Creating elasticsearch index `' . $index->getIndex()->getName() . '`…');
+                $index->createVersioned();
+                $index->getIndex()->refresh();
+            }
         }
     }
 
     /**
      * @param string|CM_Elasticsearch_Type_Abstract|null $indexName
-     * @param string|null                           $host Elasticsearch host
-     * @param int|null                              $port Elasticsearch port
+     * @param string|null                                $host Elasticsearch host
+     * @param int|null                                   $port Elasticsearch port
      * @throws CM_Exception_Invalid
      */
     public function update($indexName = null, $host = null, $port = null) {
         if ($indexName instanceof CM_Elasticsearch_Type_Abstract) {
             $indexes = array($indexName);
-        } elseif ($indexName) {
+        } elseif (null !== $indexName) {
             $indexes = array($this->_getIndex($indexName, $host, $port));
         } else {
             $indexes = $this->_getIndexes($host, $port);
         }
         foreach ($indexes as $index) {
-            $this->_getOutput()->writeln('Updating index `' . $index->getIndex()->getName() . '`...');
+            $this->_getStreamOutput()->writeln('Updating elasticsearch index `' . $index->getIndex()->getName() . '`...');
             $indexName = $index->getIndex()->getName();
             $key = 'Search.Updates_' . $index->getType()->getName();
             try {
@@ -51,6 +54,23 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
                 }
                 $message .= 'Reason: ' . $e->getMessage() . PHP_EOL;
                 throw new CM_Exception_Invalid($message);
+            }
+        }
+    }
+
+    /**
+     * @param string|null $indexName
+     */
+    public function delete($indexName = null) {
+        if (null !== $indexName) {
+            $indexes = array($this->_getIndex($indexName));
+        } else {
+            $indexes = $this->_getIndexes();
+        }
+        foreach ($indexes as $index) {
+            if ($index->getIndex()->exists()) {
+                $this->_getStreamOutput()->writeln('Deleting elasticsearch index `' . $index->getIndex()->getName() . '`…');
+                $index->getIndex()->delete();
             }
         }
     }

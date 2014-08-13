@@ -1,6 +1,6 @@
 <?php
 
-require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.link.php';
+require_once CM_Util::getModulePath('CM') . 'library/CM/SmartyPlugins/function.link.php';
 
 class smarty_function_linkTest extends CMTest_TestCase {
 
@@ -95,6 +95,11 @@ class smarty_function_linkTest extends CMTest_TestCase {
             'icon'  => 'delete',
             'title' => 'Title',
         ));
+    }
+
+    public function testHref() {
+        $expected = '<a href="http://www.example.com/foo" class="link hasLabel"><span class="label">http://www.example.com/foo</span></a>';
+        $this->_assertSame($expected, array('href' => 'http://www.example.com/foo'));
     }
 
     /**

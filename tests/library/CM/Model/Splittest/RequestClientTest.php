@@ -2,8 +2,8 @@
 
 class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
 
-    public function setUp() {
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
+    public function tearDown() {
+        CMTest_TH::clearEnv();
     }
 
     public function testIsVariationFixture() {
@@ -15,8 +15,6 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
             $variationUser1 = $test->isVariationFixture($request, 'v1');
             $this->assertSame($variationUser1, $test->isVariationFixture($request, 'v1'));
         }
-
-        $test->delete();
     }
 
     public function testSetConversion() {
@@ -35,8 +33,6 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
         $this->assertSame(1, $variation->getConversionCount(true));
         $test->setConversion($request2, 2.5);
         $this->assertSame(1.75, $variation->getConversionRate(true));
-
-        $test->delete();
     }
 
     public function testIgnoreBots() {
@@ -44,5 +40,31 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
         /** @var CM_Model_Splittest_RequestClient $test */
         $test = CM_Model_Splittest_RequestClient::createStatic(array('name' => 'foo', 'variations' => array('v1')));
         $this->assertFalse($test->isVariationFixture($request, 'v1'));
+    }
+
+    public function testIsVariationFixtureStatic() {
+        $request = $this->createRequest('/');
+        $this->assertFalse(CM_Model_Splittest_RequestClient::isVariationFixtureStatic('foo', $request, 'bar'));
+        CM_Model_Splittest_RequestClient::create('foo', ['bar']);
+        $this->assertTrue(CM_Model_Splittest_RequestClient::isVariationFixtureStatic('foo', $request, 'bar'));
+    }
+
+    public function testSetConversionStatic() {
+        $request1 = $this->createRequest('/');
+        $request2 = $this->createRequest('/');
+
+        CM_Model_Splittest_RequestClient::setConversionStatic('foo', $request1);
+        $splittest = CM_Model_Splittest_RequestClient::create('foo', ['bar']);
+
+        /** @var CM_Model_SplittestVariation $variation */
+        $variation = $splittest->getVariations()->getItem(0);
+        $splittest->isVariationFixture($request1, 'bar');
+        $splittest->isVariationFixture($request2, 'bar');
+
+        $this->assertSame(0, $variation->getConversionCount(true));
+        CM_Model_Splittest_RequestClient::setConversionStatic('foo', $request1);
+        $this->assertSame(1, $variation->getConversionCount(true));
+        CM_Model_Splittest_RequestClient::setConversionStatic('foo', $request2, 2.5);
+        $this->assertSame(1.75, $variation->getConversionRate(true));
     }
 }

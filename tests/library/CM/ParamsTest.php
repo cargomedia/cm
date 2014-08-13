@@ -137,7 +137,7 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testGetObject() {
-        $language = CM_Model_Language::createStatic(array('name' => 'English', 'abbreviation' => 'en', 'enabled' => '1'));
+        $language = CM_Model_Language::create('English', 'en', true);
         $params = new CM_Params(array('language' => $language, 'languageId' => $language->getId(), 'no-object-param' => 'xyz'));
         $this->assertEquals($language, $params->getLanguage('language'));
         $this->assertEquals($language, $params->getLanguage('languageId'));
@@ -243,5 +243,23 @@ class CM_ParamsTest extends CMTest_TestCase {
     public function testGetParamsInvalidString() {
         $params = new CM_Params(array('foo' => 'hello'));
         $params->getParams('foo');
+    }
+
+    public function testJsonEncode() {
+        $actual = CM_Params::jsonEncode(['foo' => 'bar']);
+        $this->assertSame('{"foo":"bar"}', $actual);
+    }
+
+    public function testJsonEncodePrettyPrint() {
+        $actual = CM_Params::jsonEncode(['foo' => 'bar'], true);
+        $this->assertSame('{' . "\n" . '    "foo": "bar"' . "\n" . '}', $actual);
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testJsonEncodeInvalid() {
+        $resource = fopen(sys_get_temp_dir(), 'r');
+        CM_Params::jsonEncode(['foo' => $resource]);
     }
 }

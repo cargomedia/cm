@@ -6,6 +6,7 @@
   min-width: @spinnerSize;
 
   &:before {
+    box-sizing: border-box;
     content: '';
     position: absolute;
     width: @spinnerSize;
@@ -34,10 +35,6 @@
 
 [data-click-spinner] {
   position: relative;
-
-  :not(.spinner) {
-    .transition(200ms);
-  }
 
   &.hasSpinner {
     .spinner {

@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `cm_actionLimit`;
 
 
 CREATE TABLE `cm_actionLimit` (
-  `actionType` tinyint(3) DEFAULT NULL,
+  `actionType` int(10) unsigned DEFAULT NULL,
   `actionVerb` tinyint(3) DEFAULT NULL,
   `type` int(10) unsigned NOT NULL,
   `role` tinyint(3) unsigned DEFAULT NULL,
@@ -67,10 +67,10 @@ CREATE TABLE `cm_ipBlocked` (
   KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_language`;
+DROP TABLE IF EXISTS `cm_model_language`;
 
 
-CREATE TABLE `cm_language` (
+CREATE TABLE `cm_model_language` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
   `abbreviation` varchar(5) NOT NULL,
@@ -81,29 +81,18 @@ CREATE TABLE `cm_language` (
   KEY `enabled` (`enabled`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_languageKey`;
+DROP TABLE IF EXISTS `cm_model_languagekey`;
 
 
-CREATE TABLE `cm_languageKey` (
+CREATE TABLE `cm_model_languagekey` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `variables` text CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `updateCountResetVersion` int(10) unsigned DEFAULT NULL,
   `updateCount` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `javascript` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `javascript` (`javascript`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_languageKey_variable`;
-
-
-CREATE TABLE `cm_languageKey_variable` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `languageKeyId` int(10) unsigned NOT NULL,
-  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`,`languageKeyId`),
-  KEY `languageKeyId` (`languageKeyId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_languageValue`;
@@ -192,7 +181,7 @@ CREATE TABLE `cm_log` (
   `type` int(10) unsigned NOT NULL,
   `msg` varchar(5000) NOT NULL,
   `timeStamp` int(10) unsigned NOT NULL,
-  `metaInfo` varchar(5000) DEFAULT NULL,
+  `metaInfo` text,
   PRIMARY KEY (`id`),
   KEY `type` (`type`,`timeStamp`),
   KEY `msg` (`msg`(333))

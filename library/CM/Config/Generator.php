@@ -17,7 +17,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
     private $_namespaceTypes = array();
 
     /**
-     * @return string[]
+     * @return array[]
      */
     public function getNamespaceTypes() {
         $this->_checkTypesGenerated();
@@ -54,7 +54,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
             $this->_typesMaxValue = CM_Config::get()->CM_Class_Abstract->typesMaxValue;
         }
         $typedClasses = CM_Util::getClassChildren('CM_Typed', true);
-        /** @var CM_Class_Abstract[] $namespaceClassList */
+        /** @var CM_Class_Abstract[]|string[] $namespaceClassList */
         $namespaceClassList = array();
         // fetch type-namespaces
         foreach ($typedClasses as $class) {
@@ -117,7 +117,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
         ksort($classTypes);
         $output .= PHP_EOL;
         foreach ($classTypes as $type => $class) {
-            $output .= '$config->' . $class . '->type = ' . $type . ';';
+            $output .= '$config->' . $class . '->type = ' . $type . ';' . PHP_EOL;
         }
         $output .= PHP_EOL . '$config->CM_Class_Abstract->typesMaxValue = ' . $this->_typesMaxValue . ';' . PHP_EOL;
         return $output;

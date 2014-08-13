@@ -30,7 +30,7 @@ class CM_WeightedRandom {
      * @return mixed Selected element
      */
     function lookup() {
-        $r = mt_rand(0, $this->_total_weight);
+        $r = mt_rand() / mt_getrandmax() * $this->_total_weight;
         return $this->_values[$this->binary_search($r, $this->_lookup)];
     }
 

@@ -132,6 +132,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Service_Databases
+     */
+    public function getDatabases() {
+        return $this->get('databases', 'CM_Service_Databases');
+    }
+
+    /**
      * @param string|null $serviceName
      * @return CM_Service_MongoDb
      */
@@ -147,6 +154,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public function getFilesystems() {
         return $this->get('filesystems', 'CM_Service_Filesystems');
+    }
+
+    /**
+     * @return CM_Service_Trackings
+     */
+    public function getTrackings() {
+        return $this->get('trackings', 'CM_Service_Trackings');
     }
 
     /**

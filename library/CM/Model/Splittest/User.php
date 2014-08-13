@@ -18,4 +18,32 @@ class CM_Model_Splittest_User extends CM_Model_Splittest {
     public function setConversion(CM_Model_User $user, $weight = null) {
         $this->_setConversion(new CM_Splittest_Fixture($user), $weight);
     }
+
+    /**
+     * @param string        $splittestName
+     * @param CM_Model_User $user
+     * @param string        $variationName
+     * @return bool
+     */
+    public static function isVariationFixtureStatic($splittestName, CM_Model_User $user, $variationName) {
+        /** @var CM_Model_Splittest_User $splittest */
+        $splittest = static::find($splittestName);
+        if (!$splittest) {
+            return false;
+        }
+        return $splittest->isVariationFixture($user, $variationName);
+    }
+
+    /**
+     * @param string        $splittestName
+     * @param CM_Model_User $user
+     * @param float|null    $weight
+     */
+    public static function setConversionStatic($splittestName, CM_Model_User $user, $weight = null) {
+        /** @var CM_Model_Splittest_User $splittest */
+        $splittest = static::find($splittestName);
+        if ($splittest) {
+            $splittest->setConversion($user, $weight);
+        }
+    }
 }

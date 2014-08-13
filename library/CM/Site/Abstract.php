@@ -2,18 +2,20 @@
 
 abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed {
 
+    /** @var string[] */
     protected $_themes = array();
-    protected $_namespaces = array();
-    /**
-     * @var CM_EventHandler_EventHandler
-     */
+
+    /** @var string[] */
+    protected $_modules = array();
+
+    /** @var CM_EventHandler_EventHandler */
     protected $_eventHandler = null;
 
     /**
-     * Default constructor to set CM namespace
+     * Default constructor to set CM module
      */
     public function __construct() {
-        $this->_setNamespace('CM');
+        $this->_setModule('CM');
     }
 
     /**
@@ -54,15 +56,15 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     /**
      * @return string
      */
-    public function getNamespace() {
-        return $this->_namespaces[0];
+    public function getModule() {
+        return $this->_modules[0];
     }
 
     /**
      * @return string[]
      */
-    public function getNamespaces() {
-        return $this->_namespaces;
+    public function getModules() {
+        return $this->_modules;
     }
 
     /**
@@ -148,12 +150,12 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @param string $namespace
+     * @param string $name
      * @return CM_Site_Abstract
      */
-    protected function _setNamespace($namespace) {
-        array_unshift($this->_namespaces, (string) $namespace);
-        // Resets themes if new namespace is set
+    protected function _setModule($name) {
+        array_unshift($this->_modules, (string) $name);
+        // Resets themes if new module is set
         $this->_themes = array('default');
         return $this;
     }

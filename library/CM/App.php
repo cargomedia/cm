@@ -29,29 +29,26 @@ class CM_App {
 
     /**
      * @param boolean|null $forceReload
-     * @throws CM_Exception_Invalid
      */
     public function setupDatabase($forceReload = null) {
-        $configDb = CM_Config::get()->CM_Db_Db;
-        if (!$configDb->db) {
-            throw new CM_Exception_Invalid('No database name configured');
-        }
-        $client = new CM_Db_Client($configDb->server['host'], $configDb->server['port'], $configDb->username, $configDb->password);
+        $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+        $db = $client->getDb();
+        $client->setDb(null);
 
         if ($forceReload) {
-            $client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($configDb->db))->execute();
+            $client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($db))->execute();
         }
 
-        $databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($configDb->db))->fetch();
+        $databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($db))->fetch();
         if (!$databaseExists) {
-            $client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($configDb->db))->execute();
+            $client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($db))->execute();
         }
 
-        $client->setDb($configDb->db);
+        $client->setDb($db);
         $tables = $client->createStatement('SHOW TABLES')->execute()->fetchAll();
         if (0 === count($tables)) {
             foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-                CM_Db_Db::runDump($configDb->db, $dump);
+                CM_Db_Db::runDump($db, $dump);
             }
             $app = CM_App::getInstance();
             foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
@@ -103,7 +100,7 @@ class CM_App {
         foreach ($assetList as $asset) {
             $asset->get(true);
         }
-        CM_Bootloader::getInstance()->getNamespaces();
+        CM_Bootloader::getInstance()->getModules();
     }
 
     /**
@@ -160,7 +157,7 @@ class CM_App {
             $versionBumps += ($version - $versionStart);
         }
         if ($versionBumps > 0) {
-            $db = CM_Config::get()->CM_Db_Db->db;
+            $db = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getDb();
             CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
         }
         return $versionBumps;
@@ -194,8 +191,8 @@ class CM_App {
      */
     private function _getUpdateScriptPaths() {
         $paths = array();
-        foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-            $paths[$namespace] = CM_Util::getNamespacePath($namespace) . 'resources/db/update/';
+        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
+            $paths[$moduleName] = CM_Util::getModulePath($moduleName) . 'resources/db/update/';
         }
 
         $rootPath = DIR_ROOT . 'resources/db/update/';
@@ -208,18 +205,18 @@ class CM_App {
 
     /**
      * @param int         $version
-     * @param string|null $namespace
+     * @param string|null $moduleName
      * @return string
      * @throws CM_Exception_Invalid
      */
-    private function _getUpdateScriptPath($version, $namespace = null) {
+    private function _getUpdateScriptPath($version, $moduleName = null) {
         $path = DIR_ROOT;
-        if ($namespace) {
-            $path = CM_Util::getNamespacePath($namespace);
+        if ($moduleName) {
+            $path = CM_Util::getModulePath($moduleName);
         }
         $file = new CM_File($path . 'resources/db/update/' . $version . '.php');
         if (!$file->getExists()) {
-            throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $namespace . '` namespace.');
+            throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $moduleName . '` namespace.');
         }
         return $file->getPath();
     }

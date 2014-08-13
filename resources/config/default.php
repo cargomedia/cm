@@ -8,10 +8,6 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Site_Abstract->class = null;
 
-    $config->CM_Tracking_Abstract->class = 'CM_Tracking';
-    $config->CM_Tracking_Abstract->enabled = false;
-    $config->CM_Tracking_Abstract->code = '';
-
     $config->CM_Splittesting_Abstract->enabled = false;
 
     $config->CM_Elasticsearch_Client->enabled = true;
@@ -42,14 +38,7 @@ return function (CM_Config_Node $config) {
         )),
     );
 
-    $config->CM_Db_Db->db = 'cm';
-    $config->CM_Db_Db->username = 'root';
-    $config->CM_Db_Db->password = '';
-    $config->CM_Db_Db->server = array('host' => 'localhost', 'port' => 3306);
-    $config->CM_Db_Db->serversRead = array();
-    $config->CM_Db_Db->serversReadEnabled = true;
     $config->CM_Db_Db->delayedEnabled = true;
-    $config->CM_Db_Db->reconnectTimeout = 300;
 
     $config->CM_Model_User->class = 'CM_Model_User';
 
@@ -104,6 +93,24 @@ return function (CM_Config_Node $config) {
 
     $config->services = array();
 
+    $config->services['databases'] = array(
+        'class' => 'CM_Service_Databases',
+    );
+
+    $config->services['database-master'] = array(
+        'class'     => 'CM_Db_Client',
+        'arguments' => array(
+            array(
+                'host'             => 'localhost',
+                'port'             => 3306,
+                'username'         => 'root',
+                'password'         => '',
+                'db'               => 'cm',
+                'reconnectTimeout' => 300
+            )
+        )
+    );
+
     $config->services['MongoDb'] = array(
         'class'     => 'CM_Service_MongoDb',
         'arguments' => array(
@@ -149,5 +156,25 @@ return function (CM_Config_Node $config) {
                 'url'        => 'http://localhost/userfiles',
             ),
         ))
+    );
+
+    $config->services['trackings'] = array(
+        'class'     => 'CM_Service_Trackings',
+        'arguments' => array(array())
+    );
+
+    $config->services['tracking-googleanalytics'] = array(
+        'class'     => 'CMService_GoogleAnalytics_Client',
+        'arguments' => array('my-web-property-id')
+    );
+
+    $config->services['tracking-kissmetrics'] = array(
+        'class'     => 'CMService_KissMetrics_Client',
+        'arguments' => array('my-api-key')
+    );
+
+    $config->services['email-verification'] = array(
+        'class'     => 'CM_Service_EmailVerification_Standard',
+        'arguments' => array()
     );
 };
