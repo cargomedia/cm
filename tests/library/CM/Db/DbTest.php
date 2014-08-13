@@ -188,4 +188,18 @@ class CM_Db_DbTest extends CMTest_TestCase {
         $id = CM_Db_Db::getRandId('test', 'id', '`id` = 2');
         $this->assertEquals(2, $id);
     }
+
+    public function testIncrementAndFetchColumn() {
+        CM_Db_Db::insert('test', array('foo' => 0));
+        $this->assertSame('0', CM_Db_Db::select('test', array('foo'))->fetchColumn());
+
+        $counter = CM_Db_Db::incrementAndFetchColumn('test', 'foo');
+        $this->assertSame($counter, (int) CM_Db_Db::select('test', array('foo'))->fetchColumn('foo'));
+
+        $counter = CM_Db_Db::incrementAndFetchColumn('test', 'foo');
+        $this->assertSame($counter, (int) CM_Db_Db::select('test', array('foo'))->fetchColumn('foo'));
+
+        $counter = CM_Db_Db::incrementAndFetchColumn('test', 'foo');
+        $this->assertSame($counter, (int) CM_Db_Db::select('test', array('foo'))->fetchColumn('foo'));
+    }
 }
