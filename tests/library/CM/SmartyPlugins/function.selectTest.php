@@ -16,8 +16,8 @@ class smarty_function_selectTest extends CMTest_TestCase {
         $this->assertSame(2, $htmlObject->find('option')->count());
         $this->assertSame(1, $htmlObject->find('option[selected]')->count());
         $this->assertSame(1, $htmlObject->find('select')->count());
-        $this->assertSame('foo', $htmlObject->getText('option[selected]'));
-        $this->assertSame('foo', $htmlObject->getText('.label'));
+        $this->assertSame('foo', $htmlObject->find('option[selected]')->getText());
+        $this->assertSame('foo', $htmlObject->find('.label')->getText());
     }
 
     public function testSelectedValue() {
@@ -33,8 +33,8 @@ class smarty_function_selectTest extends CMTest_TestCase {
         $this->assertSame(2, $htmlObject->find('option')->count());
         $this->assertSame(1, $htmlObject->find('option[selected]')->count());
         $this->assertSame(1, $htmlObject->find('select')->count());
-        $this->assertSame('bar', $htmlObject->getText('option[selected]'));
-        $this->assertSame('bar', $htmlObject->getText('.label'));
+        $this->assertSame('bar', $htmlObject->find('option[selected]')->getText());
+        $this->assertSame('bar', $htmlObject->find('.label')->getText());
     }
 
     public function testPlaceholder() {
@@ -50,8 +50,8 @@ class smarty_function_selectTest extends CMTest_TestCase {
         $this->assertSame(3, $htmlObject->find('option')->count());
         $this->assertSame(1, $htmlObject->find('option[selected]')->count());
         $this->assertSame(1, $htmlObject->find('select')->count());
-        $this->assertSame('please choose', $htmlObject->getText('option[selected]'));
-        $this->assertSame('please choose', $htmlObject->getText('.label'));
+        $this->assertSame('please choose', $htmlObject->find('option[selected]')->getText());
+        $this->assertSame('please choose', $htmlObject->find('.label')->getText());
     }
 
     public function testPlaceholder_true() {
@@ -67,8 +67,8 @@ class smarty_function_selectTest extends CMTest_TestCase {
         $this->assertSame(3, $htmlObject->find('option')->count());
         $this->assertSame(1, $htmlObject->find('option[selected]')->count());
         $this->assertSame(1, $htmlObject->find('select')->count());
-        $this->assertSame(' -Select- ', $htmlObject->getText('option[selected]'));
-        $this->assertSame(' -Select- ', $htmlObject->getText('.label'));
+        $this->assertSame(' -Select- ', $htmlObject->find('option[selected]')->getText());
+        $this->assertSame(' -Select- ', $htmlObject->find('.label')->getText());
     }
 
     public function testPlaceholder_false() {
@@ -84,8 +84,8 @@ class smarty_function_selectTest extends CMTest_TestCase {
         $this->assertSame(2, $htmlObject->find('option')->count());
         $this->assertSame(1, $htmlObject->find('option[selected]')->count());
         $this->assertSame(1, $htmlObject->find('select')->count());
-        $this->assertSame('foo', $htmlObject->getText('option[selected]'));
-        $this->assertSame('foo', $htmlObject->getText('.label'));
+        $this->assertSame('foo', $htmlObject->find('option[selected]')->getText());
+        $this->assertSame('foo', $htmlObject->find('.label')->getText());
     }
 
     public function testPlaceholder_empty() {
@@ -101,8 +101,8 @@ class smarty_function_selectTest extends CMTest_TestCase {
         $this->assertSame(3, $htmlObject->find('option')->count());
         $this->assertSame(1, $htmlObject->find('option[selected]')->count());
         $this->assertSame(1, $htmlObject->find('select')->count());
-        $this->assertSame('', $htmlObject->getText('option[selected]'));
-        $this->assertSame('', $htmlObject->getText('.label'));
+        $this->assertSame('', $htmlObject->find('option[selected]')->getText());
+        $this->assertSame('', $htmlObject->find('.label')->getText());
     }
 
     public function testLabelPrefix() {
@@ -115,7 +115,7 @@ class smarty_function_selectTest extends CMTest_TestCase {
             'labelPrefix' => 'foobar',
         ));
 
-        $this->assertEquals('foobar', $htmlObject->getText('.labelPrefix'));
+        $this->assertEquals('foobar', $htmlObject->find('.labelPrefix')->getText());
     }
 
     /**
