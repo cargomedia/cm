@@ -13,9 +13,9 @@ class smarty_function_selectTest extends CMTest_TestCase {
             ),
         ));
 
-        $this->assertSame(2, $htmlObject->getCount('option'));
-        $this->assertSame(1, $htmlObject->getCount('option[selected]'));
-        $this->assertSame(1, $htmlObject->getCount('select'));
+        $this->assertSame(2, $htmlObject->find('option')->count());
+        $this->assertSame(1, $htmlObject->find('option[selected]')->count());
+        $this->assertSame(1, $htmlObject->find('select')->count());
         $this->assertSame('foo', $htmlObject->getText('option[selected]'));
         $this->assertSame('foo', $htmlObject->getText('.label'));
     }
@@ -30,9 +30,9 @@ class smarty_function_selectTest extends CMTest_TestCase {
             'selectedValue' => 1,
         ));
 
-        $this->assertSame(2, $htmlObject->getCount('option'));
-        $this->assertSame(1, $htmlObject->getCount('option[selected]'));
-        $this->assertSame(1, $htmlObject->getCount('select'));
+        $this->assertSame(2, $htmlObject->find('option')->count());
+        $this->assertSame(1, $htmlObject->find('option[selected]')->count());
+        $this->assertSame(1, $htmlObject->find('select')->count());
         $this->assertSame('bar', $htmlObject->getText('option[selected]'));
         $this->assertSame('bar', $htmlObject->getText('.label'));
     }
@@ -47,9 +47,9 @@ class smarty_function_selectTest extends CMTest_TestCase {
             'placeholder' => 'please choose',
         ));
 
-        $this->assertSame(3, $htmlObject->getCount('option'));
-        $this->assertSame(1, $htmlObject->getCount('option[selected]'));
-        $this->assertSame(1, $htmlObject->getCount('select'));
+        $this->assertSame(3, $htmlObject->find('option')->count());
+        $this->assertSame(1, $htmlObject->find('option[selected]')->count());
+        $this->assertSame(1, $htmlObject->find('select')->count());
         $this->assertSame('please choose', $htmlObject->getText('option[selected]'));
         $this->assertSame('please choose', $htmlObject->getText('.label'));
     }
@@ -64,9 +64,9 @@ class smarty_function_selectTest extends CMTest_TestCase {
             'placeholder' => true,
         ));
 
-        $this->assertSame(3, $htmlObject->getCount('option'));
-        $this->assertSame(1, $htmlObject->getCount('option[selected]'));
-        $this->assertSame(1, $htmlObject->getCount('select'));
+        $this->assertSame(3, $htmlObject->find('option')->count());
+        $this->assertSame(1, $htmlObject->find('option[selected]')->count());
+        $this->assertSame(1, $htmlObject->find('select')->count());
         $this->assertSame(' -Select- ', $htmlObject->getText('option[selected]'));
         $this->assertSame(' -Select- ', $htmlObject->getText('.label'));
     }
@@ -81,9 +81,9 @@ class smarty_function_selectTest extends CMTest_TestCase {
             'placeholder' => false,
         ));
 
-        $this->assertSame(2, $htmlObject->getCount('option'));
-        $this->assertSame(1, $htmlObject->getCount('option[selected]'));
-        $this->assertSame(1, $htmlObject->getCount('select'));
+        $this->assertSame(2, $htmlObject->find('option')->count());
+        $this->assertSame(1, $htmlObject->find('option[selected]')->count());
+        $this->assertSame(1, $htmlObject->find('select')->count());
         $this->assertSame('foo', $htmlObject->getText('option[selected]'));
         $this->assertSame('foo', $htmlObject->getText('.label'));
     }
@@ -98,9 +98,9 @@ class smarty_function_selectTest extends CMTest_TestCase {
             'placeholder' => '',
         ));
 
-        $this->assertSame(3, $htmlObject->getCount('option'));
-        $this->assertSame(1, $htmlObject->getCount('option[selected]'));
-        $this->assertSame(1, $htmlObject->getCount('select'));
+        $this->assertSame(3, $htmlObject->find('option')->count());
+        $this->assertSame(1, $htmlObject->find('option[selected]')->count());
+        $this->assertSame(1, $htmlObject->find('select')->count());
         $this->assertSame('', $htmlObject->getText('option[selected]'));
         $this->assertSame('', $htmlObject->getText('.label'));
     }
