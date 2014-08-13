@@ -4,8 +4,6 @@ class CM_Clockwork_Persistence {
 
     const FOLDER_NAME = 'clockwork';
 
-    const TIME_FORMAT = 'Y-m-d H:i:s';
-
     /** @var string */
     private $_context;
 
@@ -60,8 +58,8 @@ class CM_Clockwork_Persistence {
             $file = $this->_getFile();
             if ($file->getExists()) {
                 $values = CM_Params::decode($file->read(), true);
-                $this->_data = \Functional\map($values, function ($dateString) {
-                    return new DateTime($dateString);
+                $this->_data = \Functional\map($values, function ($timeStamp) {
+                    return new DateTime('@' . $timeStamp);
                 });
             }
         }
@@ -69,7 +67,7 @@ class CM_Clockwork_Persistence {
 
     private function _save() {
         $values = \Functional\map($this->_data, function (DateTime $dateTime) {
-            return $dateTime->format(self::TIME_FORMAT);
+            return $dateTime->getTimestamp();
         });
         $content = CM_Params::encode($values, true);
         $file = $this->_getFile();

@@ -25,7 +25,7 @@ class CM_Clockwork_PersistenceTest extends CMTest_TestCase {
         $this->_datetime1 = new DateTime('455-01-06 03:15:02');
         $this->_datetime2 = new DateTime('1375-04-08 13:34:59');
         $this->_fileContent = <<<EOT
-{"foo":"0455-01-06 03:15:02","bar":"1375-04-08 13:34:59"}
+{"foo":-47808283498,"bar":-18767910301}
 EOT;
         $this->_context = 'persistence-test';
         $this->_fileSystem = CM_Service_Manager::getInstance()->getFilesystems()->getData();
@@ -50,6 +50,20 @@ EOT;
         $this->assertEquals($this->_datetime1, $persistence->getLastRuntime($event1));
         $this->assertEquals($this->_datetime2, $persistence->getLastRuntime($event2));
         $this->assertNull($persistence->getLastRuntime($event3));
+    }
+
+    public function testGetLastRunTimeTimeZoneChange() {
+        $defaultTimeZoneBackup = date_default_timezone_get();
+        $this->_fileSystem->ensureDirectory('clockwork');
+        CM_File::create($this->_file->getPath(), $this->_fileContent, $this->_fileSystem);
+        $interval = new DateInterval('P1D');
+        $event1 = new CM_Clockwork_Event('foo', $interval);
+
+        $persistence = new CM_Clockwork_Persistence($this->_context);
+        date_default_timezone_set('Antarctica/Vostok');
+
+        $this->assertEquals($this->_datetime1, $persistence->getLastRuntime($event1));
+        date_default_timezone_set($defaultTimeZoneBackup);
     }
 
     public function testSetRuntime() {
