@@ -135,8 +135,8 @@ abstract class CM_Request_Abstract {
      */
     public function getClientId() {
         if (!$this->hasClientId()) {
-            if (!($this->_clientId = (int) $this->getCookie('clientId')) || !$this->_isValidClientId($this->_clientId)) {
-                $this->_clientId = (int) CM_Db_Db::insert('cm_requestClient', array());
+            if (!$this->_clientId = (int) $this->getCookie('clientId')) {
+                $this->_clientId = CM_Db_Db::incrementAndFetchColumn('cm_requestCounter', 'counter');
             }
         }
 
@@ -469,24 +469,6 @@ abstract class CM_Request_Abstract {
             return null;
         }
         return $this->getViewer(true)->getLanguage();
-    }
-
-    /**
-     * @param int $clientId
-     * @return bool
-     */
-    private function _isValidClientId($clientId) {
-        $clientId = (int) $clientId;
-        $cacheKey = CM_CacheConst::Request_Client . '_id:' . $clientId;
-        $cache = CM_Cache_Local::getInstance();
-        if (false === ($isValid = $cache->get($cacheKey))) {
-            $isValid = (bool) CM_Db_Db::count('cm_requestClient', array('id' => $clientId));
-            if ($isValid) {
-                $cache->set($cacheKey, true);
-            }
-        }
-
-        return $isValid;
     }
 
     /**
