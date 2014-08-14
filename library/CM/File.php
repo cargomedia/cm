@@ -237,13 +237,6 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
     /**
      * @return string
      */
-    public function __toString() {
-        return $this->read();
-    }
-
-    /**
-     * @return string
-     */
     private function _getCacheKeyContent() {
         return __CLASS__ . '_content_filesystem:' . get_class($this->_filesystem->getAdapter()) . '_path:' . $this->getPath();
     }
