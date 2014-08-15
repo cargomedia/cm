@@ -79,35 +79,26 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
         try {
             $response = $this->_getResponse($email);
             if ($response->code !== 200 || !is_array($response->body)) {
-                $this->_logException(array(
+                $exception = new CM_Exception('KickBox exception', array(
                     'email'   => $email,
                     'code'    => $response->code,
                     'headers' => $response->headers,
                     'body'    => $response->body,
                 ));
+                $this->_logException($exception);
                 return null;
             }
         } catch (Exception $exception) {
-            $serializableException = new CM_ExceptionHandling_SerializableException($exception);
-            $formatter = new CM_ExceptionHandling_Formatter_Plain();
-            $this->_logException(array(
-                'email'     => $email,
-                'exception' => $formatter->getHeader($serializableException),
-                'trace'     => $formatter->getTrace($serializableException),
-            ));
+            $this->_logException($exception);
             return null;
         }
         return $response->body;
     }
 
     /**
-     * @param array $metaInfo
+     * @param Exception $exception
      */
-    protected function _logException(array $metaInfo) {
-        $exception = new CM_Exception('KickBox exception', $metaInfo);
-        $exception->setSeverity(CM_Exception::ERROR);
-        $exceptionHandler = clone(CM_Bootloader::getInstance()->getExceptionHandler());
-        $exceptionHandler->setPrintSeverityMin(CM_Exception::FATAL);
-        $exceptionHandler->handleException($exception);
+    protected function _logException(Exception $exception) {
+        CM_Bootloader::getInstance()->getExceptionHandler()->handleException($exception, true);
     }
 }

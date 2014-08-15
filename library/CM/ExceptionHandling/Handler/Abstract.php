@@ -61,8 +61,10 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
 
     /**
      * @param Exception $exception
+     * @param bool|null $quiet
      */
-    public function handleException(Exception $exception) {
+    public function handleException(Exception $exception, $quiet = null) {
+        $quiet = (bool) $quiet;
         $printException = true;
         if ($exception instanceof CM_Exception) {
             $printException = $exception->getSeverity() >= $this->_getPrintSeverityMin();
@@ -74,7 +76,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
             $printException = true;
         }
 
-        if ($printException) {
+        if ($printException && !$quiet) {
             $this->_printException($exception);
         }
 
