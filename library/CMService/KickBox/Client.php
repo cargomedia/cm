@@ -78,19 +78,19 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
     protected function _getResponseBody($email) {
         try {
             $response = $this->_getResponse($email);
+            if ($response->code !== 200 || !is_array($response->body)) {
+                $this->_logException(array(
+                    'email'   => $email,
+                    'code'    => $response->code,
+                    'headers' => $response->headers,
+                    'body'    => $response->body,
+                ));
+                return null;
+            }
         } catch (Exception $exception) {
             $this->_logException(array(
                 'email'   => $email,
                 'message' => $exception->getMessage(),
-            ));
-            return null;
-        }
-        if ($response->code !== 200 || !is_array($response->body)) {
-            $this->_logException(array(
-                'email'   => $email,
-                'code'    => $response->code,
-                'headers' => $response->headers,
-                'body'    => $response->body,
             ));
             return null;
         }
