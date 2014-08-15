@@ -39,11 +39,12 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
             if (null === $response) {
                 return true;
             }
-            if (
-                ($this->_disallowInvalid && 'invalid' === $response['result']) ||
-                ($this->_disallowDisposable && 'true' === $response['disposable']) ||
-                ($response['sendex'] < $this->_disallowUnknownThreshold && ('true' === $response['accept_all'] || 'unknown' === $response['result']))
-            ) {
+            $isInvalid = isset($response['result']) && 'invalid' === $response['result'];
+            $isDisposable = isset($response['disposable']) && 'true' === $response['disposable'];
+            $isSendexUnderThreshold = isset($response['sendex']) && $response['sendex'] < $this->_disallowUnknownThreshold;
+            $isUnknown = isset($response['result']) && 'unknown' === $response['result'] ||
+                isset($response['accept_all']) && 'true' === $response['accept_all'];
+            if ($this->_disallowInvalid && $isInvalid || $this->_disallowDisposable && $isDisposable || $isSendexUnderThreshold && $isUnknown) {
                 $isValid = 0;
             } else {
                 $isValid = 1;
@@ -63,6 +64,7 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
     /**
      * @param string $email
      * @return \Kickbox\HttpClient\Response
+     * @throws Exception
      */
     protected function _getResponse($email) {
         $kickBox = new \Kickbox\Client($this->_getCode());
@@ -74,25 +76,33 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
      * @return array|null
      */
     protected function _getResponseBody($email) {
-        $response = $this->_getResponse($email);
+        try {
+            $response = $this->_getResponse($email);
+        } catch (Exception $e) {
+            $this->_logException(array(
+                'email'   => $email,
+                'message' => $e->getMessage(),
+            ));
+            return null;
+        }
         if ($response->code !== 200 || !is_array($response->body)) {
-            $exception = new CM_Exception('KickBox exception', array(
+            $this->_logException(array(
                 'email'   => $email,
                 'code'    => $response->code,
                 'headers' => $response->headers,
                 'body'    => $response->body,
             ));
-            $exception->setSeverity(CM_Exception::WARN);
-            $this->_handleException($exception);
             return null;
         }
         return $response->body;
     }
 
     /**
-     * @param CM_Exception $exception
+     * @param array $metaInfo
      */
-    protected function _handleException(CM_Exception $exception) {
+    protected function _logException(array $metaInfo) {
+        $exception = new CM_Exception('KickBox exception', $metaInfo);
+        $exception->setSeverity(CM_Exception::WARN);
         CM_Bootloader::getInstance()->getExceptionHandler()->handleException($exception);
     }
 }

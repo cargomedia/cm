@@ -55,16 +55,14 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
 
     public function testHandleExceptionNoCredits() {
         $responseMock = new \Kickbox\HttpClient\Response(array('result' => 'unknown'), 403, array('header' => 'value'));
-        $kickBoxMock = $this->getMock('CMService_KickBox_Client', array('_getResponse', '_handleException'), array('', true, false, 0));
+        $kickBoxMock = $this->getMock('CMService_KickBox_Client', array('_getResponse', '_logException'), array('', true, false, 0));
         $kickBoxMock->expects($this->once())->method('_getResponse')->will($this->returnValue($responseMock));
-        $exception = new CM_Exception('KickBox exception', array(
+        $kickBoxMock->expects($this->once())->method('_logException')->with(array(
             'email'   => 'test@example.com',
             'code'    => 403,
             'headers' => array('header' => 'value'),
             'body'    => array('result' => 'unknown'),
         ));
-        $exception->setSeverity(CM_Exception::WARN);
-        $kickBoxMock->expects($this->once())->method('_handleException')->with($exception);
         /** @var CMService_KickBox_Client $kickBoxMock */
         $kickBoxMock->isValid('test@example.com');
     }
