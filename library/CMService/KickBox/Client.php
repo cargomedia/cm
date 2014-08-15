@@ -42,9 +42,9 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
             $isInvalid = isset($response['result']) && 'invalid' === $response['result'];
             $isDisposable = isset($response['disposable']) && 'true' === $response['disposable'];
             $isSendexUnderThreshold = isset($response['sendex']) && $response['sendex'] < $this->_disallowUnknownThreshold;
-            $isUnknown = isset($response['result']) && 'unknown' === $response['result'] ||
-                isset($response['accept_all']) && 'true' === $response['accept_all'];
-            if ($this->_disallowInvalid && $isInvalid || $this->_disallowDisposable && $isDisposable || $isSendexUnderThreshold && $isUnknown) {
+            $isUnknown = (isset($response['result']) && 'unknown' === $response['result']) ||
+                (isset($response['accept_all']) && 'true' === $response['accept_all']);
+            if (($this->_disallowInvalid && $isInvalid) || ($this->_disallowDisposable && $isDisposable) || ($isSendexUnderThreshold && $isUnknown)) {
                 $isValid = 0;
             } else {
                 $isValid = 1;
@@ -78,10 +78,10 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
     protected function _getResponseBody($email) {
         try {
             $response = $this->_getResponse($email);
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             $this->_logException(array(
                 'email'   => $email,
-                'message' => $e->getMessage(),
+                'message' => $exception->getMessage(),
             ));
             return null;
         }
