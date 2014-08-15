@@ -88,9 +88,12 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
                 return null;
             }
         } catch (Exception $exception) {
+            $serializableException = new CM_ExceptionHandling_SerializableException($exception);
+            $formatter = new CM_ExceptionHandling_Formatter_Plain();
             $this->_logException(array(
-                'email'   => $email,
-                'message' => $exception->getMessage(),
+                'email'     => $email,
+                'exception' => $formatter->getHeader($serializableException),
+                'trace'     => $formatter->getTrace($serializableException),
             ));
             return null;
         }
