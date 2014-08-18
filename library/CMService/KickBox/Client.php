@@ -35,15 +35,16 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
             '_threshold:' . $this->_disallowUnknownThreshold;
         $cache = CM_Cache_Shared::getInstance();
         if (false === ($isValid = $cache->get($key))) {
-            $response = $this->_getResponse($email);
+            $response = $this->_getResponseBody($email);
             if (null === $response) {
                 return true;
             }
-            if (
-                ($this->_disallowInvalid && 'invalid' === $response['result']) ||
-                ($this->_disallowDisposable && 'true' === $response['disposable']) ||
-                ($response['sendex'] < $this->_disallowUnknownThreshold && ('true' === $response['accept_all'] || 'unknown' === $response['result']))
-            ) {
+            $isInvalid = isset($response['result']) && 'invalid' === $response['result'];
+            $isDisposable = isset($response['disposable']) && 'true' === $response['disposable'];
+            $isSendexUnderThreshold = isset($response['sendex']) && $response['sendex'] < $this->_disallowUnknownThreshold;
+            $isUnknown = (isset($response['result']) && 'unknown' === $response['result']) ||
+                (isset($response['accept_all']) && 'true' === $response['accept_all']);
+            if (($this->_disallowInvalid && $isInvalid) || ($this->_disallowDisposable && $isDisposable) || ($isSendexUnderThreshold && $isUnknown)) {
                 $isValid = 0;
             } else {
                 $isValid = 1;
@@ -62,14 +63,40 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
 
     /**
      * @param string $email
-     * @return array|null
+     * @return \Kickbox\HttpClient\Response
+     * @throws Exception
      */
     protected function _getResponse($email) {
         $kickBox = new \Kickbox\Client($this->_getCode());
-        $response = $kickBox->kickbox()->verify($email);
-        if ($response->code !== 200 || !is_array($response->body)) {
+        return $kickBox->kickbox()->verify($email);
+    }
+
+    /**
+     * @param string $email
+     * @return array|null
+     */
+    protected function _getResponseBody($email) {
+        try {
+            $response = $this->_getResponse($email);
+            if ($response->code !== 200 || !is_array($response->body)) {
+                throw new CM_Exception('Invalid KickBox email validation response', array(
+                    'email'   => $email,
+                    'code'    => $response->code,
+                    'headers' => $response->headers,
+                    'body'    => $response->body,
+                ));
+            }
+        } catch (Exception $exception) {
+            $this->_logException($exception);
             return null;
         }
         return $response->body;
+    }
+
+    /**
+     * @param Exception $exception
+     */
+    protected function _logException(Exception $exception) {
+        CM_Bootloader::getInstance()->getExceptionHandler()->logException($exception);
     }
 }
