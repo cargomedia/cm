@@ -15,18 +15,8 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
     if (class_exists($name)) {
         $classname = $name;
     } else {
-        if (0 === strpos($name, '*')) {
-            $name = str_replace('*_', '', $name);
-            foreach ($render->getSite()->getModules() as $availableNamespace) {
-                $classString = $availableNamespace . '_' . $name;
-                if (class_exists($classString)) {
-                    $classname = $classString;
-                    break;
-                }
-            }
-            if (null === $classname) {
-                throw new CM_Exception_Invalid('The class was not found in any namespace.', array('name' => $name));
-            }
+        if (0 === strpos($name, '*_')) {
+            $classname = $render->getClassnameWithoutNamespace(mb_substr($name, 2));
         }
     }
 
