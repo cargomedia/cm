@@ -293,6 +293,13 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
     }
 
     /**
+     * @return bool
+     */
+    protected function _canContainUnprocessableItems() {
+        return ($this->_getStalenessChance() != 0);
+    }
+
+    /**
      * @return int Multiple of items per page to load from CM_PagingSource_Abstract
      */
     protected function _getPageFillRate() {
@@ -449,13 +456,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
             $items[$i] = $this->_items[$i];
         }
         return $items;
-    }
-
-    /**
-     * @return bool
-     */
-    private function _canContainUnprocessableItems() {
-        return ($this->_getStalenessChance() != 0);
     }
 
     /**
