@@ -52,7 +52,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
         }
         $length = max(0, min($length, $count - $offset));
 
-        if ($this->_canContainUnprocessableItems() || $this->_hasFilters()) {
+        if ($this->_canContainUnprocessableItems() || $this->_hasFilters() || $returnNonexistentItems || $negativeOffset) {
             $items = $this->_getItems($offset, $length, $returnNonexistentItems, $negativeOffset);
         } else {
             $items = $this->_getItemsInstantiable($offset, $length);
