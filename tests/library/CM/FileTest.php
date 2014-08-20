@@ -26,7 +26,7 @@ class CM_FileTest extends CMTest_TestCase {
         $this->assertEquals('test.jpg', $file->getFileName());
         $this->assertEquals(filesize($this->_testFilePath), $file->getSize());
         $this->assertEquals(file_get_contents($this->_testFilePath), $file->read());
-        $this->assertEquals(file_get_contents($this->_testFilePath), '' . $file);
+        $this->assertEquals(file_get_contents($this->_testFilePath), '' . $file->read());
     }
 
     public function testConstructNonExistent() {

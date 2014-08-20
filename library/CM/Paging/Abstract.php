@@ -52,7 +52,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
         }
         $length = max(0, min($length, $count - $offset));
 
-        if ($this->_canContainUnprocessableItems() || $this->_hasFilters()) {
+        if ($this->_canContainUnprocessableItems() || $this->_hasFilters() || $returnNonexistentItems || $negativeOffset) {
             $items = $this->_getItems($offset, $length, $returnNonexistentItems, $negativeOffset);
         } else {
             $items = $this->_getItemsInstantiable($offset, $length);
@@ -293,6 +293,13 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
     }
 
     /**
+     * @return bool
+     */
+    protected function _canContainUnprocessableItems() {
+        return ($this->_getStalenessChance() != 0);
+    }
+
+    /**
      * @return int Multiple of items per page to load from CM_PagingSource_Abstract
      */
     protected function _getPageFillRate() {
@@ -449,13 +456,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
             $items[$i] = $this->_items[$i];
         }
         return $items;
-    }
-
-    /**
-     * @return bool
-     */
-    private function _canContainUnprocessableItems() {
-        return ($this->_getStalenessChance() != 0);
     }
 
     /**

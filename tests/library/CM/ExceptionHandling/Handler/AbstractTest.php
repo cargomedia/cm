@@ -10,7 +10,7 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $exception->expects($this->any())->method('getLog')->will($this->returnValue($log));
         $exception->expects($this->any())->method('getMetaInfo')->will($this->returnValue(array()));
 
-        $method = CMTest_TH::getProtectedMethod('CM_ExceptionHandling_Handler_Abstract', '_logException');
+        $method = CMTest_TH::getProtectedMethod('CM_ExceptionHandling_Handler_Abstract', 'logException');
         $exceptionHandler = $this->getMockBuilder('CM_ExceptionHandling_Handler_Abstract')->getMockForAbstractClass();
         $method->invoke($exceptionHandler, $exception);
     }
@@ -24,7 +24,7 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $exception->expects($this->any())->method('getLog')->will($this->returnValue($log));
         $exception->expects($this->any())->method('getMetaInfo')->will($this->returnValue(array()));
 
-        $method = CMTest_TH::getProtectedMethod('CM_ExceptionHandling_Handler_Abstract', '_logException');
+        $method = CMTest_TH::getProtectedMethod('CM_ExceptionHandling_Handler_Abstract', 'logException');
         $exceptionHandler = $this->getMockBuilder('CM_ExceptionHandling_Handler_Abstract')->setMethods(array('_getLogFile'))->getMockForAbstractClass();
         $exceptionHandler->expects($this->any())->method('_getLogFile')->will($this->returnValue(new CM_File($errorLog)));
 
@@ -43,7 +43,7 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $fatalException = new CM_Exception(null, null, array('severity' => CM_Exception::FATAL));
 
         $exceptionHandler = $this->getMockBuilder('CM_ExceptionHandling_Handler_Abstract')
-            ->setMethods(array('_logException', '_printException'))->getMockForAbstractClass();
+            ->setMethods(array('logException', '_printException'))->getMockForAbstractClass();
         $exceptionHandler->expects($this->at(1))->method('_printException')->with($errorException);
         $exceptionHandler->expects($this->at(3))->method('_printException')->with($nativeException);
         $exceptionHandler->expects($this->at(5))->method('_printException')->with($fatalException);
@@ -60,8 +60,8 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $fatalException = new CM_Exception(null, null, array('severity' => CM_Exception::FATAL));
 
         $exceptionHandler = $this->getMockBuilder('CM_ExceptionHandling_Handler_Abstract')
-            ->setMethods(array('_logException', '_printException'))->getMockForAbstractClass();
-        $exceptionHandler->expects($this->any())->method('_logException');
+            ->setMethods(array('logException', '_printException'))->getMockForAbstractClass();
+        $exceptionHandler->expects($this->any())->method('logException');
         $exceptionHandler->expects($this->at(2))->method('_printException')->with($nativeException);
         $exceptionHandler->expects($this->at(4))->method('_printException')->with($fatalException);
         /** @var CM_ExceptionHandling_Handler_Abstract $exceptionHandler */
