@@ -60,8 +60,10 @@ class CM_Params extends CM_Class_Abstract {
      * @return array
      */
     public function getAll() {
-        foreach (array_diff_key($this->_paramsOriginal, $this->_params) as $key => $value) {
-            $this->_params[$key] = self::decode($value);
+        if ($this->_decode) {
+            foreach (array_diff_key($this->_paramsOriginal, $this->_params) as $key => $value) {
+                $this->_params[$key] = self::decode($value);
+            }
         }
         return $this->_params;
     }
