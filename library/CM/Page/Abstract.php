@@ -41,7 +41,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
             $pathToken = CM_Util::camelize($pathToken);
         }
 
-        return $render->getClassnameWithoutNamespace('Page_' . implode('_', $pathTokens));
+        return $render->getClassnameByPartialClassname('Page_' . implode('_', $pathTokens));
     }
 
     /**

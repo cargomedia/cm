@@ -16,7 +16,7 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
         $classname = $name;
     } else {
         if (0 === strpos($name, '*_')) {
-            $classname = $render->getClassnameWithoutNamespace(mb_substr($name, 2));
+            $classname = $render->getClassnameByPartialClassname(mb_substr($name, 2));
         }
     }
 
