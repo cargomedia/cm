@@ -12,15 +12,11 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
     $name = $params['name'];
     unset($params['name']);
 
-    if (class_exists($name)) {
-        $classname = $name;
-    } else {
-        if (0 === strpos($name, '*_')) {
-            $classname = $render->getClassnameByPartialClassname(mb_substr($name, 2));
-        }
+    if (0 === strpos($name, '*_')) {
+        $name = $render->getClassnameByPartialClassname(mb_substr($name, 2));
     }
 
-    $component = CM_Component_Abstract::factory($classname, $params);
+    $component = CM_Component_Abstract::factory($name, $params);
     $renderAdapter = CM_RenderAdapter_Component::factory($render, $component);
     return $renderAdapter->fetch();
 }
