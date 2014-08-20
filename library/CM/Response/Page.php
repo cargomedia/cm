@@ -124,7 +124,7 @@ class CM_Response_Page extends CM_Response_Abstract {
             $pageParams = CM_Params::factory($request->getQuery());
 
             try {
-                $className = CM_Page_Abstract::getClassnameByPath($this->getSite(), $request->getPath());
+                $className = CM_Page_Abstract::getClassnameByPath($this->getRender(), $request->getPath());
                 $page = CM_Page_Abstract::factory($className, $pageParams);
             } catch (CM_Exception $ex) {
                 throw new CM_Exception_Nonexistent('Cannot load page `' . $request->getPath() . '`: ' . $ex->getMessage());

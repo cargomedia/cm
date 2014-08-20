@@ -407,6 +407,22 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
+     * @param string $classname
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    public function getClassnameByPartialClassname($classname) {
+        $classname = (string) $classname;
+        foreach ($this->getSite()->getModules() as $availableNamespace) {
+            $classnameWithNamespace = $availableNamespace . '_' . $classname;
+            if (class_exists($classnameWithNamespace)) {
+                return $classnameWithNamespace;
+            }
+        }
+        throw new CM_Exception_Invalid('The class was not found in any namespace.', array('name' => $classname));
+    }
+
+    /**
      * @return Smarty
      */
     private function _getSmarty() {
