@@ -23,9 +23,7 @@ class CM_Params extends CM_Class_Abstract {
         $this->_paramsOriginal = (array) $params;
         $this->_params = (array) $params;
         if ($this->_decode) {
-            foreach ($this->_params as $key => &$param) {
-                $param = self::decode($param);
-            }
+            $this->_params = array();
         }
     }
 
@@ -54,13 +52,17 @@ class CM_Params extends CM_Class_Abstract {
      * @return bool
      */
     public function has($key) {
-        return (array_key_exists($key, $this->_params) && null !== $this->_params[$key]);
+        return (array_key_exists($key, $this->_params) && null !== $this->_params[$key])
+            || (array_key_exists($key, $this->_paramsOriginal) && null !== $this->_paramsOriginal[$key]);
     }
 
     /**
      * @return array
      */
     public function getAll() {
+        foreach (array_diff_key($this->_paramsOriginal, $this->_params) as $key => $value) {
+            $this->_params[$key] = self::decode($value);
+        }
         return $this->_params;
     }
 
@@ -413,6 +415,9 @@ class CM_Params extends CM_Class_Abstract {
         }
         if (!$this->has($key) && $default !== null) {
             return $default;
+        }
+        if (!array_key_exists($key, $this->_params)) {
+            $this->_params[$key] = self::decode($this->_paramsOriginal[$key]);
         }
         return $this->_params[$key];
     }
