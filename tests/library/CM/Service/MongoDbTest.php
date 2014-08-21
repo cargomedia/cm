@@ -75,9 +75,9 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = $this->_getEmptyCollectionName('find');
 
-        $mongoDb->insert($collectionName, array('userId' => 1, 'groupId' => 1, 'name' => 'alice'));
-        $mongoDb->insert($collectionName, array('userId' => 2, 'groupId' => 2, 'name' => 'steve'));
-        $mongoDb->insert($collectionName, array('userId' => 3, 'groupId' => 1, 'name' => 'bob'));
+        $mongoDb->insert($collectionName, array('userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]));
+        $mongoDb->insert($collectionName, array('userId' => 2, 'groupId' => 2, 'name' => 'steve', 'foo' => [1,2]));
+        $mongoDb->insert($collectionName, array('userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [1,2,3]));
         $users = $mongoDb->find($collectionName, array('groupId' => 1));
         $this->assertSame(2, $users->count());
         $expectedNames = array('alice', 'bob');
@@ -85,16 +85,26 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
             $expectedNames = array_diff($expectedNames, array($user['name']));
         }
         $this->assertEmpty($expectedNames);
+
+        $result = $mongoDb->find($collectionName, ['groupId' => 1], ['_id' => 0, 'foo' => 1], [['$unwind' => '$foo']]);
+        $actual = \Functional\map($result, function($val) {
+            return $val;
+        });
+        $this->assertEquals([['foo' => 1], ['foo' => 1], ['foo' => 2], ['foo' => 3]], $actual);
     }
 
     public function testCount() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = $this->_getEmptyCollectionName('count');
         $this->assertSame(0, $mongoDb->count($collectionName));
-        $mongoDb->insert($collectionName, array('userId' => 1, 'name' => 'alice'));
-        $mongoDb->insert($collectionName, array('userId' => 2, 'name' => 'steve'));
-        $mongoDb->insert($collectionName, array('userId' => 3, 'name' => 'bob'));
+        $mongoDb->insert($collectionName, array('userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]));
+        $mongoDb->insert($collectionName, array('userId' => 2, 'groupId' => 2, 'name' => 'steve', 'foo' => [1,2]));
+        $mongoDb->insert($collectionName, array('userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [1,2,3]));
         $this->assertSame(3, $mongoDb->count($collectionName));
+        $this->assertSame(2, $mongoDb->count($collectionName, array('groupId' => 1)));
+        $this->assertSame(6, $mongoDb->count($collectionName, null, [['$unwind' => '$foo']]));
+        $this->assertSame(2, $mongoDb->count($collectionName, null, null, 2));
+        $this->assertSame(1, $mongoDb->count($collectionName, null, null, null, 2));
     }
 
     public function testRemove() {

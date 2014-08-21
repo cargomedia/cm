@@ -64,28 +64,62 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param string     $collection
      * @param array|null $criteria
      * @param array|null $projection
-     * @return MongoCursor
+     * @param array|null $aggregation
+     * @return Iterator
      */
-    public function find($collection, array $criteria = null, array $projection = null) {
+    public function find($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
         $criteria = (array) $criteria;
         $projection = (array) $projection;
         CM_Debug::getInstance()->incStats('mongo', "find in {$collection}: " . serialize(array('fields' => $projection) + $criteria));
-        return $this->_getCollection($collection)->find($criteria, $projection);
+        $collection = $this->_getCollection($collection);
+        if ($aggregation) {
+            $pipeline = $aggregation;
+            if ($projection) {
+                array_unshift($pipeline, ['$project' => $projection]);
+            }
+            if ($criteria) {
+                array_unshift($pipeline, ['$match' => $criteria]);
+            }
+            $resultCursor = $collection->aggregateCursor($pipeline);
+        } else {
+            $resultCursor = $collection->find($criteria, $projection);
+        }
+        return $resultCursor;
     }
 
     /**
      * @param string     $collection
      * @param array|null $criteria
+     * @param array|null $aggregation
      * @param int|null   $limit
      * @param int|null   $offset
      * @return int
      */
-    public function count($collection, array $criteria = null, $limit = null, $offset = null) {
+    public function count($collection, array $criteria = null, array $aggregation = null, $limit = null, $offset = null) {
         $criteria = (array) $criteria;
         $limit = (int) $limit;
         $offset = (int) $offset;
         CM_Debug::getInstance()->incStats('mongo', "count in {$collection}: " . serialize($criteria));
-        return $this->_getCollection($collection)->count($criteria, $limit, $offset);
+        $pipeline = [];
+        if ($aggregation) {
+            $pipeline = $aggregation;
+        }
+        if ($criteria) {
+            array_unshift($pipeline, ['$match' => $criteria]);
+        }
+        if ($offset) {
+            array_push($pipeline, ['$skip' => $offset]);
+        }
+        if ($limit) {
+            array_push($pipeline, ['$limit' => $limit]);
+        }
+        array_push($pipeline, ['$group' => ['_id' => null, 'count' => ['$sum' => 1]]]);
+        array_push($pipeline, ['$project' => ['_id' => 0, 'count' => 1]]);
+        $result = $this->_getCollection($collection)->aggregate($pipeline);
+        if (!empty($result['result'])) {
+            return $result['result'][0]['count'];
+        }
+        return 0;
     }
 
     /**
