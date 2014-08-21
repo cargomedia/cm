@@ -20,6 +20,20 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
         $this->assertSame(0, $sourceEmpty->getCount());
     }
 
+    public function testCountAggregation() {
+        $mongodb = CM_Service_Manager::getInstance()->getMongoDb();
+        for ($i = 0; $i < 7; $i++) {
+            $item = array('foo' => 12, 'bar' => array(array('sub' => $i), array('sub' => 'something-else')));
+            $mongodb->insert('my-collection', $item);
+        }
+
+        $source = new CM_PagingSource_MongoDb('my-collection', array('bar.sub' => 5), array('bar' => 1, '_id' => 0), [['$unwind' => '$bar']]);
+        $this->assertSame(2, $source->getCount());
+
+        $sourceEmpty= new CM_PagingSource_MongoDb('my-collection', array('bar.sub' => 99), array('bar' => 1, '_id' => 0), [['$unwind' => '$bar']]);
+        $this->assertSame(0, $sourceEmpty->getCount());
+    }
+
     public function testGetItems() {
         $mongodb = CM_Service_Manager::getInstance()->getMongoDb();
         $itemsExpected = array();
@@ -35,6 +49,33 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
         $itemActual = $itemsActual[0];
         unset($itemActual['_id']);
         $this->assertEquals($itemActual, $itemsExpected[5]);
+
+        $source = new CM_PagingSource_MongoDb('my-collection');
+        $this->assertEquals($itemsExpected, Functional\map($source->getItems(), function($doc) {
+            unset($doc['_id']);
+            return $doc;
+        }));
+    }
+
+    public function testGetItemsAggregation() {
+        $mongodb = CM_Service_Manager::getInstance()->getMongoDb();
+        $itemsExpected = array();
+        for ($i = 0; $i < 2; $i++) {
+            $item = array('foo' => 12, 'bar' => array(array('sub' => $i), array('sub' => 'something-else')));
+            $itemsExpected = array_merge($itemsExpected, \Functional\map($item['bar'], function($bar) use ($item, $i) {
+                return ['foo' => $item['foo'], 'bar' => $bar];
+            }));
+            $mongodb->insert('my-collection', $item);
+        }
+        $source = new CM_PagingSource_MongoDb('my-collection', array('bar.sub' => 1), array('bar' => 1, '_id' => 0), [['$unwind' => '$bar']]);
+        $this->assertEquals([['bar' => ['sub' => 1]], ['bar' => ['sub' => 'something-else']]], $source->getItems());
+
+        $source = new CM_PagingSource_MongoDb('my-collection', null, null, [['$unwind' => '$bar']]);
+        $result = \Functional\map($source->getItems(), function ($doc) {
+            unset($doc['_id']);
+            return $doc;
+        });
+        $this->assertEquals($itemsExpected, $result);
     }
 
     public function testGetCountOffsetCount() {

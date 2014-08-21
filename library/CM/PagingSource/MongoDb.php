@@ -11,15 +11,23 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
     /** @var array */
     private $_projection;
 
+    /** @var array */
+    private $_aggregation;
+
     /**
-     * @param  string     $collection
-     * @param  array|null $criteria
-     * @param  array|null $projection http://docs.mongodb.org/manual/reference/method/db.collection.find/#projections
+     * @param string     $collection
+     * @param array|null $criteria
+     * @param array|null $projection  http://docs.mongodb.org/manual/reference/method/db.collection.find/#projections
+     * @param array|null $aggregation http://docs.mongodb.org/manual/core/aggregation-pipeline/
+     *
+     * When using aggregation, $criteria and $projection, if defined, automatically
+     * function as `$match` and `$project` operator respectively at the front of the pipeline
      */
-    public function __construct($collection, array $criteria = null, array $projection = null) {
+    public function __construct($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
         $this->_collection = (string) $collection;
         $this->_criteria = (array) $criteria;
         $this->_projection = (array) $projection;
+        $this->_aggregation = $aggregation;
     }
 
     /**
@@ -31,7 +39,7 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
         $cacheKey = array('count');
         if (($count = $this->_cacheGet($cacheKey)) === false) {
             $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-            $count = $mongoDb->count($this->_collection, $this->_criteria, $count, $offset);
+            $count = $mongoDb->count($this->_collection, $this->_criteria, $this->_aggregation, $count, $offset);
             $this->_cacheSet($cacheKey, $count);
         } else {
             CM_Debug::getInstance()->incStats('mongoCacheHit', 'count()');
@@ -48,7 +56,7 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
         $cacheKey = array('items', $offset, $count);
         if (($items = $this->_cacheGet($cacheKey)) === false) {
             $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-            $cursor = $mongoDb->find($this->_collection, $this->_criteria, $this->_projection);
+            $cursor = $mongoDb->find($this->_collection, $this->_criteria, $this->_projection, $this->_aggregation);
 
             if (null !== $offset) {
                 $cursor->skip($offset);
