@@ -213,10 +213,10 @@ class CM_ParamsTest extends CMTest_TestCase {
             'foo4' => json_encode(array('bar' => 14)),
         ));
 
-        $this->assertSame(array(), $params->getParams('foo1')->getAll());
-        $this->assertSame(array('bar' => 12), $params->getParams('foo2')->getAll());
-        $this->assertSame(array('bar' => 13), $params->getParams('foo3')->getAll());
-        $this->assertSame(array('bar' => 14), $params->getParams('foo4')->getAll());
+        $this->assertSame(array(), $params->getParams('foo1')->getParamsDecoded());
+        $this->assertSame(array('bar' => 12), $params->getParams('foo2')->getParamsDecoded());
+        $this->assertSame(array('bar' => 13), $params->getParams('foo3')->getParamsDecoded());
+        $this->assertSame(array('bar' => 14), $params->getParams('foo4')->getParamsDecoded());
     }
 
     /**
