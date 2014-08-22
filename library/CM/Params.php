@@ -2,28 +2,24 @@
 
 class CM_Params extends CM_Class_Abstract {
 
-    /**  @var array */
-    private $_paramsEncoded;
-
-    /**  @var array */
-    private $_paramsDecoded;
+    private $_params;
 
     /**
      * @param array|null $params
      * @param bool|null  $decode Defaults to true
      */
     public function __construct(array $params = null, $decode = null) {
-        $params = $params ? : array();
+        $params = $params ?: array();
         if (null === $decode) {
             $decode = true;
         }
-        if ($decode) {
-            $this->_paramsEncoded = $params;
-            $this->_paramsDecoded = array();
-        } else {
-            $this->_paramsEncoded = $params;
-            $this->_paramsDecoded = $params;
-        }
+        $this->_params = \Functional\map($params, function ($value) use ($decode) {
+            if ($decode) {
+                return ['encoded' => $value, 'decoded' => null];
+            } else {
+                return ['encoded' => null, 'decoded' => $value];
+            }
+        });
     }
 
     /**
@@ -40,7 +36,7 @@ class CM_Params extends CM_Class_Abstract {
      * @param mixed  $value
      */
     public function set($key, $value) {
-        $this->_paramsDecoded[$key] = $value;
+        $this->_params[$key] = ['decoded' => $value, 'encoded' => null];
     }
 
     /**
@@ -48,28 +44,36 @@ class CM_Params extends CM_Class_Abstract {
      * @return bool
      */
     public function has($key) {
-        return (array_key_exists($key, $this->_paramsDecoded) && null !== $this->_paramsDecoded[$key])
-            || (array_key_exists($key, $this->_paramsEncoded) && null !== $this->_paramsEncoded[$key]);
+        return array_key_exists($key, $this->_params)
+        && (null !== $this->_params[$key]['decoded'] || null !== $this->_params[$key]['encoded']);
     }
 
     /**
      * @return array
      */
     public function getParamsDecoded() {
-        foreach (array_diff_key($this->_paramsEncoded, $this->_paramsDecoded) as $key => $value) {
-            $this->_paramsDecoded[$key] = self::decode($value);
+        $result = array();
+        foreach ($this->_params as $key => &$param) {
+            if (null === $param['decoded']) {
+                $param['decoded'] = self::decode($param['encoded']);
+            }
+            $result[$key] = $param['decoded'];
         }
-        return $this->_paramsDecoded;
+        return $result;
     }
 
     /**
      * @return array
      */
     public function getParamsEncoded() {
-        foreach (array_diff_key($this->_paramsDecoded, $this->_paramsEncoded) as $key => $value) {
-            $this->_paramsEncoded[$key] = self::encode($value);
+        $result = array();
+        foreach ($this->_params as $key => &$param) {
+            if (null === $param['encoded']) {
+                $param['encoded'] = self::encode($param['decoded']);
+            }
+            $result[$key] = $param['encoded'];
         }
-        return $this->_paramsEncoded;
+        return $result;
     }
 
     /**
@@ -392,24 +396,15 @@ class CM_Params extends CM_Class_Abstract {
      * @return mixed
      */
     public function shift() {
-        if (empty($this->_paramsDecoded)) {
-            $firstKey = array_keys($this->_paramsEncoded)[0];
-            $this->_paramsDecoded[$firstKey] = self::decode($this->_paramsEncoded[$firstKey]);
-        } else {
-            $firstKey = array_keys($this->_paramsDecoded)[0];
-        }
-        $val = $this->_paramsDecoded[$firstKey];
-        unset($this->_paramsDecoded[$firstKey]);
-        unset($this->_paramsEncoded[$firstKey]);
-        return $val;
+        $param = array_shift($this->_params);
+        return null !== $param['decoded'] ? $param['decoded'] : self::decode($param['encoded']);
     }
 
     /**
      * @param string $key
      */
     public function remove($key) {
-        unset($this->_paramsDecoded[$key]);
-        unset($this->_paramsEncoded[$key]);
+        unset($this->_params[$key]);
     }
 
     /**
@@ -425,10 +420,11 @@ class CM_Params extends CM_Class_Abstract {
         if (!$this->has($key) && $default !== null) {
             return $default;
         }
-        if (!array_key_exists($key, $this->_paramsDecoded)) {
-            $this->_paramsDecoded[$key] = self::decode($this->_paramsEncoded[$key]);
+        $param = &$this->_params[$key];
+        if (null === $param['decoded']) {
+            $param['decoded'] = self::decode($param['encoded']);
         }
-        return $this->_paramsDecoded[$key];
+        return $param['decoded'];
     }
 
     /**
