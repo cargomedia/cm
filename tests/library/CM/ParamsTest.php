@@ -180,12 +180,22 @@ class CM_ParamsTest extends CMTest_TestCase {
         $params->getGeoPoint('point');
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Cannot json_decode value `foo`
-     */
-    public function testDecode() {
-        CM_Params::decode('foo', true);
+    public function testDecodeEncode() {
+        $this->assertSame('foo', CM_Params::decode('foo'));
+        $this->assertSame(array(), CM_Params::decode(array()));
+        $this->assertSame(array('foo' => 'bar', 'foo1' => true), CM_Params::decode(array('foo' => 'bar', 'foo1' => true)));
+
+        $decodedEnLan = CM_Model_Language::create('Swiss', 'sw', true);
+        $encodedEnLan = array(
+            '_type'        => $decodedEnLan->getType(),
+            '_id'          => array('id' => $decodedEnLan->getId()),
+            'id'           => $decodedEnLan->getId(),
+            'abbreviation' => $decodedEnLan->getAbbreviation(),
+            '_class'       => get_class($decodedEnLan)
+        );
+
+        $this->assertEquals($encodedEnLan, CM_Params::encode($decodedEnLan));
+        $this->assertEquals($decodedEnLan, CM_Params::decode($encodedEnLan));
     }
 
     public function testGetDateTime() {
@@ -205,7 +215,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         }
     }
 
-    public function testGetParams() {
+    public function testGetParamsDecoded() {
         $params = new CM_Params(array(
             'foo1' => new CM_Params(),
             'foo2' => new CM_Params(array('bar' => 12)),
@@ -217,6 +227,21 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame(array('bar' => 12), $params->getParams('foo2')->getParamsDecoded());
         $this->assertSame(array('bar' => 13), $params->getParams('foo3')->getParamsDecoded());
         $this->assertSame(array('bar' => 14), $params->getParams('foo4')->getParamsDecoded());
+
+        $foo5 = CM_Model_Language::create('French', 'fr', true);
+        $params->set('foo5', $foo5);
+        $this->assertSame($foo5, $params->get('foo5'));
+    }
+
+    public function testGetParamsEncoded() {
+        $paramsSource = array(
+            'foo1' => new CM_Params(),
+            'foo2' => new CM_Params(array('bar' => 12)),
+            'foo3' => array('bar' => 13),
+            'foo4' => CM_Model_Language::create('German', 'de', true)
+        );
+        $params = new CM_Params($paramsSource, false);
+        $this->assertSame(CM_Params::encode($paramsSource), $params->getParamsEncoded());
     }
 
     /**
