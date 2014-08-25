@@ -56,13 +56,25 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
         $cacheKey = array('items', $offset, $count);
         if (($items = $this->_cacheGet($cacheKey)) === false) {
             $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-            $cursor = $mongoDb->find($this->_collection, $this->_criteria, $this->_projection, $this->_aggregation);
-
-            if (null !== $offset) {
-                $cursor->skip($offset);
+            $aggregation = null;
+            if ($this->_aggregation) {
+                $aggregation = $this->_aggregation;
+                if (null !== $offset) {
+                    array_push($aggregation, ['$skip' => $offset]);
+                }
+                if (null !== $count) {
+                    array_push($aggregation, ['$limit' => $count]);
+                }
             }
-            if (null !== $count) {
-                $cursor->limit($count);
+            $cursor = $mongoDb->find($this->_collection, $this->_criteria, $this->_projection, $aggregation);
+            if (null === $this->_aggregation) {
+                /** @var MongoCursor $cursor */
+                if (null !== $offset) {
+                    $cursor->skip($offset);
+                }
+                if (null !== $count) {
+                    $cursor->limit($count);
+                }
             }
             $items = array();
             foreach ($cursor as $item) {

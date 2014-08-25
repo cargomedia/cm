@@ -55,6 +55,18 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
             unset($doc['_id']);
             return $doc;
         }));
+
+        $result = \Functional\map($source->getItems(1), function ($doc) {
+            unset($doc['_id']);
+            return $doc;
+        });
+        $this->assertEquals(array_slice($itemsExpected, 1), $result);
+
+        $result = \Functional\map($source->getItems(1, 2), function ($doc) {
+            unset($doc['_id']);
+            return $doc;
+        });
+        $this->assertEquals(array_slice($itemsExpected, 1, 2), $result);
     }
 
     public function testGetItemsAggregation() {
@@ -76,6 +88,18 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
             return $doc;
         });
         $this->assertEquals($itemsExpected, $result);
+
+        $result = \Functional\map($source->getItems(1), function ($doc) {
+            unset($doc['_id']);
+            return $doc;
+        });
+        $this->assertEquals(array_slice($itemsExpected, 1), $result);
+
+        $result = \Functional\map($source->getItems(1, 2), function ($doc) {
+            unset($doc['_id']);
+            return $doc;
+        });
+        $this->assertEquals(array_slice($itemsExpected, 1, 2), $result);
     }
 
     public function testGetCountOffsetCount() {
