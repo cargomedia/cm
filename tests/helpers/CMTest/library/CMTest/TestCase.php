@@ -91,7 +91,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             return array(
                 'id'        => $viewResponse->getAutoId(),
                 'className' => get_class($viewResponse->getView()),
-                'params'    => $viewResponse->getView()->getParams()->getParamsEncoded()
+                'params'    => $viewResponse->getView()->getParams()->getParamsEncoded(),
             );
         };
         $viewInfoList = array_map($getViewInfo,
