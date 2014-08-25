@@ -136,7 +136,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         }
     }
 
-    public function testGetObject() {
+    public function testGetLanguage() {
         $language = CM_Model_Language::create('English', 'en', true);
         $params = new CM_Params(array('language' => $language, 'languageId' => $language->getId(), 'no-object-param' => 'xyz'));
         $this->assertEquals($language, $params->getLanguage('language'));
@@ -184,18 +184,33 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame('foo', CM_Params::decode('foo'));
         $this->assertSame(array(), CM_Params::decode(array()));
         $this->assertSame(array('foo' => 'bar', 'foo1' => true), CM_Params::decode(array('foo' => 'bar', 'foo1' => true)));
+    }
 
-        $decodedEnLan = CM_Model_Language::create('Swiss', 'sw', true);
-        $encodedEnLan = array(
-            '_type'        => $decodedEnLan->getType(),
-            '_id'          => array('id' => $decodedEnLan->getId()),
-            'id'           => $decodedEnLan->getId(),
-            'abbreviation' => $decodedEnLan->getAbbreviation(),
-            '_class'       => get_class($decodedEnLan)
+    public function testDecodeArrayConvertible() {
+        $arrayConvertibleClass = $this->mockInterface('CM_ArrayConvertible');
+        $fromArrayMethod = $arrayConvertibleClass->mockStaticMethod('fromArray')->set(function ($encoded) {
+            $this->assertSame(['foo' => 1], $encoded);
+            return $encoded['foo'];
+        });
+        $encodedArrayConvertible = [
+            'foo'    => 1,
+            '_class' => get_class($arrayConvertibleClass->newInstance()),
+        ];
+        $this->assertEquals(1, CM_Params::decode($encodedArrayConvertible));
+        $this->assertSame(1, $fromArrayMethod->getCallCount());
+    }
+
+    public function testEncodeArrayConvertible() {
+        $arrayConvertible = $this->mockInterface('CM_ArrayConvertible')->newInstance();
+        $toArrayMethod = $arrayConvertible->mockMethod('toArray')->set([
+            'foo' => 1
+        ]);
+        $expectedEncoded = array(
+            'foo'    => 1,
+            '_class' => get_class($arrayConvertible),
         );
-
-        $this->assertEquals($encodedEnLan, CM_Params::encode($decodedEnLan));
-        $this->assertEquals($decodedEnLan, CM_Params::decode($encodedEnLan));
+        $this->assertEquals($expectedEncoded, CM_Params::encode($arrayConvertible));
+        $this->assertSame(1, $toArrayMethod->getCallCount());
     }
 
     public function testGetDateTime() {
