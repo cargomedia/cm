@@ -6,15 +6,15 @@ class CM_Params extends CM_Class_Abstract {
 
     /**
      * @param array|null $params
-     * @param bool|null  $decode Defaults to true
+     * @param bool|null  $encoded Defaults to true
      */
-    public function __construct(array $params = null, $decode = null) {
+    public function __construct(array $params = null, $encoded = null) {
         $params = $params ?: array();
-        if (null === $decode) {
-            $decode = true;
+        if (null === $encoded) {
+            $encoded = true;
         }
-        $this->_params = \Functional\map($params, function ($value) use ($decode) {
-            if ($decode) {
+        $this->_params = \Functional\map($params, function ($value) use ($encoded) {
+            if ($encoded) {
                 return ['encoded' => $value, 'decoded' => null];
             } else {
                 return ['encoded' => null, 'decoded' => $value];
@@ -55,7 +55,7 @@ class CM_Params extends CM_Class_Abstract {
         $result = array();
         foreach ($this->_params as $key => &$param) {
             if (null === $param['decoded']) {
-                $param['decoded'] = self::decode($param['encoded']);
+                $param['decoded'] = static::decode($param['encoded']);
             }
             $result[$key] = $param['decoded'];
         }
@@ -69,7 +69,7 @@ class CM_Params extends CM_Class_Abstract {
         $result = array();
         foreach ($this->_params as $key => &$param) {
             if (null === $param['encoded']) {
-                $param['encoded'] = self::encode($param['decoded']);
+                $param['encoded'] = static::encode($param['decoded']);
             }
             $result[$key] = $param['encoded'];
         }

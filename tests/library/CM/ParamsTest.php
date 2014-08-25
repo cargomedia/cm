@@ -231,32 +231,65 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testGetParamsDecoded() {
-        $params = new CM_Params(array(
-            'foo1' => new CM_Params(),
-            'foo2' => new CM_Params(array('bar' => 12)),
-            'foo3' => array('bar' => 13),
-            'foo4' => json_encode(array('bar' => 14)),
-        ));
+        $paramsArray = [
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ];
+        $paramsClass = $this->mockClass('CM_Params');
+        $decodeMethod = $paramsClass->mockStaticMethod('decode')
+            ->at(0, function ($value) {
+                $this->assertSame('foo', $value);
+                return $value . '-decoded';
+            })
+            ->at(1, function ($value) {
+                $this->assertSame('bar', $value);
+                return $value . '-decoded';
+            });
+        $params = $paramsClass->newInstance([$paramsArray]);
+        /** @var CM_Params $params */
 
-        $this->assertSame(array(), $params->getParams('foo1')->getParamsDecoded());
-        $this->assertSame(array('bar' => 12), $params->getParams('foo2')->getParamsDecoded());
-        $this->assertSame(array('bar' => 13), $params->getParams('foo3')->getParamsDecoded());
-        $this->assertSame(array('bar' => 14), $params->getParams('foo4')->getParamsDecoded());
+        $expected = [
+            'foo' => 'foo-decoded',
+            'bar' => 'bar-decoded'
+        ];
+        $this->assertSame(0, $decodeMethod->getCallCount());
 
-        $foo5 = CM_Model_Language::create('French', 'fr', true);
-        $params->set('foo5', $foo5);
-        $this->assertSame($foo5, $params->get('foo5'));
+        $this->assertSame($expected, $params->getParamsDecoded());
+        $this->assertSame(count($paramsArray), $decodeMethod->getCallCount());
+
+        $this->assertSame($expected, $params->getParamsDecoded());
+        $this->assertSame(count($paramsArray), $decodeMethod->getCallCount());
     }
 
     public function testGetParamsEncoded() {
-        $paramsSource = array(
-            'foo1' => new CM_Params(),
-            'foo2' => new CM_Params(array('bar' => 12)),
-            'foo3' => array('bar' => 13),
-            'foo4' => CM_Model_Language::create('German', 'de', true)
-        );
-        $params = new CM_Params($paramsSource, false);
-        $this->assertSame(CM_Params::encode($paramsSource), $params->getParamsEncoded());
+        $paramsArray = [
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ];
+        $paramsClass = $this->mockClass('CM_Params');
+        $encodeMethod = $paramsClass->mockStaticMethod('encode')
+            ->at(0, function ($value) {
+                $this->assertSame('foo', $value);
+                return $value . '-encoded';
+            })
+            ->at(1, function ($value) {
+                $this->assertSame('bar', $value);
+                return $value . '-encoded';
+            });
+        $params = $paramsClass->newInstance([$paramsArray, false]);
+        /** @var CM_Params $params */
+
+        $expected = [
+            'foo' => 'foo-encoded',
+            'bar' => 'bar-encoded'
+        ];
+        $this->assertSame(0, $encodeMethod->getCallCount());
+
+        $this->assertSame($expected, $params->getParamsEncoded());
+        $this->assertSame(count($paramsArray), $encodeMethod->getCallCount());
+
+        $this->assertSame($expected, $params->getParamsEncoded());
+        $this->assertSame(count($paramsArray), $encodeMethod->getCallCount());
     }
 
     /**
