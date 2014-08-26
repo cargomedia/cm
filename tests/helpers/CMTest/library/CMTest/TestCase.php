@@ -88,10 +88,15 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $url = (string) $url;
         $query = (array) $query;
         $getViewInfo = function (CM_Frontend_ViewResponse $viewResponse) {
+            /**
+             * Simulate sending view-params to client and back (remove any objects)
+             */
+            $viewParams = $viewResponse->getView()->getParams()->getParamsDecoded();
+            $viewParams = CM_Params::decode(CM_Params::encode($viewParams, true), true);
             return array(
                 'id'        => $viewResponse->getAutoId(),
                 'className' => get_class($viewResponse->getView()),
-                'params'    => $viewResponse->getView()->getParams()->getParamsEncoded(),
+                'params'    => $viewParams,
             );
         };
         $viewInfoList = array_map($getViewInfo,
