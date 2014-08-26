@@ -248,14 +248,13 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param CM_Component_Abstract $component
      * @param CM_Model_User|null    $viewer
      * @param CM_Site_Abstract|null $site
-     * @return CMTest_TH_Html
+     * @return CM_Dom_NodeList
      */
     protected function _renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
         $render = new CM_Frontend_Render($site, $viewer);
         $renderAdapter = new CM_RenderAdapter_Component($render, $component);
         $componentHtml = $renderAdapter->fetch();
-        $html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $componentHtml . '</body></html>';
-        return new CMTest_TH_Html($html);
+        return new CM_Dom_NodeList($componentHtml, true);
     }
 
     /**
@@ -270,14 +269,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         }
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
         $html = $renderAdapter->fetch(CM_Params::factory($renderParams));
-        return new CM_Dom_NodeList($html);
+        return new CM_Dom_NodeList($html, true);
     }
 
     /**
      * @param CM_Page_Abstract      $page
      * @param CM_Model_User|null    $viewer
      * @param CM_Site_Abstract|null $site
-     * @return CMTest_TH_Html
+     * @return CM_Dom_NodeList
      */
     protected function _renderPage(CM_Page_Abstract $page, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
         if (null === $site) {
@@ -290,7 +289,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $page->prepareResponse($render->getEnvironment(), $response);
         $renderAdapter = new CM_RenderAdapter_Page($render, $page);
         $html = $renderAdapter->fetch();
-        return new CMTest_TH_Html($html);
+        return new CM_Dom_NodeList($html, true);
     }
 
     /**
@@ -528,11 +527,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CMTest_TH_Html $html
-     * @param string         $css
+     * @param CM_Dom_NodeList $html
+     * @param string          $css
      */
-    public static function assertHtmlExists(CMTest_TH_Html $html, $css) {
-        self::assertTrue($html->exists($css), 'HTML does not contain `' . $css . '`.');
+    public static function assertHtmlExists(CM_Dom_NodeList $html, $css) {
+        self::assertTrue($html->has($css), 'HTML does not contain `' . $css . '`.');
     }
 
     /**
@@ -594,10 +593,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CMTest_TH_Html $page
-     * @param bool           $warnings
+     * @param CM_Dom_NodeList $page
+     * @param bool            $warnings
      */
-    public static function assertTidy(CMTest_TH_Html $page, $warnings = true) {
+    public static function assertTidy(CM_Dom_NodeList $page, $warnings = true) {
         if (!extension_loaded('tidy')) {
             self::markTestSkipped('The tidy extension is not available.');
         }
