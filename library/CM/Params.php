@@ -302,7 +302,7 @@ class CM_Params extends CM_Class_Abstract {
             } else {
                 throw new CM_Exception_InvalidParam('Unexpected input of type `' . gettype($param) . '` to create CM_Params');
             }
-            return CM_Params::factory($array);
+            return CM_Params::factory($array, false);
         });
         if (!($param instanceof CM_Params)) {
             throw new CM_Exception_Invalid('Not a CM_Params');

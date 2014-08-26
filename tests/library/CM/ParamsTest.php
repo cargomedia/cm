@@ -225,7 +225,6 @@ class CM_ParamsTest extends CMTest_TestCase {
         foreach ($dateTimeList as $dateTime) {
             $paramsArray = json_decode(json_encode(array('date' => $dateTime)), true);
             $params = new CM_Params($paramsArray, true);
-
             $this->assertEquals($params->getDateTime('date'), $dateTime);
         }
     }
