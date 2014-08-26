@@ -95,7 +95,7 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
 
         $job = $this->getMockForAbstractClass('CM_Jobdistribution_Job_Abstract', array(), '', true, true, true, array('_execute'));
         $job->expects($this->exactly(2))->method('_execute')->will($this->returnCallback(function (CM_Params $params) {
-            return array_flip($params->getParamsDecoded());
+            return array_flip($params->getAllOriginal());
         }));
 
         /** @var CM_Jobdistribution_Job_Abstract $job */

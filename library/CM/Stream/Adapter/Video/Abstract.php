@@ -83,7 +83,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
         $height = (int) $height;
         $serverId = (int) $serverId;
         $data = (string) $data;
-        $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
+        $params = CM_Params::factory(CM_Params::decode($data, true));
         $streamChannelType = $params->getInt('streamChannelType');
         $session = new CM_Session($params->getString('sessionId'));
         $user = $session->getUser(true);
@@ -142,7 +142,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
         $start = (int) $start;
         $data = (string) $data;
         $user = null;
-        $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
+        $params = CM_Params::factory(CM_Params::decode($data, true));
         if ($params->has('sessionId')) {
             if ($session = CM_Session::findById($params->getString('sessionId'))) {
                 $user = $session->getUser(false);

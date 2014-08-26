@@ -136,7 +136,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         }
     }
 
-    public function testGetLanguage() {
+    public function testGetObject() {
         $language = CM_Model_Language::create('English', 'en', true);
         $params = new CM_Params(array('language' => $language, 'languageId' => $language->getId(), 'no-object-param' => 'xyz'));
         $this->assertEquals($language, $params->getLanguage('language'));
@@ -180,37 +180,12 @@ class CM_ParamsTest extends CMTest_TestCase {
         $params->getGeoPoint('point');
     }
 
-    public function testDecodeEncode() {
-        $this->assertSame('foo', CM_Params::decode('foo'));
-        $this->assertSame(array(), CM_Params::decode(array()));
-        $this->assertSame(array('foo' => 'bar', 'foo1' => true), CM_Params::decode(array('foo' => 'bar', 'foo1' => true)));
-    }
-
-    public function testDecodeArrayConvertible() {
-        $arrayConvertibleClass = $this->mockInterface('CM_ArrayConvertible');
-        $fromArrayMethod = $arrayConvertibleClass->mockStaticMethod('fromArray')->set(function ($encoded) {
-            $this->assertSame(['foo' => 1], $encoded);
-            return $encoded['foo'];
-        });
-        $encodedArrayConvertible = [
-            'foo'    => 1,
-            '_class' => get_class($arrayConvertibleClass->newInstance()),
-        ];
-        $this->assertEquals(1, CM_Params::decode($encodedArrayConvertible));
-        $this->assertSame(1, $fromArrayMethod->getCallCount());
-    }
-
-    public function testEncodeArrayConvertible() {
-        $arrayConvertible = $this->mockInterface('CM_ArrayConvertible')->newInstance();
-        $toArrayMethod = $arrayConvertible->mockMethod('toArray')->set([
-            'foo' => 1
-        ]);
-        $expectedEncoded = array(
-            'foo'    => 1,
-            '_class' => get_class($arrayConvertible),
-        );
-        $this->assertEquals($expectedEncoded, CM_Params::encode($arrayConvertible));
-        $this->assertSame(1, $toArrayMethod->getCallCount());
+    /**
+     * @expectedException CM_Exception_Invalid
+     * @expectedExceptionMessage Cannot json_decode value `foo`
+     */
+    public function testDecode() {
+        CM_Params::decode('foo', true);
     }
 
     public function testGetDateTime() {
@@ -230,66 +205,18 @@ class CM_ParamsTest extends CMTest_TestCase {
         }
     }
 
-    public function testGetParamsDecoded() {
-        $paramsArray = [
-            'foo' => 'foo',
-            'bar' => 'bar',
-        ];
-        $paramsClass = $this->mockClass('CM_Params');
-        $decodeMethod = $paramsClass->mockStaticMethod('decode')
-            ->at(0, function ($value) {
-                $this->assertSame('foo', $value);
-                return $value . '-decoded';
-            })
-            ->at(1, function ($value) {
-                $this->assertSame('bar', $value);
-                return $value . '-decoded';
-            });
-        $params = $paramsClass->newInstance([$paramsArray]);
-        /** @var CM_Params $params */
+    public function testGetParams() {
+        $params = new CM_Params(array(
+            'foo1' => new CM_Params(),
+            'foo2' => new CM_Params(array('bar' => 12)),
+            'foo3' => array('bar' => 13),
+            'foo4' => json_encode(array('bar' => 14)),
+        ));
 
-        $expected = [
-            'foo' => 'foo-decoded',
-            'bar' => 'bar-decoded'
-        ];
-        $this->assertSame(0, $decodeMethod->getCallCount());
-
-        $this->assertSame($expected, $params->getParamsDecoded());
-        $this->assertSame(count($paramsArray), $decodeMethod->getCallCount());
-
-        $this->assertSame($expected, $params->getParamsDecoded());
-        $this->assertSame(count($paramsArray), $decodeMethod->getCallCount());
-    }
-
-    public function testGetParamsEncoded() {
-        $paramsArray = [
-            'foo' => 'foo',
-            'bar' => 'bar',
-        ];
-        $paramsClass = $this->mockClass('CM_Params');
-        $encodeMethod = $paramsClass->mockStaticMethod('encode')
-            ->at(0, function ($value) {
-                $this->assertSame('foo', $value);
-                return $value . '-encoded';
-            })
-            ->at(1, function ($value) {
-                $this->assertSame('bar', $value);
-                return $value . '-encoded';
-            });
-        $params = $paramsClass->newInstance([$paramsArray, false]);
-        /** @var CM_Params $params */
-
-        $expected = [
-            'foo' => 'foo-encoded',
-            'bar' => 'bar-encoded'
-        ];
-        $this->assertSame(0, $encodeMethod->getCallCount());
-
-        $this->assertSame($expected, $params->getParamsEncoded());
-        $this->assertSame(count($paramsArray), $encodeMethod->getCallCount());
-
-        $this->assertSame($expected, $params->getParamsEncoded());
-        $this->assertSame(count($paramsArray), $encodeMethod->getCallCount());
+        $this->assertSame(array(), $params->getParams('foo1')->getAll());
+        $this->assertSame(array('bar' => 12), $params->getParams('foo2')->getAll());
+        $this->assertSame(array('bar' => 13), $params->getParams('foo3')->getAll());
+        $this->assertSame(array('bar' => 14), $params->getParams('foo4')->getAll());
     }
 
     /**

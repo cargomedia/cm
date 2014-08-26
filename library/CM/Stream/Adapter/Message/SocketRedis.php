@@ -126,7 +126,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
      * @throws CM_Exception_Invalid
      */
     public function onRedisMessage($message) {
-        $message = CM_Params::jsonDecode($message);
+        $message = CM_Params::decode($message, true);
         $type = $message['type'];
         $data = $message['data'];
         switch ($type) {
@@ -220,8 +220,8 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
         $servers = self::_getConfig()->servers;
         $statusData = array();
         foreach ($servers as $server) {
-            $statusData = array_merge_recursive($statusData, CM_Params::jsonDecode(CM_Util::getContents(
-                'http://' . $server['httpHost'] . ':' . $server['httpPort'])));
+            $statusData = array_merge_recursive($statusData, CM_Params::decode(CM_Util::getContents(
+                'http://' . $server['httpHost'] . ':' . $server['httpPort']), true));
         }
         return $statusData;
     }
