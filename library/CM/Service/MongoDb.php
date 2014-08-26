@@ -30,8 +30,8 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @return array|bool
      */
     public function insert($collection, array $object) {
-        CM_Debug::getInstance()->incStats('mongo', "insert to {$collection}");
-        $ref = & $object;
+        CM_Debug::getInstance()->incStats('mongo', "Insert `{$collection}`: " . CM_Params::jsonEncode($object));
+        $ref = &$object;
         return $this->_getCollection($collection)->insert($ref);
     }
 
@@ -41,7 +41,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @return mixed
      */
     public function batchInsert($collection, array $objectList) {
-        CM_Debug::getInstance()->incStats('mongo', "batch insert to {$collection}");
+        CM_Debug::getInstance()->incStats('mongo', "Batch Insert `{$collection}`: " . CM_Params::jsonEncode($objectList));
         return $this->_getCollection($collection)->batchInsert($objectList);
     }
 
@@ -54,8 +54,8 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     public function findOne($collection, array $criteria = null, array $projection = null) {
         $criteria = (array) $criteria;
         $projection = (array) $projection;
-        CM_Debug::getInstance()->incStats('mongo',
-            "findOne in {$collection}: " . serialize(array('projection' => $projection) + $criteria));
+        CM_Debug::getInstance()->incStats('mongo', "findOne `{$collection}`: " . CM_Params::jsonEncode(['projection' => $projection,
+                                                                                                        'criteria'   => $criteria]));
 
         return $this->_getCollection($collection)->findOne($criteria, $projection);
     }
@@ -70,7 +70,9 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     public function find($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
         $criteria = (array) $criteria;
         $projection = (array) $projection;
-        CM_Debug::getInstance()->incStats('mongo', "find in {$collection}: " . serialize(array('fields' => $projection) + $criteria));
+        CM_Debug::getInstance()->incStats('mongo', "find `{$collection}`: " . CM_Params::jsonEncode(['projection'  => $projection,
+                                                                                                     'criteria'    => $criteria,
+                                                                                                     'aggregation' => $aggregation]));
         $collection = $this->_getCollection($collection);
         if ($aggregation) {
             $pipeline = $aggregation;
@@ -99,7 +101,8 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         $criteria = (array) $criteria;
         $limit = (int) $limit;
         $offset = (int) $offset;
-        CM_Debug::getInstance()->incStats('mongo', "count in {$collection}: " . serialize($criteria));
+        CM_Debug::getInstance()->incStats('mongo', "count `{$collection}`: " . CM_Params::jsonEncode(['criteria'    => $criteria,
+                                                                                                    'aggregation' => $aggregation]));
         $pipeline = [];
         if ($aggregation) {
             $pipeline = $aggregation;
@@ -127,7 +130,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @return array
      */
     public function drop($collection) {
-        CM_Debug::getInstance()->incStats('mongo', "drop {$collection}: ");
+        CM_Debug::getInstance()->incStats('mongo', "drop `{$collection}`");
         return $this->_getCollection($collection)->drop();
     }
 
@@ -140,7 +143,8 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     public function update($collection, array $criteria, array $newObject, array $options = null) {
         $options = (array) $options;
-        CM_Debug::getInstance()->incStats('mongo', "Update {$collection}");
+        CM_Debug::getInstance()->incStats('mongo', "Update `{$collection}`: " . CM_Params::jsonEncode(['criteria'  => $criteria,
+                                                                                                       'newObject' => $newObject]));
         return $this->_getCollection($collection)->update($criteria, $newObject, $options);
     }
 
@@ -152,7 +156,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     public function remove($collection, array $criteria, array $options = null) {
         $options = (array) $options;
-        CM_Debug::getInstance()->incStats('mongo', "remove from {$collection}");
+        CM_Debug::getInstance()->incStats('mongo', "Remove `{$collection}`: " . CM_Params::jsonEncode($criteria));
         return $this->_getCollection($collection)->remove($criteria, $options);
     }
 
