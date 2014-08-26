@@ -2,24 +2,31 @@
 
 class CM_Params extends CM_Class_Abstract {
 
-    private $_params;
+    /**  @var array */
+    private $_paramsOriginal = array();
+
+    /**  @var array */
+    private $_params = array();
+
+    /** @var bool */
+    private $_decode;
 
     /**
      * @param array|null $params
-     * @param bool|null  $encoded Defaults to true
+     * @param bool|null  $decode Defaults to true
      */
-    public function __construct(array $params = null, $encoded = null) {
-        $params = $params ?: array();
-        if (null === $encoded) {
-            $encoded = true;
+    public function __construct(array $params = null, $decode = null) {
+        if (null === $decode) {
+            $decode = true;
         }
-        $this->_params = \Functional\map($params, function ($value) use ($encoded) {
-            if ($encoded) {
-                return ['encoded' => $value, 'decoded' => null];
-            } else {
-                return ['encoded' => null, 'decoded' => $value];
+        $this->_decode = (bool) $decode;
+        $this->_paramsOriginal = (array) $params;
+        $this->_params = (array) $params;
+        if ($this->_decode) {
+            foreach ($this->_params as $key => &$param) {
+                $param = self::decode($param);
             }
-        });
+        }
     }
 
     /**
@@ -36,7 +43,10 @@ class CM_Params extends CM_Class_Abstract {
      * @param mixed  $value
      */
     public function set($key, $value) {
-        $this->_params[$key] = ['decoded' => $value, 'encoded' => null];
+        if ($this->_decode) {
+            $value = self::decode($value);
+        }
+        $this->_params[$key] = $value;
     }
 
     /**
@@ -44,36 +54,21 @@ class CM_Params extends CM_Class_Abstract {
      * @return bool
      */
     public function has($key) {
-        return array_key_exists($key, $this->_params)
-        && (null !== $this->_params[$key]['decoded'] || null !== $this->_params[$key]['encoded']);
+        return (array_key_exists($key, $this->_params) && null !== $this->_params[$key]);
     }
 
     /**
      * @return array
      */
-    public function getParamsDecoded() {
-        $result = array();
-        foreach ($this->_params as $key => &$param) {
-            if (null === $param['decoded']) {
-                $param['decoded'] = static::decode($param['encoded']);
-            }
-            $result[$key] = $param['decoded'];
-        }
-        return $result;
+    public function getAll() {
+        return $this->_params;
     }
 
     /**
      * @return array
      */
-    public function getParamsEncoded() {
-        $result = array();
-        foreach ($this->_params as $key => &$param) {
-            if (null === $param['encoded']) {
-                $param['encoded'] = static::encode($param['decoded']);
-            }
-            $result[$key] = $param['encoded'];
-        }
-        return $result;
+    public function getAllOriginal() {
+        return $this->_paramsOriginal;
     }
 
     /**
@@ -396,8 +391,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return mixed
      */
     public function shift() {
-        $param = array_shift($this->_params);
-        return null !== $param['decoded'] ? $param['decoded'] : self::decode($param['encoded']);
+        return array_shift($this->_params);
     }
 
     /**
@@ -420,11 +414,7 @@ class CM_Params extends CM_Class_Abstract {
         if (!$this->has($key) && $default !== null) {
             return $default;
         }
-        $param = &$this->_params[$key];
-        if (null === $param['decoded']) {
-            $param['decoded'] = self::decode($param['encoded']);
-        }
-        return $param['decoded'];
+        return $this->_params[$key];
     }
 
     /**
@@ -552,12 +542,12 @@ class CM_Params extends CM_Class_Abstract {
 
     /**
      * @param array|null $params
-     * @param bool|null  $encoded
+     * @param bool|null  $decode
      * @return static
      */
-    public static function factory(array $params = null, $encoded = null) {
+    public static function factory(array $params = null, $decode = null) {
         $params = (array) $params;
         $className = self::_getClassName();
-        return new $className($params, $encoded);
+        return new $className($params, $decode);
     }
 }

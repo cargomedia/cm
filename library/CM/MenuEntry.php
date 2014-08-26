@@ -170,7 +170,7 @@ class CM_MenuEntry {
      * @return bool
      */
     public final function isActive($path, CM_Params $params) {
-        if ($this->compare($path, $params->getParamsDecoded())) {
+        if ($this->compare($path, $params->getAllOriginal())) {
             return true;
         }
 

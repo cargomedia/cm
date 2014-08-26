@@ -62,10 +62,10 @@ class CM_Cli_Arguments {
      * @throws CM_Cli_Exception_InvalidArguments
      */
     public function checkUnused() {
-        if ($this->getNumeric()->getParamsDecoded()) {
+        if ($this->getNumeric()->getAll()) {
             throw new CM_Cli_Exception_InvalidArguments('Too many arguments provided');
         }
-        if ($named = $this->getNamed()->getParamsDecoded()) {
+        if ($named = $this->getNamed()->getAll()) {
             throw new CM_Cli_Exception_InvalidArguments('Illegal option used: `--' . key($named) . '`');
         }
     }
@@ -95,7 +95,7 @@ class CM_Cli_Arguments {
      * @param string $value
      */
     private function _addNumeric($value) {
-        $this->_numeric->set(count($this->_numeric->getParamsDecoded()), $value);
+        $this->_numeric->set(count($this->_numeric->getAll()), $value);
     }
 
     /**
@@ -115,7 +115,7 @@ class CM_Cli_Arguments {
         $paramName = CM_Util::uncamelize($param->getName());
         if (!$param->isOptional()) {
             $argumentsNumeric = $this->getNumeric();
-            if (!$argumentsNumeric->getParamsDecoded()) {
+            if (!$argumentsNumeric->getAll()) {
                 throw new CM_Cli_Exception_InvalidArguments('Missing argument `' . $paramName . '`');
             }
             $value = $argumentsNumeric->shift();
