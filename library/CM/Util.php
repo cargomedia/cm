@@ -145,7 +145,7 @@ class CM_Util {
         curl_setopt($curlConnection, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curlConnection, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curlConnection, CURLOPT_TIMEOUT, $timeout);
-        curl_setopt($curlConnection, CURLOPT_USERAGENT, 'Mozilla/5.0');
+        curl_setopt($curlConnection, CURLOPT_USERAGENT, 'Mozilla/5.0 AppleWebKit');
         if ($methodPost) {
             curl_setopt($curlConnection, CURLOPT_POST, 1);
             if (!empty($params)) {

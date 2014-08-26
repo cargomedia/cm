@@ -7,7 +7,7 @@ class CM_Asset_Javascript_Internal extends CM_Asset_Javascript_Abstract {
      */
     public function __construct(CM_Site_Abstract $site) {
         $this->_content = 'var cm = new ' . $this->_getAppClassName($site) . '();' . PHP_EOL;
-        $this->_content .= new CM_File(DIR_ROOT . 'resources/config/js/internal.js');
+        $this->_content .= (new CM_File(DIR_ROOT . 'resources/config/js/internal.js'))->read();
     }
 
     /**

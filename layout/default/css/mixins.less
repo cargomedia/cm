@@ -149,6 +149,11 @@
   }
 }
 
+.appearance(@value) {
+  -webkit-appearance: @value;
+  -moz-appearance: @value;
+}
+
 .animation(@name, @duration: 300ms, @timing-function: ease, @delay: 0s, @iteration-count: 1, @direction: normal, @fill-mode: none) {
   animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 }
@@ -161,4 +166,17 @@
 .gradient(@direction, @color1, @color2, @pos1: 0%, @pos2: 100%) when (@direction = vertical) and (iscolor(@color1)) and (iscolor(@color2)) {
   filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
   background-image: linear-gradient(to bottom,@color1 @pos1,@color2 @pos2);
+}
+
+.fontFace(@family, @file, @weight: normal, @style: normal) {
+  @font-face{
+    font-family: @family;
+    src: url(urlFont("@{file}.eot") + "");
+    src: url(urlFont("@{file}.eot") + "?#iefix") format("embedded-opentype"),
+         url(urlFont("@{file}.woff") + "") format("woff"),
+         url(urlFont("@{file}.ttf") + "") format("truetype"),
+         url(urlFont("@{file}.svg") + "#@{family}") format("svg");
+    font-weight: @{weight};
+    font-style: @{style};
+  }
 }
