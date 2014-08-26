@@ -100,7 +100,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     public function __executeGearman(GearmanJob $job) {
         $workload = $job->workload();
         try {
-            $params = CM_Params::factory(CM_Params::decode($workload, true));
+            $params = CM_Params::factory(CM_Params::jsonDecode($workload), true);
         } catch (CM_Exception_Nonexistent $ex) {
             throw new CM_Exception_Nonexistent(
                 'Cannot decode workload for Job `' . get_class($this) . '`: Original exception message `' . $ex->getMessage() .
