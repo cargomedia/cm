@@ -552,12 +552,12 @@ class CM_Params extends CM_Class_Abstract {
 
     /**
      * @param array|null $params
-     * @param bool|null  $decode
+     * @param bool|null  $encoded
      * @return static
      */
-    public static function factory(array $params = null, $decode = null) {
+    public static function factory(array $params = null, $encoded = null) {
         $params = (array) $params;
         $className = self::_getClassName();
-        return new $className($params, $decode);
+        return new $className($params, $encoded);
     }
 }
