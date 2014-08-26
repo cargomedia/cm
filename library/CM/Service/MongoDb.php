@@ -51,13 +51,21 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param array|null $projection
      * @return array
      */
-    public function findOne($collection, array $criteria = null, array $projection = null) {
+    public function findOne($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
         $criteria = (array) $criteria;
         $projection = (array) $projection;
-        CM_Debug::getInstance()->incStats('mongo', "findOne `{$collection}`: " . CM_Params::jsonEncode(['projection' => $projection,
-                                                                                                        'criteria'   => $criteria]));
+        if ($aggregation) {
+            array_push($aggregation, ['$limit' => 1]);
+            $resultSet = $this->find($collection, $criteria, $projection, $aggregation);
+            $resultSet->rewind();
+            $result = $resultSet->current();
+        } else {
+            $result = $this->_getCollection($collection)->findOne($criteria, $projection);
+            CM_Debug::getInstance()->incStats('mongo', "findOne `{$collection}`: " . CM_Params::jsonEncode(['projection' => $projection,
+                                                                                                            'criteria'   => $criteria]));
+        }
 
-        return $this->_getCollection($collection)->findOne($criteria, $projection);
+        return $result;
     }
 
     /**

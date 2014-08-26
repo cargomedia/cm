@@ -93,6 +93,23 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $this->assertEquals([['foo' => 1], ['foo' => 1], ['foo' => 2], ['foo' => 3]], $actual);
     }
 
+    public function testFindOne() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = $this->_getEmptyCollectionName('find');
+
+        $mongoDb->insert($collectionName, ['userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]]);
+        $mongoDb->insert($collectionName, ['userId' => 2, 'groupId' => 2, 'name' => 'steve', 'foo' => [2,3]]);
+        $mongoDb->insert($collectionName, ['userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [4,5,6]]);
+
+        $user = $mongoDb->findOne($collectionName, array('groupId' => 1), ['_id' => 0]);
+        $this->assertSame(['userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]], $user);
+
+        $this->assertSame(['foo' => 4], $mongoDb->findOne($collectionName, ['userId' => 3], ['_id' => 0, 'foo' => 1], [['$unwind' => '$foo']]));
+
+        $this->assertNull($mongoDb->findOne($collectionName, array('groupId' => 3), ['_id' => 0]));
+        $this->assertNull($mongoDb->findOne($collectionName, ['userId' => 4], ['_id' => 0, 'foo' => 1], [['$unwind' => '$foo']]));
+    }
+
     public function testCount() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = $this->_getEmptyCollectionName('count');
