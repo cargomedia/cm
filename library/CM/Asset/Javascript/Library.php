@@ -8,7 +8,7 @@ class CM_Asset_Javascript_Library extends CM_Asset_Javascript_Abstract {
     public function __construct(CM_Site_Abstract $site) {
         $content = '';
         foreach (self::getIncludedPaths($site) as $path) {
-            $content .= new CM_File($path);
+            $content .= (new CM_File($path))->read();
         }
         $internal = new CM_Asset_Javascript_Internal($site);
         $content .= $internal->get();
