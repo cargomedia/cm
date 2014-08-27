@@ -1,7 +1,7 @@
 <?php
 
 function smarty_function_input(array $params, Smarty_Internal_Template $template) {
-    $params = CM_Params::factory($params);
+    $params = CM_Params::factory($params, false);
     if (!$params->has('name')) {
         throw new CM_Exception_Invalid('Param `name` missing');
     }

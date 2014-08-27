@@ -145,7 +145,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         }
         $viewInfo = $this->_getViewInfo($className);
         /** @var CM_View_Abstract $className */
-        return $className::factory($viewInfo['className'], $viewInfo['params']);
+        return $className::factory($viewInfo['className'], CM_Params::factory($viewInfo['params'], true));
     }
 
     /**

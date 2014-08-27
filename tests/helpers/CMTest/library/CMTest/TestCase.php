@@ -91,7 +91,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             /**
              * Simulate sending view-params to client and back (remove any objects)
              */
-            $viewParams = $viewResponse->getView()->getParams()->getAll();
+            $viewParams = $viewResponse->getView()->getParams()->getParamsDecoded();
             $viewParams = CM_Params::decode(CM_Params::encode($viewParams, true), true);
             return array(
                 'id'        => $viewResponse->getAutoId(),
@@ -241,7 +241,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @return CM_Page_Abstract
      */
     protected function _createPage($pageClass, array $params = null) {
-        return new $pageClass(CM_Params::factory($params));
+        return new $pageClass(CM_Params::factory($params, false));
     }
 
     /**
@@ -259,16 +259,16 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_FormField_Abstract   $formField
-     * @param CM_Params|array|null    $renderParams
+     * @param array|null              $renderParams
      * @param CM_Frontend_Render|null $render
      * @return CM_Dom_NodeList
      */
-    protected function _renderFormField(CM_FormField_Abstract $formField, $renderParams = null, CM_Frontend_Render $render = null) {
+    protected function _renderFormField(CM_FormField_Abstract $formField, array $renderParams = null, CM_Frontend_Render $render = null) {
         if (null === $render) {
             $render = new CM_Frontend_Render();
         }
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
-        $html = $renderAdapter->fetch(CM_Params::factory($renderParams));
+        $html = $renderAdapter->fetch(CM_Params::factory($renderParams, false));
         return new CM_Dom_NodeList($html, true);
     }
 
@@ -283,7 +283,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             $site = CM_Site_Abstract::factory();
         }
         $host = parse_url($site->getUrl(), PHP_URL_HOST);
-        $request = new CM_Request_Get('?' . http_build_query($page->getParams()->getAllOriginal()), array('host' => $host), null, $viewer);
+        $request = new CM_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), array('host' => $host), null, $viewer);
         $response = new CM_Response_Page($request);
         $render = new CM_Frontend_Render($site, $viewer);
         $page->prepareResponse($render->getEnvironment(), $response);

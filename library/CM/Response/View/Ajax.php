@@ -23,7 +23,7 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
             }
 
             $ajaxMethodName = 'ajax_' . $query['method'];
-            $params = CM_Params::factory($query['params']);
+            $params = CM_Params::factory($query['params'], true);
 
             $componentHandler = new CM_Frontend_JavascriptContainer_View();
 
