@@ -117,7 +117,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $site->expects($this->any())->method('getUrlCdn')->will($this->returnValue(null));
         /** @var CM_Site_Abstract $site */
 
-        $render = new CM_Frontend_Render($site);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('/layout/' . $site->getType() . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('layout', 'foo.jpg'));
     }
@@ -135,7 +135,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $site->expects($this->any())->method('getUrlCdn')->will($this->returnValue(null));
         /** @var CM_Site_Abstract $site */
 
-        $render = new CM_Frontend_Render($site);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
     }
