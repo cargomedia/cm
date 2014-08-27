@@ -25,17 +25,18 @@ class CM_FormField_SetTest extends CMTest_TestCase {
 
         $environment = new CM_Frontend_Environment();
         $userInputGood = array(32, 64, 128);
-        $response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
-        $validationResult = $field->validate($environment, $userInputGood);
-        $this->assertSame($userInputGood, $validationResult);
+        $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
+        $parsedInput = $field->parseUserInput($userInputGood);
+        $field->validate($environment, $parsedInput);
+        $this->assertSame($userInputGood, $parsedInput);
 
         $userInputTainted = array(32, 23, 132);
-        $validationResult = $field->validate($environment, $userInputTainted);
-        $this->assertSame(array(32), $validationResult);
+        $parsedInput = $field->parseUserInput($userInputTainted);
+        $field->validate($environment, $parsedInput);
+        $this->assertSame(array(32), $parsedInput);
     }
 
     public function testRender() {
-        $render = new CM_Frontend_Render();
         $name = 'foo';
         $data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
         $field = new CM_FormField_Set(['name' => $name, 'values' => $data, 'labelsInValues' => true]);

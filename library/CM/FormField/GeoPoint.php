@@ -2,13 +2,7 @@
 
 class CM_FormField_GeoPoint extends CM_FormField_Abstract {
 
-    /**
-     * @param CM_Frontend_Environment $environment
-     * @param array                   $userInput
-     * @throws CM_Exception_FormFieldValidation
-     * @return CM_Geo_Point
-     */
-    public function validate(CM_Frontend_Environment $environment, $userInput) {
+    public function parseUserInput($userInput) {
         if (!isset($userInput['latitude']) || !is_numeric($userInput['latitude'])) {
             throw new CM_Exception_FormFieldValidation('Latitude needs to be numeric');
         }
@@ -21,8 +15,19 @@ class CM_FormField_GeoPoint extends CM_FormField_Abstract {
         } catch (CM_Exception_Invalid $e) {
             throw new CM_Exception_FormFieldValidation('Invalid latitude or longitude value');
         }
-
         return $point;
+    }
+
+    /**
+     * @param CM_Frontend_Environment $environment
+     * @param array                   $userInput
+     * @throws CM_Exception_FormFieldValidation
+     * @return CM_Geo_Point
+     */
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
+        if (!($userInput instanceof CM_Geo_Point)) {
+            throw new CM_Exception_FormFieldValidation('Expected a CM_Geo_Point instance.');
+        }
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {

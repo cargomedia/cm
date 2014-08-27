@@ -20,13 +20,25 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
         $viewResponse->set('placeholder', $renderParams->has('placeholder') ? $renderParams->getString('placeholder') : null);
     }
 
-    public function validate(CM_Frontend_Environment $environment, $userInput) {
+    /**
+     * @param $userInput
+     * @return array
+     */
+    public function parseUserInput($userInput) {
         $values = explode(',', $userInput);
         $values = array_unique($values);
-        if ($this->_options['cardinality'] && count($values) > $this->_options['cardinality']) {
+        return $values;
+    }
+
+    /**
+     * @param CM_Frontend_Environment $environment
+     * @param array                   $userInput
+     * @throws CM_Exception_FormFieldValidation
+     */
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
+        if ($this->_options['cardinality'] && count($userInput) > $this->_options['cardinality']) {
             throw new CM_Exception_FormFieldValidation('Too many elements.');
         }
-        return $values;
     }
 
     public function ajax_getSuggestions(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {

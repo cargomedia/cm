@@ -16,26 +16,34 @@ class CM_FormField_File extends CM_FormField_Abstract {
     }
 
     /**
-     * @param CM_Frontend_Environment $environment
-     * @param array                   $userInput
-     * @throws CM_Exception_Invalid
+     * @param array $userInput
      * @return array
+     * @throws CM_Exception_FormFieldValidation
      */
-    public function validate(CM_Frontend_Environment $environment, $userInput) {
-        $userInput = array_filter($userInput, function ($value) {
-            return !empty($value);
-        });
-
-        if ($this->_options['cardinality'] > 0 && sizeof($userInput) > $this->_options['cardinality']) {
-            throw new CM_Exception_Invalid('Too many files uploaded');
+    public function parseUserInput($userInput) {
+        if (!is_array($userInput)) {
+            throw new CM_Exception_FormFieldValidation('Expected an array.');
         }
+        $userInput = array_filter($userInput);
 
         $files = array();
         foreach ($userInput as $file) {
             $files[] = new CM_File_UserContent_Temp($file);
         }
 
-        return (array) $files;
+        return $files;
+    }
+
+    /**
+     * @param CM_Frontend_Environment $environment
+     * @param array                   $userInput
+     * @throws CM_Exception_Invalid
+     * @return array
+     */
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
+        if ($this->_options['cardinality'] > 0 && sizeof($userInput) > $this->_options['cardinality']) {
+            throw new CM_Exception_Invalid('Too many files uploaded');
+        }
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {

@@ -8,11 +8,11 @@ class CM_FormField_FloatTest extends CMTest_TestCase {
     public function testValidate() {
         $environment = new CM_Frontend_Environment();
         $field = new CM_FormField_Float(['name' => 'foo']);
-        $response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
-        /** @var CM_Response_Abstract $response */
+        $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
 
-        $validationResult = $field->validate($environment, 1.3);
-        $this->assertSame(1.3, $validationResult);
+        $parsedInput = $field->parseUserInput(1.3);
+        $this->assertSame(1.3, $parsedInput);
+        $field->validate($environment, $parsedInput);
         $field->validate($environment, 'foo');
     }
 }

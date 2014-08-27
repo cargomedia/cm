@@ -1,6 +1,6 @@
 <?php
 
-class CM_FormField_Set extends CM_FormField_Abstract {
+class  CM_FormField_Set extends CM_FormField_Abstract {
 
     /** @var array */
     private $_values = array();
@@ -14,13 +14,15 @@ class CM_FormField_Set extends CM_FormField_Abstract {
         parent::_initialize();
     }
 
+    /**
+     * @param CM_Frontend_Environment $environment
+     * @param mixed                   $userInput
+     */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
-        foreach ($userInput as $key => $value) {
-            if (!in_array($value, $this->_getValues())) {
-                unset($userInput[$key]);
-            }
-        }
-        return $userInput;
+    }
+
+    public function parseUserInput($userInput) {
+        return array_intersect($userInput, $this->_getValues());
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {

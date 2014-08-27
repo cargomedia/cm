@@ -5,8 +5,11 @@ class CM_FormField_Boolean extends CM_FormField_Abstract {
     const DISPLAY_CHECKBOX = 'checkbox';
     const DISPLAY_SWITCH = 'switch';
 
-    public function validate(CM_Frontend_Environment $environment, $userInput) {
+    public function parseUserInput($userInput) {
         return (bool) $userInput;
+    }
+
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {

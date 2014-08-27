@@ -57,11 +57,7 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
 
     public function testValidateValues() {
         $userInputList = array(
-            'date'  => array(
-                'year'  => 1984,
-                'month' => 12,
-                'day'   => 29,
-            ),
+            'date'  => array('year' => '1984', 'month' => 12, 'day' => 29),
             'color' => 'invalid-color',
         );
         $expected = array(

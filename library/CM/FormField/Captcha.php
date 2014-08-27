@@ -6,6 +6,22 @@ class CM_FormField_Captcha extends CM_FormField_Abstract {
         $viewResponse->set('imageId', CM_Captcha::create()->getId());
     }
 
+    public function parseUserInput($userInput) {
+        if (!is_array($userInput) || !isset($userInput['id']) || !isset($userInput['value'])) {
+            throw new CM_Exception_FormFieldValidation('Expected an array with id and value keys.');
+        }
+
+        return array(
+            'id' => (int) $userInput['id'],
+            'value' => (string) $userInput['value']
+        );
+    }
+
+    /**
+     * @param CM_Frontend_Environment $environment
+     * @param array                   $userInput
+     * @throws CM_Exception_FormFieldValidation
+     */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         $id = (int) $userInput['id'];
         $text = (string) $userInput['value'];
@@ -18,8 +34,6 @@ class CM_FormField_Captcha extends CM_FormField_Abstract {
         if (!$captcha->check($text)) {
             throw new CM_Exception_FormFieldValidation('Number doesn\'t match captcha');
         }
-
-        return $userInput;
     }
 
     public function ajax_createNumber(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
