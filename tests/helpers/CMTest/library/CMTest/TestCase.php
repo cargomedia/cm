@@ -81,7 +81,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param array|null                    $query
      * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
-     * @return CM_Request_Post|\Mocka\ClassTrait
+     * @return CM_Request_Post|\Mocka\AbstractClassTrait
      * @throws Mocka\Exception
      */
     public function createRequest($url, array $query = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
@@ -125,7 +125,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
      * @throws CM_Exception_Invalid
-     * @return CM_Request_Post|\Mocka\ClassTrait
+     * @return CM_Request_Post|\Mocka\AbstractClassTrait
      */
     public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
         $actionName = $action->getName();
@@ -153,7 +153,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param array|null                    $params
      * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
-     * @return CM_Request_Post|\Mocka\ClassTrait
+     * @return CM_Request_Post|\Mocka\AbstractClassTrait
      */
     public function createRequestAjax(CM_Component_Abstract $component, $methodName, array $params = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
         $viewResponseComponent = new CM_Frontend_ViewResponse($component);
@@ -172,7 +172,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Request_Abstract $request
-     * @return CM_Response_Abstract|\Mocka\ClassTrait
+     * @return CM_Response_Abstract|\Mocka\AbstractClassTrait
      */
     public function getResponse(CM_Request_Abstract $request) {
         $className = CM_Response_Abstract::getResponseClassName($request);
@@ -181,7 +181,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Request_Abstract $request
-     * @return CM_Response_Abstract|\Mocka\ClassTrait
+     * @return CM_Response_Abstract|\Mocka\AbstractClassTrait
      */
     public function processRequest(CM_Request_Abstract $request) {
         $response = $this->getResponse($request);
