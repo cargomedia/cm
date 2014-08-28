@@ -61,14 +61,11 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         }
     }
 
-    /**
-     * NOTE: this one actually tests if the returned id isn't empty rather than if it's unique... which would be hard to test.
-     */
     public function testGetNewId() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $id1 = $mongoDb->getNewId();
         $id2 = $mongoDb->getNewId();
-        $this->assertNotSame($id1, $id2);
+        $this->assertNotSame((string) $id1, (string) $id2);
     }
 
     public function testFind() {
