@@ -135,5 +135,8 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
 
         $this->assertSame(2, $mongoDb->count($collectionName));
         $this->assertSame(0, $mongoDb->find($collectionName, array('userId' => 2))->count());
+
+        $mongoDb->remove($collectionName);
+        $this->assertSame(0, $mongoDb->count($collectionName));
     }
 }

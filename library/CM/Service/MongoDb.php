@@ -31,7 +31,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     public function insert($collection, array $object) {
         CM_Debug::getInstance()->incStats('mongo', "insert to {$collection}");
-        $ref = & $object;
+        $ref = &$object;
         return $this->_getCollection($collection)->insert($ref);
     }
 
@@ -62,7 +62,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @return array
      */
     public function createIndex($collection, array $keys, array $options = null) {
-        $options = $options ? : [];
+        $options = $options ?: [];
         CM_Debug::getInstance()->incStats('mongo', "create index on {$collection}: " . CM_Params::jsonEncode($keys) . ' ' .
             CM_Params::jsonEncode($options));
         return $this->_getCollection($collection)->createIndex($keys, $options);
@@ -107,16 +107,16 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
-     * @param $collection
+     * @param string       $collection
      * @param string|array $index
      * @return bool
      */
     public function hasIndex($collection, $index) {
         $indexInfo = $this->getIndexInfo($collection);
-        return !\Functional\none($indexInfo, function($indexInfo) use ($index) {
+        return !\Functional\none($indexInfo, function ($indexInfo) use ($index) {
             $keys = $indexInfo['key'];
             if (is_array($index)) {
-                return (count($index) === count($keys) && \Functional\every($index, function($index) use ($keys) {
+                return (count($index) === count($keys) && \Functional\every($index, function ($index) use ($keys) {
                         return array_key_exists((string) $index, $keys);
                     }));
             } else {
@@ -173,12 +173,13 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
 
     /**
      * @param string     $collection
-     * @param array      $criteria
+     * @param array|null $criteria
      * @param array|null $options
      * @return mixed
      */
-    public function remove($collection, array $criteria, array $options = null) {
-        $options = (array) $options;
+    public function remove($collection, array $criteria = null, array $options = null) {
+        $criteria = $criteria ?: array();
+        $options = $options ?: array();
         CM_Debug::getInstance()->incStats('mongo', "remove from {$collection}");
         return $this->_getCollection($collection)->remove($criteria, $options);
     }
