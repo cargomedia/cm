@@ -6,6 +6,6 @@ class CM_Page_Error_NotAllowedTest extends CMTest_TestCase {
         $page = $this->_createPage('CM_Page_Error_NotAllowed');
         $html = $this->_renderPage($page);
 
-        $this->assertTrue($html->exists('.CM_Component_NotAllowed'));
+        $this->assertTrue($html->has('.CM_Component_NotAllowed'));
     }
 }

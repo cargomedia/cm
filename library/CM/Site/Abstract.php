@@ -103,10 +103,14 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUrlCdn() {
-        return (string) self::_getConfig()->urlCdn;
+        $config = self::_getConfig();
+        if (!isset($config->urlCdn)) {
+            return null;
+        }
+        return (string) $config->urlCdn;
     }
 
     /**

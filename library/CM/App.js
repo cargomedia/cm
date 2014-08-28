@@ -118,15 +118,20 @@ var CM_App = CM_Class_Abstract.extend({
   /**
    * @param {String} [path]
    * @param {Object} [params]
+   * @param {Boolean} [relative]
    * @return {String}
    */
-  getUrl: function(path, params) {
+  getUrl: function(path, params, relative) {
     path = path || '';
     params = params || null;
+    relative = relative || false;
     if (params) {
       path += '?' + jQuery.param(params, true);
     }
-    return cm.options.url + path;
+    if (!relative) {
+      path = cm.options.url + path
+    }
+    return path;
   },
 
   /**
@@ -183,7 +188,7 @@ var CM_App = CM_Class_Abstract.extend({
       path += '/' + cm.options.language.abbreviation;
     }
     path += '/' + this.getSiteId();
-    return this.getUrl(path);
+    return this.getUrl(path, null, true);
   },
 
   error: {

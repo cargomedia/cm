@@ -1,5 +1,5 @@
 .textinput {
-  appearance: none;
+  .appearance(none);
   box-sizing: border-box;
   width: 100%;
   height: @heightInputText;
@@ -201,7 +201,13 @@ input:focus, .textinput:focus, .textinput.focus, select:focus, textarea:focus {
 }
 
 input[type=checkbox], input[type=radio] {
+  .appearance(none);
+  display: block;
   position: absolute;
+  width: @sizeCheckbox;
+  height: @sizeCheckbox;
+  transform: scale(2);
+  transform-origin: 0 0;
   opacity: 0;
 
   + label {
