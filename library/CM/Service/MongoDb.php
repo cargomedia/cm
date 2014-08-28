@@ -98,12 +98,21 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
 
     /**
      * @param $collection
+     * @return array
+     */
+    public function getIndexInfo($collection) {
+        CM_Debug::getInstance()->incStats('mongo', "indexInfo {$collection}");
+        $indexInfo = $this->_getCollection($collection)->getIndexInfo();
+        return $indexInfo;
+    }
+
+    /**
+     * @param $collection
      * @param string|array $index
      * @return bool
      */
     public function hasIndex($collection, $index) {
-        CM_Debug::getInstance()->incStats('mongo', "indexInfo {$collection}");
-        $indexInfo = $this->_getCollection($collection)->getIndexInfo();
+        $indexInfo = $this->getIndexInfo($collection);
         return !\Functional\none($indexInfo, function($indexInfo) use ($index) {
             $keys = $indexInfo['key'];
             if (is_array($index)) {

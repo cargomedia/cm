@@ -53,6 +53,17 @@ class CM_App {
             foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
                 CM_Db_Db::runDump($db, $dump);
             }
+            foreach (CM_Util::getResourceFiles('mongo/collections.json') as $dump) {
+                $collectionInfo = CM_Params::jsonDecode($dump->read());
+                foreach ($collectionInfo as $collection => $indexes) {
+                    $mongoClient->createCollection($collection);
+                    foreach ($indexes as $indexInfo) {
+                        $mongoClient->createIndex($collection, $indexInfo['key'], $indexInfo['options']);
+                    }
+                }
+            }
+        }
+        if (0 === count($tables)) {
             $app = CM_App::getInstance();
             foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
                 $updateFiles = CM_Util::rglob('*.php', $path);
