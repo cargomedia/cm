@@ -31,21 +31,24 @@ class CM_App {
      * @param boolean|null $forceReload
      */
     public function setupDatabase($forceReload = null) {
-        $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
-        $db = $client->getDb();
-        $client->setDb(null);
+        $serviceManager = CM_Service_Manager::getInstance();
+        $mongoClient = $serviceManager->getMongoDb();
+        $mysqlClient = $serviceManager->getDatabases()->getMaster();
+        $db = $mysqlClient->getDb();
+        $mysqlClient->setDb(null);
 
         if ($forceReload) {
-            $client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($db))->execute();
+            $mysqlClient->createStatement('DROP DATABASE IF EXISTS ' . $mysqlClient->quoteIdentifier($db))->execute();
+            $mongoClient->dropDatabase();
         }
 
-        $databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($db))->fetch();
+        $databaseExists = (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($db))->fetch();
         if (!$databaseExists) {
-            $client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($db))->execute();
+            $mysqlClient->createStatement('CREATE DATABASE ' . $mysqlClient->quoteIdentifier($db))->execute();
         }
 
-        $client->setDb($db);
-        $tables = $client->createStatement('SHOW TABLES')->execute()->fetchAll();
+        $mysqlClient->setDb($db);
+        $tables = $mysqlClient->createStatement('SHOW TABLES')->execute()->fetchAll();
         if (0 === count($tables)) {
             foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
                 CM_Db_Db::runDump($db, $dump);
