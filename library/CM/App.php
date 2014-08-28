@@ -62,8 +62,6 @@ class CM_App {
                     }
                 }
             }
-        }
-        if (0 === count($tables)) {
             $app = CM_App::getInstance();
             foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
                 $updateFiles = CM_Util::rglob('*.php', $path);
