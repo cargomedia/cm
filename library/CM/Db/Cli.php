@@ -41,7 +41,9 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
      */
     private function _dbToFileMongo($namespace) {
         $mongo = CM_Service_Manager::getInstance()->getMongoDb();
-        $collectionList = $mongo->listCollectionNames();
+        $collectionList = \Functional\select($mongo->listCollectionNames(), function($collection) use ($namespace) {
+            return preg_match('/^' . strtolower($namespace) . '_/', $collection);
+        });
         sort($collectionList);
         $optionsValid = ['background', 'unique', 'name', 'dropDups', 'sparse', 'expireAfterSeconds'];
         $indexes = [];
@@ -54,7 +56,9 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
             }
         }
         $dump = CM_Params::jsonEncode($indexes, true);
-        CM_File::create(CM_Util::getModulePath($namespace) . '/resources/mongo/collections.json', $dump);
+        $dirPath = CM_Util::getModulePath($namespace) . '/resources/mongo/';
+        CM_File::getFilesystemDefault()->ensureDirectory($dirPath);
+        CM_File::create($dirPath  . 'collections.json', $dump);
     }
 
     /**
