@@ -2,13 +2,6 @@
 
 class CM_Service_MongoDbTest extends CMTest_TestCase {
 
-    public function tearDown() {
-        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        foreach ($mongoDb->listCollectionNames() as $collection) {
-            $mongoDb->drop($collection);
-        }
-    }
-
     public function testInsert() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'insert';
@@ -35,15 +28,15 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
 
     public function testCreateCollection() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $this->assertEmpty($mongoDb->listCollectionNames());
-        $collectionName = 'test';
+        $collectionName = 'createCollection';
+        $this->assertFalse($mongoDb->existsCollection($collectionName));
         $mongoDb->createCollection($collectionName);
-        $this->assertSame([$collectionName], $mongoDb->listCollectionNames());
+        $this->assertTrue($mongoDb->existsCollection($collectionName));
     }
 
     public function testCreateIndex() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $collectionName = 'test';
+        $collectionName = 'createIndex';
         $mongoDb->createCollection('' . $collectionName . '');
         $this->assertFalse($mongoDb->hasIndex($collectionName, 'foo'));
         $mongoDb->createIndex($collectionName, ['foo' => 1]);

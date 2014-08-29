@@ -159,6 +159,14 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
+     * @param string $collection
+     * @return boolean
+     */
+    public function existsCollection($collection) {
+        return \Functional\contains($this->listCollectionNames(), (string) $collection);
+    }
+
+    /**
      * @param string     $collection
      * @param array      $criteria
      * @param array      $newObject
