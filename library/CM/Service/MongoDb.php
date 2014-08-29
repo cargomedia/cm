@@ -129,13 +129,13 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         CM_Debug::getInstance()->incStats('mongo', "indexInfo {$collection}");
         $indexInfo = $this->_getCollection($collection)->getIndexInfo();
         return !\Functional\none($indexInfo, function ($indexInfo) use ($index) {
-            $keys = $indexInfo['key'];
+            $keys = array_keys($indexInfo['key']);
             if (is_array($index)) {
-                return (count($index) === count($keys) && \Functional\every($index, function ($index) use ($keys) {
-                        return array_key_exists((string) $index, $keys);
+                return (count($index) === count($keys) && \Functional\every($index, function ($index, $arrayIndex) use ($keys) {
+                        return $index === $keys[$arrayIndex];
                     }));
             } else {
-                return (count($keys) === 1 && array_key_exists((string) $index, $keys));
+                return (count($keys) === 1 && $index === $keys[0]);
             }
         });
     }

@@ -47,8 +47,9 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $this->assertTrue($mongoDb->hasIndex($collectionName, 'foo'));
         $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo', 'bar']));
         $mongoDb->createIndex($collectionName, ['foo' => 1, 'bar' => -1]);
-        $this->assertTrue($mongoDb->hasIndex($collectionName, ['bar', 'foo']));
+        $this->assertTrue($mongoDb->hasIndex($collectionName, ['foo', 'bar']));
         $this->assertFalse($mongoDb->hasIndex($collectionName, ['bar']));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['bar', 'foo']));
     }
 
     public function testUpdate() {
