@@ -75,10 +75,6 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
             unset($doc['_id']);
             return $doc;
         }));
-        var_dump(\Functional\map($source->getItems(1, 2), function ($doc) {
-            unset($doc['_id']);
-            return $doc;
-        }));
     }
 
     public function testGetItemsAggregation() {
