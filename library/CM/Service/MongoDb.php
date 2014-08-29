@@ -62,7 +62,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @return array
      */
     public function createIndex($collection, array $keys, array $options = null) {
-        $options = $options ? : [];
+        $options = $options ?: [];
         CM_Debug::getInstance()->incStats('mongo', "create index on {$collection}: " . CM_Params::jsonEncode($keys) . ' ' .
             CM_Params::jsonEncode($options));
         return $this->_getCollection($collection)->createIndex($keys, $options);
@@ -121,17 +121,17 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
-     * @param $collection
+     * @param string       $collection
      * @param string|array $index
      * @return bool
      */
     public function hasIndex($collection, $index) {
         CM_Debug::getInstance()->incStats('mongo', "indexInfo {$collection}");
         $indexInfo = $this->_getCollection($collection)->getIndexInfo();
-        return !\Functional\none($indexInfo, function($indexInfo) use ($index) {
+        return !\Functional\none($indexInfo, function ($indexInfo) use ($index) {
             $keys = $indexInfo['key'];
             if (is_array($index)) {
-                return (count($index) === count($keys) && \Functional\every($index, function($index) use ($keys) {
+                return (count($index) === count($keys) && \Functional\every($index, function ($index) use ($keys) {
                         return array_key_exists((string) $index, $keys);
                     }));
             } else {
