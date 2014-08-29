@@ -82,7 +82,7 @@ class CM_Process_ForkHandler {
         ]);
         try {
             $workloadResult = unserialize($ipcData);
-        } catch (CM_Exception_Invalid $e) {
+        } catch (ErrorException $e) {
             throw $invalidIpcDataException;
         }
         if (!$workloadResult instanceof CM_Process_WorkloadResult) {
