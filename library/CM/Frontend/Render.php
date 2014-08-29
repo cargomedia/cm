@@ -23,29 +23,13 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     private static $_smarty;
 
     /**
-     * @param CM_Site_Abstract|null   $site
-     * @param CM_Model_User|null      $viewer
-     * @param CM_Model_Language|null  $language
-     * @param boolean|null            $languageRewrite
-     * @param CM_Model_Location|null  $location
-     * @param CM_Service_Manager|null $serviceManager
+     * @param CM_Frontend_Environment|null $environment
+     * @param boolean|null                 $languageRewrite
+     * @param CM_Service_Manager|null      $serviceManager
      */
-    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, $languageRewrite = null, CM_Model_Location $location = null, CM_Service_Manager $serviceManager = null) {
-        if (!$language) {
-            $language = CM_Model_Language::findDefault();
-        }
-        $environment = new CM_Frontend_Environment();
-        if ($site) {
-            $environment->setSite($site);
-        }
-        if ($viewer) {
-            $environment->setViewer($viewer);
-        }
-        if ($language) {
-            $environment->setLanguage($language);
-        }
-        if ($location) {
-            $environment->setLocation($location);
+    public function __construct(CM_Frontend_Environment $environment = null, $languageRewrite = null, CM_Service_Manager $serviceManager = null) {
+        if (!$environment) {
+            $environment = new CM_Frontend_Environment();
         }
         $this->_environment = $environment;
         $this->_languageRewrite = (bool) $languageRewrite;

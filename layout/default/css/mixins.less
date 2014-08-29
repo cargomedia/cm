@@ -167,16 +167,3 @@
   filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
   background-image: linear-gradient(to bottom,@color1 @pos1,@color2 @pos2);
 }
-
-.fontFace(@family, @file, @weight: normal, @style: normal) {
-  @font-face{
-    font-family: @family;
-    src: url(urlFont("@{file}.eot") + "");
-    src: url(urlFont("@{file}.eot") + "?#iefix") format("embedded-opentype"),
-         url(urlFont("@{file}.woff") + "") format("woff"),
-         url(urlFont("@{file}.ttf") + "") format("truetype"),
-         url(urlFont("@{file}.svg") + "#@{family}") format("svg");
-    font-weight: @{weight};
-    font-style: @{style};
-  }
-}

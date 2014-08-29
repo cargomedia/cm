@@ -81,7 +81,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param array|null                    $query
      * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
-     * @return CM_Request_Post|\Mocka\ClassTrait
+     * @return CM_Request_Post|\Mocka\AbstractClassTrait
      * @throws Mocka\Exception
      */
     public function createRequest($url, array $query = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
@@ -125,7 +125,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
      * @throws CM_Exception_Invalid
-     * @return CM_Request_Post|\Mocka\ClassTrait
+     * @return CM_Request_Post|\Mocka\AbstractClassTrait
      */
     public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
         $actionName = $action->getName();
@@ -153,7 +153,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param array|null                    $params
      * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
-     * @return CM_Request_Post|\Mocka\ClassTrait
+     * @return CM_Request_Post|\Mocka\AbstractClassTrait
      */
     public function createRequestAjax(CM_Component_Abstract $component, $methodName, array $params = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
         $viewResponseComponent = new CM_Frontend_ViewResponse($component);
@@ -172,7 +172,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Request_Abstract $request
-     * @return CM_Response_Abstract|\Mocka\ClassTrait
+     * @return CM_Response_Abstract|\Mocka\AbstractClassTrait
      */
     public function getResponse(CM_Request_Abstract $request) {
         $className = CM_Response_Abstract::getResponseClassName($request);
@@ -181,7 +181,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Request_Abstract $request
-     * @return CM_Response_Abstract|\Mocka\ClassTrait
+     * @return CM_Response_Abstract|\Mocka\AbstractClassTrait
      */
     public function processRequest(CM_Request_Abstract $request) {
         $response = $this->getResponse($request);
@@ -241,7 +241,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @return CM_Page_Abstract
      */
     protected function _createPage($pageClass, array $params = null) {
-        return new $pageClass(CM_Params::factory($params));
+        return new $pageClass(CM_Params::factory($params, false));
     }
 
     /**
@@ -251,7 +251,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @return CM_Dom_NodeList
      */
     protected function _renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
-        $render = new CM_Frontend_Render($site, $viewer);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, $viewer));
         $renderAdapter = new CM_RenderAdapter_Component($render, $component);
         $componentHtml = $renderAdapter->fetch();
         return new CM_Dom_NodeList($componentHtml, true);
@@ -259,16 +259,16 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_FormField_Abstract   $formField
-     * @param CM_Params|array|null    $renderParams
+     * @param array|null              $renderParams
      * @param CM_Frontend_Render|null $render
      * @return CM_Dom_NodeList
      */
-    protected function _renderFormField(CM_FormField_Abstract $formField, $renderParams = null, CM_Frontend_Render $render = null) {
+    protected function _renderFormField(CM_FormField_Abstract $formField, array $renderParams = null, CM_Frontend_Render $render = null) {
         if (null === $render) {
             $render = new CM_Frontend_Render();
         }
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
-        $html = $renderAdapter->fetch(CM_Params::factory($renderParams));
+        $html = $renderAdapter->fetch(CM_Params::factory($renderParams, false));
         return new CM_Dom_NodeList($html, true);
     }
 
@@ -285,7 +285,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $host = parse_url($site->getUrl(), PHP_URL_HOST);
         $request = new CM_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), array('host' => $host), null, $viewer);
         $response = new CM_Response_Page($request);
-        $render = new CM_Frontend_Render($site, $viewer);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, $viewer));
         $page->prepareResponse($render->getEnvironment(), $response);
         $renderAdapter = new CM_RenderAdapter_Page($render, $page);
         $html = $renderAdapter->fetch();

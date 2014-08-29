@@ -59,7 +59,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
             'name'         => 'Test',
             'emailAddress' => 'test@test.dev',
         ));
-        $renderSite = new CM_Frontend_Render($site);
+        $renderSite = new CM_Frontend_Render(new CM_Frontend_Environment($site));
 
         $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
             $render->getUrlPage('CM_Page_Foo_Bar_FooBar', null, $site));
@@ -86,19 +86,15 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
         $render = new CM_Frontend_Render();
         $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
-        $render = new CM_Frontend_Render(null, null, null, true); // This should never happen in application, but lets test it
+        $render = new CM_Frontend_Render(null, true); // This should never happen in application, but lets test it
         $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
 
         $language = CMTest_TH::createLanguage('en');
 
-        $render = new CM_Frontend_Render();
+        $environment = new CM_Frontend_Environment(null, null, $language);
+        $render = new CM_Frontend_Render($environment);
         $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
-        $render = new CM_Frontend_Render(null, null, null, true); // This should never happen in application, but lets test it
-        $this->assertSame($baseUrl . '/en/test', $render->getUrlPage($page));
-
-        $render = new CM_Frontend_Render(null, null, $language, null);
-        $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
-        $render = new CM_Frontend_Render(null, null, $language, true);
+        $render = new CM_Frontend_Render($environment, true);
         $this->assertSame($baseUrl . '/en/test', $render->getUrlPage($page));
     }
 
@@ -121,7 +117,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $site->expects($this->any())->method('getUrlCdn')->will($this->returnValue(null));
         /** @var CM_Site_Abstract $site */
 
-        $render = new CM_Frontend_Render($site);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('/layout/' . $site->getType() . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('layout', 'foo.jpg'));
     }
@@ -139,7 +135,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $site->expects($this->any())->method('getUrlCdn')->will($this->returnValue(null));
         /** @var CM_Site_Abstract $site */
 
-        $render = new CM_Frontend_Render($site);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
     }
@@ -152,14 +148,14 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $this->assertSame('abc ', $render->getTranslation('abc {$variable}', array('foo' => 'bar')));
 
         $language = CM_Model_Language::create('Test language', 'test', true);
-        $render = new CM_Frontend_Render(null, null, $language);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment(null, null, $language));
         $language->setTranslation('abc {$variable}', 'translated stuff is {$variable}');
         $this->assertSame('translated stuff is cool', $render->getTranslation('abc {$variable}', array('variable' => 'cool')));
     }
 
     public function testGetViewer() {
         $viewer = CMTest_TH::createUser();
-        $render = new CM_Frontend_Render(null, $viewer);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment(null, $viewer));
         $this->assertEquals($viewer, $render->getViewer());
 
         $render = new CM_Frontend_Render();

@@ -129,7 +129,7 @@ class CMTest_TH {
      */
     public static function createPage($pageClass, CM_Model_User $viewer = null, $params = array()) {
         $request = new CM_Request_Get('?' . http_build_query($params), array(), $viewer);
-        return new $pageClass(CM_Params::factory($request->getQuery()), $request->getViewer());
+        return new $pageClass(CM_Params::factory($request->getQuery(), true), $request->getViewer());
     }
 
     /**

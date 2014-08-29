@@ -32,7 +32,7 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
         }
         $formField = $form->getField($fieldName);
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
-        $input .= $renderAdapter->fetch(CM_Params::factory($params), $viewResponse);
+        $input .= $renderAdapter->fetch(CM_Params::factory($params, false), $viewResponse);
 
         if (null !== $formField->getValue()) {
             $cssClasses[] = 'prefilled';
