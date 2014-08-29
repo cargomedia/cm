@@ -12,6 +12,7 @@ services:
   - mongodb
 
 before_script:
+  - mongo --version
   - tests/travis/install-php-runkit.sh
   - tests/travis/install-php-svm.sh
   - printf "\n" | pecl install imagick
