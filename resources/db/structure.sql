@@ -227,18 +227,10 @@ CREATE TABLE `cm_cli_command_manager_process` (
   KEY `timeoutStamp` (`timeoutStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_requestClient`;
+DROP TABLE IF EXISTS `cm_requestClientCounter`;
 
 
-CREATE TABLE `cm_requestClient` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_requestCounter`;
-
-
-CREATE TABLE `cm_requestCounter` (
+CREATE TABLE `cm_requestClientCounter` (
   `counter` int(10) unsigned NOT NULL,
   PRIMARY KEY (`counter`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

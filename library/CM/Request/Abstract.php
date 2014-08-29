@@ -136,7 +136,7 @@ abstract class CM_Request_Abstract {
     public function getClientId() {
         if (!$this->hasClientId()) {
             if (!$this->_clientId = (int) $this->getCookie('clientId')) {
-                $this->_clientId = CM_Db_Db::incrementAndFetchColumn('cm_requestCounter', 'counter');
+                $this->_clientId = CM_Db_Db::incrementAndFetchColumn('cm_requestClientCounter', 'counter');
             }
         }
 
