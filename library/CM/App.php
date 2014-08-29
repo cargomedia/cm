@@ -89,7 +89,7 @@ class CM_App {
             $assetList[] = new CM_Asset_Javascript_VendorAfterBody($site);
             $assetList[] = new CM_Asset_Javascript_VendorBeforeBody($site);
             foreach ($languageList as $language) {
-                $render = new CM_Frontend_Render($site, null, $language);
+                $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, null, $language));
                 $assetList[] = new CM_Asset_Css_Vendor($render);
                 $assetList[] = new CM_Asset_Css_Library($render);
             }

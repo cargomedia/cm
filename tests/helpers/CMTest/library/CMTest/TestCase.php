@@ -251,7 +251,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @return CM_Dom_NodeList
      */
     protected function _renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
-        $render = new CM_Frontend_Render($site, $viewer);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, $viewer));
         $renderAdapter = new CM_RenderAdapter_Component($render, $component);
         $componentHtml = $renderAdapter->fetch();
         return new CM_Dom_NodeList($componentHtml, true);
@@ -285,7 +285,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $host = parse_url($site->getUrl(), PHP_URL_HOST);
         $request = new CM_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), array('host' => $host), null, $viewer);
         $response = new CM_Response_Page($request);
-        $render = new CM_Frontend_Render($site, $viewer);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, $viewer));
         $page->prepareResponse($render->getEnvironment(), $response);
         $renderAdapter = new CM_RenderAdapter_Page($render, $page);
         $html = $renderAdapter->fetch();
