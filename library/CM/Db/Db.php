@@ -291,7 +291,7 @@ class CM_Db_Db extends CM_Class_Abstract {
             'UPDATE ' . $client->quoteIdentifier($table) . ' SET ' . $client->quoteIdentifier($column) . ' = LAST_INSERT_ID(' .
             $client->quoteIdentifier($column) . ' + 1); SELECT LAST_INSERT_ID() AS ' . $client->quoteIdentifier($column) . ';');
         $result->nextRowset();
-        return (int) $result->fetchColumn('counter');
+        return (int) $result->fetchColumn(0);
     }
 
     /**
