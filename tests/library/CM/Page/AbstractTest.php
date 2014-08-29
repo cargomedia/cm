@@ -6,7 +6,7 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
         $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getModules'))->getMock();
         $site->expects($this->any())->method('getModules')->will($this->returnValue(array('Foo', 'Bar')));
         /** @var CM_Site_Abstract $site */
-        $render = new CM_Frontend_Render($site);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
 
         $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Bar_Page_Test', false);
         $this->assertEquals('Bar_Page_Test', CM_Page_Abstract::getClassnameByPath($render, '/test'));
@@ -23,7 +23,7 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
         $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getModules'))->getMock();
         $site->expects($this->any())->method('getModules')->will($this->returnValue(array('FooBar')));
         /** @var CM_Site_Abstract $site */
-        $render = new CM_Frontend_Render($site);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
 
         CM_Page_Abstract::getClassnameByPath($render, '/test');
     }

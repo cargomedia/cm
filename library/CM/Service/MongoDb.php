@@ -221,10 +221,10 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
-     * @return string
+     * @return MongoId
      */
     public function getNewId() {
-        return (string) new MongoId();
+        return new MongoId();
     }
 
     /**
