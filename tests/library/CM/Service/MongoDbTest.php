@@ -42,14 +42,16 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'test';
         $mongoDb->createCollection('' . $collectionName . '');
-        $this->assertFalse($mongoDb->hasIndex($collectionName, 'foo'));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo' => 1]));
         $mongoDb->createIndex($collectionName, ['foo' => 1]);
-        $this->assertTrue($mongoDb->hasIndex($collectionName, 'foo'));
-        $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo', 'bar']));
+        $this->assertTrue($mongoDb->hasIndex($collectionName, ['foo' => 1]));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo' => -1]));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo' => 1, 'bar' => -1]));
         $mongoDb->createIndex($collectionName, ['foo' => 1, 'bar' => -1]);
-        $this->assertTrue($mongoDb->hasIndex($collectionName, ['foo', 'bar']));
-        $this->assertFalse($mongoDb->hasIndex($collectionName, ['bar']));
-        $this->assertFalse($mongoDb->hasIndex($collectionName, ['bar', 'foo']));
+        $this->assertTrue($mongoDb->hasIndex($collectionName, ['foo' => 1, 'bar' => -1]));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['bar' => -1]));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['bar' => -1, 'foo' => 1]));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo' => 1, 'bar' => 1]));
     }
 
     public function testUpdate() {

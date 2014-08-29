@@ -121,22 +121,15 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
-     * @param string       $collection
-     * @param string|array $index
+     * @param string $collection
+     * @param array  $index
      * @return bool
      */
     public function hasIndex($collection, $index) {
         CM_Debug::getInstance()->incStats('mongo', "indexInfo {$collection}");
         $indexInfo = $this->_getCollection($collection)->getIndexInfo();
         return !\Functional\none($indexInfo, function ($indexInfo) use ($index) {
-            $keys = array_keys($indexInfo['key']);
-            if (is_array($index)) {
-                return (count($index) === count($keys) && \Functional\every($index, function ($index, $arrayIndex) use ($keys) {
-                        return $index === $keys[$arrayIndex];
-                    }));
-            } else {
-                return (count($keys) === 1 && $index === $keys[0]);
-            }
+            return $index === $indexInfo['key'];
         });
     }
 
@@ -153,7 +146,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         $limit = (int) $limit;
         $offset = (int) $offset;
         CM_Debug::getInstance()->incStats('mongo', "count `{$collection}`: " . CM_Params::jsonEncode(['criteria'    => $criteria,
-                                                                                                    'aggregation' => $aggregation]));
+                                                                                                      'aggregation' => $aggregation]));
         $pipeline = [];
         if ($aggregation) {
             $pipeline = $aggregation;
