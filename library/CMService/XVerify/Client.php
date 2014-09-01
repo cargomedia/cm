@@ -26,7 +26,7 @@ class CMService_XVerify_Client implements CM_Service_EmailVerification_ClientInt
             if (null === $response) {
                 return true;
             }
-            if (isset($response['status']) && 'invalid' === $response['status']) {
+            if (!isset($response['status']) || 'invalid' === $response['status'] || 'bad_data' === $response['status']) {
                 $isValid = 0;
             } else {
                 $isValid = 1;
@@ -77,7 +77,6 @@ class CMService_XVerify_Client implements CM_Service_EmailVerification_ClientInt
             }
             $responseCode = isset($body['email']['responsecode']) ? (int) $body['email']['responsecode'] : null;
             $responseCodeInvalidList = array(
-                400 => 'Missing required fields',
                 503 => 'Invalid API Key/Service Not Active',
             );
             if (null === $responseCode || isset($responseCodeInvalidList[$responseCode])) {
