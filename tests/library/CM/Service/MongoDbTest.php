@@ -2,6 +2,10 @@
 
 class CM_Service_MongoDbTest extends CMTest_TestCase {
 
+    public function tearDown() {
+        CMTest_TH::clearDb();
+    }
+
     public function testInsert() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'insert';
@@ -16,7 +20,7 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'batchInsert';
         $mongoDb->batchInsert($collectionName, array(
-                array('userId' => 1 , 'name' => 'Bob'),
+                array('userId' => 1, 'name' => 'Bob'),
                 array('userId' => 2, 'name' => 'Alice'),
             )
         );
@@ -38,13 +42,17 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'createIndex';
         $mongoDb->createCollection('' . $collectionName . '');
-        $this->assertFalse($mongoDb->hasIndex($collectionName, 'foo'));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo' => 1]));
         $mongoDb->createIndex($collectionName, ['foo' => 1]);
-        $this->assertTrue($mongoDb->hasIndex($collectionName, 'foo'));
-        $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo', 'bar']));
+        $this->assertTrue($mongoDb->hasIndex($collectionName, ['foo' => 1]));
+        $this->assertTrue($mongoDb->hasIndex($collectionName, ['foo' => 1.0]));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo' => -1]));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo' => 1, 'bar' => -1]));
         $mongoDb->createIndex($collectionName, ['foo' => 1, 'bar' => -1]);
-        $this->assertTrue($mongoDb->hasIndex($collectionName, ['bar', 'foo']));
-        $this->assertFalse($mongoDb->hasIndex($collectionName, ['bar']));
+        $this->assertTrue($mongoDb->hasIndex($collectionName, ['foo' => 1, 'bar' => -1]));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['bar' => -1]));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['bar' => -1, 'foo' => 1]));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo' => 1, 'bar' => 1]));
     }
 
     public function testUpdate() {
@@ -91,9 +99,9 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'find';
 
-        $mongoDb->insert($collectionName, array('userId' => 1, 'groupId' => 1, 'name' => 'alice'));
-        $mongoDb->insert($collectionName, array('userId' => 2, 'groupId' => 2, 'name' => 'steve'));
-        $mongoDb->insert($collectionName, array('userId' => 3, 'groupId' => 1, 'name' => 'bob'));
+        $mongoDb->insert($collectionName, array('userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]));
+        $mongoDb->insert($collectionName, array('userId' => 2, 'groupId' => 2, 'name' => 'steve', 'foo' => [1, 2]));
+        $mongoDb->insert($collectionName, array('userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [1, 2, 3]));
         $users = $mongoDb->find($collectionName, array('groupId' => 1));
         $this->assertSame(2, $users->count());
         $expectedNames = array('alice', 'bob');
@@ -101,16 +109,43 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
             $expectedNames = array_diff($expectedNames, array($user['name']));
         }
         $this->assertEmpty($expectedNames);
+
+        $result = $mongoDb->find($collectionName, ['groupId' => 1], ['_id' => 0, 'foo' => 1], [['$unwind' => '$foo']]);
+        $actual = \Functional\map($result, function ($val) {
+            return $val;
+        });
+        $this->assertEquals([['foo' => 1], ['foo' => 1], ['foo' => 2], ['foo' => 3]], $actual);
+    }
+
+    public function testFindOne() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = 'findOne';
+
+        $mongoDb->insert($collectionName, ['userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]]);
+        $mongoDb->insert($collectionName, ['userId' => 2, 'groupId' => 2, 'name' => 'steve', 'foo' => [2, 3]]);
+        $mongoDb->insert($collectionName, ['userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [4, 5, 6]]);
+
+        $user = $mongoDb->findOne($collectionName, array('groupId' => 1), ['_id' => 0]);
+        $this->assertSame(['userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]], $user);
+
+        $this->assertSame(['foo' => 4], $mongoDb->findOne($collectionName, ['userId' => 3], ['_id' => 0, 'foo' => 1], [['$unwind' => '$foo']]));
+
+        $this->assertNull($mongoDb->findOne($collectionName, array('groupId' => 3), ['_id' => 0]));
+        $this->assertNull($mongoDb->findOne($collectionName, ['userId' => 4], ['_id' => 0, 'foo' => 1], [['$unwind' => '$foo']]));
     }
 
     public function testCount() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'count';
         $this->assertSame(0, $mongoDb->count($collectionName));
-        $mongoDb->insert($collectionName, array('userId' => 1, 'name' => 'alice'));
-        $mongoDb->insert($collectionName, array('userId' => 2, 'name' => 'steve'));
-        $mongoDb->insert($collectionName, array('userId' => 3, 'name' => 'bob'));
+        $mongoDb->insert($collectionName, array('userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]));
+        $mongoDb->insert($collectionName, array('userId' => 2, 'groupId' => 2, 'name' => 'steve', 'foo' => [1, 2]));
+        $mongoDb->insert($collectionName, array('userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [1, 2, 3]));
         $this->assertSame(3, $mongoDb->count($collectionName));
+        $this->assertSame(2, $mongoDb->count($collectionName, array('groupId' => 1)));
+        $this->assertSame(6, $mongoDb->count($collectionName, null, [['$unwind' => '$foo']]));
+        $this->assertSame(2, $mongoDb->count($collectionName, null, null, 2));
+        $this->assertSame(1, $mongoDb->count($collectionName, null, null, null, 2));
     }
 
     public function testRemove() {
