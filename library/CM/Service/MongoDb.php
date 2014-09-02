@@ -241,7 +241,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     /**
      * @return MongoClient
      */
-    public function _getClient() {
+    protected function _getClient() {
         if (null === $this->_client) {
             $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
         }
