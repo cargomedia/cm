@@ -31,7 +31,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     public function insert($collection, array $object) {
         CM_Debug::getInstance()->incStats('mongo', "insert to {$collection}");
-        $ref = & $object;
+        $ref = &$object;
         return $this->_getCollection($collection)->insert($ref);
     }
 
@@ -43,6 +43,29 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     public function batchInsert($collection, array $objectList) {
         CM_Debug::getInstance()->incStats('mongo', "batch insert to {$collection}");
         return $this->_getCollection($collection)->batchInsert($objectList);
+    }
+
+    /**
+     * @param string $name
+     * @param array  $options
+     * @return MongoCollection
+     */
+    public function createCollection($name, array $options = null) {
+        CM_Debug::getInstance()->incStats('mongo', "create collection {$name}: " . CM_Params::jsonEncode($options));
+        return $this->_getDatabase()->createCollection($name, $options);
+    }
+
+    /**
+     * @param       $collection
+     * @param array $keys
+     * @param array $options
+     * @return array
+     */
+    public function createIndex($collection, array $keys, array $options = null) {
+        $options = $options ?: [];
+        CM_Debug::getInstance()->incStats('mongo', "create index on {$collection}: " . CM_Params::jsonEncode($keys) . ' ' .
+            CM_Params::jsonEncode($options));
+        return $this->_getCollection($collection)->createIndex($keys, $options);
     }
 
     /**
@@ -74,6 +97,35 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
+     * @param $collection
+     * @return array
+     */
+    public function getIndexInfo($collection) {
+        CM_Debug::getInstance()->incStats('mongo', "indexInfo {$collection}");
+        $indexInfo = $this->_getCollection($collection)->getIndexInfo();
+        return $indexInfo;
+    }
+
+    /**
+     * @param string       $collection
+     * @param string|array $index
+     * @return bool
+     */
+    public function hasIndex($collection, $index) {
+        $indexInfo = $this->getIndexInfo($collection);
+        return !\Functional\none($indexInfo, function ($indexInfo) use ($index) {
+            $keys = $indexInfo['key'];
+            if (is_array($index)) {
+                return (count($index) === count($keys) && \Functional\every($index, function ($index) use ($keys) {
+                        return array_key_exists((string) $index, $keys);
+                    }));
+            } else {
+                return (count($keys) === 1 && array_key_exists((string) $index, $keys));
+            }
+        });
+    }
+
+    /**
      * @param string     $collection
      * @param array|null $criteria
      * @param int|null   $limit
@@ -98,6 +150,23 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
+     * @return array
+     */
+    public function dropDatabase() {
+        $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
+        CM_Debug::getInstance()->incStats('mongo', "drop database {$dbName}");
+        return $this->_getDatabase()->drop();
+    }
+
+    /**
+     * @param string $collection
+     * @return boolean
+     */
+    public function existsCollection($collection) {
+        return \Functional\contains($this->listCollectionNames(), (string) $collection);
+    }
+
+    /**
      * @param string     $collection
      * @param array      $criteria
      * @param array      $newObject
@@ -112,12 +181,13 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
 
     /**
      * @param string     $collection
-     * @param array      $criteria
+     * @param array|null $criteria
      * @param array|null $options
      * @return mixed
      */
-    public function remove($collection, array $criteria, array $options = null) {
-        $options = (array) $options;
+    public function remove($collection, array $criteria = null, array $options = null) {
+        $criteria = $criteria ?: array();
+        $options = $options ?: array();
         CM_Debug::getInstance()->incStats('mongo', "remove from {$collection}");
         return $this->_getCollection($collection)->remove($criteria, $options);
     }
@@ -132,7 +202,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     /**
      * @return MongoClient
      */
-    protected function _getClient() {
+    public function _getClient() {
         if (null === $this->_client) {
             $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
         }

@@ -2,11 +2,9 @@
 
 class CM_Service_MongoDbTest extends CMTest_TestCase {
 
-    private $_collectionPrefix = 'UnitTest_';
-
     public function testInsert() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $collectionName = $this->_getEmptyCollectionName('insert');
+        $collectionName = 'insert';
         $name = 'Bob';
         $userId = 123;
         $mongoDb->insert($collectionName, array('userId' => $userId, 'name' => $name));
@@ -16,7 +14,7 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
 
     public function testBatchInsert() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $collectionName = $this->_getEmptyCollectionName('batchInsert');
+        $collectionName = 'batchInsert';
         $mongoDb->batchInsert($collectionName, array(
                 array('userId' => 1 , 'name' => 'Bob'),
                 array('userId' => 2, 'name' => 'Alice'),
@@ -28,9 +26,30 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $this->assertSame($res['name'], 'Alice');
     }
 
+    public function testCreateCollection() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = 'createCollection';
+        $this->assertFalse($mongoDb->existsCollection($collectionName));
+        $mongoDb->createCollection($collectionName);
+        $this->assertTrue($mongoDb->existsCollection($collectionName));
+    }
+
+    public function testCreateIndex() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = 'createIndex';
+        $mongoDb->createCollection('' . $collectionName . '');
+        $this->assertFalse($mongoDb->hasIndex($collectionName, 'foo'));
+        $mongoDb->createIndex($collectionName, ['foo' => 1]);
+        $this->assertTrue($mongoDb->hasIndex($collectionName, 'foo'));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo', 'bar']));
+        $mongoDb->createIndex($collectionName, ['foo' => 1, 'bar' => -1]);
+        $this->assertTrue($mongoDb->hasIndex($collectionName, ['bar', 'foo']));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['bar']));
+    }
+
     public function testUpdate() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $collectionName = $this->_getEmptyCollectionName('update');
+        $collectionName = 'update';
         $name = 'Bob';
         $userId = 123;
         $mongoDb->insert($collectionName, array('userId' => $userId, 'name' => $name));
@@ -41,7 +60,7 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $res = $mongoDb->findOne($collectionName, array('userId' => $userId));
         $this->assertSame($res['name'], 'Alice');
 
-        $collectionName = $this->_getEmptyCollectionName('update2');
+        $collectionName = 'update2';
         $mongoDb->insert($collectionName, array('messageId'  => 1,
                                                 'recipients' => array(array('userId' => 1, 'read' => 0), array('userId' => 2, 'read' => 0))));
         $mongoDb->update($collectionName, array('messageId' => 1, 'recipients.userId' => 2), array('$set' => array('recipients.$.read' => 1)));
@@ -70,7 +89,7 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
 
     public function testFind() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $collectionName = $this->_getEmptyCollectionName('find');
+        $collectionName = 'find';
 
         $mongoDb->insert($collectionName, array('userId' => 1, 'groupId' => 1, 'name' => 'alice'));
         $mongoDb->insert($collectionName, array('userId' => 2, 'groupId' => 2, 'name' => 'steve'));
@@ -86,7 +105,7 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
 
     public function testCount() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $collectionName = $this->_getEmptyCollectionName('count');
+        $collectionName = 'count';
         $this->assertSame(0, $mongoDb->count($collectionName));
         $mongoDb->insert($collectionName, array('userId' => 1, 'name' => 'alice'));
         $mongoDb->insert($collectionName, array('userId' => 2, 'name' => 'steve'));
@@ -96,7 +115,7 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
 
     public function testRemove() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $collectionName = $this->_getEmptyCollectionName('remove');
+        $collectionName = 'remove';
         $mongoDb->insert($collectionName, array('userId' => 1, 'name' => 'alice'));
         $mongoDb->insert($collectionName, array('userId' => 2, 'name' => 'steve'));
         $mongoDb->insert($collectionName, array('userId' => 3, 'name' => 'bob'));
@@ -106,17 +125,8 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
 
         $this->assertSame(2, $mongoDb->count($collectionName));
         $this->assertSame(0, $mongoDb->find($collectionName, array('userId' => 2))->count());
-    }
 
-    /**
-     * Generate a name of a collection and ensure it's empty
-     * @param string $testName
-     * @return string
-     */
-    private function _getEmptyCollectionName($testName) {
-        $collectionName = $this->_collectionPrefix . $testName;
-        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $mongoDb->drop($collectionName);
-        return $collectionName;
+        $mongoDb->remove($collectionName);
+        $this->assertSame(0, $mongoDb->count($collectionName));
     }
 }
