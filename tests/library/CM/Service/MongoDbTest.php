@@ -3,7 +3,7 @@
 class CM_Service_MongoDbTest extends CMTest_TestCase {
 
     public function tearDown() {
-        CMTest_TH::clearMongoDb();
+        CMTest_TH::clearDb();
     }
 
     public function testInsert() {
@@ -20,7 +20,7 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'batchInsert';
         $mongoDb->batchInsert($collectionName, array(
-                array('userId' => 1 , 'name' => 'Bob'),
+                array('userId' => 1, 'name' => 'Bob'),
                 array('userId' => 2, 'name' => 'Alice'),
             )
         );
@@ -32,15 +32,15 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
 
     public function testCreateCollection() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $this->assertEmpty($mongoDb->listCollectionNames());
-        $collectionName = 'test';
+        $collectionName = 'createCollection';
+        $this->assertFalse($mongoDb->existsCollection($collectionName));
         $mongoDb->createCollection($collectionName);
-        $this->assertSame([$collectionName], $mongoDb->listCollectionNames());
+        $this->assertTrue($mongoDb->existsCollection($collectionName));
     }
 
     public function testCreateIndex() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $collectionName = 'test';
+        $collectionName = 'createIndex';
         $mongoDb->createCollection('' . $collectionName . '');
         $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo' => 1]));
         $mongoDb->createIndex($collectionName, ['foo' => 1]);
@@ -100,8 +100,8 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $collectionName = 'find';
 
         $mongoDb->insert($collectionName, array('userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]));
-        $mongoDb->insert($collectionName, array('userId' => 2, 'groupId' => 2, 'name' => 'steve', 'foo' => [1,2]));
-        $mongoDb->insert($collectionName, array('userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [1,2,3]));
+        $mongoDb->insert($collectionName, array('userId' => 2, 'groupId' => 2, 'name' => 'steve', 'foo' => [1, 2]));
+        $mongoDb->insert($collectionName, array('userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [1, 2, 3]));
         $users = $mongoDb->find($collectionName, array('groupId' => 1));
         $this->assertSame(2, $users->count());
         $expectedNames = array('alice', 'bob');
@@ -111,7 +111,7 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $this->assertEmpty($expectedNames);
 
         $result = $mongoDb->find($collectionName, ['groupId' => 1], ['_id' => 0, 'foo' => 1], [['$unwind' => '$foo']]);
-        $actual = \Functional\map($result, function($val) {
+        $actual = \Functional\map($result, function ($val) {
             return $val;
         });
         $this->assertEquals([['foo' => 1], ['foo' => 1], ['foo' => 2], ['foo' => 3]], $actual);
@@ -122,8 +122,8 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $collectionName = 'findOne';
 
         $mongoDb->insert($collectionName, ['userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]]);
-        $mongoDb->insert($collectionName, ['userId' => 2, 'groupId' => 2, 'name' => 'steve', 'foo' => [2,3]]);
-        $mongoDb->insert($collectionName, ['userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [4,5,6]]);
+        $mongoDb->insert($collectionName, ['userId' => 2, 'groupId' => 2, 'name' => 'steve', 'foo' => [2, 3]]);
+        $mongoDb->insert($collectionName, ['userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [4, 5, 6]]);
 
         $user = $mongoDb->findOne($collectionName, array('groupId' => 1), ['_id' => 0]);
         $this->assertSame(['userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]], $user);
@@ -139,8 +139,8 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $collectionName = 'count';
         $this->assertSame(0, $mongoDb->count($collectionName));
         $mongoDb->insert($collectionName, array('userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]));
-        $mongoDb->insert($collectionName, array('userId' => 2, 'groupId' => 2, 'name' => 'steve', 'foo' => [1,2]));
-        $mongoDb->insert($collectionName, array('userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [1,2,3]));
+        $mongoDb->insert($collectionName, array('userId' => 2, 'groupId' => 2, 'name' => 'steve', 'foo' => [1, 2]));
+        $mongoDb->insert($collectionName, array('userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [1, 2, 3]));
         $this->assertSame(3, $mongoDb->count($collectionName));
         $this->assertSame(2, $mongoDb->count($collectionName, array('groupId' => 1)));
         $this->assertSame(6, $mongoDb->count($collectionName, null, [['$unwind' => '$foo']]));
@@ -160,5 +160,8 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
 
         $this->assertSame(2, $mongoDb->count($collectionName));
         $this->assertSame(0, $mongoDb->find($collectionName, array('userId' => 2))->count());
+
+        $mongoDb->remove($collectionName);
+        $this->assertSame(0, $mongoDb->count($collectionName));
     }
 }

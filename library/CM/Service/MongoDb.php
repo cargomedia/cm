@@ -121,13 +121,22 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
+     * @param $collection
+     * @return array
+     */
+    public function getIndexInfo($collection) {
+        CM_Debug::getInstance()->incStats('mongo', "indexInfo {$collection}");
+        $indexInfo = $this->_getCollection($collection)->getIndexInfo();
+        return $indexInfo;
+    }
+
+    /**
      * @param string $collection
      * @param array  $index
      * @return bool
      */
     public function hasIndex($collection, array $index) {
-        CM_Debug::getInstance()->incStats('mongo', "indexInfo {$collection}");
-        $indexInfo = $this->_getCollection($collection)->getIndexInfo();
+        $indexInfo = $this->getIndexInfo($collection);
         return \Functional\some($indexInfo, function ($indexInfo) use ($index) {
             return array_keys($index) === array_keys($indexInfo['key']) && $index == $indexInfo['key'];
         });
@@ -188,6 +197,14 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
+     * @param string $collection
+     * @return boolean
+     */
+    public function existsCollection($collection) {
+        return \Functional\contains($this->listCollectionNames(), (string) $collection);
+    }
+
+    /**
      * @param string     $collection
      * @param array      $criteria
      * @param array      $newObject
@@ -203,12 +220,13 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
 
     /**
      * @param string     $collection
-     * @param array      $criteria
+     * @param array|null $criteria
      * @param array|null $options
      * @return mixed
      */
-    public function remove($collection, array $criteria, array $options = null) {
-        $options = (array) $options;
+    public function remove($collection, array $criteria = null, array $options = null) {
+        $criteria = $criteria ?: array();
+        $options = $options ?: array();
         CM_Debug::getInstance()->incStats('mongo', "Remove `{$collection}`: " . CM_Params::jsonEncode($criteria));
         return $this->_getCollection($collection)->remove($criteria, $options);
     }
@@ -223,7 +241,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     /**
      * @return MongoClient
      */
-    protected function _getClient() {
+    public function _getClient() {
         if (null === $this->_client) {
             $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
         }
