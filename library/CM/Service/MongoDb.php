@@ -156,26 +156,34 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         $offset = (int) $offset;
         CM_Debug::getInstance()->incStats('mongo', "count `{$collection}`: " . CM_Params::jsonEncode(['criteria'    => $criteria,
                                                                                                       'aggregation' => $aggregation]));
-        $pipeline = [];
         if ($aggregation) {
             $pipeline = $aggregation;
+            if ($criteria) {
+                array_unshift($pipeline, ['$match' => $criteria]);
+            }
+            if ($offset) {
+                array_push($pipeline, ['$skip' => $offset]);
+            }
+            if ($limit) {
+                array_push($pipeline, ['$limit' => $limit]);
+            }
+            array_push($pipeline, ['$group' => ['_id' => null, 'count' => ['$sum' => 1]]]);
+            array_push($pipeline, ['$project' => ['_id' => 0, 'count' => 1]]);
+            $result = $this->_getCollection($collection)->aggregate($pipeline);
+            if (!empty($result['result'])) {
+                return $result['result'][0]['count'];
+            }
+            return 0;
+        } else {
+            $count = $this->_getCollection($collection)->count($criteria);
+            if ($offset) {
+                $count -= $offset;
+            }
+            if ($limit) {
+                $count = min($count, $limit);
+            }
+            return max(0, $count);
         }
-        if ($criteria) {
-            array_unshift($pipeline, ['$match' => $criteria]);
-        }
-        if ($offset) {
-            array_push($pipeline, ['$skip' => $offset]);
-        }
-        if ($limit) {
-            array_push($pipeline, ['$limit' => $limit]);
-        }
-        array_push($pipeline, ['$group' => ['_id' => null, 'count' => ['$sum' => 1]]]);
-        array_push($pipeline, ['$project' => ['_id' => 0, 'count' => 1]]);
-        $result = $this->_getCollection($collection)->aggregate($pipeline);
-        if (!empty($result['result'])) {
-            return $result['result'][0]['count'];
-        }
-        return 0;
     }
 
     /**

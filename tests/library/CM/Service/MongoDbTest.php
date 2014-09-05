@@ -146,6 +146,8 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $this->assertSame(6, $mongoDb->count($collectionName, null, [['$unwind' => '$foo']]));
         $this->assertSame(2, $mongoDb->count($collectionName, null, null, 2));
         $this->assertSame(1, $mongoDb->count($collectionName, null, null, null, 2));
+        $this->assertSame(0, $mongoDb->count($collectionName, null, null, null, 4));
+        $this->assertSame(1, $mongoDb->count($collectionName, null, null, 3, 2));
     }
 
     public function testRemove() {
