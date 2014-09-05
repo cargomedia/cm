@@ -386,6 +386,11 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             } catch (phpmailerException $e) {
                 throw new CM_Exception_Invalid('Cannot send email, phpmailer reports: ' . $e->getMessage());
             }
+            if ($recipient = $this->getRecipient()) {
+                $action = new CM_Action_Email(CM_Action_Abstract::SEND, $recipient, $this->getType());
+                $action->prepare($recipient);
+                $action->notify($recipient);
+            }
         }
     }
 

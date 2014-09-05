@@ -14,6 +14,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     const UNPUBLISH = 'UNPUBLISH';
     const SUBSCRIBE = 'SUBSCRIBE';
     const UNSUBSCRIBE = 'UNSUBSCRIBE';
+    const SEND = 'SEND';
 
     /** @var CM_Model_User|int */
     protected $_actor = null;
