@@ -93,5 +93,6 @@ return function (CM_Config_Node $config) {
     $config->CM_Action_Abstract->verbs[CM_Action_Abstract::UNPUBLISH] = 10;
     $config->CM_Action_Abstract->verbs[CM_Action_Abstract::SUBSCRIBE] = 11;
     $config->CM_Action_Abstract->verbs[CM_Action_Abstract::UNSUBSCRIBE] = 12;
-    $config->CM_Action_Abstract->verbsMaxValue = 12;
+    $config->CM_Action_Abstract->verbs[CM_Action_Abstract::SEND] = 13;
+    $config->CM_Action_Abstract->verbsMaxValue = 13;
 };
