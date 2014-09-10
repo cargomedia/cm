@@ -45,7 +45,7 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
             return preg_match('/^' . strtolower($namespace) . '_/', $collection);
         });
         sort($collectionList);
-        $optionsValid = ['background', 'unique', 'name', 'dropDups', 'sparse', 'expireAfterSeconds'];
+        $optionsValid = ['unique', 'name', 'dropDups', 'sparse', 'expireAfterSeconds'];
         $indexes = [];
         foreach ($collectionList as $collection) {
             $indexList = $mongo->getIndexInfo($collection);
