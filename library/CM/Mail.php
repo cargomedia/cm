@@ -201,6 +201,13 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
+     * @return CM_Site_Abstract
+     */
+    public function getSite() {
+        return $this->_site;
+    }
+
+    /**
      * @return string|null
      */
     public function getSubject() {
@@ -243,6 +250,13 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     public function setTplParam($key, $value) {
         $this->_tplParams[$key] = $value;
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getVerificationRequired() {
+        return (bool) $this->_verificationRequired;
     }
 
     /**

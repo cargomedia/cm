@@ -109,4 +109,23 @@ class CM_MailTest extends CMTest_TestCase {
         $mail->processQueue(100);
         $this->assertSame(0, CM_Mail::getQueueSize());
     }
+
+    public function testGetSite() {
+        $site = $this->getMockSite();
+        $mail = new CM_Mail(null, null, $site);
+        $this->assertEquals($site, $mail->getSite());
+    }
+
+    public function testGetSiteDefault() {
+        $mail = new CM_Mail();
+        $this->assertEquals(CM_Site_Abstract::factory(), $mail->getSite());
+    }
+
+    public function testGetSiteRecipient() {
+        $site = $this->getMockSite();
+        $recipient = CMTest_TH::createUser();
+        $recipient->setSite($site);
+        $mail = new CM_Mail($recipient);
+        $this->assertEquals($site, $mail->getSite());
+    }
 }
