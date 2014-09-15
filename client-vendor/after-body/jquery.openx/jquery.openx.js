@@ -56,6 +56,7 @@
       var $element = $(this);
       $.getJSON(src + '&callback=?', function(html) {
         $element.html(html);
+        $element.trigger('openx-loaded');
       });
     });
   };
