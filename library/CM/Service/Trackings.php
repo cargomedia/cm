@@ -34,6 +34,12 @@ class CM_Service_Trackings extends CM_Service_ManagerAware implements CM_Service
         }
     }
 
+    public function trackAffiliate($requestClientId, $affiliateName) {
+        foreach ($this->_getTrackingServiceList() as $trackingService) {
+            $trackingService->trackAffiliate($requestClientId, $affiliateName);
+        }
+    }
+
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
         foreach ($this->_getTrackingServiceList() as $trackingService) {
             $trackingService->trackPageView($environment, $path);

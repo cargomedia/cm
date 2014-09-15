@@ -19,6 +19,12 @@ interface CM_Service_Tracking_ClientInterface {
     public function trackAction(CM_Action_Abstract $action);
 
     /**
+     * @param int    $requestClientId
+     * @param string $affiliateName
+     */
+    public function trackAffiliate($requestClientId, $affiliateName);
+
+    /**
      * @param CM_Frontend_Environment $environment
      * @param string|null             $path
      */
