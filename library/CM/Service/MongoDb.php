@@ -30,8 +30,8 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @return array|bool
      */
     public function insert($collection, array $object) {
-        CM_Debug::getInstance()->incStats('mongo', "insert to {$collection}");
-        $ref = & $object;
+        CM_Debug::getInstance()->incStats('mongo', "Insert `{$collection}`: " . CM_Params::jsonEncode($object));
+        $ref = &$object;
         return $this->_getCollection($collection)->insert($ref);
     }
 
@@ -41,8 +41,31 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @return mixed
      */
     public function batchInsert($collection, array $objectList) {
-        CM_Debug::getInstance()->incStats('mongo', "batch insert to {$collection}");
+        CM_Debug::getInstance()->incStats('mongo', "Batch Insert `{$collection}`: " . CM_Params::jsonEncode($objectList));
         return $this->_getCollection($collection)->batchInsert($objectList);
+    }
+
+    /**
+     * @param string $name
+     * @param array  $options
+     * @return MongoCollection
+     */
+    public function createCollection($name, array $options = null) {
+        CM_Debug::getInstance()->incStats('mongo', "create collection {$name}: " . CM_Params::jsonEncode($options));
+        return $this->_getDatabase()->createCollection($name, $options);
+    }
+
+    /**
+     * @param       $collection
+     * @param array $keys
+     * @param array $options
+     * @return array
+     */
+    public function createIndex($collection, array $keys, array $options = null) {
+        $options = $options ?: [];
+        CM_Debug::getInstance()->incStats('mongo', "create index on {$collection}: " . CM_Params::jsonEncode($keys) . ' ' .
+            CM_Params::jsonEncode($options));
+        return $this->_getCollection($collection)->createIndex($keys, $options);
     }
 
     /**
@@ -51,41 +74,116 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param array|null $projection
      * @return array
      */
-    public function findOne($collection, array $criteria = null, array $projection = null) {
+    public function findOne($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
         $criteria = (array) $criteria;
         $projection = (array) $projection;
-        CM_Debug::getInstance()->incStats('mongo',
-            "findOne in {$collection}: " . serialize(array('projection' => $projection) + $criteria));
+        if ($aggregation) {
+            array_push($aggregation, ['$limit' => 1]);
+            $resultSet = $this->find($collection, $criteria, $projection, $aggregation);
+            $resultSet->rewind();
+            $result = $resultSet->current();
+        } else {
+            $result = $this->_getCollection($collection)->findOne($criteria, $projection);
+            CM_Debug::getInstance()->incStats('mongo', "findOne `{$collection}`: " . CM_Params::jsonEncode(['projection' => $projection,
+                                                                                                            'criteria'   => $criteria]));
+        }
 
-        return $this->_getCollection($collection)->findOne($criteria, $projection);
+        return $result;
     }
 
     /**
      * @param string     $collection
      * @param array|null $criteria
      * @param array|null $projection
-     * @return MongoCursor
+     * @param array|null $aggregation
+     * @return Iterator
      */
-    public function find($collection, array $criteria = null, array $projection = null) {
+    public function find($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
         $criteria = (array) $criteria;
         $projection = (array) $projection;
-        CM_Debug::getInstance()->incStats('mongo', "find in {$collection}: " . serialize(array('fields' => $projection) + $criteria));
-        return $this->_getCollection($collection)->find($criteria, $projection);
+        CM_Debug::getInstance()->incStats('mongo', "find `{$collection}`: " . CM_Params::jsonEncode(['projection'  => $projection,
+                                                                                                     'criteria'    => $criteria,
+                                                                                                     'aggregation' => $aggregation]));
+        $collection = $this->_getCollection($collection);
+        if ($aggregation) {
+            $pipeline = $aggregation;
+            if ($projection) {
+                array_unshift($pipeline, ['$project' => $projection]);
+            }
+            if ($criteria) {
+                array_unshift($pipeline, ['$match' => $criteria]);
+            }
+            $resultCursor = $collection->aggregateCursor($pipeline);
+        } else {
+            $resultCursor = $collection->find($criteria, $projection);
+        }
+        return $resultCursor;
+    }
+
+    /**
+     * @param $collection
+     * @return array
+     */
+    public function getIndexInfo($collection) {
+        CM_Debug::getInstance()->incStats('mongo', "indexInfo {$collection}");
+        $indexInfo = $this->_getCollection($collection)->getIndexInfo();
+        return $indexInfo;
+    }
+
+    /**
+     * @param string $collection
+     * @param array  $index
+     * @return bool
+     */
+    public function hasIndex($collection, array $index) {
+        $indexInfo = $this->getIndexInfo($collection);
+        return \Functional\some($indexInfo, function ($indexInfo) use ($index) {
+            return array_keys($index) === array_keys($indexInfo['key']) && $index == $indexInfo['key'];
+        });
     }
 
     /**
      * @param string     $collection
      * @param array|null $criteria
+     * @param array|null $aggregation
      * @param int|null   $limit
      * @param int|null   $offset
      * @return int
      */
-    public function count($collection, array $criteria = null, $limit = null, $offset = null) {
+    public function count($collection, array $criteria = null, array $aggregation = null, $limit = null, $offset = null) {
         $criteria = (array) $criteria;
         $limit = (int) $limit;
         $offset = (int) $offset;
-        CM_Debug::getInstance()->incStats('mongo', "count in {$collection}: " . serialize($criteria));
-        return $this->_getCollection($collection)->count($criteria, $limit, $offset);
+        CM_Debug::getInstance()->incStats('mongo', "count `{$collection}`: " . CM_Params::jsonEncode(['criteria'    => $criteria,
+                                                                                                      'aggregation' => $aggregation]));
+        if ($aggregation) {
+            $pipeline = $aggregation;
+            if ($criteria) {
+                array_unshift($pipeline, ['$match' => $criteria]);
+            }
+            if ($offset) {
+                array_push($pipeline, ['$skip' => $offset]);
+            }
+            if ($limit) {
+                array_push($pipeline, ['$limit' => $limit]);
+            }
+            array_push($pipeline, ['$group' => ['_id' => null, 'count' => ['$sum' => 1]]]);
+            array_push($pipeline, ['$project' => ['_id' => 0, 'count' => 1]]);
+            $result = $this->_getCollection($collection)->aggregate($pipeline);
+            if (!empty($result['result'])) {
+                return $result['result'][0]['count'];
+            }
+            return 0;
+        } else {
+            $count = $this->_getCollection($collection)->count($criteria);
+            if ($offset) {
+                $count -= $offset;
+            }
+            if ($limit) {
+                $count = min($count, $limit);
+            }
+            return max(0, $count);
+        }
     }
 
     /**
@@ -93,8 +191,25 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @return array
      */
     public function drop($collection) {
-        CM_Debug::getInstance()->incStats('mongo', "drop {$collection}: ");
+        CM_Debug::getInstance()->incStats('mongo', "drop `{$collection}`");
         return $this->_getCollection($collection)->drop();
+    }
+
+    /**
+     * @return array
+     */
+    public function dropDatabase() {
+        $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
+        CM_Debug::getInstance()->incStats('mongo', "drop database {$dbName}");
+        return $this->_getDatabase()->drop();
+    }
+
+    /**
+     * @param string $collection
+     * @return boolean
+     */
+    public function existsCollection($collection) {
+        return \Functional\contains($this->listCollectionNames(), (string) $collection);
     }
 
     /**
@@ -106,19 +221,21 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      */
     public function update($collection, array $criteria, array $newObject, array $options = null) {
         $options = (array) $options;
-        CM_Debug::getInstance()->incStats('mongo', "Update {$collection}");
+        CM_Debug::getInstance()->incStats('mongo', "Update `{$collection}`: " . CM_Params::jsonEncode(['criteria'  => $criteria,
+                                                                                                       'newObject' => $newObject]));
         return $this->_getCollection($collection)->update($criteria, $newObject, $options);
     }
 
     /**
      * @param string     $collection
-     * @param array      $criteria
+     * @param array|null $criteria
      * @param array|null $options
      * @return mixed
      */
-    public function remove($collection, array $criteria, array $options = null) {
-        $options = (array) $options;
-        CM_Debug::getInstance()->incStats('mongo', "remove from {$collection}");
+    public function remove($collection, array $criteria = null, array $options = null) {
+        $criteria = $criteria ?: array();
+        $options = $options ?: array();
+        CM_Debug::getInstance()->incStats('mongo', "Remove `{$collection}`: " . CM_Params::jsonEncode($criteria));
         return $this->_getCollection($collection)->remove($criteria, $options);
     }
 

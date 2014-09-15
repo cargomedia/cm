@@ -81,61 +81,20 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
-     * @param string $key
-     * @param mixed  $value
-     * @return CM_Component_Abstract
-     */
-    public function setTplParam($key, $value) {
-        $this->_tplParams[$key] = $value;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getTplParams() {
-        return $this->_tplParams;
-    }
-
-    /**
-     * @return CM_Model_User|null
-     */
-    public function getRecipient() {
-        return $this->_recipient;
-    }
-
-    /**
      * @param string      $address
      * @param string|null $name
      */
-    public function addTo($address, $name = null) {
+    public function addBcc($address, $name = null) {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
-        $this->_to[] = array('address' => $address, 'name' => $name);
+        $this->_bcc[] = array('address' => $address, 'name' => $name);
     }
 
     /**
      * @return array
      */
-    public function getTo() {
-        return $this->_to;
-    }
-
-    /**
-     * @param string      $address
-     * @param string|null $name
-     */
-    public function addReplyTo($address, $name = null) {
-        $address = (string) $address;
-        $name = is_null($name) ? $name : (string) $name;
-        $this->_replyTo[] = array('address' => $address, 'name' => $name);
-    }
-
-    /**
-     * @return array
-     */
-    public function getReplyTo() {
-        return $this->_replyTo;
+    public function getBcc() {
+        return $this->_bcc;
     }
 
     /**
@@ -159,17 +118,34 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @param string      $address
      * @param string|null $name
      */
-    public function addBcc($address, $name = null) {
+    public function addReplyTo($address, $name = null) {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
-        $this->_bcc[] = array('address' => $address, 'name' => $name);
+        $this->_replyTo[] = array('address' => $address, 'name' => $name);
     }
 
     /**
      * @return array
      */
-    public function getBcc() {
-        return $this->_bcc;
+    public function getReplyTo() {
+        return $this->_replyTo;
+    }
+
+    /**
+     * @param string      $address
+     * @param string|null $name
+     */
+    public function addTo($address, $name = null) {
+        $address = (string) $address;
+        $name = is_null($name) ? $name : (string) $name;
+        $this->_to[] = array('address' => $address, 'name' => $name);
+    }
+
+    /**
+     * @return array
+     */
+    public function getTo() {
+        return $this->_to;
     }
 
     /**
@@ -187,6 +163,27 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
+     * @return CM_Model_User|null
+     */
+    public function getRecipient() {
+        return $this->_recipient;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getRenderLayout() {
+        return $this->_renderLayout;
+    }
+
+    /**
+     * @param boolean $state OPTIONAL
+     */
+    public function setRenderLayout($state = true) {
+        $this->_renderLayout = (boolean) $state;
+    }
+
+    /**
      * @return array
      */
     public function getSender() {
@@ -201,6 +198,13 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
         $this->_sender = array('address' => $address, 'name' => $name);
+    }
+
+    /**
+     * @return CM_Site_Abstract
+     */
+    public function getSite() {
+        return $this->_site;
     }
 
     /**
@@ -232,24 +236,34 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
+     * @return array
+     */
+    public function getTplParams() {
+        return $this->_tplParams;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $value
+     * @return CM_Component_Abstract
+     */
+    public function setTplParam($key, $value) {
+        $this->_tplParams[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getVerificationRequired() {
+        return (bool) $this->_verificationRequired;
+    }
+
+    /**
      * @param boolean $state OPTIONAL
      */
     public function setVerificationRequired($state = true) {
         $this->_verificationRequired = $state;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getRenderLayout() {
-        return $this->_renderLayout;
-    }
-
-    /**
-     * @param boolean $state OPTIONAL
-     */
-    public function setRenderLayout($state = true) {
-        $this->_renderLayout = (boolean) $state;
     }
 
     /**
@@ -331,25 +345,14 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         }
     }
 
-    private function _queue($subject, $text, $html) {
-        CM_Db_Db::insert('cm_mail', array(
-            'subject'     => $subject,
-            'text'        => $text,
-            'html'        => $html,
-            'createStamp' => time(),
-            'sender'      => serialize($this->getSender()),
-            'replyTo'     => serialize($this->getReplyTo()),
-            'to'          => serialize($this->getTo()),
-            'cc'          => serialize($this->getCc()),
-            'bcc'         => serialize($this->getBcc()),
-        ));
-    }
-
-    private function _log($subject, $text) {
-        $msg = '* ' . $subject . ' *' . PHP_EOL . PHP_EOL;
-        $msg .= $text . PHP_EOL;
-        $log = new CM_Paging_Log_Mail();
-        $log->add($this, $msg);
+    /**
+     * @param CM_Model_Language|null $language
+     * @return array array($subject, $html, $text)
+     */
+    protected function _render($language) {
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($this->_site, $this->_recipient, $language));
+        $renderAdapter = new CM_RenderAdapter_Mail($render, $this);
+        return $renderAdapter->fetch();
     }
 
     protected function _send($subject, $text, $html = null) {
@@ -386,16 +389,32 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             } catch (phpmailerException $e) {
                 throw new CM_Exception_Invalid('Cannot send email, phpmailer reports: ' . $e->getMessage());
             }
+            if ($recipient = $this->getRecipient()) {
+                $action = new CM_Action_Email(CM_Action_Abstract::SEND, $recipient, $this->getType());
+                $action->prepare($recipient);
+                $action->notify($recipient);
+            }
         }
     }
 
-    /**
-     * @param CM_Model_Language|null $language
-     * @return array array($subject, $html, $text)
-     */
-    protected function _render($language) {
-        $render = new CM_Frontend_Render(new CM_Frontend_Environment($this->_site, $this->_recipient, $language));
-        $renderAdapter = new CM_RenderAdapter_Mail($render, $this);
-        return $renderAdapter->fetch();
+    private function _queue($subject, $text, $html) {
+        CM_Db_Db::insert('cm_mail', array(
+            'subject'     => $subject,
+            'text'        => $text,
+            'html'        => $html,
+            'createStamp' => time(),
+            'sender'      => serialize($this->getSender()),
+            'replyTo'     => serialize($this->getReplyTo()),
+            'to'          => serialize($this->getTo()),
+            'cc'          => serialize($this->getCc()),
+            'bcc'         => serialize($this->getBcc()),
+        ));
+    }
+
+    private function _log($subject, $text) {
+        $msg = '* ' . $subject . ' *' . PHP_EOL . PHP_EOL;
+        $msg .= $text . PHP_EOL;
+        $log = new CM_Paging_Log_Mail();
+        $log->add($this, $msg);
     }
 }
