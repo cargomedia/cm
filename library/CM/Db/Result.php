@@ -59,4 +59,8 @@ class CM_Db_Result {
     public function getAffectedRows() {
         return $this->_pdoStatement->rowCount();
     }
+
+    public function nextRowset() {
+        $this->_pdoStatement->nextRowset();
+    }
 }
