@@ -34,6 +34,7 @@
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-96x96.png' type='layout'}" sizes="96x96">
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-16x16.png' type='layout'}" sizes="16x16">
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-32x32.png' type='layout'}" sizes="32x32">
+
     <title>{$pageTitle|escape}</title>
     {resourceCss file='all.css' type="vendor"}
     {resourceCss file='all.css' type="library"}
