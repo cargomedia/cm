@@ -13,13 +13,13 @@
     <meta name="apple-mobile-web-app-title" content="{$render->getSite()->getName()|escape}">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
-    <link rel="apple-touch-icon" href="{resourceUrl path='img/touch-icon-57.png' type='layout'}">
-    <link rel="apple-touch-icon" sizes="72x72" href="{resourceUrl path='img/touch-icon-72.png' type='layout'}">
-    <link rel="apple-touch-icon" sizes="76x76" href="{resourceUrl path='img/touch-icon-76.png' type='layout'}">
-    <link rel="apple-touch-icon" sizes="114x114" href="{resourceUrl path='img/touch-icon-114.png' type='layout'}">
-    <link rel="apple-touch-icon" sizes="120x120" href="{resourceUrl path='img/touch-icon-120.png' type='layout'}">
-    <link rel="apple-touch-icon" sizes="144x144" href="{resourceUrl path='img/touch-icon-144.png' type='layout'}">
-    <link rel="apple-touch-icon" sizes="152x152" href="{resourceUrl path='img/touch-icon-152.png' type='layout'}">
+    <link rel="apple-touch-icon" sizes="57x57" href="{resourceUrl path='img/apple-touch-icon-57x57.png' type='layout'}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{resourceUrl path='img/apple-touch-icon-72x72.png' type='layout'}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{resourceUrl path='img/apple-touch-icon-76x76.png' type='layout'}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{resourceUrl path='img/apple-touch-icon-114x114.png' type='layout'}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{resourceUrl path='img/apple-touch-icon-120x120.png' type='layout'}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{resourceUrl path='img/apple-touch-icon-144x144.png' type='layout'}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{resourceUrl path='img/apple-touch-icon-152x152.png' type='layout'}">
 
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-1536x2008.png' type='layout'}" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 2)">
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-1496x2048.png' type='layout'}" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 2)">
