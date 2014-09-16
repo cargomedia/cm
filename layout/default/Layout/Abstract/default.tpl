@@ -29,7 +29,11 @@
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-640x920.png' type='layout'}" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)">
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-320x460.png' type='layout'}" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 1)">
 
-    <link rel="shortcut icon" href="{resourceUrl path='img/favicon.ico' type='layout'}">
+    <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-192x192.png' type='layout'}" sizes="192x192">
+    <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-160x160.png' type='layout'}" sizes="160x160">
+    <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-96x96.png' type='layout'}" sizes="96x96">
+    <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-16x16.png' type='layout'}" sizes="16x16">
+    <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-32x32.png' type='layout'}" sizes="32x32">
     <title>{$pageTitle|escape}</title>
     {resourceCss file='all.css' type="vendor"}
     {resourceCss file='all.css' type="library"}
