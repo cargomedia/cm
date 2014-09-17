@@ -7,13 +7,12 @@
     {if isset($pageKeywords)}
       <meta name="keywords" content="{$pageKeywords|escape}">{/if}
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-    <meta name="msapplication-TileColor" content="{block name='tileColor'}#ffffff{/block}">
-    <meta name="msapplication-TileImage" content="{resourceUrl path='img/mstile-144x144.png' type='layout'}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="{$render->getSite()->getName()|escape}">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
     <link rel="apple-touch-icon" sizes="57x57" href="{resourceUrl path='img/apple-touch-icon-57x57.png' type='layout'}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{resourceUrl path='img/apple-touch-icon-60x60.png' type='layout'}">
     <link rel="apple-touch-icon" sizes="72x72" href="{resourceUrl path='img/apple-touch-icon-72x72.png' type='layout'}">
     <link rel="apple-touch-icon" sizes="76x76" href="{resourceUrl path='img/apple-touch-icon-76x76.png' type='layout'}">
     <link rel="apple-touch-icon" sizes="114x114" href="{resourceUrl path='img/apple-touch-icon-114x114.png' type='layout'}">
@@ -29,11 +28,17 @@
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-640x920.png' type='layout'}" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)">
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-320x460.png' type='layout'}" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 1)">
 
-    <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-192x192.png' type='layout'}" sizes="192x192">
-    <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-160x160.png' type='layout'}" sizes="160x160">
-    <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-96x96.png' type='layout'}" sizes="96x96">
+    <!-- favicon.ico used for IE9: -->
+    <!--[if IE]><link rel="shortcut icon" type="image/x-icon" href="{resourceUrl path='img/favicon.ico' type='layout'}"><![endif]-->
+
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-16x16.png' type='layout'}" sizes="16x16">
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-32x32.png' type='layout'}" sizes="32x32">
+    <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-96x96.png' type='layout'}" sizes="96x96">
+    <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-160x160.png' type='layout'}" sizes="160x160">
+    <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-192x192.png' type='layout'}" sizes="192x192">
+
+    <meta name="msapplication-TileColor" content="{block name='tileColor'}#3FB4FF{/block}">
+    <meta name="msapplication-TileImage" content="{resourceUrl path='img/mstile-144x144.png' type='layout'}">
 
     <title>{$pageTitle|escape}</title>
     {resourceCss file='all.css' type="vendor"}
