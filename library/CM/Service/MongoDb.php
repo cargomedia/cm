@@ -72,7 +72,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param string     $collection
      * @param array|null $criteria
      * @param array|null $projection
-     * @return array
+     * @return array|null
      */
     public function findOne($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
         $criteria = (array) $criteria;
