@@ -19,9 +19,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @return string[]
      */
     public function listCollectionNames() {
-        return array_map(function (MongoCollection $collection) {
-            return $collection->getName();
-        }, $this->_getDatabase()->listCollections());
+        return $this->_getDatabase()->getCollectionNames();
     }
 
     /**
