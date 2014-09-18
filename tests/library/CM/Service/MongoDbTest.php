@@ -117,6 +117,17 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
         $this->assertEquals([['foo' => 1], ['foo' => 1], ['foo' => 2], ['foo' => 3]], $actual);
     }
 
+    public function testFindAndModify() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = 'findAndModify';
+
+        $this->assertNull($mongoDb->findOne($collectionName, ['userId' => 1]));
+        $result = $mongoDb->findAndModify($collectionName, ['userId' => 1], ['$inc' => ['score' => 1]], ['_id' => 0], ['upsert' => true, 'new' => true]);
+        $this->assertSame(['userId' => 1, 'score' => 1], $result);
+        $this->assertSame($result, $mongoDb->findOne($collectionName, ['userId' => 1], ['_id' => 0]));
+        $this->assertNull($mongoDb->findAndModify($collectionName, ['userId' => 2], ['$inc' => ['score' => 1]], ['_id' => 0], ['new' => true]));
+    }
+
     public function testFindOne() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'findOne';

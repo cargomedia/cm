@@ -54,9 +54,9 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
-     * @param       $collection
-     * @param array $keys
-     * @param array $options
+     * @param string $collection
+     * @param array  $keys
+     * @param array  $options
      * @return array
      */
     public function createIndex($collection, array $keys, array $options = null) {
@@ -64,6 +64,18 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
         CM_Debug::getInstance()->incStats('mongo', "create index on {$collection}: " . CM_Params::jsonEncode($keys) . ' ' .
             CM_Params::jsonEncode($options));
         return $this->_getCollection($collection)->createIndex($keys, $options);
+    }
+
+    /**
+     * @param string     $collection
+     * @param array|null $criteria
+     * @param array|null $update
+     * @param array|null $projection
+     * @param array|null $options
+     * @return array|null
+     */
+    public function findAndModify($collection, $criteria = null, $update = null, $projection = null, $options = null) {
+        return $this->_getCollection($collection)->findAndModify($criteria, $update, $projection, $options);
     }
 
     /**
