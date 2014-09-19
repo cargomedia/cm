@@ -310,7 +310,10 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      */
     public function getTranslation($key, array $params = null) {
         $params = (array) $params;
-        $translation = $this->getLanguage(true)->getTranslation($key, array_keys($params));
+        $translation = $key;
+        if ($language = $this->getLanguage(true)) {
+            $translation = $language->getTranslation($key, array_keys($params));
+        }
         $translation = $this->_parseVariables($translation, $params);
         return $translation;
     }
