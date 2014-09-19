@@ -293,9 +293,11 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
 
         if (null === $language && $fallbackToDefault) {
             if ($viewer = $this->getViewer()) {
-                return $viewer->getLanguage();
+                $language = $viewer->getLanguage();
             }
-            return CM_Model_Language::findDefault();
+            if (null === $language) {
+                $language = CM_Model_Language::findDefault();
+            }
         }
 
         return $language;
