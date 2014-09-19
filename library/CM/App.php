@@ -31,8 +31,8 @@ class CM_App {
      * @param boolean|null $forceReload
      */
     public function setupDatabase($forceReload = null) {
-        $this->_setupDbSql($forceReload);
-        $this->_setupDbMongo($forceReload);
+        $isEmptyMysql = $this->_setupDbMysql($forceReload);
+        $isEmptyMongo = $this->_setupDbMongo($forceReload);
         $app = CM_App::getInstance();
         foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
             $updateFiles = CM_Util::rglob('*.php', $path);
@@ -42,8 +42,10 @@ class CM_App {
             }, $app->getVersion());
             $app->setVersion($version, $namespace);
         }
-        foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
-            require $setupScript->getPath();
+        if ($isEmptyMysql && $isEmptyMongo) {
+            foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
+                require $setupScript->getPath();
+            }
         }
     }
 
@@ -205,6 +207,7 @@ class CM_App {
 
     /**
      * @param boolean $forceReload
+     * @return boolean
      * @throws CM_Exception_Invalid
      */
     private function _setupDbMongo($forceReload) {
@@ -213,7 +216,8 @@ class CM_App {
             $mongoClient->dropDatabase();
         }
         $collections = $mongoClient->listCollectionNames();
-        if (0 === count($collections)) {
+        $isEmpty = 0 === count($collections);
+        if ($isEmpty) {
             foreach (CM_Util::getResourceFiles('mongo/collections.json') as $dump) {
                 $collectionInfo = CM_Params::jsonDecode($dump->read());
                 foreach ($collectionInfo as $collection => $indexes) {
@@ -224,13 +228,15 @@ class CM_App {
                 }
             }
         }
+        return $isEmpty;
     }
 
     /**
      * @param boolean $forceReload
+     * @return boolean
      * @throws CM_Db_Exception
      */
-    private function _setupDbSql($forceReload) {
+    private function _setupDbMysql($forceReload) {
         $mysqlClient = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
         $db = $mysqlClient->getDb();
         $mysqlClient->setDb(null);
@@ -243,10 +249,12 @@ class CM_App {
         }
         $mysqlClient->setDb($db);
         $tables = $mysqlClient->createStatement('SHOW TABLES')->execute()->fetchAll();
-        if (0 === count($tables)) {
+        $isEmpty = 0 === count($tables);
+        if ($isEmpty) {
             foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
                 CM_Db_Db::runDump($db, $dump);
             }
         }
+        return $isEmpty;
     }
 }
