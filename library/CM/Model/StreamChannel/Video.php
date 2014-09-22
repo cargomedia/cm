@@ -9,7 +9,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
     }
 
     public function onUnpublish(CM_Model_Stream_Publish $streamPublish) {
-        if (!CM_Db_Db::count('cm_streamChannelArchive_video', array('id' => $this->getId()))) {
+        if (!CM_Model_StreamChannelArchive_Video::findById($this->getId())) {
             CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $this));
         }
     }
