@@ -181,10 +181,10 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 
     public function testFindById() {
         $streamChannel = $streamChannel = CMTest_TH::createStreamChannel();
-        $streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
         $this->assertNull(CM_Model_StreamChannelArchive_Video::findById($streamChannel->getId()));
 
-        $streamChannel->onUnpublish($streamPublish);
+        CMTest_TH::createStreamPublish(null, $streamChannel);
+        CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
         $this->assertInstanceOf('CM_Model_StreamChannelArchive_Video', CM_Model_StreamChannelArchive_Video::findById($streamChannel->getId()));
     }
 
