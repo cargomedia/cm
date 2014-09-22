@@ -10,6 +10,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="{$render->getSite()->getName()|escape}">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="msapplication-TileColor" content="{block name='tileColor'}#3FB4FF{/block}">
+    <meta name="msapplication-TileImage" content="{resourceUrl path='img/mstile-144x144.png' type='layout'}">
+    <meta name="msapplication-config" content="{resourceUrl path='browserconfig.xml' type='layout'}">
 
     <link rel="apple-touch-icon" sizes="57x57" href="{resourceUrl path='img/apple-touch-icon-57x57.png' type='layout'}">
     <link rel="apple-touch-icon" sizes="60x60" href="{resourceUrl path='img/apple-touch-icon-60x60.png' type='layout'}">
@@ -19,6 +22,7 @@
     <link rel="apple-touch-icon" sizes="120x120" href="{resourceUrl path='img/apple-touch-icon-120x120.png' type='layout'}">
     <link rel="apple-touch-icon" sizes="144x144" href="{resourceUrl path='img/apple-touch-icon-144x144.png' type='layout'}">
     <link rel="apple-touch-icon" sizes="152x152" href="{resourceUrl path='img/apple-touch-icon-152x152.png' type='layout'}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{resourceUrl path='img/apple-touch-icon-180x180.png' type='layout'}">
 
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-1536x2008.png' type='layout'}" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 2)">
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-1496x2048.png' type='layout'}" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 2)">
@@ -28,17 +32,14 @@
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-640x920.png' type='layout'}" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)">
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-320x460.png' type='layout'}" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 1)">
 
-    <!-- favicon.ico used for IE9: -->
-    <!--[if IE]><link rel="shortcut icon" type="image/x-icon" href="{resourceUrl path='img/favicon.ico' type='layout'}"><![endif]-->
-
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-16x16.png' type='layout'}" sizes="16x16">
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-32x32.png' type='layout'}" sizes="32x32">
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-96x96.png' type='layout'}" sizes="96x96">
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-160x160.png' type='layout'}" sizes="160x160">
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-192x192.png' type='layout'}" sizes="192x192">
 
-    <meta name="msapplication-TileColor" content="{block name='tileColor'}#3FB4FF{/block}">
-    <meta name="msapplication-TileImage" content="{resourceUrl path='img/mstile-144x144.png' type='layout'}">
+    <!-- favicon.ico used for IE9: -->
+    <!--[if IE]><link rel="shortcut icon" href="{resourceUrl path='img/favicon.ico' type='layout'}"><![endif]-->
 
     <title>{$pageTitle|escape}</title>
     {resourceCss file='all.css' type="vendor"}
@@ -59,7 +60,7 @@
     {block name='body-start'}{/block}
     <div id="body-container">
       {block name='body'}
-	    {$renderAdapter->fetchPage()}
+        {$renderAdapter->fetchPage()}
       {/block}
     </div>
     {if CM_Bootloader::getInstance()->isDebug()}{component name='CM_Component_Debug'}{/if}
