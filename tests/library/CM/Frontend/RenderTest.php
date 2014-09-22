@@ -142,28 +142,37 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
     public function testGetLanguage() {
         $render = new CM_Frontend_Render();
+
         $this->assertNull($render->getLanguage());
         $this->assertNull($render->getLanguage(true));
+    }
 
-        $languageDefault = CM_Model_Language::create('Test language', 'foo', true);
-
+    public function testGetLanguageFromDefaultLanguage() {
+        $language = CM_Model_Language::create('Test language', 'foo', true);
         $render = new CM_Frontend_Render();
+
         $this->assertNull($render->getLanguage());
-        $this->assertEquals($languageDefault, $render->getLanguage(true));
+        $this->assertEquals($language, $render->getLanguage(true));
+    }
 
-        $languageEnvironment = CM_Model_Language::create('Test language Environment', 'foo2', true);
-        $environment = new CM_Frontend_Environment(null, null, $languageEnvironment);
+    public function testGetLanguageEnvironmentHasLanguage() {
+        $language = CM_Model_Language::create('Test language', 'foo', true);
+        $environment = new CM_Frontend_Environment(null, null, $language);
         $render = new CM_Frontend_Render($environment);
-        $this->assertSame($languageEnvironment, $render->getLanguage());
-        $this->assertSame($languageEnvironment, $render->getLanguage(true));
 
-        $languageUser = CM_Model_Language::create('Test language User', 'foo3', true);
+        $this->assertSame($language, $render->getLanguage());
+        $this->assertSame($language, $render->getLanguage(true));
+    }
+
+    public function testGetLanguageViewerHasLanguage() {
+        $language = CM_Model_Language::create('Test language', 'foo', true);
         $viewer = CMTest_TH::createUser();
-        $viewer->setLanguage($languageUser);
+        $viewer->setLanguage($language);
         $environment = new CM_Frontend_Environment(null, $viewer);
         $render = new CM_Frontend_Render($environment);
+
         $this->assertNull($render->getLanguage());
-        $this->assertEquals($languageUser, $render->getLanguage(true));
+        $this->assertEquals($language, $render->getLanguage(true));
     }
 
     public function testGetTranslation() {
