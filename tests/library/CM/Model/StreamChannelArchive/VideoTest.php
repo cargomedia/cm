@@ -179,6 +179,15 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
         }
     }
 
+    public function testFindById() {
+        $streamChannel = $streamChannel = CMTest_TH::createStreamChannel();
+        $streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
+        $this->assertNull(CM_Model_StreamChannelArchive_Video::findById($streamChannel->getId()));
+
+        $streamChannel->onUnpublish($streamPublish);
+        $this->assertInstanceOf('CM_Model_StreamChannelArchive_Video', CM_Model_StreamChannelArchive_Video::findById($streamChannel->getId()));
+    }
+
     /**
      * @param CM_Model_StreamChannelArchive_Video $archive
      * @return CM_File[]

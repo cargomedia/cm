@@ -120,6 +120,17 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
         CM_Db_Db::delete('cm_streamChannelArchive_video', array('id' => $this->getId()));
     }
 
+    /**
+     * @param int $id
+     * @return null|static
+     */
+    public static function findById($id) {
+        if (!CM_Db_Db::count('cm_streamChannelArchive_video', array('id' => $id))) {
+            return null;
+        }
+        return new static($id);
+    }
+
     protected static function _createStatic(array $data) {
         /** @var CM_Model_StreamChannel_Video $streamChannel */
         $streamChannel = $data['streamChannel'];
