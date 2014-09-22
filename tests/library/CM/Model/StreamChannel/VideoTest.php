@@ -101,7 +101,7 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
     }
 
     public function testOnUnpublish() {
-        $streamChannel = $streamChannel = CMTest_TH::createStreamChannel();
+        $streamChannel = CMTest_TH::createStreamChannel();
         $streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
         $this->assertNull(CM_Model_StreamChannelArchive_Video::findById($streamChannel->getId()));
 
