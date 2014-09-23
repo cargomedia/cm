@@ -10,7 +10,7 @@ class CM_Response_Resource_Layout extends CM_Response_Resource_Abstract {
             $file = new CM_File($pathRaw);
             $content = $file->read();
             $mimeType = $file->getMimeType();
-        } elseif ($pathTpl = $this->getRender()->getLayoutPath('resource/' . $this->getRequest()->getPath() . '.tpl', null, true, false)) {
+        } elseif ($pathTpl = $this->getRender()->getLayoutPath('resource/' . $this->getRequest()->getPath() . '.smarty', null, true, false)) {
             $content = $this->getRender()->fetchTemplate($pathTpl);
             $mimeType = CM_File::getMimeTypeByContent($content);
         } else {
