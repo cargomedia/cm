@@ -33,16 +33,8 @@ class CM_App {
     public function setupDatabase($forceReload = null) {
         $isEmptyMysql = $this->_setupDbMysql($forceReload);
         $isEmptyMongo = $this->_setupDbMongo($forceReload);
-        $app = CM_App::getInstance();
-        foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
-            $updateFiles = CM_Util::rglob('*.php', $path);
-            $version = array_reduce($updateFiles, function ($initial, $path) {
-                $filename = basename($path);
-                return max($initial, (int) $filename);
-            }, $app->getVersion());
-            $app->setVersion($version, $namespace);
-        }
         if ($isEmptyMysql && $isEmptyMongo) {
+            $this->_setInitialVersion();
             foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
                 require $setupScript->getPath();
             }
@@ -203,6 +195,18 @@ class CM_App {
             throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $moduleName . '` namespace.');
         }
         return $file->getPath();
+    }
+
+    private function _setInitialVersion() {
+        $app = CM_App::getInstance();
+        foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
+            $updateFiles = CM_Util::rglob('*.php', $path);
+            $version = array_reduce($updateFiles, function ($initial, $path) {
+                $filename = basename($path);
+                return max($initial, (int) $filename);
+            }, $app->getVersion($namespace));
+            $app->setVersion($version, $namespace);
+        }
     }
 
     /**
