@@ -60,13 +60,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
      * @throws CM_Exception
      */
     public function getMimeType() {
-        $info = new finfo(FILEINFO_MIME);
-        $infoFile = $info->buffer($this->read());
-        if (false === $infoFile) {
-            throw new CM_Exception('Cannot detect FILEINFO_MIME of `' . $this->getPath() . '`');
-        }
-        $mime = explode(';', $infoFile);
-        return $mime[0];
+        return self::getMimeTypeByContent($this->read());
     }
 
     /**
@@ -298,6 +292,21 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
             throw new CM_Exception_Invalid('Invalid filename.');
         }
         return $clean;
+    }
+
+    /**
+     * @param string $content
+     * @return string
+     * @throws CM_Exception
+     */
+    public static function getMimeTypeByContent($content) {
+        $info = new finfo(FILEINFO_MIME);
+        $infoFile = $info->buffer($content);
+        if (false === $infoFile) {
+            throw new CM_Exception('Cannot detect FILEINFO_MIME of `' . $this->getPath() . '`');
+        }
+        $mime = explode(';', $infoFile);
+        return $mime[0];
     }
 
     /**
