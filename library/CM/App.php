@@ -34,7 +34,7 @@ class CM_App {
         $isEmptyMysql = $this->_setupDbMysql($forceReload);
         $isEmptyMongo = $this->_setupDbMongo($forceReload);
         if ($isEmptyMysql && $isEmptyMongo) {
-            $this->_setInitialsVersion();
+            $this->_setInitialVersion();
             foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
                 require $setupScript->getPath();
             }
@@ -197,7 +197,7 @@ class CM_App {
         return $file->getPath();
     }
 
-    private function _setInitialsVersion() {
+    private function _setInitialVersion() {
         $app = CM_App::getInstance();
         foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
             $updateFiles = CM_Util::rglob('*.php', $path);
