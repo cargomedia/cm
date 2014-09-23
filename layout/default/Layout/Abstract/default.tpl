@@ -24,6 +24,8 @@
     <link rel="apple-touch-icon" sizes="152x152" href="{resourceUrl path='img/apple-touch-icon-152x152.png' type='layout'}">
     <link rel="apple-touch-icon" sizes="180x180" href="{resourceUrl path='img/apple-touch-icon-180x180.png' type='layout'}">
 
+    <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-1242x2208.png' type='layout'}" media="(device-width: 414px) and (device-height: 736px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-750x1334.png' type='layout'}" media="(device-width: 375px) and (device-height: 667px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 2)">
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-1536x2008.png' type='layout'}" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 2)">
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-1496x2048.png' type='layout'}" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 2)">
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-768x1004.png' type='layout'}" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 1)">
