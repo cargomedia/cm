@@ -179,6 +179,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         return $this->mockClass($className)->newInstance([$request]);
     }
 
+    public function getResponseResourceLayout($path) {
+        $request = $this->createRequest('/layout/null/' . time() . '/' . $path);
+        return $this->processRequest($request);
+    }
+
     /**
      * @param CM_Request_Abstract $request
      * @return CM_Response_Abstract|\Mocka\AbstractClassTrait

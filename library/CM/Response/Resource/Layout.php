@@ -8,6 +8,9 @@ class CM_Response_Resource_Layout extends CM_Response_Resource_Abstract {
 
         if ($pathRaw = $this->getRender()->getLayoutPath('resource/' . $this->getRequest()->getPath(), null, true, false)) {
             $file = new CM_File($pathRaw);
+            if (in_array($file->getExtension(), $this->_getFiletypesForbidden())) {
+                throw new CM_Exception_Nonexistent('Forbidden file-type', ['path' => $this->getRequest()->getPath()], ['severity' => CM_Exception::WARN]);
+            }
             $content = $file->read();
             $mimeType = $file->getMimeType();
         } elseif ($pathTpl = $this->getRender()->getLayoutPath('resource/' . $this->getRequest()->getPath() . '.smarty', null, true, false)) {
@@ -20,6 +23,13 @@ class CM_Response_Resource_Layout extends CM_Response_Resource_Abstract {
         $this->enableCache();
         $this->setHeader('Content-Type', $mimeType);
         $this->_setContent($content);
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function _getFiletypesForbidden() {
+        return ['smarty'];
     }
 
     public static function match(CM_Request_Abstract $request) {
