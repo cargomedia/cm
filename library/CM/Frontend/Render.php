@@ -237,6 +237,8 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         }
         if ($urlCdn = $this->getSite()->getUrlCdn()) {
             $url = $urlCdn . $url;
+        } else {
+            $url = $this->getSite()->getUrl() . $url;
         }
         return $url;
     }
@@ -265,6 +267,8 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         }
         if ($urlCdn = $this->getSite()->getUrlCdn()) {
             $url = $urlCdn . $url;
+        } else {
+            $url = $this->getSite()->getUrl() . $url;
         }
         return $url;
     }
