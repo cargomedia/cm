@@ -34,15 +34,15 @@ class CM_App {
         $isEmptyMysql = $this->_setupDbMysql($forceReload);
         $isEmptyMongo = $this->_setupDbMongo($forceReload);
         $app = CM_App::getInstance();
-        foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
-            $updateFiles = CM_Util::rglob('*.php', $path);
-            $version = array_reduce($updateFiles, function ($initial, $path) {
-                $filename = basename($path);
-                return max($initial, (int) $filename);
-            }, $app->getVersion());
-            $app->setVersion($version, $namespace);
-        }
         if ($isEmptyMysql && $isEmptyMongo) {
+            foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
+                $updateFiles = CM_Util::rglob('*.php', $path);
+                $version = array_reduce($updateFiles, function ($initial, $path) {
+                    $filename = basename($path);
+                    return max($initial, (int) $filename);
+                }, $app->getVersion($namespace));
+                $app->setVersion($version, $namespace);
+            }
             foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
                 require $setupScript->getPath();
             }
