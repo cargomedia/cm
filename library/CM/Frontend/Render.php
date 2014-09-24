@@ -285,10 +285,22 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
+     * @param bool|null $fallbackToDefault
      * @return CM_Model_Language|null
      */
-    public function getLanguage() {
-        return $this->getEnvironment()->getLanguage();
+    public function getLanguage($fallbackToDefault = null) {
+        $language = $this->getEnvironment()->getLanguage();
+
+        if (null === $language && $fallbackToDefault) {
+            if ($viewer = $this->getViewer()) {
+                $language = $viewer->getLanguage();
+            }
+            if (null === $language) {
+                $language = CM_Model_Language::findDefault();
+            }
+        }
+
+        return $language;
     }
 
     /**
@@ -299,8 +311,8 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     public function getTranslation($key, array $params = null) {
         $params = (array) $params;
         $translation = $key;
-        if ($this->getLanguage()) {
-            $translation = $this->getLanguage()->getTranslation($key, array_keys($params));
+        if ($language = $this->getLanguage(true)) {
+            $translation = $language->getTranslation($key, array_keys($params));
         }
         $translation = $this->_parseVariables($translation, $params);
         return $translation;

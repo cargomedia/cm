@@ -14,6 +14,11 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         $this->setupElasticsearch($reload);
         $this->_getStreamOutput()->writeln('Setting up translations…');
         $this->setupTranslations();
+
+        if ($reload) {
+            $cacheCli = new CM_Cache_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
+            $cacheCli->clear();
+        }
     }
 
     public function setupFilesystem() {

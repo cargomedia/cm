@@ -19,9 +19,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @return string[]
      */
     public function listCollectionNames() {
-        return array_map(function (MongoCollection $collection) {
-            return $collection->getName();
-        }, $this->_getDatabase()->listCollections());
+        return $this->_getDatabase()->getCollectionNames();
     }
 
     /**
@@ -56,9 +54,9 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     }
 
     /**
-     * @param       $collection
-     * @param array $keys
-     * @param array $options
+     * @param string $collection
+     * @param array  $keys
+     * @param array  $options
      * @return array
      */
     public function createIndex($collection, array $keys, array $options = null) {
@@ -71,8 +69,20 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     /**
      * @param string     $collection
      * @param array|null $criteria
+     * @param array|null $update
      * @param array|null $projection
-     * @return array
+     * @param array|null $options
+     * @return array|null
+     */
+    public function findAndModify($collection, $criteria = null, $update = null, $projection = null, $options = null) {
+        return $this->_getCollection($collection)->findAndModify($criteria, $update, $projection, $options);
+    }
+
+    /**
+     * @param string     $collection
+     * @param array|null $criteria
+     * @param array|null $projection
+     * @return array|null
      */
     public function findOne($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
         $criteria = (array) $criteria;

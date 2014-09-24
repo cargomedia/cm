@@ -200,15 +200,6 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * Enables caching by removing no-cache headers
-     */
-    public function enableCache() {
-        header_remove('Cache-Control');
-        header_remove('Pragma');
-        header_remove('Expires');
-    }
-
-    /**
      * @param string $content
      */
     protected function _setContent($content) {
