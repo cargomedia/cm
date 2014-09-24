@@ -11,9 +11,19 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
         $collectionName = 'insert';
         $name = 'Bob';
         $userId = 123;
-        $mongoDb->insert($collectionName, array('userId' => $userId, 'name' => $name));
-        $res = $mongoDb->findOne($collectionName, array('userId' => $userId));
-        $this->assertSame($res['name'], $name);
+
+        $data = ['userId' => $userId, 'name' => $name];
+        $result = $mongoDb->insert($collectionName, $data);
+        $id = $result['insertId'];
+        $this->assertEquals(['userId' => $userId, 'name' => $name], $data);
+        $doc = $mongoDb->findOne($collectionName, array('userId' => $userId));
+        $this->assertEquals(['_id' => $id] + $data, $doc);
+
+        $data = ['_id' => 1, 'userId' => $userId, 'name' => $name];
+        $result = $mongoDb->insert($collectionName, $data);
+        $this->assertArrayNotHasKey('insertId', $result);
+        $doc = $mongoDb->findOne($collectionName, ['_id' => 1]);
+        $this->assertSame($data, $doc);
     }
 
     public function testBatchInsert() {
@@ -122,7 +132,8 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
         $collectionName = 'findAndModify';
 
         $this->assertNull($mongoDb->findOne($collectionName, ['userId' => 1]));
-        $result = $mongoDb->findAndModify($collectionName, ['userId' => 1], ['$inc' => ['score' => 1]], ['_id' => 0], ['upsert' => true, 'new' => true]);
+        $result = $mongoDb->findAndModify($collectionName, ['userId' => 1], ['$inc' => ['score' => 1]], ['_id' => 0], ['upsert' => true,
+                                                                                                                       'new'    => true]);
         $this->assertSame(['userId' => 1, 'score' => 1], $result);
         $this->assertSame($result, $mongoDb->findOne($collectionName, ['userId' => 1], ['_id' => 0]));
         $this->assertNull($mongoDb->findAndModify($collectionName, ['userId' => 2], ['$inc' => ['score' => 1]], ['_id' => 0], ['new' => true]));

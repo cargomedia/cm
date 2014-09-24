@@ -28,11 +28,15 @@ class CM_MongoDb_Client {
      * @return array|bool
      * @throws CM_MongoDb_Exception
      */
-    public function insert($collection, array $object) {
+    public function insert($collection, array &$object) {
         CM_Debug::getInstance()->incStats('mongo', "Insert `{$collection}`: " . CM_Params::jsonEncode($object));
-        $ref = &$object;
-        $result = $this->_getCollection($collection)->insert($ref);
+        $data = $object;
+        $result = $this->_getCollection($collection)->insert($data);
         $this->_checkResultForErrors($result);
+        $id = $data['_id'];
+        if (!array_key_exists('_id', $object)) {
+            $result['insertId'] = $id;
+        }
         return $result;
     }
 
