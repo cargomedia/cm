@@ -204,7 +204,7 @@ class CM_App {
             $version = array_reduce($updateFiles, function ($initial, $path) {
                 $filename = basename($path);
                 return max($initial, (int) $filename);
-            }, $app->getVersion($namespace));
+            }, 0);
             $app->setVersion($version, $namespace);
         }
     }
