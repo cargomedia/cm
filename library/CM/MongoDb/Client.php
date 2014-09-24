@@ -1,8 +1,8 @@
 <?php
 
-class CM_Service_MongoDb extends CM_Service_ManagerAware {
+class CM_MongoDb_Client {
 
-    /** @var CM_Service_MongoDB|null $_client */
+    /** @var CM_MongoDb_Client|null $_client */
     private $_client = null;
 
     /** @var array */

@@ -1,6 +1,6 @@
 <?php
 
-class CM_Service_MongoDbTest extends CMTest_TestCase {
+class CM_Mongo_ClientTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearDb();
