@@ -140,6 +140,41 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $this->assertSame('/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
     }
 
+    public function testGetLanguage() {
+        $render = new CM_Frontend_Render();
+
+        $this->assertNull($render->getLanguage());
+        $this->assertNull($render->getLanguage(true));
+    }
+
+    public function testGetLanguageFromDefaultLanguage() {
+        $language = CM_Model_Language::create('Test language', 'foo', true);
+        $render = new CM_Frontend_Render();
+
+        $this->assertNull($render->getLanguage());
+        $this->assertEquals($language, $render->getLanguage(true));
+    }
+
+    public function testGetLanguageEnvironmentHasLanguage() {
+        $language = CM_Model_Language::create('Test language', 'foo', true);
+        $environment = new CM_Frontend_Environment(null, null, $language);
+        $render = new CM_Frontend_Render($environment);
+
+        $this->assertSame($language, $render->getLanguage());
+        $this->assertSame($language, $render->getLanguage(true));
+    }
+
+    public function testGetLanguageViewerHasLanguage() {
+        $language = CM_Model_Language::create('Test language', 'foo', true);
+        $viewer = CMTest_TH::createUser();
+        $viewer->setLanguage($language);
+        $environment = new CM_Frontend_Environment(null, $viewer);
+        $render = new CM_Frontend_Render($environment);
+
+        $this->assertNull($render->getLanguage());
+        $this->assertEquals($language, $render->getLanguage(true));
+    }
+
     public function testGetTranslation() {
         $render = new CM_Frontend_Render();
         $this->assertSame('abc', $render->getTranslation('abc'));
