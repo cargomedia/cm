@@ -41,12 +41,14 @@ class CM_MongoDb_Client {
     }
 
     /**
-     * @param string  $collection
-     * @param array[] $objectList
+     * @param string     $collection
+     * @param array[]    $objectList
+     * @param array|null $options
      * @return mixed
      * @throws CM_MongoDb_Exception
      */
     public function batchInsert($collection, array $objectList, array $options = null) {
+        $options = $options ?: [];
         CM_Debug::getInstance()->incStats('mongo', "Batch Insert `{$collection}`: " . CM_Params::jsonEncode($objectList));
         $result = $this->_getCollection($collection)->batchInsert($objectList, $options);
         $this->_checkResultForErrors($result);
