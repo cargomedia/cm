@@ -18,18 +18,17 @@ class CM_Response_Resource_LayoutTest extends CMTest_TestCase {
         }
     }
 
+    /**
+     * @expectedException CM_Exception_Invalid
+     * @expectedExceptionMessage Cannot find `resource/browserconfig.xml`
+     */
     public function testRendering() {
         $filePath = 'browserconfig.xml';
         /** @var CM_Response_Resource_Layout $response */
         $response = $this->getResponseResourceLayout($filePath);
         $this->assertContains('Content-Type: application/xml', $response->getHeaders());
-        try {
-            $response->getRender()->getLayoutFile('resource/' . $filePath);
-            $this->fail('Render target file actually exists');
-        } catch (CM_Exception_Invalid $ex) {
-            $this->assertContains('Cannot find `resource/browserconfig.xml`', $ex->getMessage());
-        }
         $this->assertTrue((boolean) preg_match('!src="http://cdn\.default\.dev/layout/.+?/img/mstile-70x70\.png"!', $response->getContent()));
+        $response->getRender()->getLayoutFile('resource/' . $filePath);
     }
 
     public function testNonexistentFile() {
