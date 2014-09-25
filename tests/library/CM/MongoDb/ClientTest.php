@@ -9,21 +9,24 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
     public function testInsert() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'insert';
-        $name = 'Bob';
-        $userId = 123;
 
-        $data = ['userId' => $userId, 'name' => $name];
+        $data = ['userId' => 1, 'name' => 'Bob'];
         $result = $mongoDb->insert($collectionName, $data);
-        $id = $result['insertId'];
-        $this->assertEquals(['userId' => $userId, 'name' => $name], $data);
-        $doc = $mongoDb->findOne($collectionName, array('userId' => $userId));
-        $this->assertEquals(['_id' => $id] + $data, $doc);
+        $this->assertEquals(['userId' => 1, 'name' => 'Bob'], $data);
+        $doc = $mongoDb->findOne($collectionName, ['userId' => 1]);
+        $this->assertEquals(['_id' => $result] + $data, $doc);
 
-        $data = ['_id' => 1, 'userId' => $userId, 'name' => $name];
+        $data = ['_id' => 1, 'userId' => 2, 'name' => 'Alice'];
         $result = $mongoDb->insert($collectionName, $data);
-        $this->assertArrayNotHasKey('insertId', $result);
+        $this->assertSame(1, $result);
         $doc = $mongoDb->findOne($collectionName, ['_id' => 1]);
         $this->assertSame($data, $doc);
+
+        $data = ['userId' => 3, 'name' => 'Dexter'];
+        $result = $mongoDb->insert($collectionName, $data, ['w' => 0]);
+        $doc = $mongoDb->findOne($collectionName, ['userId' => 3]);
+        $this->assertEquals(['_id' => $result] + $data, $doc);
+
     }
 
     public function testBatchInsert() {

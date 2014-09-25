@@ -25,7 +25,7 @@ class CM_MongoDb_Client {
     /**
      * @param string $collection
      * @param array  $object
-     * @return array|bool
+     * @return mixed insertId
      * @throws CM_MongoDb_Exception
      */
     public function insert($collection, array $object) {
@@ -35,10 +35,7 @@ class CM_MongoDb_Client {
         $result = $this->_getCollection($collection)->insert($data);
         $this->_checkResultForErrors($result);
         $id = $data['_id'];
-        if (!array_key_exists('_id', $object)) {
-            $result['insertId'] = $id;
-        }
-        return $result;
+        return $id;
     }
 
     /**
