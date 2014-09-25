@@ -147,8 +147,12 @@ class CM_Response_Page extends CM_Response_Abstract {
             if (!array_key_exists(get_class($e), $this->_getConfig()->catch)) {
                 throw $e;
             }
+            $exceptionClassName = get_class($e);
+            if ($exceptionClassName == 'CM_Exception_Nonexistent') {
+                CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e, true);
+            }
             $this->getRender()->getGlobalResponse()->clear();
-            $path = $this->_getConfig()->catch[get_class($e)];
+            $path = $this->_getConfig()->catch[$exceptionClassName];
             $request->setPath($path);
             $request->setQuery(array());
         }
