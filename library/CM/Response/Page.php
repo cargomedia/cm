@@ -127,7 +127,7 @@ class CM_Response_Page extends CM_Response_Abstract {
                 $className = CM_Page_Abstract::getClassnameByPath($this->getRender(), $request->getPath());
                 $page = CM_Page_Abstract::factory($className, $pageParams);
             } catch (CM_Exception $ex) {
-                throw new CM_Exception_Nonexistent('Cannot load page `' . $request->getPath() . '`: ' . $ex->getMessage());
+                throw new CM_Exception_Nonexistent('Cannot load page: ' . $ex->getMessage());
             }
 
             $this->_setStringRepresentation(get_class($page));
@@ -149,7 +149,7 @@ class CM_Response_Page extends CM_Response_Abstract {
             }
             $exceptionClassName = get_class($e);
             if ($exceptionClassName == 'CM_Exception_Nonexistent') {
-                CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e, true);
+                CM_Bootloader::getInstance()->getExceptionHandler()->logException($e);
             }
             $this->getRender()->getGlobalResponse()->clear();
             $path = $this->_getConfig()->catch[$exceptionClassName];
