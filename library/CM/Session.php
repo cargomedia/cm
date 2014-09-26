@@ -2,7 +2,7 @@
 
 class CM_Session implements CM_Comparable {
 
-    const LIFETIME_DEFAULT = 259200;
+    const LIFETIME_DEFAULT = 259200; // 3 days
 
     /** @var string */
     private $_id;
