@@ -119,7 +119,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame('/layout/' . $site->getType() . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('layout', 'foo.jpg'));
+        $this->assertSame('http://www.default.dev/layout/' . $site->getType() . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('layout', 'foo.jpg'));
     }
 
     public function testGetUrlStatic() {
@@ -137,7 +137,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame('/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
+        $this->assertSame('http://www.default.dev/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
     }
 
     public function testGetTranslation() {
