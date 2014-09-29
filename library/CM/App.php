@@ -43,9 +43,9 @@ class CM_App {
         $isEmptyMongo = $this->_setupDbMongo($forceReload);
         if ($isEmptyMysql && $isEmptyMongo) {
             $this->_setInitialVersion();
-            foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
-                require $setupScript->getPath();
-            }
+            $setupProcessor = new CM_Setup_Loader($output);
+            $setupProcessor->setServiceManager($this->_getServiceManager());
+            $setupProcessor->load();
         }
     }
 
