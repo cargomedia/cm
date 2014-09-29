@@ -307,7 +307,7 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('.showTooltip[title]').tooltip();
       $dom.find('.toggleNext').toggleNext();
       $dom.find('.tabs').tabs();
-      $dom.find('.openx-ad').openx();
+      $dom.find('.openx-ad:visible').openx();
       $dom.find('.fancySelect').fancySelect();
     },
     /**
