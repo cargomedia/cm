@@ -10,7 +10,7 @@ class CMTest_TH {
     private static $_dbClient = null;
 
     public static function init() {
-        CM_App::getInstance()->setupDatabase(true);
+        CM_App::getInstance()->setupDatabase(null, true);
 
         self::$_configBackup = serialize(CM_Config::get());
 
