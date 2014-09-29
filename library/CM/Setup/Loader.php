@@ -22,16 +22,26 @@ class CM_Setup_Loader implements CM_Service_ManagerAwareInterface {
             return $setupScript->getNamespace();
         });
 
-        /** @var CM_Setup_Script_Abstract[] $moduleSetupScriptList */
-        foreach ($setupScriptsGrouped as $moduleSetupScriptList) {
-            $moduleSetupScriptOrder = \Functional\invoke($moduleSetupScriptList, 'getOrder');
-            array_multisort($moduleSetupScriptOrder, $moduleSetupScriptList);
-
-            foreach ($moduleSetupScriptList as $setupScript) {
+        foreach ($setupScriptsGrouped as $setupScriptList) {
+            foreach ($this->_orderSetupScriptList($setupScriptList) as $setupScript) {
                 $this->_output->writeln('Loading ' . $setupScript->getName() . '...');
                 $setupScript->load($this->getServiceManager());
             }
         }
+    }
+
+    /**
+     * @param CM_Setup_Script_Abstract[] $list
+     * @return CM_Setup_Script_Abstract[]
+     */
+    protected function _orderSetupScriptList(array $list) {
+        list($unorderedList, $orderedList) = \Functional\partition($list, function (CM_Setup_Script_Abstract $setupScript) {
+            return null === $setupScript->getOrder();
+        });
+        $orderedListOrder = \Functional\invoke($orderedList, 'getOrder');
+        array_multisort($orderedListOrder, $orderedList);
+
+        return array_merge($orderedList, $unorderedList);
     }
 
     /**
