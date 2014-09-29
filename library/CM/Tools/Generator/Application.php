@@ -14,7 +14,7 @@ class CM_Tools_Generator_Application extends CM_Class_Abstract {
      */
     public function __construct(CM_Tools_AppInstallation $appInstallation, CM_OutputStream_Interface $output) {
         $this->_installation = $appInstallation;
-        $this->_filesystemHelper = new CM_Tools_Generator_FilesystemHelper($this->_installation->getFilesystem(), $output);
+        $this->_filesystemHelper = new CM_Tools_Generator_FilesystemHelper($output);
     }
 
     /**

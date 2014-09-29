@@ -5,27 +5,24 @@ class CM_Tools_Generator_FilesystemHelper extends CM_Class_Abstract {
     /** @var CM_OutputStream_Interface */
     private $_output;
 
-    /** @var CM_File_Filesystem */
-    private $_filesystem;
-
     /**
-     * @param CM_File_Filesystem        $filesystem
      * @param CM_OutputStream_Interface $output
      */
-    public function __construct(CM_File_Filesystem $filesystem, CM_OutputStream_Interface $output) {
-        $this->_filesystem = $filesystem;
+    public function __construct(CM_OutputStream_Interface $output) {
         $this->_output = $output;
     }
 
     /**
-     * @param CM_File $file
+     * @param CM_File $directory
      */
-    public function createDirectory(CM_File $file) {
-        if ($file->isDirectory()) {
-            $this->notify('skip', $file->getPath());
+    public function createDirectory(CM_File $directory) {
+        if ($directory->isDirectory()) {
+            $this->notify('skip', $directory->getPath());
         } else {
-            $this->notify('mkdir', $file->getPath());
-            $this->_filesystem->ensureDirectory($file->getPath());
+            $gitKeepFile = $directory->joinPath('.gitkeep');
+            $this->notify('mkdir', $gitKeepFile->getParentDirectory()->getPath());
+            $gitKeepFile->ensureParentDirectory();
+            $this->createFile($gitKeepFile);
         }
     }
 
@@ -53,7 +50,7 @@ class CM_Tools_Generator_FilesystemHelper extends CM_Class_Abstract {
     }
 
     /**
-     * @param string  $action
+     * @param string $action
      * @param string $path
      */
     public function notify($action, $path) {
