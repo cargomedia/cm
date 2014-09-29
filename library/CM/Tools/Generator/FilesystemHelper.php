@@ -1,6 +1,6 @@
 <?php
 
-class CMTools_Generator_FilesystemHelper extends CM_Class_Abstract {
+class CM_Tools_Generator_FilesystemHelper extends CM_Class_Abstract {
 
     /** @var CM_OutputStream_Interface */
     private $_output;

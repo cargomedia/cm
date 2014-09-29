@@ -1,6 +1,6 @@
 <?php
 
-class CMTools_Generator_Class_Javascript extends CMTools_Generator_Class_Abstract {
+class CM_Tools_Generator_Class_Javascript extends CM_Tools_Generator_Class_Abstract {
 
     /**
      * @param string $className

@@ -1,8 +1,8 @@
 <?php
 
-class CMTools_Generator_Cli extends CM_Cli_Runnable_Abstract {
+class CM_Tools_Generator_Cli extends CM_Cli_Runnable_Abstract {
 
-    /** @var CMTools_AppInstallation */
+    /** @var CM_Tools_AppInstallation */
     protected $_appInstallation;
 
     /**
@@ -39,7 +39,7 @@ class CMTools_Generator_Cli extends CM_Cli_Runnable_Abstract {
                 throw new CM_Cli_Exception_Internal('Cannot find module path');
             }
         }
-        $generatorApp = new CMTools_Generator_Application($appInstallation, $this->_getStreamOutput());
+        $generatorApp = new CM_Tools_Generator_Application($appInstallation, $this->_getStreamOutput());
         $generatorApp->addModule($moduleName, $modulePath);
         $this->_createNamespace($moduleName, $moduleName);
     }
@@ -50,7 +50,7 @@ class CMTools_Generator_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function createView($className) {
         $appInstallation = $this->_getAppInstallation();
-        $generatorPhp = new CMTools_Generator_Class_Php($appInstallation, $this->_getStreamOutput());
+        $generatorPhp = new CM_Tools_Generator_Class_Php($appInstallation, $this->_getStreamOutput());
 
         $parentClassName = $generatorPhp->getParentClassName($className);
         if (!is_subclass_of($parentClassName, 'CM_View_Abstract')) {
@@ -58,10 +58,10 @@ class CMTools_Generator_Cli extends CM_Cli_Runnable_Abstract {
         }
         $generatorPhp->createClassFile($className);
 
-        $generatorJavascript = new CMTools_Generator_Class_Javascript($appInstallation, $this->_getStreamOutput());
+        $generatorJavascript = new CM_Tools_Generator_Class_Javascript($appInstallation, $this->_getStreamOutput());
         $generatorJavascript->createClassFile($className);
 
-        $generatorLayout = new CMTools_Generator_Class_Layout($appInstallation, $this->_getStreamOutput());
+        $generatorLayout = new CM_Tools_Generator_Class_Layout($appInstallation, $this->_getStreamOutput());
         $generatorLayout->createTemplateFile($className);
         $generatorLayout->createStylesheetFile($className);
     }
@@ -74,7 +74,7 @@ class CMTools_Generator_Cli extends CM_Cli_Runnable_Abstract {
         if (class_exists($className) && !$this->_getStreamInput()->confirm('Class `' . $className . '` already exists. Replace?')) {
             return;
         }
-        $generatorPhp = new CMTools_Generator_Class_Php($this->_getAppInstallation(), $this->_getStreamOutput());
+        $generatorPhp = new CM_Tools_Generator_Class_Php($this->_getAppInstallation(), $this->_getStreamOutput());
         $generatorPhp->createClassFile($className);
 
         (new CM_App_Cli())->generateConfigInternal();
@@ -88,8 +88,8 @@ class CMTools_Generator_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function createSite($className, $name, $domain) {
         $appInstallation = $this->_getAppInstallation();
-        $generatorPhp = new CMTools_Generator_Class_Php($appInstallation, $this->_getStreamOutput());
-        $generatorConfig = new CMTools_Generator_Config($appInstallation, $this->_getStreamOutput());
+        $generatorPhp = new CM_Tools_Generator_Class_Php($appInstallation, $this->_getStreamOutput());
+        $generatorConfig = new CM_Tools_Generator_Config($appInstallation, $this->_getStreamOutput());
 
         $moduleName = CM_Util::getNamespace($className);
         $parentClassName = $generatorPhp->getParentClassName($className);
@@ -123,7 +123,7 @@ class CMTools_Generator_Cli extends CM_Cli_Runnable_Abstract {
      * @throws CM_Cli_Exception_Internal
      */
     public function bootstrapProject($projectName = null, $domain = null, $moduleName = null) {
-        $generatorApp = new CMTools_Generator_Application($this->_getAppInstallation(), $this->_getStreamOutput());
+        $generatorApp = new CM_Tools_Generator_Application($this->_getAppInstallation(), $this->_getStreamOutput());
 
         $projectName = $this->_read('Please provide project name (vendor/project):', $projectName, null, function ($value) use ($generatorApp) {
             if (!$generatorApp->isValidProjectName($value)) {
@@ -175,17 +175,17 @@ class CMTools_Generator_Cli extends CM_Cli_Runnable_Abstract {
             throw new CM_Cli_Exception_Internal('Namespace `' . $namespace . '` already exists');
         }
         $namespacePath = $appInstallation->getModulePath($moduleName) . 'library/' . $namespace;
-        $generatorApp = new CMTools_Generator_Application($appInstallation, $this->_getStreamOutput());
+        $generatorApp = new CM_Tools_Generator_Application($appInstallation, $this->_getStreamOutput());
         $generatorApp->addNamespace($namespace, $namespacePath);
         $generatorApp->dumpAutoload();
     }
 
     /**
-     * @return CMTools_AppInstallation
+     * @return CM_Tools_AppInstallation
      */
     protected function _getAppInstallation() {
         if (null === $this->_appInstallation) {
-            $this->_appInstallation = new CMTools_AppInstallation(DIR_ROOT);
+            $this->_appInstallation = new CM_Tools_AppInstallation(DIR_ROOT);
         }
         return $this->_appInstallation;
     }

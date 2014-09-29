@@ -1,6 +1,6 @@
 <?php
 
-class CMTools_AppInstallation {
+class CM_Tools_AppInstallation {
 
     /** @var string */
     protected $_dirRoot;

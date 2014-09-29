@@ -1,8 +1,8 @@
 <?php
 
-class CMTools_Generator_CliTest extends PHPUnit_Framework_TestCase {
+class CM_Tools_Generator_CliTest extends PHPUnit_Framework_TestCase {
 
-    /** @var CMTools_Generator_Cli */
+    /** @var CM_Tools_Generator_Cli */
     private $_generatorCli;
 
     /** @var string */
@@ -46,8 +46,8 @@ class CMTools_Generator_CliTest extends PHPUnit_Framework_TestCase {
         $filesystemTmp->ensureDirectory('foo-app/vendor/cargomedia');
         symlink($frameworkLocal, $frameworkTest);
 
-        $installation = new CMTools_AppInstallation($this->_dirRoot);
-        $this->_generatorCli = $this->getMockBuilder('CMTools_Generator_Cli')->setMethods(array('_getAppInstallation'))->getMock();
+        $installation = new CM_Tools_AppInstallation($this->_dirRoot);
+        $this->_generatorCli = $this->getMockBuilder('CM_Tools_Generator_Cli')->setMethods(array('_getAppInstallation'))->getMock();
         $this->_generatorCli->expects($this->any())->method('_getAppInstallation')->will($this->returnValue($installation));
     }
 
@@ -56,14 +56,14 @@ class CMTools_Generator_CliTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testCreateModule() {
-        $app = new CMTools_AppInstallation($this->_dirRoot);
+        $app = new CM_Tools_AppInstallation($this->_dirRoot);
         $this->assertFalse($app->moduleExists('Foo'));
         $this->assertFalse($app->moduleExists('Bar'));
 
         $this->_generatorCli->createModule('Foo');
         $this->_generatorCli->createModule('Bar', false, 'custom/');
 
-        $app = new CMTools_AppInstallation($this->_dirRoot);
+        $app = new CM_Tools_AppInstallation($this->_dirRoot);
         $this->assertTrue($app->moduleExists('Foo'));
         $this->assertSame('modules/Foo/', $app->getModulePath('Foo'));
         $this->assertFileExists($this->_dirRoot . $app->getModulePath('Foo'));
@@ -76,7 +76,7 @@ class CMTools_Generator_CliTest extends PHPUnit_Framework_TestCase {
     public function testCreateModuleSingle() {
         $this->_generatorCli->createModule('Bar', true);
 
-        $app = new CMTools_AppInstallation($this->_dirRoot);
+        $app = new CM_Tools_AppInstallation($this->_dirRoot);
         $this->assertTrue($app->moduleExists('Bar'));
         $this->assertSame('', $app->getModulePath('Bar'));
         $this->assertFileExists($this->_dirRoot . $app->getModulePath('Bar'));

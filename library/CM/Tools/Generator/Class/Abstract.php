@@ -1,20 +1,20 @@
 <?php
 
-abstract class CMTools_Generator_Class_Abstract {
+abstract class CM_Tools_Generator_Class_Abstract {
 
-    /** @var CMTools_AppInstallation */
+    /** @var CM_Tools_AppInstallation */
     protected $_appInstallation;
 
-    /** @var CMTools_Generator_FilesystemHelper */
+    /** @var CM_Tools_Generator_FilesystemHelper */
     protected $_filesystemHelper;
 
     /**
-     * @param CMTools_AppInstallation   $appInstallation
+     * @param CM_Tools_AppInstallation $appInstallation
      * @param CM_OutputStream_Interface $output
      */
-    public function __construct(CMTools_AppInstallation $appInstallation, CM_OutputStream_Interface $output) {
+    public function __construct(CM_Tools_AppInstallation $appInstallation, CM_OutputStream_Interface $output) {
         $this->_appInstallation = $appInstallation;
-        $this->_filesystemHelper = new CMTools_Generator_FilesystemHelper($this->_appInstallation->getFilesystem(), $output);
+        $this->_filesystemHelper = new CM_Tools_Generator_FilesystemHelper($this->_appInstallation->getFilesystem(), $output);
     }
 
     /**
