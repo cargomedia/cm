@@ -32,7 +32,7 @@ abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract impleme
         foreach ($stringList as $string) {
             $data[] = ['type' => $this->_type, 'string' => (string) $string];
         }
-        CM_Db_Db::replace('cm_string', $data);
+        CM_Db_Db::replace('cm_string', ['type', 'string'], $data);
         $this->_change();
     }
 
