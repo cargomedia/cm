@@ -21,7 +21,18 @@ abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract impleme
      * @param string $string
      */
     public function add($string) {
-        CM_Db_Db::replace('cm_string', array('type' => $this->_type, 'string' => $string));
+        $this->addMultiple([$string]);
+    }
+
+    /**
+     * @param string[] $stringList
+     */
+    public function addMultiple(array $stringList) {
+        $data = [];
+        foreach ($stringList as $string) {
+            $data[] = ['type' => $this->_type, 'string' => (string) $string];
+        }
+        CM_Db_Db::replace('cm_string', $data);
         $this->_change();
     }
 
