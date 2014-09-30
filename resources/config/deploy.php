@@ -1,4 +1,4 @@
 <?php
 return function (CM_Config_Node $config) {
-    $config->deployVersion = 1;
+    $config->deployVersion = 1412037469;
 };

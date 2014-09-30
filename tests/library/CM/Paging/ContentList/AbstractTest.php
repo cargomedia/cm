@@ -31,6 +31,16 @@ class CM_Paging_ContentList_AbstractTest extends CMTest_TestCase {
         $this->assertSame(0, $paging->getCount());
     }
 
+    public function testContains() {
+        $paging = $this->_getPaging();
+        $paging->addMultiple(['foo']);
+        $this->assertTrue($paging->contains('foo'));
+        $this->assertTrue($paging->contains('FoO'));
+        $this->assertFalse($paging->contains('foo-suffixed'));
+
+        $this->assertTrue($paging->contains('foo-suffixed', '/^\Q$item\E/'));
+    }
+
     /**
      * @return \Mocka\AbstractClassTrait|CM_Paging_ContentList_Abstract
      */
