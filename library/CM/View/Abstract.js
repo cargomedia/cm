@@ -299,15 +299,37 @@ var CM_View_Abstract = Backbone.View.extend({
     options = _.defaults(options || {}, {
       'success': function() {
         this.popOut();
-      },
+      }
+    });
+    var success = options.success;
+    options.success = function(response) {
+      this._injectView(response, success);
+    };
+    return this.preloadComponent(className, params, options);
+  },
+
+  /**
+   * @param {String} className
+   * @param {Object|Null} [params]
+   * @param {Object|Null} [options]
+   * @return jqXHR
+   */
+  preloadComponent: function(className, params, options) {
+    options = _.defaults(options || {}, {
       'modal': true,
       'method': 'loadComponent'
     });
+
     params = params || {};
     params.className = className;
     var success = options.success;
     options.success = function(response) {
-      this._injectView(response, success);
+      if (options.responseReference) {
+        options.responseReference.response = response;
+      }
+      if (success) {
+        success.call(this, response);
+      }
     };
     return this.ajax(options.method, params, options);
   },
