@@ -24,23 +24,25 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
 
         $data = ['userId' => 3, 'name' => 'Dexter'];
         $id = $mongoDb->insert($collectionName, $data, ['w' => 0]);
-        $doc3 = $mongoDb->findOne($collectionName, ['userId' => 3]);
-        $this->assertEquals(['_id' => $id] + $data, $doc3);
+        $this->assertInstanceOf('MongoId', $id);
 
     }
 
     public function testBatchInsert() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'batchInsert';
-        $mongoDb->batchInsert($collectionName, array(
-                array('userId' => 1, 'name' => 'Bob'),
-                array('userId' => 2, 'name' => 'Alice'),
+        $data1 = ['userId' => 1, 'name' => 'Bob'];
+        list($id1, $id2) = $mongoDb->batchInsert($collectionName, array(
+                $data1,
+                ['_id' => 1, 'userId' => 2, 'name' => 'Alice'],
             )
         );
-        $res = $mongoDb->findOne($collectionName, array('userId' => 1));
-        $this->assertSame($res['name'], 'Bob');
-        $res = $mongoDb->findOne($collectionName, array('userId' => 2));
-        $this->assertSame($res['name'], 'Alice');
+        $this->assertSame(1, $id2);
+        $this->assertEquals(['userId' => 1, 'name' => 'Bob'], $data1);
+        $doc1 = $mongoDb->findOne($collectionName, ['userId' => 1]);
+        $this->assertEquals(['_id' => $id1] + $data1, $doc1);
+        $doc2 = $mongoDb->findOne($collectionName, ['userId' => 2]);
+        $this->assertEquals(['_id' => $id2, 'userId' => 2, 'name' => 'Alice'], $doc2);
     }
 
     public function testCreateCollection() {

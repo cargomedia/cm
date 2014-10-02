@@ -24,15 +24,17 @@ class CM_MongoDb_Client {
 
     /**
      * @param string $collection
-     * @param array  $object
+     * @param array $object
+     * @param array|null $options
      * @return mixed insertId
      * @throws CM_MongoDb_Exception
      */
-    public function insert($collection, array $object) {
+    public function insert($collection, array $object, array $options = null) {
+        $options = $options ?: [];
         CM_Debug::getInstance()->incStats('mongo', "Insert `{$collection}`: " . CM_Params::jsonEncode($object));
         $intermediary = &$object;
         $data = $intermediary;
-        $result = $this->_getCollection($collection)->insert($data);
+        $result = $this->_getCollection($collection)->insert($data, $options);
         $this->_checkResultForErrors($result);
         $id = $data['_id'];
         return $id;
@@ -42,15 +44,20 @@ class CM_MongoDb_Client {
      * @param string     $collection
      * @param array[]    $objectList
      * @param array|null $options
-     * @return mixed
+     * @return mixed[] insertIds
      * @throws CM_MongoDb_Exception
      */
     public function batchInsert($collection, array $objectList, array $options = null) {
         $options = $options ?: [];
         CM_Debug::getInstance()->incStats('mongo', "Batch Insert `{$collection}`: " . CM_Params::jsonEncode($objectList));
-        $result = $this->_getCollection($collection)->batchInsert($objectList, $options);
+        $dataList = \Functional\map($objectList, function(array $object) {
+            return $object;
+        });
+        $result = $this->_getCollection($collection)->batchInsert($dataList, $options);
         $this->_checkResultForErrors($result);
-        return $result;
+        return \Functional\map($dataList, function (array $data) {
+            return $data['_id'];
+        });
     }
 
     /**
@@ -95,6 +102,7 @@ class CM_MongoDb_Client {
      * @param string     $collection
      * @param array|null $criteria
      * @param array|null $projection
+     * @param array|null $aggregation
      * @return array|null
      */
     public function findOne($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
