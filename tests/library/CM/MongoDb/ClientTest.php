@@ -223,4 +223,16 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
         $mongoDb->createCollection($collectionName);
         $this->assertTrue($mongoDb->existsCollection($collectionName));
     }
+
+    public function getNewId() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+
+        $this->assertInstanceOf('MongoId', $mongoDb->getNewId());
+
+        $idString = '4cb4ab6d7addf98506010001';
+        $mongoId = $mongoDb->getNewId($idString);
+
+        $this->assertSame($idString, $mongoId->id);
+        $this->assertEquals($mongoId, $mongoDb->getNewId($mongoId));
+    }
 }
