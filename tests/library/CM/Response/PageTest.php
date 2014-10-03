@@ -98,6 +98,18 @@ class CM_Response_PageTest extends CMTest_TestCase {
         $this->assertContains("_kmq.push(['alias', 'Guest {$clientId}', '1']);", $html);
     }
 
+    public function test404ErrorLogging() {
+        $log = new CM_Paging_Log_404();
+        $this->assertCount(0, $log);
+
+        $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
+        $response = CMTest_TH::createResponsePage('/NotExists');
+        $response->process();
+
+        $log = new CM_Paging_Log_404();
+        $this->assertCount(1, $log);
+    }
+
     /**
      * @param string $codeGoogleAnalytics
      * @param string $codeKissMetrics
