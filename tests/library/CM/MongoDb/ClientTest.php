@@ -25,7 +25,6 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
         $data = ['userId' => 3, 'name' => 'Dexter'];
         $id = $mongoDb->insert($collectionName, $data, ['w' => 0]);
         $this->assertInstanceOf('MongoId', $id);
-
     }
 
     public function testBatchInsert() {
@@ -183,6 +182,15 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
         $this->assertSame(1, $mongoDb->count($collectionName, null, null, 3, 2));
     }
 
+    public function testDrop() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = 'drop';
+        $mongoDb->createCollection($collectionName);
+        $this->assertTrue($mongoDb->existsCollection($collectionName));
+        $mongoDb->drop($collectionName);
+        $this->assertFalse($mongoDb->existsCollection($collectionName));
+    }
+
     public function testRemove() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'remove';
@@ -205,5 +213,14 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
         $this->assertSame(0, $mongoDb->count($collectionName));
 
         $this->assertTrue($mongoDb->remove($collectionName, null, ['w' => 0]));
+    }
+
+    public function testExistsCollection() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = 'existsCollection';
+
+        $this->assertFalse($mongoDb->existsCollection($collectionName));
+        $mongoDb->createCollection($collectionName);
+        $this->assertTrue($mongoDb->existsCollection($collectionName));
     }
 }
