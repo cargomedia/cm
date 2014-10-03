@@ -283,7 +283,7 @@ class CM_MongoDb_Client {
      * @param string|null $id
      * @return MongoId
      */
-    public function getNewId($id = null) {
+    public function getObjectId($id = null) {
         return new MongoId($id);
     }
 

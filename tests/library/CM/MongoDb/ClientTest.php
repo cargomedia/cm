@@ -110,8 +110,8 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
 
     public function testGetNewId() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $id1 = $mongoDb->getNewId();
-        $id2 = $mongoDb->getNewId();
+        $id1 = $mongoDb->getObjectId();
+        $id2 = $mongoDb->getObjectId();
         $this->assertNotSame((string) $id1, (string) $id2);
     }
 
@@ -227,13 +227,13 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
     public function getNewId() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
 
-        $this->assertInstanceOf('MongoId', $mongoDb->getNewId());
+        $this->assertInstanceOf('MongoId', $mongoDb->getObjectId());
 
         $idString = '4cb4ab6d7addf98506010001';
-        $mongoId = $mongoDb->getNewId($idString);
+        $mongoId = $mongoDb->getObjectId($idString);
 
         $this->assertSame($idString, $mongoId->id);
-        $this->assertEquals($mongoId, $mongoDb->getNewId($mongoId));
+        $this->assertEquals($mongoId, $mongoDb->getObjectId($mongoId));
     }
 
     public function test_checkResultForErrors() {
