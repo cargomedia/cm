@@ -280,10 +280,11 @@ class CM_MongoDb_Client {
     }
 
     /**
+     * @param string|null $id
      * @return MongoId
      */
-    public function getNewId() {
-        return new MongoId();
+    public function getNewId($id = null) {
+        return new MongoId($id);
     }
 
     /**
