@@ -186,17 +186,24 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
     public function testRemove() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'remove';
-        $mongoDb->insert($collectionName, array('userId' => 1, 'name' => 'alice'));
-        $mongoDb->insert($collectionName, array('userId' => 2, 'name' => 'steve'));
-        $mongoDb->insert($collectionName, array('userId' => 3, 'name' => 'bob'));
+        $mongoDb->insert($collectionName, array('userId' => 1, 'name' => 'alice', 'groupId' => 1));
+        $mongoDb->insert($collectionName, array('userId' => 2, 'name' => 'steve', 'groupId' => 1));
+        $mongoDb->insert($collectionName, array('userId' => 3, 'name' => 'bob', 'groupId' => 1));
+        $mongoDb->insert($collectionName, array('userId' => 4, 'name' => 'dexter', 'groupId' => 2));
+        $this->assertSame(4, $mongoDb->count($collectionName));
+
+        $this->assertSame(1, $mongoDb->remove($collectionName, array('userId' => 2)));
+
         $this->assertSame(3, $mongoDb->count($collectionName));
-
-        $mongoDb->remove($collectionName, array('userId' => 2));
-
-        $this->assertSame(2, $mongoDb->count($collectionName));
         $this->assertSame(0, $mongoDb->find($collectionName, array('userId' => 2))->count());
 
-        $mongoDb->remove($collectionName);
+        $this->assertSame(2, $mongoDb->remove($collectionName, ['groupId' => 1]));
+        $this->assertSame(1, $mongoDb->count($collectionName));
+
+        $this->assertSame(1, $mongoDb->remove($collectionName));
+
         $this->assertSame(0, $mongoDb->count($collectionName));
+
+        $this->assertTrue($mongoDb->remove($collectionName, null, ['w' => 0]));
     }
 }

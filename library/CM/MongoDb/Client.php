@@ -276,7 +276,7 @@ class CM_MongoDb_Client {
         CM_Debug::getInstance()->incStats('mongo', "Remove `{$collection}`: " . CM_Params::jsonEncode($criteria));
         $result = $this->_getCollection($collection)->remove($criteria, $options);
         $this->_checkResultForErrors($result);
-        return $result;
+        return is_array($result) ? $result['n'] : $result;
     }
 
     /**
