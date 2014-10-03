@@ -235,4 +235,23 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
         $this->assertSame($idString, $mongoId->id);
         $this->assertEquals($mongoId, $mongoDb->getNewId($mongoId));
     }
+
+    public function test_checkResultForErrors() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+
+        CMTest_TH::callProtectedMethod($mongoDb, '_checkResultForErrors', [true]);
+        CMTest_TH::callProtectedMethod($mongoDb, '_checkResultForErrors', [['ok' => 1]]);
+
+        try {
+            CMTest_TH::callProtectedMethod($mongoDb, '_checkResultForErrors', [false]);
+        } catch (CM_MongoDb_Exception $ex) {
+            $this->assertSame(['result' => false], $ex->getMetaInfo(true));
+        }
+
+        try {
+            CMTest_TH::callProtectedMethod($mongoDb, '_checkResultForErrors', [['ok' => 0, 'errmsg' => 'foo']]);
+        } catch (CM_MongoDb_Exception $ex) {
+            $this->assertSame(['result' => ['ok' => 0, 'errmsg' => 'foo']], $ex->getMetaInfo(true));
+        }
+    }
 }
