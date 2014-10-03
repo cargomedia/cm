@@ -73,15 +73,21 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
     public function testUpdate() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'update';
-        $name = 'Bob';
-        $userId = 123;
-        $mongoDb->insert($collectionName, array('userId' => $userId, 'name' => $name));
-        $res = $mongoDb->findOne($collectionName, array('userId' => $userId));
-        $this->assertSame($res['name'], $name);
+        $doc1 = array('_id' => 1, 'name' => 'Bob', 'groupId' => 1);
+        $doc2 = array('_id' => 2, 'name' => 'Alice', 'groupId' => 1);
+        $doc3 = array('_id' => 3, 'name' => 'Dexter', 'groupId' => 2);
+        $mongoDb->insert($collectionName, $doc1);
+        $mongoDb->insert($collectionName, $doc2);
+        $mongoDb->insert($collectionName, $doc3);
+        $this->assertSame($doc1, $mongoDb->findOne($collectionName, array('_id' => 1)));
 
-        $mongoDb->update($collectionName, array('userId' => $userId), array('$set' => array('name' => 'Alice')));
-        $res = $mongoDb->findOne($collectionName, array('userId' => $userId));
-        $this->assertSame($res['name'], 'Alice');
+        $res = $mongoDb->update($collectionName, array('_id' => 1), array('$set' => array('name' => 'Klaus')));
+        $this->assertSame(1, $res);
+        $this->assertSame(['_id' => 1, 'name' => 'Klaus', 'groupId' => 1], $mongoDb->findOne($collectionName, array('_id' => 1)));
+        $res = $mongoDb->update($collectionName, ['groupId' => 1], ['$set' => ['groupId' => 3]], ['multiple' => true]);
+        $this->assertSame(2, $res);
+
+        $this->assertTrue($mongoDb->update($collectionName, ['_id' => 4], ['name' => 'Martin'], ['w' => 0]));
 
         $collectionName = 'update2';
         $mongoDb->insert($collectionName, array('messageId'  => 1,

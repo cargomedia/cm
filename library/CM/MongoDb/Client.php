@@ -260,7 +260,7 @@ class CM_MongoDb_Client {
                                                                                                        'newObject' => $newObject]));
         $result = $this->_getCollection($collection)->update($criteria, $newObject, $options);
         $this->_checkResultForErrors($result);
-        return $result;
+        return is_array($result) ? $result['n'] : $result;
     }
 
     /**
