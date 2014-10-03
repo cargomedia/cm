@@ -39,6 +39,7 @@ return function (CM_Config_Node $config) {
     $config->CM_Paging_Log_Abstract->types[22] = 'CM_Paging_Log_JsError';
     $config->CM_Paging_Log_Abstract->types[23] = 'CM_Paging_Log_Mail';
     $config->CM_Paging_Log_Abstract->types[24] = 'CM_Paging_Log_Warn';
+    $config->CM_Paging_Log_Abstract->types[32] = 'CM_Paging_Log_404';
     
     $config->CM_Site_Abstract->types = array();
     
@@ -77,8 +78,9 @@ return function (CM_Config_Node $config) {
     $config->CM_Model_Location_State->type = 29;
     $config->CM_Model_Location_Zip->type = 30;
     $config->CM_Model_LanguageKey->type = 31;
+    $config->CM_Paging_Log_404->type = 32;
     
-    $config->CM_Class_Abstract->typesMaxValue = 31;
+    $config->CM_Class_Abstract->typesMaxValue = 32;
     
     $config->CM_Action_Abstract->verbs = array();
     $config->CM_Action_Abstract->verbs[CM_Action_Abstract::CREATE] = 1;
