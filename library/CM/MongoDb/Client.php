@@ -292,7 +292,7 @@ class CM_MongoDb_Client {
      */
     protected function _checkResultForErrors($result) {
         if (true !== $result && empty($result['ok'])) {
-            throw new CM_MongoDb_Exception('Cannot perform mongodb operation', [$result]);
+            throw new CM_MongoDb_Exception('Cannot perform mongodb operation', ['result' => $result]);
         }
     }
 
