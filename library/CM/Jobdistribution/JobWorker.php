@@ -14,7 +14,13 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
         //use non-blocking IO mode to enable signal processing in worker processes as soon as libgearman/pecl gearman is fixed
         //see https://bugs.php.net/bug.php?id=60764
         //$this->_gearmanWorker->addOptions(GEARMAN_WORKER_NON_BLOCKING);
-        $this->_registerJobs();
+    }
+
+    /**
+     * @param CM_Jobdistribution_Job_Abstract $job
+     */
+    public function registerJob(CM_Jobdistribution_Job_Abstract $job) {
+        $this->_gearmanWorker->addFunction(get_class($job), array($job, '__executeGearman'));
     }
 
     public function run() {
@@ -50,12 +56,5 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
             $this->_gearmanWorker = new GearmanWorker();
         }
         return $this->_gearmanWorker;
-    }
-
-    /**
-     * @param CM_Jobdistribution_Job_Abstract $job
-     */
-    public function registerJob(CM_Jobdistribution_Job_Abstract $job) {
-        $this->_gearmanWorker->addFunction(get_class($job), array($job, '__executeGearman'));
     }
 }
