@@ -52,10 +52,17 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
         return $this->_gearmanWorker;
     }
 
-    private function _registerJobs() {
+    protected function _registerJobs() {
         foreach (CM_Jobdistribution_Job_Abstract::getClassChildren() as $jobClassName) {
             $job = new $jobClassName();
-            $this->_gearmanWorker->addFunction($jobClassName, array($job, '__executeGearman'));
+            $this->_registerJob($job);
         }
+    }
+
+    /**
+     * @param CM_Jobdistribution_Job_Abstract $job
+     */
+    protected function _registerJob(CM_Jobdistribution_Job_Abstract $job) {
+        $this->_gearmanWorker->addFunction(get_class($job), array($job, '__executeGearman'));
     }
 }
