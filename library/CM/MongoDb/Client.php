@@ -1,8 +1,8 @@
 <?php
 
-class CM_Service_MongoDb extends CM_Service_ManagerAware {
+class CM_MongoDb_Client {
 
-    /** @var CM_Service_MongoDB|null $_client */
+    /** @var CM_MongoDb_Client|null $_client */
     private $_client = null;
 
     /** @var array */
@@ -24,23 +24,40 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
 
     /**
      * @param string $collection
-     * @param array  $object
-     * @return array|bool
+     * @param array $object
+     * @param array|null $options
+     * @return mixed insertId
+     * @throws CM_MongoDb_Exception
      */
-    public function insert($collection, array $object) {
+    public function insert($collection, array $object, array $options = null) {
+        $options = $options ?: [];
         CM_Debug::getInstance()->incStats('mongo', "Insert `{$collection}`: " . CM_Params::jsonEncode($object));
-        $ref = &$object;
-        return $this->_getCollection($collection)->insert($ref);
+        $intermediary = &$object;
+        $data = $intermediary;
+        $result = $this->_getCollection($collection)->insert($data, $options);
+        $this->_checkResultForErrors($result);
+        $id = $data['_id'];
+        return $id;
     }
 
     /**
-     * @param string  $collection
-     * @param array[] $objectList
-     * @return mixed
+     * @param string     $collection
+     * @param array[]    $objectList
+     * @param array|null $options
+     * @return mixed[] insertIds
+     * @throws CM_MongoDb_Exception
      */
-    public function batchInsert($collection, array $objectList) {
+    public function batchInsert($collection, array $objectList, array $options = null) {
+        $options = $options ?: [];
         CM_Debug::getInstance()->incStats('mongo', "Batch Insert `{$collection}`: " . CM_Params::jsonEncode($objectList));
-        return $this->_getCollection($collection)->batchInsert($objectList);
+        $dataList = \Functional\map($objectList, function(array $object) {
+            return $object;
+        });
+        $result = $this->_getCollection($collection)->batchInsert($dataList, $options);
+        $this->_checkResultForErrors($result);
+        return \Functional\map($dataList, function (array $data) {
+            return $data['_id'];
+        });
     }
 
     /**
@@ -58,12 +75,15 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param array  $keys
      * @param array  $options
      * @return array
+     * @throws CM_MongoDb_Exception
      */
     public function createIndex($collection, array $keys, array $options = null) {
         $options = $options ?: [];
         CM_Debug::getInstance()->incStats('mongo', "create index on {$collection}: " . CM_Params::jsonEncode($keys) . ' ' .
             CM_Params::jsonEncode($options));
-        return $this->_getCollection($collection)->createIndex($keys, $options);
+        $result = $this->_getCollection($collection)->createIndex($keys, $options);
+        $this->_checkResultForErrors($result);
+        return $result;
     }
 
     /**
@@ -82,6 +102,7 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param string     $collection
      * @param array|null $criteria
      * @param array|null $projection
+     * @param array|null $aggregation
      * @return array|null
      */
     public function findOne($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
@@ -199,10 +220,13 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
     /**
      * @param string $collection
      * @return array
+     * @throws CM_MongoDb_Exception
      */
     public function drop($collection) {
         CM_Debug::getInstance()->incStats('mongo', "drop `{$collection}`");
-        return $this->_getCollection($collection)->drop();
+        $result = $this->_getCollection($collection)->drop();
+        $this->_checkResultForErrors($result);
+        return $result;
     }
 
     /**
@@ -228,12 +252,15 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param array      $newObject
      * @param array|null $options
      * @return MongoCursor
+     * @throws CM_MongoDb_Exception
      */
     public function update($collection, array $criteria, array $newObject, array $options = null) {
         $options = (array) $options;
         CM_Debug::getInstance()->incStats('mongo', "Update `{$collection}`: " . CM_Params::jsonEncode(['criteria'  => $criteria,
                                                                                                        'newObject' => $newObject]));
-        return $this->_getCollection($collection)->update($criteria, $newObject, $options);
+        $result = $this->_getCollection($collection)->update($criteria, $newObject, $options);
+        $this->_checkResultForErrors($result);
+        return is_array($result) ? $result['n'] : $result;
     }
 
     /**
@@ -241,19 +268,33 @@ class CM_Service_MongoDb extends CM_Service_ManagerAware {
      * @param array|null $criteria
      * @param array|null $options
      * @return mixed
+     * @throws CM_MongoDb_Exception
      */
     public function remove($collection, array $criteria = null, array $options = null) {
         $criteria = $criteria ?: array();
         $options = $options ?: array();
         CM_Debug::getInstance()->incStats('mongo', "Remove `{$collection}`: " . CM_Params::jsonEncode($criteria));
-        return $this->_getCollection($collection)->remove($criteria, $options);
+        $result = $this->_getCollection($collection)->remove($criteria, $options);
+        $this->_checkResultForErrors($result);
+        return is_array($result) ? $result['n'] : $result;
     }
 
     /**
+     * @param string|null $id
      * @return MongoId
      */
-    public function getNewId() {
-        return new MongoId();
+    public function getObjectId($id = null) {
+        return new MongoId($id);
+    }
+
+    /**
+     * @param array|boolean $result
+     * @throws CM_MongoDb_Exception
+     */
+    protected function _checkResultForErrors($result) {
+        if (true !== $result && empty($result['ok'])) {
+            throw new CM_MongoDb_Exception('Cannot perform mongodb operation', ['result' => $result]);
+        }
     }
 
     /**
