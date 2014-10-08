@@ -51,8 +51,7 @@ EOL;
         $config->CM_Model_Entity_Mock2 = new stdClass();
         $config->CM_Model_Entity_Mock2->type = CM_Model_Entity_Mock2::getTypeStatic();
 
-        $user = CM_Model_User::createStatic();
-        $entity = CM_Model_Entity_Mock2::createStatic(['userId' => $user->getId(), 'foo' => 'bar1']);
+        $entity = CM_Model_Entity_Mock2::createStatic();
         $component = new CM_Component_Mock();
         $scopeView = new CM_Frontend_ViewResponse($component);
         $request = $this->createRequestAjax($component, 'reloadComponent', ['entity' => $entity], $scopeView, $scopeView);
