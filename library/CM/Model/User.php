@@ -54,7 +54,7 @@ class CM_Model_User extends CM_Model_Abstract {
     /**
      * @return int
      */
-    public function getLatestactivity() {
+    public function getLatestActivity() {
         return (int) $this->_get('activityStamp');
     }
 
@@ -198,7 +198,7 @@ class CM_Model_User extends CM_Model_Abstract {
 
     public function updateLatestActivity() {
         $currentTime = time();
-        if ($this->getLatestactivity() < $currentTime - self::ACTIVITY_EXPIRATION) {
+        if ($this->getLatestActivity() < $currentTime - self::ACTIVITY_EXPIRATION) {
             CM_Db_Db::update('cm_user', array('activityStamp' => $currentTime), array('userId' => $this->getId()));
             $this->_set('activityStamp', $currentTime);
         }
