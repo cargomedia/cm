@@ -102,11 +102,11 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $activityStamp1 = time();
         $this->assertSameTime($activityStamp1, $user->getLatestactivity());
         CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2);
-        $user->updateLatestactivity();
+        $user->updateLatestActivity();
         $this->assertSameTime($activityStamp1, $user->getLatestactivity());
         CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2 + 1);
         $activityStamp2 = time();
-        $user->updateLatestactivity();
+        $user->updateLatestActivity();
         $this->assertSameTime($activityStamp2, $user->getLatestactivity());
     }
 }
