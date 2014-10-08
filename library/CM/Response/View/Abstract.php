@@ -9,12 +9,14 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         $componentInfo = $this->_getViewInfo('CM_Component_Abstract');
         $componentId = $componentInfo['id'];
         $componentClassName = $componentInfo['className'];
-        $componentParams = $componentInfo['params'];
+        $componentParams = CM_Params::factory($componentInfo['params']);
 
         if ($additionalParams) {
-            $componentParams = array_merge($componentParams, $additionalParams);
+            foreach ($additionalParams as $key => $value) {
+                $componentParams->set($key, $value);
+            }
         }
-        $component = CM_Component_Abstract::factory($componentClassName, CM_Params::factory($componentParams));
+        $component = CM_Component_Abstract::factory($componentClassName, $componentParams);
         $renderAdapter = CM_RenderAdapter_Component::factory($this->getRender(), $component);
         $html = $renderAdapter->fetch();
 
