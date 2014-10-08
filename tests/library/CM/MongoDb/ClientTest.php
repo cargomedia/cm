@@ -234,7 +234,7 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
         $this->assertFalse($mongoDb->isValidObjectId('1234567890abcdef1234567g'));
     }
 
-    public function getNewId() {
+    public function testGetObjectId() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
 
         $this->assertInstanceOf('MongoId', $mongoDb->getObjectId());
@@ -242,7 +242,7 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
         $idString = '4cb4ab6d7addf98506010001';
         $mongoId = $mongoDb->getObjectId($idString);
 
-        $this->assertSame($idString, $mongoId->id);
+        $this->assertSame($idString, $mongoId->{'$id'});
         $this->assertEquals($mongoId, $mongoDb->getObjectId($mongoId));
     }
 
