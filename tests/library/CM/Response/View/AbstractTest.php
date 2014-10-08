@@ -46,12 +46,12 @@ EOL;
     }
 
     public function testReloadComponentAdditionalParams() {
+        $entity = CM_Model_Entity_Mock2::createStatic();
         $config = CM_Config::get();
-        $config->CM_Model_Abstract->types[CM_Model_Entity_Mock2::getTypeStatic()] = 'CM_Model_Entity_Mock2';
+        $config->CM_Model_Abstract->types[CM_Model_Entity_Mock2::getTypeStatic()] = get_class($entity);
         $config->CM_Model_Entity_Mock2 = new stdClass();
         $config->CM_Model_Entity_Mock2->type = CM_Model_Entity_Mock2::getTypeStatic();
 
-        $entity = CM_Model_Entity_Mock2::createStatic();
         $component = new CM_Component_Mock();
         $scopeView = new CM_Frontend_ViewResponse($component);
         $request = $this->createRequestAjax($component, 'reloadComponent', ['entity' => $entity], $scopeView, $scopeView);
