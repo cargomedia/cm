@@ -130,9 +130,7 @@ class CM_Model_Entity_Mock2 extends CM_Model_Entity_Abstract {
     }
 
     protected static function _createStatic(array $data) {
-        $entity = new self(1);
-        $entity->_set($data);
-        return $entity;
+        return new self(1);
     }
 
     public static function getTypeStatic() {
