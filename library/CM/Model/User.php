@@ -197,15 +197,15 @@ class CM_Model_User extends CM_Model_Abstract {
     }
 
     public function updateLatestActivity() {
-        $currentTime = time();
-        if ($this->getLatestActivity() < $currentTime - self::ACTIVITY_EXPIRATION) {
-            CM_Db_Db::update('cm_user', array('activityStamp' => $currentTime), array('userId' => $this->getId()));
-            $this->_set('activityStamp', $currentTime);
+        if ($this->getLatestActivity() < time() - self::ACTIVITY_EXPIRATION) {
             $this->_updateLatestActivityThrottle();
         }
     }
 
     protected function _updateLatestActivityThrottle() {
+        $currentTime = time();
+        CM_Db_Db::update('cm_user', array('activityStamp' => $currentTime), array('userId' => $this->getId()));
+        $this->_set('activityStamp', $currentTime);
     }
 
     protected function _getAssets() {
