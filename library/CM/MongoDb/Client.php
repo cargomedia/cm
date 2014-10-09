@@ -247,6 +247,14 @@ class CM_MongoDb_Client {
     }
 
     /**
+     * @param string|MongoId $id
+     * @return boolean
+     */
+    public function isValidObjectId($id) {
+        return MongoId::isValid($id);
+    }
+
+    /**
      * @param string     $collection
      * @param array      $criteria
      * @param array      $newObject
