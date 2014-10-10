@@ -1,3 +1,4 @@
+test
 CM Framework  [![Build Status](https://travis-ci.org/cargomedia/CM.png)](https://travis-ci.org/cargomedia/CM)
 ============
 
