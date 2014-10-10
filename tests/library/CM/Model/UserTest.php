@@ -97,7 +97,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertEquals($language, $user->getLanguage());
     }
 
-    public function testUpdateLatestActivity() {
+    public function testUpdateLatestActivityThrottled() {
         $user = CMTest_TH::createUser();
         $activityStamp1 = time();
         $this->assertSameTime($activityStamp1, $user->getLatestActivity());
