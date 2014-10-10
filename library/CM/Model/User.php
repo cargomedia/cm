@@ -196,13 +196,13 @@ class CM_Model_User extends CM_Model_Abstract {
         $this->_change();
     }
 
-    public function updateLatestActivity() {
+    public function updateLatestActivityThrottled() {
         if ($this->getLatestActivity() < time() - self::ACTIVITY_EXPIRATION) {
-            $this->_updateLatestActivityThrottled();
+            $this->_updateLatestActivity();
         }
     }
 
-    protected function _updateLatestActivityThrottled() {
+    protected function _updateLatestActivity() {
         $currentTime = time();
         CM_Db_Db::update('cm_user', array('activityStamp' => $currentTime), array('userId' => $this->getId()));
         $this->_set('activityStamp', $currentTime);

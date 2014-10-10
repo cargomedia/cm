@@ -217,7 +217,7 @@ class CM_Session implements CM_Comparable {
                 $this->deleteUser();
                 return;
             }
-            $user->updateLatestActivity();
+            $user->updateLatestActivityThrottled();
             if (!$user->getOnline()) {
                 $user->setOnline(true);
             }
