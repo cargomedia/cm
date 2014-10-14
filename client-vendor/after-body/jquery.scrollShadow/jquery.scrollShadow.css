@@ -1,31 +1,18 @@
-.scrollShadow-wrapper {
-  position: relative;
-}
-
 .scrollShadow {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-.scrollShadow:before, .scrollShadow:after {
-  position: absolute;
-  content: '';
-  left: 0;
-  width: 100%;
-  height: 5px;
-  z-index: 1;
-  background-color: rgba(0, 0, 0, 0.05);
-  opacity: 0;
+.scrollShadow.notScrolledTop {
+  box-shadow: inset 0 11px 8px -10px #CCC;
 }
 
-.scrollShadow:before {
-  top: 0;
+.scrollShadow.notScrolledBottom {
+  box-shadow: inset 0 -11px 8px -10px #CCC;
 }
 
-.scrollShadow:after {
-  bottom: 0;
-}
-
-.scrollShadow.notScrolledTop:before, .scrollShadow.notScrolledBottom:after {
-  opacity: 1;
+.scrollShadow.notScrolledTop.notScrolledBottom {
+  box-shadow:
+  inset 0 11px 8px -10px #CCC,
+  inset 0 -11px 8px -10px #CCC;
 }
