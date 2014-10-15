@@ -112,7 +112,7 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['MongoDb'] = array(
-        'class'     => 'CM_Service_MongoDb',
+        'class'     => 'CM_MongoDb_Client',
         'arguments' => array(
             array(
                 'db'      => 'cm',
