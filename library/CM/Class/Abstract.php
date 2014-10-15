@@ -49,10 +49,10 @@ abstract class CM_Class_Abstract {
         if (null === self::$_classConfigCacheEnabled) {
             self::$_classConfigCacheEnabled = CM_Config::get()->classConfigCacheEnabled;
         }
-        $cacheKey = CM_CacheConst::ClassConfig . '_className:' . get_called_class();
-        $cache = new CM_Cache_Storage_Apc();
         $calledClass = get_called_class();
-        if (!isset(self::$_classConfigList[$calledClass])) {
+        $cacheKey = CM_CacheConst::ClassConfig . '_className:' . $calledClass;
+        $cache = new CM_Cache_Storage_Apc();
+        if (!self::$_classConfigCacheEnabled || !isset(self::$_classConfigList[$calledClass])) {
             if (!self::$_classConfigCacheEnabled || false === ($result = $cache->get($cacheKey))) {
                 $result = self::_getConfigRaw();
                 if (self::$_classConfigCacheEnabled) {
