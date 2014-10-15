@@ -43,6 +43,8 @@ class CM_Class_AbstractTest extends CMTest_TestCase {
 
     public function testGetConfigCaching() {
         $reflectedClass = new ReflectionClass('CM_Class_Abstract');
+        $configCacheList = $reflectedClass->getProperty('_classConfigList');
+        $configCacheList->setAccessible(true);
 
         CM_Config::get()->CM_Class_Implementation = new stdClass();
         CM_Config::get()->CM_Class_Implementation->foo = 'foo';
@@ -50,8 +52,6 @@ class CM_Class_AbstractTest extends CMTest_TestCase {
         CM_Config::get()->CM_Class_Implementation->foo = 'bar';
         $this->assertSame('foo', CM_Class_Implementation::getConfig()->foo);
 
-        $configCacheList = $reflectedClass->getProperty('_classConfigList');
-        $configCacheList->setAccessible(true);
         $configCacheList->setValue([]);
         $this->assertSame('foo', CM_Class_Implementation::getConfig()->foo);
 
