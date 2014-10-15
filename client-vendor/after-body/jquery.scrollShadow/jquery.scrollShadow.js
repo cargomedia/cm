@@ -25,6 +25,7 @@
       var self = this;
 
       this.$element.addClass('scrollShadow');
+      this.$element.wrap('<div class="scrollShadow-wrapper"></div>');
 
       this.$element.on('scroll.scrollShadow', _.throttle(function() {
         self.updateShadow();
@@ -38,7 +39,7 @@
       if (!this.initialized) {
         return;
       }
-      this.$element.removeClass('notScrolledBottom notScrolledTop');
+      this.$element.unwrap().removeClass('scrollShadow');
       this.$element.off('scroll.scrollShadow');
       this.initialized = false;
     },
