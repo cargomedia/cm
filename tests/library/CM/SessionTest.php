@@ -181,12 +181,12 @@ class CM_SessionTest extends CMTest_TestCase {
         $sessionId = $session->getId();
         unset($session);
         $session = new CM_Session($sessionId);
-        $this->assertEquals($activityStamp1, $session->getUser(true)->getLatestactivity(), null, 1);
+        $this->assertEquals($activityStamp1, $session->getUser(true)->getLatestActivity(), null, 1);
 
         CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2);
         $session = new CM_Session($sessionId);
         $session->start();
-        $this->assertEquals($activityStamp1, $session->getUser(true)->getLatestactivity(), null, 1);
+        $this->assertEquals($activityStamp1, $session->getUser(true)->getLatestActivity(), null, 1);
 
         CM_Db_Db::update('cm_session', array('data' => serialize(array('userId' => $user->getId(), 'foo' => 'bar'))));
         unset($session);
@@ -196,7 +196,7 @@ class CM_SessionTest extends CMTest_TestCase {
         $activityStamp2 = time();
         $session = new CM_Session($sessionId);
         $session->start();
-        $this->assertEquals($activityStamp2, $session->getUser(true)->getLatestactivity(), null, 1);
+        $this->assertEquals($activityStamp2, $session->getUser(true)->getLatestActivity(), null, 1);
         CMTest_TH::timeForward($session->getLifetime() / 2);
         $session->start();
 
