@@ -2,9 +2,24 @@
 
 class CM_Class_AbstractTest extends CMTest_TestCase {
 
+    /** @var boolean */
+    private static $_configCacheFlagBackup;
+
+    /** @var ReflectionProperty */
+    private static $_configCacheFlag;
+
     public static function setupBeforeClass() {
+        $reflectedClass = new ReflectionClass('CM_Class_Abstract');
+        self::$_configCacheFlag = $reflectedClass->getProperty('_classConfigCacheEnabled');
+        self::$_configCacheFlag->setAccessible(true);
+        self::$_configCacheFlagBackup = self::$_configCacheFlag->getValue();
+        self::$_configCacheFlag->setValue(true);
         CM_Config::get()->CM_Class_AbstractMock = new stdClass();
         CM_Config::get()->CM_Class_AbstractMock->types[CM_Class_Implementation::getTypeStatic()] = 'CM_Class_Implementation';
+    }
+
+    public static function tearDownAfterClass() {
+        self::$_configCacheFlag->setValue(self::$_configCacheFlagBackup);
     }
 
     public function testGetConfig() {
@@ -24,6 +39,28 @@ class CM_Class_AbstractTest extends CMTest_TestCase {
         } catch (CM_Exception_Invalid $ex) {
             $this->assertTrue(true);
         }
+    }
+
+    public function testGetConfigCaching() {
+        $reflectedClass = new ReflectionClass('CM_Class_Abstract');
+
+        CM_Config::get()->CM_Class_Implementation = new stdClass();
+        CM_Config::get()->CM_Class_Implementation->foo = 'foo';
+        $this->assertSame('foo', CM_Class_Implementation::getConfig()->foo);
+        CM_Config::get()->CM_Class_Implementation->foo = 'bar';
+        $this->assertSame('foo', CM_Class_Implementation::getConfig()->foo);
+
+        $configCacheList = $reflectedClass->getProperty('_classConfigList');
+        $configCacheList->setAccessible(true);
+        $configCacheList->setValue([]);
+        $this->assertSame('foo', CM_Class_Implementation::getConfig()->foo);
+
+        $cache = new CM_Cache_Storage_Apc();
+        $cache->flush();
+        $this->assertSame('foo', CM_Class_Implementation::getConfig()->foo);
+
+        $configCacheList->setValue([]);
+        $this->assertSame('bar', CM_Class_Implementation::getConfig()->foo);
     }
 
     public function testGetClassName() {
