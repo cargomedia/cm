@@ -19,7 +19,6 @@ class CM_Setup_LoaderTest extends CMTest_TestCase {
     }
 
     public function testLoad() {
-
         $fooSetupScriptClass = new \Mocka\ClassMock('Foo_SetupScript', 'CM_Setup_Script_Abstract');
         $barSetupScriptClass = new \Mocka\ClassMock('Bar_SetupScript', 'CM_Setup_Script_Abstract');
 
@@ -28,7 +27,6 @@ class CM_Setup_LoaderTest extends CMTest_TestCase {
         $script3 = $barSetupScriptClass->newInstance();
         $script4 = $fooSetupScriptClass->newInstance();
         $script5 = $barSetupScriptClass->newInstance();
-
         $scriptList = [$script1, $script2, $script3, $script4, $script5];
 
         $loader = $this->mockObject('CM_Setup_Loader');
