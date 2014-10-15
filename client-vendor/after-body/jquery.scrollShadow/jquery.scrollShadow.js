@@ -22,6 +22,9 @@
         this.updateShadow();
         return;
       }
+      if ($(window).width() < 600) {
+        return;
+      }
       var self = this;
 
       this.$element.addClass('scrollShadow');
