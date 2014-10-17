@@ -40,7 +40,7 @@ EOT;
     public function testGetLastRunTime() {
         $this->_fileSystem->ensureDirectory('clockwork');
         CM_File::create($this->_file->getPath(), $this->_fileContent, $this->_fileSystem);
-        $interval = new DateInterval('P1D');
+        $interval = '1 day';
         $event1 = new CM_Clockwork_Event('foo', $interval);
         $event2 = new CM_Clockwork_Event('bar', $interval);
         $event3 = new CM_Clockwork_Event('nonexistent', $interval);
@@ -56,8 +56,7 @@ EOT;
         $defaultTimeZoneBackup = date_default_timezone_get();
         $this->_fileSystem->ensureDirectory('clockwork');
         CM_File::create($this->_file->getPath(), $this->_fileContent, $this->_fileSystem);
-        $interval = new DateInterval('P1D');
-        $event1 = new CM_Clockwork_Event('foo', $interval);
+        $event1 = new CM_Clockwork_Event('foo', '1 day');
 
         $persistence = new CM_Clockwork_Persistence($this->_context);
         date_default_timezone_set('Antarctica/Vostok');
@@ -67,7 +66,7 @@ EOT;
     }
 
     public function testSetRuntime() {
-        $interval = new DateInterval('P1D');
+        $interval = '1 day';
         $event1 = new CM_Clockwork_Event('foo', $interval);
         $event2 = new CM_Clockwork_Event('bar', $interval);
 
