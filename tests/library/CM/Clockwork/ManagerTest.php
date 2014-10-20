@@ -50,6 +50,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
         $persistence->expects($this->at(0))->method('getLastRuntime')->with($event1)->will($this->returnValue(null));
         $persistence->expects($this->at(1))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime()));
+
         $persistence->expects($this->at(2))->method('getLastRuntime')->with($event1)->will($this->returnValue(null));
         $persistence->expects($this->at(3))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime()));
         $persistence->expects($this->at(4))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(1));
