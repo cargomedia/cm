@@ -98,7 +98,8 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
     public function getRender() {
         if (!$this->_render) {
             $languageRewrite = !$this->getViewer() && $this->getRequest()->getLanguageUrl();
-            $this->_render = new CM_Frontend_Render($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), $languageRewrite, $this->getRequest()->getLocation());
+            $environment = new CM_Frontend_Environment($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), null, null, $this->getRequest()->getLocation());
+            $this->_render = new CM_Frontend_Render($environment, $languageRewrite);
         }
         return $this->_render;
     }
@@ -196,15 +197,6 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
     public function send() {
         $this->sendHeaders();
         $this->sendContent();
-    }
-
-    /**
-     * Enables caching by removing no-cache headers
-     */
-    public function enableCache() {
-        header_remove('Cache-Control');
-        header_remove('Pragma');
-        header_remove('Expires');
     }
 
     /**

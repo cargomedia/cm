@@ -97,6 +97,16 @@ EOF;
         ));
     }
 
+    public function trackAffiliate($requestClientId, $affiliateName) {
+        $this->setRequestClientId($requestClientId);
+        $trackEventJob = new CMService_KissMetrics_TrackPropertyListJob();
+        $trackEventJob->queue([
+            'code'         => $this->_getCode(),
+            'identityList' => $this->_getIdentityList(),
+            'propertyList' => ['Affiliate Name' => $affiliateName],
+        ]);
+    }
+
     /**
      * @param string $eventName
      * @param array  $propertyList

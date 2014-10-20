@@ -31,34 +31,10 @@ class CM_App {
      * @param boolean|null $forceReload
      */
     public function setupDatabase($forceReload = null) {
-        $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
-        $db = $client->getDb();
-        $client->setDb(null);
-
-        if ($forceReload) {
-            $client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($db))->execute();
-        }
-
-        $databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($db))->fetch();
-        if (!$databaseExists) {
-            $client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($db))->execute();
-        }
-
-        $client->setDb($db);
-        $tables = $client->createStatement('SHOW TABLES')->execute()->fetchAll();
-        if (0 === count($tables)) {
-            foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-                CM_Db_Db::runDump($db, $dump);
-            }
-            $app = CM_App::getInstance();
-            foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
-                $updateFiles = CM_Util::rglob('*.php', $path);
-                $version = array_reduce($updateFiles, function ($initial, $path) {
-                    $filename = basename($path);
-                    return max($initial, (int) $filename);
-                }, $app->getVersion());
-                $app->setVersion($version, $namespace);
-            }
+        $isEmptyMysql = $this->_setupDbMysql($forceReload);
+        $isEmptyMongo = $this->_setupDbMongo($forceReload);
+        if ($isEmptyMysql && $isEmptyMongo) {
+            $this->_setInitialVersion();
             foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
                 require $setupScript->getPath();
             }
@@ -89,7 +65,7 @@ class CM_App {
             $assetList[] = new CM_Asset_Javascript_VendorAfterBody($site);
             $assetList[] = new CM_Asset_Javascript_VendorBeforeBody($site);
             foreach ($languageList as $language) {
-                $render = new CM_Frontend_Render($site, null, $language);
+                $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, null, $language));
                 $assetList[] = new CM_Asset_Css_Vendor($render);
                 $assetList[] = new CM_Asset_Css_Library($render);
             }
@@ -219,5 +195,70 @@ class CM_App {
             throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $moduleName . '` namespace.');
         }
         return $file->getPath();
+    }
+
+    private function _setInitialVersion() {
+        $app = CM_App::getInstance();
+        foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
+            $updateFiles = CM_Util::rglob('*.php', $path);
+            $version = array_reduce($updateFiles, function ($initial, $path) {
+                $filename = basename($path);
+                return max($initial, (int) $filename);
+            }, 0);
+            $app->setVersion($version, $namespace);
+        }
+    }
+
+    /**
+     * @param boolean $forceReload
+     * @return boolean
+     * @throws CM_Exception_Invalid
+     */
+    private function _setupDbMongo($forceReload) {
+        $mongoClient = CM_Service_Manager::getInstance()->getMongoDb();
+        if ($forceReload) {
+            $mongoClient->dropDatabase();
+        }
+        $collections = $mongoClient->listCollectionNames();
+        $isEmpty = 0 === count($collections);
+        if ($isEmpty) {
+            foreach (CM_Util::getResourceFiles('mongo/collections.json') as $dump) {
+                $collectionInfo = CM_Params::jsonDecode($dump->read());
+                foreach ($collectionInfo as $collection => $indexes) {
+                    $mongoClient->createCollection($collection);
+                    foreach ($indexes as $indexInfo) {
+                        $mongoClient->createIndex($collection, $indexInfo['key'], $indexInfo['options']);
+                    }
+                }
+            }
+        }
+        return $isEmpty;
+    }
+
+    /**
+     * @param boolean $forceReload
+     * @return boolean
+     * @throws CM_Db_Exception
+     */
+    private function _setupDbMysql($forceReload) {
+        $mysqlClient = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+        $db = $mysqlClient->getDb();
+        $mysqlClient->setDb(null);
+        if ($forceReload) {
+            $mysqlClient->createStatement('DROP DATABASE IF EXISTS ' . $mysqlClient->quoteIdentifier($db))->execute();
+        }
+        $databaseExists = (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($db))->fetch();
+        if (!$databaseExists) {
+            $mysqlClient->createStatement('CREATE DATABASE ' . $mysqlClient->quoteIdentifier($db))->execute();
+        }
+        $mysqlClient->setDb($db);
+        $tables = $mysqlClient->createStatement('SHOW TABLES')->execute()->fetchAll();
+        $isEmpty = 0 === count($tables);
+        if ($isEmpty) {
+            foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
+                CM_Db_Db::runDump($db, $dump);
+            }
+        }
+        return $isEmpty;
     }
 }

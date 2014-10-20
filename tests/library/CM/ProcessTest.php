@@ -29,7 +29,6 @@ class CM_ProcessTest extends CMTest_TestCase {
                 $ms = 100 * $i;
                 usleep($ms * 1000);
                 CM_ProcessTest::writeln("Child $i terminated after $ms ms.");
-                ob_clean(); // Remove any test output buffered by phpUnit, which uses STDOUT itself to return test results from isolated processes
             });
         }
         CM_ProcessTest::writeln('Parent waiting for 250 ms...');
@@ -39,16 +38,6 @@ class CM_ProcessTest extends CMTest_TestCase {
             CM_ProcessTest::writeln('All children terminated.');
         });
         CM_ProcessTest::writeln('Parent terminated.');
-
-        $this->expectOutputString('Child 1 forked.
-Child 2 forked.
-Child 3 forked.
-Child 4 forked.
-Parent waiting for 250 ms...
-Parent listening to children...
-All children terminated.
-Parent terminated.
-');
 
         $outputFileExpected = 'Child 1 forked.
 Child 2 forked.
@@ -84,18 +73,59 @@ Parent terminated.
         });
         $process->fork(function () {
             usleep(150 * 1000);
-            $this->setExpectedException('Exception');
             throw new Exception('Child 3 finished');
         });
 
         $workloadResultList = $process->waitForChildren();
         $this->assertCount(3, $workloadResultList);
-        $this->assertSame('Child 1 finished', $workloadResultList[0]->getResult());
-        $this->assertSame(null, $workloadResultList[0]->getException());
-        $this->assertSame(array('msg' => 'Child 2 finished'), $workloadResultList[1]->getResult());
+
+        $this->assertSame('Child 1 finished', $workloadResultList[1]->getResult());
         $this->assertSame(null, $workloadResultList[1]->getException());
+
+        $this->assertSame(array('msg' => 'Child 2 finished'), $workloadResultList[2]->getResult());
+        $this->assertSame(null, $workloadResultList[2]->getException());
+
+        $this->assertSame(null, $workloadResultList[3]->getResult());
+        $this->assertSame('Child 3 finished', $workloadResultList[3]->getException()->getMessage());
+        $errorLog = new CM_Paging_Log_Error();
+        $this->assertSame(1, $errorLog->getCount());
+        $this->assertContains('Child 3 finished', $errorLog->getItem(0)['msg']);
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testForkAndWaitForChildrenWithResultsAndExiting() {
+        $process = CM_Process::getInstance();
+        $process->fork(function () {
+            usleep(50 * 1000);
+            return 'Child 1 finished';
+        });
+        $process->fork(function () {
+            exit(0);
+        });
+        $process->fork(function () {
+            posix_kill(posix_getpid(), SIGTERM);
+        });
+        $process->fork(function () {
+            posix_kill(posix_getpid(), SIGKILL);
+        });
+
+        $workloadResultList = $process->waitForChildren();
+        $this->assertCount(4, $workloadResultList);
+
+        $this->assertSame('Child 1 finished', $workloadResultList[1]->getResult());
+        $this->assertSame(null, $workloadResultList[1]->getException());
+
         $this->assertSame(null, $workloadResultList[2]->getResult());
-        $this->assertSame('Child 3 finished', $workloadResultList[2]->getException()->getMessage());
+        $this->assertSame('Received no data from IPC stream.', $workloadResultList[2]->getException()->getMessage());
+
+        $this->assertSame(null, $workloadResultList[3]->getResult());
+        $this->assertSame('Received no data from IPC stream.', $workloadResultList[3]->getException()->getMessage());
+
+        $this->assertSame(null, $workloadResultList[4]->getResult());
+        $this->assertSame('Received no data from IPC stream.', $workloadResultList[4]->getException()->getMessage());
     }
 
     /**
@@ -161,7 +191,6 @@ Parent terminated.
      * @param string $message
      */
     public static function writeln($message) {
-        print "$message\n";
         fwrite(self::$_file, "$message\n");
     }
 

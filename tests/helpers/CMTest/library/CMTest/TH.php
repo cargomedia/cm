@@ -22,7 +22,6 @@ class CMTest_TH {
 
     public static function clearEnv() {
         self::clearDb();
-        self::clearMongoDb();
         self::clearCache();
         self::timeReset();
         self::clearConfig();
@@ -43,13 +42,6 @@ class CMTest_TH {
         CM_Cache_Local::getInstance()->flush();
     }
 
-    public static function clearMongoDb() {
-        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        foreach ($mongoDb->listCollectionNames() as $collectionName) {
-            $mongoDb->drop($collectionName);
-        }
-    }
-
     public static function clearDb() {
         $alltables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
         CM_Db_Db::exec('SET foreign_key_checks = 0;');
@@ -57,6 +49,10 @@ class CMTest_TH {
             CM_Db_Db::delete($table);
         }
         CM_Db_Db::exec('SET foreign_key_checks = 1;');
+        $mongo = CM_Service_Manager::getInstance()->getMongoDb();
+        foreach ($mongo->listCollectionNames() as $collectionName) {
+            $mongo->remove($collectionName);
+        }
         foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
             require $setupScript->getPath();
         }
@@ -129,7 +125,7 @@ class CMTest_TH {
      */
     public static function createPage($pageClass, CM_Model_User $viewer = null, $params = array()) {
         $request = new CM_Request_Get('?' . http_build_query($params), array(), $viewer);
-        return new $pageClass(CM_Params::factory($request->getQuery()), $request->getViewer());
+        return new $pageClass(CM_Params::factory($request->getQuery(), true), $request->getViewer());
     }
 
     /**
