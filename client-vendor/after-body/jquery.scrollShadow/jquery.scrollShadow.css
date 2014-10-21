@@ -4,7 +4,6 @@
 
 .scrollShadow {
   overflow: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .scrollShadow:before, .scrollShadow:after {
