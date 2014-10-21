@@ -8,9 +8,12 @@ class CM_Clockwork_Manager {
     /** @var CM_Clockwork_Persistence */
     private $_persistence;
 
+    private $_startTime;
+
     public function __construct() {
         $this->_events = array();
         $this->_persistence = new CM_Clockwork_Persistence_None();
+        $this->_startTime = $this->_getCurrentDateTime();
     }
 
     /**
@@ -21,9 +24,9 @@ class CM_Clockwork_Manager {
     }
 
     /**
-     * @param string        $name
-     * @param string        $dateTimeString
-     * @param callable      $callback
+     * @param string   $name
+     * @param string   $dateTimeString
+     * @param callable $callback
      */
     public function registerCallback($name, $dateTimeString, $callback) {
         $event = new CM_Clockwork_Event($name, $dateTimeString);
@@ -42,8 +45,7 @@ class CM_Clockwork_Manager {
         /** @var CM_Clockwork_Event[] $eventsToRun */
         $eventsToRun = array();
         foreach ($this->_events as $event) {
-            $lastRuntime = $this->_persistence->getLastRuntime($event);
-            if ($event->shouldRun($lastRuntime)) {
+            if ($this->_shouldRun($event)) {
                 $eventsToRun[] = $event;
             }
         }
@@ -58,6 +60,27 @@ class CM_Clockwork_Manager {
      */
     public function setPersistence(CM_Clockwork_Persistence $persistence) {
         $this->_persistence = $persistence;
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     * @return boolean
+     */
+    protected function _shouldRun(CM_Clockwork_Event $event) {
+        $lastRuntime = $this->_persistence->getLastRuntime($event);
+        if ($lastRuntime) {
+            $nextExecutionTime = clone $lastRuntime;
+            $dateTimeString = $event->getDateTimeString();
+            $nextExecutionTime->modify($dateTimeString);
+            if ($nextExecutionTime == $this->_getCurrentDateTime()->modify($dateTimeString) ||
+                $nextExecutionTime > $this->_getCurrentDateTime()
+            ) {
+                return false;
+            }
+            return true;
+        }
+        $startTime = clone $this->_startTime;
+        return $this->_getCurrentDateTime() >= $startTime->modify($event->getDateTimeString());
     }
 
     protected function _getCurrentDateTime() {

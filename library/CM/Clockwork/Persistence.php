@@ -8,7 +8,7 @@ class CM_Clockwork_Persistence {
     private $_context;
 
     /** @var DateTime[] */
-    private $_data = array();
+    protected $_data = array();
 
     /**
      * @param string $context
@@ -31,11 +31,11 @@ class CM_Clockwork_Persistence {
 
     /**
      * @param CM_Clockwork_Event $event
-     * @param DateTime           $runTime
+     * @param DateTime           $runtime
      */
-    public function setRuntime(CM_Clockwork_Event $event, DateTime $runTime) {
+    public function setRuntime(CM_Clockwork_Event $event, DateTime $runtime) {
         $this->_load();
-        $this->_data[$event->getName()] = clone $runTime;
+        $this->_data[$event->getName()] = clone $runtime;
         $this->_save();
     }
 

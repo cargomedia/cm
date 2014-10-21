@@ -3,14 +3,19 @@
 class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
     public function testRunEventsFor() {
-        $manager = new CM_Clockwork_Manager();
+        $currently = $this->_getCurrentDateTime();
+        $managerMock = $this->mockClass('CM_Clockwork_Manager');
+        $managerMock->mockMethod('_getCurrentDateTime')->set(function () use ($currently) {
+            return clone $currently;
+        });
+        /** @var CM_Clockwork_Manager $manager */
+        $manager = $managerMock->newInstance();
         $counter = array(
             '1'  => 0,
             '2'  => 0,
             '5'  => 0,
             '60' => 0,
         );
-        $currently = $this->_getCurrentDateTime();
         $this->_createEvent($manager, $currently, '1 second', $counter, 'event1');
         $this->_createEvent($manager, $currently, '2 seconds', $counter, 'event2');
         $this->_createEvent($manager, $currently, '5 seconds', $counter, 'event3');
@@ -32,13 +37,14 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $currently = $this->_getCurrentDateTime();
         $context = 'foo';
         $persistence = $this->getMockBuilder('CM_Clockwork_Persistence')->setConstructorArgs(array($context))->setMethods(array('getLastRuntime',
-                'setRuntime'))
+            'setRuntime'))
             ->getMock();
 
-        $manager = $this->getMockBuilder('CM_Clockwork_Manager')->setMethods(array('_getCurrentDateTime'))->getMockForAbstractClass();
+        $manager = $this->getMockBuilder('CM_Clockwork_Manager')->setMethods(array('_getCurrentDateTime'))->disableOriginalConstructor()->getMockForAbstractClass();
         $manager->expects($this->any())->method('_getCurrentDateTime')->will($this->returnCallback(function () use ($currently) {
             return clone $currently;
         }));
+        $manager->__construct();
         /** @var CM_Clockwork_Manager $manager */
         $manager->setPersistence($persistence);
         $counter = array(
@@ -82,6 +88,91 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
             $manager->runEvents();
             $currently->add(new DateInterval('PT1S'));
         }
+    }
+
+    public function testShouldRunFixedTime() {
+        $currently = new DateTime();
+        $lastRuntime = null;
+        $persistenceMock = $this->mockClass('CM_Clockwork_Persistence');
+        $persistenceMock->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
+            if ($lastRuntime instanceof DateTime) {
+                return clone $lastRuntime;
+            }
+            return $lastRuntime;
+        });
+        $managerMock = $this->mockClass('CM_Clockwork_Manager');
+        $managerMock->mockMethod('_getCurrentDateTime')->set(function () use (&$currently) {
+            return clone $currently;
+        });
+        /** @var CM_Clockwork_Persistence $persistence */
+        $persistence = $persistenceMock->newInstanceWithoutConstructor();
+        /** @var CM_Clockwork_Manager $manager */
+        $manager = $managerMock->newInstance();
+        $manager->setPersistence($persistence);
+        $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
+
+        /** @var CM_Clockwork_Event $event */
+        $event = new CM_Clockwork_Event('event1', '14:00');
+        $currently->modify('13:59:59');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('2 seconds');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+
+        $lastRuntime = clone($currently);
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('1 day');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+
+        $lastRuntime = null;
+        $event = new CM_Clockwork_Event('event2', 'first day of 09:00');
+        $currently = new DateTime('first day of 08:59');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('last day of');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+
+        $lastRuntime = clone($currently);
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('next day 09:00');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+    }
+
+    public function testShouldRunInterval() {
+        $currently = new DateTime();
+        $lastRuntime = null;
+        $persistenceMock = $this->mockClass('CM_Clockwork_Persistence');
+        $persistenceMock->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
+            if ($lastRuntime instanceof DateTime) {
+                return clone $lastRuntime;
+            }
+            return $lastRuntime;
+        });
+        $managerMock = $this->mockClass('CM_Clockwork_Manager');
+        $managerMock->mockMethod('_getCurrentDateTime')->set(function () use (&$currently) {
+            return clone $currently;
+        });
+        /** @var CM_Clockwork_Persistence $persistence */
+        $persistence = $persistenceMock->newInstanceWithoutConstructor();
+        /** @var CM_Clockwork_Manager $manager */
+        $manager = $managerMock->newInstance();
+        $manager->setPersistence($persistence);
+        $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
+
+        $event = new CM_Clockwork_Event('event', '2 seconds');
+        $lastRuntime = null;
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('2 seconds');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+        $lastRuntime = clone($currently);
+
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('1 second');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('1 second');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
     }
 
     /**

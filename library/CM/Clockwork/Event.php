@@ -8,9 +8,6 @@ class CM_Clockwork_Event {
     /** @var string */
     private $_name;
 
-    /** @var DateTime */
-    private $_nextRun;
-
     /** @var callable[] */
     private $_callbacks;
 
@@ -21,7 +18,6 @@ class CM_Clockwork_Event {
     public function __construct($name, $dateTimeString) {
         $this->_name = (string) $name;
         $this->_dateTimeString = (string) $dateTimeString;
-        $this->_nextRun = $this->_getCurrentDateTime()->modify($dateTimeString);
         $this->_callbacks = [];
     }
 
@@ -33,19 +29,10 @@ class CM_Clockwork_Event {
     }
 
     /**
-     * @param DateTime $lastRuntime
-     * @return bool
+     * @return string
      */
-    public function shouldRun(DateTime $lastRuntime = null) {
-        if ($lastRuntime) {
-            $nextExecutionTime = clone $lastRuntime;
-            $nextExecutionTime->modify($this->_dateTimeString);
-            if ($nextExecutionTime == $this->_getCurrentDateTime()->modify($this->_dateTimeString) || $nextExecutionTime > $this->_getCurrentDateTime()) {
-                return false;
-            }
-            return true;
-        }
-        return $this->_getCurrentDateTime() >= $this->_nextRun;
+    public function getDateTimeString() {
+        return $this->_dateTimeString;
     }
 
     /**
@@ -63,7 +50,6 @@ class CM_Clockwork_Event {
         foreach ($this->_callbacks as $callback) {
             call_user_func($callback);
         }
-        $this->_nextRun = $this->_getCurrentDateTime()->modify($this->_dateTimeString);
     }
 
     /**
