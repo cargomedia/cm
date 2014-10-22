@@ -72,7 +72,7 @@ class CM_Clockwork_Manager {
             $nextExecutionTime = clone $lastRuntime;
             $dateTimeString = $event->getDateTimeString();
             $nextExecutionTime->modify($dateTimeString);
-            if ($nextExecutionTime == $this->_getCurrentDateTime()->modify($dateTimeString) ||
+            if (($nextExecutionTime == $this->_getCurrentDateTime()->modify($dateTimeString) && $lastRuntime >= $nextExecutionTime) ||
                 $nextExecutionTime > $this->_getCurrentDateTime()
             ) {
                 return false;

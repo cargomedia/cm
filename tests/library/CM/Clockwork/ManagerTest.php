@@ -138,6 +138,25 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
         $currently->modify('next day 09:00');
         $this->assertTrue($_shouldRun->invoke($manager, $event));
+
+        //execution delayed into next timeframe
+
+        $lastRuntime = null;
+        $event = new CM_Clockwork_Event('event3', '23:59');
+        $currently = new DateTime('23:59');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+
+        $lastRuntime = clone($currently);
+        $currently->modify('2 days 00:01');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+
+        $lastRuntime = clone($currently);
+        $currently->modify('23:58');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('23:59');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+
     }
 
     public function testShouldRunInterval() {
