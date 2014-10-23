@@ -5,14 +5,15 @@ class CM_Clockwork_Manager {
     /** @var CM_Clockwork_Event[] */
     private $_events;
 
-    /** @var CM_Clockwork_Persistence */
-    private $_persistence;
+    /** @var CM_Clockwork_Storage_Abstract */
+    private $_storage;
 
+   /** @var DateTime */
     private $_startTime;
 
     public function __construct() {
         $this->_events = array();
-        $this->_persistence = new CM_Clockwork_Persistence_None();
+        $this->_storage = new CM_Clockwork_Storage_Memory();
         $this->_startTime = $this->_getCurrentDateTime();
     }
 
@@ -51,15 +52,15 @@ class CM_Clockwork_Manager {
         }
         foreach ($eventsToRun as $event) {
             $event->run();
-            $this->_persistence->setRuntime($event, $this->_getCurrentDateTime());
+            $this->_storage->setRuntime($event, $this->_getCurrentDateTime());
         }
     }
 
     /**
-     * @param CM_Clockwork_Persistence $persistence
+     * @param CM_Clockwork_Storage_Abstract $persistence
      */
-    public function setPersistence(CM_Clockwork_Persistence $persistence) {
-        $this->_persistence = $persistence;
+    public function setStorage(CM_Clockwork_Storage_Abstract $persistence) {
+        $this->_storage = $persistence;
     }
 
     /**
@@ -67,7 +68,7 @@ class CM_Clockwork_Manager {
      * @return boolean
      */
     protected function _shouldRun(CM_Clockwork_Event $event) {
-        $lastRuntime = $this->_persistence->getLastRuntime($event);
+        $lastRuntime = $this->_storage->getLastRuntime($event);
         if ($lastRuntime) {
             $nextExecutionTime = clone $lastRuntime;
             $dateTimeString = $event->getDateTimeString();
@@ -83,6 +84,9 @@ class CM_Clockwork_Manager {
         return $this->_getCurrentDateTime() >= $startTime->modify($event->getDateTimeString());
     }
 
+    /**
+     * @return DateTime
+     */
     protected function _getCurrentDateTime() {
         return new DateTime();
     }

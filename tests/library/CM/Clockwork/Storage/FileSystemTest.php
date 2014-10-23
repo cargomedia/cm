@@ -1,6 +1,6 @@
 <?php
 
-class CM_Clockwork_PersistenceTest extends CMTest_TestCase {
+class CM_Clockwork_Storage_FileSystemTest extends CMTest_TestCase {
 
     /** @var DateTime */
     private $_datetime1;
@@ -37,7 +37,7 @@ EOT;
         CMTest_TH::clearFilesystem();
     }
 
-    public function testGetLastRunTime() {
+    public function testGetLastRuntime() {
         $this->_fileSystem->ensureDirectory('clockwork');
         CM_File::create($this->_file->getPath(), $this->_fileContent, $this->_fileSystem);
         $interval = '1 day';
@@ -45,20 +45,20 @@ EOT;
         $event2 = new CM_Clockwork_Event('bar', $interval);
         $event3 = new CM_Clockwork_Event('nonexistent', $interval);
 
-        $persistence = new CM_Clockwork_Persistence($this->_context);
+        $persistence = new CM_Clockwork_Storage_FileSystem($this->_context);
 
         $this->assertEquals($this->_datetime1, $persistence->getLastRuntime($event1));
         $this->assertEquals($this->_datetime2, $persistence->getLastRuntime($event2));
         $this->assertNull($persistence->getLastRuntime($event3));
     }
 
-    public function testGetLastRunTimeTimeZoneChange() {
+    public function testGetLastRuntimeTimeZoneChange() {
         $defaultTimeZoneBackup = date_default_timezone_get();
         $this->_fileSystem->ensureDirectory('clockwork');
         CM_File::create($this->_file->getPath(), $this->_fileContent, $this->_fileSystem);
         $event1 = new CM_Clockwork_Event('foo', '1 day');
 
-        $persistence = new CM_Clockwork_Persistence($this->_context);
+        $persistence = new CM_Clockwork_Storage_FileSystem($this->_context);
         date_default_timezone_set('Antarctica/Vostok');
 
         $this->assertEquals($this->_datetime1, $persistence->getLastRuntime($event1));
@@ -70,7 +70,7 @@ EOT;
         $event1 = new CM_Clockwork_Event('foo', $interval);
         $event2 = new CM_Clockwork_Event('bar', $interval);
 
-        $persistence = new CM_Clockwork_Persistence($this->_context);
+        $persistence = new CM_Clockwork_Storage_FileSystem($this->_context);
 
         $dir = new CM_File('clockwork', $this->_fileSystem);
         $this->assertFalse($dir->getExists());

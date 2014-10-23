@@ -35,18 +35,18 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
     public function testRunEventsPersistence() {
         $currently = $this->_getCurrentDateTime();
-        $context = 'foo';
-        $persistence = $this->getMockBuilder('CM_Clockwork_Persistence')->setConstructorArgs(array($context))->setMethods(array('getLastRuntime',
+        /** @var CM_Clockwork_Storage_Memory $storage */
+        $storage = $this->getMockBuilder('CM_Clockwork_Storage_Memory')->setMethods(array('getLastRuntime',
             'setRuntime'))
             ->getMock();
 
-        $manager = $this->getMockBuilder('CM_Clockwork_Manager')->setMethods(array('_getCurrentDateTime'))->disableOriginalConstructor()->getMockForAbstractClass();
+        $manager = $this->getMockBuilder('CM_Clockwork_Manager')->setMethods(array('_getCurrentDateTime'))->disableOriginalConstructor()->getMock();
         $manager->expects($this->any())->method('_getCurrentDateTime')->will($this->returnCallback(function () use ($currently) {
             return clone $currently;
         }));
         $manager->__construct();
         /** @var CM_Clockwork_Manager $manager */
-        $manager->setPersistence($persistence);
+        $manager->setStorage($storage);
         $counter = array(
             '1' => 0,
             '2' => 0,
@@ -54,35 +54,35 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $event1 = $this->_createEvent($manager, $currently, '1 second', $counter, 'event1');
         $event2 = $this->_createEvent($manager, $currently, '2 seconds', $counter, 'event2');
 
-        $persistence->expects($this->at(0))->method('getLastRuntime')->with($event1)->will($this->returnValue(null));
-        $persistence->expects($this->at(1))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime()));
+        $storage->expects($this->at(0))->method('getLastRuntime')->with($event1)->will($this->returnValue(null));
+        $storage->expects($this->at(1))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime()));
 
-        $persistence->expects($this->at(2))->method('getLastRuntime')->with($event1)->will($this->returnValue(null));
-        $persistence->expects($this->at(3))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime()));
-        $persistence->expects($this->at(4))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(1));
+        $storage->expects($this->at(2))->method('getLastRuntime')->with($event1)->will($this->returnValue(null));
+        $storage->expects($this->at(3))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime()));
+        $storage->expects($this->at(4))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(1));
 
-        $persistence->expects($this->at(5))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(1)));
-        $persistence->expects($this->at(6))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(0)));
-        $persistence->expects($this->at(7))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(2));
-        $persistence->expects($this->at(8))->method('setRuntime')->with($event2, $this->_getCurrentDateTime(2));
+        $storage->expects($this->at(5))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(1)));
+        $storage->expects($this->at(6))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(0)));
+        $storage->expects($this->at(7))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(2));
+        $storage->expects($this->at(8))->method('setRuntime')->with($event2, $this->_getCurrentDateTime(2));
 
-        $persistence->expects($this->at(9))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(2)));
-        $persistence->expects($this->at(10))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(2)));
-        $persistence->expects($this->at(11))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(3));
+        $storage->expects($this->at(9))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(2)));
+        $storage->expects($this->at(10))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(2)));
+        $storage->expects($this->at(11))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(3));
 
-        $persistence->expects($this->at(12))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(3)));
-        $persistence->expects($this->at(13))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(2)));
-        $persistence->expects($this->at(14))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(4));
-        $persistence->expects($this->at(15))->method('setRuntime')->with($event2, $this->_getCurrentDateTime(4));
+        $storage->expects($this->at(12))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(3)));
+        $storage->expects($this->at(13))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(2)));
+        $storage->expects($this->at(14))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(4));
+        $storage->expects($this->at(15))->method('setRuntime')->with($event2, $this->_getCurrentDateTime(4));
 
-        $persistence->expects($this->at(16))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(4)));
-        $persistence->expects($this->at(17))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(4)));
-        $persistence->expects($this->at(18))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(5));
+        $storage->expects($this->at(16))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(4)));
+        $storage->expects($this->at(17))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(4)));
+        $storage->expects($this->at(18))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(5));
 
-        $persistence->expects($this->at(19))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(5)));
-        $persistence->expects($this->at(20))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(4)));
-        $persistence->expects($this->at(21))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(6));
-        $persistence->expects($this->at(22))->method('setRuntime')->with($event2, $this->_getCurrentDateTime(6));
+        $storage->expects($this->at(19))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(5)));
+        $storage->expects($this->at(20))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(4)));
+        $storage->expects($this->at(21))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(6));
+        $storage->expects($this->at(22))->method('setRuntime')->with($event2, $this->_getCurrentDateTime(6));
 
         for ($i = 0; $i <= 6; $i++) {
             $manager->runEvents();
@@ -93,8 +93,8 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
     public function testShouldRunFixedTime() {
         $currently = new DateTime();
         $lastRuntime = null;
-        $persistenceMock = $this->mockClass('CM_Clockwork_Persistence');
-        $persistenceMock->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
             if ($lastRuntime instanceof DateTime) {
                 return clone $lastRuntime;
             }
@@ -104,11 +104,11 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $managerMock->mockMethod('_getCurrentDateTime')->set(function () use (&$currently) {
             return clone $currently;
         });
-        /** @var CM_Clockwork_Persistence $persistence */
-        $persistence = $persistenceMock->newInstanceWithoutConstructor();
+        /** @var CM_Clockwork_Storage_FileSystem $storage */
+        $storage = $storageClass->newInstance();
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
-        $manager->setPersistence($persistence);
+        $manager->setStorage($storage);
         $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
 
         /** @var CM_Clockwork_Event $event */
@@ -162,8 +162,8 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
     public function testShouldRunInterval() {
         $currently = new DateTime();
         $lastRuntime = null;
-        $persistenceMock = $this->mockClass('CM_Clockwork_Persistence');
-        $persistenceMock->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
             if ($lastRuntime instanceof DateTime) {
                 return clone $lastRuntime;
             }
@@ -173,11 +173,11 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $managerMock->mockMethod('_getCurrentDateTime')->set(function () use (&$currently) {
             return clone $currently;
         });
-        /** @var CM_Clockwork_Persistence $persistence */
-        $persistence = $persistenceMock->newInstanceWithoutConstructor();
+        /** @var CM_Clockwork_Storage_FileSystem $storage */
+        $storage = $storageClass->newInstance();
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
-        $manager->setPersistence($persistence);
+        $manager->setStorage($storage);
         $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
 
         $event = new CM_Clockwork_Event('event', '2 seconds');
