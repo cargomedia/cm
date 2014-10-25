@@ -107,7 +107,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
     }
 
     public function testShouldRunFixedTimeMode() {
-        $timeZone = new DateTimeZone('UTC');
+        $timeZone = CM_Bootloader::getInstance()->getTimeZone();
         $currently = null;
         $lastRuntime = null;
         $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');

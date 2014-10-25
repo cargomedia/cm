@@ -17,7 +17,7 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     public function __construct() {
         $this->_events = array();
         $this->_storage = new CM_Clockwork_Storage_Memory();
-        $this->_timeZone = new DateTimeZone('UTC');
+        $this->_timeZone = CM_Bootloader::getInstance()->getTimeZone();
         $this->_startTime = $this->_getCurrentDateTime();
     }
 
