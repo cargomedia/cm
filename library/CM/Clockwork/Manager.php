@@ -112,7 +112,7 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
      */
     protected function _getDSTAgnosticDateTime(DateTime $dateTime) {
         $offsetHours = $dateTime->getOffset() / 3600;
-        $dateString = $dateTime->format('Y-m-d ') . ' ' . $dateTime->format('H:i:s') . ($offsetHours >= 0 ? ' +' : '') . $offsetHours;
+        $dateString = $dateTime->format('Y-m-d H:i:s') . ($offsetHours >= 0 ? ' +' : '') . $offsetHours;
         return new DateTime($dateString);
     }
 
