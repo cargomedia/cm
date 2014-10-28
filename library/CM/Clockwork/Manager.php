@@ -1,6 +1,6 @@
 <?php
 
-class CM_Clockwork_Manager {
+class CM_Clockwork_Manager extends CM_Class_Abstract {
 
     /** @var CM_Clockwork_Event[] */
     private $_events;
@@ -8,12 +8,16 @@ class CM_Clockwork_Manager {
     /** @var CM_Clockwork_Storage_Abstract */
     private $_storage;
 
-   /** @var DateTime */
+    /** @var DateTime */
     private $_startTime;
+
+    /** @var DateTimeZone */
+    private $_timeZone;
 
     public function __construct() {
         $this->_events = array();
         $this->_storage = new CM_Clockwork_Storage_Memory();
+        $this->_timeZone = new DateTimeZone('UTC');
         $this->_startTime = $this->_getCurrentDateTime();
     }
 
@@ -22,6 +26,14 @@ class CM_Clockwork_Manager {
      */
     public function registerEvent(CM_Clockwork_Event $event) {
         $this->_events[] = $event;
+    }
+
+    /**
+     * @param DateTimeZone $timeZone
+     */
+    public function setTimeZone(DateTimeZone $timeZone) {
+        $this->_timeZone = $timeZone;
+        $this->_startTime->setTimezone($this->_timeZone);
     }
 
     /**
@@ -69,25 +81,49 @@ class CM_Clockwork_Manager {
      */
     protected function _shouldRun(CM_Clockwork_Event $event) {
         $lastRuntime = $this->_storage->getLastRuntime($event);
+        $dateTimeString = $event->getDateTimeString();
+
         if ($lastRuntime) {
+            $lastRuntime->setTimezone($this->_timeZone);
             $nextExecutionTime = clone $lastRuntime;
-            $dateTimeString = $event->getDateTimeString();
-            $nextExecutionTime->modify($dateTimeString);
-            if (($nextExecutionTime == $this->_getCurrentDateTime()->modify($dateTimeString) && $lastRuntime >= $nextExecutionTime) ||
-                $nextExecutionTime > $this->_getCurrentDateTime()
-            ) {
+        } else {
+            $nextExecutionTime = clone $this->_startTime;
+        }
+
+        $nextExecutionTime = $this->_getDSTAgnosticDateTime($nextExecutionTime);
+        $nextExecutionTime->modify($dateTimeString);
+        if ($lastRuntime) {
+            $executedInCurrentTimeframe = $nextExecutionTime ==
+                $this->_getDSTAgnosticDateTime($this->_getCurrentDateTime(), $lastRuntime->getOffset())->modify($dateTimeString);
+            if ($executedInCurrentTimeframe && $lastRuntime >= $nextExecutionTime) {
                 return false;
             }
-            return true;
         }
-        $startTime = clone $this->_startTime;
-        return $this->_getCurrentDateTime() >= $startTime->modify($event->getDateTimeString());
+        return $this->_getCurrentDateTime() >= $nextExecutionTime;
+    }
+
+    /**
+     * @param DateTime $dateTime
+     * @param int|null $offset
+     * @return DateTime
+     *
+     * Workaround for buggy DateTime modify() behaviour around dst-change see https://bugs.php.net/bug.php?id=51051
+     */
+    protected function _getDSTAgnosticDateTime(DateTime $dateTime, $offset = null) {
+        $offset = $offset ? $offset : $dateTime->getOffset();
+        $offsetHours = $offset / 3600;
+        $dateString = $dateTime->format('Y-m-d ') . ' ' . $dateTime->format('H:i:s') . ($offsetHours >= 0 ? ' +' : '') . $offsetHours;
+        return new DateTime($dateString);
     }
 
     /**
      * @return DateTime
      */
     protected function _getCurrentDateTime() {
-        return new DateTime();
+        return $this->_getCurrentDateTimeUTC()->setTimezone($this->_timeZone);
+    }
+
+    protected function _getCurrentDateTimeUTC() {
+        return new DateTime('now', new DateTimeZone('UTC'));
     }
 }
