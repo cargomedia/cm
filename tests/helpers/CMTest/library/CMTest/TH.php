@@ -53,9 +53,9 @@ class CMTest_TH {
         foreach ($mongo->listCollectionNames() as $collectionName) {
             $mongo->remove($collectionName);
         }
-        foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
-            require $setupScript->getPath();
-        }
+        $setupProcessor = new CM_Setup_Loader();
+        $setupProcessor->setServiceManager(CM_Service_Manager::getInstance());
+        $setupProcessor->load();
     }
 
     public static function clearConfig() {
