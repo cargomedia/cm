@@ -12,7 +12,7 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public function fileToDb() {
-        CM_App::getInstance()->setupDatabase(true);
+        CM_App::getInstance()->setupDatabase($this->_getStreamOutput(), true);
     }
 
     public function runUpdates() {
