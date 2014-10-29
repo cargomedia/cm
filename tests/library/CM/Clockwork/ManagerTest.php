@@ -321,7 +321,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $lastRuntime = clone $currently;
         $currently->modify('19 minutes 59 seconds');
         $this->assertFalse($_shouldRun->invoke($manager, $event));
-        return;
         $currently->modify('1 second');
         $this->assertTrue($_shouldRun->invoke($manager, $event));
     }
