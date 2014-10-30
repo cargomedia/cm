@@ -2,6 +2,20 @@
 
 class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
+    public function testSetStorage() {
+        $manager = new CM_Clockwork_Manager();
+        $serviceManager = CM_Service_Manager::getInstance();
+        $manager->setServiceManager($serviceManager);
+        $storage = $this->mockObject('CM_Clockwork_Storage_Abstract', ['foo']);
+        $methodMock = $storage->mockMethod('setServiceManager');
+        $methodMock->set(function(CM_Service_Manager $manager) use ($serviceManager) {
+            $this->assertEquals($serviceManager, $manager);
+        });
+        /** @var CM_Clockwork_Storage_Abstract $storage */
+        $manager->setStorage($storage);
+        $this->assertSame(1, $methodMock->getCallCount());
+    }
+
     public function testRunEventsFor() {
         $currently = $this->_getCurrentDateTime();
         $managerMock = $this->mockClass('CM_Clockwork_Manager');
