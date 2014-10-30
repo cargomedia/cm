@@ -23,25 +23,16 @@ class CM_Clockwork_Storage_FileSystem extends CM_Clockwork_Storage_Abstract {
         $content = CM_Params::encode($values, true);
         $file = $this->_getFile();
         if (!$file->getExists()) {
-            $filesystem = $this->_getFileSystem();
-            $filesystem->ensureDirectory(self::FOLDER_NAME);
-            CM_File::create($file->getPath(), $content, $filesystem);
-        } else {
-            $file->write($content);
+            $file->ensureParentDirectory();
         }
+        $file->write($content);
     }
 
     /**
      * @return CM_File
      */
     private function _getFile() {
-        return new CM_File(self::FOLDER_NAME . DIRECTORY_SEPARATOR . $this->_context . '.json', $this->_getFileSystem());
-    }
-
-    /**
-     * @return CM_File_Filesystem
-     */
-    private function _getFileSystem() {
-        return CM_Service_Manager::getInstance()->getFilesystems()->getData();
+        return new CM_File(self::FOLDER_NAME . DIRECTORY_SEPARATOR . $this->_context .
+            '.json', CM_Service_Manager::getInstance()->getFilesystems()->getData());
     }
 }
