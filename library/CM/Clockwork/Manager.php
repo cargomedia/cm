@@ -5,11 +5,11 @@ class CM_Clockwork_Manager extends CM_Class_Abstract {
     /** @var CM_Clockwork_Event[] */
     private $_events;
 
-    /** @var CM_Clockwork_Storage_Abstract */
-    private $_storage;
-
     /** @var DateTime */
     private $_startTime;
+
+    /** @var CM_Clockwork_Storage_Abstract */
+    private $_storage;
 
     /** @var DateTimeZone */
     private $_timeZone;
@@ -19,21 +19,6 @@ class CM_Clockwork_Manager extends CM_Class_Abstract {
         $this->_storage = new CM_Clockwork_Storage_Memory();
         $this->_timeZone = new DateTimeZone('UTC');
         $this->_startTime = $this->_getCurrentDateTime();
-    }
-
-    /**
-     * @param CM_Clockwork_Event $event
-     */
-    public function registerEvent(CM_Clockwork_Event $event) {
-        $this->_events[] = $event;
-    }
-
-    /**
-     * @param DateTimeZone $timeZone
-     */
-    public function setTimeZone(DateTimeZone $timeZone) {
-        $this->_timeZone = $timeZone;
-        $this->_startTime->setTimezone($this->_timeZone);
     }
 
     /**
@@ -47,11 +32,11 @@ class CM_Clockwork_Manager extends CM_Class_Abstract {
         $this->registerEvent($event);
     }
 
-    public function start() {
-        while (true) {
-            $this->runEvents();
-            sleep(1);
-        }
+    /**
+     * @param CM_Clockwork_Event $event
+     */
+    public function registerEvent(CM_Clockwork_Event $event) {
+        $this->_events[] = $event;
     }
 
     public function runEvents() {
@@ -76,6 +61,21 @@ class CM_Clockwork_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @param DateTimeZone $timeZone
+     */
+    public function setTimeZone(DateTimeZone $timeZone) {
+        $this->_timeZone = $timeZone;
+        $this->_startTime->setTimezone($this->_timeZone);
+    }
+
+    public function start() {
+        while (true) {
+            $this->runEvents();
+            sleep(1);
+        }
+    }
+
+    /**
      * @param CM_Clockwork_Event $event
      * @return boolean
      */
@@ -95,7 +95,6 @@ class CM_Clockwork_Manager extends CM_Class_Abstract {
                 $nextExecutionTime->modify('next ' . $timeframe);
             }
         }
-
         if (!$timeframe) {
             $nextExecutionTime = $this->_getDSTAgnosticDateTime($nextExecutionTime);
         }

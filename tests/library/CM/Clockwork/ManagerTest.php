@@ -113,7 +113,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
         $manager->setStorage($storage);
-        //
         /** @var CM_Clockwork_Event $event */
         $event = new CM_Clockwork_Event('event1', '14:00', 'day');
         $currently->modify('13:59:59');
@@ -140,7 +139,9 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $event = new CM_Clockwork_Event('event2', 'first day of 09:00', 'month');
         $this->assertFalse($_shouldRun->invoke($manager, $event));
 
-        $currently->modify('next day 09:00');
+        $currently->modify('next day 08:59:59');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('09:00:00');
         $this->assertTrue($_shouldRun->invoke($manager, $event));
 
         // execution delayed into next timeframe
@@ -152,7 +153,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
         $event = new CM_Clockwork_Event('event3', '23:59', 'day');
-        echo "\n\n";
 
         $currently->modify('next day 00:01');
         $this->assertTrue($_shouldRun->invoke($manager, $event));
@@ -161,7 +161,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $currently->modify('23:58');
         $this->assertFalse($_shouldRun->invoke($manager, $event));
 
-        $currently->modify('next day 00:01');
+        $currently->modify('23:59');
         $this->assertTrue($_shouldRun->invoke($manager, $event));
     }
 
@@ -239,7 +239,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $lastRuntime = null;
         $timeZone = new DateTimeZone('Europe/Berlin');
         $currently = new DateTime('2014-10-26 00:20:00', new DateTimeZone('UTC'));
-        //        $currently = $this->_getDateTime($currently);
         $managerMock = $this->mockClass('CM_Clockwork_Manager');
         $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
             return clone $currently;
@@ -280,11 +279,10 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertTrue($_shouldRun->invoke($manager, $event));
     }
 
-    public function testShouldRun_intervalMode_forwardDaylightSavingTimeSwitch_PositiveOffsetTimeZone() {
+    public function testShouldRun_intervalMode_forwardDaylightSavingTimeSwitch() {
         $lastRuntime = null;
         $timeZone = new DateTimeZone('Europe/Berlin');
         $currently = new DateTime('2014-3-30 00:59:59', new DateTimeZone('UTC'));
-        //        $currently = $this->_getDateTime($currently);
         $managerMock = $this->mockClass('CM_Clockwork_Manager');
         $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
             return clone $currently;
@@ -329,7 +327,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $lastRuntime = null;
         $timeZone = new DateTimeZone('America/Chicago');
         $currently = new DateTime('2014-11-1 06:20:00', new DateTimeZone('UTC'));
-        //        $currently = $this->_getDateTime($currently);
         $managerMock = $this->mockClass('CM_Clockwork_Manager');
         $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
             return clone $currently;
