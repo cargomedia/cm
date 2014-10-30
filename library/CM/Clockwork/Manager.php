@@ -83,7 +83,6 @@ class CM_Clockwork_Manager extends CM_Class_Abstract {
         $lastRuntime = $this->_storage->getLastRuntime($event);
         $dateTimeString = $event->getDateTimeString();
         $timeframe = $event->getTimeframe();
-
         if ($lastRuntime) {
             $lastRuntime->setTimezone($this->_timeZone);
             $nextExecutionTime = clone $lastRuntime;
