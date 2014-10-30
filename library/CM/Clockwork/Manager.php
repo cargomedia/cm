@@ -106,14 +106,12 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
 
     /**
      * @param DateTime $dateTime
-     * @param int|null $offset
      * @return DateTime
      *
      * Workaround for buggy DateTime modify() behaviour around dst-change see https://bugs.php.net/bug.php?id=51051
      */
-    protected function _getDSTAgnosticDateTime(DateTime $dateTime, $offset = null) {
-        $offset = $offset ? $offset : $dateTime->getOffset();
-        $offsetHours = $offset / 3600;
+    protected function _getDSTAgnosticDateTime(DateTime $dateTime) {
+        $offsetHours = $dateTime->getOffset() / 3600;
         $dateString = $dateTime->format('Y-m-d ') . ' ' . $dateTime->format('H:i:s') . ($offsetHours >= 0 ? ' +' : '') . $offsetHours;
         return new DateTime($dateString);
     }
