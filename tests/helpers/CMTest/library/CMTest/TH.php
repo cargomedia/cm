@@ -53,7 +53,8 @@ class CMTest_TH {
         foreach ($mongo->listCollectionNames() as $collectionName) {
             $mongo->remove($collectionName);
         }
-        $setupProcessor = new CM_Setup_Loader();
+        $setupProcessor = new CM_Provision_Loader();
+        $setupProcessor->registerScriptFromClassNames(CM_Config::get()->CMTest_TH->provisionClasses);
         $setupProcessor->setServiceManager(CM_Service_Manager::getInstance());
         $setupProcessor->load();
     }

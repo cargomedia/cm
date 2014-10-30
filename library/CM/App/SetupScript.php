@@ -1,6 +1,6 @@
 <?php
 
-class CM_App_SetupScript extends CM_Setup_Script_Abstract {
+class CM_App_SetupScript extends CM_Provision_Script_Abstract {
 
     public function load(CM_Service_Manager $manager) {
         $client = $manager->getDatabases()->getMaster();
