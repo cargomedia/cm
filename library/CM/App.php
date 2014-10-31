@@ -35,20 +35,27 @@ class CM_App {
     }
 
     /**
-     * @param CM_OutputStream_Interface|null $output
-     * @param boolean|null                   $forceReload
+     * @param boolean|null $forceReload
      */
-    public function setupDatabase(CM_OutputStream_Interface $output = null, $forceReload = null) {
-        $isEmptyMysql = $this->_setupDbMysql($forceReload);
-        $isEmptyMongo = $this->_setupDbMongo($forceReload);
-        if ($isEmptyMysql && $isEmptyMongo) {
-            $this->_setInitialVersion();
+    public function setupDatabase($forceReload = null) {
+        $this->_setupDbMysql($forceReload);
+        $this->_setupDbMongo($forceReload);
+    }
 
-            $setupProcessor = new CM_Provision_Loader($output);
-            $setupProcessor->registerScriptFromClassNames(CM_Config::get()->CM_App->provisionClasses);
-            $setupProcessor->setServiceManager($this->_getServiceManager());
-            $setupProcessor->load();
+    /**
+     * @param CM_OutputStream_Interface $output
+     */
+    public function setupData(CM_OutputStream_Interface $output) {
+        if (CM_Option::getInstance()->get('provisioned')) {
+            return;
         }
+        $setupProcessor = new CM_Provision_Loader($output);
+        $setupProcessor->registerScriptFromClassNames(CM_Config::get()->CM_App->provisionClasses);
+        $setupProcessor->setServiceManager($this->_getServiceManager());
+        $setupProcessor->load();
+
+        $this->_setInitialVersion();
+        CM_Option::getInstance()->set('provisioned', true);
     }
 
     public function setupTranslations() {
@@ -102,7 +109,7 @@ class CM_App {
     }
 
     /**
-     * @param int         $version
+     * @param int $version
      * @param string|null $namespace
      */
     public function setVersion($version, $namespace = null) {
@@ -150,8 +157,8 @@ class CM_App {
     }
 
     /**
-     * @param string       $namespace
-     * @param int          $version
+     * @param string $namespace
+     * @param int $version
      * @param Closure|null $callbackBefore
      * @param Closure|null $callbackAfter
      * @return int
@@ -197,7 +204,7 @@ class CM_App {
     }
 
     /**
-     * @param int         $version
+     * @param int $version
      * @param string|null $moduleName
      * @return string
      * @throws CM_Exception_Invalid
@@ -228,17 +235,16 @@ class CM_App {
 
     /**
      * @param boolean $forceReload
-     * @return boolean
      * @throws CM_Exception_Invalid
      */
-    private function _setupDbMongo($forceReload) {
+    protected function _setupDbMongo($forceReload) {
         $mongoClient = $this->_getServiceManager()->getMongoDb();
         if ($forceReload) {
             $mongoClient->dropDatabase();
         }
         $collections = $mongoClient->listCollectionNames();
-        $isEmpty = 0 === count($collections);
-        if ($isEmpty) {
+        $hasCollections = count($collections) > 0;
+        if (!$hasCollections) {
             foreach (CM_Util::getResourceFiles('mongo/collections.json') as $dump) {
                 $collectionInfo = CM_Params::jsonDecode($dump->read());
                 foreach ($collectionInfo as $collection => $indexes) {
@@ -249,15 +255,13 @@ class CM_App {
                 }
             }
         }
-        return $isEmpty;
     }
 
     /**
      * @param boolean $forceReload
-     * @return boolean
      * @throws CM_Db_Exception
      */
-    private function _setupDbMysql($forceReload) {
+    protected function _setupDbMysql($forceReload) {
         $mysqlClient = $this->_getServiceManager()->getDatabases()->getMaster();
         $db = $mysqlClient->getDb();
         $mysqlClient->setDb(null);
@@ -270,12 +274,11 @@ class CM_App {
         }
         $mysqlClient->setDb($db);
         $tables = $mysqlClient->createStatement('SHOW TABLES')->execute()->fetchAll();
-        $isEmpty = 0 === count($tables);
-        if ($isEmpty) {
+        $hasTables = count($tables) > 0;
+        if (!$hasTables) {
             foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
                 CM_Db_Db::runDump($db, $dump);
             }
         }
-        return $isEmpty;
     }
 }

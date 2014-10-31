@@ -12,6 +12,8 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         $this->setupDatabase($reload);
         $this->_getStreamOutput()->writeln('Setting up elasticsearch indexes…');
         $this->setupElasticsearch($reload);
+        $this->_getStreamOutput()->writeln('Setting up data…');
+        $this->setupData($reload);
         $this->_getStreamOutput()->writeln('Setting up translations…');
         $this->setupTranslations();
 
@@ -29,7 +31,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
      * @param bool|null $reload
      */
     public function setupDatabase($reload = null) {
-        CM_App::getInstance()->setupDatabase($this->_getStreamOutput(), $reload);
+        CM_App::getInstance()->setupDatabase($reload);
     }
 
     /**
@@ -38,6 +40,13 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
     public function setupElasticsearch($reload = null) {
         $searchCli = new CM_Elasticsearch_Index_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
         $searchCli->create(null, !$reload);
+    }
+
+    /**
+     * @param bool|null $reload
+     */
+    public function setupData($reload = null) {
+        CM_App::getInstance()->setupData($this->_getStreamOutput(), $reload);
     }
 
     public function setupTranslations() {
