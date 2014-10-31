@@ -19,6 +19,7 @@ return function (CM_Config_Node $config) {
     $config->CM_App->provisionClasses[] = 'CM_I18n_SetupScript';
 
     $config->CMTest_TH->provisionClasses = array();
+    $config->CMTest_TH->provisionClasses[] = 'CM_App_SetupScript';
 
     $config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
     $config->CM_Cache_Local->lifetime = 86400;
@@ -156,11 +157,11 @@ return function (CM_Config_Node $config) {
     $config->services['usercontent'] = array(
         'class'     => 'CM_Service_UserContent',
         'arguments' => array(array(
-            'default' => array(
-                'filesystem' => 'filesystem-usercontent',
-                'url'        => 'http://localhost/userfiles',
-            ),
-        ))
+                                 'default' => array(
+                                     'filesystem' => 'filesystem-usercontent',
+                                     'url'        => 'http://localhost/userfiles',
+                                 ),
+                             ))
     );
 
     $config->services['trackings'] = array(
