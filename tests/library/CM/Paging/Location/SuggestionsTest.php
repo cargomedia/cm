@@ -26,12 +26,12 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
         CM_Model_Location_City::create($country1, $state3, 'El Serrat', '42.617', '1.55', '209961');
 
         $country2 = CM_Model_Location_Country::create('Australia', 'AU');
-        $state4 = CM_Model_Location_State::create($country2, 'Queensland', null, 'AU02');
-        $state5 = CM_Model_Location_State::create($country2, 'Victoria', null, 'AU03');
-        $state6 = CM_Model_Location_State::create($country2, 'Tazmania', null, 'AU04');
-        CM_Model_Location_City::create($country2, $state4, 'Abermain', '-27.567', '152.783');
-        CM_Model_Location_City::create($country2, $state5, 'Acheron', '-37.25', '145.7');
-        CM_Model_Location_City::create($country2, $state6, 'Baden', '-42.433', '147.467');
+        $state4 = CM_Model_Location_State::create($country2, 'Queensland', null, 'AU04');
+        $state5 = CM_Model_Location_State::create($country2, 'Victoria', null, 'AU07');
+        $state6 = CM_Model_Location_State::create($country2, 'Tasmania', null, 'AU06');
+        CM_Model_Location_City::create($country2, $state4, 'Abermain', '-27.567', '152.783', '33924');
+        CM_Model_Location_City::create($country2, $state5, 'Acheron', '-37.25', '145.7', '195676');
+        CM_Model_Location_City::create($country2, $state6, 'Baden', '-42.433', '147.467', '242082');
 
         CM_Model_Location::createAggregation();
         CM_Config::get()->CM_Elasticsearch_Client->enabled = true;
