@@ -116,7 +116,7 @@ class CM_App {
 
     /**
      * @param Closure|null $callbackBefore fn($version)
-     * @param Closure|null $callbackAfter  fn($version)
+     * @param Closure|null $callbackAfter fn($version)
      * @return int Number of version bumps
      */
     public function runUpdateScripts(Closure $callbackBefore = null, Closure $callbackAfter = null) {
@@ -144,7 +144,7 @@ class CM_App {
 
     /**
      * @param string $namespace
-     * @param int $version
+     * @param int    $version
      * @param Closure|null $callbackBefore
      * @param Closure|null $callbackAfter
      * @return int
