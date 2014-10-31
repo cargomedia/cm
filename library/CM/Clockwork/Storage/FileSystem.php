@@ -20,7 +20,7 @@ class CM_Clockwork_Storage_FileSystem extends CM_Clockwork_Storage_Abstract {
         $values = \Functional\map($data, function (DateTime $dateTime) {
             return $dateTime->getTimestamp();
         });
-        $content = CM_Params::encode($values, true);
+        $content = CM_Params::jsonEncode($values, true);
         $file = $this->_getStorageFile();
         if (!$file->getExists()) {
             $file->ensureParentDirectory();
