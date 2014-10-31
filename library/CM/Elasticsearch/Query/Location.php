@@ -3,6 +3,17 @@
 class CM_Elasticsearch_Query_Location extends CM_Elasticsearch_Query {
 
     /**
+     * @param CM_Model_Location $location
+     */
+    public function filterIds(CM_Model_Location $location) {
+        $level = $location->getLevel();
+        $id = $location->getId($level);
+        if ($id) {
+            $this->filterTerm('ids.' . $level, $id);
+        }
+    }
+
+    /**
      * @param int $levelMin
      * @param int $levelMax OPTIONAL
      */
