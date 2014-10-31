@@ -2,7 +2,7 @@
 
 class CM_App_SetupScript_Translations extends CM_Provision_Script_Abstract {
 
-    public function load(CM_Service_Manager $manager) {
+    public function load(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
         /** @var CM_Model_Language $language */
         foreach (new CM_Paging_Language_All() as $language) {
             $path = 'translations/' . $language->getAbbreviation() . '.php';
