@@ -50,7 +50,7 @@ class CM_App {
             return;
         }
         $setupProcessor = new CM_Provision_Loader($output);
-        $setupProcessor->registerScriptFromClassNames(CM_Config::get()->CM_App->provisionClasses);
+        $setupProcessor->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses);
         $setupProcessor->setServiceManager($this->_getServiceManager());
         $setupProcessor->load();
 
@@ -95,7 +95,7 @@ class CM_App {
     }
 
     /**
-     * @param int $version
+     * @param int         $version
      * @param string|null $namespace
      */
     public function setVersion($version, $namespace = null) {
@@ -116,7 +116,7 @@ class CM_App {
 
     /**
      * @param Closure|null $callbackBefore fn($version)
-     * @param Closure|null $callbackAfter fn($version)
+     * @param Closure|null $callbackAfter  fn($version)
      * @return int Number of version bumps
      */
     public function runUpdateScripts(Closure $callbackBefore = null, Closure $callbackAfter = null) {
@@ -143,8 +143,8 @@ class CM_App {
     }
 
     /**
-     * @param string $namespace
-     * @param int    $version
+     * @param string       $namespace
+     * @param int          $version
      * @param Closure|null $callbackBefore
      * @param Closure|null $callbackAfter
      * @return int
@@ -190,7 +190,7 @@ class CM_App {
     }
 
     /**
-     * @param int $version
+     * @param int         $version
      * @param string|null $moduleName
      * @return string
      * @throws CM_Exception_Invalid

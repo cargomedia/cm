@@ -54,7 +54,7 @@ class CMTest_TH {
             $mongo->remove($collectionName);
         }
         $setupProcessor = new CM_Provision_Loader();
-        $setupProcessor->registerScriptFromClassNames(CM_Config::get()->CMTest_TH->provisionClasses);
+        $setupProcessor->registerScriptFromClassNames(CM_Config::get()->CMTest_TH->setupScriptClasses);
         $setupProcessor->setServiceManager(CM_Service_Manager::getInstance());
         $setupProcessor->load();
     }
