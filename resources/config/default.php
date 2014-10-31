@@ -15,11 +15,11 @@ return function (CM_Config_Node $config) {
         array('host' => 'localhost', 'port' => 9200),
     );
     $config->CM_App->provisionClasses = array();
-    $config->CM_App->provisionClasses[] = 'CM_App_SetupScript';
-    $config->CM_App->provisionClasses[] = 'CM_I18n_SetupScript';
+    $config->CM_App->provisionClasses[] = 'CM_App_SetupScript_Core';
+    $config->CM_App->provisionClasses[] = 'CM_App_SetupScript_Translations';
 
     $config->CMTest_TH->provisionClasses = array();
-    $config->CMTest_TH->provisionClasses[] = 'CM_App_SetupScript';
+    $config->CMTest_TH->provisionClasses[] = 'CM_App_SetupScript_Core';
 
     $config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
     $config->CM_Cache_Local->lifetime = 86400;

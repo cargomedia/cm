@@ -1,6 +1,6 @@
 <?php
 
-class CM_I18n_SetupScript extends CM_Provision_Script_Abstract {
+class CM_App_SetupScript_Translations extends CM_Provision_Script_Abstract {
 
     public function load(CM_Service_Manager $manager) {
         /** @var CM_Model_Language $language */
