@@ -14,8 +14,6 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         $this->setupElasticsearch($reload);
         $this->_getStreamOutput()->writeln('Setting up data…');
         $this->setupData($reload);
-        $this->_getStreamOutput()->writeln('Setting up translations…');
-        $this->setupTranslations();
 
         if ($reload) {
             $cacheCli = new CM_Cache_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
@@ -47,10 +45,6 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function setupData($reload = null) {
         CM_App::getInstance()->setupData($this->_getStreamOutput(), $reload);
-    }
-
-    public function setupTranslations() {
-        CM_App::getInstance()->setupTranslations();
     }
 
     public function fillCaches() {
