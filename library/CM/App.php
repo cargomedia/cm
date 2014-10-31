@@ -58,20 +58,6 @@ class CM_App {
         CM_Option::getInstance()->set('provisioned', true);
     }
 
-    public function setupTranslations() {
-        /** @var CM_Model_Language $language */
-        foreach (new CM_Paging_Language_All() as $language) {
-            $path = 'translations/' . $language->getAbbreviation() . '.php';
-            foreach (CM_Util::getResourceFiles($path) as $translationsFile) {
-                $translationsSetter = require $translationsFile->getPath();
-                if (!$translationsSetter instanceof Closure) {
-                    throw new CM_Exception_Invalid('Invalid translation file. `' . $translationsFile->getPath() . '` must return callable');
-                }
-                $translationsSetter($language);
-            }
-        }
-    }
-
     public function fillCaches() {
         /** @var CM_Asset_Javascript_Abstract[] $assetList */
         $assetList = array();

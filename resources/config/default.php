@@ -16,6 +16,7 @@ return function (CM_Config_Node $config) {
     );
     $config->CM_App->provisionClasses = array();
     $config->CM_App->provisionClasses[] = 'CM_App_SetupScript';
+    $config->CM_App->provisionClasses[] = 'CM_I18n_SetupScript';
 
     $config->CMTest_TH->provisionClasses = array();
 
