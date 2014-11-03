@@ -54,41 +54,41 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
 
     public function testSearch() {
         $source = new CM_Paging_Location_Suggestions('Merit ad', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_CITY);
-        $this->assertEquals(1, $source->getCount());
+        $this->assertCount(1, $source);
         $this->assertEquals('Meritxell', $source->getItem(0)->getName());
     }
 
     public function testSearchWithLevel() {
         $source = new CM_Paging_Location_Suggestions('Encamp', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
-        $this->assertEquals(1, $source->getCount());
+        $this->assertCount(1, $source);
         $this->assertEquals('Encamp', $source->getItem(0)->getName());
     }
 
     public function testSearchWithScope() {
         $scopeLocation = new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, self::$_countryId1);
         $source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_ZIP, null, $scopeLocation);
-        $this->assertEquals(12, $source->getCount());
+        $this->assertCount(12, $source);
 
         $scopeLocation = new CM_Model_Location(CM_Model_Location::LEVEL_STATE, self::$_stateId1);
         $source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_ZIP, null, $scopeLocation);
-        $this->assertEquals(6, $source->getCount());
+        $this->assertCount(6, $source);
 
         $scopeLocation = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, self::$_cityId);
         $source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_ZIP, null, $scopeLocation);
-        $this->assertEquals(1, $source->getCount());
+        $this->assertCount(1, $source);
 
         $scopeLocation = new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, self::$_countryId2);
         $source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_ZIP, null, $scopeLocation);
-        $this->assertEquals(7, $source->getCount());
+        $this->assertCount(7, $source);
 
         $scopeLocation = new CM_Model_Location(CM_Model_Location::LEVEL_STATE, self::$_stateId4);
         $source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_ZIP, null, $scopeLocation);
-        $this->assertEquals(2, $source->getCount());
+        $this->assertCount(2, $source);
     }
 
     public function testSearchEmpty() {
         $source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
-        $this->assertEquals(11, $source->getCount());
+        $this->assertCount(11, $source);
     }
 
     public function testSearchDistance() {
@@ -104,9 +104,9 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
         CM_Cache_Local::getInstance()->flush();
 
         $source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
-        $this->assertEquals(0, $source->getCount());
+        $this->assertCount(0, $source);
 
         $source = new CM_Paging_Location_Suggestions('el', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
-        $this->assertEquals(0, $source->getCount());
+        $this->assertCount(0, $source);
     }
 }
