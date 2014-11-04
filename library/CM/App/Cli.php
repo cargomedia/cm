@@ -29,7 +29,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
      * @param bool|null $reload
      */
     public function setupDatabase($reload = null) {
-        CM_App::getInstance()->setupDatabase($this->_getStreamOutput(), $reload);
+        CM_App::getInstance()->setupDatabase($reload);
     }
 
     /**

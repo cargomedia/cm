@@ -7,13 +7,6 @@ class CM_App {
      */
     private static $_instance;
 
-    /** @var CM_Service_Manager */
-    private $_serviceManager;
-
-    public function __construct() {
-        $this->_serviceManager = CM_Service_Manager::getInstance();
-    }
-
     /**
      * @return CM_App
      */
@@ -25,7 +18,7 @@ class CM_App {
     }
 
     public function setupFilesystem() {
-        $serviceManager = $this->_getServiceManager();
+        $serviceManager = CM_Service_Manager::getInstance();
         $serviceManager->getFilesystems()->getData()->getAdapter()->setup();
         $serviceManager->getFilesystems()->getTmp()->getAdapter()->setup();
         $serviceManager->getFilesystems()->getTmp()->deleteByPrefix('/');
@@ -35,17 +28,16 @@ class CM_App {
     }
 
     /**
-     * @param CM_OutputStream_Interface|null $output
-     * @param boolean|null                   $forceReload
+     * @param boolean|null $forceReload
      */
-    public function setupDatabase(CM_OutputStream_Interface $output = null, $forceReload = null) {
+    public function setupDatabase($forceReload = null) {
         $isEmptyMysql = $this->_setupDbMysql($forceReload);
         $isEmptyMongo = $this->_setupDbMongo($forceReload);
         if ($isEmptyMysql && $isEmptyMongo) {
             $this->_setInitialVersion();
-            $setupProcessor = new CM_Setup_Loader($output);
-            $setupProcessor->setServiceManager($this->_getServiceManager());
-            $setupProcessor->load();
+            foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
+                require $setupScript->getPath();
+            }
         }
     }
 
@@ -141,7 +133,7 @@ class CM_App {
             $versionBumps += ($version - $versionStart);
         }
         if ($versionBumps > 0) {
-            $db = $this->_getServiceManager()->getDatabases()->getMaster()->getDb();
+            $db = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getDb();
             CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
         }
         return $versionBumps;
@@ -168,13 +160,6 @@ class CM_App {
             $callbackAfter($version);
         }
         return 1;
-    }
-
-    /**
-     * @return CM_Service_Manager
-     */
-    protected function _getServiceManager() {
-        return $this->_serviceManager;
     }
 
     /**
@@ -230,7 +215,7 @@ class CM_App {
      * @throws CM_Exception_Invalid
      */
     private function _setupDbMongo($forceReload) {
-        $mongoClient = $this->_getServiceManager()->getMongoDb();
+        $mongoClient = CM_Service_Manager::getInstance()->getMongoDb();
         if ($forceReload) {
             $mongoClient->dropDatabase();
         }
@@ -256,7 +241,7 @@ class CM_App {
      * @throws CM_Db_Exception
      */
     private function _setupDbMysql($forceReload) {
-        $mysqlClient = $this->_getServiceManager()->getDatabases()->getMaster();
+        $mysqlClient = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
         $db = $mysqlClient->getDb();
         $mysqlClient->setDb(null);
         if ($forceReload) {
