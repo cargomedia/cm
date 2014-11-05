@@ -7,4 +7,8 @@ class CM_App_SetupScript_Core extends CM_Provision_Script_Abstract {
         $query = new CM_Db_Query_Insert($client, 'cm_requestClientCounter', ['counter' => 0]);
         $query->execute();
     }
+
+    public function getRunLevel() {
+        return 1;
+    }
 }

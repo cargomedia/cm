@@ -48,6 +48,11 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
      * @return CM_Provision_Script_Abstract[]
      */
     protected function _getScriptList() {
-        return $this->_scriptList;
+        $scriptList = $this->_scriptList;
+        $runLevelList = \Functional\map($this->_scriptList, function (CM_Provision_Script_Abstract $script) {
+            return $script->getRunLevel();
+        });
+        array_multisort($runLevelList, $scriptList);
+        return $scriptList;
     }
 }

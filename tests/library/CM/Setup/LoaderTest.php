@@ -17,4 +17,22 @@ class CM_Provision_LoaderTest extends CMTest_TestCase {
         $loader->load();
         $this->assertSame(1, $loadMethod->getCallCount());
     }
+
+    public function testGetScriptList() {
+
+        $script1 = $this->mockObject('CM_Provision_Script_Abstract');
+        $script2 = $this->mockObject('CM_Provision_Script_Abstract');
+        $script2->mockMethod('getRunLevel')->set(10);
+        $script3 = $this->mockObject('CM_Provision_Script_Abstract');
+        $script3->mockMethod('getRunLevel')->set(1);
+
+        $loader = new CM_Provision_Loader();
+        $loader->registerScript($script1);
+        $loader->registerScript($script2);
+        $loader->registerScript($script3);
+
+        $scriptList = CMTest_TH::callProtectedMethod($loader, '_getScriptList');
+        $expected = [$script3, $script1, $script2];
+        $this->assertSame($expected, $scriptList);
+    }
 }

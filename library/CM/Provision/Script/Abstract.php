@@ -14,4 +14,11 @@ abstract class CM_Provision_Script_Abstract {
     public function getName() {
         return get_class($this);
     }
+
+    /**
+     * @return int
+     */
+    public function getRunLevel() {
+        return 5;
+    }
 }
