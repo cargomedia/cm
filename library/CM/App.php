@@ -47,11 +47,11 @@ class CM_App {
      * @param bool                      $reload
      */
     public function setup(CM_OutputStream_Interface $output, $reload) {
-        if (CM_Option::getInstance()->get('provisioned')) {
-            return;
-        }
         $setupProcessor = new CM_Provision_Loader($output);
         $setupProcessor->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses);
+        if ($setupProcessor->isAnyScriptLoaded()) {
+            return;
+        }
         $setupProcessor->setServiceManager($this->_getServiceManager());
         $setupProcessor->load();
 

@@ -45,6 +45,15 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
     }
 
     /**
+     * @return bool
+     */
+    public function isAnyScriptLoaded() {
+        return \Functional\some($this->_getScriptList(), function (CM_Provision_Script_Abstract $script) {
+            return $script->isLoaded();
+        });
+    }
+
+    /**
      * @return CM_Provision_Script_Abstract[]
      */
     protected function _getScriptList() {

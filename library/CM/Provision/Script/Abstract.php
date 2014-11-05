@@ -16,6 +16,13 @@ abstract class CM_Provision_Script_Abstract {
     }
 
     /**
+     * @return bool
+     */
+    public function isLoaded() {
+        return false;
+    }
+
+    /**
      * @return int
      */
     public function getRunLevel() {
