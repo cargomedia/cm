@@ -6,8 +6,6 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
      * @param bool|null $reload
      */
     public function setup($reload = null) {
-        $this->_getStreamOutput()->writeln('Setting up filesystem…');
-        $this->setupFilesystem();
         $this->_getStreamOutput()->writeln('Setting up elasticsearch indexes…');
         $this->setupElasticsearch($reload);
         $this->_getStreamOutput()->writeln('Setting up data…');
@@ -17,10 +15,6 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
             $cacheCli = new CM_Cache_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
             $cacheCli->clear();
         }
-    }
-
-    public function setupFilesystem() {
-        CM_App::getInstance()->setupFilesystem();
     }
 
     /**

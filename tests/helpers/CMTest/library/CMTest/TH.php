@@ -10,7 +10,7 @@ class CMTest_TH {
     private static $_dbClient = null;
 
     public static function init() {
-        CM_App::getInstance()->setupDatabase(true);
+        CM_App::getInstance()->setup(new CM_OutputStream_Null(), true);
 
         self::$_configBackup = serialize(CM_Config::get());
 
@@ -34,7 +34,11 @@ class CMTest_TH {
         foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
             $filesystem->deleteByPrefix('/');
         }
-        CM_App::getInstance()->setupFilesystem();
+        $setupProcessor = new CM_Provision_Loader();
+        $setupProcessor->setServiceManager(CM_Service_Manager::getInstance());
+        $setupProcessor->registerScript(new CM_File_Filesystem_SetupScript());
+        $setupProcessor->unload();
+        $setupProcessor->load();
     }
 
     public static function clearCache() {

@@ -24,16 +24,6 @@ class CM_App {
         return self::$_instance;
     }
 
-    public function setupFilesystem() {
-        $serviceManager = $this->_getServiceManager();
-        $serviceManager->getFilesystems()->getData()->getAdapter()->setup();
-        $serviceManager->getFilesystems()->getTmp()->getAdapter()->setup();
-        $serviceManager->getFilesystems()->getTmp()->deleteByPrefix('/');
-        foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
-            $filesystem->getAdapter()->setup();
-        }
-    }
-
     /**
      * @param CM_OutputStream_Interface $output
      * @param bool                      $reload
