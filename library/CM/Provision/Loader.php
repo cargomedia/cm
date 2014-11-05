@@ -7,7 +7,7 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
     /** @var CM_OutputStream_Interface */
     private $_output;
 
-    /** @var CM_Provision_Script_Abstract[] * */
+    /** @var CM_Provision_Script_Abstract[] */
     private $_scriptList;
 
     /**
