@@ -15,6 +15,8 @@ return function (CM_Config_Node $config) {
         array('host' => 'localhost', 'port' => 9200),
     );
     $config->CM_App->setupScriptClasses = array();
+    $config->CM_App->setupScriptClasses[] = 'CM_Db_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_MongoDb_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Core';
     $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Translations';
 

@@ -35,14 +35,6 @@ class CM_App {
     }
 
     /**
-     * @param boolean|null $forceReload
-     */
-    public function setupDatabase($forceReload = null) {
-        $this->_setupDbMysql($forceReload);
-        $this->_setupDbMongo($forceReload);
-    }
-
-    /**
      * @param CM_OutputStream_Interface $output
      * @param bool                      $reload
      */
@@ -220,55 +212,6 @@ class CM_App {
                 return max($initial, (int) $filename);
             }, 0);
             $app->setVersion($version, $namespace);
-        }
-    }
-
-    /**
-     * @param boolean $forceReload
-     * @throws CM_Exception_Invalid
-     */
-    protected function _setupDbMongo($forceReload) {
-        $mongoClient = $this->_getServiceManager()->getMongoDb();
-        if ($forceReload) {
-            $mongoClient->dropDatabase();
-        }
-        $collections = $mongoClient->listCollectionNames();
-        $hasCollections = count($collections) > 0;
-        if (!$hasCollections) {
-            foreach (CM_Util::getResourceFiles('mongo/collections.json') as $dump) {
-                $collectionInfo = CM_Params::jsonDecode($dump->read());
-                foreach ($collectionInfo as $collection => $indexes) {
-                    $mongoClient->createCollection($collection);
-                    foreach ($indexes as $indexInfo) {
-                        $mongoClient->createIndex($collection, $indexInfo['key'], $indexInfo['options']);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * @param boolean $forceReload
-     * @throws CM_Db_Exception
-     */
-    protected function _setupDbMysql($forceReload) {
-        $mysqlClient = $this->_getServiceManager()->getDatabases()->getMaster();
-        $db = $mysqlClient->getDb();
-        $mysqlClient->setDb(null);
-        if ($forceReload) {
-            $mysqlClient->createStatement('DROP DATABASE IF EXISTS ' . $mysqlClient->quoteIdentifier($db))->execute();
-        }
-        $databaseExists = (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($db))->fetch();
-        if (!$databaseExists) {
-            $mysqlClient->createStatement('CREATE DATABASE ' . $mysqlClient->quoteIdentifier($db))->execute();
-        }
-        $mysqlClient->setDb($db);
-        $tables = $mysqlClient->createStatement('SHOW TABLES')->execute()->fetchAll();
-        $hasTables = count($tables) > 0;
-        if (!$hasTables) {
-            foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-                CM_Db_Db::runDump($db, $dump);
-            }
         }
     }
 }
