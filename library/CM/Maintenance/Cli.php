@@ -2,7 +2,7 @@
 
 class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 
-    /** CM_Clockwork_Manager */
+    /** @var CM_Clockwork_Manager */
     protected $_clockworkManager;
 
     /**
