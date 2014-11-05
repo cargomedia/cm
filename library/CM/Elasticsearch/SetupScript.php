@@ -11,8 +11,4 @@ class CM_Elasticsearch_SetupScript extends CM_Provision_Script_Abstract {
         $searchCli = new CM_Elasticsearch_Index_Cli(null, $output, $output);
         $searchCli->delete();
     }
-
-    public function getRunLevel() {
-        return 1;
-    }
 }
