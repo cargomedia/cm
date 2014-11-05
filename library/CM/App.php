@@ -44,8 +44,9 @@ class CM_App {
 
     /**
      * @param CM_OutputStream_Interface $output
+     * @param bool                      $reload
      */
-    public function setupData(CM_OutputStream_Interface $output) {
+    public function setup(CM_OutputStream_Interface $output, $reload) {
         if (CM_Option::getInstance()->get('provisioned')) {
             return;
         }
