@@ -48,7 +48,7 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
         /** @var CM_Provision_Script_Abstract[] $scriptList */
         $scriptList = array_reverse($this->_getScriptList());
         foreach ($scriptList as $setupScript) {
-            $this->_output->writeln('  UnlLoading ' . $setupScript->getName() . '...');
+            $this->_output->writeln('  Unloading ' . $setupScript->getName() . '...');
             $setupScript->unload($this->getServiceManager(), $this->_output);
         }
     }
@@ -70,6 +70,7 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
         $runLevelList = \Functional\map($this->_scriptList, function (CM_Provision_Script_Abstract $script) {
             return $script->getRunLevel();
         });
+        print_r(array_combine(array_map('get_class', $scriptList), $runLevelList));
         array_multisort($runLevelList, $scriptList);
         return $scriptList;
     }

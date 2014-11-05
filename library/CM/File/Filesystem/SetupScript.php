@@ -17,4 +17,8 @@ class CM_File_Filesystem_SetupScript extends CM_Provision_Script_Abstract {
             $filesystem->deleteByPrefix('/');
         }
     }
+
+    public function getRunLevel() {
+        return 1;
+    }
 }

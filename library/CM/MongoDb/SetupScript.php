@@ -21,7 +21,11 @@ class CM_MongoDb_SetupScript extends CM_Provision_Script_Abstract {
     }
 
     public function isLoaded(CM_Service_Manager $manager) {
-        $hasCollections = $manager->getMongoDb()->listCollectionNames() > 0;
+        $hasCollections = count($manager->getMongoDb()->listCollectionNames()) > 0;
         return $hasCollections;
+    }
+
+    public function getRunLevel() {
+        return 1;
     }
 }

@@ -3,21 +3,20 @@
 class CM_Db_SetupScript extends CM_Provision_Script_Abstract {
 
     public function load(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
-        $mysqlClient = $manager->getDatabases()->getMaster();
-        $db = $mysqlClient->getDb();
+        $mysqlDbClient = $manager->getDatabases()->getMaster();
+        $databaseName = $mysqlDbClient->getDb();
+        $mysqlClient = $mysqlDbClient->getDblessClient();
 
-        $mysqlClient->setDb(null);
-        $databaseExists = (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($db))->fetch();
+        $databaseExists = (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($databaseName))->fetch();
         if (!$databaseExists) {
-            $mysqlClient->createStatement('CREATE DATABASE ' . $mysqlClient->quoteIdentifier($db))->execute();
+            $mysqlClient->createStatement('CREATE DATABASE ' . $mysqlClient->quoteIdentifier($databaseName))->execute();
         }
-        $mysqlClient->setDb($db);
 
-        $tables = $mysqlClient->createStatement('SHOW TABLES')->execute()->fetchAll();
+        $tables = $mysqlDbClient->createStatement('SHOW TABLES')->execute()->fetchAll();
         $hasTables = count($tables) > 0;
         if (!$hasTables) {
             foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-                CM_Db_Db::runDump($db, $dump);
+                CM_Db_Db::runDump($databaseName, $dump);
             }
         }
         $this->_setInitialVersion();
@@ -28,31 +27,32 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract {
      * @param CM_OutputStream_Interface $output
      */
     public function unload(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
-        $mysqlClient = $manager->getDatabases()->getMaster();
-        $db = $mysqlClient->getDb();
-        $mysqlClient->setDb(null);
-        $mysqlClient->createStatement('DROP DATABASE IF EXISTS ' . $mysqlClient->quoteIdentifier($db))->execute();
-        $mysqlClient->setDb($db);
+        $mysqlDbClient = $manager->getDatabases()->getMaster();
+        $mysqlClient = $mysqlDbClient->getDblessClient();
+        $db = $mysqlDbClient->getDb();
+        $mysqlClient->createStatement('DROP DATABASE IF EXISTS ' . $mysqlDbClient->quoteIdentifier($db))->execute();
     }
 
     public function isLoaded(CM_Service_Manager $manager) {
-        $mysqlClient = $manager->getDatabases()->getMaster();
-        $db = $mysqlClient->getDb();
+        $mysqlDbClient = $manager->getDatabases()->getMaster();
+        $mysqlClient = $mysqlDbClient->getDblessClient();
 
-        $mysqlClient->setDb(null);
-        $databaseExists = (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($db))->fetch();
-        $mysqlClient->setDb($db);
+        $databaseExists = (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($mysqlDbClient->getDb()))->fetch();
         if (!$databaseExists) {
             return false;
         }
 
-        $tables = $mysqlClient->createStatement('SHOW TABLES')->execute()->fetchAll();
+        $tables = $mysqlDbClient->createStatement('SHOW TABLES')->execute()->fetchAll();
         $hasTables = count($tables) > 0;
         if (!$hasTables) {
             return false;
         }
 
         return true;
+    }
+
+    public function getRunLevel() {
+        return 1;
     }
 
     private function _setInitialVersion() {

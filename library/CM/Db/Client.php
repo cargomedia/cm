@@ -224,6 +224,15 @@ class CM_Db_Client {
         return $this->_lastConnect;
     }
 
+    public function getDblessClient() {
+        return new static([
+            'host'     => $this->_host,
+            'port'     => $this->_port,
+            'username' => $this->_username,
+            'password' => $this->_password,
+        ]);
+    }
+
     /**
      * @param PDOException $exception
      * @return bool
