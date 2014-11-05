@@ -56,7 +56,6 @@ class CM_App {
         $setupProcessor->load();
 
         $this->_setInitialVersion();
-        CM_Option::getInstance()->set('provisioned', true);
     }
 
     public function fillCaches() {
