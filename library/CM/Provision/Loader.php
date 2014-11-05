@@ -38,9 +38,16 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
     }
 
     public function load() {
-        foreach ($this->_scriptList as $setupScript) {
-            $this->_output->writeln('Loading ' . $setupScript->getName() . '...');
+        foreach ($this->_getScriptList() as $setupScript) {
+            $this->_output->writeln('  Loading ' . $setupScript->getName() . '...');
             $setupScript->load($this->getServiceManager(), $this->_output);
         }
+    }
+
+    /**
+     * @return CM_Provision_Script_Abstract[]
+     */
+    protected function _getScriptList() {
+        return $this->_scriptList;
     }
 }
