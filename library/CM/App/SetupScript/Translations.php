@@ -16,6 +16,9 @@ class CM_App_SetupScript_Translations extends CM_Provision_Script_Abstract {
         }
     }
 
+    public function unload(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
+    }
+
     public function getRunLevel() {
         return 10;
     }

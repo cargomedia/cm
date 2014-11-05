@@ -44,6 +44,15 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
         }
     }
 
+    public function unload() {
+        /** @var CM_Provision_Script_Abstract[] $scriptList */
+        $scriptList = array_reverse($this->_getScriptList());
+        foreach ($scriptList as $setupScript) {
+            $this->_output->writeln('  UnlLoading ' . $setupScript->getName() . '...');
+            $setupScript->unload($this->getServiceManager(), $this->_output);
+        }
+    }
+
     /**
      * @return bool
      */

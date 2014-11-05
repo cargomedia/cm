@@ -49,6 +49,10 @@ class CM_App {
     public function setup(CM_OutputStream_Interface $output, $reload) {
         $setupProcessor = new CM_Provision_Loader($output);
         $setupProcessor->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses);
+        if ($reload) {
+            $setupProcessor->unload();
+        }
+
         if ($setupProcessor->isAnyScriptLoaded()) {
             return;
         }

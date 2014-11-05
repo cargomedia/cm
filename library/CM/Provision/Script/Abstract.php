@@ -9,6 +9,12 @@ abstract class CM_Provision_Script_Abstract {
     abstract public function load(CM_Service_Manager $manager, CM_OutputStream_Interface $output);
 
     /**
+     * @param CM_Service_Manager        $manager
+     * @param CM_OutputStream_Interface $output
+     */
+    abstract public function unload(CM_Service_Manager $manager, CM_OutputStream_Interface $output);
+
+    /**
      * @return string
      */
     public function getName() {
