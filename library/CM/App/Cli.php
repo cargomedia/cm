@@ -6,20 +6,13 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
      * @param bool|null $reload
      */
     public function setup($reload = null) {
-        $this->_getStreamOutput()->writeln('Setting up data…');
-        $this->setupData($reload);
+        $this->_getStreamOutput()->writeln('Setting up application data layers…');
+        CM_App::getInstance()->setup($this->_getStreamOutput(), $reload);
 
         if ($reload) {
             $cacheCli = new CM_Cache_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
             $cacheCli->clear();
         }
-    }
-
-    /**
-     * @param bool|null $reload
-     */
-    public function setupData($reload = null) {
-        CM_App::getInstance()->setup($this->_getStreamOutput(), $reload);
     }
 
     public function fillCaches() {
