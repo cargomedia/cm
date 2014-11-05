@@ -50,8 +50,6 @@ class CM_App {
         }
         $loader->setServiceManager($this->_getServiceManager());
         $loader->load();
-
-        $this->_setInitialVersion();
     }
 
     public function fillCaches() {
@@ -111,6 +109,23 @@ class CM_App {
     }
 
     /**
+     * @return string[]
+     */
+    public function getUpdateScriptPaths() {
+        $paths = array();
+        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
+            $paths[$moduleName] = CM_Util::getModulePath($moduleName) . 'resources/db/update/';
+        }
+
+        $rootPath = DIR_ROOT . 'resources/db/update/';
+        if (!in_array($rootPath, $paths)) {
+            $paths[null] = $rootPath;
+        }
+
+        return $paths;
+    }
+
+    /**
      * @param Closure|null $callbackBefore fn($version)
      * @param Closure|null $callbackAfter  fn($version)
      * @return int Number of version bumps
@@ -119,7 +134,7 @@ class CM_App {
         CM_Cache_Shared::getInstance()->flush();
         CM_Cache_Local::getInstance()->flush();
         $versionBumps = 0;
-        foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
+        foreach ($this->getUpdateScriptPaths() as $namespace => $path) {
             $version = $versionStart = $this->getVersion($namespace);
             while (true) {
                 $version++;
@@ -169,29 +184,12 @@ class CM_App {
     }
 
     /**
-     * @return string[]
-     */
-    private function _getUpdateScriptPaths() {
-        $paths = array();
-        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
-            $paths[$moduleName] = CM_Util::getModulePath($moduleName) . 'resources/db/update/';
-        }
-
-        $rootPath = DIR_ROOT . 'resources/db/update/';
-        if (!in_array($rootPath, $paths)) {
-            $paths[null] = $rootPath;
-        }
-
-        return $paths;
-    }
-
-    /**
      * @param int         $version
      * @param string|null $moduleName
      * @return string
      * @throws CM_Exception_Invalid
      */
-    private function _getUpdateScriptPath($version, $moduleName = null) {
+    public function _getUpdateScriptPath($version, $moduleName = null) {
         $path = DIR_ROOT;
         if ($moduleName) {
             $path = CM_Util::getModulePath($moduleName);
@@ -201,17 +199,5 @@ class CM_App {
             throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $moduleName . '` namespace.');
         }
         return $file->getPath();
-    }
-
-    private function _setInitialVersion() {
-        $app = CM_App::getInstance();
-        foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
-            $updateFiles = CM_Util::rglob('*.php', $path);
-            $version = array_reduce($updateFiles, function ($initial, $path) {
-                $filename = basename($path);
-                return max($initial, (int) $filename);
-            }, 0);
-            $app->setVersion($version, $namespace);
-        }
     }
 }

@@ -20,6 +20,7 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract {
                 CM_Db_Db::runDump($db, $dump);
             }
         }
+        $this->_setInitialVersion();
     }
 
     /**
@@ -52,5 +53,17 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract {
         }
 
         return true;
+    }
+
+    private function _setInitialVersion() {
+        $app = CM_App::getInstance();
+        foreach (CM_App::getInstance()->getUpdateScriptPaths() as $namespace => $path) {
+            $updateFiles = CM_Util::rglob('*.php', $path);
+            $version = array_reduce($updateFiles, function ($initial, $path) {
+                $filename = basename($path);
+                return max($initial, (int) $filename);
+            }, 0);
+            $app->setVersion($version, $namespace);
+        }
     }
 }
