@@ -4,14 +4,16 @@ class CM_Provision_LoaderTest extends CMTest_TestCase {
 
     public function testLoad() {
         $serviceManager = new CM_Service_Manager();
+        $outputStream = new CM_OutputStream_Null();
 
         $script = $this->mockObject('CM_Provision_Script_Abstract');
-        $loadMethod = $script->mockMethod('load')->set(function (CM_Service_Manager $manager) use ($serviceManager) {
+        $loadMethod = $script->mockMethod('load')->set(function (CM_Service_Manager $manager, $output) use ($serviceManager, $outputStream) {
             $this->assertSame($serviceManager, $manager);
+            $this->assertSame($outputStream, $output);
         });
         /** @var CM_Provision_Script_Abstract $script */
 
-        $loader = new CM_Provision_Loader();
+        $loader = new CM_Provision_Loader($outputStream);
         $loader->setServiceManager($serviceManager);
         $loader->registerScript($script);
         $loader->load();
