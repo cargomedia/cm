@@ -22,9 +22,10 @@ abstract class CM_Provision_Script_Abstract {
     }
 
     /**
+     * @param CM_Service_Manager $manager
      * @return bool
      */
-    public function isLoaded() {
+    public function isLoaded(CM_Service_Manager $manager) {
         return false;
     }
 
