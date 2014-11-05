@@ -47,17 +47,17 @@ class CM_App {
      * @param bool                      $reload
      */
     public function setup(CM_OutputStream_Interface $output, $reload) {
-        $setupProcessor = new CM_Provision_Loader($output);
-        $setupProcessor->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses);
+        $loader = new CM_Provision_Loader($output);
+        $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses);
         if ($reload) {
-            $setupProcessor->unload();
+            $loader->unload();
         }
 
-        if ($setupProcessor->isAnyScriptLoaded()) {
+        if ($loader->isAnyScriptLoaded()) {
             return;
         }
-        $setupProcessor->setServiceManager($this->_getServiceManager());
-        $setupProcessor->load();
+        $loader->setServiceManager($this->_getServiceManager());
+        $loader->load();
 
         $this->_setInitialVersion();
     }
