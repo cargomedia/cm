@@ -6,8 +6,6 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
      * @param bool|null $reload
      */
     public function setup($reload = null) {
-        $this->_getStreamOutput()->writeln('Setting up elasticsearch indexes…');
-        $this->setupElasticsearch($reload);
         $this->_getStreamOutput()->writeln('Setting up data…');
         $this->setupData($reload);
 
@@ -15,14 +13,6 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
             $cacheCli = new CM_Cache_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
             $cacheCli->clear();
         }
-    }
-
-    /**
-     * @param bool|null $reload
-     */
-    public function setupElasticsearch($reload = null) {
-        $searchCli = new CM_Elasticsearch_Index_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
-        $searchCli->create(null, !$reload);
     }
 
     /**
