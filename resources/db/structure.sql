@@ -493,8 +493,10 @@ DROP TABLE IF EXISTS `cm_user_online`;
 CREATE TABLE `cm_user_online` (
   `userId` int(10) unsigned NOT NULL,
   `visible` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `offlineStamp` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`userId`),
-  KEY `visible` (`visible`)
+  KEY `visible` (`visible`),
+  KEY `offlineStamp` (`offlineStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_user_preference`;
