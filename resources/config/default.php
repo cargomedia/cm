@@ -161,11 +161,11 @@ return function (CM_Config_Node $config) {
     $config->services['usercontent'] = array(
         'class'     => 'CM_Service_UserContent',
         'arguments' => array(array(
-                                 'default' => array(
-                                     'filesystem' => 'filesystem-usercontent',
-                                     'url'        => 'http://localhost/userfiles',
-                                 ),
-                             ))
+            'default' => array(
+                'filesystem' => 'filesystem-usercontent',
+                'url'        => 'http://localhost/userfiles',
+            ),
+        ))
     );
 
     $config->services['trackings'] = array(
