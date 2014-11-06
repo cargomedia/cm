@@ -224,7 +224,10 @@ class CM_Db_Client {
         return $this->_lastConnect;
     }
 
-    public function getDblessClient() {
+    /**
+     * @return static
+     */
+    public function getClientWithoutDatabase() {
         return new static([
             'host'     => $this->_host,
             'port'     => $this->_port,

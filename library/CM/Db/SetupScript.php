@@ -5,7 +5,7 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
     public function load(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
         $mysqlDbClient = $manager->getDatabases()->getMaster();
         $databaseName = $mysqlDbClient->getDb();
-        $mysqlClient = $mysqlDbClient->getDblessClient();
+        $mysqlClient = $mysqlDbClient->getClientWithoutDatabase();
 
         $databaseExists = (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($databaseName))->fetch();
         if (!$databaseExists) {
@@ -28,14 +28,14 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
      */
     public function unload(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
         $mysqlDbClient = $manager->getDatabases()->getMaster();
-        $mysqlClient = $mysqlDbClient->getDblessClient();
+        $mysqlClient = $mysqlDbClient->getClientWithoutDatabase();
         $db = $mysqlDbClient->getDb();
         $mysqlClient->createStatement('DROP DATABASE IF EXISTS ' . $mysqlDbClient->quoteIdentifier($db))->execute();
     }
 
     public function isLoaded(CM_Service_Manager $manager) {
         $mysqlDbClient = $manager->getDatabases()->getMaster();
-        $mysqlClient = $mysqlDbClient->getDblessClient();
+        $mysqlClient = $mysqlDbClient->getClientWithoutDatabase();
 
         $databaseExists = (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($mysqlDbClient->getDb()))->fetch();
         if (!$databaseExists) {
