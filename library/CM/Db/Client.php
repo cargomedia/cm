@@ -102,7 +102,7 @@ class CM_Db_Client {
             'port'             => $this->getPort(),
             'username'         => $this->getUsername(),
             'password'         => $this->getPassword(),
-            'db'               => $this->getDb(),
+            'db' => $this->getDatabaseName(),
             'reconnectTimeout' => $this->getReconnectTimeout(),
         );
     }
@@ -110,21 +110,8 @@ class CM_Db_Client {
     /**
      * @return string|null
      */
-    public function getDb() {
+    public function getDatabaseName() {
         return $this->_db;
-    }
-
-    /**
-     * @param string|null $db
-     */
-    public function setDb($db) {
-        if (null !== $db) {
-            $db = (string) $db;
-            $this->_db = null;
-            $this->connect();
-            $this->_pdo->exec('USE ' . $db);
-        }
-        $this->_db = $db;
     }
 
     /**

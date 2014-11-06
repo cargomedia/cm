@@ -137,7 +137,7 @@ class CM_App {
             $versionBumps += ($version - $versionStart);
         }
         if ($versionBumps > 0) {
-            $db = $this->_getServiceManager()->getDatabases()->getMaster()->getDb();
+            $db = $this->_getServiceManager()->getDatabases()->getMaster()->getDatabaseName();
             CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
         }
         return $versionBumps;
