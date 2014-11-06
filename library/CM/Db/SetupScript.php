@@ -1,6 +1,6 @@
 <?php
 
-class CM_Db_SetupScript extends CM_Provision_Script_Abstract {
+class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provision_Script_UnloadableInterface {
 
     public function load(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
         $mysqlDbClient = $manager->getDatabases()->getMaster();

@@ -1,6 +1,6 @@
 <?php
 
-class CM_File_Filesystem_SetupScript extends CM_Provision_Script_Abstract {
+class CM_File_Filesystem_SetupScript extends CM_Provision_Script_Abstract implements CM_Provision_Script_UnloadableInterface {
 
     public function load(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
         $manager->getFilesystems()->getData()->getAdapter()->setup();

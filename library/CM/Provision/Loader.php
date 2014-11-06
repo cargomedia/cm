@@ -39,17 +39,20 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
 
     public function load() {
         foreach ($this->_getScriptList() as $setupScript) {
-            $this->_output->writeln('  Loading ' . $setupScript->getName() . '...');
-            $setupScript->load($this->getServiceManager(), $this->_output);
+            if ($setupScript instanceof CM_Provision_Script_LoadableInterface) {
+                $this->_output->writeln('  Loading ' . $setupScript->getName() . '...');
+                $setupScript->load($this->getServiceManager(), $this->_output);
+            }
         }
     }
 
     public function unload() {
-        /** @var CM_Provision_Script_Abstract[] $scriptList */
         $scriptList = array_reverse($this->_getScriptList());
         foreach ($scriptList as $setupScript) {
-            $this->_output->writeln('  Unloading ' . $setupScript->getName() . '...');
-            $setupScript->unload($this->getServiceManager(), $this->_output);
+            if ($setupScript instanceof CM_Provision_Script_UnloadableInterface) {
+                $this->_output->writeln('  Unloading ' . $setupScript->getName() . '...');
+                $setupScript->unload($this->getServiceManager(), $this->_output);
+            }
         }
     }
 

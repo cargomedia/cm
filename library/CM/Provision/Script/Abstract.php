@@ -1,18 +1,6 @@
 <?php
 
-abstract class CM_Provision_Script_Abstract {
-
-    /**
-     * @param CM_Service_Manager        $manager
-     * @param CM_OutputStream_Interface $output
-     */
-    abstract public function load(CM_Service_Manager $manager, CM_OutputStream_Interface $output);
-
-    /**
-     * @param CM_Service_Manager        $manager
-     * @param CM_OutputStream_Interface $output
-     */
-    abstract public function unload(CM_Service_Manager $manager, CM_OutputStream_Interface $output);
+abstract class CM_Provision_Script_Abstract implements CM_Provision_Script_LoadableInterface {
 
     /**
      * @return string
