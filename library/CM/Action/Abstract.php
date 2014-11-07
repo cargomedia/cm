@@ -387,11 +387,11 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     }
 
     /**
-     * @param int $ageSeconds
+     * @param int $age
      */
-    public static function deleteTransgressionsOlder($ageSeconds) {
-        $ageSeconds = (int) $ageSeconds;
-        CM_Db_Db::exec("DELETE FROM cm_action WHERE actionLimitType IS NOT NULL AND createStamp < ?", [time() - $ageSeconds]);
+    public static function deleteTransgressionsOlder($age) {
+        $age = (int) $age;
+        CM_Db_Db::exec("DELETE FROM cm_action WHERE actionLimitType IS NOT NULL AND createStamp < ?", [time() - $age]);
     }
 
     /**
