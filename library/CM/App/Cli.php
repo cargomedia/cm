@@ -2,9 +2,20 @@
 
 class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 
-    public function setupLocalEnvironment($reload) {
+    /**
+     * @param bool|null $reload
+     */
+    public function setup($reload = null) {
+        $this->setupLocalEnvironment($reload);
+        $this->setupGlobalEnvironment($reload);
+    }
+
+    /**
+     * @param bool|null $reload
+     */
+    public function setupLocalEnvironment($reload = null) {
         $this->_getStreamOutput()->writeln('Setting up local environment…');
-        CM_App::getInstance()->setupLocalEnviroment($this->_getStreamOutput(), $reload);
+        CM_App::getInstance()->setupLocalEnvironment($this->_getStreamOutput(), $reload);
     }
 
     /**

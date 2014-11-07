@@ -24,6 +24,10 @@ class CM_App {
         return self::$_instance;
     }
 
+    /**
+     * @param CM_OutputStream_Interface $output
+     * @param bool                      $reload
+     */
     public function setupLocalEnvironment(CM_OutputStream_Interface $output, $reload) {
         $loader = new CM_Provision_Loader($output);
         $loader->setServiceManager($this->_getServiceManager());
@@ -131,7 +135,7 @@ class CM_App {
 
     /**
      * @param Closure|null $callbackBefore fn($version)
-     * @param Closure|null $callbackAfter  fn($version)
+     * @param Closure|null $callbackAfter fn($version)
      * @return int Number of version bumps
      */
     public function runUpdateScripts(Closure $callbackBefore = null, Closure $callbackAfter = null) {
