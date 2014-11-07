@@ -12,7 +12,7 @@
   transition: border-color .1s;
 
   &:hover {
-    border-left: 1px solid lighten(@colorNotice, 15);
+    border-left: 1px solid @colorFocus;
   }
 }
 
@@ -25,7 +25,7 @@ textarea.textinput {
 
 .input_focus {
   outline: none;
-  border: 1px solid lighten(@colorNotice, 15);
+  border-color: @colorFocus;
 }
 
 .placeholder(@color) {
@@ -238,8 +238,8 @@ input[type=checkbox], input[type=radio] {
   }
 
   &:checked + label:before {
-    background-color: lighten(@colorNotice, 15);
-    border-color: lighten(@colorNotice, 5);
+    background-color: @colorFocus;
+    border-color: @colorFocus;
   }
 
   &:disabled + label {

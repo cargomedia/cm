@@ -170,7 +170,9 @@ class CM_Cli_CommandManager {
             $streamOutput = $this->_streamOutput;
             $streamError = $this->_streamError;
             $workload = function () use ($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError) {
-                CMService_Newrelic::getInstance()->startTransaction($transactionName);
+                if (!$command->getKeepalive()) {
+                    CMService_Newrelic::getInstance()->startTransaction($transactionName);
+                }
                 $command->run($arguments, $streamInput, $streamOutput, $streamError);
             };
 
