@@ -2,12 +2,17 @@
 
 class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 
+    public function setupLocalEnvironment($reload) {
+        $this->_getStreamOutput()->writeln('Setting up local environment…');
+        CM_App::getInstance()->setupLocalEnviroment($this->_getStreamOutput(), $reload);
+    }
+
     /**
      * @param bool|null $reload
      */
-    public function setup($reload = null) {
-        $this->_getStreamOutput()->writeln('Setting up application data layers…');
-        CM_App::getInstance()->setup($this->_getStreamOutput(), $reload);
+    public function setupGlobalEnvironment($reload = null) {
+        $this->_getStreamOutput()->writeln('Setting up global environment…');
+        CM_App::getInstance()->setupGlobalEnvironment($this->_getStreamOutput(), $reload);
 
         if ($reload) {
             $cacheCli = new CM_Cache_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
@@ -21,7 +26,8 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public function deploy() {
-        $this->setup();
+        $this->setupLocalEnvironment();
+        $this->setupGlobalEnvironment();
         $this->setDeployVersion();
 
         $dbCli = new CM_Db_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());

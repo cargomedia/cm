@@ -24,14 +24,28 @@ class CM_App {
         return self::$_instance;
     }
 
+    public function setupLocalEnvironment(CM_OutputStream_Interface $output, $reload) {
+        $loader = new CM_Provision_Loader($output);
+        $loader->setServiceManager($this->_getServiceManager());
+        $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses->local);
+        if ($reload) {
+            $loader->unload();
+        }
+
+        if ($loader->isAnyScriptLoaded()) {
+            return;
+        }
+        $loader->load();
+    }
+
     /**
      * @param CM_OutputStream_Interface $output
      * @param bool                      $reload
      */
-    public function setup(CM_OutputStream_Interface $output, $reload) {
+    public function setupGlobalEnvironment(CM_OutputStream_Interface $output, $reload) {
         $loader = new CM_Provision_Loader($output);
         $loader->setServiceManager($this->_getServiceManager());
-        $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses);
+        $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses->global);
         if ($reload) {
             $loader->unload();
         }

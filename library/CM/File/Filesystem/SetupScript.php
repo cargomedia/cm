@@ -12,7 +12,6 @@ class CM_File_Filesystem_SetupScript extends CM_Provision_Script_Abstract implem
 
     public function unload(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
         $manager->getFilesystems()->getData()->deleteByPrefix('/');
-        $manager->getFilesystems()->getTmp()->deleteByPrefix('/');
         foreach ($manager->getUserContent()->getFilesystemList() as $filesystem) {
             $filesystem->deleteByPrefix('/');
         }
