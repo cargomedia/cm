@@ -102,7 +102,7 @@ class CM_Db_Client {
             'port'             => $this->getPort(),
             'username'         => $this->getUsername(),
             'password'         => $this->getPassword(),
-            'db' => $this->getDatabaseName(),
+            'db'               => $this->getDatabaseName(),
             'reconnectTimeout' => $this->getReconnectTimeout(),
         );
     }
