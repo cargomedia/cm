@@ -35,11 +35,6 @@ class CMTest_TH {
         foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
             $filesystem->deleteByPrefix('/');
         }
-        $setupProcessor = new CM_Provision_Loader();
-        $setupProcessor->setServiceManager(CM_Service_Manager::getInstance());
-        $setupProcessor->registerScript(new CM_File_Filesystem_SetupScript());
-        $setupProcessor->unload();
-        $setupProcessor->load();
     }
 
     public static function clearCache() {
