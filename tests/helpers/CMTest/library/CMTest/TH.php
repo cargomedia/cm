@@ -32,6 +32,7 @@ class CMTest_TH {
     public static function clearFilesystem() {
         $serviceManager = CM_Service_Manager::getInstance();
         $serviceManager->getFilesystems()->getData()->deleteByPrefix('/');
+        $serviceManager->getFilesystems()->getTmp()->deleteByPrefix('/');
         foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
             $filesystem->deleteByPrefix('/');
         }
