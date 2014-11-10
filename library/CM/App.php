@@ -35,10 +35,6 @@ class CM_App {
         if ($reload) {
             $loader->unload();
         }
-
-        if ($loader->isAnyScriptLoaded()) {
-            return;
-        }
         $loader->load();
     }
 
@@ -52,10 +48,6 @@ class CM_App {
         $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses->global);
         if ($reload) {
             $loader->unload();
-        }
-
-        if ($loader->isAnyScriptLoaded()) {
-            return;
         }
         $loader->load();
     }
