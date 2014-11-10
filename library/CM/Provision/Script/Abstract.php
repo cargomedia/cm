@@ -13,9 +13,7 @@ abstract class CM_Provision_Script_Abstract implements CM_Provision_Script_Loada
      * @param CM_Service_Manager $manager
      * @return bool
      */
-    public function isLoaded(CM_Service_Manager $manager) {
-        return false;
-    }
+    abstract public function isLoaded(CM_Service_Manager $manager);
 
     /**
      * @return int

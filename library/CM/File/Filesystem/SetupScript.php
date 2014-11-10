@@ -17,6 +17,10 @@ class CM_File_Filesystem_SetupScript extends CM_Provision_Script_Abstract implem
         }
     }
 
+    public function isLoaded(CM_Service_Manager $manager) {
+        return false;
+    }
+
     public function getRunLevel() {
         return 1;
     }
