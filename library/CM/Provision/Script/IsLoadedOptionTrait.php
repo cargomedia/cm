@@ -10,6 +10,7 @@ trait CM_Provision_Script_IsLoadedOptionTrait {
     }
 
     /**
+     * @param CM_Service_Manager $manager
      * @return bool
      */
     public function isLoaded(CM_Service_Manager $manager) {
