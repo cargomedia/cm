@@ -12,7 +12,7 @@ trait CM_Provision_Script_IsLoadedOptionTrait {
     /**
      * @return bool
      */
-    public function isLoaded() {
+    public function isLoaded(CM_Service_Manager $manager) {
         return (bool) CM_Option::getInstance()->get($this->_getOptionName());
     }
 
