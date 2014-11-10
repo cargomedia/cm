@@ -38,21 +38,17 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
     }
 
     public function load() {
-        foreach ($this->_getScriptList() as $setupScript) {
-            if ($setupScript instanceof CM_Provision_Script_LoadableInterface) {
-                $this->_output->writeln('  Loading ' . $setupScript->getName() . '...');
-                $setupScript->load($this->getServiceManager(), $this->_output);
-            }
+        foreach ($this->_getScriptListLoadable() as $setupScript) {
+            $this->_output->writeln('  Loading ' . $setupScript->getName() . '...');
+            $setupScript->load($this->getServiceManager(), $this->_output);
         }
     }
 
     public function unload() {
-        $scriptList = array_reverse($this->_getScriptList());
+        $scriptList = $this->_getScriptListUnloadable();
         foreach ($scriptList as $setupScript) {
-            if ($setupScript instanceof CM_Provision_Script_UnloadableInterface) {
                 $this->_output->writeln('  Unloading ' . $setupScript->getName() . '...');
                 $setupScript->unload($this->getServiceManager(), $this->_output);
-            }
         }
     }
 
@@ -76,4 +72,26 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
         array_multisort($runLevelList, $scriptList);
         return $scriptList;
     }
+
+    /**
+     * @return CM_Provision_Script_LoadableInterface[]|CM_Provision_Script_Abstract[]
+     */
+    protected function _getScriptListLoadable() {
+        $scriptList = $this->_getScriptList();
+        return \Functional\select($scriptList, function($script) {
+            return $script instanceof CM_Provision_Script_LoadableInterface;
+        });
+    }
+
+    /**
+     * @return CM_Provision_Script_UnloadableInterface[]|CM_Provision_Script_Abstract[]
+     */
+    protected function _getScriptListUnloadable() {
+        $scriptList = array_reverse($this->_getScriptList());
+        return \Functional\select($scriptList, function($script) {
+            return $script instanceof CM_Provision_Script_UnloadableInterface;
+        });
+    }
+
+
 }
