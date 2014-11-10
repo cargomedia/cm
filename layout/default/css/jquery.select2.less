@@ -9,16 +9,22 @@
     .textinput;
 
     .select2-search-choice {
-      margin: 4px 5px 3px 0;
+      margin: 5px 5px 3px 0;
       padding: 3px 18px 3px 5px;
-      line-height: 14px;
+      line-height: @fontLineHeight;
+
+      .select2-search-choice-close {
+        top: 6px;
+      }
     }
   }
 
   &.select2-container-active {
-    .select2-choices {
+    .textinput {
       box-shadow: none;
       .input_focus;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
     }
   }
 }
