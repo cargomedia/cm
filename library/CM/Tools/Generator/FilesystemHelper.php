@@ -55,6 +55,6 @@ class CM_Tools_Generator_FilesystemHelper extends CM_Class_Abstract {
      */
     public function notify($action, $path) {
         $actionMessage = str_pad($action, 10, ' ', STR_PAD_LEFT);
-        $this->_output->writeln($actionMessage . '  ' . $path);
+        $this->_output->writeln($actionMessage . '  ' . preg_replace('#^/#', '', $path));
     }
 }
