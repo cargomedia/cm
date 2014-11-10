@@ -22,7 +22,6 @@ class CM_Tools_Generator_FilesystemHelper extends CM_Class_Abstract {
             $gitKeepFile = $directory->joinPath('.gitkeep');
             $this->notify('mkdir', $gitKeepFile->getParentDirectory()->getPath());
             $gitKeepFile->ensureParentDirectory();
-            $this->createFile($gitKeepFile);
         }
     }
 
