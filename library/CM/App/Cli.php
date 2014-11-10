@@ -6,29 +6,12 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
      * @param bool|null $reload
      */
     public function setup($reload = null) {
-        $this->setupLocalEnvironment($reload);
-        $this->setupGlobalEnvironment($reload);
+        CM_App::getInstance()->setup($this->_getStreamOutput(), $reload);
 
         if ($reload) {
             $cacheCli = new CM_Cache_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
             $cacheCli->clear();
         }
-    }
-
-    /**
-     * @param bool|null $reload
-     */
-    public function setupLocalEnvironment($reload = null) {
-        $this->_getStreamOutput()->writeln('Setting up local environment…');
-        CM_App::getInstance()->setupLocalEnvironment($this->_getStreamOutput(), $reload);
-    }
-
-    /**
-     * @param bool|null $reload
-     */
-    public function setupGlobalEnvironment($reload = null) {
-        $this->_getStreamOutput()->writeln('Setting up global environment…');
-        CM_App::getInstance()->setupGlobalEnvironment($this->_getStreamOutput(), $reload);
     }
 
     public function fillCaches() {
@@ -37,8 +20,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public function deploy() {
-        $this->setupLocalEnvironment();
-        $this->setupGlobalEnvironment();
+        $this->setup();
         $this->setDeployVersion();
 
         $dbCli = new CM_Db_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
