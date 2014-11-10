@@ -37,4 +37,28 @@ class CM_Provision_LoaderTest extends CMTest_TestCase {
         $expected = [$script3, $script1, $script2];
         $this->assertSame($expected, $scriptList);
     }
+
+    public function testUnload() {
+        $serviceManager = new CM_Service_Manager();
+        $outputStream = new CM_OutputStream_Null();
+
+        $scriptAbstract = $this->mockObject('CM_Provision_Script_Abstract');
+        $scriptAbstractUnloadMethod = $scriptAbstract->mockMethod('unload');
+        /** @var CM_Provision_Script_Abstract $scriptAbstract */
+
+        $scriptUnloadable = $this->mockClass('CM_Provision_Script_Abstract', ['CM_Provision_Script_UnloadableInterface'])->newInstance();
+        $scriptUnloadableUnloadMethod = $scriptUnloadable->mockMethod('unload')->set(function (CM_Service_Manager $manager, $output) use ($serviceManager, $outputStream) {
+            $this->assertSame($serviceManager, $manager);
+            $this->assertSame($outputStream, $output);
+        });
+        /** @var CM_Provision_Script_Abstract $scriptUnloadable */
+
+        $loader = new CM_Provision_Loader($outputStream);
+        $loader->setServiceManager($serviceManager);
+        $loader->registerScript($scriptAbstract);
+        $loader->registerScript($scriptUnloadable);
+        $loader->unload();
+        $this->assertSame(0, $scriptAbstractUnloadMethod->getCallCount());
+        $this->assertSame(1, $scriptUnloadableUnloadMethod->getCallCount());
+    }
 }
