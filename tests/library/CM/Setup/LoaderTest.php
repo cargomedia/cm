@@ -2,6 +2,23 @@
 
 class CM_Provision_LoaderTest extends CMTest_TestCase {
 
+    public function testGetScriptList() {
+        $script1 = $this->mockObject('CM_Provision_Script_Abstract');
+        $script2 = $this->mockObject('CM_Provision_Script_Abstract');
+        $script2->mockMethod('getRunLevel')->set(10);
+        $script3 = $this->mockObject('CM_Provision_Script_Abstract');
+        $script3->mockMethod('getRunLevel')->set(1);
+
+        $loader = new CM_Provision_Loader();
+        $loader->registerScript($script1);
+        $loader->registerScript($script2);
+        $loader->registerScript($script3);
+
+        $scriptList = CMTest_TH::callProtectedMethod($loader, '_getScriptList');
+        $expected = [$script3, $script1, $script2];
+        $this->assertSame($expected, $scriptList);
+    }
+
     public function testLoad() {
         $serviceManager = new CM_Service_Manager();
         $outputStream = new CM_OutputStream_Null();
@@ -20,45 +37,33 @@ class CM_Provision_LoaderTest extends CMTest_TestCase {
         $this->assertSame(1, $loadMethod->getCallCount());
     }
 
-    public function testGetScriptList() {
+    public function testGetScriptListUnloadable() {
+        $classScriptUnloadable = $this->mockClass('CM_Provision_Script_Abstract', ['CM_Provision_Script_UnloadableInterface']);
 
         $script1 = $this->mockObject('CM_Provision_Script_Abstract');
-        $script2 = $this->mockObject('CM_Provision_Script_Abstract');
-        $script2->mockMethod('getRunLevel')->set(10);
-        $script3 = $this->mockObject('CM_Provision_Script_Abstract');
-        $script3->mockMethod('getRunLevel')->set(1);
+        $script2 = $classScriptUnloadable->newInstance();
+        $script3 = $classScriptUnloadable->newInstance();
 
-        $loader = new CM_Provision_Loader();
-        $loader->registerScript($script1);
-        $loader->registerScript($script2);
-        $loader->registerScript($script3);
-
-        $scriptList = CMTest_TH::callProtectedMethod($loader, '_getScriptList');
-        $expected = [$script3, $script1, $script2];
-        $this->assertSame($expected, $scriptList);
+        $loader = $this->mockObject('CM_Provision_Loader');
+        $loader->mockMethod('_getScriptList')->set([$script1, $script2, $script3]);
+        $this->assertSame([$script3, $script2], CMTest_TH::callProtectedMethod($loader, '_getScriptListUnloadable'));
     }
 
     public function testUnload() {
         $serviceManager = new CM_Service_Manager();
         $outputStream = new CM_OutputStream_Null();
 
-        $scriptAbstract = $this->mockObject('CM_Provision_Script_Abstract');
-        $scriptAbstractUnloadMethod = $scriptAbstract->mockMethod('unload');
-        /** @var CM_Provision_Script_Abstract $scriptAbstract */
-
-        $scriptUnloadable = $this->mockClass('CM_Provision_Script_Abstract', ['CM_Provision_Script_UnloadableInterface'])->newInstance();
-        $scriptUnloadableUnloadMethod = $scriptUnloadable->mockMethod('unload')->set(function (CM_Service_Manager $manager, $output) use ($serviceManager, $outputStream) {
+        $script = $this->mockClass('CM_Provision_Script_Abstract', ['CM_Provision_Script_UnloadableInterface'])->newInstance();
+        $unloadMethod = $script->mockMethod('unload')->set(function (CM_Service_Manager $manager, $output) use ($serviceManager, $outputStream) {
             $this->assertSame($serviceManager, $manager);
             $this->assertSame($outputStream, $output);
         });
-        /** @var CM_Provision_Script_Abstract $scriptUnloadable */
+        /** @var CM_Provision_Script_Abstract $script */
 
         $loader = new CM_Provision_Loader($outputStream);
         $loader->setServiceManager($serviceManager);
-        $loader->registerScript($scriptAbstract);
-        $loader->registerScript($scriptUnloadable);
+        $loader->registerScript($script);
         $loader->unload();
-        $this->assertSame(0, $scriptAbstractUnloadMethod->getCallCount());
-        $this->assertSame(1, $scriptUnloadableUnloadMethod->getCallCount());
+        $this->assertSame(1, $unloadMethod->getCallCount());
     }
 }
