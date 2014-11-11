@@ -187,7 +187,8 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
         CM_Db_Db::exec('UPDATE `cm_splittestVariation_fixture`
             SET `conversionStamp` = COALESCE(`conversionStamp`, ?),
             `conversionWeight` = `conversionWeight` + ?
-            WHERE `splittestId` = ? AND ' . $columnIdQuoted . ' = ?', array(time(), $weight, $this->getId(), $fixtureId));
+            WHERE `splittestId` = ? AND ' . $columnIdQuoted . ' = ?',
+            array(time(), $weight, $this->getId(), $fixtureId));
     }
 
     /**
