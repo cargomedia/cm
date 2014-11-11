@@ -96,18 +96,17 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $test->isVariationFixture($user, 'v1');
         $test->isVariationFixture($user2, 'v1');
         $test->isVariationFixture($user3, 'v1');
+        $this->assertSame(0, $variation->getConversionCount(true));
         $this->assertSame(0.0, $variation->getConversionWeight(true));
         $test->setConversion($user, 3.75);
         $test->setConversion($user2, 3.29);
+        $this->assertSame(2, $variation->getConversionCount(true));
         $this->assertSame(7.04, $variation->getConversionWeight(true));
         $this->assertSame(2.3466666666667, $variation->getConversionRate(true));
-
-        try {
-            $test->setConversion($user, -2);
-            $this->fail('Could set Conversion with negative weight');
-        } catch (CM_Exception_Invalid $e) {
-            $this->assertTrue(true);
-        }
+        $test->setConversion($user, -2);
+        $this->assertSame(2, $variation->getConversionCount(true));
+        $this->assertSame(5.04, $variation->getConversionWeight(true));
+        $this->assertSame(1.68, $variation->getConversionRate(true));
 
         $test->delete();
     }
