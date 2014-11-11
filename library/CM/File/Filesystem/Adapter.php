@@ -96,7 +96,8 @@ abstract class CM_File_Filesystem_Adapter implements CM_Comparable {
      */
     protected function _getAbsolutePath($pathRelative) {
         $pathRelative = (string) $pathRelative;
-        $path = $this->_pathPrefix . CM_File_Filesystem::normalizePath($pathRelative);
+        $path = CM_File_Filesystem::normalizePath($this->_pathPrefix . '/' . $pathRelative);
+
         if (0 !== strpos($path, $this->_pathPrefix)) {
             throw new CM_Exception('Path is out of filesystem directory: `' . $path . '`.');
         }
