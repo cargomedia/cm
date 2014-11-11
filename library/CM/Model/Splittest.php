@@ -177,18 +177,21 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
      * @throws CM_Exception_Invalid
      */
     protected function _setConversion(CM_Splittest_Fixture $fixture, $weight = null) {
-        if (null === $weight) {
-            $weight = 1;
-        }
-        $weight = (float) $weight;
+        $columnId = $fixture->getColumnId();
         $fixtureId = $fixture->getId();
-        $columnIdQuoted = CM_Db_Db::getClient()->quoteIdentifier($fixture->getColumnId());
-
-        CM_Db_Db::exec('UPDATE `cm_splittestVariation_fixture`
-            SET `conversionStamp` = COALESCE(`conversionStamp`, ?),
-            `conversionWeight` = `conversionWeight` + ?
-            WHERE `splittestId` = ? AND ' . $columnIdQuoted . ' = ?',
-            array(time(), $weight, $this->getId(), $fixtureId));
+        if (null === $weight) {
+            CM_Db_Db::update('cm_splittestVariation_fixture',
+                array('conversionStamp' => time(), 'conversionWeight' => 1),
+                array('splittestId' => $this->getId(), $columnId => $fixtureId, 'conversionStamp' => null));
+        } else {
+            $weight = (float) $weight;
+            $columnIdQuoted = CM_Db_Db::getClient()->quoteIdentifier($columnId);
+            CM_Db_Db::exec('UPDATE `cm_splittestVariation_fixture`
+                SET `conversionStamp` = COALESCE(`conversionStamp`, ?),
+                `conversionWeight` = `conversionWeight` + ?
+                WHERE `splittestId` = ? AND ' . $columnIdQuoted . ' = ?',
+                array(time(), $weight, $this->getId(), $fixtureId));
+        }
     }
 
     /**
