@@ -101,12 +101,16 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 
         $conversionsExpectedA = $rateTotal * $fixturesA / $netRateA;
         $conversionsExpectedB = $rateTotal * $fixturesB / $netRateB;
-        $sigmaExpectedA = sqrt($conversionsExpectedA * (1 - $conversionsExpectedA / $fixturesA));
-        $sigmaExpectedB = sqrt($conversionsExpectedB * (1 - $conversionsExpectedB / $fixturesB));
+        $varianceExpectedA = $conversionsExpectedA * (1 - $conversionsExpectedA / $fixturesA);
+        $varianceExpectedB = $conversionsExpectedB * (1 - $conversionsExpectedB / $fixturesB);
 
-        if ($sigmaExpectedA < 3 || $sigmaExpectedB < 3) {
+        if ($varianceExpectedA < 9 || $varianceExpectedB < 9) {
             return null;
         }
+
+        $sigmaExpectedA = sqrt($varianceExpectedA);
+        $sigmaExpectedB = sqrt($varianceExpectedB);
+
         if ($conversionsExpectedA - 3 * $sigmaExpectedA < 0 || $conversionsExpectedB - 3 * $sigmaExpectedB < 0) {
             return null;
         }

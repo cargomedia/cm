@@ -317,7 +317,7 @@ CREATE TABLE `cm_splittestVariation_fixture` (
   `variationId` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   `conversionStamp` int(11) DEFAULT NULL,
-  `conversionWeight` decimal(10,2) NOT NULL DEFAULT '1.00',
+  `conversionWeight` decimal(10,2) NOT NULL DEFAULT '0.00',
   UNIQUE KEY `userSplittest` (`userId`,`splittestId`),
   UNIQUE KEY `requestClientSplittest` (`requestClientId`,`splittestId`),
   KEY `splittestId` (`splittestId`),
