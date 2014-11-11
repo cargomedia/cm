@@ -2,6 +2,8 @@
 
 class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provision_Script_UnloadableInterface {
 
+    use CM_Provision_Script_IsLoadedTrait;
+
     public function load(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
         $mysqlDbClient = $manager->getDatabases()->getMaster();
         $databaseName = $mysqlDbClient->getDatabaseName();
@@ -33,7 +35,11 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
         $mysqlClient->createStatement('DROP DATABASE IF EXISTS ' . $mysqlDbClient->quoteIdentifier($db))->execute();
     }
 
-    public function isLoaded(CM_Service_Manager $manager) {
+    public function getRunLevel() {
+        return 1;
+    }
+
+    protected function _isLoaded(CM_Service_Manager $manager) {
         $mysqlDbClient = $manager->getDatabases()->getMaster();
         $mysqlClient = $mysqlDbClient->getClientWithoutDatabase();
 
@@ -49,10 +55,6 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
         }
 
         return true;
-    }
-
-    public function getRunLevel() {
-        return 1;
     }
 
     private function _setInitialVersion() {

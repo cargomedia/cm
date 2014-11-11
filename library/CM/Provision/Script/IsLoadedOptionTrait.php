@@ -2,10 +2,12 @@
 
 trait CM_Provision_Script_IsLoadedOptionTrait {
 
+    use CM_Provision_Script_IsLoadedTrait;
+
     /**
      * @param bool $loaded
      */
-    public function setLoaded($loaded) {
+    protected function _setLoaded($loaded) {
         CM_Option::getInstance()->set($this->_getOptionName(), (bool) $loaded);
     }
 
@@ -13,8 +15,12 @@ trait CM_Provision_Script_IsLoadedOptionTrait {
      * @param CM_Service_Manager $manager
      * @return bool
      */
-    public function isLoaded(CM_Service_Manager $manager) {
-        return (bool) CM_Option::getInstance()->get($this->_getOptionName());
+    protected function _isLoaded(CM_Service_Manager $manager) {
+        try {
+            return CM_Option::getInstance()->get($this->_getOptionName());
+        } catch (CM_Db_Exception $e) {
+            return false;
+        }
     }
 
     /**
@@ -23,5 +29,4 @@ trait CM_Provision_Script_IsLoadedOptionTrait {
     private function _getOptionName() {
         return 'SetupScript.' . get_class($this);
     }
-
 }

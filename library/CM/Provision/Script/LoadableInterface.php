@@ -7,4 +7,10 @@ interface CM_Provision_Script_LoadableInterface {
      * @param CM_OutputStream_Interface $output
      */
     public function load(CM_Service_Manager $manager, CM_OutputStream_Interface $output);
+
+    /**
+     * @param CM_Service_Manager $manager
+     * @return bool
+     */
+    public function isLoadable(CM_Service_Manager $manager);
 }

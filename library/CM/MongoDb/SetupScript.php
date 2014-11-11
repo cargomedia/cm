@@ -2,6 +2,8 @@
 
 class CM_MongoDb_SetupScript extends CM_Provision_Script_Abstract implements CM_Provision_Script_UnloadableInterface {
 
+    use CM_Provision_Script_IsLoadedTrait;
+
     public function load(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
         $mongoClient = $manager->getMongoDb();
 
@@ -20,12 +22,12 @@ class CM_MongoDb_SetupScript extends CM_Provision_Script_Abstract implements CM_
         $manager->getMongoDb()->dropDatabase();
     }
 
-    public function isLoaded(CM_Service_Manager $manager) {
-        $hasCollections = count($manager->getMongoDb()->listCollectionNames()) > 0;
-        return $hasCollections;
-    }
-
     public function getRunLevel() {
         return 1;
+    }
+
+    protected function _isLoaded(CM_Service_Manager $manager) {
+        $hasCollections = count($manager->getMongoDb()->listCollectionNames()) > 0;
+        return $hasCollections;
     }
 }

@@ -16,7 +16,7 @@ class CM_App_SetupScript_Translations extends CM_Provision_Script_Abstract {
                 $translationsSetter($language);
             }
         }
-        $this->setLoaded(true);
+        $this->_setLoaded(true);
     }
 
     public function getRunLevel() {

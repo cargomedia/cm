@@ -93,6 +93,14 @@ abstract class CM_File_Filesystem_Adapter implements CM_Comparable {
     }
 
     /**
+     * @return bool
+     */
+    public function isEmpty() {
+        $entries = $this->listByPrefix('/');
+        return count($entries['dirs']) === 0 && count($entries['files']) === 0;
+    }
+
+    /**
      * @param string $pathRelative
      * @return string
      * @throws CM_Exception
