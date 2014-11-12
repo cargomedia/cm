@@ -26,9 +26,9 @@ class CM_App {
 
     /**
      * @param CM_OutputStream_Interface $output
-     * @param bool                      $reload
+     * @param bool|null                 $reload
      */
-    public function setup(CM_OutputStream_Interface $output, $reload) {
+    public function setup(CM_OutputStream_Interface $output, $reload = null) {
         $loader = new CM_Provision_Loader($output);
         $loader->setServiceManager($this->_getServiceManager());
         $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses);
