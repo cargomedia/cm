@@ -29,12 +29,11 @@ class CMTest_TH {
     }
 
     public static function clearFilesystem() {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $serviceManager->getFilesystems()->getData()->deleteByPrefix('/');
-        $serviceManager->getFilesystems()->getTmp()->deleteByPrefix('/');
-        foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
-            $filesystem->deleteByPrefix('/');
-        }
+        $manager = CM_Service_Manager::getInstance();
+        $output = new CM_OutputStream_Null();
+
+        $script = new CM_File_Filesystem_SetupScript();
+        $script->unload($manager, $output);
     }
 
     public static function clearCache() {
@@ -53,10 +52,8 @@ class CMTest_TH {
         foreach ($mongo->listCollectionNames() as $collectionName) {
             $mongo->remove($collectionName);
         }
-        $setupProcessor = new CM_Provision_Loader();
-        $setupProcessor->registerScriptFromClassNames(CM_Config::get()->CMTest_TH->setupScriptClasses);
-        $setupProcessor->setServiceManager(CM_Service_Manager::getInstance());
-        $setupProcessor->load();
+        CM_Cache_Shared::getInstance()->delete(CM_CacheConst::Option);
+        CM_App::getInstance()->setup(new CM_OutputStream_Null());
     }
 
     public static function clearConfig() {

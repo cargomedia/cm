@@ -1,6 +1,14 @@
 <?php
 
 return function (CM_Config_Node $config) {
+    $config->CM_App->setupScriptClasses = array();
+    $config->CM_App->setupScriptClasses[] = 'CM_File_Filesystem_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_Db_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_MongoDb_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_Elasticsearch_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Core';
+    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Translations';
+
     $config->timeZone = 'US/Central';
 
     $config->CM_Mail->send = true;
@@ -14,17 +22,6 @@ return function (CM_Config_Node $config) {
     $config->CM_Elasticsearch_Client->servers = array(
         array('host' => 'localhost', 'port' => 9200),
     );
-
-    $config->CM_App->setupScriptClasses = array();
-    $config->CM_App->setupScriptClasses[] = 'CM_File_Filesystem_SetupScript';
-    $config->CM_App->setupScriptClasses[] = 'CM_Db_SetupScript';
-    $config->CM_App->setupScriptClasses[] = 'CM_MongoDb_SetupScript';
-    $config->CM_App->setupScriptClasses[] = 'CM_Elasticsearch_SetupScript';
-    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Core';
-    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Translations';
-
-    $config->CMTest_TH->setupScriptClasses = array();
-    $config->CMTest_TH->setupScriptClasses[] = 'CM_App_SetupScript_Core';
 
     $config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
     $config->CM_Cache_Local->lifetime = 86400;
