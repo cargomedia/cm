@@ -177,19 +177,21 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
      * @throws CM_Exception_Invalid
      */
     protected function _setConversion(CM_Splittest_Fixture $fixture, $weight = null) {
-        if (null === $weight) {
-            $weight = 1;
-        }
-        if ($weight <= 0) {
-            throw new CM_Exception_Invalid('Weight must be positive or null, `' . $weight . '` given');
-        }
-        $weight = (float) $weight;
-        $fixtureId = $fixture->getId();
         $columnId = $fixture->getColumnId();
-
-        CM_Db_Db::update('cm_splittestVariation_fixture',
-            array('conversionStamp' => time(), 'conversionWeight' => $weight),
-            array('splittestId' => $this->getId(), $columnId => $fixtureId));
+        $fixtureId = $fixture->getId();
+        if (null === $weight) {
+            CM_Db_Db::update('cm_splittestVariation_fixture',
+                array('conversionStamp' => time(), 'conversionWeight' => 1),
+                array('splittestId' => $this->getId(), $columnId => $fixtureId, 'conversionStamp' => null));
+        } else {
+            $weight = (float) $weight;
+            $columnIdQuoted = CM_Db_Db::getClient()->quoteIdentifier($columnId);
+            CM_Db_Db::exec('UPDATE `cm_splittestVariation_fixture`
+                SET `conversionStamp` = COALESCE(`conversionStamp`, ?),
+                `conversionWeight` = `conversionWeight` + ?
+                WHERE `splittestId` = ? AND ' . $columnIdQuoted . ' = ?',
+                array(time(), $weight, $this->getId(), $fixtureId));
+        }
     }
 
     /**
@@ -208,6 +210,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
      */
     protected function _getVariationFixture(CM_Splittest_Fixture $fixture) {
         $columnId = $fixture->getColumnId();
+        $columnIdQuoted = CM_Db_Db::getClient()->quoteIdentifier($columnId);
         $fixtureId = $fixture->getId();
 
         $cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_id:' . $fixture->getId() . '_type:' . $fixture->getFixtureType();
@@ -218,7 +221,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
 				SELECT `variation`.`splittestId`, `variation`.`name`
 					FROM `cm_splittestVariation_fixture` `fixture`
 					JOIN `cm_splittestVariation` `variation` ON(`variation`.`id` = `fixture`.`variationId`)
-					WHERE `fixture`.`' . $columnId . '` = ?', array($fixtureId))->fetchAllTree();
+					WHERE `fixture`.' . $columnIdQuoted . ' = ?', array($fixtureId))->fetchAllTree();
             $cacheWrite = true;
         }
 

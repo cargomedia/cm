@@ -24,7 +24,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
         }
 
         $this->_filesystem = $filesystem;
-        $this->_path = (string) $path;
+        $this->_path = CM_File_Filesystem::normalizePath($path);
     }
 
     /**
