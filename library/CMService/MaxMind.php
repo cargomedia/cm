@@ -759,7 +759,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             if (null === $url) {
                 throw new CM_Exception('File not found: `' . $file->getPath() . '`');
             }
-            $contents = @file_get_contents($url);
+            $contents = CM_Util::getContents($url, null, null, 300);
             if (false === $contents) {
                 throw new CM_Exception('Download of `' . $url . '` failed');
             }
