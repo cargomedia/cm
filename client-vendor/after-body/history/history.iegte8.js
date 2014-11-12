@@ -1,9 +1,9 @@
 /*!
- * History API JavaScript Library v4.1.0
+ * History API JavaScript Library v4.1.15
  *
  * Support: IE8+, FF3+, Opera 9+, Safari, Chrome and other
  *
- * Copyright 2011-2013, Dmitrii Pakhtinov ( spb.piksel@gmail.com )
+ * Copyright 2011-2014, Dmitrii Pakhtinov ( spb.piksel@gmail.com )
  *
  * http://spb-piksel.ru/
  *
@@ -11,23 +11,32 @@
  *   http://www.opensource.org/licenses/mit-license.php
  *   http://www.gnu.org/licenses/gpl.html
  *
- * Update: 2014-03-24 13:14
+ * Update: 2014-10-31 21:58
  */
-(function(window) {
-    // Prevent the code from running if there is no window.history object
-    if (!window.history) return;
+(function(factory) {
+    if (typeof define === 'function' && define['amd']) {
+        // https://github.com/devote/HTML5-History-API/issues/57#issuecomment-43133600
+        define(typeof document !== "object" || document.readyState !== "loading" ? [] : "html5-history-api", factory);
+    } else {
+        factory();
+    }
+})(function() {
+    // Define global variable
+    var global = (typeof window === 'object' ? window : this) || {};
+    // Prevent the code from running if there is no window.history object or library already loaded
+    if (!global.history || "emulate" in global.history) return global.history;
     // symlink to document
-    var document = window.document;
+    var document = global.document;
     // HTML element
     var documentElement = document.documentElement;
     // symlink to constructor of Object
-    var Object = window['Object'];
+    var Object = global['Object'];
     // symlink to JSON Object
-    var JSON = window['JSON'];
+    var JSON = global['JSON'];
     // symlink to instance object of 'Location'
-    var windowLocation = window.location;
+    var windowLocation = global.location;
     // symlink to instance object of 'History'
-    var windowHistory = window.history;
+    var windowHistory = global.history;
     // new instance of 'History'. The default is a reference to the original object instance
     var historyObject = windowHistory;
     // symlink to method 'history.pushState'
@@ -45,17 +54,17 @@
     // prefix for the names of events
     var eventNamePrefix = '';
     // String that will contain the name of the method
-    var addEventListenerName = window.addEventListener ? 'addEventListener' : (eventNamePrefix = 'on') && 'attachEvent';
+    var addEventListenerName = global.addEventListener ? 'addEventListener' : (eventNamePrefix = 'on') && 'attachEvent';
     // String that will contain the name of the method
-    var removeEventListenerName = window.removeEventListener ? 'removeEventListener' : 'detachEvent';
+    var removeEventListenerName = global.removeEventListener ? 'removeEventListener' : 'detachEvent';
     // String that will contain the name of the method
-    var dispatchEventName = window.dispatchEvent ? 'dispatchEvent' : 'fireEvent';
+    var dispatchEventName = global.dispatchEvent ? 'dispatchEvent' : 'fireEvent';
     // reference native methods for the events
-    var addEvent = window[addEventListenerName];
-    var removeEvent = window[removeEventListenerName];
-    var dispatch = window[dispatchEventName];
+    var addEvent = global[addEventListenerName];
+    var removeEvent = global[removeEventListenerName];
+    var dispatch = global[dispatchEventName];
     // default settings
-    var settings = {"basepath": '/', "redirect": 0, "type": '/'};
+    var settings = {"basepath": '/', "redirect": 0, "type": '/', "init": 0};
     // key for the sessionStorage
     var sessionStorageKey = '__historyAPI__';
     // Anchor Element for parseURL function
@@ -64,8 +73,12 @@
     var lastURL = windowLocation.href;
     // Control URL, need to fix the bug in Opera
     var checkUrlForPopState = '';
+    // for fix on Safari 8
+    var triggerEventsInWindowAttributes = 1;
     // trigger event 'onpopstate' on page load
     var isFireInitialState = false;
+    // if used history.location of other code
+    var isUsedHistoryLocationFlag = 0;
     // store a list of 'state' objects in the current session
     var stateStorage = {};
     // in this object will be stored custom handlers
@@ -89,13 +102,13 @@
      * See https://github.com/devote/HTML5-History-API/issues/29
      */
     var fastFixChrome = function(method, args) {
-        var isNeedFix = window.history !== windowHistory;
+        var isNeedFix = global.history !== windowHistory;
         if (isNeedFix) {
-            window.history = windowHistory;
+            global.history = windowHistory;
         }
         method.apply(windowHistory, args);
         if (isNeedFix) {
-            window.history = historyObject;
+            global.history = historyObject;
         }
     };
 
@@ -108,14 +121,27 @@
      */
     var historyDescriptors = {
         /**
+         * Setting library initialization
+         *
+         * @param {null|String} [basepath] The base path to the site; defaults to the root "/".
+         * @param {null|String} [type] Substitute the string after the anchor; by default "/".
+         * @param {null|Boolean} [redirect] Enable link translation.
+         */
+        "setup": function(basepath, type, redirect) {
+            settings["basepath"] = ('' + (basepath == null ? settings["basepath"] : basepath))
+                .replace(/(?:^|\/)[^\/]*$/, '/');
+            settings["type"] = type == null ? settings["type"] : type;
+            settings["redirect"] = redirect == null ? settings["redirect"] : !!redirect;
+        },
+        /**
          * @namespace history
          * @param {String} [type]
          * @param {String} [basepath]
          */
         "redirect": function(type, basepath) {
-            settings["basepath"] = basepath = basepath == null ? settings["basepath"] : basepath;
-            settings["type"] = type = type == null ? settings["type"] : type;
-            if (window.top == window.self) {
+            historyObject['setup'](basepath, type);
+            basepath = settings["basepath"];
+            if (global.top == global.self) {
                 var relative = parseURL(null, false, true)._relative;
                 var path = windowLocation.pathname + windowLocation.search;
                 if (isSupportHistoryAPI) {
@@ -127,7 +153,7 @@
                     path = path.replace(/([^\/])\?/, '$1/?');
                     if ((new RegExp("^" + basepath, "i")).test(path)) {
                         windowLocation.replace(basepath + '#' + path.
-                            replace(new RegExp("^" + basepath, "i"), type) + windowLocation.hash);
+                            replace(new RegExp("^" + basepath, "i"), settings["type"]) + windowLocation.hash);
                     }
                 }
             }
@@ -181,9 +207,11 @@
          */
         "location": {
             set: function(value) {
-                window.location = value;
+                if (isUsedHistoryLocationFlag === 0) isUsedHistoryLocationFlag = 1;
+                global.location = value;
             },
             get: function() {
+                if (isUsedHistoryLocationFlag === 0) isUsedHistoryLocationFlag = 1;
                 return isSupportHistoryAPI ? windowLocation : locationObject;
             }
         },
@@ -343,13 +371,21 @@
      * @return {Object}
      */
     function parseURL(href, isWindowLocation, isNotAPI) {
-        var re = /(?:([\w0-9]+:))?(?:\/\/(?:[^@]*@)?([^\/:\?#]+)(?::([0-9]+))?)?([^\?#]*)(?:(\?[^#]+)|\?)?(?:(#.*))?/;
+        var re = /(?:(\w+\:))?(?:\/\/(?:[^@]*@)?([^\/:\?#]+)(?::([0-9]+))?)?([^\?#]*)(?:(\?[^#]+)|\?)?(?:(#.*))?/;
         if (href != null && href !== '' && !isWindowLocation) {
-            var current = parseURL(), _pathname = current._pathname, _protocol = current._protocol;
+            var current = parseURL(),
+                base = document.getElementsByTagName('base')[0];
+            if (!isNotAPI && base && base.getAttribute('href')) {
+              // Fix for IE ignoring relative base tags.
+              // See http://stackoverflow.com/questions/3926197/html-base-tag-and-local-folder-path-with-internet-explorer
+              base.href = base.href;
+              current = parseURL(base.href, null, true);
+            }
+            var _pathname = current._pathname, _protocol = current._protocol;
             // convert to type of string
             href = '' + href;
             // convert relative link to the absolute
-            href = /^(?:[\w0-9]+\:)?\/\//.test(href) ? href.indexOf("/") === 0
+            href = /^(?:\w+\:)?\/\//.test(href) ? href.indexOf("/") === 0
                 ? _protocol + href : href : _protocol + "//" + current._host + (
                 href.indexOf("/") === 0 ? href : href.indexOf("?") === 0
                     ? _pathname + href : href.indexOf("#") === 0
@@ -411,7 +447,7 @@
          * and: http://stackoverflow.com/a/12976988/669360
          */
         try {
-            sessionStorage = window['sessionStorage'];
+            sessionStorage = global['sessionStorage'];
             sessionStorage.setItem(sessionStorageKey + 't', '1');
             sessionStorage.removeItem(sessionStorageKey + 't');
         } catch(_e_) {
@@ -458,8 +494,12 @@
      * @return {Object|Boolean} Returns an object on success, otherwise returns false
      */
     function redefineProperty(object, prop, descriptor, onWrapped) {
+        var testOnly = 0;
         // test only if descriptor is undefined
-        descriptor = descriptor || {set: emptyFunction};
+        if (!descriptor) {
+            descriptor = {set: emptyFunction};
+            testOnly = 1;
+        }
         // variable will have a value of true the success of attempts to set descriptors
         var isDefinedSetter = !descriptor.set;
         var isDefinedGetter = !descriptor.get;
@@ -495,62 +535,87 @@
             }
 
             // Browser refused to override the property, using the standard and deprecated methods
-            if ((!isDefinedSetter || !isDefinedGetter) && object === window) {
-                try {
-                    // save original value from this property
-                    var originalValue = object[prop];
-                    // set null to built-in(native) property
-                    object[prop] = null;
-                } catch(_e_) {
-                }
-                // This rule for Internet Explorer 8
-                if ('execScript' in window) {
-                    /**
-                     * to IE8 override the global properties using
-                     * VBScript, declaring it in global scope with
-                     * the same names.
-                     */
-                    window['execScript']('Public ' + prop, 'VBScript');
-                } else {
+            if (!isDefinedSetter || !isDefinedGetter) {
+                if (testOnly) {
+                    return false;
+                } else if (object === global) {
+                    // try override global properties
                     try {
-                        /**
-                         * This hack allows to override a property
-                         * with the set 'configurable: false', working
-                         * in the hack 'Safari' to 'Mac'
-                         */
-                        defineProperty(object, prop, {value: emptyFunction});
+                        // save original value from this property
+                        var originalValue = object[prop];
+                        // set null to built-in(native) property
+                        object[prop] = null;
                     } catch(_e_) {
                     }
-                }
-                // set old value to new variable
-                object[prop] = originalValue;
-
-            } else if (!isDefinedSetter || !isDefinedGetter) {
-                // the last stage of trying to override the property
-                try {
-                    try {
-                        // wrap the object in a new empty object
-                        var temp = Object.create(object);
-                        defineProperty(Object.getPrototypeOf(temp) === object ? temp : object, prop, descriptor);
-                        for(var key in object) {
-                            // need to bind a function to the original object
-                            if (typeof object[key] === 'function') {
-                                temp[key] = object[key].bind(object);
+                    // This rule for Internet Explorer 8
+                    if ('execScript' in global) {
+                        /**
+                         * to IE8 override the global properties using
+                         * VBScript, declaring it in global scope with
+                         * the same names.
+                         */
+                        global['execScript']('Public ' + prop, 'VBScript');
+                        global['execScript']('var ' + prop + ';', 'JavaScript');
+                    } else {
+                        try {
+                            /**
+                             * This hack allows to override a property
+                             * with the set 'configurable: false', working
+                             * in the hack 'Safari' to 'Mac'
+                             */
+                            defineProperty(object, prop, {value: emptyFunction});
+                        } catch(_e_) {
+                            if (prop === 'onpopstate') {
+                                /**
+                                 * window.onpopstate fires twice in Safari 8.0.
+                                 * Block initial event on window.onpopstate
+                                 * See: https://github.com/devote/HTML5-History-API/issues/69
+                                 */
+                                addEvent('popstate', descriptor = function() {
+                                    removeEvent('popstate', descriptor, false);
+                                    var onpopstate = object.onpopstate;
+                                    // cancel initial event on attribute handler
+                                    object.onpopstate = null;
+                                    setTimeout(function() {
+                                      // restore attribute value after short time
+                                      object.onpopstate = onpopstate;
+                                    }, 1);
+                                }, false);
+                                // cancel trigger events on attributes in object the window
+                                triggerEventsInWindowAttributes = 0;
                             }
                         }
-                        try {
-                            // to run a function that will inform about what the object was to wrapped
-                            onWrapped.call(temp, temp, object);
-                        } catch(_e_) {
-                        }
-                        object = temp;
-                    } catch(_e_) {
-                        // sometimes works override simply by assigning the prototype property of the constructor
-                        defineProperty(object.constructor.prototype, prop, descriptor);
                     }
-                } catch(_e_) {
-                    // all methods have failed
-                    return false;
+                    // set old value to new variable
+                    object[prop] = originalValue;
+
+                } else {
+                    // the last stage of trying to override the property
+                    try {
+                        try {
+                            // wrap the object in a new empty object
+                            var temp = Object.create(object);
+                            defineProperty(Object.getPrototypeOf(temp) === object ? temp : object, prop, descriptor);
+                            for(var key in object) {
+                                // need to bind a function to the original object
+                                if (typeof object[key] === 'function') {
+                                    temp[key] = object[key].bind(object);
+                                }
+                            }
+                            try {
+                                // to run a function that will inform about what the object was to wrapped
+                                onWrapped.call(temp, temp, object);
+                            } catch(_e_) {
+                            }
+                            object = temp;
+                        } catch(_e_) {
+                            // sometimes works override simply by assigning the prototype property of the constructor
+                            defineProperty(object.constructor.prototype, prop, descriptor);
+                        }
+                    } catch(_e_) {
+                        // all methods have failed
+                        return false;
+                    }
                 }
             }
         }
@@ -615,7 +680,7 @@
     function removeEventListener(event, listener, capture) {
         var list = eventsList[event];
         if (list) {
-            for(var i = list.length; --i;) {
+            for(var i = list.length; i--;) {
                 if (list[i] === listener) {
                     list.splice(i, 1);
                     break;
@@ -647,17 +712,19 @@
                         get: event === 'type' ? function() {
                             return eventType;
                         } : function() {
-                            return window;
+                            return global;
                         }
                     });
                 }
             }
-            // run function defined in the attributes 'onpopstate/onhashchange' in the 'window' context
-            ((eventType === 'popstate' ? window.onpopstate : window.onhashchange)
-                || emptyFunction).call(window, eventObject);
+            if (triggerEventsInWindowAttributes) {
+              // run function defined in the attributes 'onpopstate/onhashchange' in the 'window' context
+              ((eventType === 'popstate' ? global.onpopstate : global.onhashchange)
+                  || emptyFunction).call(global, eventObject);
+            }
             // run other functions that are in the list of handlers
             for(var i = 0, len = list.length; i < len; i++) {
-                list[i].call(window, eventObject);
+                list[i].call(global, eventObject);
             }
             return true;
         } else {
@@ -701,8 +768,10 @@
      */
     function changeState(state, url, replace, lastURLValue) {
         if (!isSupportHistoryAPI) {
+            // if not used implementation history.location
+            if (isUsedHistoryLocationFlag === 0) isUsedHistoryLocationFlag = 2;
             // normalization url
-            var urlObject = parseURL(url);
+            var urlObject = parseURL(url, isUsedHistoryLocationFlag === 2 && ('' + url).indexOf("#") !== -1);
             // if current url not equal new url
             if (urlObject._relative !== parseURL()._relative) {
                 // if empty lastURLValue to skip hash change event
@@ -715,6 +784,8 @@
                     windowLocation.hash = urlObject._special;
                 }
             }
+        } else {
+            lastURL = windowLocation.href;
         }
         if (!isSupportStateObjectInHistory && state) {
             stateStorage[windowLocation.href] = state;
@@ -742,9 +813,9 @@
                 firePopState();
             }
             // current event object
-            event = event || window.event;
+            event = event || global.event;
 
-            var oldURLObject = parseURL(lastURL, true);
+            var oldURLObject = parseURL(fireNow, true);
             var newURLObject = parseURL();
             // HTML4 browser not support properties oldURL/newURL
             if (!event.oldURL) {
@@ -783,9 +854,9 @@
             }, false);
         }, 0);
         // for non-HTML5 browsers
-        if (!isSupportHistoryAPI && noScroll !== true && historyObject.location) {
+        if (!isSupportHistoryAPI && noScroll !== true && "location" in historyObject) {
             // scroll window to anchor element
-            scrollToAnchorId(historyObject.location.hash);
+            scrollToAnchorId(locationObject.hash);
             // fire initial state for non-HTML5 browser after load page
             fireInitialState();
         }
@@ -810,7 +881,7 @@
      * @param {Event} e
      */
     function onAnchorClick(e) {
-        var event = e || window.event;
+        var event = e || global.event;
         var target = anchorTarget(event.target || event.srcElement);
         var defaultPrevented = "defaultPrevented" in event ? event['defaultPrevented'] : event.returnValue === false;
         if (target && target.nodeName === "A" && !defaultPrevented) {
@@ -819,7 +890,7 @@
             var isEqualBaseURL = current._href.split('#').shift() === expect._href.split('#').shift();
             if (isEqualBaseURL && expect._hash) {
                 if (current._hash !== expect._hash) {
-                    historyObject.location.hash = expect._hash;
+                    locationObject.hash = expect._hash;
                 }
                 scrollToAnchorId(expect._hash);
                 if (event.preventDefault) {
@@ -840,7 +911,7 @@
         var target = document.getElementById(hash = (hash || '').replace(/^#/, ''));
         if (target && target.id === hash && target.nodeName === "A") {
             var rect = target.getBoundingClientRect();
-            window.scrollTo((documentElement.scrollLeft || 0), rect.top + (documentElement.scrollTop || 0)
+            global.scrollTo((documentElement.scrollLeft || 0), rect.top + (documentElement.scrollTop || 0)
                 - (documentElement.clientTop || 0));
         }
     }
@@ -858,7 +929,7 @@
         var src = (scripts[scripts.length - 1] || {}).src || '';
         var arg = src.indexOf('?') !== -1 ? src.split('?').pop() : '';
         arg.replace(/(\w+)(?:=([^&]*))?/g, function(a, key, value) {
-            settings[key] = (value || (key === 'basepath' ? '/' : '')).replace(/^(0|false)$/, '');
+            settings[key] = (value || '').replace(/^(0|false)$/, '');
         });
 
         /**
@@ -867,7 +938,7 @@
         addEvent(eventNamePrefix + 'hashchange', onHashChange, false);
 
         // a list of objects with pairs of descriptors/object
-        var data = [locationDescriptors, locationObject, eventsDescriptors, window, historyDescriptors, historyObject];
+        var data = [locationDescriptors, locationObject, eventsDescriptors, global, historyDescriptors, historyObject];
 
         // if browser support object 'state' in interface 'History'
         if (isSupportStateObjectInHistory) {
@@ -890,7 +961,7 @@
                             // is satisfied if the failed override property
                             if (o === historyObject) {
                                 // the problem occurs in Safari on the Mac
-                                window.history = historyObject = data[i + 1] = n;
+                                global.history = historyObject = data[i + 1] = n;
                             }
                         })) {
                             // if there is no possibility override.
@@ -904,7 +975,7 @@
                         }
 
                         // create a repository for custom handlers onpopstate/onhashchange
-                        if (data[i + 1] === window) {
+                        if (data[i + 1] === global) {
                             eventsList[prop] = eventsList[prop.substr(2)] = [];
                         }
                     }
@@ -912,9 +983,18 @@
             }
         }
 
+        // check settings
+        historyObject['setup']();
+
         // redirect if necessary
         if (settings['redirect']) {
             historyObject['redirect']();
+        }
+
+        // initialize
+        if (settings["init"]) {
+            // You agree that you will use window.history.location instead window.location
+            isUsedHistoryLocationFlag = 1;
         }
 
         // If browser does not support object 'state' in interface 'History'
@@ -970,8 +1050,9 @@
     /**
      * Replace the original methods on the wrapper
      */
-    window[addEventListenerName] = addEventListener;
-    window[removeEventListenerName] = removeEventListener;
-    window[dispatchEventName] = dispatchEvent;
+    global[addEventListenerName] = addEventListener;
+    global[removeEventListenerName] = removeEventListener;
+    global[dispatchEventName] = dispatchEvent;
 
-})(window);
+    return historyObject;
+});
