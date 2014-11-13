@@ -81,7 +81,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    */
   getField: function(name) {
     if (!this._fields[name]) {
-      return null;
+      cm.error.triggerThrow(this.getClass() + ' cannot find form field `' + name + '`');
     }
     return this._fields[name];
   },
