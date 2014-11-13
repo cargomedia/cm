@@ -205,13 +205,16 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
 
     /**
      * @param CM_Splittest_Fixture $fixture
+     * @param bool                 $isRetry
+     * @throws CM_Db_Exception
      * @throws CM_Exception_Invalid
      * @return string
      */
-    protected function _getVariationFixture(CM_Splittest_Fixture $fixture) {
+    protected function _getVariationFixture(CM_Splittest_Fixture $fixture, $isRetry = null) {
         $columnId = $fixture->getColumnId();
         $columnIdQuoted = CM_Db_Db::getClient()->quoteIdentifier($columnId);
         $fixtureId = $fixture->getId();
+        $isRetry = (bool) $isRetry;
 
         $cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_id:' . $fixture->getId() . '_type:' . $fixture->getFixtureType();
         $cacheWrite = false;
@@ -227,8 +230,15 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
 
         if (!array_key_exists($this->getId(), $variationFixtureList)) {
             $variation = $this->_getVariationRandom();
-            CM_Db_Db::replace('cm_splittestVariation_fixture',
-                array('splittestId' => $this->getId(), $columnId => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
+            try {
+                CM_Db_Db::insert('cm_splittestVariation_fixture',
+                    array('splittestId' => $this->getId(), $columnId => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
+            } catch (CM_Db_Exception $exception) {
+                if (!$isRetry) {
+                    return $this->_getVariationFixture($fixture, true);
+                }
+                throw $exception;
+            }
             $variationFixtureList[$this->getId()] = $variation->getName();
             $cacheWrite = true;
             $this->getServiceManager()->getTrackings()->trackSplittest($fixture, $variation);
