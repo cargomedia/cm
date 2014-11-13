@@ -84,24 +84,26 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     protected function _shouldRun(CM_Clockwork_Event $event) {
         $lastRuntime = $this->_storage->getLastRuntime($event);
         $dateTimeString = $event->getDateTimeString();
-        $timeframe = $event->getTimeframe();
+        $base = $lastRuntime ? : $this->_startTime;
         if ($lastRuntime) {
             $lastRuntime->setTimezone($this->_timeZone);
-            $nextExecutionTime = clone $lastRuntime;
-            if ($timeframe && $lastRuntime >= $nextExecutionTime->modify($dateTimeString)) {
-                $nextExecutionTime->modify('next ' . $timeframe);
+            $nextExecutionTime = clone $base;
+            $nextExecutionTime->modify($dateTimeString);
+            if ($nextExecutionTime <= $base) {
+                $nextExecutionTime = $this->_getCurrentDateTime()->modify($dateTimeString);
+            } else {
+                $nextExecutionTime = $this->_getDSTAgnosticDateTime($base)->modify($dateTimeString);
             }
         } else {
-            $nextExecutionTime = clone $this->_startTime;
-            if ($timeframe && $this->_startTime > $nextExecutionTime->modify($dateTimeString)) {
-                $nextExecutionTime->modify('next ' . $timeframe);
+            $nextExecutionTime = clone $base;
+            $nextExecutionTime->modify($dateTimeString);
+            if ($nextExecutionTime < $base) {
+                $nextExecutionTime = $this->_getCurrentDateTime()->modify($dateTimeString);
+            } else {
+                $nextExecutionTime = $this->_getDSTAgnosticDateTime($base)->modify($dateTimeString);
             }
         }
-        if (!$timeframe) {
-            $nextExecutionTime = $this->_getDSTAgnosticDateTime($nextExecutionTime);
-        }
-        $nextExecutionTime->modify($dateTimeString);
-        return $this->_getCurrentDateTime() >= $nextExecutionTime;
+        return (($lastRuntime && ($nextExecutionTime > $base)) || (!$lastRuntime && ($nextExecutionTime >= $base))) && ($this->_getCurrentDateTime() >= $nextExecutionTime);
     }
 
     /**
