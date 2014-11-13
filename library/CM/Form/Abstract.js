@@ -77,7 +77,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @return CM_FormField_Abstract|null
+   * @return CM_FormField_Abstract
    */
   getField: function(name) {
     if (!this._fields[name]) {
