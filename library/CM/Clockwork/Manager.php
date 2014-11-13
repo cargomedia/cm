@@ -24,11 +24,10 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     /**
      * @param string      $name
      * @param string      $dateTimeString
-     * @param string|null $timeframe
      * @param callable    $callback
      */
-    public function registerCallback($name, $dateTimeString, $callback, $timeframe = null) {
-        $event = new CM_Clockwork_Event($name, $dateTimeString, $timeframe);
+    public function registerCallback($name, $dateTimeString, $callback) {
+        $event = new CM_Clockwork_Event($name, $dateTimeString);
         $event->registerCallback($callback);
         $this->registerEvent($event);
     }

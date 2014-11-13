@@ -11,19 +11,14 @@ class CM_Clockwork_Event {
     /** @var string */
     private $_name;
 
-    /** @var string|null */
-    private $_timeframe;
-
     /**
      * @param string      $name
      * @param string      $dateTimeString see http://php.net/manual/en/datetime.formats.php
-     * @param string|null $timeframe used to specify the timeframe when using points in time as $dateTimeString
      */
-    public function __construct($name, $dateTimeString, $timeframe = null) {
+    public function __construct($name, $dateTimeString) {
         $this->_name = (string) $name;
         $this->_dateTimeString = (string) $dateTimeString;
         $this->_callbacks = [];
-        $this->_timeframe = $timeframe ? (string) $timeframe : null;
     }
 
     /**
@@ -38,13 +33,6 @@ class CM_Clockwork_Event {
      */
     public function getName() {
         return $this->_name;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getTimeframe() {
-        return $this->_timeframe;
     }
 
     /**

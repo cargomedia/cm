@@ -131,7 +131,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager->setServiceManager(CM_Service_Manager::getInstance());
         $manager->setStorage($storage);
         /** @var CM_Clockwork_Event $event */
-        $event = new CM_Clockwork_Event('event1', '14:00', 'day');
+        $event = new CM_Clockwork_Event('event1', '14:00');
         $currently->modify('13:59:59');
         $this->assertFalse($_shouldRun->invoke($manager, $event));
 
@@ -154,7 +154,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager->setServiceManager(CM_Service_Manager::getInstance());
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
-        $event = new CM_Clockwork_Event('event2', 'first day of 09:00', 'month');
+        $event = new CM_Clockwork_Event('event2', 'first day of 09:00');
         $this->assertFalse($_shouldRun->invoke($manager, $event));
 
         $currently->modify('next day 08:59:59');
@@ -171,7 +171,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager->setServiceManager(CM_Service_Manager::getInstance());
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
-        $event = new CM_Clockwork_Event('event3', '23:59', 'day');
+        $event = new CM_Clockwork_Event('event3', '23:59');
 
         $currently->modify('next day 00:01');
         $this->assertTrue($_shouldRun->invoke($manager, $event));
@@ -261,7 +261,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
         $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
-        $event = new CM_Clockwork_Event('event', '02:10:00', 'day');
+        $event = new CM_Clockwork_Event('event', '02:10:00');
 
         $this->assertFalse($_shouldRun->invoke($manager, $event));
 
@@ -306,7 +306,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
         $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
-        $event = new CM_Clockwork_Event('event', '02:10:00', 'day');
+        $event = new CM_Clockwork_Event('event', '02:10:00');
 
         $this->assertFalse($_shouldRun->invoke($manager, $event));
 
@@ -345,7 +345,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
         $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
-        $event = new CM_Clockwork_Event('event', '01:10:00', 'day');
+        $event = new CM_Clockwork_Event('event', '01:10:00');
 
         $this->assertFalse($_shouldRun->invoke($manager, $event));
         $currently->modify('1 second');
@@ -384,7 +384,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
         $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
-        $event = new CM_Clockwork_Event('event', '02:10:00', 'day');
+        $event = new CM_Clockwork_Event('event', '02:10:00');
 
         $this->assertFalse($_shouldRun->invoke($manager, $event));
 
