@@ -178,7 +178,9 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      */
     public static function deleteByName($name) {
         $languageKey = self::findByName($name);
-        $languageKey->delete();
+        if ($languageKey) {
+            $languageKey->delete();
+        }
     }
 
     public static function getPersistenceClass() {

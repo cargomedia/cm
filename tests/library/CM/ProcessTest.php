@@ -62,6 +62,16 @@ Parent terminated.
      * @preserveGlobalState disabled
      */
     public function testForkAndWaitForChildrenWithResults() {
+        $bootloader = CM_Bootloader::getInstance();
+        $exceptionHandlerBackup = $bootloader->getExceptionHandler();
+
+        /**
+         * Increase print-severity to make sure "child 3"'s exception output doesn't disturb phpunit
+         */
+        $exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
+        $exceptionHandler->setPrintSeverityMin(CM_Exception::FATAL);
+        $bootloader->setExceptionHandler($exceptionHandler);
+
         $process = CM_Process::getInstance();
         $process->fork(function () {
             usleep(100 * 1000);
@@ -73,7 +83,7 @@ Parent terminated.
         });
         $process->fork(function () {
             usleep(150 * 1000);
-            throw new Exception('Child 3 finished');
+            throw new CM_Exception('Child 3 finished');
         });
 
         $workloadResultList = $process->waitForChildren();
@@ -90,6 +100,8 @@ Parent terminated.
         $errorLog = new CM_Paging_Log_Error();
         $this->assertSame(1, $errorLog->getCount());
         $this->assertContains('Child 3 finished', $errorLog->getItem(0)['msg']);
+
+        $bootloader->setExceptionHandler($exceptionHandlerBackup);
     }
 
     /**

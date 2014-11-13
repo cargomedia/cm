@@ -48,14 +48,18 @@ input[type=checkbox] {
       }
     }
 
+    .label {
+      vertical-align: middle;
+    }
+
     &:before {
       display: none;
     }
   }
 
   &:checked + label .handle {
-    background-color: lighten(@colorNotice, 15);
-    border-color: lighten(@colorNotice, 5);
+    background-color: @colorFocus;
+    border-color: @colorFocus;
 
     &:before {
       right: 0;
@@ -66,7 +70,11 @@ input[type=checkbox] {
 
     &:after {
       transform: translateX(@sizeSwitch + 4px);
-      background-color: lighten(@colorNotice, 30);
+      background-color: lighten(@colorFocus, 30);
     }
+  }
+
+  &:focus + label .handle {
+    border-color: @colorFocus;
   }
 }

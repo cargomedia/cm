@@ -25,6 +25,11 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     protected function _registerCallbacks() {
+        $this->_registerClockworkCallbacks('10 seconds', array(
+            'CM_Model_User::offlineDelayed' => function () {
+                CM_Model_User::offlineDelayed();
+            }
+        ));
         $this->_registerClockworkCallbacks('1 minute', array(
             'CM_Model_User::offlineOld'                 => function () {
                 CM_Model_User::offlineOld();
@@ -61,13 +66,16 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             }
         ));
         $this->_registerClockworkCallbacks('15 minutes', array(
-            'CM_Mail::processQueue'           => function () {
+            'CM_Mail::processQueue'                         => function () {
                 CM_Mail::processQueue(500);
             },
-            'CM_Action_Abstract::aggregate'   => function () {
+            'CM_Action_Abstract::aggregate'                 => function () {
                 CM_Action_Abstract::aggregate();
             },
-            'CM_Paging_Log_Abstract::cleanup' => function () {
+            'CM_Action_Abstract::deleteTransgressionsOlder' => function () {
+                CM_Action_Abstract::deleteTransgressionsOlder(3 * 31 * 86400);
+            },
+            'CM_Paging_Log_Abstract::cleanup'               => function () {
                 foreach (CM_Paging_Log_Abstract::getClassChildren() as $logClass) {
                     /** @var CM_Paging_Log_Abstract $log */
                     $log = new $logClass();

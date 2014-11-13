@@ -95,6 +95,7 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         $this->assertTrue(CM_Model_LanguageKey::exists('foo'));
         CM_Model_LanguageKey::deleteByName('foo');
         $this->assertFalse(CM_Model_LanguageKey::exists('foo'));
+        CM_Model_LanguageKey::deleteByName('foo');
     }
 
     public function testIncreaseUpdateCountNewDeploy() {

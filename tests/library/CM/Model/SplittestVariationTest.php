@@ -96,18 +96,63 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $test->isVariationFixture($user, 'v1');
         $test->isVariationFixture($user2, 'v1');
         $test->isVariationFixture($user3, 'v1');
+        $this->assertSame(0, $variation->getConversionCount(true));
         $this->assertSame(0.0, $variation->getConversionWeight(true));
         $test->setConversion($user, 3.75);
         $test->setConversion($user2, 3.29);
+        $this->assertSame(2, $variation->getConversionCount(true));
         $this->assertSame(7.04, $variation->getConversionWeight(true));
         $this->assertSame(2.3466666666667, $variation->getConversionRate(true));
+        $test->setConversion($user, -2);
+        $this->assertSame(2, $variation->getConversionCount(true));
+        $this->assertSame(5.04, $variation->getConversionWeight(true));
+        $this->assertSame(1.68, $variation->getConversionRate(true));
 
-        try {
-            $test->setConversion($user, -2);
-            $this->fail('Could set Conversion with negative weight');
-        } catch (CM_Exception_Invalid $e) {
-            $this->assertTrue(true);
-        }
+        $test->delete();
+    }
+
+    public function testGetConversionWeight_SingleConversion() {
+        $user = CMTest_TH::createUser();
+
+        /** @var CM_Model_Splittest_User $test */
+        $test = CM_Model_Splittest_User::createStatic(array('name' => 'bar', 'variations' => array('v1')));
+        /** @var CM_Model_SplittestVariation $variation */
+        $variation = $test->getVariations()->getItem(0);
+
+        $test->isVariationFixture($user, 'v1');
+        $this->assertSame(0, $variation->getConversionCount(true));
+        $this->assertSame(0.0, $variation->getConversionWeight(true));
+        $test->setConversion($user);
+        $this->assertSame(1, $variation->getConversionCount(true));
+        $this->assertSame(1., $variation->getConversionWeight(true));
+        $this->assertSame(1., $variation->getConversionRate(true));
+        $test->setConversion($user);
+        $this->assertSame(1, $variation->getConversionCount(true));
+        $this->assertSame(1., $variation->getConversionWeight(true));
+        $this->assertSame(1., $variation->getConversionRate(true));
+
+        $test->delete();
+    }
+
+    public function testGetConversionWeight_MultipleConversions() {
+        $user = CMTest_TH::createUser();
+
+        /** @var CM_Model_Splittest_User $test */
+        $test = CM_Model_Splittest_User::createStatic(array('name' => 'bar', 'variations' => array('v1')));
+        /** @var CM_Model_SplittestVariation $variation */
+        $variation = $test->getVariations()->getItem(0);
+
+        $test->isVariationFixture($user, 'v1');
+        $this->assertSame(0, $variation->getConversionCount(true));
+        $this->assertSame(0.0, $variation->getConversionWeight(true));
+        $test->setConversion($user, 1.);
+        $this->assertSame(1, $variation->getConversionCount(true));
+        $this->assertSame(1., $variation->getConversionWeight(true));
+        $this->assertSame(1., $variation->getConversionRate(true));
+        $test->setConversion($user, 1.);
+        $this->assertSame(1, $variation->getConversionCount(true));
+        $this->assertSame(2., $variation->getConversionWeight(true));
+        $this->assertSame(2., $variation->getConversionRate(true));
 
         $test->delete();
     }

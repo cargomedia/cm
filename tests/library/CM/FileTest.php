@@ -31,7 +31,7 @@ class CM_FileTest extends CMTest_TestCase {
 
     public function testConstructNonExistent() {
         $file = new CM_File(DIR_TEST_DATA . '/nonexistent-file');
-        $this->assertEquals(DIR_TEST_DATA . '/nonexistent-file', $file->getPath());
+        $this->assertEquals(DIR_TEST_DATA . 'nonexistent-file', $file->getPath());
     }
 
     public function testSanitizeFilename() {
@@ -175,9 +175,6 @@ class CM_FileTest extends CMTest_TestCase {
 
         $file->write('foo');
         $this->assertSame('foo', $file->read());
-
-        file_put_contents($file->getPath(), 'bar');
-        $this->assertSame('foo', $file->read());
     }
 
     public function testReadFirstLine() {
@@ -211,8 +208,7 @@ class CM_FileTest extends CMTest_TestCase {
     public function testJoinPath() {
         $dir = CM_File::createTmpDir();
         $fileJoined = $dir->joinPath('foo', 'bar', '//mega//', 'jo', '..', 'nei');
-        $fileJoinedPathRelative = substr($fileJoined->getPath(), strlen($dir->getPath()) + 1);
-        $this->assertSame('/foo/bar/mega/nei', $fileJoinedPathRelative);
+        $this->assertSame($dir->getPath() . '/foo/bar/mega/nei', $fileJoined->getPath());
     }
 
     public function testEquals() {

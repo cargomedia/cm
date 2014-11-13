@@ -1,0 +1,29 @@
+.tableField {
+  padding: 5px 0 5px 5px;
+}
+
+.tableField:first-child {
+  border-width: 0;
+}
+
+.tableField > .label {
+  box-sizing: border-box;
+  color: @colorFgLinkSubtle;
+  font-weight: bold;
+
+  @media (min-width: @breakpointSmall) {
+    width: 100px;
+    float: left;
+    text-align: right;
+  }
+}
+
+.tableField > .label:after {
+  content: ":";
+}
+
+.tableField > .value {
+  @media (min-width: @breakpointSmall) {
+    margin-left: 110px;
+  }
+}
