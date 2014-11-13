@@ -96,9 +96,8 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
     /**
      * @param string    $dateTimeString
      * @param Closure[] $callbacks
-     * @param DateTime  $nextRun
      */
-    protected function _registerClockworkCallbacks($dateTimeString, $callbacks, DateTime $nextRun = null) {
+    protected function _registerClockworkCallbacks($dateTimeString, $callbacks) {
         foreach ($callbacks as $name => $callback) {
             $transactionName = 'cm ' . static::getPackageName() . ' start: ' . $name;
             $this->_clockworkManager->registerCallback($name, $dateTimeString, function () use ($transactionName, $callback) {
@@ -109,7 +108,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                     CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
                 }
                 CMService_Newrelic::getInstance()->endTransaction();
-            }, $nextRun);
+            });
         }
     }
 }
