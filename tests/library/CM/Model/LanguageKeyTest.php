@@ -12,6 +12,16 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         $this->assertSame(['bar'], $languageKey->getVariables());
     }
 
+    public function testCreateRemoveDuplicates() {
+        $languageKeyFirst = CM_Model_LanguageKey::create('foo', ['bar']);
+        $languageKeySecond = CM_Model_LanguageKey::create('foo', ['foo']);
+
+        $this->assertEquals($languageKeyFirst, $languageKeySecond);
+        $this->assertEquals(['bar'], $languageKeySecond->getVariables());
+
+        $this->assertSame(1, CM_Db_Db::count('cm_model_languagekey', ['name' => 'foo']));
+    }
+
     public function testSetGetVariables() {
         $languageKey = CM_Model_LanguageKey::create('foo');
         $this->assertSame([], $languageKey->getVariables());
