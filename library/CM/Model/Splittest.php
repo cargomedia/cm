@@ -205,7 +205,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
 
     /**
      * @param CM_Splittest_Fixture $fixture
-     * @param bool                 $isRetry
+     * @param bool|null            $isRetry
      * @throws CM_Db_Exception
      * @throws CM_Exception_Invalid
      * @return string
