@@ -16,94 +16,41 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertSame(1, $methodMock->getCallCount());
     }
 
-    public function testRunEventsFor() {
-        $currently = $this->_getCurrentDateTime();
-        $managerMock = $this->mockClass('CM_Clockwork_Manager');
-        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use ($currently) {
+    public function testRunEvents() {
+        $currently = new DateTime();
+        $eventMock = $this->mockClass('CM_Clockwork_Event');
+        $eventRun = $eventMock->newInstanceWithoutConstructor();
+        $runEventRun = $eventRun->mockMethod('run');
+        /** @var CM_Clockwork_Event $eventRun */
+        $eventNoRun =$eventMock->newInstanceWithoutConstructor();
+        $runEventNoRun = $eventNoRun->mockMethod('run');
+        /** @var CM_Clockwork_Event $eventNoRun */
+        $manager = $this->mockObject('CM_Clockwork_Manager');
+        $manager->mockMethod('_getCurrentDateTime')->set(function () use (&$currently) {
             return clone $currently;
         });
+        $shouldRun = $manager->mockMethod('_shouldRun')->set(function(CM_Clockwork_Event $event) use ($eventRun, $eventNoRun) {
+           return $event == $eventRun;
+        });
         /** @var CM_Clockwork_Manager $manager */
-        $manager = $managerMock->newInstance();
-        $manager->setServiceManager(CM_Service_Manager::getInstance());
-        $counter = array(
-            '1'  => 0,
-            '2'  => 0,
-            '5'  => 0,
-            '60' => 0,
-        );
-        $this->_createEvent($manager, $currently, '1 second', $counter, 'event1');
-        $this->_createEvent($manager, $currently, '2 seconds', $counter, 'event2');
-        $this->_createEvent($manager, $currently, '5 seconds', $counter, 'event3');
-        $this->_createEvent($manager, $currently, '60 seconds', $counter, 'event4');
-
-        for ($i = 0; $i <= 100; $i++) {
-            $manager->runEvents();
-            $currently->add(new DateInterval('PT1S'));
-        }
-        $this->assertSame(array(
-            '1'  => 100,
-            '2'  => 50,
-            '5'  => 20,
-            '60' => 1,
-        ), $counter);
-    }
-
-    public function testRunEventsPersistence() {
-        $currently = $this->_getCurrentDateTime();
-        /** @var CM_Clockwork_Storage_Memory $storage */
-        $storage = $this->getMockBuilder('CM_Clockwork_Storage_Memory')->setMethods(array('getLastRuntime',
-            'setRuntime'))
-            ->getMock();
-
-        $manager = $this->getMockBuilder('CM_Clockwork_Manager')->setMethods(array('_getCurrentDateTimeUTC'))->disableOriginalConstructor()->getMock();
-        $manager->expects($this->any())->method('_getCurrentDateTimeUTC')->will($this->returnCallback(function () use ($currently) {
-            return clone $currently;
-        }));
-        $manager->__construct();
-        /** @var CM_Clockwork_Manager $manager */
+        $currently->modify('10 seconds');
+        $storage = $this->mockClass('CM_Clockwork_Storage_Abstract')->newInstanceWithoutConstructor();
+        $setRuntime = $storage->mockMethod('setRuntime')->at(0, function(CM_Clockwork_Event $event, DateTime $runtime) use ($currently, $eventRun) {
+            $this->assertEquals($currently, $runtime);
+            $this->assertEquals($eventRun, $event);
+        });
+        /** @var CM_Clockwork_Storage_Abstract $storage */
         $manager->setServiceManager(CM_Service_Manager::getInstance());
         $manager->setStorage($storage);
-        $counter = array(
-            '1' => 0,
-            '2' => 0,
-        );
-        $event1 = $this->_createEvent($manager, $currently, '1 second', $counter, 'event1');
-        $event2 = $this->_createEvent($manager, $currently, '2 seconds', $counter, 'event2');
 
-        $storage->expects($this->at(0))->method('getLastRuntime')->with($event1)->will($this->returnValue(null));
-        $storage->expects($this->at(1))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime()));
+        $manager->registerEvent($eventRun);
+        $manager->registerEvent($eventNoRun);
 
-        $storage->expects($this->at(2))->method('getLastRuntime')->with($event1)->will($this->returnValue(null));
-        $storage->expects($this->at(3))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime()));
-        $storage->expects($this->at(4))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(1));
-
-        $storage->expects($this->at(5))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(1)));
-        $storage->expects($this->at(6))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(0)));
-        $storage->expects($this->at(7))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(2));
-        $storage->expects($this->at(8))->method('setRuntime')->with($event2, $this->_getCurrentDateTime(2));
-
-        $storage->expects($this->at(9))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(2)));
-        $storage->expects($this->at(10))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(2)));
-        $storage->expects($this->at(11))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(3));
-
-        $storage->expects($this->at(12))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(3)));
-        $storage->expects($this->at(13))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(2)));
-        $storage->expects($this->at(14))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(4));
-        $storage->expects($this->at(15))->method('setRuntime')->with($event2, $this->_getCurrentDateTime(4));
-
-        $storage->expects($this->at(16))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(4)));
-        $storage->expects($this->at(17))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(4)));
-        $storage->expects($this->at(18))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(5));
-
-        $storage->expects($this->at(19))->method('getLastRuntime')->with($event1)->will($this->returnValue($this->_getCurrentDateTime(5)));
-        $storage->expects($this->at(20))->method('getLastRuntime')->with($event2)->will($this->returnValue($this->_getCurrentDateTime(4)));
-        $storage->expects($this->at(21))->method('setRuntime')->with($event1, $this->_getCurrentDateTime(6));
-        $storage->expects($this->at(22))->method('setRuntime')->with($event2, $this->_getCurrentDateTime(6));
-
-        for ($i = 0; $i <= 6; $i++) {
-            $manager->runEvents();
-            $currently->add(new DateInterval('PT1S'));
-        }
+        $manager->runEvents();
+        $this->assertSame(1, $setRuntime->getCallCount());
+        $this->assertSame(2, $shouldRun->getCallCount());
+        $this->assertSame(1, $runEventRun->getCallCount());
+        $this->assertSame(0, $runEventNoRun->getCallCount());
     }
 
     public function testShouldRunFixedTimeMode() {
@@ -185,7 +132,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
     }
 
     public function testShouldRunIntervalMode() {
-        $currently = $this->_getCurrentDateTime();
+        $currently = new DateTime('now', new DateTimeZone('UTC'));
         $lastRuntime = null;
         $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
         $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
@@ -461,40 +408,5 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         if ($timeZone->getOffset($start) === $timeZone->getOffset($currently)) {
             throw new CM_Exception_Invalid("Test did not go through a daylight saving time switch");
         }
-    }
-
-    /**
-     * @param int $delta
-     * @return DateTime
-     */
-    private function _getCurrentDateTime($delta = null) {
-        $dateTime = new DateTime('midnight', new DateTimeZone('UTC'));
-        if ($delta) {
-            $dateTime->add(new DateInterval('PT' . $delta . 'S'));
-        }
-        return $dateTime;
-    }
-
-    /**
-     * @param CM_Clockwork_Manager $manager
-     * @param DateTime             $timeReference
-     * @param string               $dateString
-     * @param array                $counter
-     * @param string               $name
-     * @return CM_Clockwork_Event
-     */
-    private function _createEvent(CM_Clockwork_Manager $manager, DateTime $timeReference, $dateString, &$counter, $name) {
-        $callback = function () use (&$counter, $dateString) {
-            $counter[(int) $dateString]++;
-        };
-        $event = $this->getMockBuilder('CM_Clockwork_Event')->setMethods(array('_getCurrentDateTimeUTC'))->disableOriginalConstructor()->getMock();
-        $event->expects($this->any())->method('_getCurrentDateTimeUTC')->will($this->returnCallback(function () use ($timeReference) {
-            return clone $timeReference;
-        }));
-        /** @var CM_Clockwork_Event $event */
-        $event->__construct($name, $dateString);
-        $event->registerCallback($callback);
-        $manager->registerEvent($event);
-        return $event;
     }
 }
