@@ -2,6 +2,10 @@
 
 class CM_Paging_Translation_LanguageTest extends CMTest_TestCase {
 
+    public function tearDown() {
+        CMTest_TH::clearEnv();
+    }
+
     public function testRemove() {
         $languagePagingFoo = CM_Model_Language::create('Foo', 'foo', true)->getTranslations();
         $languagePagingBar = CM_Model_Language::create('Bar', 'bar', true)->getTranslations();

@@ -136,13 +136,9 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      */
     public static function findByName($name) {
         $name = (string) $name;
-        $languageKeyIdList = CM_Db_Db::select('cm_model_languagekey', 'id', array('name' => $name), 'id ASC')->fetchAllColumn();
-        if (count($languageKeyIdList) === 0) {
+        $languageKeyId = CM_Db_Db::select('cm_model_languagekey', 'id', array('name' => $name), 'id ASC')->fetchColumn();
+        if (!$languageKeyId) {
             return null;
-        }
-        $languageKeyId = array_shift($languageKeyIdList);
-        if (count($languageKeyIdList) > 0) {
-            CM_Db_Db::exec("DELETE FROM `cm_model_languagekey` WHERE `name` = ? AND `id` != ?", array($name, $languageKeyId));
         }
         return new self($languageKeyId);
     }
