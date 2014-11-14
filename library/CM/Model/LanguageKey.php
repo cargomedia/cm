@@ -151,10 +151,8 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     public static function replace($name, array $variableNames = null) {
         $languageKey = self::findByName($name);
         if (!$languageKey) {
-            self::create($name, $variableNames);
-            $languageKey = self::findByName($name);
-        }
-        if (null !== $variableNames) {
+            $languageKey = self::create($name, $variableNames);
+        } elseif (null !== $variableNames) {
             $languageKey->setVariables($variableNames);
         }
         return $languageKey;

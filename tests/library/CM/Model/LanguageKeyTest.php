@@ -88,12 +88,19 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
     }
 
     public function testReplace() {
-        $languageKey = CM_Model_LanguageKey::create('foo');
+        $languageKey = CM_Model_LanguageKey::create('foo', ['bar']);
+        $this->assertSame(['bar'], $languageKey->getVariables());
+
         $this->assertRow('cm_model_languagekey', ['name' => 'foo'], 1);
         $languageKeyReplaced = CM_Model_LanguageKey::replace('foo', ['foo']);
         $this->assertRow('cm_model_languagekey', ['name' => 'foo'], 1);
         $this->assertEquals($languageKey, $languageKeyReplaced);
         $this->assertSame(['foo'], $languageKeyReplaced->getVariables());
+
+        $this->assertRow('cm_model_languagekey', ['name' => 'bar'], 0);
+        $languageKeyCreated = CM_Model_LanguageKey::replace('bar', ['bar']);
+        $this->assertRow('cm_model_languagekey', ['name' => 'bar'], 1);
+        $this->assertSame(['bar'], $languageKeyCreated->getVariables());
     }
 
     public function testExists() {
