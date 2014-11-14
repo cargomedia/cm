@@ -7,8 +7,11 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
     }
 
     public function testCreate() {
+        $language = CMTest_TH::createLanguage('foo');
+        $this->assertCount(0, $language->getTranslations());
         $languageKey = CM_Model_LanguageKey::create('foo', ['bar']);
         $this->assertTrue(CM_Model_LanguageKey::exists('foo'));
+        $this->assertCount(1, $language->getTranslations());
         $this->assertSame(['bar'], $languageKey->getVariables());
     }
 

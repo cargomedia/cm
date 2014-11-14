@@ -99,14 +99,6 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
         CM_Db_Db::delete('cm_languageValue', array('languageKeyId' => $this->getId()));
     }
 
-    protected function _getContainingCacheables() {
-        $cacheables = parent::_getContainingCacheables();
-        foreach (new CM_Paging_Language_All() as $language) {
-            $cacheables[] = new CM_Paging_Translation_Language($language);
-        }
-        return $cacheables;
-    }
-
     protected function _changeContainingCacheables() {
         parent::_changeContainingCacheables();
         CM_Cache_Local::getInstance()->delete(CM_CacheConst::LanguageKey_Tree);
