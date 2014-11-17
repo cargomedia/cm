@@ -2,6 +2,12 @@
 
 abstract class CM_Tools_Generator_Class_Abstract {
 
+    /**
+     * @param string $className
+     * @return string
+     */
+    abstract protected function _getClassPath($className);
+
     /** @var CM_Tools_AppInstallation */
     protected $_appInstallation;
 
@@ -44,25 +50,9 @@ abstract class CM_Tools_Generator_Class_Abstract {
 
     /**
      * @param string $className
-     * @return string
-     * @throws CM_Exception_Invalid
-     */
-    protected function _getClassDirectory($className) {
-        $namespace = CM_Util::getNamespace($className);
-        $namespaces = $this->_appInstallation->getNamespaces();
-        if (!in_array($namespace, $namespaces)) {
-            throw new CM_Exception_Invalid('Cannot find `' . $namespace . '` namespace');
-        }
-        return $this->_appInstallation->getNamespacePath($namespace);
-    }
-
-    /**
-     * @param string $className
      * @return bool
      */
     protected function _classFileExists($className) {
-        $namespace = CM_Util::getNamespace($className);
-        $classPath = $this->_appInstallation->getNamespacePath($namespace) . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
-        return $this->_appInstallation->getFilesystem()->exists($classPath);
+        return $this->_appInstallation->getFilesystem()->exists($this->_getClassPath($className));
     }
 }

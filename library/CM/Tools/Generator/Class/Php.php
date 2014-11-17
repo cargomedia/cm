@@ -44,19 +44,22 @@ class CM_Tools_Generator_Class_Php extends CM_Tools_Generator_Class_Abstract {
     public function createClassFileFromClass(CodeGenerator\ClassBlock $classBlock) {
         $fileBlock = new CodeGenerator\FileBlock();
         $fileBlock->addBlock($classBlock);
-        $classFile = new CM_File($this->_getClassPath($classBlock->getName()), $this->_appInstallation->getFilesystem());
+        $classPath = $this->_getClassPath($classBlock->getName());
+        $classFile = new CM_File($classPath, $this->_appInstallation->getFilesystem());
         $this->_filesystemHelper->createFile($classFile, $fileBlock->dump());
-        $classPathAbsolute = $this->_appInstallation->getFilesystem()->getAdapter()->getPathPrefix() . '/' . $classFile->getPath();
-        require_once($classPathAbsolute);
+        require_once($this->_appInstallation->getFilesystem()->getAdapter()->getPathPrefix() . '/' . $classPath);
         return $classFile;
     }
 
     /**
      * @param string $className
      * @return string
+     * @throws CM_Exception_Invalid
      */
-    private function _getClassPath($className) {
-        return $this->_getClassDirectory($className) . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+    protected function _getClassPath($className) {
+        $namespace = CM_Util::getNamespace($className);
+        $namespacePath = $this->_appInstallation->getNamespacePath($namespace);
+        return $namespacePath . '/' . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
     }
 
     /**

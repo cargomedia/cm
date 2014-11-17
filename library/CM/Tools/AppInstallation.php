@@ -50,11 +50,10 @@ class CM_Tools_AppInstallation {
      * @throws CM_Exception_Invalid
      */
     public function getModulePath($name) {
-        $modulePaths = $this->_appInstallation->getModulePaths();
-        if (!array_key_exists($name, $modulePaths)) {
-            throw new CM_Exception_Invalid('Cannot find module `' . $name . '`');
+        if (!$this->moduleExists($name)) {
+            throw new CM_Exception_Invalid('Cannot find `' . $name . '` module/namespace within `' . implode('`', $this->getModuleNames()) . '`');
         }
-        return $modulePaths[$name];
+        return $this->_appInstallation->getModulePaths()[$name];
     }
 
     /**
