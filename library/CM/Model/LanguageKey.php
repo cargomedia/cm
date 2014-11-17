@@ -192,7 +192,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      * @param CM_Model_LanguageKey $languageKey
      * @return CM_Model_LanguageKey
      */
-    protected static function _replaceWithExisting(self $languageKey) {
+    protected static function _replaceWithExisting(CM_Model_LanguageKey $languageKey) {
         $name = $languageKey->getName();
         $languageKeyIdList = CM_Db_Db::select('cm_model_languagekey', 'id', array('name' => $name), 'id ASC')->fetchAllColumn();
 
