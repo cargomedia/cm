@@ -84,7 +84,7 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         $languageKey1 = CM_Model_LanguageKey::create('foo');
         $this->assertEquals($languageKey1, CM_Model_LanguageKey::findByName('foo'));
 
-        $this->assertNull(CM_Model_LanguageKey::findByName('nonexistne'));
+        $this->assertNull(CM_Model_LanguageKey::findByName('nonexistent'));
     }
 
     public function testReplace() {
