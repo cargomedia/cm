@@ -38,7 +38,7 @@ class CM_Tools_Generator_Class_Layout extends CM_Tools_Generator_Class_Abstract 
      * @return CM_File
      */
     private function _createLayoutFile($className, $templateBasename, $content = null) {
-        if (!$this->_classFileExists($className)) {
+        if (!$this->_classExists($className)) {
             throw new CM_Exception_Invalid('Cannot create layout for non-existing class `' . $className . '`');
         }
         $templatePath = $this->_getTemplatePath($className) . $templateBasename;

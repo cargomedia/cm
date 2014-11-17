@@ -41,7 +41,7 @@ abstract class CM_Tools_Generator_Class_Abstract {
         $namespaces = array_splice($namespaces, $position);
         foreach ($namespaces as $namespace) {
             $parentClassName = $namespace . '_' . $type . '_Abstract';
-            if ($this->_classFileExists($parentClassName)) {
+            if ($this->_classExists($parentClassName)) {
                 return $parentClassName;
             }
         }
@@ -52,7 +52,7 @@ abstract class CM_Tools_Generator_Class_Abstract {
      * @param string $className
      * @return bool
      */
-    protected function _classFileExists($className) {
-        return $this->_appInstallation->getFilesystem()->exists($this->_getClassPath($className));
+    protected function _classExists($className) {
+        return class_exists($className) || $this->_appInstallation->getFilesystem()->exists($this->_getClassPath($className));
     }
 }
