@@ -2,8 +2,12 @@
 
 class CM_Paging_ContentList_AbstractTest extends CMTest_TestCase {
 
+    public function tearDown() {
+        $this->_getPaging()->removeAll();
+    }
+
     public function testAdd() {
-        $paging = $this->_getPaging(1);
+        $paging = $this->_getPaging();
         $paging->add('foo');
         $paging->addMultiple(['bar', 'zoo']);
         $this->assertSame(['bar', 'foo', 'zoo'], $paging->getItems());
@@ -12,7 +16,7 @@ class CM_Paging_ContentList_AbstractTest extends CMTest_TestCase {
     }
 
     public function testRemove() {
-        $paging = $this->_getPaging(2);
+        $paging = $this->_getPaging();
         $paging->addMultiple(['foo', 'bar']);
 
         $this->assertSame(['bar', 'foo'], $paging->getItems());
@@ -24,7 +28,7 @@ class CM_Paging_ContentList_AbstractTest extends CMTest_TestCase {
     }
 
     public function testRemoveAll() {
-        $paging = $this->_getPaging(3);
+        $paging = $this->_getPaging();
         $paging->addMultiple(['foo', 'bar', 'zoo']);
         $this->assertSame(3, $paging->getCount());
         $paging->removeAll();
@@ -32,7 +36,7 @@ class CM_Paging_ContentList_AbstractTest extends CMTest_TestCase {
     }
 
     public function testContains() {
-        $paging = $this->_getPaging(4);
+        $paging = $this->_getPaging();
         $paging->addMultiple(['foo']);
         $this->assertTrue($paging->contains('foo'));
         $this->assertTrue($paging->contains('FoO'));
@@ -42,10 +46,9 @@ class CM_Paging_ContentList_AbstractTest extends CMTest_TestCase {
     }
 
     /**
-     * @param int $type
      * @return CM_Paging_ContentList_Abstract|\Mocka\AbstractClassTrait
      */
-    private function _getPaging($type) {
-        return $this->mockObject('CM_Paging_ContentList_Abstract', [$type]);
+    private function _getPaging() {
+        return $this->mockObject('CM_Paging_ContentList_Abstract', [1]);
     }
 }
