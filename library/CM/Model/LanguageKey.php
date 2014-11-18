@@ -99,14 +99,6 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
         CM_Db_Db::delete('cm_languageValue', array('languageKeyId' => $this->getId()));
     }
 
-    protected function _getContainingCacheables() {
-        $cacheables = parent::_getContainingCacheables();
-        foreach (new CM_Paging_Language_All() as $language) {
-            $cacheables[] = new CM_Paging_Translation_Language($language);
-        }
-        return $cacheables;
-    }
-
     protected function _changeContainingCacheables() {
         parent::_changeContainingCacheables();
         CM_Cache_Local::getInstance()->delete(CM_CacheConst::LanguageKey_Tree);
@@ -127,6 +119,8 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
         ]);
         $languageKey->setVariables($variables);
         $languageKey->commit();
+
+        $languageKey = self::_replaceWithExisting($languageKey);
         return $languageKey;
     }
 
@@ -136,13 +130,9 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      */
     public static function findByName($name) {
         $name = (string) $name;
-        $languageKeyIdList = CM_Db_Db::select('cm_model_languagekey', 'id', array('name' => $name), 'id ASC')->fetchAllColumn();
-        if (count($languageKeyIdList) === 0) {
+        $languageKeyId = CM_Db_Db::select('cm_model_languagekey', 'id', array('name' => $name), 'id ASC')->fetchColumn();
+        if (!$languageKeyId) {
             return null;
-        }
-        $languageKeyId = array_shift($languageKeyIdList);
-        if (count($languageKeyIdList) > 0) {
-            CM_Db_Db::exec("DELETE FROM `cm_model_languagekey` WHERE `name` = ? AND `id` != ?", array($name, $languageKeyId));
         }
         return new self($languageKeyId);
     }
@@ -155,10 +145,8 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     public static function replace($name, array $variableNames = null) {
         $languageKey = self::findByName($name);
         if (!$languageKey) {
-            self::create($name, $variableNames);
-            $languageKey = self::findByName($name);
-        }
-        if (null !== $variableNames) {
+            $languageKey = self::create($name, $variableNames);
+        } elseif (null !== $variableNames) {
             $languageKey->setVariables($variableNames);
         }
         return $languageKey;
@@ -198,5 +186,21 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
             $cache->set($cacheKey, $tree);
         }
         return $tree;
+    }
+
+    /**
+     * @param CM_Model_LanguageKey $languageKey
+     * @return CM_Model_LanguageKey
+     */
+    protected static function _replaceWithExisting(CM_Model_LanguageKey $languageKey) {
+        $name = $languageKey->getName();
+        $languageKeyIdList = CM_Db_Db::select('cm_model_languagekey', 'id', array('name' => $name), 'id ASC')->fetchAllColumn();
+
+        if (count($languageKeyIdList) > 1) {
+            $languageKeyId = array_shift($languageKeyIdList);
+            CM_Db_Db::exec("DELETE FROM `cm_model_languagekey` WHERE `name` = ? AND `id` != ?", array($name, $languageKeyId));
+            $languageKey = new self($languageKeyId);
+        }
+        return $languageKey;
     }
 }

@@ -7,9 +7,22 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
     }
 
     public function testCreate() {
+        $language = CMTest_TH::createLanguage('foo');
+        $this->assertCount(0, $language->getTranslations());
         $languageKey = CM_Model_LanguageKey::create('foo', ['bar']);
         $this->assertTrue(CM_Model_LanguageKey::exists('foo'));
+        $this->assertCount(1, $language->getTranslations());
         $this->assertSame(['bar'], $languageKey->getVariables());
+    }
+
+    public function testCreateRemoveDuplicates() {
+        $languageKeyFirst = CM_Model_LanguageKey::create('foo', ['bar']);
+        $languageKeySecond = CM_Model_LanguageKey::create('foo', ['foo']);
+
+        $this->assertEquals($languageKeyFirst, $languageKeySecond);
+        $this->assertEquals(['bar'], $languageKeySecond->getVariables());
+
+        $this->assertSame(1, CM_Db_Db::count('cm_model_languagekey', ['name' => 'foo']));
     }
 
     public function testSetGetVariables() {
@@ -69,19 +82,25 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
 
     public function testFindByName() {
         $languageKey1 = CM_Model_LanguageKey::create('foo');
-        $languageKey2 = CM_Model_LanguageKey::create('foo');
-        $this->assertRow('cm_model_languagekey', ['name' => 'foo'], 2);
         $this->assertEquals($languageKey1, CM_Model_LanguageKey::findByName('foo'));
-        $this->assertRow('cm_model_languagekey', ['name' => 'foo'], 1);
+
+        $this->assertNull(CM_Model_LanguageKey::findByName('nonexistent'));
     }
 
     public function testReplace() {
-        $languageKey = CM_Model_LanguageKey::create('foo');
+        $languageKey = CM_Model_LanguageKey::create('foo', ['bar']);
+        $this->assertSame(['bar'], $languageKey->getVariables());
+
         $this->assertRow('cm_model_languagekey', ['name' => 'foo'], 1);
         $languageKeyReplaced = CM_Model_LanguageKey::replace('foo', ['foo']);
         $this->assertRow('cm_model_languagekey', ['name' => 'foo'], 1);
         $this->assertEquals($languageKey, $languageKeyReplaced);
         $this->assertSame(['foo'], $languageKeyReplaced->getVariables());
+
+        $this->assertRow('cm_model_languagekey', ['name' => 'bar'], 0);
+        $languageKeyCreated = CM_Model_LanguageKey::replace('bar', ['bar']);
+        $this->assertRow('cm_model_languagekey', ['name' => 'bar'], 1);
+        $this->assertSame(['bar'], $languageKeyCreated->getVariables());
     }
 
     public function testExists() {
