@@ -1,5 +1,7 @@
 <?php
 
+echo 'Please run CM script 40 online' . PHP_EOL;
+return;
 $duplicates = CM_Db_Db::exec("SELECT * FROM (SELECT name, count(*) AS count FROM cm_model_languagekey GROUP BY BINARY name) AS t1 WHERE count > 1 ORDER BY count DESC;");
 while ($row = $duplicates->fetch()) {
     $name = $row['name'];
