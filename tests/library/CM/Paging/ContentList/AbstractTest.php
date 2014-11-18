@@ -2,6 +2,10 @@
 
 class CM_Paging_ContentList_AbstractTest extends CMTest_TestCase {
 
+    public function tearDown() {
+        $this->_getPaging()->removeAll();
+    }
+
     public function testAdd() {
         $paging = $this->_getPaging();
         $paging->add('foo');
@@ -42,10 +46,9 @@ class CM_Paging_ContentList_AbstractTest extends CMTest_TestCase {
     }
 
     /**
-     * @return \Mocka\AbstractClassTrait|CM_Paging_ContentList_Abstract
+     * @return CM_Paging_ContentList_Abstract|\Mocka\AbstractClassTrait
      */
     private function _getPaging() {
-        $type = rand(0, 100);
-        return $this->mockObject('CM_Paging_ContentList_Abstract', [$type]);
+        return $this->mockObject('CM_Paging_ContentList_Abstract', [1]);
     }
 }
