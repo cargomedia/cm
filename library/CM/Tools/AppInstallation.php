@@ -153,6 +153,14 @@ class CM_Tools_AppInstallation {
     }
 
     /**
+     * @param string $path
+     * @return bool
+     */
+    public function fileExists($path) {
+        return $this->getFilesystem()->exists($path);
+    }
+
+    /**
      * @return array [namespace => pathRelative]
      */
     protected function _getModulePaths() {

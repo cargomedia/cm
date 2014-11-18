@@ -53,17 +53,6 @@ class CM_Tools_Generator_Class_Php extends CM_Tools_Generator_Class_Abstract {
 
     /**
      * @param string $className
-     * @return string
-     * @throws CM_Exception_Invalid
-     */
-    protected function _getClassPath($className) {
-        $namespace = CM_Util::getNamespace($className);
-        $namespacePath = $this->_appInstallation->getNamespacePath($namespace);
-        return $namespacePath . '/' . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
-    }
-
-    /**
-     * @param string $className
      * @return bool
      */
     private function _isAbstractClassName($className) {

@@ -50,14 +50,6 @@ class CM_Tools_Generator_Class_Layout extends CM_Tools_Generator_Class_Abstract 
      * @param string $className
      * @return string
      */
-    protected function _getClassPath($className) {
-        return $this->_getTemplatePath($className);
-    }
-
-    /**
-     * @param string $className
-     * @return string
-     */
     protected function _getTemplatePath($className) {
         $moduleName = CM_Util::getNamespace($className);
         $modulePath = $this->_appInstallation->getModulePath($moduleName);
