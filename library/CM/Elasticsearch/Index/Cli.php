@@ -85,8 +85,10 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
 
     public function startMaintenance() {
         $clockwork = new CM_Clockwork_Manager();
-        $clockwork->registerCallback(new DateInterval('PT1M'), array($this, 'update'));
-        $clockwork->registerCallback(new DateInterval('PT1H'), array($this, 'optimize'));
+        $clockwork->setServiceManager(CM_Service_Manager::getInstance());
+        $clockwork->setStorage(new CM_Clockwork_Storage_FileSystem('search-maintenance'));
+        $clockwork->registerCallback('search-index-update', '1 minute', array($this, 'update'));
+        $clockwork->registerCallback('search-index-optimize', '1 hour', array($this, 'optimize'));
         $clockwork->start();
     }
 
