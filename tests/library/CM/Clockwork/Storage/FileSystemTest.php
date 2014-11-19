@@ -17,7 +17,8 @@ class CM_Clockwork_Storage_FileSystemTest extends CMTest_TestCase {
         $serviceManager = CM_Service_Manager::getInstance();
         $storage->setServiceManager($serviceManager);
 
-        $file = new CM_File('clockwork/persistence-test.json', $serviceManager->getFilesystems()->getData());
+        $filepath = 'clockwork/' . md5($context) . '.json';
+        $file = new CM_File($filepath, $serviceManager->getFilesystems()->getData());
         $this->assertFalse($file->getExists());
         $this->assertFalse($file->getParentDirectory()->getExists());
         $storage->setRuntime($event1, $date1);

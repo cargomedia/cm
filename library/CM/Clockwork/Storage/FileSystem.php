@@ -2,8 +2,6 @@
 
 class CM_Clockwork_Storage_FileSystem extends CM_Clockwork_Storage_Abstract {
 
-    const FOLDER_NAME = 'clockwork';
-
     protected function _load() {
         $data = [];
         $file = $this->_getStorageFile();
@@ -32,7 +30,7 @@ class CM_Clockwork_Storage_FileSystem extends CM_Clockwork_Storage_Abstract {
      * @return CM_File
      */
     private function _getStorageFile() {
-        return new CM_File(self::FOLDER_NAME . DIRECTORY_SEPARATOR . $this->_context .
-            '.json', $this->getServiceManager()->getFilesystems()->getData());
+        $filename = md5($this->_context);
+        return new CM_File("clockwork/{$filename}.json", $this->getServiceManager()->getFilesystems()->getData());
     }
 }
