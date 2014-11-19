@@ -289,21 +289,20 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       var required = action.fields[fieldName];
       if (required) {
         var field = this.getField(fieldName);
-        if (!field.isEmpty(data[fieldName])) {
-          return;
-        }
-        var label;
-        var $textInput = field.$('input, textarea');
-        var $labels = $('label[for="' + field.getAutoId() + '-input"]');
-        if ($labels.length) {
-          label = $labels.first().text();
-        } else if ($textInput.attr('placeholder')) {
-          label = $textInput.attr('placeholder');
-        }
-        if (label) {
-          errorList[fieldName] = cm.language.get('{$label} is required.', {label: label});
-        } else {
-          errorList[fieldName] = cm.language.get('Required');
+        if (field.isEmpty(data[fieldName])) {
+          var label;
+          var $textInput = field.$('input, textarea');
+          var $labels = $('label[for="' + field.getAutoId() + '-input"]');
+          if ($labels.length) {
+            label = $labels.first().text();
+          } else if ($textInput.attr('placeholder')) {
+            label = $textInput.attr('placeholder');
+          }
+          if (label) {
+            errorList[fieldName] = cm.language.get('{$label} is required.', {label: label});
+          } else {
+            errorList[fieldName] = cm.language.get('Required');
+          }
         }
       }
     }, this);
