@@ -299,7 +299,6 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {jQuery} $dom
      */
     setup: function($dom) {
-      $dom.placeholder();
       $dom.find('.timeago').timeago();
       $dom.find('textarea.autosize, .autosize textarea').autosize({append: ''});
       $dom.find('.clipSlide').clipSlide();
