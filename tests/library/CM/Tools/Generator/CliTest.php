@@ -1,25 +1,137 @@
 <?php
 
-class CM_Tools_Generator_CliTest extends PHPUnit_Framework_TestCase {
+class CM_Tools_Generator_CliTest extends CMTest_TestCase {
 
-    /** @var CM_Tools_Generator_Cli */
-    private $_generatorCli;
+    public function testCreateModule() {
+        $app = $this->_mockAppInstallation();
+        $this->assertFalse($app->moduleExists('Foo'));
+        $this->assertFalse($app->moduleExists('Bar'));
 
-    /** @var string */
-    private $_dirRoot;
+        $cli = $this->_mockGeneratorCli($app);
+        $cli->createModule('Foo');
+        $cli->createModule('Bar', false, 'custom/');
 
-    public function setUp() {
+        $this->assertTrue($app->moduleExists('Foo'));
+        $this->assertSame('modules/Foo/', $app->getModulePath('Foo'));
+        $this->assertTrue($app->getFilesystem()->exists($app->getModulePath('Foo')));
+
+        $this->assertTrue($app->moduleExists('Bar'));
+        $this->assertSame('custom/', $app->getModulePath('Bar'));
+        $this->assertTrue($app->getFilesystem()->exists($app->getModulePath('Bar')));
+    }
+
+    public function testCreateModuleSingle() {
+        $app = $this->_mockAppInstallation();
+        $this->_mockGeneratorCli($app)->createModule('Bar', true);
+
+        $this->assertTrue($app->moduleExists('Bar'));
+        $this->assertSame('', $app->getModulePath('Bar'));
+        $this->assertTrue($app->getFilesystem()->exists($app->getModulePath('Bar')));
+    }
+
+    /**
+     * @expectedException CM_Cli_Exception_Internal
+     * @expectedExceptionMessage Module `foo` must exist!
+     */
+    public function testCreateNamespaceNoModule() {
+        $app = $this->_mockAppInstallation();
+        $cli = $this->_mockGeneratorCli($app);
+        CMTest_TH::callProtectedMethod($cli, '_createNamespace', ['foo', 'bar']);
+    }
+
+    public function testCreateClass() {
+        $app = $this->_mockAppInstallation();
+        $cli = $this->_mockGeneratorCli($app);
+        $cli->createModule('Foo');
+        $cli->createClass('Foo_Bar');
+        $this->assertTrue(class_exists('Foo_Bar'));
+        $this->assertSame('CM_Class_Abstract', get_parent_class('Foo_Bar'));
+        $this->assertTrue($app->getFilesystem()->exists('modules/Foo/library/Foo/Bar.php'));
+    }
+
+    public function testCreateView() {
+        $app = $this->_mockAppInstallation();
+        $cli = $this->_mockGeneratorCli($app);
+
+        $cli->createModule('Foo');
+        $cli->createView('Foo_Component_Foo_Bar');
+        $this->assertTrue(class_exists('Foo_Component_Foo_Bar'));
+        $this->assertSame('CM_Component_Abstract', get_parent_class('Foo_Component_Foo_Bar'));
+        $this->assertTrue($app->getFilesystem()->exists('modules/Foo/library/Foo/Component/Foo/Bar.php'));
+        $this->assertTrue($app->getFilesystem()->exists('modules/Foo/library/Foo/Component/Foo/Bar.js'));
+        $this->assertTrue($app->getFilesystem()->exists('modules/Foo/layout/default/Component/Foo_Bar/default.tpl'));
+        $this->assertTrue($app->getFilesystem()->exists('modules/Foo/layout/default/Component/Foo_Bar/default.less'));
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     * @expectedExceptionMessage is not a subclass of `CM_View_Abstract`
+     */
+    public function testCreateViewInvalid() {
+        $app = $this->_mockAppInstallation();
+        $cli = $this->_mockGeneratorCli($app);
+        $cli->createModule('Foo');
+        $cli->createView('Foo_Foo_Bar');
+    }
+
+    public function testCreateSite() {
+        $app = $this->_mockAppInstallation();
+        $cli = $this->_mockGeneratorCli($app);
+        $cli->createModule('Foo');
+        $cli->createSite('Foo_Site_Foo', 'Foo', 'foo.com');
+        $this->assertTrue(class_exists('Foo_Site_Foo'));
+        $this->assertSame('CM_Site_Abstract', get_parent_class('Foo_Site_Foo'));
+        $this->assertTrue($app->getFilesystem()->exists('modules/Foo/library/Foo/Site/Foo.php'));
+        $this->assertTrue($app->getFilesystem()->exists('modules/Foo/resources/config/default.php'));
+        $this->assertTrue($app->getFilesystem()->exists('resources/config/local.php'));
+
+        $appDirRoot = $app->getDirRoot();
+        /** @var Closure $configExtendDefault */
+        $configExtendDefault = require $appDirRoot . 'modules/Foo/resources/config/default.php';
+        $this->assertInstanceOf('Closure', $configExtendDefault);
+        /** @var Closure $configExtendLocal */
+        $configExtendLocal = require $appDirRoot . 'resources/config/local.php';
+        $this->assertInstanceOf('Closure', $configExtendLocal);
+
+        $configNode = new CM_Config_Node();
+        $configExtendDefault($configNode);
+        $configExtendLocal($configNode);
+
+        $expectedConfig = [
+            'name'         => 'Foo',
+            'emailAddress' => 'hello@foo.com',
+            'url'          => 'http://www.foo.com',
+            'urlCdn'       => 'http://origin-www.foo.com',
+        ];
+        $this->assertSame($expectedConfig, (array) $configNode->Foo_Site_Foo->export());
+    }
+
+    /**
+     * @throws CM_Exception_Invalid
+     * @throws Exception
+     * @throws \Mocka\Exception
+     * @return CM_Tools_AppInstallation|\Mocka\AbstractClassTrait
+     */
+    private function _mockAppInstallation() {
+        $appName = uniqid('foo-app-');
         $filesystemTmp = CM_Service_Manager::getInstance()->getFilesystems()->getTmp();
-        $this->_dirRoot = $filesystemTmp->getAdapter()->getPathPrefix() . '/foo-app/';
+        $dirRoot = $filesystemTmp->getAdapter()->getPathPrefix() . '/' . $appName . '/';
 
-        $composerFile = new \Composer\Json\JsonFile($this->_dirRoot . 'composer.json');
+        $frameworkLocal = DIR_ROOT . CM_Bootloader::getInstance()->getModulePath('CM');
+        $frameworkTest = $dirRoot . 'vendor/cargomedia/cm';
+        $filesystemTmp->ensureDirectory("{$appName}/vendor/cargomedia");
+        if (false === symlink($frameworkLocal, $frameworkTest)) {
+            throw new CM_Exception_Invalid('Symlink failed to be created');
+        }
+
+        $composerFile = new \Composer\Json\JsonFile($dirRoot . 'composer.json');
         $composerFile->write(array(
             'name'    => 'foo/bar',
             'require' => array('cargomedia/cm' => '*'),
         ));
 
-        $filesystemTmp->ensureDirectory('foo-app/vendor/composer/');
-        $installedFile = new \Composer\Json\JsonFile($this->_dirRoot . 'vendor/composer/installed.json');
+        $filesystemTmp->ensureDirectory("{$appName}/vendor/composer/");
+        $installedFile = new \Composer\Json\JsonFile($dirRoot . 'vendor/composer/installed.json');
         $installedFile->write(
             [
                 [
@@ -41,115 +153,27 @@ class CM_Tools_Generator_CliTest extends PHPUnit_Framework_TestCase {
                 ]
             ]
         );
-        $frameworkLocal = DIR_ROOT . CM_Bootloader::getInstance()->getModulePath('CM');
-        $frameworkTest = $this->_dirRoot . 'vendor/cargomedia/cm';
-        $filesystemTmp->ensureDirectory('foo-app/vendor/cargomedia');
-        symlink($frameworkLocal, $frameworkTest);
 
-        $installation = new CM_Tools_AppInstallation($this->_dirRoot);
-        $this->_generatorCli = $this->getMockBuilder('CM_Tools_Generator_Cli')->setMethods(array('_getAppInstallation'))->getMock();
-        $this->_generatorCli->expects($this->any())->method('_getAppInstallation')->will($this->returnValue($installation));
-    }
+        $filesystemAdapter = new CM_File_Filesystem_Adapter_Local(DIR_ROOT);
+        $filesystemApplication = new CM_File_Filesystem($filesystemAdapter);
 
-    public function tearDown() {
-        CMTest_TH::clearFilesystem();
-    }
-
-    public function testCreateModule() {
-        $app = new CM_Tools_AppInstallation($this->_dirRoot);
-        $this->assertFalse($app->moduleExists('Foo'));
-        $this->assertFalse($app->moduleExists('Bar'));
-
-        $this->_generatorCli->createModule('Foo');
-        $this->_generatorCli->createModule('Bar', false, 'custom/');
-
-        $app = new CM_Tools_AppInstallation($this->_dirRoot);
-        $this->assertTrue($app->moduleExists('Foo'));
-        $this->assertSame('modules/Foo/', $app->getModulePath('Foo'));
-        $this->assertFileExists($this->_dirRoot . $app->getModulePath('Foo'));
-
-        $this->assertTrue($app->moduleExists('Bar'));
-        $this->assertSame('custom/', $app->getModulePath('Bar'));
-        $this->assertFileExists($this->_dirRoot . $app->getModulePath('Bar'));
-    }
-
-    public function testCreateModuleSingle() {
-        $this->_generatorCli->createModule('Bar', true);
-
-        $app = new CM_Tools_AppInstallation($this->_dirRoot);
-        $this->assertTrue($app->moduleExists('Bar'));
-        $this->assertSame('', $app->getModulePath('Bar'));
-        $this->assertFileExists($this->_dirRoot . $app->getModulePath('Bar'));
+        $installation = $this->mockObject('CM_Tools_AppInstallation', [$dirRoot]);
+        $installation->mockMethod('fileExists')->set(function($path) use ($filesystemApplication, $installation) {
+            /** @var $installation CM_Tools_AppInstallation */
+            return $filesystemApplication->exists($path) || $installation->getFilesystem()->exists($path);
+        });
+        return $installation;
     }
 
     /**
-     * @expectedException CM_Cli_Exception_Internal
-     * @expectedExceptionMessage Module `foo` must exist!
+     * @param CM_Tools_AppInstallation $appInstallation
+     * @return \Mocka\AbstractClassTrait|CM_Tools_Generator_Cli
+     * @throws \Mocka\Exception
      */
-    public function testCreateNamespaceNoModule() {
-        $method = new ReflectionMethod($this->_generatorCli, '_createNamespace');
-        $method->setAccessible(true);
-        $method->invoke($this->_generatorCli, 'foo', 'bar');
+    private function _mockGeneratorCli(CM_Tools_AppInstallation $appInstallation) {
+        $cli = $this->mockObject('CM_Tools_Generator_Cli');
+        $cli->mockMethod('_getAppInstallation')->set($appInstallation);
+        return $cli;
     }
 
-    public function testCreateClass() {
-        $cli = $this->_generatorCli;
-        $cli->createModule('Foo');
-        $cli->createClass('Foo_Bar');
-        $this->assertTrue(class_exists('Foo_Bar'));
-        $this->assertSame('CM_Class_Abstract', get_parent_class('Foo_Bar'));
-        $this->assertFileExists($this->_dirRoot . 'modules/Foo/library/Foo/Bar.php');
-    }
-
-    public function testCreateView() {
-        $cli = $this->_generatorCli;
-        $cli->createModule('Foo');
-        $cli->createView('Foo_Component_Foo_Bar');
-        $this->assertTrue(class_exists('Foo_Component_Foo_Bar'));
-        $this->assertSame('CM_Component_Abstract', get_parent_class('Foo_Component_Foo_Bar'));
-        $this->assertFileExists($this->_dirRoot . 'modules/Foo/library/Foo/Component/Foo/Bar.php');
-        $this->assertFileExists($this->_dirRoot . 'modules/Foo/library/Foo/Component/Foo/Bar.js');
-        $this->assertFileExists($this->_dirRoot . 'modules/Foo/layout/default/Component/Foo_Bar/default.tpl');
-        $this->assertFileExists($this->_dirRoot . 'modules/Foo/layout/default/Component/Foo_Bar/default.less');
-    }
-
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage is not a subclass of `CM_View_Abstract`
-     */
-    public function testCreateViewInvalid() {
-        $cli = $this->_generatorCli;
-        $cli->createModule('Foo');
-        $cli->createView('Foo_Foo_Bar');
-    }
-
-    public function testCreateSite() {
-        $cli = $this->_generatorCli;
-        $cli->createModule('Foo');
-        $cli->createSite('Foo_Site_Foo', 'Foo', 'foo.com');
-        $this->assertTrue(class_exists('Foo_Site_Foo'));
-        $this->assertSame('CM_Site_Abstract', get_parent_class('Foo_Site_Foo'));
-        $this->assertFileExists($this->_dirRoot . 'modules/Foo/library/Foo/Site/Foo.php');
-        $this->assertFileExists($this->_dirRoot . 'modules/Foo/resources/config/default.php');
-        $this->assertFileExists($this->_dirRoot . 'resources/config/local.php');
-
-        /** @var Closure $configExtendDefault */
-        $configExtendDefault = require $this->_dirRoot . 'modules/Foo/resources/config/default.php';
-        $this->assertInstanceOf('Closure', $configExtendDefault);
-        /** @var Closure $configExtendLocal */
-        $configExtendLocal = require $this->_dirRoot . 'resources/config/local.php';
-        $this->assertInstanceOf('Closure', $configExtendLocal);
-
-        $configNode = new CM_Config_Node();
-        $configExtendDefault($configNode);
-        $configExtendLocal($configNode);
-
-        $expectedConfig = [
-            'name'         => 'Foo',
-            'emailAddress' => 'hello@foo.com',
-            'url'          => 'http://www.foo.com',
-            'urlCdn'       => 'http://origin-www.foo.com',
-        ];
-        $this->assertSame($expectedConfig, (array) $configNode->Foo_Site_Foo->export());
-    }
 }
