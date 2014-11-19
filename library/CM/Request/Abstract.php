@@ -455,7 +455,7 @@ abstract class CM_Request_Abstract {
             return true;
         }
         $userAgent = $this->getHeader('user-agent');
-        if (preg_match('#MSIE [5678]\.#', $userAgent)) {
+        if (preg_match('#MSIE [56789]\.#', $userAgent)) {
             return false;
         }
         return true;
