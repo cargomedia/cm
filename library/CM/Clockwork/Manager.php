@@ -86,16 +86,14 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
         if (!$this->_isIntervalEvent($event)) {     // do not set timezone for interval-based events due to buggy behaviour with timezones that use
             $base->setTimezone($this->_timeZone);   // daylight saving time, see https://bugs.php.net/bug.php?id=51051
         }
+        $nextExecutionTime = clone $base;
+        $nextExecutionTime->modify($dateTimeString);
         if ($lastRuntime) {
-            $nextExecutionTime = clone $base;
-            $nextExecutionTime->modify($dateTimeString);
             if ($nextExecutionTime <= $base) {
                 $nextExecutionTime = $this->_getCurrentDateTime()->modify($dateTimeString);
             }
             $shouldRun = $nextExecutionTime > $base && $this->_getCurrentDateTime() >= $nextExecutionTime;
         } else {
-            $nextExecutionTime = clone $base;
-            $nextExecutionTime->modify($dateTimeString);
             if ($nextExecutionTime < $base) {
                 $nextExecutionTime = $this->_getCurrentDateTime()->modify($dateTimeString);
             }
