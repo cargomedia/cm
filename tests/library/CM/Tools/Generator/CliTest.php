@@ -3,7 +3,7 @@
 class CM_Tools_Generator_CliTest extends CMTest_TestCase {
 
     public function tearDown() {
-        CMTest_TH::clearFilesystem();
+        CMTest_TH::clearEnv();
     }
 
     public function testCreateModule() {
