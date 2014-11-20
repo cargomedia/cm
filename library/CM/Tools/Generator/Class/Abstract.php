@@ -60,6 +60,6 @@ abstract class CM_Tools_Generator_Class_Abstract {
     protected function _getClassPath($className) {
         $namespace = CM_Util::getNamespace($className);
         $namespacePath = $this->_appInstallation->getNamespacePath($namespace);
-        return $namespacePath . '/' . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+        return $namespacePath . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
     }
 }
