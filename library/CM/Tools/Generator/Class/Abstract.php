@@ -32,9 +32,11 @@ abstract class CM_Tools_Generator_Class_Abstract {
             throw new CM_Exception_Invalid('Namespace module `' . $classNamespace . '` not found within `' . implode(', ', $namespaces) .
             '` modules.');
         }
+        var_dump($namespaces);
         $namespaces = array_splice($namespaces, $position);
         foreach ($namespaces as $namespace) {
             $parentClassName = $namespace . '_' . $type . '_Abstract';
+            var_dump($parentClassName);
             if ($this->_classExists($parentClassName)) {
                 return $parentClassName;
             }
