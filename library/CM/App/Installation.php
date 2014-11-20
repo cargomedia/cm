@@ -113,9 +113,11 @@ class CM_App_Installation {
         $cacheKey = CM_CacheConst::ComposerVendorDir;
         $fileCache = new CM_Cache_Storage_File();
         if (false === ($vendorDir = $fileCache->get($cacheKey)) || $fileComposerJson->getModified() > $fileCache->getCreateStamp($cacheKey)) {
+            echo 'vendor-dir uncached';
             $vendorDir = rtrim($this->getComposer()->getConfig()->get('vendor-dir'), '/') . '/';
             $fileCache->set($cacheKey, $vendorDir);
         }
+        var_dump('vendor-dir', $vendorDir);
         return $vendorDir;
     }
 
