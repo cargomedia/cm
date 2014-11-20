@@ -160,16 +160,7 @@ class CM_Tools_Generator_CliTest extends CMTest_TestCase {
                 ]
             ]
         );
-
-        $filesystemAdapter = new CM_File_Filesystem_Adapter_Local(DIR_ROOT);
-        $filesystemApplication = new CM_File_Filesystem($filesystemAdapter);
-
-        $installation = $this->mockObject('CM_Tools_AppInstallation', [$dirRoot]);
-        $installation->mockMethod('fileExists')->set(function($path) use ($filesystemApplication, $installation) {
-            /** @var $installation CM_Tools_AppInstallation */
-            return $filesystemApplication->exists($path) || $installation->getFilesystem()->exists($path);
-        });
-        return $installation;
+        return $this->mockObject('CM_Tools_AppInstallation', [$dirRoot]);
     }
 
     /**
