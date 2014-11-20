@@ -54,6 +54,7 @@ class CM_Tools_Generator_CliTest extends CMTest_TestCase {
     }
 
     public function testCreateView() {
+        echo __METHOD__. ' start'. PHP_EOL;
         $app = $this->_mockAppInstallation();
         $cli = $this->_mockGeneratorCli($app);
         $this->assertSame(['CM'], $app->getModuleNames());
@@ -66,6 +67,7 @@ class CM_Tools_Generator_CliTest extends CMTest_TestCase {
         $this->assertTrue($app->getFilesystem()->exists('modules/Foo/library/Foo/Component/Foo/Bar.js'));
         $this->assertTrue($app->getFilesystem()->exists('modules/Foo/layout/default/Component/Foo_Bar/default.tpl'));
         $this->assertTrue($app->getFilesystem()->exists('modules/Foo/layout/default/Component/Foo_Bar/default.less'));
+        echo __METHOD__. ' end'. PHP_EOL;
     }
 
     /**
@@ -80,6 +82,7 @@ class CM_Tools_Generator_CliTest extends CMTest_TestCase {
     }
 
     public function testCreateSite() {
+        echo __METHOD__. ' start'. PHP_EOL;
         $app = $this->_mockAppInstallation();
         $cli = $this->_mockGeneratorCli($app);
         $this->assertSame(['CM'], $app->getModuleNames());
@@ -111,6 +114,7 @@ class CM_Tools_Generator_CliTest extends CMTest_TestCase {
             'urlCdn'       => 'http://origin-www.foo.com',
         ];
         $this->assertSame($expectedConfig, (array) $configNode->Foo_Site_Foo->export());
+        echo __METHOD__. ' end'. PHP_EOL;
     }
 
     /**
