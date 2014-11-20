@@ -164,6 +164,13 @@ class CM_Tools_AppInstallation {
     }
 
     /**
+     * @return CM_App_Installation
+     */
+    public function getAppInstallation() {
+        return $this->_appInstallation;
+    }
+
+    /**
      * @return array [namespace => pathRelative]
      */
     protected function _getModulePaths() {

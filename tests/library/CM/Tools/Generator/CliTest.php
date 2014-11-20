@@ -58,8 +58,10 @@ class CM_Tools_Generator_CliTest extends CMTest_TestCase {
         $app = $this->_mockAppInstallation();
         $cli = $this->_mockGeneratorCli($app);
         $this->assertSame(['CM'], $app->getModuleNames());
+        var_dump($app->getAppInstallation()->getModulePaths());
         $cli->createModule('Foo');
         $this->assertSame(['CM', 'Foo'], $app->getModuleNames());
+        var_dump($app->getAppInstallation()->getModulePaths());
         $cli->createView('Foo_Component_Foo_Bar');
         $this->assertTrue(class_exists('Foo_Component_Foo_Bar'));
         $this->assertSame('CM_Component_Abstract', get_parent_class('Foo_Component_Foo_Bar'));
@@ -86,8 +88,10 @@ class CM_Tools_Generator_CliTest extends CMTest_TestCase {
         $app = $this->_mockAppInstallation();
         $cli = $this->_mockGeneratorCli($app);
         $this->assertSame(['CM'], $app->getModuleNames());
+        var_dump($app->getAppInstallation()->getModulePaths());
         $cli->createModule('Foo');
         $this->assertSame(['CM', 'Foo'], $app->getModuleNames());
+        var_dump($app->getAppInstallation()->getModulePaths());
         $cli->createSite('Foo_Site_Foo', 'Foo', 'foo.com');
         $this->assertTrue(class_exists('Foo_Site_Foo'));
         $this->assertSame('CM_Site_Abstract', get_parent_class('Foo_Site_Foo'));
