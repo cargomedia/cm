@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Provision_Script_Abstract implements CM_Provision_Script_LoadableInterface {
+abstract class CM_Provision_Script_Abstract extends CM_Class_Abstract implements CM_Provision_Script_LoadableInterface {
 
     /**
      * @return string
