@@ -40,10 +40,10 @@ return function (CM_Config_Node $config) {
     $config->CM_Paging_Log_Abstract->types[23] = 'CM_Paging_Log_Mail';
     $config->CM_Paging_Log_Abstract->types[24] = 'CM_Paging_Log_Warn';
     
-    $config->CM_Provision_Script_IsLoadedOption->types = array();
-    $config->CM_Provision_Script_IsLoadedOption->types[32] = 'CM_App_SetupScript_Core';
-    $config->CM_Provision_Script_IsLoadedOption->types[33] = 'CM_App_SetupScript_Translations';
-    $config->CM_Provision_Script_IsLoadedOption->types[34] = 'CM_Elasticsearch_SetupScript';
+    $config->CM_Provision_Script_OptionBased->types = array();
+    $config->CM_Provision_Script_OptionBased->types[35] = 'CM_App_SetupScript_Core';
+    $config->CM_Provision_Script_OptionBased->types[36] = 'CM_App_SetupScript_Translations';
+    $config->CM_Provision_Script_OptionBased->types[37] = 'CM_Elasticsearch_SetupScript';
     
     $config->CM_Site_Abstract->types = array();
     
@@ -82,11 +82,11 @@ return function (CM_Config_Node $config) {
     $config->CM_Model_Location_State->type = 29;
     $config->CM_Model_Location_Zip->type = 30;
     $config->CM_Model_LanguageKey->type = 31;
-    $config->CM_App_SetupScript_Core->type = 32;
-    $config->CM_App_SetupScript_Translations->type = 33;
-    $config->CM_Elasticsearch_SetupScript->type = 34;
+    $config->CM_App_SetupScript_Core->type = 35;
+    $config->CM_App_SetupScript_Translations->type = 36;
+    $config->CM_Elasticsearch_SetupScript->type = 37;
     
-    $config->CM_Class_Abstract->typesMaxValue = 34;
+    $config->CM_Class_Abstract->typesMaxValue = 37;
     
     $config->CM_Action_Abstract->verbs = array();
     $config->CM_Action_Abstract->verbs[CM_Action_Abstract::CREATE] = 1;
