@@ -27,6 +27,6 @@ abstract class CM_Provision_Script_OptionBased extends CM_Provision_Script_Abstr
      * @return string
      */
     private function _getOptionName() {
-        return 'SetupScript.' . $this->getType();
+        return __CLASS__ . ':' . $this->getType();
     }
 }
