@@ -1,12 +1,35 @@
 <?php
 
-class CM_Clockwork_Manager {
+class CM_Clockwork_Manager extends CM_Service_ManagerAware {
 
     /** @var CM_Clockwork_Event[] */
     private $_events;
 
+    /** @var DateTime */
+    private $_startTime;
+
+    /** @var CM_Clockwork_Storage_Abstract */
+    private $_storage;
+
+    /** @var DateTimeZone */
+    private $_timeZone;
+
     public function __construct() {
         $this->_events = array();
+        $this->_storage = new CM_Clockwork_Storage_Memory();
+        $this->_timeZone = CM_Bootloader::getInstance()->getTimeZone();
+        $this->_startTime = $this->_getCurrentDateTimeUTC();
+    }
+
+    /**
+     * @param string      $name
+     * @param string      $dateTimeString
+     * @param callable    $callback
+     */
+    public function registerCallback($name, $dateTimeString, $callback) {
+        $event = new CM_Clockwork_Event($name, $dateTimeString);
+        $event->registerCallback($callback);
+        $this->registerEvent($event);
     }
 
     /**
@@ -16,14 +39,33 @@ class CM_Clockwork_Manager {
         $this->_events[] = $event;
     }
 
+    public function runEvents() {
+        /** @var CM_Clockwork_Event[] $eventsToRun */
+        $eventsToRun = array();
+        foreach ($this->_events as $event) {
+            if ($this->_shouldRun($event)) {
+                $eventsToRun[] = $event;
+            }
+        }
+        foreach ($eventsToRun as $event) {
+            $event->run();
+            $this->_storage->setRuntime($event, $this->_getCurrentDateTime());
+        }
+    }
+
     /**
-     * @param DateInterval $interval
-     * @param callable     $callback
+     * @param CM_Clockwork_Storage_Abstract $storage
      */
-    public function registerCallback(DateInterval $interval, $callback) {
-        $event = new CM_Clockwork_Event($interval);
-        $event->registerCallback($callback);
-        $this->registerEvent($event);
+    public function setStorage(CM_Clockwork_Storage_Abstract $storage) {
+        $this->_storage = $storage;
+        $this->_storage->setServiceManager($this->getServiceManager());
+    }
+
+    /**
+     * @param DateTimeZone $timeZone
+     */
+    public function setTimeZone(DateTimeZone $timeZone) {
+        $this->_timeZone = $timeZone;
     }
 
     public function start() {
@@ -33,16 +75,53 @@ class CM_Clockwork_Manager {
         }
     }
 
-    public function runEvents() {
-        /** @var CM_Clockwork_Event[] $eventsToRun */
-        $eventsToRun = array();
-        foreach ($this->_events as $event) {
-            if ($event->shouldRun()) {
-                $eventsToRun[] = $event;
+    /**
+     * @param CM_Clockwork_Event $event
+     * @return boolean
+     */
+    protected function _shouldRun(CM_Clockwork_Event $event) {
+        $lastRuntime = $this->_storage->getLastRuntime($event);
+        $base = $lastRuntime ?: clone $this->_startTime;
+        $dateTimeString = $event->getDateTimeString();
+        if (!$this->_isIntervalEvent($event)) {     // do not set timezone for interval-based events due to buggy behaviour with timezones that use
+            $base->setTimezone($this->_timeZone);   // daylight saving time, see https://bugs.php.net/bug.php?id=51051
+        }
+        $nextExecutionTime = clone $base;
+        $nextExecutionTime->modify($dateTimeString);
+        if ($lastRuntime) {
+            if ($nextExecutionTime <= $base) {
+                $nextExecutionTime = $this->_getCurrentDateTime()->modify($dateTimeString);
             }
+            $shouldRun = $nextExecutionTime > $base && $this->_getCurrentDateTime() >= $nextExecutionTime;
+        } else {
+            if ($nextExecutionTime < $base) {
+                $nextExecutionTime = $this->_getCurrentDateTime()->modify($dateTimeString);
+            }
+            $shouldRun = $nextExecutionTime >= $base && $this->_getCurrentDateTime() >= $nextExecutionTime;
         }
-        foreach ($eventsToRun as $event) {
-            $event->run();
-        }
+        return $shouldRun;
+    }
+
+    /**
+     * @return DateTime
+     */
+    protected function _getCurrentDateTime() {
+        return $this->_getCurrentDateTimeUTC()->setTimezone($this->_timeZone);
+    }
+
+    protected function _getCurrentDateTimeUTC() {
+        return new DateTime('now', new DateTimeZone('UTC'));
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     * @return boolean
+     */
+    protected function _isIntervalEvent(CM_Clockwork_Event $event) {
+        $dateTimeString = $event->getDateTimeString();
+        $date = new DateTime();
+        $dateModified = new DateTime();
+        $dateModified->modify($dateTimeString);
+        return $date->modify($dateTimeString) != $dateModified->modify($dateTimeString);
     }
 }
