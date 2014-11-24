@@ -18,8 +18,9 @@ class CM_FormField_Date extends CM_FormField_Abstract {
         $dd = (int) trim($userInput['day']);
         $mm = (int) trim($userInput['month']);
         $yy = (int) trim($userInput['year']);
+        $date = trim($userInput['date']);
 
-        return new DateTime($yy . '-' . $mm . '-' . $dd);
+        return new DateTime($date ? $date : self::format($yy, $mm, $dd));
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
@@ -34,12 +35,21 @@ class CM_FormField_Date extends CM_FormField_Abstract {
         $viewResponse->set('days', array_combine($days, $days));
 
         $value = $this->getValue();
-        $viewResponse->set('yy', $value ? $value->format('Y') : null);
-        $viewResponse->set('mm', $value ? $value->format('n') : null);
-        $viewResponse->set('dd', $value ? $value->format('j') : null);
+        $yy = $value ? $value->format('Y') : null;
+        $viewResponse->set('yy', $yy);
+        $mm = $value ? $value->format('n') : null;
+        $viewResponse->set('mm', $mm);
+        $dd = $value ? $value->format('j') : null;
+        $viewResponse->set('dd', $dd);
+
+        $viewResponse->set('date', self::format($yy, $mm, $dd));
     }
 
     public function isEmpty($userInput) {
-        return empty($userInput['day']) || empty($userInput['month']) || empty($userInput['year']);
+        return (empty($userInput['day']) || empty($userInput['month']) || empty($userInput['year'])) && (empty($userInput['date']));
+    }
+
+    public static function format($yy, $mm, $dd) {
+        return $yy . '-' . $mm . '-' . $dd;
     }
 }
