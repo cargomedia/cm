@@ -1143,17 +1143,10 @@ var CM_App = CM_Class_Abstract.extend({
     },
 
     /**
-     * @returns Location
-     */
-    getLocation: function() {
-      return window.history.location || document.location;
-    },
-
-    /**
      * @returns string
      */
     _getFragment: function() {
-      var location = this.getLocation();
+      var location = window.location;
       return location.pathname + location.search;
     },
 
