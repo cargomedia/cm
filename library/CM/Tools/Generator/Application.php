@@ -129,11 +129,6 @@ class CM_Tools_Generator_Application extends CM_Class_Abstract {
         $localRepo = $composer->getRepositoryManager()->getLocalRepository();
         $package = $composer->getPackage();
         $config = $composer->getConfig();
-        $config->merge([
-            'config' => [
-                'vendor-dir' => $this->_installation->getDirRoot() . $config->get('vendor-dir')
-            ]
-        ]);
         $im = $composer->getInstallationManager();
         $generator = $composer->getAutoloadGenerator();
         $generator->dump($config, $localRepo, $package, $im, 'composer');
