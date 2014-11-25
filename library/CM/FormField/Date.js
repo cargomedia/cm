@@ -7,7 +7,7 @@ var CM_FormField_Date = CM_FormField_Abstract.extend({
 
   ready: function() {
     var dateSource;
-    if (Modernizr.inputtypes.date && Modernizr.touchevents) {
+    if (this._browserHasSpinningDatePicker()) {
       $('.fancySelect').toggle(false);
       dateSource = this.$('[type=date]').toggle(true);
     } else {
@@ -20,5 +20,9 @@ var CM_FormField_Date = CM_FormField_Abstract.extend({
 
   isEmpty: function(value) {
     return _.isEmpty(value.day) || _.isEmpty(value.month) || _.isEmpty(value.year);
+  },
+
+  _browserHasSpinningDatePicker: function() {
+    return /Android|iPhone|iPad|iPod|IEMobile/i.test(navigator.userAgent);
   }
 });
