@@ -32,7 +32,6 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
         $this->assertSame(md5('hello'), $adapter->getChecksum('foo'));
     }
 
-
     public function testWrite() {
         $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()
             ->setMethods(array('putObject'))->getMock();
