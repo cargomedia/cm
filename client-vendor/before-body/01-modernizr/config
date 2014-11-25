@@ -8,7 +8,6 @@
     "test/history",
     "test/svg",
     "test/forms/fileinput",
-    "test/inputtypes",
     "test/dom/classlist",
     "test/requestanimationframe",
     "test/css/transforms3d",
