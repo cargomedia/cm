@@ -157,9 +157,7 @@ class CM_Tools_AppInstallation {
      * @return bool
      */
     public function fileExists($path) {
-        $exists = $this->getFilesystem()->exists($path);
-        var_dump($path . ' ' . ($exists ? 'exists' : 'does not exist'));
-        return $exists;
+        return $this->getFilesystem()->exists($path);
 
     }
 
