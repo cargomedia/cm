@@ -1,7 +1,8 @@
 <?php
 
 class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implements
-    CM_File_Filesystem_Adapter_SizeCalculatorInterface {
+        CM_File_Filesystem_Adapter_SizeCalculatorInterface,
+        CM_File_Filesystem_Adapter_ChecksumCalculatorInterface {
 
     /** @var Aws\S3\S3Client */
     private $_client;
@@ -14,9 +15,9 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
 
     /**
      * @param Aws\S3\S3Client $client
-     * @param string          $bucket
-     * @param string|null     $acl
-     * @param string|null     $pathPrefix
+     * @param string $bucket
+     * @param string|null $acl
+     * @param string|null $pathPrefix
      */
     public function __construct(Aws\S3\S3Client $client, $bucket, $acl = null, $pathPrefix = null) {
         parent::__construct($pathPrefix);
@@ -71,6 +72,15 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         }
     }
 
+    public function getChecksum($path) {
+        $options = $this->_getOptions($path);
+        try {
+            return $this->_client->getObject($options)->get('ETag');
+        } catch (\Exception $e) {
+            throw new CM_Exception('Cannot get AWS::ETag of `' . $path . '`: ' . $e->getMessage());
+        }
+    }
+
     public function delete($path) {
         $options = $this->_getOptions($path);
         try {
@@ -81,10 +91,10 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
     }
 
     public function listByPrefix($pathPrefix, $noRecursion = null) {
-        $pathPrefix = $this->_getAbsolutePath($pathPrefix) . '/';  // force trailing slash for input-output consistency
+        $pathPrefix = $this->_getAbsolutePath($pathPrefix) . '/'; // force trailing slash for input-output consistency
         $commandOptions = array(
-            'Bucket' => $this->_bucket,
-            'Prefix' => $pathPrefix,
+                'Bucket' => $this->_bucket,
+                'Prefix' => $pathPrefix,
         );
         if ($noRecursion) {
             $commandOptions['Delimiter'] = '/';
@@ -109,7 +119,7 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
 
     public function copy($sourcePath, $targetPath) {
         $options = $this->_getOptions($targetPath,
-            array('CopySource' => $this->_bucket . '/' . $this->_getAbsolutePath($sourcePath)));
+                array('CopySource' => $this->_bucket . '/' . $this->_getAbsolutePath($sourcePath)));
 
         try {
             $this->_client->copyObject($options);
@@ -120,9 +130,9 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
 
     public function isDirectory($path) {
         $options = array(
-            'Bucket'  => $this->_bucket,
-            'Prefix'  => $this->_getAbsolutePath($path) . '/',
-            'MaxKeys' => 1,
+                'Bucket' => $this->_bucket,
+                'Prefix' => $this->_getAbsolutePath($path) . '/',
+                'MaxKeys' => 1,
         );
 
         try {
@@ -212,7 +222,7 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
 
     /**
      * @param string $path
-     * @param array  $options
+     * @param array $options
      * @return array
      */
     protected function _getOptions($path, array $options = null) {
