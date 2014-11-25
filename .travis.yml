@@ -20,16 +20,21 @@ before_install:
 before_script:
   - "until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done"
   - tests/travis/install-php-runkit.sh
+  - tests/travis/install-php-svm.sh
+  - printf "\n" | pecl install imagick
+  - pecl install stats
+  - sudo apt-get install libgearman-dev && pecl install gearman-1.0.3
   - sh -c "if [ `php-config --vernum` -ge 50500 ]; then printf "yes\n" | pecl install apcu-beta; fi"
   - phpenv config-add tests/travis/php.ini
   - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
+  - npm install -g autoprefixer
 
   - composer self-update
   - composer install --dev
   - cp tests/travis/config.php resources/config/local.php
   - bin/cm app set-deploy-version
 
-script: bin/phpunit tests/library/CM/Tools/Generator/CliTest.php
+script: bin/phpunit
 
 notifications:
   email: false
