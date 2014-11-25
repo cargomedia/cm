@@ -62,6 +62,7 @@ class CM_Tools_Generator_CliTest extends CMTest_TestCase {
         $cli->createView('Foo_Component_Foo_Bar');
         $this->assertTrue(class_exists('Foo_Component_Foo_Bar'));
         $this->assertSame('CM_Component_Abstract', get_parent_class('Foo_Component_Foo_Bar'));
+        $this->assertTrue($app->getFilesystem()->exists('vendor/autoload.php'));
         $this->assertTrue($app->getFilesystem()->exists('modules/Foo/library/Foo/Component/Foo/Bar.php'));
         $this->assertTrue($app->getFilesystem()->exists('modules/Foo/library/Foo/Component/Foo/Bar.js'));
         $this->assertTrue($app->getFilesystem()->exists('modules/Foo/layout/default/Component/Foo_Bar/default.tpl'));
