@@ -680,47 +680,6 @@
   
 /*!
 {
-  "name": "History API",
-  "property": "history",
-  "caniuse": "history",
-  "tags": ["history"],
-  "authors": ["Hay Kranen", "Alexander Farkas"],
-  "notes": [{
-    "name": "W3C Spec",
-    "href": "http://www.w3.org/TR/html51/browsers.html#the-history-interface"
-  }, {
-    "name": "MDN documentation",
-    "href": "https://developer.mozilla.org/en-US/docs/Web/API/window.history"
-  }],
-  "polyfills": ["historyjs", "html5historyapi"]
-}
-!*/
-/* DOC
-Detects support for the History API for manipulating the browser session history.
-*/
-
-  Modernizr.addTest('history', function() {
-    // Issue #733
-    // The stock browser on Android 2.2 & 2.3, and 4.0.x returns positive on history support
-    // Unfortunately support is really buggy and there is no clean way to detect
-    // these bugs, so we fall back to a user agent sniff :(
-    var ua = navigator.userAgent;
-
-    // We only want Android 2 and 4.0, stock browser, and not Chrome which identifies
-    // itself as 'Mobile Safari' as well
-    if ((ua.indexOf('Android 2.') !== -1 ||
-        (ua.indexOf('Android 4.0') !== -1)) &&
-        ua.indexOf('Mobile Safari') !== -1 &&
-        ua.indexOf('Chrome') === -1) {
-      return false;
-    }
-
-    // Return the regular check
-    return (window.history && 'pushState' in window.history);
-  });
-
-/*!
-{
   "name": "SVG",
   "property": "svg",
   "caniuse": "svg",
@@ -746,7 +705,13 @@ Detects support for SVG in `<embed>` or `<object>` elements.
 
 
   var createElement = function() {
-    return document.createElement.apply(document, arguments);
+    if (typeof document.createElement !== 'function') {
+      // This is the case in IE7, where the type of createElement is "object".
+      // For this reason, we cannot call apply() as Object is not a Function.
+      return document.createElement(arguments[0]);
+    } else {
+      return document.createElement.apply(document, arguments);
+    }
   };
   
 /*!
@@ -992,7 +957,7 @@ E.g. iOS < 6 and some android version don't support this
     }
 
     // Otherwise do it properly
-    var afterInit, i, prop, before;
+    var afterInit, i, propsLength, prop, before;
 
     // If we don't have a style element, that means
     // we're running async or after the core tests,
@@ -1012,7 +977,8 @@ E.g. iOS < 6 and some android version don't support this
       }
     }
 
-    for ( i in props ) {
+    propsLength = props.length;
+    for ( i = 0; i < propsLength; i++ ) {
       prop = props[i];
       before = mStyle.style[prop];
 
@@ -1149,7 +1115,11 @@ E.g. iOS < 6 and some android version don't support this
     var cssrule = window.CSSRule;
     var rule;
 
-    // remove literal @ from begining of provided property
+    if (typeof cssrule === 'undefined') {
+      return false;
+    }
+
+    // remove literal @ from beginning of provided property
     prop = prop.replace(/^@/,'');
 
     // CSSRules use underscores instead of dashes
