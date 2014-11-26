@@ -8,10 +8,10 @@ var CM_FormField_Date = CM_FormField_Abstract.extend({
   ready: function() {
     var dateSource;
     if (this._browserHasSpinningDatePicker()) {
-      this.$('.fancySelect').toggle(false).find('select').attr('disabled', true);
+      this.$('.fancySelect').toggle(false).find('select').prop('disabled', true);
       dateSource = this.$('[type=date]').toggle(true);
     } else {
-      this.$('[type=date]').attr('disabled', true);
+      this.$('[type=date]').prop('disabled', true);
       dateSource = this.$('select');
     }
     this.bindJquery(dateSource, 'change', function() {
