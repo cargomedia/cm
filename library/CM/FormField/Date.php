@@ -15,12 +15,14 @@ class CM_FormField_Date extends CM_FormField_Abstract {
     }
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {
-        $dd = (int) trim($userInput['day']);
-        $mm = (int) trim($userInput['month']);
-        $yy = (int) trim($userInput['year']);
-        $date = trim($userInput['date']);
-
-        return new DateTime($date ? $date : self::format($yy, $mm, $dd));
+        if (isset($userInput['date'])) {
+            return new DateTime(trim($userInput['date']));
+        } else {
+            $dd = (int) trim($userInput['day']);
+            $mm = (int) trim($userInput['month']);
+            $yy = (int) trim($userInput['year']);
+            return new DateTime(self::format($yy, $mm, $dd));
+        }
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
@@ -36,12 +38,12 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 
         $value = $this->getValue();
         $yy = $value ? $value->format('Y') : null;
-        $viewResponse->set('yy', $yy);
         $mm = $value ? $value->format('n') : null;
-        $viewResponse->set('mm', $mm);
         $dd = $value ? $value->format('j') : null;
-        $viewResponse->set('dd', $dd);
 
+        $viewResponse->set('yy', $yy);
+        $viewResponse->set('mm', $mm);
+        $viewResponse->set('dd', $dd);
         $viewResponse->set('date', self::format($yy, $mm, $dd));
     }
 
