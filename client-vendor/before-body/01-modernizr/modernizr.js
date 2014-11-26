@@ -4,7 +4,7 @@
  *
  * Copyright (c) Faruk Ates, Paul Irish, Alex Sexton, Ryan Seddon, Alexander Farkas, Patrick Kettner, Stu Cox
  * MIT License
- */
+ */ 
 /*
  * Modernizr tests which native CSS3 and HTML5 features are available in the
  * current UA and makes the results available to you in two ways: as properties on
@@ -15,7 +15,7 @@
  */
 ;(function(window, document, undefined){
   var tests = [];
-
+  
 
   var ModernizrProto = {
     // The current version, dummy
@@ -56,7 +56,7 @@
     }
   };
 
-
+  
 
   // Fake some of Object.create
   // so we can force non test results
@@ -69,10 +69,10 @@
   // Overwrite name so constructor name is nicer :D
   Modernizr = new Modernizr();
 
-
+  
 
   var classes = [];
-
+  
 
   /**
    * is returns a boolean for if typeof obj is exactly type.
@@ -149,7 +149,7 @@
   ;
 
   var docElement = document.documentElement;
-
+  
 
   // Pass in an and array of class names, e.g.:
   //  ['no-webp', 'borderradius', ...]
@@ -677,7 +677,7 @@
 
   }(this, document));
 
-
+  
 /*!
 {
   "name": "History API",
@@ -748,7 +748,7 @@ Detects support for SVG in `<embed>` or `<object>` elements.
   var createElement = function() {
     return document.createElement.apply(document, arguments);
   };
-
+  
 /*!
 {
   "name": "input[file] Attribute",
@@ -801,11 +801,11 @@ E.g. iOS < 6 and some android version don't support this
 
   // More here: github.com/Modernizr/Modernizr/issues/issue/21
   var omPrefixes = 'Webkit Moz O ms';
-
+  
 
   var cssomPrefixes = (ModernizrProto._config.usePrefixes ? omPrefixes.split(' ') : []);
   ModernizrProto._cssomPrefixes = cssomPrefixes;
-
+  
 
   /**
    * contains returns a boolean for if substr is found within str.
@@ -828,7 +828,7 @@ E.g. iOS < 6 and some android version don't support this
     delete modElem.elem;
   });
 
-
+  
 
   var mStyle = {
     style : modElem.elem.style
@@ -841,7 +841,7 @@ E.g. iOS < 6 and some android version don't support this
     delete mStyle.style;
   });
 
-
+  
 
   function getBody() {
     // After page load injecting a fake body doesn't work so check if body exists
@@ -1058,7 +1058,7 @@ E.g. iOS < 6 and some android version don't support this
 
   var domPrefixes = (ModernizrProto._config.usePrefixes ? omPrefixes.toLowerCase().split(' ') : []);
   ModernizrProto._domPrefixes = domPrefixes;
-
+  
 
   // Change the function's scope.
   function fnBind(fn, that) {
@@ -1127,7 +1127,7 @@ E.g. iOS < 6 and some android version don't support this
   // Modernizr.testAllProps('boxSizing')
   ModernizrProto.testAllProps = testPropsAll;
 
-
+  
 
   // List of property values to set for css tests. See ticket #21
   var prefixes = (ModernizrProto._config.usePrefixes ? ' -webkit- -moz- -o- -ms- '.split(' ') : []);
@@ -1135,7 +1135,7 @@ E.g. iOS < 6 and some android version don't support this
   // expose these for the plugin API. Look in the source for how to join() them against your input
   ModernizrProto._prefixes = prefixes;
 
-
+  
 
   /**
    * atRule returns a given CSS property at-rule (eg @keyframes), possibly in
@@ -1172,7 +1172,7 @@ E.g. iOS < 6 and some android version don't support this
     return false;
   };
 
-
+  
 
   // Modernizr.prefixed() returns the prefixed or nonprefixed property name variant of your input
   // Modernizr.prefixed('boxSizing') // 'MozBoxSizing'
@@ -1206,7 +1206,7 @@ E.g. iOS < 6 and some android version don't support this
     }
   };
 
-
+  
 /*!
 {
   "name": "requestAnimationFrame",
@@ -1249,10 +1249,10 @@ Detects support for the `window.requestAnimationFrame` API, for offloading anima
     return testPropsAll(prop, undefined, undefined, value, skipValueTest);
   }
   ModernizrProto.testAllProps = testAllProps;
-
+  
 
   var testStyles = ModernizrProto.testStyles = injectElementWithStyles;
-
+  
 /*!
 {
   "name": "CSS Transforms 3D",
