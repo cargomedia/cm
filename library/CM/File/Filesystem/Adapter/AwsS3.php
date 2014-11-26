@@ -1,8 +1,7 @@
 <?php
 
 class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implements
-    CM_File_Filesystem_Adapter_SizeCalculatorInterface,
-    CM_File_Filesystem_Adapter_ChecksumCalculatorInterface {
+    CM_File_Filesystem_Adapter_SizeCalculatorInterface {
 
     /** @var Aws\S3\S3Client */
     private $_client;
@@ -69,15 +68,6 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
             return strtotime($lastModified);
         } catch (\Exception $e) {
             throw new CM_Exception_Invalid('Cannot get modified time of `' . $path . '`: ' . $e->getMessage());
-        }
-    }
-
-    public function getChecksum($path) {
-        $options = $this->_getOptions($path);
-        try {
-            return $this->_client->getObject($options)->get('ETag');
-        } catch (\Exception $e) {
-            throw new CM_Exception('Cannot get AWS::ETag of `' . $path . '`: ' . $e->getMessage());
         }
     }
 
