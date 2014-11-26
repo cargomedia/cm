@@ -1064,27 +1064,10 @@ var CM_App = CM_Class_Abstract.extend({
   router: {
     ready: function() {
       var router = this;
-      var skipInitialFire = false;
 
       $(window).on('popstate', function(event) {
-        if (skipInitialFire) {
-          skipInitialFire = false;
-          return;
-        }
         router._handleLocationChange(router._getFragment());
       });
-
-      var hash = window.location.hash.substr(1);
-      var path = window.location.pathname + window.location.search;
-      if (!Modernizr.history) {
-        if (hash) {
-          if (hash == path) {
-            skipInitialFire = true;
-          }
-        } else {
-          window.history.replaceState(null, null, path);
-        }
-      }
 
       var urlBase = cm.getUrl();
       $(document).on('click', 'a[href]:not([data-router-disabled=true])', function(event) {
