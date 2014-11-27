@@ -299,7 +299,6 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {jQuery} $dom
      */
     setup: function($dom) {
-      $dom.placeholder();
       $dom.find('.timeago').timeago();
       $dom.find('textarea.autosize, .autosize textarea').autosize({append: ''});
       $dom.find('.clipSlide').clipSlide();
@@ -1065,27 +1064,10 @@ var CM_App = CM_Class_Abstract.extend({
   router: {
     ready: function() {
       var router = this;
-      var skipInitialFire = false;
 
       $(window).on('popstate', function(event) {
-        if (skipInitialFire) {
-          skipInitialFire = false;
-          return;
-        }
         router._handleLocationChange(router._getFragment());
       });
-
-      var hash = window.location.hash.substr(1);
-      var path = window.location.pathname + window.location.search;
-      if (!Modernizr.history) {
-        if (hash) {
-          if (hash == path) {
-            skipInitialFire = true;
-          }
-        } else {
-          window.history.replaceState(null, null, path);
-        }
-      }
 
       var urlBase = cm.getUrl();
       $(document).on('click', 'a[href]:not([data-router-disabled=true])', function(event) {
@@ -1144,17 +1126,10 @@ var CM_App = CM_Class_Abstract.extend({
     },
 
     /**
-     * @returns Location
-     */
-    getLocation: function() {
-      return window.history.location || document.location;
-    },
-
-    /**
      * @returns string
      */
     _getFragment: function() {
-      var location = this.getLocation();
+      var location = window.location;
       return location.pathname + location.search;
     },
 

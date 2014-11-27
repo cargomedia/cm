@@ -42,14 +42,6 @@ textarea.textinput {
   :-ms-input-placeholder {
     color: @color;
   }
-  label.placeholder {
-    color: @color;
-    margin-top: 7px;
-
-    .CM_FormField_Textarea & {
-      margin-top: 1px;
-    }
-  }
 }
 
 .placeholder(lighten(@colorFgSubtle, 10));
@@ -67,7 +59,6 @@ textarea.textinput {
   white-space: nowrap;
   border-radius: @borderRadiusInput;
   vertical-align: top;
-  font-weight: lighter;
   letter-spacing: 1px;
   cursor: pointer;
   transition: background-color 200ms;

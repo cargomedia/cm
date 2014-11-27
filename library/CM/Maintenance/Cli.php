@@ -10,23 +10,27 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function start() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
+        $this->_clockworkManager->setServiceManager(CM_Service_Manager::getInstance());
+        $this->_clockworkManager->setStorage(new CM_Clockwork_Storage_FileSystem('app-maintenance'));
         $this->_registerCallbacks();
         $this->_clockworkManager->start();
     }
 
     public function startLocal() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
+        $this->_clockworkManager->setServiceManager(CM_Service_Manager::getInstance());
+        $this->_clockworkManager->setStorage(new CM_Clockwork_Storage_FileSystem('app-maintenance-local'));
         $this->_registerCallbacksLocal();
         $this->_clockworkManager->start();
     }
 
     protected function _registerCallbacks() {
-        $this->_registerClockworkCallbacks(new DateInterval('PT10S'), array(
+        $this->_registerClockworkCallbacks('10 seconds', array(
             'CM_Model_User::offlineDelayed' => function () {
                 CM_Model_User::offlineDelayed();
             }
         ));
-        $this->_registerClockworkCallbacks(new DateInterval('PT1M'), array(
+        $this->_registerClockworkCallbacks('1 minute', array(
             'CM_Model_User::offlineOld'                 => function () {
                 CM_Model_User::offlineOld();
             },
@@ -61,17 +65,17 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 CM_Stream_Message::getInstance()->synchronize();
             }
         ));
-        $this->_registerClockworkCallbacks(new DateInterval('PT15M'), array(
-            'CM_Mail::processQueue'           => function () {
+        $this->_registerClockworkCallbacks('15 minutes', array(
+            'CM_Mail::processQueue'                         => function () {
                 CM_Mail::processQueue(500);
             },
-            'CM_Action_Abstract::aggregate'   => function () {
+            'CM_Action_Abstract::aggregate'                 => function () {
                 CM_Action_Abstract::aggregate();
             },
             'CM_Action_Abstract::deleteTransgressionsOlder' => function () {
                 CM_Action_Abstract::deleteTransgressionsOlder(3 * 31 * 86400);
             },
-            'CM_Paging_Log_Abstract::cleanup' => function () {
+            'CM_Paging_Log_Abstract::cleanup'               => function () {
                 foreach (CM_Paging_Log_Abstract::getClassChildren() as $logClass) {
                     /** @var CM_Paging_Log_Abstract $log */
                     $log = new $logClass();
@@ -82,7 +86,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     protected function _registerCallbacksLocal() {
-        $this->_registerClockworkCallbacks(new DateInterval('PT1M'), array(
+        $this->_registerClockworkCallbacks('1 minute', array(
             'CM_Cli_CommandManager::monitorSynchronizedCommands' => function () {
                 $commandManager = new CM_Cli_CommandManager();
                 $commandManager->monitorSynchronizedCommands();
@@ -98,13 +102,13 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param DateInterval $interval
-     * @param Closure[]    $callbacks
+     * @param string    $dateTimeString
+     * @param Closure[] $callbacks
      */
-    protected function _registerClockworkCallbacks(DateInterval $interval, $callbacks) {
+    protected function _registerClockworkCallbacks($dateTimeString, $callbacks) {
         foreach ($callbacks as $name => $callback) {
             $transactionName = 'cm ' . static::getPackageName() . ' start: ' . $name;
-            $this->_clockworkManager->registerCallback($interval, function () use ($transactionName, $callback) {
+            $this->_clockworkManager->registerCallback($name, $dateTimeString, function () use ($transactionName, $callback) {
                 CMService_Newrelic::getInstance()->startTransaction($transactionName);
                 try {
                     $callback();
