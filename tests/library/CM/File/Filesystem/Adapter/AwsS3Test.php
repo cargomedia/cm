@@ -33,6 +33,20 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
         $adapter->write('foo', 'hello');
     }
 
+    public function testChecksum() {
+        $result = new Guzzle\Common\Collection(array('ETag' => md5('hello')));
+        $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()
+                ->setMethods(array('getObject'))->getMock();
+        $clientMock->expects($this->once())->method('getObject')->with(array(
+                'ACL'    => 'private',
+                'Bucket' => 'bucket',
+                'Key'    => 'foo',
+        ))->will($this->returnValue($result));
+        /** @var Aws\S3\S3Client $clientMock */
+        $adapter = new CM_File_Filesystem_Adapter_AwsS3($clientMock, 'bucket');
+        $this->assertSame(md5('hello'), $adapter->getChecksum('foo'));
+    }
+
     public function testExists() {
         $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()
             ->setMethods(array('doesObjectExist'))->getMock();
