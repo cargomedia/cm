@@ -1,7 +1,8 @@
 <?php
 
 class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implements
-    CM_File_Filesystem_Adapter_SizeCalculatorInterface {
+    CM_File_Filesystem_Adapter_SizeCalculatorInterface,
+    CM_File_Filesystem_Adapter_ChecksumCalculatorInterface {
 
     /** @var Aws\S3\S3Client */
     private $_client;
@@ -71,6 +72,15 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         }
     }
 
+    public function getChecksum($path) {
+        $options = $this->_getOptions($path);
+        try {
+            return trim($this->_client->headObject($options)->get('ETag'), '"');
+        } catch (\Exception $e) {
+            throw new CM_Exception('Cannot get AWS::ETag of `' . $path . '`: ' . $e->getMessage());
+        }
+    }
+
     public function delete($path) {
         $options = $this->_getOptions($path);
         try {
@@ -81,7 +91,7 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
     }
 
     public function listByPrefix($pathPrefix, $noRecursion = null) {
-        $pathPrefix = $this->_getAbsolutePath($pathPrefix) . '/';  // force trailing slash for input-output consistency
+        $pathPrefix = $this->_getAbsolutePath($pathPrefix) . '/'; // force trailing slash for input-output consistency
         $commandOptions = array(
             'Bucket' => $this->_bucket,
             'Prefix' => $pathPrefix,
