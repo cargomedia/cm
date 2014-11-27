@@ -23,7 +23,7 @@ class CM_Tools_AppInstallation {
      * @return string
      */
     public function getDirRoot() {
-        return $this->_appInstallation->getDirRoot();
+        return $this->_dirRoot;
     }
 
     /**
@@ -41,7 +41,7 @@ class CM_Tools_AppInstallation {
      * @return string[]
      */
     public function getModuleNames() {
-        return array_keys($this->_appInstallation->getModulePaths());
+        return array_keys($this->_getModulePaths());
     }
 
     /**
@@ -50,11 +50,10 @@ class CM_Tools_AppInstallation {
      * @throws CM_Exception_Invalid
      */
     public function getModulePath($name) {
-        $modulePaths = $this->_appInstallation->getModulePaths();
-        if (!array_key_exists($name, $modulePaths)) {
-            throw new CM_Exception_Invalid('Cannot find module `' . $name . '`');
+        if (!$this->moduleExists($name)) {
+            throw new CM_Exception_Invalid('Cannot find `' . $name . '` module/namespace within `' . implode('`', $this->getModuleNames()) . '`');
         }
-        return $modulePaths[$name];
+        return $this->_getModulePaths()[$name];
     }
 
     /**
@@ -151,6 +150,29 @@ class CM_Tools_AppInstallation {
 
     public function reload() {
         $this->_appInstallation = new CM_App_Installation($this->_dirRoot);
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    public function fileExists($path) {
+        return $this->getFilesystem()->exists($path);
+
+    }
+
+    /**
+     * @return CM_App_Installation
+     */
+    public function getAppInstallation() {
+        return $this->_appInstallation;
+    }
+
+    /**
+     * @return array [namespace => pathRelative]
+     */
+    protected function _getModulePaths() {
+        return $this->_appInstallation->getModulePaths();
     }
 
     /**

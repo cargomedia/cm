@@ -10,12 +10,12 @@ class CM_Tools_Generator_Class_Layout extends CM_Tools_Generator_Class_Abstract 
         if ($reflectionClass->isSubclassOf('CM_Form_Abstract')) {
             return;
         }
-        $templateDirectory = new CM_File($this->_getTemplateDirectory($className), $this->_appInstallation->getFilesystem());
+        $templateDirectory = new CM_File($this->_getTemplatePath($className), $this->_appInstallation->getFilesystem());
         $this->_filesystemHelper->createDirectory($templateDirectory);
 
         $content = '';
         if ($reflectionClass->isSubclassOf('CM_Page_Abstract')) {
-            $content = $this->_getPageContent($reflectionClass);
+            $content = $this->_generatePageContent($reflectionClass);
         }
         $this->_createLayoutFile($className, 'default.tpl', $content);
     }
@@ -38,10 +38,10 @@ class CM_Tools_Generator_Class_Layout extends CM_Tools_Generator_Class_Abstract 
      * @return CM_File
      */
     private function _createLayoutFile($className, $templateBasename, $content = null) {
-        if (!$this->_classFileExists($className)) {
+        if (!$this->_classExists($className)) {
             throw new CM_Exception_Invalid('Cannot create layout for non-existing class `' . $className . '`');
         }
-        $templatePath = $this->_getTemplateDirectory($className) . $templateBasename;
+        $templatePath = $this->_getTemplatePath($className) . $templateBasename;
         $templateFile = new CM_File($templatePath, $this->_appInstallation->getFilesystem());
         $this->_filesystemHelper->createFile($templateFile, $content);
     }
@@ -50,28 +50,17 @@ class CM_Tools_Generator_Class_Layout extends CM_Tools_Generator_Class_Abstract 
      * @param string $className
      * @return string
      */
-    private function _getTemplateDirectory($className) {
-        return $this->_getClassDirectory($className) . 'layout/default/' . $this->_getTemplateDirectoryRelative($className);
-    }
-
-    /**
-     * @param string $className
-     * @return string
-     * @throws CM_Exception_Invalid
-     */
-    protected function _getClassDirectory($className) {
+    protected function _getTemplatePath($className) {
         $moduleName = CM_Util::getNamespace($className);
-        if (!$this->_appInstallation->moduleExists($moduleName)) {
-            throw new CM_Exception_Invalid('Cannot find `' . $moduleName . '` module/namespace within `' . implode('`', $this->_appInstallation->getModuleNames()) . '`');
-        }
-        return $this->_appInstallation->getModulePath($moduleName);
+        $modulePath = $this->_appInstallation->getModulePath($moduleName);
+        return $modulePath . 'layout/default/' . $this->_extractTemplateName($className);
     }
 
     /**
      * @param string $className
      * @return string
      */
-    private function _getTemplateDirectoryRelative($className) {
+    protected function _extractTemplateName($className) {
         $pathParts = explode('_', $className, 3);
         array_shift($pathParts);
         return implode('/', $pathParts) . '/';
@@ -81,10 +70,10 @@ class CM_Tools_Generator_Class_Layout extends CM_Tools_Generator_Class_Abstract 
      * @param ReflectionClass $reflection
      * @return null|string
      */
-    private function _getPageContent(ReflectionClass $reflection) {
+    protected function _generatePageContent(ReflectionClass $reflection) {
         if ($reflection->isSubclassOf('CM_Page_Abstract')) {
             $parentClassName = $reflection->getParentClass()->getName();
-            $content = "{extends file=\$render->getLayoutPath('" . $this->_getTemplateDirectoryRelative($parentClassName) . "default.tpl'";
+            $content = "{extends file=\$render->getLayoutPath('" . $this->_extractTemplateName($parentClassName) . "default.tpl'";
             if ($reflection->isAbstract()) {
                 $namespace = CM_Util::getNamespace($parentClassName);
                 $content .= ", '" . $namespace . "'";
