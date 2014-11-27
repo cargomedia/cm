@@ -9,14 +9,8 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
     public function __construct(CM_Frontend_Render $render) {
         parent::__construct($render);
 
-        foreach (array_reverse($render->getSite()->getModules()) as $moduleName) {
-            foreach (array_reverse($render->getSite()->getThemes()) as $theme) {
-                $file = new CM_File($render->getThemeDir(true, $theme, $moduleName) . 'variables.less');
-                if ($file->getExists()) {
-                    $this->add($file->read());
-                }
-            }
-        }
+        $this->_addVariables($render);
+
         $file = new CM_File(DIR_PUBLIC . 'static/css/library/icon.less');
         if ($file->getExists()) {
             $this->add($file->read());

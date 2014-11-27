@@ -67,6 +67,20 @@ class CM_Asset_Css extends CM_Asset_Abstract {
     }
 
     /**
+     * @param CM_Frontend_Render $render
+     */
+    protected function _addVariables(CM_Frontend_Render $render) {
+        foreach (array_reverse($render->getSite()->getModules()) as $moduleName) {
+            foreach (array_reverse($render->getSite()->getThemes()) as $theme) {
+                $file = new CM_File($render->getThemeDir(true, $theme, $moduleName) . 'variables.less');
+                if ($file->getExists()) {
+                    $this->add($file->read());
+                }
+            }
+        }
+    }
+
+    /**
      * @param string       $content
      * @param boolean|null $compress
      * @return string
