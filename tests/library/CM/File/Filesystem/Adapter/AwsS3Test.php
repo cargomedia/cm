@@ -34,13 +34,13 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
     }
 
     public function testChecksum() {
-        $result = new Guzzle\Common\Collection(array('ETag' => md5('hello')));
+        $result = new Guzzle\Common\Collection(array('ETag' => '"' . md5('hello') . '"'));
         $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()
-                ->setMethods(array('getObject'))->getMock();
-        $clientMock->expects($this->once())->method('getObject')->with(array(
-                'ACL'    => 'private',
-                'Bucket' => 'bucket',
-                'Key'    => 'foo',
+            ->setMethods(array('headObject'))->getMock();
+        $clientMock->expects($this->once())->method('headObject')->with(array(
+            'ACL'    => 'private',
+            'Bucket' => 'bucket',
+            'Key'    => 'foo',
         ))->will($this->returnValue($result));
         /** @var Aws\S3\S3Client $clientMock */
         $adapter = new CM_File_Filesystem_Adapter_AwsS3($clientMock, 'bucket');
@@ -197,7 +197,7 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
 
     public function testSetupExists() {
         $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()
-                ->setMethods(array('doesBucketExist', 'createBucket'))->getMock();
+            ->setMethods(array('doesBucketExist', 'createBucket'))->getMock();
         $clientMock->expects($this->once())->method('doesBucketExist')->with('my-bucket')->will($this->returnValue(true));
         $clientMock->expects($this->never())->method('createBucket');
         /** @var Aws\S3\S3Client $clientMock */
