@@ -24,9 +24,7 @@ abstract class CM_Provision_Script_Abstract extends CM_Class_Abstract {
             throw new CM_Exception_Invalid('Can only reload unloadable scripts');
         }
         /** @var $this CM_Provision_Script_Abstract|CM_Provision_Script_UnloadableInterface */
-        if (!$this->shouldBeLoaded($manager)) {
-            $this->unload($manager, $output);
-        }
+        $this->unload($manager, $output);
         $this->load($manager, $output);
     }
 

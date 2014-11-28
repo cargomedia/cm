@@ -63,7 +63,8 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
             if ($setupScript->shouldBeLoaded($this->getServiceManager())) {
                 $this->_output->writeln('  Loading ' . $setupScript->getName() . '…');
                 $setupScript->load($this->getServiceManager(), $this->_output);
-            } else {
+            } elseif ($setupScript instanceof CM_Provision_Script_UnloadableInterface) {
+                /** @var $setupScript CM_Provision_Script_Abstract */
                 $this->_output->writeln('  Reloading ' . $setupScript->getName() . '…');
                 $setupScript->reload($this->getServiceManager(), $this->_output);
             }
