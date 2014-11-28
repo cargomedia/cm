@@ -12,7 +12,7 @@ class CM_Config {
         $cacheKey = CM_CacheConst::Config;
         if (false === ($config = $cache->get($cacheKey))) {
             $node = new CM_Config_Node();
-            $node->extend('internal.php');
+            $node->extendWithFile(new CM_File(DIR_ROOT . 'resources/config/internal.php'));
             $node->extend('default.php');
             $node->extend('local.php');
             $node->extend('deploy.php');
