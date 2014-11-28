@@ -38,7 +38,7 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
     }
 
     public function load() {
-        $scriptList = $this->_getScriptListLoadable();
+        $scriptList = $this->_getScriptList();
         foreach ($scriptList as $setupScript) {
             if ($setupScript->shouldBeLoaded($this->getServiceManager())) {
                 $this->_output->writeln('  Loading ' . $setupScript->getName() . '…');
@@ -58,7 +58,7 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
     }
 
     public function reload() {
-        $scriptList = $this->_getScriptListLoadable();
+        $scriptList = $this->_getScriptList();
         foreach ($scriptList as $setupScript) {
             if ($setupScript->shouldBeLoaded($this->getServiceManager())) {
                 $this->_output->writeln('  Loading ' . $setupScript->getName() . '…');
@@ -88,29 +88,11 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * @return CM_Provision_Script_LoadableInterface[]|CM_Provision_Script_Abstract[]
-     */
-    protected function _getScriptListLoadable() {
-        return $this->_getScriptList(function (CM_Provision_Script_Abstract $script) {
-            return $script instanceof CM_Provision_Script_LoadableInterface;
-        });
-    }
-
-    /**
      * @return CM_Provision_Script_UnloadableInterface[]|CM_Provision_Script_Abstract[]
      */
     protected function _getScriptListUnloadable() {
         return array_reverse($this->_getScriptList(function (CM_Provision_Script_Abstract $script) {
             return $script instanceof CM_Provision_Script_UnloadableInterface;
         }));
-    }
-
-    /**
-     * @return CM_Provision_Script_UnloadableInterface[]|CM_Provision_Script_Abstract[]
-     */
-    protected function _getScriptListReloadable() {
-        return $this->_getScriptList(function (CM_Provision_Script_Abstract $script) {
-            return $script instanceof CM_Provision_Script_UnloadableInterface;
-        });
     }
 }
