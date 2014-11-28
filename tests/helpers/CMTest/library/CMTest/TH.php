@@ -42,12 +42,6 @@ class CMTest_TH {
     }
 
     public static function clearDb() {
-        $alltables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
-        CM_Db_Db::exec('SET foreign_key_checks = 0;');
-        foreach ($alltables as $table) {
-            CM_Db_Db::delete($table);
-        }
-        CM_Db_Db::exec('SET foreign_key_checks = 1;');
         $mongo = CM_Service_Manager::getInstance()->getMongoDb();
         foreach ($mongo->listCollectionNames() as $collectionName) {
             $mongo->remove($collectionName);

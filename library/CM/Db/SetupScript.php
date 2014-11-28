@@ -35,6 +35,15 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
         $mysqlClient->createStatement('DROP DATABASE IF EXISTS ' . $mysqlDbClient->quoteIdentifier($db))->execute();
     }
 
+    public function reload(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
+        $tableNames = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
+        CM_Db_Db::exec('SET foreign_key_checks = 0;');
+        foreach ($tableNames as $table) {
+            CM_Db_Db::delete($table);
+        }
+        CM_Db_Db::exec('SET foreign_key_checks = 1;');
+    }
+
     public function getRunLevel() {
         return 1;
     }
