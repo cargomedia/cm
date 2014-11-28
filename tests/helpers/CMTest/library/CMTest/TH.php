@@ -41,11 +41,17 @@ class CMTest_TH {
         CM_Cache_Local::getInstance()->flush();
     }
 
+    /**
+     * @deprecated use clearEnv instead
+     */
     public static function clearDb() {
         CM_Cache_Shared::getInstance()->delete(CM_CacheConst::Option);
         CM_App::getInstance()->setup(new CM_OutputStream_Null());
     }
 
+    /**
+     * @deprecated use clearEnv instead
+     */
     public static function clearConfig() {
         CM_Config::set(unserialize(self::$_configBackup));
     }
