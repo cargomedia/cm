@@ -30,8 +30,7 @@ class CM_App {
      */
     public function setup(CM_OutputStream_Interface $output, $reload = null) {
         $loader = new CM_Provision_Loader($output);
-        $loader->setServiceManager($this->_getServiceManager());
-        $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses);
+        $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses, $this->_getServiceManager());
         if ($reload) {
             $loader->reload();
         } else {

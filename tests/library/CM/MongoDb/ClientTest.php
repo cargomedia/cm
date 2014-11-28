@@ -3,7 +3,7 @@
 class CM_Mongo_ClientTest extends CMTest_TestCase {
 
     public function tearDown() {
-        $script = new CM_MongoDb_SetupScript();
+        $script = new CM_MongoDb_SetupScript(CM_Service_Manager::getInstance());
         $script->unload(new CM_OutputStream_Null());
         $script->load(new CM_OutputStream_Null());
     }

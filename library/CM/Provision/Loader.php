@@ -1,8 +1,6 @@
 <?php
 
-class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
-
-    use CM_Service_ManagerAwareTrait;
+class CM_Provision_Loader {
 
     /** @var CM_OutputStream_Interface */
     private $_output;
@@ -29,11 +27,12 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * @param string[] $scriptClassNames
+     * @param string[]           $scriptClassNames
+     * @param CM_Service_Manager $serviceManager
      */
-    public function registerScriptFromClassNames(array $scriptClassNames) {
+    public function registerScriptFromClassNames(array $scriptClassNames, CM_Service_Manager $serviceManager) {
         foreach ($scriptClassNames as $scriptClassName) {
-            $this->registerScript(new $scriptClassName($this->getServiceManager()));
+            $this->registerScript(new $scriptClassName($serviceManager));
         }
     }
 

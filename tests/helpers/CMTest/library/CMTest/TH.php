@@ -29,11 +29,8 @@ class CMTest_TH {
     }
 
     public static function clearFilesystem() {
-        $manager = CM_Service_Manager::getInstance();
-        $output = new CM_OutputStream_Null();
-
-        $script = new CM_File_Filesystem_SetupScript();
-        $script->unload($output);
+        $script = new CM_File_Filesystem_SetupScript(CM_Service_Manager::getInstance());
+        $script->unload(new CM_OutputStream_Null());
     }
 
     public static function clearCache() {
