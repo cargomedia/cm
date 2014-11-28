@@ -4,8 +4,8 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
 
     use CM_Provision_Script_IsLoadedTrait;
 
-    public function load(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
-        $mysqlDbClient = $manager->getDatabases()->getMaster();
+    public function load(CM_OutputStream_Interface $output) {
+        $mysqlDbClient = $this->getServiceManager()->getDatabases()->getMaster();
         $databaseName = $mysqlDbClient->getDatabaseName();
         $mysqlClient = $mysqlDbClient->getClientWithoutDatabase();
 
@@ -24,18 +24,14 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
         $this->_setInitialVersion();
     }
 
-    /**
-     * @param CM_Service_Manager        $manager
-     * @param CM_OutputStream_Interface $output
-     */
-    public function unload(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
-        $mysqlDbClient = $manager->getDatabases()->getMaster();
+    public function unload(CM_OutputStream_Interface $output) {
+        $mysqlDbClient = $this->getServiceManager()->getDatabases()->getMaster();
         $mysqlClient = $mysqlDbClient->getClientWithoutDatabase();
         $db = $mysqlDbClient->getDatabaseName();
         $mysqlClient->createStatement('DROP DATABASE IF EXISTS ' . $mysqlDbClient->quoteIdentifier($db))->execute();
     }
 
-    public function reload(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
+    public function reload(CM_OutputStream_Interface $output) {
         $tableNames = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
         CM_Db_Db::exec('SET foreign_key_checks = 0;');
         foreach ($tableNames as $table) {
@@ -48,8 +44,8 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
         return 1;
     }
 
-    protected function _isLoaded(CM_Service_Manager $manager) {
-        $mysqlDbClient = $manager->getDatabases()->getMaster();
+    protected function _isLoaded() {
+        $mysqlDbClient = $this->getServiceManager()->getDatabases()->getMaster();
         $mysqlClient = $mysqlDbClient->getClientWithoutDatabase();
 
         $databaseExists = (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($mysqlDbClient->getDatabaseName()))->fetch();

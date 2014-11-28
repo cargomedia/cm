@@ -33,16 +33,16 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
      */
     public function registerScriptFromClassNames(array $scriptClassNames) {
         foreach ($scriptClassNames as $scriptClassName) {
-            $this->registerScript(new $scriptClassName());
+            $this->registerScript(new $scriptClassName($this->getServiceManager()));
         }
     }
 
     public function load() {
         $scriptList = $this->_getScriptList();
         foreach ($scriptList as $setupScript) {
-            if ($setupScript->shouldBeLoaded($this->getServiceManager())) {
+            if ($setupScript->shouldBeLoaded()) {
                 $this->_output->writeln('  Loading ' . $setupScript->getName() . '…');
-                $setupScript->load($this->getServiceManager(), $this->_output);
+                $setupScript->load($this->_output);
             }
         }
     }
@@ -50,9 +50,9 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
     public function unload() {
         $scriptList = $this->_getScriptListUnloadable();
         foreach ($scriptList as $setupScript) {
-            if ($setupScript->shouldBeUnloaded($this->getServiceManager())) {
+            if ($setupScript->shouldBeUnloaded()) {
                 $this->_output->writeln('  Unloading ' . $setupScript->getName() . '…');
-                $setupScript->unload($this->getServiceManager(), $this->_output);
+                $setupScript->unload($this->_output);
             }
         }
     }
@@ -60,13 +60,13 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
     public function reload() {
         $scriptList = $this->_getScriptList();
         foreach ($scriptList as $setupScript) {
-            if ($setupScript->shouldBeLoaded($this->getServiceManager())) {
+            if ($setupScript->shouldBeLoaded()) {
                 $this->_output->writeln('  Loading ' . $setupScript->getName() . '…');
-                $setupScript->load($this->getServiceManager(), $this->_output);
+                $setupScript->load($this->_output);
             } elseif ($setupScript instanceof CM_Provision_Script_UnloadableInterface) {
                 /** @var $setupScript CM_Provision_Script_Abstract */
                 $this->_output->writeln('  Reloading ' . $setupScript->getName() . '…');
-                $setupScript->reload($this->getServiceManager(), $this->_output);
+                $setupScript->reload($this->_output);
             }
         }
     }

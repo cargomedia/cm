@@ -12,10 +12,11 @@ abstract class CM_Provision_Script_OptionBased extends CM_Provision_Script_Abstr
     }
 
     /**
-     * @param CM_Service_Manager $manager
+     * @throws CM_Exception_Invalid
+     * @internal param CM_Service_Manager $manager
      * @return bool
      */
-    protected function _isLoaded(CM_Service_Manager $manager) {
+    protected function _isLoaded() {
         try {
             return CM_Option::getInstance()->get($this->_getOptionName());
         } catch (CM_Db_Exception $e) {

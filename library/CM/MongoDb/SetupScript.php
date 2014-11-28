@@ -4,8 +4,8 @@ class CM_MongoDb_SetupScript extends CM_Provision_Script_Abstract implements CM_
 
     use CM_Provision_Script_IsLoadedTrait;
 
-    public function load(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
-        $mongoClient = $manager->getMongoDb();
+    public function load(CM_OutputStream_Interface $output) {
+        $mongoClient = $this->getServiceManager()->getMongoDb();
 
         foreach (CM_Util::getResourceFiles('mongo/collections.json') as $dump) {
             $collectionInfo = CM_Params::jsonDecode($dump->read());
@@ -18,12 +18,12 @@ class CM_MongoDb_SetupScript extends CM_Provision_Script_Abstract implements CM_
         }
     }
 
-    public function unload(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
-        $manager->getMongoDb()->dropDatabase();
+    public function unload(CM_OutputStream_Interface $output) {
+        $this->getServiceManager()->getMongoDb()->dropDatabase();
     }
 
-    public function reload(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
-        $mongoDb = $manager->getMongoDb();
+    public function reload(CM_OutputStream_Interface $output) {
+        $mongoDb = $this->getServiceManager()->getMongoDb();
         foreach ($mongoDb->listCollectionNames() as $collectionName) {
             $mongoDb->remove($collectionName);
         }
@@ -33,8 +33,8 @@ class CM_MongoDb_SetupScript extends CM_Provision_Script_Abstract implements CM_
         return 1;
     }
 
-    protected function _isLoaded(CM_Service_Manager $manager) {
-        $hasCollections = count($manager->getMongoDb()->listCollectionNames()) > 0;
+    protected function _isLoaded() {
+        $hasCollections = count($this->getServiceManager()->getMongoDb()->listCollectionNames()) > 0;
         return $hasCollections;
     }
 }

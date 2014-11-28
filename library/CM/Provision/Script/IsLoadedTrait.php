@@ -3,17 +3,16 @@
 trait CM_Provision_Script_IsLoadedTrait {
 
     /**
-     * @param CM_Service_Manager $manager
      * @return bool
      */
-    abstract protected function _isLoaded(CM_Service_Manager $manager);
+    abstract protected function _isLoaded();
 
-    public function shouldBeLoaded(CM_Service_Manager $manager) {
-        return !$this->_isLoaded($manager);
+    public function shouldBeLoaded() {
+        return !$this->_isLoaded();
     }
 
-    public function shouldBeUnloaded(CM_Service_Manager $manager) {
-        return $this->_isLoaded($manager);
+    public function shouldBeUnloaded() {
+        return $this->_isLoaded();
     }
 
 }

@@ -4,8 +4,8 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
 
     public function tearDown() {
         $script = new CM_MongoDb_SetupScript();
-        $script->unload(CM_Service_Manager::getInstance(), new CM_OutputStream_Null());
-        $script->load(CM_Service_Manager::getInstance(), new CM_OutputStream_Null());
+        $script->unload(new CM_OutputStream_Null());
+        $script->load(new CM_OutputStream_Null());
     }
 
     public function testInsert() {

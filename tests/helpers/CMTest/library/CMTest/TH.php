@@ -33,7 +33,7 @@ class CMTest_TH {
         $output = new CM_OutputStream_Null();
 
         $script = new CM_File_Filesystem_SetupScript();
-        $script->unload($manager, $output);
+        $script->unload($output);
     }
 
     public static function clearCache() {
