@@ -22,6 +22,13 @@ class CM_MongoDb_SetupScript extends CM_Provision_Script_Abstract implements CM_
         $manager->getMongoDb()->dropDatabase();
     }
 
+    public function reload(CM_Service_Manager $manager, CM_OutputStream_Interface $output) {
+        $mongoDb = $manager->getMongoDb();
+        foreach ($mongoDb->listCollectionNames() as $collectionName) {
+            $mongoDb->remove($collectionName);
+        }
+    }
+
     public function getRunLevel() {
         return 1;
     }
