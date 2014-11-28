@@ -39,7 +39,7 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
 
     public function load() {
         foreach ($this->_getScriptListLoadable() as $setupScript) {
-            if ($setupScript->isLoadable($this->getServiceManager())) {
+            if ($setupScript->shouldBeLoaded($this->getServiceManager())) {
                 $this->_output->writeln('  Loading ' . $setupScript->getName() . '…');
                 $setupScript->load($this->getServiceManager(), $this->_output);
             }
@@ -49,7 +49,7 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
     public function unload() {
         $scriptList = $this->_getScriptListUnloadable();
         foreach ($scriptList as $setupScript) {
-            if ($setupScript->isUnloadable($this->getServiceManager())) {
+            if ($setupScript->shouldBeUnloaded($this->getServiceManager())) {
                 $this->_output->writeln('  Unloading ' . $setupScript->getName() . '…');
                 $setupScript->unload($this->getServiceManager(), $this->_output);
             }

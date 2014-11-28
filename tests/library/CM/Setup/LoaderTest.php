@@ -24,7 +24,7 @@ class CM_Provision_LoaderTest extends CMTest_TestCase {
         $outputStream = new CM_OutputStream_Null();
 
         $script = $this->mockObject('CM_Provision_Script_Abstract');
-        $script->mockMethod('isLoadable')->set(true);
+        $script->mockMethod('shouldBeLoaded')->set(true);
         $loadMethod = $script->mockMethod('load')->set(function (CM_Service_Manager $manager, $output) use ($serviceManager, $outputStream) {
             $this->assertSame($serviceManager, $manager);
             $this->assertSame($outputStream, $output);
@@ -55,7 +55,7 @@ class CM_Provision_LoaderTest extends CMTest_TestCase {
         $outputStream = new CM_OutputStream_Null();
 
         $script = $this->mockClass('CM_Provision_Script_Abstract', ['CM_Provision_Script_UnloadableInterface'])->newInstance();
-        $script->mockMethod('isUnloadable')->set(true);
+        $script->mockMethod('shouldBeUnloaded')->set(true);
         $unloadMethod = $script->mockMethod('unload')->set(function (CM_Service_Manager $manager, $output) use ($serviceManager, $outputStream) {
             $this->assertSame($serviceManager, $manager);
             $this->assertSame($outputStream, $output);

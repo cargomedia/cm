@@ -12,5 +12,5 @@ interface CM_Provision_Script_UnloadableInterface {
      * @param CM_Service_Manager $manager
      * @return bool
      */
-    public function isUnloadable(CM_Service_Manager $manager);
+    public function shouldBeUnloaded(CM_Service_Manager $manager);
 }

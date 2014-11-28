@@ -8,11 +8,11 @@ trait CM_Provision_Script_IsLoadedTrait {
      */
     abstract protected function _isLoaded(CM_Service_Manager $manager);
 
-    public function isLoadable(CM_Service_Manager $manager) {
+    public function shouldBeLoaded(CM_Service_Manager $manager) {
         return !$this->_isLoaded($manager);
     }
 
-    public function isUnloadable(CM_Service_Manager $manager) {
+    public function shouldBeUnloaded(CM_Service_Manager $manager) {
         return $this->_isLoaded($manager);
     }
 

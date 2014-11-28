@@ -14,11 +14,11 @@ class CM_File_Filesystem_SetupScript extends CM_Provision_Script_Abstract implem
         }
     }
 
-    public function isLoadable(CM_Service_Manager $manager) {
+    public function shouldBeLoaded(CM_Service_Manager $manager) {
         return true;
     }
 
-    public function isUnloadable(CM_Service_Manager $manager) {
+    public function shouldBeUnloaded(CM_Service_Manager $manager) {
         return true;
     }
 

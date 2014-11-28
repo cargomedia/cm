@@ -12,5 +12,5 @@ interface CM_Provision_Script_LoadableInterface {
      * @param CM_Service_Manager $manager
      * @return bool
      */
-    public function isLoadable(CM_Service_Manager $manager);
+    public function shouldBeLoaded(CM_Service_Manager $manager);
 }
