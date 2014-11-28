@@ -46,7 +46,7 @@ class CMTest_TH {
      */
     public static function clearDb() {
         CM_Cache_Shared::getInstance()->delete(CM_CacheConst::Option);
-        CM_App::getInstance()->setup(new CM_OutputStream_Null());
+        CM_App::getInstance()->setup(new CM_OutputStream_Null(), true);
     }
 
     /**
