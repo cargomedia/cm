@@ -71,19 +71,15 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * @param Closure|null $filterCallback
      * @return CM_Provision_Script_Abstract[]
      */
-    protected function _getScriptList($filterCallback = null) {
+    protected function _getScriptList() {
         $scriptList = $this->_scriptList;
         $runLevelList = \Functional\map($this->_scriptList, function (CM_Provision_Script_Abstract $script) {
             return $script->getRunLevel();
         });
         array_multisort($runLevelList, $scriptList);
 
-        if ($filterCallback) {
-            $scriptList = \Functional\select($scriptList, $filterCallback);
-        }
         return $scriptList;
     }
 
@@ -91,8 +87,10 @@ class CM_Provision_Loader implements CM_Service_ManagerAwareInterface {
      * @return CM_Provision_Script_UnloadableInterface[]|CM_Provision_Script_Abstract[]
      */
     protected function _getScriptListUnloadable() {
-        return array_reverse($this->_getScriptList(function (CM_Provision_Script_Abstract $script) {
+        $scriptList = $this->_getScriptList();
+        $scriptList = \Functional\select($scriptList, function (CM_Provision_Script_Abstract $script) {
             return $script instanceof CM_Provision_Script_UnloadableInterface;
-        }));
+        });
+        return array_reverse($scriptList);
     }
 }
