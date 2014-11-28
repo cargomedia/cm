@@ -33,9 +33,10 @@ class CM_App {
         $loader->setServiceManager($this->_getServiceManager());
         $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses);
         if ($reload) {
-            $loader->unload();
+            $loader->reload();
+        } else {
+            $loader->load();
         }
-        $loader->load();
     }
 
     public function fillCaches() {
