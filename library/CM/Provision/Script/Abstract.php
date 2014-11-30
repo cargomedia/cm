@@ -13,7 +13,6 @@ abstract class CM_Provision_Script_Abstract extends CM_Class_Abstract implements
 
     /**
      * @param CM_OutputStream_Interface $output
-     * @return
      */
     abstract public function load(CM_OutputStream_Interface $output);
 
