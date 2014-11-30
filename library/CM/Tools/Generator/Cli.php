@@ -77,7 +77,9 @@ class CM_Tools_Generator_Cli extends CM_Cli_Runnable_Abstract {
         $generatorPhp = new CM_Tools_Generator_Class_Php($this->_getAppInstallation(), $this->_getStreamOutput());
         $generatorPhp->createClassFile($className);
 
-        (new CM_App_Cli())->generateConfigInternal();
+        $appCli = new CM_App_Cli();
+        $appCli->setApplication($this->_getApplication());
+        $appCli->generateConfigInternal();
     }
 
     /**

@@ -58,6 +58,8 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public function generateConfigInternal() {
+        $rootPath = new CM_File($this->_getApplication()->getRootPath());
+
         $indentation = '    ';
         $indent = function ($content) use ($indentation) {
             return preg_replace('/(:?^|[\n])/', '$1' . $indentation, $content);
@@ -74,7 +76,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         }
 
         // Create model class types and action verbs config PHP
-        $configPhp = new CM_File(DIR_ROOT . 'resources/config/internal.php');
+        $configPhp = $rootPath->joinPath('resources/config/internal.php');
         $configPhp->ensureParentDirectory();
         $configPhp->truncate();
         $configPhp->appendLine('<?php');
@@ -87,7 +89,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         $this->_getStreamOutput()->writeln('Created `' . $configPhp->getPath() . '`');
 
         // Create model class types and action verbs config JS
-        $configJs = new CM_File(DIR_ROOT . 'resources/config/js/internal.js');
+        $configJs = $rootPath->joinPath('resources/config/js/internal.js');
         $configJs->ensureParentDirectory();
         $configJs->truncate();
         $classTypes = $generator->getNamespaceTypes();
@@ -100,6 +102,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
      * @param int|null $deployVersion
      */
     public function setDeployVersion($deployVersion = null) {
+        $rootPath = new CM_File($this->_getApplication()->getRootPath());
         $deployVersion = (null !== $deployVersion) ? (int) $deployVersion : time();
         $sourceCode = join(PHP_EOL, array(
             '<?php',
@@ -108,8 +111,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
             '};',
             '',
         ));
-        $targetPath = DIR_ROOT . 'resources/config/deploy.php';
-        $configFile = new CM_File($targetPath);
+        $configFile = $rootPath->joinPath('resources/config/deploy.php');
         $configFile->ensureParentDirectory();
         $configFile->write($sourceCode);
     }
