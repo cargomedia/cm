@@ -6,20 +6,13 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
 
     public function load(CM_OutputStream_Interface $output) {
         $mysqlDbClient = $this->getServiceManager()->getDatabases()->getMaster();
+
         $databaseName = $mysqlDbClient->getDatabaseName();
         $mysqlClient = $mysqlDbClient->getClientWithoutDatabase();
+        $mysqlClient->createStatement('CREATE DATABASE ' . $mysqlClient->quoteIdentifier($databaseName))->execute();
 
-        $databaseExists = (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($databaseName))->fetch();
-        if (!$databaseExists) {
-            $mysqlClient->createStatement('CREATE DATABASE ' . $mysqlClient->quoteIdentifier($databaseName))->execute();
-        }
-
-        $tables = $mysqlDbClient->createStatement('SHOW TABLES')->execute()->fetchAll();
-        $hasTables = count($tables) > 0;
-        if (!$hasTables) {
-            foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-                CM_Db_Db::runDump($databaseName, $dump);
-            }
+        foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
+            CM_Db_Db::runDump($databaseName, $dump);
         }
         $this->_setInitialVersion();
     }
@@ -27,8 +20,8 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
     public function unload(CM_OutputStream_Interface $output) {
         $mysqlDbClient = $this->getServiceManager()->getDatabases()->getMaster();
         $mysqlClient = $mysqlDbClient->getClientWithoutDatabase();
-        $db = $mysqlDbClient->getDatabaseName();
-        $mysqlClient->createStatement('DROP DATABASE IF EXISTS ' . $mysqlDbClient->quoteIdentifier($db))->execute();
+        $databaseName = $mysqlDbClient->getDatabaseName();
+        $mysqlClient->createStatement('DROP DATABASE ' . $mysqlDbClient->quoteIdentifier($databaseName))->execute();
     }
 
     public function reload(CM_OutputStream_Interface $output) {
