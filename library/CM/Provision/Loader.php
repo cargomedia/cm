@@ -47,9 +47,10 @@ class CM_Provision_Loader {
     }
 
     public function unload() {
-        $scriptList = $this->_getScriptListUnloadable();
+        $scriptList = array_reverse($this->_getScriptList());
         foreach ($scriptList as $setupScript) {
-            if ($setupScript->shouldBeUnloaded()) {
+            if ($setupScript instanceof CM_Provision_Script_UnloadableInterface && $setupScript->shouldBeUnloaded()) {
+                /** @var $setupScript CM_Provision_Script_Abstract|CM_Provision_Script_UnloadableInterface */
                 $this->_output->writeln('  Unloading ' . $setupScript->getName() . '…');
                 $setupScript->unload($this->_output);
             }
@@ -75,22 +76,9 @@ class CM_Provision_Loader {
      */
     protected function _getScriptList() {
         $scriptList = $this->_scriptList;
-        $runLevelList = \Functional\map($this->_scriptList, function (CM_Provision_Script_Abstract $script) {
-            return $script->getRunLevel();
-        });
+        $runLevelList = \Functional\pluck($this->_scriptList, 'getRunLevel');
         array_multisort($runLevelList, $scriptList);
 
         return $scriptList;
-    }
-
-    /**
-     * @return CM_Provision_Script_UnloadableInterface[]|CM_Provision_Script_Abstract[]
-     */
-    protected function _getScriptListUnloadable() {
-        $scriptList = $this->_getScriptList();
-        $scriptList = \Functional\select($scriptList, function (CM_Provision_Script_Abstract $script) {
-            return $script instanceof CM_Provision_Script_UnloadableInterface;
-        });
-        return array_reverse($scriptList);
     }
 }
