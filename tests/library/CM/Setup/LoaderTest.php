@@ -51,7 +51,10 @@ class CM_Provision_LoaderTest extends CMTest_TestCase {
         $outputStream = new CM_OutputStream_Null();
 
         $script = $this->mockClass('CM_Provision_Script_Abstract', ['CM_Provision_Script_UnloadableInterface'])->newInstanceWithoutConstructor();
-        $script->mockMethod('shouldBeUnloaded')->set(true);
+        $script->mockMethod('shouldBeUnloaded')
+            ->at(0, true)
+            ->at(1, false)
+            ->at(2, true);
         $unloadMethod = $script->mockMethod('unload')->set(function ($output) use ($outputStream) {
             $this->assertSame($outputStream, $output);
         });
@@ -59,7 +62,9 @@ class CM_Provision_LoaderTest extends CMTest_TestCase {
 
         $loader = new CM_Provision_Loader($outputStream);
         $loader->registerScript($script);
+        $loader->registerScript($script);
+        $loader->registerScript($script);
         $loader->unload();
-        $this->assertSame(1, $unloadMethod->getCallCount());
+        $this->assertSame(2, $unloadMethod->getCallCount());
     }
 }
