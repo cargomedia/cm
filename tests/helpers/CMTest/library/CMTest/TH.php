@@ -42,7 +42,7 @@ class CMTest_TH {
      * @deprecated use clearEnv instead
      */
     public static function clearDb() {
-        CM_Cache_Shared::getInstance()->delete(CM_CacheConst::Option);
+        self:;clearCache();
         CM_App::getInstance()->setup(new CM_OutputStream_Null(), true);
     }
 
