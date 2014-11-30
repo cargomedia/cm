@@ -12,8 +12,6 @@ abstract class CM_Provision_Script_OptionBased extends CM_Provision_Script_Abstr
     }
 
     /**
-     * @throws CM_Exception_Invalid
-     * @internal param CM_Service_Manager $manager
      * @return bool
      */
     protected function _isLoaded() {
