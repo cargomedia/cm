@@ -34,7 +34,6 @@ class CM_MongoDb_SetupScript extends CM_Provision_Script_Abstract implements CM_
     }
 
     protected function _isLoaded() {
-        $hasCollections = count($this->getServiceManager()->getMongoDb()->listCollectionNames()) > 0;
-        return $hasCollections;
+        return $this->getServiceManager()->getMongoDb()->databaseExists();
     }
 }

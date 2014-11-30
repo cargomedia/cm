@@ -233,9 +233,15 @@ class CM_MongoDb_Client {
      * @return array
      */
     public function dropDatabase() {
-        $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
-        CM_Debug::getInstance()->incStats('mongo', "drop database {$dbName}");
+        CM_Debug::getInstance()->incStats('mongo', "drop database {$this->_getDatabaseName()}");
         return $this->_getDatabase()->drop();
+    }
+
+    /**
+     * @return bool
+     */
+    public function databaseExists() {
+        return \Functional\contains($this->_getClient()->listDBs(), $this->_getDatabaseName());
     }
 
     /**
@@ -316,12 +322,20 @@ class CM_MongoDb_Client {
     }
 
     /**
+     * @return string
+     * @throws Exception
+     */
+    protected function _getDatabaseName() {
+        return CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
+
+    }
+
+    /**
      * @return MongoDB
      * @throws CM_Exception_Nonexistent
      */
     protected function _getDatabase() {
-        $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
-        return $this->_getClient()->selectDB($dbName);
+        return $this->_getClient()->selectDB($this->_getDatabaseName());
     }
 
     /**
