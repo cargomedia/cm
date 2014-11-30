@@ -1,17 +1,16 @@
 <?php
 
-class CM_App {
+class CM_App implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /**
      * @var CM_App
      */
     private static $_instance;
 
-    /** @var CM_Service_Manager */
-    private $_serviceManager;
-
     public function __construct() {
-        $this->_serviceManager = CM_Service_Manager::getInstance();
+        $this->setServiceManager(CM_Service_Manager::getInstance());
     }
 
     /**
@@ -30,7 +29,7 @@ class CM_App {
      */
     public function setup(CM_OutputStream_Interface $output, $reload = null) {
         $loader = new CM_Provision_Loader($output);
-        $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses, $this->_getServiceManager());
+        $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses, $this->getServiceManager());
         if ($reload) {
             $loader->reload();
         } else {
@@ -133,7 +132,7 @@ class CM_App {
             $versionBumps += ($version - $versionStart);
         }
         if ($versionBumps > 0) {
-            $db = $this->_getServiceManager()->getDatabases()->getMaster()->getDatabaseName();
+            $db = $this->getServiceManager()->getDatabases()->getMaster()->getDatabaseName();
             CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
         }
         return $versionBumps;
@@ -160,13 +159,6 @@ class CM_App {
             $callbackAfter($version);
         }
         return 1;
-    }
-
-    /**
-     * @return CM_Service_Manager
-     */
-    protected function _getServiceManager() {
-        return $this->_serviceManager;
     }
 
     /**
