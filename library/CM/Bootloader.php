@@ -23,8 +23,8 @@ class CM_Bootloader {
      * @throws CM_Exception_Invalid
      */
     public function __construct($pathRoot) {
-        if (self::$_instance) {
-            throw new CM_Exception_Invalid('Bootloader already instantiated');
+        if (self::isLoaded()) {
+            throw new CM_Exception_Invalid('Bootloader already loaded');
         }
         self::$_instance = $this;
 
@@ -212,9 +212,16 @@ class CM_Bootloader {
      * @throws Exception
      */
     public static function getInstance() {
-        if (!self::$_instance) {
+        if (!self::isLoaded()) {
             throw new Exception('No bootloader instance');
         }
         return self::$_instance;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isLoaded() {
+        return (bool) self::$_instance;
     }
 }
