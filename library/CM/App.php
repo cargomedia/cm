@@ -188,6 +188,13 @@ class CM_App implements CM_Service_ManagerAwareInterface {
     }
 
     /**
+     * @return string
+     */
+    public function getRootPath() {
+        return $this->_rootPath;
+    }
+
+    /**
      * @return string[]
      */
     private function _getUpdateScriptPaths() {

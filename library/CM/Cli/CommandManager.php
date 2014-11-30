@@ -16,8 +16,17 @@ class CM_Cli_CommandManager {
     /** @var CM_OutputStream_Interface */
     private $_streamOutput, $_streamError;
 
-    public function __construct() {
+    /** @var CM_App */
+    private $_application;
+
+    /**
+     * @param CM_App $application
+     * @throws CM_Exception_Invalid
+     */
+    public function __construct(CM_App $application) {
+        $this->_application = $application;
         $this->_commands = array();
+
         $this->_setStreamInput(new CM_InputStream_Readline());
         $this->_setStreamOutput(new CM_OutputStream_Stream_StandardOutput());
         $this->_setStreamError(new CM_OutputStream_Stream_StandardError());
@@ -175,7 +184,7 @@ class CM_Cli_CommandManager {
                 } else {
                     CMService_Newrelic::getInstance()->startTransaction($transactionName);
                 }
-                $command->run($arguments, $streamInput, $streamOutput, $streamError);
+                $command->run($this->_application, $arguments, $streamInput, $streamOutput, $streamError);
             };
 
             $forks = max($this->_forks, 1);
