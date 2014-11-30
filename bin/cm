@@ -15,7 +15,7 @@ $rootPath = dirname(dirname(realpath($autoloadPath))) . '/';
 $application = new CM_App($rootPath);
 $application->bootstrap();
 
-$manager = new CM_Cli_CommandManager();
+$manager = new CM_Cli_CommandManager($application);
 $manager->autoloadCommands();
 $returnCode = $manager->run(new CM_Cli_Arguments($argv));
 exit($returnCode);
