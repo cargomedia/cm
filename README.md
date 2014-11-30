@@ -153,36 +153,6 @@ composer create-project cargomedia/cm-project --stability=dev <project-name>
 ```
 This will create a new directory `<project-name>` containing a project based on CM.
 
-### Setting up a virtual host
-
-The only entry point of your application should be `public/index.php`.
-A typical Apache virtual host configuration for this purpose were:
-
-```conf
-<VirtualHost *>
-  ServerName ‹hostname›
-  RedirectPermanent / http://www.‹hostname›/
-</VirtualHost>
-
-<VirtualHost *>
-  ServerName www.‹hostname›
-  DocumentRoot ‹project-dir›
-
-  <Directory ‹project-dir›/>
-    RewriteEngine on
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^(.*)$ public/$1
-  </Directory>
-
-  <Directory ‹project-dir›/public/>
-    SetEnv CM_DEBUG 1
-    RewriteEngine on
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^(.*)$ index.php
-    RewriteRule .* - [E=HTTP_X_REQUESTED_WITH:%{HTTP:X-Requested-With}]
-  </Directory>
-</VirtualHost>
-```
 
 ### Project configuration
 
