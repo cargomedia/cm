@@ -524,7 +524,8 @@ var CM_App = CM_Class_Abstract.extend({
      * @return {String}
      */
     renderHtml: function(template, variables) {
-      return _.template(template, variables).replace(/^\s+|\s+$/g, '');
+      var compiled = _.template(template);
+      return compiled(variables).replace(/^\s+|\s+$/g, '');
     }
   },
 
