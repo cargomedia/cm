@@ -115,7 +115,9 @@ class CM_Tools_Generator_Cli extends CM_Cli_Runnable_Abstract {
         $config->$className->urlCdn = 'http://origin-www.' . $domain;
         $generatorConfig->addEntries($file, $config);
 
-        (new CM_App_Cli())->generateConfigInternal();
+        $appCli = new CM_App_Cli();
+        $appCli->setApplication($this->_getApplication());
+        $appCli->generateConfigInternal();
     }
 
     /**
