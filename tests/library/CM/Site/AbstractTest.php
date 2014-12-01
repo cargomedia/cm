@@ -15,6 +15,13 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertEquals(array($site), CM_Site_Abstract::getAll());
     }
 
+    public function testGetConfig() {
+        /** @var CM_Site_Abstract $site */
+        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
+        $config = CM_Config::get()->CM_Site_Abstract;
+        $this->assertEquals($config, $site->getConfig());
+    }
+
     public function testGetEmailAddress() {
         /** @var CM_Site_Abstract $site */
         $site = $this->getMockForAbstractClass('CM_Site_Abstract');
