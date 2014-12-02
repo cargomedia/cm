@@ -22,7 +22,7 @@ class CM_AdproviderTest extends CMTest_TestCase {
     }
 
     public function testGetHtmlWithSiteConfig() {
-        $site = $this->getMockSite(null, 12345);
+        $site = $this->getMockSite();
         $siteClassName = get_class($site);
 
         CM_Config::get()->CM_Adprovider->enabled = true;
