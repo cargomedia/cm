@@ -78,13 +78,13 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
     }
 
     /**
-     * @param string $msg
-     * @param array  $metaInfo
+     * @param string     $msg
+     * @param array|null $metaInfo
      */
     protected function _add($msg, array $metaInfo = null) {
         $msg = (string) $msg;
         $values = array('type' => $this->getType(), 'msg' => $msg, 'timeStamp' => time());
-        if ($metaInfo) {
+        if (!empty($metaInfo)) {
             $values['metaInfo'] = serialize($this->_dump($metaInfo));
         }
         CM_Db_Db::insertDelayed('cm_log', $values);
