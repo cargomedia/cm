@@ -198,6 +198,24 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
         $request->getHost();
     }
 
+    public function testIsSupported() {
+        $userAgentList = [
+            'MSIE 6.0'                                           => false,
+            'MSIE 9.0'                                           => false,
+            'MSIE 10.0'                                          => true,
+            'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0)' => true,
+        ];
+        foreach ($userAgentList as $userAgent => $isSupported) {
+            $request = new CM_Request_Get('/', ['user-agent' => $userAgent]);
+            $this->assertSame($isSupported, $request->isSupported(), 'Mismatch for UA: `' . $userAgent . '`.');
+        }
+    }
+
+    public function testIsSupportedWithoutUserAgent() {
+        $request = new CM_Request_Get('/', []);
+        $this->assertSame(true, $request->isSupported());
+    }
+
     /**
      * @param string             $uri
      * @param array|null         $additionalHeaders
