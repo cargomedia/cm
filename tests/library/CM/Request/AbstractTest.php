@@ -200,13 +200,14 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 
     public function testIsSupported() {
         $userAgentList = [
-            'MSIE 6.0'                                           => false,
-            'MSIE 9.0'                                           => false,
-            'MSIE 9.1'                                           => false,
-            'MSIE 10.0'                                          => true,
-            'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0)' => true,
-            'Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC)'  => false,
-            'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus)'   => true,
+            'MSIE 6.0'                                            => false,
+            'MSIE 9.0'                                            => false,
+            'MSIE 9.1'                                            => false,
+            'MSIE 10.0'                                           => true,
+            'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0)'  => true,
+            'Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC)'   => false,
+            'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus)'    => true,
+            'Opera/9.80 (Android; Opera Mini/7.6.35766/35.5706;)' => false,
         ];
         foreach ($userAgentList as $userAgent => $isSupported) {
             $request = new CM_Request_Get('/', ['user-agent' => $userAgent]);

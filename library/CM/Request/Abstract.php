@@ -455,6 +455,9 @@ abstract class CM_Request_Abstract {
             return true;
         }
         $userAgent = $this->getHeader('user-agent');
+        if (preg_match('#Opera Mini#', $userAgent)) {
+            return false;
+        }
         if (preg_match('#MSIE (?<version>[\d\.]{1,6})#', $userAgent, $matches) && $matches['version'] < 10) {
             return false;
         }
