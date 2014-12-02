@@ -58,6 +58,9 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
      */
     protected function _getDefaultMetaInfo() {
         $metaInfo = array();
+        if ($fqdn = CM_Util::getFqdn()) {
+            $metaInfo['fqdn'] = $fqdn;
+        }
         if (CM_Request_Abstract::hasInstance()) {
             $request = CM_Request_Abstract::getInstance();
             $metaInfo['path'] = $request->getPath();
