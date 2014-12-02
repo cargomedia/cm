@@ -93,10 +93,10 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
             'Bucket' => 'bucket',
             'Prefix' => 'bar/foo/',
         ))->will($this->returnValue(array(
-            array('Key' => 'foo/bar/foo/object1'),
-            array('Key' => 'foo/bar/foo/object2'),
-            array('Key' => 'foo/bar/foo/subdir/obj1'),
-            array('Key' => 'foo/bar/foo/subdir/obj2'),
+            array('Key' => 'bar/foo/object1'),
+            array('Key' => 'bar/foo/object2'),
+            array('Key' => 'bar/foo/subdir/obj1'),
+            array('Key' => 'bar/foo/subdir/obj2'),
         )));
         /** @var Aws\S3\S3Client $clientMock */
         $adapter = new CM_File_Filesystem_Adapter_AwsS3($clientMock, 'bucket', 'public-read', '/bar////');
@@ -115,8 +115,8 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
             'Prefix'    => 'bar/foo/',
             'Delimiter' => '/'
         ))->will($this->returnValue(array(
-            array('Key' => '/bar/foo/object1'),
-            array('Key' => '/bar/foo/object2'),
+            array('Key' => 'bar/foo/object1'),
+            array('Key' => 'bar/foo/object2'),
             array('Prefix' => 'bar/foo/subdir/')
         )));
         /** @var Aws\S3\S3Client $clientMock */
