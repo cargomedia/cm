@@ -284,7 +284,7 @@ class CM_Util {
     }
 
     /**
-     * @param string $name
+     * @param string    $name
      * @param bool|null $relative
      * @return string
      */
@@ -502,7 +502,7 @@ class CM_Util {
             if (!is_array($item) || count($item) < ($level + 1)) {
                 throw new CM_Exception_Invalid('Item is not an array or has less than `' . ($level + 1) . '` elements.');
             }
-            $resultEntry = & $result;
+            $resultEntry = &$result;
             for ($i = 0; $i < $level; $i++) {
                 if (isset($keyNames[$i])) {
                     $keyName = $keyNames[$i];
@@ -514,7 +514,7 @@ class CM_Util {
                 } else {
                     $value = array_shift($item);
                 }
-                $resultEntry = & $resultEntry[$value];
+                $resultEntry = &$resultEntry[$value];
             }
             if (count($item) <= 1) {
                 $item = reset($item);
@@ -526,5 +526,22 @@ class CM_Util {
             }
         }
         return $result;
+    }
+
+    /**
+     * @return string|null
+     */
+    public static function getFqdn() {
+        $ipAddressList = [
+            '127.0.1.1',
+            '127.0.0.1',
+        ];
+        foreach ($ipAddressList as $ipAddress) {
+            $hostName = gethostbyaddr($ipAddress);
+            if ($hostName != $ipAddress) {
+                return $hostName;
+            }
+        }
+        return null;
     }
 }

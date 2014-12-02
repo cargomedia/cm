@@ -27,6 +27,20 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
         $this->assertSame(null, $items[1]['metaInfo']);
     }
 
+    public function testAddEmptyMetaInfo() {
+        $paging = $this->getMockBuilder('CM_Paging_Log_Abstract')->setMethods(array('getType'))->disableOriginalConstructor()->getMockForAbstractClass();
+        $paging->expects($this->any())->method('getType')->will($this->returnValue(14));
+        /** @var CM_Paging_Log_Abstract $paging */
+        $paging->__construct();
+
+        $add = CMTest_TH::getProtectedMethod('CM_Paging_Log_Abstract', '_add');
+        $add->invoke($paging, 'foo');
+        $add->invoke($paging, 'bar', []);
+
+        $this->assertSame(null, $paging->getItem(0)['metaInfo']);
+        $this->assertSame(null, $paging->getItem(1)['metaInfo']);
+    }
+
     public function testGetInvalidMetaInfo() {
         $paging = $this->getMockBuilder('CM_Paging_Log_Abstract')->setMethods(array('getType'))
             ->disableOriginalConstructor()->getMockForAbstractClass();
@@ -34,7 +48,8 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
         /** @var CM_Paging_Log_Abstract $paging */
         $paging->__construct();
 
-        CM_Db_Db::insert('cm_log', array('msg' => 'foo', 'metaInfo' => str_ireplace('{', '/', serialize(array('foo' => 'bar'))), 'timeStamp' => time(), 'type' => 14));
+        CM_Db_Db::insert('cm_log', array('msg'       => 'foo', 'metaInfo' => str_ireplace('{', '/', serialize(array('foo' => 'bar'))),
+                                         'timeStamp' => time(), 'type' => 14));
 
         $items = $paging->getItems();
         $this->assertSame(1, count($items));
