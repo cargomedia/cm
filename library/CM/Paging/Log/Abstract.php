@@ -63,7 +63,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
         }
         if (CM_Request_Abstract::hasInstance()) {
             $request = CM_Request_Abstract::getInstance();
-            $metaInfo['path'] = $request->getPath();
+            $metaInfo['uri'] = $request->getUri();
             if ($viewer = $request->getViewer()) {
                 $metaInfo['userId'] = $viewer->getId();
             }
