@@ -21,7 +21,7 @@
     "tomaszdurka/codegenerator": "~0.4.1"
   },
   "require-dev": {
-    "phpunit/phpunit": "~4.1.3",
+    "phpunit/phpunit": "~4.3.5",
     "tomaszdurka/mocka": "~0.8.1"
   },
   "autoload": {

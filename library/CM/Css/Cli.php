@@ -2,9 +2,6 @@
 
 class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
 
-    /**
-     * @synchronized
-     */
     public function iconRefresh() {
         /** @var CM_File[] $svgFileList */
         $svgFileList = array();
@@ -22,19 +19,24 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
         $this->_getStreamOutput()->writeln('Processing ' . count($svgFileList) . ' unique icons...');
 
         $dirWork = CM_File::createTmpDir();
+        $dirBuild = $dirWork->joinPath('/build');
+
         foreach ($svgFileList as $fontFile) {
-            $fontFile->copy($dirWork->getPath() . '/' . $fontFile->getFileName());
+            $fontFile->copyToFile($dirWork->joinPath($fontFile->getFileName()));
         }
 
-        $dirBuild = new CM_File($dirWork->getPath() . '/build');
-        CM_Util::exec('fontcustom',
-            array('compile', $dirWork->getPath(), '--no-hash', '--font-name=icon-webfont', '--output=' . $dirBuild->getPath()));
+        CM_Util::exec('fontcustom', array(
+            'compile', $dirWork->getPathOnLocalFilesystem(),
+            '--no-hash',
+            '--font-name=icon-webfont',
+            '--output=' . $dirBuild->getPathOnLocalFilesystem()
+        ));
 
-        $cssFile = new CM_File($dirBuild->getPath() . '/icon-webfont.css');
+        $cssFile = $dirBuild->joinPath('/icon-webfont.css');
         $less = preg_replace('/url\("(?:.*?\/)(.+?)(\??#.+?)?"\)/', 'url(urlFont("\1") + "\2")', $cssFile->read());
         CM_File::create(DIR_PUBLIC . 'static/css/library/icon.less', $less);
 
-        foreach (glob($dirBuild->getPath() . '/icon-webfont.*') as $fontPath) {
+        foreach (glob($dirBuild->joinPath('/icon-webfont.*')->getPathOnLocalFilesystem()) as $fontPath) {
             $fontFile = new CM_File($fontPath);
             $fontFile->rename(DIR_PUBLIC . 'static/font/' . $fontFile->getFileName());
         }

@@ -136,14 +136,14 @@ class CM_FileTest extends CMTest_TestCase {
         $adapter = $this->mockObject('CM_File_Filesystem_Adapter');
         $fs = new CM_File_Filesystem($adapter);
         $file = new CM_File('foo', $fs);
-        $adapter->mockMethod('equals')->set(function(CM_File_FileSystem_Adapter $other) use($adapter) {
+        $adapter->mockMethod('equals')->set(function (CM_File_FileSystem_Adapter $other) use ($adapter) {
             return $adapter === $other;
         });
         $adapter->mockMethod('listByPrefix')->set(function ($path, $noRecursion) use ($file) {
             $this->assertSame($file->getPath(), $path);
             $this->assertNull($noRecursion);
             return [
-                'dirs'   =>
+                'dirs'  =>
                     [
                         $path . '/foo/',
                         $path . '/bar/',
@@ -243,5 +243,24 @@ class CM_FileTest extends CMTest_TestCase {
 
         $file1->copyToFile($file3);
         $this->assertSame($file1->read(), $file3->read());
+    }
+
+    public function testGetPathOnLocalFilesystem() {
+        $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
+        $filesystem = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp));
+        $file = new CM_File('foo', $filesystem);
+
+        $this->assertSame(rtrim($dirTmp, '/') . '/foo', $file->getPathOnLocalFilesystem());
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     */
+    public function testGetPathOnLocalFilesystemUnexpectedFilesystem() {
+        $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()->getMock();
+        $filesystem = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_AwsS3($clientMock, 'bucket'));
+        $file = new CM_File('foo', $filesystem);
+
+        $file->getPathOnLocalFilesystem();
     }
 }

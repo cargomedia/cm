@@ -234,6 +234,18 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
 
     /**
      * @return string
+     * @throws CM_Exception_Invalid
+     */
+    public function getPathOnLocalFilesystem() {
+        $filesystemAdapter = $this->_filesystem->getAdapter();
+        if (!$filesystemAdapter instanceof CM_File_Filesystem_Adapter_Local) {
+            throw new CM_Exception_Invalid('Unexpected filesystem with adapter `' . get_class($filesystemAdapter) . '`.');
+        }
+        return $filesystemAdapter->getPathPrefix() . $this->getPath();
+    }
+
+    /**
+     * @return string
      */
     private function _getCacheKeyContent() {
         return __CLASS__ . '_content_filesystem:' . get_class($this->_filesystem->getAdapter()) . '_path:' . $this->getPath();
