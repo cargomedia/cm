@@ -8,6 +8,9 @@ class CM_Adprovider extends CM_Class_Abstract {
     /** @var CM_AdproviderAdapter_Abstract[] */
     private $_adapters = array();
 
+    /** @var array  */
+    private $_zones = array();
+
     /**
      * @param CM_Site_Abstract $site
      * @param string           $zoneName
@@ -37,10 +40,15 @@ class CM_Adprovider extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      */
     protected function _getZone(CM_Site_Abstract $site, $zoneName) {
-        $zones = CM_Config::get()->CM_Adprovider->zones;
-        if (isset($site->getConfig()->CM_Adprovider->zones)) {
-            $zones = array_merge($zones, $site->getConfig()->CM_Adprovider->zones);
+        $siteId = $site->getId();
+        if (!array_key_exists($siteId, $this->_zones)) {
+            $zones = CM_Config::get()->CM_Adprovider->zones;
+            if (isset($site->getConfig()->CM_Adprovider->zones)) {
+                $zones = array_merge($zones, $site->getConfig()->CM_Adprovider->zones);
+            }
+            $this->_zones[$siteId] = $zones;
         }
+        $zones = $this->_zones[$siteId];
         if (!array_key_exists($zoneName, $zones)) {
             throw new CM_Exception_Invalid('Zone `' . $zoneName . '` not configured.');
         }

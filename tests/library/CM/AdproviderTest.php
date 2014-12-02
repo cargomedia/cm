@@ -7,7 +7,7 @@ class CM_AdproviderTest extends CMTest_TestCase {
     }
 
     public function testGetHtml() {
-        $site = $this->getMockSite();
+        $site = $this->getMockSite(null, 12345);
         $siteClassName = get_class($site);
 
         CM_Config::get()->CM_Adprovider->enabled = true;
@@ -17,9 +17,9 @@ class CM_AdproviderTest extends CMTest_TestCase {
         $this->assertSame('{"zoneData":{"zoneId":1},"variables":[]}', $adprovider->getHtml($site, 'foo'));
         $this->assertSame('{"zoneData":{"zoneId":1},"variables":{"foo":"bar"}}', $adprovider->getHtml($site, 'foo', array('foo' => 'bar')));
 
-        CM_Config::get()->$siteClassName = new stdClass();
         CM_Config::get()->$siteClassName->CM_Adprovider = new stdClass();
         CM_Config::get()->$siteClassName->CM_Adprovider->zones = array('foo' => array('adapter' => 'CM_AdproviderAdapter_Mock', 'zoneId' => 2),);
+        $adprovider = new CM_Adprovider();
 
         $this->assertSame('{"zoneData":{"zoneId":2},"variables":[]}', $adprovider->getHtml($site, 'foo'));
         $this->assertSame('{"zoneData":{"zoneId":2},"variables":{"foo":"bar"}}', $adprovider->getHtml($site, 'foo', array('foo' => 'bar')));
