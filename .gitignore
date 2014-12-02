@@ -6,7 +6,7 @@
 
 /data
 /resources/config/local.php
-/tmp
-/tests/tmp
 /resources/config/internal.php
 /resources/config/js/internal.js
+/tmp
+/tests/tmp
