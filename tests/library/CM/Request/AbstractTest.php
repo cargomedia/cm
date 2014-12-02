@@ -202,6 +202,7 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
         $userAgentList = [
             'MSIE 6.0'                                           => false,
             'MSIE 9.0'                                           => false,
+            'MSIE 9.1'                                           => false,
             'MSIE 10.0'                                          => true,
             'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0)' => true,
         ];

@@ -455,7 +455,7 @@ abstract class CM_Request_Abstract {
             return true;
         }
         $userAgent = $this->getHeader('user-agent');
-        if (preg_match('#MSIE (?<version>\d{1,2})\.#', $userAgent, $matches) && $matches['version'] <= 9) {
+        if (preg_match('#MSIE (?<version>[\d\.]{1,6})#', $userAgent, $matches) && $matches['version'] < 10) {
             return false;
         }
         return true;
