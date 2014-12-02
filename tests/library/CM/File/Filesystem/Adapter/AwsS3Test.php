@@ -93,16 +93,16 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
             'Bucket' => 'bucket',
             'Prefix' => 'bar/foo/',
         ))->will($this->returnValue(array(
-            array('Key' => '/bar/foo/object1'),
-            array('Key' => '/bar/foo/object2'),
-            array('Key' => 'bar/foo/subdir/obj1'),
-            array('Key' => 'bar/foo/subdir/obj2'),
+            array('Key' => 'foo/bar/foo/object1'),
+            array('Key' => 'foo/bar/foo/object2'),
+            array('Key' => 'foo/bar/foo/subdir/obj1'),
+            array('Key' => 'foo/bar/foo/subdir/obj2'),
         )));
         /** @var Aws\S3\S3Client $clientMock */
         $adapter = new CM_File_Filesystem_Adapter_AwsS3($clientMock, 'bucket', 'public-read', '/bar////');
 
         $this->assertSame(array(
-            'files' => array('foo/object1', 'foo/object2', 'bar/foo/subdir/obj1', 'bar/foo/subdir/obj2'),
+            'files' => array('foo/object1', 'foo/object2', 'foo/subdir/obj1', 'foo/subdir/obj2'),
             'dirs' => array(),
         ), $adapter->listByPrefix('foo'));
     }
@@ -124,7 +124,7 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
 
         $this->assertSame(array(
             'files' => array('foo/object1', 'foo/object2'),
-            'dirs' => array('bar/foo/subdir'),
+            'dirs' => array('foo/subdir'),
         ), $adapter->listByPrefix('foo', true));
     }
 
