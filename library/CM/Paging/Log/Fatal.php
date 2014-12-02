@@ -7,6 +7,6 @@ class CM_Paging_Log_Fatal extends CM_Paging_Log_Abstract {
      * @param array|null $metaInfo
      */
     public function add($msg, array $metaInfo = null) {
-        $this->_add($msg, array_merge($this->_getMetafInfoFromRequest(), (array) $metaInfo));
+        $this->_add($msg, array_merge($this->_getMetaInfoFromRequest(), (array) $metaInfo));
     }
 }
