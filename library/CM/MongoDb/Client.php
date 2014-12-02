@@ -230,6 +230,14 @@ class CM_MongoDb_Client {
     }
 
     /**
+     * @return string[]
+     */
+    public function listDatabaseNames() {
+        $databasesInfo = $this->_getClient()->listDBs();
+        return \Functional\pluck($databasesInfo['databases'], 'name');
+    }
+
+    /**
      * @return array
      */
     public function dropDatabase() {
@@ -241,7 +249,7 @@ class CM_MongoDb_Client {
      * @return bool
      */
     public function databaseExists() {
-        return \Functional\contains($this->_getClient()->listDBs(), $this->_getDatabaseName());
+        return \Functional\contains($this->listDatabaseNames(), $this->_getDatabaseName());
     }
 
     /**
