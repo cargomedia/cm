@@ -458,6 +458,9 @@ abstract class CM_Request_Abstract {
         if (preg_match('#MSIE (?<version>[\d\.]{1,6})#', $userAgent, $matches) && $matches['version'] < 10) {
             return false;
         }
+        if (preg_match('#Android (?<version>[\d\.]{1,6})#', $userAgent, $matches) && $matches['version'] < 4) {
+            return false;
+        }
         return true;
     }
 
