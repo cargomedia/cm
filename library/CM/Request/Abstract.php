@@ -2,59 +2,37 @@
 
 abstract class CM_Request_Abstract {
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $_path;
 
-    /**
-     * @var array|null
-     */
+    /** @var array|null */
     protected $_pathParts;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $_query = array();
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $_headers = array();
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $_server = array();
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $_cookies;
 
-    /**
-     * @var bool|CM_Model_User|null
-     */
+    /** @var bool|CM_Model_User|null */
     protected $_viewer = false;
 
-    /**
-     * @var CM_Session|null
-     */
+    /** @var CM_Session|null */
     private $_session;
 
-    /**
-     * @var CM_Model_Language|null
-     */
+    /** @var CM_Model_Language|null */
     private $_languageUrl;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $_clientId;
 
-    /**
-     * @var CM_Request_Abstract
-     */
+    /** @var CM_Request_Abstract */
     private static $_instance;
 
     /**
