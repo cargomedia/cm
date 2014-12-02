@@ -15,9 +15,9 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
 
     /**
      * @param Aws\S3\S3Client $client
-     * @param string $bucket
-     * @param string|null $acl
-     * @param string|null $pathPrefix
+     * @param string          $bucket
+     * @param string|null     $acl
+     * @param string|null     $pathPrefix
      */
     public function __construct(Aws\S3\S3Client $client, $bucket, $acl = null, $pathPrefix = null) {
         parent::__construct($pathPrefix);
@@ -140,8 +140,8 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
 
     public function isDirectory($path) {
         $options = array(
-            'Bucket' => $this->_bucket,
-            'Prefix' => $this->_getAbsolutePath($path) . '/',
+            'Bucket'  => $this->_bucket,
+            'Prefix'  => $this->_getAbsolutePath($path) . '/',
             'MaxKeys' => 1,
         );
 
@@ -232,7 +232,7 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
 
     /**
      * @param string $path
-     * @param array $options
+     * @param array  $options
      * @return array
      */
     protected function _getOptions($path, array $options = null) {
