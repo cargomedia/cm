@@ -110,11 +110,14 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
         $this->assertSame(array('foo', 'bar'), $mock->getPathParts());
         $this->assertSame(array('foo1' => 'bar1'), $mock->getQuery());
         $this->assertEquals($language, $mock->getLanguageUrl());
+        $this->assertSame($uri, $mock->getUri());
+
         $mock->setUri('/foo1/bar1?foo=bar');
         $this->assertSame('/foo1/bar1', $mock->getPath());
         $this->assertSame(array('foo1', 'bar1'), $mock->getPathParts());
         $this->assertSame(array('foo' => 'bar'), $mock->getQuery());
         $this->assertNull($mock->getLanguageUrl());
+        $this->assertSame('/foo1/bar1?foo=bar', $mock->getUri());
     }
 
     public function testSetUriRelativeAndColon() {
@@ -123,6 +126,22 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
         $mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri));
         $this->assertSame('/foo/bar', $mock->getPath());
         $this->assertSame(array('foo1' => 'bar1:80'), $mock->getQuery());
+    }
+
+    public function testGetUri() {
+        $request = $this->getMockForAbstractClass('CM_Request_Abstract', array('/foo/bar?hello=world'));
+        /** @var CM_Request_Abstract $request */
+
+        $this->assertSame('/foo/bar?hello=world', $request->getUri());
+
+        $this->assertSame('foo', $request->popPathPart());
+        $this->assertSame('/foo/bar?hello=world', $request->getUri());
+
+        $request->setPath('/hello');
+        $this->assertSame('/foo/bar?hello=world', $request->getUri());
+
+        $request->setUri('/world');
+        $this->assertSame('/world', $request->getUri());
     }
 
     public function testGetClientId() {

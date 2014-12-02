@@ -3,6 +3,9 @@
 abstract class CM_Request_Abstract {
 
     /** @var string */
+    protected $_uri;
+
+    /** @var string */
     protected $_path;
 
     /** @var array|null */
@@ -239,24 +242,35 @@ abstract class CM_Request_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function setUri($uri) {
-        if ('/' === substr($uri, 0, 1)) {
-            $uri = 'http://host' . $uri;
+        $uriWithHost = $uri;
+        if ('/' === substr($uriWithHost, 0, 1)) {
+            $uriWithHost = 'http://host' . $uri;
         }
-        if (false === ($path = parse_url($uri, PHP_URL_PATH))) {
-            throw new CM_Exception_Invalid('Cannot detect path from `' . $uri . '`.');
+
+        if (false === ($path = parse_url($uriWithHost, PHP_URL_PATH))) {
+            throw new CM_Exception_Invalid('Cannot detect path from `' . $uriWithHost . '`.');
         }
         if ($path === null) {
             $path = '/';
         }
         $this->setPath($path);
 
-        if (false === ($queryString = parse_url($uri, PHP_URL_QUERY))) {
-            throw new CM_Exception_Invalid('Cannot detect query from `' . $uri . '`.');
+        if (false === ($queryString = parse_url($uriWithHost, PHP_URL_QUERY))) {
+            throw new CM_Exception_Invalid('Cannot detect query from `' . $uriWithHost . '`.');
         }
         parse_str($queryString, $query);
         $this->setQuery($query);
 
-        $this->setLanguageUrl();
+        $this->setLanguageUrl(null);
+
+        $this->_uri = $uri;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUri() {
+        return $this->_uri;
     }
 
     /**
