@@ -8,6 +8,14 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
         $script->load(new CM_OutputStream_Null());
     }
 
+    public function testDatabaseExists() {
+        $client = CM_Service_Manager::getInstance()->getMongoDb();
+        $this->assertTrue($client->databaseExists());
+        $client->dropDatabase();
+        $this->assertFalse($client->databaseExists());
+    }
+
+
     public function testInsert() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'insert';
