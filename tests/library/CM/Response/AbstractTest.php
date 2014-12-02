@@ -41,6 +41,6 @@ class CM_Response_AbstractTest extends CMTest_TestCase {
 
         $response->deleteCookie('foo');
         $headers = $response->getHeaders();
-        $this->assertSame('Set-Cookie: foo=; Expires=Wed, 31-Dec-1969 06:00:01 US/Central; Path=/', $headers[0]);
+        $this->assertSame('Set-Cookie: foo=; Expires=Thu, 01-Jan-1970 12:00:01 UTC; Path=/', $headers[0]);
     }
 }
