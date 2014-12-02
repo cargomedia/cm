@@ -32,7 +32,6 @@
         <div class="color-palette colorTheme">@colorTheme: #e22b59</div>
         <div class="color-palette colorBgBody">@colorBgBody: #eeeeee</div>
         <div class="color-palette colorBg">@colorBg: #ffffff</div>
-        <div class="color-palette colorHighlight">@colorHighlight: #f5cd24</div>
       </div>
     </div>
     <div class="box text">
