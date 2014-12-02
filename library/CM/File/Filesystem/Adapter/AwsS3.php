@@ -15,9 +15,9 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
 
     /**
      * @param Aws\S3\S3Client $client
-     * @param string          $bucket
-     * @param string|null     $acl
-     * @param string|null     $pathPrefix
+     * @param string $bucket
+     * @param string|null $acl
+     * @param string|null $pathPrefix
      */
     public function __construct(Aws\S3\S3Client $client, $bucket, $acl = null, $pathPrefix = null) {
         parent::__construct($pathPrefix);
@@ -91,7 +91,10 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
     }
 
     public function listByPrefix($pathPrefix, $noRecursion = null) {
-        $pathPrefix = $this->_getAbsolutePath($pathPrefix) . '/'; // force trailing slash for input-output consistency
+        $pathPrefix = $this->_getAbsolutePath($pathPrefix);
+        if ('' !== $pathPrefix) {
+            $pathPrefix .= '/';
+        }
         $commandOptions = array(
             'Bucket' => $this->_bucket,
             'Prefix' => $pathPrefix,
@@ -99,13 +102,20 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         if ($noRecursion) {
             $commandOptions['Delimiter'] = '/';
         }
+        $iteratorOptions = array(
+            'return_prefixes' => true,
+        );
 
-        $keys = array();
-        foreach ($this->_client->getIterator('ListObjects', $commandOptions) as $file) {
-            $keys[] = $this->_getRelativePath($file['Key']);
+        $fileKeys = $directoryKeys = array();
+        foreach ($this->_client->getIterator('ListObjects', $commandOptions, $iteratorOptions) as $file) {
+            if (isset($file['Prefix'])) {
+                $directoryKeys[] = $this->_getRelativePath($file['Prefix']);
+            } else {
+                $fileKeys[] = $this->_getRelativePath($file['Key']);
+            }
         }
 
-        return array('files' => $keys, 'dirs' => array());
+        return array('files' => $fileKeys, 'dirs' => $directoryKeys);
     }
 
     public function rename($sourcePath, $targetPath) {
@@ -130,8 +140,8 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
 
     public function isDirectory($path) {
         $options = array(
-            'Bucket'  => $this->_bucket,
-            'Prefix'  => $this->_getAbsolutePath($path) . '/',
+            'Bucket' => $this->_bucket,
+            'Prefix' => $this->_getAbsolutePath($path) . '/',
             'MaxKeys' => 1,
         );
 
@@ -222,7 +232,7 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
 
     /**
      * @param string $path
-     * @param array  $options
+     * @param array $options
      * @return array
      */
     protected function _getOptions($path, array $options = null) {
