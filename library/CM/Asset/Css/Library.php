@@ -8,8 +8,7 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
      */
     public function __construct(CM_Frontend_Render $render) {
         parent::__construct($render);
-
-        $this->addVariables($render);
+        $this->addVariables();
 
         $file = new CM_File(DIR_PUBLIC . 'static/css/library/icon.less');
         if ($file->getExists()) {
