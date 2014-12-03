@@ -78,4 +78,34 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
         $paging->cleanUp();
         $this->assertSame(0, $paging->getCount());
     }
+
+    public function testAggregate() {
+        $paging = $this->getMockBuilder('CM_Paging_Log_Abstract')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getType'))
+            ->getMockForAbstractClass();
+        $paging->expects($this->any())->method('getType')->will($this->returnValue(1));
+        /** @var CM_Paging_Log_Abstract $paging */
+        $paging->__construct();
+
+        CMTest_TH::callProtectedMethod($paging, '_add', ['haha']);
+        CMTest_TH::callProtectedMethod($paging, '_add', ['huhu']);
+        CMTest_TH::timeDaysForward(1);
+        CMTest_TH::timeDaysForward(1);
+        CMTest_TH::callProtectedMethod($paging, '_add', ['haha']);
+        CMTest_TH::callProtectedMethod($paging, '_add', ['haha', array('id' => 123123, 'ip' => 1234123)]);
+        CMTest_TH::timeDaysForward(1);
+        CMTest_TH::callProtectedMethod($paging, '_add', ['ha']);
+        CMTest_TH::callProtectedMethod($paging, '_add', ['ha']);
+        CMTest_TH::callProtectedMethod($paging, '_add', ['ha']);
+
+        $paging->__construct(true, 2 * 86400);
+        $this->assertEquals(2, $paging->getCount());
+        $warning1 = $paging->getItem(0);
+        $warning2 = $paging->getItem(1);
+        $this->assertEquals(3, $warning1['count']);
+        $this->assertEquals(2, $warning2['count']);
+        $this->assertEquals('haha', $warning2['msg']);
+        $this->assertEquals('ha', $warning1['msg']);
+    }
 }
