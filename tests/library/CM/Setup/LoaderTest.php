@@ -35,18 +35,6 @@ class CM_Provision_LoaderTest extends CMTest_TestCase {
         $this->assertSame(1, $loadMethod->getCallCount());
     }
 
-    public function testGetScriptListUnloadable() {
-        $classScriptUnloadable = $this->mockClass('CM_Provision_Script_Abstract', ['CM_Provision_Script_UnloadableInterface']);
-
-        $script1 = $this->mockClass('CM_Provision_Script_Abstract')->newInstanceWithoutConstructor();
-        $script2 = $classScriptUnloadable->newInstanceWithoutConstructor();
-        $script3 = $classScriptUnloadable->newInstanceWithoutConstructor();
-
-        $loader = $this->mockObject('CM_Provision_Loader');
-        $loader->mockMethod('_getScriptList')->set([$script1, $script2, $script3]);
-        $this->assertSame([$script3, $script2], CMTest_TH::callProtectedMethod($loader, '_getScriptListUnloadable'));
-    }
-
     public function testUnload() {
         $outputStream = new CM_OutputStream_Null();
 

@@ -76,9 +76,8 @@ class CM_Provision_Loader {
      */
     protected function _getScriptList() {
         $scriptList = $this->_scriptList;
-        $runLevelList = \Functional\pluck($this->_scriptList, 'getRunLevel');
+        $runLevelList = \Functional\invoke($scriptList, 'getRunLevel');
         array_multisort($runLevelList, $scriptList);
-
         return $scriptList;
     }
 }
