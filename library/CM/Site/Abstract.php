@@ -30,6 +30,13 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
+     * @return stdClass
+     */
+    public function getConfig() {
+        return self::_getConfig();
+    }
+
+    /**
      * @return string
      */
     public function getEmailAddress() {
