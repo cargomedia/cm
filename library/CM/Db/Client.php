@@ -257,6 +257,17 @@ class CM_Db_Client {
         return '`' . str_replace('`', '``', $name) . '`';
     }
 
+    public function __sleep() {
+        return array(
+            '_host',
+            '_port',
+            '_username',
+            '_password',
+            '_db',
+            '_reconnectTimeout',
+        );
+    }
+
     /**
      * @return bool
      */

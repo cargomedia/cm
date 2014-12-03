@@ -172,6 +172,8 @@ class CM_Tools_Generator_CliTest extends CMTest_TestCase {
     private function _mockGeneratorCli(CM_Tools_AppInstallation $appInstallation) {
         $cli = $this->mockObject('CM_Tools_Generator_Cli');
         $cli->mockMethod('_getAppInstallation')->set($appInstallation);
+        /** @var $cli CM_Tools_Generator_Cli */
+        $cli->setApplication(new CM_App($appInstallation->getDirRoot()));
         return $cli;
     }
 

@@ -1,6 +1,11 @@
 <?php
 
-class CM_App {
+class CM_App implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
+
+    /** @var string */
+    private $_rootPath;
 
     /**
      * @var CM_App
@@ -8,11 +13,31 @@ class CM_App {
     private static $_instance;
 
     /**
+     * @param string $rootPath
+     */
+    public function __construct($rootPath) {
+        $this->_rootPath = (string) $rootPath;
+
+        if (!self::$_instance) {
+            self::$_instance = $this;
+        }
+    }
+
+    public function bootstrap() {
+        if (!CM_Bootloader::isLoaded()) {
+            $bootloader = new CM_Bootloader($this->_rootPath);
+            $bootloader->load();
+        }
+        $this->setServiceManager(CM_Service_Manager::getInstance());
+    }
+
+    /**
+     * @throws CM_Exception_Invalid
      * @return CM_App
      */
     public static function getInstance() {
         if (!self::$_instance) {
-            self::$_instance = new self();
+            throw new CM_Exception_Invalid('Cannot find CM_App instance');
         }
         return self::$_instance;
     }
@@ -113,7 +138,7 @@ class CM_App {
 
     /**
      * @param Closure|null $callbackBefore fn($version)
-     * @param Closure|null $callbackAfter  fn($version)
+     * @param Closure|null $callbackAfter fn($version)
      * @return int Number of version bumps
      */
     public function runUpdateScripts(Closure $callbackBefore = null, Closure $callbackAfter = null) {
@@ -160,6 +185,13 @@ class CM_App {
             $callbackAfter($version);
         }
         return 1;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRootPath() {
+        return $this->_rootPath;
     }
 
     /**
