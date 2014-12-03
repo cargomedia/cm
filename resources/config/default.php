@@ -9,7 +9,7 @@ return function (CM_Config_Node $config) {
     $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Core';
     $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Translations';
 
-    $config->timeZone = 'US/Central';
+    $config->timeZone = 'UTC';
 
     $config->CM_Mail->send = true;
     $config->CM_Mail->mailDeliveryAgent = null;

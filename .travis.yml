@@ -32,6 +32,7 @@ before_script:
   - composer self-update
   - composer install --dev
   - cp tests/travis/config.php resources/config/local.php
+  - bin/cm app generate-config-internal
   - bin/cm app set-deploy-version
 
 script: bin/phpunit

@@ -81,4 +81,7 @@ class CM_CacheConst {
     const Modules = 'Modules';
 
     const ComposerVendorDir = 'ComposerVendorDir';
+
+    // _siteId:X
+    const AdproviderZones = 'AdproviderZones';
 }
