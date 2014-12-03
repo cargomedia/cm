@@ -7,7 +7,7 @@ function smarty_function_load_lessFile(array $params, Smarty_Internal_Template $
     $namespace = isset($params['namespace']) ? $params['namespace'] : null;
     $tplPath = $render->getLayoutPath($params['file'], $namespace, true);
     $file = new CM_File($tplPath);
-    $assetCss = new CM_Asset_Css_File($render, $file, true);
+    $assetCss = new CM_Asset_Css_File($render, $file);
 
     return $assetCss->get(true);
 }
