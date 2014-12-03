@@ -237,18 +237,18 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
 
     /**
      * @param CM_Splittest_Fixture $fixture
-     * @param bool|null            $refresh
+     * @param bool|null            $updateCache
      * @return array
      */
-    protected function _getVariationListFixture(CM_Splittest_Fixture $fixture, $refresh = null) {
+    protected function _getVariationListFixture(CM_Splittest_Fixture $fixture, $updateCache = null) {
         $columnId = $fixture->getColumnId();
         $columnIdQuoted = CM_Db_Db::getClient()->quoteIdentifier($columnId);
         $fixtureId = $fixture->getId();
-        $refresh = (bool) $refresh;
+        $updateCache = (bool) $updateCache;
 
         $cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_id:' . $fixture->getId() . '_type:' . $fixture->getFixtureType();
         $cache = CM_Cache_Local::getInstance();
-        if ($refresh || (($variationListFixture = $cache->get($cacheKey)) === false)) {
+        if ($updateCache || (($variationListFixture = $cache->get($cacheKey)) === false)) {
             $variationListFixture = CM_Db_Db::exec('
 				SELECT `variation`.`splittestId`, `variation`.`name`
 					FROM `cm_splittestVariation_fixture` `fixture`
