@@ -163,6 +163,13 @@ class CM_App {
     }
 
     /**
+     * @return CM_Http_Handler
+     */
+    public function getHttpHandler() {
+        return new CM_Http_Handler(CM_Service_Manager::getInstance());
+    }
+
+    /**
      * @return string[]
      */
     private function _getUpdateScriptPaths() {
