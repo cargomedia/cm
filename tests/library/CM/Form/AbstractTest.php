@@ -115,7 +115,7 @@ class CM_FormAction_MockForm_TestExampleAction extends CM_FormAction_Abstract {
         return array('must_check', 'text');
     }
 
-    protected function _process(CM_Params $params, CM_Response_View_Form $response, CM_Form_Abstract $form) {
+    protected function _process(CM_Params $params, CM_Http_Response_View_Form $response, CM_Form_Abstract $form) {
         CM_Form_AbstractTest::$formActionProcessCount++;
         CM_Form_AbstractTest::$formActionData = $params;
     }

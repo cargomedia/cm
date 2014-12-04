@@ -133,9 +133,9 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @param CM_Response_Page $response
+     * @param CM_Http_Response_Page $response
      */
-    public function preprocessPageResponse(CM_Response_Page $response) {
+    public function preprocessPageResponse(CM_Http_Response_Page $response) {
     }
 
     /**

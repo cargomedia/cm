@@ -6,7 +6,7 @@ class CM_FormAction_Example_Go extends CM_FormAction_Abstract {
         return array('text', 'color');
     }
 
-    protected function _process(CM_Params $params, CM_Response_View_Form $response, CM_Form_Abstract $form) {
+    protected function _process(CM_Params $params, CM_Http_Response_View_Form $response, CM_Form_Abstract $form) {
         //$response->reloadComponent();
         $response->addMessage(nl2br($this->_printVar($params->getParamsDecoded())));
     }

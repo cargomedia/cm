@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_Resource_Javascript_Library extends CM_Response_Resource_Javascript_Abstract {
+class CM_Http_Response_Resource_Javascript_Library extends CM_Http_Response_Resource_Javascript_Abstract {
 
     protected function _process() {
         if ($this->getRequest()->getPath() === '/library.js') {

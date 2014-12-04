@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_Resource_Layout extends CM_Response_Resource_Abstract {
+class CM_Http_Response_Resource_Layout extends CM_Http_Response_Resource_Abstract {
 
     protected function _process() {
         $content = null;

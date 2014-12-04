@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Response_Resource_Javascript_Abstract extends CM_Response_Resource_Abstract {
+abstract class CM_Http_Response_Resource_Javascript_Abstract extends CM_Http_Response_Resource_Abstract {
 
     protected function _setContent($content) {
         $this->setHeader('Content-Type', 'application/x-javascript');

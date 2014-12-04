@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_JsError extends CM_Response_Abstract {
+class CM_Http_Response_JsError extends CM_Http_Response_Abstract {
 
     protected function _process() {
         $request = $this->getRequest();

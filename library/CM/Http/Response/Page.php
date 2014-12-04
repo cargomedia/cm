@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_Page extends CM_Response_Abstract {
+class CM_Http_Response_Page extends CM_Http_Response_Abstract {
 
     /** @var CM_Page_Abstract|null */
     private $_page;

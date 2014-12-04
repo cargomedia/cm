@@ -219,7 +219,7 @@ class CMTest_TH {
      * @param string             $uri
      * @param array|null         $headers
      * @param CM_Model_User|null $viewer
-     * @return CM_Response_Page
+     * @return CM_Http_Response_Page
      */
     public static function createResponsePage($uri, array $headers = null, CM_Model_User $viewer = null) {
         if (!$headers) {
@@ -227,7 +227,7 @@ class CMTest_TH {
             $headers = array('host' => $site->getHost());
         }
         $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
-        return new CM_Response_Page($request);
+        return new CM_Http_Response_Page($request);
     }
 
     /**

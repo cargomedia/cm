@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_Upload extends CM_Response_Abstract {
+class CM_Http_Response_Upload extends CM_Http_Response_Abstract {
 
     /** @var CM_Http_Request_Post */
     protected $_request;

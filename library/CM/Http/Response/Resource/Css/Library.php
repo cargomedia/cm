@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_Resource_Css_Library extends CM_Response_Resource_Css_Abstract {
+class CM_Http_Response_Resource_Css_Library extends CM_Http_Response_Resource_Css_Abstract {
 
     protected function _process() {
         switch ($this->getRequest()->getPath()) {

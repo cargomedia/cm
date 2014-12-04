@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_View_Form extends CM_Response_View_Abstract {
+class CM_Http_Response_View_Form extends CM_Http_Response_View_Abstract {
 
     /**
      * @var array

@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_UploadTest extends CMTest_TestCase {
+class CM_Http_Response_UploadTest extends CMTest_TestCase {
 
     /** @var string */
     private $_dir;
@@ -21,7 +21,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
         $request = new CM_Http_Request_Post('/upload/null');
-        $upload = new CM_Response_Upload($request);
+        $upload = new CM_Http_Response_Upload($request);
         $upload->process();
         $data = json_decode($upload->getContent(), true);
 
@@ -41,7 +41,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
         $request = new CM_Http_Request_Post('/upload/null?field=CM_FormField_FileImage');
-        $upload = new CM_Response_Upload($request);
+        $upload = new CM_Http_Response_Upload($request);
         $upload->process();
         $data = json_decode($upload->getContent(), true);
 
@@ -58,7 +58,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
         $request = new CM_Http_Request_Post('/upload/null?field=CM_FormField_FileImage');
-        $upload = new CM_Response_Upload($request);
+        $upload = new CM_Http_Response_Upload($request);
         $upload->process();
         $data = json_decode($upload->getContent(), true);
 
@@ -73,7 +73,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
         $request = new CM_Http_Request_Post('/upload/null?field=CM_FormField_File');
-        $upload = new CM_Response_Upload($request);
+        $upload = new CM_Http_Response_Upload($request);
         $upload->process();
         $data = json_decode($upload->getContent(), true);
 
@@ -88,7 +88,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
         $request = new CM_Http_Request_Post('/upload/null?field=CM_FormField_FileImage');
-        $upload = new CM_Response_Upload($request);
+        $upload = new CM_Http_Response_Upload($request);
         $upload->process();
         $data = json_decode($upload->getContent(), true);
 
@@ -103,7 +103,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
         $request = new CM_Http_Request_Post('/upload/null?field=CM_FormField_File');
-        $upload = new CM_Response_Upload($request);
+        $upload = new CM_Http_Response_Upload($request);
         $upload->process();
         $data = json_decode($upload->getContent(), true);
 
@@ -118,7 +118,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
         $request = new CM_Http_Request_Post('/upload/null?field=nonexistent');
-        $upload = new CM_Response_Upload($request);
+        $upload = new CM_Http_Response_Upload($request);
 
         try {
             $upload->process();

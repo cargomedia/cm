@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Response_Abstract extends CM_Class_Abstract {
+abstract class CM_Http_Response_Abstract extends CM_Class_Abstract {
 
     /** @var CM_Http_Request_Abstract */
     protected $_request;
@@ -225,21 +225,21 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 
     /**
      * @param CM_Http_Request_Abstract $request
-     * @return CM_Response_Abstract|string
+     * @return CM_Http_Response_Abstract|string
      */
     public static function getResponseClassName(CM_Http_Request_Abstract $request) {
-        /** @var $responseClass CM_Response_Abstract */
+        /** @var $responseClass CM_Http_Response_Abstract */
         foreach (array_reverse(self::getClassChildren()) as $responseClass) {
             if ($responseClass::match($request)) {
                 return $responseClass;
             }
         }
-        return 'CM_Response_Page';
+        return 'CM_Http_Response_Page';
     }
 
     /**
      * @param CM_Http_Request_Abstract $request
-     * @return CM_Response_Abstract
+     * @return CM_Http_Response_Abstract
      */
     public static function factory(CM_Http_Request_Abstract $request) {
         $className = self::getResponseClassName($request);

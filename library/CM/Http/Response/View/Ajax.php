@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_View_Ajax extends CM_Response_View_Abstract {
+class CM_Http_Response_View_Ajax extends CM_Http_Response_View_Abstract {
 
     protected function _process() {
         $output = array();

@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
+abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract {
 
     /**
      * @param array|null $additionalParams
@@ -52,11 +52,11 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
     /**
      * @param CM_Params             $params
-     * @param CM_Response_View_Ajax $response
+     * @param CM_Http_Response_View_Ajax $response
      * @throws CM_Exception_Invalid
      * @return array
      */
-    public function loadPage(CM_Params $params, CM_Response_View_Ajax $response) {
+    public function loadPage(CM_Params $params, CM_Http_Response_View_Ajax $response) {
         $request = new CM_Http_Request_Get($params->getString('path'), $this->getRequest()->getHeaders(), $this->getRequest()->getServer(), $this->getRequest()->getViewer());
 
         $count = 0;
@@ -66,7 +66,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
             if ($count++ > 10) {
                 throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $paths) . ').');
             }
-            $responsePage = new CM_Response_Page_Embed($request);
+            $responsePage = new CM_Http_Response_Page_Embed($request);
             $responsePage->process();
             $paths[] = $request->getPath();
 

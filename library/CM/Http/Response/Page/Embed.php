@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_Page_Embed extends CM_Response_Page {
+class CM_Http_Response_Page_Embed extends CM_Http_Response_Page {
 
     /** @var string|null */
     private $_title;

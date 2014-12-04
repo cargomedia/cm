@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_RPC extends CM_Response_Abstract {
+class CM_Http_Response_RPC extends CM_Http_Response_Abstract {
 
     protected function _process() {
         $output = array();

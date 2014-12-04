@@ -74,13 +74,13 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
 
     public function testGetLanguageByUrl() {
         $request = $this->_prepareRequest('/de/home');
-        CM_Response_Abstract::factory($request);
+        CM_Http_Response_Abstract::factory($request);
         $this->assertNull($request->getLanguage());
 
         CMTest_TH::createLanguage('en'); // default language
         $urlLanguage = CMTest_TH::createLanguage('de');
         $request = $this->_prepareRequest('/de/home');
-        CM_Response_Abstract::factory($request);
+        CM_Http_Response_Abstract::factory($request);
         $this->assertEquals($request->getLanguage(), $urlLanguage);
     }
 
@@ -176,8 +176,8 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
     public function testGetClientIdSetCookie() {
         $request = new CM_Http_Request_Post('/foo/null/');
         $clientId = $request->getClientId();
-        /** @var CM_Response_Abstract $response */
-        $response = $this->getMock('CM_Response_Abstract', array('_process', 'setCookie'), array($request));
+        /** @var CM_Http_Response_Abstract $response */
+        $response = $this->getMock('CM_Http_Response_Abstract', array('_process', 'setCookie'), array($request));
         $response->expects($this->once())->method('setCookie')->with('clientId', (string) $clientId);
         $response->process();
     }

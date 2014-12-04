@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Response_Resource_Abstract extends CM_Response_Abstract {
+abstract class CM_Http_Response_Resource_Abstract extends CM_Http_Response_Abstract {
 
     public function __construct(CM_Http_Request_Abstract $request) {
         parent::__construct($request);
