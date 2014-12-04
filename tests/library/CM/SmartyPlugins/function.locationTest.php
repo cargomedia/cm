@@ -33,12 +33,30 @@ class smarty_function_locationTest extends CMTest_TestCase {
         $this->assertEmpty($debug->getStats());
     }
 
-    public function testPartFilter() {
-        $partNamer = function (CM_Model_Location $location) {
-            return '(' . $location->getName() . ')';
+    public function testLabeler() {
+        $partLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
+            return '(' . $locationPart->getName() . ')';
         };
-        $expected = '<span class="function-location">(cityFoo), (stateFoo), (countryFoo)</span>';
-        $this->_assertSame($expected, array('location' => $this->_location, 'partNamer' => $partNamer));
+        $flagLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
+            return '[' . $locationPart->getName() . ']';
+        };
+        $expected = '<span class="function-location">(cityFoo), (stateFoo), (countryFoo)[countryFoo]</span>';
+        $this->_assertSame($expected, array('location' => $this->_location, 'partLabeler' => $partLabeler, 'flagLabeler' => $flagLabeler));
+    }
+
+    public function testLabelerEmpty() {
+        $partLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
+            if (CM_Model_Location::LEVEL_COUNTRY === $locationPart->getLevel()) {
+                return null;
+            } else {
+                return 'foo';
+            }
+        };
+        $flagLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
+            return null;
+        };
+        $expected = '<span class="function-location">foo, foo</span>';
+        $this->_assertSame($expected, array('location' => $this->_location, 'partLabeler' => $partLabeler, 'flagLabeler' => $flagLabeler));
     }
 
     /**
