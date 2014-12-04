@@ -12,7 +12,7 @@ class CM_Response_Resource_Css_Vendor extends CM_Response_Resource_Css_Abstract 
         }
     }
 
-    public static function match(CM_Request_Abstract $request) {
+    public static function match(CM_Http_Request_Abstract $request) {
         return $request->getPathPart(0) === 'vendor-css';
     }
 }

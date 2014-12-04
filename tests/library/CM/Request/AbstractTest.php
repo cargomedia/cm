@@ -1,6 +1,6 @@
 <?php
 
-class CM_Request_AbstractTest extends CMTest_TestCase {
+class CM_Http_Request_AbstractTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
@@ -10,12 +10,12 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
         $user = CMTest_TH::createUser();
         $uri = '/';
         $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
-        $mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
-        /** @var CM_Request_Abstract $mock */
+        $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
+        /** @var CM_Http_Request_Abstract $mock */
         $this->assertNull($mock->getViewer());
 
         $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => 'sessionId=a1d2726e5b3801226aafd12fd62496c8');
-        $mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+        $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
         try {
             $mock->getViewer(true);
             $this->fail();
@@ -28,11 +28,11 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
         $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => 'sessionId=' . $session->getId());
         unset($session);
 
-        $mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+        $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
         $this->assertEquals($user, $mock->getViewer(true));
 
         $user2 = CMTest_TH::createUser();
-        $mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers, null, $user2));
+        $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers, null, $user2));
         $this->assertEquals($user2, $mock->getViewer(true));
     }
 
@@ -40,7 +40,7 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
         $uri = '/';
         $headers = array('Host'   => 'example.ch', 'Connection' => 'keep-alive',
                          'Cookie' => ';213q;213;=foo=hello;bar=tender;  adkhfa ; asdkf===fsdaf');
-        $mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+        $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
         $this->assertEquals('hello', $mock->getCookie('foo'));
         $this->assertEquals('tender', $mock->getCookie('bar'));
         $this->assertNull($mock->getCookie('asdkf'));
@@ -95,16 +95,16 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
     }
 
     public function testFactory() {
-        $this->assertInstanceOf('CM_Request_Get', CM_Request_Abstract::factory('GET', '/test'));
-        $this->assertInstanceOf('CM_Request_Post', CM_Request_Abstract::factory('POST', '/test'));
+        $this->assertInstanceOf('CM_Http_Request_Get', CM_Http_Request_Abstract::factory('GET', '/test'));
+        $this->assertInstanceOf('CM_Http_Request_Post', CM_Http_Request_Abstract::factory('POST', '/test'));
     }
 
     public function testSetUri() {
         $language = CM_Model_Language::create('english', 'en', true);
         $uri = '/en/foo/bar?foo1=bar1';
         $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
-        /** @var CM_Request_Abstract $mock */
-        $mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+        /** @var CM_Http_Request_Abstract $mock */
+        $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
         $this->assertEquals($language, $mock->popPathLanguage());
         $this->assertSame('/foo/bar', $mock->getPath());
         $this->assertSame(array('foo', 'bar'), $mock->getPathParts());
@@ -122,15 +122,15 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 
     public function testSetUriRelativeAndColon() {
         $uri = '/foo/bar?foo1=bar1:80';
-        /** @var CM_Request_Abstract $mock */
-        $mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri));
+        /** @var CM_Http_Request_Abstract $mock */
+        $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri));
         $this->assertSame('/foo/bar', $mock->getPath());
         $this->assertSame(array('foo1' => 'bar1:80'), $mock->getQuery());
     }
 
     public function testGetUri() {
-        $request = $this->getMockForAbstractClass('CM_Request_Abstract', array('/foo/bar?hello=world'));
-        /** @var CM_Request_Abstract $request */
+        $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array('/foo/bar?hello=world'));
+        /** @var CM_Http_Request_Abstract $request */
 
         $this->assertSame('/foo/bar?hello=world', $request->getUri());
 
@@ -147,8 +147,8 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
     public function testGetClientId() {
         $uri = '/en/foo/bar?foo1=bar1';
         $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
-        /** @var CM_Request_Abstract $mock */
-        $mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+        /** @var CM_Http_Request_Abstract $mock */
+        $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
         $this->assertFalse($mock->hasClientId());
         $clientId = $mock->getClientId();
         $this->assertInternalType('int', $clientId);
@@ -156,8 +156,8 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 
         $uri = '/';
         $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=clientId=WRONG;');
-        /** @var CM_Request_Abstract $mock */
-        $mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+        /** @var CM_Http_Request_Abstract $mock */
+        $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
         $this->assertFalse($mock->hasClientId());
         $this->assertSame($clientId + 1, $mock->getClientId());
         $this->assertTrue($mock->hasClientId());
@@ -166,15 +166,15 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 
         $uri = '/';
         $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=clientId=' . $id . ';');
-        /** @var CM_Request_Abstract $mock */
-        $mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+        /** @var CM_Http_Request_Abstract $mock */
+        $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
         $this->assertFalse($mock->hasClientId());
         $this->assertSame($id, $mock->getClientId());
         $this->assertTrue($mock->hasClientId());
     }
 
     public function testGetClientIdSetCookie() {
-        $request = new CM_Request_Post('/foo/null/');
+        $request = new CM_Http_Request_Post('/foo/null/');
         $clientId = $request->getClientId();
         /** @var CM_Response_Abstract $response */
         $response = $this->getMock('CM_Response_Abstract', array('_process', 'setCookie'), array($request));
@@ -189,23 +189,23 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
             'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)'    => true,
         );
         foreach ($useragents as $useragent => $expected) {
-            $request = new CM_Request_Get('/foo', array('user-agent' => $useragent));
+            $request = new CM_Http_Request_Get('/foo', array('user-agent' => $useragent));
             $this->assertSame($expected, $request->isBotCrawler());
         }
     }
 
     public function testIsBotCrawlerWithoutUseragent() {
-        $request = new CM_Request_Get('/foo');
+        $request = new CM_Http_Request_Get('/foo');
         $this->assertFalse($request->isBotCrawler());
     }
 
     public function testGetHost() {
-        $request = new CM_Request_Get('/', array('host' => 'www.example.com'));
+        $request = new CM_Http_Request_Get('/', array('host' => 'www.example.com'));
         $this->assertSame('www.example.com', $request->getHost());
     }
 
     public function testGetHostWithPort() {
-        $request = new CM_Request_Get('/', array('host' => 'www.example.com:80'));
+        $request = new CM_Http_Request_Get('/', array('host' => 'www.example.com:80'));
         $this->assertSame('www.example.com', $request->getHost());
     }
 
@@ -213,7 +213,7 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
      * @expectedException CM_Exception_Invalid
      */
     public function testGetHostWithoutHeader() {
-        $request = new CM_Request_Get('/');
+        $request = new CM_Http_Request_Get('/');
         $request->getHost();
     }
 
@@ -229,13 +229,13 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
             'Opera/9.80 (Android; Opera Mini/7.6.35766/35.5706;)' => false,
         ];
         foreach ($userAgentList as $userAgent => $isSupported) {
-            $request = new CM_Request_Get('/', ['user-agent' => $userAgent]);
+            $request = new CM_Http_Request_Get('/', ['user-agent' => $userAgent]);
             $this->assertSame($isSupported, $request->isSupported(), 'Mismatch for UA: `' . $userAgent . '`.');
         }
     }
 
     public function testIsSupportedWithoutUserAgent() {
-        $request = new CM_Request_Get('/', []);
+        $request = new CM_Http_Request_Get('/', []);
         $this->assertSame(true, $request->isSupported());
     }
 
@@ -243,15 +243,15 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
      * @param string             $uri
      * @param array|null         $additionalHeaders
      * @param CM_Model_User|null $user
-     * @return CM_Request_Abstract
+     * @return CM_Http_Request_Abstract
      */
     private function _prepareRequest($uri, array $additionalHeaders = null, CM_Model_User $user = null) {
         $headers = array('Host' => 'example.com', 'Connection' => 'keep-alive');
         if ($additionalHeaders) {
             $headers = array_merge($headers, $additionalHeaders);
         }
-        /** @var CM_Request_Abstract $request */
-        $request = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers), '', true, true, true, array('getViewer'));
+        /** @var CM_Http_Request_Abstract $request */
+        $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers), '', true, true, true, array('getViewer'));
         $request->expects($this->any())->method('getViewer')->will($this->returnValue($user));
         $this->assertSame($request->getViewer(), $user);
         return $request;

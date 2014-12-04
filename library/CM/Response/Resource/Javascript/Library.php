@@ -24,7 +24,7 @@ class CM_Response_Resource_Javascript_Library extends CM_Response_Resource_Javas
         throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', null, array('severity' => CM_Exception::WARN));
     }
 
-    public static function match(CM_Request_Abstract $request) {
+    public static function match(CM_Http_Request_Abstract $request) {
         return $request->getPathPart(0) === 'library-js';
     }
 }

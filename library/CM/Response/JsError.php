@@ -24,7 +24,7 @@ class CM_Response_JsError extends CM_Response_Abstract {
         $this->_setContent('');
     }
 
-    public static function match(CM_Request_Abstract $request) {
+    public static function match(CM_Http_Request_Abstract $request) {
         return $request->getPathPart(0) === 'jserror';
     }
 }

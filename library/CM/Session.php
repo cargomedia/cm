@@ -13,7 +13,7 @@ class CM_Session implements CM_Comparable {
     /** @var int */
     private $_expires;
 
-    /** @var CM_Request_Abstract|null */
+    /** @var CM_Http_Request_Abstract|null */
     private $_request;
 
     /** @var boolean */
@@ -24,10 +24,10 @@ class CM_Session implements CM_Comparable {
 
     /**
      * @param string|null              $id
-     * @param CM_Request_Abstract|null $request
+     * @param CM_Http_Request_Abstract|null $request
      * @throws CM_Exception_Nonexistent
      */
-    public function __construct($id = null, CM_Request_Abstract $request = null) {
+    public function __construct($id = null, CM_Http_Request_Abstract $request = null) {
         if (null !== $id) {
             $this->_id = (string) $id;
             $data = self::_findDataById($this->getId());
@@ -130,7 +130,7 @@ class CM_Session implements CM_Comparable {
     }
 
     /**
-     * @return CM_Request_Abstract|null
+     * @return CM_Http_Request_Abstract|null
      */
     public function getRequest() {
         return $this->_request;

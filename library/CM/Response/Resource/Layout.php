@@ -30,7 +30,7 @@ class CM_Response_Resource_Layout extends CM_Response_Resource_Abstract {
         return ['smarty'];
     }
 
-    public static function match(CM_Request_Abstract $request) {
+    public static function match(CM_Http_Request_Abstract $request) {
         return $request->getPathPart(0) === 'layout';
     }
 }

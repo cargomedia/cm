@@ -3,11 +3,11 @@
 class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @param string              $variationName
      * @return bool
      */
-    public function isVariationFixture(CM_Request_Abstract $request, $variationName) {
+    public function isVariationFixture(CM_Http_Request_Abstract $request, $variationName) {
         if ($request->isBotCrawler()) {
             return false;
         }
@@ -15,10 +15,10 @@ class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
     }
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @param float|null          $weight
      */
-    public function setConversion(CM_Request_Abstract $request, $weight = null) {
+    public function setConversion(CM_Http_Request_Abstract $request, $weight = null) {
         if ($request->isBotCrawler()) {
             return;
         }
@@ -27,11 +27,11 @@ class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
 
     /**
      * @param string              $splittestName
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @param string              $variationName
      * @return bool
      */
-    public static function isVariationFixtureStatic($splittestName, CM_Request_Abstract $request, $variationName) {
+    public static function isVariationFixtureStatic($splittestName, CM_Http_Request_Abstract $request, $variationName) {
         /** @var CM_Model_Splittest_RequestClient $splittest */
         $splittest = static::find($splittestName);
         if (!$splittest) {
@@ -42,10 +42,10 @@ class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
 
     /**
      * @param string              $splittestName
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @param float|null          $weight
      */
-    public static function setConversionStatic($splittestName, CM_Request_Abstract $request, $weight = null) {
+    public static function setConversionStatic($splittestName, CM_Http_Request_Abstract $request, $weight = null) {
         /** @var CM_Model_Splittest_RequestClient $splittest */
         $splittest = static::find($splittestName);
         if ($splittest) {

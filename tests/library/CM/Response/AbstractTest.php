@@ -22,13 +22,13 @@ class CM_Response_AbstractTest extends CMTest_TestCase {
         $responses['/homepage'] = 'CM_Response_Page';
 
         foreach ($responses as $path => $expectedResponse) {
-            $request = new CM_Request_Post($path . '/null/timestamp', null, null, '');
+            $request = new CM_Http_Request_Post($path . '/null/timestamp', null, null, '');
             $this->assertInstanceOf($expectedResponse, CM_Response_Abstract::factory($request));
         }
     }
 
     public function testSetDeleteCookie() {
-        $request = new CM_Request_Post('/foo/null');
+        $request = new CM_Http_Request_Post('/foo/null');
         $response = CM_Response_Abstract::factory($request);
         $time = time();
         $timeString = date('D\, d\-M\-Y h:i:s e', $time);

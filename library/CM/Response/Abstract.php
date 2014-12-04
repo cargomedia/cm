@@ -2,7 +2,7 @@
 
 abstract class CM_Response_Abstract extends CM_Class_Abstract {
 
-    /** @var CM_Request_Abstract */
+    /** @var CM_Http_Request_Abstract */
     protected $_request;
 
     /** @var CM_Frontend_Render */
@@ -27,9 +27,9 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
     private $_stringRepresentation;
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      */
-    public function __construct(CM_Request_Abstract $request) {
+    public function __construct(CM_Http_Request_Abstract $request) {
         $this->_request = clone $request;
         $responseType = $this->_request->popPathPart();
         $language = $this->_request->popPathLanguage();
@@ -63,7 +63,7 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_Request_Abstract
+     * @return CM_Http_Request_Abstract
      */
     public function getRequest() {
         return $this->_request;
@@ -224,10 +224,10 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @return CM_Response_Abstract|string
      */
-    public static function getResponseClassName(CM_Request_Abstract $request) {
+    public static function getResponseClassName(CM_Http_Request_Abstract $request) {
         /** @var $responseClass CM_Response_Abstract */
         foreach (array_reverse(self::getClassChildren()) as $responseClass) {
             if ($responseClass::match($request)) {
@@ -238,19 +238,19 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @return CM_Response_Abstract
      */
-    public static function factory(CM_Request_Abstract $request) {
+    public static function factory(CM_Http_Request_Abstract $request) {
         $className = self::getResponseClassName($request);
         return new $className($request);
     }
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @return bool
      */
-    public static function match(CM_Request_Abstract $request) {
+    public static function match(CM_Http_Request_Abstract $request) {
         return false;
     }
 }

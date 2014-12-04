@@ -1,6 +1,6 @@
 <?php
 
-class CM_Request_Post extends CM_Request_Abstract {
+class CM_Http_Request_Post extends CM_Http_Request_Abstract {
 
     const ENCODING_NONE = 1;
     const ENCODING_JSON = 2;

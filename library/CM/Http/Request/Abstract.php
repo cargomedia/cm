@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Request_Abstract {
+abstract class CM_Http_Request_Abstract {
 
     /** @var string */
     protected $_uri;
@@ -35,7 +35,7 @@ abstract class CM_Request_Abstract {
     /** @var int */
     private $_clientId;
 
-    /** @var CM_Request_Abstract */
+    /** @var CM_Http_Request_Abstract */
     private static $_instance;
 
     /**
@@ -133,7 +133,7 @@ abstract class CM_Request_Abstract {
 
     /**
      * @param string $path
-     * @return CM_Request_Abstract
+     * @return CM_Http_Request_Abstract
      */
     public function setPath($path) {
         $this->_path = (string) $path;
@@ -496,7 +496,7 @@ abstract class CM_Request_Abstract {
 
     /**
      * @throws CM_Exception_Invalid
-     * @return CM_Request_Abstract
+     * @return CM_Http_Request_Abstract
      */
     public static function getInstance() {
         if (!self::hasInstance()) {
@@ -512,27 +512,27 @@ abstract class CM_Request_Abstract {
      * @param array|null  $server
      * @param string|null $body
      * @throws CM_Exception_Invalid
-     * @return CM_Request_Abstract
+     * @return CM_Http_Request_Abstract
      */
     public static function factory($method, $uri, array $headers = null, array $server = null, $body = null) {
         $method = strtolower($method);
         if ($method === 'post') {
-            return new CM_Request_Post($uri, $headers, $server, $body);
+            return new CM_Http_Request_Post($uri, $headers, $server, $body);
         }
         if ($method === 'get') {
-            return new CM_Request_Get($uri, $headers, $server);
+            return new CM_Http_Request_Get($uri, $headers, $server);
         }
         if ($method === 'head') {
-            return new CM_Request_Head($uri, $headers, $server);
+            return new CM_Http_Request_Head($uri, $headers, $server);
         }
         if ($method === 'options') {
-            return new CM_Request_Options($uri, $headers, $server);
+            return new CM_Http_Request_Options($uri, $headers, $server);
         }
         throw new CM_Exception_Invalid('Invalid request method `' . $method . '`');
     }
 
     /**
-     * @return CM_Request_Abstract
+     * @return CM_Http_Request_Abstract
      */
     public static function factoryFromGlobals() {
         $method = $_SERVER['REQUEST_METHOD'];

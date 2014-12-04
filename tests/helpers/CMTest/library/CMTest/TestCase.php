@@ -81,7 +81,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param array|null                    $query
      * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
-     * @return CM_Request_Post|\Mocka\AbstractClassTrait
+     * @return CM_Http_Request_Post|\Mocka\AbstractClassTrait
      * @throws Mocka\Exception
      */
     public function createRequest($url, array $query = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
@@ -109,7 +109,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             $query['viewInfoList'] = $viewInfoList;
         }
 
-        $mockClass = $this->mockClass('CM_Request_Post');
+        $mockClass = $this->mockClass('CM_Http_Request_Post');
         $mockClass->mockMethod('getQuery')->set(function () use ($query) {
             return $query;
         });
@@ -125,7 +125,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
      * @throws CM_Exception_Invalid
-     * @return CM_Request_Post|\Mocka\AbstractClassTrait
+     * @return CM_Http_Request_Post|\Mocka\AbstractClassTrait
      */
     public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
         $actionName = $action->getName();
@@ -153,7 +153,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param array|null                    $params
      * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
-     * @return CM_Request_Post|\Mocka\AbstractClassTrait
+     * @return CM_Http_Request_Post|\Mocka\AbstractClassTrait
      */
     public function createRequestAjax(CM_Component_Abstract $component, $methodName, array $params = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
         $viewResponseComponent = new CM_Frontend_ViewResponse($component);
@@ -171,10 +171,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @return CM_Response_Abstract|\Mocka\AbstractClassTrait
      */
-    public function getResponse(CM_Request_Abstract $request) {
+    public function getResponse(CM_Http_Request_Abstract $request) {
         $className = CM_Response_Abstract::getResponseClassName($request);
         return $this->mockClass($className)->newInstance([$request]);
     }
@@ -189,10 +189,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @return CM_Response_Abstract|\Mocka\AbstractClassTrait
      */
-    public function processRequest(CM_Request_Abstract $request) {
+    public function processRequest(CM_Http_Request_Abstract $request) {
         $response = $this->getResponse($request);
         $response->process();
         return $response;
@@ -292,7 +292,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             $site = CM_Site_Abstract::factory();
         }
         $host = parse_url($site->getUrl(), PHP_URL_HOST);
-        $request = new CM_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), array('host' => $host), null, $viewer);
+        $request = new CM_Http_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), array('host' => $host), null, $viewer);
         $response = new CM_Response_Page($request);
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, $viewer));
         $page->prepareResponse($render->getEnvironment(), $response);

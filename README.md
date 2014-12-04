@@ -9,7 +9,7 @@ A namespace groups related code. The namespace is used as a prefix for classname
 ### Site
 One application can serve multiple *sites* (extending `CM_Site_Abstract`).
 
-Each HTTP-request (`CM_Request_Abstract`) is matched against the available sites (`::match()`), before it is processed.
+Each HTTP-request (`CM_Http_Request_Abstract`) is matched against the available sites (`::match()`), before it is processed.
 
 A site contains multiple *Namespaces* (for models and controllers) and *themes* (for views).
 

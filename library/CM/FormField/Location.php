@@ -70,7 +70,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
     }
 
     protected function _getSuggestions($term, array $options, CM_Frontend_Render $render) {
-        $ip = CM_Request_Abstract::getInstance()->getIp();
+        $ip = CM_Http_Request_Abstract::getInstance()->getIp();
         $locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $options['levelMax'], CM_Model_Location::findByIp($ip), $options['scopeLocation']);
         $locations->setPage(1, 15);
         $out = array();

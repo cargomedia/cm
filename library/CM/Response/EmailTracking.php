@@ -19,7 +19,7 @@ class CM_Response_EmailTracking extends CM_Response_Abstract {
         $this->_setContent(base64_decode('R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='));
     }
 
-    public static function match(CM_Request_Abstract $request) {
+    public static function match(CM_Http_Request_Abstract $request) {
         return $request->getPathPart(0) === 'emailtracking';
     }
 }

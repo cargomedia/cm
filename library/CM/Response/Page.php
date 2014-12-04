@@ -11,7 +11,7 @@ class CM_Response_Page extends CM_Response_Abstract {
     /** @var string|null */
     private $_redirectUrl;
 
-    public function __construct(CM_Request_Abstract $request) {
+    public function __construct(CM_Http_Request_Abstract $request) {
         $this->_request = $request;
         $this->_site = CM_Site_Abstract::findByRequest($this->_request);
         $this->_request->popPathLanguage();
@@ -70,11 +70,11 @@ class CM_Response_Page extends CM_Response_Abstract {
     }
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @throws CM_Exception_Invalid
      * @return string|null
      */
-    protected function _processPageLoop(CM_Request_Abstract $request) {
+    protected function _processPageLoop(CM_Http_Request_Abstract $request) {
         $count = 0;
         $paths = array($request->getPath());
         while (false === ($html = $this->_processPage($request))) {
@@ -112,13 +112,13 @@ class CM_Response_Page extends CM_Response_Abstract {
     }
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @throws CM_Exception_Nonexistent
      * @throws CM_Exception
      * @throws CM_Exception_Nonexistent
      * @return string|null|boolean
      */
-    private function _processPage(CM_Request_Abstract $request) {
+    private function _processPage(CM_Http_Request_Abstract $request) {
         try {
             $this->getSite()->rewrite($request);
             $pageParams = CM_Params::factory($request->getQuery(), true);

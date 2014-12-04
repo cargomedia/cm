@@ -139,9 +139,9 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      */
-    public function rewrite(CM_Request_Abstract $request) {
+    public function rewrite(CM_Http_Request_Abstract $request) {
         if ($request->getPath() == '/') {
             $request->setPath('/index');
         }
@@ -172,10 +172,10 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @return boolean
      */
-    public function match(CM_Request_Abstract $request) {
+    public function match(CM_Http_Request_Abstract $request) {
         $urlRequest = $request->getHost();
         $urlSite = $this->getHost();
         return 0 === strpos(preg_replace('/^www\./', '', $urlRequest), preg_replace('/^www\./', '', $urlSite));
@@ -203,11 +203,11 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @return CM_Site_Abstract
      * @throws CM_Exception_Invalid
      */
-    public static function findByRequest(CM_Request_Abstract $request) {
+    public static function findByRequest(CM_Http_Request_Abstract $request) {
         foreach (array_reverse(static::getClassChildren()) as $className) {
             /** @var CM_Site_Abstract $site */
             $site = new $className();

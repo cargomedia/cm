@@ -57,7 +57,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
      * @return array
      */
     public function loadPage(CM_Params $params, CM_Response_View_Ajax $response) {
-        $request = new CM_Request_Get($params->getString('path'), $this->getRequest()->getHeaders(), $this->getRequest()->getServer(), $this->getRequest()->getViewer());
+        $request = new CM_Http_Request_Get($params->getString('path'), $this->getRequest()->getHeaders(), $this->getRequest()->getServer(), $this->getRequest()->getViewer());
 
         $count = 0;
         $paths = array($request->getPath());
