@@ -221,3 +221,26 @@ Commands:
  search-index start-maintenance
  stream start-message-synchronization
 ```
+
+## Deployment
+
+Apart from setting whole infrastructure (http server, various services) application itself needs some preparation.
+
+### Class types
+Each CM application heavily depends on types which are integer identifiers for classes. In order to keep fixed identifier (class name can change) we require to store those in VCS-stored config file (internal.php).
+In order to generate types run:
+```bash
+$ bin/cm app generate-config-internal
+```
+This will generate `resources/config/internal.php` and `resources/config/js/internal.js` files required for application to work. Keep this file in VCS at it needs to be preserved between releases.
+
+
+### Provision scripts
+Most CM applications require services to be setup and/or some initial data inserted. To do so CM Framework uses so-called provision scripts.
+There is built-in command for running all setup-scripts defined in `$config->CM_App->setupScriptClasses` config property. All those scripts need to be classes extending `CM_Provision_Script_Abstract`.
+
+```bash
+$ bin/cm app setup
+```
+
+Provision scripts are about to set up everything app-related - from creating database schema to loading fixtures.
