@@ -1064,12 +1064,15 @@ var CM_App = CM_Class_Abstract.extend({
   router: {
     ready: function() {
       var router = this;
+      var startPage = location.href;
 
-      $(window).on('popstate', function(event) {
-        //Fixes double 'popstate' fire on initial load.
-        if (window.history.ready || event.originalEvent.state) {
-          router._handleLocationChange(router._getFragment());
+      $(window).on('popstate', function() {
+        if(startPage === location.href){
+          startPage = null;
+          return;
         }
+        startPage = null;
+        router._handleLocationChange(router._getFragment());
       });
 
       var urlBase = cm.getUrl();
@@ -1118,7 +1121,6 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {String|Null} [url] Absolute or relative URL
      */
     pushState: function(url) {
-      window.history.ready = true;//Fixes double 'popstate' fire on initial load.
       window.history.pushState(null, null, url);
     },
 
