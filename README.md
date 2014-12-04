@@ -153,14 +153,6 @@ composer create-project cargomedia/cm-project --stability=dev <project-name>
 ```
 This will create a new directory `<project-name>` containing a project based on CM.
 
-
-### Project configuration
-
-In your project directory, run:
-```bash
-bin/cm app generate-config-internal
-```
-
 ### Namespace creation, site setup
 
 CM framework provides a base which should be extended. Our own libraries should be part of different namespace. To create one simply run:
