@@ -1065,8 +1065,13 @@ var CM_App = CM_Class_Abstract.extend({
     ready: function() {
       var router = this;
 
-      $(window).on('popstate', function(event) {
-        router._handleLocationChange(router._getFragment());
+      //Fixes Safari 8 double 'popstate' fire on initial load.
+      $(window).on('load', function() {
+        setTimeout(function() {
+          $(window).on('popstate', function(event) {
+            router._handleLocationChange(router._getFragment());
+          });
+        }, 0);
       });
 
       var urlBase = cm.getUrl();
