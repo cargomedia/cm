@@ -33,6 +33,14 @@ class smarty_function_locationTest extends CMTest_TestCase {
         $this->assertEmpty($debug->getStats());
     }
 
+    public function testPartFilter() {
+        $partNamer = function (CM_Model_Location $location) {
+            return '(' . $location->getName() . ')';
+        };
+        $expected = '<span class="function-location">(cityFoo), (stateFoo), (countryFoo)</span>';
+        $this->_assertSame($expected, array('location' => $this->_location, 'partNamer' => $partNamer));
+    }
+
     /**
      * @param string $expected
      * @param array  $params
