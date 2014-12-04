@@ -25,8 +25,8 @@ class smarty_function_locationTest extends CMTest_TestCase {
         $debug = CM_Debug::getInstance();
         $debug->setEnabled(true);
 
-        $urlFlag = $this->_render->getUrlResource('layout', 'img/flags/fo.png');
-        $expected = '<span class="function-location">cityFoo, stateFoo, countryFoo<img class="flag" src="' . $urlFlag . '" /></span>';
+        $flag = '<img class="flag" src="' . $this->_render->getUrlResource('layout', 'img/flags/fo.png') . '" title="countryFoo" />';
+        $expected = '<span class="function-location">cityFoo, stateFoo, countryFoo' . $flag . '</span>';
         $this->_assertSame($expected, array('location' => $this->_location));
 
         $debug->setEnabled(false);
