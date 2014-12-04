@@ -7,8 +7,8 @@ function smarty_function_locationFlag(array $params, Smarty_Internal_Template $t
     $location = $params['location'];
 
     $html = '';
-    if ($country = $location->get(CM_Model_Location::LEVEL_COUNTRY)) {
-        $flagUrl = $render->getUrlResource('layout', 'img/flags/' . strtolower($country->getAbbreviation()) . '.png');
+    if ($abbreviation = $location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) {
+        $flagUrl = $render->getUrlResource('layout', 'img/flags/' . strtolower($abbreviation) . '.png');
         $html .= '<img class="flag" src="' . $flagUrl . '" />';
     }
 
