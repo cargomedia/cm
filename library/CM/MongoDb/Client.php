@@ -331,7 +331,6 @@ class CM_MongoDb_Client {
 
     /**
      * @return string
-     * @throws Exception
      */
     protected function _getDatabaseName() {
         return CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];

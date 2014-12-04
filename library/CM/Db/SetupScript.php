@@ -40,19 +40,7 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
     protected function _isLoaded() {
         $mysqlDbClient = $this->getServiceManager()->getDatabases()->getMaster();
         $mysqlClient = $mysqlDbClient->getClientWithoutDatabase();
-
-        $databaseExists = (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($mysqlDbClient->getDatabaseName()))->fetch();
-        if (!$databaseExists) {
-            return false;
-        }
-
-        $tables = $mysqlDbClient->createStatement('SHOW TABLES')->execute()->fetchAll();
-        $hasTables = count($tables) > 0;
-        if (!$hasTables) {
-            return false;
-        }
-
-        return true;
+        return (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($mysqlDbClient->getDatabaseName()))->fetch();
     }
 
     private function _setInitialVersion() {
