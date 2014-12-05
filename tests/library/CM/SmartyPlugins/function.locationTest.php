@@ -59,6 +59,18 @@ class smarty_function_locationTest extends CMTest_TestCase {
         $this->_assertSame($expected, array('location' => $this->_location, 'partLabeler' => $partLabeler, 'flagLabeler' => $flagLabeler));
     }
 
+    public function testCountryOnly() {
+        $country = CM_Model_Location::createCountry('My country', 'MC');
+        $partLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
+            return $locationPart->getName();
+        };
+        $flagLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
+            return null;
+        };
+        $expected = '<span class="function-location">My country</span>';
+        $this->_assertSame($expected, array('location' => $country, 'partLabeler' => $partLabeler, 'flagLabeler' => $flagLabeler));
+    }
+
     /**
      * @param string $expected
      * @param array  $params
