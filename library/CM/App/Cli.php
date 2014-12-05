@@ -6,42 +6,12 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
      * @param bool|null $reload
      */
     public function setup($reload = null) {
-        $this->_getStreamOutput()->writeln('Setting up filesystem…');
-        $this->setupFilesystem();
-        $this->_getStreamOutput()->writeln('Setting up database…');
-        $this->setupDatabase($reload);
-        $this->_getStreamOutput()->writeln('Setting up elasticsearch indexes…');
-        $this->setupElasticsearch($reload);
-        $this->_getStreamOutput()->writeln('Setting up translations…');
-        $this->setupTranslations();
+        CM_App::getInstance()->setup($this->_getStreamOutput(), $reload);
 
         if ($reload) {
             $cacheCli = new CM_Cache_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
             $cacheCli->clear();
         }
-    }
-
-    public function setupFilesystem() {
-        CM_App::getInstance()->setupFilesystem();
-    }
-
-    /**
-     * @param bool|null $reload
-     */
-    public function setupDatabase($reload = null) {
-        CM_App::getInstance()->setupDatabase($reload);
-    }
-
-    /**
-     * @param bool|null $reload
-     */
-    public function setupElasticsearch($reload = null) {
-        $searchCli = new CM_Elasticsearch_Index_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
-        $searchCli->create(null, !$reload);
-    }
-
-    public function setupTranslations() {
-        CM_App::getInstance()->setupTranslations();
     }
 
     public function fillCaches() {

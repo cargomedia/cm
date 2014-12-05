@@ -10,7 +10,7 @@ class CMTest_TH {
     private static $_dbClient = null;
 
     public static function init() {
-        CM_App::getInstance()->setupDatabase(true);
+        CM_App::getInstance()->setup(new CM_OutputStream_Null(), true);
 
         self::$_configBackup = serialize(CM_Config::get());
 
@@ -29,12 +29,8 @@ class CMTest_TH {
     }
 
     public static function clearFilesystem() {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $serviceManager->getFilesystems()->getData()->deleteByPrefix('/');
-        foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
-            $filesystem->deleteByPrefix('/');
-        }
-        CM_App::getInstance()->setupFilesystem();
+        $script = new CM_File_Filesystem_SetupScript(CM_Service_Manager::getInstance());
+        $script->unload(new CM_OutputStream_Null());
     }
 
     public static function clearCache() {
@@ -42,22 +38,17 @@ class CMTest_TH {
         CM_Cache_Local::getInstance()->flush();
     }
 
+    /**
+     * @deprecated use clearEnv instead
+     */
     public static function clearDb() {
-        $alltables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
-        CM_Db_Db::exec('SET foreign_key_checks = 0;');
-        foreach ($alltables as $table) {
-            CM_Db_Db::delete($table);
-        }
-        CM_Db_Db::exec('SET foreign_key_checks = 1;');
-        $mongo = CM_Service_Manager::getInstance()->getMongoDb();
-        foreach ($mongo->listCollectionNames() as $collectionName) {
-            $mongo->remove($collectionName);
-        }
-        foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
-            require $setupScript->getPath();
-        }
+        self::clearCache();
+        CM_App::getInstance()->setup(new CM_OutputStream_Null(), true);
     }
 
+    /**
+     * @deprecated use clearEnv instead
+     */
     public static function clearConfig() {
         CM_Config::set(unserialize(self::$_configBackup));
     }

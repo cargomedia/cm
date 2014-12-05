@@ -1,6 +1,14 @@
 <?php
 
 return function (CM_Config_Node $config) {
+    $config->CM_App->setupScriptClasses = array();
+    $config->CM_App->setupScriptClasses[] = 'CM_File_Filesystem_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_Db_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_MongoDb_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_Elasticsearch_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Core';
+    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Translations';
+
     $config->timeZone = 'UTC';
 
     $config->CM_Mail->send = true;
