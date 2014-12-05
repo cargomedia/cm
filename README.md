@@ -1,7 +1,8 @@
 CM Framework  [![Build Status](https://travis-ci.org/cargomedia/CM.png)](https://travis-ci.org/cargomedia/CM)
 ============
 
-## Major concepts
+Major concepts
+--------------
 
 ### Namespace
 A namespace groups related code. The namespace is used as a prefix for classnames. `CM` is a namespace, a classname could be `CM_Foo_BarZoo`.
@@ -143,7 +144,8 @@ CM_Paging_User_Country                         # All users from a given country
 ```
 
 
-## Creating a new project
+Creating a new project
+----------------------
 
 ### Cloning the CM skeleton application
 
@@ -214,7 +216,8 @@ Commands:
  stream start-message-synchronization
 ```
 
-## Deployment
+Deployment
+----------
 
 Apart from setting whole infrastructure (http server, various services) application itself needs some preparation.
 
@@ -229,10 +232,19 @@ This will generate `resources/config/internal.php` and `resources/config/js/inte
 
 ### Provision scripts
 Most CM applications require services to be setup and/or some initial data inserted. To do so CM Framework uses so-called provision scripts.
-There is built-in command for running all setup-scripts defined in `$config->CM_App->setupScriptClasses` config property. All those scripts need to be classes extending `CM_Provision_Script_Abstract`.
+There is built-in command for running all setup-scripts defined in `$config->CM_App->setupScriptClasses` config property.
 
 ```bash
 $ bin/cm app setup
 ```
 
-Provision scripts are about to set up everything app-related - from creating database schema to loading fixtures.
+Provision scripts are responsible for setting up everything app-related - from creating database schema to loading fixtures.
+
+#### Provision script
+All those scripts need to be classes extending `CM_Provision_Script_Abstract` and therefore implement `load` and `shouldBeLoaded` method.
+Anytime scripts are about to be loaded they will be first checked if they actually should, by running `shouldBeLoaded`.
+Once this is positive it will run `load`.
+
+Additionally provision scripts can implement `CM_Provision_Script_UnloadableInterface` with corresponding `unload` and `shouldBeUnloaded` methods.
+
+
