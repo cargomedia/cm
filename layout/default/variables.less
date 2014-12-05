@@ -39,11 +39,11 @@
 
 //Font
 @fontFamily: Helvetica, Arial, sans-serif;
-@fontWeight: 200;
-@fontLineHeight: 1.4;
-
 @fontFamilyHeading: Helvetica, Arial, sans-serif;
+@fontWeight: 200;
 @fontWeightHeading: 700;
+@fontWeightStrong: @fontWeight * 2;
+@fontLineHeight: 1.4;
 @fontLineHeightHeading: 1.7;
 
 @fontSize: 14px;
@@ -70,12 +70,12 @@
 @borderRadiusInput: 3px;
 
 //Usertext
-@usertextFontSizeH1: @fontSize*1.6;
-@usertextFontSizeH2: @fontSize*1.5;
-@usertextFontSizeH3: @fontSize*1.4;
-@usertextFontSizeH4: @fontSize*1.3;
-@usertextFontSizeH5: @fontSize*1.2;
-@usertextFontSizeH6: @fontSize;
+@usertextFontSizeH1: round(@fontSize*1.3);
+@usertextFontSizeH2: round(@fontSize*1.2);
+@usertextFontSizeH3: round(@fontSize*1.1);
+@usertextFontSizeH4: round(@fontSize*1.0);
+@usertextFontSizeH5: round(@fontSize*1.0);
+@usertextFontSizeH6: round(@fontSize*1.0);
 @usertextFontSize: @fontSize;
 
 @usertextColorFgH1: #505050;
