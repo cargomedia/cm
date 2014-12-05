@@ -1064,14 +1064,15 @@ var CM_App = CM_Class_Abstract.extend({
   router: {
     ready: function() {
       var router = this;
-      var startPage = location.href;
+      var hrefInitial = location.href;
 
       $(window).on('popstate', function() {
-        if(startPage === location.href){
-          startPage = null;
+        // this `if` fixes double fire of `popstate` event on the initial page.
+        if (hrefInitial === location.href) {
+          hrefInitial = null;
           return;
         }
-        startPage = null;
+        hrefInitial = null;
         router._handleLocationChange(router._getFragment());
       });
 
