@@ -1062,17 +1062,20 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   router: {
+    /** @type {String|Null} */
+    hrefInitial: null,
+
     ready: function() {
       var router = this;
-      var hrefInitial = location.href;
+      this.hrefInitial = location.href;
 
       $(window).on('popstate', function() {
         // this `if` fixes double fire of `popstate` event on the initial page.
-        if (hrefInitial === location.href) {
-          hrefInitial = null;
+        if (router.hrefInitial === location.href) {
+          router.hrefInitial = null;
           return;
         }
-        hrefInitial = null;
+        router.hrefInitial = null;
         router._handleLocationChange(router._getFragment());
       });
 
@@ -1122,6 +1125,7 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {String|Null} [url] Absolute or relative URL
      */
     pushState: function(url) {
+      this.hrefInitial = null;
       window.history.pushState(null, null, url);
     },
 
@@ -1129,6 +1133,7 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {String|Null} [url] Absolute or relative URL
      */
     replaceState: function(url) {
+      this.hrefInitial = null;
       window.history.replaceState(null, null, url);
     },
 
