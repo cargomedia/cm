@@ -148,15 +148,15 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_Component_Abstract         $component
+     * @param CM_View_Abstract              $view
      * @param string                        $methodName
      * @param array|null                    $params
      * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
      * @return CM_Request_Post|\Mocka\AbstractClassTrait
      */
-    public function createRequestAjax(CM_Component_Abstract $component, $methodName, array $params = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
-        $viewResponseComponent = new CM_Frontend_ViewResponse($component);
+    public function createRequestAjax(CM_View_Abstract $view, $methodName, array $params = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+        $viewResponseComponent = new CM_Frontend_ViewResponse($view);
         if (null === $scopeView) {
             $scopeView = $viewResponseComponent;
         }
@@ -199,14 +199,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_Component_Abstract        $component
+     * @param CM_View_Abstract             $view
      * @param string                       $methodName
      * @param array|null                   $params
      * @param CM_Frontend_Environment|null $environment
      * @return CM_Response_View_Ajax
      */
-    public function getResponseAjax(CM_Component_Abstract $component, $methodName, array $params = null, CM_Frontend_Environment $environment = null) {
-        $request = $this->createRequestAjax($component, $methodName, $params);
+    public function getResponseAjax(CM_View_Abstract $view, $methodName, array $params = null, CM_Frontend_Environment $environment = null) {
+        $request = $this->createRequestAjax($view, $methodName, $params);
         if ($environment) {
             $request->mockMethod('getViewer')->set(function () use ($environment) {
                 return $environment->getViewer();
