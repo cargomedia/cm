@@ -304,7 +304,7 @@ class CM_Db_Db extends CM_Class_Abstract {
     public static function getDump(array $tables = null, $skipData = null, $skipStructure = null, $dbName = null) {
         $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
         if (null === $dbName) {
-            $dbName = $client->getDb();
+            $dbName = $client->getDatabaseName();
         }
         $args = array();
         $args[] = '--compact';

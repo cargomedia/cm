@@ -3,8 +3,17 @@
 class CM_Mongo_ClientTest extends CMTest_TestCase {
 
     public function tearDown() {
-        CMTest_TH::clearDb();
+        CM_Service_Manager::getInstance()->getMongoDb()->dropDatabase();
+        CMTest_TH::clearEnv();
     }
+
+    public function testDatabaseExists() {
+        $client = CM_Service_Manager::getInstance()->getMongoDb();
+        $this->assertFalse($client->databaseExists());
+        $client->createCollection('foo');
+        $this->assertTrue($client->databaseExists());
+    }
+
 
     public function testInsert() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
