@@ -3,6 +3,9 @@
 class CM_Model_StorageAdapter_CacheLocalTest extends CMTest_TestCase {
 
     public static function setupBeforeClass() {
+        if (!ini_get('apc.enable_cli')) {
+            self::markTestSkipped('APC must be enabled for the cli for this test to work');
+        }
     }
 
     public function tearDown() {
@@ -10,9 +13,6 @@ class CM_Model_StorageAdapter_CacheLocalTest extends CMTest_TestCase {
     }
 
     public function testLoadMultiple() {
-        if (!ini_get('apc.enable_cli')) {
-            $this->markTestSkipped('APC must be enabled for the cli for this test to work');
-        }
         CM_Config::get()->CM_Model_Abstract = new stdClass();
         CM_Config::get()->CM_Model_Abstract->types = array(
             1 => 'CMTest_ModelMock_1',
@@ -47,5 +47,14 @@ class CM_Model_StorageAdapter_CacheLocalTest extends CMTest_TestCase {
         $values = $adapter->loadMultiple($idsTypes);
         $this->assertSame(3, count($values));
         $this->assertSame($expected, $values);
+    }
+
+    public function testSaveLoadDelete() {
+        $adapter = new CM_Model_StorageAdapter_CacheLocal();
+        $adapter->save(12, ['id' => 13], ['foo' => 'bar']);
+        $this->assertSame(['foo' => 'bar'], $adapter->load(12, ['id' => 13]));
+
+        $adapter->delete(12, ['id' => 13]);
+        $this->assertSame(false, $adapter->load(12, ['id' => 13]));
     }
 }
