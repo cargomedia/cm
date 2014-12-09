@@ -31,6 +31,7 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
             CM_Db_Db::delete($table);
         }
         CM_Db_Db::exec('SET foreign_key_checks = 1;');
+        $this->_setInitialVersion();
     }
 
     public function getRunLevel() {
