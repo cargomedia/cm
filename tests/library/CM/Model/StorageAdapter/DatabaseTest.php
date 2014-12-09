@@ -32,7 +32,7 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
         $this->assertSame('cmtest_modelmock_1', $method->invoke($adapter, 1));
         $this->assertSame('cmtest_modelmock_2', $method->invoke($adapter, 2));
 
-        CMTest_TH::clearConfig();
+        CMTest_TH::clearEnv();
     }
 
     public function testLoad() {

@@ -7,6 +7,6 @@ class CM_AdproviderAdapter_AbstractTest extends CMTest_TestCase {
 
         $this->assertInstanceOf('CM_AdproviderAdapter_Openx', CM_AdproviderAdapter_Abstract::factory());
 
-        CMTest_TH::clearConfig();
+        CMTest_TH::clearEnv();
     }
 }

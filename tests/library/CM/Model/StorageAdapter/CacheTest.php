@@ -21,7 +21,7 @@ class CM_Model_StorageAdapter_CacheTest extends CMTest_TestCase {
         $this->assertSame('CM_Model_StorageAdapter_Cache_type:1_id:a:1:{s:2:"id";i:2;}', $method->invoke($adapter, 1, array('id' => 2)));
         $this->assertSame('CM_Model_StorageAdapter_Cache_type:2_id:a:1:{s:2:"id";i:3;}', $method->invoke($adapter, 2, array('id' => 3)));
 
-        CMTest_TH::clearConfig();
+        CMTest_TH::clearEnv();
     }
 
     public function testLoad() {
