@@ -20,6 +20,7 @@
 @colorBgEmphasize1: darken(@colorBg, 3);
 @colorBgEmphasize2: darken(@colorBg, 6);
 @colorBgEmphasize3: darken(@colorBg, 10);
+@colorBgSelect: mix(@colorBrand, @colorBg, 10);
 
 //Border
 @colorFgBorder: #f1f1f1;
@@ -29,8 +30,6 @@
 
 //Links
 @colorFgLink: #0a7bc3;
-@colorFgLinkSubtle: lighten(@colorFg, 15);
-@colorBgSelect: mix(@colorBrand, @colorBg, 10);
 
 // Tooltip
 @colorFgTooltip: @colorBg;
@@ -49,6 +48,7 @@
 @fontColorHeading: @colorBrand;
 
 @fontWeightStrong: @fontWeight * 2;
+@fontColorStrong: mix(@colorFg, @colorBg, 90);
 
 @fontSizeSmall: 12px;
 @fontSizeTiny: 10px;
@@ -56,9 +56,9 @@
 //Buttons
 @sizeButton: 38px;
 @sizeCheckbox: 20px;
-@colorBgButton: @colorBg;
 @colorFgButtonBorder: rgb(199, 199, 199);
-@colorFgButton: @colorFg;
+@colorBgButton: @colorBg;
+@colorFgButton: @fontColorStrong;
 
 @colorBgButtonHighlight: @colorBrand;
 @colorFgButtonHighlight: #ffffff;
