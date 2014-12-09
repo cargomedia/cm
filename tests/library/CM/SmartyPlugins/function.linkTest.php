@@ -113,6 +113,11 @@ class smarty_function_linkTest extends CMTest_TestCase {
         $this->_assertSame($expected, array('label' => 'bar', 'icon' => 'foo', 'iconPosition' => 'right'));
     }
 
+    public function testOnclick() {
+        $expected = '<a href="javascript:;" class="link" onclick="alert(12);"></a>';
+        $this->_assertSame($expected, array('onclick' => 'alert(12);'));
+    }
+
     /**
      * @param string $expected
      * @param array  $params

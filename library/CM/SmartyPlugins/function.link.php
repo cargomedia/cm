@@ -39,6 +39,12 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
     }
     unset($params['data']);
 
+    $onclick = null;
+    if (isset($params['onclick'])) {
+        $onclick = $params['onclick'];
+    }
+    unset($params['onclick']);
+
     $href = 'javascript:;';
     if (isset($params['href'])) {
         $href = (string) $params['href'];
@@ -78,6 +84,7 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
         'href'    => $href,
         'class'   => $class,
         'title'   => $title,
+        'onclick' => $onclick,
     ];
 
     foreach ($data as $name => $value) {
