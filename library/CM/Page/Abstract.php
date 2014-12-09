@@ -25,12 +25,12 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
     }
 
     /**
-     * @param CM_Site_Abstract $site
-     * @param string           $path
+     * @param CM_Frontend_Render $render
+     * @param string             $path
      * @throws CM_Exception_Invalid
      * @return string
      */
-    public static final function getClassnameByPath(CM_Site_Abstract $site, $path) {
+    public static final function getClassnameByPath(CM_Frontend_Render $render, $path) {
         $path = (string) $path;
 
         $pathTokens = explode('/', $path);
@@ -41,14 +41,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
             $pathToken = CM_Util::camelize($pathToken);
         }
 
-        foreach ($site->getNamespaces() as $namespace) {
-            $classname = $namespace . '_Page_' . implode('_', $pathTokens);
-            if (class_exists($classname)) {
-                return $classname;
-            }
-        }
-
-        throw new CM_Exception_Invalid('page `' . implode('_', $pathTokens) . '` is not defined in any namespace');
+        return $render->getClassnameByPartialClassname('Page_' . implode('_', $pathTokens));
     }
 
     /**
@@ -91,8 +84,8 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
         }
         $layoutName = (string) $layoutName;
 
-        foreach ($environment->getSite()->getNamespaces() as $namespace) {
-            $classname = $namespace . '_Layout_' . $layoutName;
+        foreach ($environment->getSite()->getModules() as $moduleNamespace) {
+            $classname = $moduleNamespace . '_Layout_' . $layoutName;
             if (class_exists($classname)) {
                 return new $classname();
             }

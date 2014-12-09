@@ -82,8 +82,8 @@ class CM_Util {
      */
     public static function rglobLibraries($pattern, CM_Site_Abstract $site) {
         $paths = array();
-        foreach ($site->getNamespaces() as $namespace) {
-            $libraryPath = CM_Util::getNamespacePath($namespace) . 'library/' . $namespace . '/';
+        foreach ($site->getModules() as $moduleName) {
+            $libraryPath = CM_Util::getModulePath($moduleName) . 'library/' . $moduleName . '/';
             $paths = array_merge($paths, CM_Util::rglob($pattern, $libraryPath));
         }
         return $paths;
@@ -145,7 +145,7 @@ class CM_Util {
         curl_setopt($curlConnection, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curlConnection, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curlConnection, CURLOPT_TIMEOUT, $timeout);
-        curl_setopt($curlConnection, CURLOPT_USERAGENT, 'Mozilla/5.0');
+        curl_setopt($curlConnection, CURLOPT_USERAGENT, 'Mozilla/5.0 AppleWebKit');
         if ($methodPost) {
             curl_setopt($curlConnection, CURLOPT_POST, 1);
             if (!empty($params)) {
@@ -284,12 +284,12 @@ class CM_Util {
     }
 
     /**
-     * @param string    $namespace
+     * @param string    $name
      * @param bool|null $relative
      * @return string
      */
-    public static function getNamespacePath($namespace, $relative = null) {
-        $path = CM_Bootloader::getInstance()->getNamespacePath($namespace);
+    public static function getModulePath($name, $relative = null) {
+        $path = CM_Bootloader::getInstance()->getModulePath($name);
         if (!$relative) {
             $path = DIR_ROOT . $path;
         }
@@ -303,8 +303,8 @@ class CM_Util {
     public static function getResourceFiles($pathRelative) {
         $pathRelative = (string) $pathRelative;
         $paths = array();
-        foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-            $paths[] = CM_Util::getNamespacePath($namespace) . 'resources/' . $pathRelative;
+        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
+            $paths[] = CM_Util::getModulePath($moduleName) . 'resources/' . $pathRelative;
         }
         $paths[] = DIR_ROOT . 'resources/' . $pathRelative;
 
@@ -448,8 +448,8 @@ class CM_Util {
         if (false === ($classNames = $cache->get($key))) {
             $pathsFiltered = array();
             $paths = array();
-            foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-                $namespacePaths = CM_Util::rglob('*.php', CM_Util::getNamespacePath($namespace) . 'library/');
+            foreach (CM_Bootloader::getInstance()->getModules() as $modulePath) {
+                $namespacePaths = CM_Util::rglob('*.php', CM_Util::getModulePath($modulePath) . 'library/');
                 $paths = array_merge($paths, $namespacePaths);
             }
             $regexp = '#\bclass\s+(?<name>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\s+#';
@@ -502,7 +502,7 @@ class CM_Util {
             if (!is_array($item) || count($item) < ($level + 1)) {
                 throw new CM_Exception_Invalid('Item is not an array or has less than `' . ($level + 1) . '` elements.');
             }
-            $resultEntry = & $result;
+            $resultEntry = &$result;
             for ($i = 0; $i < $level; $i++) {
                 if (isset($keyNames[$i])) {
                     $keyName = $keyNames[$i];
@@ -514,7 +514,7 @@ class CM_Util {
                 } else {
                     $value = array_shift($item);
                 }
-                $resultEntry = & $resultEntry[$value];
+                $resultEntry = &$resultEntry[$value];
             }
             if (count($item) <= 1) {
                 $item = reset($item);
@@ -526,5 +526,22 @@ class CM_Util {
             }
         }
         return $result;
+    }
+
+    /**
+     * @return string|null
+     */
+    public static function getFqdn() {
+        $ipAddressList = [
+            '127.0.1.1',
+            '127.0.0.1',
+        ];
+        foreach ($ipAddressList as $ipAddress) {
+            $hostName = gethostbyaddr($ipAddress);
+            if ($hostName != $ipAddress) {
+                return $hostName;
+            }
+        }
+        return null;
     }
 }

@@ -59,6 +59,7 @@ class CM_Model_Splittest_UserTest extends CMTest_TestCase {
         CM_Model_Splittest_User::setConversionStatic('foo', $user1);
         $this->assertSame(1, $variation->getConversionCount(true));
         CM_Model_Splittest_User::setConversionStatic('foo', $user2, 2.5);
+        $this->assertSame(2, $variation->getConversionCount(true));
         $this->assertSame(1.75, $variation->getConversionRate(true));
     }
 }

@@ -64,11 +64,11 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         }
     }
 
-    public function listByPrefix($pathPrefix) {
+    public function listByPrefix($pathPrefix, $noRecursion = null) {
         $fileList = array();
         $dirList = array();
         if ($this->isDirectory($pathPrefix)) {
-            $this->_listByPrefixRecursive($pathPrefix, $fileList, $dirList);
+            $this->_listByPrefix($pathPrefix, $fileList, $dirList, !$noRecursion);
         }
 
         return array('files' => $fileList, 'dirs' => $dirList);
@@ -143,12 +143,14 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
      * @param string   $pathPrefix
      * @param string[] $fileList
      * @param string[] $dirList
+     * @param boolean  $recursive
      * @throws CM_Exception
      */
-    private function _listByPrefixRecursive($pathPrefix, array &$fileList, array &$dirList) {
+    private function _listByPrefix($pathPrefix, array &$fileList, array &$dirList, $recursive) {
         if ($this->_isLink($pathPrefix)) {
             return;
         }
+        $pathPrefix = CM_File_Filesystem::normalizePath($pathPrefix);
         $pathPrefixAbsolute = $this->_getAbsolutePath($pathPrefix);
         $filenameList = @scandir($pathPrefixAbsolute);
         if (false === $filenameList) {
@@ -159,7 +161,9 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         foreach ($filenameList as $filename) {
             $path = ltrim($pathPrefix . '/' . $filename, '/');
             if ($this->isDirectory($path)) {
-                $this->_listByPrefixRecursive($path, $fileList, $dirList);
+                if ($recursive) {
+                    $this->_listByPrefix($path, $fileList, $dirList, true);
+                }
                 $dirList[] = $path;
             } else {
                 $fileListLocal[] = $path;

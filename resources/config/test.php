@@ -1,6 +1,12 @@
 <?php
 
 return function (CM_Config_Node $config) {
+    $config->CM_App->setupScriptClasses = array();
+    $config->CM_App->setupScriptClasses[] = 'CM_File_Filesystem_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_Db_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_MongoDb_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Core';
+
     $config->CM_Mail->send = false;
 
     $config->CM_Elasticsearch_Client->enabled = false;
@@ -9,8 +15,6 @@ return function (CM_Config_Node $config) {
     $config->CM_Db_Db->delayedEnabled = false;
 
     $config->classConfigCacheEnabled = false;
-
-    $config->CM_Model_Splitfeature->withoutPersistence = true;
 
     $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
 
@@ -42,7 +46,7 @@ return function (CM_Config_Node $config) {
             ),
         ));
 
-    $config->services['filesystem-userfiles'] = array(
+    $config->services['filesystem-usercontent'] = array(
         'class'  => 'CM_File_Filesystem_Factory',
         'method' => array(
             'name'      => 'createFilesystem',
@@ -50,18 +54,6 @@ return function (CM_Config_Node $config) {
                 'CM_File_Filesystem_Adapter_Local',
                 array(
                     'pathPrefix' => DIR_ROOT . 'tests/tmp/userfiles/',
-                )
-            ),
-        ));
-
-    $config->services['filesystem-userfiles-tmp'] = array(
-        'class'  => 'CM_File_Filesystem_Factory',
-        'method' => array(
-            'name'      => 'createFilesystem',
-            'arguments' => array(
-                'CM_File_Filesystem_Adapter_Local',
-                array(
-                    'pathPrefix' => DIR_ROOT . 'tests/tmp/userfiles/tmp/',
                 )
             ),
         ));

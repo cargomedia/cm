@@ -1,11 +1,17 @@
 <?php
 
-class CM_App {
+class CM_App implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /**
      * @var CM_App
      */
     private static $_instance;
+
+    public function __construct() {
+        $this->setServiceManager(CM_Service_Manager::getInstance());
+    }
 
     /**
      * @return CM_App
@@ -17,65 +23,17 @@ class CM_App {
         return self::$_instance;
     }
 
-    public function setupFilesystem() {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $serviceManager->getFilesystems()->getData()->getAdapter()->setup();
-        $serviceManager->getFilesystems()->getTmp()->getAdapter()->setup();
-        $serviceManager->getFilesystems()->getTmp()->deleteByPrefix('/');
-        foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
-            $filesystem->getAdapter()->setup();
-        }
-    }
-
     /**
-     * @param boolean|null $forceReload
+     * @param CM_OutputStream_Interface $output
+     * @param bool|null                 $reload
      */
-    public function setupDatabase($forceReload = null) {
-        $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
-        $db = $client->getDb();
-        $client->setDb(null);
-
-        if ($forceReload) {
-            $client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($db))->execute();
-        }
-
-        $databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($db))->fetch();
-        if (!$databaseExists) {
-            $client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($db))->execute();
-        }
-
-        $client->setDb($db);
-        $tables = $client->createStatement('SHOW TABLES')->execute()->fetchAll();
-        if (0 === count($tables)) {
-            foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-                CM_Db_Db::runDump($db, $dump);
-            }
-            $app = CM_App::getInstance();
-            foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
-                $updateFiles = CM_Util::rglob('*.php', $path);
-                $version = array_reduce($updateFiles, function ($initial, $path) {
-                    $filename = basename($path);
-                    return max($initial, (int) $filename);
-                }, $app->getVersion());
-                $app->setVersion($version, $namespace);
-            }
-            foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
-                require $setupScript->getPath();
-            }
-        }
-    }
-
-    public function setupTranslations() {
-        /** @var CM_Model_Language $language */
-        foreach (new CM_Paging_Language_All() as $language) {
-            $path = 'translations/' . $language->getAbbreviation() . '.php';
-            foreach (CM_Util::getResourceFiles($path) as $translationsFile) {
-                $translationsSetter = require $translationsFile->getPath();
-                if (!$translationsSetter instanceof Closure) {
-                    throw new CM_Exception_Invalid('Invalid translation file. `' . $translationsFile->getPath() . '` must return callable');
-                }
-                $translationsSetter($language);
-            }
+    public function setup(CM_OutputStream_Interface $output, $reload = null) {
+        $loader = new CM_Provision_Loader($output);
+        $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses, $this->getServiceManager());
+        if ($reload) {
+            $loader->reload();
+        } else {
+            $loader->load();
         }
     }
 
@@ -89,7 +47,7 @@ class CM_App {
             $assetList[] = new CM_Asset_Javascript_VendorAfterBody($site);
             $assetList[] = new CM_Asset_Javascript_VendorBeforeBody($site);
             foreach ($languageList as $language) {
-                $render = new CM_Frontend_Render($site, null, $language);
+                $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, null, $language));
                 $assetList[] = new CM_Asset_Css_Vendor($render);
                 $assetList[] = new CM_Asset_Css_Library($render);
             }
@@ -100,7 +58,7 @@ class CM_App {
         foreach ($assetList as $asset) {
             $asset->get(true);
         }
-        CM_Bootloader::getInstance()->getNamespaces();
+        CM_Bootloader::getInstance()->getModules();
     }
 
     /**
@@ -136,15 +94,32 @@ class CM_App {
     }
 
     /**
+     * @return string[]
+     */
+    public function getUpdateScriptPaths() {
+        $paths = array();
+        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
+            $paths[$moduleName] = CM_Util::getModulePath($moduleName) . 'resources/db/update/';
+        }
+
+        $rootPath = DIR_ROOT . 'resources/db/update/';
+        if (!in_array($rootPath, $paths)) {
+            $paths[null] = $rootPath;
+        }
+
+        return $paths;
+    }
+
+    /**
      * @param Closure|null $callbackBefore fn($version)
-     * @param Closure|null $callbackAfter  fn($version)
+     * @param Closure|null $callbackAfter fn($version)
      * @return int Number of version bumps
      */
     public function runUpdateScripts(Closure $callbackBefore = null, Closure $callbackAfter = null) {
         CM_Cache_Shared::getInstance()->flush();
         CM_Cache_Local::getInstance()->flush();
         $versionBumps = 0;
-        foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
+        foreach ($this->getUpdateScriptPaths() as $namespace => $path) {
             $version = $versionStart = $this->getVersion($namespace);
             while (true) {
                 $version++;
@@ -157,7 +132,7 @@ class CM_App {
             $versionBumps += ($version - $versionStart);
         }
         if ($versionBumps > 0) {
-            $db = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getDb();
+            $db = $this->getServiceManager()->getDatabases()->getMaster()->getDatabaseName();
             CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
         }
         return $versionBumps;
@@ -187,36 +162,19 @@ class CM_App {
     }
 
     /**
-     * @return string[]
-     */
-    private function _getUpdateScriptPaths() {
-        $paths = array();
-        foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-            $paths[$namespace] = CM_Util::getNamespacePath($namespace) . 'resources/db/update/';
-        }
-
-        $rootPath = DIR_ROOT . 'resources/db/update/';
-        if (!in_array($rootPath, $paths)) {
-            $paths[null] = $rootPath;
-        }
-
-        return $paths;
-    }
-
-    /**
      * @param int         $version
-     * @param string|null $namespace
+     * @param string|null $moduleName
      * @return string
      * @throws CM_Exception_Invalid
      */
-    private function _getUpdateScriptPath($version, $namespace = null) {
+    public function _getUpdateScriptPath($version, $moduleName = null) {
         $path = DIR_ROOT;
-        if ($namespace) {
-            $path = CM_Util::getNamespacePath($namespace);
+        if ($moduleName) {
+            $path = CM_Util::getModulePath($moduleName);
         }
         $file = new CM_File($path . 'resources/db/update/' . $version . '.php');
         if (!$file->getExists()) {
-            throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $namespace . '` namespace.');
+            throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $moduleName . '` namespace.');
         }
         return $file->getPath();
     }

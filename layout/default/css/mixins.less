@@ -48,12 +48,14 @@
     border-color: transparent;
     border-width: @size;
     margin-left: -@size;
+    margin-right: -@size;
     border-bottom-color: @colorInner;
   }
 
   &:before {
     border-width: @size + @borderSize;
     margin-left: -(@size + @borderSize);
+    margin-right: -(@size + @borderSize);
     border-bottom-color: @colorBorder;
   }
 }
@@ -74,12 +76,14 @@
     border-color: transparent;
     border-width: @size;
     margin-left: -@size;
+    margin-right: -@size;
     border-top-color: @colorInner;
   }
 
   &:before {
     border-width: @size + @borderSize;
     margin-left: -(@size + @borderSize);
+    margin-right: -(@size + @borderSize);
     border-top-color: @colorBorder;
   }
 }
@@ -100,12 +104,14 @@
     border-color: transparent;
     border-width: @size;
     margin-top: -@size;
+    margin-bottom: -@size;
     border-right-color: @colorInner;
   }
 
   &:before {
     border-width: @size + @borderSize;
     margin-top: -(@size + @borderSize);
+    margin-bottom: -(@size + @borderSize);
     border-right-color: @colorBorder;
   }
 }
@@ -126,12 +132,14 @@
     border-width: @size;
     border-color: transparent;
     margin-top: -@size;
+    margin-bottom: -@size;
     border-left-color: @colorInner;
   }
 
   &:before {
     border-width: @size + @borderSize;
     margin-top: -(@size + @borderSize);
+    margin-bottom: -(@size + @borderSize);
     border-left-color: @colorBorder;
   }
 }
@@ -149,33 +157,21 @@
   }
 }
 
-// Vendor prefixing
 .appearance(@value) {
   -webkit-appearance: @value;
   -moz-appearance: @value;
-  appearance: @value;
 }
 
 .animation(@name, @duration: 300ms, @timing-function: ease, @delay: 0s, @iteration-count: 1, @direction: normal, @fill-mode: none) {
-  -webkit-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
   animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 }
 
-.background-size(@value) {
-  -webkit-background-size: @value;
-  background-size: @value;
+.gradient(@direction, @color1, @color2, @pos1: 0%, @pos2: 100%) when (@direction = horizontal) and (iscolor(@color1)) and (iscolor(@color2)) {
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
+  background-image: linear-gradient(to right,@color1 @pos1,@color2 @pos2);
 }
 
-.hyphens(@arg) {
-  -webkit-hyphens: @arg;
-  -moz-hyphens: @arg;
-  hyphens: @arg;
-}
-
-.transform-origin (@x:center, @y:center) {
-  -webkit-transform-origin: @x @y;
-  -moz-transform-origin: @x @y;
-  -ms-transform-origin: @x @y;
-  -o-transform-origin: @x @y;
-  transform-origin: @x @y;
+.gradient(@direction, @color1, @color2, @pos1: 0%, @pos2: 100%) when (@direction = vertical) and (iscolor(@color1)) and (iscolor(@color2)) {
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
+  background-image: linear-gradient(to bottom,@color1 @pos1,@color2 @pos2);
 }

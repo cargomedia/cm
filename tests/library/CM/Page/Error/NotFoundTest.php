@@ -6,6 +6,6 @@ class CM_Page_Error_NotFoundTest extends CMTest_TestCase {
         $page = $this->_createPage('CM_Page_Error_NotFound');
         $html = $this->_renderPage($page);
 
-        $this->assertTrue($html->exists('.CM_Component_Notfound'));
+        $this->assertTrue($html->has('.CM_Component_Notfound'));
     }
 }

@@ -1,7 +1,15 @@
 <?php
 
 return function (CM_Config_Node $config) {
-    $config->timeZone = 'US/Central';
+    $config->CM_App->setupScriptClasses = array();
+    $config->CM_App->setupScriptClasses[] = 'CM_File_Filesystem_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_Db_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_MongoDb_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_Elasticsearch_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Core';
+    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Translations';
+
+    $config->timeZone = 'UTC';
 
     $config->CM_Mail->send = true;
     $config->CM_Mail->mailDeliveryAgent = null;
@@ -112,7 +120,7 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['MongoDb'] = array(
-        'class'     => 'CM_Service_MongoDb',
+        'class'     => 'CM_MongoDb_Client',
         'arguments' => array(
             array(
                 'db'      => 'cm',
@@ -171,5 +179,10 @@ return function (CM_Config_Node $config) {
     $config->services['tracking-kissmetrics'] = array(
         'class'     => 'CMService_KissMetrics_Client',
         'arguments' => array('my-api-key')
+    );
+
+    $config->services['email-verification'] = array(
+        'class'     => 'CM_Service_EmailVerification_Standard',
+        'arguments' => array()
     );
 };

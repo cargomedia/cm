@@ -73,6 +73,6 @@ class CM_ModelAsset_User_PreferencesTest extends CMTest_TestCase {
         $user = CMTest_TH::createUser();
         $user->_change();
         $user->getPreferences()->getAll();
-        $user->getLatestactivity();
+        $user->getLatestActivity();
     }
 }

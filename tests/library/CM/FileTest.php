@@ -26,12 +26,12 @@ class CM_FileTest extends CMTest_TestCase {
         $this->assertEquals('test.jpg', $file->getFileName());
         $this->assertEquals(filesize($this->_testFilePath), $file->getSize());
         $this->assertEquals(file_get_contents($this->_testFilePath), $file->read());
-        $this->assertEquals(file_get_contents($this->_testFilePath), '' . $file);
+        $this->assertEquals(file_get_contents($this->_testFilePath), '' . $file->read());
     }
 
     public function testConstructNonExistent() {
         $file = new CM_File(DIR_TEST_DATA . '/nonexistent-file');
-        $this->assertEquals(DIR_TEST_DATA . '/nonexistent-file', $file->getPath());
+        $this->assertEquals(DIR_TEST_DATA . 'nonexistent-file', $file->getPath());
     }
 
     public function testSanitizeFilename() {
@@ -132,14 +132,48 @@ class CM_FileTest extends CMTest_TestCase {
         $this->assertSame('image/jpeg', $file->getMimeType());
     }
 
+    public function testListFiles() {
+        $adapter = $this->mockObject('CM_File_Filesystem_Adapter');
+        $fs = new CM_File_Filesystem($adapter);
+        $file = new CM_File('foo', $fs);
+        $adapter->mockMethod('equals')->set(function (CM_File_FileSystem_Adapter $other) use ($adapter) {
+            return $adapter === $other;
+        });
+        $adapter->mockMethod('listByPrefix')->set(function ($path, $noRecursion) use ($file) {
+            $this->assertSame($file->getPath(), $path);
+            $this->assertNull($noRecursion);
+            return [
+                'dirs'  =>
+                    [
+                        $path . '/foo/',
+                        $path . '/bar/',
+                    ],
+                'files' =>
+                    [
+                        $path . '/foo/bar',
+                        $path . '/bar/foo',
+                        $path . '/foo.bar',
+                        $path . '/bar.foo',
+                    ]
+            ];
+        });
+        $filePath = $file->getPath();
+        $expected = [
+            new CM_File($filePath . '/foo/', $fs),
+            new CM_File($filePath . '/bar/', $fs),
+            new CM_File($filePath . '/foo/bar', $fs),
+            new CM_File($filePath . '/bar/foo', $fs),
+            new CM_File($filePath . '/foo.bar', $fs),
+            new CM_File($filePath . '/bar.foo', $fs),
+        ];
+        $this->assertEquals($expected, $file->listFiles());
+    }
+
     public function testRead() {
         $file = CM_File::createTmp(null, 'hello');
         $this->assertSame('hello', $file->read());
 
         $file->write('foo');
-        $this->assertSame('foo', $file->read());
-
-        file_put_contents($file->getPath(), 'bar');
         $this->assertSame('foo', $file->read());
     }
 
@@ -174,8 +208,7 @@ class CM_FileTest extends CMTest_TestCase {
     public function testJoinPath() {
         $dir = CM_File::createTmpDir();
         $fileJoined = $dir->joinPath('foo', 'bar', '//mega//', 'jo', '..', 'nei');
-        $fileJoinedPathRelative = substr($fileJoined->getPath(), strlen($dir->getPath()) + 1);
-        $this->assertSame('/foo/bar/mega/nei', $fileJoinedPathRelative);
+        $this->assertSame($dir->getPath() . '/foo/bar/mega/nei', $fileJoined->getPath());
     }
 
     public function testEquals() {
@@ -210,5 +243,24 @@ class CM_FileTest extends CMTest_TestCase {
 
         $file1->copyToFile($file3);
         $this->assertSame($file1->read(), $file3->read());
+    }
+
+    public function testGetPathOnLocalFilesystem() {
+        $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
+        $filesystem = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp));
+        $file = new CM_File('foo', $filesystem);
+
+        $this->assertSame(rtrim($dirTmp, '/') . '/foo', $file->getPathOnLocalFilesystem());
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     */
+    public function testGetPathOnLocalFilesystemUnexpectedFilesystem() {
+        $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()->getMock();
+        $filesystem = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_AwsS3($clientMock, 'bucket'));
+        $file = new CM_File('foo', $filesystem);
+
+        $file->getPathOnLocalFilesystem();
     }
 }

@@ -1,15 +1,22 @@
 <?php
 
-class CM_Model_Splittest extends CM_Model_Abstract {
+class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var array|null */
     private $_variationWeightList;
 
     /**
-     * @param string $name
+     * @param string             $name
+     * @param CM_Service_Manager $serviceManager
      */
-    public function __construct($name) {
+    public function __construct($name, CM_Service_Manager $serviceManager = null) {
         $this->_construct(array('name' => $name));
+        if (null === $serviceManager) {
+            $serviceManager = CM_Service_Manager::getInstance();
+        }
+        $this->setServiceManager($serviceManager);
     }
 
     /**
@@ -170,19 +177,21 @@ class CM_Model_Splittest extends CM_Model_Abstract {
      * @throws CM_Exception_Invalid
      */
     protected function _setConversion(CM_Splittest_Fixture $fixture, $weight = null) {
-        if (null === $weight) {
-            $weight = 1;
-        }
-        if ($weight <= 0) {
-            throw new CM_Exception_Invalid('Weight must be positive or null, `' . $weight . '` given');
-        }
-        $weight = (float) $weight;
-        $fixtureId = $fixture->getId();
         $columnId = $fixture->getColumnId();
-
-        CM_Db_Db::update('cm_splittestVariation_fixture',
-            array('conversionStamp' => time(), 'conversionWeight' => $weight),
-            array('splittestId' => $this->getId(), $columnId => $fixtureId));
+        $fixtureId = $fixture->getId();
+        if (null === $weight) {
+            CM_Db_Db::update('cm_splittestVariation_fixture',
+                array('conversionStamp' => time(), 'conversionWeight' => 1),
+                array('splittestId' => $this->getId(), $columnId => $fixtureId, 'conversionStamp' => null));
+        } else {
+            $weight = (float) $weight;
+            $columnIdQuoted = CM_Db_Db::getClient()->quoteIdentifier($columnId);
+            CM_Db_Db::exec('UPDATE `cm_splittestVariation_fixture`
+                SET `conversionStamp` = COALESCE(`conversionStamp`, ?),
+                `conversionWeight` = `conversionWeight` + ?
+                WHERE `splittestId` = ? AND ' . $columnIdQuoted . ' = ?',
+                array(time(), $weight, $this->getId(), $fixtureId));
+        }
     }
 
     /**
@@ -196,6 +205,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
     /**
      * @param CM_Splittest_Fixture $fixture
+     * @throws CM_Db_Exception
      * @throws CM_Exception_Invalid
      * @return string
      */
@@ -203,31 +213,50 @@ class CM_Model_Splittest extends CM_Model_Abstract {
         $columnId = $fixture->getColumnId();
         $fixtureId = $fixture->getId();
 
+        $variationListFixture = $this->_getVariationListFixture($fixture);
+        if (!array_key_exists($this->getId(), $variationListFixture)) {
+            $variation = $this->_getVariationRandom();
+            try {
+                CM_Db_Db::insert('cm_splittestVariation_fixture',
+                    array('splittestId' => $this->getId(), $columnId => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
+                $variationListFixture[$this->getId()] = $variation->getName();
+                $cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_id:' . $fixture->getId() . '_type:' . $fixture->getFixtureType();
+                $cache = CM_Cache_Local::getInstance();
+                $cache->set($cacheKey, $variationListFixture);
+                $this->getServiceManager()->getTrackings()->trackSplittest($fixture, $variation);
+            } catch (CM_Db_Exception $exception) {
+                $variationListFixture = $this->_getVariationListFixture($fixture, true);
+                if (!array_key_exists($this->getId(), $variationListFixture)) {
+                    throw $exception;
+                }
+            }
+        }
+
+        return $variationListFixture[$this->getId()];
+    }
+
+    /**
+     * @param CM_Splittest_Fixture $fixture
+     * @param bool|null            $updateCache
+     * @return array
+     */
+    protected function _getVariationListFixture(CM_Splittest_Fixture $fixture, $updateCache = null) {
+        $columnId = $fixture->getColumnId();
+        $columnIdQuoted = CM_Db_Db::getClient()->quoteIdentifier($columnId);
+        $fixtureId = $fixture->getId();
+        $updateCache = (bool) $updateCache;
+
         $cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_id:' . $fixture->getId() . '_type:' . $fixture->getFixtureType();
-        $cacheWrite = false;
         $cache = CM_Cache_Local::getInstance();
-        if (($variationFixtureList = $cache->get($cacheKey)) === false) {
-            $variationFixtureList = CM_Db_Db::exec('
+        if ($updateCache || (($variationListFixture = $cache->get($cacheKey)) === false)) {
+            $variationListFixture = CM_Db_Db::exec('
 				SELECT `variation`.`splittestId`, `variation`.`name`
 					FROM `cm_splittestVariation_fixture` `fixture`
 					JOIN `cm_splittestVariation` `variation` ON(`variation`.`id` = `fixture`.`variationId`)
-					WHERE `fixture`.`' . $columnId . '` = ?', array($fixtureId))->fetchAllTree();
-            $cacheWrite = true;
+					WHERE `fixture`.' . $columnIdQuoted . ' = ?', array($fixtureId))->fetchAllTree();
+            $cache->set($cacheKey, $variationListFixture);
         }
-
-        if (!array_key_exists($this->getId(), $variationFixtureList)) {
-            $variation = $this->_getVariationRandom();
-            CM_Db_Db::replace('cm_splittestVariation_fixture',
-                array('splittestId' => $this->getId(), $columnId => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
-            $variationFixtureList[$this->getId()] = $variation->getName();
-            $cacheWrite = true;
-        }
-
-        if ($cacheWrite) {
-            $cache->set($cacheKey, $variationFixtureList);
-        }
-
-        return $variationFixtureList[$this->getId()];
+        return $variationListFixture;
     }
 
     /**
@@ -283,7 +312,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
      * @param string $name
      * @return static|null
      */
-    protected static function _getSplittest($name) {
+    public static function find($name) {
         if (!self::exists($name)) {
             return null;
         }

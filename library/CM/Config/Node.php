@@ -31,11 +31,19 @@ class CM_Config_Node {
      */
     public function extend($configBasename) {
         foreach (CM_Util::getResourceFiles('config/' . $configBasename) as $configFile) {
-            $configSetter = require $configFile->getPath();
-            if (!$configSetter instanceof Closure) {
-                throw new CM_Exception_Invalid('Invalid config file. `' . $configFile->getPath() . '` must return closure');
-            }
-            $configSetter($this);
+            $this->extendWithFile($configFile);
         }
+    }
+
+    /**
+     * @param CM_File $configFile
+     * @throws CM_Exception_Invalid
+     */
+    public function extendWithFile(CM_File $configFile) {
+        $configSetter = require $configFile->getPath();
+        if (!$configSetter instanceof Closure) {
+            throw new CM_Exception_Invalid('Invalid config file. `' . $configFile->getPath() . '` must return closure');
+        }
+        $configSetter($this);
     }
 }

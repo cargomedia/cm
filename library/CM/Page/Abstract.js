@@ -20,7 +20,7 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
     CM_Component_Abstract.prototype._ready.call(this);
 
     if (this.hasStateParams()) {
-      var location = cm.router.getLocation();
+      var location = window.location;
       var params = queryString.parse(location.search);
       var state = _.pick(params, _.intersection(_.keys(params), this.getStateParams()));
       this.routeToState(state, location.pathname + location.search);

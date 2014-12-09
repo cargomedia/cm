@@ -3,6 +3,7 @@
 class CM_Model_User extends CM_Model_Abstract {
 
     const ONLINE_EXPIRATION = 1800;
+    const OFFLINE_DELAY = 10;
     const ACTIVITY_EXPIRATION = 60;
 
     /**
@@ -54,7 +55,7 @@ class CM_Model_User extends CM_Model_Abstract {
     /**
      * @return int
      */
-    public function getLatestactivity() {
+    public function getLatestActivity() {
         return (int) $this->_get('activityStamp');
     }
 
@@ -78,6 +79,10 @@ class CM_Model_User extends CM_Model_Abstract {
             CM_Db_Db::delete('cm_user_online', array('userId' => $this->getId()));
             $this->_set(array('online' => null, 'visible' => null));
         }
+    }
+
+    public function setOfflineStamp() {
+        CM_Db_Db::update('cm_user_online', ['offlineStamp' => time()], ['userId' => $this->getId()]);
     }
 
     /**
@@ -196,12 +201,16 @@ class CM_Model_User extends CM_Model_Abstract {
         $this->_change();
     }
 
-    public function updateLatestactivity() {
-        $currentTime = time();
-        if ($this->getLatestactivity() < $currentTime - self::ACTIVITY_EXPIRATION) {
-            CM_Db_Db::update('cm_user', array('activityStamp' => $currentTime), array('userId' => $this->getId()));
-            $this->_set('activityStamp', $currentTime);
+    public function updateLatestActivityThrottled() {
+        if ($this->getLatestActivity() < time() - self::ACTIVITY_EXPIRATION) {
+            $this->_updateLatestActivity();
         }
+    }
+
+    protected function _updateLatestActivity() {
+        $currentTime = time();
+        CM_Db_Db::update('cm_user', array('activityStamp' => $currentTime), array('userId' => $this->getId()));
+        $this->_set('activityStamp', $currentTime);
     }
 
     protected function _getAssets() {
@@ -236,6 +245,18 @@ class CM_Model_User extends CM_Model_Abstract {
     public static function factory($id) {
         $className = self::_getClassName();
         return new $className($id);
+    }
+
+    public static function offlineDelayed() {
+        $result = CM_Db_Db::exec('SELECT `userId` FROM `cm_user_online` WHERE `offlineStamp` < ?', [time() - self::OFFLINE_DELAY]);
+        while ($userId = $result->fetchColumn()) {
+            try {
+                $user = CM_Model_User::factory($userId);
+                $user->setOnline(false);
+            } catch (CM_Exception_Nonexistent $e) {
+                CM_Db_Db::delete('cm_user_online', array('userId' => $userId));
+            }
+        }
     }
 
     public static function offlineOld() {

@@ -23,29 +23,13 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     private static $_smarty;
 
     /**
-     * @param CM_Site_Abstract|null   $site
-     * @param CM_Model_User|null      $viewer
-     * @param CM_Model_Language|null  $language
-     * @param boolean|null            $languageRewrite
-     * @param CM_Model_Location|null  $location
-     * @param CM_Service_Manager|null $serviceManager
+     * @param CM_Frontend_Environment|null $environment
+     * @param boolean|null                 $languageRewrite
+     * @param CM_Service_Manager|null      $serviceManager
      */
-    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, $languageRewrite = null, CM_Model_Location $location = null, CM_Service_Manager $serviceManager = null) {
-        if (!$language) {
-            $language = CM_Model_Language::findDefault();
-        }
-        $environment = new CM_Frontend_Environment();
-        if ($site) {
-            $environment->setSite($site);
-        }
-        if ($viewer) {
-            $environment->setViewer($viewer);
-        }
-        if ($language) {
-            $environment->setLanguage($language);
-        }
-        if ($location) {
-            $environment->setLocation($location);
+    public function __construct(CM_Frontend_Environment $environment = null, $languageRewrite = null, CM_Service_Manager $serviceManager = null) {
+        if (!$environment) {
+            $environment = new CM_Frontend_Environment();
         }
         $this->_environment = $environment;
         $this->_languageRewrite = (bool) $languageRewrite;
@@ -122,41 +106,41 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             $theme = $this->getSite()->getTheme();
         }
         if (!$namespace) {
-            $namespace = $this->getSite()->getNamespace();
+            $namespace = $this->getSite()->getModule();
         }
 
-        $path = CM_Util::getNamespacePath($namespace, !$absolute);
+        $path = CM_Util::getModulePath($namespace, !$absolute);
         return $path . 'layout/' . $theme . '/';
     }
 
     /**
-     * @param string      $tpl Template file name
-     * @param string|null $namespace
+     * @param string      $template Template file name
+     * @param string|null $module
      * @param bool|null   $absolute
      * @param bool|null   $needed
-     * @return string Layout path based on theme
      * @throws CM_Exception_Invalid
+     * @return string Layout path based on theme
      */
-    public function getLayoutPath($tpl, $namespace = null, $absolute = null, $needed = true) {
-        $namespaceList = $this->getSite()->getNamespaces();
-        if ($namespace !== null) {
-            $namespaceList = array((string) $namespace);
+    public function getLayoutPath($template, $module = null, $absolute = null, $needed = true) {
+        $moduleList = $this->getSite()->getModules();
+        if ($module !== null) {
+            $moduleList = array((string) $module);
         }
-        foreach ($namespaceList as $namespace) {
+        foreach ($moduleList as $module) {
             foreach ($this->getSite()->getThemes() as $theme) {
-                $file = new CM_File($this->getThemeDir(true, $theme, $namespace) . $tpl);
+                $file = new CM_File($this->getThemeDir(true, $theme, $module) . $template);
                 if ($file->getExists()) {
                     if ($absolute) {
                         return $file->getPath();
                     } else {
-                        return $this->getThemeDir(false, $theme, $namespace) . $tpl;
+                        return $this->getThemeDir(false, $theme, $module) . $template;
                     }
                 }
             }
         }
 
         if ($needed) {
-            throw new CM_Exception_Invalid('Cannot find `' . $tpl . '` in namespaces `' . implode('`, `', $namespaceList) . '` and themes `' .
+            throw new CM_Exception_Invalid('Cannot find `' . $template . '` in modules `' . implode('`, `', $moduleList) . '` and themes `' .
                 implode('`, `', $this->getSite()->getThemes()) . '`');
         }
         return null;
@@ -219,7 +203,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             throw new CM_Exception_Invalid('Cannot find namespace of `' . $pageClassName . '`');
         }
         $namespace = $matches[1];
-        if (!in_array($namespace, $site->getNamespaces())) {
+        if (!in_array($namespace, $site->getModules())) {
             throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
         }
         /** @var CM_Page_Abstract $pageClassName */
@@ -241,17 +225,22 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     public function getUrlResource($type = null, $path = null) {
-        $urlPath = '';
+        $url = '';
         if (!is_null($type) && !is_null($path)) {
             $type = (string) $type;
             $path = (string) $path;
-            $urlPath .= '/' . $type;
+            $url .= '/' . $type;
             if ($this->getLanguage()) {
-                $urlPath .= '/' . $this->getLanguage()->getAbbreviation();
+                $url .= '/' . $this->getLanguage()->getAbbreviation();
             }
-            $urlPath .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getDeployVersion() . '/' . $path;
+            $url .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getDeployVersion() . '/' . $path;
         }
-        return $this->getSite()->getUrlCdn() . $urlPath;
+        if ($urlCdn = $this->getSite()->getUrlCdn()) {
+            $url = $urlCdn . $url;
+        } else {
+            $url = $this->getSite()->getUrl() . $url;
+        }
+        return $url;
     }
 
     /**
@@ -272,11 +261,16 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     public function getUrlStatic($path = null) {
-        $urlPath = '/static';
+        $url = '/static';
         if (null !== $path) {
-            $urlPath .= $path . '?' . CM_App::getInstance()->getDeployVersion();
+            $url .= $path . '?' . CM_App::getInstance()->getDeployVersion();
         }
-        return $this->getSite()->getUrlCdn() . $urlPath;
+        if ($urlCdn = $this->getSite()->getUrlCdn()) {
+            $url = $urlCdn . $url;
+        } else {
+            $url = $this->getSite()->getUrl() . $url;
+        }
+        return $url;
     }
 
     /**
@@ -295,10 +289,22 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
+     * @param bool|null $fallbackToDefault
      * @return CM_Model_Language|null
      */
-    public function getLanguage() {
-        return $this->getEnvironment()->getLanguage();
+    public function getLanguage($fallbackToDefault = null) {
+        $language = $this->getEnvironment()->getLanguage();
+
+        if (null === $language && $fallbackToDefault) {
+            if ($viewer = $this->getViewer()) {
+                $language = $viewer->getLanguage();
+            }
+            if (null === $language) {
+                $language = CM_Model_Language::findDefault();
+            }
+        }
+
+        return $language;
     }
 
     /**
@@ -309,8 +315,8 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     public function getTranslation($key, array $params = null) {
         $params = (array) $params;
         $translation = $key;
-        if ($this->getLanguage()) {
-            $translation = $this->getLanguage()->getTranslation($key, array_keys($params));
+        if ($language = $this->getLanguage(true)) {
+            $translation = $language->getTranslation($key, array_keys($params));
         }
         $translation = $this->_parseVariables($translation, $params);
         return $translation;
@@ -407,6 +413,22 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
+     * @param string $classname
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    public function getClassnameByPartialClassname($classname) {
+        $classname = (string) $classname;
+        foreach ($this->getSite()->getModules() as $availableNamespace) {
+            $classnameWithNamespace = $availableNamespace . '_' . $classname;
+            if (class_exists($classnameWithNamespace)) {
+                return $classnameWithNamespace;
+            }
+        }
+        throw new CM_Exception_Invalid('The class was not found in any namespace.', array('name' => $classname));
+    }
+
+    /**
      * @return Smarty
      */
     private function _getSmarty() {
@@ -422,8 +444,8 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         }
 
         $pluginDirs = array(SMARTY_PLUGINS_DIR);
-        foreach ($this->getSite()->getNamespaces() as $namespace) {
-            $pluginDirs[] = CM_Util::getNamespacePath($namespace) . 'library/' . $namespace . '/SmartyPlugins';
+        foreach ($this->getSite()->getModules() as $moduleName) {
+            $pluginDirs[] = CM_Util::getModulePath($moduleName) . 'library/' . $moduleName . '/SmartyPlugins';
         }
         self::$_smarty->setPluginsDir($pluginDirs);
         self::$_smarty->loadFilter('pre', 'translate');

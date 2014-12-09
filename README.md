@@ -1,7 +1,8 @@
 CM Framework  [![Build Status](https://travis-ci.org/cargomedia/CM.png)](https://travis-ci.org/cargomedia/CM)
 ============
 
-## Major concepts
+Major concepts
+--------------
 
 ### Namespace
 A namespace groups related code. The namespace is used as a prefix for classnames. `CM` is a namespace, a classname could be `CM_Foo_BarZoo`.
@@ -143,7 +144,8 @@ CM_Paging_User_Country                         # All users from a given country
 ```
 
 
-## Creating a new project
+Creating a new project
+----------------------
 
 ### Cloning the CM skeleton application
 
@@ -152,44 +154,6 @@ In your workspace, run:
 composer create-project cargomedia/cm-project --stability=dev <project-name>
 ```
 This will create a new directory `<project-name>` containing a project based on CM.
-
-### Setting up a virtual host
-
-The only entry point of your application should be `public/index.php`.
-A typical Apache virtual host configuration for this purpose were:
-
-```conf
-<VirtualHost *>
-  ServerName ‹hostname›
-  RedirectPermanent / http://www.‹hostname›/
-</VirtualHost>
-
-<VirtualHost *>
-  ServerName www.‹hostname›
-  DocumentRoot ‹project-dir›
-
-  <Directory ‹project-dir›/>
-    RewriteEngine on
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^(.*)$ public/$1
-  </Directory>
-
-  <Directory ‹project-dir›/public/>
-    SetEnv CM_DEBUG 1
-    RewriteEngine on
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^(.*)$ index.php
-    RewriteRule .* - [E=HTTP_X_REQUESTED_WITH:%{HTTP:X-Requested-With}]
-  </Directory>
-</VirtualHost>
-```
-
-### Project configuration
-
-In your project directory, run:
-```bash
-bin/cm app generate-config-internal
-```
 
 ### Namespace creation, site setup
 
@@ -251,3 +215,36 @@ Commands:
  search-index start-maintenance
  stream start-message-synchronization
 ```
+
+Deployment
+----------
+
+Apart from setting whole infrastructure (http server, various services) application itself needs some preparation.
+
+### Class types
+Each CM application heavily depends on types which are integer identifiers for classes. In order to keep fixed identifier (class name can change) we require to store those in VCS-stored config file (internal.php).
+In order to generate types run:
+```bash
+$ bin/cm app generate-config-internal
+```
+This will generate `resources/config/internal.php` and `resources/config/js/internal.js` files required for application to work. Keep this file in VCS at it needs to be preserved between releases.
+
+
+### Provision scripts
+Most CM applications require services to be setup and/or some initial data inserted. To do so CM Framework uses so-called provision scripts.
+There is built-in command for running all setup-scripts defined in `$config->CM_App->setupScriptClasses` config property.
+
+```bash
+$ bin/cm app setup
+```
+
+Provision scripts are responsible for setting up everything app-related - from creating database schema to loading fixtures.
+
+#### Provision script
+All those scripts need to be classes extending `CM_Provision_Script_Abstract` and therefore implement `load` and `shouldBeLoaded` method.
+Anytime scripts are about to be loaded they will be first checked if they actually should, by running `shouldBeLoaded`.
+Once this is positive it will run `load`.
+
+Additionally provision scripts can implement `CM_Provision_Script_UnloadableInterface` with corresponding `unload` and `shouldBeUnloaded` methods.
+
+

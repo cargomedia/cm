@@ -77,20 +77,26 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param string                        $methodName
-     * @param array                         $params
-     * @param CM_Frontend_ViewResponse      $scopeView
+     * @param string                        $url
+     * @param array|null                    $query
+     * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
-     * @param CM_Frontend_Environment|null  $environment
-     * @return CM_Response_View_Ajax
+     * @return CM_Request_Post|\Mocka\AbstractClassTrait
+     * @throws Mocka\Exception
      */
-    public function getResponseAjax($methodName, array $params, CM_Frontend_ViewResponse $scopeView, CM_Frontend_ViewResponse $scopeComponent = null, CM_Frontend_Environment $environment = null) {
-        $methodName = (string) $methodName;
+    public function createRequest($url, array $query = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+        $url = (string) $url;
+        $query = (array) $query;
         $getViewInfo = function (CM_Frontend_ViewResponse $viewResponse) {
+            /**
+             * Simulate sending view-params to client and back (remove any objects)
+             */
+            $viewParams = $viewResponse->getView()->getParams()->getParamsDecoded();
+            $viewParams = CM_Params::decode(CM_Params::encode($viewParams, true), true);
             return array(
                 'id'        => $viewResponse->getAutoId(),
                 'className' => get_class($viewResponse->getView()),
-                'params'    => $viewResponse->getView()->getParams()->getAllOriginal()
+                'params'    => $viewParams,
             );
         };
         $viewInfoList = array_map($getViewInfo,
@@ -99,117 +105,143 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
                 'CM_Component_Abstract' => $scopeComponent,
             ])
         );
-        $body = array(
-            'method'       => $methodName,
-            'params'       => $params,
-            'viewInfoList' => $viewInfoList,
-        );
-        $request = new CM_Request_Post('/ajax/null', null, null, CM_Params::encode($body, true));
-        if ($environment && $environment->hasViewer()) {
-            $request->getSession()->setUser($environment->getViewer());
+        if ($viewInfoList) {
+            $query['viewInfoList'] = $viewInfoList;
         }
 
-        $response = new CM_Response_View_Ajax($request);
-        $response->process();
-        return $response;
+        $mockClass = $this->mockClass('CM_Request_Post');
+        $mockClass->mockMethod('getQuery')->set(function () use ($query) {
+            return $query;
+        });
+        $mockClass->mockMethod('getIp')->set(function () {
+            return '16909060';
+        });
+        return $mockClass->newInstance([$url]);
     }
 
     /**
-     * @param string               $formClassName
-     * @param string               $actionName
-     * @param array                $data
-     * @param string|null          $componentClassName Component that uses that form
-     * @param CM_Model_User|null   $viewer
-     * @param array|null           $componentParams
-     * @param CM_Request_Post|null $request
-     * @param int|null             $siteId
-     * @param string|null          $languageAbbreviation
-     * @return CM_Response_View_Form
+     * @param CM_FormAction_Abstract        $action
+     * @param array|null                    $data
+     * @param CM_Frontend_ViewResponse|null $scopeView
+     * @param CM_Frontend_ViewResponse|null $scopeComponent
+     * @throws CM_Exception_Invalid
+     * @return CM_Request_Post|\Mocka\AbstractClassTrait
      */
-    public function getResponseForm($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null, array $componentParams = null, &$request = null, $siteId = null, $languageAbbreviation = null) {
-        if (null === $componentParams) {
-            $componentParams = array();
-        }
-        if (null === $siteId) {
-            $siteId = 'null';
-        }
-        if (null !== $languageAbbreviation) {
-            $languageAbbreviation .= '/';
-        }
-        $session = new CM_Session();
-        if ($viewer) {
-            $session->setUser($viewer);
-        }
-        $headers = array('Cookie' => 'sessionId=' . $session->getId());
-        $server = array('remote_addr' => '1.2.3.4');
-        unset($session); // Make sure session is stored persistently
-
-        $viewArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
-        $componentArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
-        $body = CM_Params::encode(array(
-            'viewInfoList' => array(
-                'CM_Component_Abstract' => $componentArray,
-                'CM_View_Abstract'      => $viewArray,
-            ),
-            'actionName'   => $actionName,
-            'data'         => $data,
-        ), true);
-        $request = new CM_Request_Post('/form/' . $languageAbbreviation . $siteId, $headers, $server, $body);
-
-        $response = new CM_Response_View_Form($request);
-        $response->process();
-        return $response;
-    }
-
-    /**
-     * @param string $url
-     * @param array  $query
-     * @return CM_Request_Post|PHPUnit_Framework_MockObject_MockObject
-     */
-    public function createRequest($url, array $query = null) {
-        $url = (string) $url;
-        $ip = '16909060';
-        $request = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs(array($url))->setMethods(array('getQuery', 'getIp'))->getMock();
-        $request->expects($this->any())->method('getQuery')->will($this->returnValue($query));
-        $request->expects($this->any())->method('getIp')->will($this->returnValue($ip));
-        return $request;
-    }
-
-    /**
-     * @param CM_FormAction_Abstract $action
-     * @param array|null             $data
-     * @return CM_Request_Post|PHPUnit_Framework_MockObject_MockObject
-     */
-    public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null) {
+    public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
         $actionName = $action->getName();
         $form = $action->getForm();
+        if (null === $scopeView) {
+            $scopeView = new CM_Frontend_ViewResponse($form);
+        }
+        if ($scopeView->getView() !== $form) {
+            throw new CM_Exception_Invalid('Action\'s form and ViewResponse\'s view must match');
+        }
+        if (null === $scopeComponent) {
+            $component = $this->mockClass('CM_Component_Abstract')->newInstance();
+            $scopeComponent = new CM_Frontend_ViewResponse($component);
+        }
         $query = array(
-            'data'         => (array) $data,
-            'actionName'   => $actionName,
-            'viewInfoList' => array(
-                'CM_View_Abstract' => array(
-                    'className' => get_class($form),
-                    'params'    => $form->getParams()->getAll(),
-                    'id'        => 'uniqueId'
-                )
-            )
+            'data'       => (array) $data,
+            'actionName' => $actionName,
         );
-        return $this->createRequest('/form/null', $query);
+        return $this->createRequest('/form/null', $query, $scopeView, $scopeComponent);
     }
 
     /**
-     * @param string        $uri
-     * @param CM_Model_User $viewer
-     * @return CM_Response_Abstract
+     * @param CM_View_Abstract              $view
+     * @param string                        $methodName
+     * @param array|null                    $params
+     * @param CM_Frontend_ViewResponse|null $scopeView
+     * @param CM_Frontend_ViewResponse|null $scopeComponent
+     * @return CM_Request_Post|\Mocka\AbstractClassTrait
      */
-    public function processRequest($uri, CM_Model_User $viewer = null) {
-        $request = CM_Request_Abstract::factory('GET', $uri);
-        if ($viewer) {
-            $request->getSession()->setUser($viewer);
+    public function createRequestAjax(CM_View_Abstract $view, $methodName, array $params = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+        $viewResponseComponent = new CM_Frontend_ViewResponse($view);
+        if (null === $scopeView) {
+            $scopeView = $viewResponseComponent;
         }
-        $response = CM_Response_Abstract::factory($request);
+        if (null === $scopeComponent) {
+            $scopeComponent = $viewResponseComponent;
+        }
+        $query = array(
+            'method' => (string) $methodName,
+            'params' => (array) $params,
+        );
+        return $this->createRequest('/ajax/null', $query, $scopeView, $scopeComponent);
+    }
+
+    /**
+     * @param CM_Request_Abstract $request
+     * @return CM_Response_Abstract|\Mocka\AbstractClassTrait
+     */
+    public function getResponse(CM_Request_Abstract $request) {
+        $className = CM_Response_Abstract::getResponseClassName($request);
+        return $this->mockClass($className)->newInstance([$request]);
+    }
+
+    /**
+     * @param string $path
+     * @return CM_Response_Abstract|\Mocka\AbstractClassTrait
+     */
+    public function getResponseResourceLayout($path) {
+        $request = $this->createRequest('/layout/null/' . time() . '/' . $path);
+        return $this->processRequest($request);
+    }
+
+    /**
+     * @param CM_Request_Abstract $request
+     * @return CM_Response_Abstract|\Mocka\AbstractClassTrait
+     */
+    public function processRequest(CM_Request_Abstract $request) {
+        $response = $this->getResponse($request);
         $response->process();
         return $response;
+    }
+
+    /**
+     * @param CM_View_Abstract             $view
+     * @param string                       $methodName
+     * @param array|null                   $params
+     * @param CM_Frontend_Environment|null $environment
+     * @return CM_Response_View_Ajax
+     */
+    public function getResponseAjax(CM_View_Abstract $view, $methodName, array $params = null, CM_Frontend_Environment $environment = null) {
+        $request = $this->createRequestAjax($view, $methodName, $params);
+        if ($environment) {
+            $request->mockMethod('getViewer')->set(function () use ($environment) {
+                return $environment->getViewer();
+            });
+        }
+        return $this->processRequest($request);
+    }
+
+    /**
+     * @param CM_FormAction_Abstract   $action
+     * @param array                    $data
+     * @param CM_Frontend_ViewResponse $scopeComponent
+     * @return CM_Response_View_Form
+     */
+    public function getResponseFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+        $request = $this->createRequestFormAction($action, $data, $scopeComponent);
+        return $this->processRequest($request);
+    }
+
+    /**
+     * @param object|string $objectOrClass
+     * @param string        $methodName
+     * @param array|null    $arguments
+     * @return mixed
+     */
+    public function forceInvokeMethod($objectOrClass, $methodName, array $arguments = null) {
+        $context = null;
+        if (is_object($objectOrClass)) {
+            $context = $objectOrClass;
+        }
+        $arguments = (array) $arguments;
+        $reflectionClass = new ReflectionClass($objectOrClass);
+        $reflectionMethod = $reflectionClass->getMethod($methodName);
+        $reflectionMethod->setAccessible(true);
+        return $reflectionMethod->invokeArgs($context, $arguments);
     }
 
     /**
@@ -218,56 +250,55 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @return CM_Page_Abstract
      */
     protected function _createPage($pageClass, array $params = null) {
-        return new $pageClass(CM_Params::factory($params));
+        return new $pageClass(CM_Params::factory($params, false));
     }
 
     /**
      * @param CM_Component_Abstract $component
      * @param CM_Model_User|null    $viewer
      * @param CM_Site_Abstract|null $site
-     * @return CMTest_TH_Html
+     * @return CM_Dom_NodeList
      */
     protected function _renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
-        $render = new CM_Frontend_Render($site, $viewer);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, $viewer));
         $renderAdapter = new CM_RenderAdapter_Component($render, $component);
         $componentHtml = $renderAdapter->fetch();
-        $html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $componentHtml . '</body></html>';
-        return new CMTest_TH_Html($html);
+        return new CM_Dom_NodeList($componentHtml, true);
     }
 
     /**
      * @param CM_FormField_Abstract   $formField
-     * @param CM_Params|array|null    $renderParams
+     * @param array|null              $renderParams
      * @param CM_Frontend_Render|null $render
      * @return CM_Dom_NodeList
      */
-    protected function _renderFormField(CM_FormField_Abstract $formField, $renderParams = null, CM_Frontend_Render $render = null) {
+    protected function _renderFormField(CM_FormField_Abstract $formField, array $renderParams = null, CM_Frontend_Render $render = null) {
         if (null === $render) {
             $render = new CM_Frontend_Render();
         }
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
-        $html = $renderAdapter->fetch(CM_Params::factory($renderParams));
-        return new CM_Dom_NodeList($html);
+        $html = $renderAdapter->fetch(CM_Params::factory($renderParams, false));
+        return new CM_Dom_NodeList($html, true);
     }
 
     /**
      * @param CM_Page_Abstract      $page
      * @param CM_Model_User|null    $viewer
      * @param CM_Site_Abstract|null $site
-     * @return CMTest_TH_Html
+     * @return CM_Dom_NodeList
      */
     protected function _renderPage(CM_Page_Abstract $page, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
         if (null === $site) {
             $site = CM_Site_Abstract::factory();
         }
         $host = parse_url($site->getUrl(), PHP_URL_HOST);
-        $request = new CM_Request_Get('?' . http_build_query($page->getParams()->getAllOriginal()), array('host' => $host), null, $viewer);
+        $request = new CM_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), array('host' => $host), null, $viewer);
         $response = new CM_Response_Page($request);
-        $render = new CM_Frontend_Render($site, $viewer);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, $viewer));
         $page->prepareResponse($render->getEnvironment(), $response);
         $renderAdapter = new CM_RenderAdapter_Page($render, $page);
         $html = $renderAdapter->fetch();
-        return new CMTest_TH_Html($html);
+        return new CM_Dom_NodeList($html, true);
     }
 
     /**
@@ -505,11 +536,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CMTest_TH_Html $html
-     * @param string         $css
+     * @param CM_Dom_NodeList $html
+     * @param string          $css
      */
-    public static function assertHtmlExists(CMTest_TH_Html $html, $css) {
-        self::assertTrue($html->exists($css), 'HTML does not contain `' . $css . '`.');
+    public static function assertHtmlExists(CM_Dom_NodeList $html, $css) {
+        self::assertTrue($html->has($css), 'HTML does not contain `' . $css . '`.');
     }
 
     /**
@@ -571,10 +602,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CMTest_TH_Html $page
-     * @param bool           $warnings
+     * @param CM_Dom_NodeList $page
+     * @param bool            $warnings
      */
-    public static function assertTidy(CMTest_TH_Html $page, $warnings = true) {
+    public static function assertTidy(CM_Dom_NodeList $page, $warnings = true) {
         if (!extension_loaded('tidy')) {
             self::markTestSkipped('The tidy extension is not available.');
         }

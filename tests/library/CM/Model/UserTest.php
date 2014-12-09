@@ -5,6 +5,10 @@ class CM_Model_UserTest extends CMTest_TestCase {
     public static function setupBeforeClass() {
     }
 
+    public function tearDown() {
+        CMTest_TH::clearEnv();
+    }
+
     public function testGetCreated() {
         $time = time();
         $user = CMTest_TH::createUser();
@@ -97,16 +101,43 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertEquals($language, $user->getLanguage());
     }
 
-    public function testUpdateLatestActivity() {
+    public function testUpdateLatestActivityThrottled() {
         $user = CMTest_TH::createUser();
         $activityStamp1 = time();
-        $this->assertSameTime($activityStamp1, $user->getLatestactivity());
+        $this->assertSameTime($activityStamp1, $user->getLatestActivity());
         CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2);
-        $user->updateLatestactivity();
-        $this->assertSameTime($activityStamp1, $user->getLatestactivity());
+        $user->updateLatestActivityThrottled();
+        $this->assertSameTime($activityStamp1, $user->getLatestActivity());
         CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2 + 1);
         $activityStamp2 = time();
-        $user->updateLatestactivity();
-        $this->assertSameTime($activityStamp2, $user->getLatestactivity());
+        $user->updateLatestActivityThrottled();
+        $this->assertSameTime($activityStamp2, $user->getLatestActivity());
+    }
+
+    public function testOfflineDelayed() {
+        $user1 = CMTest_TH::createUser();
+        $user2 = CMTest_TH::createUser();
+        $user3 = CMTest_TH::createUser();
+        $user1->setOnline();
+        $user2->setOnline();
+        $user3->setOnline();
+
+        $user1->setOfflineStamp();
+        $user2->setOfflineStamp();
+        CMTest_TH::timeForward(CM_Model_User::OFFLINE_DELAY);
+        $user3->setOfflineStamp();
+        $user2->setOnline();
+
+        $userOnlinePaging = new CM_Paging_User_Online();
+        $this->assertEquals([$user1, $user2, $user3], $userOnlinePaging);
+
+        CM_Model_User::offlineDelayed();
+        $userOnlinePaging = new CM_Paging_User_Online();
+        $this->assertEquals([$user1, $user2, $user3], $userOnlinePaging);
+
+        CMTest_TH::timeForward(1);
+        CM_Model_User::offlineDelayed();
+        $userOnlinePaging = new CM_Paging_User_Online();
+        $this->assertEquals([$user2, $user3], $userOnlinePaging);
     }
 }

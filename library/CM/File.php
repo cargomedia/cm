@@ -24,7 +24,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
         }
 
         $this->_filesystem = $filesystem;
-        $this->_path = (string) $path;
+        $this->_path = CM_File_Filesystem::normalizePath($path);
     }
 
     /**
@@ -60,13 +60,11 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
      * @throws CM_Exception
      */
     public function getMimeType() {
-        $info = new finfo(FILEINFO_MIME);
-        $infoFile = $info->buffer($this->read());
-        if (false === $infoFile) {
+        try {
+            return self::getMimeTypeByContent($this->read());
+        } catch (CM_Exception $ex) {
             throw new CM_Exception('Cannot detect FILEINFO_MIME of `' . $this->getPath() . '`');
         }
-        $mime = explode(';', $infoFile);
-        return $mime[0];
     }
 
     /**
@@ -107,6 +105,17 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
      */
     public function isDirectory() {
         return $this->_filesystem->isDirectory($this->getPath());
+    }
+
+    /**
+     * @param boolean|null $noRecursion
+     * @return CM_File[]
+     */
+    public function listFiles($noRecursion = null) {
+        $result = $this->_filesystem->listByPrefix($this->getPath(), $noRecursion);
+        return \Functional\map(array_merge($result['dirs'], $result['files']), function ($path) {
+            return new CM_File($path, $this->_filesystem);
+        });
     }
 
     /**
@@ -225,9 +234,14 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
 
     /**
      * @return string
+     * @throws CM_Exception_Invalid
      */
-    public function __toString() {
-        return $this->read();
+    public function getPathOnLocalFilesystem() {
+        $filesystemAdapter = $this->_filesystem->getAdapter();
+        if (!$filesystemAdapter instanceof CM_File_Filesystem_Adapter_Local) {
+            throw new CM_Exception_Invalid('Unexpected filesystem with adapter `' . get_class($filesystemAdapter) . '`.');
+        }
+        return $filesystemAdapter->getPathPrefix() . $this->getPath();
     }
 
     /**
@@ -297,6 +311,21 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
     }
 
     /**
+     * @param string $content
+     * @return string
+     * @throws CM_Exception
+     */
+    public static function getMimeTypeByContent($content) {
+        $info = new finfo(FILEINFO_MIME);
+        $infoFile = $info->buffer($content);
+        if (false === $infoFile) {
+            throw new CM_Exception('Cannot detect FILEINFO_MIME');
+        }
+        $mime = explode(';', $infoFile);
+        return $mime[0];
+    }
+
+    /**
      * @param string $path
      * @return CM_File
      */
@@ -318,7 +347,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
      * @return CM_File_Filesystem
      */
     public static function getFilesystemDefault() {
-        global $filesystem;
+        static $filesystem;
         if (null === $filesystem) {
             $adapter = new CM_File_Filesystem_Adapter_Local();
             $filesystem = new CM_File_Filesystem($adapter);

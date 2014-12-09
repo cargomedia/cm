@@ -10,7 +10,7 @@ class CMTest_TH {
     private static $_dbClient = null;
 
     public static function init() {
-        CM_App::getInstance()->setupDatabase(true);
+        CM_App::getInstance()->setup(new CM_OutputStream_Null(), true);
 
         self::$_configBackup = serialize(CM_Config::get());
 
@@ -22,7 +22,6 @@ class CMTest_TH {
 
     public static function clearEnv() {
         self::clearDb();
-        self::clearMongoDb();
         self::clearCache();
         self::timeReset();
         self::clearConfig();
@@ -30,12 +29,8 @@ class CMTest_TH {
     }
 
     public static function clearFilesystem() {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $serviceManager->getFilesystems()->getData()->deleteByPrefix('/');
-        foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
-            $filesystem->deleteByPrefix('/');
-        }
-        CM_App::getInstance()->setupFilesystem();
+        $script = new CM_File_Filesystem_SetupScript(CM_Service_Manager::getInstance());
+        $script->unload(new CM_OutputStream_Null());
     }
 
     public static function clearCache() {
@@ -43,25 +38,17 @@ class CMTest_TH {
         CM_Cache_Local::getInstance()->flush();
     }
 
-    public static function clearMongoDb() {
-        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        foreach ($mongoDb->listCollectionNames() as $collectionName) {
-            $mongoDb->drop($collectionName);
-        }
-    }
-
+    /**
+     * @deprecated use clearEnv instead
+     */
     public static function clearDb() {
-        $alltables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
-        CM_Db_Db::exec('SET foreign_key_checks = 0;');
-        foreach ($alltables as $table) {
-            CM_Db_Db::delete($table);
-        }
-        CM_Db_Db::exec('SET foreign_key_checks = 1;');
-        foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
-            require $setupScript->getPath();
-        }
+        self::clearCache();
+        CM_App::getInstance()->setup(new CM_OutputStream_Null(), true);
     }
 
+    /**
+     * @deprecated use clearEnv instead
+     */
     public static function clearConfig() {
         CM_Config::set(unserialize(self::$_configBackup));
     }
@@ -118,7 +105,7 @@ class CMTest_TH {
                 $abbreviation = self::_randStr(5);
             } while (CM_Model_Language::findByAbbreviation($abbreviation));
         }
-        return CM_Model_Language::createStatic(array('name' => 'English', 'abbreviation' => $abbreviation, 'enabled' => 1));
+        return CM_Model_Language::create('English', $abbreviation, true);
     }
 
     /**
@@ -129,7 +116,7 @@ class CMTest_TH {
      */
     public static function createPage($pageClass, CM_Model_User $viewer = null, $params = array()) {
         $request = new CM_Request_Get('?' . http_build_query($params), array(), $viewer);
-        return new $pageClass(CM_Params::factory($request->getQuery()), $request->getViewer());
+        return new $pageClass(CM_Params::factory($request->getQuery(), true), $request->getViewer());
     }
 
     /**
@@ -288,6 +275,23 @@ class CMTest_TH {
         $method = $class->getMethod($methodName);
         $method->setAccessible(true);
         return $method;
+    }
+
+    /**
+     * @param string|object $objectOrClassName
+     * @param string        $methodName
+     * @param array|null    $args
+     * @return mixed
+     */
+    public static function callProtectedMethod($objectOrClassName, $methodName, array $args = null) {
+        $args = (array) $args;
+        $context = null;
+        if (is_object($objectOrClassName)) {
+            $context = $objectOrClassName;
+        }
+        $reflectionMethod = new ReflectionMethod($objectOrClassName, $methodName);
+        $reflectionMethod->setAccessible(true);
+        return $reflectionMethod->invokeArgs($context, $args);
     }
 
     /**

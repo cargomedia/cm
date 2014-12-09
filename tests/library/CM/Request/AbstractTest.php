@@ -79,7 +79,6 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 
         CMTest_TH::createLanguage('en'); // default language
         $urlLanguage = CMTest_TH::createLanguage('de');
-        CM_Model_Language::changeAll(); // Need to flush CM_Paging_Languages_Enabled() cache
         $request = $this->_prepareRequest('/de/home');
         CM_Response_Abstract::factory($request);
         $this->assertEquals($request->getLanguage(), $urlLanguage);
@@ -101,7 +100,7 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
     }
 
     public function testSetUri() {
-        $language = CM_Model_Language::createStatic(array('name' => 'english', 'abbreviation' => 'en', 'enabled' => true));
+        $language = CM_Model_Language::create('english', 'en', true);
         $uri = '/en/foo/bar?foo1=bar1';
         $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
         /** @var CM_Request_Abstract $mock */
@@ -111,11 +110,14 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
         $this->assertSame(array('foo', 'bar'), $mock->getPathParts());
         $this->assertSame(array('foo1' => 'bar1'), $mock->getQuery());
         $this->assertEquals($language, $mock->getLanguageUrl());
+        $this->assertSame($uri, $mock->getUri());
+
         $mock->setUri('/foo1/bar1?foo=bar');
         $this->assertSame('/foo1/bar1', $mock->getPath());
         $this->assertSame(array('foo1', 'bar1'), $mock->getPathParts());
         $this->assertSame(array('foo' => 'bar'), $mock->getQuery());
         $this->assertNull($mock->getLanguageUrl());
+        $this->assertSame('/foo1/bar1?foo=bar', $mock->getUri());
     }
 
     public function testSetUriRelativeAndColon() {
@@ -124,6 +126,22 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
         $mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri));
         $this->assertSame('/foo/bar', $mock->getPath());
         $this->assertSame(array('foo1' => 'bar1:80'), $mock->getQuery());
+    }
+
+    public function testGetUri() {
+        $request = $this->getMockForAbstractClass('CM_Request_Abstract', array('/foo/bar?hello=world'));
+        /** @var CM_Request_Abstract $request */
+
+        $this->assertSame('/foo/bar?hello=world', $request->getUri());
+
+        $this->assertSame('foo', $request->popPathPart());
+        $this->assertSame('/foo/bar?hello=world', $request->getUri());
+
+        $request->setPath('/hello');
+        $this->assertSame('/foo/bar?hello=world', $request->getUri());
+
+        $request->setUri('/world');
+        $this->assertSame('/world', $request->getUri());
     }
 
     public function testGetClientId() {
@@ -197,6 +215,28 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
     public function testGetHostWithoutHeader() {
         $request = new CM_Request_Get('/');
         $request->getHost();
+    }
+
+    public function testIsSupported() {
+        $userAgentList = [
+            'MSIE 6.0'                                            => false,
+            'MSIE 9.0'                                            => false,
+            'MSIE 9.1'                                            => false,
+            'MSIE 10.0'                                           => true,
+            'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0)'  => true,
+            'Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC)'   => false,
+            'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus)'    => true,
+            'Opera/9.80 (Android; Opera Mini/7.6.35766/35.5706;)' => false,
+        ];
+        foreach ($userAgentList as $userAgent => $isSupported) {
+            $request = new CM_Request_Get('/', ['user-agent' => $userAgent]);
+            $this->assertSame($isSupported, $request->isSupported(), 'Mismatch for UA: `' . $userAgent . '`.');
+        }
+    }
+
+    public function testIsSupportedWithoutUserAgent() {
+        $request = new CM_Request_Get('/', []);
+        $this->assertSame(true, $request->isSupported());
     }
 
     /**

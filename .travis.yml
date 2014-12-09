@@ -11,7 +11,14 @@ services:
   - redis-server
   - mongodb
 
+before_install:
+  - "sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10"
+  - "echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list"
+  - "sudo apt-get update"
+  - "sudo apt-get install mongodb-org-server"
+
 before_script:
+  - "until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done"
   - tests/travis/install-php-runkit.sh
   - tests/travis/install-php-svm.sh
   - printf "\n" | pecl install imagick
@@ -20,10 +27,12 @@ before_script:
   - sh -c "if [ `php-config --vernum` -ge 50500 ]; then printf "yes\n" | pecl install apcu-beta; fi"
   - phpenv config-add tests/travis/php.ini
   - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
+  - npm install -g autoprefixer
 
   - composer self-update
   - composer install --dev
   - cp tests/travis/config.php resources/config/local.php
+  - bin/cm app generate-config-internal
   - bin/cm app set-deploy-version
 
 script: bin/phpunit

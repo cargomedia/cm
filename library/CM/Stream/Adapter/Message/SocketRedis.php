@@ -95,7 +95,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
                     try {
                         $clientKey = (string) $subscriber['clientKey'];
                         if (!isset($subscribesPersistenceArray[$statusChannelKey . '/' . $clientKey])) {
-                            $data = CM_Params::factory((array) $subscriber['data']);
+                            $data = CM_Params::factory((array) $subscriber['data'], true);
                             $user = null;
                             if ($data->has('sessionId')) {
                                 if ($session = CM_Session::findById($data->getString('sessionId'))) {
@@ -126,7 +126,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
      * @throws CM_Exception_Invalid
      */
     public function onRedisMessage($message) {
-        $message = CM_Params::decode($message, true);
+        $message = CM_Params::jsonDecode($message);
         $type = $message['type'];
         $data = $message['data'];
         switch ($type) {
@@ -135,7 +135,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
                 $clientKey = $data['clientKey'];
                 $start = time();
                 $allowedUntil = null;
-                $data = CM_Params::factory((array) $data['data']);
+                $data = CM_Params::factory((array) $data['data'], true);
                 $user = null;
                 if ($data->has('sessionId')) {
                     if ($session = CM_Session::findById($data->getString('sessionId'))) {
@@ -220,8 +220,8 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
         $servers = self::_getConfig()->servers;
         $statusData = array();
         foreach ($servers as $server) {
-            $statusData = array_merge_recursive($statusData, CM_Params::decode(CM_Util::getContents(
-                'http://' . $server['httpHost'] . ':' . $server['httpPort']), true));
+            $statusData = array_merge_recursive($statusData, CM_Params::jsonDecode(CM_Util::getContents(
+                'http://' . $server['httpHost'] . ':' . $server['httpPort'])));
         }
         return $statusData;
     }

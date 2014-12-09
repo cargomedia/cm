@@ -33,4 +33,11 @@ class CM_Process_WorkloadResult {
     public function getException() {
         return $this->_exception;
     }
+
+    /**
+     * @return bool
+     */
+    public function isSuccess() {
+        return null === $this->getException();
+    }
 }

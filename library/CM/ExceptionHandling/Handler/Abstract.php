@@ -69,7 +69,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
         }
 
         try {
-            $this->_logException($exception);
+            $this->logException($exception);
         } catch (Exception $e) {
             $printException = true;
         }
@@ -84,26 +84,14 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
     }
 
     /**
-     * @param int $severity
-     */
-    public function setPrintSeverityMin($severity) {
-        $this->_printSeverityMin = (int) $severity;
-    }
-
-    /**
      * @param Exception $exception
      */
-    abstract protected function _printException(Exception $exception);
-
-    /**
-     * @param Exception $exception
-     */
-    protected function _logException(Exception $exception) {
+    public function logException(Exception $exception) {
         $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
         try {
             if ($exception instanceof CM_Exception) {
                 $log = $exception->getLog();
-                $metaInfo = $exception->getMetaInfo();
+                $metaInfo = $exception->getMetaInfo(true);
             } else {
                 $log = new CM_Paging_Log_Error();
                 $metaInfo = null;
@@ -120,6 +108,18 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
             $logFile->append($logEntry);
         }
     }
+
+    /**
+     * @param int $severity
+     */
+    public function setPrintSeverityMin($severity) {
+        $this->_printSeverityMin = (int) $severity;
+    }
+
+    /**
+     * @param Exception $exception
+     */
+    abstract protected function _printException(Exception $exception);
 
     /**
      * @return CM_File

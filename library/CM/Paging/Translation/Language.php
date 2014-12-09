@@ -2,6 +2,9 @@
 
 class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 
+    /** @var CM_Model_Language */
+    protected $_language;
+
     /**
      * @param CM_Model_Language $language
      * @param string|null       $searchPhrase
@@ -10,6 +13,7 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
      * @param bool|null         $javascriptOnly
      */
     public function __construct(CM_Model_Language $language, $searchPhrase = null, $section = null, $translated = null, $javascriptOnly = null) {
+        $this->_language = $language;
         $where = array();
         $parameters = array();
         if ($searchPhrase) {
@@ -32,10 +36,10 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
         }
 
         $orderBy = 'k.name ASC';
-        $join = 'LEFT JOIN `cm_languageValue` AS v ON k.id = v.languageKeyId AND v.languageId = ' . $language->getId() . ' ';
-        $groupBy = 'k.name';
+        $join = 'LEFT JOIN `cm_languageValue` AS v ON k.id = v.languageKeyId AND v.languageId = ' . $this->_language->getId() . ' ';
+        $groupBy = 'BINARY k.name';
         $source = new CM_PagingSource_Sql_Deferred('k.name AS `key`, v.value, k.variables',
-            'cm_languageKey` as `k', implode(' AND ', $where), $orderBy, $join, $groupBy, $parameters);
+            'cm_model_languagekey` as `k', implode(' AND ', $where), $orderBy, $join, $groupBy, $parameters);
         parent::__construct($source);
     }
 
@@ -50,6 +54,50 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
             $translations[$key] = $translation;
         }
         return $translations;
+    }
+
+    /**
+     * @param string $phrase
+     * @throws CM_Exception_Invalid
+     * @return string
+     */
+    public function get($phrase) {
+        $translations = $this->getAssociativeArray();
+        if (!array_key_exists($phrase, $translations)) {
+            throw new CM_Exception_Invalid('Translation `' . $phrase . '` does not exist');
+        }
+        return $translations[$phrase]['value'];
+    }
+
+    /**
+     * @param string      $phrase
+     * @param string|null $value
+     * @param array|null  $variables
+     */
+    public function set($phrase, $value = null, array $variables = null) {
+        if (null === $value) {
+            $value = $phrase;
+        }
+
+        $languageKey = CM_Model_LanguageKey::replace($phrase, $variables);
+        CM_Db_Db::insert('cm_languageValue', array(
+            'value'         => $value,
+            'languageKeyId' => $languageKey->getId(),
+            'languageId'    => $this->_language->getId()
+        ), null, array('value' => $value));
+        $this->_change();
+    }
+
+    /**
+     * @param string $phrase
+     */
+    public function remove($phrase) {
+        $languageKey = CM_Model_LanguageKey::findByName($phrase);
+        if (!$languageKey) {
+            return;
+        }
+        CM_Db_Db::delete('cm_languageValue', array('languageKeyId' => $languageKey->getId(), 'languageId' => $this->_language->getId()));
+        $this->_change();
     }
 
     protected function _processItem($item) {

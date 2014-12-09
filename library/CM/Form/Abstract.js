@@ -77,11 +77,11 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @return CM_FormField_Abstract|null
+   * @return CM_FormField_Abstract
    */
   getField: function(name) {
     if (!this._fields[name]) {
-      return null;
+      cm.error.triggerThrow(this.getClass() + ' cannot find form field `' + name + '`');
     }
     return this._fields[name];
   },
@@ -287,20 +287,22 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
     _.each(_.keys(action.fields).reverse(), function(fieldName) {
       var required = action.fields[fieldName];
-      var field = this.getField(fieldName);
-      if (required && field.isEmpty(data[fieldName])) {
-        var label;
-        var $textInput = field.$('input, textarea');
-        var $labels = $('label[for="' + field.getAutoId() + '-input"]');
-        if ($labels.length) {
-          label = $labels.first().text();
-        } else if ($textInput.attr('placeholder')) {
-          label = $textInput.attr('placeholder');
-        }
-        if (label) {
-          errorList[fieldName] = cm.language.get('{$label} is required.', {label: label});
-        } else {
-          errorList[fieldName] = cm.language.get('Required');
+      if (required) {
+        var field = this.getField(fieldName);
+        if (field.isEmpty(data[fieldName])) {
+          var label;
+          var $textInput = field.$('input, textarea');
+          var $labels = $('label[for="' + field.getAutoId() + '-input"]');
+          if ($labels.length) {
+            label = $labels.first().text();
+          } else if ($textInput.attr('placeholder')) {
+            label = $textInput.attr('placeholder');
+          }
+          if (label) {
+            errorList[fieldName] = cm.language.get('{$label} is required.', {label: label});
+          } else {
+            errorList[fieldName] = cm.language.get('Required');
+          }
         }
       }
     }, this);

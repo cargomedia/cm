@@ -56,11 +56,14 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
     /**
      * @return array
      */
-    protected function _getMetafInfoFromRequest() {
+    protected function _getDefaultMetaInfo() {
         $metaInfo = array();
+        if ($fqdn = CM_Util::getFqdn()) {
+            $metaInfo['fqdn'] = $fqdn;
+        }
         if (CM_Request_Abstract::hasInstance()) {
             $request = CM_Request_Abstract::getInstance();
-            $metaInfo['path'] = $request->getPath();
+            $metaInfo['uri'] = $request->getUri();
             if ($viewer = $request->getViewer()) {
                 $metaInfo['userId'] = $viewer->getId();
             }
@@ -78,26 +81,51 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
     }
 
     /**
-     * @param string $msg
-     * @param array  $metaInfo
+     * @param string     $msg
+     * @param array|null $metaInfo
      */
     protected function _add($msg, array $metaInfo = null) {
         $msg = (string) $msg;
         $values = array('type' => $this->getType(), 'msg' => $msg, 'timeStamp' => time());
-        if ($metaInfo) {
-            $values['metaInfo'] = serialize($metaInfo);
+        if (!empty($metaInfo)) {
+            $values['metaInfo'] = serialize($this->_dump($metaInfo));
         }
         CM_Db_Db::insertDelayed('cm_log', $values);
     }
 
     protected function _processItem($item) {
         if (!empty($item['metaInfo'])) {
-            $metaInfo = @unserialize($item['metaInfo']);
-            if (false === $metaInfo) {
-                $metaInfo = null;
-            }
+            $metaInfo = $this->_unserialize($item['metaInfo'], true);
             $item['metaInfo'] = $metaInfo;
         }
         return $item;
+    }
+
+    /**
+     * @param mixed $value
+     * @return string
+     */
+    protected function _dump($value) {
+        if (is_array($value)) {
+            foreach ($value as &$element) {
+                $element = $this->_dump($element);
+            }
+        } elseif ($value instanceof CM_Model_Abstract) {
+            $value = CM_Util::varDump($value);
+        }
+        return $value;
+    }
+
+    /**
+     * @param string  $value
+     * @param boolean $returnNull
+     * @return mixed|null
+     */
+    protected function _unserialize($value, $returnNull) {
+        $result = @unserialize($value);
+        if (false === $result) {
+            return $returnNull ? null : $value;
+        }
+        return $result;
     }
 }

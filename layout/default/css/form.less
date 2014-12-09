@@ -1,30 +1,31 @@
 .textinput {
   .appearance(none);
+  box-sizing: border-box;
   width: 100%;
   height: @heightInputText;
   overflow: hidden;
-  padding-left: 6px;
-  padding-right: 6px;
-  border-radius: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: @borderRadiusInput;
   background: @colorBg;
   border: 1px solid @colorFgBorderEmphasize2;
-  .transition(border-color .1s);
+  transition: border-color .1s;
 
   &:hover {
-    border-left: 1px solid lighten(@colorNotice, 15);
+    border-left: 1px solid @colorFocus;
   }
 }
 
 textarea.textinput {
   height: @heightInputTextarea;
-  padding-top: 6px;
+  padding-top: (@heightInputText - 2px - @fontSize*@fontLineHeight) / 2;
   overflow: auto;
   resize: vertical;
 }
 
 .input_focus {
   outline: none;
-  border: 1px solid lighten(@colorNotice, 15);
+  border-color: @colorFocus;
 }
 
 .placeholder(@color) {
@@ -41,42 +42,29 @@ textarea.textinput {
   :-ms-input-placeholder {
     color: @color;
   }
-  label.placeholder {
-    color: @color;
-    margin-top: 7px;
-
-    .CM_FormField_Textarea & {
-      margin-top: 1px;
-    }
-  }
 }
 
 .placeholder(lighten(@colorFgSubtle, 10));
 
 .button {
+  box-sizing: border-box;
   width: auto;
   height: @sizeButton;
   line-height: @sizeButton - 2px;
   min-width: @sizeButton;
   max-width: 100%;
-  padding: 0 8px;
-  overflow: hidden;
   margin: 1px;
-  font-weight: bold;
-  cursor: pointer;
-  vertical-align: top;
+  padding: 0 15px;
+  overflow: hidden;
   white-space: nowrap;
-  border-radius: 0;
-  background-size: auto 200%;
-  background-position: 0 0;
-  .transition(background-position 200ms);
+  border-radius: @borderRadiusInput;
+  vertical-align: top;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background-color 200ms;
 
   &:not(:disabled):active {
     box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-  }
-
-  &:not(:disabled):hover {
-    background-position: 0 100%;
   }
 
   &:focus {
@@ -91,7 +79,7 @@ textarea.textinput {
     padding: 0;
 
     &.hasLabel {
-      padding: 0 8px;
+      padding: 0 15px;
 
       .icon {
         margin-right: 5px;
@@ -106,7 +94,7 @@ textarea.textinput {
 
 .button.confirmClick {
   .button-success;
-  .animation(clickConfirm, 3000ms, ease-out, 0, 1);
+  .animation(clickConfirm, 3000ms, ease-out, 0s, 1);
 }
 
 .button.confirmClick.warning {
@@ -114,17 +102,22 @@ textarea.textinput {
 }
 
 .button-default-active {
-  background: darken(@colorBg, 8);
+  background: darken(@colorBgButton, 5);
+  color: @colorFgHeading;
 }
 
 .button-default {
-  .gradient(vertical, @colorBg, darken(@colorBg, 10));
-  border: 1px solid @colorFgBorderEmphasize3;
-  color: lighten(@colorFg, 25);
-  text-shadow: 1px 1px fadeout(@colorFgTheme, 80);
+  background-color: @colorBgButton;
+  border: 1px solid @colorFgButtonBorder;
+  color: @colorFgButton;
 
   &:not(:disabled):active {
-    border-color: darken(@colorFgBorderEmphasize3, 5);
+    border-color: darken(@colorBgButton, 5);
+  }
+
+  &:not(:disabled):hover {
+    background-color: darken(@colorBgButton, 5);
+    border-color: darken(@colorFgButtonBorder, 5);
   }
 }
 
@@ -134,35 +127,47 @@ textarea.textinput {
 }
 
 .button-highlight {
-  .gradient(vertical, @colorHighlight, spin(@colorHighlight, -6));
-  border: 1px solid spin(@colorHighlight, -3);
-  color: @colorFgTheme;
-  text-shadow: 1px 1px spin(@colorHighlight, -8);
+  background-color: @colorBgButtonHighlight;
+  border: 1px solid @colorBgButtonHighlight;
+  color: @colorFgButtonHighlight;
 
   &:not(:disabled):active {
-    border-color: spin(@colorHighlight, -15);
+    border-color: darken(@colorBgButtonHighlight, 5);
+  }
+
+  &:not(:disabled):hover {
+    background-color: darken(@colorBgButtonHighlight, 5);
+    border-color: darken(@colorBgButtonHighlight, 5);
   }
 }
 
 .button-success {
-  .gradient(vertical, lighten(@colorOk, 9), lighten(@colorOk, 3));
-  border: 1px solid lighten(@colorOk, 3);
-  color: @colorFgTheme;
-  text-shadow: 1px 1px spin(@colorOk, -8);
+  background-color: @colorBgButtonSuccess;
+  border: 1px solid @colorBgButtonSuccess;
+  color: @colorFgButtonSuccess;
 
   &:not(:disabled):active {
-    border-color: darken(@colorOk, 6);
+    border-color: darken(@colorBgButtonSuccess, 5);
+  }
+
+  &:not(:disabled):hover {
+    background-color: darken(@colorBgButtonSuccess, 5);
+    border-color: darken(@colorBgButtonSuccess, 5);
   }
 }
 
 .button-danger {
-  .gradient(vertical, lighten(@colorError, 10), @colorError);
-  border: 1px solid @colorError;
-  color: @colorFgTheme;
-  text-shadow: 1px 1px @colorError;
+  background-color: @colorBgButtonDanger;
+  border: 1px solid @colorBgButtonDanger;
+  color: @colorFgButtonDanger;
 
   &:not(:disabled):active {
-    border-color: darken(@colorError, 12);
+    border-color: darken(@colorBgButtonDanger, 5);
+  }
+
+  &:not(:disabled):hover {
+    background-color: darken(@colorBgButtonDanger, 5);
+    border-color: darken(@colorBgButtonDanger, 5);
   }
 }
 
@@ -171,10 +176,10 @@ textarea.textinput {
   min-width: 1.5*@sizeButton;
   font-size: 2em;
   border-radius: 3px;
-  padding: 0 15px;
+  padding: 0 25px;
 
   &.hasIcon.hasLabel {
-    padding: 0 20px 0 10px;
+    padding: 0 20px;
 
     .icon {
       margin-right: 10px;
@@ -199,7 +204,13 @@ input:focus, .textinput:focus, .textinput.focus, select:focus, textarea:focus {
 }
 
 input[type=checkbox], input[type=radio] {
+  .appearance(none);
+  display: block;
   position: absolute;
+  width: @sizeCheckbox;
+  height: @sizeCheckbox;
+  transform: scale(2);
+  transform-origin: 0 0;
   opacity: 0;
 
   + label {
@@ -208,6 +219,7 @@ input[type=checkbox], input[type=radio] {
     margin-left: @sizeCheckbox+4px;
 
     &:before {
+      box-sizing: border-box;
       position: absolute;
       content: "";
       display: block;
@@ -218,7 +230,7 @@ input[type=checkbox], input[type=radio] {
       left: -(@sizeCheckbox+4px);
       margin-top: -@sizeCheckbox/2;
       border: 1px solid @colorFgBorderEmphasize3;
-      .transition(100ms);
+      transition: 100ms;
     }
   }
 
@@ -229,8 +241,8 @@ input[type=checkbox], input[type=radio] {
   }
 
   &:checked + label:before {
-    background-color: lighten(@colorNotice, 15);
-    border-color: lighten(@colorNotice, 5);
+    background-color: @colorFocus;
+    border-color: @colorFocus;
   }
 
   &:disabled + label {
@@ -257,7 +269,7 @@ input[type=checkbox] {
     html.no-svg & {
       background-image: image('checkbox.png');
     }
-    .background-size(contain);
+    background-size: contain;
   }
 
   + label {
@@ -268,12 +280,14 @@ input[type=checkbox] {
 }
 
 .formField, .formAction {
+  box-sizing: border-box;
   max-width: 100%;
   padding: 6px;
 }
 
 .formField {
   > label {
+    box-sizing: border-box;
     color: @colorFgLinkSubtle;
     font-weight: bold;
     padding-left: 2px;

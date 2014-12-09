@@ -140,13 +140,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
 
     /**
      * @param string|null $serviceName
-     * @return CM_Service_MongoDb
+     * @return CM_MongoDb_Client
      */
     public function getMongoDb($serviceName = null) {
         if (null === $serviceName) {
             $serviceName = 'MongoDb';
         }
-        return $this->get($serviceName, 'CM_Service_MongoDb');
+        return $this->get($serviceName, 'CM_MongoDb_Client');
     }
 
     /**

@@ -6,36 +6,48 @@
   var selector = '.openerDropdown';
 
   var OpenerDropdown = function($element) {
-    $element.on('click.openerDropdown', this.toggle);
+    this.element = $element;
   };
 
   OpenerDropdown.prototype = {
     constructor: OpenerDropdown,
 
-    toggle: function(event) {
-      var $opener = $(this).closest('.openerDropdown');
-      $opener.find('> .openerDropdown-window').toggleModal(function() {
+    element: null,
+
+    activate: function() {
+      this.element.on('click.openerDropdown', this.toggle);
+    },
+
+    toggle: function() {
+      var self = this;
+      this.element.find('> .openerDropdown-window').toggleModal(function() {
         $(this).toggle();
-        $opener.toggleClass('open');
+        self.element.toggleClass('open');
       });
+    },
+
+    close: function() {
+      this.element.find('> .openerDropdown-window').toggleModalClose();
     }
   };
 
-  $.fn.opener = function(option) {
+  $.fn.opener = function(action) {
     return this.each(function() {
-      var $this = $(this);
+      var $this = $(this).closest('.openerDropdown');
       var data = $this.data('openerDropdown');
       if (!data) {
         $this.data('openerDropdown', (data = new OpenerDropdown($this)))
       }
-      if (typeof option == 'string') {
-        data[option].call($this)
+      if ('string' === typeof action) {
+        data[action]()
       }
     })
   };
 
   $(function() {
-    $('body').on('click.openerDropdown', selector + ' .openerDropdown-panel', OpenerDropdown.prototype.toggle);
+    $('body').on('click.openerDropdown', selector + ' .openerDropdown-panel', function() {
+      $(this).closest('.openerDropdown').opener('toggle');
+    });
   });
 
 })(jQuery);

@@ -281,6 +281,20 @@ class CM_Db_Db extends CM_Class_Abstract {
     }
 
     /**
+     * @param string $table
+     * @param string $column
+     * @return int
+     */
+    public static function incrementAndFetchColumn($table, $column) {
+        $client = self::getClient();
+        $result = self::exec(
+            'UPDATE ' . $client->quoteIdentifier($table) . ' SET ' . $client->quoteIdentifier($column) . ' = LAST_INSERT_ID(' .
+            $client->quoteIdentifier($column) . ' + 1); SELECT LAST_INSERT_ID() AS ' . $client->quoteIdentifier($column) . ';');
+        $result->nextRowset();
+        return (int) $result->fetchColumn(0);
+    }
+
+    /**
      * @param array|null  $tables
      * @param bool|null   $skipData
      * @param bool|null   $skipStructure
@@ -290,7 +304,7 @@ class CM_Db_Db extends CM_Class_Abstract {
     public static function getDump(array $tables = null, $skipData = null, $skipStructure = null, $dbName = null) {
         $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
         if (null === $dbName) {
-            $dbName = $client->getDb();
+            $dbName = $client->getDatabaseName();
         }
         $args = array();
         $args[] = '--compact';

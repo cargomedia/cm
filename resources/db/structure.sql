@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `cm_actionLimit`;
 
 
 CREATE TABLE `cm_actionLimit` (
-  `actionType` tinyint(3) DEFAULT NULL,
+  `actionType` int(10) unsigned DEFAULT NULL,
   `actionVerb` tinyint(3) DEFAULT NULL,
   `type` int(10) unsigned NOT NULL,
   `role` tinyint(3) unsigned DEFAULT NULL,
@@ -67,10 +67,10 @@ CREATE TABLE `cm_ipBlocked` (
   KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_language`;
+DROP TABLE IF EXISTS `cm_model_language`;
 
 
-CREATE TABLE `cm_language` (
+CREATE TABLE `cm_model_language` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
   `abbreviation` varchar(5) NOT NULL,
@@ -81,10 +81,10 @@ CREATE TABLE `cm_language` (
   KEY `enabled` (`enabled`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_languageKey`;
+DROP TABLE IF EXISTS `cm_model_languagekey`;
 
 
-CREATE TABLE `cm_languageKey` (
+CREATE TABLE `cm_model_languagekey` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `variables` text CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
@@ -181,7 +181,7 @@ CREATE TABLE `cm_log` (
   `type` int(10) unsigned NOT NULL,
   `msg` varchar(5000) NOT NULL,
   `timeStamp` int(10) unsigned NOT NULL,
-  `metaInfo` varchar(5000) DEFAULT NULL,
+  `metaInfo` text,
   PRIMARY KEY (`id`),
   KEY `type` (`type`,`timeStamp`),
   KEY `msg` (`msg`(333))
@@ -227,12 +227,12 @@ CREATE TABLE `cm_cli_command_manager_process` (
   KEY `timeoutStamp` (`timeoutStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_requestClient`;
+DROP TABLE IF EXISTS `cm_requestClientCounter`;
 
 
-CREATE TABLE `cm_requestClient` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`id`)
+CREATE TABLE `cm_requestClientCounter` (
+  `counter` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`counter`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_role`;
@@ -311,13 +311,15 @@ DROP TABLE IF EXISTS `cm_splittestVariation_fixture`;
 
 
 CREATE TABLE `cm_splittestVariation_fixture` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `splittestId` int(10) unsigned NOT NULL,
   `requestClientId` int(10) unsigned DEFAULT NULL,
   `userId` int(10) unsigned DEFAULT NULL,
   `variationId` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   `conversionStamp` int(11) DEFAULT NULL,
-  `conversionWeight` decimal(10,2) NOT NULL DEFAULT '1.00',
+  `conversionWeight` decimal(10,2) NOT NULL DEFAULT '0.00',
+  PRIMARY KEY (`id`),
   UNIQUE KEY `userSplittest` (`userId`,`splittestId`),
   UNIQUE KEY `requestClientSplittest` (`requestClientId`,`splittestId`),
   KEY `splittestId` (`splittestId`),
@@ -479,7 +481,7 @@ CREATE TABLE `cm_user` (
   `userId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `activityStamp` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
-  `site` tinyint(3) unsigned DEFAULT NULL,
+  `site` int(10) unsigned DEFAULT NULL,
   `languageId` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`userId`),
   KEY `activityStamp` (`activityStamp`),
@@ -493,8 +495,10 @@ DROP TABLE IF EXISTS `cm_user_online`;
 CREATE TABLE `cm_user_online` (
   `userId` int(10) unsigned NOT NULL,
   `visible` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `offlineStamp` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`userId`),
-  KEY `visible` (`visible`)
+  KEY `visible` (`visible`),
+  KEY `offlineStamp` (`offlineStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_user_preference`;

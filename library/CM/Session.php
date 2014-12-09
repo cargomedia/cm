@@ -2,7 +2,7 @@
 
 class CM_Session implements CM_Comparable {
 
-    const LIFETIME_DEFAULT = 3600;
+    const LIFETIME_DEFAULT = 259200; // 3 days
 
     /** @var string */
     private $_id;
@@ -217,7 +217,7 @@ class CM_Session implements CM_Comparable {
                 $this->deleteUser();
                 return;
             }
-            $user->updateLatestactivity();
+            $user->updateLatestActivityThrottled();
             if (!$user->getOnline()) {
                 $user->setOnline(true);
             }

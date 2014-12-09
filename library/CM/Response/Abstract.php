@@ -30,10 +30,10 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
      * @param CM_Request_Abstract $request
      */
     public function __construct(CM_Request_Abstract $request) {
-        $this->_request = $request;
-        $responseType = $request->popPathPart();
-        $language = $request->popPathLanguage();
-        $this->_site = $request->popPathSite();
+        $this->_request = clone $request;
+        $responseType = $this->_request->popPathPart();
+        $language = $this->_request->popPathLanguage();
+        $this->_site = $this->_request->popPathSite();
     }
 
     abstract protected function _process();
@@ -98,7 +98,8 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
     public function getRender() {
         if (!$this->_render) {
             $languageRewrite = !$this->getViewer() && $this->getRequest()->getLanguageUrl();
-            $this->_render = new CM_Frontend_Render($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), $languageRewrite, $this->getRequest()->getLocation());
+            $environment = new CM_Frontend_Environment($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), null, null, $this->getRequest()->getLocation());
+            $this->_render = new CM_Frontend_Render($environment, $languageRewrite);
         }
         return $this->_render;
     }
@@ -199,15 +200,6 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * Enables caching by removing no-cache headers
-     */
-    public function enableCache() {
-        header_remove('Cache-Control');
-        header_remove('Pragma');
-        header_remove('Expires');
-    }
-
-    /**
      * @param string $content
      */
     protected function _setContent($content) {
@@ -233,16 +225,25 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 
     /**
      * @param CM_Request_Abstract $request
-     * @return CM_Response_Abstract
+     * @return CM_Response_Abstract|string
      */
-    public static function factory(CM_Request_Abstract $request) {
+    public static function getResponseClassName(CM_Request_Abstract $request) {
         /** @var $responseClass CM_Response_Abstract */
         foreach (array_reverse(self::getClassChildren()) as $responseClass) {
             if ($responseClass::match($request)) {
-                return new $responseClass($request);
+                return $responseClass;
             }
         }
-        return new CM_Response_Page($request);
+        return 'CM_Response_Page';
+    }
+
+    /**
+     * @param CM_Request_Abstract $request
+     * @return CM_Response_Abstract
+     */
+    public static function factory(CM_Request_Abstract $request) {
+        $className = self::getResponseClassName($request);
+        return new $className($request);
     }
 
     /**

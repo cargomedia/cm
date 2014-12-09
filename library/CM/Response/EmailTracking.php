@@ -3,12 +3,12 @@
 class CM_Response_EmailTracking extends CM_Response_Abstract {
 
     protected function _process() {
-        $params = CM_Params::factory($this->_request->getQuery());
+        $params = CM_Params::factory($this->_request->getQuery(), true);
         try {
             $user = $params->getUser('user');
             $mailType = $params->getInt('mailType');
 
-            $action = new CM_Action_Email(CM_Action_Abstract::VIEW, $user);
+            $action = new CM_Action_Email(CM_Action_Abstract::VIEW, $user, $mailType);
             $action->prepare();
             $action->notify($user, $mailType);
         } catch (CM_Exception_Nonexistent $e) {

@@ -14,7 +14,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
         }
         foreach ($indexes as $index) {
             if (!$index->getIndex()->exists() || !$skipIfExist) {
-                $this->_getOutput()->writeln('Creating elasticsearch index `' . $index->getIndex()->getName() . '`…');
+                $this->_getStreamOutput()->writeln('Creating elasticsearch index `' . $index->getIndex()->getName() . '`…');
                 $index->createVersioned();
                 $index->getIndex()->refresh();
             }
@@ -36,7 +36,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
             $indexes = $this->_getIndexes($host, $port);
         }
         foreach ($indexes as $index) {
-            $this->_getOutput()->writeln('Updating elasticsearch index `' . $index->getIndex()->getName() . '`...');
+            $this->_getStreamOutput()->writeln('Updating elasticsearch index `' . $index->getIndex()->getName() . '`...');
             $indexName = $index->getIndex()->getName();
             $key = 'Search.Updates_' . $index->getType()->getName();
             try {
@@ -69,7 +69,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
         }
         foreach ($indexes as $index) {
             if ($index->getIndex()->exists()) {
-                $this->_getOutput()->writeln('Deleting elasticsearch index `' . $index->getIndex()->getName() . '`…');
+                $this->_getStreamOutput()->writeln('Deleting elasticsearch index `' . $index->getIndex()->getName() . '`…');
                 $index->getIndex()->delete();
             }
         }
@@ -85,8 +85,10 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
 
     public function startMaintenance() {
         $clockwork = new CM_Clockwork_Manager();
-        $clockwork->registerCallback('search-index-update', new DateInterval('PT1M'), array($this, 'update'));
-        $clockwork->registerCallback('search-index-optimize', new DateInterval('PT1H'), array($this, 'optimize'));
+        $clockwork->setServiceManager(CM_Service_Manager::getInstance());
+        $clockwork->setStorage(new CM_Clockwork_Storage_FileSystem('search-maintenance'));
+        $clockwork->registerCallback('search-index-update', '1 minute', array($this, 'update'));
+        $clockwork->registerCallback('search-index-optimize', '1 hour', array($this, 'optimize'));
         $clockwork->start();
     }
 

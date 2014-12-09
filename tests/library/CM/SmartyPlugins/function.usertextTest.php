@@ -1,6 +1,6 @@
 <?php
 
-require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.usertext.php';
+require_once CM_Util::getModulePath('CM') . 'library/CM/SmartyPlugins/function.usertext.php';
 
 class smarty_function_usertextTest extends CMTest_TestCase {
 
@@ -77,7 +77,8 @@ class smarty_function_usertextTest extends CMTest_TestCase {
         $emoticonId = CM_Db_Db::insert('cm_emoticon', array('code' => ':smiley:', 'codeAdditional' => ':-)', 'file' => '1.png'));
         $siteDefault = CM_Site_Abstract::factory();
         $this->_assertSame(
-            '<span class="usertext oneline">foo <img src="http://cdn.default.dev/layout/' . $siteDefault->getId() . '/' . CM_App::getInstance()->getDeployVersion() .
+            '<span class="usertext oneline">foo <img src="http://cdn.default.dev/layout/' . $siteDefault->getId() . '/' .
+            CM_App::getInstance()->getDeployVersion() .
             '/img/emoticon/1.png" class="emoticon emoticon-' .
             $emoticonId . '" title=":smiley:" height="16" /></span>',
             array('text' => 'foo :-)', 'mode' => 'oneline', 'isMail' => true));

@@ -27,8 +27,6 @@ class CM_CacheConst {
 
     // _id:X
     const Session = 'Session';
-    // _id:X
-    const Request_Client = 'Request_Client';
 
     // _type:X_id:X
     const CM_Model_StorageAdapter_Cache = 'CM_Model_StorageAdapter_Cache';
@@ -62,7 +60,7 @@ class CM_CacheConst {
 
     const Language_Default = 'Language_Default';
 
-    const Language_Tree = 'Language_Tree';
+    const LanguageKey_Tree = 'LanguageKey_Tree';
 
     // _className:X_abstracts:X
     const ClassChildren = 'ClassChildren';
@@ -83,4 +81,7 @@ class CM_CacheConst {
     const Modules = 'Modules';
 
     const ComposerVendorDir = 'ComposerVendorDir';
+
+    // _siteId:X
+    const AdproviderZones = 'AdproviderZones';
 }

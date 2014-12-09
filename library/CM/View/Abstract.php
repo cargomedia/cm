@@ -10,7 +10,7 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
      */
     public function __construct($params = null) {
         if (!$params instanceof CM_Params) {
-            $params = CM_Params::factory($params);
+            $params = CM_Params::factory($params, false);
         }
         $this->_params = $params;
     }

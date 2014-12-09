@@ -68,6 +68,13 @@ class CM_Bootloader {
     }
 
     /**
+     * @param CM_ExceptionHandling_Handler_Abstract $exceptionHandler
+     */
+    public function setExceptionHandler(CM_ExceptionHandling_Handler_Abstract $exceptionHandler) {
+        $this->_exceptionHandler = $exceptionHandler;
+    }
+
+    /**
      * @return CM_EventHandler_EventHandler
      */
     public function getEventHandler() {
@@ -108,11 +115,11 @@ class CM_Bootloader {
     /**
      * @return string[]
      */
-    public function getNamespaces() {
-        return array_keys($this->_getNamespacePaths());
+    public function getModules() {
+        return array_keys($this->_getModulePaths());
     }
 
-    public function reloadNamespacePaths() {
+    public function reloadModulePaths() {
         $cacheKey = CM_CacheConst::Modules;
         $cache = new CM_Cache_Storage_Apc();
         $cache->delete($cacheKey);
@@ -126,16 +133,16 @@ class CM_Bootloader {
     }
 
     /**
-     * @param string $namespace
+     * @param string $name
      * @throws CM_Exception_Invalid
      * @return string
      */
-    public function getNamespacePath($namespace) {
-        $namespacePaths = $this->_getNamespacePaths();
-        if (!array_key_exists($namespace, $namespacePaths)) {
-            throw new CM_Exception_Invalid('`' . $namespace . '`, not found within namespace paths');
+    public function getModulePath($name) {
+        $namespacePaths = $this->_getModulePaths();
+        if (!array_key_exists($name, $namespacePaths)) {
+            throw new CM_Exception_Invalid('`' . $name . '`, not found within module paths');
         }
-        return $namespacePaths[$namespace];
+        return $namespacePaths[$name];
     }
 
     /**
@@ -185,19 +192,19 @@ class CM_Bootloader {
     /**
      * @return array
      */
-    private function _getNamespacePaths() {
+    private function _getModulePaths() {
         $cacheKey = CM_CacheConst::Modules;
         $apcCache = new CM_Cache_Storage_Apc();
-        if (false === ($namespacePaths = $apcCache->get($cacheKey))) {
+        if (false === ($modulePaths = $apcCache->get($cacheKey))) {
             $fileCache = new CM_Cache_Storage_File();
             $installation = new CM_App_Installation(DIR_ROOT);
-            if ($installation->getUpdateStamp() > $fileCache->getCreateStamp($cacheKey) || false === ($namespacePaths = $fileCache->get($cacheKey))) {
-                $namespacePaths = $installation->getModulePaths();
-                $fileCache->set($cacheKey, $namespacePaths);
+            if ($installation->getUpdateStamp() > $fileCache->getCreateStamp($cacheKey) || false === ($modulePaths = $fileCache->get($cacheKey))) {
+                $modulePaths = $installation->getModulePaths();
+                $fileCache->set($cacheKey, $modulePaths);
             }
-            $apcCache->set($cacheKey, $namespacePaths);
+            $apcCache->set($cacheKey, $modulePaths);
         }
-        return $namespacePaths;
+        return $modulePaths;
     }
 
     /**
