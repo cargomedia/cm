@@ -75,16 +75,12 @@ textarea.textinput {
     opacity: .5;
   }
 
-  &.hasIcon {
+  &.hasIcon:not(.hasLabel) {
     padding: 0;
+  }
 
-    &.hasLabel {
-      padding: 0 15px;
-
-      .icon {
-        margin-right: 5px;
-      }
-    }
+  &.hasIcon.hasLabel .icon {
+    margin-right: 5px;
   }
 
   &.hasIconRight.hasLabel .icon {
