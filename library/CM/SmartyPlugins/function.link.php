@@ -20,10 +20,17 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
     }
     unset($params['title']);
 
+    $icon = null;
     if (isset($params['icon'])) {
         $icon = $params['icon'];
     }
     unset($params['icon']);
+
+    $iconPosition = 'left';
+    if (isset($params['iconPosition']) && $params['iconPosition'] === 'right') {
+        $iconPosition = 'right';
+    }
+    unset($params['iconPosition']);
 
     $data = array();
     if (isset($params['data'])) {
@@ -44,15 +51,24 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
         $label = $href;
     }
 
-    $html = '';
-    if (!empty($label)) {
-        $html = '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
-        $class .= ' hasLabel';
+    $iconMarkup = null;
+    if (null !== $icon) {
+        $iconMarkup = '<span class="icon icon-' . $icon . '"></span>';
     }
 
-    if (!empty($icon)) {
-        $html = '<span class="icon icon-' . $icon . '"></span>' . $html;
+    $html = '';
+
+    if (null !== $iconMarkup && 'left' === $iconPosition) {
+        $html .= $iconMarkup;
         $class .= ' hasIcon';
+    }
+    if (!empty($label)) {
+        $html .= '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
+        $class .= ' hasLabel';
+    }
+    if (null !== $iconMarkup && 'right' === $iconPosition) {
+        $html .= $iconMarkup;
+        $class .= ' hasIconRight';
     }
 
     $titleAttr = '';
