@@ -84,7 +84,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 function _smarty_function_paging_href(CM_Frontend_Render $render, $urlPage, array $urlParams, CM_Frontend_ViewResponse $component, $page, $ajax) {
     if ($ajax) {
         $onClick = 'cm.views["' . $component->getAutoId() . '"].reload(' . json_encode(array('page' => $page)) . ')';
-        return 'javascript:' . CM_Util::htmlspecialchars($onClick) . ';';
+        return 'javascript:' . rawurlencode($onClick) . ';';
     } else {
         return $render->getUrlPage($urlPage, array_merge($urlParams, array('page' => $page)));
     }
