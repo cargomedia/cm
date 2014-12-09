@@ -1,5 +1,6 @@
 <?php
 require_once 'function.linkUrl.php';
+require_once 'function.tag.php';
 
 function smarty_function_link(array $params, Smarty_Internal_Template $template) {
     $label = '';
@@ -14,7 +15,7 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
     }
     unset($params['class']);
 
-    $title = '';
+    $title = null;
     if (isset($params['title'])) {
         $title = $params['title'];
     }
@@ -71,17 +72,17 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
         $class .= ' hasIconRight';
     }
 
-    $titleAttr = '';
-    if (!empty($title)) {
-        $titleAttr = ' title="' . CM_Util::htmlspecialchars($title) . '"';
-    }
+    $attributeList = [
+        'el'      => 'a',
+        'content' => $html,
+        'href'    => $href,
+        'class'   => $class,
+        'title'   => $title,
+    ];
 
-    $dataAttr = '';
     foreach ($data as $name => $value) {
-        $dataAttr .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
+        $attributeList['data-' . $name] = $value;
     }
 
-    $html = '<a href="' . $href . '" class="' . $class . '"' . $titleAttr . $dataAttr . '>' . $html . '</a>';
-
-    return $html;
+    return smarty_function_tag($attributeList, $template);
 }
