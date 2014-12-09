@@ -42,16 +42,14 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 
     if ($paging->getPage() > 1) {
         if ($pageMin > 1) {
-            $html .= smarty_function_link([
-                'href'         => _smarty_function_paging_href($render, $urlPage, $urlParams, $component, 1, $ajax),
+            $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, 1, [
                 'label'        => $render->getTranslation('First'),
                 'icon'         => 'arrow-first',
                 'iconPosition' => 'left',
                 'class'        => 'pagingFirst',
             ], $template);
         }
-        $html .= smarty_function_link([
-            'href'         => _smarty_function_paging_href($render, $urlPage, $urlParams, $component, $paging->getPage() - 1, $ajax),
+        $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $paging->getPage() - 1, [
             'label'        => $render->getTranslation('Previous'),
             'icon'         => 'nav-left',
             'iconPosition' => 'left',
@@ -64,8 +62,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
         if ($p == $paging->getPage()) {
             $html .= '<span class="pagingCurrent">' . $labelNumber . '</span>';
         } else {
-            $html .= smarty_function_link([
-                'href'  => _smarty_function_paging_href($render, $urlPage, $urlParams, $component, $p, $ajax),
+            $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $p, [
                 'label' => $labelNumber,
                 'class' => 'pagingNumber',
             ], $template);
@@ -73,16 +70,14 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
     }
 
     if ($paging->getPage() < $paging->getPageCount()) {
-        $html .= smarty_function_link([
-            'href'         => _smarty_function_paging_href($render, $urlPage, $urlParams, $component, $paging->getPage() + 1, $ajax),
+        $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $paging->getPage() + 1, [
             'label'        => $render->getTranslation('Next'),
             'icon'         => 'nav-right',
             'iconPosition' => 'right',
             'class'        => 'pagingNext',
         ], $template);
         if ($pageMax < $paging->getPageCount()) {
-            $html .= smarty_function_link([
-                'href'         => _smarty_function_paging_href($render, $urlPage, $urlParams, $component, $paging->getPageCount(), $ajax),
+            $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $paging->getPageCount(), [
                 'label'        => $render->getTranslation('Last'),
                 'icon'         => 'arrow-last',
                 'iconPosition' => 'right',
@@ -102,14 +97,16 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
  * @param array                    $urlParams
  * @param CM_Frontend_ViewResponse $component
  * @param int                      $page
- * @param bool                     $ajax
+ * @param string[]                 $linkParams
+ * @param Smarty_Internal_Template $template
  * @return string
  */
-function _smarty_function_paging_href(CM_Frontend_Render $render, $urlPage, array $urlParams, CM_Frontend_ViewResponse $component, $page, $ajax) {
-    if ($ajax) {
-        $onClick = 'cm.views["' . $component->getAutoId() . '"].reload(' . json_encode(array('page' => $page)) . ')';
-        return 'javascript:' . rawurlencode($onClick) . ';';
+function _smarty_function_paging_link(CM_Frontend_Render $render, $urlPage, array $urlParams, CM_Frontend_ViewResponse $component, $page, array $linkParams, Smarty_Internal_Template $template) {
+    if (empty($urlPage)) {
+        $javascript = 'cm.views["' . $component->getAutoId() . '"].reload(' . json_encode(array('page' => $page)) . ')';
+        $linkParams['onclick'] = $javascript . ';return false;';
     } else {
-        return $render->getUrlPage($urlPage, array_merge($urlParams, array('page' => $page)));
+        $linkParams['href'] = $render->getUrlPage($urlPage, array_merge($urlParams, array('page' => $page)));
     }
+    return smarty_function_link($linkParams, $template);
 }
