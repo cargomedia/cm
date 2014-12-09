@@ -24,8 +24,8 @@ class CMTest_TH {
         self::clearDb();
         self::clearCache();
         self::timeReset();
-        self::clearConfig();
         self::clearFilesystem();
+        CM_Config::set(unserialize(self::$_configBackup));
     }
 
     public static function clearFilesystem() {
@@ -44,13 +44,6 @@ class CMTest_TH {
     public static function clearDb() {
         self::clearCache();
         CM_App::getInstance()->setup(new CM_OutputStream_Null(), true);
-    }
-
-    /**
-     * @deprecated use clearEnv instead
-     */
-    public static function clearConfig() {
-        CM_Config::set(unserialize(self::$_configBackup));
     }
 
     public static function timeInit() {
