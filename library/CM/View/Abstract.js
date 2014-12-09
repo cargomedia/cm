@@ -9,9 +9,6 @@ var CM_View_Abstract = Backbone.View.extend({
   _children: [],
 
   constructor: function(options) {
-    if (this.options) {
-      options = _.extend({}, _.result(this, 'options'), options);
-    }
     this.options = options;
     Backbone.View.apply(this, arguments);
   },
