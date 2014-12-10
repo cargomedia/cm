@@ -173,7 +173,7 @@ class CM_App implements CM_Service_ManagerAwareInterface {
             $path = CM_Util::getModulePath($moduleName);
         }
         $file = new CM_File($path . 'resources/db/update/' . $version . '.php');
-        if (!$file->getExists()) {
+        if (!$file->exists()) {
             throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $moduleName . '` namespace.');
         }
         return $file->getPath();

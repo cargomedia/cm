@@ -129,7 +129,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         foreach ($moduleList as $module) {
             foreach ($this->getSite()->getThemes() as $theme) {
                 $file = new CM_File($this->getThemeDir(true, $theme, $module) . $template);
-                if ($file->getExists()) {
+                if ($file->exists()) {
                     if ($absolute) {
                         return $file->getPath();
                     } else {

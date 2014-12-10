@@ -70,7 +70,7 @@ class CM_FileTest extends CMTest_TestCase {
 
     public function testCreateTmp() {
         $file = CM_File::createTmp();
-        $this->assertTrue($file->getExists());
+        $this->assertTrue($file->exists());
         $this->assertNull($file->getExtension());
         $this->assertEmpty($file->read());
         $file->delete();
@@ -89,12 +89,12 @@ class CM_FileTest extends CMTest_TestCase {
         $dir = CM_File::createTmpDir();
         $file = $dir->joinPath('foo');
         $file->write('hello');
-        $this->assertTrue($dir->getExists());
-        $this->assertTrue($file->getExists());
+        $this->assertTrue($dir->exists());
+        $this->assertTrue($file->exists());
 
         $dir->delete(true);
-        $this->assertFalse($dir->getExists());
-        $this->assertFalse($file->getExists());
+        $this->assertFalse($dir->exists());
+        $this->assertFalse($file->exists());
     }
 
     /**
@@ -105,8 +105,8 @@ class CM_FileTest extends CMTest_TestCase {
         $dir = CM_File::createTmpDir();
         $file = $dir->joinPath('foo');
         $file->write('hello');
-        $this->assertTrue($dir->getExists());
-        $this->assertTrue($file->getExists());
+        $this->assertTrue($dir->exists());
+        $this->assertTrue($file->exists());
 
         $dir->delete();
     }
@@ -191,11 +191,11 @@ class CM_FileTest extends CMTest_TestCase {
     public function testEnsureParentDirectory() {
         $dir = new CM_File(CM_Bootloader::getInstance()->getDirTmp() . 'foo/bar');
         $file = new CM_File($dir->getPath() . '/mega.txt');
-        $this->assertFalse($dir->getExists());
+        $this->assertFalse($dir->exists());
 
         $file->ensureParentDirectory();
-        $this->assertTrue($dir->getExists());
-        $this->assertFalse($file->getExists());
+        $this->assertTrue($dir->exists());
+        $this->assertFalse($file->exists());
     }
 
     public function createTmpDir() {

@@ -11,7 +11,7 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
         $this->addVariables();
 
         $file = new CM_File(DIR_PUBLIC . 'static/css/library/icon.less');
-        if ($file->getExists()) {
+        if ($file->exists()) {
             $this->add($file->read());
         }
         foreach (array_reverse($render->getSite()->getModules()) as $moduleName) {

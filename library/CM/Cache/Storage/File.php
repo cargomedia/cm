@@ -9,7 +9,7 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
      */
     public function getCreateStamp($key) {
         $file = $this->_getFile($this->_getKeyArmored($key));
-        if (!$file->getExists()) {
+        if (!$file->exists()) {
             return null;
         }
         return $file->getModified();
@@ -30,7 +30,7 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 
     protected function _get($key) {
         $file = $this->_getFile($key);
-        if (!$file->getExists()) {
+        if (!$file->exists()) {
             return false;
         }
         return unserialize($file->read());
@@ -38,7 +38,7 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 
     protected function _delete($key) {
         $file = $this->_getFile($key);
-        if ($file->getExists()) {
+        if ($file->exists()) {
             $file->delete();
         }
     }
