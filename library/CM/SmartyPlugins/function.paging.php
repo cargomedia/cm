@@ -1,4 +1,5 @@
 <?php
+require_once 'function.link.php';
 
 function smarty_function_paging(array $params, Smarty_Internal_Template $template) {
     /** @var CM_Frontend_Render $render */
@@ -17,14 +18,22 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
     $urlParams = !empty($params['urlParams']) ? (array) $params['urlParams'] : array();
 
     $ajax = empty($urlPage);
-    $size = 5;
+    $size = 1;
 
     if ($paging->getPageCount() <= 1) {
         return '';
     }
 
+    $class = 'function-paging';
+    if (1 === $paging->getPage()) {
+        $class .= ' paging-isFirst';
+    }
+    if ($paging->getPageCount() === $paging->getPage()) {
+        $class .= ' paging-isLast';
+    }
+
     $html = '';
-    $html .= '<div class="paging">';
+    $html .= '<div class="' . $class . '">';
 
     $boundDistMin = min($paging->getPage() - 1, $paging->getPageCount() - $paging->getPage());
     $sizeMax = $size - min($boundDistMin, floor($size / 2)) - 1;
@@ -33,22 +42,47 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 
     if ($paging->getPage() > 1) {
         if ($pageMin > 1) {
-            $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, 1, '1', $ajax, 'pagingFirst');
+            $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, 1, [
+                'label'        => $render->getTranslation('First'),
+                'icon'         => 'arrow-first',
+                'iconPosition' => 'left',
+                'class'        => 'pagingFirst',
+            ], $template);
         }
-        $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component,
-            $paging->getPage() - 1, '', $ajax, 'pagingPrev icon-arrow-left');
+        $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $paging->getPage() - 1, [
+            'label'        => $render->getTranslation('Previous'),
+            'icon'         => 'nav-left',
+            'iconPosition' => 'left',
+            'class'        => 'pagingPrevious',
+        ], $template);
     }
 
     for ($p = $pageMin; $p <= $pageMax; $p++) {
-        $classActive = ($p == $paging->getPage()) ? 'active' : '';
-        $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $p, $p, $ajax, 'pagingNumber ' . $classActive);
+        $labelNumber = $render->getTranslation('Page {$number}', ['number' => $p]);
+        if ($p == $paging->getPage()) {
+            $html .= '<span class="pagingCurrent">' . $labelNumber . '</span>';
+        } else {
+            $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $p, [
+                'label' => $labelNumber,
+                'class' => 'pagingNumber',
+            ], $template);
+        }
     }
 
     if ($paging->getPage() < $paging->getPageCount()) {
-        $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component,
-            $paging->getPage() + 1, $render->getTranslation('next'), $ajax, 'pagingNext');
+        $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $paging->getPage() + 1, [
+            'label'        => $render->getTranslation('Next'),
+            'icon'         => 'nav-right',
+            'iconPosition' => 'right',
+            'class'        => 'pagingNext',
+        ], $template);
         if ($pageMax < $paging->getPageCount()) {
-            $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $paging->getPageCount(), $paging->getPageCount(), $ajax, 'pagingLast');
+            $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $paging->getPageCount(), [
+                'label'        => $render->getTranslation('Last'),
+                'icon'         => 'arrow-last',
+                'iconPosition' => 'right',
+                'class'        => 'pagingLast',
+            ], $template);
         }
     }
 
@@ -63,26 +97,16 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
  * @param array                    $urlParams
  * @param CM_Frontend_ViewResponse $component
  * @param int                      $page
- * @param string                   $text
- * @param bool                     $ajax
- * @param string|null              $class
+ * @param string[]                 $linkParams
+ * @param Smarty_Internal_Template $template
  * @return string
  */
-function _smarty_function_paging_link(CM_Frontend_Render $render, $urlPage, array $urlParams, CM_Frontend_ViewResponse $component, $page, $text, $ajax, $class = null) {
-    if ($ajax) {
-        $href = 'javascript:;';
-        $onClick = 'cm.views["' . $component->getAutoId() . '"].reload(' . json_encode(array('page' => $page)) . ')';
+function _smarty_function_paging_link(CM_Frontend_Render $render, $urlPage, array $urlParams, CM_Frontend_ViewResponse $component, $page, array $linkParams, Smarty_Internal_Template $template) {
+    if (empty($urlPage)) {
+        $javascript = 'cm.views["' . $component->getAutoId() . '"].reload(' . json_encode(array('page' => $page)) . ')';
+        $linkParams['onclick'] = $javascript . ';return false;';
     } else {
-        $href = $render->getUrlPage($urlPage, array_merge($urlParams, array('page' => $page)));
-        $onClick = null;
+        $linkParams['href'] = $render->getUrlPage($urlPage, array_merge($urlParams, array('page' => $page)));
     }
-    $html = '<a href="' . $href . '"';
-    if ($onClick) {
-        $html .= ' onclick="' . htmlentities($onClick) . ';return false;"';
-    }
-    if ($class) {
-        $html .= ' class="' . $class . '"';
-    }
-    $html .= '>' . $text . '</a>';
-    return $html;
+    return smarty_function_link($linkParams, $template);
 }

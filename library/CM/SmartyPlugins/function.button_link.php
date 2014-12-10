@@ -82,7 +82,7 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
     }
 
     if ($onclick) {
-        $attrs .= ' onclick="' . $onclick . '"';
+        $attrs .= ' onclick="' . CM_Util::htmlspecialchars($onclick) . '"';
     }
 
     if (isset($params['data'])) {

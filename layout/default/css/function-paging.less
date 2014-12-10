@@ -1,0 +1,46 @@
+.function-paging {
+  padding: 10px;
+  text-align: center;
+
+  .pagingCurrent {
+    padding: 0 20px;
+    color: @fontColorStrong;
+    font-weight: @fontWeightStrong;
+    line-height: @sizeButton;
+  }
+
+  .pagingNumber, .pagingNext, .pagingPrevious, .pagingFirst, .pagingLast {
+    display: inline-block;
+    .button;
+    .button-default;
+
+    &.link:hover > .label {
+      text-decoration: none;
+    }
+  }
+
+  .pagingFirst, .pagingLast {
+    display: none;
+  }
+
+  &.paging-isFirst {
+
+    .pagingCurrent {
+      display: none;
+    }
+  }
+
+  &:not(.paging-isFirst):not(.paging-isLast) {
+    .pagingNext, .pagingPrevious, .pagingFirst, .pagingLast {
+      padding-left: 20px;
+      padding-right: 20px;
+
+      .label {
+        display: none;
+      }
+      .icon {
+        margin: 0;
+      }
+    }
+  }
+}

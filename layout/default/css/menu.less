@@ -10,15 +10,12 @@
       display: block;
       .nowrap;
       padding: 7px 10px;
-      color: @colorFgLinkSubtle;
+      color: @fontColorStrong;
+      font-weight: @fontWeightStrong;
       opacity: .8;
 
       &:hover {
         opacity: 1;
-
-        .icon {
-          color: @colorFgHeading;
-        }
       }
     }
     &.hasIcon.hasLabel > a > .label {
@@ -29,7 +26,7 @@
       opacity: 1;
 
       .icon {
-        color: @colorFgHeading;
+        color: @fontColorHeading;
       }
     }
   }
@@ -103,10 +100,10 @@
         background-color: @colorBg;
         box-shadow: none;
         z-index: auto;
-        font-weight: bold;
+        font-weight: @fontWeightStrong;
 
         .icon {
-          color: @colorFgHeading;
+          color: @fontColorHeading;
         }
       }
     }

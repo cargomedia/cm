@@ -53,14 +53,14 @@
       }
 
       &.selected {
-        font-weight: bold;
+        font-weight: @fontWeightStrong;
       }
     }
 
     &.unselect {
       cursor: pointer;
-      color: @colorFgLinkSubtle;
       .nowrap;
+      font-style: italic;
     }
 
     .count {
@@ -77,7 +77,7 @@
       cursor: pointer;
 
       &:hover {
-        color: @colorFgHeading;
+        color: @fontColorHeading;
       }
     }
   }
@@ -89,7 +89,7 @@
 
     > .icon-arrow-right {
       transform: rotate(90deg);
-      color: @colorFgHeading;
+      color: @fontColorHeading;
     }
   }
 }

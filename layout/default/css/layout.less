@@ -1,6 +1,8 @@
 html {
   font-family: @fontFamily;
   font-size: @fontSize;
+  font-weight: @fontWeight;
+  -webkit-font-smoothing: antialiased;
   line-height: @fontLineHeight;
   color: @colorFg;
 }
@@ -19,38 +21,39 @@ a:hover, a:active {
 }
 
 h1, h2, h3, h4, h5 {
-  line-height: 1.7;
+  font-weight: @fontWeightHeading;
+  line-height: @fontLineHeightHeading;
 }
 
 h1, h2, h3 {
   font-family: @fontFamilyHeading;
-  font-weight: normal;
-  color: @colorFgHeading;
+  color: @fontColorHeading;
 }
 
 h1 {
   margin: 7px 0;
-  font-size: 18px;
+  font-size: round(@fontSize * 1.3);
   letter-spacing: 1px;
 }
 
 h2 {
   margin: 0;
-  font-size: 15px;
+  font-size: round(@fontSize * 1.1);
 }
 
 h3 {
   margin: 0;
-  font-size: 13px;
+  font-size: @fontSize;
 }
 
 h4 {
+  font-size: @fontSize;
   margin: 8px 0 2px 0;
 }
 
 h5 {
   margin: 0;
-  font-weight: normal;
+  font-size: @fontSize;
   font-style: italic;
 }
 
@@ -64,8 +67,8 @@ hr {
   border-top: 1px solid @colorFgBorderEmphasize1;
 }
 
-strong {
-  font-weight: bold;
+strong, b {
+  font-weight: @fontWeightStrong;
 }
 
 small {
