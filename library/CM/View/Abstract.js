@@ -9,7 +9,7 @@ var CM_View_Abstract = Backbone.View.extend({
   _children: [],
 
   /**
-   * @param {Object} options
+   * @param {Object} [options]
    */
   constructor: function(options) {
     this.options = options || {};
