@@ -8,8 +8,8 @@
 @colorFocus: @colorBrand;
 
 // Basic Color
-@colorFg: #222222;
-@colorFgSubtle: lighten(@colorFg, 25);
+@colorFg: #444444;
+@colorFgSubtle: mix(@colorFg, @colorBg, 80);
 
 @colorBgTheme: @colorBrand;
 @colorFgTheme: #ffffff;
@@ -37,17 +37,14 @@
 
 //Font
 @fontFamily: Helvetica, Arial, sans-serif;
-@fontWeight: 200;
 @fontLineHeight: 1.4;
 @fontColor: @colorFg;
 @fontSize: 14px;
 
 @fontFamilyHeading: Helvetica, Arial, sans-serif;
-@fontWeightHeading: 700;
 @fontLineHeightHeading: 1.7;
 @fontColorHeading: @colorBrand;
 
-@fontWeightStrong: @fontWeight * 2;
 @fontColorStrong: mix(@colorFg, @colorBg, 90);
 
 @fontSizeSmall: 12px;
