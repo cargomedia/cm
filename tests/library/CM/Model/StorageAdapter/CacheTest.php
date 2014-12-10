@@ -6,7 +6,7 @@ class CM_Model_StorageAdapter_CacheTest extends CMTest_TestCase {
     }
 
     public function tearDown() {
-        CM_Cache_Shared::getInstance()->flush();
+        CMTest_TH::clearEnv();
     }
 
     public function testGetCacheKey() {
@@ -20,8 +20,6 @@ class CM_Model_StorageAdapter_CacheTest extends CMTest_TestCase {
         $method = CMTest_TH::getProtectedMethod('CM_Model_StorageAdapter_Cache', '_getCacheKey');
         $this->assertSame('CM_Model_StorageAdapter_Cache_type:1_id:a:1:{s:2:"id";i:2;}', $method->invoke($adapter, 1, array('id' => 2)));
         $this->assertSame('CM_Model_StorageAdapter_Cache_type:2_id:a:1:{s:2:"id";i:3;}', $method->invoke($adapter, 2, array('id' => 3)));
-
-        CMTest_TH::clearEnv();
     }
 
     public function testLoad() {

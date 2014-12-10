@@ -461,8 +461,6 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $modelMock2 = CM_Model_Abstract::factoryGeneric(CM_ModelMock::getTypeStatic(), $idRaw);
         $this->assertEquals($modelMock1, $modelMock2);
         $this->assertEquals($modelMock1->_get('foo'), $modelMock2->_get('foo'));
-
-        CMTest_TH::clearEnv();
     }
 
     public function testFactoryGenericWithData() {
@@ -472,8 +470,6 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         /** @var CM_ModelMock $modelMock2 */
         $modelMock2 = CM_Model_Abstract::factoryGeneric(CM_ModelMock::getTypeStatic(), $modelMock1->getIdRaw(), array('foo' => 'bla'));
         $this->assertSame('bla', $modelMock2->getFoo());
-
-        CMTest_TH::clearEnv();
     }
 
     public function testFactoryGenericMultiple() {

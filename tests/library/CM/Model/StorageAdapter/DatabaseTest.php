@@ -31,8 +31,6 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
         $method = CMTest_TH::getProtectedMethod('CM_Model_StorageAdapter_Database', '_getTableName');
         $this->assertSame('cmtest_modelmock_1', $method->invoke($adapter, 1));
         $this->assertSame('cmtest_modelmock_2', $method->invoke($adapter, 2));
-
-        CMTest_TH::clearEnv();
     }
 
     public function testLoad() {

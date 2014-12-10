@@ -2,6 +2,10 @@
 
 class CM_AdproviderAdapter_OpenxTest extends CMTest_TestCase {
 
+    public function tearDown() {
+        CMTest_TH::clearEnv();
+    }
+
     public function testGetHtml() {
         CM_Config::get()->CM_Adprovider->enabled = true;
         CM_Config::get()->CM_AdproviderAdapter_Openx->host = 'www.foo.org';
@@ -12,7 +16,5 @@ class CM_AdproviderAdapter_OpenxTest extends CMTest_TestCase {
 
         $html = $openx->getHtml(array('zoneId' => 'zone1'), array());
         $this->assertContains('<div class="openx-ad" data-zone-id="zone1" data-host="www.foo.org" data-variables="{}"', $html);
-
-        CMTest_TH::clearEnv();
     }
 }

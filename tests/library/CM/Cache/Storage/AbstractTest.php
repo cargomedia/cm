@@ -3,7 +3,6 @@
 class CM_Cache_Storage_AbstractTest extends CMTest_TestCase {
 
     public function tearDown() {
-        CM_Cache_Storage_Runtime::getInstance()->flush();
         CMTest_TH::clearEnv();
     }
 

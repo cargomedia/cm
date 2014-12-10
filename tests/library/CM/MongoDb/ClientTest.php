@@ -14,7 +14,6 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
         $this->assertTrue($client->databaseExists());
     }
 
-
     public function testInsert() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'insert';
