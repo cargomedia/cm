@@ -62,7 +62,6 @@ textarea.textinput {
   letter-spacing: 1px;
   cursor: pointer;
   transition: background-color 200ms;
-  font-weight: @fontWeightStrong;
 
   &:not(:disabled):active {
     box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
@@ -115,6 +114,10 @@ textarea.textinput {
   &:not(:disabled):hover {
     background-color: darken(@colorBgButton, 5);
     border-color: darken(@colorFgButtonBorder, 5);
+  }
+
+  &.active {
+    .button-default-active;
   }
 }
 
@@ -286,7 +289,6 @@ input[type=checkbox] {
   > label {
     box-sizing: border-box;
     color: @fontColorStrong;
-    font-weight: @fontWeightStrong;
     padding-left: 2px;
     .word_wrap;
 
