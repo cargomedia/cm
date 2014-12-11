@@ -2,6 +2,7 @@
 
 class CM_Config_Generator extends CM_Class_Abstract {
 
+    /** @var int  */
     private $_typesMaxValue = 0;
 
     /** @var string[] */
@@ -17,7 +18,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
     private $_namespaceTypes = array();
 
     /**
-     * @return array[]
+     * @return array[][]
      */
     public function getNamespaceTypes() {
         $this->_checkTypesGenerated();
@@ -46,6 +47,55 @@ class CM_Config_Generator extends CM_Class_Abstract {
     public function getClassTypesRemoved() {
         $this->_checkTypesGenerated();
         return $this->_classTypesRemoved;
+    }
+
+    /**
+     * @return CM_Config_Node
+     */
+    public function getConfigClassTypes() {
+        $config = new CM_Config_Node();
+        foreach ($this->getNamespaceTypes() as $namespaceClass => $typeList) {
+            ksort($typeList);
+            $config->$namespaceClass->types = $typeList;
+        }
+        $classTypes = $this->getClassTypes();
+        ksort($classTypes);
+        foreach ($classTypes as $type => $class) {
+            $config->$class->type = $type;
+        }
+        $config->CM_Class_Abstract->typesMaxValue = $this->_typesMaxValue;
+        return $config;
+    }
+
+    /**
+     * @return CM_Config_Node
+     * @throws CM_Exception_Invalid
+     */
+    public function getConfigActionVerbs() {
+        $maxValue = 0;
+        if (isset(CM_Config::get()->CM_Action_Abstract->verbsMaxValue)) {
+            $maxValue = CM_Config::get()->CM_Action_Abstract->verbsMaxValue;
+        }
+
+        $currentVerbs = array();
+        if (isset(CM_Config::get()->CM_Action_Abstract->verbs)) {
+            $currentVerbs = CM_Config::get()->CM_Action_Abstract->verbs;
+        }
+
+        $config = new CM_Config_Node();
+        $actionVerbs = [];
+        foreach ($this->getActionVerbs() as $actionVerb) {
+            if (!array_key_exists($actionVerb['value'], $currentVerbs)) {
+                $maxValue++;
+                $currentVerbs[$actionVerb['value']] = $maxValue;
+            }
+            $key = $actionVerb['className'] . '::' . $actionVerb['name'];
+            $id = $currentVerbs[$actionVerb['value']];
+            $actionVerbs[$key] = $id;
+        }
+        $config->CM_Action_Abstract->verbs = $actionVerbs;
+        $config->CM_Action_Abstract->verbsMaxValue = $maxValue;
+        return $config;
     }
 
     public function generateClassTypes() {
@@ -95,57 +145,6 @@ class CM_Config_Generator extends CM_Class_Abstract {
                 $this->_namespaceTypes[$namespaceClass][$type] = $class;
             }
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function generateConfigClassTypes() {
-        if (empty($this->_classTypes)) {
-            $this->generateClassTypes();
-        }
-        $output = '';
-        foreach ($this->getNamespaceTypes() as $namespaceClass => $typeList) {
-            ksort($typeList);
-            $output .= '$config->' . $namespaceClass . '->types = array();' . PHP_EOL;
-            foreach ($typeList as $type => $class) {
-                $output .= '$config->' . $namespaceClass . '->types[' . $type . '] = \'' . $class . '\';' . PHP_EOL;
-            }
-            $output .= PHP_EOL;
-        }
-        $classTypes = $this->getClassTypes();
-        ksort($classTypes);
-        $output .= PHP_EOL;
-        foreach ($classTypes as $type => $class) {
-            $output .= '$config->' . $class . '->type = ' . $type . ';' . PHP_EOL;
-        }
-        $output .= PHP_EOL . '$config->CM_Class_Abstract->typesMaxValue = ' . $this->_typesMaxValue . ';' . PHP_EOL;
-        return $output;
-    }
-
-    public function generateConfigActionVerbs() {
-        $maxValue = 0;
-        if (isset(CM_Config::get()->CM_Action_Abstract->verbsMaxValue)) {
-            $maxValue = CM_Config::get()->CM_Action_Abstract->verbsMaxValue;
-        }
-
-        $currentVerbs = array();
-        if (isset(CM_Config::get()->CM_Action_Abstract->verbs)) {
-            $currentVerbs = CM_Config::get()->CM_Action_Abstract->verbs;
-        }
-
-        $content = '$config->CM_Action_Abstract->verbs = array();' . PHP_EOL;
-        foreach ($this->getActionVerbs() as $actionVerb) {
-            if (!array_key_exists($actionVerb['value'], $currentVerbs)) {
-                $maxValue++;
-                $currentVerbs[$actionVerb['value']] = $maxValue;
-            }
-            $key = $actionVerb['className'] . '::' . $actionVerb['name'];
-            $id = $currentVerbs[$actionVerb['value']];
-            $content .= '$config->CM_Action_Abstract->verbs[' . $key . '] = ' . var_export($id, true) . ';' . PHP_EOL;
-        }
-        $content .= '$config->CM_Action_Abstract->verbsMaxValue = ' . $maxValue . ';';
-        return $content;
     }
 
     /**
