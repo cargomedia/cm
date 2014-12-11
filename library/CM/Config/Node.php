@@ -87,7 +87,7 @@ class CM_Config_Node {
             if (is_object($value) && isset ($base->$key) && is_object($base->$key)) {
                 $base->$key = $this->extendWithConfig($value, $base->$key);
             } elseif (is_array($value) && isset ($base->$key) && is_array($base->$key)) {
-                $base->$key = array_merge($base->$key, $value);
+                $base->$key = $value + $base->$key;
             } else {
                 $base->$key = $value;
             }

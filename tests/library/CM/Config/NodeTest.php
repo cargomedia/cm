@@ -13,18 +13,21 @@ class CM_Config_NodeTest extends CMTest_TestCase {
         $base = new CM_Config_Node();
         $base->foo->bar->foo = 1;
         $base->foo->bar->bar = 1;
-        $base->foo->bar->array = ['foo' => 3, 'bar' => 2];
+        $base->foo->bar->arrayAssoc = ['foo' => 3, 'bar' => 2];
+        $base->foo->bar->arrayNumeric = [1, 2, 3];
 
         $extension = new CM_Config_Node();
         $extension->bar = 'foo';
         $extension->foo->bar->bar = 2;
-        $extension->foo->bar->array = ['foo' => 2];
+        $extension->foo->bar->arrayAssoc = ['foo' => 2];
+        $extension->foo->bar->arrayNumeric = [2, 3];
 
         $expected = new CM_Config_Node();
         $expected->foo->bar->foo = 1;
         $expected->foo->bar->bar = 2;
         $expected->bar = 'foo';
-        $expected->foo->bar->array = ['foo' => 2, 'bar' => 2];
+        $expected->foo->bar->arrayAssoc = ['foo' => 2, 'bar' => 2];
+        $expected->foo->bar->arrayNumeric = [2, 3, 3];
 
         $actual = clone $base;
 
