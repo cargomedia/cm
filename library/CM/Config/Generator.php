@@ -53,6 +53,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
      * @return CM_Config_Node
      */
     public function getConfigClassTypes() {
+        $this->generateClassTypes();
         $config = new CM_Config_Node();
         foreach ($this->getNamespaceTypes() as $namespaceClass => $typeList) {
             ksort($typeList);
