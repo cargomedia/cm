@@ -8,8 +8,8 @@
 @colorFocus: @colorBrand;
 
 // Basic Color
-@colorFg: #222222;
-@colorFgSubtle: lighten(@colorFg, 25);
+@colorFg: #555555;
+@colorFgSubtle: mix(@colorFg, @colorBg, 80);
 
 @colorBgTheme: @colorBrand;
 @colorFgTheme: #ffffff;
@@ -20,7 +20,6 @@
 @colorBgEmphasize1: darken(@colorBg, 3);
 @colorBgEmphasize2: darken(@colorBg, 6);
 @colorBgEmphasize3: darken(@colorBg, 10);
-@colorBgSelect: mix(@colorBrand, @colorBg, 10);
 
 //Border
 @colorFgBorder: #f1f1f1;
@@ -37,18 +36,15 @@
 
 //Font
 @fontFamily: Helvetica, Arial, sans-serif;
-@fontWeight: 200;
 @fontLineHeight: 1.4;
 @fontColor: @colorFg;
 @fontSize: 14px;
 
 @fontFamilyHeading: Helvetica, Arial, sans-serif;
-@fontWeightHeading: 700;
 @fontLineHeightHeading: 1.7;
 @fontColorHeading: @colorBrand;
 
-@fontWeightStrong: @fontWeight * 2;
-@fontColorStrong: mix(@colorFg, @colorBg, 90);
+@fontColorStrong: contrast(@colorFg, lighten(@colorFg, 10), darken(@colorFg, 10));
 
 @fontSizeSmall: 12px;
 @fontSizeTiny: 10px;

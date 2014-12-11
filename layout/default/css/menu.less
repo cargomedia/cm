@@ -4,30 +4,23 @@
 
   > li {
     display: inline-block;
-    vertical-align: bottom;
 
     > a {
-      display: block;
       .nowrap;
+      display: block;
       padding: 7px 10px;
-      color: @fontColorStrong;
-      font-weight: @fontWeightStrong;
-      opacity: .8;
-
-      &:hover {
-        opacity: 1;
-      }
-    }
-    &.hasIcon.hasLabel > a > .label {
-      margin-left: 4px;
-    }
-
-    &.active a, &.active a:hover {
-      opacity: 1;
+      color: @fontColor;
 
       .icon {
-        color: @fontColorHeading;
+        opacity: 0.8;
       }
+    }
+    &.hasIcon.hasLabel .label {
+      margin-left: 5px;
+    }
+
+    &.active a {
+      color: @fontColorHeading;
     }
   }
 }
@@ -35,77 +28,32 @@
 .menu-pills {
   margin-bottom: 5px;
   line-height: 0;
-
-  &.select {
-    > li {
-      margin: 0 5px 5px 0;
-
-      > a {
-        box-shadow: 1px 1px lighten(@colorFg, 20);
-        background-color: @colorBg;
-      }
-
-      &.active > a {
-        transform: translate(1px, 1px);
-        background-color: @colorBgEmphasize3;
-      }
-    }
-  }
+  background-color: @colorBgButton;
+  border: 1px solid @colorFgButtonBorder;
+  border-radius: @borderRadiusInput;
 
   > li {
     display: inline-block;
-    position: relative;
-    margin-bottom: 2px;
-    white-space: nowrap;
-
-    &:not(:first-child) {
-      margin-left: -1px;
-    }
 
     > a {
-      position: relative;
-      display: block;
-      max-width: 150px;
       .nowrap;
+      display: block;
       padding: 0 15px;
-      z-index: 1;
-      line-height: 38px;
-      border: 1px solid @colorFgBorderEmphasize3;
-      background-color: @colorBgEmphasize1;
-      text-decoration: none;
-      color: @colorFg;
-
-      &:hover {
-        background-color: @colorBgEmphasize2;
-      }
-
-      .icon, .label {
-        vertical-align: top;
-      }
+      max-width: 150px;
+      color: @fontColor;
+      line-height: @sizeButton;
 
       .icon {
-        display: inline-block;
-        font-size: 1.2em;
-        color: @colorFgSubtle;
+        opacity: 0.8;
       }
     }
 
     &.hasIcon.hasLabel .label {
-      margin-left: 7px;
+      margin-left: 5px;
     }
 
-    &.active {
-      > a {
-        border: 1px solid darken(@colorFgBorderEmphasize3, 5);
-        background-color: @colorBg;
-        box-shadow: none;
-        z-index: auto;
-        font-weight: @fontWeightStrong;
-
-        .icon {
-          color: @fontColorHeading;
-        }
-      }
+    &.active a {
+      color: @fontColorHeading;
     }
   }
 }
