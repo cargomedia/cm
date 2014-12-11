@@ -19,6 +19,9 @@ class CM_Config_Node {
             if ($value instanceof self) {
                 $object->$key = $value->export();
             } else {
+                if (is_array($value)) {
+                    $this->_evaluateConstantsInKeys($value);
+                }
                 $object->$key = $value;
             }
         }
@@ -45,5 +48,32 @@ class CM_Config_Node {
             throw new CM_Exception_Invalid('Invalid config file. `' . $configFile->getPath() . '` must return closure');
         }
         $configSetter($this);
+    }
+
+    /**
+     * @param array $list
+     */
+    private function _evaluateConstantsInKeys(array &$list) {
+        $keys = array_keys($list);
+        $keys = \Functional\map($keys, function ($key) {
+            if ($value = $this->_evaluateClassConstant($key)) {
+                return $value;
+            }
+            return $key;
+        });
+        $list = array_combine($keys, array_values($list));
+    }
+
+    /**
+     * @param string $reference
+     * @return mixed|null
+     */
+    private function _evaluateClassConstant($reference) {
+        if (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*::[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $reference) &&
+            $value = eval("return {$reference};")
+        ) {
+            return $value;
+        }
+        return null;
     }
 }
