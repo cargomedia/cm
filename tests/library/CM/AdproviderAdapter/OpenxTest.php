@@ -2,10 +2,6 @@
 
 class CM_AdproviderAdapter_OpenxTest extends CMTest_TestCase {
 
-    public function tearDown() {
-        CMTest_TH::clearEnv();
-    }
-
     public function testGetHtml() {
         CM_Config::get()->CM_Adprovider->enabled = true;
         CM_Config::get()->CM_AdproviderAdapter_Openx->host = 'www.foo.org';

@@ -2,10 +2,6 @@
 
 class CM_AdproviderAdapter_AbstractTest extends CMTest_TestCase {
 
-    public function tearDown() {
-        CMTest_TH::clearEnv();
-    }
-
     public function testFactory() {
         CM_Config::get()->CM_AdproviderAdapter_Abstract->class = 'CM_AdproviderAdapter_Openx';
 
