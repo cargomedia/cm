@@ -83,9 +83,11 @@ class CM_Config_Node {
     public function extendWithConfig($config, $base = null) {
         $base = $base ?: $this;
 
-        foreach ($config as $key => &$value) {
+        foreach ($config as $key => $value) {
             if (is_object($value) && isset ($base->$key) && is_object($base->$key)) {
                 $base->$key = $this->extendWithConfig($value, $base->$key);
+            } elseif (is_array($value) && isset ($base->$key) && is_array($base->$key)) {
+                $base->$key = array_merge($base->$key, $value);
             } else {
                 $base->$key = $value;
             }

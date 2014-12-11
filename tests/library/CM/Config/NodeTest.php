@@ -24,7 +24,7 @@ class CM_Config_NodeTest extends CMTest_TestCase {
         $expected->foo->bar->foo = 1;
         $expected->foo->bar->bar = 2;
         $expected->bar = 'foo';
-        $expected->foo->bar->array = ['foo' => 2];
+        $expected->foo->bar->array = ['foo' => 2, 'bar' => 2];
 
         $actual = clone $base;
 
