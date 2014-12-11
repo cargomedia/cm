@@ -96,7 +96,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
     /**
      * @return bool
      */
-    public function getExists() {
+    public function exists() {
         return $this->_filesystem->exists($this->getPath());
     }
 

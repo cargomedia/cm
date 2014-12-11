@@ -19,11 +19,11 @@ class CM_Clockwork_Storage_FileSystemTest extends CMTest_TestCase {
 
         $filepath = 'clockwork/' . md5($context) . '.json';
         $file = new CM_File($filepath, $serviceManager->getFilesystems()->getData());
-        $this->assertFalse($file->getExists());
-        $this->assertFalse($file->getParentDirectory()->getExists());
+        $this->assertFalse($file->exists());
+        $this->assertFalse($file->getParentDirectory()->exists());
         $storage->setRuntime($event1, $date1);
-        $this->assertTrue($file->getParentDirectory()->getExists());
-        $this->assertTrue($file->getExists());
+        $this->assertTrue($file->getParentDirectory()->exists());
+        $this->assertTrue($file->exists());
         $storage->setRuntime($event2, $date2);
 
         date_default_timezone_set('Antarctica/Vostok');

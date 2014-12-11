@@ -30,7 +30,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 
         $file = new CM_File_UserContent_Temp($data['success']['id']);
         $this->assertEquals($content, $file->read());
-        $this->assertFalse($fileTmp->getExists());
+        $this->assertFalse($fileTmp->exists());
     }
 
     public function testUploadImageField() {

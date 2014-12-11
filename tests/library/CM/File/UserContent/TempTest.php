@@ -47,10 +47,10 @@ class CM_File_UserContent_TempTest extends CMTest_TestCase {
 
     public function testDelete() {
         $file = CM_File_UserContent_Temp::create('foo.txt', 'bar');
-        $this->assertTrue($file->getExists());
+        $this->assertTrue($file->exists());
 
         $file->delete();
-        $this->assertFalse($file->getExists());
+        $this->assertFalse($file->exists());
         try {
             new CM_File_UserContent_Temp($file->getUniqid());
             $this->fail('Can instantiate deleted temp file');
@@ -61,13 +61,13 @@ class CM_File_UserContent_TempTest extends CMTest_TestCase {
 
     public function testDeleteOlder() {
         $file = CM_File_UserContent_Temp::create('foo.txt', 'bar');
-        $this->assertTrue($file->getExists());
+        $this->assertTrue($file->exists());
 
         CM_File_UserContent_Temp::deleteOlder(100);
-        $this->assertTrue($file->getExists());
+        $this->assertTrue($file->exists());
 
         CMTest_TH::timeForward(1000);
         CM_File_UserContent_Temp::deleteOlder(100);
-        $this->assertFalse($file->getExists());
+        $this->assertFalse($file->exists());
     }
 }
