@@ -14,7 +14,11 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
      * @return int|null
      */
     public function getStartStamp($role) {
-        return $this->_get($role, 'startStamp');
+        $startStamp = $this->_get($role, 'startStamp');
+        if (null !== $startStamp) {
+            $startStamp = (int) $startStamp;
+        }
+        return $startStamp;
     }
 
     /**
@@ -22,7 +26,11 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
      * @return int|null
      */
     public function getExpirationStamp($role) {
-        return $this->_get($role, 'expirationStamp');
+        $expirationStamp = $this->_get($role, 'expirationStamp');
+        if (null !== $expirationStamp) {
+            $expirationStamp = (int) $expirationStamp;
+        }
+        return $expirationStamp;
     }
 
     /**
