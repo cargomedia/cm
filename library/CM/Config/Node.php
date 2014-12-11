@@ -29,6 +29,43 @@ class CM_Config_Node {
     }
 
     /**
+     * @param string                    $baseKey
+     * @param CM_Config_Node|array|null $property
+     * @throws CM_Exception_Invalid
+     * @return string
+     */
+    public function exportAsString($baseKey, $property = null) {
+        $baseKey = (string) $baseKey;
+        $property = ($property !== null) ? $property : $this;
+        $output = '';
+        if ($property instanceof self) {
+            $getFullKey = function ($base, $key) {
+                return $base . '->' . $key;
+            };
+        } elseif (is_array($property)) {
+            $getFullKey = function ($base, $key) {
+                if (!(is_string($key) && $this->_evaluateClassConstant($key))) {
+                    $key = var_export($key, true);
+                }
+                return $base . '[' . $key . ']';
+            };
+        } else {
+            throw new CM_Exception_Invalid('Invalid property type', ['property' => $property]);
+        }
+        foreach ($property as $key => $value) {
+            if (is_array($value)) {
+                $output .= $getFullKey($baseKey, $key) . " = [];" . PHP_EOL;
+            }
+            if (!is_scalar($value)) {
+                $output .= $this->exportAsString($getFullKey($baseKey, $key), $value);
+            } else {
+                $output .= $getFullKey($baseKey, $key) . " = " . var_export($value, true) . ";" . PHP_EOL;
+            }
+        }
+        return $output;
+    }
+
+    /**
      * @param string $configBasename
      * @throws CM_Exception_Invalid
      */

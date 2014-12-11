@@ -24,4 +24,23 @@ class CM_Config_NodeTest extends CMTest_TestCase {
 
         $this->assertEquals($expected, $node->export());
     }
+
+    public function testExportAsString() {
+        $node = new CM_Config_Node();
+        $node->foo->bar->foo = 1;
+        $node->foo->bar->bar = '1';
+        $node->foo->bar->array = ['foo' => '3', 'CM_Config_NodeTest::TEST' => 2];
+        $node->foo->bar->boolean = false;
+
+        $expected = <<<'EOD'
+$config->foo->bar->foo = 1;
+$config->foo->bar->bar = '1';
+$config->foo->bar->array = [];
+$config->foo->bar->array['foo'] = '3';
+$config->foo->bar->array[CM_Config_NodeTest::TEST] = 2;
+$config->foo->bar->boolean = false;
+
+EOD;
+        $this->assertSame($expected, $node->exportAsString('$config'));
+    }
 }
