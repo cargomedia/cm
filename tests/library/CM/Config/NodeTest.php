@@ -9,6 +9,34 @@ class CM_Config_NodeTest extends CMTest_TestCase {
         $this->assertEmpty($reflection->getProperties());
     }
 
+    public function testExtendWithConfig() {
+        $base = new CM_Config_Node();
+        $base->foo->bar->foo = 1;
+        $base->foo->bar->bar = 1;
+        $base->foo->bar->array = ['foo' => 3, 'bar' => 2];
+
+        $extension = new CM_Config_Node();
+        $extension->bar = 'foo';
+        $extension->foo->bar->bar = 2;
+        $extension->foo->bar->array = ['foo' => 2];
+
+        $expected = new CM_Config_Node();
+        $expected->foo->bar->foo = 1;
+        $expected->foo->bar->bar = 2;
+        $expected->bar = 'foo';
+        $expected->foo->bar->array = ['foo' => 2];
+
+        $actual = clone $base;
+
+        $actual->extendWithConfig($extension);
+        $this->assertEquals($expected, $actual);
+
+        $actual = clone $base;
+        $actual->extendWithConfig($extension->export());
+        $this->assertEquals($expected, $actual);
+
+    }
+
     public function testExport() {
         $node = new CM_Config_Node();
         $node->foo->bar->foo = 1;

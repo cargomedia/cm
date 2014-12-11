@@ -76,6 +76,25 @@ class CM_Config_Node {
     }
 
     /**
+     * @param CM_Config_Node|stdClass $config
+     * @param CM_Config_Node|null     $base
+     * @return CM_Config_Node
+     */
+    public function extendWithConfig($config, $base = null) {
+        $base = $base ?: $this;
+
+        foreach ($config as $key => &$value) {
+            if (is_object($value) && isset ($base->$key) && is_object($base->$key)) {
+                $base->$key = $this->extendWithConfig($value, $base->$key);
+            } else {
+                $base->$key = $value;
+            }
+        }
+
+        return $base;
+    }
+
+    /**
      * @param CM_File $configFile
      * @throws CM_Exception_Invalid
      */
