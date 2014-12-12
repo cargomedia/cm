@@ -1,19 +1,38 @@
 <?php
 
-class CM_Clockwork_Manager {
+class CM_Clockwork_Manager extends CM_Service_ManagerAware {
 
     /** @var CM_Clockwork_Event[] */
     private $_events;
 
+    /** @var DateTime */
+    private $_startTime;
+
     /** @var CM_Clockwork_Event[] */
     private $_eventsRunning = array();
 
-    /** @var CM_Clockwork_Persistence */
-    private $_persistence;
+    /** @var CM_Clockwork_Storage_Abstract */
+    private $_storage;
+
+    /** @var DateTimeZone */
+    private $_timeZone;
 
     public function __construct() {
         $this->_events = array();
-        $this->_persistence = new CM_Clockwork_Persistence_Noop();
+        $this->_storage = new CM_Clockwork_Storage_Memory();
+        $this->_timeZone = CM_Bootloader::getInstance()->getTimeZone();
+        $this->_startTime = $this->_getCurrentDateTimeUTC();
+    }
+
+    /**
+     * @param string      $name
+     * @param string      $dateTimeString
+     * @param callable    $callback
+     */
+    public function registerCallback($name, $dateTimeString, $callback) {
+        $event = new CM_Clockwork_Event($name, $dateTimeString);
+        $event->registerCallback($callback);
+        $this->registerEvent($event);
     }
 
     /**
@@ -23,16 +42,40 @@ class CM_Clockwork_Manager {
         $this->_events[] = $event;
     }
 
+    public function runEvents($noWaitOnEventExecution = null) {
+        $process = $this->_getProcess();
+        $noWaitOnEventExecution = (boolean) $noWaitOnEventExecution;
+        if ($noWaitOnEventExecution) {
+            $process->listenForChildren();
+        }
+        /** @var CM_Clockwork_Event[] $eventsToRun */
+        $eventsToRun = array();
+        foreach ($this->_events as $event) {
+            if (!$this->_isRunning($event) && $this->_shouldRun($event)) {
+                $eventsToRun[] = $event;
+            }
+        }
+        foreach ($eventsToRun as $event) {
+            $this->_runEvent($event);
+        }
+        if (!$noWaitOnEventExecution) {
+            $process->waitForChildren();
+        }
+    }
+
     /**
-     * @param string        $name
-     * @param DateInterval  $interval
-     * @param callable      $callback
-     * @param DateTime|null $nextRun
+     * @param CM_Clockwork_Storage_Abstract $storage
      */
-    public function registerCallback($name, DateInterval $interval, $callback, DateTime $nextRun = null) {
-        $event = new CM_Clockwork_Event($name, $interval, $nextRun);
-        $event->registerCallback($callback);
-        $this->registerEvent($event);
+    public function setStorage(CM_Clockwork_Storage_Abstract $storage) {
+        $this->_storage = $storage;
+        $this->_storage->setServiceManager($this->getServiceManager());
+    }
+
+    /**
+     * @param DateTimeZone $timeZone
+     */
+    public function setTimeZone(DateTimeZone $timeZone) {
+        $this->_timeZone = $timeZone;
     }
 
     public function start() {
@@ -42,45 +85,61 @@ class CM_Clockwork_Manager {
         }
     }
 
-    public function runEvents($noWaitOnEventExecution = null) {
-        $process = CM_Process::getInstance();
-        if ($noWaitOnEventExecution) {
-            $process->listenForChildren();
+    /**
+     * @param CM_Clockwork_Event $event
+     * @return boolean
+     */
+    protected function _shouldRun(CM_Clockwork_Event $event) {
+        $lastRuntime = $this->_storage->getLastRuntime($event);
+        $base = $lastRuntime ?: clone $this->_startTime;
+        $dateTimeString = $event->getDateTimeString();
+        if (!$this->_isIntervalEvent($event)) {     // do not set timezone for interval-based events due to buggy behaviour with timezones that use
+            $base->setTimezone($this->_timeZone);   // daylight saving time, see https://bugs.php.net/bug.php?id=51051
         }
-        $noWaitOnEventExecution = (boolean) $noWaitOnEventExecution;
-        /** @var CM_Clockwork_Event[] $eventsToRun */
-        $eventsToRun = array();
-        foreach ($this->_events as $event) {
-            $lastRuntime = $this->_persistence->getLastRunTime($event);
-            if ($event->shouldRun($lastRuntime) && !$this->_isRunning($event)) {
-                $eventsToRun[] = $event;
+        $nextExecutionTime = clone $base;
+        $nextExecutionTime->modify($dateTimeString);
+        if ($lastRuntime) {
+            if ($nextExecutionTime <= $base) {
+                $nextExecutionTime = $this->_getCurrentDateTime()->modify($dateTimeString);
             }
+            $shouldRun = $nextExecutionTime > $base && $this->_getCurrentDateTime() >= $nextExecutionTime;
+        } else {
+            if ($nextExecutionTime < $base) {
+                $nextExecutionTime = $this->_getCurrentDateTime()->modify($dateTimeString);
+            }
+            $shouldRun = $nextExecutionTime >= $base && $this->_getCurrentDateTime() >= $nextExecutionTime;
         }
-        foreach ($eventsToRun as $event) {
-            $this->_markRunning($event);
-            $process->fork(function () use ($event) {
-                $event->run();
-                return array('thisRun' => $this->_getCurrentDateTime(), 'nextRun' => $event->getNextRun());
-            }, function (CM_Process_WorkloadResult $result) use ($event) {
-                $this->_markStopped($event);
-                $event->setNextRun($result->getResult()['nextRun']);
-                $this->_persistence->setRuntime($event, $result->getResult()['thisRun']);
-            });
-        }
-        if (!$noWaitOnEventExecution) {
-            $process->waitForChildren();
-        }
+        return $shouldRun;
     }
 
     /**
-     * @param CM_Clockwork_Persistence $persistence
+     * @return DateTime
      */
-    public function setPersistence(CM_Clockwork_Persistence $persistence) {
-        $this->_persistence = $persistence;
+    protected function _getCurrentDateTime() {
+        return $this->_getCurrentDateTimeUTC()->setTimezone($this->_timeZone);
     }
 
-    protected function _getCurrentDateTime() {
-        return new DateTime();
+    protected function _getCurrentDateTimeUTC() {
+        return new DateTime('now', new DateTimeZone('UTC'));
+    }
+
+    /**
+     * @return CM_Process
+     */
+    protected function _getProcess() {
+        return CM_Process::getInstance();
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     * @return boolean
+     */
+    protected function _isIntervalEvent(CM_Clockwork_Event $event) {
+        $dateTimeString = $event->getDateTimeString();
+        $date = new DateTime();
+        $dateModified = new DateTime();
+        $dateModified->modify($dateTimeString);
+        return $date->modify($dateTimeString) != $dateModified->modify($dateTimeString);
     }
 
     /**
@@ -107,5 +166,21 @@ class CM_Clockwork_Manager {
         if (!$this->_isRunning($event)) {
             $this->_eventsRunning[$event->getName()] = $event;
         }
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     */
+    protected function _runEvent(CM_Clockwork_Event $event) {
+        $process = $this->_getProcess();
+        $this->_markRunning($event);
+        $process->fork(function () use ($event) {
+            $event->run();
+        }, function (CM_Process_WorkloadResult $result) use ($event) {
+            $this->_markStopped($event);
+            /** @var DateTime $runtime */
+            $runtime = $this->_getCurrentDateTime();
+            $this->_storage->setRuntime($event, $runtime);
+        });
     }
 }

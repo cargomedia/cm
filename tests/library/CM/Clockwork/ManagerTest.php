@@ -1,145 +1,454 @@
 <?php
 require_once dirname(dirname(dirname(__DIR__))) . '/bootstrap.php'; // Bootstrap the test explicitly when running in a separate process
-use Mocka\Mocka;
-
 class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
-    /** @var resource */
-    public static $_file;
-
-    public static function setupBeforeClass() {
-        parent::setUpBeforeClass();
-        self::$_file = tmpfile();
+    public function testSetStorage() {
+        $manager = new CM_Clockwork_Manager();
+        $serviceManager = $this->mockObject('CM_Service_Manager');
+        /** @var CM_Service_Manager $serviceManager */
+        $manager->setServiceManager($serviceManager);
+        $storage = $this->mockObject('CM_Clockwork_Storage_Abstract', ['foo']);
+        /** @var CM_Clockwork_Storage_Abstract $storage */
+        $manager->setStorage($storage);
+        $this->assertSame($serviceManager, $storage->getServiceManager());
     }
 
-    public static function tearDownAfterClass() {
-        fclose(self::$_file);
-        parent::tearDownAfterClass();
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function testRunEventsFor() {
+    public function testRunEvents() {
         $currently = new DateTime();
-
-        $manager = $this->getMockBuilder('CM_Clockwork_Manager')->setMethods(array('_getCurrentDateTime'))->getMockForAbstractClass();
-        $manager->expects($this->any())->method('_getCurrentDateTime')->will($this->returnCallback(function() use ($currently) {
-            return $currently;
-        }));
+        $eventMock = $this->mockClass('CM_Clockwork_Event');
+        $eventRun = $eventMock->newInstanceWithoutConstructor();
+        $runEventRun = $eventRun->mockMethod('run');
+        /** @var CM_Clockwork_Event $eventRun */
+        $eventNoRun =$eventMock->newInstanceWithoutConstructor();
+        $runEventNoRun = $eventNoRun->mockMethod('run');
+        /** @var CM_Clockwork_Event $eventNoRun */
+        $manager = $this->mockObject('CM_Clockwork_Manager');
+        $manager->mockMethod('_getCurrentDateTime')->set(function () use (&$currently) {
+            return clone $currently;
+        });
+        $shouldRun = $manager->mockMethod('_shouldRun')->set(function(CM_Clockwork_Event $event) use ($eventRun, $eventNoRun) {
+            return $event == $eventRun;
+        });
         /** @var CM_Clockwork_Manager $manager */
+        $currently->modify('10 seconds');
+        $storage = $this->mockClass('CM_Clockwork_Storage_Abstract')->newInstanceWithoutConstructor();
+        $setRuntime = $storage->mockMethod('setRuntime')->at(0, function(CM_Clockwork_Event $event, DateTime $runtime) use ($currently, $eventRun) {
+            $this->assertEquals($currently, $runtime);
+            $this->assertEquals($eventRun, $event);
+        });
+        /** @var CM_Clockwork_Storage_Abstract $storage */
+        $manager->setServiceManager(CM_Service_Manager::getInstance());
+        $manager->setStorage($storage);
 
-        $this->_createEvent($manager, $currently, new DateInterval('PT1S'), 'event1');
-        $this->_createEvent($manager, $currently, new DateInterval('PT2S'), 'event2');
-        $this->_createEvent($manager, $currently, new DateInterval('PT5S'), 'event3');
-        $this->_createEvent($manager, $currently, new DateInterval('PT15S'), 'event4');
+        $manager->registerEvent($eventRun);
+        $manager->registerEvent($eventNoRun);
 
-        for($i = 1; $i <= 20; $i++) {
-            $manager->runEvents(true);
-            $currently->add(new DateInterval('PT1S'));
-            usleep(100 * 1000);
-        }
-        CM_Process::getInstance()->waitForChildren();
-        $this->assertSame(array(
-            'event1'  => 20,
-            'event2'  => 10,
-            'event3'  => 4,
-            'event4' => 2,
-        ), $this->getCounter());
+        $manager->runEvents();
+        $this->assertSame(1, $setRuntime->getCallCount());
+        $this->assertSame(2, $shouldRun->getCallCount());
+        $this->assertSame(1, $runEventRun->getCallCount());
+        $this->assertSame(0, $runEventNoRun->getCallCount());
+    }
+
+    public function testRunNonBlocking2() {
+        $process = $this->mockClass('CM_Process')->newInstanceWithoutConstructor();
+        $terminationCallbackList = [];
+        $forkMock = $process->mockMethod('fork');
+        $forkMock->set(function(Closure $workload, Closure $terminationCallback) use (&$terminationCallbackList) {
+            $terminationCallbackList[] = $terminationCallback;
+        });
+        $manager = $this->mockObject('CM_Clockwork_Manager');
+        $manager->mockMethod('_shouldRun')->set(true);
+        $manager->mockMethod('_getProcess')->set($process);
+        /** @var CM_Clockwork_Manager|\Mocka\ClassMock $manager */
+        $event1 = new CM_Clockwork_Event('event1', '1 second');
+        $manager->registerEvent($event1);
+        /** @var CM_Clockwork_Manager|\Mocka\ClassMock $manager */
+        $event2 = new CM_Clockwork_Event('event2', '1 second');
+        $manager->registerEvent($event2);
+
+        $this->assertFalse(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event1]));
+        $this->assertFalse(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event2]));
+
+        $manager->runEvents(true);
+        $this->assertSame(2, $forkMock->getCallCount());
+        $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event1]));
+        $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event2]));
+
+        $manager->runEvents(true);
+        $this->assertSame(2, $forkMock->getCallCount());
+
+        call_user_func(array_pop($terminationCallbackList), new CM_Process_WorkloadResult(null));
+        $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event1]));
+        $this->assertFalse(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event2]));
+
+        $manager->runEvents(true);
+        $this->assertSame(3, $forkMock->getCallCount());
+        $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event1]));
+        $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event2]));
+
+        call_user_func(array_pop($terminationCallbackList), new CM_Process_WorkloadResult(null));
+        call_user_func(array_pop($terminationCallbackList), new CM_Process_WorkloadResult(null));
+
+
+        $this->assertFalse(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event1]));
+        $this->assertFalse(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event2]));
+    }
+
+    public function testShouldRunFixedTimeMode() {
+        $timeZone = CM_Bootloader::getInstance()->getTimeZone();
+        $currently = new DateTime('midnight', new DateTimeZone('UTC'));
+        $lastRuntime = null;
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
+            if ($lastRuntime instanceof DateTime) {
+                return clone $lastRuntime;
+            }
+            return $lastRuntime;
+        });
+        $managerMock = $this->mockClass('CM_Clockwork_Manager');
+        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
+            return clone $currently;
+        });
+        $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
+        /** @var CM_Clockwork_Storage_FileSystem $storage */
+        $storage = $storageClass->newInstance();
+
+        $currently = new DateTime('13:59:59', $timeZone);
+        /** @var CM_Clockwork_Manager $manager */
+        $manager = $managerMock->newInstance();
+        $manager->setServiceManager(CM_Service_Manager::getInstance());
+        $manager->setStorage($storage);
+        /** @var CM_Clockwork_Event $event */
+        $event = new CM_Clockwork_Event('event1', '14:00');
+        $currently->modify('13:59:59');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('1 second');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+
+        $lastRuntime = clone($currently);
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('next day 13:59:59');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('1 second');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+
+        // manager started after scheduled execution
+        $lastRuntime = null;
+        $currently = new DateTime('last day of', $timeZone);
+        $manager = $managerMock->newInstance();
+        $manager->setServiceManager(CM_Service_Manager::getInstance());
+        $manager->setStorage($storage);
+        $manager->setTimeZone($timeZone);
+        $event = new CM_Clockwork_Event('event2', 'first day of 09:00');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('next day 08:59:59');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('09:00:00');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+
+        // execution delayed into next timeframe
+
+        $lastRuntime = null;
+        $currently = new DateTime('23:59', $timeZone);
+
+        $manager = $managerMock->newInstance();
+        $manager->setServiceManager(CM_Service_Manager::getInstance());
+        $manager->setStorage($storage);
+        $manager->setTimeZone($timeZone);
+        $event = new CM_Clockwork_Event('event3', '23:59');
+
+        $currently->modify('next day 00:01');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+
+        $lastRuntime = clone($currently);
+        $currently->modify('23:58');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('23:59');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+    }
+
+    public function testShouldRunIntervalMode() {
+        $currently = new DateTime('now', new DateTimeZone('UTC'));
+        $lastRuntime = null;
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
+            if ($lastRuntime instanceof DateTime) {
+                return clone $lastRuntime;
+            }
+            return $lastRuntime;
+        });
+        $managerMock = $this->mockClass('CM_Clockwork_Manager');
+        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
+            return clone $currently;
+        });
+        /** @var CM_Clockwork_Storage_FileSystem $storage */
+        $storage = $storageClass->newInstance();
+        /** @var CM_Clockwork_Manager $manager */
+        $manager = $managerMock->newInstance();
+        $manager->setServiceManager(CM_Service_Manager::getInstance());
+        $manager->setStorage($storage);
+        $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
+
+        $event = new CM_Clockwork_Event('event', '2 seconds');
+        $lastRuntime = null;
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('2 seconds');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+        $lastRuntime = clone($currently);
+
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('1 second');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('1 second');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+    }
+
+    public function testShouldRun_intervalMode_backwardDaylightSavingTimeSwitch() {
+        $this->_testIntervalModeDST(new DateTime('2014-10-26 00:20:00', new DateTimeZone('UTC')), new DateTimeZone('Europe/Berlin'));
+    }
+
+    public function testShouldRun_intervalMode_forwardDaylightSavingTimeSwitch() {
+        $this->_testIntervalModeDST(new DateTime('2014-3-30 00:20:00', new DateTimeZone('UTC')), new DateTimeZone('Europe/Berlin'));
+    }
+
+    public function testShouldRun_intervalMode_backwardDaylightSavingTimeSwitch_NegativeOffsetTimeZone() {
+        $this->_testIntervalModeDST(new DateTime('2014-11-2 06:20:00', new DateTimeZone('UTC')), new DateTimeZone('America/Chicago'));
+    }
+
+    public function testShouldRun_intervalMode_forwardDaylightSavingTimeSwitch_NegativeOffsetTimeZone() {
+        $this->_testIntervalModeDST(new DateTime('2014-3-9 07:20:00', new DateTimeZone('UTC')), new DateTimeZone('America/Chicago'));
+    }
+
+    public function testShouldRun_fixedTimeMode_backwardDaylightSavingTimeSwitch() {
+        $timeZone = new DateTimeZone('Europe/Berlin'); // gmt +1/+2
+        $lastRuntime = null;
+        $currently = new DateTime('2014-10-26 00:10:00', new DateTimeZone('UTC'));
+
+        $managerMock = $this->mockClass('CM_Clockwork_Manager');
+        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
+            return clone $currently;
+        });
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
+            if ($lastRuntime instanceof DateTime) {
+                return clone $lastRuntime;
+            }
+            return $lastRuntime;
+        });
+        /** @var CM_Clockwork_Storage_FileSystem $storage */
+        $storage = $storageClass->newInstance();
+
+        /** @var CM_Clockwork_Manager $manager */
+        $manager = $managerMock->newInstance();
+        $manager->setServiceManager(CM_Service_Manager::getInstance());
+        $manager->setStorage($storage);
+        $manager->setTimeZone($timeZone);
+        $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
+        $event = new CM_Clockwork_Event('event', '02:10:00');
+
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('01:09:59');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('01:10:00');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+        $lastRuntime = clone $currently;
+
+        $currently = new DateTime('2014-10-26 01:10:00', new DateTimeZone('UTC'));
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently = new DateTime('2014-10-27 01:09:59', new DateTimeZone('UTC'));
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('1 second');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+    }
+
+    public function testShouldRun_fixedTimeMode_forwardDaylightSavingTimeSwitch() {
+        $timeZone = new DateTimeZone('Europe/Berlin'); // gmt +1/+2
+        $lastRuntime = null;
+        $currently = new DateTime('2014-03-30 01:09:59', new DateTimeZone('UTC'));
+
+        $managerMock = $this->mockClass('CM_Clockwork_Manager');
+        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
+            return clone $currently;
+        });
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
+            if ($lastRuntime instanceof DateTime) {
+                return clone $lastRuntime;
+            }
+            return $lastRuntime;
+        });
+        /** @var CM_Clockwork_Storage_FileSystem $storage */
+        $storage = $storageClass->newInstance();
+
+        /** @var CM_Clockwork_Manager $manager */
+        $manager = $managerMock->newInstance();
+        $manager->setServiceManager(CM_Service_Manager::getInstance());
+        $manager->setStorage($storage);
+        $manager->setTimeZone($timeZone);
+        $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
+        $event = new CM_Clockwork_Event('event', '02:10:00');
+
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('1 second');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+        $lastRuntime = clone $currently;
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently = new DateTime('2014-03-31 00:09:59', new DateTimeZone('UTC'));
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('1 second');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+    }
+
+    public function testShouldRun_fixedTimeMode_backwardDaylightSavingTimeSwitch_NegativeOffsetTimeZone() {
+        $lastRuntime = null;
+        $timeZone = new DateTimeZone('America/Chicago'); // gmt -6/-5
+        $currently = new DateTime('2014-11-2 06:09:59', new DateTimeZone('UTC'));
+
+        $managerMock = $this->mockClass('CM_Clockwork_Manager');
+        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
+            return clone $currently;
+        });
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
+            if ($lastRuntime instanceof DateTime) {
+                return clone $lastRuntime;
+            }
+            return $lastRuntime;
+        });
+        /** @var CM_Clockwork_Storage_FileSystem $storage */
+        $storage = $storageClass->newInstance();
+        /** @var CM_Clockwork_Manager $manager */
+        $manager = $managerMock->newInstance();
+        $manager->setServiceManager(CM_Service_Manager::getInstance());
+        $manager->setStorage($storage);
+        $manager->setTimeZone($timeZone);
+        $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
+        $event = new CM_Clockwork_Event('event', '01:10:00');
+
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('1 second');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+        $lastRuntime = clone $currently;
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently = new DateTime('2014-11-3 07:09:59', new DateTimeZone('UTC'));
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('1 second');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+    }
+
+    public function testShouldRun_fixedTimeMode_forwardDaylightSavingTimeSwitch_NegativeOffsetTimeZone() {
+        $timeZone = new DateTimeZone('America/Chicago'); // gmt -6/-5
+        $lastRuntime = null;
+        $currently = new DateTime('2014-03-09 07:10:00', new DateTimeZone('UTC'));
+
+        $managerMock = $this->mockClass('CM_Clockwork_Manager');
+        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
+            return clone $currently;
+        });
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
+            if ($lastRuntime instanceof DateTime) {
+                return clone $lastRuntime;
+            }
+            return $lastRuntime;
+        });
+        /** @var CM_Clockwork_Storage_FileSystem $storage */
+        $storage = $storageClass->newInstance();
+
+        /** @var CM_Clockwork_Manager $manager */
+        $manager = $managerMock->newInstance();
+        $manager->setServiceManager(CM_Service_Manager::getInstance());
+        $manager->setStorage($storage);
+        $manager->setTimeZone($timeZone);
+        $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
+        $event = new CM_Clockwork_Event('event', '02:10:00');
+
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('08:09:59');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently->modify('08:10:00');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+        $lastRuntime = clone $currently;
+
+        $currently = new DateTime('2014-03-09 08:10:00', new DateTimeZone('UTC'));
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+
+        $currently = new DateTime('2014-03-10 07:09:59', new DateTimeZone('UTC'));
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('1 second');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
     }
 
     /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function testRunEventsPersistence() {
-        $currently = new DateTime();
-        $context = 'foo';
-        $adapter = $this->getMockBuilder('CM_Clockwork_PersistenceAdapter_Abstract')->disableOriginalConstructor()->setMethods(array('load', 'save'))
-            ->getMockForAbstractClass();
-        $adapter->expects($this->any())->method('load')->will($this->returnValue(array('event2' => $this->_getCurrentDateTime())));
-        $adapter->expects($this->at(1))->method('save')->with($context, array('event2' => $this->_getCurrentDateTime(), 'event1' => $this->_getCurrentDateTime(1)));
-        $adapter->expects($this->at(2))->method('save')->with($context, array('event2' => $this->_getCurrentDateTime(), 'event1' => $this->_getCurrentDateTime(2)));
-        $adapter->expects($this->at(3))->method('save')->with($context, array('event2' => $this->_getCurrentDateTime(2), 'event1' => $this->_getCurrentDateTime(2)));
-        $adapter->expects($this->at(4))->method('save')->with($context, array('event2' => $this->_getCurrentDateTime(2), 'event1' => $this->_getCurrentDateTime(3)));
-        $adapter->expects($this->at(5))->method('save')->with($context, array('event2' => $this->_getCurrentDateTime(2), 'event1' => $this->_getCurrentDateTime(4)));
-        $adapter->expects($this->at(6))->method('save')->with($context, array('event2' => $this->_getCurrentDateTime(4), 'event1' => $this->_getCurrentDateTime(4)));
-        $adapter->expects($this->at(7))->method('save')->with($context, array('event2' => $this->_getCurrentDateTime(4), 'event1' => $this->_getCurrentDateTime(5)));
-        $adapter->expects($this->at(8))->method('save')->with($context, array('event2' => $this->_getCurrentDateTime(4), 'event1' => $this->_getCurrentDateTime(6)));
-        $adapter->expects($this->at(9))->method('save')->with($context, array('event2' => $this->_getCurrentDateTime(6), 'event1' => $this->_getCurrentDateTime(6)));
-        $manager = $this->getMockBuilder('CM_Clockwork_Manager')->setMethods(array('_getCurrentDateTime'))->getMockForAbstractClass();
-        $manager->expects($this->any())->method('_getCurrentDateTime')->will($this->returnCallback(function() use ($currently) {
-            return $currently;
-        }));
-        /** @var CM_Clockwork_Manager $manager */
-        $manager->setPersistence(new CM_Clockwork_Persistence($context, $adapter));
-        $this->_createEvent($manager, $currently, new DateInterval('PT1S'), 'event1');
-        $this->_createEvent($manager, $currently, new DateInterval('PT2S'), 'event2');
-
-        for ($i = 1; $i <= 6; $i++) {
-            $currently->add(new DateInterval('PT1S'));
-            $manager->runEvents(true);
-            usleep(100 * 1000);
-        }
-        CM_Process::getInstance()->waitForChildren();
-    }
-
-    /**
-     * @param int $delta
+     * @param DateTime $dateTime
      * @return DateTime
      */
-    protected function _getCurrentDateTime($delta = null) {
-        $dateTime = new DateTime();
-        if ($delta) {
-            $dateTime->add(new DateInterval('PT' . $delta . 'S'));
-        }
-        return $dateTime;
+    private function _getDateTime(DateTime $dateTime) {
+        return new DateTime($dateTime->format('Y-m-d ') . ' ' . $dateTime->format('H:i:s') . ' +' . ($dateTime->getOffset() / 3600));
     }
 
     /**
-     * @param CM_Clockwork_Manager $manager
-     * @param DateTime             $start
-     * @param DateInterval         $interval
-     * @param string               $name
+     * @param DateTime     $start
+     * @param DateTimeZone $timeZone
+     * @throws CM_Exception_Invalid
      */
-    private function _createEvent(CM_Clockwork_Manager $manager, DateTime $start, DateInterval $interval, $name) {
-        $callback = function () use ($name) {
-            CM_Clockwork_ManagerTest::incCounter($name);
-        };
-        $mocka = new Mocka();
-        $event = $mocka->mockObject('CM_Clockwork_Event', array($name, $interval, $start));
-        $event->mockMethod('_getCurrentDateTime')->set(function() use ($start) {
-            return clone $start;
+    private function _testIntervalModeDST(DateTime $start, DateTimeZone $timeZone) {
+        $currently = clone $start;
+        $managerMock = $this->mockClass('CM_Clockwork_Manager');
+        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
+            return clone $currently;
         });
-        /** @var CM_Clockwork_Event $event */
-        $event->registerCallback($callback);
-        $manager->registerEvent($event);
-    }
-
-    /**
-     * @param string $message
-     */
-    public static function writeln($message) {
-        print "$message\n";
-        fwrite(self::$_file, "$message\n");
-    }
-
-    public static function incCounter($name) {
-        fwrite(self::$_file, "$name\n");
-    }
-
-    public function getCounter() {
-        rewind(self::$_file);
-        $fileContent = fread(self::$_file, 8192);
-        //        return unserialize($fileContent);
-        $counter = array();
-        foreach (explode("\n", $fileContent) as $line) {
-            if (strlen($line)) {
-                $counter[$line] = isset($counter[$line]) ? $counter[$line] + 1 : 1;
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
+            if ($lastRuntime instanceof DateTime) {
+                return clone $lastRuntime;
             }
+            return $lastRuntime;
+        });
+        /** @var CM_Clockwork_Storage_FileSystem $storage */
+        $storage = $storageClass->newInstance();
+        /** @var CM_Clockwork_Manager $manager */
+        $manager = $managerMock->newInstance();
+        $manager->setServiceManager(CM_Service_Manager::getInstance());
+        $manager->setStorage($storage);
+        $manager->setTimeZone($timeZone);
+        $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
+        $event = new CM_Clockwork_Event('event', '20 minutes');
+
+        $lastRuntime = null;
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('19 minutes 59 seconds');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('1 second');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+
+        $lastRuntime = clone $currently;
+        $currently->modify('19 minutes 59 seconds');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('1 second');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+
+        $lastRuntime = clone $currently;
+        $currently->modify('19 minutes 59 seconds');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('1 second');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+        if ($timeZone->getOffset($start) === $timeZone->getOffset($currently)) {
+            throw new CM_Exception_Invalid("Test did not go through a daylight saving time switch");
         }
-        ksort($counter);
-        return $counter;
     }
 }

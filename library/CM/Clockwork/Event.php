@@ -2,32 +2,30 @@
 
 class CM_Clockwork_Event {
 
-    /** @var DateInterval */
-    private $_interval;
+    /** @var callable[] */
+    private $_callbacks;
+
+    /** @var string */
+    private $_dateTimeString;
 
     /** @var string */
     private $_name;
 
-    /** @var DateTime */
-    private $_nextRun;
-
-    /** @var callable[] */
-    private $_callbacks;
+    /**
+     * @param string $name
+     * @param string $dateTimeString see http://php.net/manual/en/datetime.formats.php
+     */
+    public function __construct($name, $dateTimeString) {
+        $this->_name = (string) $name;
+        $this->_dateTimeString = (string) $dateTimeString;
+        $this->_callbacks = [];
+    }
 
     /**
-     * @param string        $name
-     * @param DateInterval  $interval
-     * @param DateTime|null $nextRun
+     * @return string
      */
-    public function __construct($name, DateInterval $interval, DateTime $nextRun = null) {
-        $this->_name = (string) $name;
-        $this->_interval = $interval;
-        if (null === $nextRun) {
-            $nextRun = $this->_getCurrentDateTime();
-            $nextRun->add($interval);
-        }
-        $this->_nextRun = $nextRun;
-        $this->_callbacks = array();
+    public function getDateTimeString() {
+        return $this->_dateTimeString;
     }
 
     /**
@@ -35,35 +33,6 @@ class CM_Clockwork_Event {
      */
     public function getName() {
         return $this->_name;
-    }
-
-    /**
-     * @return DateTime|null
-     */
-    public function getNextRun() {
-        return clone $this->_nextRun;
-    }
-
-    /**
-     * @param DateTime $nextRun
-     */
-    public function setNextRun(DateTime $nextRun) {
-        $this->_nextRun = clone $nextRun;
-    }
-
-    /**
-     * @param DateTime $lastRuntime
-     * @return bool
-     */
-    public function shouldRun(DateTime $lastRuntime = null) {
-        if ($lastRuntime) {
-            $lastRuntime = clone $lastRuntime;
-            if ($lastRuntime->add($this->_interval) > $this->_getCurrentDateTime()) {
-                return false;
-            }
-            return true;
-        }
-        return $this->_getCurrentDateTime() >= $this->_nextRun;
     }
 
     /**
@@ -81,9 +50,6 @@ class CM_Clockwork_Event {
         foreach ($this->_callbacks as $callback) {
             call_user_func($callback);
         }
-        $nextRun = $this->_getCurrentDateTime();
-        $nextRun->add($this->_interval);
-        $this->setNextRun($nextRun);
     }
 
     /**

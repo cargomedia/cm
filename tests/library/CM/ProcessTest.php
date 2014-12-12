@@ -87,22 +87,7 @@ Parent terminated.
         CM_ProcessTest::writeln('Parent listening to children...');
         $process->listenForChildren();
         CM_ProcessTest::writeln('Parent terminated.');
-        $this->expectOutputString('Child 1 forked.
-Child 2 forked.
-Child 3 forked.
-Child 4 forked.
-Parent waiting for 250 ms...
-Parent listening to children...
-Child 1 termination registered by parent.
-Child 2 termination registered by parent.
-Parent waiting for 100 ms...
-Parent listening to children...
-Child 3 termination registered by parent.
-Parent waiting for 100 ms...
-Parent listening to children...
-Child 4 termination registered by parent.
-Parent terminated.
-');
+
         $outputFileExpected = 'Child 1 forked.
 Child 2 forked.
 Child 3 forked.
