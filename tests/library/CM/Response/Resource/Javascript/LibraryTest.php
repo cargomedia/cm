@@ -9,6 +9,7 @@ class CM_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
         CMTest_TH::createLanguage();
 
         $this->_configInternalFile = new CM_File(DIR_ROOT . 'resources/config/js/internal.js');
+        $this->_configInternalFile->ensureParentDirectory();
         $this->_configInternalFile->write('console.log("hello world")');
     }
 
