@@ -1,5 +1,5 @@
 <?php
-require_once dirname(dirname(dirname(__DIR__))) . '/bootstrap.php'; // Bootstrap the test explicitly when running in a separate process
+
 class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
     public function testSetStorage() {
