@@ -44,7 +44,7 @@ class CM_Config_Node {
             };
         } elseif (is_array($property)) {
             $getFullKey = function ($base, $key) {
-                if (!(is_string($key) && $this->_evaluateClassConstant($key))) {
+                if (!(is_string($key) && (null !== $this->_evaluateClassConstant($key)))) {
                     $key = var_export($key, true);
                 }
                 return $base . '[' . $key . ']';
@@ -115,7 +115,7 @@ class CM_Config_Node {
     private function _evaluateConstantsInKeys(array $list) {
         $keys = array_keys($list);
         $keys = \Functional\map($keys, function ($key) {
-            if ($value = $this->_evaluateClassConstant($key)) {
+            if (null !== ($value = $this->_evaluateClassConstant($key))) {
                 return $value;
             }
             return $key;
@@ -128,10 +128,8 @@ class CM_Config_Node {
      * @return mixed|null
      */
     private function _evaluateClassConstant($reference) {
-        if (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*::[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $reference) &&
-            $value = @constant($reference)
-        ) {
-            return $value;
+        if (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*::[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $reference)) {
+            return @constant($reference);
         }
         return null;
     }

@@ -3,6 +3,8 @@
 class CM_Config_NodeTest extends CMTest_TestCase {
 
     const TEST = 3;
+    const TEST_0 = 0;
+    const TEST_NULL = null;
 
     public function testNodeClass() {
         $reflection = new ReflectionClass('CM_Config_Node');
@@ -44,14 +46,14 @@ class CM_Config_NodeTest extends CMTest_TestCase {
         $node = new CM_Config_Node();
         $node->foo->bar->foo = 1;
         $node->foo->bar->bar = '1';
-        $node->foo->bar->array = ['foo' => 3, 'CM_Config_NodeTest::TEST' => 2, 'CM_Config_NodeTest::NONEXISTENT' => 1, 'NonexistentClass::FOO' => 0];
+        $node->foo->bar->array = ['foo' => 1, 'CM_Config_NodeTest::TEST' => 2, 'CM_Config_NodeTest::NONEXISTENT' => 3, 'NonexistentClass::FOO' => 4, 'CM_Config_NodeTest::TEST_0' => 5, 'CM_Config_NodeTest::TEST_NULL' => 6];
 
         $expected = new stdClass();
         $expected->foo = new stdClass();
         $expected->foo->bar = new stdClass();
         $expected->foo->bar->foo = 1;
         $expected->foo->bar->bar = '1';
-        $expected->foo->bar->array = ['foo' => 3, CM_Config_NodeTest::TEST => 2, 'CM_Config_NodeTest::NONEXISTENT' => 1, 'NonexistentClass::FOO' => 0];
+        $expected->foo->bar->array = ['foo' => 1, CM_Config_NodeTest::TEST => 2, 'CM_Config_NodeTest::NONEXISTENT' => 3, 'NonexistentClass::FOO' => 4, CM_Config_NodeTest::TEST_0 => 5, 'CM_Config_NodeTest::TEST_NULL' => 6];
 
         $this->assertEquals($expected, $node->export());
     }
@@ -60,17 +62,19 @@ class CM_Config_NodeTest extends CMTest_TestCase {
         $node = new CM_Config_Node();
         $node->foo->bar->foo = 1;
         $node->foo->bar->bar = '1';
-        $node->foo->bar->array = ['foo' => '3', 'CM_Config_NodeTest::TEST' => 2, 'CM_Config_NodeTest::NONEXISTENT' => 1, 'NonexistentClass::FOO' => 0];
+        $node->foo->bar->array = ['foo' => '1', 'CM_Config_NodeTest::TEST' => 2, 'CM_Config_NodeTest::NONEXISTENT' => 3, 'NonexistentClass::FOO' => 4, 'CM_Config_NodeTest::TEST_0' => 5, 'CM_Config_NodeTest::TEST_NULL' => 6];
         $node->foo->bar->boolean = false;
 
         $expected = <<<'EOD'
 $config->foo->bar->foo = 1;
 $config->foo->bar->bar = '1';
 $config->foo->bar->array = [];
-$config->foo->bar->array['foo'] = '3';
+$config->foo->bar->array['foo'] = '1';
 $config->foo->bar->array[CM_Config_NodeTest::TEST] = 2;
-$config->foo->bar->array['CM_Config_NodeTest::NONEXISTENT'] = 1;
-$config->foo->bar->array['NonexistentClass::FOO'] = 0;
+$config->foo->bar->array['CM_Config_NodeTest::NONEXISTENT'] = 3;
+$config->foo->bar->array['NonexistentClass::FOO'] = 4;
+$config->foo->bar->array[CM_Config_NodeTest::TEST_0] = 5;
+$config->foo->bar->array['CM_Config_NodeTest::TEST_NULL'] = 6;
 $config->foo->bar->boolean = false;
 
 EOD;
