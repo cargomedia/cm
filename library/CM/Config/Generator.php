@@ -18,7 +18,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
     private $_namespaceTypes = array();
 
     /**
-     * @return array[][]
+     * @return string[][]
      */
     public function getNamespaceTypes() {
         $this->_checkTypesGenerated();
