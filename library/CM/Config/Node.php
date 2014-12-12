@@ -129,7 +129,7 @@ class CM_Config_Node {
      */
     private function _evaluateClassConstant($reference) {
         if (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*::[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $reference) &&
-            $value = eval("return {$reference};")
+            $value = @constant($reference)
         ) {
             return $value;
         }
