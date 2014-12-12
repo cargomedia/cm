@@ -16,10 +16,10 @@ class CMTest_TestSuite {
 
     public function generateInternalConfig() {
         $generator = new CM_Config_Generator();
-        $internalConfig = $generator->getConfigClassTypes()->extendWithConfig($generator->getConfigActionVerbs());
-        $originalConfig = CM_Config::get();
-        $mergedConfig = $internalConfig->extendWithConfig($originalConfig);
-        $config = $mergedConfig->export();
-        CM_Config::set($config);
+        $config = new CM_Config_Node();
+        $config->extendWithConfig($generator->getConfigClassTypes());
+        $config->extendWithConfig($generator->getConfigActionVerbs());
+        $config->extendWithConfig(CM_Config::get());
+        CM_Config::set($config->export());
     }
 }
