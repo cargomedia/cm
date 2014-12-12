@@ -116,18 +116,23 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     /**
      * @param string      $template Template file name
      * @param string|null $module
+     * @param string|null $theme
      * @param bool|null   $absolute
      * @param bool|null   $needed
      * @throws CM_Exception_Invalid
      * @return string Layout path based on theme
      */
-    public function getLayoutPath($template, $module = null, $absolute = null, $needed = true) {
+    public function getLayoutPath($template, $module = null, $theme = null, $absolute = null, $needed = true) {
         $moduleList = $this->getSite()->getModules();
         if ($module !== null) {
             $moduleList = array((string) $module);
         }
+        $themeList = $this->getSite()->getThemes();
+        if ($theme !== null) {
+            $themeList = array((string) $theme);
+        }
         foreach ($moduleList as $module) {
-            foreach ($this->getSite()->getThemes() as $theme) {
+            foreach ($themeList as $theme) {
                 $file = new CM_File($this->getThemeDir(true, $theme, $module) . $template);
                 if ($file->exists()) {
                     if ($absolute) {
@@ -153,7 +158,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @throws CM_Exception_Invalid
      */
     public function getLayoutFile($path, $namespace = null) {
-        return new CM_File($this->getLayoutPath($path, $namespace, true));
+        return new CM_File($this->getLayoutPath($path, $namespace, null, true));
     }
 
     /**
@@ -381,7 +386,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             }
             $templatePathRelative = $matches[2] . DIRECTORY_SEPARATOR . $matches[3] . DIRECTORY_SEPARATOR . $templateName . '.tpl';
             $namespace = $matches[1];
-            if ($templatePath = $this->getLayoutPath($templatePathRelative, $namespace, false, false)) {
+            if ($templatePath = $this->getLayoutPath($templatePathRelative, $namespace, null, false, false)) {
                 return $templatePath;
             }
         }

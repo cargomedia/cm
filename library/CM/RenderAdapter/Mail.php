@@ -61,7 +61,7 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
      * @return string
      */
     private function _getTplPathLayout($tplName) {
-        if ($path = $this->getRender()->getLayoutPath('Mail/' . $tplName, null, null, false)) {
+        if ($path = $this->getRender()->getLayoutPath('Mail/' . $tplName, null, null, null, false)) {
             return $path;
         }
         throw new CM_Exception_Invalid('Cannot find layout template `' . $tplName . '`');
