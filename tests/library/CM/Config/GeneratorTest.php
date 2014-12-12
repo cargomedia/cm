@@ -2,7 +2,7 @@
 
 class CM_Config_GeneratorTest extends CMTest_TestCase {
 
-    public function testGenerateConfigActionVerbs() {
+    public function testGetConfigActionVerbs() {
         if (CM_Config::get()->CM_Action_Abstract->verbsMaxValue) {
             unset(CM_Config::get()->CM_Action_Abstract->verbsMaxValue);
         }
@@ -21,21 +21,18 @@ class CM_Config_GeneratorTest extends CMTest_TestCase {
                 'className' => 'CM_Action_Abstract',
             )
         );
-        $expected = <<<'EOD'
-$config->CM_Action_Abstract->verbs = array();
-$config->CM_Action_Abstract->verbs[CM_Action_Abstract::CREATE] = 1;
-$config->CM_Action_Abstract->verbs[CM_Action_Abstract::UPDATE] = 2;
-$config->CM_Action_Abstract->verbsMaxValue = 2;
-EOD;
+        $expected = new CM_Config_Node();
+        $expected->CM_Action_Abstract->verbs = ['CM_Action_Abstract::CREATE' => 1, 'CM_Action_Abstract::UPDATE' => 2];
+        $expected->CM_Action_Abstract->verbsMaxValue = 2;
+
         $generator = $this->getMockBuilder('CM_Config_Generator')->setMethods(array('getActionVerbs'))->getMock();
         $generator->expects($this->any())->method('getActionVerbs')->will($this->returnValue($actionVerbs));
 
         /** @var CM_Config_Generator $generator */
-        $this->assertSame($expected, $generator->generateConfigActionVerbs());
-        $this->assertSame($expected, $generator->generateConfigActionVerbs());
+        $this->assertEquals($expected, $generator->getConfigActionVerbs());
     }
 
-    public function testGenerateConfigActionVerbsMaxValue() {
+    public function testGetConfigActionVerbsConfig() {
         CM_Config::get()->CM_Action_Abstract->verbsMaxValue = 5;
         CM_Config::get()->CM_Action_Abstract->verbs = array();
         $actionVerbs = array(
@@ -45,15 +42,14 @@ EOD;
                 'className' => 'CM_Action_Abstract',
             )
         );
-        $expected = <<<'EOD'
-$config->CM_Action_Abstract->verbs = array();
-$config->CM_Action_Abstract->verbs[CM_Action_Abstract::CREATE] = 6;
-$config->CM_Action_Abstract->verbsMaxValue = 6;
-EOD;
+        $expected = new CM_Config_Node();
+        $expected->CM_Action_Abstract->verbs = ['CM_Action_Abstract::CREATE' => 6];
+        $expected->CM_Action_Abstract->verbsMaxValue = 6;
+
         $generator = $this->getMockBuilder('CM_Config_Generator')->setMethods(array('getActionVerbs'))->getMock();
         $generator->expects($this->any())->method('getActionVerbs')->will($this->returnValue($actionVerbs));
 
         /** @var CM_Config_Generator $generator */
-        $this->assertSame($expected, $generator->generateConfigActionVerbs());
+        $this->assertEquals($expected, $generator->getConfigActionVerbs());
     }
 }
