@@ -9,7 +9,7 @@ class CM_Mail_WelcomeTest extends CMTest_TestCase {
         $language->setTranslation('Welcome to {$siteName}!', 'foo');
 
         list($subject, $html, $text) = $mail->render();
-        $nodeList = new CM_Dom_NodeList(htmlspecialchars($html));
+        $nodeList = new CM_Dom_NodeList($html, true);
 
         $this->assertContains('foo', $nodeList->getText());
     }
