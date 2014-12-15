@@ -1,6 +1,6 @@
 <?php
 
-class CM_App_SetupScript_Core extends CM_Provision_Script_OptionBased {
+class CM_Http_SetupScript extends CM_Provision_Script_OptionBased {
 
     public function load(CM_OutputStream_Interface $output) {
         $client = $this->getServiceManager()->getDatabases()->getMaster();
