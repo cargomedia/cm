@@ -1,5 +1,6 @@
 <?php
 require_once 'function.linkUrl.php';
+require_once 'function.tag.php';
 
 function smarty_function_link(array $params, Smarty_Internal_Template $template) {
     $label = '';
@@ -14,22 +15,35 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
     }
     unset($params['class']);
 
-    $title = '';
+    $title = null;
     if (isset($params['title'])) {
         $title = $params['title'];
     }
     unset($params['title']);
 
+    $icon = null;
     if (isset($params['icon'])) {
         $icon = $params['icon'];
     }
     unset($params['icon']);
+
+    $iconPosition = 'left';
+    if (isset($params['iconPosition']) && $params['iconPosition'] === 'right') {
+        $iconPosition = 'right';
+    }
+    unset($params['iconPosition']);
 
     $data = array();
     if (isset($params['data'])) {
         $data = (array) $params['data'];
     }
     unset($params['data']);
+
+    $onclick = null;
+    if (isset($params['onclick'])) {
+        $onclick = $params['onclick'];
+    }
+    unset($params['onclick']);
 
     $href = 'javascript:;';
     if (isset($params['href'])) {
@@ -44,28 +58,38 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
         $label = $href;
     }
 
-    $html = '';
-    if (!empty($label)) {
-        $html = '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
-        $class .= ' hasLabel';
+    $iconMarkup = null;
+    if (null !== $icon) {
+        $iconMarkup = '<span class="icon icon-' . $icon . '"></span>';
     }
 
-    if (!empty($icon)) {
-        $html = '<span class="icon icon-' . $icon . '"></span>' . $html;
+    $html = '';
+
+    if (null !== $iconMarkup && 'left' === $iconPosition) {
+        $html .= $iconMarkup;
         $class .= ' hasIcon';
     }
-
-    $titleAttr = '';
-    if (!empty($title)) {
-        $titleAttr = ' title="' . CM_Util::htmlspecialchars($title) . '"';
+    if (!empty($label)) {
+        $html .= '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
+        $class .= ' hasLabel';
+    }
+    if (null !== $iconMarkup && 'right' === $iconPosition) {
+        $html .= $iconMarkup;
+        $class .= ' hasIconRight';
     }
 
-    $dataAttr = '';
+    $attributeList = [
+        'el'      => 'a',
+        'content' => $html,
+        'href'    => $href,
+        'class'   => $class,
+        'title'   => $title,
+        'onclick' => $onclick,
+    ];
+
     foreach ($data as $name => $value) {
-        $dataAttr .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
+        $attributeList['data-' . $name] = $value;
     }
 
-    $html = '<a href="' . $href . '" class="' . $class . '"' . $titleAttr . $dataAttr . '>' . $html . '</a>';
-
-    return $html;
+    return smarty_function_tag($attributeList, $template);
 }

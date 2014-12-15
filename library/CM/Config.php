@@ -13,7 +13,7 @@ class CM_Config {
         if (false === ($config = $cache->get($cacheKey))) {
             $node = new CM_Config_Node();
             $internalConfigFile = new CM_File(DIR_ROOT . 'resources/config/internal.php');
-            if ($internalConfigFile->getExists()) {
+            if ($internalConfigFile->exists()) {
                 $node->extendWithFile($internalConfigFile);
             }
             $node->extend('default.php');

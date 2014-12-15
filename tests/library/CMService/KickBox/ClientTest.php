@@ -16,7 +16,7 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
     }
 
     public function testInvalid() {
-        $responseBodyMock = array('result' => 'invalid', 'disposable' => 'false', 'accept_all' => 'false', 'sendex' => 0.2);
+        $responseBodyMock = array('result' => 'invalid', 'disposable' => false, 'accept_all' => false, 'sendex' => 0.2);
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.2, $responseBodyMock);
         $this->assertFalse($kickBoxMock->isValid('testInvalid@example.com'));
         $kickBoxMock = $this->_getKickBoxMock(false, true, 0.2, $responseBodyMock);
@@ -24,7 +24,7 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
     }
 
     public function testDisposable() {
-        $responseBodyMock = array('result' => 'valid', 'disposable' => 'true', 'accept_all' => 'false', 'sendex' => 0.2);
+        $responseBodyMock = array('result' => 'valid', 'disposable' => true, 'accept_all' => false, 'sendex' => 0.2);
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.2, $responseBodyMock);
         $this->assertFalse($kickBoxMock->isValid('testDisposable@example.com'));
         $kickBoxMock = $this->_getKickBoxMock(true, false, 0.2, $responseBodyMock);
@@ -32,7 +32,7 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
     }
 
     public function testAcceptAll() {
-        $responseBodyMock = array('result' => 'valid', 'disposable' => 'false', 'accept_all' => 'true', 'sendex' => 0.19);
+        $responseBodyMock = array('result' => 'valid', 'disposable' => false, 'accept_all' => true, 'sendex' => 0.19);
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.2, $responseBodyMock);
         $this->assertFalse($kickBoxMock->isValid('testAcceptAll@example.com'));
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.19, $responseBodyMock);
@@ -40,7 +40,7 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
     }
 
     public function testUnknown() {
-        $responseBodyMock = array('result' => 'unknown', 'disposable' => 'false', 'accept_all' => 'false', 'sendex' => 0.19);
+        $responseBodyMock = array('result' => 'unknown', 'disposable' => false, 'accept_all' => false, 'sendex' => 0.19);
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.2, $responseBodyMock);
         $this->assertFalse($kickBoxMock->isValid('testUnknown@example.com'));
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.19, $responseBodyMock);
@@ -48,7 +48,7 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
     }
 
     public function testValid() {
-        $responseBodyMock = array('result' => 'valid', 'disposable' => 'false', 'accept_all' => 'false', 'sendex' => 0.19);
+        $responseBodyMock = array('result' => 'valid', 'disposable' => false, 'accept_all' => false, 'sendex' => 0.19);
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.2, $responseBodyMock);
         $this->assertTrue($kickBoxMock->isValid('testValid@example.com'));
     }

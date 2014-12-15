@@ -59,7 +59,7 @@ class CM_Component_Example extends CM_Component_Abstract {
      */
     private function _getIcons() {
         $file = new CM_File(DIR_PUBLIC . '/static/css/library/icon.less');
-        if (!$file->getExists()) {
+        if (!$file->exists()) {
             return array();
         }
 
@@ -75,7 +75,7 @@ class CM_Component_Example extends CM_Component_Abstract {
         $style = '';
         foreach (array_reverse($site->getModules()) as $moduleName) {
             $file = new CM_File(CM_Util::getModulePath($moduleName) . 'layout/default/variables.less');
-            if ($file->getExists()) {
+            if ($file->exists()) {
                 $style .= $file->read() . PHP_EOL;
             }
         }

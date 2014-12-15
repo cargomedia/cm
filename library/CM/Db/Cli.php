@@ -12,7 +12,13 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public function fileToDb() {
-        CM_App::getInstance()->setupDatabase(true);
+        $manager = CM_Service_Manager::getInstance();
+
+        $loader = new CM_Provision_Loader($this->_getStreamOutput());
+        $loader->registerScript(new CM_Db_SetupScript($manager));
+        $loader->registerScript(new CM_MongoDb_SetupScript($manager));
+        $loader->unload();
+        $loader->load();
     }
 
     public function runUpdates() {
@@ -31,7 +37,7 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
     public function runUpdate($version, $namespace = null) {
         $versionBumps = CM_App::getInstance()->runUpdateScript($namespace, $version);
         if ($versionBumps > 0) {
-            $db = CM_Db_Db::getClient()->getDb();
+            $db = CM_Db_Db::getClient()->getDatabaseName();
             CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
         }
     }
@@ -41,7 +47,7 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
      */
     private function _dbToFileMongo($namespace) {
         $mongo = CM_Service_Manager::getInstance()->getMongoDb();
-        $collectionList = \Functional\select($mongo->listCollectionNames(), function($collection) use ($namespace) {
+        $collectionList = \Functional\select($mongo->listCollectionNames(), function ($collection) use ($namespace) {
             return preg_match('/^' . strtolower($namespace) . '_/', $collection);
         });
         sort($collectionList);
@@ -58,7 +64,7 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
         $dump = CM_Params::jsonEncode($indexes, true);
         $dirPath = CM_Util::getModulePath($namespace) . '/resources/mongo/';
         CM_File::getFilesystemDefault()->ensureDirectory($dirPath);
-        CM_File::create($dirPath  . 'collections.json', $dump);
+        CM_File::create($dirPath . 'collections.json', $dump);
     }
 
     /**

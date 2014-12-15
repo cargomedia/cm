@@ -1,17 +1,17 @@
 <div class="columns">
   <div class="column2">
     <div class="box">
-      <div class="box-header">
+      <h3 class="box-header">
         {translate 'Logo'}
-      </div>
+      </h3>
       <div class="box-body">
         {img path="logo.png"}
       </div>
     </div>
     <div class="box">
-      <div class="box-header">
+      <h3 class="box-header">
         {translate 'Headings'}
-      </div>
+      </h3>
       <div class="box-body">
         <h1>Heading 1</h1>
         <h2>Heading 2</h2>
@@ -25,9 +25,9 @@
   </div>
   <div class="column2">
     <div class="box">
-      <div class="box-header">
+      <h3 class="box-header">
         {translate 'Color Palette'}
-      </div>
+      </h3>
       <div class="box-body">
         <div class="color-palette colorTheme">@colorTheme: #e22b59</div>
         <div class="color-palette colorBgBody">@colorBgBody: #eeeeee</div>
@@ -35,9 +35,9 @@
       </div>
     </div>
     <div class="box text">
-      <div class="box-header">
+      <h3 class="box-header">
         {translate 'Text'}
-      </div>
+      </h3>
       <div class="box-body">
         <p class="text-heading">Text Heading <span class="colorCode">@colorHeading: #e22b59</span></p>
         <p class="text-normal">Text Normal <span class="colorCode">@colorFg: #333333</span></p>

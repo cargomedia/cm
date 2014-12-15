@@ -26,6 +26,6 @@ class CM_Model_StorageAdapter_CacheLocal extends CM_Model_StorageAdapter_Cache {
     }
 
     public function delete($type, array $id) {
-        CM_Cache_Local::getInstance()->delete($type, $this->_getCacheKey($type, $id));
+        CM_Cache_Local::getInstance()->delete($this->_getCacheKey($type, $id));
     }
 }

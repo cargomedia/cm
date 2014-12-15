@@ -311,7 +311,7 @@ class CM_Util {
         $files = array();
         foreach (array_unique($paths) as $path) {
             $file = new CM_File($path);
-            if ($file->getExists()) {
+            if ($file->exists()) {
                 $files[] = $file;
             }
         }

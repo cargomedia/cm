@@ -481,7 +481,7 @@ CREATE TABLE `cm_user` (
   `userId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `activityStamp` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
-  `site` tinyint(3) unsigned DEFAULT NULL,
+  `site` int(10) unsigned DEFAULT NULL,
   `languageId` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`userId`),
   KEY `activityStamp` (`activityStamp`),

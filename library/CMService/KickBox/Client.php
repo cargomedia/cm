@@ -40,10 +40,10 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
                 return true;
             }
             $isInvalid = isset($response['result']) && 'invalid' === $response['result'];
-            $isDisposable = isset($response['disposable']) && 'true' === $response['disposable'];
+            $isDisposable = isset($response['disposable']) && true === $response['disposable'];
             $isSendexUnderThreshold = isset($response['sendex']) && $response['sendex'] < $this->_disallowUnknownThreshold;
             $isUnknown = (isset($response['result']) && 'unknown' === $response['result']) ||
-                (isset($response['accept_all']) && 'true' === $response['accept_all']);
+                (isset($response['accept_all']) && true === $response['accept_all']);
             if (($this->_disallowInvalid && $isInvalid) || ($this->_disallowDisposable && $isDisposable) || ($isSendexUnderThreshold && $isUnknown)) {
                 $isValid = 0;
             } else {

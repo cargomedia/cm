@@ -5,7 +5,7 @@ class CM_Clockwork_Storage_FileSystem extends CM_Clockwork_Storage_Abstract {
     protected function _load() {
         $data = [];
         $file = $this->_getStorageFile();
-        if ($file->getExists()) {
+        if ($file->exists()) {
             $values = CM_Params::decode($file->read(), true);
             $data = \Functional\map($values, function ($timeStamp) {
                 return new DateTime('@' . $timeStamp);
@@ -20,7 +20,7 @@ class CM_Clockwork_Storage_FileSystem extends CM_Clockwork_Storage_Abstract {
         });
         $content = CM_Params::jsonEncode($values, true);
         $file = $this->_getStorageFile();
-        if (!$file->getExists()) {
+        if (!$file->exists()) {
             $file->ensureParentDirectory();
         }
         $file->write($content);

@@ -44,7 +44,7 @@ textarea.textinput {
   }
 }
 
-.placeholder(lighten(@colorFgSubtle, 10));
+.placeholder(lighten(@colorFgSubtle, 30));
 
 .button {
   box-sizing: border-box;
@@ -75,16 +75,12 @@ textarea.textinput {
     opacity: .5;
   }
 
-  &.hasIcon {
+  &.hasIcon:not(.hasLabel) {
     padding: 0;
+  }
 
-    &.hasLabel {
-      padding: 0 15px;
-
-      .icon {
-        margin-right: 5px;
-      }
-    }
+  &.hasIcon.hasLabel .icon {
+    margin-right: 5px;
   }
 
   &.hasIconRight.hasLabel .icon {
@@ -103,7 +99,7 @@ textarea.textinput {
 
 .button-default-active {
   background: darken(@colorBgButton, 5);
-  color: @colorFgHeading;
+  color: @fontColorHeading;
 }
 
 .button-default {
@@ -118,6 +114,10 @@ textarea.textinput {
   &:not(:disabled):hover {
     background-color: darken(@colorBgButton, 5);
     border-color: darken(@colorFgButtonBorder, 5);
+  }
+
+  &.active {
+    .button-default-active;
   }
 }
 
@@ -288,8 +288,7 @@ input[type=checkbox] {
 .formField {
   > label {
     box-sizing: border-box;
-    color: @colorFgLinkSubtle;
-    font-weight: bold;
+    color: @fontColorStrong;
     padding-left: 2px;
     .word_wrap;
 
