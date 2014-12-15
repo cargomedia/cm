@@ -11,7 +11,7 @@ class CMTest_TH {
 
     public static function init() {
         $output = new CM_OutputStream_Null();
-        $loader = CM_App::getInstance()->getProvisionLoader(new CM_OutputStream_Null());
+        $loader = CM_App::getInstance()->getProvisionLoader();
         $loader->unload($output);
         $loader->load($output);
 

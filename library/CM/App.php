@@ -29,19 +29,18 @@ class CM_App implements CM_Service_ManagerAwareInterface {
      */
     public function setup(CM_OutputStream_Interface $output, $reload = null) {
         if ($reload) {
-            $this->getProvisionLoader($output)->reload($output);
+            $this->getProvisionLoader()->reload($output);
         } else {
-            $this->getProvisionLoader($output)->load($output);
+            $this->getProvisionLoader()->load($output);
         }
     }
 
     /**
-     * @param CM_OutputStream_Interface $output
      * @throws CM_Exception_Invalid
      * @return CM_Provision_Loader
      */
-    public function getProvisionLoader(CM_OutputStream_Interface $output) {
-        $loader = new CM_Provision_Loader();
+    public function getProvisionLoader() {
+    $loader = new CM_Provision_Loader();
         $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses, $this->getServiceManager());
         return $loader;
     }
