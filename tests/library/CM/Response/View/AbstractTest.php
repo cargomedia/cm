@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_View_AbstractTest extends CMTest_TestCase {
+class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
     public function testLoadPage() {
         $viewer = CMTest_TH::createUser();
@@ -88,7 +88,7 @@ EOL;
 
 class CM_Page_View_Ajax_Test_MockRedirect extends CM_Page_Abstract {
 
-    public function prepareResponse(CM_Frontend_Environment $environment, CM_Response_Page $response) {
+    public function prepareResponse(CM_Frontend_Environment $environment, CM_Http_Response_Page $response) {
         $response->redirectUrl('http://www.foo.bar');
     }
 }

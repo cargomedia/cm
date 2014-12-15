@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_PageTest extends CMTest_TestCase {
+class CM_Http_Response_PageTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
@@ -70,7 +70,7 @@ class CM_Response_PageTest extends CMTest_TestCase {
         $this->assertContains("_gaq.push(['_trackPageview']);", $html);
         $this->assertContains('var _kmq = _kmq || [];', $html);
         $this->assertContains("var _kmk = _kmk || 'km123';", $html);
-        $clientId = CM_Request_Abstract::getInstance()->getClientId();
+        $clientId = CM_Http_Request_Abstract::getInstance()->getClientId();
         $this->assertContains("_kmq.push(['identify', 'Guest {$clientId}']);", $html);
         $this->assertNotContains("_kmq.push(['alias'", $html);
     }
@@ -92,7 +92,7 @@ class CM_Response_PageTest extends CMTest_TestCase {
         $this->assertContains("_gaq.push(['_trackPageview']);", $html);
         $this->assertContains('var _kmq = _kmq || [];', $html);
         $this->assertContains("var _kmk = _kmk || 'km123';", $html);
-        $clientId = CM_Request_Abstract::getInstance()->getClientId();
+        $clientId = CM_Http_Request_Abstract::getInstance()->getClientId();
         $this->assertContains("_kmq.push(['identify', 'Guest {$clientId}']);", $html);
         $this->assertContains("_kmq.push(['identify', '1']);", $html);
         $this->assertContains("_kmq.push(['alias', 'Guest {$clientId}', '1']);", $html);

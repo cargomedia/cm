@@ -62,20 +62,20 @@ abstract class CM_FormAction_Abstract {
 
     /**
      * @param array                 $data
-     * @param CM_Response_View_Form $response
+     * @param CM_Http_Response_View_Form $response
      * @param CM_Form_Abstract      $form
      */
-    final public function checkData(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
+    final public function checkData(array $data, CM_Http_Response_View_Form $response, CM_Form_Abstract $form) {
         $this->_checkData(CM_Params::factory($data, false), $response, $form);
     }
 
     /**
      * @param array                 $data
-     * @param CM_Response_View_Form $response
+     * @param CM_Http_Response_View_Form $response
      * @param CM_Form_Abstract      $form
      * @return mixed
      */
-    final public function process(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
+    final public function process(array $data, CM_Http_Response_View_Form $response, CM_Form_Abstract $form) {
         return $this->_process(CM_Params::factory($data, false), $response, $form);
     }
 
@@ -88,18 +88,18 @@ abstract class CM_FormAction_Abstract {
 
     /**
      * @param CM_Params             $params
-     * @param CM_Response_View_Form $response
+     * @param CM_Http_Response_View_Form $response
      * @param CM_Form_Abstract      $form
      */
-    protected function _checkData(CM_Params $params, CM_Response_View_Form $response, CM_Form_Abstract $form) {
+    protected function _checkData(CM_Params $params, CM_Http_Response_View_Form $response, CM_Form_Abstract $form) {
     }
 
     /**
      * @param CM_Params             $params
-     * @param CM_Response_View_Form $response
+     * @param CM_Http_Response_View_Form $response
      * @param CM_Form_Abstract      $form
      * @return mixed
      */
-    protected function _process(CM_Params $params, CM_Response_View_Form $response, CM_Form_Abstract $form) {
+    protected function _process(CM_Params $params, CM_Http_Response_View_Form $response, CM_Form_Abstract $form) {
     }
 }

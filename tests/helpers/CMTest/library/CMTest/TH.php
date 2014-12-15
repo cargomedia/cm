@@ -108,7 +108,7 @@ class CMTest_TH {
      * @return CM_Page_Abstract
      */
     public static function createPage($pageClass, CM_Model_User $viewer = null, $params = array()) {
-        $request = new CM_Request_Get('?' . http_build_query($params), array(), $viewer);
+        $request = new CM_Http_Request_Get('?' . http_build_query($params), array(), $viewer);
         return new $pageClass(CM_Params::factory($request->getQuery(), true), $request->getViewer());
     }
 
@@ -203,15 +203,15 @@ class CMTest_TH {
      * @param string             $uri
      * @param array|null         $headers
      * @param CM_Model_User|null $viewer
-     * @return CM_Response_Page
+     * @return CM_Http_Response_Page
      */
     public static function createResponsePage($uri, array $headers = null, CM_Model_User $viewer = null) {
         if (!$headers) {
             $site = CM_Site_Abstract::factory();
             $headers = array('host' => $site->getHost());
         }
-        $request = new CM_Request_Get($uri, $headers, null, $viewer);
-        return new CM_Response_Page($request);
+        $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
+        return new CM_Http_Response_Page($request);
     }
 
     /**

@@ -162,6 +162,13 @@ class CM_App implements CM_Service_ManagerAwareInterface {
     }
 
     /**
+     * @return CM_Http_Handler
+     */
+    public function getHttpHandler() {
+        return new CM_Http_Handler(CM_Service_Manager::getInstance());
+    }
+
+    /**
      * @param int         $version
      * @param string|null $moduleName
      * @return string
