@@ -219,16 +219,90 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
             list($fixturesA, $conversionsA, $weightA, $fixturesB, $conversionsB, $weightB, $significant, $significance) = $list;
             $variationA = $this->_getVariationMock($fixturesA, $conversionsA, $weightA);
             $variationB = $this->_getVariationMock($fixturesB, $conversionsB, $weightB);
+            $this->createSplittestMock(array($variationA, $variationB));
             $this->assertSame($significance, $variationA->getSignificance($variationB));
             $this->assertSame($significance, $variationB->getSignificance($variationA));
             $this->assertSame($significant, $variationA->isDeviationSignificant($variationB));
             $this->assertSame($significant, $variationB->isDeviationSignificant($variationA));
             $variationA = $this->_getVariationMock($fixturesA, $conversionsA, $weightA * 1000);
             $variationB = $this->_getVariationMock($fixturesB, $conversionsB, $weightB * 1000);
+            $this->createSplittestMock(array($variationA, $variationB));
             $this->assertSame($significance, $variationA->getSignificance($variationB));
             $this->assertSame($significance, $variationB->getSignificance($variationA));
             $this->assertSame($significant, $variationA->isDeviationSignificant($variationB));
             $this->assertSame($significant, $variationB->isDeviationSignificant($variationA));
+        }
+    }
+
+    public function testGetSignificance_lookElsewhereEffect() {
+        foreach (array(
+                     array(1000, 500, 250, 1000, 250, 250, 1000, 125, 250,
+                         false, 1.0, false, 1.0, false, 1.0),
+                     array(1000, 498, 249, 1000, 251, 251, 1000, 126, 252,
+                         false, 0.99898016595311, false, 0.99878701610201, false, 0.99996774926289),
+                     array(1000, 490, 245, 1000, 255, 255, 1000, 130, 260,
+                         false, 0.89423607974365, false, 0.8779205344303, false, 0.99615308117639),
+                     array(1000, 480, 240, 1000, 260, 260, 1000, 135, 270,
+                         false, 0.49925073536738, false, 0.45454216509692, false, 0.97187664417951),
+                     array(1000, 460, 230, 1000, 270, 270, 1000, 145, 290,
+                         false, 0.033846891676281, false, 0.024348300078172, false, 0.82828010860014),
+                     array(1000, 440, 220, 1000, 280, 280, 1000, 155, 310,
+                         true, 0.00044334139766322, true, 0.00024544126717674, false, 0.59565430415875),
+                     array(1000, 420, 210, 1000, 290, 290, 1000, 165, 330,
+                         true, 0.0000012601176634375, true, 0.00000054728619780509, false, 0.36583598873314),
+                 ) as $list) {
+            list(
+                $fixturesA, $conversionsA, $weightA,
+                $fixturesB, $conversionsB, $weightB,
+                $fixturesC, $conversionsC, $weightC,
+                $significantAB, $significanceAB,
+                $significantAC, $significanceAC,
+                $significantBC, $significanceBC
+                ) = $list;
+            $variationA = $this->_getVariationMock($fixturesA, $conversionsA, $weightA);
+            $variationB = $this->_getVariationMock($fixturesB, $conversionsB, $weightB);
+            $variationC = $this->_getVariationMock($fixturesC, $conversionsC, $weightC);
+            $this->createSplittestMock(array($variationA, $variationB, $variationC));
+            $this->assertSame($significanceAB, $variationA->getSignificance($variationB));
+            $this->assertSame($significanceAB, $variationB->getSignificance($variationA));
+            $this->assertSame($significantAB, $variationA->isDeviationSignificant($variationB));
+            $this->assertSame($significantAB, $variationB->isDeviationSignificant($variationA));
+            $this->assertSame($significanceAC, $variationA->getSignificance($variationC));
+            $this->assertSame($significanceAC, $variationC->getSignificance($variationA));
+            $this->assertSame($significantAC, $variationA->isDeviationSignificant($variationC));
+            $this->assertSame($significantAC, $variationC->isDeviationSignificant($variationA));
+            $this->assertSame($significanceBC, $variationB->getSignificance($variationC));
+            $this->assertSame($significanceBC, $variationC->getSignificance($variationB));
+            $this->assertSame($significantBC, $variationB->isDeviationSignificant($variationC));
+            $this->assertSame($significantBC, $variationC->isDeviationSignificant($variationB));
+            $variationA = $this->_getVariationMock($fixturesA, $conversionsA, $weightA * 1000);
+            $variationB = $this->_getVariationMock($fixturesB, $conversionsB, $weightB * 1000);
+            $variationC = $this->_getVariationMock($fixturesC, $conversionsC, $weightC * 1000);
+            $this->createSplittestMock(array($variationA, $variationB, $variationC));
+            $this->assertSame($significanceAB, $variationA->getSignificance($variationB));
+            $this->assertSame($significanceAB, $variationB->getSignificance($variationA));
+            $this->assertSame($significantAB, $variationA->isDeviationSignificant($variationB));
+            $this->assertSame($significantAB, $variationB->isDeviationSignificant($variationA));
+            $this->assertSame($significanceAC, $variationA->getSignificance($variationC));
+            $this->assertSame($significanceAC, $variationC->getSignificance($variationA));
+            $this->assertSame($significantAC, $variationA->isDeviationSignificant($variationC));
+            $this->assertSame($significantAC, $variationC->isDeviationSignificant($variationA));
+            $this->assertSame($significanceBC, $variationB->getSignificance($variationC));
+            $this->assertSame($significanceBC, $variationC->getSignificance($variationB));
+            $this->assertSame($significantBC, $variationB->isDeviationSignificant($variationC));
+            $this->assertSame($significantBC, $variationC->isDeviationSignificant($variationB));
+        }
+    }
+
+    /**
+     * @param PHPUnit_Framework_MockObject_MockObject[] $variationList
+     */
+    protected function createSplittestMock(array $variationList) {
+        $splittest = $this->getMockBuilder('CM_Model_Splittest')->disableOriginalConstructor()->setMethods(array('getVariations'))->getMock();
+        $variationPagingMock = new CM_PagingSource_Array($variationList);
+        $splittest->expects($this->any())->method('getVariations')->will($this->returnValue($variationPagingMock));
+        foreach ($variationList as $variation) {
+            $variation->expects($this->any())->method('getSplittest')->will($this->returnValue($splittest));
         }
     }
 
@@ -240,7 +314,7 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
      */
     protected function _getVariationMock($fixture, $conversion, $weight) {
         $variation = $this->getMockBuilder('CM_Model_SplittestVariation')->disableOriginalConstructor()
-            ->setMethods(array('getFixtureCount', 'getConversionCount', 'getConversionWeight'))->getMock();
+            ->setMethods(array('getFixtureCount', 'getConversionCount', 'getConversionWeight', 'getSplittest'))->getMock();
         $variation->expects($this->any())->method('getFixtureCount')->will($this->returnValue($fixture));
         $variation->expects($this->any())->method('getConversionCount')->will($this->returnValue($conversion));
         $variation->expects($this->any())->method('getConversionWeight')->will($this->returnValue($weight));

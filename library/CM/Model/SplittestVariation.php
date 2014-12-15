@@ -125,7 +125,11 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 
         $pValue = 2 * stats_cdf_normal(-$rateDeviation, 0, $sigmaExpectedRateDeviation, 1);
 
-        return $pValue;
+        $variationCount = $this->getSplittest()->getVariations()->getCount();
+        $splittestCount = $variationCount * ($variationCount - 1) / 2;
+        $pValueCorrected = 1 - pow(1 - $pValue, $splittestCount);
+
+        return $pValueCorrected;
     }
 
     /**
