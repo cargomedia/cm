@@ -48,27 +48,27 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     public function runEvents($noWaitOnEventExecution = null) {
         $process = $this->_getProcess();
         $noWaitOnEventExecution = (boolean) $noWaitOnEventExecution;
-        if ($noWaitOnEventExecution) {
-            $resultList = $process->listenForChildren(null);
-            foreach ($resultList as $result) {
-                $this->_handleWorkloadResult($result);
-            }
-        }
         /** @var CM_Clockwork_Event[] $eventsToRun */
         $eventsToRun = array();
         foreach ($this->_events as $event) {
             if (!$this->_isRunning($event) && $this->_shouldRun($event)) {
                 $eventsToRun[] = $event;
+            } else {
+                $file = fopen(DIR_ROOT . 'log.txt', 'a');
+                fwrite($file, posix_getpid() . ' ' . (new DateTime())->format('H:i:s') . ' Event still running `' . $event->getName() . '`' . PHP_EOL);
+                fclose($file);
             }
         }
         foreach ($eventsToRun as $event) {
             $this->_runEvent($event);
         }
-        if (!$noWaitOnEventExecution) {
+        if ($noWaitOnEventExecution) {
+            $resultList = $process->listenForChildren(null);
+        } else {
             $resultList = $process->waitForChildren(null);
-            foreach ($resultList as $result) {
-                $this->_handleWorkloadResult($result);
-            }
+        }
+        foreach ($resultList as $result) {
+            $this->_handleWorkloadResult($result);
         }
     }
 
