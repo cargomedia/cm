@@ -40,7 +40,7 @@ class CM_App implements CM_Service_ManagerAwareInterface {
      * @return CM_Provision_Loader
      */
     public function getProvisionLoader() {
-    $loader = new CM_Provision_Loader();
+        $loader = new CM_Provision_Loader();
         $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses, $this->getServiceManager());
         return $loader;
     }
