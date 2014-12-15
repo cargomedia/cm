@@ -17,7 +17,7 @@ function smarty_function_checkbox(array $params, Smarty_Internal_Template $templ
     }
 
     if ($isSwitch) {
-        $class .= ' switch';
+        $class .= ' checkbox-switch';
     }
 
     if (!empty($class)) {
