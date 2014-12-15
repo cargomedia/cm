@@ -29,9 +29,9 @@ class CM_App implements CM_Service_ManagerAwareInterface {
      */
     public function setup(CM_OutputStream_Interface $output, $reload = null) {
         if ($reload) {
-            $this->getProvisionLoader($output)->reload();
+            $this->getProvisionLoader($output)->reload($output);
         } else {
-            $this->getProvisionLoader($output)->load();
+            $this->getProvisionLoader($output)->load($output);
         }
     }
 
@@ -41,7 +41,7 @@ class CM_App implements CM_Service_ManagerAwareInterface {
      * @return CM_Provision_Loader
      */
     public function getProvisionLoader(CM_OutputStream_Interface $output) {
-        $loader = new CM_Provision_Loader($output);
+        $loader = new CM_Provision_Loader();
         $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses, $this->getServiceManager());
         return $loader;
     }

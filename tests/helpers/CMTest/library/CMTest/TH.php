@@ -10,9 +10,10 @@ class CMTest_TH {
     private static $_dbClient = null;
 
     public static function init() {
+        $output = new CM_OutputStream_Null();
         $loader = CM_App::getInstance()->getProvisionLoader(new CM_OutputStream_Null());
-        $loader->unload();
-        $loader->load();
+        $loader->unload($output);
+        $loader->load($output);
 
         self::$_configBackup = serialize(CM_Config::get());
 
