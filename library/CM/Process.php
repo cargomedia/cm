@@ -120,11 +120,13 @@ class CM_Process {
     }
 
     /**
+     * @param boolean|null $keepAlive
+     * @param Closure|null $terminationCallback
      * @return CM_Process_WorkloadResult[]
      * @throws CM_Exception
      */
-    public function listenForChildren() {
-        return $this->_wait(null, null, true);
+    public function listenForChildren($keepAlive = null, Closure $terminationCallback = null) {
+        return $this->_wait($keepAlive, $terminationCallback, true);
     }
 
     /**

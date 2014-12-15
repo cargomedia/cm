@@ -1,6 +1,6 @@
 <?php
 
-class CM_Clockwork_Event {
+class CM_Clockwork_Event implements Serializable {
 
     /** @var callable[] */
     private $_callbacks;
@@ -57,5 +57,15 @@ class CM_Clockwork_Event {
      */
     protected function _getCurrentDateTime() {
         return new DateTime();
+    }
+
+
+    public function serialize() {
+        return serialize(['name' => $this->getName(), 'dateTimeString' => $this->getDateTimeString()]);
+    }
+
+    public function unserialize($serialized) {
+        $unserialized = unserialize($serialized);
+        $this->__construct($unserialized['name'], $unserialized['dateTimeString']);
     }
 }

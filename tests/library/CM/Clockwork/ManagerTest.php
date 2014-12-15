@@ -16,11 +16,11 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
     public function testRunEvents() {
         $currently = new DateTime();
         $eventMock = $this->mockClass('CM_Clockwork_Event');
-        $eventRun = $eventMock->newInstanceWithoutConstructor();
-        $runEventRun = $eventRun->mockMethod('run');
+        $eventRun = $eventMock->newInstance(['Event 1','']);
+        $eventRun->mockMethod('run');
         /** @var CM_Clockwork_Event $eventRun */
-        $eventNoRun =$eventMock->newInstanceWithoutConstructor();
-        $runEventNoRun = $eventNoRun->mockMethod('run');
+        $eventNoRun =$eventMock->newInstance(['Event 2','']);
+        $eventNoRun->mockMethod('run');
         /** @var CM_Clockwork_Event $eventNoRun */
         $manager = $this->mockObject('CM_Clockwork_Manager');
         $manager->mockMethod('_getCurrentDateTime')->set(function () use (&$currently) {
@@ -34,7 +34,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $storage = $this->mockClass('CM_Clockwork_Storage_Abstract')->newInstanceWithoutConstructor();
         $setRuntime = $storage->mockMethod('setRuntime')->at(0, function(CM_Clockwork_Event $event, DateTime $runtime) use ($currently, $eventRun) {
             $this->assertEquals($currently, $runtime);
-            $this->assertEquals($eventRun, $event);
+            $this->assertSame($eventRun->getName(), $event->getName());
         });
         /** @var CM_Clockwork_Storage_Abstract $storage */
         $manager->setServiceManager(CM_Service_Manager::getInstance());
@@ -46,25 +46,23 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager->runEvents();
         $this->assertSame(1, $setRuntime->getCallCount());
         $this->assertSame(2, $shouldRun->getCallCount());
-        $this->assertSame(1, $runEventRun->getCallCount());
-        $this->assertSame(0, $runEventNoRun->getCallCount());
     }
 
-    public function testRunNonBlocking2() {
+    public function testRunNonBlocking() {
+        $pidEvent1 = 1;
+        $pidEvent2 = 2;
         $process = $this->mockClass('CM_Process')->newInstanceWithoutConstructor();
-        $terminationCallbackList = [];
         $forkMock = $process->mockMethod('fork');
-        $forkMock->set(function(Closure $workload, Closure $terminationCallback) use (&$terminationCallbackList) {
-            $terminationCallbackList[] = $terminationCallback;
+        $forkMock->set(function () use ($forkMock) {
+            return ($forkMock->getCallCount() % 2) ? 1 : 2;
         });
         $manager = $this->mockObject('CM_Clockwork_Manager');
         $manager->mockMethod('_shouldRun')->set(true);
         $manager->mockMethod('_getProcess')->set($process);
-        /** @var CM_Clockwork_Manager|\Mocka\ClassMock $manager */
-        $event1 = new CM_Clockwork_Event('event1', '1 second');
+        /** @var CM_Clockwork_Manager $manager */
+        $event1 = new CM_Clockwork_Event('1', '1 second');
         $manager->registerEvent($event1);
-        /** @var CM_Clockwork_Manager|\Mocka\ClassMock $manager */
-        $event2 = new CM_Clockwork_Event('event2', '1 second');
+        $event2 = new CM_Clockwork_Event('2', '1 second');
         $manager->registerEvent($event2);
 
         $this->assertFalse(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event1]));
@@ -75,10 +73,13 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event1]));
         $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event2]));
 
+        // events still running
         $manager->runEvents(true);
         $this->assertSame(2, $forkMock->getCallCount());
 
-        call_user_func(array_pop($terminationCallbackList), new CM_Process_WorkloadResult(null));
+        // event 2 finishes
+        CMTest_TH::callProtectedMethod($manager, '_handleWorkloadResult', [new CM_Process_WorkloadResult($pidEvent2, null)]);
+
         $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event1]));
         $this->assertFalse(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event2]));
 
@@ -87,9 +88,9 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event1]));
         $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event2]));
 
-        call_user_func(array_pop($terminationCallbackList), new CM_Process_WorkloadResult(null));
-        call_user_func(array_pop($terminationCallbackList), new CM_Process_WorkloadResult(null));
-
+        // event 2 finishes with an error
+        CMTest_TH::callProtectedMethod($manager, '_handleWorkloadResult', [new CM_Process_WorkloadResult($pidEvent1, null)]);
+        CMTest_TH::callProtectedMethod($manager, '_handleWorkloadResult', [new CM_Process_WorkloadResult($pidEvent2, null, new CM_Exception())]);
 
         $this->assertFalse(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event1]));
         $this->assertFalse(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event2]));
