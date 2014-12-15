@@ -10,8 +10,7 @@ class CMTest_TH {
     private static $_dbClient = null;
 
     public static function init() {
-        $loader = new CM_Provision_Loader();
-        $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses, CM_Service_Manager::getInstance());
+        $loader = CM_App::getInstance()->getProvisionLoader(new CM_OutputStream_Null());
         $loader->unload();
         $loader->load();
 
