@@ -34,7 +34,7 @@ class CM_Component_LogList extends CM_Component_Abstract {
         $viewResponse->getJs()->setProperty('type', $type);
     }
 
-    public function ajax_flushLog(CM_Params $params, CM_Frontend_JavascriptContainer $handler, CM_Response_View_Ajax $response) {
+    public function ajax_flushLog(CM_Params $params, CM_Frontend_JavascriptContainer $handler, CM_Http_Response_View_Ajax $response) {
         if (!$this->_getAllowedFlush($response->getRender()->getEnvironment())) {
             throw new CM_Exception_NotAllowed();
         }

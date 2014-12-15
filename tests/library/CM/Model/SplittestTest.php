@@ -96,9 +96,9 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
     }
 
     public function testTracking_RequestClient() {
-        $request = $this->getMockForAbstractClass('CM_Request_Abstract', array(''), '', true, true, true, array('getClientId'));
+        $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array(''), '', true, true, true, array('getClientId'));
         $request->expects($this->any())->method('getClientId')->will($this->returnValue(1));
-        /** @var CM_Request_Abstract $request */
+        /** @var CM_Http_Request_Abstract $request */
         $fixture = new CM_Splittest_Fixture($request);
 
         /** @var CM_Model_Splittest_Mock $test */

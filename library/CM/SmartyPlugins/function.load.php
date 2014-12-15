@@ -12,7 +12,7 @@ function smarty_function_load(array $params, Smarty_Internal_Template $template)
         $params = array_merge($template->getTemplateVars(), $params);
         return $render->fetchTemplate($tplPath, $params);
     } else {
-        $tplPath = $render->getLayoutPath($params['file'], $namespace, true);
+        $tplPath = $render->getLayoutPath($params['file'], $namespace, null, true);
         $file = new CM_File($tplPath);
         return $file->read();
     }

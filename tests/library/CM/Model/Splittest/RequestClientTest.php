@@ -7,7 +7,7 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
     }
 
     public function testIsVariationFixture() {
-        $request = new CM_Request_Post('/foo/null');
+        $request = new CM_Http_Request_Post('/foo/null');
         /** @var CM_Model_Splittest_RequestClient $test */
         $test = CM_Model_Splittest_RequestClient::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 
@@ -18,8 +18,8 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
     }
 
     public function testSetConversion() {
-        $request = new CM_Request_Post('/foo/null');
-        $request2 = new CM_Request_Post('/foo/null');
+        $request = new CM_Http_Request_Post('/foo/null');
+        $request2 = new CM_Http_Request_Post('/foo/null');
 
         /** @var CM_Model_Splittest_RequestClient $test */
         $test = CM_Model_Splittest_RequestClient::createStatic(array('name' => 'bar', 'variations' => array('v1')));
@@ -36,7 +36,7 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
     }
 
     public function testIgnoreBots() {
-        $request = new CM_Request_Get('/foo', array('user-agent' => 'Googlebot'));
+        $request = new CM_Http_Request_Get('/foo', array('user-agent' => 'Googlebot'));
         /** @var CM_Model_Splittest_RequestClient $test */
         $test = CM_Model_Splittest_RequestClient::createStatic(array('name' => 'foo', 'variations' => array('v1')));
         $this->assertFalse($test->isVariationFixture($request, 'v1'));

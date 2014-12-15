@@ -56,14 +56,14 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
         $adapter = new CM_Stream_Adapter_Video_Wowza();
         $ipAddresses = array('10.0.3.109', '10.0.3.108');
         foreach ($ipAddresses as $ipAddress) {
-            $request = $this->getMockForAbstractClass('CM_Request_Abstract', array($ipAddress), 'CM_Request_Mock', true, true, true, array('getIp',
+            $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($ipAddress), 'CM_Http_Request_Mock', true, true, true, array('getIp',
                 'getHost'));
             $request->expects($this->any())->method('getIp')->will($this->returnValue(sprintf('%u', ip2long($ipAddress))));
             $this->assertEquals(1, $adapter->getServerId($request));
         }
         try {
             $ipAddress = '66.66.66.66';
-            $request = $this->getMockForAbstractClass('CM_Request_Abstract', array($ipAddress), 'CM_Request_Mock', true, true, true, array('getIp',
+            $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($ipAddress), 'CM_Http_Request_Mock', true, true, true, array('getIp',
                 'getHost'));
             $request->expects($this->any())->method('getIp')->will($this->returnValue(sprintf('%u', ip2long($ipAddress))));
             $adapter->getServerId($request);

@@ -103,10 +103,10 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     /**
      * @param array                 $data
      * @param string                $actionName
-     * @param CM_Response_View_Form $response
+     * @param CM_Http_Response_View_Form $response
      * @return mixed
      */
-    public function process(array $data, $actionName, CM_Response_View_Form $response) {
+    public function process(array $data, $actionName, CM_Http_Response_View_Form $response) {
         $action = $this->getAction($actionName);
 
         $formData = array();
