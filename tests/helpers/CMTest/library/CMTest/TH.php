@@ -46,7 +46,7 @@ class CMTest_TH {
      */
     public static function clearDb() {
         self::clearCache();
-        CM_App::getInstance()->setup(new CM_OutputStream_Null(), true);
+        CM_App::getInstance()->getProvisionLoader()->reload(new CM_OutputStream_Null());
     }
 
     public static function timeInit() {

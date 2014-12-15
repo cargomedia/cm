@@ -24,18 +24,6 @@ class CM_App implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * @param CM_OutputStream_Interface $output
-     * @param bool|null                 $reload
-     */
-    public function setup(CM_OutputStream_Interface $output, $reload = null) {
-        if ($reload) {
-            $this->getProvisionLoader()->reload($output);
-        } else {
-            $this->getProvisionLoader()->load($output);
-        }
-    }
-
-    /**
      * @throws CM_Exception_Invalid
      * @return CM_Provision_Loader
      */
