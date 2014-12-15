@@ -61,7 +61,7 @@ class CM_Process_ForkHandler {
             $exception = $e;
         }
 
-        $result = new CM_Process_WorkloadResult($this->getPid(), $return, $exception);
+        $result = new CM_Process_WorkloadResult($return, $exception, $this->getPid());
         fwrite($this->_ipcStream, serialize($result));
     }
 
