@@ -72,7 +72,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 
     /**
      * @param CM_Model_SplittestVariation $variationWorse
-     * @return float|null P-value
+     * @return float|null P-value with Šidák correction
      */
     public function getSignificance(CM_Model_SplittestVariation $variationWorse) {
         $fixturesA = $this->getFixtureCount();
