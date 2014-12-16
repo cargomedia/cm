@@ -1,3 +1,4 @@
+// patched with: https://github.com/ftlabs/fastclick/pull/103/files
 /**
  * @preserve FastClick: polyfill to remove click delays on browsers with touch UIs.
  *
@@ -280,7 +281,7 @@ FastClick.prototype.needsFocus = function(target) {
  */
 FastClick.prototype.sendClick = function(targetElement, event) {
 	'use strict';
-	var clickEvent, touch;
+	var clickEvent, mouseupEvent, touch;
 
 	// On some Android devices activeElement needs to be blurred otherwise the synthetic click will have no effect (#24)
 	if (document.activeElement && document.activeElement !== targetElement) {
@@ -288,6 +289,11 @@ FastClick.prototype.sendClick = function(targetElement, event) {
 	}
 
 	touch = event.changedTouches[0];
+
+	mouseupEvent = document.createEvent('MouseEvents');
+	mouseupEvent.initMouseEvent('mouseup', true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
+	mouseupEvent.forwardedTouchEvent = true;
+	targetElement.dispatchEvent(mouseupEvent);
 
 	// Synthesise a click event, with an extra attribute so it can be tracked
 	clickEvent = document.createEvent('MouseEvents');
