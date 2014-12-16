@@ -180,6 +180,10 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
     }
 
     /**
+     * @param array      $variationDataList
+     * @param bool       $significant
+     * @param float|null $significance
+     *
      * @dataProvider dataProviderTestGetSignificance
      */
     public function testGetSignificance($variationDataList, $significant, $significance) {
