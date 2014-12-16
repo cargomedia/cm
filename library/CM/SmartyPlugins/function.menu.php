@@ -5,6 +5,10 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
     $render = $template->smarty->getTemplateVars('render');
     $environment = $render->getEnvironment();
 
+    if (isset($params['params'])) {
+        $params = array_merge($params['params'], $params);
+    }
+
     $activePage = null;
     if (isset($params['activePage'])) {
         $activePage = $params['activePage'];
@@ -91,7 +95,13 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
     }
 
     $tplPath = $render->getLayoutPath('menu/' . $tplName . '.tpl');
-    $assign = array('menu_entries' => $menuEntries, 'menu_class' => $class, 'activePath' => $activePath, 'activeParams' => $activeParams,
-                    'name'         => $name);
+    $assign = array(
+        'menu_entries'   => $menuEntries,
+        'menu_class'     => $class,
+        'activePath'     => $activePath,
+        'activeParams'   => $activeParams,
+        'name'           => $name,
+        'originalParams' => $params,
+    );
     return $render->fetchTemplate($tplPath, $assign);
 }

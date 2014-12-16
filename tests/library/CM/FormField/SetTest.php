@@ -25,7 +25,7 @@ class CM_FormField_SetTest extends CMTest_TestCase {
 
         $environment = new CM_Frontend_Environment();
         $userInputGood = array(32, 64, 128);
-        $response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
+        $response = $this->getMockForAbstractClass('CM_Http_Response_Abstract', array(), '', false);
         $validationResult = $field->validate($environment, $userInputGood);
         $this->assertSame($userInputGood, $validationResult);
 

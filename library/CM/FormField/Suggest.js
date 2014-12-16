@@ -44,9 +44,10 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
       },
       createSearchChoice: function(term, data) {
         if (field.getOption("enableChoiceCreate")) {
-          if ($(data).filter(function() {
-            return this.name.localeCompare(term) === 0;
-          }).length === 0) {
+          var existingMatches = $(data).filter(function() {
+            return this.name.toLowerCase().localeCompare(term.toLowerCase()) === 0;
+          });
+          if (existingMatches.length === 0) {
             return {'id': term, 'name': term, 'new': 1};
           }
         }

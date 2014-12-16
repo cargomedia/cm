@@ -3,7 +3,7 @@
 class CM_Splittest_FixtureTest extends CMTest_TestCase {
 
     public function testCreate() {
-        new CM_Splittest_Fixture(new CM_Request_Post('/foo/null'));
+        new CM_Splittest_Fixture(new CM_Http_Request_Post('/foo/null'));
         new CM_Splittest_Fixture(CMTest_TH::createUser());
         try {
             new CM_Splittest_Fixture(CMTest_TH::createSession());
@@ -14,21 +14,21 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
     }
 
     public function testGetFixtureTye() {
-        $fixtureRequestClient = new CM_Splittest_Fixture(new CM_Request_Post('/foo/null'));
+        $fixtureRequestClient = new CM_Splittest_Fixture(new CM_Http_Request_Post('/foo/null'));
         $fixtureUser = new CM_Splittest_Fixture(CMTest_TH::createUser());
         $this->assertSame(CM_Splittest_Fixture::TYPE_REQUEST_CLIENT, $fixtureRequestClient->getFixtureType());
         $this->assertSame(CM_Splittest_Fixture::TYPE_USER, $fixtureUser->getFixtureType());
     }
 
     public function testGetColumnId() {
-        $fixtureRequestClient = new CM_Splittest_Fixture(new CM_Request_Post('/foo/null'));
+        $fixtureRequestClient = new CM_Splittest_Fixture(new CM_Http_Request_Post('/foo/null'));
         $fixtureUser = new CM_Splittest_Fixture(CMTest_TH::createUser());
         $this->assertSame('requestClientId', $fixtureRequestClient->getColumnId());
         $this->assertSame('userId', $fixtureUser->getColumnId());
     }
 
     public function testGetId() {
-        $request = new CM_Request_Post('/foo/null');
+        $request = new CM_Http_Request_Post('/foo/null');
         $user = CMTest_TH::createUser();
         $fixtureRequestClient = new CM_Splittest_Fixture($request);
         $fixtureUser = new CM_Splittest_Fixture($user);
@@ -42,14 +42,14 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
         /** @var CM_Model_Splittest_User_Mock $splittestUser */
         $splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
-        $request1 = new CM_Request_Post('/foo/null');
+        $request1 = new CM_Http_Request_Post('/foo/null');
         $variationRequest1 = $splittestRequestClient->getVariationFixture($request1);
         $userA = CMTest_TH::createUser();
         CM_Splittest_Fixture::setUserForRequestClient($request1, $userA);
         $this->assertSame($variationRequest1, $splittestUser->getVariationFixture($userA));
 
         for ($i = 0; $i < 10; $i++) {
-            $requestNew = new CM_Request_Post('/foo/null');
+            $requestNew = new CM_Http_Request_Post('/foo/null');
             $splittestRequestClient->getVariationFixture($requestNew);
             CM_Splittest_Fixture::setUserForRequestClient($requestNew, $userA);
             $this->assertSame($variationRequest1, $splittestUser->getVariationFixture($userA));
@@ -66,7 +66,7 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
         /** @var CM_Model_Splittest_User_Mock $splittestUser */
         $splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
-        $request1 = new CM_Request_Post('/foo/null');
+        $request1 = new CM_Http_Request_Post('/foo/null');
         $variationRequest1 = $splittestRequestClient->getVariationFixture($request1);
         $userA = CMTest_TH::createUser();
         CM_Splittest_Fixture::setUserForRequestClient($request1, $userA);
@@ -90,7 +90,7 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
         /** @var CM_Model_Splittest_User_Mock $splittestUser */
         $splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
-        $request = new CM_Request_Post('/foo/null');
+        $request = new CM_Http_Request_Post('/foo/null');
         $variationRequest = $splittestRequestClient->getVariationFixture($request);
         $user = CMTest_TH::createUser();
         $session = $request->getSession();
@@ -112,7 +112,7 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
         $this->assertSame(0, $variation->getFixtureCount());
         $this->assertSame(0, $variation->getConversionCount());
 
-        $request1 = new CM_Request_Post('/foo/null');
+        $request1 = new CM_Http_Request_Post('/foo/null');
         $splittestRequestClient->getVariationFixture($request1);
         $this->assertSame(1, $variation->getFixtureCount(true));
         $this->assertSame(0, $variation->getConversionCount(true));
@@ -127,12 +127,12 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
         $this->assertSame(1, $variation->getFixtureCount(true));
         $this->assertSame(1, $variation->getConversionCount(true));
 
-        $request2 = new CM_Request_Post('/foo/null');
+        $request2 = new CM_Http_Request_Post('/foo/null');
         $splittestRequestClient->getVariationFixture($request2);
         $this->assertSame(2, $variation->getFixtureCount(true));
         $this->assertSame(1, $variation->getConversionCount(true));
 
-        $request3 = new CM_Request_Post('/foo/null');
+        $request3 = new CM_Http_Request_Post('/foo/null');
         $splittestRequestClient->getVariationFixture($request3);
         $this->assertSame(3, $variation->getFixtureCount(true));
         $this->assertSame(1, $variation->getConversionCount(true));
@@ -171,7 +171,7 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
         $this->assertSame(0, $variation->getFixtureCount(true));
         $this->assertSame(0, $variation->getConversionCount(true));
 
-        $request = new CM_Request_Post('/foo/null');
+        $request = new CM_Http_Request_Post('/foo/null');
         $splittestRequestClient->getVariationFixture($request);
         $this->assertSame(1, $variation->getFixtureCount(true));
         $this->assertSame(0, $variation->getConversionCount(true));
@@ -198,10 +198,10 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
 class CM_Model_Splittest_RequestClient_Mock extends CM_Model_Splittest_RequestClient {
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @return string
      */
-    public function getVariationFixture(CM_Request_Abstract $request) {
+    public function getVariationFixture(CM_Http_Request_Abstract $request) {
         return $this->_getVariationFixture(new CM_Splittest_Fixture($request));
     }
 }

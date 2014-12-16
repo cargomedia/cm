@@ -524,7 +524,8 @@ var CM_App = CM_Class_Abstract.extend({
      * @return {String}
      */
     renderHtml: function(template, variables) {
-      return _.template(template, variables).replace(/^\s+|\s+$/g, '');
+      var compiled = _.template(template);
+      return compiled(variables).replace(/^\s+|\s+$/g, '');
     }
   },
 
@@ -1062,10 +1063,20 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   router: {
+    /** @type {String|Null} */
+    hrefInitialIgnore: null,
+
     ready: function() {
       var router = this;
+      this.hrefInitialIgnore = location.href;
 
-      $(window).on('popstate', function(event) {
+      $(window).on('popstate', function() {
+        // this `if` fixes double fire of `popstate` event on the initial page.
+        if (router.hrefInitialIgnore === location.href) {
+          router.hrefInitialIgnore = null;
+          return;
+        }
+        router.hrefInitialIgnore = null;
         router._handleLocationChange(router._getFragment());
       });
 
@@ -1115,6 +1126,7 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {String|Null} [url] Absolute or relative URL
      */
     pushState: function(url) {
+      this.hrefInitialIgnore = null;
       window.history.pushState(null, null, url);
     },
 
@@ -1122,6 +1134,7 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {String|Null} [url] Absolute or relative URL
      */
     replaceState: function(url) {
+      this.hrefInitialIgnore = null;
       window.history.replaceState(null, null, url);
     },
 

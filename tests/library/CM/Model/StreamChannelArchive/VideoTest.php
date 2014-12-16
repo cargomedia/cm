@@ -95,12 +95,12 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
         $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel);
         $files = $this->_createArchiveFiles($archive);
         foreach ($files as $file) {
-            $this->assertTrue($file->getExists());
+            $this->assertTrue($file->exists());
         }
 
         $archive->delete();
         foreach ($files as $file) {
-            $this->assertFalse($file->getExists());
+            $this->assertFalse($file->exists());
         }
         try {
             new CM_Model_StreamChannelArchive_Video($archive->getId());
@@ -149,17 +149,17 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
         }
 
         foreach ($filesNotDeleted as $file) {
-            $this->assertTrue($file->getExists());
+            $this->assertTrue($file->exists());
         }
         foreach ($filesDeleted as $file) {
-            $this->assertTrue($file->getExists());
+            $this->assertTrue($file->exists());
         }
         CM_Model_StreamChannelArchive_Video::deleteOlder(10, CM_Model_StreamChannel_Video::getTypeStatic());
         foreach ($filesNotDeleted as $file) {
-            $this->assertTrue($file->getExists());
+            $this->assertTrue($file->exists());
         }
         foreach ($filesDeleted as $file) {
-            $this->assertFalse($file->getExists());
+            $this->assertFalse($file->exists());
         }
         foreach ($archivesNotDeleted as $archive) {
             try {

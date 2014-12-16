@@ -26,15 +26,15 @@ class CM_File_FilesystemTest extends CMTest_TestCase {
         }
 
         foreach ($fileList as $file) {
-            $this->assertTrue($file->getExists());
+            $this->assertTrue($file->exists());
         }
 
         $filesystem->deleteByPrefix($dirTmp);
 
         foreach ($fileList as $file) {
-            $this->assertFalse($file->getExists());
+            $this->assertFalse($file->exists());
         }
-        $this->assertTrue((new CM_File($dirTmp))->getExists());
+        $this->assertTrue((new CM_File($dirTmp))->exists());
     }
 
     public function testNormalizePath() {

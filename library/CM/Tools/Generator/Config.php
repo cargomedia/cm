@@ -106,7 +106,7 @@ class CM_Tools_Generator_Config extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      */
     private function _getConfigClosure(CM_File $configFile) {
-        if (!$configFile->getExists()) {
+        if (!$configFile->exists()) {
             return null;
         }
         $configSetter = require $configFile->getPath();

@@ -91,7 +91,10 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
     }
 
     public function listByPrefix($pathPrefix, $noRecursion = null) {
-        $pathPrefix = $this->_getAbsolutePath($pathPrefix) . '/'; // force trailing slash for input-output consistency
+        $pathPrefix = $this->_getAbsolutePath($pathPrefix);
+        if ('' !== $pathPrefix) {
+            $pathPrefix .= '/';
+        }
         $commandOptions = array(
             'Bucket' => $this->_bucket,
             'Prefix' => $pathPrefix,
@@ -99,13 +102,20 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         if ($noRecursion) {
             $commandOptions['Delimiter'] = '/';
         }
+        $iteratorOptions = array(
+            'return_prefixes' => true,
+        );
 
-        $keys = array();
-        foreach ($this->_client->getIterator('ListObjects', $commandOptions) as $file) {
-            $keys[] = $this->_getRelativePath($file['Key']);
+        $fileKeys = $directoryKeys = array();
+        foreach ($this->_client->getIterator('ListObjects', $commandOptions, $iteratorOptions) as $file) {
+            if (isset($file['Prefix'])) {
+                $directoryKeys[] = $this->_getRelativePath($file['Prefix']);
+            } else {
+                $fileKeys[] = $this->_getRelativePath($file['Key']);
+            }
         }
 
-        return array('files' => $keys, 'dirs' => array());
+        return array('files' => $fileKeys, 'dirs' => $directoryKeys);
     }
 
     public function rename($sourcePath, $targetPath) {

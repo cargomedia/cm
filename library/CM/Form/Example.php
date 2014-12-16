@@ -4,6 +4,7 @@ class CM_Form_Example extends CM_Form_Abstract {
 
     protected function _initialize() {
         $this->registerField(new CM_FormField_Text(['name' => 'text']));
+        $this->registerField(new CM_FormField_Textarea(['name' => 'textarea']));
         $this->registerField(new CM_FormField_Integer(['name' => 'int', 'min' => -10, 'max' => 20, 'step' => 2]));
         $this->registerField(new CM_FormField_Distance(['name' => 'locationSlider']));
         $this->registerField(new CM_FormField_Location(['name' => 'location', 'fieldNameDistance' => 'locationSlider']));
@@ -22,7 +23,7 @@ class CM_Form_Example extends CM_Form_Abstract {
     }
 
     public function prepare(CM_Frontend_Environment $environment) {
-        $ip = CM_Request_Abstract::getInstance()->getIp();
+        $ip = CM_Http_Request_Abstract::getInstance()->getIp();
         if ($locationGuess = CM_Model_Location::findByIp($ip)) {
             $this->getField('location')->setValue($locationGuess);
         }

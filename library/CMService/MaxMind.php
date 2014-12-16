@@ -747,13 +747,13 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @codeCoverageIgnore
      */
     protected function _download(CM_File $file, $url = null) {
-        if ($file->getExists()) {
+        if ($file->exists()) {
             $modificationTime = $file->getModified();
             if (time() - $modificationTime > self::CACHE_LIFETIME) {
                 $file->delete();
             }
         }
-        if ($file->getExists()) {
+        if ($file->exists()) {
             $contents = $file->read();
         } else {
             if (null === $url) {
@@ -1679,7 +1679,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      */
     private function _setGeoIpFile(CM_File $geoIpFile = null) {
         if (null !== $geoIpFile) {
-            if (!$geoIpFile->getExists()) {
+            if (!$geoIpFile->exists()) {
                 throw new CM_Exception_Invalid('GeoIP file not found: ' . $geoIpFile->getPath());
             }
         }

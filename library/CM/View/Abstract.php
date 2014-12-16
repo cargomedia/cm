@@ -22,11 +22,11 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
         return $this->_params;
     }
 
-    public function ajax_loadComponent(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
+    public function ajax_loadComponent(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
         return $response->loadComponent($params);
     }
 
-    public function ajax_loadPage(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
+    public function ajax_loadPage(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
         return $response->loadPage($params, $response);
     }
 

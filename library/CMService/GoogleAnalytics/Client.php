@@ -6,7 +6,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     protected $_code;
 
     /** @var array */
-    protected $_pageViews = array(), $_orders = array(), $_customVars = array();
+    protected $_customVarList = array(), $_eventList = array(), $_transactionList = array(), $_pageViewList = array();
 
     /**
      * @param string $code
@@ -26,7 +26,29 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
         $name = (string) $name;
         $value = (string) $value;
         $scope = (int) $scope;
-        $this->_customVars[$index] = array('index' => $index, 'name' => $name, 'value' => $value, 'scope' => $scope);
+        $this->_customVarList[$index] = array('index' => $index, 'name' => $name, 'value' => $value, 'scope' => $scope);
+    }
+
+    /**
+     * @param string      $category
+     * @param string      $action
+     * @param string|null $label
+     * @param int|null    $value
+     * @param bool|null   $nonInteraction
+     */
+    public function addEvent($category, $action, $label = null, $value = null, $nonInteraction = null) {
+        $category = (string) $category;
+        $action = (string) $action;
+        $label = isset($label) ? (string) $label : null;
+        $value = isset($value) ? (int) $value : null;
+        $nonInteraction = (bool) $nonInteraction;
+        $this->_eventList[] = array(
+            'category'       => $category,
+            'action'         => $action,
+            'label'          => $label,
+            'value'          => $value,
+            'nonInteraction' => $nonInteraction,
+        );
     }
 
     /**
@@ -36,24 +58,24 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
         if (null !== $path) {
             $path = (string) $path;
         }
-        if ($this->_getPageViews() === array(null)) {
-            $this->_pageViews = array();
+        if ($this->_pageViewList === array(null)) {
+            $this->_pageViewList = array();
         }
-        if (null !== $path || 0 === count($this->_getPageViews())) {
-            $this->_pageViews[] = $path;
+        if (null !== $path || 0 === count($this->_pageViewList)) {
+            $this->_pageViewList[] = $path;
         }
     }
 
     /**
-     * @param string $orderId
+     * @param string $transactionId
      * @param string $productId
      * @param float  $amount
      */
-    public function addSale($orderId, $productId, $amount) {
-        if (!isset($this->_orders[$orderId])) {
-            $this->_orders[$orderId] = array();
-        }
-        $this->_orders[$orderId][$productId] = (float) $amount;
+    public function addSale($transactionId, $productId, $amount) {
+        $transactionId = (string) $transactionId;
+        $productId = (string) $productId;
+        $amount = (float) $amount;
+        $this->_transactionList[$transactionId][$productId] = $amount;
     }
 
     /**
@@ -61,27 +83,45 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
      */
     public function getJs() {
         $js = '';
-        foreach ($this->_getPageViews() as $pageView) {
+        foreach ($this->_pageViewList as $pageView) {
             if (null === $pageView) {
                 $js .= "_gaq.push(['_trackPageview']);";
             } else {
                 $js .= "_gaq.push(['_trackPageview', '" . $pageView . "']);";
             }
         }
-        foreach ($this->_orders as $orderId => $products) {
+        foreach ($this->_customVarList as $customVar) {
+            $index = (string) $customVar['index'];
+            $name = "'" . $customVar['name'] . "'";
+            $value = "'" . $customVar['value'] . "'";
+            $scope = (string) $customVar['scope'];
+            $js .= "_gaq.push(['_setCustomVar', $index, $name, $value, $scope]);";
+        }
+        foreach ($this->_eventList as $event) {
+            $category = "'" . $event['category'] . "'";
+            $action = "'" . $event['action'] . "'";
+            $label = isset($event['label']) ? "'" . $event['label'] . "'" : 'undefined';
+            $value = isset($event['value']) ? (string) $event['value'] : 'undefined';
+            $nonInteraction = $event['nonInteraction'] ? 'true' : 'undefined';
+            $js .= "_gaq.push(['_trackEvent', $category, $action, $label, $value, $nonInteraction]);";
+        }
+        foreach ($this->_transactionList as $transactionId => $productList) {
             $amountTotal = 0;
-            foreach ($products as $productId => $amount) {
+            foreach ($productList as $productId => $amount) {
                 $amountTotal += $amount;
             }
-            $js .= "_gaq.push(['_addTrans', '$orderId', '', '$amountTotal', '', '', '', '', '']);";
-            foreach ($products as $productId => $amount) {
-                $js .= "_gaq.push(['_addItem', '$orderId', '$productId', 'product-$productId', '', '$amount', '1']);";
+            $transactionId = "'" . $transactionId . "'";
+            $amountTotal = "'" . $amountTotal . "'";
+            $js .= "_gaq.push(['_addTrans', $transactionId, '', $amountTotal, '', '', '', '', '']);";
+            foreach ($productList as $productId => $amount) {
+                $productCode = "'" . $productId . "'";
+                $productName = "'product-" . $productId . "'";
+                $amount = "'" . $amount . "'";
+                $js .= "_gaq.push(['_addItem', $transactionId, $productCode, $productName, '', $amount, '1']);";
             }
-            $js .= "_gaq.push(['_trackTrans']);";
         }
-        foreach ($this->_customVars as $customVar) {
-            $js .= "_gaq.push(['_setCustomVar', " . $customVar['index'] . ", '" . $customVar['name'] . "', '" . $customVar['value'] . "', " .
-                $customVar['scope'] . "]);";
+        if (!empty($this->_transactionList)) {
+            $js .= "_gaq.push(['_trackTrans']);";
         }
         return $js;
     }
@@ -123,12 +163,5 @@ EOF;
      */
     protected function _getCode() {
         return $this->_code;
-    }
-
-    /**
-     * @return array
-     */
-    protected function _getPageViews() {
-        return $this->_pageViews;
     }
 }

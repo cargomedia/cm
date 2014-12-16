@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_Resource_LayoutTest extends CMTest_TestCase {
+class CM_Http_Response_Resource_LayoutTest extends CMTest_TestCase {
 
     public function testProcess() {
         $filePath = 'img/logo.png';
@@ -24,7 +24,7 @@ class CM_Response_Resource_LayoutTest extends CMTest_TestCase {
      */
     public function testRendering() {
         $filePath = 'browserconfig.xml';
-        /** @var CM_Response_Resource_Layout $response */
+        /** @var CM_Http_Response_Resource_Layout $response */
         $response = $this->getResponseResourceLayout($filePath);
         $this->assertContains('Content-Type: application/xml', $response->getHeaders());
         $this->assertTrue((boolean) preg_match('!src="http://cdn\.default\.dev/layout/.+?/img/mstile-70x70\.png"!', $response->getContent()));

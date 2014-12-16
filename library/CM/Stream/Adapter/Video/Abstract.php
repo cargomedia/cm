@@ -5,11 +5,11 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
     abstract public function synchronize();
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @throws CM_Exception_Invalid
      * return int
      */
-    abstract public function getServerId(CM_Request_Abstract $request);
+    abstract public function getServerId(CM_Http_Request_Abstract $request);
 
     /**
      * @param CM_Model_Stream_Abstract $stream

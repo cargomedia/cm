@@ -80,6 +80,9 @@ abstract class CM_File_Filesystem_Adapter implements CM_Comparable {
 
     abstract public function ensureDirectory($path);
 
+    /**
+     * Must be idempotent
+     */
     abstract public function setup();
 
     /**

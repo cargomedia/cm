@@ -18,7 +18,7 @@ class CM_Asset_Javascript_Internal extends CM_Asset_Javascript_Abstract {
     private function _getAppClassName(CM_Site_Abstract $site) {
         foreach ($site->getModules() as $moduleName) {
             $file = new CM_File(DIR_ROOT . CM_Bootloader::getInstance()->getModulePath($moduleName) . 'library/' . $moduleName . '/App.js');
-            if ($file->getExists()) {
+            if ($file->exists()) {
                 return $moduleName . '_App';
             }
         }

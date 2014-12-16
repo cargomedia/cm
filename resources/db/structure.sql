@@ -311,6 +311,7 @@ DROP TABLE IF EXISTS `cm_splittestVariation_fixture`;
 
 
 CREATE TABLE `cm_splittestVariation_fixture` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `splittestId` int(10) unsigned NOT NULL,
   `requestClientId` int(10) unsigned DEFAULT NULL,
   `userId` int(10) unsigned DEFAULT NULL,
@@ -318,6 +319,7 @@ CREATE TABLE `cm_splittestVariation_fixture` (
   `createStamp` int(10) unsigned NOT NULL,
   `conversionStamp` int(11) DEFAULT NULL,
   `conversionWeight` decimal(10,2) NOT NULL DEFAULT '0.00',
+  PRIMARY KEY (`id`),
   UNIQUE KEY `userSplittest` (`userId`,`splittestId`),
   UNIQUE KEY `requestClientSplittest` (`requestClientId`,`splittestId`),
   KEY `splittestId` (`splittestId`),
@@ -479,7 +481,7 @@ CREATE TABLE `cm_user` (
   `userId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `activityStamp` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
-  `site` tinyint(3) unsigned DEFAULT NULL,
+  `site` int(10) unsigned DEFAULT NULL,
   `languageId` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`userId`),
   KEY `activityStamp` (`activityStamp`),

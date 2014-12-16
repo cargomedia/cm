@@ -32,10 +32,10 @@ class CM_Tools_Generator_FilesystemHelper extends CM_Class_Abstract {
      */
     public function createFile(CM_File $file, $content = null, $overwrite = null) {
         $parentDirectory = $file->getParentDirectory();
-        if (!$parentDirectory->getExists()) {
+        if (!$parentDirectory->exists()) {
             $this->createDirectory($parentDirectory);
         }
-        if ($file->getExists()) {
+        if ($file->exists()) {
             if (!$overwrite) {
                 $this->notify('skip', $file->getPath());
             } else {
