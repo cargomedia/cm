@@ -126,7 +126,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
         $pValue = 2 * stats_cdf_normal(-$rateDeviation, 0, $sigmaExpectedRateDeviation, 1);
 
         $variationCount = $this->getSplittest()->getVariations()->getCount();
-        $independentExperimentCount = min(1, $variationCount - 1);
+        $independentExperimentCount = max(1, $variationCount - 1);
         $pValueSidak = 1 - pow(1 - $pValue, $independentExperimentCount);
 
         return $pValueSidak;
