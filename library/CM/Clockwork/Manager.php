@@ -14,6 +14,9 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     /** @var DateTimeZone */
     private $_timeZone;
 
+    /** @var CM_Clockwork_Event[] */
+    private $_pidEventMap = [];
+
     public function __construct() {
         $this->_events = array();
         $this->_storage = new CM_Clockwork_Storage_Memory();
@@ -22,9 +25,9 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     }
 
     /**
-     * @param string      $name
-     * @param string      $dateTimeString
-     * @param callable    $callback
+     * @param string   $name
+     * @param string   $dateTimeString
+     * @param callable $callback
      */
     public function registerCallback($name, $dateTimeString, $callback) {
         $event = new CM_Clockwork_Event($name, $dateTimeString);
@@ -40,16 +43,20 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     }
 
     public function runEvents() {
+        $process = $this->_getProcess();
         /** @var CM_Clockwork_Event[] $eventsToRun */
-        $eventsToRun = array();
+        $eventsToRun = [];
         foreach ($this->_events as $event) {
-            if ($this->_shouldRun($event)) {
+            if (!$this->_isRunning($event) && $this->_shouldRun($event)) {
                 $eventsToRun[] = $event;
             }
         }
         foreach ($eventsToRun as $event) {
-            $event->run();
-            $this->_storage->setRuntime($event, $this->_getCurrentDateTime());
+            $this->_runEvent($event);
+        }
+        $resultList = $process->listenForChildren();
+        foreach ($resultList as $result) {
+            $this->_handleWorkloadResult($result);
         }
     }
 
@@ -73,6 +80,12 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
             $this->runEvents();
             sleep(1);
         }
+    }
+
+    protected function _handleWorkloadResult(CM_Process_WorkloadResult $result) {
+        $event = $this->_pidEventMap[$result->getPid()];
+        $this->_markStopped($event);
+        $this->_storage->setRuntime($event, $this->_getCurrentDateTime());
     }
 
     /**
@@ -114,6 +127,13 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     }
 
     /**
+     * @return CM_Process
+     */
+    protected function _getProcess() {
+        return CM_Process::getInstance();
+    }
+
+    /**
      * @param CM_Clockwork_Event $event
      * @return boolean
      */
@@ -123,5 +143,44 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
         $dateModified = new DateTime();
         $dateModified->modify($dateTimeString);
         return $date->modify($dateTimeString) != $dateModified->modify($dateTimeString);
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     * @return boolean
+     */
+    protected function _isRunning(CM_Clockwork_Event $event) {
+        return false !== array_search($event, $this->_pidEventMap);
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     * @param int                $pid
+     */
+    protected function _markRunning(CM_Clockwork_Event $event, $pid) {
+        if (!$this->_isRunning($event)) {
+            $this->_pidEventMap[$pid] = $event;
+        }
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     */
+    protected function _markStopped(CM_Clockwork_Event $event) {
+        if ($this->_isRunning($event)) {
+            $pid = array_search($event, $this->_pidEventMap);
+            unset($this->_pidEventMap[$pid]);
+        }
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     */
+    protected function _runEvent(CM_Clockwork_Event $event) {
+        $process = $this->_getProcess();
+        $pid = $process->fork(function () use ($event) {
+            $event->run();
+        });
+        $this->_markRunning($event, $pid);
     }
 }
