@@ -8,11 +8,17 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     /** @var DateTime */
     private $_startTime;
 
+    /** @var CM_Clockwork_Event[] */
+    private $_eventsRunning = array();
+
     /** @var CM_Clockwork_Storage_Abstract */
     private $_storage;
 
     /** @var DateTimeZone */
     private $_timeZone;
+
+    /** @var CM_Clockwork_Event[] */
+    private $_pidEventMap = [];
 
     public function __construct() {
         $this->_events = array();
@@ -22,9 +28,9 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     }
 
     /**
-     * @param string      $name
-     * @param string      $dateTimeString
-     * @param callable    $callback
+     * @param string   $name
+     * @param string   $dateTimeString
+     * @param callable $callback
      */
     public function registerCallback($name, $dateTimeString, $callback) {
         $event = new CM_Clockwork_Event($name, $dateTimeString);
@@ -39,17 +45,30 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
         $this->_events[] = $event;
     }
 
-    public function runEvents() {
+    public function runEvents($noWaitOnEventExecution = null) {
+        $process = $this->_getProcess();
+        $noWaitOnEventExecution = (boolean) $noWaitOnEventExecution;
         /** @var CM_Clockwork_Event[] $eventsToRun */
         $eventsToRun = array();
         foreach ($this->_events as $event) {
-            if ($this->_shouldRun($event)) {
+            if (!$this->_isRunning($event) && $this->_shouldRun($event)) {
                 $eventsToRun[] = $event;
+            } else {
+                $file = fopen(DIR_ROOT . 'log.txt', 'a');
+                fwrite($file, posix_getpid() . ' ' . (new DateTime())->format('H:i:s') . ' Event still running `' . $event->getName() . '`' . PHP_EOL);
+                fclose($file);
             }
         }
         foreach ($eventsToRun as $event) {
-            $event->run();
-            $this->_storage->setRuntime($event, $this->_getCurrentDateTime());
+            $this->_runEvent($event);
+        }
+        if ($noWaitOnEventExecution) {
+            $resultList = $process->listenForChildren(null);
+        } else {
+            $resultList = $process->waitForChildren(null);
+        }
+        foreach ($resultList as $result) {
+            $this->_handleWorkloadResult($result);
         }
     }
 
@@ -70,9 +89,22 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
 
     public function start() {
         while (true) {
-            $this->runEvents();
+            $this->runEvents(true);
             sleep(1);
         }
+    }
+
+    protected function _handleWorkloadResult(CM_Process_WorkloadResult $result) {
+        $pid = $result->getPid();
+        /** @var CM_Clockwork_Event $event */
+        $event = $this->_pidEventMap[$pid];
+        $file = fopen(DIR_ROOT . 'log.txt', 'a');
+        fwrite($file, posix_getpid() . ' ' . (new DateTime())->format('H:i:s') . ' Ending event `' . $event->getName() . '`' . PHP_EOL);
+        fclose($file);
+        $this->_markStopped($event);
+        /** @var DateTime $runtime */
+        $runtime = $this->_getCurrentDateTime();
+        $this->_storage->setRuntime($event, $runtime);
     }
 
     /**
@@ -80,6 +112,7 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
      * @return boolean
      */
     protected function _shouldRun(CM_Clockwork_Event $event) {
+//                return true;
         $lastRuntime = $this->_storage->getLastRuntime($event);
         $base = $lastRuntime ?: clone $this->_startTime;
         $dateTimeString = $event->getDateTimeString();
@@ -114,6 +147,13 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     }
 
     /**
+     * @return CM_Process
+     */
+    protected function _getProcess() {
+        return CM_Process::getInstance();
+    }
+
+    /**
      * @param CM_Clockwork_Event $event
      * @return boolean
      */
@@ -123,5 +163,55 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
         $dateModified = new DateTime();
         $dateModified->modify($dateTimeString);
         return $date->modify($dateTimeString) != $dateModified->modify($dateTimeString);
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     * @return boolean
+     */
+    protected function _isRunning(CM_Clockwork_Event $event) {
+        return array_key_exists($event->getName(), $this->_eventsRunning);
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     */
+    protected function _markStopped(CM_Clockwork_Event $event) {
+        if ($this->_isRunning($event)) {
+            unset($this->_eventsRunning[$event->getName()]);
+            if (false !== ($pid = array_search($event, $this->_pidEventMap))) {
+                unset($this->_eventsRunning[$pid]);
+            }
+        }
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     * @param int $pid
+     */
+    protected function _markRunning(CM_Clockwork_Event $event, $pid) {
+        if (!$this->_isRunning($event)) {
+            $this->_eventsRunning[$event->getName()] = $event;
+            $this->_pidEventMap[$pid] = $event;
+        }
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     */
+    protected function _runEvent(CM_Clockwork_Event $event) {
+        $process = $this->_getProcess();
+        $file = fopen(DIR_ROOT . 'log.txt', 'a');
+        fwrite($file, $process->getProcessId() . ' ' . (new DateTime())->format('H:i:s') . ' Starting event `' . $event->getName() . '`' . PHP_EOL);
+        fclose($file);
+        //            echo "muh\n";
+        $pid = $process->fork(function () use ($event) {
+            $file = fopen(DIR_ROOT . 'log.txt', 'a');
+            fwrite($file, posix_getpid() . ' ' . (new DateTime())->format('H:i:s') . ' Running event `' . $event->getName() . '`' . PHP_EOL);
+            fclose($file);
+            $event->run();
+            return $event;
+        });
+        $this->_markRunning($event, $pid);
     }
 }
