@@ -46,7 +46,8 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager->runEvents();
         $this->assertSame(2, $shouldRun->getCallCount());
         $this->assertSame(0, $setRuntime->getCallCount());
-        usleep(100000);
+
+        usleep(200000);
         $manager->runEvents();
         $this->assertSame(1, $setRuntime->getCallCount());
         $this->assertSame(3, $shouldRun->getCallCount());
