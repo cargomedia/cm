@@ -1,6 +1,6 @@
 <?php
 
-class CM_Mongo_ClientTest extends CMTest_TestCase {
+class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
     public function tearDown() {
         CM_Service_Manager::getInstance()->getMongoDb()->dropDatabase();
@@ -9,6 +9,7 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
 
     public function testDatabaseExists() {
         $client = CM_Service_Manager::getInstance()->getMongoDb();
+        $client->dropDatabase();
         $this->assertFalse($client->databaseExists());
         $client->createCollection('foo');
         $this->assertTrue($client->databaseExists());
