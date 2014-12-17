@@ -172,19 +172,17 @@ textarea.textinput {
 }
 
 .button-large {
-  height: 1.5*@sizeButton;
-  min-width: 1.5*@sizeButton;
-  font-size: 2em;
-  border-radius: 3px;
+  height: 1.2*@sizeButton;
+  min-width: 1.2*@sizeButton;
+  font-size: 1.5rem;
   padding: 0 25px;
 
-  &.hasIcon.hasLabel {
-    padding: 0 20px;
+  &.hasIcon.hasLabel .icon {
+    margin-right: 10px;
+  }
 
-    .icon {
-      margin-right: 10px;
-      font-size: 1em;
-    }
+  &.hasIconRight.hasLabel .icon {
+    margin-left: 10px;
   }
 }
 
