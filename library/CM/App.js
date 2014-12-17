@@ -294,6 +294,8 @@ var CM_App = CM_Class_Abstract.extend({
           new FastClick(document.body);
         }, false);
       }
+
+      window.viewportUnitsBuggyfill.init();
     },
     /**
      * @param {jQuery} $dom
