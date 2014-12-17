@@ -6,7 +6,11 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
      * @param bool|null $reload
      */
     public function setup($reload = null) {
-        CM_App::getInstance()->setup($this->_getStreamOutput(), $reload);
+        $provisionLoader = CM_App::getInstance()->getProvisionLoader();
+        if ($reload) {
+            $provisionLoader->unload($this->_getStreamOutput());
+        }
+        $provisionLoader->load($this->_getStreamOutput());
 
         if ($reload) {
             $cacheCli = new CM_Cache_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
