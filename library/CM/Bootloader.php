@@ -39,7 +39,6 @@ class CM_Bootloader {
         $this->_constants();
         $this->_exceptionHandler();
         $this->_errorHandler();
-        $this->_registerServices();
         $this->_defaults();
     }
 
@@ -169,19 +168,6 @@ class CM_Bootloader {
             $errorHandler->handleException($exception);
             exit(1);
         });
-    }
-
-    protected function _registerServices() {
-        $serviceManager = CM_Service_Manager::getInstance();
-
-        $serviceManager->register('filesystems', 'CM_Service_Filesystems');
-        $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', array(
-            new CM_File_Filesystem_Adapter_Local($this->getDirTmp()),
-        ));
-
-        foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
-            $serviceManager->registerWithArray($serviceKey, $serviceDefinition);
-        }
     }
 
     protected function _defaults() {

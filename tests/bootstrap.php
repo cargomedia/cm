@@ -3,10 +3,8 @@
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 $rootPath = dirname(__DIR__) . '/';
 
-$bootloader = new CM_Bootloader_Testing($rootPath);
-$bootloader->load();
-
-$application = new CM_App($rootPath);
+$application = new CM_App_Testing($rootPath);
+$application->installGlobalHandlers();
 $application->bootstrap();
 
 $suite = new CMTest_TestSuite();

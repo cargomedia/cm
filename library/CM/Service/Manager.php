@@ -196,8 +196,15 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public static function getInstance() {
         if (null === self::$instance) {
-            self::$instance = new self();
+            self::setInstance(new self());
         }
         return self::$instance;
+    }
+
+    /**
+     * @param CM_Service_Manager $serviceManager
+     */
+    public static function setInstance(CM_Service_Manager $serviceManager) {
+        self::$instance = $serviceManager;
     }
 }

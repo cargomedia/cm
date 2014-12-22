@@ -16,6 +16,7 @@ require $autoloadPath;
 $rootPath = dirname(dirname(realpath($autoloadPath))) . '/';
 
 $application = new CM_App($rootPath);
+$application->installGlobalHandlers();
 $application->bootstrap();
 
 $manager = new CM_Cli_CommandManager($application);

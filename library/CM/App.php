@@ -21,25 +21,31 @@ class CM_App implements CM_Service_ManagerAwareInterface {
         if (!self::$_instance) {
             self::$_instance = $this;
         }
+        $this->setServiceManager(new CM_Service_Manager());
+        $this->_registerServicesCritical();
+    }
+
+    public function installGlobalHandlers() {
+        CM_Service_Manager::setInstance($this->getServiceManager());
+        $bootloader = new CM_Bootloader($this->getRootPath());
+        $bootloader->load();
     }
 
     public function bootstrap() {
-        if (!CM_Bootloader::isLoaded()) {
-            $bootloader = new CM_Bootloader($this->_rootPath);
-            $bootloader->load();
-        }
-        $this->setServiceManager(CM_Service_Manager::getInstance());
+        $this->_registerServicesFromConfig();
     }
 
-    /**
-     * @throws CM_Exception_Invalid
-     * @return CM_App
-     */
-    public static function getInstance() {
-        if (!self::$_instance) {
-            throw new CM_Exception_Invalid('Cannot find CM_App instance');
+    protected function _registerServicesCritical() {
+        $this->getServiceManager()->register('filesystems', 'CM_Service_Filesystems');
+        $this->getServiceManager()->register('filesystem-tmp', 'CM_File_Filesystem', array(
+            new CM_File_Filesystem_Adapter_Local($this->getRootPath(). 'tmp/'),
+        ));
+    }
+
+    protected function _registerServicesFromConfig() {
+        foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
+            $this->getServiceManager()->registerWithArray($serviceKey, $serviceDefinition);
         }
-        return self::$_instance;
     }
 
     /**
@@ -210,5 +216,16 @@ class CM_App implements CM_Service_ManagerAwareInterface {
             throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $moduleName . '` namespace.');
         }
         return $file->getPath();
+    }
+
+    /**
+     * @throws CM_Exception_Invalid
+     * @return CM_App
+     */
+    public static function getInstance() {
+        if (!self::$_instance) {
+            throw new CM_Exception_Invalid('Cannot find CM_App instance');
+        }
+        return self::$_instance;
     }
 }
