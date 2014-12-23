@@ -5,10 +5,11 @@
 
   /**
    * @param {Function} callback fn(state, callbackOptions)
-   * @param {Object} [callbackOptions]
+   * @param {Object|null} [callbackOptions]
+   * @param {String|null} [toggleContainer] jQuery selector
    * @returns {jQuery}
    */
-  $.fn.toggleModal = function(callback, callbackOptions) {
+  $.fn.toggleModal = function(callback, callbackOptions, toggleContainer) {
     callback = callback || function(state) {
       $(this).toggle();
     };
@@ -17,16 +18,17 @@
     if (!$self.length) {
       return $self;
     }
+    toggleContainer = toggleContainer || document;
 
     if (!$self.data('toggleModal')) {
 
-      var documentClick = function(e) {
+      var toggleContainerClick = function(e) {
         if (!$self.length || e.target !== $self[0] && !$.contains($self[0], e.target)) {
           close();
         }
       };
 
-      var documentKeydown = function(e) {
+      var toggleContainerKeydown = function(e) {
         if (e.which == 27) {
           close();
         }
@@ -42,15 +44,15 @@
         }
         callback.call($self, false, callbackOptions);
         $self.removeData('toggleModal').off('.toggleModal');
-        $(document).off('click.toggleModal', documentClick);
-        $(document).off('keydown.toggleModal', documentKeydown);
+        $(toggleContainer).off('click.toggleModal', toggleContainerClick);
+        $(toggleContainer).off('keydown.toggleModal', toggleContainerKeydown);
       };
 
       callback.call($self, true, callbackOptions);
       $self.data('toggleModal', close);
       setTimeout(function() {
-        $(document).on('click.toggleModal', documentClick);
-        $(document).on('keydown.toggleModal', documentKeydown);
+        $(toggleContainer).on('click.toggleModal', toggleContainerClick);
+        $(toggleContainer).on('keydown.toggleModal', toggleContainerKeydown);
       }, 0);
     }
 
