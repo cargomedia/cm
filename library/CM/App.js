@@ -296,6 +296,7 @@ var CM_App = CM_Class_Abstract.extend({
       }
 
       window.viewportUnitsBuggyfill.init();
+      $.fn.toggleModal.defaults.toggleContainer = $('#body-container');
     },
     /**
      * @param {jQuery} $dom

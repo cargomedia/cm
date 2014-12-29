@@ -6,10 +6,9 @@
   /**
    * @param {Function} callback fn(state, callbackOptions)
    * @param {Object|null} [callbackOptions]
-   * @param {String|null} [toggleContainer] jQuery selector
    * @returns {jQuery}
    */
-  $.fn.toggleModal = function(callback, callbackOptions, toggleContainer) {
+  $.fn.toggleModal = function(callback, callbackOptions) {
     callback = callback || function(state) {
       $(this).toggle();
     };
@@ -18,7 +17,7 @@
     if (!$self.length) {
       return $self;
     }
-    toggleContainer = toggleContainer || document;
+    var toggleContainer = $.fn.toggleModal.defaults.toggleContainer;
 
     if (!$self.data('toggleModal')) {
 
@@ -57,6 +56,10 @@
     }
 
     return $self;
+  };
+
+  $.fn.toggleModal.defaults = {
+    toggleContainer: document
   };
 
   /**
