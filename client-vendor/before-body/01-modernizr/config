@@ -5,7 +5,6 @@
     "html5printshiv"
   ],
   "feature-detects": [
-    "test/svg",
     "test/forms/fileinput",
     "test/dom/classlist",
     "test/requestanimationframe",
