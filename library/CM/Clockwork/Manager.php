@@ -14,8 +14,8 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     /** @var DateTimeZone */
     private $_timeZone;
 
-    /** @var CM_Clockwork_Event[] */
-    private $_pidEventMap = [];
+    /** @var array */
+    private $_eventsRunning = [];
 
     public function __construct() {
         $this->_events = array();
@@ -83,7 +83,12 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     }
 
     protected function _handleWorkloadResult(CM_Process_WorkloadResult $result) {
-        $event = $this->_pidEventMap[$result->getPid()];
+        $pid = $result->getPid();
+        $eventName = array_search($pid, \Functional\pluck($this->_eventsRunning, 'identifier'));
+        if (false === $eventName) {
+            throw new CM_Exception('Could not find event', ['identifier' => $pid]);
+        }
+        $event = $this->_eventsRunning[$eventName]['event'];
         $this->_markStopped($event);
         $this->_storage->setRuntime($event, $this->_getCurrentDateTime());
     }
@@ -150,16 +155,16 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
      * @return boolean
      */
     protected function _isRunning(CM_Clockwork_Event $event) {
-        return false !== array_search($event, $this->_pidEventMap);
+        return array_key_exists($event->getName(), $this->_eventsRunning);
     }
 
     /**
      * @param CM_Clockwork_Event $event
-     * @param int                $pid
+     * @param string|int         $identifier
      */
-    protected function _markRunning(CM_Clockwork_Event $event, $pid) {
+    protected function _markRunning(CM_Clockwork_Event $event, $identifier) {
         if (!$this->_isRunning($event)) {
-            $this->_pidEventMap[$pid] = $event;
+            $this->_eventsRunning[$event->getName()] = ['event' => $event, 'identifier' => $identifier];
         }
     }
 
@@ -168,8 +173,7 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
      */
     protected function _markStopped(CM_Clockwork_Event $event) {
         if ($this->_isRunning($event)) {
-            $pid = array_search($event, $this->_pidEventMap);
-            unset($this->_pidEventMap[$pid]);
+            unset($this->_eventsRunning[$event->getName()]);
         }
     }
 

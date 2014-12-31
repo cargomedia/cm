@@ -16,10 +16,10 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
     public function testRunEvents() {
         $currently = new DateTime();
         $eventMock = $this->mockClass('CM_Clockwork_Event');
-        $eventRun = $eventMock->newInstanceWithoutConstructor();
+        $eventRun = $eventMock->newInstance(['eventRun', '']);
         $eventRun->mockMethod('run');
         /** @var CM_Clockwork_Event $eventRun */
-        $eventNoRun = $eventMock->newInstanceWithoutConstructor();
+        $eventNoRun = $eventMock->newInstance(['eventNoRun', '']);
         $eventNoRun->mockMethod('run');
         /** @var CM_Clockwork_Event $eventNoRun */
         $manager = $this->mockObject('CM_Clockwork_Manager');
