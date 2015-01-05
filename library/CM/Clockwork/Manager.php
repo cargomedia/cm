@@ -44,15 +44,10 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
 
     public function runEvents() {
         $process = $this->_getProcess();
-        /** @var CM_Clockwork_Event[] $eventsToRun */
-        $eventsToRun = [];
         foreach ($this->_events as $event) {
             if (!$this->_isRunning($event) && $this->_shouldRun($event)) {
-                $eventsToRun[] = $event;
+                $this->_runEvent($event);
             }
-        }
-        foreach ($eventsToRun as $event) {
-            $this->_runEvent($event);
         }
         $resultList = $process->listenForChildren();
         foreach ($resultList as $result) {
