@@ -43,14 +43,14 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
     if ($paging->getPage() > 1) {
         if ($pageMin > 1) {
             $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, 1, [
-                'label'        => $render->getTranslation('First'),
+                'label'        => $render->getTranslation('.pagination.first'),
                 'icon'         => 'arrow-first',
                 'iconPosition' => 'left',
                 'class'        => 'pagingFirst',
             ], $template);
         }
         $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $paging->getPage() - 1, [
-            'label'        => $render->getTranslation('Previous'),
+            'label'        => $render->getTranslation('.pagination.previous'),
             'icon'         => 'nav-left',
             'iconPosition' => 'left',
             'class'        => 'pagingPrevious',
@@ -71,14 +71,14 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 
     if ($paging->getPage() < $paging->getPageCount()) {
         $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $paging->getPage() + 1, [
-            'label'        => $render->getTranslation('Next'),
+            'label'        => $render->getTranslation('.pagination.next'),
             'icon'         => 'nav-right',
             'iconPosition' => 'right',
             'class'        => 'pagingNext',
         ], $template);
         if ($pageMax < $paging->getPageCount()) {
             $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $paging->getPageCount(), [
-                'label'        => $render->getTranslation('Last'),
+                'label'        => $render->getTranslation('.pagination.last'),
                 'icon'         => 'arrow-last',
                 'iconPosition' => 'right',
                 'class'        => 'pagingLast',
