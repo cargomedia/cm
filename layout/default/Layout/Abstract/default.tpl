@@ -44,8 +44,8 @@
     <!--[if IE]><link rel="shortcut icon" href="{resourceUrl path='img/favicon.ico' type='layout'}"><![endif]-->
 
     <title>{$pageTitle|escape}</title>
-    {resourceCss file='all.css' type="vendor"}
-    {resourceCss file='all.css' type="library"}
+    {resourceCss file='vendor.css'}
+    {resourceCss file='library.css'}
     {resourceJs file='before-body.js' type="vendor"}
     {block name='head'}{/block}
   </head>
