@@ -46,6 +46,10 @@ return function (CM_Model_Language $language) {
     $language->setTranslation('.date.period.months', '{$count} Monate', array('count'));
     $language->setTranslation('.date.period.year', '1 Jahr');
     $language->setTranslation('.date.period.years', '{$count} Jahre', array('count'));
+    $language->setTranslation('.pagination.first', 'Erste');
+    $language->setTranslation('.pagination.next', 'Weiter');
+    $language->setTranslation('.pagination.previous', 'Zurück');
+    $language->setTranslation('.pagination.last', 'Letzte');
     $language->setTranslation('You can only select {$cardinality} items.', 'Maximal {$cardinality} Element.', array('cardinality'));
     $language->setTranslation('{$file} has an invalid extension. Only {$extensions} are allowed.', '{$file} hat eine ungültige Dateiendung. Nur {$extensions} werden unterstützt.',
         array('file', 'extensions'));
