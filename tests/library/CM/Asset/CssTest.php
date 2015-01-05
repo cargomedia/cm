@@ -107,7 +107,7 @@ EOD;
 }
 EOD;
         $css = new CM_Asset_Css($render, $css, [
-            'autoprefixerBrowsers' => 'Safari 6',
+            'autoprefixerBrowsers' => 'Android 4.3',
         ]);
         $this->assertSame(trim($expected), $css->get());
     }
@@ -146,7 +146,7 @@ EOD;
 EOD;
         $expected = '.foo{color:red;}';
         $css = new CM_Asset_Css($render, $css, [
-            'autoprefixerBrowsers' => '',
+            'autoprefixerBrowsers' => 'Chrome 30',
         ]);
         $this->assertSame(trim($expected), $css->get(true));
     }
