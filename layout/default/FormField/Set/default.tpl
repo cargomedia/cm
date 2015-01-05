@@ -7,9 +7,8 @@
       {else}
         {$label = $itemLabel|escape}
       {/if}
-      {$id = "$name-$inputId-$itemValue"}
       {$checked = $value && in_array($itemValue, $value)}
-      {checkbox id=$id name={$name|cat: '[]'} value={$itemValue|escape} checked=$checked label=$label}
+      {checkbox id="{$inputId}-{$itemValue}" name="{$name}[]" value={$itemValue|escape} checked=$checked label=$label}
     </li>
   {/foreach}
 </ul>
