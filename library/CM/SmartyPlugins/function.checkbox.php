@@ -1,56 +1,57 @@
 <?php
 
-function smarty_function_checkbox(array $params, Smarty_Internal_Template $template) {
-    $htmlAttributes = array('name', 'tabindex', 'value');
+require_once 'function.tag.php';
 
+function smarty_function_checkbox(array $params, Smarty_Internal_Template $template) {
     $isSwitch = isset($params['isSwitch']) ? (bool) $params['isSwitch'] : false;
     $checked = isset($params['checked']) ? (bool) $params['checked'] : false;
-    $id = isset($params['id']) ? $params['id'] : null;
-    $label = isset($params['label']) ? $params['label'] : null;
-    $class = '';
+    $id = isset($params['id']) ? (string) $params['id'] : null;
+    $label = (string) $params['label'];
+    $name = isset($params['name']) ? (string) $params['name'] : null;
+    $tabindex = isset($params['tabindex']) ? (int) $params['tabindex'] : null;
+    $value = isset($params['value']) ? (string) $params['value'] : null;
 
-
-    $html = '<input type="checkbox"';
-
+    $classList = [];
     if (isset($params['class'])) {
-        $class .= CM_Util::htmlspecialchars($params['class']);
+        $classList[] = (string) $params['class'];
     }
-
     if ($isSwitch) {
-        $class .= ' checkbox-switch';
-    }
-
-    if (!empty($class)) {
-        $html .= ' ' . 'class' . '="' . $class . '"';
+        $classList[] = 'checkbox-switch';
     }
 
     if (empty($id)) {
         $id = 'noId-' . rand();
     }
 
-    $html .= ' ' . 'id' . '="' . $id . '"';
+    $html = smarty_function_tag([
+        'el'       => 'input',
+        'type'     => 'checkbox',
+        'id'       => $id,
+        'class'    => !empty($classList) ? implode(' ', $classList) : null,
+        'checked'  => $checked ? 'checked' : null,
+        'name'     => $name,
+        'tabindex' => $tabindex,
+        'value'    => $value,
+    ], $template);
 
-    foreach ($htmlAttributes as $name) {
-        if (isset($params[$name])) {
-            $html .= ' ' . $name . '="' . CM_Util::htmlspecialchars($params[$name]) . '"';
-        }
-    }
-
-    if ($checked) {
-        $html .= ' checked';
-    }
-
-    $html .= '>';
-    $html .= '<label for="' . $id . '">';
-
+    $htmlLabelContent = '';
     if ($isSwitch) {
-        $html .= '<span class="handle"></span>';
+        $htmlLabelContent .= smarty_function_tag([
+            'el'    => 'span',
+            'class' => 'handle',
+        ], $template);
     }
+    $htmlLabelContent .= smarty_function_tag([
+        'el'      => 'span',
+        'content' => $label,
+        'class'   => 'label',
+    ], $template);
 
-    if (isset($label)) {
-        $html .= '<span class="label">' . $label . '</span>';
-    }
+    $html .= smarty_function_tag([
+        'el'      => 'label',
+        'content' => $htmlLabelContent,
+        'for'     => $id,
+    ], $template);
 
-    $html .= '</label>';
     return $html;
 }
