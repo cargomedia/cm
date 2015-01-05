@@ -26,7 +26,7 @@ function smarty_function_tag(array $params, Smarty_Internal_Template $template) 
         }
     }
     if (in_array($name, $namesVoid)) {
-        $html .= ' />';
+        $html .= '>';
     } else {
         $html .= '>' . $content . '</' . $name . '>';
     }
