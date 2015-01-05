@@ -19,8 +19,8 @@ function smarty_function_checkbox(array $params, Smarty_Internal_Template $templ
         $classList[] = 'checkbox-switch';
     }
 
-    if (empty($id)) {
-        $id = 'noId-' . rand();
+    if (null === $id) {
+        $id = uniqid();
     }
 
     $html = smarty_function_tag([
