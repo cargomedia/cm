@@ -218,6 +218,21 @@ class CMTest_TH {
     }
 
     /**
+     * @param string             $uri
+     * @param array|null         $headers
+     * @param CM_Model_User|null $viewer
+     * @return CM_Http_Response_Page
+     */
+    public static function createResponsePageEmbed($uri, array $headers = null, CM_Model_User $viewer = null) {
+        if (!$headers) {
+            $site = CM_Site_Abstract::factory();
+            $headers = array('host' => $site->getHost());
+        }
+        $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
+        return new CM_Http_Response_Page_Embed($request);
+    }
+
+    /**
      * @param int|null $level
      * @return CM_Model_Location
      */
