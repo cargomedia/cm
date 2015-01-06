@@ -77,6 +77,10 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
         }
     }
 
+    /**
+     * @param $identifier
+     * @throws CM_Exception
+     */
     protected function _handleResult($identifier) {
         $eventName = array_search($identifier, \Functional\pluck($this->_eventsRunning, 'identifier'));
         if (false === $eventName) {
