@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="300px" height="300px" viewBox="0 0 300 300" style="enable-background:new 0 0 300 300;" xml:space="preserve">
-<g id="Restricted">
-</g>
-<g id="Help">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+<g id="Layer_1">
 	<g>
-		<path d="M294,284.402c0,4.776-3.371,8.598-8.146,8.598H13.146C8.371,293,4,289.178,4,284.402v-28.365
-			C4,251.261,8.371,247,13.146,247h272.709c4.774,0,8.146,4.261,8.146,9.037V284.402z"/>
-		<polygon points="87,124 87,221 215,221 215,124 250,124 150.001,24.021 50,124 		"/>
+		<path d="M451.5,293.8c-12.4,0-22.5,10-22.5,22.4V419H84V316.3c0-12.4-10.1-22.4-22.5-22.4S39,303.9,39,316.3V464h435V316.3
+			C474,303.9,463.9,293.8,451.5,293.8z"/>
+		<path d="M198.5,170.5l37.5-37.9v235.7c0,12.4,10.1,22.4,22.5,22.4s22.5-10,22.5-22.4V134.8l35.3,35.7c4.4,4.4,10.1,6.6,15.9,6.6
+			c5.7,0,11.4-2.2,15.8-6.5c8.8-8.7,8.8-22.9,0.1-31.7l-74.8-75.5c-8.4-8.5-23.4-8.5-31.8,0l-74.8,75.5c-8.7,8.8-8.7,23,0.1,31.7
+			C175.6,179.3,189.8,179.3,198.5,170.5z"/>
 	</g>
+</g>
+<g id="Layer_2">
 </g>
 </svg>
