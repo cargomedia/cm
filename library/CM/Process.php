@@ -181,7 +181,6 @@ class CM_Process {
             $forkHandler->closeIpcStream();
             exit;
         }
-        return $pid;
     }
 
     private function _installSignalHandlers() {
