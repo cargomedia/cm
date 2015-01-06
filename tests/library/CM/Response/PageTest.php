@@ -9,9 +9,9 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     public function testProcessLanguageRedirect() {
         CMTest_TH::createLanguage('en');
         $user = CMTest_TH::createUser();
-        $response = CMTest_TH::createResponsePage('/en/mock5', null, $user);
+        $response = CMTest_TH::createResponsePage('/en/mock5?a=1', null, $user);
         $response->process();
-        $this->assertContains('Location: ' . $response->getSite()->getUrl() . '/mock5', $response->getHeaders());
+        $this->assertContains('Location: ' . $response->getSite()->getUrl() . '/mock5?a=1', $response->getHeaders());
     }
 
     public function testProcessLanguageNoRedirect() {

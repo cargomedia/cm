@@ -132,7 +132,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
 
             $this->_setStringRepresentation(get_class($page));
             if ($this->getViewer() && $request->getLanguageUrl()) {
-                $this->redirect($page);
+                $this->redirect($page, $pageParams->getParamsDecoded());
             }
             $page->prepareResponse($this->getRender()->getEnvironment(), $this);
             if ($this->getRedirectUrl()) {
