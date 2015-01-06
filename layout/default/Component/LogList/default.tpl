@@ -1,4 +1,4 @@
-{button_link icon='delete' iconConfirm='delete-confirm' label='Flush' class='warning flushLog' data=['click-confirmed' => 'true']}
+{button_link icon='trash' iconConfirm='trash-open' label='Flush' class='warning flushLog' data=['click-confirmed' => 'true']}
 
 <ul class="aggregationPeriodList menu-pills">
   <li class="aggregationPeriod {if null === $aggregate}active{/if}">
