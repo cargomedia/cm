@@ -21,6 +21,19 @@ class CM_ProcessTest extends CMTest_TestCase {
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
+    public function testFork() {
+        $process = CM_Process::getInstance();
+        $seq1 = $process->fork(function() {});
+        $seq2 = $process->fork(function() {});
+        $seq3 = $process->fork(function() {});
+        $this->assertSame(1, $seq2 - $seq1);
+        $this->assertSame(1, $seq3 - $seq2);
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function testForkAndWaitForChildren() {
         $process = CM_Process::getInstance();
         for ($i = 1; $i <= 4; $i++) {
