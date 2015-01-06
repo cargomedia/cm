@@ -100,8 +100,11 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
         if ($this->_site->getHost() !== $this->_request->getHost()) {
             $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
             $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
-        }
-        if (!$this->getRedirectUrl()) {
+        } elseif ($this->_request->getLanguageUrl() && $this->getViewer()) {
+            $this->_request->setPathParts($this->_request->getPathParts());
+            $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
+            $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
+        } else {
             $this->getRender()->getServiceManager()->getTrackings()->trackPageView($this->getRender()->getEnvironment());
             $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);
@@ -131,9 +134,6 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             }
 
             $this->_setStringRepresentation(get_class($page));
-            if ($this->getViewer() && $request->getLanguageUrl()) {
-                $this->redirect($page, $pageParams->getParamsEncoded());
-            }
             $page->prepareResponse($this->getRender()->getEnvironment(), $this);
             if ($this->getRedirectUrl()) {
                 $request->setUri($this->getRedirectUrl());
