@@ -97,20 +97,26 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
 
     protected function _process() {
         $this->_site->preprocessPageResponse($this);
+        $this->_processPageEmbed();
+        if ($redirectUrl = $this->getRedirectUrl()) {
+            $this->setRedirectHeader($redirectUrl);
+        }
+    }
+
+    protected function _processPageEmbed() {
         if ($this->_site->getHost() !== $this->_request->getHost()) {
             $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
             $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
-        } elseif ($this->_request->getLanguageUrl() && $this->getViewer()) {
-            $this->_request->setPathParts($this->_request->getPathParts());
+        }
+        if ($this->_request->getLanguageUrl() && $this->getViewer()) {
             $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
             $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
-        } elseif (!$this->getRedirectUrl()) {
+            $this->_request->setLanguageUrl(null);
+        }
+        if (!$this->getRedirectUrl()) {
             $this->getRender()->getServiceManager()->getTrackings()->trackPageView($this->getRender()->getEnvironment());
             $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);
-        }
-        if ($redirectUrl = $this->getRedirectUrl()) {
-            $this->setRedirectHeader($redirectUrl);
         }
     }
 
