@@ -51,7 +51,9 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
         }
         $resultList = $process->listenForChildren();
         foreach ($resultList as $identifier => $result) {
-            $this->_handleResult($identifier);
+            $event = $this->_getRunningEvent($identifier);
+            $this->_markStopped($event);
+            $this->_storage->setRuntime($event, $this->_getCurrentDateTime());
         }
     }
 
@@ -78,17 +80,16 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     }
 
     /**
-     * @param $identifier
+     * @param int $identifier
+     * @return CM_Clockwork_Event
      * @throws CM_Exception
      */
-    protected function _handleResult($identifier) {
+    protected function _getRunningEvent($identifier) {
         $eventName = array_search($identifier, \Functional\pluck($this->_eventsRunning, 'identifier'));
         if (false === $eventName) {
             throw new CM_Exception('Could not find event', ['identifier' => $identifier]);
         }
-        $event = $this->_eventsRunning[$eventName]['event'];
-        $this->_markStopped($event);
-        $this->_storage->setRuntime($event, $this->_getCurrentDateTime());
+        return $this->_eventsRunning[$eventName]['event'];
     }
 
     /**
