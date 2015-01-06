@@ -104,7 +104,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             $this->_request->setPathParts($this->_request->getPathParts());
             $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
             $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
-        } else {
+        } elseif (!$this->getRedirectUrl()) {
             $this->getRender()->getServiceManager()->getTrackings()->trackPageView($this->getRender()->getEnvironment());
             $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);
