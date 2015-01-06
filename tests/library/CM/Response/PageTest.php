@@ -9,9 +9,21 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     public function testProcessLanguageRedirect() {
         CMTest_TH::createLanguage('en');
         $user = CMTest_TH::createUser();
-        $response = CMTest_TH::createResponsePage('/en/mock5?a=1', null, $user);
+        $response = CMTest_TH::createResponsePage('/en/mock5', null, $user);
         $response->process();
-        $this->assertContains('Location: ' . $response->getSite()->getUrl() . '/mock5?a=1', $response->getHeaders());
+        $this->assertContains('Location: ' . $response->getSite()->getUrl() . '/mock5', $response->getHeaders());
+    }
+
+    public function testProcessLanguageRedirect_parameter() {
+        CMTest_TH::createLanguage('en');
+        $user = CMTest_TH::createUser();
+        $location = CMTest_TH::createLocation();
+        $locationEncoded = CM_Params::encode($location, true);
+        $query = http_build_query(['location' => $locationEncoded]);
+        $response = CMTest_TH::createResponsePage('/en/mock5?' . $query, null, $user);
+        $response->process();
+        $siteUrl = $response->getSite()->getUrl();
+        $this->assertContains('Location: ' . $siteUrl . '/mock5?' . $query, $response->getHeaders());
     }
 
     public function testProcessLanguageNoRedirect() {
@@ -35,15 +47,27 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
 
     public function testProcessHostRedirect() {
         $site = CM_Site_Abstract::factory();
-        $redirectHeader = 'Location: http://' . $site->getHost() . '/mock5';
 
         $response = CMTest_TH::createResponsePage('/mock5', array('host' => $site->getHost()));
         $response->process();
-        $this->assertNotContains($redirectHeader, $response->getHeaders());
+        $this->assertEmpty($response->getHeaders());
 
         $response = CMTest_TH::createResponsePage('/mock5', array('host' => 'incorrect-host.org'));
         $response->process();
-        $this->assertContains($redirectHeader, $response->getHeaders());
+        $siteUrl = 'http://' . $site->getHost();
+        $this->assertContains('Location: ' . $siteUrl . '/mock5', $response->getHeaders());
+    }
+
+    public function testProcessHostRedirect_parameter() {
+        $site = CM_Site_Abstract::factory();
+
+        $location = CMTest_TH::createLocation();
+        $locationEncoded = CM_Params::encode($location, true);
+        $query = http_build_query(['location' => $locationEncoded]);
+        $response = CMTest_TH::createResponsePage('/mock5?' . $query, array('host' => 'incorrect-host.org'));
+        $response->process();
+        $siteUrl = 'http://' . $site->getHost();
+        $this->assertContains('Location: ' . $siteUrl . '/mock5?' . $query, $response->getHeaders());
     }
 
     public function testProcessTrackingDisabled() {
