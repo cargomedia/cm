@@ -51,7 +51,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
         }
         $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $paging->getPage() - 1, [
             'label'        => $render->getTranslation('.pagination.previous'),
-            'icon'         => 'nav-left',
+            'icon'         => 'arrow-left',
             'iconPosition' => 'left',
             'class'        => 'pagingPrevious',
         ], $template);
@@ -72,7 +72,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
     if ($paging->getPage() < $paging->getPageCount()) {
         $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $paging->getPage() + 1, [
             'label'        => $render->getTranslation('.pagination.next'),
-            'icon'         => 'nav-right',
+            'icon'         => 'arrow-right',
             'iconPosition' => 'right',
             'class'        => 'pagingNext',
         ], $template);
