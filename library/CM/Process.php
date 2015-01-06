@@ -32,7 +32,8 @@ class CM_Process {
      */
     public function fork(Closure $workload) {
         $sequence = ++$this->_forkHandlerCounter;
-        return $this->_fork($workload, $sequence);
+        $this->_fork($workload, $sequence);
+        return $sequence;
     }
 
     /**
