@@ -140,6 +140,6 @@ class CM_Asset_Css extends CM_Asset_Abstract {
             $args[] = '--browsers';
             $args[] = $this->_autoprefixerBrowsers;
         }
-        return CM_Util::exec($command, null, $content);
+        return CM_Util::exec($command, $args, $content);
     }
 }
