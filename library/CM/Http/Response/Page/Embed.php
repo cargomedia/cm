@@ -27,6 +27,6 @@ class CM_Http_Response_Page_Embed extends CM_Http_Response_Page {
     }
 
     protected function _process() {
-        $this->_processPageEmbed();
+        $this->_processContentOrRedirect();
     }
 }

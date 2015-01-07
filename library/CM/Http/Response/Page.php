@@ -97,13 +97,13 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
 
     protected function _process() {
         $this->_site->preprocessPageResponse($this);
-        $this->_processPageEmbed();
+        $this->_processContentOrRedirect();
         if ($redirectUrl = $this->getRedirectUrl()) {
             $this->setRedirectHeader($redirectUrl);
         }
     }
 
-    protected function _processPageEmbed() {
+    protected function _processContentOrRedirect() {
         if ($this->_site->getHost() !== $this->_request->getHost()) {
             $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
             $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
