@@ -13,46 +13,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertSame($serviceManager, $storage->getServiceManager());
     }
 
-    public function testRunEvents() {
-        $currently = new DateTime();
-        $eventMock = $this->mockClass('CM_Clockwork_Event');
-        $eventRun = $eventMock->newInstance(['eventRun', '']);
-        $eventRun->mockMethod('run');
-        /** @var CM_Clockwork_Event $eventRun */
-        $eventNoRun = $eventMock->newInstance(['eventNoRun', '']);
-        $eventNoRun->mockMethod('run');
-        /** @var CM_Clockwork_Event $eventNoRun */
-        $manager = $this->mockObject('CM_Clockwork_Manager');
-        $manager->mockMethod('_getCurrentDateTime')->set(function () use (&$currently) {
-            return clone $currently;
-        });
-        $shouldRun = $manager->mockMethod('_shouldRun')->set(function (CM_Clockwork_Event $event) use ($eventRun, $eventNoRun) {
-            return $event == $eventRun;
-        });
-        /** @var CM_Clockwork_Manager $manager */
-        $currently->modify('10 seconds');
-        $storage = $this->mockClass('CM_Clockwork_Storage_Abstract')->newInstanceWithoutConstructor();
-        $setRuntime = $storage->mockMethod('setRuntime')->at(0, function (CM_Clockwork_Event $event, DateTime $runtime) use ($currently, $eventRun) {
-            $this->assertEquals($currently, $runtime);
-            $this->assertEquals($eventRun, $event);
-        });
-        /** @var CM_Clockwork_Storage_Abstract $storage */
-        $manager->setServiceManager(CM_Service_Manager::getInstance());
-        $manager->setStorage($storage);
-
-        $manager->registerEvent($eventRun);
-        $manager->registerEvent($eventNoRun);
-
-        $manager->runEvents();
-        $this->assertSame(2, $shouldRun->getCallCount());
-        $this->assertSame(0, $setRuntime->getCallCount());
-
-        usleep(200000);
-        $manager->runEvents();
-        $this->assertSame(1, $setRuntime->getCallCount());
-        $this->assertSame(3, $shouldRun->getCallCount());
-    }
-
     public function testRunNonBlocking() {
         $process = $this->mockClass('CM_Process')->newInstanceWithoutConstructor();
         $forkMock = $process->mockMethod('fork');
