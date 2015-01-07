@@ -1,7 +1,7 @@
 <div class="captcha">
   <div class="captcha-image">
     <img src="{$render->getUrl("/captcha/{$render->getSite()->getId()}?id={$imageId}")}" />
-    {link icon="reload" class="refreshCaptcha refresh-link" title="{translate 'Refresh'}"}
+    {link icon="refresh" class="refreshCaptcha refresh-link" title="{translate 'Refresh'}"}
   </div>
   <div class="captcha-input">
     <label for="{$name}">{translate 'Enter Code'}</label>

@@ -33,5 +33,5 @@
       </ul>
     </div>
   {/foreach}
-  {link icon="debug" class="debugIndication toggleDebugBar" title="{translate 'Debug (Click here or use [d] key)'}"}
+  {link icon="bug" class="debugIndication toggleDebugBar" title="{translate 'Debug (Click here or use [d] key)'}"}
 </div>
