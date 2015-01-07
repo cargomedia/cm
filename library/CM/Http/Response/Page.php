@@ -70,23 +70,6 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     }
 
     /**
-     * @param CM_Http_Request_Abstract $request
-     * @throws CM_Exception_Invalid
-     * @return string|null
-     */
-    protected function _processPageLoop(CM_Http_Request_Abstract $request) {
-        $count = 0;
-        $paths = array($request->getPath());
-        while (false === ($html = $this->_processPage($request))) {
-            $paths[] = $request->getPath();
-            if ($count++ > 10) {
-                throw new CM_Exception_Invalid('Page dispatch loop detected (' . implode(' -> ', $paths) . ').');
-            }
-        }
-        return $html;
-    }
-
-    /**
      * @param CM_Page_Abstract $page
      * @return string
      */
@@ -118,6 +101,23 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);
         }
+    }
+
+    /**
+     * @param CM_Http_Request_Abstract $request
+     * @throws CM_Exception_Invalid
+     * @return string|null
+     */
+    protected function _processPageLoop(CM_Http_Request_Abstract $request) {
+        $count = 0;
+        $paths = array($request->getPath());
+        while (false === ($html = $this->_processPage($request))) {
+            $paths[] = $request->getPath();
+            if ($count++ > 10) {
+                throw new CM_Exception_Invalid('Page dispatch loop detected (' . implode(' -> ', $paths) . ').');
+            }
+        }
+        return $html;
     }
 
     /**
