@@ -2,6 +2,10 @@
 
 class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
+    public function tearDown() {
+        CMTest_TH::clearEnv();
+    }
+
     public function testLoadPage() {
         $viewer = CMTest_TH::createUser();
         $environment = new CM_Frontend_Environment(null, $viewer);
@@ -22,6 +26,33 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     public function testLoadPageRedirectExternal() {
         $response = $this->getResponseAjax(new CM_Page_View_Ajax_Test_Mock(), 'loadPage', ['path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()]);
         $this->assertViewResponseSuccess($response, array('redirectExternal' => 'http://www.foo.bar'));
+    }
+
+    public function testLoadPageRedirectHost() {
+        $siteRequest = CM_Site_Abstract::factory();
+        $siteEnvironment = $this->getMockSite(null, null, ['url' => 'http://www.example.com']);
+        CMTest_TH::createLanguage('en');
+        $viewer = CMTest_TH::createUser();
+        $environment = new CM_Frontend_Environment($siteEnvironment, $viewer);
+        $component = new CM_Page_View_Ajax_Test_Mock();
+        $response = $this->getResponseAjax($component, 'loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath()], $environment);
+
+        $this->assertViewResponseSuccess($response);
+        $responseDecoded = CM_Params::jsonDecode($response->getContent());
+        $this->assertSame($siteRequest->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['url']);
+    }
+
+    public function testLoadPageRedirectLanguage() {
+        $site = CM_Site_Abstract::factory();
+        CMTest_TH::createLanguage('en');
+        $viewer = CMTest_TH::createUser();
+        $environment = new CM_Frontend_Environment(null, $viewer);
+        $component = new CM_Page_View_Ajax_Test_Mock();
+        $response = $this->getResponseAjax($component, 'loadPage', ['path' => '/en' . CM_Page_View_Ajax_Test_Mock::getPath()], $environment);
+
+        $this->assertViewResponseSuccess($response);
+        $responseDecoded = CM_Params::jsonDecode($response->getContent());
+        $this->assertSame($site->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['url']);
     }
 
     public function testReloadComponent() {
