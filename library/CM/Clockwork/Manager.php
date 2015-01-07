@@ -159,7 +159,7 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
 
     /**
      * @param CM_Clockwork_Event $event
-     * @param int         $identifier
+     * @param int                $identifier
      */
     protected function _markRunning(CM_Clockwork_Event $event, $identifier) {
         if (!$this->_isRunning($event)) {
