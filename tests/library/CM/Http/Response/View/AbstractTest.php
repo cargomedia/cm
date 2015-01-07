@@ -2,6 +2,10 @@
 
 class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
+    public function tearDown() {
+        CMTest_TH::clearEnv();
+    }
+
     public function testLoadPage() {
         $viewer = CMTest_TH::createUser();
         $environment = new CM_Frontend_Environment(null, $viewer);
