@@ -8,7 +8,6 @@ return function (CM_Config_Node $config) {
     $config->CM_App->setupScriptClasses[] = 'CM_Elasticsearch_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_Http_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Translations';
-    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Emoticons';
 
     $config->timeZone = 'UTC';
 
