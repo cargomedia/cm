@@ -111,6 +111,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
 
     public function flush() {
         CM_Db_Db::delete('cm_splittestVariation_fixture', array('splittestId' => $this->getId()));
+        CM_Db_Db::update('cm_splittest', array('createStamp' => time()), array('id' => $this->getId()));
     }
 
     /**
