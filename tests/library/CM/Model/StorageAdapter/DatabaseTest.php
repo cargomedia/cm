@@ -30,7 +30,7 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
         $adapter = new CM_Model_StorageAdapter_Database();
         $method = CMTest_TH::getProtectedMethod('CM_Model_StorageAdapter_Database', '_getTableName');
         $this->assertSame('cmtest_modelmock_1', $method->invoke($adapter, 1));
-        $this->assertSame('cmtest_modelmock_2', $method->invoke($adapter, 2));
+        $this->assertSame('custom_table', $method->invoke($adapter, 2));
     }
 
     public function testLoad() {
@@ -127,5 +127,16 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
         $values = $adapter->loadMultiple($idsTypes);
         $this->assertSame(4, count($values));
         $this->assertSame($expected, $values);
+    }
+}
+
+class CMTest_ModelMock_1 extends CM_Model_Abstract {
+
+}
+
+class CMTest_ModelMock_2 extends CM_Model_Abstract {
+
+    public static function getTableName() {
+        return 'custom_table';
     }
 }
