@@ -198,6 +198,10 @@ class CM_File_Image extends CM_File {
         $this->_compressionQuality = $quality;
     }
 
+    public function freeMemory() {
+        $this->_imagick = null;
+    }
+
     /**
      * @return Imagick
      * @throws CM_Exception
