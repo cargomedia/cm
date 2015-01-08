@@ -21,6 +21,19 @@ class CM_ProcessTest extends CMTest_TestCase {
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
+    public function testFork() {
+        $process = CM_Process::getInstance();
+        $seq1 = $process->fork(function() {});
+        $seq2 = $process->fork(function() {});
+        $seq3 = $process->fork(function() {});
+        $this->assertSame(1, $seq2 - $seq1);
+        $this->assertSame(1, $seq3 - $seq2);
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function testForkAndWaitForChildren() {
         $process = CM_Process::getInstance();
         for ($i = 1; $i <= 4; $i++) {
@@ -52,6 +65,82 @@ Child 4 terminated after 400 ms.
 All children terminated.
 Parent terminated.
 ';
+        rewind(self::$_file);
+        $outputFileActual = fread(self::$_file, 8192);
+        $this->assertEquals($outputFileExpected, $outputFileActual);
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testForkAndListenForChildren() {
+        $process = CM_Process::getInstance();
+        for ($i = 1; $i <= 4; $i++) {
+            CM_ProcessTest::writeln("Child $i forked.");
+            $process->fork(function () use ($i) {
+                $ms = 100 * $i - 25;
+                usleep($ms * 1000);
+                CM_ProcessTest::writeln("Child $i terminated after $ms ms.");
+                ob_clean(); // Remove any test output buffered by phpUnit, which uses STDOUT itself to return test results from isolated processes
+                return "Child $i heard by parent...";
+            });
+        }
+        $terminationCallback = function() {
+            CM_ProcessTest::writeln('Parent stops listening to children...');
+        };
+        $handleChildrenResponses = function(CM_Process_WorkloadResult $result) {
+            CM_ProcessTest::writeln($result->getResult());
+        };
+        CM_ProcessTest::writeln('Parent waiting for 250 ms...');
+        usleep(250000);
+        CM_ProcessTest::writeln('Parent listening for children...');
+        $responseList = $process->listenForChildren(null, $terminationCallback);
+        \Functional\each($responseList, $handleChildrenResponses);
+        CM_ProcessTest::writeln('Parent waiting for 100 ms...');
+        usleep(100000);
+        CM_ProcessTest::writeln('Parent listening for children...');
+        $responseList = $process->listenForChildren(null, $terminationCallback);
+        \Functional\each($responseList, $handleChildrenResponses);
+        CM_ProcessTest::writeln('Parent waiting for 100 ms...');
+        usleep(100000);
+        CM_ProcessTest::writeln('Parent listening for children...');
+        $responseList = $process->listenForChildren(null, $terminationCallback);
+        \Functional\each($responseList, $handleChildrenResponses);
+        CM_ProcessTest::writeln('Parent waiting for 100 ms...');
+        usleep(100000);
+        CM_ProcessTest::writeln('Parent listening for children...');
+        $responseList = $process->listenForChildren(null, $terminationCallback);
+        \Functional\each($responseList, $handleChildrenResponses);
+        CM_ProcessTest::writeln('Parent terminated.');
+
+        $outputFileExpected = 'Child 1 forked.
+Child 2 forked.
+Child 3 forked.
+Child 4 forked.
+Parent waiting for 250 ms...
+Child 1 terminated after 75 ms.
+Child 2 terminated after 175 ms.
+Parent listening for children...
+Parent stops listening to children...
+Child 1 heard by parent...
+Child 2 heard by parent...
+Parent waiting for 100 ms...
+Child 3 terminated after 275 ms.
+Parent listening for children...
+Parent stops listening to children...
+Child 3 heard by parent...
+Parent waiting for 100 ms...
+Child 4 terminated after 375 ms.
+Parent listening for children...
+Parent stops listening to children...
+Child 4 heard by parent...
+Parent waiting for 100 ms...
+Parent listening for children...
+Parent stops listening to children...
+Parent terminated.
+';
+
         rewind(self::$_file);
         $outputFileActual = fread(self::$_file, 8192);
         $this->assertEquals($outputFileExpected, $outputFileActual);
