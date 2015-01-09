@@ -40,6 +40,14 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $this->assertGreaterThanOrEqual($time, $test->getCreated());
     }
 
+    public function testFlush() {
+        $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $created = $test->getCreated();
+        CMTest_TH::timeForward(1);
+        $test->flush();
+        $this->assertGreaterThan($created, $test->getCreated());
+    }
+
     public function testGetVariations() {
         /** @var CM_Model_Splittest $test */
         $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
