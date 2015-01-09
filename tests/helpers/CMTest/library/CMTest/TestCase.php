@@ -595,6 +595,27 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @param string     $collection
+     * @param array|null $criteria
+     * @param int|null   $rowCount
+     */
+    public static function assertRowMongoDb($collection, $criteria = null, $rowCount = null) {
+        if (null === $rowCount) {
+            $rowCount = 1;
+        }
+        $rowCountActual = CMTest_TH::getMongoDb()->count($collection, $criteria);
+        self::assertEquals($rowCount, $rowCountActual);
+    }
+
+    /**
+     * @param string     $collection
+     * @param array|null $criteria
+     */
+    public static function assertNotRowMongoDb($collection, $criteria = null) {
+        self::assertRowMongoDb($collection, $criteria, 0);
+    }
+
+    /**
      * @param number $expected
      * @param number $actual
      * @param number|null
