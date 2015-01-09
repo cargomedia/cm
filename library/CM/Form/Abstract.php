@@ -107,14 +107,14 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
      * @return bool
      */
     public function getAvoidPasswordManager() {
-        return (bool) $this->_avoidPasswordManager;
+        return $this->_avoidPasswordManager;
     }
 
     /**
      * @param boolean $avoidPasswordManager
      */
     public function setAvoidPasswordManager($avoidPasswordManager) {
-        $this->_avoidPasswordManager = $avoidPasswordManager;
+        $this->_avoidPasswordManager = (bool) $avoidPasswordManager;
     }
 
     /**
