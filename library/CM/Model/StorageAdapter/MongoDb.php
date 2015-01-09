@@ -59,7 +59,8 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
      */
     protected function _getCollectionName($type) {
         $className = CM_Model_Abstract::getClassName($type);
-        return call_user_func([$className, 'getTableName']);
+        /** @var CM_Model_Abstract $className */
+        return $className::getTableName();
     }
 
     /**

@@ -260,6 +260,9 @@ class CMTest_TH {
         }
     }
 
+    /**
+     * @return CM_MongoDb_Client
+     */
     public static function getMongoDb() {
         return CM_Service_Manager::getInstance()->getMongoDb();
     }

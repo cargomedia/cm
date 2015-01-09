@@ -57,6 +57,7 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
      */
     protected function _getTableName($type) {
         $className = CM_Model_Abstract::getClassName($type);
-        return call_user_func(array($className, 'getTableName'));
+        /** @var CM_Model_Abstract $className */
+        return $className::getTableName();
     }
 }
