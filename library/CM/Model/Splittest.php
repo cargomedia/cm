@@ -41,6 +41,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
      * @param int $timestamp
      */
     public function setCreated($timestamp) {
+        $timestamp = (int) $timestamp;
         $this->_set('createStamp', $timestamp);
     }
 
