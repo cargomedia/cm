@@ -2,7 +2,7 @@
 {button_link label="Button"}
 {button_link label="Button with html <em>tags</em>" isHtmlLabel=true}
 {button_link label="With Tooltip" title="With Tooltip"}
-{button_link icon="thumbs-up"}
+{button_link icon="like"}
 {button_link icon="trophy" label="With Icon"}
 <hr />
 <h3>Large</h3>
@@ -17,4 +17,4 @@
 <hr />
 <h3>Confirmation</h3>
 {button_link class="confirmAction" label="With Confirmation" data=['click-confirmed' => true]}
-{button_link icon='delete' iconConfirm='delete-confirm' class="confirmAction warning" label="With Warning" data=['click-confirmed' => true]}
+{button_link icon='trash' iconConfirm='trash-open' class="confirmAction warning" label="With Warning" data=['click-confirmed' => true]}

@@ -3,7 +3,7 @@
 class CM_ExceptionHandling_Formatter_Html extends CM_ExceptionHandling_Formatter_Abstract {
 
     public function getHeader(CM_ExceptionHandling_SerializableException $exception) {
-        return '<h1>' . $exception->getClass() . '</h1><h2>' . $exception->getMessage() . '</h2><code>' . $exception->getFile() . ' on line ' .
+        return '<h1>' . $exception->getClass() . '</h1><h2>' . $exception->getMessage() . '</h2><pre>' . $exception->getFile() . ' on line ' .
         $exception->getLine() . '</pre>';
     }
 

@@ -37,6 +37,11 @@ class CM_Db_Client {
      *                           }
      */
     public function __construct(array $config) {
+        $defaults = [
+            'reconnectTimeout' => 300,
+        ];
+        $config = array_merge($defaults, $config);
+
         $this->_host = (string) $config['host'];
         $this->_port = (int) $config['port'];
         $this->_username = (string) $config['username'];

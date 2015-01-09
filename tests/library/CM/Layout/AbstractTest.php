@@ -60,6 +60,24 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
         $this->assertNotContains("_kmq.push(['alias'", $html);
     }
 
+    public function testLanguageAlternatives() {
+        $site = $this->getMockSite('CM_Site_Abstract', null, array('url' => 'http://www.example.com'));
+        $language1 = CMTest_TH::createLanguage('en');
+        $language2 = CMTest_TH::createLanguage('de');
+
+        $environment = new CM_Frontend_Environment($site, null, $language2, null, true);
+        $render = new CM_Frontend_Render($environment, true);
+
+        $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
+        $page = new CM_Page_Example();
+        $renderAdapter = new CM_RenderAdapter_Layout($render, $page);
+        $html = $renderAdapter->fetch();
+
+        $this->assertContains('<link rel="alternate" href="http://www.example.com/example" hreflang="x-default">', $html);
+        $this->assertContains('<link rel="alternate" href="http://www.example.com/en/example" hreflang="en">', $html);
+        $this->assertContains('<link rel="alternate" href="http://www.example.com/de/example" hreflang="de">', $html);
+    }
+
     /**
      * @param string $codeGoogleAnalytics
      * @param string $codeKissMetrics

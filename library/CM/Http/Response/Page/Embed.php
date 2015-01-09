@@ -27,9 +27,6 @@ class CM_Http_Response_Page_Embed extends CM_Http_Response_Page {
     }
 
     protected function _process() {
-        $this->getRender()->getServiceManager()->getTrackings()->trackPageView($this->getRender()->getEnvironment());
-        $html = $this->_processPageLoop($this->getRequest());
-
-        $this->_setContent($html);
+        $this->_processContentOrRedirect();
     }
 }

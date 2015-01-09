@@ -3,7 +3,7 @@
 <br />  foo={usertext text=$foo mode='simple'}<br />  time={$now}<br />
 <hr />
 
-{button_link class="reloadComponent" label="reload()" icon="reload"}
+{button_link class="reloadComponent" label="reload()" icon="refresh"}
 {button_link class="popoutComponent" label="popOut()"}
 {button_link class="popinComponent" label="popIn()"}
 {button_link class="loadComponent" label="load()"}
