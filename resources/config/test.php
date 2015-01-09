@@ -29,7 +29,6 @@ return function (CM_Config_Node $config) {
                 'username'         => 'root',
                 'password'         => '',
                 'db'               => 'cm_test',
-                'reconnectTimeout' => 300
             )
         )
     );
