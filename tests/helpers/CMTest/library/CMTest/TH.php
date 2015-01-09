@@ -41,14 +41,6 @@ class CMTest_TH {
         CM_Cache_Local::getInstance()->flush();
     }
 
-    /**
-     * @deprecated use clearEnv instead
-     */
-    public static function clearDb() {
-        self::clearCache();
-        CM_App::getInstance()->getProvisionLoader()->reload(new CM_OutputStream_Null());
-    }
-
     public static function timeInit() {
         if (!isset(self::$_timeStart)) {
             runkit_function_copy('time', 'time_original');
@@ -317,5 +309,10 @@ class CMTest_TH {
             $str .= $charset[mt_rand(0, $count - 1)];
         }
         return $str;
+    }
+
+    private static function clearDb() {
+        self::clearCache();
+        CM_App::getInstance()->getProvisionLoader()->reload(new CM_OutputStream_Null());
     }
 }
