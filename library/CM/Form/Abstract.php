@@ -11,6 +11,9 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     /** @var CM_FormAction_Abstract[] */
     private $_actions = array();
 
+    /** @var bool */
+    private $_avoidPasswordManager = false;
+
     abstract protected function _initialize();
 
     public function __construct($params = null) {
@@ -98,6 +101,20 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
             throw new CM_Exception_Invalid('Unrecognized field `' . $fieldName . '`.');
         }
         return $this->_fields[$fieldName];
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAvoidPasswordManager() {
+        return $this->_avoidPasswordManager;
+    }
+
+    /**
+     * @param boolean $avoidPasswordManager
+     */
+    public function setAvoidPasswordManager($avoidPasswordManager) {
+        $this->_avoidPasswordManager = (bool) $avoidPasswordManager;
     }
 
     /**
