@@ -29,6 +29,13 @@ class CM_Emoticon extends CM_Class_Abstract {
     /**
      * @return string
      */
+    public function getDefaultCode() {
+        return $this->_codes[0];
+    }
+
+    /**
+     * @return string
+     */
     public function getFileName() {
         return $this->_fileName;
     }
@@ -45,11 +52,12 @@ class CM_Emoticon extends CM_Class_Abstract {
      */
     protected function _load() {
         $data = self::getEmoticonData();
-        if (empty($data[$this->getName()])) {
-            throw new CM_Exception_Nonexistent();
+        $name = $this->getName();
+        if (empty($data[$name])) {
+            throw new CM_Exception_Nonexistent('Nonexistent Emoticon', ['name' => $name]);
         }
-        $this->_fileName = $data[$this->getName()]['fileName'];
-        $this->_codes = $data[$this->getName()]['codes'];
+        $this->_fileName = $data[$name]['fileName'];
+        $this->_codes = $data[$name]['codes'];
     }
 
     /**
@@ -63,6 +71,36 @@ class CM_Emoticon extends CM_Class_Abstract {
             $cache->set($cacheKey, $emoticonData, 0);
         }
         return $emoticonData;
+    }
+
+    /**
+     * @param string $code
+     * @return CM_Emoticon|null
+     */
+    public static function findCode($code) {
+        $emoticonData = self::getEmoticonData();
+        $emoticon = \Functional\first($emoticonData, function ($emoticonData) use ($code) {
+            if ('smiley' === $emoticonData['name']) {
+                $a = 2;
+            }
+            return false !== array_search($code, $emoticonData['codes']);
+        });
+        if ($emoticon) {
+            return new static($emoticon['name']);
+        }
+        return null;
+    }
+
+    /**
+     * @param string $name
+     * @return CM_Emoticon|null
+     */
+    public static function findName($name) {
+        $emoticonData = self::getEmoticonData();
+        if (array_key_exists($name, $emoticonData)) {
+            return new static($name);
+        }
+        return null;
     }
 
     /**
