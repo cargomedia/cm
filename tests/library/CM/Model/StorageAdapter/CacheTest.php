@@ -61,7 +61,7 @@ class CM_Model_StorageAdapter_CacheTest extends CMTest_TestCase {
      */
     public function testCreate() {
         $adapter = new CM_Model_StorageAdapter_Cache();
-        $id = $adapter->create(1, array('foo' => 'foo1', 'bar' => 23));
+        $adapter->create(1, array('foo' => 'foo1', 'bar' => 23));
     }
 
     public function testDelete() {
