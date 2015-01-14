@@ -158,7 +158,6 @@ class CM_Tools_AppInstallation {
      */
     public function fileExists($path) {
         return $this->getFilesystem()->exists($path);
-
     }
 
     /**
@@ -177,6 +176,7 @@ class CM_Tools_AppInstallation {
 
     /**
      * @return CM_App_Package
+     * @throws CM_Exception_Invalid
      */
     private function _getRootPackage() {
         $rootPackageName = $this->getComposer()->getPackage()->getName();
@@ -185,5 +185,6 @@ class CM_Tools_AppInstallation {
                 return $package;
             }
         }
+        throw new CM_Exception_Invalid('No package with rootPackageName `' . $rootPackageName . '` was found.');
     }
 }
