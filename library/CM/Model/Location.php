@@ -179,6 +179,61 @@ class CM_Model_Location extends CM_Model_Abstract {
     }
 
     /**
+     * @param int    $level A LEVEL_*-const
+     * @param string $fieldName
+     * @param string $fieldValue
+     * @return CM_Model_Location|null
+     * @throws CM_Exception_Invalid
+     */
+    public static function findByAttribute($level, $fieldName, $fieldValue) {
+        switch ($level) {
+            case self::LEVEL_COUNTRY:
+                $className = 'CM_Model_Location_Country';
+                $tableName = CM_Model_Location_Country::getTableName();
+                $tableSchema = CM_Model_Location_Country::getSchema();
+                break;
+            case self::LEVEL_STATE:
+                $className = 'CM_Model_Location_State';
+                $tableName = CM_Model_Location_State::getTableName();
+                $tableSchema = CM_Model_Location_State::getSchema();
+                break;
+            case self::LEVEL_CITY:
+                $className = 'CM_Model_Location_City';
+                $tableName = CM_Model_Location_City::getTableName();
+                $tableSchema = CM_Model_Location_City::getSchema();
+                break;
+            case self::LEVEL_ZIP:
+                $className = 'CM_Model_Location_Zip';
+                $tableName = CM_Model_Location_Zip::getTableName();
+                $tableSchema = CM_Model_Location_Zip::getSchema();
+                break;
+            default:
+                throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
+        }
+
+        if (!$tableSchema->hasField($fieldName)) {
+            throw new CM_Exception_Invalid('Invalid field name `' . $fieldName . '` for `' . $tableName . '`');
+        }
+
+        $cacheKey = CM_CacheConst::Location_ByAttribute . '_level:' . $level . '_name:' . $fieldName . '_value:' . $fieldValue;
+        $cache = CM_Cache_Local::getInstance();
+
+        if (false === ($id = $cache->get($cacheKey))) {
+            $id = CM_Db_Db::select($tableName, array('id'), array($fieldName => $fieldValue), $fieldName)->fetchColumn();
+            if (false === $id) {
+                $id = null;
+            }
+            $cache->set($cacheKey, $id);
+        }
+
+        if (!$id) {
+            return null;
+        }
+
+        return new $className($id);
+    }
+
+    /**
      * @param int $ip
      * @return CM_Model_Location|null
      */

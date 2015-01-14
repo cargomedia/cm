@@ -79,12 +79,7 @@ class CM_Model_Location_Zip extends CM_Model_Location_Abstract {
     }
 
     public function _getSchema() {
-        return new CM_Model_Schema_Definition(array(
-            'cityId' => array('type' => 'CM_Model_Location_City'),
-            'name'   => array('type' => 'string'),
-            'lat'    => array('type' => 'float', 'optional' => true),
-            'lon'    => array('type' => 'float', 'optional' => true),
-        ));
+        return self::getSchema();
     }
 
     /**
@@ -104,5 +99,14 @@ class CM_Model_Location_Zip extends CM_Model_Location_Abstract {
         ));
         $zip->commit();
         return $zip;
+    }
+
+    public static function getSchema() {
+        return new CM_Model_Schema_Definition(array(
+            'cityId' => array('type' => 'CM_Model_Location_City'),
+            'name'   => array('type' => 'string'),
+            'lat'    => array('type' => 'float', 'optional' => true),
+            'lon'    => array('type' => 'float', 'optional' => true),
+        ));
     }
 }

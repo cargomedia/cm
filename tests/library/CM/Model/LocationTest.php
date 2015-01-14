@@ -4,6 +4,12 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 
     private static $_fields;
 
+    private static $_switzerland;
+
+    private static $_baselStadt;
+
+    private static $_basel;
+
     public static function setUpBeforeClass() {
         $switzerland = CM_Db_Db::insert('cm_model_location_country', array('abbreviation' => 'CH', 'name' => 'Switzerland'));
         $germany = CM_Db_Db::insert('cm_model_location_country', array('abbreviation' => 'DE', 'name' => 'Germany'));
@@ -43,6 +49,10 @@ class CM_Model_LocationTest extends CMTest_TestCase {
         self::$_fields[CM_Model_Location::LEVEL_STATE] = array('id' => (int) $location['2.id'], 'name' => $location['2.name']);
         self::$_fields[CM_Model_Location::LEVEL_CITY] = array('id' => (int) $location['3.id'], 'name' => $location['3.name']);
         self::$_fields[CM_Model_Location::LEVEL_ZIP] = array('id' => (int) $location['4.id'], 'name' => $location['4.name']);
+
+        self::$_switzerland = $switzerland;
+        self::$_baselStadt = $baselStadt;
+        self::$_basel = $basel;
     }
 
     public function testConstructor() {
@@ -255,5 +265,90 @@ class CM_Model_LocationTest extends CMTest_TestCase {
         $this->assertSame($city->getId(), $zip->getId(CM_Model_Location::LEVEL_CITY));
         $this->assertSame('12333', $zip->getName());
         $this->assertSame(array('lat' => (float) 50, 'lon' => (float) 100), $zip->getCoordinates());
+    }
+
+    public function testFindByAttribute() {
+        $country = CM_Model_Location::findByAttribute(CM_Model_Location::LEVEL_COUNTRY, 'abbreviation', 'UK');
+        $this->assertNull($country);
+
+        $country = CM_Model_Location::findByAttribute(CM_Model_Location::LEVEL_COUNTRY, 'abbreviation', 'CH');
+        $this->assertInstanceOf('CM_Model_Location_Country', $country);
+        $this->assertSame(CM_Model_Location::LEVEL_COUNTRY, $country->getLevel());
+        $this->assertSame('CH', $country->getAbbreviation());
+        $this->assertSame('Switzerland', $country->getName());
+
+        $country = CM_Model_Location::findByAttribute(CM_Model_Location::LEVEL_COUNTRY, 'name', 'Switzerland');
+        $this->assertInstanceOf('CM_Model_Location_Country', $country);
+        $this->assertSame(CM_Model_Location::LEVEL_COUNTRY, $country->getLevel());
+        $this->assertSame('CH', $country->getAbbreviation());
+        $this->assertSame('Switzerland', $country->getName());
+
+        /** @var CM_Model_Location_State $state */
+        $state = CM_Model_Location::findByAttribute(CM_Model_Location::LEVEL_STATE, 'name', 'Basel-Stadt');
+        $this->assertInstanceOf('CM_Model_Location_State', $state);
+        $this->assertSame(CM_Model_Location::LEVEL_STATE, $state->getLevel());
+        $this->assertSame((int) self::$_switzerland, $state->getCountry()->getId());
+        $this->assertNull($state->getAbbreviation());
+        $this->assertSame('Basel-Stadt', $state->getName());
+
+        $state = CM_Model_Location::findByAttribute(CM_Model_Location::LEVEL_STATE, 'countryId', self::$_switzerland);
+        $this->assertInstanceOf('CM_Model_Location_State', $state);
+        $this->assertSame(CM_Model_Location::LEVEL_STATE, $state->getLevel());
+        $this->assertSame((int) self::$_switzerland, $state->getCountry()->getId());
+        $this->assertNull($state->getAbbreviation());
+        $this->assertSame('Basel-Stadt', $state->getName());
+
+        /** @var CM_Model_Location_City $city */
+        $city = CM_Model_Location::findByAttribute(CM_Model_Location::LEVEL_CITY, 'countryId', self::$_switzerland);
+        $this->assertInstanceOf('CM_Model_Location_City', $city);
+        $this->assertSame(CM_Model_Location::LEVEL_CITY, $city->getLevel());
+        $this->assertSame((int) self::$_switzerland, $city->getCountry()->getId());
+        $this->assertSame((int) self::$_baselStadt, $city->getState()->getId());
+        $this->assertSame('Basel', $city->getName());
+
+        $city = CM_Model_Location::findByAttribute(CM_Model_Location::LEVEL_CITY, 'stateId', self::$_baselStadt);
+        $this->assertInstanceOf('CM_Model_Location_City', $city);
+        $this->assertSame(CM_Model_Location::LEVEL_CITY, $city->getLevel());
+        $this->assertSame((int) self::$_switzerland, $city->getCountry()->getId());
+        $this->assertSame((int) self::$_baselStadt, $city->getState()->getId());
+        $this->assertSame('Basel', $city->getName());
+
+        $city = CM_Model_Location::findByAttribute(CM_Model_Location::LEVEL_CITY, 'name', 'Basel');
+        $this->assertInstanceOf('CM_Model_Location_City', $city);
+        $this->assertSame(CM_Model_Location::LEVEL_CITY, $city->getLevel());
+        $this->assertSame((int) self::$_switzerland, $city->getCountry()->getId());
+        $this->assertSame((int) self::$_baselStadt, $city->getState()->getId());
+        $this->assertSame('Basel', $city->getName());
+
+        /** @var CM_Model_Location_Zip $zip */
+        $zip = CM_Model_Location::findByAttribute(CM_Model_Location::LEVEL_ZIP, 'cityId', self::$_basel);
+        $this->assertInstanceOf('CM_Model_Location_Zip', $zip);
+        $this->assertSame(CM_Model_Location::LEVEL_ZIP, $zip->getLevel());
+        $this->assertSame('4057', $zip->getName());
+
+        $zip = CM_Model_Location::findByAttribute(CM_Model_Location::LEVEL_ZIP, 'name', '4056');
+        $this->assertInstanceOf('CM_Model_Location_Zip', $zip);
+        $this->assertSame(CM_Model_Location::LEVEL_ZIP, $zip->getLevel());
+        $this->assertSame((int) self::$_basel, $zip->getCity()->getId());
+        $this->assertSame('4056', $zip->getName());
+    }
+
+    public function testFindByAttributeCache() {
+        $cacheKey = CM_CacheConst::Location_ByAttribute . '_level:' . CM_Model_Location::LEVEL_COUNTRY . '_name:abbreviation_value:CH';
+        $cache = CM_Cache_Local::getInstance();
+
+        $this->assertFalse($cache->get($cacheKey));
+
+        $country = CM_Model_Location::findByAttribute(CM_Model_Location::LEVEL_COUNTRY, 'abbreviation', 'CH');
+
+        $this->assertSame($country->getId(), (int) $cache->get($cacheKey));
+    }
+
+    /**
+     * @expectedException        CM_Exception_Invalid
+     * @expectedExceptionMessage Invalid field name `notExistingField` for `cm_model_location_country`
+     */
+    public function testFindByAttributeException() {
+        CM_Model_Location::findByAttribute(CM_Model_Location::LEVEL_COUNTRY, 'notExistingField', 'CH');
     }
 }
