@@ -55,6 +55,10 @@ class CM_Model_LocationTest extends CMTest_TestCase {
         self::$_basel = $basel;
     }
 
+    public function tearDown() {
+        CMTest_TH::clearCache();
+    }
+
     public function testConstructor() {
         foreach (self::$_fields as $level => $fields) {
             $location = new CM_Model_Location($level, $fields['id']);
