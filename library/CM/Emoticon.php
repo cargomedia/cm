@@ -51,7 +51,7 @@ class CM_Emoticon extends CM_Class_Abstract {
      * @throws CM_Exception_Nonexistent
      */
     protected function _load() {
-        $data = self::getEmoticonData();
+        $data = static::getEmoticonData();
         $name = $this->getName();
         if (empty($data[$name])) {
             throw new CM_Exception_Nonexistent('Nonexistent Emoticon', ['name' => $name]);
@@ -67,7 +67,7 @@ class CM_Emoticon extends CM_Class_Abstract {
         $cache = CM_Cache_Local::getInstance();
         $cacheKey = CM_CacheConst::Emoticons;
         if (false === $emoticonData = $cache->get($cacheKey)) {
-            $emoticonData = self::_buildEmoticonData();
+            $emoticonData = static::_buildEmoticonData();
             $cache->set($cacheKey, $emoticonData, 0);
         }
         return $emoticonData;
@@ -78,7 +78,7 @@ class CM_Emoticon extends CM_Class_Abstract {
      * @return CM_Emoticon|null
      */
     public static function findCode($code) {
-        $emoticonData = self::getEmoticonData();
+        $emoticonData = static::getEmoticonData();
         $emoticon = \Functional\first($emoticonData, function ($emoticonData) use ($code) {
             if ('smiley' === $emoticonData['name']) {
                 $a = 2;
@@ -96,7 +96,7 @@ class CM_Emoticon extends CM_Class_Abstract {
      * @return CM_Emoticon|null
      */
     public static function findName($name) {
-        $emoticonData = self::getEmoticonData();
+        $emoticonData = static::getEmoticonData();
         if (array_key_exists($name, $emoticonData)) {
             return new static($name);
         }
