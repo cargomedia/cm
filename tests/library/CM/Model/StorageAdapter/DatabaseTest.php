@@ -129,3 +129,11 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
         $this->assertSame($expected, $values);
     }
 }
+
+class CMTest_ModelMock_1 extends CM_Model_Abstract {
+
+}
+
+class CMTest_ModelMock_2 extends CM_Model_Abstract {
+
+}
