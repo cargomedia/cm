@@ -353,7 +353,7 @@ var CM_App = CM_Class_Abstract.extend({
   string: {
     padLeft: function(str, length, character) {
       character = character || ' ';
-      string = String(str);
+      var string = String(str);
       return new Array(length - string.length + 1).join(character) + string;
     }
   },
@@ -805,7 +805,7 @@ var CM_App = CM_Class_Abstract.extend({
   /**
    * @param {String} methodName
    * @param {Object} params
-   * @param {Object|Null} callbacks
+   * @param {Object|Null} [callbacks]
    * @return jqXHR
    */
   rpc: function(methodName, params, callbacks) {

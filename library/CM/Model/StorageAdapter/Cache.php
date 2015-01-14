@@ -43,7 +43,7 @@ class CM_Model_StorageAdapter_Cache extends CM_Model_StorageAdapter_AbstractAdap
     }
 
     /**
-     * @return array
+     * @throws CM_Exception_NotImplemented
      */
     protected function _generateId() {
         throw new CM_Exception_NotImplemented();
