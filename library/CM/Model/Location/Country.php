@@ -37,7 +37,10 @@ class CM_Model_Location_Country extends CM_Model_Location_Abstract {
     }
 
     public function _getSchema() {
-        return self::getSchema();
+        return new CM_Model_Schema_Definition(array(
+            'name'         => array('type' => 'string'),
+            'abbreviation' => array('type' => 'string'),
+        ));
     }
 
     /**
@@ -53,15 +56,5 @@ class CM_Model_Location_Country extends CM_Model_Location_Abstract {
         ));
         $country->commit();
         return $country;
-    }
-
-    /**
-     * @return CM_Model_Schema_Definition
-     */
-    public static function getSchema() {
-        return new CM_Model_Schema_Definition(array(
-            'name'         => array('type' => 'string'),
-            'abbreviation' => array('type' => 'string'),
-        ));
     }
 }

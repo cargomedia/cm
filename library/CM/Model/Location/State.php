@@ -66,7 +66,12 @@ class CM_Model_Location_State extends CM_Model_Location_Abstract {
     }
 
     public function _getSchema() {
-        return self::getSchema();
+        return new CM_Model_Schema_Definition(array(
+            'countryId'    => array('type' => 'CM_Model_Location_Country'),
+            'name'         => array('type' => 'string'),
+            'abbreviation' => array('type' => 'string', 'optional' => true),
+            '_maxmind'     => array('type' => 'string', 'optional' => true),
+        ));
     }
 
     /**
@@ -86,14 +91,5 @@ class CM_Model_Location_State extends CM_Model_Location_Abstract {
         ));
         $state->commit();
         return $state;
-    }
-
-    public static function getSchema() {
-        return new CM_Model_Schema_Definition(array(
-            'countryId'    => array('type' => 'CM_Model_Location_Country'),
-            'name'         => array('type' => 'string'),
-            'abbreviation' => array('type' => 'string', 'optional' => true),
-            '_maxmind'     => array('type' => 'string', 'optional' => true),
-        ));
     }
 }
