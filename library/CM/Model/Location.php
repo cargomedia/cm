@@ -188,20 +188,20 @@ class CM_Model_Location extends CM_Model_Abstract {
     public static function findByAttribute($level, array $data) {
         switch ($level) {
             case self::LEVEL_COUNTRY:
-                $className = 'CM_Model_Location_Country';
                 $type = CM_Model_Location_Country::getTypeStatic();
+                $className = CM_Model_Location_Country::getClassName($type);
                 break;
             case self::LEVEL_STATE:
-                $className = 'CM_Model_Location_State';
                 $type = CM_Model_Location_State::getTypeStatic();
+                $className = CM_Model_Location_State::getClassName($type);
                 break;
             case self::LEVEL_CITY:
-                $className = 'CM_Model_Location_City';
                 $type = CM_Model_Location_City::getTypeStatic();
+                $className = CM_Model_Location_City::getClassName($type);
                 break;
             case self::LEVEL_ZIP:
-                $className = 'CM_Model_Location_Zip';
                 $type = CM_Model_Location_Zip::getTypeStatic();
+                $className = CM_Model_Location_Zip::getClassName($type);
                 break;
             default:
                 throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
