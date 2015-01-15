@@ -6,9 +6,6 @@ class CMTest_TH {
     private static $timeDelta = 0;
     private static $_configBackup;
 
-    /** @var CM_Db_Client|null */
-    private static $_dbClient = null;
-
     public static function init() {
         $output = new CM_OutputStream_Null();
         $loader = CM_App::getInstance()->getProvisionLoader();
