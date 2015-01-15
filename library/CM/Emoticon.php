@@ -12,11 +12,13 @@ class CM_Emoticon extends CM_Class_Abstract {
     private $_name;
 
     /**
-     * @param string $name
+     * @param string     $name
+     * @param array|null $data
+     * @throws CM_Exception_Nonexistent
      */
-    public function __construct($name) {
+    public function __construct($name, array $data = null) {
         $this->_name = (string) $name;
-        $this->_load();
+        $this->_load($data);
     }
 
     /**
@@ -48,16 +50,20 @@ class CM_Emoticon extends CM_Class_Abstract {
     }
 
     /**
-     * @throws CM_Exception_Nonexistent
+     * @param array|null $data
+     * @throws CM_Exception_Invalid
      */
-    protected function _load() {
-        $data = static::getEmoticonData();
-        $name = $this->getName();
-        if (empty($data[$name])) {
-            throw new CM_Exception_Invalid('Nonexistent Emoticon', ['name' => $name]);
+    protected function _load(array $data = null) {
+        if (null === $data) {
+            $dataList = static::getEmoticonData();
+            $name = $this->getName();
+            if (empty($dataList[$name])) {
+                throw new CM_Exception_Invalid('Nonexistent Emoticon', ['name' => $name]);
+            }
+            $data = $dataList[$name];
         }
-        $this->_fileName = $data[$name]['fileName'];
-        $this->_codes = $data[$name]['codes'];
+        $this->_fileName = $data['fileName'];
+        $this->_codes = $data['codes'];
     }
 
     /**
