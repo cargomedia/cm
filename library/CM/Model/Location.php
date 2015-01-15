@@ -185,23 +185,19 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @throws CM_Class_Exception_TypeNotConfiguredException
      * @throws CM_Exception_Invalid
      */
-    public static function findByAttribute($level, array $data) {
+    public static function findByAttributes($level, array $data) {
         switch ($level) {
             case self::LEVEL_COUNTRY:
                 $type = CM_Model_Location_Country::getTypeStatic();
-                $className = CM_Model_Location_Country::getClassName($type);
                 break;
             case self::LEVEL_STATE:
                 $type = CM_Model_Location_State::getTypeStatic();
-                $className = CM_Model_Location_State::getClassName($type);
                 break;
             case self::LEVEL_CITY:
                 $type = CM_Model_Location_City::getTypeStatic();
-                $className = CM_Model_Location_City::getClassName($type);
                 break;
             case self::LEVEL_ZIP:
                 $type = CM_Model_Location_Zip::getTypeStatic();
-                $className = CM_Model_Location_Zip::getClassName($type);
                 break;
             default:
                 throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
@@ -225,7 +221,7 @@ class CM_Model_Location extends CM_Model_Abstract {
             return null;
         }
 
-        return new $className($id);
+        return new CM_Model_Location($level, $id);
     }
 
     /**
