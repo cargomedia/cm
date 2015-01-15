@@ -20,6 +20,7 @@ class CM_Option {
     /**
      * @param string $key
      * @return mixed|null
+     * @throws CM_Exception_Invalid
      */
     public function get($key) {
         $cacheKey = CM_CacheConst::Option;

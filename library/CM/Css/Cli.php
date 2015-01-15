@@ -28,6 +28,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
         CM_Util::exec('fontcustom', array(
             'compile', $dirWork->getPathOnLocalFilesystem(),
             '--no-hash',
+            '--autowidth',
             '--font-name=icon-webfont',
             '--output=' . $dirBuild->getPathOnLocalFilesystem()
         ));

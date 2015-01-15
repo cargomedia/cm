@@ -17,9 +17,6 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase {
         CM_Db_Db::exec("DROP TABLE `entityMock`");
     }
 
-    public function setup() {
-    }
-
     public function tearDown() {
         CM_Db_Db::truncate('entityMock');
         CMTest_TH::clearEnv();
