@@ -107,8 +107,15 @@ class CM_Emoticon extends CM_Class_Abstract {
     }
 
     /**
+     * @throws CM_Exception
+     */
+    public static function validateData() {
+        self::_buildEmoticonData();
+    }
+
+    /**
      * @return array[]
-     * @throws CM_Exception_Invalid
+     * @throws CM_Exception
      */
     private static function _buildEmoticonData() {
         /** @var CM_File[] $configurationFiles */
@@ -142,13 +149,11 @@ class CM_Emoticon extends CM_Class_Abstract {
                     $codeList[$code] = $name;
                     $emoticonData[$name]['codes'][] = $code;
                 } else {
-                    $warning = new CM_Exception("Emoticon codes overlap",
+                    throw new CM_Exception("Emoticon codes overlap",
                         [
                             'overlapping emoticons' => [$name, $codeList[$code]],
                             'code'                  => $code
-                        ],
-                        ['severity' => CM_Exception::WARN]);
-                    CM_Bootloader::getInstance()->getExceptionHandler()->logException($warning);
+                        ]);
                 }
             }
         }
