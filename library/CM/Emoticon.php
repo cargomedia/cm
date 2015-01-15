@@ -86,9 +86,6 @@ class CM_Emoticon extends CM_Class_Abstract {
     public static function findCode($code) {
         $emoticonData = static::getEmoticonData();
         $emoticon = \Functional\first($emoticonData, function ($emoticonData) use ($code) {
-            if ('smiley' === $emoticonData['name']) {
-                $a = 2;
-            }
             return false !== array_search($code, $emoticonData['codes']);
         });
         if ($emoticon) {
