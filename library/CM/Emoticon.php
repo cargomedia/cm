@@ -89,7 +89,7 @@ class CM_Emoticon extends CM_Class_Abstract {
             return false !== array_search($code, $emoticonData['codes']);
         });
         if ($emoticon) {
-            return new static($emoticon['name']);
+            return new static($emoticon['name'], $emoticon);
         }
         return null;
     }
@@ -101,7 +101,7 @@ class CM_Emoticon extends CM_Class_Abstract {
     public static function findName($name) {
         $emoticonData = static::getEmoticonData();
         if (array_key_exists($name, $emoticonData)) {
-            return new static($name);
+            return new static($name, $emoticonData[$name]);
         }
         return null;
     }
