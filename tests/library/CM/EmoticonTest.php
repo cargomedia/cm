@@ -2,6 +2,12 @@
 
 class CM_EmoticonTest extends CMTest_TestCase {
 
+    public function testFilesystemScanning() {
+        $emoticon1 = new CM_Emoticon('smiley');
+        $emoticon2 = CM_Emoticon::findCode(':)');
+        $this->assertEquals($emoticon1, $emoticon2);
+    }
+
     public function testConstructorNonexistentEmoticon() {
         $emoticonClass = $this->_getEmoticonMock();
         /** @var CM_Emoticon $emoticon */
