@@ -52,11 +52,11 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
     }
 
     public function findByData($type, array $data) {
-        $id = CM_Db_Db::select($this->_getTableName($type), array('id'), $data)->fetchColumn();
-        if (false === $id) {
-            $id = null;
+        $result = CM_Db_Db::select($this->_getTableName($type), array('id'), $data)->fetch();
+        if (false === $result) {
+            $result = null;
         }
-        return $id;
+        return $result;
     }
 
     /**

@@ -216,7 +216,8 @@ class CM_Model_Location extends CM_Model_Abstract {
         if (false === ($id = $cache->get($cacheKey))) {
             /** @var CM_Model_StorageAdapter_Database $persistence */
             $persistence = self::_getStorageAdapter('CM_Model_StorageAdapter_Database');
-            $id = $persistence->findByData($type, $data);
+            $result = $persistence->findByData($type, $data);
+            $id = $result['id'];
             $cache->set($cacheKey, $id);
         }
 
