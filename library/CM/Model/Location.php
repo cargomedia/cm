@@ -127,16 +127,6 @@ class CM_Model_Location extends CM_Model_Abstract {
         if (null === $level) {
             $level = $this->getLevel();
         }
-        $level = (int) $level;
-        $typeList = array(
-            self::LEVEL_COUNTRY => CM_Model_Location_Country::getTypeStatic(),
-            self::LEVEL_STATE   => CM_Model_Location_State::getTypeStatic(),
-            self::LEVEL_CITY    => CM_Model_Location_City::getTypeStatic(),
-            self::LEVEL_ZIP     => CM_Model_Location_Zip::getTypeStatic(),
-        );
-        if (!isset($typeList[$level])) {
-            throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
-        }
         if (!array_key_exists($level, $this->_locationList)) {
             /** @var array[] $locationDataList */
             $locationDataList = $this->_get('locationDataList');
@@ -144,7 +134,8 @@ class CM_Model_Location extends CM_Model_Abstract {
                 $this->_locationList[$level] = null;
             } else {
                 $locationData = $locationDataList[$level];
-                $this->_locationList[$level] = self::factoryGeneric($typeList[$level], $locationData['id'], $locationData['data']);
+                $type = self::getTypeByLevel($level);
+                $this->_locationList[$level] = self::factoryGeneric($type, $locationData['id'], $locationData['data']);
             }
         }
         return $this->_locationList[$level];
@@ -186,32 +177,16 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @throws CM_Exception_Invalid
      */
     public static function findByAttributes($level, array $data) {
-        switch ($level) {
-            case self::LEVEL_COUNTRY:
-                $type = CM_Model_Location_Country::getTypeStatic();
-                break;
-            case self::LEVEL_STATE:
-                $type = CM_Model_Location_State::getTypeStatic();
-                break;
-            case self::LEVEL_CITY:
-                $type = CM_Model_Location_City::getTypeStatic();
-                break;
-            case self::LEVEL_ZIP:
-                $type = CM_Model_Location_Zip::getTypeStatic();
-                break;
-            default:
-                throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
-        }
-
+        $cache = CM_Cache_Local::getInstance();
         $cacheKey = CM_CacheConst::Location_ByAttribute . '_level:' . $level;
         foreach ($data as $fieldName => $fieldValue) {
             $cacheKey .= '_name:' . $fieldName . '_value:' . $fieldValue;
         }
-        $cache = CM_Cache_Local::getInstance();
 
         if (false === ($id = $cache->get($cacheKey))) {
             /** @var CM_Model_StorageAdapter_Database $persistence */
             $persistence = self::_getStorageAdapter('CM_Model_StorageAdapter_Database');
+            $type = self::getTypeByLevel($level);
             $result = $persistence->findByData($type, $data);
             $id = $result['id'];
             $cache->set($cacheKey, $id);
@@ -312,6 +287,26 @@ class CM_Model_Location extends CM_Model_Abstract {
      */
     public static function fromLocation(CM_Model_Location_Abstract $location) {
         return new self($location->getLevel(), $location->getId());
+    }
+
+    /**
+     * @param int $level
+     * @return int
+     * @throws CM_Class_Exception_TypeNotConfiguredException
+     * @throws CM_Exception_Invalid
+     */
+    public static function getTypeByLevel($level) {
+        $level = (int) $level;
+        $typeList = array(
+            self::LEVEL_COUNTRY => CM_Model_Location_Country::getTypeStatic(),
+            self::LEVEL_STATE   => CM_Model_Location_State::getTypeStatic(),
+            self::LEVEL_CITY    => CM_Model_Location_City::getTypeStatic(),
+            self::LEVEL_ZIP     => CM_Model_Location_Zip::getTypeStatic(),
+        );
+        if (!isset($typeList[$level])) {
+            throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
+        }
+        return $typeList[$level];
     }
 
     public static function getCacheClass() {
