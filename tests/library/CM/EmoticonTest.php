@@ -14,7 +14,7 @@ class CM_EmoticonTest extends CMTest_TestCase {
         try {
             $emoticonClass->newInstance(['nonexistentEmoticon']);
             $this->fail('Instantiated nonexistent emoticon');
-        } catch(CM_Exception_Nonexistent $ex) {
+        } catch(CM_Exception_Invalid $ex) {
             $this->assertSame('Nonexistent Emoticon', $ex->getMessage());
             $this->assertSame(['name' => 'nonexistentEmoticon'], $ex->getMetaInfo(true));
         }

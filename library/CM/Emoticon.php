@@ -54,7 +54,7 @@ class CM_Emoticon extends CM_Class_Abstract {
         $data = static::getEmoticonData();
         $name = $this->getName();
         if (empty($data[$name])) {
-            throw new CM_Exception_Nonexistent('Nonexistent Emoticon', ['name' => $name]);
+            throw new CM_Exception_Invalid('Nonexistent Emoticon', ['name' => $name]);
         }
         $this->_fileName = $data[$name]['fileName'];
         $this->_codes = $data[$name]['codes'];
