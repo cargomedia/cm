@@ -84,6 +84,7 @@ class CM_Emoticon extends CM_Class_Abstract {
      * @return CM_Emoticon|null
      */
     public static function findByCode($code) {
+        $code = (string) $code;
         $dataList = static::getEmoticonData();
         $data = \Functional\first($dataList, function ($data) use ($code) {
             return false !== array_search($code, $data['codes'], true);
@@ -99,6 +100,7 @@ class CM_Emoticon extends CM_Class_Abstract {
      * @return CM_Emoticon|null
      */
     public static function findByName($name) {
+        $name = (string) $name;
         $dataList = static::getEmoticonData();
         if (array_key_exists($name, $dataList)) {
             return new static($name, $dataList[$name]);
