@@ -126,8 +126,7 @@ class CM_Emoticon extends CM_Class_Abstract {
         $imageFiles = [];
         $bootloader = CM_Bootloader::getInstance();
         foreach ($bootloader->getModules() as $namespace) {
-            $emoticonPath = CM_Util::getModulePath($namespace) . 'layout/default/resource/img/emoticon/';
-            $emoticonDir = new CM_File($emoticonPath);
+            $emoticonDir = new CM_File(CM_Util::getModulePath($namespace) . 'layout/default/resource/img/emoticon/');
             foreach ($emoticonDir->listFiles(true) as $file) {
                 $name = strtolower($file->getFileNameWithoutExtension());
                 if ('json' === $file->getExtension()) {
