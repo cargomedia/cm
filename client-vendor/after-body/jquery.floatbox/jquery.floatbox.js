@@ -82,12 +82,8 @@
         self.close.apply(self);
       });
 
-      _.delay(function() {
-        // FF Mobile moves floatbox out of viewport, if no delay here
-        self.$floatbox.focus();
-        self.$floatbox.trap();
-      }, 50);
-
+      self.$floatbox.focus();
+      self.$floatbox.trap();
       this.$layer.data('floatbox', this);
       $element.trigger('floatbox-open');
     },
