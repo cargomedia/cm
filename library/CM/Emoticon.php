@@ -67,7 +67,7 @@ class CM_Emoticon extends CM_Class_Abstract {
     }
 
     /**
-     * @return array[]
+     * @return array[] ['name' => string, 'fileName' => string, 'codes' => string[]]
      */
     public static function getEmoticonData() {
         $cache = CM_Cache_Local::getInstance();
