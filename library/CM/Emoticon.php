@@ -14,7 +14,7 @@ class CM_Emoticon extends CM_Class_Abstract {
     /**
      * @param string     $name
      * @param array|null $data
-     * @throws CM_Exception_Nonexistent
+     * @throws CM_Exception_Invalid
      */
     public function __construct($name, array $data = null) {
         $this->_name = (string) $name;
