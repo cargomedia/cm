@@ -68,11 +68,13 @@ html.floatbox-active body {
 }
 
 .floatbox.fullscreen {
+  height: 100%;
   width: 100%;
   display: block;
 }
 
 .floatbox.fullscreen .floatbox-body {
+  height: 1px;
   min-height: 100%;
 }
 
