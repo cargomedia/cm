@@ -10,6 +10,9 @@ class CM_CacheConst {
     // _ip:X
     const Location_ByIp = 'Location.ByIp';
 
+    // _level:X_name:X_value:X
+    const Location_ByAttribute = 'Location.ByAttribute';
+
     // _class:X_userId:X
     const Page = 'Page';
 

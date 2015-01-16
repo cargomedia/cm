@@ -128,4 +128,19 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
         $this->assertSame(4, count($values));
         $this->assertSame($expected, $values);
     }
+
+    public function testFindByData() {
+        $id1 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo1', 'bar' => 1));
+        $id2 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo2', 'bar' => 2));
+        $type = 99;
+
+        $adapter = $this->getMockBuilder('CM_Model_StorageAdapter_Database')->setMethods(array('_getTableName'))->getMock();
+        $adapter->expects($this->any())->method('_getTableName')->will($this->returnValue('mock_modelStorageAdapter'));
+        /** @var CM_Model_StorageAdapter_Database $adapter */
+
+        $this->assertSame(array('id' => $id1), $adapter->findByData($type, array('foo' => 'foo1')));
+        $this->assertSame(array('id' => $id1), $adapter->findByData($type, array('bar' => 1)));
+        $this->assertSame(array('id' => $id1), $adapter->findByData($type, array('foo' => 'foo1', 'bar' => 1)));
+        $this->assertNull($adapter->findByData($type, array('foo' => 'foo2', 'bar' => 1)));
+    }
 }
