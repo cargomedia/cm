@@ -86,7 +86,7 @@ class CM_Emoticon extends CM_Class_Abstract {
     public static function findByCode($code) {
         $emoticonData = static::getEmoticonData();
         $emoticon = \Functional\first($emoticonData, function ($emoticonData) use ($code) {
-            return false !== array_search($code, $emoticonData['codes']);
+            return false !== array_search($code, $emoticonData['codes'], true);
         });
         if ($emoticon) {
             return new static($emoticon['name'], $emoticon);
