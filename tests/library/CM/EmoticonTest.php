@@ -14,10 +14,21 @@ class CM_EmoticonTest extends CMTest_TestCase {
         try {
             $emoticonClass->newInstance(['nonexistentEmoticon']);
             $this->fail('Instantiated nonexistent emoticon');
-        } catch(CM_Exception_Invalid $ex) {
+        } catch (CM_Exception_Invalid $ex) {
             $this->assertSame('Nonexistent Emoticon', $ex->getMessage());
             $this->assertSame(['name' => 'nonexistentEmoticon'], $ex->getMetaInfo(true));
         }
+    }
+
+    public function testConstructorDataInjection() {
+        $emoticonClass = $this->_getEmoticonMock();
+        /** @var CM_Emoticon $emoticonRegular */
+        $emoticonRegular = $emoticonClass->newInstance(['foo']);
+        $emoticonInjected = $emoticonClass->newInstance(['foo', ['name'     => 'foo',
+                                                                 'fileName' => 'foo.png',
+                                                                 'codes'    => [':foo:', '-(', '-()']]
+        ]);
+        $this->assertEquals($emoticonInjected, $emoticonRegular);
     }
 
     public function testGetCodes() {
