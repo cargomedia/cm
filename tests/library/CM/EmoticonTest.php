@@ -76,7 +76,7 @@ class CM_EmoticonTest extends CMTest_TestCase {
      * @return \Mocka\ClassMock
      */
     private function _getEmoticonMock() {
-        $emoticonData =
+        $dataList =
             [
                 'foo' =>
                     ['name'     => 'foo',
@@ -90,7 +90,7 @@ class CM_EmoticonTest extends CMTest_TestCase {
                     ]
             ];
         $emoticonClass = $this->mockClass('CM_Emoticon');
-        $emoticonClass->mockStaticMethod('getEmoticonData')->set($emoticonData);
+        $emoticonClass->mockStaticMethod('getEmoticonData')->set($dataList);
         return $emoticonClass;
     }
 }

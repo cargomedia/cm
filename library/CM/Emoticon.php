@@ -72,11 +72,11 @@ class CM_Emoticon extends CM_Class_Abstract {
     public static function getEmoticonData() {
         $cache = CM_Cache_Local::getInstance();
         $cacheKey = CM_CacheConst::Emoticons;
-        if (false === $emoticonData = $cache->get($cacheKey)) {
-            $emoticonData = static::_readEmoticonData();
-            $cache->set($cacheKey, $emoticonData);
+        if (false === $dataList = $cache->get($cacheKey)) {
+            $dataList = static::_readEmoticonData();
+            $cache->set($cacheKey, $dataList);
         }
-        return $emoticonData;
+        return $dataList;
     }
 
     /**
@@ -84,12 +84,12 @@ class CM_Emoticon extends CM_Class_Abstract {
      * @return CM_Emoticon|null
      */
     public static function findByCode($code) {
-        $emoticonData = static::getEmoticonData();
-        $emoticon = \Functional\first($emoticonData, function ($emoticonData) use ($code) {
-            return false !== array_search($code, $emoticonData['codes'], true);
+        $dataList = static::getEmoticonData();
+        $data = \Functional\first($dataList, function ($data) use ($code) {
+            return false !== array_search($code, $data['codes'], true);
         });
-        if ($emoticon) {
-            return new static($emoticon['name'], $emoticon);
+        if ($data) {
+            return new static($data['name'], $data);
         }
         return null;
     }
@@ -99,9 +99,9 @@ class CM_Emoticon extends CM_Class_Abstract {
      * @return CM_Emoticon|null
      */
     public static function findName($name) {
-        $emoticonData = static::getEmoticonData();
-        if (array_key_exists($name, $emoticonData)) {
-            return new static($name, $emoticonData[$name]);
+        $dataList = static::getEmoticonData();
+        if (array_key_exists($name, $dataList)) {
+            return new static($name, $dataList[$name]);
         }
         return null;
     }
@@ -135,10 +135,10 @@ class CM_Emoticon extends CM_Class_Abstract {
                 }
             }
         }
-        $emoticonData = [];
+        $dataList = [];
         $codeList = [];
         foreach ($imageFiles as $name => $file) {
-            $emoticonData[$name] = ['name' => $name, 'fileName' => $file->getFileName(), 'codes' => [":{$name}:"]];
+            $dataList[$name] = ['name' => $name, 'fileName' => $file->getFileName(), 'codes' => [":{$name}:"]];
             $codeList[":{$name}:"] = $name;
         }
         foreach ($configurationFiles as $name => $file) {
@@ -146,7 +146,7 @@ class CM_Emoticon extends CM_Class_Abstract {
             foreach ($additionalCodes as $code) {
                 if (!array_key_exists($code, $codeList)) {
                     $codeList[$code] = $name;
-                    $emoticonData[$name]['codes'][] = $code;
+                    $dataList[$name]['codes'][] = $code;
                 } else {
                     throw new CM_Exception("Emoticon codes overlap",
                         [
@@ -156,6 +156,6 @@ class CM_Emoticon extends CM_Class_Abstract {
                 }
             }
         }
-        return $emoticonData;
+        return $dataList;
     }
 }
