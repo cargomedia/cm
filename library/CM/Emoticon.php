@@ -73,7 +73,7 @@ class CM_Emoticon extends CM_Class_Abstract {
         $cache = CM_Cache_Local::getInstance();
         $cacheKey = CM_CacheConst::Emoticons;
         if (false === $emoticonData = $cache->get($cacheKey)) {
-            $emoticonData = static::_buildEmoticonData();
+            $emoticonData = static::_readEmoticonData();
             $cache->set($cacheKey, $emoticonData, 0);
         }
         return $emoticonData;
@@ -110,14 +110,14 @@ class CM_Emoticon extends CM_Class_Abstract {
      * @throws CM_Exception
      */
     public static function validateData() {
-        self::_buildEmoticonData();
+        self::_readEmoticonData();
     }
 
     /**
      * @return array[]
      * @throws CM_Exception
      */
-    private static function _buildEmoticonData() {
+    private static function _readEmoticonData() {
         /** @var CM_File[] $configurationFiles */
         $configurationFiles = [];
         /** @var CM_File[] $imageFiles */
