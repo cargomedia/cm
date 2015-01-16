@@ -501,13 +501,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
     }
 
     /**
-     * @return string
-     */
-    public static function getTableName() {
-        return strtolower(get_called_class());
-    }
-
-    /**
      * @param array $idRaw
      * @return array
      */
