@@ -74,7 +74,7 @@ class CM_Emoticon extends CM_Class_Abstract {
         $cacheKey = CM_CacheConst::Emoticons;
         if (false === $emoticonData = $cache->get($cacheKey)) {
             $emoticonData = static::_readEmoticonData();
-            $cache->set($cacheKey, $emoticonData, 0);
+            $cache->set($cacheKey, $emoticonData);
         }
         return $emoticonData;
     }
