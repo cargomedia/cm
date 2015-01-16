@@ -98,7 +98,7 @@ class CM_Emoticon extends CM_Class_Abstract {
      * @param string $name
      * @return CM_Emoticon|null
      */
-    public static function findName($name) {
+    public static function findByName($name) {
         $dataList = static::getEmoticonData();
         if (array_key_exists($name, $dataList)) {
             return new static($name, $dataList[$name]);
