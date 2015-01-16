@@ -4,7 +4,7 @@ class CM_EmoticonTest extends CMTest_TestCase {
 
     public function testFilesystemScanning() {
         $emoticon1 = new CM_Emoticon('smiley');
-        $emoticon2 = CM_Emoticon::findCode(':)');
+        $emoticon2 = CM_Emoticon::findByCode(':)');
         $this->assertEquals($emoticon1, $emoticon2);
     }
 
@@ -48,16 +48,17 @@ class CM_EmoticonTest extends CMTest_TestCase {
         $this->assertSame('foo', $emoticon->getName());
     }
 
-    public function testFindCode() {
+    public function testfindbyCode() {
         $emoticonClass = $this->_getEmoticonMock();
         /** @var CM_Emoticon $emoticon */
         $emoticon = $emoticonClass->newInstance(['foo']);
 
+        /** @var CM_Emoticon $className */
         $className = $emoticonClass->getClassName();
-        $this->assertEquals($emoticon, $className::findCode(':foo:'));
-        $this->assertEquals($emoticon, $className::findCode('-('));
-        $this->assertEquals($emoticon, $className::findCode('-()'));
-        $this->assertNull($className::findCode('nonexistentCode'));
+        $this->assertEquals($emoticon, $className::findbyCode(':foo:'));
+        $this->assertEquals($emoticon, $className::findbyCode('-('));
+        $this->assertEquals($emoticon, $className::findbyCode('-()'));
+        $this->assertNull($className::findbyCode('nonexistentCode'));
     }
 
     public function testFindName() {
@@ -65,6 +66,7 @@ class CM_EmoticonTest extends CMTest_TestCase {
         /** @var CM_Emoticon $emoticon */
         $emoticon = $emoticonClass->newInstance(['bar']);
 
+        /** @var CM_Emoticon $className */
         $className = $emoticonClass->getClassName();
         $this->assertEquals($emoticon, $className::findName('bar'));
         $this->assertNull($className::findName('nonexistentEmoticon'));

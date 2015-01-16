@@ -51,7 +51,7 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
     }
 
     protected function _getEmoticonImg($emoticonCode, $height = null) {
-        $emoticon = CM_Emoticon::findCode($emoticonCode);
+        $emoticon = CM_Emoticon::findByCode($emoticonCode);
         if (!$emoticon) {
             var_dump($emoticonCode);
         }
