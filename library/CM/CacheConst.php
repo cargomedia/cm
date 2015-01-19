@@ -87,4 +87,6 @@ class CM_CacheConst {
 
     // _siteId:X
     const AdproviderZones = 'AdproviderZones';
+
+    const Emoticons = 'Emoticons';
 }
