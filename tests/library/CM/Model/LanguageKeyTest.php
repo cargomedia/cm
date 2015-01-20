@@ -3,7 +3,7 @@
 class CM_Model_LanguageKeyTest extends CMTest_TestCase {
 
     public function tearDown() {
-        CMTest_TH::clearDb();
+        CMTest_TH::clearEnv();
     }
 
     public function testCreate() {

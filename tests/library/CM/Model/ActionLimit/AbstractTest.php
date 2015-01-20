@@ -7,7 +7,7 @@ class CM_Model_ActionLimit_AbstractTest extends CMTest_TestCase {
     private $_type = 3;
     private $_role = 1;
 
-    public function setup() {
+    public function setUp() {
         CMTest_TH::clearEnv();
         CM_Db_Db::replace('cm_actionLimit', array('actionType', 'actionVerb', 'type', 'role', 'limit', 'period'), array(array($this->_actionType,
             $this->_actionVerb, $this->_type, $this->_role, 2, 3), array($this->_actionType, $this->_actionVerb, $this->_type, null, 10, 11)));

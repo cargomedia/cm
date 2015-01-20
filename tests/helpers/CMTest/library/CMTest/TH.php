@@ -6,9 +6,6 @@ class CMTest_TH {
     private static $timeDelta = 0;
     private static $_configBackup;
 
-    /** @var CM_Db_Client|null */
-    private static $_dbClient = null;
-
     public static function init() {
         $output = new CM_OutputStream_Null();
         $loader = CM_App::getInstance()->getProvisionLoader();
@@ -39,14 +36,6 @@ class CMTest_TH {
     public static function clearCache() {
         CM_Cache_Shared::getInstance()->flush();
         CM_Cache_Local::getInstance()->flush();
-    }
-
-    /**
-     * @deprecated use clearEnv instead
-     */
-    public static function clearDb() {
-        self::clearCache();
-        CM_App::getInstance()->getProvisionLoader()->reload(new CM_OutputStream_Null());
     }
 
     public static function timeInit() {
@@ -324,5 +313,10 @@ class CMTest_TH {
             $str .= $charset[mt_rand(0, $count - 1)];
         }
         return $str;
+    }
+
+    private static function clearDb() {
+        self::clearCache();
+        CM_App::getInstance()->getProvisionLoader()->reload(new CM_OutputStream_Null());
     }
 }

@@ -7,7 +7,6 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
 
     public static function setUpBeforeClass() {
         CM_Db_Db::exec("CREATE TABLE `index_mock` (`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, `name` VARCHAR(100))");
-        CM_Config::get()->CM_Elasticsearch_Client->enabled = true;
     }
 
     public static function tearDownAfterClass() {
@@ -16,14 +15,16 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
     }
 
     public function setUp() {
+        CM_Config::get()->CM_Elasticsearch_Client->enabled = true;
         $this->_type = new CM_Elasticsearch_Type_AbstractMock();
         $this->_type->createVersioned();
         $this->_type->getIndex()->refresh();
     }
 
     public function tearDown() {
-        CMTest_TH::clearDb();
         $this->_type->getIndex()->delete();
+
+        CMTest_TH::clearEnv();
     }
 
     public function testUpdateItem() {

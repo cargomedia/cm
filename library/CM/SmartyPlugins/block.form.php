@@ -23,6 +23,11 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
         $cssClasses[] = $form->getName();
         $html = '<form id="' . $viewResponse->getAutoId() . '" class="' .
             implode(' ', $cssClasses) . ' clearfix" method="post" onsubmit="return false;" novalidate >';
+        if ($form->getAvoidPasswordManager()) {
+            $html .= '<input style="display:none" type="text" name="fakeusernameremembered">';
+            $html .= '<input style="display:none" type="password" name="fakepasswordremembered">';
+        }
+
         $html .= $content;
 
         foreach ($form->getFields() as $field) {

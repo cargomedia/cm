@@ -198,7 +198,6 @@ Commands:
  app set-deploy-version [--deploy-version=<value>]
  console interactive
  css icon-refresh
- css emoticon-refresh
  db db-to-file <namespace>
  db file-to-db
  db run-updates

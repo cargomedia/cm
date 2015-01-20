@@ -29,6 +29,18 @@ class CM_Db_ClientTest extends CMTest_TestCase {
         }
     }
 
+    public function testConstructReconnectTimeout() {
+        $config = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getConfig();
+
+        unset($config['reconnectTimeout']);
+        $client = new CM_Db_Client($config);
+        $this->assertSame(300, $client->getReconnectTimeout());
+
+        $config['reconnectTimeout'] = 123;
+        $client = new CM_Db_Client($config);
+        $this->assertSame(123, $client->getReconnectTimeout());
+    }
+
     public function testConnectDisconnect() {
         $config = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getConfig();
         unset($config['db']);

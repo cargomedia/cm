@@ -359,14 +359,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
     }
 
     /**
-     * @param DateTime $dateTime
-     * @return DateTime
-     */
-    private function _getDateTime(DateTime $dateTime) {
-        return new DateTime($dateTime->format('Y-m-d ') . ' ' . $dateTime->format('H:i:s') . ' +' . ($dateTime->getOffset() / 3600));
-    }
-
-    /**
      * @param DateTime     $start
      * @param DateTimeZone $timeZone
      * @throws CM_Exception_Invalid
