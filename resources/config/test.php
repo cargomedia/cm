@@ -33,6 +33,17 @@ return function (CM_Config_Node $config) {
         )
     );
 
+    $config->services['redis'] = array(
+        'class'     => 'CM_Redis_Client',
+        'arguments' => array(
+            array(
+                'host'     => 'localhost',
+                'port'     => '6379',
+                'database' => 2,
+            )
+        ),
+    );
+
     $config->services['filesystem-data'] = array(
         'class'  => 'CM_File_Filesystem_Factory',
         'method' => array(
