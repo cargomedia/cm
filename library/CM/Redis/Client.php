@@ -280,15 +280,4 @@ class CM_Redis_Client extends CM_Class_Abstract {
     public function flush() {
         $this->_redis->flushAll();
     }
-
-    /**
-     * @return CM_Redis_Client
-     */
-    public static function getInstance() {
-        static $instance;
-        if (!$instance) {
-            $instance = new self();
-        }
-        return $instance;
-    }
 }
