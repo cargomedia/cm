@@ -17,17 +17,23 @@ class CM_Redis_Client extends CM_Class_Abstract {
      */
     public function __construct(array $config) {
         $defaults = [
+            'database' => null
         ];
         $config = array_merge($defaults, $config);
 
         $host = (string) $config['host'];
         $port = (int) $config['port'];
+        $database = isset($config['database']) ? (int) $config['database'] : null;
 
         $this->_redis = new Redis();
         try {
             $this->_redis->connect($host, $port);
         } catch (RedisException $e) {
             throw new CM_Exception('Cannot connect to redis server `' . $host . '` on port `' . $port . '`: ' . $e->getMessage());
+        }
+
+        if (null !== $database) {
+            $this->_redis->select($database);
         }
     }
 
@@ -279,5 +285,16 @@ class CM_Redis_Client extends CM_Class_Abstract {
 
     public function flush() {
         $this->_redis->flushAll();
+    }
+
+    /**
+     * @param int $database
+     * @throws CM_Exception
+     */
+    protected function _select($database) {
+        $database = (int) $database;
+        if (false === $this->_redis->select($database)) {
+            throw new CM_Exception('Cannot select database `' . $database . '`.');
+        }
     }
 }
