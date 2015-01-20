@@ -3,8 +3,11 @@
 class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAdapter {
 
     public function load($type, array $id) {
+        $type = (int) $type;
+        $id = (string) $id['id'];
         $collectionName = $this->_getCollectionName($type);
-        $data = $this->_getMongoDb()->findOne($collectionName, $id);
+        $mongoId = new MongoId($id);
+        $data = $this->_getMongoDb()->findOne($collectionName, ['_id' => $mongoId]);
         if (null === $data) {
             return false;
         }
@@ -12,22 +15,24 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
     }
 
     public function loadMultiple(array $idTypeList) {
-        $types = [];
-        $dbEntryToArrayKey = [];
+        $idListByCollection = [];
+        $keyListById = [];
 
         foreach ($idTypeList as $key => $idType) {
             $type = (int) $idType['type'];
-            $id = $idType['id']['_id'];
-            $types[$type][] = $id;
-            $dbEntryToArrayKey['type:' . $type . 'id:' . serialize($id)] = $key;
+            $id = (string) $idType['id']['id'];
+            $collectionName = $this->_getCollectionName($type);
+            $idListByCollection[$collectionName][] = new MongoId($id);
+            $keyListById[$id][] = $key;
         }
         $resultSet = [];
-        foreach ($types as $type => $ids) {
-            $result = $this->_getMongoDb()->find($this->_getCollectionName($type), ['_id' => ['$in' => $ids]]);
+        foreach ($idListByCollection as $collectionName => $idList) {
+            $result = $this->_getMongoDb()->find($collectionName, ['_id' => ['$in' => $idList]]);
             foreach ($result as $row) {
-                $id = $row['_id'];
-                $key = $dbEntryToArrayKey['type:' . $type . 'id:' . serialize($id)];
-                $resultSet[$key] = $row;
+                $id = (string) $row['_id'];
+                foreach ($keyListById[$id] as $key) {
+                    $resultSet[$key] = $row;
+                }
             }
         }
         return $resultSet;
@@ -35,9 +40,11 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
 
     public function save($type, array $id, array $data) {
         $type = (int) $type;
+        $id = (string) $id['id'];
         $data = ['_type' => $type] + $data;
         $collectionName = $this->_getCollectionName($type);
-        $this->_getMongoDb()->update($collectionName, $id, $data);
+        $mongoId = new MongoId($id);
+        $this->_getMongoDb()->update($collectionName, ['_id' => $mongoId], $data);
     }
 
     public function create($type, array $data) {
@@ -45,12 +52,15 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
         $data = ['_type' => $type] + $data;
         $collectionName = $this->_getCollectionName($type);
         $mongoId = $this->_getMongoDb()->insert($collectionName, $data);
-        return ['_id' => $mongoId, '_type' => $type];
+        return ['id' => (string) $mongoId];
     }
 
     public function delete($type, array $id) {
+        $type = (int) $type;
+        $id = (string) $id['id'];
         $collectionName = $this->_getCollectionName($type);
-        $this->_getMongoDb()->remove($collectionName, $id);
+        $mongoId = new MongoId($id);
+        $this->_getMongoDb()->remove($collectionName, ['_id' => $mongoId]);
     }
 
     /**
