@@ -11,13 +11,23 @@ class CM_Redis_Client extends CM_Class_Abstract {
     /** @var Closure|null */
     private $_subscribeCallback;
 
-    public function __construct() {
+    /**
+     * @param array $config
+     * @throws CM_Exception
+     */
+    public function __construct(array $config) {
+        $defaults = [
+        ];
+        $config = array_merge($defaults, $config);
+
+        $host = (string) $config['host'];
+        $port = (int) $config['port'];
+
         $this->_redis = new Redis();
-        $server = self::_getConfig()->server;
         try {
-            $this->_redis->connect($server['host'], $server['port']);
+            $this->_redis->connect($host, $port);
         } catch (RedisException $e) {
-            throw new CM_Exception('Cannot connect to redis server `' . $server['host'] . '` on port `' . $server['port'] . '`: ' . $e->getMessage());
+            throw new CM_Exception('Cannot connect to redis server `' . $host . '` on port `' . $port . '`: ' . $e->getMessage());
         }
     }
 
