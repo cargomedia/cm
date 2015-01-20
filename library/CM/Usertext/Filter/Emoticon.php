@@ -58,12 +58,13 @@ class CM_Usertext_Filter_Emoticon extends CM_Usertext_Filter_Abstract {
             if (null !== $this->_fixedHeight) {
                 $fixedHeight = ' height="' . $this->_fixedHeight . '"';
             }
+            /** @var CM_Emoticon $emoticon */
             foreach (new CM_Paging_Emoticon_All() as $emoticon) {
-                foreach ($emoticon['codes'] as $code) {
+                foreach ($emoticon->getCodes() as $code) {
                     $emoticons['codes'][] = $code;
                     $emoticons['htmls'][] =
-                        '<img src="' . $render->getUrlResource('layout', 'img/emoticon/' . $emoticon['file']) . '" class="emoticon emoticon-' .
-                        $emoticon['id'] . '" title="' . $emoticon['code'] . '"' . $fixedHeight . ' />';
+                        '<img src="' . $render->getUrlResource('layout', 'img/emoticon/' . $emoticon->getFileName()) . '" class="emoticon emoticon-' .
+                        $emoticon->getName() . '" title="' . $emoticon->getDefaultCode() . '"' . $fixedHeight . ' />';
                 }
             }
             $cache->set($cacheKey, $emoticons);

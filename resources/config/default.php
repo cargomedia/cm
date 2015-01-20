@@ -16,8 +16,6 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Site_Abstract->class = null;
 
-    $config->CM_Splittesting_Abstract->enabled = false;
-
     $config->CM_Elasticsearch_Client->enabled = true;
     $config->CM_Elasticsearch_Client->servers = array(
         array('host' => 'localhost', 'port' => 9200),
