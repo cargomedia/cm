@@ -82,8 +82,14 @@
         self.close.apply(self);
       });
 
-      self.$floatbox.focus();
-      self.$floatbox.trap();
+      var focusElement = this.options.focusElement;
+      if (focusElement && $.contains(this.$floatbox[0], focusElement)) {
+        $(focusElement).focus();
+      } else {
+        this.$floatbox.focus();
+      }
+      this.$floatbox.trap();
+
       this.$layer.data('floatbox', this);
       $element.trigger('floatbox-open');
     },
