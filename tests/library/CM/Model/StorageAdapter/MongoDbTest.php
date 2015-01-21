@@ -36,6 +36,12 @@ class CM_Model_StorageAdapter_MongoDbTest extends CMTest_TestCase {
 
         $this->assertEquals(['_id' => $id1['id'], '_type' => 99, 'foo' => 'foo1', 'bar' => 1], $adapter->load($type, $id1));
         $this->assertEquals(['_id' => $id2['id'], '_type' => 99, 'foo' => 'foo2', 'bar' => 2], $adapter->load($type, $id2));
+    }
+
+    public function testLoad_nonExistent() {
+        $type = 99;
+        $adapter = $this->_getAdapter();
+
         $this->assertFalse($adapter->load($type, ['id' => (string) new MongoId()]));
     }
 
@@ -49,6 +55,16 @@ class CM_Model_StorageAdapter_MongoDbTest extends CMTest_TestCase {
         $this->assertSame(2, CMTest_TH::getMongoDb()->count('mock_modelStorageAdapter'));
         $this->assertSame(1, CMTest_TH::getMongoDb()->count('mock_modelStorageAdapter', ['foo' => 'hello', 'bar' => 55]));
         $this->assertSame(1, CMTest_TH::getMongoDb()->count('mock_modelStorageAdapter', ['foo' => 'foo2', 'bar' => 2]));
+    }
+
+    public function testSave_nonExistent() {
+        $type = 99;
+        $adapter = $this->_getAdapter();
+        $id1 = $adapter->create($type, ['foo' => 'foo1', 'bar' => 1]);
+        $adapter->save($type, ['id' => (string) new MongoId()], ['foo' => 'foo2', 'bar' => 2]);
+
+        $this->assertSame(1, CMTest_TH::getMongoDb()->count('mock_modelStorageAdapter'));
+        $this->assertSame(1, CMTest_TH::getMongoDb()->count('mock_modelStorageAdapter', ['foo' => 'foo1', 'bar' => 1]));
     }
 
     public function testCreate() {
