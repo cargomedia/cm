@@ -7,29 +7,35 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
     }
 
     public function loadMultiple(array $idTypeList) {
-        $types = array();
-        $dbEntryToArrayKey = array();
+        $idListByTable = [];
+        $keyListById = [];
 
         foreach ($idTypeList as $key => $idType) {
             $type = (int) $idType['type'];
             $id = $idType['id'];
-            $types[$type][] = $id;
+            $tableName = $this->_getTableName($type);
+            $idListByTable[$tableName][] = $id;
             foreach ($id as &$idPart) {
                 $idPart = (string) $idPart;
             }
-            $dbEntryToArrayKey['type:' . $type . 'id:' . serialize($id)] = $key;
+            $idSerialized = 'table:' . $tableName . ';id:' . serialize($id);
+            $keyListById[$idSerialized][] = $key;
         }
-        $resultSet = array();
-        foreach ($types as $type => $ids) {
-            $idColumnList = array_keys($ids[0]);
-            $result = CM_Db_Db::selectMultiple($this->_getTableName($type), '*', $ids)->fetchAll();
+        $resultSet = [];
+        foreach ($idListByTable as $tableName => $idList) {
+            $idColumnList = array_keys($idList[0]);
+            $result = CM_Db_Db::selectMultiple($tableName, '*', $idList)->fetchAll();
             foreach ($result as $row) {
-                $id = array();
+                $id = [];
                 foreach ($idColumnList as $idColumn) {
                     $id[$idColumn] = $row[$idColumn];
                 }
-                $key = $dbEntryToArrayKey['type:' . $type . 'id:' . serialize($id)];
-                $resultSet[$key] = $row;
+                $idSerialized = 'table:' . $tableName . ';id:' . serialize($id);
+                if (isset($keyListById[$idSerialized])) {
+                    foreach ($keyListById[$idSerialized] as $key) {
+                        $resultSet[$key] = $row;
+                    }
+                }
             }
         }
         return $resultSet;
