@@ -3,6 +3,7 @@
  */
 (function($) {
   var defaults = {
+    focusElement: null,
     closable: true,
     fullscreen: false
   };
