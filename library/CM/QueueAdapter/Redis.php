@@ -6,7 +6,7 @@ class CM_QueueAdapter_Redis extends CM_QueueAdapter_Abstract {
     private $_redisClient = null;
 
     public function __construct() {
-        $this->_redisClient = CM_Redis_Client::getInstance();
+        $this->_redisClient = CM_Service_Manager::getInstance()->getRedis();
     }
 
     public function push($key, $value) {

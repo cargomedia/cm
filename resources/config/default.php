@@ -31,8 +31,6 @@ return function (CM_Config_Node $config) {
         array('host' => 'localhost', 'port' => 11211),
     );
 
-    $config->CM_Redis_Client->server = array('host' => 'localhost', 'port' => 6379);
-
     $config->classConfigCacheEnabled = true;
 
     $config->CM_Stream_Message->enabled = true;
@@ -123,6 +121,16 @@ return function (CM_Config_Node $config) {
                 'db'      => 'cm',
                 'server'  => 'mongodb://localhost:27017',
                 'options' => array('connect' => true),
+            )
+        ),
+    );
+
+    $config->services['redis'] = array(
+        'class'     => 'CM_Redis_Client',
+        'arguments' => array(
+            array(
+                'host' => 'localhost',
+                'port' => '6379',
             )
         ),
     );
