@@ -83,8 +83,12 @@
       });
 
       var focusElement = this.options.focusElement;
-      if (focusElement && $.contains(this.$floatbox[0], focusElement)) {
-        $(focusElement).focus();
+      if (focusElement) {
+        if ($.contains(this.$floatbox[0], focusElement)) {
+          $(focusElement).focus();
+        } else {
+          throw new Error('floatbox must contain options.focusElement.');
+        }
       } else {
         this.$floatbox.focus();
       }
