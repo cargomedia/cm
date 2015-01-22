@@ -216,7 +216,8 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
             return;
         }
         $id = self::getIdForItem($item);
-        CM_Redis_Client::getInstance()->sAdd('Search.Updates_' . static::INDEX_NAME, (string) $id);
+        $redis = CM_Service_Manager::getInstance()->getRedis();
+        $redis->sAdd('Search.Updates_' . static::INDEX_NAME, (string) $id);
     }
 
     /**

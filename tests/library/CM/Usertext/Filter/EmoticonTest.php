@@ -53,7 +53,7 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
     protected function _getEmoticonImg($emoticonCode, $height = null) {
         $emoticon = CM_Emoticon::findByCode($emoticonCode);
         if (!$emoticon) {
-            var_dump($emoticonCode);
+            throw new CM_Exception_Invalid('Cannot find emoticon for code `' . $emoticonCode  . '`.');
         }
         $urlCdn = $this->_mockSite->getUrlCdn();
         $siteType = $this->_mockSite->getId();

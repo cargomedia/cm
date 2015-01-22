@@ -309,7 +309,6 @@ class CM_File_ImageTest extends CMTest_TestCase {
     public function testResizeSpecific() {
         $imageOriginal = new CM_File_Image(DIR_TEST_DATA . 'img/test.jpg');
         $image = CM_File_Image::createTmp(null, $imageOriginal->read());
-        var_dump($image->getPathOnLocalFilesystem());
 
         $image->resizeSpecific(50, 50, 20, 20);
         $this->assertSame(50, $image->getWidth());

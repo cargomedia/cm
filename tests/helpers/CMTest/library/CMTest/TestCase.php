@@ -307,6 +307,34 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @param CM_Model_Abstract $model
+     * @param string|null       $message
+     */
+    public static function assertModelInstantiable(CM_Model_Abstract $model, $message = null) {
+        $message = null !== $message ? (string) $message : 'Model cannot be instantiated';
+        try {
+            CMTest_TH::reinstantiateModel($model);
+            self::assertTrue(true);
+        } catch (CM_Exception_Nonexistent $ex) {
+            self::fail($message);
+        }
+    }
+
+    /**
+     * @param CM_Model_Abstract $model
+     * @param string|null       $message
+     */
+    public static function assertModelNotInstantiable(CM_Model_Abstract $model, $message = null) {
+        $message = null !== $message ? (string) $message : 'Model can be instantiated';
+        try {
+            CMTest_TH::reinstantiateModel($model);
+            self::fail($message);
+        } catch (CM_Exception_Nonexistent $ex) {
+            self::assertTrue(true);
+        }
+    }
+
+    /**
      * @param CM_Http_Response_View_Abstract $response
      * @param array|null                     $data
      */
