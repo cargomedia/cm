@@ -17,14 +17,12 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 
     public function publish($channel, $event, $data) {
         $event = array('type' => 'publish', 'data' => array('channel' => $channel, 'event' => $event, 'data' => $data));
-        CM_Redis_Client::getInstance()->publish('socket-redis-down', json_encode($event));
+        $this->_getRedis()->publish('socket-redis-down', json_encode($event));
     }
 
     public function startSynchronization() {
-        $adapter = $this;
-        $redis = new CM_Redis_Client();
-        $redis->subscribe('socket-redis-up', function ($channel, $message) use ($adapter) {
-            $adapter->onRedisMessage($message);
+        $this->_getRedis()->subscribe('socket-redis-up', function ($channel, $message) {
+            $this->onRedisMessage($message);
         });
     }
 
@@ -231,5 +229,12 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
      */
     protected function _handleException(CM_Exception $exception) {
         CM_Bootloader::getInstance()->getExceptionHandler()->handleException($exception);
+    }
+
+    /**
+     * @return CM_Redis_Client
+     */
+    private function _getRedis() {
+        return CM_Service_Manager::getInstance()->getRedis();
     }
 }

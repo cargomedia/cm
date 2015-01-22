@@ -249,6 +249,13 @@ class CMTest_TH {
         }
     }
 
+    /**
+     * @return CM_MongoDb_Client
+     */
+    public static function getMongoDb() {
+        return CM_Service_Manager::getInstance()->getMongoDb();
+    }
+
     public static function randomizeAutoincrement() {
         $tables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
         foreach ($tables as $table) {

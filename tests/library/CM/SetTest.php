@@ -4,7 +4,7 @@ class CM_SetTest extends CMTest_TestCase {
 
     public static function tearDownAfterClass() {
         parent::tearDownAfterClass();
-        CM_Redis_Client::getInstance()->flush();
+        CM_Service_Manager::getInstance()->getRedis()->flush();
     }
 
     public function testConstructor() {

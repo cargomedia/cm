@@ -13,7 +13,7 @@ class CM_PagingSource_Redis_List extends CM_PagingSource_Abstract {
      */
     public function __construct($key) {
         $this->_key = (string) $key;
-        $this->_client = CM_Redis_Client::getInstance();
+        $this->_client = CM_Service_Manager::getInstance()->getRedis();
     }
 
     protected function _cacheKeyBase() {
