@@ -4,7 +4,7 @@
  */
 
 (function() {
-  Modernizr.addTest('inputfixed', function() {
+  Modernizr.addTest('inputinfixed', function() {
     return !navigator.userAgent.match(/(iPad|iPhone|iPod)/i);
   });
 })();
