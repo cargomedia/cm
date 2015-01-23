@@ -83,18 +83,7 @@
         self.close.apply(self);
       });
 
-      var focusElement = this.options.focusElement;
-      var $focusElement;
-      if (focusElement) {
-        if ($.contains(this.$floatbox[0], focusElement)) {
-          $focusElement = $(focusElement);
-        } else {
-          throw new Error('floatbox must contain options.focusElement.');
-        }
-      } else {
-        $focusElement = this.$floatbox;
-      }
-      $focusElement.focus();
+      this._getFocusElement().focus();
       this.$floatbox.trap();
 
       this.$layer.data('floatbox', this);
@@ -133,6 +122,20 @@
         var top = Math.max(0, ($viewport.outerHeight(true) - this.$floatbox.outerHeight()) / 4);
         this.$floatbox.css('margin-top', top);
       }
+    },
+    _getFocusElement: function() {
+      var focusElement = this.options.focusElement;
+      var $focusElement;
+      if (focusElement) {
+        if ($.contains(this.$floatbox[0], focusElement)) {
+          $focusElement = $(focusElement);
+        } else {
+          throw new Error('floatbox must contain options.focusElement.');
+        }
+      } else {
+        $focusElement = this.$floatbox;
+      }
+      return $focusElement;
     }
   });
 
