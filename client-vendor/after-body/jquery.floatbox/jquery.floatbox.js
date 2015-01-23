@@ -84,15 +84,17 @@
       });
 
       var focusElement = this.options.focusElement;
+      var $focusElement;
       if (focusElement) {
         if ($.contains(this.$floatbox[0], focusElement)) {
-          $(focusElement).focus();
+          $focusElement = $(focusElement);
         } else {
           throw new Error('floatbox must contain options.focusElement.');
         }
       } else {
-        this.$floatbox.focus();
+        $focusElement = this.$floatbox;
       }
+      $focusElement.focus();
       this.$floatbox.trap();
 
       this.$layer.data('floatbox', this);
