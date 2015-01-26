@@ -996,6 +996,39 @@ var CM_App = CM_Class_Abstract.extend({
     }
   },
 
+  globalEvents: {
+    /**
+     * @type {Object}
+     */
+    _dispatcher: _.clone(Backbone.Events),
+
+    /**
+     * @param {String} eventName
+     * @param {Function} callback fn(CM_View_Abstract view, array data)
+     * @param {Object} [context]
+     */
+    bind: function(eventName, callback, context) {
+      this._dispatcher.on(eventName, callback, context);
+    },
+
+    /**
+     * @param {String} eventName
+     * @param {Function} callback fn(CM_View_Abstract view, array data)
+     * @param {Object} [context]
+     */
+    unbind: function(eventName, callback, context) {
+      this._dispatcher.off(eventName, callback, context);
+    },
+
+    /**
+     * @param {String} eventName
+     * @param {*} data
+     */
+    trigger: function(eventName, data) {
+      this._dispatcher.trigger(eventName, data);
+    }
+  },
+
   model: {
     types: {
     }
