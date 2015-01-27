@@ -33,8 +33,8 @@ var CM_View_Abstract = Backbone.View.extend({
     if (this.childrenEvents) {
       this._bindChildrenEvents(this.childrenEvents);
     }
-    if (this.events) {
-      this._bindAppEvents(this.events);
+    if (this.appEvents) {
+      this._bindAppEvents(this.appEvents);
     }
     this.on('all', function(eventName, data) {
       cm.viewEvents.trigger(this, eventName, data);

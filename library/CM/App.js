@@ -996,15 +996,15 @@ var CM_App = CM_Class_Abstract.extend({
     }
   },
 
-  events: {
+  appEvents: {
     /**
-     * @type {Object}
+     * @type {Backbone.Events}
      */
     _dispatcher: _.clone(Backbone.Events),
 
     /**
      * @param {String} eventName
-     * @param {Function} callback fn(CM_View_Abstract view, array data)
+     * @param {Function} callback fn(array data)
      * @param {Object} [context]
      */
     bind: function(eventName, callback, context) {
@@ -1013,7 +1013,7 @@ var CM_App = CM_Class_Abstract.extend({
 
     /**
      * @param {String} eventName
-     * @param {Function} callback fn(CM_View_Abstract view, array data)
+     * @param {Function} callback fn(array data)
      * @param {Object} [context]
      */
     unbind: function(eventName, callback, context) {
@@ -1022,7 +1022,7 @@ var CM_App = CM_Class_Abstract.extend({
 
     /**
      * @param {String} eventName
-     * @param {*} data
+     * @param {*} [data]
      */
     trigger: function(eventName, data) {
       this._dispatcher.trigger(eventName, data);
