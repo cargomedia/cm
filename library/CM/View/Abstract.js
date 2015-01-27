@@ -385,12 +385,12 @@ var CM_View_Abstract = Backbone.View.extend({
 
   /**
    * @param {String} event
-   * @param {Function} callback fn(Object data)
+   * @param {Function} callback fn(array data)
    */
   bindAppEvent: function(event, callback) {
-    cm.events.bind(event, callback, this);
+    cm.event.bind(event, callback, this);
     this.on('destruct', function() {
-      cm.events.unbind(event, callback, this);
+      cm.event.unbind(event, callback, this);
     });
   },
 

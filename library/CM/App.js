@@ -996,7 +996,7 @@ var CM_App = CM_Class_Abstract.extend({
     }
   },
 
-  events: {
+  event: {
     /**
      * @type {Backbone.Events}
      */
