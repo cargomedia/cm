@@ -33,8 +33,8 @@ var CM_View_Abstract = Backbone.View.extend({
     if (this.childrenEvents) {
       this._bindChildrenEvents(this.childrenEvents);
     }
-    if (this.globalEvents) {
-      this._bindGlobalEvents(this.globalEvents);
+    if (this.events) {
+      this._bindAppEvents(this.events);
     }
     this.on('all', function(eventName, data) {
       cm.viewEvents.trigger(this, eventName, data);
@@ -387,10 +387,10 @@ var CM_View_Abstract = Backbone.View.extend({
    * @param {String} event
    * @param {Function} callback fn(Object data)
    */
-  bindGlobalEvent: function(event, callback) {
-    cm.globalEvents.bind(event, callback, this);
+  bindAppEvent: function(event, callback) {
+    cm.events.bind(event, callback, this);
     this.on('destruct', function() {
-      cm.globalEvents.unbind(event, callback, this);
+      cm.events.unbind(event, callback, this);
     });
   },
 
@@ -630,11 +630,11 @@ var CM_View_Abstract = Backbone.View.extend({
   /**
    * @param {Object} events
    */
-  _bindGlobalEvents: function(events) {
+  _bindAppEvents: function(events) {
     _.each(events, function(callback, eventNameStr) {
       var eventNameList = eventNameStr.split(/[\s]+/);
       _.each(eventNameList, function(eventName) {
-        this.bindGlobalEvent(eventName, callback);
+        this.bindAppEvent(eventName, callback);
       }, this);
     }, this);
   },
