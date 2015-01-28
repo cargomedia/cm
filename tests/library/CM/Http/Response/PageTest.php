@@ -125,10 +125,9 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
      */
     protected function _getServiceManager($codeGoogleAnalytics, $codeKissMetrics) {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('tracking-googleanalytics-test', 'CMService_GoogleAnalytics_Client', array($codeGoogleAnalytics));
-        $serviceManager->register('tracking-kissmetrics-test', 'CMService_KissMetrics_Client', array($codeKissMetrics));
-        $serviceManager->unregister('trackings');
-        $serviceManager->register('trackings', 'CM_Service_Trackings', array(array('tracking-googleanalytics-test', 'tracking-kissmetrics-test')));
+        $serviceManager->register('googleanalytics', 'CMService_GoogleAnalytics_Client', [$codeGoogleAnalytics]);
+        $serviceManager->register('kissmetrics', 'CMService_KissMetrics_Client', array($codeKissMetrics));
+        $serviceManager->register('trackings', 'CM_Service_Trackings', [['googleanalytics', 'kissmetrics']]);
         return $serviceManager;
     }
 }
