@@ -127,6 +127,19 @@ class CM_Model_StorageAdapter_MongoDbTest extends CMTest_TestCase {
         $this->assertEquals($expected, $values);
     }
 
+    public function testFindByData() {
+        $type = 99;
+        $adapter = $this->_getAdapter();
+        $id1 = $adapter->create($type, ['foo' => 'foo1', 'bar' => 1]);
+        $id2 = $adapter->create($type, ['foo' => 'foo2', 'bar' => 2]);
+
+        $this->assertSame($id1, $adapter->findByData($type, array('foo' => 'foo1')));
+        $this->assertSame($id1, $adapter->findByData($type, array('bar' => 1)));
+        $this->assertSame($id1, $adapter->findByData($type, array('foo' => 'foo1', 'bar' => 1)));
+        $this->assertSame($id2, $adapter->findByData($type, array('foo' => 'foo2')));
+        $this->assertNull($adapter->findByData($type, array('foo' => 'foo2', 'bar' => 1)));
+    }
+
     /**
      * @return CM_Model_StorageAdapter_MongoDb
      */
