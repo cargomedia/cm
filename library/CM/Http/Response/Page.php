@@ -157,7 +157,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             foreach ($this->_getConfig()->catch as $exception => $options) {
                 if (true === $options['log']) {
                     $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
-                    $log = new CM_Paging_Log_404();
+                    $log = new CM_Paging_Log_NotFound();
                     $log->add($formatter->formatException($e), $e->getMetaInfo());
                 }
             }
