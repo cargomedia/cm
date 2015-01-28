@@ -149,12 +149,17 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     }
 
     public function getHtml(CM_Frontend_Environment $environment) {
+        $scriptName = 'analytics.js';
+        if ($environment->isDebug()) {
+            $scriptName = 'analytics_debug.js';
+        }
+
         $html = '<script type="text/javascript">';
         $html .= <<<EOF
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+})(window,document,'script','//www.google-analytics.com/${scriptName}','ga');
 EOF;
         $html .= 'ga("create", "' . $this->_getCode() . '", "auto");';
         $html .= $this->getJs();
