@@ -6,7 +6,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     protected $_code;
 
     /** @var array */
-    protected $_customVarList = array(), $_eventList = array(), $_transactionList = array(), $_pageViewList = array();
+    protected $_eventList = array(), $_transactionList = array(), $_pageViewList = array(), $_dimensionList = array(), $_metricList = array();
 
     /**
      * @param string $code
@@ -16,17 +16,23 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     }
 
     /**
-     * @param int    $index 1-5
-     * @param string $name
+     * @param int    $index
      * @param string $value
-     * @param int    $scope 1 (visitor-level), 2 (session-level), or 3 (page-level)
      */
-    public function addCustomVar($index, $name, $value, $scope) {
+    public function setCustomDimension($index, $value) {
         $index = (int) $index;
-        $name = (string) $name;
         $value = (string) $value;
-        $scope = (int) $scope;
-        $this->_customVarList[$index] = array('index' => $index, 'name' => $name, 'value' => $value, 'scope' => $scope);
+        $this->_dimensionList[$index] = $value;
+    }
+
+    /**
+     * @param int       $index
+     * @param int|float $value
+     */
+    public function setCustomMetric($index, $value) {
+        $index = (int) $index;
+        $value = (float) $value;
+        $this->_metricList[$index] = $value;
     }
 
     /**
@@ -83,63 +89,65 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
      */
     public function getJs() {
         $js = '';
+        foreach ($this->_dimensionList as $dimensionIndex => $dimensionValue) {
+            $js .= 'ga("set", "dimension' . $dimensionIndex . '", "' . $dimensionValue . '");';
+        }
+        foreach ($this->_metricList as $metricIndex => $metricValue) {
+            $js .= 'ga("set", "metric' . $metricIndex . '", ' . $metricValue . ');';
+        }
         foreach ($this->_pageViewList as $pageView) {
             if (null === $pageView) {
-                $js .= "_gaq.push(['_trackPageview']);";
+                $js .= 'ga("send", "pageview");';
             } else {
-                $js .= "_gaq.push(['_trackPageview', '" . $pageView . "']);";
+                $js .= 'ga("send", "pageview", "' . $pageView . '");';
             }
-        }
-        foreach ($this->_customVarList as $customVar) {
-            $index = (string) $customVar['index'];
-            $name = "'" . $customVar['name'] . "'";
-            $value = "'" . $customVar['value'] . "'";
-            $scope = (string) $customVar['scope'];
-            $js .= "_gaq.push(['_setCustomVar', $index, $name, $value, $scope]);";
         }
         foreach ($this->_eventList as $event) {
-            $category = "'" . $event['category'] . "'";
-            $action = "'" . $event['action'] . "'";
-            $label = isset($event['label']) ? "'" . $event['label'] . "'" : 'undefined';
-            $value = isset($event['value']) ? (string) $event['value'] : 'undefined';
-            $nonInteraction = $event['nonInteraction'] ? 'true' : 'undefined';
-            $js .= "_gaq.push(['_trackEvent', $category, $action, $label, $value, $nonInteraction]);";
-        }
-        foreach ($this->_transactionList as $transactionId => $productList) {
-            $amountTotal = 0;
-            foreach ($productList as $productId => $amount) {
-                $amountTotal += $amount;
-            }
-            $transactionId = "'" . $transactionId . "'";
-            $amountTotal = "'" . $amountTotal . "'";
-            $js .= "_gaq.push(['_addTrans', $transactionId, '', $amountTotal, '', '', '', '', '']);";
-            foreach ($productList as $productId => $amount) {
-                $productCode = "'" . $productId . "'";
-                $productName = "'product-" . $productId . "'";
-                $amount = "'" . $amount . "'";
-                $js .= "_gaq.push(['_addItem', $transactionId, $productCode, $productName, '', $amount, '1']);";
-            }
+            $js .= 'ga("send", ' . CM_Params::jsonEncode(array_filter([
+                    'hitType'        => 'event',
+                    'eventCategory'  => $event['category'],
+                    'eventAction'    => $event['action'],
+                    'eventLabel'     => $event['label'],
+                    'eventValue'     => $event['value'],
+                    'nonInteraction' => $event['nonInteraction'],
+                ])) . ');';
         }
         if (!empty($this->_transactionList)) {
-            $js .= "_gaq.push(['_trackTrans']);";
+            $js .= 'ga("require", "ecommerce");';
+            foreach ($this->_transactionList as $transactionId => $productList) {
+                $amountTotal = 0;
+                foreach ($productList as $productId => $amount) {
+                    $amountTotal += $amount;
+                }
+                $js .= 'ga("ecommerce:addTransaction", ' . CM_Params::jsonEncode(array_filter([
+                        'id'      => $transactionId,
+                        'revenue' => $amountTotal,
+                    ])) . ');';
+                foreach ($productList as $productId => $amount) {
+                    $js .= 'ga("ecommerce:addItem", ' . CM_Params::jsonEncode(array_filter([
+                            'id'       => $transactionId,
+                            'name'     => 'product-' . $productId,
+                            'sku'      => $productId,
+                            'price'    => $amount,
+                            'quantity' => 1,
+                        ])) . ');';
+                }
+            }
+            $js .= 'ga("ecommerce:send");';
         }
         return $js;
     }
 
     public function getHtml(CM_Frontend_Environment $environment) {
         $html = '<script type="text/javascript">';
-        $html .= 'var _gaq = _gaq || [];';
-        $html .= "_gaq.push(['_setAccount', '" . $this->_getCode() . "']);";
-        $html .= "_gaq.push(['_setDomainName', '" . $environment->getSite()->getHost() . "']);";
-        $html .= $this->getJs();
-
         $html .= <<<EOF
-(function() {
-var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
-var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 EOF;
+        $html .= 'ga("create", "' . $this->_getCode() . '", "auto");';
+        $html .= $this->getJs();
         $html .= '</script>';
 
         return $html;
