@@ -31,6 +31,8 @@ return function (CM_Config_Node $config) {
         array('host' => 'localhost', 'port' => 11211),
     );
 
+    $config->CM_Paging_Ip_Blocked->maxAge = (7 * 86400);
+
     $config->classConfigCacheEnabled = true;
 
     $config->CM_Stream_Message->enabled = true;
@@ -105,11 +107,11 @@ return function (CM_Config_Node $config) {
         'class'     => 'CM_Db_Client',
         'arguments' => array(
             array(
-                'host'             => 'localhost',
-                'port'             => 3306,
-                'username'         => 'root',
-                'password'         => '',
-                'db'               => 'cm',
+                'host'     => 'localhost',
+                'port'     => 3306,
+                'username' => 'root',
+                'password' => '',
+                'db'       => 'cm',
             )
         )
     );

@@ -47,7 +47,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 CM_SVM_Model::deleteOldTrainings(3000);
             },
             'CM_Paging_Ip_Blocked::deleteOlder'         => function () {
-                CM_Paging_Ip_Blocked::deleteOlder(7 * 86400);
+                CM_Paging_Ip_Blocked::deleteOld();
             },
             'CM_Captcha::deleteOlder'                   => function () {
                 CM_Captcha::deleteOlder(3600);

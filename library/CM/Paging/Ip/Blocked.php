@@ -24,11 +24,14 @@ class CM_Paging_Ip_Blocked extends CM_Paging_Ip_Abstract {
         CM_Db_Db::delete('cm_ipBlocked', array('ip' => $ip));
     }
 
+    public static function deleteOld() {
+        CM_Db_Db::delete('cm_ipBlocked', '`createStamp` < ' . (time() - self::_getMaxAge()));
+    }
+
     /**
-     * @param int $age
+     * @return int
      */
-    public static function deleteOlder($age) {
-        $age = (int) $age;
-        CM_Db_Db::delete('cm_ipBlocked', '`createStamp` < ' . (time() - $age));
+    protected static function _getMaxAge() {
+        return (int) self::_getConfig()->maxAge;
     }
 }
