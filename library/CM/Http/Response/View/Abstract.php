@@ -87,7 +87,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
 
         $frontend = $responsePage->getRender()->getGlobalResponse();
         $html = $responsePage->getContent();
-        $js = implode(PHP_EOL, array_filter([$frontend->getJs(), $response->getRender()->getServiceManager()->getTrackings()->getJs()]));
+        $js = $frontend->getJs();
         $autoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
         $frontend->clear();
@@ -96,6 +96,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $layoutClass = get_class($page->getLayout($this->getRender()->getEnvironment()));
         $menuList = array_merge($this->getSite()->getMenus(), $responsePage->getRender()->getMenuList());
         $menuEntryHashList = $this->_getMenuEntryHashList($menuList, get_class($page), $responsePage->getPageParams());
+        $jsTracking = $responsePage->getRender()->getServiceManager()->getTrackings()->getJs();
 
         return array(
             'autoId'            => $autoId,
@@ -105,6 +106,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
             'url'               => $url,
             'layoutClass'       => $layoutClass,
             'menuEntryHashList' => $menuEntryHashList,
+            'jsTracking'        => $jsTracking,
         );
     }
 

@@ -68,7 +68,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
           layout._$pagePlaceholder.replaceWith(this.$el);
           layout._$pagePlaceholder = null;
           window.history.replaceState(null, null, fragment);
-          layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList);
+          layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList, response.jsTracking);
         });
       },
       error: function(msg, type, isPublic) {
@@ -92,14 +92,18 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
    * @param {String} title
    * @param {String} url
    * @param {String[]} menuEntryHashList
+   * @param {String} [jsTracking]
    */
-  _onPageSetup: function(page, title, url, menuEntryHashList) {
+  _onPageSetup: function(page, title, url, menuEntryHashList, jsTracking) {
     document.title = title;
     $('[data-menu-entry-hash]').removeClass('active');
     var menuEntrySelectors = _.map(menuEntryHashList, function(menuEntryHash) {
       return '[data-menu-entry-hash=' + menuEntryHash + ']';
     });
     $(menuEntrySelectors.join(',')).addClass('active');
+    if (jsTracking) {
+      new Function(jsTracking).call(this);
+    }
   },
 
   _onPageError: function() {
