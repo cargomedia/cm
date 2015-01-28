@@ -96,6 +96,23 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $this->assertSame(1, substr_count($js, 'ga("send", "pageview", " / foo");'));
     }
 
+    public function testSetPageView() {
+        $googleAnalytics = new CMService_GoogleAnalytics_Client('');
+        $environment = new CM_Frontend_Environment();
+        $js = $googleAnalytics->getJs($environment);
+        $this->assertNotContains('ga("send", "pageview"', $js);
+
+        $googleAnalytics->addPageView('/foo');
+        $js = $googleAnalytics->getJs($environment);
+        $this->assertSame(1, substr_count($js, 'ga("send", "pageview"'));
+        $this->assertSame(1, substr_count($js, 'ga("send", "pageview", "/foo");'));
+
+        $googleAnalytics->setPageView('/bar');
+        $js = $googleAnalytics->getJs($environment);
+        $this->assertSame(1, substr_count($js, 'ga("send", "pageview"'));
+        $this->assertSame(1, substr_count($js, 'ga("send", "pageview", "/bar");'));
+    }
+
     public function testAddSale() {
         $googleAnalytics = new CMService_GoogleAnalytics_Client('');
         $environment = new CM_Frontend_Environment();

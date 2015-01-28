@@ -73,6 +73,16 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     }
 
     /**
+     * @param string|null $path
+     */
+    public function setPageView($path = null) {
+        if (null !== $path) {
+            $path = (string) $path;
+        }
+        $this->_pageViewList = [$path];
+    }
+
+    /**
      * @param string $transactionId
      * @param string $productId
      * @param float  $amount
@@ -160,7 +170,7 @@ EOF;
     }
 
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
-        $this->addPageView($path);
+        $this->setPageView($path);
     }
 
     public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
