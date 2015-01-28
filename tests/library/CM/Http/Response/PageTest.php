@@ -76,7 +76,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $response->process();
         $html = $response->getContent();
 
-        $this->assertNotContains("_gaq.push(['_trackPageview'", $html);
+        $this->assertNotContains('ga("send", "pageview"', $html);
         $this->assertNotContains("_kmq.push(['identify'", $html);
         $this->assertNotContains("_kmq.push(['alias'", $html);
     }
@@ -88,10 +88,8 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $response->process();
         $html = $response->getContent();
 
-        $this->assertContains('var _gaq = _gaq || [];', $html);
-        $this->assertContains("_gaq.push(['_setAccount', 'ga123']);", $html);
-        $this->assertContains("_gaq.push(['_setDomainName', 'www.default.dev']);", $html);
-        $this->assertContains("_gaq.push(['_trackPageview']);", $html);
+        $this->assertContains('ga("create", "ga123"', $html);
+        $this->assertContains('ga("send", "pageview"', $html);
         $this->assertContains('var _kmq = _kmq || [];', $html);
         $this->assertContains("var _kmk = _kmk || 'km123';", $html);
         $clientId = CM_Http_Request_Abstract::getInstance()->getClientId();
@@ -110,10 +108,8 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $response->process();
         $html = $response->getContent();
 
-        $this->assertContains('var _gaq = _gaq || [];', $html);
-        $this->assertContains("_gaq.push(['_setAccount', 'ga123']);", $html);
-        $this->assertContains("_gaq.push(['_setDomainName', 'www.default.dev']);", $html);
-        $this->assertContains("_gaq.push(['_trackPageview']);", $html);
+        $this->assertContains('ga("create", "ga123"', $html);
+        $this->assertContains('ga("send", "pageview"', $html);
         $this->assertContains('var _kmq = _kmq || [];', $html);
         $this->assertContains("var _kmk = _kmk || 'km123';", $html);
         $clientId = CM_Http_Request_Abstract::getInstance()->getClientId();
