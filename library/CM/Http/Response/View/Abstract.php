@@ -44,14 +44,14 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $data = array(
             'autoId' => $frontend->getTreeRoot()->getValue()->getAutoId(),
             'html'   => $html,
-            'js'     => $frontend->getJs()
+            'js'     => $frontend->getJs(),
         );
         $frontend->clear();
         return $data;
     }
 
     /**
-     * @param CM_Params             $params
+     * @param CM_Params                  $params
      * @param CM_Http_Response_View_Ajax $response
      * @throws CM_Exception_Invalid
      * @return array
@@ -97,9 +97,15 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $menuList = array_merge($this->getSite()->getMenus(), $responsePage->getRender()->getMenuList());
         $menuEntryHashList = $this->_getMenuEntryHashList($menuList, get_class($page), $responsePage->getPageParams());
 
-        return array('autoId'            => $autoId, 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url,
-                     'layoutClass'       => $layoutClass,
-                     'menuEntryHashList' => $menuEntryHashList);
+        return array(
+            'autoId'            => $autoId,
+            'html'              => $html,
+            'js'                => $js,
+            'title'             => $title,
+            'url'               => $url,
+            'layoutClass'       => $layoutClass,
+            'menuEntryHashList' => $menuEntryHashList,
+        );
     }
 
     public function popinComponent() {
