@@ -66,7 +66,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
             if ($count++ > 10) {
                 throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $paths) . ').');
             }
-            $responsePage = new CM_Http_Response_Page_Embed($request);
+            $responsePage = new CM_Http_Response_Page_Embed($request, $this->getServiceManager());
             $responsePage->process();
             $paths[] = $request->getPath();
 

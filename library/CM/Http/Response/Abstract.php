@@ -1,6 +1,8 @@
 <?php
 
-abstract class CM_Http_Response_Abstract extends CM_Class_Abstract {
+abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var CM_Http_Request_Abstract */
     protected $_request;
@@ -28,12 +30,15 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract {
 
     /**
      * @param CM_Http_Request_Abstract $request
+     * @param CM_Service_Manager       $serviceManager
      */
-    public function __construct(CM_Http_Request_Abstract $request) {
+    public function __construct(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
         $this->_request = clone $request;
         $responseType = $this->_request->popPathPart();
         $language = $this->_request->popPathLanguage();
         $this->_site = $this->_request->popPathSite();
+
+        $this->setServiceManager($serviceManager);
     }
 
     abstract protected function _process();
@@ -99,7 +104,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract {
         if (!$this->_render) {
             $languageRewrite = !$this->getViewer() && $this->getRequest()->getLanguageUrl();
             $environment = new CM_Frontend_Environment($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), null, null, $this->getRequest()->getLocation());
-            $this->_render = new CM_Frontend_Render($environment, $languageRewrite);
+            $this->_render = new CM_Frontend_Render($environment, $languageRewrite, $this->getServiceManager());
         }
         return $this->_render;
     }
@@ -239,11 +244,12 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract {
 
     /**
      * @param CM_Http_Request_Abstract $request
+     * @param CM_Service_Manager       $serviceManager
      * @return CM_Http_Response_Abstract
      */
-    public static function factory(CM_Http_Request_Abstract $request) {
+    public static function factory(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
         $className = self::getResponseClassName($request);
-        return new $className($request);
+        return new $className($request, $serviceManager);
     }
 
     /**
