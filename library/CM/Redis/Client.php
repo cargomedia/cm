@@ -12,7 +12,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
     private $_subscribeCallback;
 
     /**
-     * @param array $config
+     * @param array $config ['host' => string, 'port' => int, 'database' => int|null]
      * @throws CM_Exception
      */
     public function __construct(array $config) {
