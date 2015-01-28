@@ -153,13 +153,17 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             if (!array_key_exists(get_class($e), $this->_getConfig()->catch)) {
                 throw $e;
             }
-            if ($e instanceof CM_Exception_Nonexistent) {
-                $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
-                $log = new CM_Paging_Log_404();
-                $log->add($formatter->formatException($e), $e->getMetaInfo());
+
+            foreach ($this->_getConfig()->catch as $exception => $options) {
+                if (true === $options['log']) {
+                    $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
+                    $log = new CM_Paging_Log_404();
+                    $log->add($formatter->formatException($e), $e->getMetaInfo());
+                }
             }
+
             $this->getRender()->getGlobalResponse()->clear();
-            $path = $this->_getConfig()->catch[get_class($e)];
+            $path = $this->_getConfig()->catch[get_class($e)]['path'];
             $request->setPath($path);
             $request->setQuery(array());
         }
