@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 17.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 300 300" style="enable-background:new 0 0 300 300;" xml:space="preserve">
+	 viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
 <g id="Layer_1">
-	<g id="Restricted">
-	</g>
-	<g id="Help">
-	</g>
-	<polygon points="295,150 5,5.477 35.526,136.645 197.22,150 35.526,164.309 5,294.523 	"/>
+	<path d="M315,486c-6.5,0-12.8-2.6-17.4-7.2l-92.4-92.4c-5.8-5.8-8.4-14.1-6.8-22.2l12.4-63.5l-61.5,13.7
+		c-8.2,1.8-16.8-0.7-22.8-6.6l-91.8-91.8c-6-6-8.5-14.6-6.6-22.8c1.8-8.2,7.7-15,15.7-17.8L451.5,27.5c8.9-3.2,19-1,25.8,5.7
+		c6.8,6.7,9.1,16.7,5.9,25.7L338.2,469.5c-2.8,8-9.5,14-17.8,15.9C318.6,485.8,316.8,486,315,486z"/>
+</g>
+<g id="Layer_2">
 </g>
 </svg>

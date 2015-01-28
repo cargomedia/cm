@@ -71,7 +71,7 @@ class CM_Paging_Mock_Comparable extends CM_Paging_Mock {
 
 class CM_Paging_AbstractTest extends CMTest_TestCase {
 
-    private static $_source, $_sourceStale;
+    private static $_source;
 
     public static function setUpBeforeClass() {
         CM_Db_Db::exec('CREATE TABLE `test` (

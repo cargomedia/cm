@@ -43,6 +43,11 @@
     <!-- favicon.ico used for IE9: -->
     <!--[if IE]><link rel="shortcut icon" href="{resourceUrl path='img/favicon.ico' type='layout'}"><![endif]-->
 
+    <link rel="alternate" href="{$renderDefault->getUrlPage($page, $page->getParams()->getParamsEncoded())|escape}" hreflang="x-default">
+    {foreach $languageList as $language}
+      <link rel="alternate" href="{$renderDefault->getUrlPage($page, $page->getParams()->getParamsEncoded(), null, $language)|escape}" hreflang="{$language->getAbbreviation()}">
+    {/foreach}
+
     <title>{$pageTitle|escape}</title>
     {resourceCss file='all.css' type="vendor"}
     {resourceCss file='all.css' type="library"}
@@ -51,7 +56,7 @@
   </head>
   <body id="{$viewResponse->getAutoId()}" class="{$viewResponse->getCssClasses()|implode:' '}">
 
-    {if CM_Request_Abstract::hasInstance() && !CM_Request_Abstract::getInstance()->isSupported()}
+    {if CM_Http_Request_Abstract::hasInstance() && !CM_Http_Request_Abstract::getInstance()->isSupported()}
       <div id="browserNotSupported">
         <h2><span class="icon-warning"></span> {translate 'Your browser is no longer supported.'}</h2>
         <p>{translate 'We recommend upgrading to the latest Internet Explorer, Google Chrome, Firefox, or Opera. Click here for <a href="{$url}">more information</a>.' url='http://whatbrowser.org'}

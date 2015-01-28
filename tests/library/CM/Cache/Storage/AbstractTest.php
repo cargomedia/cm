@@ -3,7 +3,6 @@
 class CM_Cache_Storage_AbstractTest extends CMTest_TestCase {
 
     public function tearDown() {
-        CM_Cache_Storage_Runtime::getInstance()->flush();
         CMTest_TH::clearEnv();
     }
 
@@ -33,7 +32,7 @@ class CM_Cache_Storage_AbstractTest extends CMTest_TestCase {
 
     public function testGetMulti() {
         $cacheRuntime = new CM_Cache_Storage_Runtime();
-        $cacheStorage = $this->getMockBuilder('CM_Cache_Storage_Apc')->setMethods(array('_getRuntime'))->getMock();
+        $cacheStorage = $this->getMockBuilder('CM_Cache_Storage_Memcache')->setMethods(array('_getRuntime'))->getMock();
         $cacheStorage->expects($this->any())->method('_getRuntime')->will($this->returnValue($cacheRuntime));
         /** @var CM_Cache_Storage_Memcache $cacheStorage */
 

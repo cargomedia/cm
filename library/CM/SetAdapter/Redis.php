@@ -2,12 +2,19 @@
 
 class CM_SetAdapter_Redis extends CM_SetAdapter_Abstract {
 
+    /** @var CM_Redis_Client */
+    private $_redisClient;
+
+    public function __construct() {
+        $this->_redisClient = CM_Service_Manager::getInstance()->getRedis();
+    }
+
     /**
      * @param string $key
      * @param string $value
      */
     public function add($key, $value) {
-        CM_Redis_Client::getInstance()->sAdd($key, $value);
+        $this->_redisClient->sAdd($key, $value);
     }
 
     /**
@@ -15,7 +22,7 @@ class CM_SetAdapter_Redis extends CM_SetAdapter_Abstract {
      * @param string $value
      */
     public function delete($key, $value) {
-        CM_Redis_Client::getInstance()->sRem($key, $value);
+        $this->_redisClient->sRem($key, $value);
     }
 
     /**
@@ -23,6 +30,6 @@ class CM_SetAdapter_Redis extends CM_SetAdapter_Abstract {
      * @return string[]
      */
     public function flush($key) {
-        return CM_Redis_Client::getInstance()->sFlush($key);
+        return $this->_redisClient->sFlush($key);
     }
 }

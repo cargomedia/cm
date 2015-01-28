@@ -25,11 +25,50 @@ class smarty_function_locationTest extends CMTest_TestCase {
         $debug = CM_Debug::getInstance();
         $debug->setEnabled(true);
 
-        $urlFlag = $this->_render->getUrlResource('layout', 'img/flags/fo.png');
-        $this->_assertSame('cityFoo, countryFoo <img class="flag" src="' . $urlFlag . '" />', array('location' => $this->_location));
+        $flag = '<img class="flag" src="' . $this->_render->getUrlResource('layout', 'img/flags/fo.png') . '" title="countryFoo" />';
+        $expected = '<span class="function-location">cityFoo, stateFoo, countryFoo' . $flag . '</span>';
+        $this->_assertSame($expected, array('location' => $this->_location));
 
         $debug->setEnabled(false);
         $this->assertEmpty($debug->getStats());
+    }
+
+    public function testLabeler() {
+        $partLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
+            return '(' . $locationPart->getName() . ')';
+        };
+        $flagLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
+            return '[' . $locationPart->getName() . ']';
+        };
+        $expected = '<span class="function-location">(cityFoo), (stateFoo), (countryFoo)[countryFoo]</span>';
+        $this->_assertSame($expected, array('location' => $this->_location, 'partLabeler' => $partLabeler, 'flagLabeler' => $flagLabeler));
+    }
+
+    public function testLabelerEmpty() {
+        $partLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
+            if (CM_Model_Location::LEVEL_COUNTRY === $locationPart->getLevel()) {
+                return null;
+            } else {
+                return 'foo';
+            }
+        };
+        $flagLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
+            return null;
+        };
+        $expected = '<span class="function-location">foo, foo</span>';
+        $this->_assertSame($expected, array('location' => $this->_location, 'partLabeler' => $partLabeler, 'flagLabeler' => $flagLabeler));
+    }
+
+    public function testCountryOnly() {
+        $country = CM_Model_Location::createCountry('My country', 'MC');
+        $partLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
+            return $locationPart->getName();
+        };
+        $flagLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
+            return null;
+        };
+        $expected = '<span class="function-location">My country</span>';
+        $this->_assertSame($expected, array('location' => $country, 'partLabeler' => $partLabeler, 'flagLabeler' => $flagLabeler));
     }
 
     /**

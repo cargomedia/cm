@@ -8,6 +8,14 @@ var CM_View_Abstract = Backbone.View.extend({
   /** @type CM_View_Abstract[] **/
   _children: [],
 
+  /**
+   * @param {Object} [options]
+   */
+  constructor: function(options) {
+    this.options = options || {};
+    Backbone.View.apply(this, arguments);
+  },
+
   initialize: function() {
     this._children = [];
 
@@ -374,7 +382,7 @@ var CM_View_Abstract = Backbone.View.extend({
 
   /**
    * @param {Function} callback
-   * @param {Integer} interval
+   * @param {Number} interval
    * @return {Number}
    */
   setInterval: function(callback, interval) {
@@ -390,7 +398,7 @@ var CM_View_Abstract = Backbone.View.extend({
 
   /**
    * @param {Function} callback
-   * @param {Integer} timeout
+   * @param {Number} timeout
    * @return {Number}
    */
   setTimeout: function(callback, timeout) {

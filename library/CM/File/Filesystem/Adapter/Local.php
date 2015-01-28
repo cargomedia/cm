@@ -160,7 +160,8 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         $fileListLocal = array();
         foreach ($filenameList as $filename) {
             $path = ltrim($pathPrefix . '/' . $filename, '/');
-            if ($this->isDirectory($path)) {
+            $pathAbsolute = $pathPrefixAbsolute . '/' . $filename;
+            if (is_dir($pathAbsolute)) {
                 if ($recursive) {
                     $this->_listByPrefix($path, $fileList, $dirList, true);
                 }

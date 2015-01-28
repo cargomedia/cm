@@ -68,6 +68,13 @@ class CM_Bootloader {
     }
 
     /**
+     * @param CM_ExceptionHandling_Handler_Abstract $exceptionHandler
+     */
+    public function setExceptionHandler(CM_ExceptionHandling_Handler_Abstract $exceptionHandler) {
+        $this->_exceptionHandler = $exceptionHandler;
+    }
+
+    /**
      * @return CM_EventHandler_EventHandler
      */
     public function getEventHandler() {

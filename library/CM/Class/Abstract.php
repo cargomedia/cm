@@ -4,6 +4,7 @@ abstract class CM_Class_Abstract {
 
     private static $_classConfigCacheEnabled = null;
     private static $_classHierarchyCache = array();
+    private static $_classConfigList = [];
 
     /**
      * @return int
@@ -48,15 +49,19 @@ abstract class CM_Class_Abstract {
         if (null === self::$_classConfigCacheEnabled) {
             self::$_classConfigCacheEnabled = CM_Config::get()->classConfigCacheEnabled;
         }
-        $cacheKey = CM_CacheConst::ClassConfig . '_className:' . get_called_class();
+        $calledClass = get_called_class();
+        $cacheKey = CM_CacheConst::ClassConfig . '_className:' . $calledClass;
         $cache = new CM_Cache_Storage_Apc();
-        if (!self::$_classConfigCacheEnabled || false === ($result = $cache->get($cacheKey))) {
-            $result = self::_getConfigRaw();
-            if (self::$_classConfigCacheEnabled) {
-                $cache->set($cacheKey, $result);
+        if (!self::$_classConfigCacheEnabled || !isset(self::$_classConfigList[$calledClass])) {
+            if (!self::$_classConfigCacheEnabled || false === ($result = $cache->get($cacheKey))) {
+                $result = self::_getConfigRaw();
+                if (self::$_classConfigCacheEnabled) {
+                    $cache->set($cacheKey, $result);
+                }
             }
+            self::$_classConfigList[$calledClass] = $result;
         }
-        return $result;
+        return self::$_classConfigList[$calledClass];
     }
 
     /**

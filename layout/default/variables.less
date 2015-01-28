@@ -4,16 +4,15 @@
 @colorOk: #008845;
 @colorNotice: #ea8e0b;
 @colorError: #C2113D;
-@colorHighlight: #f5cd24;
 @colorClose: #C2113D;
+@colorFocus: @colorBrand;
 
 // Basic Color
-@colorFg: #333333;
-@colorFgSubtle: lighten(@colorFg, 25);
+@colorFg: #444444;
+@colorFgSubtle: mix(@colorFg, @colorBg, 80);
 
 @colorBgTheme: @colorBrand;
 @colorFgTheme: #ffffff;
-@colorFgHeading: @colorBrand;
 
 // Backgrounds
 @colorBgBody: #ffffff;
@@ -30,37 +29,52 @@
 
 //Links
 @colorFgLink: #0a7bc3;
-@colorFgLinkSubtle: #6d6e71;
-@colorBgSelect: mix(@colorBrand, @colorBg, 10);
 
 // Tooltip
 @colorFgTooltip: @colorBg;
 @colorBgTooltip: lighten(@colorFg, 20);
 
 //Font
-@fontFamily: "Lucida Grande", Verdana, Arial, sans-serif;
-@fontFamilyHeading: "Trebuchet MS", Tahoma, Verdana, Arial, sans-serif;
-@fontLineHeight: 1.5;
+@fontFamily: Helvetica, Arial, sans-serif;
+@fontLineHeight: 1.4;
+@fontColor: @colorFg;
+@fontSize: 14px;
 
-@fontSize: 12px;
-@fontSizeSmall: 11px;
-@fontSizeTiny: 9px;
+@fontFamilyHeading: Helvetica, Arial, sans-serif;
+@fontLineHeightHeading: 1.7;
+@fontColorHeading: @colorBrand;
+
+@fontColorStrong: contrast(@colorFg, lighten(@colorFg, 10), darken(@colorFg, 10));
+
+@fontSizeSmall: 12px;
+@fontSizeTiny: 10px;
 
 //Buttons
-@sizeButton: 32px;
-@sizeCheckbox: 16px;
+@sizeButton: 38px;
+@sizeCheckbox: 20px;
+@colorFgButtonBorder: rgb(199, 199, 199);
+@colorBgButton: @colorBg;
+@colorFgButton: @fontColorStrong;
+
+@colorBgButtonHighlight: @colorBrand;
+@colorFgButtonHighlight: #ffffff;
+@colorBgButtonSuccess: #009e54;
+@colorFgButtonSuccess: #ffffff;
+@colorBgButtonDanger: #d6162a;
+@colorFgButtonDanger: #ffffff;
 
 //Textinput
-@heightInputText: 32px;
+@heightInputText: @sizeButton;
 @heightInputTextarea: 65px;
+@borderRadiusInput: 3px;
 
 //Usertext
-@usertextFontSizeH1: @fontSize*1.6;
-@usertextFontSizeH2: @fontSize*1.5;
-@usertextFontSizeH3: @fontSize*1.4;
-@usertextFontSizeH4: @fontSize*1.3;
-@usertextFontSizeH5: @fontSize*1.2;
-@usertextFontSizeH6: @fontSize;
+@usertextFontSizeH1: round(@fontSize*1.3);
+@usertextFontSizeH2: round(@fontSize*1.2);
+@usertextFontSizeH3: round(@fontSize*1.1);
+@usertextFontSizeH4: round(@fontSize*1.0);
+@usertextFontSizeH5: round(@fontSize*1.0);
+@usertextFontSizeH6: round(@fontSize*1.0);
 @usertextFontSize: @fontSize;
 
 @usertextColorFgH1: #505050;
@@ -70,4 +84,4 @@
 @usertextColorFgH5: #737373;
 @usertextColorFgH6: #737373;
 
-@emoticonSize: 1.5em;
+@emoticonSize: 1.4em;

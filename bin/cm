@@ -1,7 +1,10 @@
 #!/usr/bin/env php
 <?php
 
-$autoloadPaths = array_filter(array(__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php'), function ($path) {
+$autoloadPaths = array_filter(array(
+    __DIR__ . '/../vendor/autoload.php',    // Binary is regular file in /bin
+    __DIR__ . '/../../../autoload.php',     // Binary is regular file in /vendor/cargomedia/cm/bin
+), function ($path) {
     return file_exists($path);
 });
 if (count($autoloadPaths) === 0) {

@@ -3,7 +3,7 @@
 class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 
     const LIFETIME_MAX = 3;
-    const CLEAR_INTERVAL = 300;
+    const CLEAR_INTERVAL = 5;
 
     /** @var int */
     private $_lastClearStamp;

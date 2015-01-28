@@ -18,7 +18,7 @@ class CM_Component_Debug extends CM_Component_Abstract {
         $viewResponse->set('cacheNames', $cacheNames);
     }
 
-    public function ajax_clearCache(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
+    public function ajax_clearCache(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
         $cachesCleared = array();
         if ($params->getBoolean('CM_Cache_Storage_Memcache', false)) {
             $cache = new CM_Cache_Storage_Memcache();

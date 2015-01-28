@@ -34,6 +34,11 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $viewResponse->set('pageKeywords', $this->fetchKeywords());
         $viewResponse->set('renderAdapter', $this);
 
+        $environmentDefault = new CM_Frontend_Environment($this->getRender()->getEnvironment()->getSite());
+        $renderDefault = new CM_Frontend_Render($environmentDefault);
+        $viewResponse->set('renderDefault', $renderDefault);
+        $viewResponse->set('languageList', new CM_Paging_Language_Enabled());
+
         $options = array();
         $options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
         $options['renderStamp'] = floor(microtime(true) * 1000);

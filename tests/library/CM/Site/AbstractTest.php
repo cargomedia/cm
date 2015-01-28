@@ -15,6 +15,13 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertEquals(array($site), CM_Site_Abstract::getAll());
     }
 
+    public function testGetConfig() {
+        /** @var CM_Site_Abstract $site */
+        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
+        $config = CM_Config::get()->CM_Site_Abstract;
+        $this->assertEquals($config, $site->getConfig());
+    }
+
     public function testGetEmailAddress() {
         /** @var CM_Site_Abstract $site */
         $site = $this->getMockForAbstractClass('CM_Site_Abstract');
@@ -54,13 +61,13 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $siteClassMatchBar->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.xxx'));
         /** @var CM_Site_Abstract $siteClassMatchBar */
 
-        $requestCom = new CM_Request_Get('/', array('host' => 'www.example.com'));
+        $requestCom = new CM_Http_Request_Get('/', array('host' => 'www.example.com'));
         $this->assertTrue($siteClassMatchFoo->match($requestCom));
 
-        $requestXxx = new CM_Request_Get('/', array('host' => 'www.example.xxx'));
+        $requestXxx = new CM_Http_Request_Get('/', array('host' => 'www.example.xxx'));
         $this->assertTrue($siteClassMatchBar->match($requestXxx));
 
-        $requestNot = new CM_Request_Get('/', array('host' => 'www.example.foo'));
+        $requestNot = new CM_Http_Request_Get('/', array('host' => 'www.example.foo'));
         $this->assertFalse($siteClassMatchBar->match($requestNot));
     }
 

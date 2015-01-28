@@ -47,6 +47,12 @@ class CMService_Newrelic extends CM_Class_Abstract {
         }
     }
 
+    public function ignoreTransaction() {
+        if ($this->_isEnabled()) {
+            newrelic_ignore_transaction();
+        }
+    }
+
     /**
      * @param bool|null $flag
      */

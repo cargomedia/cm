@@ -1,14 +1,20 @@
 <?php
 
 return function (CM_Config_Node $config) {
-    $config->timeZone = 'US/Central';
+    $config->CM_App->setupScriptClasses = array();
+    $config->CM_App->setupScriptClasses[] = 'CM_File_Filesystem_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_Db_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_MongoDb_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_Elasticsearch_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_Http_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Translations';
+
+    $config->timeZone = 'UTC';
 
     $config->CM_Mail->send = true;
     $config->CM_Mail->mailDeliveryAgent = null;
 
     $config->CM_Site_Abstract->class = null;
-
-    $config->CM_Splittesting_Abstract->enabled = false;
 
     $config->CM_Elasticsearch_Client->enabled = true;
     $config->CM_Elasticsearch_Client->servers = array(
@@ -24,8 +30,6 @@ return function (CM_Config_Node $config) {
     $config->CM_Memcache_Client->servers = array(
         array('host' => 'localhost', 'port' => 11211),
     );
-
-    $config->CM_Redis_Client->server = array('host' => 'localhost', 'port' => 6379);
 
     $config->classConfigCacheEnabled = true;
 
@@ -46,14 +50,14 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Usertext_Usertext->class = 'CM_Usertext_Usertext';
 
-    $config->CM_Response_Page->catch = array(
+    $config->CM_Http_Response_Page->catch = array(
         'CM_Exception_Nonexistent'  => '/error/not-found',
         'CM_Exception_InvalidParam' => '/error/not-found',
         'CM_Exception_AuthRequired' => '/error/auth-required',
         'CM_Exception_NotAllowed'   => '/error/not-allowed',
     );
 
-    $config->CM_Response_View_Abstract->catch = array(
+    $config->CM_Http_Response_View_Abstract->catch = array(
         'CM_Exception_Nonexistent',
         'CM_Exception_AuthRequired',
         'CM_Exception_NotAllowed',
@@ -61,7 +65,7 @@ return function (CM_Config_Node $config) {
         'CM_Exception_ActionLimit',
     );
 
-    $config->CM_Response_RPC->catch = array(
+    $config->CM_Http_Response_RPC->catch = array(
         'CM_Exception_AuthRequired',
         'CM_Exception_NotAllowed',
     );
@@ -106,18 +110,27 @@ return function (CM_Config_Node $config) {
                 'username'         => 'root',
                 'password'         => '',
                 'db'               => 'cm',
-                'reconnectTimeout' => 300
             )
         )
     );
 
     $config->services['MongoDb'] = array(
-        'class'     => 'CM_Service_MongoDb',
+        'class'     => 'CM_MongoDb_Client',
         'arguments' => array(
             array(
                 'db'      => 'cm',
                 'server'  => 'mongodb://localhost:27017',
                 'options' => array('connect' => true),
+            )
+        ),
+    );
+
+    $config->services['redis'] = array(
+        'class'     => 'CM_Redis_Client',
+        'arguments' => array(
+            array(
+                'host' => 'localhost',
+                'port' => '6379',
             )
         ),
     );

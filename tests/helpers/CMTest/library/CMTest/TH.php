@@ -6,11 +6,11 @@ class CMTest_TH {
     private static $timeDelta = 0;
     private static $_configBackup;
 
-    /** @var CM_Db_Client|null */
-    private static $_dbClient = null;
-
     public static function init() {
-        CM_App::getInstance()->setupDatabase(true);
+        $output = new CM_OutputStream_Null();
+        $loader = CM_App::getInstance()->getProvisionLoader();
+        $loader->unload($output);
+        $loader->load($output);
 
         self::$_configBackup = serialize(CM_Config::get());
 
@@ -24,42 +24,18 @@ class CMTest_TH {
         self::clearDb();
         self::clearCache();
         self::timeReset();
-        self::clearConfig();
         self::clearFilesystem();
+        CM_Config::set(unserialize(self::$_configBackup));
     }
 
     public static function clearFilesystem() {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $serviceManager->getFilesystems()->getData()->deleteByPrefix('/');
-        foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
-            $filesystem->deleteByPrefix('/');
-        }
-        CM_App::getInstance()->setupFilesystem();
+        $script = new CM_File_Filesystem_SetupScript(CM_Service_Manager::getInstance());
+        $script->unload(new CM_OutputStream_Null());
     }
 
     public static function clearCache() {
         CM_Cache_Shared::getInstance()->flush();
         CM_Cache_Local::getInstance()->flush();
-    }
-
-    public static function clearDb() {
-        $alltables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
-        CM_Db_Db::exec('SET foreign_key_checks = 0;');
-        foreach ($alltables as $table) {
-            CM_Db_Db::delete($table);
-        }
-        CM_Db_Db::exec('SET foreign_key_checks = 1;');
-        $mongo = CM_Service_Manager::getInstance()->getMongoDb();
-        foreach ($mongo->listCollectionNames() as $collectionName) {
-            $mongo->remove($collectionName);
-        }
-        foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
-            require $setupScript->getPath();
-        }
-    }
-
-    public static function clearConfig() {
-        CM_Config::set(unserialize(self::$_configBackup));
     }
 
     public static function timeInit() {
@@ -124,7 +100,7 @@ class CMTest_TH {
      * @return CM_Page_Abstract
      */
     public static function createPage($pageClass, CM_Model_User $viewer = null, $params = array()) {
-        $request = new CM_Request_Get('?' . http_build_query($params), array(), $viewer);
+        $request = new CM_Http_Request_Get('?' . http_build_query($params), array(), $viewer);
         return new $pageClass(CM_Params::factory($request->getQuery(), true), $request->getViewer());
     }
 
@@ -219,15 +195,30 @@ class CMTest_TH {
      * @param string             $uri
      * @param array|null         $headers
      * @param CM_Model_User|null $viewer
-     * @return CM_Response_Page
+     * @return CM_Http_Response_Page
      */
     public static function createResponsePage($uri, array $headers = null, CM_Model_User $viewer = null) {
         if (!$headers) {
             $site = CM_Site_Abstract::factory();
             $headers = array('host' => $site->getHost());
         }
-        $request = new CM_Request_Get($uri, $headers, null, $viewer);
-        return new CM_Response_Page($request);
+        $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
+        return new CM_Http_Response_Page($request);
+    }
+
+    /**
+     * @param string             $uri
+     * @param array|null         $headers
+     * @param CM_Model_User|null $viewer
+     * @return CM_Http_Response_Page
+     */
+    public static function createResponsePageEmbed($uri, array $headers = null, CM_Model_User $viewer = null) {
+        if (!$headers) {
+            $site = CM_Site_Abstract::factory();
+            $headers = array('host' => $site->getHost());
+        }
+        $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
+        return new CM_Http_Response_Page_Embed($request);
     }
 
     /**
@@ -256,6 +247,13 @@ class CMTest_TH {
             default:
                 return new CM_Model_Location(CM_Model_Location::LEVEL_ZIP, $zip);
         }
+    }
+
+    /**
+     * @return CM_MongoDb_Client
+     */
+    public static function getMongoDb() {
+        return CM_Service_Manager::getInstance()->getMongoDb();
     }
 
     public static function randomizeAutoincrement() {
@@ -315,5 +313,10 @@ class CMTest_TH {
             $str .= $charset[mt_rand(0, $count - 1)];
         }
         return $str;
+    }
+
+    private static function clearDb() {
+        self::clearCache();
+        CM_App::getInstance()->getProvisionLoader()->reload(new CM_OutputStream_Null());
     }
 }

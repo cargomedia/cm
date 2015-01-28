@@ -3,7 +3,7 @@
 class CM_QueueTest extends CMTest_TestCase {
 
     public function tearDown() {
-        CM_Redis_Client::getInstance()->flush();
+        CM_Service_Manager::getInstance()->getRedis()->flush();
     }
 
     public function testConstructor() {

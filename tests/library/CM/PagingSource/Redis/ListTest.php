@@ -6,7 +6,7 @@ class CM_PagingSource_Redis_ListTest extends CMTest_TestCase {
     private $_client;
 
     public function setUp() {
-        $this->_client = CM_Redis_Client::getInstance();
+        $this->_client = CM_Service_Manager::getInstance()->getRedis();
     }
 
     public function tearDown() {

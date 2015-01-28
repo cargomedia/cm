@@ -8,17 +8,10 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
      */
     public function __construct(CM_Frontend_Render $render) {
         parent::__construct($render);
+        $this->addVariables();
 
-        foreach (array_reverse($render->getSite()->getModules()) as $moduleName) {
-            foreach (array_reverse($render->getSite()->getThemes()) as $theme) {
-                $file = new CM_File($render->getThemeDir(true, $theme, $moduleName) . 'variables.less');
-                if ($file->getExists()) {
-                    $this->add($file->read());
-                }
-            }
-        }
         $file = new CM_File(DIR_PUBLIC . 'static/css/library/icon.less');
-        if ($file->getExists()) {
+        if ($file->exists()) {
             $this->add($file->read());
         }
         foreach (array_reverse($render->getSite()->getModules()) as $moduleName) {
@@ -32,7 +25,9 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
 
         $viewClasses = CM_View_Abstract::getClassChildren(true);
         foreach ($viewClasses as $viewClassName) {
-            if ($this->_isValidViewClass($viewClassName)) {
+            $validModule = in_array(CM_Util::getNamespace($viewClassName), $render->getSite()->getModules());
+            $validViewClass = $this->_isValidViewClass($viewClassName);
+            if ($validModule && $validViewClass) {
                 $asset = new CM_Asset_Css_View($this->_render, $viewClassName);
                 $this->add($asset->_getContent());
             }

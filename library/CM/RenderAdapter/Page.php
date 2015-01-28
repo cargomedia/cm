@@ -46,7 +46,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
     protected function _getMetaTemplatePath($templateName) {
         $templatePath = $this->getRender()->getTemplatePath($this->_getView(), $templateName);
         if (null === $templatePath) {
-            $templatePath = $this->getRender()->getLayoutPath('Page/Abstract/' . $templateName . '.tpl', null, null, false);
+            $templatePath = $this->getRender()->getLayoutPath('Page/Abstract/' . $templateName . '.tpl', null, null, null, false);
         }
         return $templatePath;
     }

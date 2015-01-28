@@ -173,8 +173,14 @@
      * @param {Hammer.event} event
      */
     _onHammer: function(event) {
-      // disable browser scrolling
-      event.gesture.preventDefault();
+      /*
+       * Workaround for Chrome/Hammer1 bug: Click-events wouldn't work anymore if "release"-event's default is prevented.
+       */
+      var skipPreventDefault = (event.type == 'release') && (event.gesture.distance < 10);
+      if (!skipPreventDefault) {
+        // disable browser scrolling
+        event.gesture.preventDefault();
+      }
 
       switch (event.type) {
         case 'dragright':

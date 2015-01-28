@@ -49,6 +49,17 @@ class CM_Asset_Css extends CM_Asset_Abstract {
         return $this->_compile($content, $compress);
     }
 
+    public function addVariables() {
+        foreach (array_reverse($this->_render->getSite()->getModules()) as $moduleName) {
+            foreach (array_reverse($this->_render->getSite()->getThemes()) as $theme) {
+                $file = new CM_File($this->_render->getThemeDir(true, $theme, $moduleName) . 'variables.less');
+                if ($file->exists()) {
+                    $this->add($file->read());
+                }
+            }
+        }
+    }
+
     protected function _getContent() {
         $content = '';
         if ($this->_prefix) {
@@ -129,6 +140,6 @@ class CM_Asset_Css extends CM_Asset_Abstract {
             $args[] = '--browsers';
             $args[] = $this->_autoprefixerBrowsers;
         }
-        return CM_Util::exec($command, null, $content);
+        return CM_Util::exec($command, $args, $content);
     }
 }

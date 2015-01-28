@@ -21,7 +21,7 @@ class CM_SVM_Model {
             throw new CM_Exception('Extension `svm` not loaded.');
         }
         $this->_id = (int) $id;
-        if (!$this->_getFile()->getExists()) {
+        if (!$this->_getFile()->exists()) {
             $this->train();
         }
         $this->_model = new SVMModel($this->_getFilePath());

@@ -140,13 +140,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
 
     /**
      * @param string|null $serviceName
-     * @return CM_Service_MongoDb
+     * @return CM_MongoDb_Client
      */
     public function getMongoDb($serviceName = null) {
         if (null === $serviceName) {
             $serviceName = 'MongoDb';
         }
-        return $this->get($serviceName, 'CM_Service_MongoDb');
+        return $this->get($serviceName, 'CM_MongoDb_Client');
     }
 
     /**
@@ -168,6 +168,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public function getUserContent() {
         return $this->get('usercontent', 'CM_Service_UserContent');
+    }
+
+    /**
+     * @return CM_Redis_Client
+     */
+    public function getRedis() {
+        return $this->get('redis', 'CM_Redis_Client');
     }
 
     /**

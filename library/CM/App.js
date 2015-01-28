@@ -294,16 +294,16 @@ var CM_App = CM_Class_Abstract.extend({
           new FastClick(document.body);
         }, false);
       }
+
+      window.viewportUnitsBuggyfill.init();
     },
     /**
      * @param {jQuery} $dom
      */
     setup: function($dom) {
-      $dom.placeholder();
       $dom.find('.timeago').timeago();
       $dom.find('textarea.autosize, .autosize textarea').autosize({append: ''});
       $dom.find('.clipSlide').clipSlide();
-      $dom.find('.scrollShadow').scrollShadow();
       $dom.find('.showTooltip[title]').tooltip();
       $dom.find('.toggleNext').toggleNext();
       $dom.find('.tabs').tabs();
@@ -353,7 +353,7 @@ var CM_App = CM_Class_Abstract.extend({
   string: {
     padLeft: function(str, length, character) {
       character = character || ' ';
-      string = String(str);
+      var string = String(str);
       return new Array(length - string.length + 1).join(character) + string;
     }
   },
@@ -526,7 +526,8 @@ var CM_App = CM_Class_Abstract.extend({
      * @return {String}
      */
     renderHtml: function(template, variables) {
-      return _.template(template, variables).replace(/^\s+|\s+$/g, '');
+      var compiled = _.template(template);
+      return compiled(variables).replace(/^\s+|\s+$/g, '');
     }
   },
 
@@ -804,7 +805,7 @@ var CM_App = CM_Class_Abstract.extend({
   /**
    * @param {String} methodName
    * @param {Object} params
-   * @param {Object|Null} callbacks
+   * @param {Object|Null} [callbacks]
    * @return jqXHR
    */
   rpc: function(methodName, params, callbacks) {
@@ -1064,29 +1065,22 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   router: {
+    /** @type {String|Null} */
+    hrefInitialIgnore: null,
+
     ready: function() {
       var router = this;
-      var skipInitialFire = false;
+      this.hrefInitialIgnore = location.href;
 
-      $(window).on('popstate', function(event) {
-        if (skipInitialFire) {
-          skipInitialFire = false;
+      $(window).on('popstate', function() {
+        // this `if` fixes double fire of `popstate` event on the initial page.
+        if (router.hrefInitialIgnore === location.href) {
+          router.hrefInitialIgnore = null;
           return;
         }
+        router.hrefInitialIgnore = null;
         router._handleLocationChange(router._getFragment());
       });
-
-      var hash = window.location.hash.substr(1);
-      var path = window.location.pathname + window.location.search;
-      if (!Modernizr.history) {
-        if (hash) {
-          if (hash == path) {
-            skipInitialFire = true;
-          }
-        } else {
-          window.history.replaceState(null, null, path);
-        }
-      }
 
       var urlBase = cm.getUrl();
       $(document).on('click', 'a[href]:not([data-router-disabled=true])', function(event) {
@@ -1134,6 +1128,7 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {String|Null} [url] Absolute or relative URL
      */
     pushState: function(url) {
+      this.hrefInitialIgnore = null;
       window.history.pushState(null, null, url);
     },
 
@@ -1141,21 +1136,15 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {String|Null} [url] Absolute or relative URL
      */
     replaceState: function(url) {
+      this.hrefInitialIgnore = null;
       window.history.replaceState(null, null, url);
-    },
-
-    /**
-     * @returns Location
-     */
-    getLocation: function() {
-      return window.history.location || document.location;
     },
 
     /**
      * @returns string
      */
     _getFragment: function() {
-      var location = this.getLocation();
+      var location = window.location;
       return location.pathname + location.search;
     },
 

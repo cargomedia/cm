@@ -3,7 +3,7 @@
 class CMService_MaxMind extends CM_Class_Abstract {
 
     const COUNTRY_URL = 'https://raw.github.com/lukes/ISO-3166-Countries-with-Regional-Codes/master/all/all.csv';
-    const REGION_URL = 'http://dev.maxmind.com/static/csv/codes/maxmind/region.csv';
+    const REGION_URL = 'http://www.maxmind.com/download/geoip/misc/region_codes.csv';
     const GEO_LITE_CITY_URL = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity-latest.zip';
 
     const CACHE_LIFETIME = 604800; // Keep downloaded files for one week (MaxMind update period)
@@ -747,19 +747,19 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @codeCoverageIgnore
      */
     protected function _download(CM_File $file, $url = null) {
-        if ($file->getExists()) {
+        if ($file->exists()) {
             $modificationTime = $file->getModified();
             if (time() - $modificationTime > self::CACHE_LIFETIME) {
                 $file->delete();
             }
         }
-        if ($file->getExists()) {
+        if ($file->exists()) {
             $contents = $file->read();
         } else {
             if (null === $url) {
                 throw new CM_Exception('File not found: `' . $file->getPath() . '`');
             }
-            $contents = @file_get_contents($url);
+            $contents = CM_Util::getContents($url);
             if (false === $contents) {
                 throw new CM_Exception('Download of `' . $url . '` failed');
             }
@@ -1679,7 +1679,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      */
     private function _setGeoIpFile(CM_File $geoIpFile = null) {
         if (null !== $geoIpFile) {
-            if (!$geoIpFile->getExists()) {
+            if (!$geoIpFile->exists()) {
                 throw new CM_Exception_Invalid('GeoIP file not found: ' . $geoIpFile->getPath());
             }
         }

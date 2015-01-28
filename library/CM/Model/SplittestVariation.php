@@ -72,7 +72,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 
     /**
      * @param CM_Model_SplittestVariation $variationWorse
-     * @return float|null P-value
+     * @return float|null P-value with Šidák correction
      */
     public function getSignificance(CM_Model_SplittestVariation $variationWorse) {
         $fixturesA = $this->getFixtureCount();
@@ -101,12 +101,16 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 
         $conversionsExpectedA = $rateTotal * $fixturesA / $netRateA;
         $conversionsExpectedB = $rateTotal * $fixturesB / $netRateB;
-        $sigmaExpectedA = sqrt($conversionsExpectedA * (1 - $conversionsExpectedA / $fixturesA));
-        $sigmaExpectedB = sqrt($conversionsExpectedB * (1 - $conversionsExpectedB / $fixturesB));
+        $varianceExpectedA = $conversionsExpectedA * (1 - $conversionsExpectedA / $fixturesA);
+        $varianceExpectedB = $conversionsExpectedB * (1 - $conversionsExpectedB / $fixturesB);
 
-        if ($sigmaExpectedA < 3 || $sigmaExpectedB < 3) {
+        if ($varianceExpectedA < 9 || $varianceExpectedB < 9) {
             return null;
         }
+
+        $sigmaExpectedA = sqrt($varianceExpectedA);
+        $sigmaExpectedB = sqrt($varianceExpectedB);
+
         if ($conversionsExpectedA - 3 * $sigmaExpectedA < 0 || $conversionsExpectedB - 3 * $sigmaExpectedB < 0) {
             return null;
         }
@@ -121,7 +125,11 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 
         $pValue = 2 * stats_cdf_normal(-$rateDeviation, 0, $sigmaExpectedRateDeviation, 1);
 
-        return $pValue;
+        $variationCount = $this->getSplittest()->getVariations()->getCount();
+        $independentExperimentCount = max(1, $variationCount - 1);
+        $pValueSidak = 1 - pow(1 - $pValue, $independentExperimentCount);
+
+        return $pValueSidak;
     }
 
     /**

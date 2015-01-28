@@ -1,3 +1,12 @@
+.mejs-offscreen{
+/* Accessibility: hide screen reader texts (and prefer "top" for RTL languages). */
+	position: absolute !important;
+	top: -10000px;
+	overflow: hidden;
+	width: 1px;
+	height: 1px;
+}
+
 .mejs-container {
 	position: relative;
 	background: #000;
@@ -9,6 +18,8 @@
 
 .me-plugin {
 	position: absolute;
+	height: auto;
+	width: auto;
 }
 
 .mejs-embed, .mejs-embed body {
@@ -187,7 +198,7 @@
 
 /* :focus for accessibility */
 .mejs-controls .mejs-button button:focus {
-	outline: solid 1px yellow;
+	outline: dotted 1px #999;
 }
 
 /* End: CONTROL BAR */
@@ -206,7 +217,7 @@
 	box-sizing: content-box;
 }
 
-.mejs-container .mejs-controls .mejs-time span {
+.mejs-container .mejs-controls .mejs-time a {
 	color: #fff;
 	font-size: 11px;
 	line-height: 12px;
@@ -238,7 +249,7 @@
 	padding-top: 5px;
 }
 
-.mejs-controls .mejs-time-rail span {
+.mejs-controls .mejs-time-rail span, .mejs-controls .mejs-time-rail a {
 	display: block;
 	position: absolute;
 	width: 180px;
@@ -473,10 +484,12 @@
 }
 
 /* horizontal version */
-.mejs-controls div.mejs-horizontal-volume-slider {
+.mejs-controls a.mejs-horizontal-volume-slider {
 	height: 26px;
 	width: 60px;
 	position: relative;
+    display: table-cell;
+    vertical-align: middle;
 }
 
 .mejs-controls .mejs-horizontal-volume-slider .mejs-horizontal-volume-total {
@@ -541,13 +554,13 @@
 	visibility: hidden;
 	position: absolute;
 	bottom: 26px;
-	right: -10px;
-	width: 130px;
+	right: -51px;
+	width: 85px;
 	height: 100px;
 	background: url(background.png);
 	background: rgba(50,50,50,0.7);
 	border: solid 1px transparent;
-	padding: 10px;
+	padding: 10px 10px 0 10px;
 	overflow: hidden;
 	-webkit-border-radius: 0;
 	-moz-border-radius: 0;
@@ -584,7 +597,7 @@
 }
 
 .mejs-controls .mejs-captions-button .mejs-captions-selector ul li label {
-	width: 100px;
+	width: 55px;
 	float: left;
 	padding: 4px 0 0 0;
 	line-height: 15px;
@@ -672,8 +685,8 @@
 	bottom: 0;
 	left: 0;
 	text-align:center;
-	line-height: 22px;
-	font-size: 12px;
+	line-height: 20px;
+	font-size: 16px;
 	color: #fff;
 }
 
@@ -695,14 +708,14 @@
 }
 
 .mejs-captions-position-hover {
-	bottom: 45px;
+	bottom: 35px;
 }
 
 .mejs-captions-text {
 	padding: 3px 5px;
 	background: url(background.png);
-	background: rgba(20, 20, 20, 0.8);
-
+	background: rgba(20, 20, 20, 0.5);
+	white-space: pre-wrap;
 }
 /* End: Track (Captions and Chapters) */
 
@@ -868,3 +881,101 @@
 	cursor: pointer;
 }
 /* End: Postroll */
+
+
+/* Start: Speed */
+div.mejs-speed-button {
+	width: 46px !important;
+	position: relative;
+}
+
+.mejs-controls .mejs-button.mejs-speed-button button {
+	background: transparent;
+	width: 36px;
+	font-size: 11px;
+	line-height: normal;
+	color: #ffffff;
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector {
+	visibility: hidden;
+	position: absolute;
+	top: -100px;
+	left: -10px;
+	width: 60px;
+	height: 100px;
+	background: url(background.png);
+	background: rgba(50, 50, 50, 0.7);
+	border: solid 1px transparent;
+	padding: 0;
+	overflow: hidden;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+}
+
+.mejs-controls .mejs-speed-button:hover > .mejs-speed-selector {
+	visibility: visible;
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector ul li label.mejs-speed-selected {
+	color: rgba(33, 248, 248, 1);
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector ul {
+	margin: 0;
+	padding: 0;
+	display: block;
+	list-style-type: none !important;
+	overflow: hidden;
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector ul li {
+	margin: 0 0 6px 0;
+	padding: 0 10px;
+	list-style-type: none !important;
+	display: block;
+	color: #fff;
+	overflow: hidden;
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector ul li input {
+	clear: both;
+	float: left;
+	margin: 3px 3px 0 5px;
+	display: none;
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector ul li label {
+	width: 60px;
+	float: left;
+	padding: 4px 0 0 0;
+	line-height: 15px;
+	font-family: helvetica, arial;
+	font-size: 11.5px;
+	color: white;
+	margin-left: 5px;
+	cursor: pointer;
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector ul li:hover {
+	background-color: rgb(200, 200, 200) !important;
+	background-color: rgba(255,255,255,.4) !important;
+}
+/* End: Speed */
+
+/* Start: Skip Back */
+
+.mejs-controls .mejs-button.mejs-skip-back-button {
+	background: transparent url(skipback.png) no-repeat;
+	background-position: 3px 3px;
+}
+.mejs-controls .mejs-button.mejs-skip-back-button button {
+	background: transparent;
+	font-size: 9px;
+	line-height: normal;
+	color: #ffffff;
+}
+
+/* End: Skip Back */
+

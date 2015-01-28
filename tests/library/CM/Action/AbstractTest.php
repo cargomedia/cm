@@ -134,4 +134,36 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         /** @var CM_Action_Abstract $actionMock */
         $this->assertSame('Email Notification Reminder View', $actionMock->getLabel());
     }
+
+    public function testDeleteTransgressionsOlder() {
+        $user = CMTest_TH::createUser();
+        $action = $this->mockClass('CM_Action_Abstract')->newInstanceWithoutConstructor();
+        $action->mockMethod('getType')->set(function () {
+            return 1;
+        });
+        $action->mockMethod('getVerb')->set(function () {
+            return 2;
+        });
+        /** @var CM_Action_Abstract $action */
+
+        $transgressions = $user->getTransgressions();
+        $actions = $user->getActions();
+
+        $transgressions->add($action, 1);
+        $transgressions->add($action, 2);
+        $actions->add($action, 1);
+
+        CMTest_TH::timeForward(61);
+        CM_Action_Abstract::deleteTransgressionsOlder(60);
+
+        $transgressions->add($action, 3);
+
+        $this->assertCount(1, $actions);
+        $this->assertCount(1, $transgressions);
+
+        CMTest_TH::timeForward(61);
+        CM_Action_Abstract::deleteTransgressionsOlder(60);
+        $transgressions->_change();
+        $this->assertCount(0, $transgressions);
+    }
 }

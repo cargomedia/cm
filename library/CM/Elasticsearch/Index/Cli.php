@@ -40,7 +40,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
             $indexName = $index->getIndex()->getName();
             $key = 'Search.Updates_' . $index->getType()->getName();
             try {
-                $ids = CM_Redis_Client::getInstance()->sFlush($key);
+                $ids = $this->_getRedis()->sFlush($key);
                 $ids = array_filter(array_unique($ids));
                 $index->update($ids);
                 $index->getIndex()->refresh();
@@ -49,7 +49,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
                 if (isset($ids)) {
                     $message .= 'Re-adding ' . count($ids) . ' ids to queue.' . PHP_EOL;
                     foreach ($ids as $id) {
-                        CM_Redis_Client::getInstance()->sAdd($key, $id);
+                        $this->_getRedis()->sAdd($key, $id);
                     }
                 }
                 $message .= 'Reason: ' . $e->getMessage() . PHP_EOL;
@@ -85,8 +85,10 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
 
     public function startMaintenance() {
         $clockwork = new CM_Clockwork_Manager();
-        $clockwork->registerCallback(new DateInterval('PT1M'), array($this, 'update'));
-        $clockwork->registerCallback(new DateInterval('PT1H'), array($this, 'optimize'));
+        $clockwork->setServiceManager(CM_Service_Manager::getInstance());
+        $clockwork->setStorage(new CM_Clockwork_Storage_FileSystem('search-maintenance'));
+        $clockwork->registerCallback('search-index-update', '1 minute', array($this, 'update'));
+        $clockwork->registerCallback('search-index-optimize', '1 hour', array($this, 'optimize'));
         $clockwork->start();
     }
 
@@ -117,6 +119,13 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
             throw new CM_Exception_Invalid('No such index: ' . $indexName);
         }
         return current($indexes);
+    }
+
+    /**
+     * @return CM_Redis_Client
+     */
+    private function _getRedis() {
+        return CM_Service_Manager::getInstance()->getRedis();
     }
 
     public static function getPackageName() {

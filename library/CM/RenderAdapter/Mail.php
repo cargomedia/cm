@@ -27,7 +27,8 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
             $html = $htmlBody;
         }
         if ($mail->getRecipient()) {
-            $imageTag = '<img style="display: none; width: 0px; height: 0px;" src="' . $this->getRender()->getUrlEmailTracking($mail) . '" />';
+            $imageTag = '<img style="display: none; width: 0px; height: 0px;" src="' .
+                CM_Util::htmlspecialchars($this->getRender()->getUrlEmailTracking($mail)) . '" />';
             $html = preg_replace('#</body>#', $imageTag . '$0', $html);
         }
 
@@ -61,7 +62,7 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
      * @return string
      */
     private function _getTplPathLayout($tplName) {
-        if ($path = $this->getRender()->getLayoutPath('Mail/' . $tplName, null, null, false)) {
+        if ($path = $this->getRender()->getLayoutPath('Mail/' . $tplName, null, null, null, false)) {
             return $path;
         }
         throw new CM_Exception_Invalid('Cannot find layout template `' . $tplName . '`');

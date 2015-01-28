@@ -33,6 +33,20 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
         $adapter->write('foo', 'hello');
     }
 
+    public function testChecksum() {
+        $result = new Guzzle\Common\Collection(array('ETag' => '"' . md5('hello') . '"'));
+        $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()
+            ->setMethods(array('headObject'))->getMock();
+        $clientMock->expects($this->once())->method('headObject')->with(array(
+            'ACL'    => 'private',
+            'Bucket' => 'bucket',
+            'Key'    => 'foo',
+        ))->will($this->returnValue($result));
+        /** @var Aws\S3\S3Client $clientMock */
+        $adapter = new CM_File_Filesystem_Adapter_AwsS3($clientMock, 'bucket');
+        $this->assertSame(md5('hello'), $adapter->getChecksum('foo'));
+    }
+
     public function testExists() {
         $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()
             ->setMethods(array('doesObjectExist'))->getMock();
@@ -75,18 +89,24 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
     public function testListByPrefix() {
         $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()
             ->setMethods(array('getIterator'))->getMock();
-        $clientMock->expects($this->once())->method('getIterator')->with('ListObjects', array(
-            'Bucket' => 'bucket',
-            'Prefix' => 'bar/foo/',
-        ))->will($this->returnValue(array(
-            array('Key' => '/bar/foo/object1'),
-            array('Key' => '/bar/foo/object2'),
-        )));
+        $clientMock->expects($this->once())->method('getIterator')->with('ListObjects',
+            array(
+                'Bucket' => 'bucket',
+                'Prefix' => 'bar/foo/',),
+            array(
+                'return_prefixes' => true
+            ))->will($this->returnValue(
+            array(
+                array('Key' => 'bar/foo/object1'),
+                array('Key' => 'bar/foo/object2'),
+                array('Key' => 'bar/foo/subdir/obj1'),
+                array('Key' => 'bar/foo/subdir/obj2'),
+            )));
         /** @var Aws\S3\S3Client $clientMock */
         $adapter = new CM_File_Filesystem_Adapter_AwsS3($clientMock, 'bucket', 'public-read', '/bar////');
 
         $this->assertSame(array(
-            'files' => array('foo/object1', 'foo/object2'),
+            'files' => array('foo/object1', 'foo/object2', 'foo/subdir/obj1', 'foo/subdir/obj2'),
             'dirs'  => array(),
         ), $adapter->listByPrefix('foo'));
     }
@@ -94,20 +114,25 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
     public function testListByPrefixNoRecursion() {
         $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()
             ->setMethods(array('getIterator'))->getMock();
-        $clientMock->expects($this->once())->method('getIterator')->with('ListObjects', array(
-            'Bucket'    => 'bucket',
-            'Prefix'    => 'bar/foo/',
-            'Delimiter' => '/'
-        ))->will($this->returnValue(array(
-            array('Key' => '/bar/foo/object1'),
-            array('Key' => '/bar/foo/object2'),
-        )));
+        $clientMock->expects($this->once())->method('getIterator')->with('ListObjects',
+            array(
+                'Bucket'    => 'bucket',
+                'Prefix'    => 'bar/foo/',
+                'Delimiter' => '/'),
+            array(
+                'return_prefixes' => true
+            ))->will($this->returnValue(
+            array(
+                array('Key' => 'bar/foo/object1'),
+                array('Key' => 'bar/foo/object2'),
+                array('Prefix' => 'bar/foo/subdir/')
+            )));
         /** @var Aws\S3\S3Client $clientMock */
         $adapter = new CM_File_Filesystem_Adapter_AwsS3($clientMock, 'bucket', 'public-read', '/bar////');
 
         $this->assertSame(array(
             'files' => array('foo/object1', 'foo/object2'),
-            'dirs'  => array(),
+            'dirs'  => array('foo/subdir'),
         ), $adapter->listByPrefix('foo', true));
     }
 
@@ -183,7 +208,7 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
 
     public function testSetupExists() {
         $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()
-                ->setMethods(array('doesBucketExist', 'createBucket'))->getMock();
+            ->setMethods(array('doesBucketExist', 'createBucket'))->getMock();
         $clientMock->expects($this->once())->method('doesBucketExist')->with('my-bucket')->will($this->returnValue(true));
         $clientMock->expects($this->never())->method('createBucket');
         /** @var Aws\S3\S3Client $clientMock */

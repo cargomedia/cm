@@ -24,7 +24,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
         }
 
         $this->_filesystem = $filesystem;
-        $this->_path = (string) $path;
+        $this->_path = CM_File_Filesystem::normalizePath($path);
     }
 
     /**
@@ -96,7 +96,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
     /**
      * @return bool
      */
-    public function getExists() {
+    public function exists() {
         return $this->_filesystem->exists($this->getPath());
     }
 
@@ -230,6 +230,18 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
         $path = implode('/', func_get_args());
         $pathNew = CM_File_Filesystem::normalizePath($this->getPath() . '/' . $path);
         return new static($pathNew, $this->_filesystem);
+    }
+
+    /**
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    public function getPathOnLocalFilesystem() {
+        $filesystemAdapter = $this->_filesystem->getAdapter();
+        if (!$filesystemAdapter instanceof CM_File_Filesystem_Adapter_Local) {
+            throw new CM_Exception_Invalid('Unexpected filesystem with adapter `' . get_class($filesystemAdapter) . '`.');
+        }
+        return $filesystemAdapter->getPathPrefix() . $this->getPath();
     }
 
     /**

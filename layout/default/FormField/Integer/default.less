@@ -1,12 +1,19 @@
 & {
-  padding-top: 2px;
+  line-height: @heightInputText;
+}
+
+.noUiSlider-wrapper, .noUiSlider-value {
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.noUiSlider-wrapper {
+  width: 70%;
   max-width: 250px;
 }
 
 .noUiSlider-value {
-  float: right;
-  text-align: left;
-  margin-left: 6px;
-  min-width: 30px;
-  line-height: @heightInputText;
+  padding-left: 6px;
+  width: 30%;
 }

@@ -26,6 +26,7 @@
     _config: {
       classPrefix : '',
       enableClasses : true,
+      enableJSClass : true,
       usePrefixes : true
     },
 
@@ -157,11 +158,13 @@
     var className = docElement.className;
     var classPrefix = Modernizr._config.classPrefix || '';
 
-    // Change `no-js` to `js` (we do this regardles of the `enableClasses`
+    // Change `no-js` to `js` (we do this independently of the `enableClasses`
     // option)
     // Handle classPrefix on this too
-    var reJS = new RegExp('(^|\\s)'+classPrefix+'no-js(\\s|$)');
-    className = className.replace(reJS, '$1'+classPrefix+'js$2');
+    if(Modernizr._config.enableJSClass) {
+      var reJS = new RegExp('(^|\\s)'+classPrefix+'no-js(\\s|$)');
+      className = className.replace(reJS, '$1'+classPrefix+'js$2');
+    }
 
     if(Modernizr._config.enableClasses) {
       // Add the new classes
@@ -172,6 +175,143 @@
   }
 
   ;
+
+  // hasOwnProperty shim by kangax needed for Safari 2.0 support
+  var hasOwnProp;
+
+  (function() {
+    var _hasOwnProperty = ({}).hasOwnProperty;
+    if ( !is(_hasOwnProperty, 'undefined') && !is(_hasOwnProperty.call, 'undefined') ) {
+      hasOwnProp = function (object, property) {
+        return _hasOwnProperty.call(object, property);
+      };
+    }
+    else {
+      hasOwnProp = function (object, property) { /* yes, this can give false positives/negatives, but most of the time we don't care about those */
+        return ((property in object) && is(object.constructor.prototype[property], 'undefined'));
+      };
+    }
+  })();
+
+  
+
+  // As far as I can think of, we shouldn't need or
+  // allow 'on' for non-async tests, and you can't do
+  // async tests without this 'addTest' module.
+
+  // Listeners for async or post-run tests
+  ModernizrProto._l = {};
+
+  // 'addTest' implies a test after the core runloop,
+  // So we'll add in the events
+  ModernizrProto.on = function( test, cb ) {
+    // Create the list of listeners if it doesn't exist
+    if (!this._l[test]) {
+      this._l[test] = [];
+    }
+
+    // Push this test on to the listener list
+    this._l[test].push(cb);
+
+    // If it's already been resolved, trigger it on next tick
+    if (Modernizr.hasOwnProperty(test)) {
+      // Next Tick
+      setTimeout(function() {
+        Modernizr._trigger(test, Modernizr[test]);
+      }, 0);
+    }
+  };
+
+  ModernizrProto._trigger = function( test, res ) {
+    if (!this._l[test]) {
+      return;
+    }
+
+    var cbs = this._l[test];
+
+    // Force async
+    setTimeout(function() {
+      var i, cb;
+      for (i = 0; i < cbs.length; i++) {
+        cb = cbs[i];
+        cb(res);
+      }
+    },0);
+
+    // Don't trigger these again
+    delete this._l[test];
+  };
+
+  /**
+   * addTest allows the user to define their own feature tests
+   * the result will be added onto the Modernizr object,
+   * as well as an appropriate className set on the html element
+   *
+   * @param feature - String naming the feature
+   * @param test - Function returning true if feature is supported, false if not
+   */
+  function addTest( feature, test ) {
+    if ( typeof feature == 'object' ) {
+      for ( var key in feature ) {
+        if ( hasOwnProp( feature, key ) ) {
+          addTest( key, feature[ key ] );
+        }
+      }
+    } else {
+
+      feature = feature.toLowerCase();
+      var featureNameSplit = feature.split('.');
+      var last = Modernizr[featureNameSplit[0]];
+
+      // Again, we don't check for parent test existence. Get that right, though.
+      if (featureNameSplit.length == 2) {
+        last = last[featureNameSplit[1]];
+      }
+
+      if ( typeof last != 'undefined' ) {
+        // we're going to quit if you're trying to overwrite an existing test
+        // if we were to allow it, we'd do this:
+        //   var re = new RegExp("\\b(no-)?" + feature + "\\b");
+        //   docElement.className = docElement.className.replace( re, '' );
+        // but, no rly, stuff 'em.
+        return Modernizr;
+      }
+
+      test = typeof test == 'function' ? test() : test;
+
+      // Set the value (this is the magic, right here).
+      if (featureNameSplit.length == 1) {
+        Modernizr[featureNameSplit[0]] = test;
+      }
+      else if (featureNameSplit.length == 2) {
+        // cast to a Boolean, if not one already
+        /* jshint -W053 */
+        if (Modernizr[featureNameSplit[0]] && !(Modernizr[featureNameSplit[0]] instanceof Boolean)) {
+          Modernizr[featureNameSplit[0]] = new Boolean(Modernizr[featureNameSplit[0]]);
+        }
+
+        Modernizr[featureNameSplit[0]][featureNameSplit[1]] = test;
+      }
+
+      // Set a single class (either `feature` or `no-feature`)
+      /* jshint -W041 */
+      setClasses([(!!test && test != false ? '' : 'no-') + featureNameSplit.join('-')]);
+      /* jshint +W041 */
+
+      // Trigger the event
+      Modernizr._trigger(feature, test);
+    }
+
+    return Modernizr; // allow chaining.
+  }
+
+  // After all the tests are run, add self
+  // to the Modernizr prototype
+  Modernizr._q.push(function() {
+    ModernizrProto.addTest = addTest;
+  });
+
+  
 
   // Take the html5 variable out of the
   // html5shiv scope so we can return it.
@@ -678,75 +818,15 @@
   }(this, document));
 
   
-/*!
-{
-  "name": "History API",
-  "property": "history",
-  "caniuse": "history",
-  "tags": ["history"],
-  "authors": ["Hay Kranen", "Alexander Farkas"],
-  "notes": [{
-    "name": "W3C Spec",
-    "href": "http://www.w3.org/TR/html51/browsers.html#the-history-interface"
-  }, {
-    "name": "MDN documentation",
-    "href": "https://developer.mozilla.org/en-US/docs/Web/API/window.history"
-  }],
-  "polyfills": ["historyjs", "html5historyapi"]
-}
-!*/
-/* DOC
-Detects support for the History API for manipulating the browser session history.
-*/
-
-  Modernizr.addTest('history', function() {
-    // Issue #733
-    // The stock browser on Android 2.2 & 2.3, and 4.0.x returns positive on history support
-    // Unfortunately support is really buggy and there is no clean way to detect
-    // these bugs, so we fall back to a user agent sniff :(
-    var ua = navigator.userAgent;
-
-    // We only want Android 2 and 4.0, stock browser, and not Chrome which identifies
-    // itself as 'Mobile Safari' as well
-    if ((ua.indexOf('Android 2.') !== -1 ||
-        (ua.indexOf('Android 4.0') !== -1)) &&
-        ua.indexOf('Mobile Safari') !== -1 &&
-        ua.indexOf('Chrome') === -1) {
-      return false;
-    }
-
-    // Return the regular check
-    return (window.history && 'pushState' in window.history);
-  });
-
-/*!
-{
-  "name": "SVG",
-  "property": "svg",
-  "caniuse": "svg",
-  "tags": ["svg"],
-  "authors": ["Erik Dahlstrom"],
-  "polyfills": [
-    "svgweb",
-    "raphael",
-    "amplesdk",
-    "canvg",
-    "svg-boilerplate",
-    "sie",
-    "dojogfx",
-    "fabricjs"
-  ]
-}
-!*/
-/* DOC
-Detects support for SVG in `<embed>` or `<object>` elements.
-*/
-
-  Modernizr.addTest('svg', !!document.createElementNS && !!document.createElementNS('http://www.w3.org/2000/svg', 'svg').createSVGRect);
-
 
   var createElement = function() {
-    return document.createElement.apply(document, arguments);
+    if (typeof document.createElement !== 'function') {
+      // This is the case in IE7, where the type of createElement is "object".
+      // For this reason, we cannot call apply() as Object is not a Function.
+      return document.createElement(arguments[0]);
+    } else {
+      return document.createElement.apply(document, arguments);
+    }
   };
   
 /*!
@@ -992,7 +1072,7 @@ E.g. iOS < 6 and some android version don't support this
     }
 
     // Otherwise do it properly
-    var afterInit, i, prop, before;
+    var afterInit, i, propsLength, prop, before;
 
     // If we don't have a style element, that means
     // we're running async or after the core tests,
@@ -1012,7 +1092,8 @@ E.g. iOS < 6 and some android version don't support this
       }
     }
 
-    for ( i in props ) {
+    propsLength = props.length;
+    for ( i = 0; i < propsLength; i++ ) {
       prop = props[i];
       before = mStyle.style[prop];
 
@@ -1149,7 +1230,11 @@ E.g. iOS < 6 and some android version don't support this
     var cssrule = window.CSSRule;
     var rule;
 
-    // remove literal @ from begining of provided property
+    if (typeof cssrule === 'undefined') {
+      return false;
+    }
+
+    // remove literal @ from beginning of provided property
     prop = prop.replace(/^@/,'');
 
     // CSSRules use underscores instead of dashes

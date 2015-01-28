@@ -15,8 +15,8 @@
 .options {
   display: none;
   position: absolute;
-  top: 0px;
-  left: 0px;
+  top: 0;
+  left: 0;
   padding-right: 10px;
   max-height: 500px;
   overflow-y: auto;
@@ -59,8 +59,8 @@
 
     &.unselect {
       cursor: pointer;
-      color: @colorFgLinkSubtle;
       .nowrap;
+      font-style: italic;
     }
 
     .count {
@@ -77,7 +77,7 @@
       cursor: pointer;
 
       &:hover {
-        color: @colorFgHeading;
+        color: @fontColorHeading;
       }
     }
   }
@@ -89,7 +89,7 @@
 
     > .icon-arrow-right {
       transform: rotate(90deg);
-      color: @colorFgHeading;
+      color: @fontColorHeading;
     }
   }
 }

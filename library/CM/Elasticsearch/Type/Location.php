@@ -82,6 +82,7 @@ class CM_Elasticsearch_Type_Location extends CM_Elasticsearch_Type_Abstract {
     }
 
     /**
+     * @param mixed $item
      * @throws CM_Exception_NotImplemented
      */
     public static function updateItem($item) {

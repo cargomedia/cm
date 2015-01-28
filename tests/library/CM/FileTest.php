@@ -31,7 +31,7 @@ class CM_FileTest extends CMTest_TestCase {
 
     public function testConstructNonExistent() {
         $file = new CM_File(DIR_TEST_DATA . '/nonexistent-file');
-        $this->assertEquals(DIR_TEST_DATA . '/nonexistent-file', $file->getPath());
+        $this->assertEquals(DIR_TEST_DATA . 'nonexistent-file', $file->getPath());
     }
 
     public function testSanitizeFilename() {
@@ -70,7 +70,7 @@ class CM_FileTest extends CMTest_TestCase {
 
     public function testCreateTmp() {
         $file = CM_File::createTmp();
-        $this->assertTrue($file->getExists());
+        $this->assertTrue($file->exists());
         $this->assertNull($file->getExtension());
         $this->assertEmpty($file->read());
         $file->delete();
@@ -89,12 +89,12 @@ class CM_FileTest extends CMTest_TestCase {
         $dir = CM_File::createTmpDir();
         $file = $dir->joinPath('foo');
         $file->write('hello');
-        $this->assertTrue($dir->getExists());
-        $this->assertTrue($file->getExists());
+        $this->assertTrue($dir->exists());
+        $this->assertTrue($file->exists());
 
         $dir->delete(true);
-        $this->assertFalse($dir->getExists());
-        $this->assertFalse($file->getExists());
+        $this->assertFalse($dir->exists());
+        $this->assertFalse($file->exists());
     }
 
     /**
@@ -105,8 +105,8 @@ class CM_FileTest extends CMTest_TestCase {
         $dir = CM_File::createTmpDir();
         $file = $dir->joinPath('foo');
         $file->write('hello');
-        $this->assertTrue($dir->getExists());
-        $this->assertTrue($file->getExists());
+        $this->assertTrue($dir->exists());
+        $this->assertTrue($file->exists());
 
         $dir->delete();
     }
@@ -136,14 +136,14 @@ class CM_FileTest extends CMTest_TestCase {
         $adapter = $this->mockObject('CM_File_Filesystem_Adapter');
         $fs = new CM_File_Filesystem($adapter);
         $file = new CM_File('foo', $fs);
-        $adapter->mockMethod('equals')->set(function(CM_File_FileSystem_Adapter $other) use($adapter) {
+        $adapter->mockMethod('equals')->set(function (CM_File_FileSystem_Adapter $other) use ($adapter) {
             return $adapter === $other;
         });
         $adapter->mockMethod('listByPrefix')->set(function ($path, $noRecursion) use ($file) {
             $this->assertSame($file->getPath(), $path);
             $this->assertNull($noRecursion);
             return [
-                'dirs'   =>
+                'dirs'  =>
                     [
                         $path . '/foo/',
                         $path . '/bar/',
@@ -175,9 +175,6 @@ class CM_FileTest extends CMTest_TestCase {
 
         $file->write('foo');
         $this->assertSame('foo', $file->read());
-
-        file_put_contents($file->getPath(), 'bar');
-        $this->assertSame('foo', $file->read());
     }
 
     public function testReadFirstLine() {
@@ -194,11 +191,11 @@ class CM_FileTest extends CMTest_TestCase {
     public function testEnsureParentDirectory() {
         $dir = new CM_File(CM_Bootloader::getInstance()->getDirTmp() . 'foo/bar');
         $file = new CM_File($dir->getPath() . '/mega.txt');
-        $this->assertFalse($dir->getExists());
+        $this->assertFalse($dir->exists());
 
         $file->ensureParentDirectory();
-        $this->assertTrue($dir->getExists());
-        $this->assertFalse($file->getExists());
+        $this->assertTrue($dir->exists());
+        $this->assertFalse($file->exists());
     }
 
     public function createTmpDir() {
@@ -211,8 +208,7 @@ class CM_FileTest extends CMTest_TestCase {
     public function testJoinPath() {
         $dir = CM_File::createTmpDir();
         $fileJoined = $dir->joinPath('foo', 'bar', '//mega//', 'jo', '..', 'nei');
-        $fileJoinedPathRelative = substr($fileJoined->getPath(), strlen($dir->getPath()) + 1);
-        $this->assertSame('/foo/bar/mega/nei', $fileJoinedPathRelative);
+        $this->assertSame($dir->getPath() . '/foo/bar/mega/nei', $fileJoined->getPath());
     }
 
     public function testEquals() {
@@ -247,5 +243,24 @@ class CM_FileTest extends CMTest_TestCase {
 
         $file1->copyToFile($file3);
         $this->assertSame($file1->read(), $file3->read());
+    }
+
+    public function testGetPathOnLocalFilesystem() {
+        $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
+        $filesystem = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp));
+        $file = new CM_File('foo', $filesystem);
+
+        $this->assertSame(rtrim($dirTmp, '/') . '/foo', $file->getPathOnLocalFilesystem());
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     */
+    public function testGetPathOnLocalFilesystemUnexpectedFilesystem() {
+        $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()->getMock();
+        $filesystem = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_AwsS3($clientMock, 'bucket'));
+        $file = new CM_File('foo', $filesystem);
+
+        $file->getPathOnLocalFilesystem();
     }
 }
