@@ -127,7 +127,7 @@ EOF;
         $kissMetrics->submit();
     }
 
-    public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
+    public function trackPageView(CM_Frontend_Environment $environment, $path) {
         if ($viewer = $environment->getViewer()) {
             $this->setUserId($viewer->getId());
         }

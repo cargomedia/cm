@@ -89,17 +89,19 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     }
 
     protected function _processContentOrRedirect() {
+        $render = $this->getRender();
         if ($this->_site->getHost() !== $this->_request->getHost()) {
             $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
-            $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
+            $this->redirectUrl($render->getUrl($path, $this->_site));
         }
         if ($this->_request->getLanguageUrl() && $this->getViewer()) {
             $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
-            $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
+            $this->redirectUrl($render->getUrl($path, $this->_site));
             $this->_request->setLanguageUrl(null);
         }
         if (!$this->getRedirectUrl()) {
-            $this->getRender()->getServiceManager()->getTrackings()->trackPageView($this->getRender()->getEnvironment());
+            $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
+            $render->getServiceManager()->getTrackings()->trackPageView($render->getEnvironment(), $path);
             $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);
         }

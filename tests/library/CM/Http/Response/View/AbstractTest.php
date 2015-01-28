@@ -55,6 +55,48 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertSame($site->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['url']);
     }
 
+    public function testLoadPageTracking() {
+        $page = new CM_Page_View_Ajax_Test_Mock();
+        $request = $this->createRequestAjax($page, 'loadPage', ['path' => $page::getPath()]);
+        $response = new CM_Http_Response_View_Ajax($request, $this->_getServiceManagerWithGA('ga123'));
+        $response->process();
+
+        $this->assertViewResponseSuccess($response);
+        $responseContent = CM_Params::decode($response->getContent(), true);
+        $this->assertContains('ga("send", "pageview", "' . $page::getPath() . '")', $responseContent['success']['data']['jsTracking']);
+    }
+
+    public function testLoadPageTrackingRedirect() {
+        $page = new CM_Page_View_Ajax_Test_MockRedirectSelf();
+        $request = $this->createRequestAjax($page, 'loadPage', ['path' => $page::getPath() . '?count=3']);
+        $response = new CM_Http_Response_View_Ajax($request, $this->_getServiceManagerWithGA('ga123'));
+        $response->process();
+
+        $this->assertViewResponseSuccess($response);
+        $responseContent = CM_Params::decode($response->getContent(), true);
+        $jsTracking = $responseContent['success']['data']['jsTracking'];
+        $this->assertSame(1, substr_count($jsTracking, 'ga("send", "pageview"'));
+        $this->assertContains('ga("send", "pageview", "' . $page::getPath() . '?count=0")', $jsTracking);
+    }
+
+    public function testLoadPageTrackingError() {
+        CM_Config::get()->CM_Http_Response_Page->catch['CM_Exception_Nonexistent'] = CM_Page_View_Ajax_Test_Mock::getPath();
+
+        $page = new CM_Page_View_Ajax_Test_Mock();
+        $request = $this->createRequestAjax($page, 'loadPage', ['path' => '/iwhdfkjlsh']);
+        $response = new CM_Http_Response_View_Ajax($request, $this->_getServiceManagerWithGA('ga123'));
+        $response->process();
+
+        $this->assertViewResponseSuccess($response);
+        $responseContent = CM_Params::decode($response->getContent(), true);
+        $jsTracking = $responseContent['success']['data']['jsTracking'];
+        $html = $responseContent['success']['data']['html'];
+
+        $this->assertSame(1, substr_count($jsTracking, 'ga("send", "pageview"'));
+        $this->assertContains('ga("send", "pageview", "/iwhdfkjlsh")', $jsTracking);
+        $this->assertContains('CM_Page_View_Ajax_Test_Mock', $html);
+    }
+
     public function testReloadComponent() {
         $component = new CM_Component_Notfound([]);
         $scopeView = new CM_Frontend_ViewResponse($component);
@@ -115,6 +157,17 @@ EOL;
         $this->assertArrayNotHasKey('exec', $successContent);
         $this->assertContains('new CM_Component_Graph', $successContent['data']['js']);
     }
+
+    /**
+     * @param string $code
+     * @return CM_Service_Manager
+     */
+    private function _getServiceManagerWithGA($code) {
+        $serviceManager = new CM_Service_Manager();
+        $serviceManager->register('googleanalytics', 'CMService_GoogleAnalytics_Client', [$code]);
+        $serviceManager->register('trackings', 'CM_Service_Trackings', [['googleanalytics']]);
+        return $serviceManager;
+    }
 }
 
 class CM_Page_View_Ajax_Test_MockRedirect extends CM_Page_Abstract {
@@ -127,9 +180,21 @@ class CM_Page_View_Ajax_Test_MockRedirect extends CM_Page_Abstract {
 class CM_Page_View_Ajax_Test_Mock extends CM_Page_Abstract {
 
     public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
-        $layoutname = 'Mock1';
-        $classname = self::_getClassNamespace() . '_Layout_' . $layoutname;
-        return new $classname();
+        return new CM_Layout_Mock1();
+    }
+}
+
+class CM_Page_View_Ajax_Test_MockRedirectSelf extends CM_Page_Abstract {
+
+    public function prepareResponse(CM_Frontend_Environment $environment, CM_Http_Response_Page $response) {
+        $count = $this->_params->getInt('count');
+        if ($count > 0) {
+            $response->redirect($this, ['count' => --$count]);
+        }
+    }
+
+    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
+        return new CM_Layout_Mock1();
     }
 }
 

@@ -58,27 +58,18 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     }
 
     /**
-     * @param string|null $path
+     * @param string $path
      */
-    public function addPageView($path = null) {
-        if (null !== $path) {
-            $path = (string) $path;
-        }
-        if ($this->_pageViewList === array(null)) {
-            $this->_pageViewList = array();
-        }
-        if (null !== $path || 0 === count($this->_pageViewList)) {
-            $this->_pageViewList[] = $path;
-        }
+    public function addPageView($path) {
+        $path = (string) $path;
+        $this->_pageViewList[] = $path;
     }
 
     /**
-     * @param string|null $path
+     * @param string $path
      */
-    public function setPageView($path = null) {
-        if (null !== $path) {
-            $path = (string) $path;
-        }
+    public function setPageView($path) {
+        $path = (string) $path;
         $this->_pageViewList = [$path];
     }
 
@@ -106,11 +97,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
             $js .= 'ga("set", "metric' . $metricIndex . '", ' . $metricValue . ');';
         }
         foreach ($this->_pageViewList as $pageView) {
-            if (null === $pageView) {
-                $js .= 'ga("send", "pageview");';
-            } else {
-                $js .= 'ga("send", "pageview", "' . $pageView . '");';
-            }
+            $js .= 'ga("send", "pageview", "' . $pageView . '");';
         }
         foreach ($this->_eventList as $event) {
             $js .= 'ga("send", ' . CM_Params::jsonEncode(array_filter([
