@@ -6,7 +6,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     protected $_code;
 
     /** @var array */
-    protected $_eventList = array(), $_transactionList = array(), $_pageViewList = array(), $_dimensionList = array(), $_metricList = array();
+    protected $_eventList = array(), $_transactionList = array(), $_pageViewList = array(), $_fieldList = array();
 
     /**
      * @param string $code
@@ -22,7 +22,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     public function setCustomDimension($index, $value) {
         $index = (int) $index;
         $value = (string) $value;
-        $this->_dimensionList[$index] = $value;
+        $this->_setField('dimension' . $index, $value);
     }
 
     /**
@@ -32,7 +32,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     public function setCustomMetric($index, $value) {
         $index = (int) $index;
         $value = (float) $value;
-        $this->_metricList[$index] = $value;
+        $this->_setField('metric' . $index, $value);
     }
 
     /**
@@ -90,11 +90,8 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
      */
     public function getJs() {
         $js = '';
-        foreach ($this->_dimensionList as $dimensionIndex => $dimensionValue) {
-            $js .= 'ga("set", "dimension' . $dimensionIndex . '", "' . $dimensionValue . '");';
-        }
-        foreach ($this->_metricList as $metricIndex => $metricValue) {
-            $js .= 'ga("set", "metric' . $metricIndex . '", ' . $metricValue . ');';
+        foreach ($this->_fieldList as $fieldName => $fieldValue) {
+            $js .= 'ga("set", "' . $fieldName . '", "' . $fieldValue . '");';
         }
         foreach ($this->_pageViewList as $pageView) {
             $js .= 'ga("send", "pageview", "' . $pageView . '");';
@@ -174,6 +171,16 @@ EOF;
     }
 
     public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
+    }
+
+    /**
+     * @param string $name
+     * @param string $value
+     */
+    protected function _setField($name, $value) {
+        $name = (string) $name;
+        $value = (string) $value;
+        $this->_fieldList[$name] = $value;
     }
 
     /**
