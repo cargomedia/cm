@@ -24,13 +24,18 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testNotFoundErrorLogging() {
+        CM_Config::get()->CM_Http_Response_Page->catch['CM_Exception_Nonexistent'] = [
+            'path' => CM_Page_View_Ajax_Test_Mock::getPath(),
+            'log'  => true,
+        ];
+
         $log = new CM_Paging_Log_NotFound();
         $this->assertCount(0, $log);
 
         $viewer = CMTest_TH::createUser();
         $environment = new CM_Frontend_Environment(null, $viewer);
         $component = new CM_Page_View_Ajax_Test_Mock();
-        $this->getResponseAjax($component, 'loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath().'/NotExist'], $environment);
+        $this->getResponseAjax($component, 'loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath() . '/NotExist'], $environment);
 
         $log = new CM_Paging_Log_NotFound();
         $this->assertCount(1, $log);
@@ -147,10 +152,6 @@ class CM_Page_View_Ajax_Test_Mock extends CM_Page_Abstract {
 }
 
 class CM_Layout_Mock1 extends CM_Layout_Abstract {
-
-}
-
-class CM_Layout_Default extends CM_Layout_Abstract {
 
 }
 
