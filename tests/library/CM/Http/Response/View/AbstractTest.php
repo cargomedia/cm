@@ -23,6 +23,19 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertSame('CM_Layout_Mock1', $responseContent['success']['data']['layoutClass']);
     }
 
+    public function testNotFoundErrorLogging() {
+        $log = new CM_Paging_Log_NotFound();
+        $this->assertCount(0, $log);
+
+        $viewer = CMTest_TH::createUser();
+        $environment = new CM_Frontend_Environment(null, $viewer);
+        $component = new CM_Page_View_Ajax_Test_Mock();
+        $this->getResponseAjax($component, 'loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath().'/NotExist'], $environment);
+
+        $log = new CM_Paging_Log_NotFound();
+        $this->assertCount(1, $log);
+    }
+
     public function testLoadPageRedirectExternal() {
         $response = $this->getResponseAjax(new CM_Page_View_Ajax_Test_Mock(), 'loadPage', ['path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()]);
         $this->assertViewResponseSuccess($response, array('redirectExternal' => 'http://www.foo.bar'));
@@ -134,6 +147,10 @@ class CM_Page_View_Ajax_Test_Mock extends CM_Page_Abstract {
 }
 
 class CM_Layout_Mock1 extends CM_Layout_Abstract {
+
+}
+
+class CM_Layout_Default extends CM_Layout_Abstract {
 
 }
 
