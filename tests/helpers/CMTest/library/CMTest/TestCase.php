@@ -17,7 +17,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
         }
 
-        $this->setServiceManager(new CM_Service_Manager());
+        $this->setServiceManager(CM_Service_Manager::getInstance());
 
         parent::runBare();
     }
@@ -186,7 +186,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      */
     public function getResponse(CM_Http_Request_Abstract $request) {
         $className = CM_Http_Response_Abstract::getResponseClassName($request);
-        $serviceManager = CM_Service_Manager::getInstance();
+        $serviceManager = self::getServiceManager();
         return $this->mockClass($className)->newInstance([$request, $serviceManager]);
     }
 
