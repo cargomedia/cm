@@ -11,10 +11,12 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     /** @var string|null */
     private $_redirectUrl;
 
-    public function __construct(CM_Http_Request_Abstract $request) {
+    public function __construct(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
         $this->_request = $request;
         $this->_site = CM_Site_Abstract::findByRequest($this->_request);
         $this->_request->popPathLanguage();
+
+        $this->setServiceManager($serviceManager);
     }
 
     /**
@@ -87,17 +89,19 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     }
 
     protected function _processContentOrRedirect() {
+        $render = $this->getRender();
         if ($this->_site->getHost() !== $this->_request->getHost()) {
             $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
-            $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
+            $this->redirectUrl($render->getUrl($path, $this->_site));
         }
         if ($this->_request->getLanguageUrl() && $this->getViewer()) {
             $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
-            $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
+            $this->redirectUrl($render->getUrl($path, $this->_site));
             $this->_request->setLanguageUrl(null);
         }
         if (!$this->getRedirectUrl()) {
-            $this->getRender()->getServiceManager()->getTrackings()->trackPageView($this->getRender()->getEnvironment());
+            $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
+            $render->getServiceManager()->getTrackings()->trackPageView($render->getEnvironment(), $path);
             $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);
         }

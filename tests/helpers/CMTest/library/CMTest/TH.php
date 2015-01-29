@@ -74,6 +74,13 @@ class CMTest_TH {
     }
 
     /**
+     * @return CM_Service_Manager
+     */
+    public static function getServiceManager() {
+        return CM_Service_Manager::getInstance();
+    }
+
+    /**
      * @return CM_Model_User
      */
     public static function createUser() {
@@ -203,7 +210,7 @@ class CMTest_TH {
             $headers = array('host' => $site->getHost());
         }
         $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
-        return new CM_Http_Response_Page($request);
+        return new CM_Http_Response_Page($request, self::getServiceManager());
     }
 
     /**
@@ -218,7 +225,7 @@ class CMTest_TH {
             $headers = array('host' => $site->getHost());
         }
         $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
-        return new CM_Http_Response_Page_Embed($request);
+        return new CM_Http_Response_Page_Embed($request, self::getServiceManager());
     }
 
     /**

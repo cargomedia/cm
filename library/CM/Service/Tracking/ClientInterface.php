@@ -26,9 +26,9 @@ interface CM_Service_Tracking_ClientInterface {
 
     /**
      * @param CM_Frontend_Environment $environment
-     * @param string|null             $path
+     * @param string                  $path
      */
-    public function trackPageView(CM_Frontend_Environment $environment, $path = null);
+    public function trackPageView(CM_Frontend_Environment $environment, $path);
 
     /**
      * @param CM_Splittest_Fixture        $fixture

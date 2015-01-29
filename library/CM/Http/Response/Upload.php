@@ -22,8 +22,8 @@ class CM_Http_Response_Upload extends CM_Http_Response_Abstract {
         UPLOAD_ERR_EXTENSION  => 'File upload stopped by extension.',
     );
 
-    public function __construct(CM_Http_Request_Post $request) {
-        parent::__construct($request);
+    public function __construct(CM_Http_Request_Post $request, CM_Service_Manager $serviceManager) {
+        parent::__construct($request, $serviceManager);
         $this->_request->setBodyEncoding(CM_Http_Request_Post::ENCODING_NONE);
     }
 
