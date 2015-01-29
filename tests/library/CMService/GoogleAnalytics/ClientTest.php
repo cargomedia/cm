@@ -20,7 +20,7 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
 
         $googleAnalytics->setCustomMetric(2, 23.34);
         $js = $googleAnalytics->getJs($environment);
-        $this->assertContains('ga("set", "metric2", 23.34)', $js);
+        $this->assertContains('ga("set", "metric2", "23.34")', $js);
     }
 
     public function testSetCustomDimension() {
