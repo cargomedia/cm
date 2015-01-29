@@ -3,10 +3,13 @@
 class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
 
     public function testAccount() {
-        $googleAnalytics = new CMService_GoogleAnalytics_Client('key');
-        $environment = new CM_Frontend_Environment();
+        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
+        $googleAnalytics = new CMService_GoogleAnalytics_Client('key123');
+        $environment = new CM_Frontend_Environment($site);
+        $request = new CM_Http_Request_Get('/pseudo-request', ['Cookie' => 'clientId=222']);
+
         $html = $googleAnalytics->getHtml($environment);
-        $this->assertContains('ga("create", "key"', $html);
+        $this->assertContains('ga("create", "key123", {"cookieDomain":"www.my-website.net","clientId":"222"}', $html);
     }
 
     public function testSetCustomMetric() {

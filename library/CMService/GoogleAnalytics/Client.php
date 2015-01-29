@@ -148,7 +148,15 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 })(window,document,'script','//www.google-analytics.com/${scriptName}','ga');
 EOF;
-        $html .= 'ga("create", "' . $this->_getCode() . '", "auto");';
+
+        $fieldList = [
+            'cookieDomain' => $environment->getSite()->getHost(),
+        ];
+        if (CM_Http_Request_Abstract::hasInstance()) {
+            $fieldList['clientId'] = (string) CM_Http_Request_Abstract::getInstance()->getClientId();
+        }
+
+        $html .= 'ga("create", "' . $this->_getCode() . '", ' . CM_Params::jsonEncode(array_filter($fieldList)) . ');';
         $html .= $this->getJs();
         $html .= '</script>';
 
