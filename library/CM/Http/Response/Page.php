@@ -150,20 +150,21 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             $this->_pageParams = $pageParams;
             return $html;
         } catch (CM_Exception $e) {
-            if (!array_key_exists(get_class($e), $this->_getConfig()->catch)) {
-                throw $e;
-            }
-
-            foreach ($this->_getConfig()->catch as $exception => $options) {
+            $exceptionClass = get_class($e);
+            $configCatch = $this->_getConfig()->catch;
+            if (array_key_exists($exceptionClass, $configCatch)) {
+                $options = $configCatch[$exceptionClass];
                 if (true === $options['log']) {
                     $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
                     $log = new CM_Paging_Log_NotFound();
                     $log->add($formatter->formatException($e), $e->getMetaInfo());
                 }
+            } else {
+                throw $e;
             }
 
             $this->getRender()->getGlobalResponse()->clear();
-            $path = $this->_getConfig()->catch[get_class($e)]['path'];
+            $path = $configCatch[get_class($e)]['path'];
             $request->setPath($path);
             $request->setQuery(array());
         }
