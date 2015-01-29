@@ -17,7 +17,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
         }
 
-        $this->setServiceManager(CM_Service_Manager::getInstance());
+        $this->setServiceManager(CMTest_TH::getServiceManager());
 
         parent::runBare();
     }
