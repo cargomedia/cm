@@ -7,6 +7,7 @@ class CM_Usertext_Filter_Emoticon_EscapeMarkdown extends CM_Usertext_Filter_Abst
         $text = preg_replace_callback('#:[[:alnum:]_]{1,50}:#u', function ($matches) {
             return str_replace('_', '-', $matches[0]);
         }, $text);
+        $text = str_replace(':-\\\\', ':-//', $text);
         return $text;
     }
 }
