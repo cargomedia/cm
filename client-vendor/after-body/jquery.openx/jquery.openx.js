@@ -1,7 +1,7 @@
 /*
  * Author: CM
  */
-(function($) {
+(function($, global) {
 
   /**
    * @param {Object} paramList
@@ -21,8 +21,8 @@
    * @param {String} label
    */
   function trackEvent(category, action, label) {
-    if (ga) {
-      ga('send', {
+    if (global.ga) {
+      global.ga('send', {
         'hitType': 'event',
         'eventCategory': category,
         'eventAction': action,
@@ -87,4 +87,4 @@
       $.getJSON(src + '&callback=?', loadCallback);
     });
   };
-})(jQuery);
+})(jQuery, window);
