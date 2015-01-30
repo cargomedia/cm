@@ -699,7 +699,14 @@ var CM_App = CM_Class_Abstract.extend({
       },
 
       _update: function() {
-        document.title = this._prefix ? this._prefix + ' ' : '' + this._text ? this._text : '';
+        var title = '';
+        if (this._prefix) {
+          title += this._prefix + ' ';
+        }
+        if (this._text) {
+          title += this._text;
+        }
+        document.title = title;
       }
     }
   },
