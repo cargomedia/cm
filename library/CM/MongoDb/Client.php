@@ -1,6 +1,6 @@
 <?php
 
-class CM_MongoDb_Client {
+class CM_MongoDb_Client extends CM_Class_Abstract {
 
     /** @var CM_MongoDb_Client|null $_client */
     private $_client = null;
@@ -147,6 +147,9 @@ class CM_MongoDb_Client {
             $resultCursor = $collection->aggregateCursor($pipeline);
         } else {
             $resultCursor = $collection->find($criteria, $projection);
+        }
+        if (isset(self::_getConfig()->batchSize)) {
+            $resultCursor->batchSize((int) self::_getConfig()->batchSize);
         }
         return $resultCursor;
     }
