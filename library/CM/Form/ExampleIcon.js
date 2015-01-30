@@ -17,10 +17,7 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
     this.on('change', function() {
       this._updateCss();
     }, this);
-    var self = this;
-    setTimeout(function() {
-      self._updateCss();
-    }, 0);
+    this._updateCss();
   },
 
   /**
