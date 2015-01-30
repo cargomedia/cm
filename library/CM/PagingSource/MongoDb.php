@@ -73,6 +73,7 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
                 }
             }
             $cursor = $mongoDb->find($this->_collection, $this->_criteria, $this->_projection, $aggregation);
+            $cursor->batchSize(100000000);
             if (null === $this->_aggregation) {
                 /** @var MongoCursor $cursor */
                 if (null !== $this->_sort) {
