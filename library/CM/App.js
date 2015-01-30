@@ -677,47 +677,7 @@ var CM_App = CM_Class_Abstract.extend({
       }
     },
 
-    title: {
-      _messageStop: function() {
-      },
-      _messageTimeout: null,
-
-      ready: function() {
-        var handler = this;
-        $(window).focus(function() {
-          handler._messageStop();
-        });
-      },
-
-      message: function(msg) {
-        if (cm.window.hasFocus()) {
-          return;
-        }
-        var handler = this;
-        var sleeper = function(offset) {
-          offset += 4;
-          if (offset >= msg.length) {
-            handler._messageStop();
-          } else {
-            document.title = msg.substring(offset, msg.length);
-            handler._messageTimeout = setTimeout(function() {
-              sleeper(offset);
-            }, 400);
-          }
-        };
-
-        this._messageStop();
-        var originalTitle = document.title;
-        document.title = msg;
-        this._messageTimeout = setTimeout(function() {
-          sleeper(0);
-        }, 1500);
-        this._messageStop = function() {
-          document.title = originalTitle;
-          clearTimeout(handler._messageTimeout);
-        };
-      }
-    }
+    title: ''
   },
 
   storage: {
