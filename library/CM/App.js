@@ -676,7 +676,32 @@ var CM_App = CM_Class_Abstract.extend({
       }
     },
 
-    title: ''
+    title: {
+      /** @var {String|null} */
+      _prefix: null,
+      /** @var {String|null} */
+      _text: null,
+
+      /**
+       * @param prefix
+       */
+      setPrefix: function(prefix) {
+        this._prefix = prefix;
+        this._update();
+      },
+
+      /**
+       * @param text
+       */
+      setText: function(text) {
+        this._text = text;
+        this._update();
+      },
+
+      _update: function() {
+        document.title = this._prefix ? this._prefix + ' ' : '' + this._text ? this._text : '';
+      }
+    }
   },
 
   storage: {

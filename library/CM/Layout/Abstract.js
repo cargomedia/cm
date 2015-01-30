@@ -95,7 +95,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
    * @param {String} [jsTracking]
    */
   _onPageSetup: function(page, title, url, menuEntryHashList, jsTracking) {
-    cm.window.title = document.title = title;
+    cm.window.title.setText(title);
     $('[data-menu-entry-hash]').removeClass('active');
     var menuEntrySelectors = _.map(menuEntryHashList, function(menuEntryHash) {
       return '[data-menu-entry-hash=' + menuEntryHash + ']';
