@@ -614,7 +614,6 @@ var CM_App = CM_Class_Abstract.extend({
       }).blur(function() {
         handler._hasFocus = false;
       });
-      this.title.ready();
     },
 
     /**
