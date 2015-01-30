@@ -683,7 +683,7 @@ var CM_App = CM_Class_Abstract.extend({
       _text: null,
 
       /**
-       * @param prefix
+       * @param {String|null} prefix
        */
       setPrefix: function(prefix) {
         this._prefix = prefix;
@@ -691,7 +691,7 @@ var CM_App = CM_Class_Abstract.extend({
       },
 
       /**
-       * @param text
+       * @param {String|null} text
        */
       setText: function(text) {
         this._text = text;
