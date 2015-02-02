@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Clockwork_Storage_Abstract extends CM_Service_ManagerAware {
+abstract class CM_Clockwork_Storage_Abstract {
 
     /** @var string */
     protected $_context;

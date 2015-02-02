@@ -1,6 +1,8 @@
 <?php
 
-class CM_Clockwork_Storage_FileSystem extends CM_Clockwork_Storage_Abstract {
+class CM_Clockwork_Storage_FileSystem extends CM_Clockwork_Storage_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     protected function _load() {
         $data = [];

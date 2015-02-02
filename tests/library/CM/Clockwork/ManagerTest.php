@@ -2,17 +2,6 @@
 
 class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
-    public function testSetStorage() {
-        $manager = new CM_Clockwork_Manager();
-        $serviceManager = $this->mockObject('CM_Service_Manager');
-        /** @var CM_Service_Manager $serviceManager */
-        $manager->setServiceManager($serviceManager);
-        $storage = $this->mockObject('CM_Clockwork_Storage_Abstract', ['foo']);
-        /** @var CM_Clockwork_Storage_Abstract $storage */
-        $manager->setStorage($storage);
-        $this->assertSame($serviceManager, $storage->getServiceManager());
-    }
-
     public function testRunNonBlocking() {
         $process = $this->mockClass('CM_Process')->newInstanceWithoutConstructor();
         $forkMock = $process->mockMethod('fork');
@@ -82,7 +71,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $currently = new DateTime('13:59:59', $timeZone);
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
-        $manager->setServiceManager(CM_Service_Manager::getInstance());
         $manager->setStorage($storage);
         /** @var CM_Clockwork_Event $event */
         $event = new CM_Clockwork_Event('event1', '14:00');
@@ -105,7 +93,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $lastRuntime = null;
         $currently = new DateTime('last day of', $timeZone);
         $manager = $managerMock->newInstance();
-        $manager->setServiceManager(CM_Service_Manager::getInstance());
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
         $event = new CM_Clockwork_Event('event2', 'first day of 09:00');
@@ -122,7 +109,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $currently = new DateTime('23:59', $timeZone);
 
         $manager = $managerMock->newInstance();
-        $manager->setServiceManager(CM_Service_Manager::getInstance());
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
         $event = new CM_Clockwork_Event('event3', '23:59');
@@ -156,7 +142,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $storage = $storageClass->newInstance();
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
-        $manager->setServiceManager(CM_Service_Manager::getInstance());
         $manager->setStorage($storage);
         $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
 
@@ -211,7 +196,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
-        $manager->setServiceManager(CM_Service_Manager::getInstance());
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
         $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
@@ -256,7 +240,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
-        $manager->setServiceManager(CM_Service_Manager::getInstance());
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
         $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
@@ -295,7 +278,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $storage = $storageClass->newInstance();
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
-        $manager->setServiceManager(CM_Service_Manager::getInstance());
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
         $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
@@ -334,7 +316,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
-        $manager->setServiceManager(CM_Service_Manager::getInstance());
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
         $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
@@ -380,7 +361,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $storage = $storageClass->newInstance();
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
-        $manager->setServiceManager(CM_Service_Manager::getInstance());
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
         $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
