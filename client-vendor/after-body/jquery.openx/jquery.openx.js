@@ -78,10 +78,11 @@
 
         if (hasContent) {
           trackEvent('Banner', 'Impression', 'zone-' + zoneId);
-          if ($element.is(':visible') && $element.find('a[href]').length > 0) {
+          var $link = $element.find('a[href]');
+          if ($element.is(':visible') && $link.length > 0) {
             trackEvent('Banner', 'Impression-Clickable', 'zone-' + zoneId);
           }
-          $element.find('a[href]').on('click', function() {
+          $link.on('click', function() {
             trackEvent('Banner', 'Click', 'zone-' + zoneId);
           });
         }
