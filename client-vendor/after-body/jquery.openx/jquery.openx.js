@@ -78,9 +78,13 @@
 
         if (hasContent) {
           trackEvent('Banner', 'Impression', 'zone-' + zoneId);
-          $element.find('a[href]').on('click', function() {
-            trackEvent('Banner', 'Click', 'zone-' + zoneId);
-          });
+          var $link = $element.find('a[href]');
+          if ($element.is(':visible') && $link.length > 0) {
+            trackEvent('Banner', 'Impression-Clickable', 'zone-' + zoneId);
+            $link.on('click', function() {
+              trackEvent('Banner', 'Click', 'zone-' + zoneId);
+            });
+          }
         }
       };
 
