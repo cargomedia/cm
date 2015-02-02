@@ -95,7 +95,7 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
     }
 
     protected function _cacheKeyBase() {
-        return array($this->_collection, $this->_criteria, $this->_projection);
+        return array($this->_collection, $this->_criteria, $this->_projection, $this->_aggregation);
     }
 
     public function getStalenessChance() {
