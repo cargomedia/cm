@@ -699,10 +699,8 @@ var CM_App = CM_Class_Abstract.extend({
        * @param {String} text
        */
       setText: function(text) {
-        if (_.isString(text)) {
-          this._text = text;
-          this._update();
-        }
+        this._text = text;
+        this._update();
       },
 
       _update: function() {
