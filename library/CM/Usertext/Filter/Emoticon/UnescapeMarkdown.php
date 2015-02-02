@@ -7,7 +7,6 @@ class CM_Usertext_Filter_Emoticon_UnescapeMarkdown extends CM_Usertext_Filter_Ab
         $text = preg_replace_callback('#:[[:alnum:]-]{1,50}:#u', function ($matches) {
             return str_replace('-', '_', $matches[0]);
         }, $text);
-        $text = str_replace(':-//', ':-\\\\', $text);
         return $text;
     }
 }

@@ -14,4 +14,14 @@ class CM_Usertext_Filter_Emoticon_EscapeMarkdownTest extends CMTest_TestCase {
 
         $this->assertSame($expected, $actual);
     }
+
+    public function testProcessAdditionalCodes() {
+        $text = 'Some text and and some emoticons :-\\\\ :-) :-[';
+        $expected = 'Some text and and some emoticons :cold_sweat: :smiley: :confused:';
+
+        $filter = new CM_Usertext_Filter_Emoticon_EscapeMarkdown();
+        $actual = $filter->transform($text, new CM_Frontend_Render());
+
+        $this->assertSame($expected, $actual);
+    }
 }
