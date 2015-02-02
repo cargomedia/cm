@@ -2,7 +2,7 @@
 
 class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
 
-    public function testAccount() {
+    public function testCreate() {
         $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
         $googleAnalytics = new CMService_GoogleAnalytics_Client('key123');
         $environment = new CM_Frontend_Environment($site);
@@ -10,6 +10,18 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
 
         $html = $googleAnalytics->getHtml($environment);
         $this->assertContains('ga("create", "key123", {"cookieDomain":"www.my-website.net","clientId":"222"}', $html);
+    }
+
+    public function testCreateWithUser() {
+        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
+        $viewer = CMTest_TH::createUser();
+        $googleAnalytics = new CMService_GoogleAnalytics_Client('key123');
+        $environment = new CM_Frontend_Environment($site, $viewer);
+        $request = new CM_Http_Request_Get('/pseudo-request', ['Cookie' => 'clientId=222']);
+
+        $html = $googleAnalytics->getHtml($environment);
+        $this->assertContains('ga("create", "key123", {"cookieDomain":"www.my-website.net","clientId":"222","userId":' . $viewer->getId() . '}',
+            $html);
     }
 
     public function testSetCustomMetric() {
@@ -87,6 +99,19 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $js = $googleAnalytics->getJs($environment);
         $this->assertSame(1, substr_count($js, 'ga("send", "pageview"'));
         $this->assertSame(1, substr_count($js, 'ga("send", "pageview", "/bar");'));
+    }
+
+    public function testTrackPageViewSetsUser() {
+        $googleAnalytics = new CMService_GoogleAnalytics_Client('');
+        $environment = new CM_Frontend_Environment();
+        $js = $googleAnalytics->getJs($environment);
+        $this->assertNotContains('ga("set", "userId"', $js);
+
+        $viewer = CMTest_TH::createUser();
+        $environmentWithViewer = new CM_Frontend_Environment(null, $viewer);
+        $googleAnalytics->trackPageView($environmentWithViewer, '/foo');
+        $js = $googleAnalytics->getJs($environment);
+        $this->assertContains('ga("set", "userId", "' . $viewer->getId() . '")', $js);
     }
 
     public function testAddSale() {
