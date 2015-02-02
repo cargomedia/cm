@@ -614,7 +614,7 @@ var CM_App = CM_Class_Abstract.extend({
       }).blur(function() {
         handler._hasFocus = false;
       });
-      this.title.setText(document.title);
+      this.title.ready();
     },
 
     /**
@@ -683,6 +683,10 @@ var CM_App = CM_Class_Abstract.extend({
       /** @var {String|null} */
       _text: null,
 
+      ready: function() {
+        this.setText(document.title);
+      },
+
       /**
        * @param {String|null} prefix
        */
@@ -695,8 +699,10 @@ var CM_App = CM_Class_Abstract.extend({
        * @param {String|null} text
        */
       setText: function(text) {
-        this._text = text;
-        this._update();
+        if (_.isString(text)) {
+          this._text = text;
+          this._update();
+        }
       },
 
       _update: function() {
