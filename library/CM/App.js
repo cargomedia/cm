@@ -680,8 +680,8 @@ var CM_App = CM_Class_Abstract.extend({
     title: {
       /** @var {String|null} */
       _prefix: null,
-      /** @var {String|null} */
-      _text: null,
+      /** @var {String} */
+      _text: '',
 
       ready: function() {
         this.setText(document.title);
@@ -696,7 +696,7 @@ var CM_App = CM_Class_Abstract.extend({
       },
 
       /**
-       * @param {String|null} text
+       * @param {String} text
        */
       setText: function(text) {
         if (_.isString(text)) {
