@@ -56,13 +56,6 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
     this._onChange();
   },
 
-  /**
-   * @returns {Number}
-   */
-  getValue: function() {
-    return parseInt(this.$('.noUiSlider').val());
-  },
-
   _onChange: function() {
     this.trigger('change');
   },

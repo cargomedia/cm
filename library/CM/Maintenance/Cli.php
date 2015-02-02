@@ -10,16 +10,18 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function start() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
-        $this->_clockworkManager->setServiceManager(CM_Service_Manager::getInstance());
-        $this->_clockworkManager->setStorage(new CM_Clockwork_Storage_FileSystem('app-maintenance'));
+        $storage = new CM_Clockwork_Storage_FileSystem('app-maintenance');
+        $storage->setServiceManager(CM_Service_Manager::getInstance());
+        $this->_clockworkManager->setStorage($storage);
         $this->_registerCallbacks();
         $this->_clockworkManager->start();
     }
 
     public function startLocal() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
-        $this->_clockworkManager->setServiceManager(CM_Service_Manager::getInstance());
-        $this->_clockworkManager->setStorage(new CM_Clockwork_Storage_FileSystem('app-maintenance-local'));
+        $storage = new CM_Clockwork_Storage_FileSystem('app-maintenance-local');
+        $storage->setServiceManager(CM_Service_Manager::getInstance());
+        $this->_clockworkManager->setStorage($storage);
         $this->_registerCallbacksLocal();
         $this->_clockworkManager->start();
     }

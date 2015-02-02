@@ -1,7 +1,7 @@
 /*
  * Author: CM
  */
-(function($) {
+(function($, global) {
 
   /**
    * @param {Object} paramList
@@ -13,6 +13,22 @@
       parts.push(encodeURIComponent(param) + '=' + encodeURIComponent(paramList[param]));
     }
     return parts.join('&');
+  }
+
+  /**
+   * @param {String} category
+   * @param {String} action
+   * @param {String} label
+   */
+  function trackEvent(category, action, label) {
+    if (global.ga) {
+      global.ga('send', {
+        'hitType': 'event',
+        'eventCategory': category,
+        'eventAction': action,
+        'eventLabel': label,
+      });
+    }
   }
 
   $.fn.openx = function() {
@@ -54,10 +70,21 @@
       }
 
       var $element = $(this);
-      $.getJSON(src + '&callback=?', function(html) {
+
+      var loadCallback = function(html) {
         $element.html(html);
-        $element.trigger('openx-loaded', {hasContent: $.trim(html).length > 0});
-      });
+        var hasContent = $.trim(html).length > 0;
+        $element.trigger('openx-loaded', {hasContent: hasContent});
+
+        if (hasContent) {
+          trackEvent('Banner', 'Impression', 'zone-' + zoneId);
+          $element.find('a[href]').on('click', function() {
+            trackEvent('Banner', 'Click', 'zone-' + zoneId);
+          });
+        }
+      };
+
+      $.getJSON(src + '&callback=?', loadCallback);
     });
   };
-})(jQuery);
+})(jQuery, window);
