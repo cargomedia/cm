@@ -83,6 +83,9 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
         }
     }
 
+    /**
+     * @keepalive
+     */
     public function startMaintenance() {
         $clockwork = new CM_Clockwork_Manager();
         $storage = new CM_Clockwork_Storage_FileSystem('search-maintenance');

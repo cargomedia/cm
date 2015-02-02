@@ -7,6 +7,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
      * @synchronized
+     * @keepalive
      */
     public function start() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
@@ -17,6 +18,9 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
         $this->_clockworkManager->start();
     }
 
+    /**
+     * @keepalive
+     */
     public function startLocal() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
         $storage = new CM_Clockwork_Storage_FileSystem('app-maintenance-local');
