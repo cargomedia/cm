@@ -81,10 +81,10 @@
           var $link = $element.find('a[href]');
           if ($element.is(':visible') && $link.length > 0) {
             trackEvent('Banner', 'Impression-Clickable', 'zone-' + zoneId);
+            $link.on('click', function() {
+              trackEvent('Banner', 'Click', 'zone-' + zoneId);
+            });
           }
-          $link.on('click', function() {
-            trackEvent('Banner', 'Click', 'zone-' + zoneId);
-          });
         }
       };
 
