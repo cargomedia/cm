@@ -86,6 +86,14 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     }
 
     /**
+     * @param int $userId
+     */
+    public function setUserId($userId) {
+        $userId = (int) $userId;
+        $this->_setField('userId', $userId);
+    }
+
+    /**
      * @return string
      */
     public function getJs() {
@@ -152,6 +160,9 @@ EOF;
         if (CM_Http_Request_Abstract::hasInstance()) {
             $fieldList['clientId'] = (string) CM_Http_Request_Abstract::getInstance()->getClientId();
         }
+        if ($user = $environment->getViewer()) {
+            $fieldList['userId'] = $user->getId();
+        }
 
         $html .= 'ga("create", "' . $this->_getCode() . '", ' . CM_Params::jsonEncode(array_filter($fieldList)) . ');';
         $html .= $this->getJs();
@@ -167,6 +178,9 @@ EOF;
     }
 
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
+        if ($viewer = $environment->getViewer()) {
+            $this->setUserId($viewer->getId());
+        }
         $this->setPageView($path);
     }
 

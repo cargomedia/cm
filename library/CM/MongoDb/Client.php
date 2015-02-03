@@ -1,6 +1,6 @@
 <?php
 
-class CM_MongoDb_Client {
+class CM_MongoDb_Client extends CM_Class_Abstract {
 
     /** @var CM_MongoDb_Client|null $_client */
     private $_client = null;
@@ -130,6 +130,10 @@ class CM_MongoDb_Client {
      * @return Iterator
      */
     public function find($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
+        $batchSize = null;
+        if (isset(self::_getConfig()->batchSize)) {
+            $batchSize = (int) self::_getConfig()->batchSize;
+        }
         $criteria = (array) $criteria;
         $projection = (array) $projection;
         CM_Debug::getInstance()->incStats('mongo', "find `{$collection}`: " . CM_Params::jsonEncode(['projection'  => $projection,
@@ -144,9 +148,16 @@ class CM_MongoDb_Client {
             if ($criteria) {
                 array_unshift($pipeline, ['$match' => $criteria]);
             }
-            $resultCursor = $collection->aggregateCursor($pipeline);
+            $options = [];
+            if (null !== $batchSize) {
+                $options['cursor'] = ['batchSize' => $batchSize];
+            }
+            $resultCursor = $collection->aggregateCursor($pipeline, $options);
         } else {
             $resultCursor = $collection->find($criteria, $projection);
+        }
+        if (null !== $batchSize) {
+            $resultCursor->batchSize($batchSize);
         }
         return $resultCursor;
     }

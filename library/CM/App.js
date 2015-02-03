@@ -678,44 +678,40 @@ var CM_App = CM_Class_Abstract.extend({
     },
 
     title: {
-      _messageStop: function() {
-      },
-      _messageTimeout: null,
+      /** @var {String|null} */
+      _prefix: null,
+      /** @var {String} */
+      _text: '',
 
       ready: function() {
-        var handler = this;
-        $(window).focus(function() {
-          handler._messageStop();
-        });
+        this.setText(document.title);
       },
 
-      message: function(msg) {
-        if (cm.window.hasFocus()) {
-          return;
-        }
-        var handler = this;
-        var sleeper = function(offset) {
-          offset += 4;
-          if (offset >= msg.length) {
-            handler._messageStop();
-          } else {
-            document.title = msg.substring(offset, msg.length);
-            handler._messageTimeout = setTimeout(function() {
-              sleeper(offset);
-            }, 400);
-          }
-        };
+      /**
+       * @param {String|null} prefix
+       */
+      setPrefix: function(prefix) {
+        this._prefix = prefix;
+        this._update();
+      },
 
-        this._messageStop();
-        var originalTitle = document.title;
-        document.title = msg;
-        this._messageTimeout = setTimeout(function() {
-          sleeper(0);
-        }, 1500);
-        this._messageStop = function() {
-          document.title = originalTitle;
-          clearTimeout(handler._messageTimeout);
-        };
+      /**
+       * @param {String} text
+       */
+      setText: function(text) {
+        this._text = text;
+        this._update();
+      },
+
+      _update: function() {
+        var title = '';
+        if (this._prefix) {
+          title += this._prefix + ' ';
+        }
+        if (this._text) {
+          title += this._text;
+        }
+        document.title = title;
       }
     }
   },
