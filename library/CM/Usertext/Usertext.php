@@ -41,7 +41,9 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
             $emoticonFixedHeight = 16;
         }
         $this->addFilter(new CM_Usertext_Filter_Badwords());
-        $this->addFilter(new CM_Usertext_Filter_Emoticon_ReplaceAdditional());
+        if ('escape' != $mode) {
+            $this->addFilter(new CM_Usertext_Filter_Emoticon_ReplaceAdditional());
+        }
         $this->addFilter(new CM_Usertext_Filter_Escape());
         switch ($mode) {
             case 'escape':
