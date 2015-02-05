@@ -98,7 +98,10 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageTrackingError() {
-        CM_Config::get()->CM_Http_Response_Page->catch['CM_Exception_Nonexistent'] = CM_Page_View_Ajax_Test_Mock::getPath();
+        CM_Config::get()->CM_Http_Response_Page->catch['CM_Exception_Nonexistent'] = [
+            'path' => CM_Page_View_Ajax_Test_Mock::getPath(),
+            'log'  => true,
+        ];
 
         $page = new CM_Page_View_Ajax_Test_Mock();
         $request = $this->createRequestAjax($page, 'loadPage', ['path' => '/iwhdfkjlsh']);
