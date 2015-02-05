@@ -11,7 +11,7 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
         $renderAdapter = new CM_RenderAdapter_Layout($render, $pageMock);
         $html = $renderAdapter->fetch();
 
-        $this->assertNotContains('var _gaq = _gaq || [];', $html);
+        $this->assertNotContains('ga("create", "key"', $html);
         $this->assertNotContains('var _kmq = _kmq || [];', $html);
     }
 
@@ -25,10 +25,8 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
         $renderAdapter = new CM_RenderAdapter_Layout($render, $pageMock);
         $html = $renderAdapter->fetch();
 
-        $this->assertContains('var _gaq = _gaq || [];', $html);
-        $this->assertContains("_gaq.push(['_setAccount', 'ga123']);", $html);
-        $this->assertContains("_gaq.push(['_setDomainName', 'www.example.com']);", $html);
-        $this->assertNotContains("_gaq.push(['_trackPageview'", $html);
+        $this->assertContains('ga("create", "ga123"', $html);
+        $this->assertNotContains('ga("send", "pageview"', $html);
         $this->assertContains('var _kmq = _kmq || [];', $html);
         $this->assertContains("var _kmk = _kmk || 'km123';", $html);
         $this->assertNotContains("_kmq.push(['identify'", $html);
@@ -50,10 +48,8 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
         $renderAdapter = new CM_RenderAdapter_Layout($render, $pageMock);
         $html = $renderAdapter->fetch();
 
-        $this->assertContains('var _gaq = _gaq || [];', $html);
-        $this->assertContains("_gaq.push(['_setAccount', 'ga123']);", $html);
-        $this->assertContains("_gaq.push(['_setDomainName', 'www.example.com']);", $html);
-        $this->assertNotContains("_gaq.push(['_trackPageview'", $html);
+        $this->assertContains('ga("create", "ga123"', $html);
+        $this->assertNotContains('ga("send", "pageview"', $html);
         $this->assertContains('var _kmq = _kmq || [];', $html);
         $this->assertContains("var _kmk = _kmk || 'km123';", $html);
         $this->assertNotContains("_kmq.push(['identify'", $html);
@@ -85,10 +81,9 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
      */
     protected function _getServiceManager($codeGoogleAnalytics, $codeKissMetrics) {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('tracking-googleanalytics-test', 'CMService_GoogleAnalytics_Client', array($codeGoogleAnalytics));
-        $serviceManager->register('tracking-kissmetrics-test', 'CMService_KissMetrics_Client', array($codeKissMetrics));
-        $serviceManager->unregister('trackings');
-        $serviceManager->register('trackings', 'CM_Service_Trackings', array(array('tracking-googleanalytics-test', 'tracking-kissmetrics-test')));
+        $serviceManager->register('googleanalytics', 'CMService_GoogleAnalytics_Client', [$codeGoogleAnalytics]);
+        $serviceManager->register('kissmetrics', 'CMService_KissMetrics_Client', array($codeKissMetrics));
+        $serviceManager->register('trackings', 'CM_Service_Trackings', [['googleanalytics', 'kissmetrics']]);
         return $serviceManager;
     }
 }

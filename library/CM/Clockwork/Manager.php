@@ -1,6 +1,6 @@
 <?php
 
-class CM_Clockwork_Manager extends CM_Service_ManagerAware {
+class CM_Clockwork_Manager {
 
     /** @var CM_Clockwork_Event[] */
     private $_events;
@@ -62,7 +62,6 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
      */
     public function setStorage(CM_Clockwork_Storage_Abstract $storage) {
         $this->_storage = $storage;
-        $this->_storage->setServiceManager($this->getServiceManager());
     }
 
     /**

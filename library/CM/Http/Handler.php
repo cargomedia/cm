@@ -16,7 +16,7 @@ class CM_Http_Handler implements CM_Service_ManagerAwareInterface {
      * @return CM_Http_Response_Abstract
      */
     public function processRequest(CM_Http_Request_Abstract $request) {
-        $response = CM_Http_Response_Abstract::factory($request);
+        $response = CM_Http_Response_Abstract::factory($request, $this->getServiceManager());
         $response->process();
         return $response;
     }

@@ -1,6 +1,15 @@
 <?php
 
-class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAdapter {
+class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAdapter implements CM_Model_StorageAdapter_FindableInterface {
+
+    public function findByData($type, array $data) {
+        $result = $this->_getMongoDb()->findOne($this->_getCollectionName($type), $data, ['_id']);
+        if (null === $result) {
+            return null;
+        }
+        $mongoId = $result['_id'];
+        return ['id' => (string) $mongoId];
+    }
 
     public function load($type, array $id) {
         $type = (int) $type;

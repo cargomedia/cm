@@ -23,13 +23,13 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
 
         foreach ($responses as $path => $expectedResponse) {
             $request = new CM_Http_Request_Post($path . '/null/timestamp', null, null, '');
-            $this->assertInstanceOf($expectedResponse, CM_Http_Response_Abstract::factory($request));
+            $this->assertInstanceOf($expectedResponse, CM_Http_Response_Abstract::factory($request, $this->getServiceManager()));
         }
     }
 
     public function testSetDeleteCookie() {
         $request = new CM_Http_Request_Post('/foo/null');
-        $response = CM_Http_Response_Abstract::factory($request);
+        $response = CM_Http_Response_Abstract::factory($request, $this->getServiceManager());
         $time = time();
         $timeString = date('D\, d\-M\-Y h:i:s e', $time);
 

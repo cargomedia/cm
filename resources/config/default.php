@@ -31,6 +31,8 @@ return function (CM_Config_Node $config) {
         array('host' => 'localhost', 'port' => 11211),
     );
 
+    $config->CM_Paging_Ip_Blocked->maxAge = (7 * 86400);
+
     $config->classConfigCacheEnabled = true;
 
     $config->CM_Stream_Message->enabled = true;
@@ -43,6 +45,8 @@ return function (CM_Config_Node $config) {
     );
 
     $config->CM_Db_Db->delayedEnabled = true;
+
+    $config->CM_MongoDb_Client->batchSize = null;
 
     $config->CM_Model_User->class = 'CM_Model_User';
 

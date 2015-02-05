@@ -2,8 +2,8 @@
 
 abstract class CM_Http_Response_Resource_Abstract extends CM_Http_Response_Abstract {
 
-    public function __construct(CM_Http_Request_Abstract $request) {
-        parent::__construct($request);
+    public function __construct(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
+        parent::__construct($request, $serviceManager);
         $timestamp = $this->_request->popPathPart();
     }
 

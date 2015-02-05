@@ -1,8 +1,10 @@
 <?php
 
-abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
+abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_Service_ManagerAwareInterface {
 
     use \Mocka\MockaTrait;
+
+    use CM_Service_ManagerAwareTrait;
 
     public function runBare() {
         if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
@@ -14,6 +16,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             ));
             CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
         }
+
+        $this->setServiceManager(CMTest_TH::getServiceManager());
+
         parent::runBare();
     }
 
@@ -181,7 +186,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      */
     public function getResponse(CM_Http_Request_Abstract $request) {
         $className = CM_Http_Response_Abstract::getResponseClassName($request);
-        return $this->mockClass($className)->newInstance([$request]);
+        $serviceManager = self::getServiceManager();
+        return $this->mockClass($className)->newInstance([$request, $serviceManager]);
     }
 
     /**
@@ -298,10 +304,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         }
         $host = parse_url($site->getUrl(), PHP_URL_HOST);
         $request = new CM_Http_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), array('host' => $host), null, $viewer);
-        $response = new CM_Http_Response_Page($request);
-        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, $viewer));
-        $page->prepareResponse($render->getEnvironment(), $response);
-        $renderAdapter = new CM_RenderAdapter_Page($render, $page);
+        $response = new CM_Http_Response_Page($request, $this->getServiceManager());
+        $page->prepareResponse($response->getRender()->getEnvironment(), $response);
+        $renderAdapter = new CM_RenderAdapter_Page($response->getRender(), $page);
         $html = $renderAdapter->fetch();
         return new CM_Dom_NodeList($html, true);
     }
