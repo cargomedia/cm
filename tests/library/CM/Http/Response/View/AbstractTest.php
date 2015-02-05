@@ -23,6 +23,24 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertSame('CM_Layout_Mock1', $responseContent['success']['data']['layoutClass']);
     }
 
+    public function testNotFoundErrorLogging() {
+        CM_Config::get()->CM_Http_Response_Page->catch['CM_Exception_Nonexistent'] = [
+            'path' => CM_Page_View_Ajax_Test_Mock::getPath(),
+            'log'  => true,
+        ];
+
+        $log = new CM_Paging_Log_NotFound();
+        $this->assertCount(0, $log);
+
+        $viewer = CMTest_TH::createUser();
+        $environment = new CM_Frontend_Environment(null, $viewer);
+        $component = new CM_Page_View_Ajax_Test_Mock();
+        $this->getResponseAjax($component, 'loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath() . '/NotExist'], $environment);
+
+        $log = new CM_Paging_Log_NotFound();
+        $this->assertCount(1, $log);
+    }
+
     public function testLoadPageRedirectExternal() {
         $response = $this->getResponseAjax(new CM_Page_View_Ajax_Test_Mock(), 'loadPage', ['path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()]);
         $this->assertViewResponseSuccess($response, array('redirectExternal' => 'http://www.foo.bar'));
@@ -80,7 +98,10 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageTrackingError() {
-        CM_Config::get()->CM_Http_Response_Page->catch['CM_Exception_Nonexistent'] = CM_Page_View_Ajax_Test_Mock::getPath();
+        CM_Config::get()->CM_Http_Response_Page->catch['CM_Exception_Nonexistent'] = [
+            'path' => CM_Page_View_Ajax_Test_Mock::getPath(),
+            'log'  => true,
+        ];
 
         $page = new CM_Page_View_Ajax_Test_Mock();
         $request = $this->createRequestAjax($page, 'loadPage', ['path' => '/iwhdfkjlsh']);
