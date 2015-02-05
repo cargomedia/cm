@@ -15,6 +15,9 @@ class CM_Usertext_UsertextTest extends CMTest_TestCase {
         $expectedValuePlain = "<img src=\"http://cdn.default.dev/layout/" . $siteType . "/" . $deployVersion . "/img/emoticon/cold_sweat.png\" class=\"emoticon emoticon-cold_sweat\" title=\":cold_sweat:\" />";
         $expectedValueMarkdown = "<p><img src=\"http://cdn.default.dev/layout/" . $siteType . "/" . $deployVersion . "/img/emoticon/cold_sweat.png\" class=\"emoticon emoticon-cold_sweat\" title=\":cold_sweat:\" /></p>";
 
+        $usertext->setMode('escape');
+        $this->assertSame('&lt;3', $usertext->transform('<3'));
+
         $usertext->setMode('oneline');
         $this->assertSame($expectedValuePlain, $usertext->transform(':-\\\\'));
 
