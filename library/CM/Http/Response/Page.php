@@ -160,9 +160,8 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
                 throw $e;
             } else {
                 $options = $configCatch[$exceptionClass];
-                $path = $options['path'];
                 $this->getRender()->getGlobalResponse()->clear();
-                $request->setPath($path);
+                $request->setPath($options['path']);
                 $request->setQuery(array());
                 if (true === $options['log']) {
                     $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
