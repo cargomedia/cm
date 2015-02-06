@@ -74,7 +74,7 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
      * @return string[]
      */
     public function getCssClasses() {
-        $cssClasses = array_merge($this->getView()->getClassHierarchy(), $this->_cssClasses);
+        $cssClasses = array_merge(CM_Util::getClassHierarchy(get_class($this->getView())), $this->_cssClasses);
         $templateName = $this->getTemplateName();
         if ('default' !== $templateName) {
             $cssClasses[] = $templateName;

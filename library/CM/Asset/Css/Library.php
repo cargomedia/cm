@@ -23,7 +23,7 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
             }
         }
 
-        $viewClasses = CM_View_Abstract::getClassChildren(true);
+        $viewClasses = CM_Util::getClassChildren('CM_View_Abstract', true);
         foreach ($viewClasses as $viewClassName) {
             $validModule = in_array(CM_Util::getNamespace($viewClassName), $render->getSite()->getModules());
             $validViewClass = $this->_isValidViewClass($viewClassName);

@@ -2,6 +2,8 @@
 
 class CM_Util {
 
+    private static $_classHierarchyCache = array();
+
     /**
      * @param int $number
      * @return int[]
@@ -543,5 +545,19 @@ class CM_Util {
             }
         }
         return null;
+    }
+
+    /**
+     * @param string $className
+     * @return string[]
+     */
+    public static function getClassHierarchy($className) {
+        if (isset(self::$_classHierarchyCache[$className])) {
+            return self::$_classHierarchyCache[$className];
+        }
+        $classHierarchy = array_values(class_parents($className));
+        array_unshift($classHierarchy, $className);
+        self::$_classHierarchyCache[$className] = $classHierarchy;
+        return $classHierarchy;
     }
 }

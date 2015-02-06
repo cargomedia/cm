@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed {
+abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Class_TypeInterface {
 
     /** @var string[] */
     protected $_themes = array();
@@ -208,7 +208,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @throws CM_Exception_Invalid
      */
     public static function findByRequest(CM_Http_Request_Abstract $request) {
-        foreach (array_reverse(static::getClassChildren()) as $className) {
+        foreach (array_reverse(CM_Util::getClassChildren(get_called_class())) as $className) {
             /** @var CM_Site_Abstract $site */
             $site = new $className();
             if ($site->match($request)) {
