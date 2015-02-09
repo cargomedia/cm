@@ -40,9 +40,6 @@
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-160x160.png' type='layout'}" sizes="160x160">
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-192x192.png' type='layout'}" sizes="192x192">
 
-    <!-- favicon.ico used for IE9: -->
-    <!--[if IE]><link rel="shortcut icon" href="{resourceUrl path='img/favicon.ico' type='layout'}"><![endif]-->
-
     <link rel="alternate" href="{$renderDefault->getUrlPage($page, $page->getParams()->getParamsEncoded())|escape}" hreflang="x-default">
     {foreach $languageList as $language}
       <link rel="alternate" href="{$renderDefault->getUrlPage($page, $page->getParams()->getParamsEncoded(), null, $language)|escape}" hreflang="{$language->getAbbreviation()}">
