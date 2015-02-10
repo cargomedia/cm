@@ -1688,6 +1688,15 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @param CM_OutputStream_Interface $streamError
      */
     public static function weeklyUpgrade(CM_OutputStream_Interface $streamOutput, CM_OutputStream_Interface $streamError) {
+        $geoIpFile = self::_downloadGeoIPFile();
+        $maxMind = new CMService_MaxMind($geoIpFile, $streamOutput, $streamError);
+        $maxMind->upgrade();
+    }
+
+    /**
+     * @return CM_File|null
+     */
+    protected static function _downloadGeoIPFile() {
         $geoIpFile = null;
         if ($licenceKey = self::_getConfig()->licenceKey) {
             $parameterList = [
@@ -1703,7 +1712,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
             }
             $geoIpFile->write($contents);
         }
-        $maxMind = new CMService_MaxMind($geoIpFile, $streamOutput, $streamError);
-        $maxMind->upgrade();
+        return $geoIpFile;
     }
 }
