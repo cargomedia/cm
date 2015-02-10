@@ -89,6 +89,11 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 }
             }
         ));
+        $this->_registerClockworkCallbacks('1 week', array(
+            'CMService_MaxMind::weeklyUpgrade' => function () {
+                CMService_MaxMind::weeklyUpgrade($this->_getStreamOutput(), $this->_getStreamError());
+            }
+        ));
     }
 
     protected function _registerCallbacksLocal() {

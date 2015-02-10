@@ -96,6 +96,8 @@ return function (CM_Config_Node $config) {
     $config->CMService_Amazon_Abstract->accessKey = '';
     $config->CMService_Amazon_Abstract->secretKey = '';
 
+    $config->CMService_MaxMind->licenceKey = '';
+
     $config->CMService_Newrelic->enabled = false;
     $config->CMService_Newrelic->appName = 'CM Application';
 

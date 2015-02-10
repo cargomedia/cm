@@ -759,10 +759,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             if (null === $url) {
                 throw new CM_Exception('File not found: `' . $file->getPath() . '`');
             }
-            $contents = CM_Util::getContents($url);
-            if (false === $contents) {
-                throw new CM_Exception('Download of `' . $url . '` failed');
-            }
+            $contents = CM_Util::getContents($url, null, null, 600);
             $file->write($contents);
         }
         return $contents;
@@ -1684,5 +1681,29 @@ class CMService_MaxMind extends CM_Class_Abstract {
             }
         }
         $this->_geoIpFile = $geoIpFile;
+    }
+
+    /**
+     * @param CM_OutputStream_Interface $streamOutput
+     * @param CM_OutputStream_Interface $streamError
+     */
+    public static function weeklyUpgrade(CM_OutputStream_Interface $streamOutput, CM_OutputStream_Interface $streamError) {
+        $geoIpFile = null;
+        if ($licenceKey = self::_getConfig()->licenceKey) {
+            $parameterList = [
+                'edition_id'  => 139,
+                'suffix'      => 'zip',
+                'license_key' => $licenceKey,
+            ];
+            $geoIpUrl = 'https://download.maxmind.com/app/geoip_download?' . http_build_query($parameterList);
+            $contents = CM_Util::getContents($geoIpUrl, null, null, 600);
+            $geoIpFile = new CM_File('GeoIP-139.zip', CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
+            if ($geoIpFile->exists()) {
+                $geoIpFile->delete();
+            }
+            $geoIpFile->write($contents);
+        }
+        $maxMind = new CMService_MaxMind($geoIpFile, $streamOutput, $streamError);
+        $maxMind->upgrade();
     }
 }
