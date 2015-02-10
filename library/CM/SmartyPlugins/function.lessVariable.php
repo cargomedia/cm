@@ -7,7 +7,7 @@ function smarty_function_lessVariable(array $params, Smarty_Internal_Template $t
 
     $assetCss = new CM_Asset_Css($render);
     $assetCss->addVariables();
-    $assetCss->add('foo:@' . $variableName . '');
+    $assetCss->add('foo:@' . $variableName);
 
     $css = $assetCss->get(true);
 
