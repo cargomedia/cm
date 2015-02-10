@@ -155,7 +155,6 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $this->assertSame(0, $cursor->info()['batchSize']);
         $cursor = $mongoDb->find($collectionName, null, null, ['$match' => ['foo' => 'bar']]);
         $this->assertSame(0, $cursor->info()['batchSize']);
-        $this->assertSame(101, $cursor->info()['query']['cursor']['batchSize']);
 
         CM_Config::get()->CM_MongoDb_Client->batchSize = 10;
 
