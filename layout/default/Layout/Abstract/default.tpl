@@ -10,10 +10,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="{$render->getSite()->getName()|escape}">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="msapplication-TileColor" content="{block name='tileColor'}#3FB4FF{/block}">
+    <meta name="msapplication-TileColor" content="{block name='tileColor'}{lessVariable name='colorBrand'}{/block}">
     <meta name="msapplication-TileImage" content="{resourceUrl path='img/meta/mstile-144x144.png' type='layout'}">
     <meta name="msapplication-config" content="{resourceUrl path='browserconfig.xml' type='layout'}">
-    <meta name="theme-color" content="{block name='themeColor'}#3FB4FF{/block}">
+    <meta name="theme-color" content="{block name='themeColor'}{lessVariable name='colorBrand'}{/block}">
 
     <link rel="apple-touch-icon" sizes="57x57" href="{resourceUrl path='img/meta/apple-touch-icon-57x57.png' type='layout'}">
     <link rel="apple-touch-icon" sizes="60x60" href="{resourceUrl path='img/meta/apple-touch-icon-60x60.png' type='layout'}">
