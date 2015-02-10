@@ -1695,7 +1695,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 'suffix'      => 'zip',
                 'license_key' => $licenceKey,
             ];
-            $geoIpUrl = 'https://download.maxmind.com/app/geoip_download?' . http_build_query($parameterList);
+            $geoIpUrl = CM_Util::link('https://download.maxmind.com/app/geoip_download', $parameterList);
             $contents = CM_Util::getContents($geoIpUrl, null, null, 600);
             $geoIpFile = new CM_File('GeoIP-139.zip', CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
             if ($geoIpFile->exists()) {
