@@ -36,11 +36,12 @@
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-320x460.png' type='layout'}" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 1)">
 
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-32x32.png' type='layout'}" sizes="32x32">
-    <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-194x194.png' type='layout'}" sizes="194x194">
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-96x96.png' type='layout'}" sizes="96x96">
     <link rel="icon" type="image/png" href="{resourceUrl path='img/android-chrome-192x192.png' type='layout'}" sizes="192x192">
     <link rel="icon" type="image/png" href="{resourceUrl path='img/favicon-16x16.png' type='layout'}" sizes="16x16">
+
     <link rel="manifest" href="{resourceUrl path='manifest.json' type='layout'}">
+    <link rel="shortcut icon" href="/img/favicon.ico">
 
     <link rel="alternate" href="{$renderDefault->getUrlPage($page, $page->getParams()->getParamsEncoded())|escape}" hreflang="x-default">
     {foreach $languageList as $language}
