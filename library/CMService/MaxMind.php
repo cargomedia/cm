@@ -776,12 +776,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $this->_download($this->_geoIpFile, self::GEO_LITE_CITY_URL);
             } else {
                 $parameterList = [
-                    'edition_id'  => 139,
+                    'edition_id'  => 134,
                     'suffix'      => 'zip',
                     'license_key' => $licenceKey,
                 ];
                 $geoIpUrl = CM_Util::link(self::GEO_IP_URL, $parameterList);
-                $this->_geoIpFile = new CM_File('GeoIP-139.zip', CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
+                $this->_geoIpFile = new CM_File('GeoIP-134.zip', CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
                 $this->_streamOutput->writeln('Downloading GeoIP database…');
                 $this->_download($this->_geoIpFile, $geoIpUrl);
             }
