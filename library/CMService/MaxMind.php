@@ -317,9 +317,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
                             $cityCount = count($regionData['cities']);
                             $s = $cityCount > 1 ? 'ies' : 'y';
                             foreach ($regionData['cities'] as $cityName => $cityData) {
-                                $cityCode = $cityData['location']['maxMind'];
+                                $cityCode = isset($cityData['location']) ? ' (' . $cityData['location']['maxMind'] . ')' : '';
                                 $infoListWarning['Cities without region'][$countryName . ', ' . $cityCount . ' cit' . $s][] =
-                                    $cityName . ' (' . $cityCode . ')';
+                                    $cityName . $cityCode;
                             }
                         }
                         foreach ($regionData['cities'] as $cityName => $cityData) {
@@ -1078,13 +1078,15 @@ class CMService_MaxMind extends CM_Class_Abstract {
                         !isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'])
                         || isset($this->_cityListByRegionOld[$countryCode][$regionCode][$maxMind])
                     ) {
-                        $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'] = array(
-                            'name'        => $name,
-                            'latitude'    => $latitude,
-                            'longitude'   => $longitude,
-                            'maxMind'     => $maxMind,
-                            'fromZipCode' => true,
-                        );
+                        if (strlen($name)) {
+                            $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'] = array(
+                                'name'        => $name,
+                                'latitude'    => $latitude,
+                                'longitude'   => $longitude,
+                                'maxMind'     => $maxMind,
+                                'fromZipCode' => true,
+                            );
+                        }
                     }
                 }
             } elseif (strlen($cityName)) { // City record
