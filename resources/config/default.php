@@ -93,7 +93,7 @@ return function (CM_Config_Node $config) {
     $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
     $config->CM_Jobdistribution_Job_Abstract->servers = array(array('host' => 'localhost', 'port' => 4730));
 
-    $config->CMService_MaxMind->licenceKey = null;
+    $config->CMService_MaxMind->licenseKey = null;
 
     $config->CMService_Newrelic->enabled = false;
     $config->CMService_Newrelic->appName = 'CM Application';
