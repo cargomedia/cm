@@ -1637,15 +1637,15 @@ class CMService_MaxMind extends CM_Class_Abstract {
      */
     private function _readBlocksData() {
         $geoIpFile = $this->_downloadGeoIpFile();
-        $zip = zip_open($geoIpFile->getPath());
+        $zip = zip_open($geoIpFile->getPathOnLocalFilesystem());
         if (!is_resource($zip)) {
-            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpFile->getPath() . '`');
+            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpFile->getPathOnLocalFilesystem() . '`');
         }
         do {
             $entry = zip_read($zip);
         } while ($entry && !preg_match('#Blocks\\.csv\\z#', zip_entry_name($entry)));
         if (!$entry) {
-            throw new CM_Exception_Invalid('Could not find blocks file in `' . $geoIpFile->getPath() . '`');
+            throw new CM_Exception_Invalid('Could not find blocks file in `' . $geoIpFile->getPathOnLocalFilesystem() . '`');
         }
         zip_entry_open($zip, $entry, 'r');
         $contents = zip_entry_read($entry, zip_entry_filesize($entry));
@@ -1660,15 +1660,15 @@ class CMService_MaxMind extends CM_Class_Abstract {
      */
     private function _readLocationData() {
         $geoIpFile = $this->_downloadGeoIpFile();
-        $zip = zip_open($geoIpFile->getPath());
+        $zip = zip_open($geoIpFile->getPathOnLocalFilesystem());
         if (!is_resource($zip)) {
-            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpFile->getPath() . '`');
+            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpFile->getPathOnLocalFilesystem() . '`');
         }
         do {
             $entry = zip_read($zip);
         } while ($entry && !preg_match('#Location\\.csv\\z#', zip_entry_name($entry)));
         if (!$entry) {
-            throw new CM_Exception_Invalid('Could not find location file in `' . $geoIpFile->getPath() . '`');
+            throw new CM_Exception_Invalid('Could not find location file in `' . $geoIpFile->getPathOnLocalFilesystem() . '`');
         }
         zip_entry_open($zip, $entry, 'r');
         $contents = zip_entry_read($entry, zip_entry_filesize($entry));
