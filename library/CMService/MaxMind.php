@@ -772,6 +772,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $licenceKey = self::_getConfig()->licenceKey;
             if ('' === $licenceKey) {
                 $this->_geoIpFile = new CM_File('GeoLiteCity.zip', CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
+                $this->_streamOutput->writeln('Downloading GeoLite database…');
                 $this->_download($this->_geoIpFile, self::GEO_LITE_CITY_URL);
             } else {
                 $parameterList = [
@@ -781,6 +782,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 ];
                 $geoIpUrl = CM_Util::link(self::GEO_IP_URL, $parameterList);
                 $this->_geoIpFile = new CM_File('GeoIP-139.zip', CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
+                $this->_streamOutput->writeln('Downloading GeoIP database…');
                 $this->_download($this->_geoIpFile, $geoIpUrl);
             }
         }
@@ -1076,15 +1078,13 @@ class CMService_MaxMind extends CM_Class_Abstract {
                         !isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'])
                         || isset($this->_cityListByRegionOld[$countryCode][$regionCode][$maxMind])
                     ) {
-                        if (strlen($name)) {
-                            $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'] = array(
-                                'name'        => $name,
-                                'latitude'    => $latitude,
-                                'longitude'   => $longitude,
-                                'maxMind'     => $maxMind,
-                                'fromZipCode' => true,
-                            );
-                        }
+                        $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'] = array(
+                            'name'        => $name,
+                            'latitude'    => $latitude,
+                            'longitude'   => $longitude,
+                            'maxMind'     => $maxMind,
+                            'fromZipCode' => true,
+                        );
                     }
                 }
             } elseif (strlen($cityName)) { // City record
