@@ -771,7 +771,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         if (!$this->_geoIpFile) {
             $licenceKey = self::_getConfig()->licenceKey;
             if (null === $licenceKey) {
-                $this->_geoIpFile = new CM_File('GeoLiteCity.zip', CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
+                $this->_geoIpFile = $this->_getFileTmp('GeoLiteCity.zip');
                 $this->_streamOutput->writeln('Downloading GeoLite database…');
                 $this->_download($this->_geoIpFile, self::GEO_LITE_CITY_URL);
             } else {
@@ -781,7 +781,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     'license_key' => $licenceKey,
                 ];
                 $geoIpUrl = CM_Util::link(self::GEO_IP_URL, $parameterList);
-                $this->_geoIpFile = new CM_File('GeoIP-134.zip', CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
+                $this->_geoIpFile = $this->_getFileTmp('GeoIP-134.zip');
                 $this->_streamOutput->writeln('Downloading GeoIP database…');
                 $this->_download($this->_geoIpFile, $geoIpUrl);
             }
@@ -797,8 +797,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      */
     protected function _getCountryData() {
         $this->_streamOutput->writeln('Downloading new country listing…');
-        $countriesPath = CM_Bootloader::getInstance()->getDirTmp() . 'countries.csv';
-        $countriesFile = new CM_File($countriesPath);
+        $countriesFile = $this->_getFileTmp('countries.csv');
         $countriesContents = $this->_download($countriesFile, self::COUNTRY_URL);
 
         $this->_streamOutput->writeln('Reading new country listing…');
@@ -877,8 +876,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      */
     protected function _getRegionData() {
         $this->_streamOutput->writeln('Downloading new region listing…');
-        $regionsPath = CM_Bootloader::getInstance()->getDirTmp() . 'region.csv';
-        $regionsFile = new CM_File($regionsPath);
+        $regionsFile = $this->_getFileTmp('region.csv');
         $regionsContents = $this->_download($regionsFile, self::REGION_URL);
 
         $this->_streamOutput->writeln('Reading new region listing…');
@@ -1449,6 +1447,14 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $escapeSequence = system('tput sgr0');
         }
         return $escapeSequence;
+    }
+
+    /**
+     * @param $name
+     * @return CM_File
+     */
+    private function _getFileTmp($name) {
+        return new CM_File($name, CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
     }
 
     /**
