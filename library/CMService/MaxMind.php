@@ -5,10 +5,11 @@ class CMService_MaxMind extends CM_Class_Abstract {
     const COUNTRY_URL = 'https://raw.github.com/lukes/ISO-3166-Countries-with-Regional-Codes/master/all/all.csv';
     const REGION_URL = 'http://www.maxmind.com/download/geoip/misc/region_codes.csv';
     const GEO_LITE_CITY_URL = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity-latest.zip';
+    const GEO_IP_URL = 'https://download.maxmind.com/app/geoip_download';
 
-    const CACHE_LIFETIME = 604800; // Keep downloaded files for one week (MaxMind update period)
+    const CACHE_LIFETIME = 518400; // Delete downloaded files after 6 days (MaxMind updates weekly)
 
-    /** @var CM_File|null */
+    /** @var CM_File */
     protected $_geoIpFile;
 
     /** @var CM_OutputStream_Interface */
@@ -30,14 +31,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $_ipBlockListByLocation;
 
     /**
-     * @param CM_File|null                   $geoIpFile
      * @param CM_OutputStream_Interface|null $streamOutput
      * @param CM_OutputStream_Interface|null $streamError
      * @param bool|null                      $withoutIpBlocks
      * @param bool|null                      $verbose
      */
-    public function __construct(CM_File $geoIpFile = null, CM_OutputStream_Interface $streamOutput = null, CM_OutputStream_Interface $streamError = null, $withoutIpBlocks = null, $verbose = null) {
-        $this->_setGeoIpFile($geoIpFile);
+    public function __construct(CM_OutputStream_Interface $streamOutput = null, CM_OutputStream_Interface $streamError = null, $withoutIpBlocks = null, $verbose = null) {
         if (null === $streamOutput) {
             $streamOutput = new CM_OutputStream_Null();
         }
@@ -766,6 +765,29 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_File
+     */
+    protected function _downloadGeoIpFile() {
+        if (!$this->_geoIpFile) {
+            $licenceKey = self::_getConfig()->licenceKey;
+            if ('' === $licenceKey) {
+                $this->_geoIpFile = new CM_File('GeoLiteCity.zip', CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
+                $this->_download($this->_geoIpFile, self::GEO_LITE_CITY_URL);
+            } else {
+                $parameterList = [
+                    'edition_id'  => 139,
+                    'suffix'      => 'zip',
+                    'license_key' => $licenceKey,
+                ];
+                $geoIpUrl = CM_Util::link(self::GEO_IP_URL, $parameterList);
+                $this->_geoIpFile = new CM_File('GeoIP-139.zip', CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
+                $this->_download($this->_geoIpFile, $geoIpUrl);
+            }
+        }
+        return $this->_geoIpFile;
+    }
+
+    /**
      * Download ISO-3166-2 countries listing (from a handy but unofficial source)
      *
      * @return array List of array($countryName, $countryCode)
@@ -805,14 +827,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      */
     protected function _getIpData() {
         $this->_streamOutput->writeln('Reading new IP blocks…');
-        if (null !== $this->_geoIpFile) {
-            $blocksFileContents = $this->_readBlocksData($this->_geoIpFile);
-        } else {
-            $geoLiteCityPath = CM_Bootloader::getInstance()->getDirTmp() . 'GeoLiteCity.zip';
-            $geoLiteCityFile = new CM_File($geoLiteCityPath);
-            $this->_download($geoLiteCityFile, self::GEO_LITE_CITY_URL);
-            $blocksFileContents = $this->_readBlocksData($geoLiteCityFile);
-        }
+        $blocksFileContents = $this->_readBlocksData();
         $ipData = array();
         $rows = preg_split('#[\r\n]++#', $blocksFileContents);
         foreach ($rows as $i => $row) {
@@ -836,14 +851,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      */
     protected function _getLocationData() {
         $this->_streamOutput->writeln('Reading new location tree…');
-        if (null !== $this->_geoIpFile) {
-            $citiesFileContents = $this->_readLocationData($this->_geoIpFile);
-        } else {
-            $geoLiteCityPath = CM_Bootloader::getInstance()->getDirTmp() . 'GeoLiteCity.zip';
-            $geoLiteCityFile = new CM_File($geoLiteCityPath);
-            $this->_download($geoLiteCityFile, self::GEO_LITE_CITY_URL);
-            $citiesFileContents = $this->_readLocationData($geoLiteCityFile);
-        }
+        $citiesFileContents = $this->_readLocationData();
         $locationData = array();
         $rows = preg_split('#[\r\n]++#', $citiesFileContents);
         foreach ($rows as $i => $row) {
@@ -1623,21 +1631,21 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_File $geoIpZipFile
      * @return string
      * @throws CM_Exception_Invalid
      * @codeCoverageIgnore
      */
-    private function _readBlocksData($geoIpZipFile) {
-        $zip = zip_open($geoIpZipFile->getPath());
+    private function _readBlocksData() {
+        $geoIpFile = $this->_downloadGeoIpFile();
+        $zip = zip_open($geoIpFile->getPath());
         if (!is_resource($zip)) {
-            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpZipFile->getPath() . '`');
+            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpFile->getPath() . '`');
         }
         do {
             $entry = zip_read($zip);
         } while ($entry && !preg_match('#Blocks\\.csv\\z#', zip_entry_name($entry)));
         if (!$entry) {
-            throw new CM_Exception_Invalid('Could not find blocks file in `' . $geoIpZipFile->getPath() . '`');
+            throw new CM_Exception_Invalid('Could not find blocks file in `' . $geoIpFile->getPath() . '`');
         }
         zip_entry_open($zip, $entry, 'r');
         $contents = zip_entry_read($entry, zip_entry_filesize($entry));
@@ -1646,72 +1654,26 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_File $geoIpZipFile
      * @return string
      * @throws CM_Exception_Invalid
      * @codeCoverageIgnore
      */
-    private function _readLocationData($geoIpZipFile) {
-        $zip = zip_open($geoIpZipFile->getPath());
+    private function _readLocationData() {
+        $geoIpFile = $this->_downloadGeoIpFile();
+        $zip = zip_open($geoIpFile->getPath());
         if (!is_resource($zip)) {
-            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpZipFile->getPath() . '`');
+            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpFile->getPath() . '`');
         }
         do {
             $entry = zip_read($zip);
         } while ($entry && !preg_match('#Location\\.csv\\z#', zip_entry_name($entry)));
         if (!$entry) {
-            throw new CM_Exception_Invalid('Could not find location file in `' . $geoIpZipFile->getPath() . '`');
+            throw new CM_Exception_Invalid('Could not find location file in `' . $geoIpFile->getPath() . '`');
         }
         zip_entry_open($zip, $entry, 'r');
         $contents = zip_entry_read($entry, zip_entry_filesize($entry));
         zip_close($zip);
         $contents = iconv('ISO-8859-1', 'UTF-8', $contents);
         return $contents;
-    }
-
-    /**
-     * @param CM_File|null $geoIpFile
-     * @throws CM_Exception_Invalid
-     * @codeCoverageIgnore
-     */
-    private function _setGeoIpFile(CM_File $geoIpFile = null) {
-        if (null !== $geoIpFile) {
-            if (!$geoIpFile->exists()) {
-                throw new CM_Exception_Invalid('GeoIP file not found: ' . $geoIpFile->getPath());
-            }
-        }
-        $this->_geoIpFile = $geoIpFile;
-    }
-
-    /**
-     * @param CM_OutputStream_Interface $streamOutput
-     * @param CM_OutputStream_Interface $streamError
-     */
-    public static function weeklyUpgrade(CM_OutputStream_Interface $streamOutput, CM_OutputStream_Interface $streamError) {
-        $geoIpFile = self::_downloadGeoIPFile();
-        $maxMind = new CMService_MaxMind($geoIpFile, $streamOutput, $streamError);
-        $maxMind->upgrade();
-    }
-
-    /**
-     * @return CM_File|null
-     */
-    protected static function _downloadGeoIPFile() {
-        $geoIpFile = null;
-        if ($licenceKey = self::_getConfig()->licenceKey) {
-            $parameterList = [
-                'edition_id'  => 139,
-                'suffix'      => 'zip',
-                'license_key' => $licenceKey,
-            ];
-            $geoIpUrl = CM_Util::link('https://download.maxmind.com/app/geoip_download', $parameterList);
-            $contents = CM_Util::getContents($geoIpUrl, null, null, 600);
-            $geoIpFile = new CM_File('GeoIP-139.zip', CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
-            if ($geoIpFile->exists()) {
-                $geoIpFile->delete();
-            }
-            $geoIpFile->write($contents);
-        }
-        return $geoIpFile;
     }
 }
