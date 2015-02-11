@@ -1450,7 +1450,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @return CM_File
      */
     private function _getFileTmp($name) {
