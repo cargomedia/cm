@@ -770,7 +770,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     protected function _downloadGeoIpFile() {
         if (!$this->_geoIpFile) {
             $licenceKey = self::_getConfig()->licenceKey;
-            if ('' === $licenceKey) {
+            if (null === $licenceKey) {
                 $this->_geoIpFile = new CM_File('GeoLiteCity.zip', CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
                 $this->_streamOutput->writeln('Downloading GeoLite database…');
                 $this->_download($this->_geoIpFile, self::GEO_LITE_CITY_URL);
