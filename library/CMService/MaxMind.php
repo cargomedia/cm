@@ -401,6 +401,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $this->_cityListByRegionRemoved[$countryCode][$regionCodeOld] = $cityListRemoved;
             }
         }
+        unset($this->_countryListRemoved);
 
         // Look for cities in regions that have been removed
         foreach ($this->_regionListByCountryRemoved as $countryCode => $regionListRemoved) {
@@ -412,6 +413,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 }
             }
         }
+        unset($this->_regionListByCountryRemoved);
 
         // Look for changes in countries that have been kept
         $countryCodeList = array_keys($this->_countryList);
@@ -705,6 +707,10 @@ class CMService_MaxMind extends CM_Class_Abstract {
         foreach ($cityIdListUpdatedCode as $cityCode => $cityId) {
             $this->_cityIdList[$cityCode] = $cityId;
         }
+        unset($this->_countryList);
+        unset($this->_countryListOld);
+        unset($this->_regionListByCountryOld);
+        unset($this->_cityListByRegionOld);
 
         // Look for zip codes in cities that have been added
         foreach ($this->_cityListByRegionAdded as $countryCode => $cityListByRegionAdded) {
@@ -731,6 +737,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 }
             }
         }
+        unset($this->_cityListByRegionRemoved);
+        unset($this->_locationTreeOld);
+        unset($this->_zipCodeListByCityRemoved);
 
         $this->_printInfoList($infoListWarning, '!');
         $this->_printInfoList($infoListAdded, '+');
@@ -1214,6 +1223,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
             }
             $this->_printProgressCounter(++$item, $count);
         }
+        unset($this->_countryIdList);
+        unset($this->_countryCodeListByMaxMind);
+        unset($this->_regionIdListByMaxMind);
+        unset($this->_cityIdList);
+        unset($this->_zipCodeIdListByMaxMind);
+
         $this->_streamOutput->writeln('Checking overlapping of IP blocks…');
         ksort($ipBlockList);
         $ipStartPrevious = $ipEndPrevious = 0;
@@ -1240,12 +1255,14 @@ class CMService_MaxMind extends CM_Class_Abstract {
             CM_Db_Db::update('cm_model_location_country', array('name' => $countryName), array('abbreviation' => $countryCode));
             $this->_printProgressCounter(++$item, $count);
         }
+        unset($this->_countryListRenamed);
         foreach ($this->_countryListAdded as $countryCode => $countryName) {
             $country = CM_Model_Location::createCountry($countryName, $countryCode);
             $countryId = $country->getId();
             $this->_countryIdList[$countryCode] = $countryId;
             $this->_printProgressCounter(++$item, $count);
         }
+        unset($this->_countryListAdded);
     }
 
     protected function _upgradeRegionList() {
@@ -1268,6 +1285,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $this->_printProgressCounter(++$item, $count);
             }
         }
+        unset($this->_regionListByCountryRenamed);
         foreach ($this->_regionListByCountryUpdatedCode as $countryCode => $regionListUpdatedCode) {
             foreach ($regionListUpdatedCode as $regionCode) {
                 $regionId = $this->_regionIdListByCountry[$countryCode][$regionCode];
@@ -1279,6 +1297,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $this->_printProgressCounter(++$item, $count);
             }
         }
+        unset($this->_regionListByCountryUpdatedCode);
         foreach ($this->_regionListByCountryAdded as $countryCode => $regionListAdded) {
             $countryId = $this->_countryIdList[$countryCode];
             $country = new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $countryId);
@@ -1295,6 +1314,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $this->_printProgressCounter(++$item, $count);
             }
         }
+        unset($this->_regionListByCountryAdded);
         foreach ($this->_regionListByCountryRemovedCodeInUse as $countryCode => $regionListRemovedCodeInUse) {
             foreach ($regionListRemovedCodeInUse as $regionIdOld => $regionCode) {
                 CM_Db_Db::delete('cm_model_location_state', array('id' => $regionIdOld));
@@ -1303,6 +1323,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $this->_printProgressCounter(++$item, $count);
             }
         }
+        unset($this->_regionListByCountryRemovedCodeInUse);
     }
 
     protected function _upgradeCityList() {
@@ -1319,6 +1340,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 }
             }
         }
+        unset($this->_cityListByRegionRenamed);
         foreach ($this->_cityListByRegionUpdatedCode as $cityListByRegionUpdatedCode) {
             foreach ($cityListByRegionUpdatedCode as $cityListUpdatedCode) {
                 foreach ($cityListUpdatedCode as $cityCode) {
@@ -1328,6 +1350,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 }
             }
         }
+        unset($this->_cityListByRegionUpdatedCode);
         foreach ($this->_cityListUpdatedRegion as $countryCode => $cityListUpdatedRegion) {
             foreach ($cityListUpdatedRegion as $cityCode => $regionCodes) {
                 $cityId = $this->_cityIdList[$cityCode];
@@ -1343,6 +1366,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $this->_printProgressCounter(++$item, $count);
             }
         }
+        unset($this->_regionListByCountry);
+        unset($this->_cityListByRegion);
+        unset($this->_cityListUpdatedRegion);
         foreach ($this->_cityListByRegionAdded as $countryCode => $cityListByRegionAdded) {
             foreach ($cityListByRegionAdded as $regionCode => $cityListAdded) {
                 if (isset($this->_regionIdListByCountry[$countryCode][$regionCode])) {
@@ -1361,6 +1387,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 }
             }
         }
+        unset($this->_regionIdListByCountry);
+        unset($this->_cityListByRegionAdded);
+        unset($this->_locationTree);
     }
 
     protected function _upgradeZipCodeList() {
@@ -1382,6 +1411,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 }
             }
         }
+        unset($this->_zipCodeListByCityAdded);
     }
 
     protected function _upgradeIpBlocks() {
@@ -1401,6 +1431,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 }
             }
         }
+        unset($this->_ipBlockListByLocation);
     }
 
     /**
