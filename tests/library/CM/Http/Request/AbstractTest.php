@@ -80,8 +80,8 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         CMTest_TH::createLanguage('en'); // default language
         $urlLanguage = CMTest_TH::createLanguage('de');
         $request = $this->_prepareRequest('/de/home');
-        CM_Http_Response_Abstract::factory($request, $this->getServiceManager());
-        $this->assertEquals($request->getLanguage(), $urlLanguage);
+        $response = CM_Http_Response_Abstract::factory($request, $this->getServiceManager());
+        $this->assertEquals($response->getRequest()->getLanguage(), $urlLanguage);
     }
 
     public function testGetLanguageByBrowser() {
