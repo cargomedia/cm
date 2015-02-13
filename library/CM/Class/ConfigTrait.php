@@ -9,7 +9,7 @@ trait CM_Class_ConfigTrait {
      * @return stdClass
      * @throws CM_Exception_Invalid
      */
-    protected static function _getConfig() {
+    public static function _getConfig() {
         if (null === self::$_classConfigCacheEnabled) {
             self::$_classConfigCacheEnabled = CM_Config::get()->classConfigCacheEnabled;
         }
@@ -51,9 +51,9 @@ trait CM_Class_ConfigTrait {
      */
     protected static function _getClassName() {
         $config = self::_getConfig();
-        if (empty($config->class)) {
-            return get_called_class();
+        if (!empty($config->class)) {
+            return $config->class;
         }
-        return $config->class;
+        return get_called_class();
     }
 }

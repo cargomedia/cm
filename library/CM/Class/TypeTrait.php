@@ -30,16 +30,16 @@ trait CM_Class_TypeTrait {
      */
     protected static function _getClassName($type = null) {
         $config = self::_getConfig();
-        if (null === $type || empty($config->types)) {
-            if (empty($config->class)) {
-                return get_called_class();
+        if (null !== $type) {
+            $type = (int) $type;
+            if (empty($config->types[$type])) {
+                throw new CM_Class_Exception_TypeNotConfiguredException("Type `{$type}` not configured for class `" . get_called_class() . '`.');
             }
+            return $config->types[$type];
+        }
+        if (!empty($config->class)) {
             return $config->class;
         }
-        $type = (int) $type;
-        if (empty($config->types[$type])) {
-            throw new CM_Class_Exception_TypeNotConfiguredException('Type `' . $type . '` not configured for class `' . get_called_class() . '`.');
-        }
-        return $config->types[$type];
+        return get_called_class();
     }
 }
