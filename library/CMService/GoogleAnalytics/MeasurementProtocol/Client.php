@@ -26,6 +26,19 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      * @param string $hitType
      * @param array  $parameterList
      */
+    public function queueHit($hitType, array $parameterList) {
+        $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob();
+        $job->queue([
+            'propertyId'    => $this->getPropertyId(),
+            'hitType'       => $hitType,
+            'parameterList' => $parameterList,
+        ]);
+    }
+
+    /**
+     * @param string $hitType
+     * @param array  $parameterList
+     */
     public function sendHit($hitType, array $parameterList) {
         $parameterList['v'] = 1;
         $parameterList['tid'] = $this->getPropertyId();
