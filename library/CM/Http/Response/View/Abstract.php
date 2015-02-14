@@ -68,6 +68,8 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
             }
             $responsePage = new CM_Http_Response_Page_Embed($request, $this->getServiceManager());
             $responsePage->process();
+            $request = $responsePage->getRequest();
+
             $paths[] = $request->getPath();
 
             if ($redirectUrl = $responsePage->getRedirectUrl()) {
