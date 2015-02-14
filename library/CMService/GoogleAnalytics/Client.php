@@ -16,6 +16,13 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     }
 
     /**
+     * @return CMService_GoogleAnalytics_MeasurementProtocol_Client
+     */
+    public function getMeasurementProtocolClient() {
+        return new CMService_GoogleAnalytics_MeasurementProtocol_Client($this->_code);
+    }
+
+    /**
      * @param int    $index
      * @param string $value
      */

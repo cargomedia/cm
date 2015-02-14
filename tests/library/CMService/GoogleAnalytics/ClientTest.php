@@ -24,6 +24,14 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
             $html);
     }
 
+    public function testGetMeasurementProtocolClient() {
+        $googleAnalytics = new CMService_GoogleAnalytics_Client('key123');
+        $measurementProtocolClient = $googleAnalytics->getMeasurementProtocolClient();
+
+        $this->assertInstanceOf('CMService_GoogleAnalytics_MeasurementProtocol_Client', $measurementProtocolClient);
+        $this->assertSame('key123', $measurementProtocolClient->getPropertyId());
+    }
+
     public function testSetCustomMetric() {
         $googleAnalytics = new CMService_GoogleAnalytics_Client('');
         $environment = new CM_Frontend_Environment();

@@ -18,7 +18,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
     /**
      * @return string
      */
-    protected function _getPropertyId() {
+    public function getPropertyId() {
         return $this->_propertyId;
     }
 
@@ -28,7 +28,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      */
     public function sendHit($hitType, array $parameterList) {
         $parameterList['v'] = 1;
-        $parameterList['tid'] = $this->_getPropertyId();
+        $parameterList['tid'] = $this->getPropertyId();
         $parameterList['t'] = (string) $hitType;
         $this->_sendRequest($parameterList);
     }
