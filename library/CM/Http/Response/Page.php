@@ -12,7 +12,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     private $_redirectUrl;
 
     public function __construct(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
-        $this->_request = $request;
+        $this->_request = clone $request;
         $this->_site = CM_Site_Abstract::findByRequest($this->_request);
         $this->_request->popPathLanguage();
 
@@ -154,13 +154,21 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             $this->_pageParams = $pageParams;
             return $html;
         } catch (CM_Exception $e) {
-            if (!array_key_exists(get_class($e), $this->_getConfig()->catch)) {
+            $exceptionClass = get_class($e);
+            $configCatch = $this->_getConfig()->catch;
+            if (!array_key_exists($exceptionClass, $configCatch)) {
                 throw $e;
+            } else {
+                $options = $configCatch[$exceptionClass];
+                $this->getRender()->getGlobalResponse()->clear();
+                $request->setPath($options['path']);
+                $request->setQuery(array());
+                if (true === $options['log']) {
+                    $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
+                    $log = new CM_Paging_Log_NotFound();
+                    $log->add($formatter->formatException($e), $e->getMetaInfo());
+                }
             }
-            $this->getRender()->getGlobalResponse()->clear();
-            $path = $this->_getConfig()->catch[get_class($e)];
-            $request->setPath($path);
-            $request->setQuery(array());
         }
         return false;
     }

@@ -15,6 +15,9 @@ class CMTest_TestSuite {
     }
 
     public function generateInternalConfig() {
+        if (isset(CM_Config::get()->CM_Class_Abstract->typesMaxValue)) {
+            return;
+        }
         $generator = new CM_Config_Generator();
         $config = new CM_Config_Node();
         $config->extendWithConfig($generator->getConfigClassTypes());

@@ -146,6 +146,25 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $this->assertEquals([['foo' => 1], ['foo' => 1], ['foo' => 2], ['foo' => 3]], $actual);
     }
 
+    public function testFindBatchSize() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = 'findBatchSize';
+        CM_Config::get()->CM_MongoDb_Client->batchSize = null;
+
+        $cursor = $mongoDb->find($collectionName);
+        $this->assertSame(0, $cursor->info()['batchSize']);
+        $cursor = $mongoDb->find($collectionName, null, null, ['$match' => ['foo' => 'bar']]);
+        $this->assertSame(0, $cursor->info()['batchSize']);
+
+        CM_Config::get()->CM_MongoDb_Client->batchSize = 10;
+
+        $cursor = $mongoDb->find($collectionName);
+        $this->assertSame(10, $cursor->info()['batchSize']);
+        $cursor = $mongoDb->find($collectionName, null, null, ['$match' => ['foo' => 'bar']]);
+        $this->assertSame(10, $cursor->info()['batchSize']);
+        $this->assertSame(10, $cursor->info()['query']['cursor']['batchSize']);
+    }
+
     public function testFindAndModify() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'findAndModify';
