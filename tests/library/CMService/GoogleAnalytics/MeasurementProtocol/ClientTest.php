@@ -43,7 +43,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_ClientTest extends CMTest_Te
 
     /**
      * @expectedException CM_Exception
-     * @expectedExceptionMessage Unknown parameter
+     * @expectedExceptionMessage Unknown parameter `foo`
      */
     public function testTrackEventInvalidParam() {
         $clientMock = $this->mockClass('CMService_GoogleAnalytics_MeasurementProtocol_Client');
@@ -52,6 +52,20 @@ class CMService_GoogleAnalytics_MeasurementProtocol_ClientTest extends CMTest_Te
 
         $client->trackEvent([
             'foo' => 12,
+        ]);
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Unexpected parameter `exd` for hitType `event`
+     */
+    public function testTrackEventParamForWrongHitType() {
+        $clientMock = $this->mockClass('CMService_GoogleAnalytics_MeasurementProtocol_Client');
+        /** @var CMService_GoogleAnalytics_MeasurementProtocol_Client $client */
+        $client = $clientMock->newInstance(['prop1']);
+
+        $client->trackEvent([
+            'exd' => 'My exception',
         ]);
     }
 }

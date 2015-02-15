@@ -97,6 +97,14 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
                 'aliasList'   => ['eventValue'],
                 'hitTypeList' => ['event'],
             ],
+            'exd' => [
+                'aliasList'   => ['exDescription'],
+                'hitTypeList' => ['exception'],
+            ],
+            'exf' => [
+                'aliasList'   => ['exFatal'],
+                'hitTypeList' => ['exception'],
+            ],
         ];
     }
 
