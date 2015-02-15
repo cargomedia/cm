@@ -4,11 +4,10 @@ class CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob extends CM_Jobdis
 
     protected function _execute(CM_Params $params) {
         $propertyId = $params->getString('propertyId');
-        $hitType = $params->getString('hitType');
         $parameterList = $params->getArray('parameterList');
 
 
         $client = new CMService_GoogleAnalytics_MeasurementProtocol_Client($propertyId);
-        $client->_submitHit($hitType, $parameterList);
+        $client->_submitHit($parameterList);
     }
 }

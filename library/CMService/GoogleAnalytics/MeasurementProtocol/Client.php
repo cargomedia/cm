@@ -23,26 +23,30 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
     }
 
     /**
-     * @param string $hitType
-     * @param array  $parameterList
+     * @param array $parameterList
      */
-    public function trackHit($hitType, array $parameterList) {
+    public function trackHit(array $parameterList) {
         $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob();
         $job->queue([
             'propertyId'    => $this->getPropertyId(),
-            'hitType'       => $hitType,
             'parameterList' => $parameterList,
         ]);
     }
 
     /**
-     * @param string $hitType
-     * @param array  $parameterList
+     * @param array $parameterList
      */
-    public function _submitHit($hitType, array $parameterList) {
+    public function trackEvent(array $parameterList) {
+        $parameterList['hitType'] = 'event';
+        $this->trackHit($this->_parseParameterList($parameterList));
+    }
+
+    /**
+     * @param array $parameterList
+     */
+    public function _submitHit(array $parameterList) {
         $parameterList['v'] = 1;
         $parameterList['tid'] = $this->getPropertyId();
-        $parameterList['t'] = (string) $hitType;
         $this->_submitRequest($parameterList);
     }
 
@@ -61,5 +65,82 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
             self::$_client = new \GuzzleHttp\Client(['base_url' => 'http://www.google-analytics.com']);
         }
         return self::$_client;
+    }
+
+    /**
+     * @return array[]
+     */
+    protected function _getParameterDefinition() {
+        return [
+            'cid' => [
+                'aliasList' => ['clientId'],
+            ],
+            'uid' => [
+                'aliasList' => ['userId'],
+            ],
+            't'   => [
+                'aliasList' => ['hitType'],
+            ],
+            'ec'  => [
+                'aliasList'   => ['eventCategory'],
+                'hitTypeList' => ['event'],
+            ],
+            'ea'  => [
+                'aliasList'   => ['eventAction'],
+                'hitTypeList' => ['event'],
+            ],
+            'el'  => [
+                'aliasList'   => ['eventLabel'],
+                'hitTypeList' => ['event'],
+            ],
+            'ev'  => [
+                'aliasList'   => ['eventValue'],
+                'hitTypeList' => ['event'],
+            ],
+        ];
+    }
+
+    /**
+     * @param array $parameterList
+     * @return array
+     */
+    protected function _resolveParameterAliases(array $parameterList) {
+        $parameterAliasToName = [];
+        foreach ($this->_getParameterDefinition() as $name => $definition) {
+            if (isset($definition['aliasList'])) {
+                foreach ($definition['aliasList'] as $alias) {
+                    $parameterAliasToName[$alias] = $name;
+                }
+            }
+        }
+        $parameterListRevolved = [];
+        foreach ($parameterList as $name => $value) {
+            if (isset($parameterAliasToName[$name])) {
+                $name = $parameterAliasToName[$name];
+            }
+            $parameterListRevolved[$name] = $value;
+        }
+        return $parameterListRevolved;
+    }
+
+    /**
+     * @param array $parameterList
+     * @return array
+     * @throws CM_Exception
+     */
+    protected function _parseParameterList(array $parameterList) {
+        $parameterList = $this->_resolveParameterAliases($parameterList);
+        $parameterDefinition = $this->_getParameterDefinition();
+        $hitType = (string) $parameterList['t'];
+        foreach ($parameterList as $name => $value) {
+            if (!isset($parameterDefinition[$name])) {
+                throw new CM_Exception('Unknown parameter `' . $name . '`.');
+            }
+            $definition = $parameterDefinition[$name];
+            if (isset($definition['hitTypeList']) && !in_array($hitType, $definition['hitTypeList'], true)) {
+                throw new CM_Exception('Unexpected parameter `' . $name . '` for hitType `' . $hitType . '`.');
+            }
+        }
+        return $parameterList;
     }
 }
