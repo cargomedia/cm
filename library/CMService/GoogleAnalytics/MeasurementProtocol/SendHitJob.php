@@ -9,6 +9,6 @@ class CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob extends CM_Jobdis
 
 
         $client = new CMService_GoogleAnalytics_MeasurementProtocol_Client($propertyId);
-        $client->sendHit($hitType, $parameterList);
+        $client->_submitHit($hitType, $parameterList);
     }
 }

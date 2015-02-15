@@ -26,7 +26,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      * @param string $hitType
      * @param array  $parameterList
      */
-    public function queueHit($hitType, array $parameterList) {
+    public function trackHit($hitType, array $parameterList) {
         $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob();
         $job->queue([
             'propertyId'    => $this->getPropertyId(),
@@ -39,17 +39,17 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      * @param string $hitType
      * @param array  $parameterList
      */
-    public function sendHit($hitType, array $parameterList) {
+    public function _submitHit($hitType, array $parameterList) {
         $parameterList['v'] = 1;
         $parameterList['tid'] = $this->getPropertyId();
         $parameterList['t'] = (string) $hitType;
-        $this->_sendRequest($parameterList);
+        $this->_submitRequest($parameterList);
     }
 
     /**
      * @param array $parameterList
      */
-    protected function _sendRequest(array $parameterList) {
+    protected function _submitRequest(array $parameterList) {
         $this->_getGuzzleClient()->post('/collect', ['body' => $parameterList]);
     }
 
