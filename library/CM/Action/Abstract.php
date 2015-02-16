@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed {
+abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Class_TypedInterface {
 
     const CREATE = 'CREATE';
     const UPDATE = 'UPDATE';

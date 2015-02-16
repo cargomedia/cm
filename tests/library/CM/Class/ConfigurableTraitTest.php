@@ -1,6 +1,6 @@
 <?php
 
-class CM_Class_ConfigTraitTest extends CMTest_TestCase {
+class CM_Class_ConfigurableTraitTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
@@ -68,5 +68,5 @@ class CM_Class_ConfigTraitTest extends CMTest_TestCase {
 
 class CM_ClassMockConfig {
 
-    use CM_Class_ConfigTrait;
+    use CM_Class_ConfigurableTrait;
 }

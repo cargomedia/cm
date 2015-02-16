@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable, CM_Class_TypeInterface {
+abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable, CM_Class_TypedInterface {
 
     /** @var array|null */
     protected $_id;

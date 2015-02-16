@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Provision_Script_OptionBased extends CM_Provision_Script_Abstract implements CM_Class_TypeInterface {
+abstract class CM_Provision_Script_OptionBased extends CM_Provision_Script_Abstract implements CM_Class_TypedInterface {
 
     use CM_Provision_Script_IsLoadedTrait;
 

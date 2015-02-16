@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Class_TypeInterface {
+abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Class_TypedInterface {
 
     /** @var string[] */
     protected $_themes = array();

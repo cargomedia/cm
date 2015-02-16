@@ -1,6 +1,6 @@
 <?php
 
-class CM_Class_TypeTraitTest extends CMTest_TestCase {
+class CM_Class_TypedTraitTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
@@ -48,7 +48,7 @@ class CM_Class_TypeTraitTest extends CMTest_TestCase {
 
 
 
-class CM_ClassMockType implements CM_Class_TypeInterface{
+class CM_ClassMockType implements CM_Class_TypedInterface{
 
-    use CM_Class_TypeTrait;
+    use CM_Class_TypedTrait;
 }

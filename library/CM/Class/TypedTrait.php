@@ -1,6 +1,6 @@
 <?php
 
-trait CM_Class_TypeTrait {
+trait CM_Class_TypedTrait {
 
     use CM_Class_ConfigurableTrait;
 

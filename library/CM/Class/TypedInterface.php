@@ -1,6 +1,6 @@
 <?php
 
-interface CM_Class_TypeInterface {
+interface CM_Class_TypedInterface {
 
     /**
      * @return int

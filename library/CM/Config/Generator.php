@@ -104,12 +104,12 @@ class CM_Config_Generator extends CM_Class_Abstract {
         if (isset(CM_Config::get()->CM_Class_Abstract->typesMaxValue)) {
             $this->_typesMaxValue = CM_Config::get()->CM_Class_Abstract->typesMaxValue;
         }
-        $typedClasses = CM_Util::getClassChildren('CM_Class_TypeInterface', true);
+        $typedClasses = CM_Util::getClassChildren('CM_Class_TypedInterface', true);
         /** @var CM_Class_Abstract[]|string[] $namespaceClassList */
         $namespaceClassList = array();
         // fetch type-namespaces
         foreach ($typedClasses as $class) {
-            if (!is_subclass_of(get_parent_class($class), 'CM_Class_TypeInterface')) {
+            if (!is_subclass_of(get_parent_class($class), 'CM_Class_TypedInterface')) {
                 $namespaceClassList[] = $class;
             }
         }
