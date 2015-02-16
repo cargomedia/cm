@@ -557,6 +557,9 @@ class CM_Util {
         }
         $classHierarchy = array_values(class_parents($className));
         array_unshift($classHierarchy, $className);
+        if ('CM_Class_Abstract' === end($classHierarchy)) {
+            array_pop($classHierarchy);
+        }
         self::$_classHierarchyCache[$className] = $classHierarchy;
         return $classHierarchy;
     }

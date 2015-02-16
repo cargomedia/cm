@@ -200,9 +200,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $cacheable->expects($this->once())->method('_change');
 
         $assetClassHierarchy = array('CM_ModelAsset_Abstract', 'CM_ModelAsset_Concrete');
-        $asset = $this->getMockBuilder('CM_ModelAsset_Abstract')->setMethods(array('getClassHierarchy', '_loadAsset'))
+        $asset = $this->getMockBuilder('CM_ModelAsset_Abstract')->setMethods(array('_loadAsset'))->setMockClassName('CM_ModelAsset_Concrete')
             ->disableOriginalConstructor()->getMockForAbstractClass();
-        $asset->expects($this->once())->method('getClassHierarchy')->will($this->returnValue($assetClassHierarchy));
         $asset->expects($this->exactly(count($assetClassHierarchy)))->method('_loadAsset');
 
         $cache = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('save'))->getMockForAbstractClass();
