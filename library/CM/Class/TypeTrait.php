@@ -2,7 +2,7 @@
 
 trait CM_Class_TypeTrait {
 
-    use CM_Class_ConfigTrait;
+    use CM_Class_ConfigurableTrait;
 
     /**
      * @return int

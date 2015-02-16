@@ -1,6 +1,6 @@
 <?php
 
-trait CM_Class_ConfigTrait {
+trait CM_Class_ConfigurableTrait {
 
     private static $_classConfigCacheEnabled = null;
     private static $_classConfigList = [];
@@ -9,7 +9,7 @@ trait CM_Class_ConfigTrait {
      * @return stdClass
      * @throws CM_Exception_Invalid
      */
-    public static function _getConfig() {
+    protected static function _getConfig() {
         if (null === self::$_classConfigCacheEnabled) {
             self::$_classConfigCacheEnabled = CM_Config::get()->classConfigCacheEnabled;
         }
