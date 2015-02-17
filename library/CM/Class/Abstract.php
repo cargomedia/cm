@@ -2,9 +2,9 @@
 
 /**
  * @deprecated
- * Use CM_Class_ConfigurableTrait if you want to use class configuration
+ * Use CM_Class_ConfigurableTrait if you want to use class-configuration
  * Use CM_Class_TypedTrait if you want to introduce a new type-namespace
- * Use CM_Util if you want to use class hierarchy helper functions
+ * Use CM_Util if you want to use class-hierarchy helper functions
  */
 abstract class CM_Class_Abstract {
 
