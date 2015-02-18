@@ -756,17 +756,17 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(
                 array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33555968, 'ipEnd' => 33556223),
-                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
-                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266586368, 'ipEnd' => 266586623),
                 array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935424, 'ipEnd' => 1412935551),
                 array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935616, 'ipEnd' => 1412935679),
-                array('id' => 2, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 68866048, 'ipEnd' => 68866303),
-                array('id' => 2, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 135422208, 'ipEnd' => 135422463),
                 array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 87097600, 'ipEnd' => 87097855),
-                array('id' => 3, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('id' => 3, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
                 array('id' => 1, 'level' => CM_Model_Location::LEVEL_ZIP, 'ipStart' => 522357760, 'ipEnd' => 522358015),
                 array('id' => 1, 'level' => CM_Model_Location::LEVEL_ZIP, 'ipStart' => 1304630016, 'ipEnd' => 1304630271),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266586368, 'ipEnd' => 266586623),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 68866048, 'ipEnd' => 68866303),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 135422208, 'ipEnd' => 135422463),
+                array('id' => 3, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 3, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -3183,7 +3183,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
             )
         );
-        $this->assertNotSame(false, strpos($this->_outputStream->read(), "Overlapping IP blocks:\n ! 266578176-266578431 and 266578200-266578400\n ! 33555968-33556223 and 33556000-33556200\n\n *"));
+        $this->assertNotSame(false, strpos($this->_outputStream->read(), "Overlapping IP blocks:\n ! 266578200-266578400 and 266578176-266578431\n ! 33556000-33556200 and 33555968-33556223\n\n *"));
     }
 
     public function testOverlappingIpBlocks_overlapping() {
@@ -3389,13 +3389,15 @@ class CMService_MaxMindTest extends CMTest_TestCase {
     }
 
     protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock, $regionListLegacyMock) {
+        $ipBlocksReaderMock = $this->_getReaderMock($ipDataMock, "Copyright (c) 2011 MaxMind Inc.  All Rights Reserved.\nstartIpNum,endIpNum,locId\n");
+        $locationReaderMock = $this->_getReaderMock($locationDataMock, "Copyright (c) 2012 MaxMind LLC.  All Rights Reserved.\nlocId,country,region,city,postalCode,latitude,longitude,metroCode,areaCode\n");
         $maxMind = $this->getMock('CMService_MaxMind',
-            array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData', '_getRegionListLegacy'),
+            array('_getCountryData', '_getRegionData', '_getLocationReader', '_getIpBlocksReader', '_getRegionListLegacy'),
             array($this->_outputStream, $this->_errorStream, null, true));
         $maxMind->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
         $maxMind->expects($this->any())->method('_getRegionData')->will($this->returnValue($regionDataMock));
-        $maxMind->expects($this->any())->method('_getLocationData')->will($this->returnValue($locationDataMock));
-        $maxMind->expects($this->any())->method('_getIpData')->will($this->returnValue($ipDataMock));
+        $maxMind->expects($this->any())->method('_getLocationReader')->will($this->returnValue($locationReaderMock));
+        $maxMind->expects($this->any())->method('_getIpBlocksReader')->will($this->returnValue($ipBlocksReaderMock));
         $maxMind->expects($this->any())->method('_getRegionListLegacy')->will($this->returnValue($regionListLegacyMock));
         /** @var CMService_MaxMind $maxMind */
         $maxMind->upgrade();
@@ -3412,5 +3414,21 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         $this->assertEquals($zipCodeDataExpected, $zipCodeDataActual);
         $ipDataActual = CM_Db_Db::select('cm_model_location_ip', '*')->fetchAll();
         $this->assertEquals($ipDataExpected, $ipDataActual);
+    }
+
+    /**
+     * @param array       $data
+     * @param string|null $header
+     * @return array stream, lineCount
+     */
+    private function _getReaderMock(array $data, $header = null) {
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, $header);
+        foreach ($data as $row) {
+            fputcsv($stream, $row);
+        }
+        rewind($stream);
+        $lineCount = count($data) + substr_count($header, "\n");
+        return ['stream' => $stream, 'lineCount' => $lineCount];
     }
 }
