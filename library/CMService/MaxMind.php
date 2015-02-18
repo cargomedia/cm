@@ -2,7 +2,7 @@
 
 class CMService_MaxMind extends CM_Class_Abstract {
 
-    const COUNTRY_URL = 'https://raw.github.com/lukes/ISO-3166-Countries-with-Regional-Codes/master/all/all.csv';
+    const COUNTRY_URL = 'https://raw.githubusercontent.com/lukes/ISO-3166-Countries-with-Regional-Codes/master/all/all.csv';
     const REGION_URL = 'http://www.maxmind.com/download/geoip/misc/region_codes.csv';
     const GEO_LITE_CITY_URL = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity-latest.zip';
     const GEO_IP_URL = 'https://download.maxmind.com/app/geoip_download';
@@ -1386,35 +1386,11 @@ class CMService_MaxMind extends CM_Class_Abstract {
         }
         if (!$file->exists()) {
             $path = $file->getPathOnLocalFilesystem();
-            $handle = fopen($path, 'w');
-            if (!$handle) {
-                throw new CM_Exception('Could not open `' . $path . '`');
-            }
-            $curlConnection = curl_init();
-            curl_setopt($curlConnection, CURLOPT_FILE, $handle);
-            curl_setopt($curlConnection, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($curlConnection, CURLOPT_TIMEOUT, 600);
-            curl_setopt($curlConnection, CURLOPT_USERAGENT, 'Mozilla/5.0 AppleWebKit');
-            curl_setopt($curlConnection, CURLOPT_URL, $url);
-
-            $curlError = null;
-            if (!curl_exec($curlConnection)) {
-                $curlError = 'Curl error: `' . curl_error($curlConnection) . '` ';
-            }
-
-            $info = curl_getinfo($curlConnection);
-            if ((int) $info['http_code'] !== 200) {
-                $curlError .= 'HTTP Code: `' . $info['http_code'] . '`';
-            }
-
-            curl_close($curlConnection);
-            if ($curlError) {
-                $curlError = 'Fetching contents from `' . $url . '` failed: `' . $curlError;
-                throw new CM_Exception_Invalid($curlError);
-            }
-            if (!fclose($handle)) {
-                throw new CM_Exception('Could not close `' . $path . '`');
-            }
+            $client = new \GuzzleHttp\Client();
+            $client->get($url, [
+                'timeout'         => 600,
+                'save_to'         => $path,
+            ]);
         }
         $this->_streamOutput->writeln('Download completed.');
     }
