@@ -83,10 +83,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $infoListRemoved = array();
 
         $this->_countryListAdded = array_diff_key($this->_countryList, $this->_countryListOld);
-        asort($this->_countryListAdded);
 
         $this->_countryListRemoved = array_diff_key($this->_countryListOld, $this->_countryList);
-        asort($this->_countryListRemoved);
 
         $this->_countryListRenamed = array();
         foreach ($this->_countryListOld as $countryCode => $countryNameOld) {
@@ -150,7 +148,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                         $regionListRemovedCodeInUse[$regionId] = $regionCodeOld;
                     }
                 }
-                asort($regionListRemovedCodeInUse);
                 if (!empty($regionListRemovedCodeInUse)) {
                     $this->_regionListByCountryRemovedCodeInUse[$countryCode] = $regionListRemovedCodeInUse;
                 }
@@ -169,7 +166,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     unset($regionListAdded[$regionCodeUpdated]);
                 }
             }
-            asort($regionListAdded);
             if (!empty($regionListAdded)) {
                 $this->_regionListByCountryAdded[$countryCode] = $regionListAdded;
             }
@@ -184,7 +180,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     unset($regionListRemoved[$regionCodeOld]);
                 }
             }
-            asort($regionListRemoved);
             if (!empty($regionListRemoved)) {
                 $this->_regionListByCountryRemoved[$countryCode] = $regionListRemoved;
             }
@@ -375,7 +370,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
         foreach ($this->_countryListAdded as $countryCode => $countryName) {
             $regionCode = null;
             $cityListAdded = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
-            asort($cityListAdded);
             if (!empty($cityListAdded)) {
                 $this->_cityListByRegionAdded[$countryCode][$regionCode] = $cityListAdded;
             }
@@ -385,7 +379,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
         foreach ($this->_regionListByCountryAdded as $countryCode => $regionListAdded) {
             foreach ($regionListAdded as $regionCode => $regionName) {
                 $cityListAdded = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
-                asort($cityListAdded);
                 if (!empty($cityListAdded)) {
                     $this->_cityListByRegionAdded[$countryCode][$regionCode] = $cityListAdded;
                 }
@@ -396,7 +389,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
         foreach ($this->_countryListRemoved as $countryCode => $countryName) {
             $regionCodeOld = null;
             $cityListRemoved = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
-            asort($cityListRemoved);
             if (!empty($cityListRemoved)) {
                 $this->_cityListByRegionRemoved[$countryCode][$regionCodeOld] = $cityListRemoved;
             }
@@ -407,7 +399,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
         foreach ($this->_regionListByCountryRemoved as $countryCode => $regionListRemoved) {
             foreach ($regionListRemoved as $regionCodeOld => $regionName) {
                 $cityListRemoved = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
-                asort($cityListRemoved);
                 if (!empty($cityListRemoved)) {
                     $this->_cityListByRegionRemoved[$countryCode][$regionCodeOld] = $cityListRemoved;
                 }
@@ -482,7 +473,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                         unset($cityListAdded[$cityCodeUpdated]);
                     }
                 }
-                asort($cityListAdded);
                 if (!empty($cityListAdded)) {
                     $this->_cityListByRegionAdded[$countryCode][$regionCode] = $cityListAdded;
                 }
@@ -494,7 +484,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                         unset($cityListRemoved[$cityCodeOld]);
                     }
                 }
-                asort($cityListRemoved);
                 if (!empty($cityListRemoved)) {
                     $this->_cityListByRegionRemoved[$countryCode][$regionCode] = $cityListRemoved;
                 }
@@ -541,14 +530,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
                     // Zip codes added
                     $zipCodeListAdded = array_diff_key($zipCodeList, $zipCodeListOld);
-                    ksort($zipCodeListAdded);
                     if (!empty($zipCodeListAdded)) {
                         $this->_zipCodeListByCityAdded[$countryCode][$regionCode][$cityCode] = $zipCodeListAdded;
                     }
 
                     // Zip codes removed
                     $zipCodeListRemoved = array_diff_key($zipCodeListOld, $zipCodeList);
-                    ksort($zipCodeListRemoved);
                     if (!empty($zipCodeListRemoved)) {
                         $this->_zipCodeListByCityRemoved[$countryCode][$regionCode][$cityCode] = $zipCodeListRemoved;
                     }
@@ -720,7 +707,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
             foreach ($cityListByRegionAdded as $regionCode => $cityListAdded) {
                 foreach ($cityListAdded as $cityCode => $cityName) {
                     $zipCodeListAdded = isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes']) ? $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes'] : array();
-                    ksort($zipCodeListAdded);
                     if (!empty($zipCodeListAdded)) {
                         $this->_zipCodeListByCityAdded[$countryCode][$regionCode][$cityCode] = $zipCodeListAdded;
                     }
@@ -733,7 +719,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
             foreach ($cityListByRegionRemoved as $regionCodeOld => $cityListRemoved) {
                 foreach ($cityListRemoved as $cityCode => $cityName) {
                     $zipCodeListRemoved = isset($this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['cities'][$cityName]['zipCodes']) ? $this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['cities'][$cityName]['zipCodes'] : array();
-                    ksort($zipCodeListRemoved);
                     if (!empty($zipCodeListRemoved)) {
                         $this->_zipCodeListByCityRemoved[$countryCode][$regionCodeOld][$cityCode] = $zipCodeListRemoved;
                     }
@@ -1654,6 +1639,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $this->_streamOutput->writeln($info . ':');
             foreach ($items as $key => $item) {
                 if (is_array($item)) {
+                    asort($item);
                     if (count($item) <= 10) {
                         $items[$key] = 'In ' . $key . ': ' . implode(', ', $item);
                     } else {
