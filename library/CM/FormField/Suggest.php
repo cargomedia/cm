@@ -15,7 +15,7 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
         parent::_initialize();
     }
 
-    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
+    public function prepare(CM_Params $renderParams, CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
         $viewResponse->set('placeholder', $renderParams->has('placeholder') ? $renderParams->getString('placeholder') : null);
     }
