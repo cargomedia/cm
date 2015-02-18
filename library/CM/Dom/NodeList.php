@@ -1,6 +1,6 @@
 <?php
 
-class CM_Dom_NodeList implements Iterator, Countable {
+class CM_Dom_NodeList implements Iterator, Countable, ArrayAccess {
 
     /** @var int */
     private $_iteratorPosition = 0;
@@ -185,6 +185,8 @@ class CM_Dom_NodeList implements Iterator, Countable {
         return $nodes;
     }
 
+    // Iterator interface functions
+
     public function current() {
         return new self(array($this->_elementList[$this->_iteratorPosition]));
     }
@@ -205,7 +207,31 @@ class CM_Dom_NodeList implements Iterator, Countable {
         $this->_iteratorPosition = 0;
     }
 
+    // Countable interface functions
+
     public function count() {
         return count($this->_elementList);
+    }
+
+    // ArrayAccess interface functions
+
+    public function offsetExists($offset) {
+        return isset($this->_elementList[$offset]);
+    }
+
+    public function offsetGet($offset) {
+        return new self([$this->_elementList[$offset]]);
+    }
+
+    public function offsetSet($offset, $value) {
+        if (null === $offset) {
+            $this->_elementList[] = $value;
+        } else {
+            $this->_elementList[$offset] = $value;
+        }
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->_elementList[0]);
     }
 }
