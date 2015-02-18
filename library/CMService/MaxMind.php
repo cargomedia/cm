@@ -419,6 +419,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $countryCodeList = array_keys($this->_countryList);
         $countryCodeListOld = array_keys($this->_countryListOld);
         $countryCodeListKept = array_intersect($countryCodeList, $countryCodeListOld);
+        $count = count($countryCodeListKept);
+        $item = 0;
         foreach ($countryCodeListKept as $countryCode) {
             if (isset($this->_countryList[$countryCode])) {
                 $countryName = $this->_countryList[$countryCode];
@@ -703,6 +705,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     }
                 }
             }
+            $this->_printProgressCounter(++$item, $count);
         }
         foreach ($cityIdListUpdatedCode as $cityCode => $cityId) {
             $this->_cityIdList[$cityCode] = $cityId;
@@ -891,8 +894,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 throw new CM_Exception('City `' . $cityName . '` (' . $cityCode . ') found twice in ' . $region);
             }
             $this->_locationTreeOld[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'] = array(
-                'name'      => (string) $cityName,
-                'maxMind'   => (int) $cityCode,
+                'name'    => (string) $cityName,
+                'maxMind' => (int) $cityCode,
             );
             $this->_cityListByRegionOld[$countryCode][$regionCode][$cityCode] = (string) $cityName;
             $this->_cityIdList[$cityCode] = $cityId;
@@ -933,8 +936,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 throw new CM_Exception('Zip code `' . $zipCode . '` found twice in ' . $city);
             }
             $this->_locationTreeOld[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes'][$zipCode] = array(
-                'name'      => (string) $zipCode,
-                'id'        => (int) $zipCodeId,
+                'name' => (string) $zipCode,
+                'id'   => (int) $zipCodeId,
             );
             $this->_printProgressCounter(++$item, $count);
         }
