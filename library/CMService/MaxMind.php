@@ -865,8 +865,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
 				`city`.`id` AS `cityId`,
 				`city`.`_maxmind` AS `maxMind`,
 				`city`.`name` AS `cityName`,
-				`city`.`lat` AS `lat`,
-				`city`.`lon` AS `lon`,
 				`state`.`id` AS `regionId`,
 				`state`.`_maxmind` AS `maxMindRegion`,
 				`state`.`abbreviation` AS `regionAbbreviation`,
@@ -879,7 +877,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $count = $result->getAffectedRows();
         $item = 0;
         while (false !== ($row = $result->fetch())) {
-            list($cityId, $cityCode, $cityName, $latitude, $longitude, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode, $countryName) = array_values($row);
+            list($cityId, $cityCode, $cityName, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode, $countryName) = array_values($row);
             if (null === $cityCode) {
                 throw new CM_Exception('City `' . $cityName . '` (' . $cityId . ') has no MaxMind code');
             }
@@ -894,8 +892,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
             }
             $this->_locationTreeOld[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'] = array(
                 'name'      => (string) $cityName,
-                'latitude'  => (float) $latitude,
-                'longitude' => (float) $longitude,
                 'maxMind'   => (int) $cityCode,
             );
             $this->_cityListByRegionOld[$countryCode][$regionCode][$cityCode] = (string) $cityName;
@@ -907,8 +903,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
 				`zip`.`id` AS `zipCodeId`,
 				`zip`.`name` AS `zipCode`,
 				`zip`.`cityId` AS `cityId`,
-				`zip`.`lat` AS `lat`,
-				`zip`.`lon` AS `lon`,
 				`city`.`name` AS `cityName`,
 				`state`.`id` AS `regionId`,
 				`state`.`_maxmind` AS `maxMindRegion`,
@@ -922,7 +916,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $count = $result->getAffectedRows();
         $item = 0;
         while (false !== ($row = $result->fetch())) {
-            list($zipCodeId, $zipCode, $cityId, $latitude, $longitude, $cityName, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode) = array_values($row);
+            list($zipCodeId, $zipCode, $cityId, $cityName, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode) = array_values($row);
             if (null === $cityId) {
                 throw new CM_Exception('Zip code `' . $zipCode . '` is not associated with any city');
             }
@@ -940,8 +934,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
             }
             $this->_locationTreeOld[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes'][$zipCode] = array(
                 'name'      => (string) $zipCode,
-                'latitude'  => (float) $latitude,
-                'longitude' => (float) $longitude,
                 'id'        => (int) $zipCodeId,
             );
             $this->_printProgressCounter(++$item, $count);
