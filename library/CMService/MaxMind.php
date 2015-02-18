@@ -739,29 +739,36 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * Download ISO-3166-2 countries listing (from a handy but unofficial source)
      *
      * @return array List of array($countryName, $countryCode)
+     * @throws CM_Exception
      * @codeCoverageIgnore
      */
     protected function _getCountryData() {
         $this->_streamOutput->writeln('Downloading new country listing…');
         $countriesFile = $this->_getFileTmp('countries.csv');
         $this->_download($countriesFile, self::COUNTRY_URL);
+        $countriesPath = $countriesFile->getPathOnLocalFilesystem();
+        $handle = fopen($countriesPath, 'r');
+        if (!$handle) {
+            throw new CM_Exception('Could not open file `' . $countriesPath . '`');
+        }
 
         $this->_streamOutput->writeln('Reading new country listing…');
         $countryData = array();
         $countryData[] = array('Netherlands Antilles', 'AN'); // Adding missing records
-        $rows = preg_split('#[\r\n]++#', $countriesFile->read());
-        foreach ($rows as $i => $row) {
-            if ($i === 0) {
-                continue; // Skip column names
+        $item = 0;
+        while (false !== ($row = fgets($handle))) {
+            if ($item >= 1) { // Skip column names
+                $row = str_replace('\\,', ',',
+                    '"' . preg_replace('#([^\\\\]),#', '$1",', $row, 1)); // Hack: Add delimiters in country name (first column) for str_getcsv()
+                $row = str_getcsv($row);
+                if (count($row) >= 2) { // Skip empty lines
+                    $countryData[] = $row;
+                }
             }
-            $row = trim($row);
-            $row = str_replace('\\,', ',',
-                '"' . preg_replace('#([^\\\\]),#', '$1",', $row, 1)); // Hack: Add delimiters in country name (first column) for str_getcsv()
-            $csv = str_getcsv($row);
-            if (count($csv) <= 1) {
-                continue; // Skip empty lines
-            }
-            $countryData[] = $csv;
+            ++$item;
+        }
+        if (!fclose($handle)) {
+            throw new CM_Exception('Could not close file `' . $countriesPath . '`');
         }
         return $countryData;
     }
@@ -770,22 +777,28 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * Download mixed FIPS 10-4 / ISO-3166-2 / proprietary region listing from MaxMind
      *
      * @return array List of array($countryCode, $regionCode, $regionName)
+     * @throws CM_Exception
      * @codeCoverageIgnore
      */
     protected function _getRegionData() {
         $this->_streamOutput->writeln('Downloading new region listing…');
         $regionsFile = $this->_getFileTmp('region.csv');
         $this->_download($regionsFile, self::REGION_URL);
+        $regionsPath = $regionsFile->getPathOnLocalFilesystem();
+        $handle = fopen($regionsPath, 'r');
+        if (!$handle) {
+            throw new CM_Exception('Could not open file `' . $regionsPath . '`');
+        }
 
         $this->_streamOutput->writeln('Reading new region listing…');
         $regionData = array();
-        $rows = preg_split('#[\r\n]++#', $regionsFile->read());
-        foreach ($rows as $row) {
-            $csv = str_getcsv(trim($row));
-            if (count($csv) <= 1) {
-                continue; // Skip empty lines
+        while (false !== ($row = fgetcsv($handle))) {
+            if (count($row) >= 3) { // Skip empty lines
+                $regionData[] = $row;
             }
-            $regionData[] = $csv;
+        }
+        if (!fclose($handle)) {
+            throw new CM_Exception('Could not close file `' . $regionsPath . '`');
         }
         return $regionData;
     }
