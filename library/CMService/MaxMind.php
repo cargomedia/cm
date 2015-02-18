@@ -1051,10 +1051,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
                             $name = $this->_regionListByCountry[$countryCode][$regionCode];
                             if (strlen($name)) {
                                 $this->_locationTree[$countryCode]['regions'][$regionCode]['location'] = array(
-                                    'name'      => $name,
-                                    'latitude'  => $latitude,
-                                    'longitude' => $longitude,
-                                    'maxMind'   => $maxMind,
+                                    'name'    => $name,
+                                    'maxMind' => $maxMind,
                                 );
                             }
                         }
@@ -1069,10 +1067,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
                             $name = $this->_countryList[$countryCode];
                             if (strlen($name)) {
                                 $this->_locationTree[$countryCode]['location'] = array(
-                                    'name'      => $name,
-                                    'latitude'  => $latitude,
-                                    'longitude' => $longitude,
-                                    'maxMind'   => $maxMind,
+                                    'name'    => $name,
+                                    'maxMind' => $maxMind,
                                 );
                                 $this->_countryCodeListByMaxMind[$maxMind] = $countryCode;
                             }
