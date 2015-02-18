@@ -1262,7 +1262,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         if ($this->_withoutIpBlocks) {
             return;
         }
-        $this->_streamOutput->writeln('Reading new IP blocks…');
+        $this->_streamOutput->writeln('Updating IP blocks database…');
         $ipBlocksReader = $this->_getIpBlocksReader();
         CM_Db_Db::exec('DROP TABLE IF EXISTS `cm_model_location_ip_new`');
         CM_Db_Db::exec('CREATE TABLE `cm_model_location_ip_new` LIKE `cm_model_location_ip`');
@@ -1309,8 +1309,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
         }
         if (!empty($batch)) {
             CM_Db_Db::insert('cm_model_location_ip_new', ['id', 'level', 'ipStart', 'ipEnd'], $batch);
-            unset($batch);
         }
+        unset($batch);
         unset($this->_countryIdList);
         unset($this->_countryCodeListByMaxMind);
         unset($this->_regionIdListByMaxMind);
