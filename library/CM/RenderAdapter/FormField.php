@@ -8,7 +8,7 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 
         $viewResponse = new CM_Frontend_ViewResponse($field);
         $viewResponse->setTemplateName('default');
-        $field->prepare($renderParams, $viewResponse);
+        $field->prepare($renderParams, $this->getRender()->getEnvironment(), $viewResponse);
         $viewResponse->set('field', $field);
         $viewResponse->set('inputId', $viewResponse->getAutoIdTagged('input'));
         $viewResponse->set('name', $field->getName());
