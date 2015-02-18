@@ -744,12 +744,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
     protected function _getCountryData() {
         $this->_streamOutput->writeln('Downloading new country listing…');
         $countriesFile = $this->_getFileTmp('countries.csv');
-        $countriesContents = $this->_download($countriesFile, self::COUNTRY_URL);
+        $this->_download($countriesFile, self::COUNTRY_URL);
 
         $this->_streamOutput->writeln('Reading new country listing…');
         $countryData = array();
         $countryData[] = array('Netherlands Antilles', 'AN'); // Adding missing records
-        $rows = preg_split('#[\r\n]++#', $countriesContents);
+        $rows = preg_split('#[\r\n]++#', $countriesFile->read());
         foreach ($rows as $i => $row) {
             if ($i === 0) {
                 continue; // Skip column names
@@ -775,11 +775,11 @@ class CMService_MaxMind extends CM_Class_Abstract {
     protected function _getRegionData() {
         $this->_streamOutput->writeln('Downloading new region listing…');
         $regionsFile = $this->_getFileTmp('region.csv');
-        $regionsContents = $this->_download($regionsFile, self::REGION_URL);
+        $this->_download($regionsFile, self::REGION_URL);
 
         $this->_streamOutput->writeln('Reading new region listing…');
         $regionData = array();
-        $rows = preg_split('#[\r\n]++#', $regionsContents);
+        $rows = preg_split('#[\r\n]++#', $regionsFile->read());
         foreach ($rows as $row) {
             $csv = str_getcsv(trim($row));
             if (count($csv) <= 1) {
@@ -1361,30 +1361,52 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_File     $file
-     * @param string|null $url
-     * @return string
+     * @param CM_File $file
+     * @param string  $url
      * @throws CM_Exception
      * @codeCoverageIgnore
      */
-    private function _download(CM_File $file, $url = null) {
+    private function _download(CM_File $file, $url) {
+        $url = (string) $url;
         if ($file->exists()) {
             $modificationTime = $file->getModified();
             if (time() - $modificationTime > self::CACHE_LIFETIME) {
                 $file->delete();
             }
         }
-        if ($file->exists()) {
-            $contents = $file->read();
-        } else {
-            if (null === $url) {
-                throw new CM_Exception('File not found: `' . $file->getPath() . '`');
+        if (!$file->exists()) {
+            $path = $file->getPathOnLocalFilesystem();
+            $handle = fopen($path, 'w');
+            if (!$handle) {
+                throw new CM_Exception('Could not open `' . $path . '`');
             }
-            $contents = CM_Util::getContents($url, null, null, 600);
-            $file->write($contents);
+            $curlConnection = curl_init();
+            curl_setopt($curlConnection, CURLOPT_FILE, $handle);
+            curl_setopt($curlConnection, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($curlConnection, CURLOPT_TIMEOUT, 600);
+            curl_setopt($curlConnection, CURLOPT_USERAGENT, 'Mozilla/5.0 AppleWebKit');
+            curl_setopt($curlConnection, CURLOPT_URL, $url);
+
+            $curlError = null;
+            if (!curl_exec($curlConnection)) {
+                $curlError = 'Curl error: `' . curl_error($curlConnection) . '` ';
+            }
+
+            $info = curl_getinfo($curlConnection);
+            if ((int) $info['http_code'] !== 200) {
+                $curlError .= 'HTTP Code: `' . $info['http_code'] . '`';
+            }
+
+            curl_close($curlConnection);
+            if ($curlError) {
+                $curlError = 'Fetching contents from `' . $url . '` failed: `' . $curlError;
+                throw new CM_Exception_Invalid($curlError);
+            }
+            if (!fclose($handle)) {
+                throw new CM_Exception('Could not close `' . $path . '`');
+            }
         }
         $this->_streamOutput->writeln('Download completed.');
-        return $contents;
     }
 
     /**
