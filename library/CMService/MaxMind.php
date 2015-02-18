@@ -1059,7 +1059,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     }
                 } elseif (strlen($countryCode)) { // Country record
                     if (!isset($this->_locationTree[$countryCode]['location'])) {
-                        if (in_array($countryCode, array('A1', 'A2', 'AP', 'EU'), true)) {
+                        if (in_array($countryCode, array('O1', 'A1', 'A2', 'AP', 'EU'), true)) {
                             $infoListWarning['Ignoring proprietary MaxMind country codes'][] = $countryCode;
                         } elseif (!isset($this->_countryList[$countryCode])) {
                             $infoListWarning['Ignoring unknown countries'][] = $countryCode . ' (' . implode(', ', $row) . ')';
