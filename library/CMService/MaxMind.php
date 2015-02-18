@@ -1395,6 +1395,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $contents = CM_Util::getContents($url, null, null, 600);
             $file->write($contents);
         }
+        $this->_streamOutput->writeln('Download completed.');
         return $contents;
     }
 
