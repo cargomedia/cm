@@ -89,7 +89,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 }
             }
         ));
-        $this->_registerClockworkCallbacks('1 week', array(
+        $this->_registerClockworkCallbacks('8 days', array(
             'CMService_MaxMind::upgrade' => function () {
                 $maxMind = new CMService_MaxMind($this->_getStreamOutput(), $this->_getStreamError());
                 $maxMind->upgrade();

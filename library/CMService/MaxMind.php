@@ -7,7 +7,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     const GEO_LITE_CITY_URL = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity-latest.zip';
     const GEO_IP_URL = 'https://download.maxmind.com/app/geoip_download';
 
-    const CACHE_LIFETIME = 518400; // Delete downloaded files after 6 days (MaxMind updates weekly)
+    const CACHE_LIFETIME = 604800; // Delete downloaded files after one week (MaxMind update period)
 
     /** @var CM_File */
     protected $_geoIpFile;
