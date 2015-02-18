@@ -859,7 +859,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @throws CM_Exception
      */
     protected function _readLocationTreeOld() {
-        $this->_streamOutput->writeln('Reading old location tree…');
+        $this->_streamOutput->writeln('Reading old location tree (cities)…');
         $this->_locationTreeOld = array();
         $result = CM_Db_Db::exec('
 			SELECT
@@ -899,6 +899,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $this->_cityIdList[$cityCode] = $cityId;
             $this->_printProgressCounter(++$item, $count);
         }
+        $this->_streamOutput->writeln('Reading old location tree (zip codes)…');
         $result = CM_Db_Db::exec('
 			SELECT
 				`zip`.`id` AS `zipCodeId`,
