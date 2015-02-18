@@ -182,6 +182,15 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
 
     /**
      * @param CM_Splittest_Fixture $fixture
+     * @return string
+     */
+    protected function _getCacheKeyFixture(CM_Splittest_Fixture $fixture) {
+        return CM_CacheConst::Splittest_VariationFixtures . '_id:' . $fixture->getId() . '_type:' . $fixture->getFixtureType()
+        . '_splittestCreated:' . $this->getCreated();
+    }
+
+    /**
+     * @param CM_Splittest_Fixture $fixture
      * @param float|null           $weight
      * @throws CM_Exception_Invalid
      */
@@ -229,7 +238,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
                 CM_Db_Db::insert('cm_splittestVariation_fixture',
                     array('splittestId' => $this->getId(), $columnId => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
                 $variationListFixture[$this->getId()] = $variation->getName();
-                $cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_id:' . $fixture->getId() . '_type:' . $fixture->getFixtureType();
+                $cacheKey = $this->_getCacheKeyFixture($fixture);
                 $cache = CM_Cache_Local::getInstance();
                 $cache->set($cacheKey, $variationListFixture);
                 $this->getServiceManager()->getTrackings()->trackSplittest($fixture, $variation);
@@ -255,7 +264,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
         $fixtureId = $fixture->getId();
         $updateCache = (bool) $updateCache;
 
-        $cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_id:' . $fixture->getId() . '_type:' . $fixture->getFixtureType();
+        $cacheKey = $this->_getCacheKeyFixture($fixture);
         $cache = CM_Cache_Local::getInstance();
         if ($updateCache || (($variationListFixture = $cache->get($cacheKey)) === false)) {
             $variationListFixture = CM_Db_Db::exec('
