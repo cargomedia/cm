@@ -123,8 +123,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     protected function _runMultipleWithoutGearman(array $paramsList) {
         $resultList = array();
         foreach ($paramsList as $params) {
-            $params = $this->_encodeParams($params);
-            $params = $this->_decodeParams($params);
+            $params = $this->_decodeParams($this->_encodeParams($params));
             $resultList[] = $this->_executeJob($params);
         }
         return $resultList;
