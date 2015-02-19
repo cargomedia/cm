@@ -48,6 +48,27 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $this->assertGreaterThan($created, $test->getCreated());
     }
 
+    public function testFlushVariationCache() {
+        $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $variation1 = new CM_Model_SplittestVariation(CM_Db_Db::select('cm_splittestVariation', 'id', ['name' => 'v1'])->fetchColumn());
+        $variation2 = new CM_Model_SplittestVariation(CM_Db_Db::select('cm_splittestVariation', 'id', ['name' => 'v2'])->fetchColumn());
+        $variation2->setEnabled(false);
+        $fixture = $this->mockClass('CM_Splittest_Fixture')->newInstanceWithoutConstructor();
+        $fixture->mockMethod('getId')->set(1);
+        $fixture->mockMethod('getFixtureType')->set(1);
+
+        CMTest_TH::timeForward(1);
+        $variation = CMTest_TH::callProtectedMethod($test, '_getVariationFixture', [$fixture]);
+        $this->assertSame('v1', $variation);
+
+        $test->flush();
+        $variation2->setEnabled(true);
+        $variation1->setEnabled(false);
+
+        $variation = CMTest_TH::callProtectedMethod($test, '_getVariationFixture', [$fixture]);
+        $this->assertSame('v2', $variation);
+    }
+
     public function testGetVariations() {
         /** @var CM_Model_Splittest $test */
         $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
