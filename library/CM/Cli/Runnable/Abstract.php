@@ -1,9 +1,8 @@
 <?php
 
-abstract class CM_Cli_Runnable_Abstract {
+abstract class CM_Cli_Runnable_Abstract implements CM_Service_ManagerAwareInterface {
 
-    /** @var CM_App|null */
-    private $_application;
+    use CM_Service_ManagerAwareTrait;
 
     /** @var CM_InputStream_Interface */
     private $_streamInput;
@@ -17,7 +16,6 @@ abstract class CM_Cli_Runnable_Abstract {
      * @param CM_OutputStream_Interface|null $streamError
      */
     public function __construct(CM_InputStream_Interface $streamInput = null, CM_OutputStream_Interface $streamOutput = null, CM_OutputStream_Interface $streamError = null) {
-
         if (null === $streamInput) {
             $streamInput = new CM_InputStream_Null();
         }
@@ -33,21 +31,7 @@ abstract class CM_Cli_Runnable_Abstract {
         $this->_initialize();
     }
 
-    /**
-     * @param CM_App|null $application
-     */
-    public function setApplication(CM_App $application = null) {
-        $this->_application = $application;
-    }
-
     protected function _initialize() {
-    }
-
-    /**
-     * @return CM_App|null
-     */
-    protected function _getApplication() {
-        return $this->_application;
     }
 
     /**

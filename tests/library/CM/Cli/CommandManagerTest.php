@@ -120,7 +120,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $processMock->expects($this->any())->method('isRunning')->will($this->returnCallback(function ($processId) {
             return $processId !== 3;
         }));
-        $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('_getProcess'));
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('_getProcess'), array($this->getServiceManager()));
         $commandManagerMock->expects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
         CM_Db_Db::insert('cm_cli_command_manager_process',
             array('commandName' => 'command-mock1', 'hostId' => 1, 'processId' => 1, 'timeoutStamp' => time() + 60));
@@ -151,7 +151,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $command->mockMethod('getSynchronized');
         $command->mockMethod('getKeepalive');
 
-        $commandManager = $this->mockObject('CM_Cli_CommandManager');
+        $commandManager = $this->mockObject('CM_Cli_CommandManager', [$this->getServiceManager()]);
         $commandManager->mockMethod('_getCommand')->set($command);
         $commandManager->mockMethod('_getProcess')
             ->at(0, function () use ($processMock) {
@@ -189,7 +189,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $keepAliveExpected = $commandMock->getKeepalive();
         $processMock = $this->_getProcessMock($keepAliveExpected);
         $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
-            array('getCommands', '_getProcess', '_findLock', '_lockCommand', 'unlockCommand', '_outputError'));
+            array('getCommands', '_getProcess', '_findLock', '_lockCommand', 'unlockCommand', '_outputError'), array($this->getServiceManager()));
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         if (null === $errorMessageExpected) {
             $commandManagerMock->expects($this->never())->method('_outputError');

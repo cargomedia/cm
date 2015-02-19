@@ -18,19 +18,19 @@ class CM_Cli_Command {
     }
 
     /**
-     * @param CM_App                    $application
+     * @param CM_Service_Manager        $serviceManager
      * @param CM_Cli_Arguments          $arguments
      * @param CM_InputStream_Interface  $streamInput
      * @param CM_OutputStream_Interface $streamOutput
      * @param CM_OutputStream_Interface $streamError
      * @throws CM_Cli_Exception_InvalidArguments
      */
-    public function run(CM_App $application, CM_Cli_Arguments $arguments, CM_InputStream_Interface $streamInput, CM_OutputStream_Interface $streamOutput, CM_OutputStream_Interface $streamError) {
+    public function run(CM_Service_Manager $serviceManager, CM_Cli_Arguments $arguments, CM_InputStream_Interface $streamInput, CM_OutputStream_Interface $streamOutput, CM_OutputStream_Interface $streamError) {
         $parameters = $arguments->extractMethodParameters($this->_method);
         $arguments->checkUnused();
         /** @var CM_Cli_Runnable_Abstract $runnable */
         $runnable = $this->_class->newInstance($streamInput, $streamOutput, $streamError);
-        $runnable->setApplication($application);
+        $runnable->setServiceManager($serviceManager);
         call_user_func_array(array($runnable, $this->_method->getName()), $parameters);
     }
 

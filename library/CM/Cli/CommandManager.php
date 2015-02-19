@@ -1,6 +1,8 @@
 <?php
 
-class CM_Cli_CommandManager {
+class CM_Cli_CommandManager implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     const TIMEOUT = 600;
 
@@ -16,15 +18,11 @@ class CM_Cli_CommandManager {
     /** @var CM_OutputStream_Interface */
     private $_streamOutput, $_streamError;
 
-    /** @var CM_App */
-    private $_application;
-
     /**
-     * @param CM_App $application
-     * @throws CM_Exception_Invalid
+     * @param CM_Service_Manager $manager
      */
-    public function __construct(CM_App $application) {
-        $this->_application = $application;
+    public function __construct(CM_Service_Manager $manager) {
+        $this->setServiceManager($manager);
         $this->_commands = array();
 
         $this->_setStreamInput(new CM_InputStream_Readline());
@@ -45,7 +43,7 @@ class CM_Cli_CommandManager {
             throw new CM_Exception_Invalid('Cannot add abstract runnable');
         }
         foreach ($class->getMethods() as $method) {
-            if (!$method->isConstructor() && $method->isPublic() && !$method->isStatic()) {
+            if ($method->isPublic() && !$method->isConstructor() && !$method->isStatic()) {
                 $command = new CM_Cli_Command($method, $class);
                 $this->_commands[$command->getName()] = $command;
             }
@@ -184,7 +182,7 @@ class CM_Cli_CommandManager {
                 } else {
                     CMService_Newrelic::getInstance()->startTransaction($transactionName);
                 }
-                $command->run($this->_application, $arguments, $streamInput, $streamOutput, $streamError);
+                $command->run($this->getServiceManager(), $arguments, $streamInput, $streamOutput, $streamError);
             };
 
             $forks = max($this->_forks, 1);
