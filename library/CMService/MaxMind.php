@@ -69,10 +69,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_upgradeCityList();
         $this->_upgradeZipCodeList();
         $this->_upgradeIpBlocks();
-        CM_Model_Location::createAggregation();
-        $type = new CM_Elasticsearch_Type_Location();
-        $searchIndexCli = new CM_Elasticsearch_Index_Cli(null, $this->_streamOutput, $this->_streamError);
-        $searchIndexCli->create($type->getIndex()->getName());
+        $this->_updateSearchIndex();
     }
 
     protected function _compareCountryLists() {
@@ -1350,6 +1347,13 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_printInfoList($infoListWarning, '!');
     }
 
+    protected function _updateSearchIndex() {
+        CM_Model_Location::createAggregation();
+        $type = new CM_Elasticsearch_Type_Location();
+        $searchIndexCli = new CM_Elasticsearch_Index_Cli(null, $this->_streamOutput, $this->_streamError);
+        $searchIndexCli->create($type->getIndex()->getName());
+    }
+
     /**
      * @param array    $array
      * @param int|null $depth
@@ -1388,8 +1392,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $path = $file->getPathOnLocalFilesystem();
             $client = new \GuzzleHttp\Client();
             $client->get($url, [
-                'timeout'         => 600,
-                'save_to'         => $path,
+                'timeout' => 600,
+                'save_to' => $path,
             ]);
         }
         $this->_streamOutput->writeln('Download completed.');
