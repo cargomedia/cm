@@ -94,14 +94,8 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 try {
                     $maxMind = new CMService_MaxMind();
                     $maxMind->upgrade();
-                } catch (Exception $exception) {
-                    $log = new CM_Paging_Log_Fatal();
-                    $params = array(
-                        'file'  => $exception->getFile(),
-                        'line'  => $exception->getLine(),
-                        'trace' => $exception->getTraceAsString(),
-                    );
-                    $log->add($exception->getMessage(), $params);
+                } catch (CM_Exception $exception) {
+                    $exception->setSeverity(CM_Exception::FATAL);
                     throw $exception;
                 }
             }
