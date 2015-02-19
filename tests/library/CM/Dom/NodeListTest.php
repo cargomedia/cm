@@ -134,4 +134,44 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
         $this->assertSame('<b>hello <i>there</i></b>', $list->find('b')->getHtml());
         $this->assertSame('<i>there</i><i>world</i>', $list->find('i')->getHtml());
     }
+
+    public function testArrayAccess() {
+        $el1 = new DOMElement('span', 1);
+        $el2 = new DOMElement('span', 2);
+        $el3 = new DOMElement('span', 3);
+        $el4 = new DOMElement('span', 4);
+        $el5 = new DOMElement('span', 5);
+        $domNodeList = new CM_Dom_NodeList([$el1, $el2, $el3]);
+
+        // offsetGet()
+        $this->assertInstanceOf('CM_Dom_NodeList', $domNodeList[1]);
+        $this->assertSame($el2->textContent, $domNodeList[1]->getText());
+        try {
+            $domNodeList[100];
+        } catch (ErrorException $ex) {
+            $this->assertContains('Undefined offset: 100', $ex->getMessage());
+        }
+
+        // offsetExists()
+        $this->assertTrue(empty($domNodeList[100]));
+        $this->assertFalse(empty($domNodeList[2]));
+        $this->assertFalse(isset($domNodeList[100]));
+        $this->assertTrue(isset($domNodeList[2]));
+
+        // offsetSet()
+        $domNodeList[] = $el4;
+        $this->assertSame($el4->textContent, $domNodeList[3]->getText());
+        $domNodeList[9] = $el5;
+        $this->assertSame($el5->textContent, $domNodeList[9]->getText());
+        try {
+            $domNodeList[] = 'lol';
+        } catch (CM_Exception_Invalid $ex) {
+            $this->assertContains('Element is not an instance of `DOMNode`', $ex->getMessage());
+        }
+
+        // offsetUnset
+        $this->assertTrue(isset($domNodeList[0]));
+        unset($domNodeList[0]);
+        $this->assertFalse(isset($domNodeList[0]));
+    }
 }
