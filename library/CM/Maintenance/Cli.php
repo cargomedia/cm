@@ -91,8 +91,19 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
         ));
         $this->_registerClockworkCallbacks('8 days', array(
             'CMService_MaxMind::upgrade' => function () {
-                $maxMind = new CMService_MaxMind();
-                $maxMind->upgrade();
+                try {
+                    $maxMind = new CMService_MaxMind();
+                    $maxMind->upgrade();
+                } catch (Exception $exception) {
+                    $log = new CM_Paging_Log_Fatal();
+                    $params = array(
+                        'file'  => $exception->getFile(),
+                        'line'  => $exception->getLine(),
+                        'trace' => $exception->getTraceAsString(),
+                    );
+                    $log->add($exception->getMessage(), $params);
+                    throw $exception;
+                }
             }
         ));
     }
