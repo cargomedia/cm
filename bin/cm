@@ -19,7 +19,7 @@ $application = new CM_App($rootPath);
 $application->installGlobalHandlers();
 $application->bootstrap();
 
-$manager = new CM_Cli_CommandManager($application);
+$manager = new CM_Cli_CommandManager($application->getServiceManager());
 $manager->autoloadCommands();
 $returnCode = $manager->run(new CM_Cli_Arguments($argv));
 exit($returnCode);
