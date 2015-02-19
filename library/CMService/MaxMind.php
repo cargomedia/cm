@@ -2,13 +2,14 @@
 
 class CMService_MaxMind extends CM_Class_Abstract {
 
-    const COUNTRY_URL = 'https://raw.github.com/lukes/ISO-3166-Countries-with-Regional-Codes/master/all/all.csv';
+    const COUNTRY_URL = 'https://raw.githubusercontent.com/lukes/ISO-3166-Countries-with-Regional-Codes/master/all/all.csv';
     const REGION_URL = 'http://www.maxmind.com/download/geoip/misc/region_codes.csv';
     const GEO_LITE_CITY_URL = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity-latest.zip';
+    const GEO_IP_URL = 'https://download.maxmind.com/app/geoip_download';
 
-    const CACHE_LIFETIME = 604800; // Keep downloaded files for one week (MaxMind update period)
+    const CACHE_LIFETIME = 604800; // Delete downloaded files after one week (MaxMind update period)
 
-    /** @var CM_File|null */
+    /** @var CM_File */
     protected $_geoIpFile;
 
     /** @var CM_OutputStream_Interface */
@@ -30,14 +31,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $_ipBlockListByLocation;
 
     /**
-     * @param CM_File|null                   $geoIpFile
      * @param CM_OutputStream_Interface|null $streamOutput
      * @param CM_OutputStream_Interface|null $streamError
      * @param bool|null                      $withoutIpBlocks
      * @param bool|null                      $verbose
      */
-    public function __construct(CM_File $geoIpFile = null, CM_OutputStream_Interface $streamOutput = null, CM_OutputStream_Interface $streamError = null, $withoutIpBlocks = null, $verbose = null) {
-        $this->_setGeoIpFile($geoIpFile);
+    public function __construct(CM_OutputStream_Interface $streamOutput = null, CM_OutputStream_Interface $streamError = null, $withoutIpBlocks = null, $verbose = null) {
         if (null === $streamOutput) {
             $streamOutput = new CM_OutputStream_Null();
         }
@@ -70,10 +69,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_upgradeCityList();
         $this->_upgradeZipCodeList();
         $this->_upgradeIpBlocks();
-        CM_Model_Location::createAggregation();
-        $type = new CM_Elasticsearch_Type_Location();
-        $searchIndexCli = new CM_Elasticsearch_Index_Cli(null, $this->_streamOutput, $this->_streamError);
-        $searchIndexCli->create($type->getIndex()->getName());
+        $this->_updateSearchIndex();
     }
 
     protected function _compareCountryLists() {
@@ -84,10 +80,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $infoListRemoved = array();
 
         $this->_countryListAdded = array_diff_key($this->_countryList, $this->_countryListOld);
-        asort($this->_countryListAdded);
 
         $this->_countryListRemoved = array_diff_key($this->_countryListOld, $this->_countryList);
-        asort($this->_countryListRemoved);
 
         $this->_countryListRenamed = array();
         foreach ($this->_countryListOld as $countryCode => $countryNameOld) {
@@ -151,7 +145,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                         $regionListRemovedCodeInUse[$regionId] = $regionCodeOld;
                     }
                 }
-                asort($regionListRemovedCodeInUse);
                 if (!empty($regionListRemovedCodeInUse)) {
                     $this->_regionListByCountryRemovedCodeInUse[$countryCode] = $regionListRemovedCodeInUse;
                 }
@@ -170,7 +163,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     unset($regionListAdded[$regionCodeUpdated]);
                 }
             }
-            asort($regionListAdded);
             if (!empty($regionListAdded)) {
                 $this->_regionListByCountryAdded[$countryCode] = $regionListAdded;
             }
@@ -185,7 +177,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     unset($regionListRemoved[$regionCodeOld]);
                 }
             }
-            asort($regionListRemoved);
             if (!empty($regionListRemoved)) {
                 $this->_regionListByCountryRemoved[$countryCode] = $regionListRemoved;
             }
@@ -318,9 +309,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
                             $cityCount = count($regionData['cities']);
                             $s = $cityCount > 1 ? 'ies' : 'y';
                             foreach ($regionData['cities'] as $cityName => $cityData) {
-                                $cityCode = $cityData['location']['maxMind'];
+                                $cityCode = isset($cityData['location']) ? ' (' . $cityData['location']['maxMind'] . ')' : '';
                                 $infoListWarning['Cities without region'][$countryName . ', ' . $cityCount . ' cit' . $s][] =
-                                    $cityName . ' (' . $cityCode . ')';
+                                    $cityName . $cityCode;
                             }
                         }
                         foreach ($regionData['cities'] as $cityName => $cityData) {
@@ -376,7 +367,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
         foreach ($this->_countryListAdded as $countryCode => $countryName) {
             $regionCode = null;
             $cityListAdded = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
-            asort($cityListAdded);
             if (!empty($cityListAdded)) {
                 $this->_cityListByRegionAdded[$countryCode][$regionCode] = $cityListAdded;
             }
@@ -386,7 +376,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
         foreach ($this->_regionListByCountryAdded as $countryCode => $regionListAdded) {
             foreach ($regionListAdded as $regionCode => $regionName) {
                 $cityListAdded = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
-                asort($cityListAdded);
                 if (!empty($cityListAdded)) {
                     $this->_cityListByRegionAdded[$countryCode][$regionCode] = $cityListAdded;
                 }
@@ -397,27 +386,29 @@ class CMService_MaxMind extends CM_Class_Abstract {
         foreach ($this->_countryListRemoved as $countryCode => $countryName) {
             $regionCodeOld = null;
             $cityListRemoved = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
-            asort($cityListRemoved);
             if (!empty($cityListRemoved)) {
                 $this->_cityListByRegionRemoved[$countryCode][$regionCodeOld] = $cityListRemoved;
             }
         }
+        unset($this->_countryListRemoved);
 
         // Look for cities in regions that have been removed
         foreach ($this->_regionListByCountryRemoved as $countryCode => $regionListRemoved) {
             foreach ($regionListRemoved as $regionCodeOld => $regionName) {
                 $cityListRemoved = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
-                asort($cityListRemoved);
                 if (!empty($cityListRemoved)) {
                     $this->_cityListByRegionRemoved[$countryCode][$regionCodeOld] = $cityListRemoved;
                 }
             }
         }
+        unset($this->_regionListByCountryRemoved);
 
         // Look for changes in countries that have been kept
         $countryCodeList = array_keys($this->_countryList);
         $countryCodeListOld = array_keys($this->_countryListOld);
         $countryCodeListKept = array_intersect($countryCodeList, $countryCodeListOld);
+        $count = count($countryCodeListKept);
+        $item = 0;
         foreach ($countryCodeListKept as $countryCode) {
             if (isset($this->_countryList[$countryCode])) {
                 $countryName = $this->_countryList[$countryCode];
@@ -479,7 +470,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                         unset($cityListAdded[$cityCodeUpdated]);
                     }
                 }
-                asort($cityListAdded);
                 if (!empty($cityListAdded)) {
                     $this->_cityListByRegionAdded[$countryCode][$regionCode] = $cityListAdded;
                 }
@@ -491,7 +481,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                         unset($cityListRemoved[$cityCodeOld]);
                     }
                 }
-                asort($cityListRemoved);
                 if (!empty($cityListRemoved)) {
                     $this->_cityListByRegionRemoved[$countryCode][$regionCode] = $cityListRemoved;
                 }
@@ -538,14 +527,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
                     // Zip codes added
                     $zipCodeListAdded = array_diff_key($zipCodeList, $zipCodeListOld);
-                    ksort($zipCodeListAdded);
                     if (!empty($zipCodeListAdded)) {
                         $this->_zipCodeListByCityAdded[$countryCode][$regionCode][$cityCode] = $zipCodeListAdded;
                     }
 
                     // Zip codes removed
                     $zipCodeListRemoved = array_diff_key($zipCodeListOld, $zipCodeList);
-                    ksort($zipCodeListRemoved);
                     if (!empty($zipCodeListRemoved)) {
                         $this->_zipCodeListByCityRemoved[$countryCode][$regionCode][$cityCode] = $zipCodeListRemoved;
                     }
@@ -702,17 +689,21 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     }
                 }
             }
+            $this->_printProgressCounter(++$item, $count);
         }
         foreach ($cityIdListUpdatedCode as $cityCode => $cityId) {
             $this->_cityIdList[$cityCode] = $cityId;
         }
+        unset($this->_countryList);
+        unset($this->_countryListOld);
+        unset($this->_regionListByCountryOld);
+        unset($this->_cityListByRegionOld);
 
         // Look for zip codes in cities that have been added
         foreach ($this->_cityListByRegionAdded as $countryCode => $cityListByRegionAdded) {
             foreach ($cityListByRegionAdded as $regionCode => $cityListAdded) {
                 foreach ($cityListAdded as $cityCode => $cityName) {
                     $zipCodeListAdded = isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes']) ? $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes'] : array();
-                    ksort($zipCodeListAdded);
                     if (!empty($zipCodeListAdded)) {
                         $this->_zipCodeListByCityAdded[$countryCode][$regionCode][$cityCode] = $zipCodeListAdded;
                     }
@@ -725,13 +716,15 @@ class CMService_MaxMind extends CM_Class_Abstract {
             foreach ($cityListByRegionRemoved as $regionCodeOld => $cityListRemoved) {
                 foreach ($cityListRemoved as $cityCode => $cityName) {
                     $zipCodeListRemoved = isset($this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['cities'][$cityName]['zipCodes']) ? $this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['cities'][$cityName]['zipCodes'] : array();
-                    ksort($zipCodeListRemoved);
                     if (!empty($zipCodeListRemoved)) {
                         $this->_zipCodeListByCityRemoved[$countryCode][$regionCodeOld][$cityCode] = $zipCodeListRemoved;
                     }
                 }
             }
         }
+        unset($this->_cityListByRegionRemoved);
+        unset($this->_locationTreeOld);
+        unset($this->_zipCodeListByCityRemoved);
 
         $this->_printInfoList($infoListWarning, '!');
         $this->_printInfoList($infoListAdded, '+');
@@ -740,149 +733,69 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_File     $file
-     * @param string|null $url
-     * @return string
-     * @throws CM_Exception
-     * @codeCoverageIgnore
-     */
-    protected function _download(CM_File $file, $url = null) {
-        if ($file->exists()) {
-            $modificationTime = $file->getModified();
-            if (time() - $modificationTime > self::CACHE_LIFETIME) {
-                $file->delete();
-            }
-        }
-        if ($file->exists()) {
-            $contents = $file->read();
-        } else {
-            if (null === $url) {
-                throw new CM_Exception('File not found: `' . $file->getPath() . '`');
-            }
-            $contents = CM_Util::getContents($url);
-            if (false === $contents) {
-                throw new CM_Exception('Download of `' . $url . '` failed');
-            }
-            $file->write($contents);
-        }
-        return $contents;
-    }
-
-    /**
      * Download ISO-3166-2 countries listing (from a handy but unofficial source)
      *
      * @return array List of array($countryName, $countryCode)
+     * @throws CM_Exception
      * @codeCoverageIgnore
      */
     protected function _getCountryData() {
         $this->_streamOutput->writeln('Downloading new country listing…');
-        $countriesPath = CM_Bootloader::getInstance()->getDirTmp() . 'countries.csv';
-        $countriesFile = new CM_File($countriesPath);
-        $countriesContents = $this->_download($countriesFile, self::COUNTRY_URL);
+        $countriesFile = $this->_getFileTmp('countries.csv');
+        $this->_download($countriesFile, self::COUNTRY_URL);
+        $countriesPath = $countriesFile->getPathOnLocalFilesystem();
+        $handle = fopen($countriesPath, 'r');
+        if (!$handle) {
+            throw new CM_Exception('Could not open file `' . $countriesPath . '`');
+        }
 
         $this->_streamOutput->writeln('Reading new country listing…');
         $countryData = array();
         $countryData[] = array('Netherlands Antilles', 'AN'); // Adding missing records
-        $rows = preg_split('#[\r\n]++#', $countriesContents);
-        foreach ($rows as $i => $row) {
-            if ($i === 0) {
-                continue; // Skip column names
+        $item = 0;
+        while (false !== ($row = fgets($handle))) {
+            if ($item >= 1) { // Skip column names
+                $row = str_replace('\\,', ',',
+                    '"' . preg_replace('#([^\\\\]),#', '$1",', $row, 1)); // Hack: Add delimiters in country name (first column) for str_getcsv()
+                $row = str_getcsv($row);
+                if (count($row) >= 2) { // Skip empty lines
+                    $countryData[] = $row;
+                }
             }
-            $row = trim($row);
-            $row = str_replace('\\,', ',',
-                '"' . preg_replace('#([^\\\\]),#', '$1",', $row, 1)); // Hack: Add delimiters in country name (first column) for str_getcsv()
-            $csv = str_getcsv($row);
-            if (count($csv) <= 1) {
-                continue; // Skip empty lines
-            }
-            $countryData[] = $csv;
+            ++$item;
+        }
+        if (!fclose($handle)) {
+            throw new CM_Exception('Could not close file `' . $countriesPath . '`');
         }
         return $countryData;
-    }
-
-    /**
-     * Download MaxMind GeoIP data
-     *
-     * @return array List of array($ipStart, $ipEnd, $maxMind)
-     * @codeCoverageIgnore
-     */
-    protected function _getIpData() {
-        $this->_streamOutput->writeln('Reading new IP blocks…');
-        if (null !== $this->_geoIpFile) {
-            $blocksFileContents = $this->_readBlocksData($this->_geoIpFile);
-        } else {
-            $geoLiteCityPath = CM_Bootloader::getInstance()->getDirTmp() . 'GeoLiteCity.zip';
-            $geoLiteCityFile = new CM_File($geoLiteCityPath);
-            $this->_download($geoLiteCityFile, self::GEO_LITE_CITY_URL);
-            $blocksFileContents = $this->_readBlocksData($geoLiteCityFile);
-        }
-        $ipData = array();
-        $rows = preg_split('#[\r\n]++#', $blocksFileContents);
-        foreach ($rows as $i => $row) {
-            if ($i < 2) {
-                continue; // Skip column names and examples
-            }
-            $csv = str_getcsv(trim($row));
-            if (count($csv) <= 1) {
-                continue; // Skip empty lines
-            }
-            $ipData[] = $csv;
-        }
-        return $ipData;
-    }
-
-    /**
-     * Download MaxMind location data
-     *
-     * @return array List of array($maxMind, $countryCode, $regionCode, $cityName, $zipCode, $latitude, $longitude)
-     * @codeCoverageIgnore
-     */
-    protected function _getLocationData() {
-        $this->_streamOutput->writeln('Reading new location tree…');
-        if (null !== $this->_geoIpFile) {
-            $citiesFileContents = $this->_readLocationData($this->_geoIpFile);
-        } else {
-            $geoLiteCityPath = CM_Bootloader::getInstance()->getDirTmp() . 'GeoLiteCity.zip';
-            $geoLiteCityFile = new CM_File($geoLiteCityPath);
-            $this->_download($geoLiteCityFile, self::GEO_LITE_CITY_URL);
-            $citiesFileContents = $this->_readLocationData($geoLiteCityFile);
-        }
-        $locationData = array();
-        $rows = preg_split('#[\r\n]++#', $citiesFileContents);
-        foreach ($rows as $i => $row) {
-            if ($i < 3) {
-                continue; // Skip column names and examples
-            }
-            $csv = str_getcsv(trim($row));
-            if (count($csv) <= 1) {
-                continue; // Skip empty lines
-            }
-            $locationData[] = $csv;
-        }
-        return $locationData;
     }
 
     /**
      * Download mixed FIPS 10-4 / ISO-3166-2 / proprietary region listing from MaxMind
      *
      * @return array List of array($countryCode, $regionCode, $regionName)
+     * @throws CM_Exception
      * @codeCoverageIgnore
      */
     protected function _getRegionData() {
         $this->_streamOutput->writeln('Downloading new region listing…');
-        $regionsPath = CM_Bootloader::getInstance()->getDirTmp() . 'region.csv';
-        $regionsFile = new CM_File($regionsPath);
-        $regionsContents = $this->_download($regionsFile, self::REGION_URL);
+        $regionsFile = $this->_getFileTmp('region.csv');
+        $this->_download($regionsFile, self::REGION_URL);
+        $regionsPath = $regionsFile->getPathOnLocalFilesystem();
+        $handle = fopen($regionsPath, 'r');
+        if (!$handle) {
+            throw new CM_Exception('Could not open file `' . $regionsPath . '`');
+        }
 
         $this->_streamOutput->writeln('Reading new region listing…');
         $regionData = array();
-        $rows = preg_split('#[\r\n]++#', $regionsContents);
-        foreach ($rows as $row) {
-            $csv = str_getcsv(trim($row));
-            if (count($csv) <= 1) {
-                continue; // Skip empty lines
+        while (false !== ($row = fgetcsv($handle))) {
+            if (count($row) >= 3) { // Skip empty lines
+                $regionData[] = $row;
             }
-            $regionData[] = $csv;
+        }
+        if (!fclose($handle)) {
+            throw new CM_Exception('Could not close file `' . $regionsPath . '`');
         }
         return $regionData;
     }
@@ -896,6 +809,23 @@ class CMService_MaxMind extends CM_Class_Abstract {
      */
     protected function _getRegionListLegacy() {
         return include __DIR__ . '/MaxMind/region_codes_legacy.php';
+    }
+
+    /**
+     * @return string
+     * @throws CM_Exception_Invalid
+     * @codeCoverageIgnore
+     */
+    protected function _getLocationReader() {
+        return $this->_getGeoIpEntryReader('#Location\\.csv\\z#');
+    }
+
+    /**
+     * @return array [resource $stream, int $lineCount]
+     * @codeCoverageIgnore
+     */
+    protected function _getIpBlocksReader() {
+        return $this->_getGeoIpEntryReader('#Blocks\\.csv\\z#');
     }
 
     protected function _readCountryListOld() {
@@ -926,15 +856,13 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @throws CM_Exception
      */
     protected function _readLocationTreeOld() {
-        $this->_streamOutput->writeln('Reading old location tree…');
+        $this->_streamOutput->writeln('Reading old location tree (cities)…');
         $this->_locationTreeOld = array();
         $result = CM_Db_Db::exec('
 			SELECT
 				`city`.`id` AS `cityId`,
 				`city`.`_maxmind` AS `maxMind`,
 				`city`.`name` AS `cityName`,
-				`city`.`lat` AS `lat`,
-				`city`.`lon` AS `lon`,
 				`state`.`id` AS `regionId`,
 				`state`.`_maxmind` AS `maxMindRegion`,
 				`state`.`abbreviation` AS `regionAbbreviation`,
@@ -944,8 +872,10 @@ class CMService_MaxMind extends CM_Class_Abstract {
 			FROM `cm_model_location_city` `city`
 			LEFT JOIN `cm_model_location_state` `state` ON `state`.`id` = `city`.`stateId`
 			LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `city`.`countryId`');
+        $count = $result->getAffectedRows();
+        $item = 0;
         while (false !== ($row = $result->fetch())) {
-            list($cityId, $cityCode, $cityName, $latitude, $longitude, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode, $countryName) = array_values($row);
+            list($cityId, $cityCode, $cityName, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode, $countryName) = array_values($row);
             if (null === $cityCode) {
                 throw new CM_Exception('City `' . $cityName . '` (' . $cityId . ') has no MaxMind code');
             }
@@ -959,21 +889,19 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 throw new CM_Exception('City `' . $cityName . '` (' . $cityCode . ') found twice in ' . $region);
             }
             $this->_locationTreeOld[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'] = array(
-                'name'      => (string) $cityName,
-                'latitude'  => (float) $latitude,
-                'longitude' => (float) $longitude,
-                'maxMind'   => (int) $cityCode,
+                'name'    => (string) $cityName,
+                'maxMind' => (int) $cityCode,
             );
             $this->_cityListByRegionOld[$countryCode][$regionCode][$cityCode] = (string) $cityName;
             $this->_cityIdList[$cityCode] = $cityId;
+            $this->_printProgressCounter(++$item, $count);
         }
+        $this->_streamOutput->writeln('Reading old location tree (zip codes)…');
         $result = CM_Db_Db::exec('
 			SELECT
 				`zip`.`id` AS `zipCodeId`,
 				`zip`.`name` AS `zipCode`,
 				`zip`.`cityId` AS `cityId`,
-				`zip`.`lat` AS `lat`,
-				`zip`.`lon` AS `lon`,
 				`city`.`name` AS `cityName`,
 				`state`.`id` AS `regionId`,
 				`state`.`_maxmind` AS `maxMindRegion`,
@@ -984,8 +912,10 @@ class CMService_MaxMind extends CM_Class_Abstract {
 			LEFT JOIN `cm_model_location_city` `city` ON `city`.`id` = `zip`.`cityId`
 			LEFT JOIN `cm_model_location_state` `state` ON `state`.`id` = `city`.`stateId`
 			LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `city`.`countryId`');
+        $count = $result->getAffectedRows();
+        $item = 0;
         while (false !== ($row = $result->fetch())) {
-            list($zipCodeId, $zipCode, $cityId, $latitude, $longitude, $cityName, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode) = array_values($row);
+            list($zipCodeId, $zipCode, $cityId, $cityName, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode) = array_values($row);
             if (null === $cityId) {
                 throw new CM_Exception('Zip code `' . $zipCode . '` is not associated with any city');
             }
@@ -1002,11 +932,10 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 throw new CM_Exception('Zip code `' . $zipCode . '` found twice in ' . $city);
             }
             $this->_locationTreeOld[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes'][$zipCode] = array(
-                'name'      => (string) $zipCode,
-                'latitude'  => (float) $latitude,
-                'longitude' => (float) $longitude,
-                'id'        => (int) $zipCodeId,
+                'name' => (string) $zipCode,
+                'id'   => (int) $zipCodeId,
             );
+            $this->_printProgressCounter(++$item, $count);
         }
     }
 
@@ -1029,93 +958,76 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     protected function _updateLocationTree() {
-        $locationData = $this->_getLocationData();
+        $this->_streamOutput->writeln('Reading new location tree…');
+        $locationReader = $this->_getLocationReader();
         $regionListByCountryLegacy = $this->_getRegionListLegacy();
         $this->_locationTree = array();
         $this->_countryCodeListByMaxMind = array();
         $infoListWarning = array();
-        $count = count($locationData);
+        $stream = $locationReader['stream'];
+        $count = $locationReader['lineCount'];
         $item = 0;
-        foreach ($locationData as $row) {
-            list($maxMind, $countryCode, $regionCode, $cityName, $zipCode, $latitude, $longitude) = $row;
-            $maxMind = (int) $maxMind;
-            $latitude = (float) $latitude;
-            $longitude = (float) $longitude;
-            if (strlen($regionCode) && !isset($this->_regionListByCountry[$countryCode][$regionCode])) {
-                if (isset($this->_regionListByCountryOld[$countryCode][$regionCode])) { // Keep missing regions
-                    $this->_regionListByCountry[$countryCode][$regionCode] = $this->_regionListByCountryOld[$countryCode][$regionCode];
-                } elseif (isset($regionListByCountryLegacy[$countryCode][$regionCode])) { // Use legacy data for missing regions
-                    $this->_regionListByCountry[$countryCode][$regionCode] = $regionListByCountryLegacy[$countryCode][$regionCode];
-                }
-            }
-            if (strlen($zipCode)) { // ZIP code record
-                if (!isset($this->_regionListByCountry[$countryCode][$regionCode])) {
-                    $regionCode = null;
-                }
-                if (!isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes'][$zipCode])) {
-                    $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes'][$zipCode] = array(
-                        'name'      => $zipCode,
-                        'latitude'  => $latitude,
-                        'longitude' => $longitude,
-                        'maxMind'   => $maxMind,
-                    );
-                }
-                // Generate city record from zip code when missing
-                if (
-                    !isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'])
-                    || !empty($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location']['fromZipCode'])
-                ) {
-                    $name = $this->_normalizeCityName($cityName);
-                    // Keep old city record if possible
-                    if (
-                        !isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'])
-                        || isset($this->_cityListByRegionOld[$countryCode][$regionCode][$maxMind])
-                    ) {
-                        if (strlen($name)) {
-                            $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'] = array(
-                                'name'        => $name,
-                                'latitude'    => $latitude,
-                                'longitude'   => $longitude,
-                                'maxMind'     => $maxMind,
-                                'fromZipCode' => true,
-                            );
-                        }
+        while (false !== ($row = fgetcsv($stream))) {
+            if ($item >= 2 && count($row) >= 7) { // Skip copyright, column names and empty lines
+                list($maxMind, $countryCode, $regionCode, $cityName, $zipCode, $latitude, $longitude) = $row;
+                $maxMind = (int) $maxMind;
+                $latitude = (float) $latitude;
+                $longitude = (float) $longitude;
+                if (strlen($regionCode) && !isset($this->_regionListByCountry[$countryCode][$regionCode])) {
+                    if (isset($this->_regionListByCountryOld[$countryCode][$regionCode])) { // Keep missing regions
+                        $this->_regionListByCountry[$countryCode][$regionCode] = $this->_regionListByCountryOld[$countryCode][$regionCode];
+                    } elseif (isset($regionListByCountryLegacy[$countryCode][$regionCode])) { // Use legacy data for missing regions
+                        $this->_regionListByCountry[$countryCode][$regionCode] = $regionListByCountryLegacy[$countryCode][$regionCode];
                     }
                 }
-            } elseif (strlen($cityName)) { // City record
-                if (!isset($this->_regionListByCountry[$countryCode][$regionCode])) {
-                    $regionCode = null;
-                }
-                // a) Overwrite record created from a zip code
-                // b) Keep old city record if possible
-                if (
-                    !isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'])
-                    || !empty($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location']['fromZipCode'])
-                    || isset($this->_cityListByRegionOld[$countryCode][$regionCode][$maxMind])
-                ) {
-                    $name = $this->_normalizeCityName($cityName);
-                    if (strlen($name)) {
-                        $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'] = array(
-                            'name'      => $name,
+                if (strlen($zipCode)) { // ZIP code record
+                    if (!isset($this->_regionListByCountry[$countryCode][$regionCode])) {
+                        $regionCode = null;
+                    }
+                    if (!isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes'][$zipCode])) {
+                        $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes'][$zipCode] = array(
+                            'name'      => $zipCode,
                             'latitude'  => $latitude,
                             'longitude' => $longitude,
                             'maxMind'   => $maxMind,
                         );
                     }
-                }
-            } elseif (strlen($regionCode)) { // Region record
-                if (!isset($this->_locationTree[$countryCode]['regions'][$regionCode]['location'])) {
-                    if (!isset($this->_regionListByCountry[$countryCode][$regionCode])) {
-                        if (isset($this->_countryList[$countryCode])) {
-                            $countryName = $this->_countryList[$countryCode];
-                        } else {
-                            $countryName = $countryCode;
+                    // Generate city record from zip code when missing
+                    if (
+                        !isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'])
+                        || !empty($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location']['fromZipCode'])
+                    ) {
+                        $name = $this->_normalizeCityName($cityName);
+                        // Keep old city record if possible
+                        if (
+                            !isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'])
+                            || isset($this->_cityListByRegionOld[$countryCode][$regionCode][$maxMind])
+                        ) {
+                            if (strlen($name)) {
+                                $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'] = array(
+                                    'name'        => $name,
+                                    'latitude'    => $latitude,
+                                    'longitude'   => $longitude,
+                                    'maxMind'     => $maxMind,
+                                    'fromZipCode' => true,
+                                );
+                            }
                         }
-                        $infoListWarning['Ignoring unknown regions'][$countryName][] = $regionCode . ' (' . implode(', ', $row) . ')';
-                    } else {
-                        $name = $this->_regionListByCountry[$countryCode][$regionCode];
+                    }
+                } elseif (strlen($cityName)) { // City record
+                    if (!isset($this->_regionListByCountry[$countryCode][$regionCode])) {
+                        $regionCode = null;
+                    }
+                    // a) Overwrite record created from a zip code
+                    // b) Keep old city record if possible
+                    if (
+                        !isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'])
+                        || !empty($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location']['fromZipCode'])
+                        || isset($this->_cityListByRegionOld[$countryCode][$regionCode][$maxMind])
+                    ) {
+                        $name = $this->_normalizeCityName($cityName);
                         if (strlen($name)) {
-                            $this->_locationTree[$countryCode]['regions'][$regionCode]['location'] = array(
+                            $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'] = array(
                                 'name'      => $name,
                                 'latitude'  => $latitude,
                                 'longitude' => $longitude,
@@ -1123,23 +1035,40 @@ class CMService_MaxMind extends CM_Class_Abstract {
                             );
                         }
                     }
-                }
-            } elseif (strlen($countryCode)) { // Country record
-                if (!isset($this->_locationTree[$countryCode]['location'])) {
-                    if (in_array($countryCode, array('A1', 'A2', 'AP', 'EU'), true)) {
-                        $infoListWarning['Ignoring proprietary MaxMind country codes'][] = $countryCode;
-                    } elseif (!isset($this->_countryList[$countryCode])) {
-                        $infoListWarning['Ignoring unknown countries'][] = $countryCode . ' (' . implode(', ', $row) . ')';
-                    } else {
-                        $name = $this->_countryList[$countryCode];
-                        if (strlen($name)) {
-                            $this->_locationTree[$countryCode]['location'] = array(
-                                'name'      => $name,
-                                'latitude'  => $latitude,
-                                'longitude' => $longitude,
-                                'maxMind'   => $maxMind,
-                            );
-                            $this->_countryCodeListByMaxMind[$maxMind] = $countryCode;
+                } elseif (strlen($regionCode)) { // Region record
+                    if (!isset($this->_locationTree[$countryCode]['regions'][$regionCode]['location'])) {
+                        if (!isset($this->_regionListByCountry[$countryCode][$regionCode])) {
+                            if (isset($this->_countryList[$countryCode])) {
+                                $countryName = $this->_countryList[$countryCode];
+                            } else {
+                                $countryName = $countryCode;
+                            }
+                            $infoListWarning['Ignoring unknown regions'][$countryName][] = $regionCode . ' (' . implode(', ', $row) . ')';
+                        } else {
+                            $name = $this->_regionListByCountry[$countryCode][$regionCode];
+                            if (strlen($name)) {
+                                $this->_locationTree[$countryCode]['regions'][$regionCode]['location'] = array(
+                                    'name'    => $name,
+                                    'maxMind' => $maxMind,
+                                );
+                            }
+                        }
+                    }
+                } elseif (strlen($countryCode)) { // Country record
+                    if (!isset($this->_locationTree[$countryCode]['location'])) {
+                        if (in_array($countryCode, array('O1', 'A1', 'A2', 'AP', 'EU'), true)) {
+                            $infoListWarning['Ignoring proprietary MaxMind country codes'][] = $countryCode;
+                        } elseif (!isset($this->_countryList[$countryCode])) {
+                            $infoListWarning['Ignoring unknown countries'][] = $countryCode . ' (' . implode(', ', $row) . ')';
+                        } else {
+                            $name = $this->_countryList[$countryCode];
+                            if (strlen($name)) {
+                                $this->_locationTree[$countryCode]['location'] = array(
+                                    'name'    => $name,
+                                    'maxMind' => $maxMind,
+                                );
+                                $this->_countryCodeListByMaxMind[$maxMind] = $countryCode;
+                            }
                         }
                     }
                 }
@@ -1168,64 +1097,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_printInfoList($infoListWarning, '!');
     }
 
-    protected function _updateIpBlocks() {
-        $ipData = $this->_getIpData();
-        $ipBlockList = array();
-        $this->_ipBlockListByLocation = array();
-        $infoListWarning = array();
-        $count = count($ipData);
-        $item = 0;
-        foreach ($ipData as $row) {
-            list($ipStart, $ipEnd, $maxMind) = $row;
-            $ipStart = (int) $ipStart;
-            $ipEnd = (int) $ipEnd;
-            $maxMind = (int) $maxMind;
-            if (isset($ipBlockList[$ipStart])) {
-                $infoListWarning['Overlapping IP blocks'][] = "$ipStart-{$ipBlockList[$ipStart]} and $ipStart-$ipEnd";
-            }
-            $ipBlockList[$ipStart] = $ipEnd;
-            $level = null;
-            $id = null;
-            if (isset($this->_zipCodeIdListByMaxMind[$maxMind])) {
-                $level = CM_Model_Location::LEVEL_ZIP;
-                $id = $this->_zipCodeIdListByMaxMind[$maxMind];
-            } elseif (isset($this->_cityIdList[$maxMind])) {
-                $level = CM_Model_Location::LEVEL_CITY;
-                $id = $this->_cityIdList[$maxMind];
-            } elseif (isset($this->_regionIdListByMaxMind[$maxMind])) {
-                $level = CM_Model_Location::LEVEL_STATE;
-                $id = $this->_regionIdListByMaxMind[$maxMind];
-            } elseif (isset($this->_countryCodeListByMaxMind[$maxMind])) {
-                $level = CM_Model_Location::LEVEL_COUNTRY;
-                $countryCode = $this->_countryCodeListByMaxMind[$maxMind];
-                if (isset($this->_countryIdList[$countryCode])) {
-                    $id = $this->_countryIdList[$countryCode];
-                }
-            }
-            if ($level && $id) {
-                $this->_ipBlockListByLocation[$level][$id][$ipEnd] = $ipStart;
-            } else {
-                $infoListWarning['Ignoring unknown locations'][] = $maxMind;
-            }
-            $this->_printProgressCounter(++$item, $count);
-        }
-        $this->_streamOutput->writeln('Checking overlapping of IP blocks…');
-        ksort($ipBlockList);
-        $ipStartPrevious = $ipEndPrevious = 0;
-        $count = count($ipBlockList);
-        $item = 0;
-        foreach ($ipBlockList as $ipStart => $ipEnd) {
-            if ($ipStart <= $ipEndPrevious) {
-                $infoListWarning['Overlapping IP blocks'][] = "$ipStartPrevious-$ipEndPrevious and $ipStart-$ipEnd";
-            }
-            $ipStartPrevious = $ipStart;
-            $ipEndPrevious = $ipEnd;
-            $this->_printProgressCounter(++$item, $count);
-        }
-
-        $this->_printInfoList($infoListWarning, '!');
-    }
-
     protected function _upgradeCountryList() {
         $this->_streamOutput->writeln('Updating countries database…');
         $count = $this->_count(array($this->_countryListRenamed, $this->_countryListAdded), 2);
@@ -1235,12 +1106,14 @@ class CMService_MaxMind extends CM_Class_Abstract {
             CM_Db_Db::update('cm_model_location_country', array('name' => $countryName), array('abbreviation' => $countryCode));
             $this->_printProgressCounter(++$item, $count);
         }
+        unset($this->_countryListRenamed);
         foreach ($this->_countryListAdded as $countryCode => $countryName) {
             $country = CM_Model_Location::createCountry($countryName, $countryCode);
             $countryId = $country->getId();
             $this->_countryIdList[$countryCode] = $countryId;
             $this->_printProgressCounter(++$item, $count);
         }
+        unset($this->_countryListAdded);
     }
 
     protected function _upgradeRegionList() {
@@ -1263,6 +1136,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $this->_printProgressCounter(++$item, $count);
             }
         }
+        unset($this->_regionListByCountryRenamed);
         foreach ($this->_regionListByCountryUpdatedCode as $countryCode => $regionListUpdatedCode) {
             foreach ($regionListUpdatedCode as $regionCode) {
                 $regionId = $this->_regionIdListByCountry[$countryCode][$regionCode];
@@ -1274,6 +1148,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $this->_printProgressCounter(++$item, $count);
             }
         }
+        unset($this->_regionListByCountryUpdatedCode);
         foreach ($this->_regionListByCountryAdded as $countryCode => $regionListAdded) {
             $countryId = $this->_countryIdList[$countryCode];
             $country = new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $countryId);
@@ -1290,6 +1165,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $this->_printProgressCounter(++$item, $count);
             }
         }
+        unset($this->_regionListByCountryAdded);
         foreach ($this->_regionListByCountryRemovedCodeInUse as $countryCode => $regionListRemovedCodeInUse) {
             foreach ($regionListRemovedCodeInUse as $regionIdOld => $regionCode) {
                 CM_Db_Db::delete('cm_model_location_state', array('id' => $regionIdOld));
@@ -1298,6 +1174,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $this->_printProgressCounter(++$item, $count);
             }
         }
+        unset($this->_regionListByCountryRemovedCodeInUse);
     }
 
     protected function _upgradeCityList() {
@@ -1314,6 +1191,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 }
             }
         }
+        unset($this->_cityListByRegionRenamed);
         foreach ($this->_cityListByRegionUpdatedCode as $cityListByRegionUpdatedCode) {
             foreach ($cityListByRegionUpdatedCode as $cityListUpdatedCode) {
                 foreach ($cityListUpdatedCode as $cityCode) {
@@ -1323,6 +1201,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 }
             }
         }
+        unset($this->_cityListByRegionUpdatedCode);
         foreach ($this->_cityListUpdatedRegion as $countryCode => $cityListUpdatedRegion) {
             foreach ($cityListUpdatedRegion as $cityCode => $regionCodes) {
                 $cityId = $this->_cityIdList[$cityCode];
@@ -1338,6 +1217,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $this->_printProgressCounter(++$item, $count);
             }
         }
+        unset($this->_regionListByCountry);
+        unset($this->_cityListByRegion);
+        unset($this->_cityListUpdatedRegion);
         foreach ($this->_cityListByRegionAdded as $countryCode => $cityListByRegionAdded) {
             foreach ($cityListByRegionAdded as $regionCode => $cityListAdded) {
                 if (isset($this->_regionIdListByCountry[$countryCode][$regionCode])) {
@@ -1356,6 +1238,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 }
             }
         }
+        unset($this->_regionIdListByCountry);
+        unset($this->_cityListByRegionAdded);
+        unset($this->_locationTree);
     }
 
     protected function _upgradeZipCodeList() {
@@ -1377,25 +1262,96 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 }
             }
         }
+        unset($this->_zipCodeListByCityAdded);
     }
 
     protected function _upgradeIpBlocks() {
         if ($this->_withoutIpBlocks) {
             return;
         }
-        $this->_updateIpBlocks();
         $this->_streamOutput->writeln('Updating IP blocks database…');
-        $count = $this->_count($this->_ipBlockListByLocation, 3);
+        $ipBlocksReader = $this->_getIpBlocksReader();
+        CM_Db_Db::exec('DROP TABLE IF EXISTS `cm_model_location_ip_new`');
+        CM_Db_Db::exec('CREATE TABLE `cm_model_location_ip_new` LIKE `cm_model_location_ip`');
+        $infoListWarning = array();
+        $stream = $ipBlocksReader['stream'];
+        $count = $ipBlocksReader['lineCount'];
         $item = 0;
-        CM_Db_Db::truncate('cm_model_location_ip');
-        foreach ($this->_ipBlockListByLocation as $level => $ipBlockListByLocation) {
-            foreach ($ipBlockListByLocation as $id => $ipBlockList) {
-                foreach ($ipBlockList as $ipEnd => $ipStart) {
-                    CM_Db_Db::insertIgnore('cm_model_location_ip', array('id' => $id, 'level' => $level, 'ipStart' => $ipStart, 'ipEnd' => $ipEnd));
-                    $this->_printProgressCounter(++$item, $count);
+        $batch = [];
+        while (false !== ($row = fgetcsv($stream))) {
+            if ($item >= 2 && count($row) >= 3) { // Skip copyright, column names and empty lines
+                list($ipStart, $ipEnd, $maxMind) = $row;
+                $ipStart = (int) $ipStart;
+                $ipEnd = (int) $ipEnd;
+                $maxMind = (int) $maxMind;
+                $level = null;
+                $id = null;
+                if (isset($this->_zipCodeIdListByMaxMind[$maxMind])) {
+                    $level = CM_Model_Location::LEVEL_ZIP;
+                    $id = $this->_zipCodeIdListByMaxMind[$maxMind];
+                } elseif (isset($this->_cityIdList[$maxMind])) {
+                    $level = CM_Model_Location::LEVEL_CITY;
+                    $id = $this->_cityIdList[$maxMind];
+                } elseif (isset($this->_regionIdListByMaxMind[$maxMind])) {
+                    $level = CM_Model_Location::LEVEL_STATE;
+                    $id = $this->_regionIdListByMaxMind[$maxMind];
+                } elseif (isset($this->_countryCodeListByMaxMind[$maxMind])) {
+                    $level = CM_Model_Location::LEVEL_COUNTRY;
+                    $countryCode = $this->_countryCodeListByMaxMind[$maxMind];
+                    if (isset($this->_countryIdList[$countryCode])) {
+                        $id = $this->_countryIdList[$countryCode];
+                    }
+                }
+                if ($level && $id) {
+                    $batch[] = [$id, $level, $ipStart, $ipEnd];
+                    if (1000 === count($batch)) {
+                        CM_Db_Db::insert('cm_model_location_ip_new', ['id', 'level', 'ipStart', 'ipEnd'], $batch);
+                        $batch = [];
+                    }
+                } else {
+                    $infoListWarning['Ignoring unknown locations'][] = $maxMind;
                 }
             }
+            $this->_printProgressCounter(++$item, $count);
         }
+        if (!empty($batch)) {
+            CM_Db_Db::insert('cm_model_location_ip_new', ['id', 'level', 'ipStart', 'ipEnd'], $batch);
+        }
+        unset($batch);
+        unset($this->_countryIdList);
+        unset($this->_countryCodeListByMaxMind);
+        unset($this->_regionIdListByMaxMind);
+        unset($this->_cityIdList);
+        unset($this->_zipCodeIdListByMaxMind);
+
+        $this->_printInfoList($infoListWarning, '!');
+
+        $this->_streamOutput->writeln('Checking overlapping of IP blocks…');
+        $result = CM_Db_Db::select('cm_model_location_ip_new', ['ipStart', 'ipEnd'], null, 'ipEnd ASC');
+        $ipStartPrevious = $ipEndPrevious = 0;
+        $count = $result->getAffectedRows();
+        $item = 0;
+        while (false !== ($row = $result->fetch())) {
+            list($ipStart, $ipEnd) = array_values($row);
+            if ($ipStart <= $ipEndPrevious) {
+                $infoListWarning['Overlapping IP blocks'][] = "$ipStartPrevious-$ipEndPrevious and $ipStart-$ipEnd";
+            }
+            $ipStartPrevious = $ipStart;
+            $ipEndPrevious = $ipEnd;
+            $this->_printProgressCounter(++$item, $count);
+        }
+
+        CM_Db_Db::exec('RENAME TABLE `cm_model_location_ip` TO `cm_model_location_ip_old`, `cm_model_location_ip_new` TO `cm_model_location_ip`');
+        CM_Db_Db::exec('DROP TABLE `cm_model_location_ip_old`');
+
+        $this->_printInfoList($infoListWarning, '!');
+    }
+
+    protected function _updateSearchIndex() {
+        CM_Model_Location::createAggregation();
+        $type = new CM_Elasticsearch_Type_Location();
+        $searchIndexCli = new CM_Elasticsearch_Index_Cli(null, $this->_streamOutput, $this->_streamError);
+        $searchIndexCli->create($type->getIndex()->getName());
     }
 
     /**
@@ -1416,6 +1372,59 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $count = count($array);
         }
         return $count;
+    }
+
+    /**
+     * @param CM_File $file
+     * @param string  $url
+     * @throws CM_Exception
+     * @codeCoverageIgnore
+     */
+    private function _download(CM_File $file, $url) {
+        $url = (string) $url;
+        if ($file->exists()) {
+            $modificationTime = $file->getModified();
+            if (time() - $modificationTime > self::CACHE_LIFETIME) {
+                $file->delete();
+            }
+        }
+        if (!$file->exists()) {
+            $path = $file->getPathOnLocalFilesystem();
+            $client = new \GuzzleHttp\Client();
+            $client->get($url, [
+                'timeout' => 600,
+                'save_to' => $path,
+            ]);
+        }
+        $this->_streamOutput->writeln('Download completed.');
+    }
+
+    /**
+     * Download MaxMind IP geolocation data
+     *
+     * @return CM_File
+     * @codeCoverageIgnore
+     */
+    private function _downloadGeoIpFile() {
+        if (!$this->_geoIpFile) {
+            $licenseKey = self::_getConfig()->licenseKey;
+            if (null === $licenseKey) {
+                $this->_geoIpFile = $this->_getFileTmp('GeoLiteCity.zip');
+                $this->_streamOutput->writeln('Downloading GeoLite database…');
+                $this->_download($this->_geoIpFile, self::GEO_LITE_CITY_URL);
+            } else {
+                $parameterList = [
+                    'edition_id'  => 134,
+                    'suffix'      => 'zip',
+                    'license_key' => $licenseKey,
+                ];
+                $geoIpUrl = CM_Util::link(self::GEO_IP_URL, $parameterList);
+                $this->_geoIpFile = $this->_getFileTmp('GeoIP-134.zip');
+                $this->_streamOutput->writeln('Downloading GeoIP database…');
+                $this->_download($this->_geoIpFile, $geoIpUrl);
+            }
+        }
+        return $this->_geoIpFile;
     }
 
     /**
@@ -1442,6 +1451,62 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $escapeSequence = system('tput sgr0');
         }
         return $escapeSequence;
+    }
+
+    /**
+     * @param string $name
+     * @return CM_File
+     * @codeCoverageIgnore
+     */
+    private function _getFileTmp($name) {
+        return new CM_File($name, CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
+    }
+
+    /**
+     * @param string $patternEntryName
+     * @return array [resource $stream, int $lineCount]
+     * @throws CM_Exception
+     * @codeCoverageIgnore
+     */
+    private function _getGeoIpEntryReader($patternEntryName) {
+        $patternEntryName = (string) $patternEntryName;
+        $geoIpFile = $this->_downloadGeoIpFile();
+        $geoIpFilePath = $geoIpFile->getPathOnLocalFilesystem();
+        $zip = zip_open($geoIpFilePath);
+        if (!is_resource($zip)) {
+            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpFilePath . '`');
+        }
+        $entryName = null;
+        while ($entry = zip_read($zip)) {
+            $entryName = zip_entry_name($entry);
+            if (preg_match($patternEntryName, $entryName)) {
+                break;
+            }
+        }
+        if (!$entry) {
+            throw new CM_Exception_Invalid('Could not find file matching `' . $patternEntryName . '` in `' . $geoIpFilePath . '`');
+        }
+        if (!zip_entry_open($zip, $entry, 'r')) {
+            throw new CM_Exception_Invalid('Could not read file `' . $entryName . '` in `' . $geoIpFilePath . '`');
+        }
+        $stream = fopen('php://temp', 'r+');
+        if (!$stream) {
+            throw new CM_Exception('Could not open temporary file to extract `' . $entryName . '`');
+        }
+        $lineCount = 0;
+        while ('' !== ($buffer = zip_entry_read($entry))) {
+            if (false === $buffer) {
+                throw new CM_Exception_Invalid('Could not read file `' . $entryName . '` in `' . $geoIpFilePath . '`');
+            }
+            $buffer = iconv('ISO-8859-1', 'UTF-8', $buffer);
+            fwrite($stream, $buffer);
+            $lineCount += substr_count($buffer, "\n");
+        }
+        zip_close($zip);
+        if (!rewind($stream)) {
+            throw new CM_Exception('Could not rewind temporary file used to extract `' . $entryName . '`');
+        }
+        return ['stream' => $stream, 'lineCount' => $lineCount];
     }
 
     /**
@@ -1586,6 +1651,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $this->_streamOutput->writeln($info . ':');
             foreach ($items as $key => $item) {
                 if (is_array($item)) {
+                    asort($item);
                     if (count($item) <= 10) {
                         $items[$key] = 'In ' . $key . ': ' . implode(', ', $item);
                     } else {
@@ -1608,11 +1674,16 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @codeCoverageIgnore
      */
     private function _printProgressCounter($item, $count) {
+        static $time = 0;
         $item = (int) $item;
         $count = (int) $count;
-        $this->_streamError->write("\r$item/$count (" . round($item / $count * 100) . "%)");
-        if ($item == $count) {
-            $this->_streamError->writeln('');
+        $now = time();
+        if (1 === $item || $count === $item || ($now - $time >= 1)) {
+            $this->_streamError->write("\r$item/$count (" . round($item / $count * 100) . "%)");
+            if ($count === $item) {
+                $this->_streamError->writeln('');
+            }
+            $time = $now;
         }
     }
 
@@ -1623,66 +1694,5 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_streamOutput->writeln('');
         $this->_streamOutput->writeln(str_repeat(' *', 10));
         $this->_streamOutput->writeln('');
-    }
-
-    /**
-     * @param CM_File $geoIpZipFile
-     * @return string
-     * @throws CM_Exception_Invalid
-     * @codeCoverageIgnore
-     */
-    private function _readBlocksData($geoIpZipFile) {
-        $zip = zip_open($geoIpZipFile->getPath());
-        if (!is_resource($zip)) {
-            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpZipFile->getPath() . '`');
-        }
-        do {
-            $entry = zip_read($zip);
-        } while ($entry && !preg_match('#Blocks\\.csv\\z#', zip_entry_name($entry)));
-        if (!$entry) {
-            throw new CM_Exception_Invalid('Could not find blocks file in `' . $geoIpZipFile->getPath() . '`');
-        }
-        zip_entry_open($zip, $entry, 'r');
-        $contents = zip_entry_read($entry, zip_entry_filesize($entry));
-        zip_close($zip);
-        return $contents;
-    }
-
-    /**
-     * @param CM_File $geoIpZipFile
-     * @return string
-     * @throws CM_Exception_Invalid
-     * @codeCoverageIgnore
-     */
-    private function _readLocationData($geoIpZipFile) {
-        $zip = zip_open($geoIpZipFile->getPath());
-        if (!is_resource($zip)) {
-            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpZipFile->getPath() . '`');
-        }
-        do {
-            $entry = zip_read($zip);
-        } while ($entry && !preg_match('#Location\\.csv\\z#', zip_entry_name($entry)));
-        if (!$entry) {
-            throw new CM_Exception_Invalid('Could not find location file in `' . $geoIpZipFile->getPath() . '`');
-        }
-        zip_entry_open($zip, $entry, 'r');
-        $contents = zip_entry_read($entry, zip_entry_filesize($entry));
-        zip_close($zip);
-        $contents = iconv('ISO-8859-1', 'UTF-8', $contents);
-        return $contents;
-    }
-
-    /**
-     * @param CM_File|null $geoIpFile
-     * @throws CM_Exception_Invalid
-     * @codeCoverageIgnore
-     */
-    private function _setGeoIpFile(CM_File $geoIpFile = null) {
-        if (null !== $geoIpFile) {
-            if (!$geoIpFile->exists()) {
-                throw new CM_Exception_Invalid('GeoIP file not found: ' . $geoIpFile->getPath());
-            }
-        }
-        $this->_geoIpFile = $geoIpFile;
     }
 }
