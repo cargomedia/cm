@@ -30,7 +30,7 @@ class CM_FormField_Text extends CM_FormField_Abstract {
         return $userInput;
     }
 
-    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
+    public function prepare(CM_Params $renderParams, CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $viewResponse->set('autocorrect', $renderParams->has('autocorrect') ? $renderParams->getString('autocorrect') : null);
         $viewResponse->set('autocapitalize', $renderParams->has('autocapitalize') ? $renderParams->getString('autocapitalize') : null);
         $viewResponse->set('tabindex', $renderParams->has('tabindex') ? $renderParams->getInt('tabindex') : null);
