@@ -42,6 +42,13 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
     }
 
     /**
+     * @return string
+     */
+    public function getRandomClientId() {
+        return rand() . uniqid();
+    }
+
+    /**
      * @param array $parameterList
      */
     public function _submitHit(array $parameterList) {
