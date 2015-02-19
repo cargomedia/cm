@@ -68,4 +68,12 @@ class CMService_GoogleAnalytics_MeasurementProtocol_ClientTest extends CMTest_Te
             'exd' => 'My exception',
         ]);
     }
+
+    public function testGetRandomClientId() {
+        $client = new CMService_GoogleAnalytics_MeasurementProtocol_Client('foo');
+
+        $this->assertInternalType('string', $client->getRandomClientId());
+        $this->assertGreaterThan(5, strlen($client->getRandomClientId()));
+        $this->assertNotEquals($client->getRandomClientId(), $client->getRandomClientId());
+    }
 }
