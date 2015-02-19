@@ -6,9 +6,9 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
     $frontend = $render->getGlobalResponse();
     if ($open) {
         $form = CM_Form_Abstract::factory($params['name'], $params);
-        $form->prepare($render->getEnvironment());
-
         $viewResponse = new CM_Frontend_ViewResponse($form);
+        $form->prepare($render->getEnvironment(), $viewResponse);
+
         $frontend->treeExpand($viewResponse);
         return '';
     } else {
@@ -22,7 +22,12 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
         $cssClasses = $viewResponse->getCssClasses();
         $cssClasses[] = $form->getName();
         $html = '<form id="' . $viewResponse->getAutoId() . '" class="' .
-            implode(' ', $cssClasses) . ' clearfix" method="post" onsubmit="return false;" novalidate >';
+            implode(' ', $cssClasses) . ' clearfix" method="post" action="" onsubmit="return false;" novalidate >';
+        if ($form->getAvoidPasswordManager()) {
+            $html .= '<input style="display:none" type="text" name="fakeusernameremembered">';
+            $html .= '<input style="display:none" type="password" name="fakepasswordremembered">';
+        }
+
         $html .= $content;
 
         foreach ($form->getFields() as $field) {

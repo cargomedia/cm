@@ -7,19 +7,25 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
      * @synchronized
+     * @keepalive
      */
     public function start() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
-        $this->_clockworkManager->setServiceManager(CM_Service_Manager::getInstance());
-        $this->_clockworkManager->setStorage(new CM_Clockwork_Storage_FileSystem('app-maintenance'));
+        $storage = new CM_Clockwork_Storage_FileSystem('app-maintenance');
+        $storage->setServiceManager(CM_Service_Manager::getInstance());
+        $this->_clockworkManager->setStorage($storage);
         $this->_registerCallbacks();
         $this->_clockworkManager->start();
     }
 
+    /**
+     * @keepalive
+     */
     public function startLocal() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
-        $this->_clockworkManager->setServiceManager(CM_Service_Manager::getInstance());
-        $this->_clockworkManager->setStorage(new CM_Clockwork_Storage_FileSystem('app-maintenance-local'));
+        $storage = new CM_Clockwork_Storage_FileSystem('app-maintenance-local');
+        $storage->setServiceManager(CM_Service_Manager::getInstance());
+        $this->_clockworkManager->setStorage($storage);
         $this->_registerCallbacksLocal();
         $this->_clockworkManager->start();
     }
@@ -47,7 +53,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 CM_SVM_Model::deleteOldTrainings(3000);
             },
             'CM_Paging_Ip_Blocked::deleteOlder'         => function () {
-                CM_Paging_Ip_Blocked::deleteOlder(7 * 86400);
+                CM_Paging_Ip_Blocked::deleteOld();
             },
             'CM_Captcha::deleteOlder'                   => function () {
                 CM_Captcha::deleteOlder(3600);

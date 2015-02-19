@@ -16,8 +16,6 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Site_Abstract->class = null;
 
-    $config->CM_Splittesting_Abstract->enabled = false;
-
     $config->CM_Elasticsearch_Client->enabled = true;
     $config->CM_Elasticsearch_Client->servers = array(
         array('host' => 'localhost', 'port' => 9200),
@@ -33,7 +31,7 @@ return function (CM_Config_Node $config) {
         array('host' => 'localhost', 'port' => 11211),
     );
 
-    $config->CM_Redis_Client->server = array('host' => 'localhost', 'port' => 6379);
+    $config->CM_Paging_Ip_Blocked->maxAge = (7 * 86400);
 
     $config->classConfigCacheEnabled = true;
 
@@ -48,6 +46,8 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Db_Db->delayedEnabled = true;
 
+    $config->CM_MongoDb_Client->batchSize = null;
+
     $config->CM_Model_User->class = 'CM_Model_User';
 
     $config->CM_Params->class = 'CM_Params';
@@ -55,10 +55,10 @@ return function (CM_Config_Node $config) {
     $config->CM_Usertext_Usertext->class = 'CM_Usertext_Usertext';
 
     $config->CM_Http_Response_Page->catch = array(
-        'CM_Exception_Nonexistent'  => '/error/not-found',
-        'CM_Exception_InvalidParam' => '/error/not-found',
-        'CM_Exception_AuthRequired' => '/error/auth-required',
-        'CM_Exception_NotAllowed'   => '/error/not-allowed',
+        'CM_Exception_Nonexistent'  => ['path' => '/error/not-found', 'log' => true],
+        'CM_Exception_InvalidParam' => ['path' => '/error/not-found', 'log' => true],
+        'CM_Exception_AuthRequired' => ['path' => '/error/auth-required', 'log' => false],
+        'CM_Exception_NotAllowed'   => ['path' => '/error/not-allowed', 'log' => false],
     );
 
     $config->CM_Http_Response_View_Abstract->catch = array(
@@ -109,12 +109,11 @@ return function (CM_Config_Node $config) {
         'class'     => 'CM_Db_Client',
         'arguments' => array(
             array(
-                'host'             => 'localhost',
-                'port'             => 3306,
-                'username'         => 'root',
-                'password'         => '',
-                'db'               => 'cm',
-                'reconnectTimeout' => 300
+                'host'     => 'localhost',
+                'port'     => 3306,
+                'username' => 'root',
+                'password' => '',
+                'db'       => 'cm',
             )
         )
     );
@@ -126,6 +125,16 @@ return function (CM_Config_Node $config) {
                 'db'      => 'cm',
                 'server'  => 'mongodb://localhost:27017',
                 'options' => array('connect' => true),
+            )
+        ),
+    );
+
+    $config->services['redis'] = array(
+        'class'     => 'CM_Redis_Client',
+        'arguments' => array(
+            array(
+                'host' => 'localhost',
+                'port' => '6379',
             )
         ),
     );

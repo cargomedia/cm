@@ -179,56 +179,95 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $test->delete();
     }
 
-    public function testGetSignificance() {
-        foreach (array(
-                     array(0, 0, 0, 0, 0, 0, false, null),
-                     array(1, 0, 0, 0, 0, 0, false, null),
-                     array(1, 1, 1, 0, 0, 0, false, null),
-                     array(1, 1, 1, 1, 0, 0, false, null),
-                     array(1, 1, 1, 1, 1, 1, false, null),
+    /**
+     * @param array      $variationDataList
+     * @param bool       $significant
+     * @param float|null $significance
+     *
+     * @dataProvider dataProviderTestGetSignificance
+     */
+    public function testGetSignificance($variationDataList, $significant, $significance) {
+        /** @var CM_Model_SplittestVariation[] $variationList */
+        $variationList = array_map(function ($variationData) {
+            list($fixtureCount, $conversionCount, $weight) = $variationData;
+            return $this->_getVariationMock($fixtureCount, $conversionCount, $weight);
+        }, $variationDataList);
+        $this->createSplittestMock($variationList);
+        $variationA = $variationList[0];
+        $variationB = $variationList[1];
+        $this->assertSame($significance, $variationA->getSignificance($variationB));
+        $this->assertSame($significance, $variationB->getSignificance($variationA));
+        $this->assertSame($significant, $variationA->isDeviationSignificant($variationB));
+        $this->assertSame($significant, $variationB->isDeviationSignificant($variationA));
+        /** @var CM_Model_SplittestVariation[] $variationList */
+        $variationList = array_map(function ($variationData) {
+            list($fixtureCount, $conversionCount, $weight) = $variationData;
+            return $this->_getVariationMock($fixtureCount, $conversionCount, $weight * 1000);
+        }, $variationDataList);
+        $this->createSplittestMock($variationList);
+        $variationA = $variationList[0];
+        $variationB = $variationList[1];
+        $this->assertSame($significance, $variationA->getSignificance($variationB));
+        $this->assertSame($significance, $variationB->getSignificance($variationA));
+        $this->assertSame($significant, $variationA->isDeviationSignificant($variationB));
+        $this->assertSame($significant, $variationB->isDeviationSignificant($variationA));
+    }
 
-                     array(1000, 0, 0, 1000, 0, 0, false, null),
-                     array(1000, 1, 1, 1000, 0, 0, false, null),
-                     array(1000, 1, 1, 1000, 1, 1, false, null),
-                     array(1000, 1, 1, 1000, 2, 2, false, null),
-                     array(1000, 9, 9, 1000, 8, 8, false, null),
-                     array(1000, 9, 9, 1000, 9, 9, false, null),
-                     array(1000, 9, 9, 1000, 10, 10, false, 0.817692941581),
-                     array(1000, 10, 10, 1000, 10, 10, false, 1.0),
-                     array(1000, 10, 10, 1000, 11, 11, false, 0.82635978436207),
+    public function dataProviderTestGetSignificance() {
+        return [
+            [[[0, 0, 0], [0, 0, 0]], false, null],
+            [[[1, 0, 0], [0, 0, 0]], false, null],
+            [[[1, 1, 1], [0, 0, 0]], false, null],
+            [[[1, 1, 1], [1, 0, 0]], false, null],
+            [[[1, 1, 1], [1, 1, 1]], false, null],
 
-                     array(1000, 200, 200, 1000, 250, 250, true, 0.0074196492610257),
+            [[[1000, 0, 0], [1000, 0, 0]], false, null],
+            [[[1000, 1, 1], [1000, 0, 0]], false, null],
+            [[[1000, 1, 1], [1000, 1, 1]], false, null],
+            [[[1000, 1, 1], [1000, 2, 2]], false, null],
+            [[[1000, 9, 9], [1000, 8, 8]], false, null],
+            [[[1000, 9, 9], [1000, 9, 9]], false, null],
+            [[[1000, 9, 9], [1000, 10, 10]], false, 0.817692941581],
+            [[[1000, 10, 10], [1000, 10, 10]], false, 1.0],
+            [[[1000, 10, 10], [1000, 11, 11]], false, 0.82635978436207],
 
-                     array(1000, 250, 250, 1000, 250, 250, false, 1.0),
-                     array(1000, 249, 249, 1000, 251, 251, false, 0.91774110086988),
-                     array(1000, 245, 245, 1000, 255, 255, false, 0.60557661633535),
-                     array(1000, 240, 240, 1000, 260, 260, false, 0.30169958247835),
-                     array(1000, 230, 230, 1000, 270, 270, false, 0.038867103812417),
-                     array(1000, 220, 220, 1000, 280, 280, true, 0.0019457736937391),
-                     array(1000, 210, 210, 1000, 290, 290, true, 0.000036090232367484),
+            [[[1000, 200, 200], [1000, 250, 250]], true, 0.0074196492610257],
 
-                     array(1000, 500, 250, 1000, 250, 250, false, 1.0),
-                     array(1000, 498, 249, 1000, 251, 251, false, 0.89934318856137),
-                     array(1000, 490, 245, 1000, 255, 255, false, 0.52708925686554),
-                     array(1000, 480, 240, 1000, 260, 260, false, 0.20590321073207),
-                     array(1000, 460, 230, 1000, 270, 270, false, 0.011412036386002),
-                     array(1000, 440, 220, 1000, 280, 280, true, 0.00014780231033445),
-                     array(1000, 420, 210, 1000, 290, 290, true, 0.0000004200393976022),
+            [[[1000, 250, 250], [1000, 250, 250]], false, 1.0],
+            [[[1000, 249, 249], [1000, 251, 251]], false, 0.91774110086988],
+            [[[1000, 245, 245], [1000, 255, 255]], false, 0.60557661633535],
+            [[[1000, 240, 240], [1000, 260, 260]], false, 0.30169958247835],
+            [[[1000, 230, 230], [1000, 270, 270]], false, 0.038867103812417],
+            [[[1000, 220, 220], [1000, 280, 280]], true, 0.0019457736937391],
+            [[[1000, 210, 210], [1000, 290, 290]], true, 0.000036090232367484],
 
-                 ) as $list) {
-            list($fixturesA, $conversionsA, $weightA, $fixturesB, $conversionsB, $weightB, $significant, $significance) = $list;
-            $variationA = $this->_getVariationMock($fixturesA, $conversionsA, $weightA);
-            $variationB = $this->_getVariationMock($fixturesB, $conversionsB, $weightB);
-            $this->assertSame($significance, $variationA->getSignificance($variationB));
-            $this->assertSame($significance, $variationB->getSignificance($variationA));
-            $this->assertSame($significant, $variationA->isDeviationSignificant($variationB));
-            $this->assertSame($significant, $variationB->isDeviationSignificant($variationA));
-            $variationA = $this->_getVariationMock($fixturesA, $conversionsA, $weightA * 1000);
-            $variationB = $this->_getVariationMock($fixturesB, $conversionsB, $weightB * 1000);
-            $this->assertSame($significance, $variationA->getSignificance($variationB));
-            $this->assertSame($significance, $variationB->getSignificance($variationA));
-            $this->assertSame($significant, $variationA->isDeviationSignificant($variationB));
-            $this->assertSame($significant, $variationB->isDeviationSignificant($variationA));
+            [[[1000, 500, 250], [1000, 250, 250]], false, 1.0],
+            [[[1000, 498, 249], [1000, 251, 251]], false, 0.89934318856137],
+            [[[1000, 490, 245], [1000, 255, 255]], false, 0.52708925686554],
+            [[[1000, 480, 240], [1000, 260, 260]], false, 0.20590321073207],
+            [[[1000, 460, 230], [1000, 270, 270]], false, 0.011412036386002],
+            [[[1000, 440, 220], [1000, 280, 280]], true, 0.00014780231033445],
+            [[[1000, 420, 210], [1000, 290, 290]], true, 0.0000004200393976022],
+
+            [[[1000, 500, 250], [1000, 250, 250], [1000, 125, 250]], false, 1.0],
+            [[[1000, 498, 249], [1000, 251, 251], [1000, 126, 252]], false, 0.98986820631101],
+            [[[1000, 490, 245], [1000, 255, 255], [1000, 130, 260]], false, 0.77635542902801],
+            [[[1000, 480, 240], [1000, 260, 260], [1000, 135, 270]], false, 0.36941028927436],
+            [[[1000, 460, 230], [1000, 270, 270], [1000, 145, 290]], false, 0.022693838197528],
+            [[[1000, 440, 220], [1000, 280, 280], [1000, 155, 310]], true, 0.00029558277514585],
+            [[[1000, 420, 210], [1000, 290, 290], [1000, 165, 330]], true, 0.0000008400786187801],
+        ];
+    }
+
+    /**
+     * @param PHPUnit_Framework_MockObject_MockObject[] $variationList
+     */
+    protected function createSplittestMock(array $variationList) {
+        $splittest = $this->getMockBuilder('CM_Model_Splittest')->disableOriginalConstructor()->setMethods(array('getVariations'))->getMock();
+        $variationPagingMock = new CM_PagingSource_Array($variationList);
+        $splittest->expects($this->any())->method('getVariations')->will($this->returnValue($variationPagingMock));
+        foreach ($variationList as $variation) {
+            $variation->expects($this->any())->method('getSplittest')->will($this->returnValue($splittest));
         }
     }
 
@@ -240,7 +279,7 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
      */
     protected function _getVariationMock($fixture, $conversion, $weight) {
         $variation = $this->getMockBuilder('CM_Model_SplittestVariation')->disableOriginalConstructor()
-            ->setMethods(array('getFixtureCount', 'getConversionCount', 'getConversionWeight'))->getMock();
+            ->setMethods(array('getFixtureCount', 'getConversionCount', 'getConversionWeight', 'getSplittest'))->getMock();
         $variation->expects($this->any())->method('getFixtureCount')->will($this->returnValue($fixture));
         $variation->expects($this->any())->method('getConversionCount')->will($this->returnValue($conversion));
         $variation->expects($this->any())->method('getConversionWeight')->will($this->returnValue($weight));

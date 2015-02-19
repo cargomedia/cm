@@ -1,9 +1,10 @@
 .noUiSlider-wrapper {
   padding: 0 1px;
 
-  .noUiSlider {
+  .noUiSlider.noUi-horizontal {
     background-color: @colorFocus;
     box-shadow: none;
+    padding-right: 32px;
 
     &[disabled] {
       opacity: 0.5;
@@ -17,6 +18,13 @@
     .noUi-handle:focus, .noUi-active {
       outline: none;
       .input_focus;
+    }
+
+    .noUi-handle {
+      left: -1px;
+    }
+    .noUi-origin  {
+      right: -32px;
     }
   }
 }

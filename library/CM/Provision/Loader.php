@@ -2,20 +2,10 @@
 
 class CM_Provision_Loader {
 
-    /** @var CM_OutputStream_Interface */
-    private $_output;
-
     /** @var CM_Provision_Script_Abstract[] */
     private $_scriptList;
 
-    /**
-     * @param CM_OutputStream_Interface|null $output
-     */
-    public function __construct(CM_OutputStream_Interface $output = null) {
-        if (null === $output) {
-            $output = new CM_OutputStream_Null();
-        }
-        $this->_output = $output;
+    public function __construct() {
         $this->_scriptList = [];
     }
 
@@ -36,37 +26,37 @@ class CM_Provision_Loader {
         }
     }
 
-    public function load() {
+    public function load(CM_OutputStream_Interface $output) {
         $scriptList = $this->_getScriptList();
         foreach ($scriptList as $setupScript) {
             if ($setupScript->shouldBeLoaded()) {
-                $this->_output->writeln('  Loading ' . $setupScript->getName() . '…');
-                $setupScript->load($this->_output);
+                $output->writeln('  Loading ' . $setupScript->getName() . '…');
+                $setupScript->load($output);
             }
         }
     }
 
-    public function unload() {
+    public function unload(CM_OutputStream_Interface $output) {
         $scriptList = array_reverse($this->_getScriptList());
         foreach ($scriptList as $setupScript) {
             if ($setupScript instanceof CM_Provision_Script_UnloadableInterface && $setupScript->shouldBeUnloaded()) {
                 /** @var $setupScript CM_Provision_Script_Abstract|CM_Provision_Script_UnloadableInterface */
-                $this->_output->writeln('  Unloading ' . $setupScript->getName() . '…');
-                $setupScript->unload($this->_output);
+                $output->writeln('  Unloading ' . $setupScript->getName() . '…');
+                $setupScript->unload($output);
             }
         }
     }
 
-    public function reload() {
+    public function reload(CM_OutputStream_Interface $output) {
         $scriptList = $this->_getScriptList();
         foreach ($scriptList as $setupScript) {
             if ($setupScript->shouldBeLoaded()) {
-                $this->_output->writeln('  Loading ' . $setupScript->getName() . '…');
-                $setupScript->load($this->_output);
+                $output->writeln('  Loading ' . $setupScript->getName() . '…');
+                $setupScript->load($output);
             } elseif ($setupScript instanceof CM_Provision_Script_UnloadableInterface) {
                 /** @var $setupScript CM_Provision_Script_Abstract */
-                $this->_output->writeln('  Reloading ' . $setupScript->getName() . '…');
-                $setupScript->reload($this->_output);
+                $output->writeln('  Reloading ' . $setupScript->getName() . '…');
+                $setupScript->reload($output);
             }
         }
     }

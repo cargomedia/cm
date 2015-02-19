@@ -44,14 +44,14 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $data = array(
             'autoId' => $frontend->getTreeRoot()->getValue()->getAutoId(),
             'html'   => $html,
-            'js'     => $frontend->getJs()
+            'js'     => $frontend->getJs(),
         );
         $frontend->clear();
         return $data;
     }
 
     /**
-     * @param CM_Params             $params
+     * @param CM_Params                  $params
      * @param CM_Http_Response_View_Ajax $response
      * @throws CM_Exception_Invalid
      * @return array
@@ -66,8 +66,10 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
             if ($count++ > 10) {
                 throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $paths) . ').');
             }
-            $responsePage = new CM_Http_Response_Page_Embed($request);
+            $responsePage = new CM_Http_Response_Page_Embed($request, $this->getServiceManager());
             $responsePage->process();
+            $request = $responsePage->getRequest();
+
             $paths[] = $request->getPath();
 
             if ($redirectUrl = $responsePage->getRedirectUrl()) {
@@ -87,7 +89,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
 
         $frontend = $responsePage->getRender()->getGlobalResponse();
         $html = $responsePage->getContent();
-        $js = implode(PHP_EOL, array_filter([$frontend->getJs(), $response->getRender()->getServiceManager()->getTrackings()->getJs()]));
+        $js = $frontend->getJs();
         $autoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
         $frontend->clear();
@@ -96,10 +98,18 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $layoutClass = get_class($page->getLayout($this->getRender()->getEnvironment()));
         $menuList = array_merge($this->getSite()->getMenus(), $responsePage->getRender()->getMenuList());
         $menuEntryHashList = $this->_getMenuEntryHashList($menuList, get_class($page), $responsePage->getPageParams());
+        $jsTracking = $responsePage->getRender()->getServiceManager()->getTrackings()->getJs();
 
-        return array('autoId'            => $autoId, 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url,
-                     'layoutClass'       => $layoutClass,
-                     'menuEntryHashList' => $menuEntryHashList);
+        return array(
+            'autoId'            => $autoId,
+            'html'              => $html,
+            'js'                => $js,
+            'title'             => $title,
+            'url'               => $url,
+            'layoutClass'       => $layoutClass,
+            'menuEntryHashList' => $menuEntryHashList,
+            'jsTracking'        => $jsTracking,
+        );
     }
 
     public function popinComponent() {

@@ -3,7 +3,7 @@
   <head>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
   </head>
-  <body style="margin: 0px">
+  <body style="margin: 0">
 
     <p>
       {if isset($recipient)}

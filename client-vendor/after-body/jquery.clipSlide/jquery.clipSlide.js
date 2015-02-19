@@ -16,7 +16,7 @@
 
 			$this.imagesLoaded().always(function() {
 				if ($this.height() < $content.outerHeight(true)) {
-					var $handle = $('<a href="javascript:;" class="clipSlide-handle"><div class="icon-expand"></div></a>').appendTo($this);
+					var $handle = $('<a href="javascript:;" class="clipSlide-handle"><div class="icon icon-arrow-down"></div></a>').appendTo($this);
 
 					$this.css({
 						position: 'relative'

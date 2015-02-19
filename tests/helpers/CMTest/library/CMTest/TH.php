@@ -6,11 +6,11 @@ class CMTest_TH {
     private static $timeDelta = 0;
     private static $_configBackup;
 
-    /** @var CM_Db_Client|null */
-    private static $_dbClient = null;
-
     public static function init() {
-        CM_App::getInstance()->setup(new CM_OutputStream_Null(), true);
+        $output = new CM_OutputStream_Null();
+        $loader = CM_App::getInstance()->getProvisionLoader();
+        $loader->unload($output);
+        $loader->load($output);
 
         self::$_configBackup = serialize(CM_Config::get());
 
@@ -36,14 +36,6 @@ class CMTest_TH {
     public static function clearCache() {
         CM_Cache_Shared::getInstance()->flush();
         CM_Cache_Local::getInstance()->flush();
-    }
-
-    /**
-     * @deprecated use clearEnv instead
-     */
-    public static function clearDb() {
-        self::clearCache();
-        CM_App::getInstance()->setup(new CM_OutputStream_Null(), true);
     }
 
     public static function timeInit() {
@@ -79,6 +71,13 @@ class CMTest_TH {
 
     public static function timeDiffInDays($stamp1, $stamp2) {
         return round(($stamp2 - $stamp1) / (60 * 60 * 24));
+    }
+
+    /**
+     * @return CM_Service_Manager
+     */
+    public static function getServiceManager() {
+        return CM_Service_Manager::getInstance();
     }
 
     /**
@@ -211,7 +210,22 @@ class CMTest_TH {
             $headers = array('host' => $site->getHost());
         }
         $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
-        return new CM_Http_Response_Page($request);
+        return new CM_Http_Response_Page($request, self::getServiceManager());
+    }
+
+    /**
+     * @param string             $uri
+     * @param array|null         $headers
+     * @param CM_Model_User|null $viewer
+     * @return CM_Http_Response_Page
+     */
+    public static function createResponsePageEmbed($uri, array $headers = null, CM_Model_User $viewer = null) {
+        if (!$headers) {
+            $site = CM_Site_Abstract::factory();
+            $headers = array('host' => $site->getHost());
+        }
+        $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
+        return new CM_Http_Response_Page_Embed($request, self::getServiceManager());
     }
 
     /**
@@ -240,6 +254,13 @@ class CMTest_TH {
             default:
                 return new CM_Model_Location(CM_Model_Location::LEVEL_ZIP, $zip);
         }
+    }
+
+    /**
+     * @return CM_MongoDb_Client
+     */
+    public static function getMongoDb() {
+        return CM_Service_Manager::getInstance()->getMongoDb();
     }
 
     public static function randomizeAutoincrement() {
@@ -299,5 +320,10 @@ class CMTest_TH {
             $str .= $charset[mt_rand(0, $count - 1)];
         }
         return $str;
+    }
+
+    private static function clearDb() {
+        self::clearCache();
+        CM_App::getInstance()->getProvisionLoader()->reload(new CM_OutputStream_Null());
     }
 }

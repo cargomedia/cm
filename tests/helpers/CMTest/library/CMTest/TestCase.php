@@ -1,8 +1,10 @@
 <?php
 
-abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
+abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_Service_ManagerAwareInterface {
 
     use \Mocka\MockaTrait;
+
+    use CM_Service_ManagerAwareTrait;
 
     public function runBare() {
         if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
@@ -14,6 +16,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             ));
             CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
         }
+
+        $this->setServiceManager(CMTest_TH::getServiceManager());
+
         parent::runBare();
     }
 
@@ -79,14 +84,19 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     /**
      * @param string                        $url
      * @param array|null                    $query
+     * @param array|null                    $headers
      * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
      * @return CM_Http_Request_Post|\Mocka\AbstractClassTrait
      * @throws Mocka\Exception
      */
-    public function createRequest($url, array $query = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+    public function createRequest($url, array $query = null, array $headers = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
         $url = (string) $url;
         $query = (array) $query;
+        if (!$headers) {
+            $site = CM_Site_Abstract::factory();
+            $headers = array('host' => $site->getHost());
+        }
         $getViewInfo = function (CM_Frontend_ViewResponse $viewResponse) {
             /**
              * Simulate sending view-params to client and back (remove any objects)
@@ -116,7 +126,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $mockClass->mockMethod('getIp')->set(function () {
             return '16909060';
         });
-        return $mockClass->newInstance([$url]);
+        return $mockClass->newInstance([$url, $headers]);
     }
 
     /**
@@ -144,7 +154,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             'data'       => (array) $data,
             'actionName' => $actionName,
         );
-        return $this->createRequest('/form/null', $query, $scopeView, $scopeComponent);
+        return $this->createRequest('/form/null', $query, null, $scopeView, $scopeComponent);
     }
 
     /**
@@ -167,7 +177,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             'method' => (string) $methodName,
             'params' => (array) $params,
         );
-        return $this->createRequest('/ajax/null', $query, $scopeView, $scopeComponent);
+        return $this->createRequest('/ajax/null', $query, null, $scopeView, $scopeComponent);
     }
 
     /**
@@ -176,7 +186,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      */
     public function getResponse(CM_Http_Request_Abstract $request) {
         $className = CM_Http_Response_Abstract::getResponseClassName($request);
-        return $this->mockClass($className)->newInstance([$request]);
+        $serviceManager = self::getServiceManager();
+        return $this->mockClass($className)->newInstance([$request, $serviceManager]);
     }
 
     /**
@@ -293,17 +304,44 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         }
         $host = parse_url($site->getUrl(), PHP_URL_HOST);
         $request = new CM_Http_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), array('host' => $host), null, $viewer);
-        $response = new CM_Http_Response_Page($request);
-        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, $viewer));
-        $page->prepareResponse($render->getEnvironment(), $response);
-        $renderAdapter = new CM_RenderAdapter_Page($render, $page);
+        $response = new CM_Http_Response_Page($request, $this->getServiceManager());
+        $page->prepareResponse($response->getRender()->getEnvironment(), $response);
+        $renderAdapter = new CM_RenderAdapter_Page($response->getRender(), $page);
         $html = $renderAdapter->fetch();
         return new CM_Dom_NodeList($html, true);
     }
 
     /**
+     * @param CM_Model_Abstract $model
+     * @param string|null       $message
+     */
+    public static function assertModelInstantiable(CM_Model_Abstract $model, $message = null) {
+        $message = null !== $message ? (string) $message : 'Model cannot be instantiated';
+        try {
+            CMTest_TH::reinstantiateModel($model);
+            self::assertTrue(true);
+        } catch (CM_Exception_Nonexistent $ex) {
+            self::fail($message);
+        }
+    }
+
+    /**
+     * @param CM_Model_Abstract $model
+     * @param string|null       $message
+     */
+    public static function assertModelNotInstantiable(CM_Model_Abstract $model, $message = null) {
+        $message = null !== $message ? (string) $message : 'Model can be instantiated';
+        try {
+            CMTest_TH::reinstantiateModel($model);
+            self::fail($message);
+        } catch (CM_Exception_Nonexistent $ex) {
+            self::assertTrue(true);
+        }
+    }
+
+    /**
      * @param CM_Http_Response_View_Abstract $response
-     * @param array|null                $data
+     * @param array|null                     $data
      */
     public static function assertViewResponseSuccess(CM_Http_Response_View_Abstract $response, array $data = null) {
         $responseContent = json_decode($response->getContent(), true);
@@ -315,8 +353,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Http_Response_View_Abstract $response
-     * @param string|null               $type
-     * @param string|null               $message
+     * @param string|null                    $type
+     * @param string|null                    $message
      */
     public static function assertViewResponseError(CM_Http_Response_View_Abstract $response, $type = null, $message = null) {
         $responseContent = json_decode($response->getContent(), true);
@@ -505,7 +543,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Http_Response_View_Form $response
-     * @param string|null           $msg
+     * @param string|null                $msg
      */
     public static function assertFormResponseSuccess(CM_Http_Response_View_Form $response, $msg = null) {
         $responseContent = json_decode($response->getContent(), true);
@@ -518,8 +556,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Http_Response_View_Form $response
-     * @param string|null           $errorMsg
-     * @param string|null           $formFieldName
+     * @param string|null                $errorMsg
+     * @param string|null                $formFieldName
      */
     public static function assertFormResponseError(CM_Http_Response_View_Form $response, $errorMsg = null, $formFieldName = null) {
         $responseContent = json_decode($response->getContent(), true);

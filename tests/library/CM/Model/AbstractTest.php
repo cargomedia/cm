@@ -28,8 +28,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         CM_Db_Db::exec("DROP TABLE `modelThasIsAnAssetMock`");
     }
 
-    public function setup() {
-        $modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
+    public function setUp() {
+        CM_ModelMock::createStatic(array('foo' => 'bar1'));
     }
 
     public function tearDown() {

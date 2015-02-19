@@ -9,12 +9,11 @@ class CM_FormField_Boolean extends CM_FormField_Abstract {
         return (bool) $userInput;
     }
 
-    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
+    public function prepare(CM_Params $renderParams, CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $display = $renderParams->get('display', self::DISPLAY_CHECKBOX);
         if (!in_array($display, array(self::DISPLAY_CHECKBOX, self::DISPLAY_SWITCH))) {
             throw new CM_Exception_InvalidParam('Display needs to be either `checkbox` or `switch`');
         }
-        $viewResponse->addCssClass($display);
         $viewResponse->set('display', $display);
 
         $viewResponse->set('tabindex', $renderParams->has('tabindex') ? $renderParams->getInt('tabindex') : null);

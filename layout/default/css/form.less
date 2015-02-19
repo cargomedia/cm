@@ -56,6 +56,7 @@ textarea.textinput {
   margin: 1px;
   padding: 0 15px;
   overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
   border-radius: @borderRadiusInput;
   vertical-align: top;
@@ -172,19 +173,17 @@ textarea.textinput {
 }
 
 .button-large {
-  height: 1.5*@sizeButton;
-  min-width: 1.5*@sizeButton;
-  font-size: 2em;
-  border-radius: 3px;
+  height: 1.2*@sizeButton;
+  min-width: 1.2*@sizeButton;
+  font-size: 1.5rem;
   padding: 0 25px;
 
-  &.hasIcon.hasLabel {
-    padding: 0 20px;
+  &.hasIcon.hasLabel .icon {
+    margin-right: 10px;
+  }
 
-    .icon {
-      margin-right: 10px;
-      font-size: 1em;
-    }
+  &.hasIconRight.hasLabel .icon {
+    margin-left: 10px;
   }
 }
 
@@ -266,9 +265,6 @@ input[type=checkbox] {
   &:checked + label:before {
     background-image: image('checkbox.svg');
 
-    html.no-svg & {
-      background-image: image('checkbox.png');
-    }
     background-size: contain;
   }
 
@@ -276,6 +272,87 @@ input[type=checkbox] {
     &:before {
       border-radius: 20%;
     }
+  }
+}
+
+input[type=checkbox].checkbox-switch {
+  @sizeSwitch: @sizeCheckbox + 4px;
+
+  + label {
+    margin-left: 0;
+
+    .handle {
+      box-sizing: border-box;
+      position: relative;
+      display: inline-block;
+      width: 2 * @sizeSwitch + 5px;
+      height: @sizeSwitch;
+      margin-right: 5px;
+      vertical-align: middle;
+      border: 1px solid @colorFgBorderEmphasize3;
+      border-radius: .5 * @sizeSwitch;
+      background-color: @colorBgEmphasize1;
+      box-shadow: 0 .1em .1em rgba(0, 0, 0, 0.02) inset;
+
+      &:before, &:after {
+        position: absolute;
+        top: 0;
+      }
+
+      &:before {
+        right: 0;
+        margin: 0 5px;
+        content: 'OFF';
+        font-weight: bold;
+        line-height: @sizeSwitch - 2px;
+        font-size: @sizeSwitch * 0.4;
+        text-transform: uppercase;
+        color: lighten(@colorFgSubtle, 10);
+      }
+
+      &:after {
+        box-sizing: border-box;
+        left: 0;
+        content: '';
+        width: @sizeSwitch - 6px;
+        height: @sizeSwitch - 6px;
+        margin: 2px;
+        border: 1px solid @colorBg;
+        border-radius: 50%;
+        background-color: lighten(@colorFgSubtle, 10);
+        transform: translateX(0);
+        transition: 200ms;
+      }
+    }
+
+    .label {
+      vertical-align: middle;
+    }
+
+    &:before {
+      display: none;
+    }
+  }
+
+  &:checked + label .handle {
+    background-color: @colorFocus;
+    border-color: @colorFocus;
+
+    &:before {
+      right: 0;
+      left: 0;
+      content: 'ON';
+      color: @colorFgTheme;
+    }
+
+    &:after {
+      transform: translateX(@sizeSwitch + 4px);
+      background-color: lighten(@colorFocus, 30);
+    }
+  }
+
+  &:focus + label .handle {
+    border-color: @colorFocus;
   }
 }
 

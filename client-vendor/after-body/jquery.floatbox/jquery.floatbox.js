@@ -3,6 +3,7 @@
  */
 (function($) {
   var defaults = {
+    focusElement: null,
     closable: true,
     fullscreen: false
   };
@@ -82,11 +83,8 @@
         self.close.apply(self);
       });
 
-      _.delay(function() {
-        // FF Mobile moves floatbox out of viewport, if no delay here
-        self.$floatbox.focus();
-        self.$floatbox.trap();
-      }, 50);
+      this._getFocusElement().focus();
+      this.$floatbox.trap();
 
       this.$layer.data('floatbox', this);
       $element.trigger('floatbox-open');
@@ -124,6 +122,20 @@
         var top = Math.max(0, ($viewport.outerHeight(true) - this.$floatbox.outerHeight()) / 4);
         this.$floatbox.css('margin-top', top);
       }
+    },
+    _getFocusElement: function() {
+      var focusElement = this.options.focusElement;
+      var $focusElement;
+      if (focusElement) {
+        if ($.contains(this.$floatbox[0], focusElement)) {
+          $focusElement = $(focusElement);
+        } else {
+          throw new Error('floatbox must contain options.focusElement.');
+        }
+      } else {
+        $focusElement = this.$floatbox;
+      }
+      return $focusElement;
     }
   });
 

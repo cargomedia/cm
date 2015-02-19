@@ -44,7 +44,6 @@ class CM_File_Image extends CM_File {
      */
     public function resize($widthMax, $heightMax, $square = null, $formatNew = null, CM_File $fileNew = null) {
         $square = isset($square) ? (bool) $square : false;
-        $format = isset($formatNew) ? (int) $formatNew : $this->getFormat();
 
         $width = $this->getWidth();
         $height = $this->getHeight();
@@ -76,6 +75,24 @@ class CM_File_Image extends CM_File {
             $heightResize = $height;
             $widthResize = $width;
         }
+
+        $this->resizeSpecific($widthResize, $heightResize, $offsetX, $offsetY, $formatNew, $fileNew);
+    }
+
+    /**
+     * @param int          $widthResize
+     * @param int          $heightResize
+     * @param int|null     $offsetX
+     * @param int|null     $offsetY
+     * @param int|null     $formatNew
+     * @param CM_File|null $fileNew
+     * @throws CM_Exception
+     * @throws CM_Exception_Invalid
+     */
+    public function resizeSpecific($widthResize, $heightResize, $offsetX = null, $offsetY = null, $formatNew = null, CM_File $fileNew = null) {
+        $format = isset($formatNew) ? (int) $formatNew : $this->getFormat();
+        $width = $this->getWidth();
+        $height = $this->getHeight();
 
         $imagick = $this->_getImagickClone();
 
@@ -179,6 +196,10 @@ class CM_File_Image extends CM_File {
             throw new CM_Exception_Invalid('Invalid compression quality `' . $quality . '`, should be between 1-100.');
         }
         $this->_compressionQuality = $quality;
+    }
+
+    public function freeMemory() {
+        $this->_imagick = null;
     }
 
     /**

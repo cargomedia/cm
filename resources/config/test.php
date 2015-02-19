@@ -29,9 +29,19 @@ return function (CM_Config_Node $config) {
                 'username'         => 'root',
                 'password'         => '',
                 'db'               => 'cm_test',
-                'reconnectTimeout' => 300
             )
         )
+    );
+
+    $config->services['redis'] = array(
+        'class'     => 'CM_Redis_Client',
+        'arguments' => array(
+            array(
+                'host'     => 'localhost',
+                'port'     => '6379',
+                'database' => 2,
+            )
+        ),
     );
 
     $config->services['filesystem-data'] = array(

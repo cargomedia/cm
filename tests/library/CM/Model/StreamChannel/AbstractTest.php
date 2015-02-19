@@ -2,7 +2,7 @@
 
 class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
-    public function setup() {
+    public function setUp() {
         CM_Config::get()->CM_Model_Abstract->types[CM_Model_StreamChannel_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Mock';
         if (!class_exists('CM_Model_StreamChannel_Mock')) {
             $this->getMockForAbstractClass('CM_Model_StreamChannel_Abstract', array(), 'CM_Model_StreamChannel_Mock', false);

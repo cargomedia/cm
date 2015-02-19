@@ -33,6 +33,9 @@ var CM_View_Abstract = Backbone.View.extend({
     if (this.childrenEvents) {
       this._bindChildrenEvents(this.childrenEvents);
     }
+    if (this.appEvents) {
+      this._bindAppEvents(this.appEvents);
+    }
     this.on('all', function(eventName, data) {
       cm.viewEvents.trigger(this, eventName, data);
     });
@@ -381,8 +384,19 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
+   * @param {String} event
+   * @param {Function} callback fn(Object data)
+   */
+  bindAppEvent: function(event, callback) {
+    cm.event.bind(event, callback, this);
+    this.on('destruct', function() {
+      cm.event.unbind(event, callback, this);
+    });
+  },
+
+  /**
    * @param {Function} callback
-   * @param {Integer} interval
+   * @param {Number} interval
    * @return {Number}
    */
   setInterval: function(callback, interval) {
@@ -398,7 +412,7 @@ var CM_View_Abstract = Backbone.View.extend({
 
   /**
    * @param {Function} callback
-   * @param {Integer} timeout
+   * @param {Number} timeout
    * @return {Number}
    */
   setTimeout: function(callback, timeout) {
@@ -609,6 +623,18 @@ var CM_View_Abstract = Backbone.View.extend({
       var eventNames = match[2].split(/\s*,\s*/);
       _.each(eventNames, function(eventName) {
         this.bindChildrenEvent(viewName, eventName, callback);
+      }, this);
+    }, this);
+  },
+
+  /**
+   * @param {Object} events
+   */
+  _bindAppEvents: function(events) {
+    _.each(events, function(callback, eventNameStr) {
+      var eventNameList = eventNameStr.split(/[\s]+/);
+      _.each(eventNameList, function(eventName) {
+        this.bindAppEvent(eventName, callback);
       }, this);
     }, this);
   },

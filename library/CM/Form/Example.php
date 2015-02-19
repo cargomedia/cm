@@ -22,10 +22,12 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerAction(new CM_FormAction_Example_Go($this));
     }
 
-    public function prepare(CM_Frontend_Environment $environment) {
-        $ip = CM_Http_Request_Abstract::getInstance()->getIp();
-        if ($locationGuess = CM_Model_Location::findByIp($ip)) {
-            $this->getField('location')->setValue($locationGuess);
+    public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
+        if (CM_Http_Request_Abstract::hasInstance()) {
+            $ip = CM_Http_Request_Abstract::getInstance()->getIp();
+            if ($locationGuess = CM_Model_Location::findByIp($ip)) {
+                $this->getField('location')->setValue($locationGuess);
+            }
         }
     }
 }

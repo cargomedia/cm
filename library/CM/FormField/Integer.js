@@ -15,23 +15,17 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
     var $sliderValue = this.$('.noUiSlider-value');
 
     $slider.noUiSlider({
-      range: [field.getOption('min'), field.getOption('max')],
+      range: {min: field.getOption('min'), max: field.getOption('max')},
       start: $input.val(),
       step: field.getOption('step'),
       handles: 1,
-      behaviour: 'extend-tap',
-      serialization: {
-        to: [
-          [$input, [$sliderValue, 'html']]
-        ],
-        resolution: 1
-      },
-      slide: function() {
-        field._onChange();
-      },
-      set: function() {
-        field._onChange();
-      }
+      behaviour: 'tap'
+    });
+    $slider.on('slide set', function(e, val) {
+      val = parseInt(val);
+      $input.val(val);
+      $sliderValue.html(val);
+      field._onChange();
     });
 
     this._$noUiHandle = $slider.find('.noUi-handle');
@@ -60,13 +54,6 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
   setValue: function(value) {
     this.$('.noUiSlider').val(value);
     this._onChange();
-  },
-
-  /**
-   * @returns {Number}
-   */
-  getValue: function() {
-    return parseInt(this.$('.noUiSlider').val());
   },
 
   _onChange: function() {

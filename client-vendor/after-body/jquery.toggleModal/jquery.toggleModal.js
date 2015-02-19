@@ -4,7 +4,7 @@
 (function($) {
 
   /**
-   * @param {Function} callback fn(state, callbackOptions)
+   * @param {Function} [callback] fn(state, callbackOptions)
    * @param {Object} [callbackOptions]
    * @returns {jQuery}
    */

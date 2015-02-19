@@ -171,6 +171,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Redis_Client
+     */
+    public function getRedis() {
+        return $this->get('redis', 'CM_Redis_Client');
+    }
+
+    /**
      * @param string $serviceName
      * @throws CM_Exception_Invalid
      * @return mixed
