@@ -1,29 +1,28 @@
 .tableField {
   padding: 5px 0 5px 5px;
-}
 
-.tableField:first-child {
-  border-width: 0;
-}
-
-.tableField > .label {
-  box-sizing: border-box;
-  font-weight: bold;
-  color: @fontColorStrong;
-
-  @media (min-width: @breakpointSmall) {
-    width: 100px;
-    float: left;
-    text-align: right;
+  :first-child {
+    border-width: 0;
   }
-}
 
-.tableField > .label:after {
-  content: ":";
-}
+  > .label {
+    box-sizing: border-box;
+    font-weight: bold;
+    color: @fontColorStrong;
 
-.tableField > .value {
-  @media (min-width: @breakpointSmall) {
-    margin-left: 110px;
+    :after {
+      content: ":";
+    }
+  }
+
+  &[min-width="250px"] {
+    > .label {
+      width: 100px;
+      float: left;
+      text-align: right;
+    }
+    > .value {
+      margin-left: 110px;
+    }
   }
 }
