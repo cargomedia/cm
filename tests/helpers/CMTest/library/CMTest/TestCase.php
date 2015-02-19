@@ -18,7 +18,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         }
 
         $this->setServiceManager(CMTest_TH::getServiceManager());
-
+        $this->backupGlobalsBlacklist = ['application'];
         parent::runBare();
     }
 
