@@ -1,6 +1,8 @@
 <?php
 
-abstract class CM_Cli_Runnable_Abstract {
+abstract class CM_Cli_Runnable_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var CM_InputStream_Interface */
     private $_streamInput;

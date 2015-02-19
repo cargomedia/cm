@@ -23,8 +23,8 @@ class CM_Bootloader {
      * @throws CM_Exception_Invalid
      */
     public function __construct($pathRoot) {
-        if (self::$_instance) {
-            throw new CM_Exception_Invalid('Bootloader already instantiated');
+        if (self::isLoaded()) {
+            throw new CM_Exception_Invalid('Bootloader already loaded');
         }
         self::$_instance = $this;
 
@@ -39,7 +39,6 @@ class CM_Bootloader {
         $this->_constants();
         $this->_exceptionHandler();
         $this->_errorHandler();
-        $this->_registerServices();
         $this->_defaults();
     }
 
@@ -171,19 +170,6 @@ class CM_Bootloader {
         });
     }
 
-    protected function _registerServices() {
-        $serviceManager = CM_Service_Manager::getInstance();
-
-        $serviceManager->register('filesystems', 'CM_Service_Filesystems');
-        $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', array(
-            new CM_File_Filesystem_Adapter_Local($this->getDirTmp()),
-        ));
-
-        foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
-            $serviceManager->registerWithArray($serviceKey, $serviceDefinition);
-        }
-    }
-
     protected function _defaults() {
         date_default_timezone_set($this->getTimeZone()->getName());
         CMService_Newrelic::getInstance()->setConfig();
@@ -212,9 +198,16 @@ class CM_Bootloader {
      * @throws Exception
      */
     public static function getInstance() {
-        if (!self::$_instance) {
+        if (!self::isLoaded()) {
             throw new Exception('No bootloader instance');
         }
         return self::$_instance;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isLoaded() {
+        return (bool) self::$_instance;
     }
 }

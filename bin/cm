@@ -13,10 +13,13 @@ if (count($autoloadPaths) === 0) {
 $autoloadPath = reset($autoloadPaths);
 
 require $autoloadPath;
-$bootloader = new CM_Bootloader(dirname(dirname(realpath($autoloadPath))) . '/');
-$bootloader->load();
+$rootPath = dirname(dirname(realpath($autoloadPath))) . '/';
 
-$manager = new CM_Cli_CommandManager();
+$application = new CM_App($rootPath);
+$application->installGlobalHandlers();
+$application->bootstrap();
+
+$manager = new CM_Cli_CommandManager($application->getServiceManager());
 $manager->autoloadCommands();
 $returnCode = $manager->run(new CM_Cli_Arguments($argv));
 exit($returnCode);
