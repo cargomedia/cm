@@ -1,6 +1,6 @@
 <?php
 
-class CM_Cache_Abstract extends CM_Class_Abstract {
+class CM_Cache_Cache extends CM_Class_Abstract {
 
     /** @var CM_Cache_Storage_Abstract */
     protected $_storage;

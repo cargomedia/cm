@@ -189,7 +189,7 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['cache-shared'] = array(
-        'class' => 'CM_Cache_Shared',
+        'class' => 'CM_Cache_Cache',
         'arguments' => array(
             'CM_Cache_Storage_Memcache',
             3600,
@@ -197,7 +197,7 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['cache-local'] = array(
-        'class' => 'CM_Cache_Local',
+        'class' => 'CM_Cache_Cache',
         'arguments' => array(
             'CM_Cache_Storage_Apc',
             86400,

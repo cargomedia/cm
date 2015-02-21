@@ -19,16 +19,16 @@ class CM_Cache_Service implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * @return CM_Cache_Shared
+     * @return CM_Cache_Cache
      */
     public function getShared() {
-        return $this->getServiceManager()->get('cache-shared', 'CM_Cache_Shared');
+        return $this->getServiceManager()->get('cache-shared', 'CM_Cache_Cache');
     }
 
     /**
-     * @return CM_Cache_Local
+     * @return CM_Cache_Cache
      */
     public function getLocal() {
-        return $this->getServiceManager()->get('cache-local', 'CM_Cache_Local');
+        return $this->getServiceManager()->get('cache-local', 'CM_Cache_Cache');
     }
 }

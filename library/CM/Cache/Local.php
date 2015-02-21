@@ -1,6 +1,6 @@
 <?php
 
-class CM_Cache_Local extends CM_Cache_Abstract {
+class CM_Cache_Local {
 
     /**
      * @return CM_Cache_Shared
