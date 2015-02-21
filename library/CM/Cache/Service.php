@@ -22,7 +22,7 @@ class CM_Cache_Service implements CM_Service_ManagerAwareInterface {
      * @return CM_Cache_Storage_Apc
      */
     public function getApc() {
-        return $this->getServiceManager()->get('cache-file', 'CM_Cache_Storage_Apc');
+        return $this->getServiceManager()->get('cache-apc', 'CM_Cache_Storage_Apc');
     }
 
     /**
