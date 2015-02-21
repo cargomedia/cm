@@ -9,11 +9,11 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract {
     private $_enabled;
 
     /**
-     * @param array[] $servers
-     * @param bool    $enabled
+     * @param array[]   $servers
+     * @param bool|null $disabled
      */
-    public function __construct(array $servers, $enabled) {
-        $this->setEnabled($enabled);
+    public function __construct(array $servers, $disabled = null) {
+        $this->setEnabled(!$disabled);
         foreach ($servers as $server) {
             $config = array_merge($server, ['timeout' => 10]);
             $this->_clients[] = new Elastica\Client($config);

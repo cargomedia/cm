@@ -66,6 +66,16 @@ return function (CM_Config_Node $config) {
             ),
         ));
 
+    $config->services['elasticsearch'] = array(
+        'class'     => 'CM_Elasticsearch_Cluster',
+        'arguments' => array(
+            array(
+                ['host' => 'localhost', 'port' => 9200]
+            ),
+            true,
+        ),
+    );
+
     $config->CMService_AwsS3Versioning_ClientTest->region = 'eu-west-1';
     $config->CMService_AwsS3Versioning_ClientTest->key = null;
     $config->CMService_AwsS3Versioning_ClientTest->secret = null;

@@ -195,7 +195,6 @@ return function (CM_Config_Node $config) {
             array(
                 ['host' => 'localhost', 'port' => 9200]
             ),
-            true,
         ),
     );
 };
