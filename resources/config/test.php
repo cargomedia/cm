@@ -9,8 +9,6 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Mail->send = false;
 
-    $config->CM_Elasticsearch_Client->enabled = false;
-
     $config->CM_Db_Db->serversReadEnabled = false;
     $config->CM_Db_Db->delayedEnabled = false;
 
