@@ -132,6 +132,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Cache_Storage_Runtime
+     */
+    public function getCacheRuntime() {
+        return $this->get('cache-runtime', 'CM_Cache_Storage_Runtime');
+    }
+
+    /**
      * @return CM_Service_Databases
      */
     public function getDatabases() {
