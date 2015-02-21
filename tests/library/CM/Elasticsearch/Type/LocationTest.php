@@ -25,7 +25,7 @@ class CM_Elasticsearch_Type_LocationTest extends CMTest_TestCase {
         CM_Model_Location_City::create($country, $state3, 'Arinsal', '42.567', '1.483', '209956');
         CM_Model_Location_City::create($country, $state3, 'El Serrat', '42.617', '1.55', '209961');
         CM_Model_Location::createAggregation();
-        CM_Config::get()->CM_Elasticsearch_Client->enabled = true;
+        CM_Service_Manager::getInstance()->getElasticsearch()->setEnabled(true);
 
         self::$_type = new CM_Elasticsearch_Type_Location();
         self::$_searchIndexCli = new CM_Elasticsearch_Index_Cli();
@@ -35,6 +35,7 @@ class CM_Elasticsearch_Type_LocationTest extends CMTest_TestCase {
 
     public static function tearDownAfterClass() {
         self::$_type->getIndex()->delete();
+        CM_Service_Manager::getInstance()->getElasticsearch()->setEnabled(false);
         parent::tearDownAfterClass();
     }
 
