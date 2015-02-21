@@ -2,8 +2,8 @@
 
 class CM_Elasticsearch_Client extends CM_Class_Abstract {
 
-    /** @var Elastica\Client */
-    private $_client;
+    /** @var Elastica\Client[] */
+    private $_clients;
 
     /** @var bool */
     private $_enabled;
@@ -14,7 +14,25 @@ class CM_Elasticsearch_Client extends CM_Class_Abstract {
      */
     public function __construct(array $servers, $enabled) {
         $this->_enabled = (bool) $enabled;
-        $this->_client = new Elastica\Client(array('servers' => $servers, 'timeout' => 10));
+        foreach ($servers as $server) {
+            $config = array_merge($server, ['timeout' => 10]);
+            $this->_clients[] = new Elastica\Client($config);
+        }
+    }
+
+    /**
+     * @return \Elastica\Client[]
+     */
+    public function getClients() {
+        return $this->_clients;
+    }
+
+    /**
+     * @return \Elastica\Client
+     */
+    public function getRandomClient() {
+        $index = array_rand($this->_clients);
+        return $this->_clients[$index];
     }
 
     /**
@@ -22,13 +40,6 @@ class CM_Elasticsearch_Client extends CM_Class_Abstract {
      */
     public function getEnabled() {
         return $this->_enabled;
-    }
-
-    /**
-     * @return \Elastica\Client
-     */
-    public function getElasticaClient() {
-        return $this->_client;
     }
 
     /**

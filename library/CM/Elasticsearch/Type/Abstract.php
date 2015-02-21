@@ -41,7 +41,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         $typeName = static::INDEX_NAME;
 
         if (!$client) {
-            $client = CM_Service_Manager::getInstance()->getElasticsearch()->getElasticaClient();
+            $client = CM_Service_Manager::getInstance()->getElasticsearch()->getRandomClient();
         }
         $this->_client = $client;
 
