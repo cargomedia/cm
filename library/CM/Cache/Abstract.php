@@ -1,15 +1,19 @@
 <?php
 
-abstract class CM_Cache_Abstract extends CM_Class_Abstract {
+class CM_Cache_Abstract extends CM_Class_Abstract {
 
     /** @var CM_Cache_Storage_Abstract */
     protected $_storage;
+
+    /** @var int */
+    protected $_defaultLifetime;
 
     public function __construct() {
         $storageClassName = static::_getConfig()->storage;
         if (!is_subclass_of($storageClassName, 'CM_Cache_Storage_Abstract')) {
             throw new CM_Exception('Invalid cache storage: `' . $storageClassName . '`');
         }
+        $this->_defaultLifetime = static::_getConfig()->lifetime;
         $this->_storage = new $storageClassName();
     }
 
@@ -20,7 +24,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
      */
     public final function set($key, $value, $lifeTime = null) {
         if (!$lifeTime) {
-            $lifeTime = static::_getConfig()->lifetime;
+            $lifeTime = $this->_defaultLifetime;
         }
         $this->_getStorage()->set($key, $value, $lifeTime);
     }
