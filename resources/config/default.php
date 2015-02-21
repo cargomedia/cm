@@ -21,9 +21,6 @@ return function (CM_Config_Node $config) {
         array('host' => 'localhost', 'port' => 9200),
     );
 
-    $config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
-    $config->CM_Cache_Local->lifetime = 86400;
-
     $config->CM_Memcache_Client->servers = array(
         array('host' => 'localhost', 'port' => 11211),
     );
@@ -196,6 +193,14 @@ return function (CM_Config_Node $config) {
         'arguments' => array(
             'CM_Cache_Storage_Memcache',
             3600,
+        ),
+    );
+
+    $config->services['cache-local'] = array(
+        'class' => 'CM_Cache_Local',
+        'arguments' => array(
+            'CM_Cache_Storage_Apc',
+            86400,
         ),
     );
 };
