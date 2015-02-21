@@ -1,6 +1,6 @@
 <?php
 
-class CM_Elasticsearch_Client extends CM_Class_Abstract {
+class CM_Elasticsearch_Cluster extends CM_Class_Abstract {
 
     /** @var Elastica\Client[] */
     private $_clients;
