@@ -181,6 +181,7 @@ class CM_Bootloader {
         $serviceManager->register('cache', 'CM_Cache_Service');
         $serviceManager->register('cache-runtime', 'CM_Cache_Storage_Runtime');
         $serviceManager->register('cache-apc', 'CM_Cache_Storage_Apc');
+        $serviceManager->register('cache-memcache', 'CM_Cache_Storage_Memcache');
 
         $storageDir = new CM_File('cache', $serviceManager->getFilesystems()->getTmp());
         $cache = new CM_Cache_Storage_File($storageDir);
