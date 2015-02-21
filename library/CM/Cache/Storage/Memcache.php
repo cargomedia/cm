@@ -6,7 +6,7 @@ class CM_Cache_Storage_Memcache extends CM_Cache_Storage_Abstract {
     private $_client;
 
     public function __construct() {
-        $this->_client = new CM_Memcache_Client(CM_Config::get()->CM_Memcache_Client->servers);
+        $this->_client = CM_Service_Manager::getInstance()->getMemcache();
         parent::__construct();
     }
 

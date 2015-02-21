@@ -27,10 +27,6 @@ return function (CM_Config_Node $config) {
     $config->CM_Cache_Shared->storage = 'CM_Cache_Storage_Memcache';
     $config->CM_Cache_Shared->lifetime = 3600;
 
-    $config->CM_Memcache_Client->servers = array(
-        array('host' => 'localhost', 'port' => 11211),
-    );
-
     $config->CM_Paging_Ip_Blocked->maxAge = (7 * 86400);
 
     $config->classConfigCacheEnabled = true;
@@ -192,5 +188,14 @@ return function (CM_Config_Node $config) {
     $config->services['email-verification'] = array(
         'class'     => 'CM_Service_EmailVerification_Standard',
         'arguments' => array()
+    );
+
+    $config->services['memcache'] = array(
+        'class'     => 'CM_Memcache_Client',
+        'arguments' => array(
+            array(
+                ['host' => 'localhost', 'port' => 11211],
+            ),
+        ),
     );
 };
