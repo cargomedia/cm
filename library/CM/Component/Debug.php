@@ -26,7 +26,7 @@ class CM_Component_Debug extends CM_Component_Abstract {
             $cachesCleared[] = 'CM_Cache_Storage_Memcache';
         }
         if ($params->getBoolean('CM_Cache_Storage_Apc', false)) {
-            $cache = new CM_Cache_Storage_Apc();
+            $cache = CM_Service_Manager::getInstance()->getCache()->getApc();
             $cache->flush();
             $cachesCleared[] = 'CM_Cache_Storage_Apc';
         }

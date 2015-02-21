@@ -121,7 +121,7 @@ class CM_Bootloader {
 
     public function reloadModulePaths() {
         $cacheKey = CM_CacheConst::Modules;
-        $cache = new CM_Cache_Storage_Apc();
+        $cache = CM_Service_Manager::getInstance()->getCache()->getApc();
         $cache->delete($cacheKey);
     }
 
@@ -180,6 +180,7 @@ class CM_Bootloader {
         ));
         $serviceManager->register('cache', 'CM_Cache_Service');
         $serviceManager->register('cache-runtime', 'CM_Cache_Storage_Runtime');
+        $serviceManager->register('cache-apc', 'CM_Cache_Storage_Apc');
 
         $storageDir = new CM_File('cache', $serviceManager->getFilesystems()->getTmp());
         $cache = new CM_Cache_Storage_File($storageDir);
@@ -201,7 +202,7 @@ class CM_Bootloader {
      */
     private function _getModulePaths() {
         $cacheKey = CM_CacheConst::Modules;
-        $apcCache = new CM_Cache_Storage_Apc();
+        $apcCache = CM_Service_Manager::getInstance()->getCache()->getApc();
         if (false === ($modulePaths = $apcCache->get($cacheKey))) {
             $fileCache = CM_Service_Manager::getInstance()->getCache()->getFile();
             $installation = new CM_App_Installation(DIR_ROOT);
