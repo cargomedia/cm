@@ -25,6 +25,13 @@ class CM_Elasticsearch_Client extends CM_Class_Abstract {
     }
 
     /**
+     * @return \Elastica\Client
+     */
+    public function getElasticaClient() {
+        return $this->_client;
+    }
+
+    /**
      * @param CM_Elasticsearch_Type_Abstract[] $types
      * @param array|null                       $data
      * @return array
