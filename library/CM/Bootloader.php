@@ -182,7 +182,9 @@ class CM_Bootloader {
         $serviceManager->register('cache-runtime', 'CM_Cache_Storage_Runtime');
 
         $storageDir = new CM_File('cache', $serviceManager->getFilesystems()->getTmp());
-        $serviceManager->registerInstance('cache-file', new CM_Cache_Storage_File($storageDir));
+        $cache = new CM_Cache_Storage_File($storageDir);
+        $cache->setRuntimeCache($serviceManager->getCache()->getRuntime());
+        $serviceManager->registerInstance('cache-file', $cache);
 
         foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
             $serviceManager->registerWithArray($serviceKey, $serviceDefinition);

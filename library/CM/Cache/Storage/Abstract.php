@@ -5,8 +5,11 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
     /** @var CM_Cache_Storage_Runtime|null */
     protected $_runtime;
 
-    public function __construct() {
-        $this->_runtime = CM_Service_Manager::getInstance()->getCache()->getRuntime();
+    /**
+     * @param CM_Cache_Storage_Runtime $runtime
+     */
+    public function setRuntimeCache(CM_Cache_Storage_Runtime $runtime) {
+        $this->_runtime = $runtime;
     }
 
     /**

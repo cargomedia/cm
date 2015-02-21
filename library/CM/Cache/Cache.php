@@ -1,6 +1,8 @@
 <?php
 
-class CM_Cache_Cache extends CM_Class_Abstract {
+class CM_Cache_Cache extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var CM_Cache_Storage_Abstract */
     protected $_storage;
@@ -20,6 +22,14 @@ class CM_Cache_Cache extends CM_Class_Abstract {
         }
         $this->_storage = new $storageClassName();
         $this->_defaultLifetime = (int) $defaultLifetime;
+    }
+
+    /**
+     * @param CM_Service_Manager $serviceManager
+     */
+    public function setServiceManager(CM_Service_Manager $serviceManager) {
+        $this->_serviceManager = $serviceManager;
+        $this->_storage->setRuntimeCache($serviceManager->getCache()->getRuntime());
     }
 
     /**

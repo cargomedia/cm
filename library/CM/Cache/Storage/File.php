@@ -10,7 +10,6 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
      */
     public function __construct(CM_File $storageDir) {
         $this->_storageDir = $storageDir;
-        parent::__construct();
     }
 
     /**
