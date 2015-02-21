@@ -13,7 +13,7 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract {
      * @param bool    $enabled
      */
     public function __construct(array $servers, $enabled) {
-        $this->_enabled = (bool) $enabled;
+        $this->setEnabled($enabled);
         foreach ($servers as $server) {
             $config = array_merge($server, ['timeout' => 10]);
             $this->_clients[] = new Elastica\Client($config);
@@ -33,6 +33,13 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract {
     public function getRandomClient() {
         $index = array_rand($this->_clients);
         return $this->_clients[$index];
+    }
+
+    /**
+     * @param bool $enabled
+     */
+    public function setEnabled($enabled) {
+        $this->_enabled = (bool) $enabled;
     }
 
     /**
