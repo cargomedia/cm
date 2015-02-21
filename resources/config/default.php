@@ -190,7 +190,7 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['elasticsearch'] = array(
-        'class '    => 'CM_Elasticsearch_Client',
+        'class'     => 'CM_Elasticsearch_Client',
         'arguments' => array(
             array(
                 ['host' => 'localhost', 'port' => 9200]
