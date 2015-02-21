@@ -3,7 +3,7 @@
 trait CM_Service_ManagerAwareTrait {
 
     /** @var CM_Service_Manager */
-    private $_serviceManager;
+    protected $_serviceManager;
 
     /**
      * @param CM_Service_Manager $serviceManager
