@@ -60,15 +60,15 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract {
         }
         CM_Debug::getInstance()->incStats('search', json_encode($data));
 
-        $search = new Elastica\Search($this->_client);
+        $search = new Elastica\Search($this->getRandomClient());
         foreach ($types as $type) {
             $search->addIndex($type->getIndex());
             $search->addType($type->getType());
         }
         try {
-            $response = $this->_client->request($search->getPath(), 'GET', $data);
+            $response = $this->getRandomClient()->request($search->getPath(), 'GET', $data);
         } catch (Elastica\Exception\ConnectionException $ex) {
-            foreach ($this->_client->getConnections() as $connection) {
+            foreach ($this->getRandomClient()->getConnections() as $connection) {
                 $connection->setEnabled();
             }
             throw $ex;
