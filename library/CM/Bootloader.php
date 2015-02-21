@@ -176,6 +176,7 @@ class CM_Bootloader {
 
         $serviceManager->register('cache', 'CM_Cache_Service');
         $serviceManager->register('cache-runtime', 'CM_Cache_Storage_Runtime');
+        $serviceManager->register('cache-file', 'CM_Cache_Storage_File');
         $serviceManager->register('filesystems', 'CM_Service_Filesystems');
         $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', array(
             new CM_File_Filesystem_Adapter_Local($this->getDirTmp()),
@@ -198,7 +199,7 @@ class CM_Bootloader {
         $cacheKey = CM_CacheConst::Modules;
         $apcCache = new CM_Cache_Storage_Apc();
         if (false === ($modulePaths = $apcCache->get($cacheKey))) {
-            $fileCache = new CM_Cache_Storage_File();
+            $fileCache = CM_Service_Manager::getInstance()->getCache()->getFile();
             $installation = new CM_App_Installation(DIR_ROOT);
             if ($installation->getUpdateStamp() > $fileCache->getCreateStamp($cacheKey) || false === ($modulePaths = $fileCache->get($cacheKey))) {
                 $modulePaths = $installation->getModulePaths();

@@ -93,7 +93,7 @@ class CM_Asset_Css extends CM_Asset_Abstract {
         if ($render->getLanguage()) {
             $cacheKey .= '_languageId:' . $render->getLanguage()->getId();
         }
-        $cache = new CM_Cache_Storage_File();
+        $cache = CM_Service_Manager::getInstance()->getCache()->getFile();
         if (false === ($contentTransformed = $cache->get($cacheKey))) {
             $contentTransformed = $content;
             $contentTransformed = $this->_compileLess($contentTransformed, $compress);

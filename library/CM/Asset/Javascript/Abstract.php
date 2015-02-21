@@ -19,7 +19,7 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
     protected function _minify($content) {
         $md5 = md5($content);
         $cacheKey = CM_CacheConst::App_Resource . '_md5:' . $md5;
-        $cache = new CM_Cache_Storage_File();
+        $cache = CM_Service_Manager::getInstance()->getCache()->getFile();
         if (false === ($contentMinified = $cache->get($cacheKey))) {
             $uglifyCommand = 'uglifyjs --no-copyright';
             /**

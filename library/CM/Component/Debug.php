@@ -31,7 +31,7 @@ class CM_Component_Debug extends CM_Component_Abstract {
             $cachesCleared[] = 'CM_Cache_Storage_Apc';
         }
         if ($params->getBoolean('CM_Cache_Storage_File', false)) {
-            $cache = new CM_Cache_Storage_File();
+            $cache = CM_Service_Manager::getInstance()->getCache()->getFile();
             $cache->flush();
             $cachesCleared[] = 'CM_Cache_Storage_File';
         }
