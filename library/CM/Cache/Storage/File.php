@@ -2,6 +2,17 @@
 
 class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 
+    /** @var CM_File */
+    private $_storageDir;
+
+    /**
+     * @param CM_File $storageDir
+     */
+    public function __construct(CM_File $storageDir) {
+        $this->_storageDir = $storageDir;
+        parent::__construct();
+    }
+
     /**
      * @param string $key
      * @throws CM_Exception_Invalid
@@ -44,7 +55,7 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
     }
 
     protected function _flush() {
-        $this->_getDirStorage()->delete(true);
+        $this->_storageDir->delete(true);
     }
 
     /**
@@ -52,14 +63,6 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
      * @return CM_File
      */
     private function _getFile($key) {
-        return $this->_getDirStorage()->joinPath(md5($key));
-    }
-
-    /**
-     * @return CM_File
-     */
-    private function _getDirStorage() {
-        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getTmp();
-        return new CM_File('cache', $filesystem);
+        return $this->_storageDir->joinPath(md5($key));
     }
 }
