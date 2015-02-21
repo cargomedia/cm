@@ -212,7 +212,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * @param mixed $item
      */
     public static function updateItem($item) {
-        if (!CM_Elasticsearch_Client::getInstance()->getEnabled()) {
+        if (!CM_Service_Manager::getInstance()->getElasticsearch()->getEnabled()) {
             return;
         }
         $id = self::getIdForItem($item);
@@ -224,7 +224,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * @param mixed $item
      */
     public static function updateItemWithJob($item) {
-        if (!CM_Elasticsearch_Client::getInstance()->getEnabled()) {
+        if (!CM_Service_Manager::getInstance()->getElasticsearch()->getEnabled()) {
             return;
         }
         $job = new CM_Elasticsearch_UpdateDocumentJob();

@@ -193,4 +193,14 @@ return function (CM_Config_Node $config) {
         'class'     => 'CM_Service_EmailVerification_Standard',
         'arguments' => array()
     );
+
+    $config->services['elasticsearch'] = array(
+        'class '    => 'CM_Elasticsearch_Client',
+        'arguments' => array(
+            array(
+                ['host' => 'localhost', 'port' => 9200]
+            ),
+            true,
+        ),
+    );
 };

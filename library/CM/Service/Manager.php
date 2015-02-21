@@ -178,6 +178,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Elasticsearch_Client
+     */
+    public function getElasticsearch() {
+        return $this->get('elasticsearch', 'CM_Elasticsearch_Client');
+    }
+
+    /**
      * @param string $serviceName
      * @throws CM_Exception_Invalid
      * @return mixed

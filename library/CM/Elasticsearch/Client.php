@@ -5,23 +5,28 @@ class CM_Elasticsearch_Client extends CM_Class_Abstract {
     /** @var Elastica\Client */
     private $_client;
 
-    /** @var CM_Elasticsearch_Client */
-    private static $_instance;
+    /** @var bool */
+    private $_enabled;
 
-    public function __construct() {
-        $this->_client = new Elastica\Client(array('servers' => self::_getConfig()->servers, 'timeout' => 10));
+    /**
+     * @param array[] $servers
+     * @param bool    $enabled
+     */
+    public function __construct(array $servers, $enabled) {
+        $this->_enabled = (bool) $enabled;
+        $this->_client = new Elastica\Client(array('servers' => $servers, 'timeout' => 10));
     }
 
     /**
      * @return bool
      */
     public function getEnabled() {
-        return (bool) self::_getConfig()->enabled;
+        return $this->_enabled;
     }
 
     /**
      * @param CM_Elasticsearch_Type_Abstract[] $types
-     * @param array|null                  $data
+     * @param array|null                       $data
      * @return array
      */
     public function query(array $types, array $data = null) {
@@ -44,15 +49,5 @@ class CM_Elasticsearch_Client extends CM_Class_Abstract {
             throw $ex;
         }
         return $response->getData();
-    }
-
-    /**
-     * @return CM_Elasticsearch_Client
-     */
-    public static function getInstance() {
-        if (!self::$_instance) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
     }
 }
