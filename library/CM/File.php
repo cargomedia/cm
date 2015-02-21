@@ -122,7 +122,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
      * @return string
      */
     public function read() {
-        $cache = CM_Service_Manager::getInstance()->getCacheRuntime();
+        $cache = CM_Service_Manager::getInstance()->getCache()->getRuntime();
         if (false === ($content = $cache->get($this->_getCacheKeyContent()))) {
             $content = $this->_filesystem->read($this->getPath());
             $cache->set($this->_getCacheKeyContent(), $content, 1);
@@ -146,7 +146,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
      */
     public function write($content) {
         $this->_filesystem->write($this->getPath(), $content);
-        $cache = CM_Service_Manager::getInstance()->getCacheRuntime();
+        $cache = CM_Service_Manager::getInstance()->getCache()->getRuntime();
         $cache->set($this->_getCacheKeyContent(), $content, 1);
     }
 
@@ -155,7 +155,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
      */
     public function append($content) {
         $this->_filesystem->append($this->getPath(), $content);
-        $cache = CM_Service_Manager::getInstance()->getCacheRuntime();
+        $cache = CM_Service_Manager::getInstance()->getCache()->getRuntime();
         $cache->delete($this->_getCacheKeyContent());
     }
 
@@ -206,7 +206,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
             $this->_filesystem->deleteByPrefix($this->getPath());
         }
         $this->_filesystem->delete($this->getPath());
-        $cache = CM_Service_Manager::getInstance()->getCacheRuntime();
+        $cache = CM_Service_Manager::getInstance()->getCache()->getRuntime();
         $cache->delete($this->_getCacheKeyContent());
     }
 
