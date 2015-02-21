@@ -26,6 +26,13 @@ class CM_Cache_Service implements CM_Service_ManagerAwareInterface {
     }
 
     /**
+     * @return CM_Cache_Storage_Memcache
+     */
+    public function getMemcache() {
+        return $this->getServiceManager()->get('cache-file', 'CM_Cache_Storage_Memcache');
+    }
+
+    /**
      * @return CM_Cache_Cache
      */
     public function getShared() {
