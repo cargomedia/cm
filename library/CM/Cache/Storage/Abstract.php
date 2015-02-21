@@ -19,7 +19,9 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract implements CM
      */
     public function setServiceManager(CM_Service_Manager $serviceManager) {
         $this->_serviceManager = $serviceManager;
-        $this->setRuntimeCache($serviceManager->getCache()->getRuntime());
+        if (!$this instanceof CM_Cache_Storage_Runtime) {
+            $this->setRuntimeCache($serviceManager->getCache()->getRuntime());
+        }
     }
 
     /**
