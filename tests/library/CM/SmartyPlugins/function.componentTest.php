@@ -18,12 +18,12 @@ class smarty_function_componentTest extends CMTest_TestCase {
 
     public function testRender() {
         $html = new CM_Dom_NodeList(smarty_function_component(array('name' => 'CM_Component_Notfound'), $this->_template));
-        $this->assertTrue($html->has('.CM_Component_Notfound'));
+        $this->assertContains('class="CM_Component_Notfound', $html->getHtml());
     }
 
     public function testRenderWithoutNamespace() {
         $html = new CM_Dom_NodeList(smarty_function_component(array('name' => '*_Component_Notfound'), $this->_template));
-        $this->assertTrue($html->has('.CM_Component_Notfound'));
+        $this->assertContains('class="CM_Component_Notfound', $html->getHtml());
     }
 
     /**
