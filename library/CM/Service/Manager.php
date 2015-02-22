@@ -178,6 +178,14 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Jobdistribution_JobManager
+     * @throws CM_Exception_Invalid
+     */
+    public function getJobManager() {
+        return $this->get('job-manager', 'CM_Jobdistribution_JobManager');
+    }
+
+    /**
      * @param string $serviceName
      * @throws CM_Exception_Invalid
      * @return mixed

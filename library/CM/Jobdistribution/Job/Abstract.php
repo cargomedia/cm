@@ -131,8 +131,8 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     /**
      * @return boolean
      */
-    private function _getGearmanEnabled() {
-        return (boolean) self::_getConfig()->gearmanEnabled;
+    protected function _getGearmanEnabled() {
+        return CM_Service_Manager::getInstance()->getJobManager()->getEnabled();
     }
 
     /**
@@ -140,14 +140,6 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
      * @throws CM_Exception
      */
     protected function _getGearmanClient() {
-        if (!extension_loaded('gearman')) {
-            throw new CM_Exception('Missing `gearman` extension');
-        }
-        $config = static::_getConfig();
-        $gearmanClient = new GearmanClient();
-        foreach ($config->servers as $server) {
-            $gearmanClient->addServer($server['host'], $server['port']);
-        }
-        return $gearmanClient;
+        return CM_Service_Manager::getInstance()->getJobManager()->getGearmanClient();
     }
 }

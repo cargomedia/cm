@@ -10,7 +10,6 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         if (!extension_loaded('gearman')) {
             $this->markTestSkipped('Gearman Pecl Extension not installed.');
         }
-        CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
 
         $gearmanClient = $this->getMock('GearmanClient', array('addTask', 'runTasks', 'setCompleteCallback', 'setFailCallback'));
         $gearmanClient->expects($this->exactly(2))->method('addTask')->will($this->returnValue(true));
@@ -27,8 +26,9 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         $gearmanClient->expects($this->exactly(1))->method('setFailCallback');
         /** @var GearmanClient $gearmanClient */
 
-        $job = $this->getMockBuilder('CM_Jobdistribution_Job_Abstract')->setMethods(array('_getGearmanClient'))->getMockForAbstractClass();
-        $job->expects($this->any())->method('_getGearmanClient')->will($this->returnValue($gearmanClient));
+        $job = $this->mockObject('CM_Jobdistribution_Job_Abstract');
+        $job->mockMethod('_getGearmanClient')->set($gearmanClient);
+        $job->mockMethod('_getGearmanEnabled')->set(true);
         /** @var CM_Jobdistribution_Job_Abstract $job */
 
         $result = $job->runMultiple(array(
@@ -50,7 +50,6 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         if (!extension_loaded('gearman')) {
             $this->markTestSkipped('Gearman Pecl Extension not installed.');
         }
-        CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
 
         $gearmanClient = $this->getMock('GearmanClient', array('addTask', 'runTasks', 'setCompleteCallback', 'setFailCallback'));
         $gearmanClient->expects($this->exactly(2))->method('addTask')->will($this->returnValue(true));
@@ -65,10 +64,10 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         }));
         /** @var GearmanClient $gearmanClient */
 
-        $job = $this->getMockBuilder('CM_Jobdistribution_Job_Abstract')
-            ->setMethods(array('_getGearmanClient', '_getJobName'))->getMockForAbstractClass();
-        $job->expects($this->any())->method('_getGearmanClient')->will($this->returnValue($gearmanClient));
-        $job->expects($this->any())->method('_getJobName')->will($this->returnValue('myJob'));
+        $job = $this->mockObject('CM_Jobdistribution_Job_Abstract');
+        $job->mockMethod('_getGearmanClient')->set($gearmanClient);
+        $job->mockMethod('_getGearmanEnabled')->set(true);
+        $job->mockMethod('_getJobName')->set('myJob');
         /** @var CM_Jobdistribution_Job_Abstract $job */
 
         $job->runMultiple(array(
