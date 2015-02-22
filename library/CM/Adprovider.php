@@ -2,11 +2,27 @@
 
 class CM_Adprovider extends CM_Class_Abstract {
 
-    /** @var CM_Adprovider|null */
-    private static $_instance;
+    /** @var array[] */
+    private $_zones;
+
+    /** @var bool */
+    private $_enabled;
 
     /** @var CM_AdproviderAdapter_Abstract[] */
     private $_adapters = array();
+
+    /**
+     * @param bool    $enabled
+     * @param array[] $zones
+     * @param array   $adapterConfigs
+     */
+    public function __construct($enabled, array $zones, array $adapterConfigs) {
+        $this->_enabled = (bool) $enabled;
+        $this->_zones = $zones;
+        foreach ($adapterConfigs as $adapterClassName => $adapterConfig) {
+            $this->_configureAdapter($adapterClassName, $adapterConfig);
+        }
+    }
 
     /**
      * @param CM_Site_Abstract $site
@@ -33,14 +49,14 @@ class CM_Adprovider extends CM_Class_Abstract {
     /**
      * @param CM_Site_Abstract $site
      * @param string           $zoneName
-     * @return mixed
+     * @return array
      * @throws CM_Exception_Invalid
      */
     protected function _getZone(CM_Site_Abstract $site, $zoneName) {
         $cacheKey = CM_CacheConst::AdproviderZones . '_siteId:' . $site->getId();
         $cache = CM_Cache_Local::getInstance();
         if (false === ($zones = $cache->get($cacheKey))) {
-            $zones = CM_Config::get()->CM_Adprovider->zones;
+            $zones = $this->_getZones();
             if (isset($site->getConfig()->CM_Adprovider->zones)) {
                 $zones = array_merge($zones, $site->getConfig()->CM_Adprovider->zones);
             }
@@ -54,17 +70,25 @@ class CM_Adprovider extends CM_Class_Abstract {
 
     /**
      * @param string $className
-     * @return CM_AdproviderAdapter_Abstract
+     * @param array  $config
      * @throws CM_Exception_Invalid
      */
-    private function _getAdapter($className) {
-        /** @var string $className */
+    protected function _configureAdapter($className, array $config = null) {
         $className = (string) $className;
         if (!class_exists($className) || !is_subclass_of($className, 'CM_AdproviderAdapter_Abstract')) {
             throw new CM_Exception_Invalid('Invalid ad adapter `' . $className . '`');
         }
+        $this->_adapters[$className] = new $className($config);
+    }
+
+    /**
+     * @param string $className
+     * @return CM_AdproviderAdapter_Abstract
+     * @throws CM_Exception_Invalid
+     */
+    protected function _getAdapter($className) {
         if (!array_key_exists($className, $this->_adapters)) {
-            $this->_adapters[$className] = new $className();
+            throw new CM_Exception_Invalid('Ad adapter `' . $className . '` is not configured');
         }
         return $this->_adapters[$className];
     }
@@ -73,16 +97,13 @@ class CM_Adprovider extends CM_Class_Abstract {
      * @return bool
      */
     private function _getEnabled() {
-        return (bool) self::_getConfig()->enabled;
+        return $this->_enabled;
     }
 
     /**
-     * @return CM_Adprovider
+     * @return array[]
      */
-    public static function getInstance() {
-        if (!self::$_instance) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
+    protected function _getZones() {
+        return $this->_zones;
     }
 }

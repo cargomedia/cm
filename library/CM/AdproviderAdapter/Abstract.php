@@ -2,12 +2,14 @@
 
 abstract class CM_AdproviderAdapter_Abstract extends CM_Class_Abstract {
 
+    /** @var array */
+    protected $_config;
+
     /**
-     * @return CM_AdproviderAdapter_Abstract
+     * @param array|null $config
      */
-    public static function factory() {
-        $className = self::_getClassName();
-        return new $className();
+    public function __construct(array $config = null) {
+        $this->_config = (array) $config;
     }
 
     /**

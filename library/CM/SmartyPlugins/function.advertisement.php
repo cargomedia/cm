@@ -11,5 +11,6 @@ function smarty_function_advertisement(array $params, Smarty_Internal_Template $
     /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
     $variables = isset($params['variables']) ? $params['variables'] : null;
-    return '<div class="advertisement">' . CM_Adprovider::getInstance()->getHtml($render->getSite(), $params['zone'], $variables) . '</div>';
+    $adprovider = CM_Service_Manager::getInstance()->getAdprovider();
+    return '<div class="advertisement">' . $adprovider->getHtml($render->getSite(), $params['zone'], $variables) . '</div>';
 }
