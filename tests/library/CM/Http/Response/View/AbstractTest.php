@@ -173,7 +173,7 @@ EOL;
 
         $autoId = $successContent['data']['autoId'];
         $this->assertNotEmpty($autoId);
-        $html = (new CM_Dom_NodeList($successContent['data']['html']))->find('.CM_Component_Abstract');
+        $html = new CM_Dom_NodeList($successContent['data']['html']);
         $this->assertSame($autoId, $html->getAttribute('id'));
         $this->assertArrayNotHasKey('exec', $successContent);
         $this->assertContains('new CM_Component_Graph', $successContent['data']['js']);
