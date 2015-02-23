@@ -178,6 +178,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Memcache_Client
+     */
+    public function getMemcache() {
+        return $this->get('memcache', 'CM_Memcache_Client');
+    }
+
+    /**
      * @return CM_Redis_Client
      */
     public function getRedis() {
