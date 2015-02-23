@@ -1,6 +1,8 @@
 <?php
 
-class CM_Options {
+class CM_Options implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /**
      * @param string $key
@@ -11,7 +13,8 @@ class CM_Options {
         $cacheKey = CM_CacheConst::Option;
         $cache = CM_Cache_Shared::getInstance();
         if (($options = $cache->get($cacheKey)) === false) {
-            $options = CM_Db_Db::select('cm_option', array('key', 'value'))->fetchAllTree();
+            $query = new CM_Db_Query_Select($this->_getDatabaseClient(), 'cm_option', array('key', 'value'));
+            $options = $query->execute()->fetchAllTree();
             $cache->set($cacheKey, $options);
         }
         if (!isset($options[$key])) {
@@ -29,7 +32,9 @@ class CM_Options {
      * @param mixed  $value
      */
     public function set($key, $value) {
-        CM_Db_Db::replace('cm_option', array('key' => $key, 'value' => serialize($value)));
+        $fields = array('key' => $key, 'value' => serialize($value));
+        $query = new CM_Db_Query_Insert($this->_getDatabaseClient(), 'cm_option', $fields, null, null, 'REPLACE');
+        $query->execute();
         $this->_clearCache();
     }
 
@@ -37,7 +42,8 @@ class CM_Options {
      * @param string $key
      */
     public function delete($key) {
-        CM_Db_Db::delete('cm_option', array('key' => $key));
+        $query = new CM_Db_Query_Delete($this->_getDatabaseClient(), 'cm_option', array('key' => $key));
+        $query->execute();
         $this->_clearCache();
     }
 
@@ -54,6 +60,14 @@ class CM_Options {
         $value += (int) $change;
         $this->set($key, $value);
         return $value;
+    }
+
+    /**
+     * @return CM_Db_Client
+     * @throws CM_Exception_Invalid
+     */
+    protected function _getDatabaseClient() {
+        return $this->getServiceManager()->getDatabases()->getMaster();
     }
 
     private function _clearCache() {

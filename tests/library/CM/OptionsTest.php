@@ -4,6 +4,7 @@ class CM_OptionsTest extends CMTest_TestCase {
 
     public function testGetSet() {
         $option = new CM_Options();
+        $option->setServiceManager($this->getServiceManager());
 
         $this->assertNull($option->get('foo'));
 
@@ -27,6 +28,7 @@ class CM_OptionsTest extends CMTest_TestCase {
 
     public function testDelete() {
         $option = new CM_Options();
+        $option->setServiceManager($this->getServiceManager());
         $option->set('foo', 12);
         $this->assertNotNull($option->get('foo'));
 
@@ -36,6 +38,7 @@ class CM_OptionsTest extends CMTest_TestCase {
 
     public function testInc() {
         $option = new CM_Options();
+        $option->setServiceManager($this->getServiceManager());
         $this->assertSame(1, $option->inc('zoo'));
         $this->assertSame(2, $option->inc('zoo'));
         $this->assertSame(5, $option->inc('zoo', 3));
