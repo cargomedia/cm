@@ -1,8 +1,6 @@
 <?php
 
-class CM_Db_Client implements CM_Service_ManagerAwareInterface {
-
-    use CM_Service_ManagerAwareTrait;
+class CM_Db_Client {
 
     /** @var string */
     private $_host;
@@ -71,7 +69,7 @@ class CM_Db_Client implements CM_Service_ManagerAwareInterface {
         try {
             $time = microtime(true) * 1000;
             $this->_pdo = new PDO($dsn, $this->_username, $this->_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES "UTF8"'));
-            $this->getServiceManager()->getNewrelic()->setCustomMetric('DB connect', (microtime(true) * 1000) - $time);
+            CM_Service_Manager::getInstance()->getNewrelic()->setCustomMetric('DB connect', (microtime(true) * 1000) - $time);
             $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             throw new CM_Db_Exception('Database connection failed: ' . $e->getMessage());
