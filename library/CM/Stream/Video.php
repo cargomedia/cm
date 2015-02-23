@@ -1,6 +1,6 @@
 <?php
 
-class CM_Stream_Video extends CM_Stream_Abstract {
+class CM_Stream_Video {
 
     /**
      * @param bool    $enabled
