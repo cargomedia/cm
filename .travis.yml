@@ -39,4 +39,3 @@ script: bin/phpunit
 
 notifications:
   email: false
-
