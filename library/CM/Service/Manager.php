@@ -187,10 +187,23 @@ class CM_Service_Manager extends CM_Class_Abstract {
             throw new CM_Exception_Invalid("Service {$serviceName} has no config.");
         }
         $config = $this->_serviceConfigList[$serviceName];
+        $namedArgs = new CM_Util_NamedArgs();
         $reflection = new ReflectionClass($config['class']);
-        $instance = $reflection->newInstanceArgs($config['arguments']);
+
+        $constructor = $reflection->getConstructor();
+        $arguments = $config['arguments'];
+        if ($constructor && $namedArgs->isNamedArgs($arguments)) {
+            $arguments = $namedArgs->matchNamedArgs($constructor, $arguments);
+        }
+        $instance = $reflection->newInstanceArgs($arguments);
+
         if (null !== $config['method']) {
-            $instance = call_user_func_array(array($instance, $config['method']['name']), $config['method']['arguments']);
+            $method = $reflection->getMethod($config['method']['name']);
+            $methodArguments = $config['method']['arguments'];
+            if ($method && $namedArgs->isNamedArgs($methodArguments)) {
+                $methodArguments = $namedArgs->matchNamedArgs($method, $methodArguments);
+            }
+            $instance = $method->invokeArgs($instance, $methodArguments);
         }
         if ($instance instanceof CM_Service_ManagerAwareInterface) {
             $instance->setServiceManager($this);
