@@ -3,13 +3,6 @@
 class CM_Options {
 
     /**
-     * @return CM_Options
-     */
-    public static function getInstance() {
-        return CM_Service_Manager::getInstance()->getOptions();
-    }
-
-    /**
      * @param string $key
      * @return mixed|null
      * @throws CM_Exception_Invalid
