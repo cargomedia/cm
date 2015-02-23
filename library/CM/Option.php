@@ -3,18 +3,10 @@
 class CM_Option {
 
     /**
-     * @var CM_Option
-     */
-    private static $_instance;
-
-    /**
      * @return CM_Option
      */
     public static function getInstance() {
-        if (!self::$_instance) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
+        return CM_Service_Manager::getInstance()->getOptions();
     }
 
     /**
