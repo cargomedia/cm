@@ -14,13 +14,13 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
      * @throws Exception
      */
     private function _executeJob(CM_Params $params) {
-        CMService_Newrelic::getInstance()->startTransaction('CM Job: ' . $this->_getClassName());
+        CM_Service_Manager::getInstance()->getNewrelic()->startTransaction('CM Job: ' . $this->_getClassName());
         try {
             $return = $this->_execute($params);
-            CMService_Newrelic::getInstance()->endTransaction();
+            CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
             return $return;
         } catch (Exception $ex) {
-            CMService_Newrelic::getInstance()->endTransaction();
+            CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
             throw $ex;
         }
     }

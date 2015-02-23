@@ -64,7 +64,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
         }
 
         $name = $this->_getStringRepresentation();
-        CMService_Newrelic::getInstance()->setNameTransaction($name);
+        CM_Service_Manager::getInstance()->getNewrelic()->setNameTransaction($name);
     }
 
     /**

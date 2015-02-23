@@ -95,9 +95,6 @@ return function (CM_Config_Node $config) {
 
     $config->CMService_MaxMind->licenseKey = null;
 
-    $config->CMService_Newrelic->enabled = false;
-    $config->CMService_Newrelic->appName = 'CM Application';
-
     $config->services = array();
 
     $config->services['databases'] = array(
@@ -192,5 +189,13 @@ return function (CM_Config_Node $config) {
     $config->services['email-verification'] = array(
         'class'     => 'CM_Service_EmailVerification_Standard',
         'arguments' => array()
+    );
+
+    $config->services['newrelic'] = array(
+        'class'     => 'CMService_Newrelic',
+        'arguments' => array(
+            'enabled' => false,
+            'appName' => 'CM Application',
+        )
     );
 };
