@@ -17,24 +17,13 @@ abstract class CM_Stream_Abstract extends CM_Class_Abstract {
      * @return bool
      */
     public function getEnabled() {
-        return (bool) self::_getConfig()->enabled;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAdapterClass() {
-        return $this->_getConfig()->adapter;
+        return (bool) $this->_enabled;
     }
 
     /**
      * @return CM_Stream_Adapter_Abstract
      */
     public function getAdapter() {
-        if (!$this->_adapter) {
-            $className = $this->getAdapterClass();
-            $this->_adapter = new $className();
-        }
         return $this->_adapter;
     }
 }

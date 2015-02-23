@@ -70,14 +70,6 @@ return function (CM_Config_Node $config) {
         'CM_Exception_NotAllowed',
     );
 
-    $config->CM_Stream_Video->adapter = 'CM_Stream_Adapter_Video_Wowza';
-    $config->CM_Stream_Video->servers = array(
-        array('publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'),
-    );
-
-    $config->CM_Stream_Adapter_Video_Wowza->httpPort = '8086';
-    $config->CM_Stream_Adapter_Video_Wowza->wowzaPort = '1935';
-
     $config->CM_Adprovider->enabled = true;
     $config->CM_Adprovider->zones = array();
 
@@ -197,5 +189,22 @@ return function (CM_Config_Node $config) {
                 ['host' => 'localhost', 'port' => 11211],
             ),
         ),
+    );
+
+    $config->services['stream-video'] = array(
+        'class'     => 'CM_Stream_Video',
+        'arguments' => array(
+            'enabled' => true,
+            'servers' => array(
+                ['publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'],
+            ),
+            'adapter' => array(
+                'className' => 'CM_Stream_Adapter_Video_Wowza',
+                'config'    => [
+                    'httpPort'  => '8086',
+                    'wowzaPort' => '1935',
+                ]
+            )
+        )
     );
 };

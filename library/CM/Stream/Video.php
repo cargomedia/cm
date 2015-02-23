@@ -2,30 +2,44 @@
 
 class CM_Stream_Video extends CM_Stream_Abstract {
 
-    /** @var CM_Stream_Video */
-    private static $_instance;
+    /**
+     * @param bool    $enabled
+     * @param array[] $servers
+     * @param array   $adapter
+     * @throws CM_Exception_Invalid
+     */
+    public function __construct($enabled, array $servers = null, array $adapter = null) {
+        $this->_enabled = (bool) $enabled;
+        $this->_servers = (array) $servers;
 
-    public function checkStreams() {
-        $this->getAdapter()->checkStreams();
-    }
-
-    public function synchronize() {
-        $this->getAdapter()->synchronize();
+        if (null !== $adapter) {
+            $adapterConfig = isset($adapter['config']) ? $adapter['config'] : [];
+            $this->_adapter = new $adapter['className']($adapterConfig, $this->getServers());
+            if (!$this->_adapter instanceof CM_Stream_Adapter_Video_Abstract) {
+                throw new CM_Exception_Invalid('Invalid stream video adapter');
+            }
+        }
     }
 
     /**
-     * @param CM_Model_Stream_Abstract $stream
-     * @throws CM_Exception_Invalid
+     * @return bool
      */
-    public function stopStream(CM_Model_Stream_Abstract $stream) {
-        $this->getAdapter()->stopStream($stream);
+    public function getEnabled() {
+        return $this->_enabled;
+    }
+
+    /**
+     * @return CM_Stream_Adapter_Video_Abstract
+     */
+    public function getAdapter() {
+        return $this->_adapter;
     }
 
     /**
      * @return array[]
      */
     public function getServers() {
-        return (array) self::_getConfig()->servers;
+        return $this->_servers;
     }
 
     /**
@@ -46,11 +60,20 @@ class CM_Stream_Video extends CM_Stream_Abstract {
         return $servers[$serverId];
     }
 
+    public function checkStreams() {
+        $this->getAdapter()->checkStreams();
+    }
+
+    public function synchronize() {
+        $this->getAdapter()->synchronize();
+    }
+
     /**
-     * @return CM_Stream_Adapter_Video_Abstract
+     * @param CM_Model_Stream_Abstract $stream
+     * @throws CM_Exception_Invalid
      */
-    public function getAdapter() {
-        return parent::getAdapter();
+    public function stopStream(CM_Model_Stream_Abstract $stream) {
+        $this->getAdapter()->stopStream($stream);
     }
 
     /**
@@ -108,12 +131,10 @@ class CM_Stream_Video extends CM_Stream_Abstract {
     }
 
     /**
+     * @deprecated use CM_Service_Manager::getInstance()->getStreamVideo()
      * @return CM_Stream_Video
      */
     public static function getInstance() {
-        if (!self::$_instance) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
+        return CM_Service_Manager::getInstance()->getStreamVideo();
     }
 }

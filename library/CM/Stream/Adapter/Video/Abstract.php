@@ -2,6 +2,12 @@
 
 abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstract {
 
+    /** @var array */
+    protected $_config;
+
+    /** @var array */
+    protected $_servers;
+
     abstract public function synchronize();
 
     /**
@@ -15,6 +21,15 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
      * @param CM_Model_Stream_Abstract $stream
      */
     abstract protected function _stopStream(CM_Model_Stream_Abstract $stream);
+
+    /**
+     * @param array|null $config
+     * @param array|null $servers
+     */
+    public function __construct(array $config = null, array $servers = null) {
+        $this->_config = (array) $config;
+        $this->_servers = (array) $servers;
+    }
 
     public function checkStreams() {
         /** @var CM_Model_StreamChannel_Video $streamChannel */
@@ -112,7 +127,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
     }
 
     /**
-     * @param string   $streamName
+     * @param string $streamName
      * @return null
      */
     public function unpublish($streamName) {

@@ -61,7 +61,7 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
     public function getServerId(CM_Http_Request_Abstract $request) {
         $ipAddress = long2ip($request->getIp());
 
-        $servers = CM_Stream_Video::_getConfig()->servers;
+        $servers = $this->_servers;
         foreach ($servers as $serverId => $server) {
             if ($server['publicIp'] == $ipAddress || $server['privateIp'] == $ipAddress) {
                 return (int) $serverId;
@@ -75,7 +75,7 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
      * @return string
      */
     protected function _fetchStatus($wowzaHost) {
-        return CM_Util::getContents('http://' . $wowzaHost . ':' . self::_getConfig()->httpPort . '/status');
+        return CM_Util::getContents('http://' . $wowzaHost . ':' . $this->_config['httpPort'] . '/status');
     }
 
     /**
@@ -88,6 +88,6 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
     }
 
     protected function _stopClient($clientId, $serverHost) {
-        CM_Util::getContents('http://' . $serverHost . ':' . self::_getConfig()->httpPort . '/stop', array('clientId' => (string) $clientId), true);
+        CM_Util::getContents('http://' . $serverHost . ':' . $this->_config['httpPort'] . '/stop', array('clientId' => (string) $clientId), true);
     }
 }
