@@ -5,7 +5,7 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
     public function synchronize() {
         $startStampLimit = time() - 3;
         $status = array();
-        foreach (CM_Stream_Video::getInstance()->getServers() as $serverId => $wowzaServer) {
+        foreach ($this->_servers as $serverId => $wowzaServer) {
             $singleStatus = CM_Params::decode($this->_fetchStatus($wowzaServer['privateIp']), true);
             foreach ($singleStatus as $streamName => $publish) {
                 $publish['serverId'] = $serverId;
