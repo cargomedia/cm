@@ -26,11 +26,11 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      * @param array $parameterList
      */
     public function trackHit(array $parameterList) {
-        $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob();
-        $job->queue([
+        $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob([
             'propertyId'    => $this->getPropertyId(),
             'parameterList' => $parameterList,
         ]);
+        CM_Service_Manager::getInstance()->getJobManager()->queue($job);
     }
 
     /**

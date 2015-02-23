@@ -88,23 +88,23 @@ EOF;
         if (0 === count($this->_getIdentityList()) && $actor = $action->getActor()) {
             $this->setUserId($actor->getId());
         }
-        $trackEventJob = new CMService_KissMetrics_TrackEventJob();
-        $trackEventJob->queue(array(
+        $trackEventJob = new CMService_KissMetrics_TrackEventJob(array(
             'code'         => $this->_getCode(),
             'identityList' => $this->_getIdentityList(),
             'eventName'    => $action->getLabel(),
             'propertyList' => $action->getTrackingPropertyList(),
         ));
+        CM_Service_Manager::getInstance()->getJobManager()->queue($trackEventJob);
     }
 
     public function trackAffiliate($requestClientId, $affiliateName) {
         $this->setRequestClientId($requestClientId);
-        $trackEventJob = new CMService_KissMetrics_TrackPropertyListJob();
-        $trackEventJob->queue([
+        $trackEventJob = new CMService_KissMetrics_TrackPropertyListJob([
             'code'         => $this->_getCode(),
             'identityList' => $this->_getIdentityList(),
             'propertyList' => ['Affiliate Name' => $affiliateName],
         ]);
+        CM_Service_Manager::getInstance()->getJobManager()->queue($trackEventJob);
     }
 
     /**
@@ -165,12 +165,12 @@ EOF;
                 $this->setUserId($fixture->getId());
                 break;
         }
-        $trackEventJob = new CMService_KissMetrics_TrackPropertyListJob();
-        $trackEventJob->queue(array(
+        $trackEventJob = new CMService_KissMetrics_TrackPropertyListJob(array(
             'code'         => $this->_getCode(),
             'identityList' => $this->_getIdentityList(),
             'propertyList' => array('Splittest ' . $nameSplittest => $nameVariation),
         ));
+        CM_Service_Manager::getInstance()->getJobManager()->queue($trackEventJob);
     }
 
     /**

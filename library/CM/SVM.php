@@ -26,8 +26,8 @@ class CM_SVM {
     public function addTraining($class, array $values) {
         $class = (int) $class;
         $params = array('id' => $this->getId(), 'class' => $class, 'values' => $values);
-        $job = new CM_SVM_AddTrainingJob();
-        $job->run($params);
+        $job = new CM_SVM_AddTrainingJob($params);
+        CM_Service_Manager::getInstance()->getJobManager()->run($job);
     }
 
     /**
@@ -36,7 +36,7 @@ class CM_SVM {
      */
     public function predict(array $values) {
         $params = array('id' => $this->getId(), 'values' => $values);
-        $job = new CM_SVM_PredictJob();
-        return (int) $job->run($params);
+        $job = new CM_SVM_PredictJob($params);
+        return (int) CM_Service_Manager::getInstance()->getJobManager()->run($job);
     }
 }

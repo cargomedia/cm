@@ -8,17 +8,17 @@ final class CM_EventHandler_EventHandler {
     private $_callbacks = array();
 
     /**
-     * @param string                          $event
-     * @param CM_Jobdistribution_Job_Abstract $job
-     * @param array                           $defaultJobParams
+     * @param string $event
+     * @param string $jobClassName
+     * @param array  $defaultJobParams
      */
-    public function bindJob($event, CM_Jobdistribution_Job_Abstract $job, array $defaultJobParams = null) {
+    public function bindJob($event, $jobClassName, array $defaultJobParams = null) {
         $event = (string) $event;
         $defaultJobParams = (array) $defaultJobParams;
-        $this->bind($event, function (array $jobParams = null) use ($job, $defaultJobParams) {
-            $jobParams = (array) $jobParams;
-            $jobParams = array_merge($defaultJobParams, $jobParams);
-            $job->queue($jobParams);
+        $this->bind($event, function (array $jobParams = null) use ($jobClassName, $defaultJobParams) {
+            $jobParams = array_merge($defaultJobParams, (array) $jobParams);
+            $job = new $jobClassName($jobParams);
+            CM_Service_Manager::getInstance()->getJobManager()->queue($job);
         });
     }
 
