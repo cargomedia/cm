@@ -106,4 +106,12 @@ class CM_Adprovider extends CM_Class_Abstract {
     protected function _getZones() {
         return $this->_zones;
     }
+
+    /**
+     * @deprecated
+     * @return CM_Adprovider
+     */
+    public static function getInstance() {
+        return CM_Service_Manager::getInstance()->getAdprovider();
+    }
 }
