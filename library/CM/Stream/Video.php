@@ -13,8 +13,8 @@ class CM_Stream_Video {
         $this->_servers = (array) $servers;
 
         if (null !== $adapter) {
-            $adapterConfig = isset($adapter['config']) ? $adapter['config'] : [];
-            $this->_adapter = new $adapter['className']($adapterConfig, $this->getServers());
+            $adapterConfig = isset($adapter['config']) ? $adapter['config'] : null;
+            $this->_adapter = new $adapter['className']($this->getServers(), $adapterConfig);
             if (!$this->_adapter instanceof CM_Stream_Adapter_Video_Abstract) {
                 throw new CM_Exception_Invalid('Invalid stream video adapter');
             }

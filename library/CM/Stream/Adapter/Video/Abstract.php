@@ -3,10 +3,10 @@
 abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstract {
 
     /** @var array */
-    protected $_config;
+    protected $_servers;
 
     /** @var array */
-    protected $_servers;
+    protected $_config;
 
     abstract public function synchronize();
 
@@ -23,12 +23,12 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
     abstract protected function _stopStream(CM_Model_Stream_Abstract $stream);
 
     /**
-     * @param array|null $config
      * @param array|null $servers
+     * @param array|null $config
      */
-    public function __construct(array $config = null, array $servers = null) {
-        $this->_config = (array) $config;
+    public function __construct(array $servers = null, array $config = null) {
         $this->_servers = (array) $servers;
+        $this->_config = (array) $config;
     }
 
     public function checkStreams() {

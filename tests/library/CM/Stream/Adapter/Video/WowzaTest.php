@@ -14,7 +14,7 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
         $servers = array(1 => array('publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109',
                                     'privateIp'  => '10.0.3.108'));
 
-        $wowza = $this->getMock('CM_Stream_Adapter_Video_Wowza', array('_fetchStatus'), [null, $servers]);
+        $wowza = $this->getMock('CM_Stream_Adapter_Video_Wowza', array('_fetchStatus'), [$servers]);
         $json = $this->_generateWowzaData(array());
         $wowza->expects($this->any())->method('_fetchStatus')->will($this->returnValue($json));
         /** @var $wowza CM_Stream_Video */
@@ -42,7 +42,7 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
         $servers = array(1 => array('publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109',
                                     'privateIp'  => '10.0.3.108'));
 
-        $wowza = $this->getMock('CM_Stream_Adapter_Video_Wowza', array('_stopClient', '_fetchStatus'), [null, $servers]);
+        $wowza = $this->getMock('CM_Stream_Adapter_Video_Wowza', array('_stopClient', '_fetchStatus'), [$servers]);
         $json = $this->_generateWowzaData(array($streamChannel));
         $wowza->expects($this->any())->method('_fetchStatus')->will($this->returnValue($json));
         $wowza->expects($this->at(1))->method('_stopClient')->with($streamPublish->getKey(), $streamChannel->getPrivateHost());
@@ -59,7 +59,7 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
         $servers = array(1 => array('publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109',
                                     'privateIp'  => '10.0.3.108'));
 
-        $adapter = new CM_Stream_Adapter_Video_Wowza(null, $servers);
+        $adapter = new CM_Stream_Adapter_Video_Wowza($servers);
         $ipAddresses = array('10.0.3.109', '10.0.3.108');
         foreach ($ipAddresses as $ipAddress) {
             $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($ipAddress), 'CM_Http_Request_Mock', true, true, true, array('getIp',
