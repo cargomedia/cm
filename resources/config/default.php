@@ -107,7 +107,7 @@ return function (CM_Config_Node $config) {
     $config->services['database-master'] = array(
         'class'     => 'CM_Db_Client',
         'arguments' => array(
-            array(
+            'config' => array(
                 'host'     => 'localhost',
                 'port'     => 3306,
                 'username' => 'root',
@@ -120,22 +120,22 @@ return function (CM_Config_Node $config) {
     $config->services['MongoDb'] = array(
         'class'     => 'CM_MongoDb_Client',
         'arguments' => array(
-            array(
+            'config' => array(
                 'db'      => 'cm',
                 'server'  => 'mongodb://localhost:27017',
                 'options' => array('connect' => true),
             )
-        ),
+        )
     );
 
     $config->services['redis'] = array(
         'class'     => 'CM_Redis_Client',
         'arguments' => array(
-            array(
+            'config' => array(
                 'host' => 'localhost',
                 'port' => '6379',
             )
-        ),
+        )
     );
 
     $config->services['filesystem-data'] = array(
@@ -143,11 +143,11 @@ return function (CM_Config_Node $config) {
         'method' => array(
             'name'      => 'createFilesystem',
             'arguments' => array(
-                'CM_File_Filesystem_Adapter_Local',
-                array(
+                'adapter' => 'CM_File_Filesystem_Adapter_Local',
+                'options' => array(
                     'pathPrefix' => DIR_ROOT . 'data/',
                 )
-            ),
+            )
         )
     );
 
@@ -156,37 +156,45 @@ return function (CM_Config_Node $config) {
         'method' => array(
             'name'      => 'createFilesystem',
             'arguments' => array(
-                'CM_File_Filesystem_Adapter_Local',
-                array(
+                'adapter' => 'CM_File_Filesystem_Adapter_Local',
+                'options' => array(
                     'pathPrefix' => DIR_PUBLIC . 'userfiles/',
                 )
-            ),
+            )
         )
     );
 
     $config->services['usercontent'] = array(
         'class'     => 'CM_Service_UserContent',
-        'arguments' => array(array(
-            'default' => array(
-                'filesystem' => 'filesystem-usercontent',
-                'url'        => 'http://localhost/userfiles',
-            ),
-        ))
+        'arguments' => array(
+            'configList' => array(
+                'default' => array(
+                    'filesystem' => 'filesystem-usercontent',
+                    'url'        => 'http://localhost/userfiles',
+                ),
+            )
+        )
     );
 
     $config->services['trackings'] = array(
         'class'     => 'CM_Service_Trackings',
-        'arguments' => array(array())
+        'arguments' => array(
+            'trackingServiceNameList' => array()
+        )
     );
 
     $config->services['tracking-googleanalytics'] = array(
         'class'     => 'CMService_GoogleAnalytics_Client',
-        'arguments' => array('my-web-property-id')
+        'arguments' => array(
+            'code' => 'my-web-property-id',
+        )
     );
 
     $config->services['tracking-kissmetrics'] = array(
         'class'     => 'CMService_KissMetrics_Client',
-        'arguments' => array('my-api-key')
+        'arguments' => array(
+            'code' => 'my-api-key',
+        )
     );
 
     $config->services['email-verification'] = array(

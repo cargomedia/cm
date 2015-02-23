@@ -23,12 +23,12 @@ return function (CM_Config_Node $config) {
     $config->services['database-read-maintenance'] = array(
         'class'     => 'CM_Db_Client',
         'arguments' => array(
-            array(
-                'host'             => 'localhost',
-                'port'             => 3306,
-                'username'         => 'root',
-                'password'         => '',
-                'db'               => 'cm_test',
+            'config' => array(
+                'host'     => 'localhost',
+                'port'     => 3306,
+                'username' => 'root',
+                'password' => '',
+                'db'       => 'cm_test',
             )
         )
     );
@@ -36,12 +36,12 @@ return function (CM_Config_Node $config) {
     $config->services['redis'] = array(
         'class'     => 'CM_Redis_Client',
         'arguments' => array(
-            array(
+            'config' => array(
                 'host'     => 'localhost',
                 'port'     => '6379',
                 'database' => 2,
             )
-        ),
+        )
     );
 
     $config->services['filesystem-data'] = array(
@@ -49,11 +49,11 @@ return function (CM_Config_Node $config) {
         'method' => array(
             'name'      => 'createFilesystem',
             'arguments' => array(
-                'CM_File_Filesystem_Adapter_Local',
-                array(
+                'adapterClassName' => 'CM_File_Filesystem_Adapter_Local',
+                'options'          => array(
                     'pathPrefix' => DIR_ROOT . 'tests/tmp/data/',
                 )
-            ),
+            )
         ));
 
     $config->services['filesystem-usercontent'] = array(
@@ -61,11 +61,11 @@ return function (CM_Config_Node $config) {
         'method' => array(
             'name'      => 'createFilesystem',
             'arguments' => array(
-                'CM_File_Filesystem_Adapter_Local',
-                array(
+                'adapterClassName' => 'CM_File_Filesystem_Adapter_Local',
+                'options'          => array(
                     'pathPrefix' => DIR_ROOT . 'tests/tmp/userfiles/',
                 )
-            ),
+            )
         ));
 
     $config->CMService_AwsS3Versioning_ClientTest->region = 'eu-west-1';
