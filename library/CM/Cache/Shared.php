@@ -3,6 +3,7 @@
 class CM_Cache_Shared {
 
     /**
+     * @deprecated Use CM_Service_Manager::getInstance()->getCache()->getShared()
      * @return CM_Cache_Shared
      */
     public static function getInstance() {
