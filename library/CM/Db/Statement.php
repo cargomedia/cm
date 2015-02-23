@@ -35,7 +35,7 @@ class CM_Db_Statement {
                 if ($disableQueryBuffering) {
                     $this->_client->setBuffered(true);
                 }
-                CM_Debug::getInstance()->incStats('mysql', $this->getQueryString());
+                CM_Service_Manager::getInstance()->getDebug()->incStats('mysql', $this->getQueryString());
                 return new CM_Db_Result($this->_pdoStatement);
             } catch (PDOException $e) {
                 if ($try < $retryCount && $this->_client->isConnectionLossError($e)) {
