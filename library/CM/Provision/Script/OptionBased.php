@@ -8,7 +8,7 @@ abstract class CM_Provision_Script_OptionBased extends CM_Provision_Script_Abstr
      * @param bool $loaded
      */
     protected function _setLoaded($loaded) {
-        CM_Option::getInstance()->set($this->_getOptionName(), (bool) $loaded);
+        CM_Options::getInstance()->set($this->_getOptionName(), (bool) $loaded);
     }
 
     /**
@@ -16,7 +16,7 @@ abstract class CM_Provision_Script_OptionBased extends CM_Provision_Script_Abstr
      */
     protected function _isLoaded() {
         try {
-            return CM_Option::getInstance()->get($this->_getOptionName());
+            return CM_Options::getInstance()->get($this->_getOptionName());
         } catch (CM_Db_Exception $e) {
             return false;
         }

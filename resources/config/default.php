@@ -195,7 +195,7 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['options'] = array(
-        'class'     => 'CM_Option',
+        'class'     => 'CM_Options',
         'arguments' => array(),
     );
 };

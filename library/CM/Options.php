@@ -1,9 +1,9 @@
 <?php
 
-class CM_Option {
+class CM_Options {
 
     /**
-     * @return CM_Option
+     * @return CM_Options
      */
     public static function getInstance() {
         return CM_Service_Manager::getInstance()->getOptions();

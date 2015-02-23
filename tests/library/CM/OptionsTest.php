@@ -1,9 +1,9 @@
 <?php
 
-class CM_OptionTest extends CMTest_TestCase {
+class CM_OptionsTest extends CMTest_TestCase {
 
     public function testGetSet() {
-        $option = CM_Option::getInstance();
+        $option = new CM_Options();
 
         $this->assertNull($option->get('foo'));
 
@@ -26,7 +26,7 @@ class CM_OptionTest extends CMTest_TestCase {
     }
 
     public function testDelete() {
-        $option = CM_Option::getInstance();
+        $option = new CM_Options();
         $option->set('foo', 12);
         $this->assertNotNull($option->get('foo'));
 
@@ -35,8 +35,7 @@ class CM_OptionTest extends CMTest_TestCase {
     }
 
     public function testInc() {
-        $option = CM_Option::getInstance();
-
+        $option = new CM_Options();
         $this->assertSame(1, $option->inc('zoo'));
         $this->assertSame(2, $option->inc('zoo'));
         $this->assertSame(5, $option->inc('zoo', 3));

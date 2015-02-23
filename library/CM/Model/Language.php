@@ -219,11 +219,11 @@ class CM_Model_Language extends CM_Model_Abstract {
      * @return int
      */
     public static function getVersionJavascript() {
-        return (int) CM_Option::getInstance()->get('language.javascript.version');
+        return (int) CM_Options::getInstance()->get('language.javascript.version');
     }
 
     public static function updateVersionJavascript() {
-        CM_Option::getInstance()->set('language.javascript.version', time());
+        CM_Options::getInstance()->set('language.javascript.version', time());
     }
 
     /**

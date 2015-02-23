@@ -66,7 +66,7 @@ class CM_App implements CM_Service_ManagerAwareInterface {
         if ($namespace) {
             $namespace = '.' . $namespace;
         }
-        return (int) CM_Option::getInstance()->get('app.version' . $namespace);
+        return (int) CM_Options::getInstance()->get('app.version' . $namespace);
     }
 
     /**
@@ -79,7 +79,7 @@ class CM_App implements CM_Service_ManagerAwareInterface {
         if ($namespace) {
             $namespace = '.' . $namespace;
         }
-        CM_Option::getInstance()->set('app.version' . $namespace, $version);
+        CM_Options::getInstance()->set('app.version' . $namespace, $version);
     }
 
     /**
