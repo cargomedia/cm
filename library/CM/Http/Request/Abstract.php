@@ -6,7 +6,7 @@ abstract class CM_Http_Request_Abstract {
     protected $_uri;
 
     /** @var string */
-    protected $_path;
+    protected $_path, $_fragment;
 
     /** @var array|null */
     protected $_pathParts;
@@ -238,6 +238,20 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @return string
+     */
+    public function getFragment() {
+        return $this->_fragment;
+    }
+
+    /**
+     * @param string $fragment
+     */
+    public function setFragment($fragment) {
+        $this->_fragment = (string) $fragment;
+    }
+
+    /**
      * @param string $uri
      * @throws CM_Exception_Invalid
      */
@@ -250,7 +264,7 @@ abstract class CM_Http_Request_Abstract {
         if (false === ($path = parse_url($uriWithHost, PHP_URL_PATH))) {
             throw new CM_Exception_Invalid('Cannot detect path from `' . $uriWithHost . '`.');
         }
-        if ($path === null) {
+        if (null === $path) {
             $path = '/';
         }
         $this->setPath($path);
@@ -260,6 +274,11 @@ abstract class CM_Http_Request_Abstract {
         }
         parse_str($queryString, $query);
         $this->setQuery($query);
+
+        if (false === ($fragment = parse_url($uriWithHost, PHP_URL_FRAGMENT))) {
+            throw new CM_Exception_Invalid('Cannot detect fragment from `' . $uriWithHost . '`.');
+        }
+        $this->setFragment($fragment);
 
         $this->setLanguageUrl(null);
 

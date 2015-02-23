@@ -101,6 +101,20 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
       return '[data-menu-entry-hash=' + menuEntryHash + ']';
     });
     $(menuEntrySelectors.join(',')).addClass('active');
+    var hashPosition = url.indexOf('#');
+    if (-1 !== hashPosition) {
+      var hash = url.substring(hashPosition + 1);
+      var anchor = document.getElementById(hash);
+      if (!anchor) {
+        var anchorList = document.getElementsByName(hash);
+        if (anchorList.length) {
+          anchor = anchorList[0];
+        }
+      }
+      if (anchor) {
+        anchor.scrollIntoView();
+      }
+    }
     if (jsTracking) {
       new Function(jsTracking).call(this);
     }
