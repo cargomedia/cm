@@ -70,10 +70,11 @@ return function (CM_Config_Node $config) {
     );
     $config->CM_Http_Response_View_Abstract->catchPublicExceptions = true;
 
-    $config->CM_Http_Response_RPC->catch = array(
-        'CM_Exception_AuthRequired',
-        'CM_Exception_NotAllowed',
+    $config->CM_Http_Response_RPC->exceptionsToCatch = array(
+        'CM_Exception_AuthRequired' => [],
+        'CM_Exception_NotAllowed'   => [],
     );
+    $config->CM_Http_Response_RPC->catchPublicExceptions = true;
 
     $config->CM_Stream_Video->adapter = 'CM_Stream_Adapter_Video_Wowza';
     $config->CM_Stream_Video->servers = array(
