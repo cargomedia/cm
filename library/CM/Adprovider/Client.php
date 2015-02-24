@@ -21,6 +21,13 @@ class CM_Adprovider_Client extends CM_Class_Abstract {
     }
 
     /**
+     * @param CM_Adprovider_Adapter_Abstract $adapter
+     */
+    public function addAdapter(CM_Adprovider_Adapter_Abstract $adapter) {
+        $this->_adapters[get_class($adapter)] = $adapter;
+    }
+
+    /**
      * @param CM_Site_Abstract $site
      * @param string           $zoneName
      * @param string[]|null    $variables
@@ -62,13 +69,6 @@ class CM_Adprovider_Client extends CM_Class_Abstract {
             throw new CM_Exception_Invalid('Zone `' . $zoneName . '` not configured.');
         }
         return $zones[$zoneName];
-    }
-
-    /**
-     * @param CM_Adprovider_Adapter_Abstract $adapter
-     */
-    public function addAdapter(CM_Adprovider_Adapter_Abstract $adapter) {
-        $this->_adapters[get_class($adapter)] = $adapter;
     }
 
     /**
