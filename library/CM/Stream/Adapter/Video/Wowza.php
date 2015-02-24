@@ -2,6 +2,18 @@
 
 class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 
+    /** @var array */
+    protected $_config;
+
+    /**
+     * @param array|null $servers
+     * @param array|null $config
+     */
+    public function __construct(array $servers = null, array $config = null) {
+        parent::__construct($servers);
+        $this->_config = (array) $config;
+    }
+
     public function synchronize() {
         $startStampLimit = time() - 3;
         $status = array();

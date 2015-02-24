@@ -195,15 +195,17 @@ return function (CM_Config_Node $config) {
         'class'     => 'CM_Stream_Video',
         'arguments' => array(
             'enabled' => true,
-            'servers' => array(
-                ['publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'],
-            ),
             'adapter' => array(
-                'className' => 'CM_Stream_Adapter_Video_Wowza',
-                'config'    => [
-                    'httpPort'  => '8086',
-                    'wowzaPort' => '1935',
-                ]
+                'class'     => 'CM_Stream_Adapter_Video_Wowza',
+                'arguments' => array(
+                    'servers' => array(
+                        ['publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'],
+                    ),
+                    'config'  => array(
+                        'httpPort'  => '8086',
+                        'wowzaPort' => '1935'
+                    ),
+                )
             )
         )
     );

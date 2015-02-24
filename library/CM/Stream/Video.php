@@ -3,21 +3,19 @@
 class CM_Stream_Video {
 
     /**
-     * @param bool    $enabled
-     * @param array[] $servers
-     * @param array   $adapter
+     * @param bool  $enabled
+     * @param array $adapter
      * @throws CM_Exception_Invalid
      */
-    public function __construct($enabled, array $servers = null, array $adapter = null) {
+    public function __construct($enabled, array $adapter = null) {
         $this->_enabled = (bool) $enabled;
-        $this->_servers = (array) $servers;
 
         if (null !== $adapter) {
-            $adapterConfig = isset($adapter['config']) ? $adapter['config'] : null;
-            $this->_adapter = new $adapter['className']($this->_servers, $adapterConfig);
-            if (!$this->_adapter instanceof CM_Stream_Adapter_Video_Abstract) {
+            $reflectionClass = new ReflectionClass($adapter['class']);
+            if (!$reflectionClass->isSubclassOf('CM_Stream_Adapter_Video_Abstract')) {
                 throw new CM_Exception_Invalid('Invalid stream video adapter');
             }
+            $this->_adapter = $reflectionClass->newInstanceArgs($adapter['arguments']);
         }
     }
 
