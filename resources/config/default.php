@@ -61,7 +61,7 @@ return function (CM_Config_Node $config) {
         'CM_Exception_NotAllowed'   => ['errorPage' => 'CM_Page_Error_NotAllowed', 'log' => null],
     );
 
-    $config->CM_Http_Response_View_Abstract->catch = array(
+    $config->CM_Http_Response_View_Abstract->exceptionsToCatch = array(
         'CM_Exception_Nonexistent'  => [],
         'CM_Exception_AuthRequired' => [],
         'CM_Exception_NotAllowed'   => [],
