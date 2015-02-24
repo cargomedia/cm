@@ -51,40 +51,50 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
         // test logging and errorCallback-execution
         CM_Config::get()->$className = new stdClass();
         CM_Config::get()->$className->exceptionsToCatch = [
-            'CM_Exception_Nonexistent' => ['log' => 'CM_Paging_Log_NotFound', 'foo' => 'bar'],
+            'CM_Exception_Nonexistent'  => ['log' => 'CM_Paging_Log_NotFound', 'foo' => 'bar'],
             'CM_Exception_InvalidParam' => ['log' => null]
         ];
         $exceptionCodeExecutionCounter = 0;
-        $errorCode = function(CM_Exception_Nonexistent $ex, $errorOptions) use (&$exceptionCodeExecutionCounter) {
+        $errorCode = function (CM_Exception_Nonexistent $ex, $errorOptions) use (&$exceptionCodeExecutionCounter) {
             $this->assertSame('bar', $errorOptions['foo']);
             $exceptionCodeExecutionCounter++;
         };
         $this->assertSame(0, $exceptionCodeExecutionCounter);
         $this->assertCount(0, new CM_Paging_Log_NotFound());
-        CMTest_TH::callProtectedMethod($response, '_runWithCatching', [function() {}, $errorCode]);
+        CMTest_TH::callProtectedMethod($response, '_runWithCatching', [
+            function () {
+            }, $errorCode]);
         $this->assertSame(0, $exceptionCodeExecutionCounter);
         $this->assertCount(0, new CM_Paging_Log_NotFound());
-        CMTest_TH::callProtectedMethod($response, '_runWithCatching', [function() {throw new CM_Exception_Nonexistent();}, $errorCode]);
+        CMTest_TH::callProtectedMethod($response, '_runWithCatching', [
+            function () {
+                throw new CM_Exception_Nonexistent();
+            }, $errorCode]);
         $this->assertSame(1, $exceptionCodeExecutionCounter);
         $this->assertCount(1, new CM_Paging_Log_NotFound());
 
-        $errorCode = function(CM_Exception_InvalidParam $ex, $errorOptions) use (&$exceptionCodeExecutionCounter) {
+        $errorCode = function (CM_Exception_InvalidParam $ex, $errorOptions) use (&$exceptionCodeExecutionCounter) {
             $exceptionCodeExecutionCounter++;
         };
-        CMTest_TH::callProtectedMethod($response, '_runWithCatching', [function() {throw new CM_Exception_InvalidParam();}, $errorCode]);
+        CMTest_TH::callProtectedMethod($response, '_runWithCatching', [
+            function () {
+                throw new CM_Exception_InvalidParam();
+            }, $errorCode]);
         $this->assertSame(2, $exceptionCodeExecutionCounter);
         $this->assertCount(1, new CM_Paging_Log_NotFound());
-
 
         // test public/non-public exceptions not marked for catching
         // public exception, no public exception catching
         CM_Config::get()->$className->exceptionsToCatch = [];
-        $errorCode = function(CM_Exception_Nonexistent $ex, $errorOptions) use (&$exceptionCodeExecutionCounter) {
+        $errorCode = function (CM_Exception_Nonexistent $ex, $errorOptions) use (&$exceptionCodeExecutionCounter) {
             $exceptionCodeExecutionCounter++;
             $this->assertTrue($ex->isPublic());
         };
         try {
-            CMTest_TH::callProtectedMethod($response, '_runWithCatching', [function() {throw new CM_Exception_Nonexistent('foo', null, ['messagePublic' => 'bar']);}, $errorCode]);
+            CMTest_TH::callProtectedMethod($response, '_runWithCatching', [
+                function () {
+                    throw new CM_Exception_Nonexistent('foo', null, ['messagePublic' => 'bar']);
+                }, $errorCode]);
             $this->fail('Caught public exception with public exception catching disabled');
         } catch (CM_Exception_Nonexistent $ex) {
             $this->assertTrue($ex->isPublic());
@@ -95,7 +105,10 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
         // non-public exception, public exception catching
         CM_Config::get()->$className->catchPublicExceptions = true;
         try {
-            CMTest_TH::callProtectedMethod($response, '_runWithCatching', [function() {throw new CM_Exception_Nonexistent('foo');}, $errorCode]);
+            CMTest_TH::callProtectedMethod($response, '_runWithCatching', [
+                function () {
+                    throw new CM_Exception_Nonexistent('foo');
+                }, $errorCode]);
             $this->fail('Caught non-public exception that was not configured to be caught');
         } catch (CM_Exception_Nonexistent $ex) {
             $this->assertFalse($ex->isPublic());
@@ -105,7 +118,10 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
 
         // public exception, public exception catching
         try {
-            $returnValue = CMTest_TH::callProtectedMethod($response, '_runWithCatching', [function() {throw new CM_Exception_Nonexistent('foo', null, ['messagePublic' => 'bar']);}, $errorCode]);
+            $returnValue = CMTest_TH::callProtectedMethod($response, '_runWithCatching', [
+                function () {
+                    throw new CM_Exception_Nonexistent('foo', null, ['messagePublic' => 'bar']);
+                }, $errorCode]);
             $this->assertNull($returnValue);
         } catch (CM_Exception_Nonexistent $ex) {
             $this->fail('Caught non-public exception');
