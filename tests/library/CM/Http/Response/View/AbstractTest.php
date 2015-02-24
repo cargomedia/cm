@@ -24,9 +24,9 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testNotFoundErrorLogging() {
-        CM_Config::get()->CM_Http_Response_Page->catch['CM_Exception_Nonexistent'] = [
-            'path' => CM_Page_View_Ajax_Test_Mock::getPath(),
-            'log'  => true,
+        CM_Config::get()->CM_Http_Response_Page->exceptionsToCatch['CM_Exception_Nonexistent'] = [
+            'errorPage' => 'CM_Page_View_Ajax_Test_Mock',
+            'log'       => 'CM_Paging_Log_NotFound',
         ];
 
         $log = new CM_Paging_Log_NotFound();
@@ -39,6 +39,40 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
         $log = new CM_Paging_Log_NotFound();
         $this->assertCount(1, $log);
+    }
+
+    public function testProcessExceptionCatching() {
+        CM_Config::get()->CM_Http_Response_View_Abstract->catchPublicExceptions = true;
+        CM_Config::get()->CM_Http_Response_View_Abstract->exceptionsToCatch = ['CM_Exception_Nonexistent' => []];
+        $response = $this->mockClass('CM_Http_Response_View_Abstract')->newInstanceWithoutConstructor();
+        $response->mockMethod('_processView')->set(function () {
+            throw new CM_Exception_Invalid('foo', null, ['messagePublic' => 'bar']);;
+        });
+        $response->mockMethod('getRender')->set(new CM_Frontend_Render());
+        /** @var CM_Http_Response_View_Abstract $response */
+        CMTest_TH::callProtectedMethod($response, '_process');
+        $responseData = CM_Params::jsonDecode($response->getContent());
+        $this->assertSame(
+            ['error' =>
+                 ['type'     => 'CM_Exception_Invalid',
+                  'msg'      => 'bar',
+                  'isPublic' => true
+                 ]
+            ], $responseData);
+
+        $response->mockMethod('_processView')->set(function () {
+            throw new CM_Exception_Nonexistent('foo');
+        });
+
+        CMTest_TH::callProtectedMethod($response, '_process');
+        $responseData = CM_Params::jsonDecode($response->getContent());
+        $this->assertSame(
+            ['error' =>
+                 ['type'     => 'CM_Exception_Nonexistent',
+                  'msg'      => 'Internal server error',
+                  'isPublic' => false
+                 ]
+            ], $responseData);
     }
 
     public function testLoadPageRedirectExternal() {

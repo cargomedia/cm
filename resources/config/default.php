@@ -62,12 +62,13 @@ return function (CM_Config_Node $config) {
     );
 
     $config->CM_Http_Response_View_Abstract->catch = array(
-        'CM_Exception_Nonexistent',
-        'CM_Exception_AuthRequired',
-        'CM_Exception_NotAllowed',
-        'CM_Exception_Blocked',
-        'CM_Exception_ActionLimit',
+        'CM_Exception_Nonexistent'  => [],
+        'CM_Exception_AuthRequired' => [],
+        'CM_Exception_NotAllowed'   => [],
+        'CM_Exception_Blocked'      => [],
+        'CM_Exception_ActionLimit'  => [],
     );
+    $config->CM_Http_Response_View_Abstract->catchPublicExceptions = true;
 
     $config->CM_Http_Response_RPC->catch = array(
         'CM_Exception_AuthRequired',
