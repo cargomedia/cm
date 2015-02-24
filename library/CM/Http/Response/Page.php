@@ -156,8 +156,8 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
         }, function (CM_Exception $ex, array $errorOptions) use ($request) {
             $this->getRender()->getGlobalResponse()->clear();
             /** @var CM_Page_Abstract $errorPage */
-            $errorPage =  new $errorOptions['errorPage']();
-            $request->setPath($errorPage->getPath());
+            $errorPage =  $errorOptions['errorPage'];
+            $request->setPath($errorPage::getPath());
             $request->setQuery(array());
             return false;
         });
