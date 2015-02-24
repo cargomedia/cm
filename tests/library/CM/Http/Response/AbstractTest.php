@@ -43,4 +43,34 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
         $headers = $response->getHeaders();
         $this->assertSame('Set-Cookie: foo=; Expires=Thu, 01-Jan-1970 12:00:01 UTC; Path=/', $headers[0]);
     }
+
+    public function testRunWithCatching() {
+        $response = $this->mockClass('CM_Http_Response_Abstract')->newInstanceWithoutConstructor();
+        $className = get_class($response);
+        CM_Config::get()->$className = new stdClass();
+        CM_Config::get()->$className->exceptionsToCatch = [
+            'CM_Exception_Nonexistent' => ['log' => 'CM_Paging_Log_NotFound', 'foo' => 'bar'],
+            'CM_Exception_InvalidParam' => ['log' => null]
+        ];
+        $exceptionCodeExecutionCounter = 0;
+        $errorCode = function(CM_Exception_Nonexistent $ex, $errorOptions) use (&$exceptionCodeExecutionCounter) {
+            $this->assertSame('bar', $errorOptions['foo']);
+            $exceptionCodeExecutionCounter++;
+        };
+        $this->assertSame(0, $exceptionCodeExecutionCounter);
+        $this->assertCount(0, new CM_Paging_Log_NotFound());
+        CMTest_TH::callProtectedMethod($response, '_runWithCatching', [function() {}, $errorCode]);
+        $this->assertSame(0, $exceptionCodeExecutionCounter);
+        $this->assertCount(0, new CM_Paging_Log_NotFound());
+        CMTest_TH::callProtectedMethod($response, '_runWithCatching', [function() {throw new CM_Exception_Nonexistent();}, $errorCode]);
+        $this->assertSame(1, $exceptionCodeExecutionCounter);
+        $this->assertCount(1, new CM_Paging_Log_NotFound());
+
+        $errorCode = function(CM_Exception_InvalidParam $ex, $errorOptions) use (&$exceptionCodeExecutionCounter) {
+            $exceptionCodeExecutionCounter++;
+        };
+        CMTest_TH::callProtectedMethod($response, '_runWithCatching', [function() {throw new CM_Exception_InvalidParam();}, $errorCode]);
+        $this->assertSame(2, $exceptionCodeExecutionCounter);
+        $this->assertCount(1, new CM_Paging_Log_NotFound());
+    }
 }

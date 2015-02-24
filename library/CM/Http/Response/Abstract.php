@@ -229,6 +229,31 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     }
 
     /**
+     * @param callable $regularCode
+     * @param callable $errorCode
+     * @return mixed|null
+     */
+    protected function _runWithCatching(Closure $regularCode, Closure $errorCode) {
+        try {
+            return $regularCode();
+        } catch(CM_Exception $ex) {
+            $exceptionClass = get_class($ex);
+            $exceptionsToCatch = self::_getConfig()->exceptionsToCatch;
+            if (array_key_exists($exceptionClass, $exceptionsToCatch)) {
+                $errorOptions = $exceptionsToCatch[$exceptionClass];
+                if (isset($errorOptions['log'])) {
+                    $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
+                    /** @var CM_Paging_Log_Abstract $log */
+                    $log = new $errorOptions['log']();
+                    $log->add($formatter->formatException($ex), $ex->getMetaInfo());
+                }
+                return $errorCode($ex, $errorOptions);
+            }
+            return null;
+        }
+    }
+
+    /**
      * @param CM_Http_Request_Abstract $request
      * @return CM_Http_Response_Abstract|string
      */
