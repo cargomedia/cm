@@ -54,11 +54,11 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Usertext_Usertext->class = 'CM_Usertext_Usertext';
 
-    $config->CM_Http_Response_Page->catch = array(
-        'CM_Exception_Nonexistent'  => ['path' => '/error/not-found', 'log' => true],
-        'CM_Exception_InvalidParam' => ['path' => '/error/not-found', 'log' => true],
-        'CM_Exception_AuthRequired' => ['path' => '/error/auth-required', 'log' => false],
-        'CM_Exception_NotAllowed'   => ['path' => '/error/not-allowed', 'log' => false],
+    $config->CM_Http_Response_Page->exceptionsToCatch = array(
+        'CM_Exception_Nonexistent'  => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => 'CM_Paging_Log_NotFound'],
+        'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => 'CM_Paging_Log_Error'],
+        'CM_Exception_AuthRequired' => ['errorPage' => 'CM_Page_Error_AuthRequired', 'log' => null],
+        'CM_Exception_NotAllowed'   => ['errorPage' => 'CM_Page_Error_NotAllowed', 'log' => null],
     );
 
     $config->CM_Http_Response_View_Abstract->catch = array(
