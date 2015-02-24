@@ -7,17 +7,16 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
     }
 
     public function testGetOptions() {
-        CM_Config::get()->CM_Stream_Adapter_Message_SocketRedis->servers = array(
+        $adapter = new CM_Stream_Adapter_Message_SocketRedis(array(
             array('httpHost' => 'foo', 'httpPort' => 8085, 'sockjsUrls' => array('http://stream:8090'))
-        );
-        $adapter = new CM_Stream_Adapter_Message_SocketRedis();
+        ));
         $options = $adapter->getOptions();
         $this->assertArrayHasKey('sockjsUrl', $options);
         $this->assertSame('http://stream:8090', $options['sockjsUrl']);
     }
 
     public function testOnRedisMessageSubscribe() {
-        $adapter = new CM_Stream_Adapter_Message_SocketRedis();
+        $adapter = new CM_Stream_Adapter_Message_SocketRedis([]);
         $message = array('type' => 'subscribe',
                          'data' => array('channel' => 'foo:' . CM_Model_StreamChannel_Message::getTypeStatic(), 'clientKey' => 'bar',
                                          'data'    => array()));
@@ -46,7 +45,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
     }
 
     public function testOnRedisMessageSubscribeUser() {
-        $adapter = new CM_Stream_Adapter_Message_SocketRedis();
+        $adapter = new CM_Stream_Adapter_Message_SocketRedis([]);
         $user = CMTest_TH::createUser();
         $session = new CM_Session();
         $session->setUser($user);
@@ -62,7 +61,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
     }
 
     public function testOnRedisMessageSubscribeSessionInvalid() {
-        $adapter = new CM_Stream_Adapter_Message_SocketRedis();
+        $adapter = new CM_Stream_Adapter_Message_SocketRedis([]);
         $message = array('type' => 'subscribe',
                          'data' => array('channel' => 'foo:' . CM_Model_StreamChannel_Message::getTypeStatic(), 'clientKey' => 'bar',
                                          'data'    => array('sessionId' => 'foo')));
@@ -74,7 +73,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
     }
 
     public function testOnRedisMessageUnsubscribe() {
-        $adapter = new CM_Stream_Adapter_Message_SocketRedis();
+        $adapter = new CM_Stream_Adapter_Message_SocketRedis([]);
         $streamChannel = CM_Model_StreamChannel_Message::createStatic(array('key' => 'foo', 'adapterType' => $adapter->getType()));
         CM_Model_Stream_Subscribe::createStatic(array('key' => 'foo', 'streamChannel' => $streamChannel, 'start' => time()));
         CM_Model_Stream_Subscribe::createStatic(array('key' => 'bar', 'streamChannel' => $streamChannel, 'start' => time()));
@@ -124,8 +123,8 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
                 'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
             ))
         );
-        $adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus'))->getMock();
-        $adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
+        $adapter = $this->mockClass('CM_Stream_Adapter_Message_SocketRedis')->newInstanceWithoutConstructor();
+        $adapter->mockMethod('_fetchStatus')->set($status);
         /** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
         $adapter->synchronize();
 
@@ -141,18 +140,22 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
                 'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
             ))
         );
-        $adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus', '_handleException'))->getMock();
-        $adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
-        $adapter->expects($this->once())->method('_handleException')->with(new PHPUnit_Framework_Constraint_ExceptionMessage('Type `0` not configured for class `CM_Model_StreamChannel_Message`.'));
+
+        $adapter = $this->mockClass('CM_Stream_Adapter_Message_SocketRedis')->newInstanceWithoutConstructor();
+        $adapter->mockMethod('_fetchStatus')->set($status);
+        $handleExceptionMethod = $adapter->mockMethod('_handleException')->set(function (Exception $exception) {
+            $this->assertSame('Type `0` not configured for class `CM_Model_StreamChannel_Message`.', $exception->getMessage());
+        });
         /** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
         $adapter->synchronize();
+        $this->assertSame(1, $handleExceptionMethod->getCallCount());
     }
 
     /**
      * @param array $status
      */
     private function _testSynchronize($status) {
-        $adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus'))->getMock();
+        $adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->disableOriginalConstructor()->setMethods(array('_fetchStatus'))->getMock();
         $adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
         /** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
         $adapter->synchronize();

@@ -178,6 +178,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Stream_Message
+     */
+    public function getStreamMessage() {
+        return $this->get('stream-message', 'CM_Stream_Message');
+    }
+
+    /**
      * @return CM_Redis_Client
      */
     public function getRedis() {

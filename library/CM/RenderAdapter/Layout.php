@@ -50,10 +50,10 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $options['language'] = $this->getRender()->getLanguage();
         $options['debug'] = CM_Bootloader::getInstance()->isDebug();
         $options['stream'] = array();
-        $options['stream']['enabled'] = CM_Stream_Message::getInstance()->getEnabled();
-        if (CM_Stream_Message::getInstance()->getEnabled()) {
-            $options['stream']['adapter'] = CM_Stream_Message::getInstance()->getAdapterClass();
-            $options['stream']['options'] = CM_Stream_Message::getInstance()->getOptions();
+        $options['stream']['enabled'] = CM_Service_Manager::getInstance()->getStreamMessage()->getEnabled();
+        if (CM_Service_Manager::getInstance()->getStreamMessage()->getEnabled()) {
+            $options['stream']['adapter'] = CM_Service_Manager::getInstance()->getStreamMessage()->getAdapterClass();
+            $options['stream']['options'] = CM_Service_Manager::getInstance()->getStreamMessage()->getOptions();
         }
         if ($viewer = $this->getRender()->getViewer()) {
             $options['stream']['channel']['key'] = CM_Model_StreamChannel_Message_User::getKeyByUser($viewer);

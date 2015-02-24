@@ -7,7 +7,7 @@ class CM_Stream_Cli extends CM_Cli_Runnable_Abstract {
      * @keepalive
      */
     public function startMessageSynchronization() {
-        CM_Stream_Message::getInstance()->startSynchronization();
+        CM_Service_Manager::getInstance()->getStreamMessage()->startSynchronization();
     }
 
     /**

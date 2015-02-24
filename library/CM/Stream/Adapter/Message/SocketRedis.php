@@ -4,8 +4,18 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 
     const SYNCHRONIZE_DELAY = 10;
 
+    /** @var array */
+    private $_servers;
+
+    /**
+     * @param array $servers
+     */
+    public function __construct(array $servers) {
+        $this->_servers = $servers;
+    }
+
     public function getOptions() {
-        $servers = static::_getConfig()->servers;
+        $servers = $this->_servers;
         if (empty($servers)) {
             throw new CM_Exception_Invalid('No servers configured');
         }
@@ -215,9 +225,8 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
      * @return array
      */
     protected function _fetchStatus() {
-        $servers = self::_getConfig()->servers;
         $statusData = array();
-        foreach ($servers as $server) {
+        foreach ($this->_servers as $server) {
             $statusData = array_merge_recursive($statusData, CM_Params::jsonDecode(CM_Util::getContents(
                 'http://' . $server['httpHost'] . ':' . $server['httpPort'])));
         }

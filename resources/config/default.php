@@ -31,15 +31,6 @@ return function (CM_Config_Node $config) {
 
     $config->classConfigCacheEnabled = true;
 
-    $config->CM_Stream_Message->enabled = true;
-    $config->CM_Stream_Message->adapter = 'CM_Stream_Adapter_Message_SocketRedis';
-
-    $config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
-        array('httpHost' => 'localhost', 'httpPort' => 8085, 'sockjsUrls' => array(
-            'http://localhost:8090',
-        )),
-    );
-
     $config->CM_Db_Db->delayedEnabled = true;
 
     $config->CM_MongoDb_Client->batchSize = null;
@@ -195,6 +186,21 @@ return function (CM_Config_Node $config) {
         'arguments' => array(
             array(
                 ['host' => 'localhost', 'port' => 11211],
+            ),
+        ),
+    );
+
+    $config->services['stream-message'] = array(
+        'class'     => 'CM_Stream_Message',
+        'arguments' => array(
+            'enabled' => true,
+            'adapter' => array(
+                'class' => 'CM_Stream_Adapter_Message_SocketRedis',
+                'arguments'   => array(
+                    'servers' => array(
+                        ['httpHost' => 'localhost', 'httpPort' => 8085, 'sockjsUrls' => ['http://localhost:8090']],
+                    ),
+                )
             ),
         ),
     );
