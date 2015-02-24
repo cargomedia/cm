@@ -8,27 +8,39 @@ class CM_Adprovider_ClientTest extends CMTest_TestCase {
 
     public function testGetHtml() {
         $site = $this->getMockSite();
+        $adapter = $this->mockObject('CM_Adprovider_Adapter_Abstract');
+        $adapter->mockMethod('getHtml')->set(function($zoneData, array $variables) {
+            return json_encode(array('zoneData' => $zoneData, 'variables' => $variables));
+        });
+        /** @var CM_Adprovider_Adapter_Abstract $adapter */
 
-        $zones = array('foo' => array('adapter' => 'CM_Adprovider_Adapter_Mock', 'zoneId' => 1),);
-        $adproviderConfig = array('CM_Adprovider_Adapter_Mock' => []);
-        $adprovider = new CM_Adprovider_Client(true, $zones, $adproviderConfig);
+        $zones = array('foo' => array('adapter' => get_class($adapter), 'zoneId' => 1),);
+        $adprovider = new CM_Adprovider_Client(true, $zones);
+        $adprovider->addAdapter($adapter);
 
         $this->assertSame('{"zoneData":{"zoneId":1},"variables":[]}', $adprovider->getHtml($site, 'foo'));
         $this->assertSame('{"zoneData":{"zoneId":1},"variables":{"foo":"bar"}}', $adprovider->getHtml($site, 'foo', array('foo' => 'bar')));
 
-        $adproviderDisabled = new CM_Adprovider_Client(false, $zones, $adproviderConfig);
+        $adproviderDisabled = new CM_Adprovider_Client(false, $zones);
+        $adproviderDisabled->addAdapter($adapter);
         $this->assertSame('', $adproviderDisabled->getHtml($site, 'foo'));
     }
 
     public function testGetHtmlWithSiteConfig() {
-        $zones = array('foo' => array('adapter' => 'CM_Adprovider_Adapter_Mock', 'zoneId' => 1),);
-        $adproviderConfig = array('CM_Adprovider_Adapter_Mock' => []);
-        $adprovider = new CM_Adprovider_Client(true, $zones, $adproviderConfig);
+        $adapter = $this->mockObject('CM_Adprovider_Adapter_Abstract');
+        $adapter->mockMethod('getHtml')->set(function($zoneData, array $variables) {
+            return json_encode(array('zoneData' => $zoneData, 'variables' => $variables));
+        });
+        /** @var CM_Adprovider_Adapter_Abstract $adapter */
+
+        $zones = array('foo' => array('adapter' => get_class($adapter), 'zoneId' => 1),);
+        $adprovider = new CM_Adprovider_Client(true, $zones);
+        $adprovider->addAdapter($adapter);
 
         $site = $this->getMockSite();
         $siteClassName = get_class($site);
         CM_Config::get()->$siteClassName->CM_Adprovider = new stdClass();
-        CM_Config::get()->$siteClassName->CM_Adprovider->zones = array('foo' => array('adapter' => 'CM_Adprovider_Adapter_Mock', 'zoneId' => 2),);
+        CM_Config::get()->$siteClassName->CM_Adprovider->zones = array('foo' => array('adapter' => get_class($adapter), 'zoneId' => 2),);
 
         $this->assertSame('{"zoneData":{"zoneId":2},"variables":[]}', $adprovider->getHtml($site, 'foo'));
         $this->assertSame('{"zoneData":{"zoneId":2},"variables":{"foo":"bar"}}', $adprovider->getHtml($site, 'foo', array('foo' => 'bar')));
@@ -36,7 +48,7 @@ class CM_Adprovider_ClientTest extends CMTest_TestCase {
 
     /**
      * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Ad adapter `CM_Adprovider_Adapter_Nonexistent` is not configured
+     * @expectedExceptionMessage Adprovider adapter `CM_Adprovider_Adapter_Nonexistent` not found
      */
     public function testGetHtmlInvalidAdapter() {
         $site = $this->getMockSite();
@@ -44,12 +56,5 @@ class CM_Adprovider_ClientTest extends CMTest_TestCase {
         $zones = array('foo' => array('adapter' => 'CM_Adprovider_Adapter_Nonexistent'),);
         $adprovider = new CM_Adprovider_Client(true, $zones, []);
         $adprovider->getHtml($site, 'foo');
-    }
-}
-
-class CM_Adprovider_Adapter_Mock extends CM_Adprovider_Adapter_Abstract {
-
-    public function getHtml($zoneData, array $variables) {
-        return json_encode(array('zoneData' => $zoneData, 'variables' => $variables));
     }
 }

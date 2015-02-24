@@ -14,14 +14,10 @@ class CM_Adprovider_Client extends CM_Class_Abstract {
     /**
      * @param bool    $enabled
      * @param array[] $zones
-     * @param array   $adapterConfigs
      */
-    public function __construct($enabled, array $zones, array $adapterConfigs) {
+    public function __construct($enabled, array $zones) {
         $this->_enabled = (bool) $enabled;
         $this->_zones = $zones;
-        foreach ($adapterConfigs as $adapterClassName => $adapterConfig) {
-            $this->_configureAdapter($adapterClassName, $adapterConfig);
-        }
     }
 
     /**
@@ -69,16 +65,10 @@ class CM_Adprovider_Client extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $className
-     * @param array  $config
-     * @throws CM_Exception_Invalid
+     * @param CM_Adprovider_Adapter_Abstract $adapter
      */
-    protected function _configureAdapter($className, array $config = null) {
-        $className = (string) $className;
-        if (!class_exists($className) || !is_subclass_of($className, 'CM_Adprovider_Adapter_Abstract')) {
-            throw new CM_Exception_Invalid('Invalid ad adapter `' . $className . '`');
-        }
-        $this->_adapters[$className] = new $className($config);
+    public function addAdapter(CM_Adprovider_Adapter_Abstract $adapter) {
+        $this->_adapters[get_class($adapter)] = $adapter;
     }
 
     /**
@@ -88,7 +78,7 @@ class CM_Adprovider_Client extends CM_Class_Abstract {
      */
     protected function _getAdapter($className) {
         if (!array_key_exists($className, $this->_adapters)) {
-            throw new CM_Exception_Invalid('Ad adapter `' . $className . '` is not configured');
+            throw new CM_Exception_Invalid('Adprovider adapter `' . $className . '` not found');
         }
         return $this->_adapters[$className];
     }
