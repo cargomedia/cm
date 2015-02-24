@@ -203,6 +203,46 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
     }
 
     /**
+     * @param int|null $serverId
+     * @throws CM_Exception_Invalid
+     * @return array
+     */
+    public function getServer($serverId = null) {
+        $servers = $this->_servers;
+        if (null === $serverId) {
+            $serverId = array_rand($servers);
+        }
+
+        $serverId = (int) $serverId;
+        if (!array_key_exists($serverId, $servers)) {
+            throw new CM_Exception_Invalid("No video server with id `$serverId` found");
+        }
+        return $servers[$serverId];
+    }
+
+    /**
+     * @param int $serverId
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    public function getPublicHost($serverId) {
+        $serverId = (int) $serverId;
+        $server = $this->getServer($serverId);
+        return $server['publicHost'];
+    }
+
+    /**
+     * @param int $serverId
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    public function getPrivateHost($serverId) {
+        $serverId = (int) $serverId;
+        $server = $this->getServer($serverId);
+        return $server['privateIp'];
+    }
+
+    /**
      * @return CM_Paging_StreamChannel_AdapterType
      */
     protected function _getStreamChannels() {

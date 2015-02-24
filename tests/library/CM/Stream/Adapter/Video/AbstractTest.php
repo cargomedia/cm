@@ -26,4 +26,24 @@ class CM_Stream_Adapter_Video_AbstractTest extends CMTest_TestCase {
 
         $adapter->checkStreams();
     }
+
+    public function testServerGetters() {
+        $servers = array(1 => ['publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109', 'privateIp' => '10.0.3.108']);
+        /** @var CM_Stream_Adapter_Video_Abstract $adapter */
+        $adapter = $this->mockObject('CM_Stream_Adapter_Video_Abstract', [$servers]);
+
+        $this->assertSame($servers[1], $adapter->getServer(1));
+        $this->assertSame('video.example.com', $adapter->getPublicHost(1));
+        $this->assertSame('10.0.3.108', $adapter->getPrivateHost(1));
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     * @expectedExceptionMessage No video server with id `5` found
+     */
+    public function testGetServerInvalid() {
+        /** @var CM_Stream_Adapter_Video_Abstract $adapter */
+        $adapter = $this->mockObject('CM_Stream_Adapter_Video_Abstract', []);
+        $adapter->getServer(5);
+    }
 }

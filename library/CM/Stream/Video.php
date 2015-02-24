@@ -14,7 +14,7 @@ class CM_Stream_Video {
 
         if (null !== $adapter) {
             $adapterConfig = isset($adapter['config']) ? $adapter['config'] : null;
-            $this->_adapter = new $adapter['className']($this->getServers(), $adapterConfig);
+            $this->_adapter = new $adapter['className']($this->_servers, $adapterConfig);
             if (!$this->_adapter instanceof CM_Stream_Adapter_Video_Abstract) {
                 throw new CM_Exception_Invalid('Invalid stream video adapter');
             }
@@ -33,31 +33,6 @@ class CM_Stream_Video {
      */
     public function getAdapter() {
         return $this->_adapter;
-    }
-
-    /**
-     * @return array[]
-     */
-    public function getServers() {
-        return $this->_servers;
-    }
-
-    /**
-     * @param string|null $serverId
-     * @throws CM_Exception_Invalid
-     * @return array
-     */
-    public function getServer($serverId = null) {
-        $servers = $this->getServers();
-        if (null === $serverId) {
-            $serverId = array_rand($servers);
-        }
-
-        $serverId = (int) $serverId;
-        if (!array_key_exists($serverId, $servers)) {
-            throw new CM_Exception_Invalid("No video server with id `$serverId` found");
-        }
-        return $servers[$serverId];
     }
 
     public function checkStreams() {

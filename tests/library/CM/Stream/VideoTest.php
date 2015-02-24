@@ -84,24 +84,6 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
 
         $this->assertSame(2, $stopStreamMethod->getCallCount());
     }
-
-    public function testGetServer() {
-        $stream = new CM_Stream_Video(true, array(
-            1 => ['publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109', 'privateIp' => '10.0.3.108'],
-        ));
-        $this->assertSame('10.0.3.108', $stream->getServer(1)['privateIp']);
-    }
-
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage No video server with id `800` found
-     */
-    public function testGetServerInvalid() {
-        $stream = new CM_Stream_Video(true, array(
-            1 => ['publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109', 'privateIp' => '10.0.3.108'],
-        ));
-        $stream->getServer(800);
-    }
 }
 
 class CM_Model_StreamChannel_Video_Mock extends CM_Model_StreamChannel_Video {

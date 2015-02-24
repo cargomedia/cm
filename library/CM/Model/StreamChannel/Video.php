@@ -66,21 +66,10 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getPublicHost() {
-        $serverId = (int) $this->_get('serverId');
-        $serverArray = CM_Service_Manager::getInstance()->getStreamVideo()->getServer($serverId);
-        return (string) $serverArray['publicHost'];
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrivateHost() {
-        $serverId = (int) $this->_get('serverId');
-        $serverArray = CM_Service_Manager::getInstance()->getStreamVideo()->getServer($serverId);
-        return (string) $serverArray['privateIp'];
+    public function getServerId() {
+        return (int) $this->_get('serverId');
     }
 
     public function toArray() {

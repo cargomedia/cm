@@ -84,7 +84,8 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
     protected function _stopStream(CM_Model_Stream_Abstract $stream) {
         /** @var $streamChannel CM_Model_StreamChannel_Video */
         $streamChannel = $stream->getStreamChannel();
-        $this->_stopClient($stream->getKey(), $streamChannel->getPrivateHost());
+        $privateHost = $this->getPrivateHost($streamChannel->getServerId());
+        $this->_stopClient($stream->getKey(), $privateHost);
     }
 
     protected function _stopClient($clientId, $serverHost) {
