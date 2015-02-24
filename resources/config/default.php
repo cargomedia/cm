@@ -194,17 +194,20 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['adprovider'] = array(
-        'class'     => 'CM_Adprovider_Factory',
-        'arguments' => array(
-            'enabled' => true,
-            'zones' => array(
-                'square-medium' => ['adapter' => 'CM_Adprovider_Adapter_Openx', 'zoneId' => 4],
-            ),
-            'adapters' => array(
-                'CM_Adprovider_Adapter_Openx' => array(
-                    'host' => 'www.example.dev',
+        'class'  => 'CM_Adprovider_Factory',
+        'method' => array(
+            'name'      => 'createClient',
+            'arguments' => array(
+                'enabled'  => true,
+                'zones'    => array(
+                    'square-medium' => ['adapter' => 'CM_Adprovider_Adapter_Openx', 'zoneId' => 4],
+                ),
+                'adapters' => array(
+                    'CM_Adprovider_Adapter_Openx' => array(
+                        'host' => 'www.example.dev',
+                    )
                 )
             )
-        ),
+        )
     );
 };
