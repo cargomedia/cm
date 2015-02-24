@@ -164,6 +164,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Debug
+     */
+    public function getDebug() {
+        return $this->get('debug' ,'CM_Debug');
+    }
+
+    /**
      * @return CM_Service_Trackings
      */
     public function getTrackings() {
