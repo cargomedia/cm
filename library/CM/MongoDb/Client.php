@@ -31,7 +31,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      */
     public function insert($collection, array $object, array $options = null) {
         $options = $options ?: [];
-        CM_Debug::getInstance()->incStats('mongo', "Insert `{$collection}`: " . CM_Params::jsonEncode($object));
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Insert `{$collection}`: " . CM_Params::jsonEncode($object));
         $intermediary = &$object;
         $data = $intermediary;
         $result = $this->_getCollection($collection)->insert($data, $options);
@@ -49,7 +49,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      */
     public function batchInsert($collection, array $objectList, array $options = null) {
         $options = $options ?: [];
-        CM_Debug::getInstance()->incStats('mongo', "Batch Insert `{$collection}`: " . CM_Params::jsonEncode($objectList));
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Batch Insert `{$collection}`: " . CM_Params::jsonEncode($objectList));
         $dataList = \Functional\map($objectList, function(array $object) {
             return $object;
         });
@@ -66,7 +66,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @return MongoCollection
      */
     public function createCollection($name, array $options = null) {
-        CM_Debug::getInstance()->incStats('mongo', "create collection {$name}: " . CM_Params::jsonEncode($options));
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "create collection {$name}: " . CM_Params::jsonEncode($options));
         return $this->_getDatabase()->createCollection($name, $options);
     }
 
@@ -79,7 +79,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      */
     public function createIndex($collection, array $keys, array $options = null) {
         $options = $options ?: [];
-        CM_Debug::getInstance()->incStats('mongo', "create index on {$collection}: " . CM_Params::jsonEncode($keys) . ' ' .
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "create index on {$collection}: " . CM_Params::jsonEncode($keys) . ' ' .
             CM_Params::jsonEncode($options));
         $result = $this->_getCollection($collection)->createIndex($keys, $options);
         $this->_checkResultForErrors($result);
@@ -115,7 +115,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
             $result = $resultSet->current();
         } else {
             $result = $this->_getCollection($collection)->findOne($criteria, $projection);
-            CM_Debug::getInstance()->incStats('mongo', "findOne `{$collection}`: " . CM_Params::jsonEncode(['projection' => $projection,
+            CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "findOne `{$collection}`: " . CM_Params::jsonEncode(['projection' => $projection,
                                                                                                             'criteria'   => $criteria]));
         }
 
@@ -139,7 +139,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
         }
         $criteria = (array) $criteria;
         $projection = (array) $projection;
-        CM_Debug::getInstance()->incStats('mongo', "find `{$collection}`: " . CM_Params::jsonEncode(['projection'  => $projection,
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "find `{$collection}`: " . CM_Params::jsonEncode(['projection'  => $projection,
                                                                                                      'criteria'    => $criteria,
                                                                                                      'aggregation' => $aggregation]));
         $collection = $this->_getCollection($collection);
@@ -170,7 +170,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @return array
      */
     public function getIndexInfo($collection) {
-        CM_Debug::getInstance()->incStats('mongo', "indexInfo {$collection}");
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "indexInfo {$collection}");
         $indexInfo = $this->_getCollection($collection)->getIndexInfo();
         return $indexInfo;
     }
@@ -199,7 +199,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
         $criteria = (array) $criteria;
         $limit = (int) $limit;
         $offset = (int) $offset;
-        CM_Debug::getInstance()->incStats('mongo', "count `{$collection}`: " . CM_Params::jsonEncode(['criteria'    => $criteria,
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "count `{$collection}`: " . CM_Params::jsonEncode(['criteria'    => $criteria,
                                                                                                       'aggregation' => $aggregation]));
         if ($aggregation) {
             $pipeline = $aggregation;
@@ -237,7 +237,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @throws CM_MongoDb_Exception
      */
     public function drop($collection) {
-        CM_Debug::getInstance()->incStats('mongo', "drop `{$collection}`");
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "drop `{$collection}`");
         $result = $this->_getCollection($collection)->drop();
         $this->_checkResultForErrors($result);
         return $result;
@@ -247,7 +247,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @return array
      */
     public function dropDatabase() {
-        CM_Debug::getInstance()->incStats('mongo', "drop database {$this->_getDatabaseName()}");
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "drop database {$this->_getDatabaseName()}");
         return $this->_getDatabase()->drop();
     }
 
@@ -284,7 +284,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      */
     public function update($collection, array $criteria, array $newObject, array $options = null) {
         $options = (array) $options;
-        CM_Debug::getInstance()->incStats('mongo', "Update `{$collection}`: " . CM_Params::jsonEncode(['criteria'  => $criteria,
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Update `{$collection}`: " . CM_Params::jsonEncode(['criteria'  => $criteria,
                                                                                                        'newObject' => $newObject]));
         $result = $this->_getCollection($collection)->update($criteria, $newObject, $options);
         $this->_checkResultForErrors($result);
@@ -301,7 +301,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     public function remove($collection, array $criteria = null, array $options = null) {
         $criteria = $criteria ?: array();
         $options = $options ?: array();
-        CM_Debug::getInstance()->incStats('mongo', "Remove `{$collection}`: " . CM_Params::jsonEncode($criteria));
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Remove `{$collection}`: " . CM_Params::jsonEncode($criteria));
         $result = $this->_getCollection($collection)->remove($criteria, $options);
         $this->_checkResultForErrors($result);
         return is_array($result) ? $result['n'] : $result;
