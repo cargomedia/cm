@@ -192,19 +192,22 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['stream-video'] = array(
-        'class'     => 'CM_Stream_Video',
-        'arguments' => array(
-            'enabled' => true,
-            'adapter' => array(
-                'class'     => 'CM_Stream_Adapter_Video_Wowza',
-                'arguments' => array(
-                    'servers' => array(
-                        ['publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'],
-                    ),
-                    'config'  => array(
-                        'httpPort'  => '8086',
-                        'wowzaPort' => '1935'
-                    ),
+        'class'  => 'CM_Stream_Video_Factory',
+        'method' => array(
+            'name'      => 'createClient',
+            'arguments' => array(
+                'enabled'       => true,
+                'adapterConfig' => array(
+                    'class'     => 'CM_Stream_Adapter_Video_Wowza',
+                    'arguments' => array(
+                        'servers' => array(
+                            ['publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'],
+                        ),
+                        'config'  => array(
+                            'httpPort'  => '8086',
+                            'wowzaPort' => '1935'
+                        ),
+                    )
                 )
             )
         )

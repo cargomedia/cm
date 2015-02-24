@@ -13,10 +13,9 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
         $adapter = $this->mockObject('CM_Stream_Adapter_Video_Abstract', [$servers]);
         $adapter->mockMethod('getType')->set(1);
         $stopStreamMethod = $adapter->mockMethod('_stopStream')->set(1);
+        /** @var CM_Stream_Adapter_Video_Abstract $adapter */
 
-        $stream = $this->mockObject('CM_Stream_Video', [true]);
-        $stream->mockMethod('getAdapter')->set($adapter);
-        /** @var $stream CM_Stream_Video */
+        $stream = new CM_Stream_Video(true, $adapter);
 
         CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Video_Mock';
 

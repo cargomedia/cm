@@ -2,21 +2,20 @@
 
 class CM_Stream_Video {
 
+    /** @var bool */
+    private $_enabled;
+
+    /** @var CM_Stream_Adapter_Video_Abstract */
+    private $_adapter;
+
     /**
-     * @param bool  $enabled
-     * @param array $adapter
+     * @param bool                             $enabled
+     * @param CM_Stream_Adapter_Video_Abstract $adapter
      * @throws CM_Exception_Invalid
      */
-    public function __construct($enabled, array $adapter = null) {
+    public function __construct($enabled, CM_Stream_Adapter_Video_Abstract $adapter) {
         $this->_enabled = (bool) $enabled;
-
-        if (null !== $adapter) {
-            $reflectionClass = new ReflectionClass($adapter['class']);
-            if (!$reflectionClass->isSubclassOf('CM_Stream_Adapter_Video_Abstract')) {
-                throw new CM_Exception_Invalid('Invalid stream video adapter');
-            }
-            $this->_adapter = $reflectionClass->newInstanceArgs($adapter['arguments']);
-        }
+        $this->_adapter = $adapter;
     }
 
     /**
