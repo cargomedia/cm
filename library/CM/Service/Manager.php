@@ -165,6 +165,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Debug
+     */
+    public function getDebug() {
+        return $this->get('debug' ,'CM_Debug');
+    }
+
+    /**
      * @return CM_Service_Trackings
      */
     public function getTrackings() {
@@ -176,6 +183,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public function getUserContent() {
         return $this->get('usercontent', 'CM_Service_UserContent');
+    }
+
+    /**
+     * @return CM_Memcache_Client
+     */
+    public function getMemcache() {
+        return $this->get('memcache', 'CM_Memcache_Client');
     }
 
     /**

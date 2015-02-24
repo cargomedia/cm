@@ -2,9 +2,6 @@
 
 class CM_Debug {
 
-    /** @var CM_Debug|null */
-    private static $_instance = null;
-
     /** @var array */
     private $_stats = array();
 
@@ -55,12 +52,10 @@ class CM_Debug {
     }
 
     /**
+     * @deprecated use CM_Service_Manager::getInstance()->getDebug()
      * @return CM_Debug
      */
     public static function getInstance() {
-        if (self::$_instance === null) {
-            self::$_instance = new self(CM_Bootloader::getInstance()->isDebug());
-        }
-        return self::$_instance;
+        return CM_Service_Manager::getInstance()->getDebug();
     }
 }
