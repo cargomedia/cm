@@ -121,4 +121,25 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
             $this->assertSame('Job failed', $ex->getMessage());
         }
     }
+
+    public function testRunGearmanDisabledWithNotSerializableObject() {
+        CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
+
+        $foo = new stdClass();
+        $foo->closure = function() {
+            echo 'bar';
+        };
+
+        $job = $this->getMockForAbstractClass('CM_Jobdistribution_Job_Abstract', array(), '', true, true, true, array('_execute'));
+        $job->expects($this->exactly(1))->method('_execute')->with($this->callback(function (CM_Params $params) use ($foo) {
+            $fooParam = $params->get('foo');
+            if ($fooParam['closure'] === $foo->closure) {
+                return false;
+            }
+            return true;
+        }));
+
+        /** @var CM_Jobdistribution_Job_Abstract $job */
+        $job->queue(array('foo' => $foo));
+    }
 }
