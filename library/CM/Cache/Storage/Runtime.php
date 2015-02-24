@@ -8,9 +8,6 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
     /** @var int */
     private $_lastClearStamp;
 
-    /** @var CM_Cache_Storage_Runtime */
-    private static $_instance;
-
     /** @var array */
     private $_storage;
 
@@ -58,15 +55,5 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
             }
         }
         $this->_lastClearStamp = $currentTime;
-    }
-
-    /**
-     * @return CM_Cache_Storage_Runtime
-     */
-    public static function getInstance() {
-        if (!self::$_instance) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
     }
 }

@@ -8,7 +8,7 @@ class CM_Config {
     private $_config = null;
 
     private function _init() {
-        $cache = new CM_Cache_Storage_Apc();
+        $cache = CM_Service_Manager::getInstance()->getCache()->getApc();
         $cacheKey = CM_CacheConst::Config;
         if (false === ($config = $cache->get($cacheKey))) {
             $node = new CM_Config_Node();

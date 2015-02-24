@@ -132,6 +132,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Cache_Service
+     */
+    public function getCache() {
+        return $this->get('cache', 'CM_Cache_Service');
+    }
+
+    /**
      * @return CM_Service_Databases
      */
     public function getDatabases() {

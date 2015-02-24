@@ -21,17 +21,17 @@ class CM_Component_Debug extends CM_Component_Abstract {
     public function ajax_clearCache(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
         $cachesCleared = array();
         if ($params->getBoolean('CM_Cache_Storage_Memcache', false)) {
-            $cache = new CM_Cache_Storage_Memcache();
+            $cache = CM_Service_Manager::getInstance()->getCache()->getMemcache();
             $cache->flush();
             $cachesCleared[] = 'CM_Cache_Storage_Memcache';
         }
         if ($params->getBoolean('CM_Cache_Storage_Apc', false)) {
-            $cache = new CM_Cache_Storage_Apc();
+            $cache = CM_Service_Manager::getInstance()->getCache()->getApc();
             $cache->flush();
             $cachesCleared[] = 'CM_Cache_Storage_Apc';
         }
         if ($params->getBoolean('CM_Cache_Storage_File', false)) {
-            $cache = new CM_Cache_Storage_File();
+            $cache = CM_Service_Manager::getInstance()->getCache()->getFile();
             $cache->flush();
             $cachesCleared[] = 'CM_Cache_Storage_File';
         }

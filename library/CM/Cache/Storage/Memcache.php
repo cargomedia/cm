@@ -7,7 +7,6 @@ class CM_Cache_Storage_Memcache extends CM_Cache_Storage_Abstract {
 
     public function __construct() {
         $this->_client = CM_Service_Manager::getInstance()->getMemcache();
-        parent::__construct();
     }
 
     protected function _getName() {

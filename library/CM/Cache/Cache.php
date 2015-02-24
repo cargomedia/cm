@@ -1,16 +1,25 @@
 <?php
 
-abstract class CM_Cache_Abstract extends CM_Class_Abstract {
+class CM_Cache_Cache extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var CM_Cache_Storage_Abstract */
     protected $_storage;
 
-    public function __construct() {
-        $storageClassName = static::_getConfig()->storage;
-        if (!is_subclass_of($storageClassName, 'CM_Cache_Storage_Abstract')) {
-            throw new CM_Exception('Invalid cache storage: `' . $storageClassName . '`');
-        }
-        $this->_storage = new $storageClassName();
+    /** @var string */
+    private $_cacheServiceName;
+
+    /** @var int */
+    protected $_defaultLifetime;
+
+    /**
+     * @param string $cacheServiceName
+     * @param int    $defaultLifetime
+     */
+    public function __construct($cacheServiceName, $defaultLifetime) {
+        $this->_cacheServiceName = (string) $cacheServiceName;
+        $this->_defaultLifetime = (int) $defaultLifetime;
     }
 
     /**
@@ -20,7 +29,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
      */
     public final function set($key, $value, $lifeTime = null) {
         if (!$lifeTime) {
-            $lifeTime = static::_getConfig()->lifetime;
+            $lifeTime = $this->_defaultLifetime;
         }
         $this->_getStorage()->set($key, $value, $lifeTime);
     }
@@ -98,6 +107,9 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
      * @return CM_Cache_Storage_Abstract
      */
     protected function _getStorage() {
+        if (null === $this->_storage) {
+            $this->_storage = $this->getServiceManager()->get($this->_cacheServiceName, 'CM_Cache_Storage_Abstract');
+        }
         return $this->_storage;
     }
 

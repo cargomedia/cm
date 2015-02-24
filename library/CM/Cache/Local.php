@@ -1,15 +1,12 @@
 <?php
 
-class CM_Cache_Local extends CM_Cache_Abstract {
+class CM_Cache_Local {
 
     /**
-     * @return CM_Cache_Local
+     * @deprecated Use CM_Service_Manager::getInstance()->getCache()->getLocal()
+     * @return CM_Cache_Shared
      */
     public static function getInstance() {
-        static $instance;
-        if (!$instance) {
-            $instance = new CM_Cache_Local();
-        }
-        return $instance;
+        return CM_Service_Manager::getInstance()->getCache()->getLocal();
     }
 }

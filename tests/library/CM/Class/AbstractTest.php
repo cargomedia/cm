@@ -55,7 +55,7 @@ class CM_Class_AbstractTest extends CMTest_TestCase {
         $configCacheList->setValue([]);
         $this->assertSame('foo', CM_Class_Implementation::getConfig()->foo);
 
-        $cache = new CM_Cache_Storage_Apc();
+        $cache = CM_Service_Manager::getInstance()->getCache()->getApc();
         $cache->flush();
         $this->assertSame('foo', CM_Class_Implementation::getConfig()->foo);
 

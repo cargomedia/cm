@@ -121,7 +121,7 @@ class CM_Bootloader {
 
     public function reloadModulePaths() {
         $cacheKey = CM_CacheConst::Modules;
-        $cache = new CM_Cache_Storage_Apc();
+        $cache = CM_Service_Manager::getInstance()->getCache()->getApc();
         $cache->delete($cacheKey);
     }
 
@@ -179,6 +179,15 @@ class CM_Bootloader {
         $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', array(
             new CM_File_Filesystem_Adapter_Local($this->getDirTmp()),
         ));
+        $serviceManager->register('cache', 'CM_Cache_Service');
+        $serviceManager->register('cache-runtime', 'CM_Cache_Storage_Runtime');
+        $serviceManager->register('cache-apc', 'CM_Cache_Storage_Apc');
+        $serviceManager->register('cache-memcache', 'CM_Cache_Storage_Memcache');
+
+        $storageDir = new CM_File('cache', $serviceManager->getFilesystems()->getTmp());
+        $cache = new CM_Cache_Storage_File($storageDir);
+        $cache->setRuntimeCache($serviceManager->getCache()->getRuntime());
+        $serviceManager->registerInstance('cache-file', $cache);
 
         foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
             $serviceManager->registerWithArray($serviceKey, $serviceDefinition);
@@ -195,9 +204,9 @@ class CM_Bootloader {
      */
     private function _getModulePaths() {
         $cacheKey = CM_CacheConst::Modules;
-        $apcCache = new CM_Cache_Storage_Apc();
+        $apcCache = CM_Service_Manager::getInstance()->getCache()->getApc();
         if (false === ($modulePaths = $apcCache->get($cacheKey))) {
-            $fileCache = new CM_Cache_Storage_File();
+            $fileCache = CM_Service_Manager::getInstance()->getCache()->getFile();
             $installation = new CM_App_Installation(DIR_ROOT);
             if ($installation->getUpdateStamp() > $fileCache->getCreateStamp($cacheKey) || false === ($modulePaths = $fileCache->get($cacheKey))) {
                 $modulePaths = $installation->getModulePaths();

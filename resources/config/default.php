@@ -21,12 +21,6 @@ return function (CM_Config_Node $config) {
         array('host' => 'localhost', 'port' => 9200),
     );
 
-    $config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
-    $config->CM_Cache_Local->lifetime = 86400;
-
-    $config->CM_Cache_Shared->storage = 'CM_Cache_Storage_Memcache';
-    $config->CM_Cache_Shared->lifetime = 3600;
-
     $config->CM_Paging_Ip_Blocked->maxAge = (7 * 86400);
 
     $config->classConfigCacheEnabled = true;
@@ -196,6 +190,22 @@ return function (CM_Config_Node $config) {
             array(
                 ['host' => 'localhost', 'port' => 11211],
             ),
+        ),
+    );
+
+    $config->services['cache-shared'] = array(
+        'class' => 'CM_Cache_Cache',
+        'arguments' => array(
+            'cache-memcache',
+            3600,
+        ),
+    );
+
+    $config->services['cache-local'] = array(
+        'class' => 'CM_Cache_Cache',
+        'arguments' => array(
+            'cache-apc',
+            86400,
         ),
     );
 };

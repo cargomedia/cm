@@ -22,7 +22,7 @@ class CM_Cache_Storage_AbstractTest extends CMTest_TestCase {
         $cacheRuntime = new CM_Cache_Storage_Runtime();
         $cacheStorage->expects($this->any())->method('_getRuntime')->will($this->returnValue($cacheRuntime));
 
-        /** @var CM_Cache_Abstract $cacheStorage */
+        /** @var CM_Cache_Storage_Abstract $cacheStorage */
         $this->assertFalse($cacheStorage->get('foo'));
         $cacheStorage->set('foo', 'bar');
         $this->assertSame('bar', $cacheStorage->get('foo'));
