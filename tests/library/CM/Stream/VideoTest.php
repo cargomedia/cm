@@ -10,11 +10,11 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
         $servers = array(
             ['publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109', 'privateIp' => '10.0.3.108'],
         );
-        $adapter = $this->mockObject('CM_Stream_Adapter_Video_Abstract', [null, $servers]);
+        $adapter = $this->mockObject('CM_Stream_Adapter_Video_Abstract', [$servers]);
         $adapter->mockMethod('getType')->set(1);
         $stopStreamMethod = $adapter->mockMethod('_stopStream')->set(1);
 
-        $stream = $this->mockObject('CM_Stream_Video', [true, $servers]);
+        $stream = $this->mockObject('CM_Stream_Video', [true]);
         $stream->mockMethod('getAdapter')->set($adapter);
         /** @var $stream CM_Stream_Video */
 
