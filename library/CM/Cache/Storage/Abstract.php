@@ -18,7 +18,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
         if ($runtime = $this->_getRuntime()) {
             $runtime->set($key, $value);
         }
-        CM_Debug::getInstance()->incStats(strtolower($this->_getName()) . '-set', $key);
+        CM_Service_Manager::getInstance()->getDebug()->incStats(strtolower($this->_getName()) . '-set', $key);
         $this->_set($this->_getKeyArmored($key), $value, $lifeTime);
     }
 
@@ -32,7 +32,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
             return $value;
         }
 
-        CM_Debug::getInstance()->incStats(strtolower($this->_getName()) . '-get', $key);
+        CM_Service_Manager::getInstance()->getDebug()->incStats(strtolower($this->_getName()) . '-get', $key);
         $value = $this->_get($this->_getKeyArmored($key));
         if ($runtime && false !== $value) {
             $runtime->set($key, $value);
@@ -76,7 +76,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
      * @return mixed[]
      */
     public final function getMulti(array $keys) {
-        CM_Debug::getInstance()->incStats(strtolower($this->_getName()) . '-getMulti', $keys);
+        CM_Service_Manager::getInstance()->getDebug()->incStats(strtolower($this->_getName()) . '-getMulti', $keys);
         foreach ($keys as &$key) {
             $key = self::_getKeyArmored($key);
         }
