@@ -8,21 +8,34 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract implements CM
     protected $_runtime;
 
     /**
-     * @param CM_Cache_Storage_Runtime $runtime
+     * @return string
      */
-    public function setRuntimeCache(CM_Cache_Storage_Runtime $runtime) {
-        $this->_runtime = $runtime;
-    }
+    abstract protected function _getName();
 
     /**
-     * @param CM_Service_Manager $serviceManager
+     * @param string   $key
+     * @param mixed    $value
+     * @param int|null $lifeTime
+     * @return boolean
      */
-    public function setServiceManager(CM_Service_Manager $serviceManager) {
-        $this->_serviceManager = $serviceManager;
-        if (!$this instanceof CM_Cache_Storage_Runtime) {
-            $this->setRuntimeCache($serviceManager->getCache()->getRuntime());
-        }
-    }
+    abstract protected function _set($key, $value, $lifeTime = null);
+
+    /**
+     * @param string $key
+     * @return mixed Result or false
+     */
+    abstract protected function _get($key);
+
+    /**
+     * @param string $key
+     * @return boolean
+     */
+    abstract protected function _delete($key);
+
+    /**
+     * @return boolean
+     */
+    abstract protected function _flush();
 
     /**
      * @param string   $key
@@ -109,34 +122,21 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract implements CM
     }
 
     /**
-     * @return string
+     * @param CM_Cache_Storage_Runtime $runtime
      */
-    abstract protected function _getName();
+    public function setRuntimeCache(CM_Cache_Storage_Runtime $runtime) {
+        $this->_runtime = $runtime;
+    }
 
     /**
-     * @param string   $key
-     * @param mixed    $value
-     * @param int|null $lifeTime
-     * @return boolean
+     * @param CM_Service_Manager $serviceManager
      */
-    abstract protected function _set($key, $value, $lifeTime = null);
-
-    /**
-     * @param string $key
-     * @return mixed Result or false
-     */
-    abstract protected function _get($key);
-
-    /**
-     * @param string $key
-     * @return boolean
-     */
-    abstract protected function _delete($key);
-
-    /**
-     * @return boolean
-     */
-    abstract protected function _flush();
+    public function setServiceManager(CM_Service_Manager $serviceManager) {
+        $this->_serviceManager = $serviceManager;
+        if (!$this instanceof CM_Cache_Storage_Runtime) {
+            $this->setRuntimeCache($serviceManager->getCache()->getRuntime());
+        }
+    }
 
     /**
      * @param string[] $keys
