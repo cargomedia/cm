@@ -171,10 +171,10 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_Adprovider
+     * @return CM_Adprovider_Client
      */
     public function getAdprovider() {
-        return $this->get('adprovider', 'CM_Adprovider');
+        return $this->get('adprovider', 'CM_Adprovider_Client');
     }
 
     /**

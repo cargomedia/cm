@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_AdproviderAdapter_Abstract extends CM_Class_Abstract {
+abstract class CM_Adprovider_Adapter_Abstract extends CM_Class_Abstract {
 
     /** @var array */
     protected $_config;

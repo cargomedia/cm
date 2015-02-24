@@ -1,6 +1,6 @@
 <?php
 
-class CM_AdproviderAdapter_Openx extends CM_AdproviderAdapter_Abstract {
+class CM_Adprovider_Adapter_Openx extends CM_Adprovider_Adapter_Abstract {
 
     public function getHtml($zoneData, array $variables) {
         if (!array_key_exists('zoneId', $zoneData)) {

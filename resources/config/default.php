@@ -194,14 +194,14 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['adprovider'] = array(
-        'class'     => 'CM_Adprovider',
+        'class'     => 'CM_Adprovider_Client',
         'arguments' => array(
             true,
             array(
-                'square-medium' => ['adapter' => 'CM_AdproviderAdapter_Openx', 'zoneId' => 4],
+                'square-medium' => ['adapter' => 'CM_Adprovider_Adapter_Openx', 'zoneId' => 4],
             ),
             array(
-                'CM_AdproviderAdapter_Openx' => ['host' => 'www.example.dev']
+                'CM_Adprovider_Adapter_Openx' => ['host' => 'www.example.dev']
             )
         ),
     );

@@ -1,6 +1,6 @@
 <?php
 
-class CM_Adprovider extends CM_Class_Abstract {
+class CM_Adprovider_Client extends CM_Class_Abstract {
 
     /** @var array[] */
     private $_zones;
@@ -8,7 +8,7 @@ class CM_Adprovider extends CM_Class_Abstract {
     /** @var bool */
     private $_enabled;
 
-    /** @var CM_AdproviderAdapter_Abstract[] */
+    /** @var CM_Adprovider_Adapter_Abstract[] */
     private $_adapters = array();
 
     /**
@@ -75,7 +75,7 @@ class CM_Adprovider extends CM_Class_Abstract {
      */
     protected function _configureAdapter($className, array $config = null) {
         $className = (string) $className;
-        if (!class_exists($className) || !is_subclass_of($className, 'CM_AdproviderAdapter_Abstract')) {
+        if (!class_exists($className) || !is_subclass_of($className, 'CM_Adprovider_Adapter_Abstract')) {
             throw new CM_Exception_Invalid('Invalid ad adapter `' . $className . '`');
         }
         $this->_adapters[$className] = new $className($config);
@@ -83,7 +83,7 @@ class CM_Adprovider extends CM_Class_Abstract {
 
     /**
      * @param string $className
-     * @return CM_AdproviderAdapter_Abstract
+     * @return CM_Adprovider_Adapter_Abstract
      * @throws CM_Exception_Invalid
      */
     protected function _getAdapter($className) {
@@ -109,7 +109,7 @@ class CM_Adprovider extends CM_Class_Abstract {
 
     /**
      * @deprecated
-     * @return CM_Adprovider
+     * @return CM_Adprovider_Client
      */
     public static function getInstance() {
         return CM_Service_Manager::getInstance()->getAdprovider();
