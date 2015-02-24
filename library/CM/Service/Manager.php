@@ -150,6 +150,14 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Options
+     * @throws CM_Exception_Invalid
+     */
+    public function getOptions() {
+        return $this->get('options', 'CM_Options');
+    }
+
+    /**
      * @return CM_Service_Filesystems
      */
     public function getFilesystems() {
