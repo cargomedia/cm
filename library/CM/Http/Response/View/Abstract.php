@@ -62,7 +62,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $count = 0;
         $paths = array($request->getPath());
         do {
-            $url = $this->getRender()->getUrl(CM_Util::link($request->getPath(), $request->getQuery(), $request->getFragment()));
+            $url = $this->getRender()->getUrl(CM_Util::link($request->getPath(), $request->getQuery()));
             if ($count++ > 10) {
                 throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $paths) . ').');
             }

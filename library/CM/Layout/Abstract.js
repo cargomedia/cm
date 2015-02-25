@@ -59,7 +59,6 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
         }
         var layout = this;
         this._injectView(response, function(response) {
-          var fragment = response.url.substr(cm.getUrl().length);
           var reload = (layout.getClass() != response.layoutClass);
           if (reload) {
             window.location.replace(response.url);
@@ -67,8 +66,25 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
           }
           layout._$pagePlaceholder.replaceWith(this.$el);
           layout._$pagePlaceholder = null;
-          window.history.replaceState(null, null, fragment);
+          var pathResponse = response.url.substr(cm.getUrl().length);
+          if (path === pathResponse + window.location.hash) {
+            pathResponse = path;
+          }
+          window.history.replaceState(null, null, pathResponse);
           layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList, response.jsTracking);
+          if ('' !== window.location.hash) {
+            var hash = window.location.hash.substring(1);
+            var anchor = document.getElementById(hash);
+            if (!anchor) {
+              var anchorList = document.getElementsByName(hash);
+              if (anchorList.length) {
+                anchor = anchorList[0];
+              }
+            }
+            if (anchor) {
+              anchor.scrollIntoView();
+            }
+          }
         });
       },
       error: function(msg, type, isPublic) {
@@ -101,20 +117,6 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
       return '[data-menu-entry-hash=' + menuEntryHash + ']';
     });
     $(menuEntrySelectors.join(',')).addClass('active');
-    var hashPosition = url.indexOf('#');
-    if (-1 !== hashPosition) {
-      var hash = url.substring(hashPosition + 1);
-      var anchor = document.getElementById(hash);
-      if (!anchor) {
-        var anchorList = document.getElementsByName(hash);
-        if (anchorList.length) {
-          anchor = anchorList[0];
-        }
-      }
-      if (anchor) {
-        anchor.scrollIntoView();
-      }
-    }
     if (jsTracking) {
       new Function(jsTracking).call(this);
     }

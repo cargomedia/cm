@@ -23,25 +23,6 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertSame('CM_Layout_Mock1', $responseContent['success']['data']['layoutClass']);
     }
 
-    public function testLoadPageWithFragment() {
-        $viewer = CMTest_TH::createUser();
-        $environment = new CM_Frontend_Environment(null, $viewer);
-        $component = new CM_Page_View_Ajax_Test_Mock();
-        $path = CM_Page_View_Ajax_Test_Mock::getPath(['a' => 1]) . '#anchor';
-        $response = $this->getResponseAjax($component, 'loadPage', ['path' => $path], $environment);
-
-        $this->assertViewResponseSuccess($response);
-        $responseContent = CM_Params::decode($response->getContent(), true);
-        $this->assertArrayHasKey('js', $responseContent['success']['data']);
-        $this->assertArrayHasKey('html', $responseContent['success']['data']);
-        $this->assertArrayHasKey('autoId', $responseContent['success']['data']);
-        $this->assertSame(array(), $responseContent['success']['data']['menuEntryHashList']);
-        $this->assertSame('', $responseContent['success']['data']['title']);
-        $urlExpected = $response->getRender()->getUrlPage('CM_Page_View_Ajax_Test_Mock', ['a' => 1]) . '#anchor';
-        $this->assertSame($urlExpected, $responseContent['success']['data']['url']);
-        $this->assertSame('CM_Layout_Mock1', $responseContent['success']['data']['layoutClass']);
-    }
-
     public function testNotFoundErrorLogging() {
         CM_Config::get()->CM_Http_Response_Page->catch['CM_Exception_Nonexistent'] = [
             'path' => CM_Page_View_Ajax_Test_Mock::getPath(),

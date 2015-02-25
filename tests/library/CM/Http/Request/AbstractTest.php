@@ -217,16 +217,6 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $request->getHost();
     }
 
-    public function testGetFragment() {
-        $request = new CM_Http_Request_Get('/?a=1#anchor', array('host' => 'www.example.com'));
-        $this->assertSame('anchor', $request->getFragment());
-    }
-
-    public function testGetFragmentEmpty() {
-        $request = new CM_Http_Request_Get('/?a=1', array('host' => 'www.example.com'));
-        $this->assertSame('', $request->getFragment());
-    }
-
     public function testIsSupported() {
         $userAgentList = [
             'MSIE 6.0'                                            => false,
