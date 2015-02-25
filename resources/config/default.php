@@ -56,7 +56,7 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Http_Response_Page->exceptionsToCatch = array(
         'CM_Exception_Nonexistent'  => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => 'CM_Paging_Log_NotFound'],
-        'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => 'CM_Paging_Log_Error'],
+        'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => 'CM_Paging_Log_NotFound'],
         'CM_Exception_AuthRequired' => ['errorPage' => 'CM_Page_Error_AuthRequired', 'log' => null],
         'CM_Exception_NotAllowed'   => ['errorPage' => 'CM_Page_Error_NotAllowed', 'log' => null],
     );
