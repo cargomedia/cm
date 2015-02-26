@@ -121,19 +121,4 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
             $this->assertSame('Job failed', $ex->getMessage());
         }
     }
-
-    public function testRunGearmanDisabledEncodesObjects() {
-        CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
-        $foo = new stdClass();
-
-        $job = $this->mockObject('CM_Jobdistribution_Job_Abstract');
-        $executeMethod = $job->mockMethod('_execute')->set(function (CM_Params $params) {
-            $this->assertNotInstanceOf('stdClass', $params->get('foo'));
-        });
-
-        /** @var CM_Jobdistribution_Job_Abstract $job */
-        $job->queue(array('foo' => $foo));
-
-        $this->assertSame(1, $executeMethod->getCallCount());
-    }
 }
