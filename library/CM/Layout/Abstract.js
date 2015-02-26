@@ -66,13 +66,13 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
           }
           layout._$pagePlaceholder.replaceWith(this.$el);
           layout._$pagePlaceholder = null;
-          var pathResponse = response.url.substr(cm.getUrl().length);
-          if (path === pathResponse + window.location.hash) {
-            pathResponse = path;
+          var responsePath = response.url.substr(cm.getUrl().length);
+          if (path === responsePath + window.location.hash) {
+            responsePath = path;
           }
-          window.history.replaceState(null, null, pathResponse);
+          window.history.replaceState(null, null, responsePath);
           layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList, response.jsTracking);
-          if ('' !== window.location.hash) {
+          if (window.location.hash) {
             var hash = window.location.hash.substring(1);
             var anchor = document.getElementById(hash);
             if (!anchor) {
