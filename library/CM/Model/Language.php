@@ -112,7 +112,7 @@ class CM_Model_Language extends CM_Model_Abstract {
         }
 
         if ($writeCache && !$skipCacheLocal) {
-            $cache->set($cacheKey, $translations, 3600);
+            $cache->set($cacheKey, $translations, $this->_getConfig()->cacheLifetime);
         }
 
         if (!isset($translations[$phrase]['value'])) {
