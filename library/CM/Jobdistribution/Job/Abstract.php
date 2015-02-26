@@ -61,7 +61,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
         });
 
         foreach ($paramsList as $params) {
-            $workload = $this->_encodeParams($params);
+            $workload = CM_Params::encode($params, true);
             $task = $gearmanClient->addTask($this->_getJobName(), $workload);
             if (false === $task) {
                 throw new CM_Exception('Cannot add task `' . $this->_getJobName() . '`.');
@@ -87,7 +87,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
             return;
         }
 
-        $workload = $this->_encodeParams($params);
+        $workload = CM_Params::encode($params, true);
         $gearmanClient = $this->_getGearmanClient();
         $gearmanClient->doBackground($this->_getJobName(), $workload);
     }
@@ -100,13 +100,13 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     public function __executeGearman(GearmanJob $job) {
         $workload = $job->workload();
         try {
-            $params = $this->_decodeParams($workload);
+            $params = CM_Params::factory(CM_Params::jsonDecode($workload), true);
         } catch (CM_Exception_Nonexistent $ex) {
             throw new CM_Exception_Nonexistent(
                 'Cannot decode workload for Job `' . get_class($this) . '`: Original exception message `' . $ex->getMessage() .
                 '`', null, null, CM_Exception::WARN);
         }
-        return $this->_encodeParams($this->_executeJob($params));
+        return CM_Params::encode($this->_executeJob($params), true);
     }
 
     /**
@@ -123,8 +123,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     protected function _runMultipleWithoutGearman(array $paramsList) {
         $resultList = array();
         foreach ($paramsList as $params) {
-            $params = $this->_decodeParams($this->_encodeParams($params));
-            $resultList[] = $this->_executeJob($params);
+            $resultList[] = $this->_executeJob(CM_Params::factory($params, true));
         }
         return $resultList;
     }
@@ -150,22 +149,5 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
             $gearmanClient->addServer($server['host'], $server['port']);
         }
         return $gearmanClient;
-    }
-
-    /**
-     * @param array $params
-     * @return string
-     */
-    protected function _encodeParams($params) {
-        return CM_Params::encode($params, true);
-    }
-
-    /**
-     * @param string $params
-     * @return CM_Params
-     * @throws CM_Exception_Invalid
-     */
-    protected function _decodeParams($params) {
-        return CM_Params::factory(CM_Params::jsonDecode($params), true);
     }
 }
