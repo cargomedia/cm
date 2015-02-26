@@ -122,18 +122,14 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         }
     }
 
-    public function testRunGearmanDisabledWithNotSerializableObject() {
+    public function testRunGearmanDisabledEncodesObjects() {
         CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
-
         $foo = new stdClass();
-        $foo->closure = function() {
-            echo 'bar';
-        };
 
         $job = $this->getMockForAbstractClass('CM_Jobdistribution_Job_Abstract', array(), '', true, true, true, array('_execute'));
-        $job->expects($this->exactly(1))->method('_execute')->with($this->callback(function (CM_Params $params) use ($foo) {
+        $job->expects($this->exactly(1))->method('_execute')->with($this->callback(function (CM_Params $params) {
             $fooParam = $params->get('foo');
-            if ($fooParam['closure'] === $foo->closure) {
+            if ($fooParam instanceof stdClass) {
                 return false;
             }
             return true;
