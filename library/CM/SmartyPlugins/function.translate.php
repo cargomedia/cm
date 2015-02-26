@@ -1,6 +1,6 @@
 <?php
 
-function smarty_function_translateVariable($params, Smarty_Internal_Template $template) {
+function smarty_function_translate($params, Smarty_Internal_Template $template) {
     /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
 
