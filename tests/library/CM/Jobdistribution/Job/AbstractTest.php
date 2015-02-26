@@ -126,16 +126,14 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
         $foo = new stdClass();
 
-        $job = $this->getMockForAbstractClass('CM_Jobdistribution_Job_Abstract', array(), '', true, true, true, array('_execute'));
-        $job->expects($this->exactly(1))->method('_execute')->with($this->callback(function (CM_Params $params) {
-            $fooParam = $params->get('foo');
-            if ($fooParam instanceof stdClass) {
-                return false;
-            }
-            return true;
-        }));
+        $job = $this->mockObject('CM_Jobdistribution_Job_Abstract');
+        $executeMethod = $job->mockMethod('_execute')->set(function (CM_Params $params) {
+            $this->assertNotInstanceOf('stdClass', $params->get('foo'));
+        });
 
         /** @var CM_Jobdistribution_Job_Abstract $job */
         $job->queue(array('foo' => $foo));
+
+        $this->assertSame(1, $executeMethod->getCallCount());
     }
 }
