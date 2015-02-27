@@ -143,8 +143,8 @@ return function (CM_Config_Node $config) {
         'method' => array(
             'name'      => 'createFilesystem',
             'arguments' => array(
-                'adapter' => 'CM_File_Filesystem_Adapter_Local',
-                'options' => array(
+                'adapterClassName' => 'CM_File_Filesystem_Adapter_Local',
+                'options'          => array(
                     'pathPrefix' => DIR_ROOT . 'data/',
                 )
             )
@@ -156,8 +156,8 @@ return function (CM_Config_Node $config) {
         'method' => array(
             'name'      => 'createFilesystem',
             'arguments' => array(
-                'adapter' => 'CM_File_Filesystem_Adapter_Local',
-                'options' => array(
+                'adapterClassName' => 'CM_File_Filesystem_Adapter_Local',
+                'options'          => array(
                     'pathPrefix' => DIR_PUBLIC . 'userfiles/',
                 )
             )
