@@ -44,6 +44,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
      * @throws CM_Exception
      */
     public function runMultiple(array $paramsList) {
+        $this->_verifyParams($paramsList);
         if (!$this->_getGearmanEnabled()) {
             return $this->_runMultipleWithoutGearman($paramsList);
         }
@@ -82,6 +83,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
         if (null === $params) {
             $params = array();
         }
+        $this->_verifyParams($params);
         if (!$this->_getGearmanEnabled()) {
             $this->_runMultipleWithoutGearman(array($params));
             return;
@@ -149,5 +151,18 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
             $gearmanClient->addServer($server['host'], $server['port']);
         }
         return $gearmanClient;
+    }
+
+    /**
+     * @param mixed $value
+     * @throws CM_Exception_InvalidParam
+     */
+    protected static function _verifyParams($value) {
+        if (is_array($value)) {
+            $value = array_map('self::_verifyParams', $value);
+        }
+        if (is_object($value) && false === $value instanceof CM_ArrayConvertible) {
+            throw new CM_Exception_InvalidParam('Object of class `' . get_class($value) . '` is not an instance of CM_ArrayConvertible');
+        }
     }
 }
