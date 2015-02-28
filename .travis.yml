@@ -31,7 +31,7 @@ before_script:
   - npm install -g uglify-js@2.4.13
 
   - composer self-update
-  - composer install --dev
+  - composer install
   - cp tests/travis/config.php resources/config/local.php
   - bin/cm app set-deploy-version
 
