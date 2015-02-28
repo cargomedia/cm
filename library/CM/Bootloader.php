@@ -175,9 +175,9 @@ class CM_Bootloader {
         $serviceManager = CM_Service_Manager::getInstance();
 
         $serviceManager->register('filesystems', 'CM_Service_Filesystems');
-        $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', array(
-            new CM_File_Filesystem_Adapter_Local($this->getDirTmp()),
-        ));
+
+        $filesystemTmpAdapter = new CM_File_Filesystem_Adapter_Local($this->getDirTmp());
+        $serviceManager->registerInstance('filesystem-tmp', new CM_File_Filesystem($filesystemTmpAdapter));
 
         foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
             $serviceManager->registerWithArray($serviceKey, $serviceDefinition);

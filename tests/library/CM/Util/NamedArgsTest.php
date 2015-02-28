@@ -48,12 +48,12 @@ class CM_Util_NamedArgsTest extends CMTest_TestCase {
 
     /**
      * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Unmatched arguments: `bar`
+     * @expectedExceptionMessage Unmatched arguments: `bar, 0`
      */
     public function testMatchNamedArgsTooMany() {
         $function = function ($foo) {
         };
         $namedArgs = new CM_Util_NamedArgs();
-        $namedArgs->matchNamedArgs($function, ['foo' => 'foo', 'bar' => 'bar']);
+        $namedArgs->matchNamedArgs($function, ['foo' => 'foo', 'bar' => 'bar', 'numeric']);
     }
 }
