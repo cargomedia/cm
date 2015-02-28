@@ -190,19 +190,15 @@ class CM_Service_Manager extends CM_Class_Abstract {
         $namedArgs = new CM_Util_NamedArgs();
         $reflection = new ReflectionClass($config['class']);
 
-        $constructor = $reflection->getConstructor();
         $arguments = $config['arguments'];
-        if ($constructor && $namedArgs->isNamedArgs($arguments)) {
+        if ($constructor = $reflection->getConstructor()) {
             $arguments = $namedArgs->matchNamedArgs($constructor, $arguments);
         }
         $instance = $reflection->newInstanceArgs($arguments);
 
         if (null !== $config['method']) {
             $method = $reflection->getMethod($config['method']['name']);
-            $methodArguments = $config['method']['arguments'];
-            if ($method && $namedArgs->isNamedArgs($methodArguments)) {
-                $methodArguments = $namedArgs->matchNamedArgs($method, $methodArguments);
-            }
+            $methodArguments = $namedArgs->matchNamedArgs($method, $config['method']['arguments']);
             $instance = $method->invokeArgs($instance, $methodArguments);
         }
         if ($instance instanceof CM_Service_ManagerAwareInterface) {

@@ -25,14 +25,6 @@ class CM_Util_NamedArgsTest extends CMTest_TestCase {
         $namedArgs->instantiateReflection(array('foo', 'bar'));
     }
 
-    public function testIsNamedArgs() {
-        $namedArgs = new CM_Util_NamedArgs();
-        $this->assertTrue($namedArgs->isNamedArgs(['foo' => 'foo']));
-        $this->assertTrue($namedArgs->isNamedArgs([]));
-        $this->assertFalse($namedArgs->isNamedArgs(['foo' => 'foo', 'bar']));
-        $this->assertFalse($namedArgs->isNamedArgs(['foo' => 'foo', '123' => 'bar']));
-    }
-
     public function testMatchNamedArgs() {
         $function = function ($foo, $bar, $zoo = 'zoo') {
         };

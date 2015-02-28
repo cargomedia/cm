@@ -31,16 +31,6 @@ class CM_Util_NamedArgs {
     }
 
     /**
-     * @param array $args
-     * @return bool
-     */
-    public function isNamedArgs(array $args) {
-        return \Functional\none($args, function ($value, $key) {
-            return is_numeric($key);
-        });
-    }
-
-    /**
      * @param ReflectionFunctionAbstract|closure|callable $function
      * @throws CM_Exception_Invalid
      * @return ReflectionFunctionAbstract
