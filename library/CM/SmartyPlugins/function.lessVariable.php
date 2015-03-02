@@ -10,6 +10,9 @@ function smarty_function_lessVariable(array $params, Smarty_Internal_Template $t
     $assetCss->add('foo:@' . $variableName);
 
     $css = $assetCss->get(true);
-    preg_match('/^foo:(.+);$/', $css, $matches);
+
+    if (!preg_match('/^foo:(.+);$/', $css, $matches)) {
+        throw new CM_Exception_Invalid('Cannot detect variable `' . $variableName . '` from CSS `' . $css . '`.');
+    }
     return $matches[1];
 }
