@@ -150,6 +150,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $command = $this->mockClass('CM_Cli_Command')->newInstanceWithoutConstructor();
         $command->mockMethod('getSynchronized');
         $command->mockMethod('getKeepalive');
+        $command->mockMethod('extractParameters');
 
         $commandManager = $this->mockObject('CM_Cli_CommandManager');
         $commandManager->mockMethod('_getCommand')->set($command);
@@ -208,13 +209,14 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
      */
     protected function _getCommandMock($synchronized, $keepAlive, $expectedRuns) {
         $commandMock = $this->getMock('CM_Cli_Command',
-            array('getPackageName', '_getMethodName', 'isAbstract', 'getSynchronized', 'getKeepalive', 'run'),
+            array('getPackageName', '_getMethodName', 'isAbstract', 'getSynchronized', 'getKeepalive', 'run', 'extractParameters'),
             array(), '', false);
         $commandMock->expects($this->any())->method('getPackageName')->will($this->returnValue('package-mock'));
         $commandMock->expects($this->any())->method('_getMethodName')->will($this->returnValue('command-mock'));
         $commandMock->expects($this->any())->method('isAbstract')->will($this->returnValue(false));
         $commandMock->expects($this->any())->method('getSynchronized')->will($this->returnValue($synchronized));
         $commandMock->expects($this->any())->method('getKeepalive')->will($this->returnValue($keepAlive));
+        $commandMock->expects($this->any())->method('extractParameters')->will($this->returnValue([]));
         $commandMock->expects($this->exactly($expectedRuns))->method('run');
         return $commandMock;
     }
