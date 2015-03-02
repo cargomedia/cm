@@ -1,6 +1,6 @@
 <?php
 
-class CM_Dom_NodeList implements Iterator, Countable {
+class CM_Dom_NodeList implements Iterator, Countable, ArrayAccess {
 
     /** @var int */
     private $_iteratorPosition = 0;
@@ -33,10 +33,6 @@ class CM_Dom_NodeList implements Iterator, Countable {
         } else {
             $html = (string) $html;
 
-            if (empty($html)) {
-                throw new CM_Exception_Invalid('Cant create elementList from empty string');
-            }
-
             $this->_doc = new DOMDocument();
             $html = '<?xml version="1.0" encoding="UTF-8"?>' . $html;
 
@@ -54,7 +50,11 @@ class CM_Dom_NodeList implements Iterator, Countable {
             }
             libxml_use_internal_errors($libxmlUseErrorsBackup);
 
-            $this->_elementList[] = $this->_doc->documentElement;
+            foreach ($this->_getXPath()->query('../html/body') as $body) {
+                foreach ($body->childNodes as $childNode) {
+                    $this->_elementList[] = $childNode;
+                }
+            }
         }
     }
 
@@ -161,29 +161,33 @@ class CM_Dom_NodeList implements Iterator, Countable {
      * @return DOMElement[]
      */
     private function _findAll($selector) {
-        $xpath = '//' . preg_replace('-([^>\s])\s+([^>\s])-', '$1//$2', trim($selector));
-        $xpath = preg_replace('/([^\s]+)\s*\>\s*([^\s]+)/', '$1/$2', $xpath);
-        $xpath = preg_replace('/\[([^~=\[\]]+)~="([^~=\[\]]+)"\]/', '[contains(concat(" ",@$1," "),concat(" ","$2"," "))]', $xpath);
-        $xpath = preg_replace('/\[([^~=\[\]]+)="([^~=\[\]]+)"\]/', '[@$1="$2"]', $xpath);
-        $xpath = preg_replace('/\[([\w-]+)\]/', '[@$1]', $xpath);
+        $xpath = '. ' . $selector;
+        $xpath = preg_replace('#([^>\s])\s+([^>\s])#', '$1//$2', trim($xpath));
+        $xpath = preg_replace('#([^\s]+)\s*\>\s*([^\s]+)#', '$1/$2', $xpath);
+        $xpath = preg_replace('#\[([^~=\[\]]+)~="([^~=\[\]]+)"\]#', '[contains(concat(" ",@$1," "),concat(" ","$2"," "))]', $xpath);
+        $xpath = preg_replace('#\[([^~=\[\]]+)="([^~=\[\]]+)"\]#', '[@$1="$2"]', $xpath);
+        $xpath = preg_replace('#\[([\w-]+)\]#', '[@$1]', $xpath);
         $xpath = str_replace(':last', '[last()]', str_replace(':first', '[1]', $xpath));
-        $xpath = preg_replace_callback('/:eq\((\d+)\)/', function ($matches) {
+        $xpath = preg_replace_callback('#:eq\((\d+)\)#', function ($matches) {
             return '[' . ($matches[1] + 1) . ']';
         }, $xpath);
-        $xpath = preg_replace('/\.([\w-]*)/', '[contains(concat(" ",@class," "),concat(" ","$1"," "))]', $xpath);
-        $xpath = preg_replace('/#([\w-]*)/', '[@id="$1"]', $xpath);
-        $xpath = preg_replace('-\/\[-', '/*[', $xpath);
+        $xpath = preg_replace('#\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)#', '[contains(concat(" ",@class," "),concat(" ","$1"," "))]', $xpath);
+        $xpath = preg_replace('#\#([\w-]*)#', '[@id="$1"]', $xpath);
+        $xpath = preg_replace('#\/\[#', '/*[', $xpath);
         $nodes = array();
+
         foreach ($this->_elementList as $element) {
-            foreach ($this->_getXPath()->query('.' . $xpath, $element) as $resultElement) {
+            foreach ($this->_getXPath()->query($xpath, $element) as $resultElement) {
                 if (!$resultElement instanceof DOMElement) {
-                    throw new CM_Exception_Invalid('Xpath query does not return DOMElement');
+                    throw new CM_Exception_Invalid('Xpath query returns `' . get_class($resultElement) . '` instead of DOMElement');
                 }
                 $nodes[] = $resultElement;
             }
         }
         return $nodes;
     }
+
+    // Iterator interface functions
 
     public function current() {
         return new self(array($this->_elementList[$this->_iteratorPosition]));
@@ -205,7 +209,34 @@ class CM_Dom_NodeList implements Iterator, Countable {
         $this->_iteratorPosition = 0;
     }
 
+    // Countable interface functions
+
     public function count() {
         return count($this->_elementList);
+    }
+
+    // ArrayAccess interface functions
+
+    public function offsetExists($offset) {
+        return isset($this->_elementList[$offset]);
+    }
+
+    public function offsetGet($offset) {
+        return new self([$this->_elementList[$offset]]);
+    }
+
+    public function offsetSet($offset, $value) {
+        if (!$value instanceof DOMNode) {
+            throw new CM_Exception_Invalid('Element is not an instance of `DOMNode`', ['element' => $value]);
+        }
+        if (null === $offset) {
+            $this->_elementList[] = $value;
+        } else {
+            $this->_elementList[$offset] = $value;
+        }
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->_elementList[0]);
     }
 }

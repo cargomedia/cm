@@ -87,6 +87,13 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
+   * @return Boolean
+   */
+  hasField: function(name) {
+    return !!this._fields[name];
+  },
+
+  /**
    * @return jQuery
    */
   $: function(selector) {

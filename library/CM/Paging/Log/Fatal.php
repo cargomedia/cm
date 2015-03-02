@@ -10,4 +10,8 @@ class CM_Paging_Log_Fatal extends CM_Paging_Log_Abstract {
         $metaInfo = array_merge((array) $metaInfo, $this->_getDefaultMetaInfo());
         $this->_add($msg, $metaInfo);
     }
+
+    public function cleanUp() {
+        $this->_deleteOlderThan(30 * 86400);
+    }
 }

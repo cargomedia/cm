@@ -22,7 +22,7 @@ class CM_FormField_Date extends CM_FormField_Abstract {
         return new DateTime($yy . '-' . $mm . '-' . $dd);
     }
 
-    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
+    public function prepare(CM_Params $renderParams, CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
 
         $years = range($this->_yearFirst, $this->_yearLast);
