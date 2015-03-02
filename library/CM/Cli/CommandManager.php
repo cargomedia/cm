@@ -171,6 +171,8 @@ class CM_Cli_CommandManager {
             $streamError = $this->_streamError;
 
             $parameters = $command->extractParameters($arguments);
+            $this->_checkUnusedArguments($arguments);
+
             $workload = function () use ($transactionName, $command, $parameters, $streamInput, $streamOutput, $streamError) {
                 if ($command->getKeepalive()) {
                     CMService_Newrelic::getInstance()->ignoreTransaction();
@@ -231,6 +233,19 @@ class CM_Cli_CommandManager {
         $hostId = dechex($lock['hostId']);
         $processId = (int) $lock['processId'];
         throw new CM_Cli_Exception_Internal("Command `$commandName` still running (process `$processId` on host `$hostId`)");
+    }
+
+    /**
+     * @param CM_Cli_Arguments $arguments
+     * @throws CM_Cli_Exception_InvalidArguments
+     */
+    protected function _checkUnusedArguments(CM_Cli_Arguments $arguments) {
+        if ($arguments->getNumeric()->getParamsDecoded()) {
+            throw new CM_Cli_Exception_InvalidArguments('Too many arguments provided');
+        }
+        if ($named = $arguments->getNamed()->getParamsDecoded()) {
+            throw new CM_Cli_Exception_InvalidArguments('Illegal option used: `--' . key($named) . '`');
+        }
     }
 
     /**

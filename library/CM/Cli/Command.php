@@ -34,7 +34,6 @@ class CM_Cli_Command {
      */
     public function extractParameters(CM_Cli_Arguments $arguments) {
         $parameters = $arguments->extractMethodParameters($this->_method);
-        $arguments->checkUnused();
         return $parameters;
     }
 

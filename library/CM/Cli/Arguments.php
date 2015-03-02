@@ -59,18 +59,6 @@ class CM_Cli_Arguments {
     }
 
     /**
-     * @throws CM_Cli_Exception_InvalidArguments
-     */
-    public function checkUnused() {
-        if ($this->getNumeric()->getParamsDecoded()) {
-            throw new CM_Cli_Exception_InvalidArguments('Too many arguments provided');
-        }
-        if ($named = $this->getNamed()->getParamsDecoded()) {
-            throw new CM_Cli_Exception_InvalidArguments('Illegal option used: `--' . key($named) . '`');
-        }
-    }
-
-    /**
      * @param string $argument
      */
     private function _parseArgument($argument) {
