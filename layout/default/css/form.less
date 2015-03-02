@@ -362,19 +362,25 @@ input[type=checkbox].checkbox-switch {
   padding: 6px;
 }
 
+.formField[min-width="@{breakpointSmall}"] {
+  > label {
+    width: 100px;
+    float: left;
+    padding-top: (@heightInputText - @fontSize * @fontLineHeight) / 2;
+    text-align: right;
+  }
+
+  > .input {
+    margin-left: 110px;
+  }
+}
+
 .formField {
   > label {
     box-sizing: border-box;
     color: @fontColorStrong;
     padding-left: 2px;
     .word_wrap;
-
-    @media (min-width: 600px) {
-      width: 100px;
-      float: left;
-      padding-top: (@heightInputText - @fontSize * @fontLineHeight) / 2;
-      text-align: right;
-    }
 
     &:after {
       content: ":";
@@ -383,13 +389,6 @@ input[type=checkbox].checkbox-switch {
     .CM_FormField_Abstract {
       float: left;
       margin-right: 3px;
-    }
-  }
-
-  > .input {
-
-    @media (min-width: 600px) {
-      margin-left: 110px;
     }
   }
 
