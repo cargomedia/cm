@@ -158,20 +158,20 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
             ->at(0, function () use ($processMock) {
                 $processSuccess = $processMock->newInstance();
                 $processSuccess->mockMethod('waitForChildren')->set([
-                    new CM_Process_WorkloadResult(true),
-                    new CM_Process_WorkloadResult(true),
-                    new CM_Process_WorkloadResult(true),
-                    new CM_Process_WorkloadResult(true),
+                    (new CM_Process_WorkloadResult())->setResult(true),
+                    (new CM_Process_WorkloadResult())->setResult(true),
+                    (new CM_Process_WorkloadResult())->setResult(true),
+                    (new CM_Process_WorkloadResult())->setResult(true),
                 ]);
                 return $processSuccess;
             })
             ->at(1, function () use ($processMock) {
                 $processFailure = $processMock->newInstance();
                 $processFailure->mockMethod('waitForChildren')->set([
-                    new CM_Process_WorkloadResult(true),
-                    new CM_Process_WorkloadResult(false, new Exception('Workload failed')),
-                    new CM_Process_WorkloadResult(true),
-                    new CM_Process_WorkloadResult(true),
+                    (new CM_Process_WorkloadResult())->setResult(true),
+                    (new CM_Process_WorkloadResult())->setResult(false)->setException(new Exception('Workload failed')),
+                    (new CM_Process_WorkloadResult())->setResult(true),
+                    (new CM_Process_WorkloadResult())->setResult(true),
                 ]);
                 return $processFailure;
             });
@@ -190,7 +190,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $keepAliveExpected = $commandMock->getKeepalive();
         $processMock = $this->_getProcessMock($keepAliveExpected);
         $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
-            array('getCommands', '_getProcess', '_findLock', '_lockCommand', 'unlockCommand', '_outputError'));
+            array('getCommands', '_getProcess', '_findLock', '_lockCommand', 'unlockCommand', '_outputError', '_checkUnusedArguments'));
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         if (null === $errorMessageExpected) {
             $commandManagerMock->expects($this->never())->method('_outputError');
@@ -198,6 +198,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
             $commandManagerMock->expects($this->once())->method('_outputError')->with($errorMessageExpected);
         }
         $commandManagerMock->expects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
+        $commandManagerMock->expects($this->any())->method('_checkUnusedArguments');
         return $commandManagerMock;
     }
 

@@ -170,25 +170,37 @@ Parent terminated.
             usleep(50 * 1000);
             return array('msg' => 'Child 2 finished');
         });
-        $process->fork(function () {
+        $process->fork(function (CM_Process_WorkloadResult $result) {
             usleep(150 * 1000);
             throw new CM_Exception('Child 3 finished');
         });
+        $process->fork(function (CM_Process_WorkloadResult $result) {
+            usleep(200 * 1000);
+            $result->setException(new CM_Exception('Child 4 finished'));
+        });
 
         $workloadResultList = $process->waitForChildren();
-        $this->assertCount(3, $workloadResultList);
+        $this->assertCount(4, $workloadResultList);
 
         $this->assertSame('Child 1 finished', $workloadResultList[1]->getResult());
         $this->assertSame(null, $workloadResultList[1]->getException());
+        $this->assertTrue($workloadResultList[1]->isSuccess());
 
         $this->assertSame(array('msg' => 'Child 2 finished'), $workloadResultList[2]->getResult());
         $this->assertSame(null, $workloadResultList[2]->getException());
+        $this->assertTrue($workloadResultList[2]->isSuccess());
 
         $this->assertSame(null, $workloadResultList[3]->getResult());
         $this->assertSame('Child 3 finished', $workloadResultList[3]->getException()->getMessage());
+        $this->assertFalse($workloadResultList[3]->isSuccess());
         $errorLog = new CM_Paging_Log_Error();
         $this->assertSame(1, $errorLog->getCount());
+
         $this->assertContains('Child 3 finished', $errorLog->getItem(0)['msg']);
+        $this->assertSame(null, $workloadResultList[4]->getResult());
+        $this->assertSame('Child 4 finished', $workloadResultList[4]->getException()->getMessage());
+        $this->assertFalse($workloadResultList[4]->isSuccess());
+        $this->assertSame(1, $errorLog->getCount());
 
         $bootloader->setExceptionHandler($exceptionHandlerBackup);
     }
