@@ -194,11 +194,15 @@ class CM_Util {
     }
 
     /**
-     * @param string $path
-     * @param array  $params Query parameters
+     * @param string      $path
+     * @param array       $params Query parameters
+     * @param string|null $fragment
      * @return string
      */
-    public static function link($path, array $params = null) {
+    public static function link($path, array $params = null, $fragment = null) {
+        $path = (string) $path;
+        $fragment = (string) $fragment;
+
         $link = $path;
 
         if (!empty($params)) {
@@ -207,6 +211,10 @@ class CM_Util {
             if (strlen($query) > 0) {
                 $link .= '?' . $query;
             }
+        }
+
+        if ('' !== $fragment) {
+            $link .= '#' . $fragment;
         }
 
         return $link;

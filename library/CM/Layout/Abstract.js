@@ -59,7 +59,6 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
         }
         var layout = this;
         this._injectView(response, function(response) {
-          var fragment = response.url.substr(cm.getUrl().length);
           var reload = (layout.getClass() != response.layoutClass);
           if (reload) {
             window.location.replace(response.url);
@@ -67,6 +66,10 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
           }
           layout._$pagePlaceholder.replaceWith(this.$el);
           layout._$pagePlaceholder = null;
+          var fragment = response.url.substr(cm.getUrl().length);
+          if (path === fragment + window.location.hash) {
+            fragment = path;
+          }
           window.history.replaceState(null, null, fragment);
           layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList, response.jsTracking);
         });
@@ -103,6 +106,19 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     $(menuEntrySelectors.join(',')).addClass('active');
     if (jsTracking) {
       new Function(jsTracking).call(this);
+    }
+    if (window.location.hash) {
+      var hash = window.location.hash.substring(1);
+      var anchor = document.getElementById(hash);
+      if (!anchor) {
+        var anchorList = document.getElementsByName(hash);
+        if (anchorList.length) {
+          anchor = anchorList[0];
+        }
+      }
+      if (anchor) {
+        anchor.scrollIntoView();
+      }
     }
   },
 
