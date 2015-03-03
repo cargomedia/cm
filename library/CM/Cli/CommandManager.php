@@ -170,17 +170,7 @@ class CM_Cli_CommandManager {
             $streamOutput = $this->_streamOutput;
             $streamError = $this->_streamError;
 
-            $parameters = $command->extractParameters($arguments);
-            $this->_checkUnusedArguments($arguments);
-
-            $workload = function () use ($transactionName, $command, $parameters, $streamInput, $streamOutput, $streamError) {
-                if ($command->getKeepalive()) {
-                    CMService_Newrelic::getInstance()->ignoreTransaction();
-                } else {
-                    CMService_Newrelic::getInstance()->startTransaction($transactionName);
-                }
-                $command->run($parameters, $streamInput, $streamOutput, $streamError);
-            };
+            $workload = $this->_getProcessWorkLoad($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError);
 
             $forks = max($this->_forks, 1);
             $process = $this->_getProcess();
@@ -195,14 +185,6 @@ class CM_Cli_CommandManager {
                 return 1;
             }
             return 0;
-        } catch (CM_Cli_Exception_InvalidArguments $e) {
-            $this->_outputError('ERROR: ' . $e->getMessage() . PHP_EOL);
-            if (isset($command)) {
-                $this->_outputError('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
-            } else {
-                $this->_outputError($this->getHelp());
-            }
-            return 1;
         } catch (CM_Cli_Exception_Internal $e) {
             $this->_outputError('ERROR: ' . $e->getMessage() . PHP_EOL);
             return 1;
@@ -281,6 +263,41 @@ class CM_Cli_CommandManager {
      */
     protected function  _getProcess() {
         return CM_Process::getInstance();
+    }
+
+    /**
+     * @param string                    $transactionName
+     * @param CM_Cli_Command            $command
+     * @param CM_Cli_Arguments          $arguments
+     * @param CM_InputStream_Interface  $streamInput
+     * @param CM_OutputStream_Interface $streamOutput
+     * @param CM_OutputStream_Interface $streamError
+     * @return callable
+     */
+    protected function _getProcessWorkload($transactionName, CM_Cli_Command $command, CM_Cli_Arguments $arguments, CM_InputStream_Interface $streamInput, CM_OutputStream_Interface $streamOutput, CM_OutputStream_Interface $streamError) {
+        return function (CM_Process_WorkloadResult $result) use ($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError) {
+            try {
+                $parameters = $command->extractParameters($arguments);
+                $this->_checkUnusedArguments($arguments);
+                if ($command->getKeepalive()) {
+                    CMService_Newrelic::getInstance()->ignoreTransaction();
+                } else {
+                    CMService_Newrelic::getInstance()->startTransaction($transactionName);
+                }
+                $command->run($parameters, $streamInput, $streamOutput, $streamError);
+            } catch (CM_Cli_Exception_InvalidArguments $ex) {
+                $this->_outputError('ERROR: ' . $ex->getMessage() . PHP_EOL);
+                if (isset($command)) {
+                    $this->_outputError('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
+                } else {
+                    $this->_outputError($this->getHelp());
+                }
+                $result->setException($ex);
+            } catch (CM_Cli_Exception_Internal $ex) {
+                $this->_outputError('ERROR: ' . $ex->getMessage() . PHP_EOL);
+                $result->setException($ex);
+            }
+        };
     }
 
     /**

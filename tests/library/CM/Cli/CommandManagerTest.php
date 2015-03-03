@@ -229,7 +229,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
     protected function _getProcessMock($keepAliveExpected) {
         $processMock = $this->getMock('CM_Process', array('fork', 'waitForChildren'), array(), '', false);
         $processMock->expects($this->any())->method('fork')->will($this->returnCallback(function ($workload) {
-            $workload();
+            $workload(new CM_Process_WorkloadResult());
         }));
         $waitForChildrenMock = function ($keepAlive, $terminationCallback) {
             if (isset($terminationCallback)) {
