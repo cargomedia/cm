@@ -40,6 +40,10 @@
       }
     },
 
+    /**
+     * @param {jQuery} $target
+     * @returns {jQuery}
+     */
     scrollTo: function($target) {
       if ($target.length == 0) {
         return;
