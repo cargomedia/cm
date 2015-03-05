@@ -44,7 +44,14 @@
       if (target.length == 0) {
         return;
       }
-      this.scrollTop(target.offset().top);
+      return this.each(function() {
+        var scrollable = this;
+        var scrollableOffsetTop = 0;
+        if (scrollable !== document) {
+          scrollableOffsetTop = $(scrollable).offset().top;
+        }
+        $(scrollable).scrollTop(target.offset().top - scrollableOffsetTop + $(scrollable).scrollTop());
+      });
     },
 
     nextOrFirst: function(selector) {
