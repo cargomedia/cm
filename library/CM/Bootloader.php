@@ -174,6 +174,7 @@ class CM_Bootloader {
     protected function _registerServices() {
         $serviceManager = CM_Service_Manager::getInstance();
 
+        $serviceManager->registerInstance('debug', new CM_Debug($this->isDebug()));
         $serviceManager->register('filesystems', 'CM_Service_Filesystems');
 
         $filesystemTmpAdapter = new CM_File_Filesystem_Adapter_Local($this->getDirTmp());

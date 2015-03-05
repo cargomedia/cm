@@ -42,8 +42,8 @@ var CM_App = CM_Class_Abstract.extend({
       return view;
     }
     return _.find(this.views, function(view) {
-      return view.hasClass(className);
-    }) || null;
+        return view.hasClass(className);
+      }) || null;
   },
 
   /**
@@ -1026,8 +1026,7 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   model: {
-    types: {
-    }
+    types: {}
   },
 
   action: {
@@ -1174,7 +1173,7 @@ var CM_App = CM_Class_Abstract.extend({
      */
     _getFragment: function() {
       var location = window.location;
-      return location.pathname + location.search;
+      return location.pathname + location.search + location.hash;
     },
 
     /**
