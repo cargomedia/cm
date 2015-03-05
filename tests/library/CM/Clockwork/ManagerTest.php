@@ -87,12 +87,12 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $event2 = new CM_Clockwork_Event('event2', '01:00');
         $manager->registerEvent($event1);
         $manager->registerEvent($event2);
+
         $currently->modify('4 seconds');
         $this->assertFalse($_shouldRun->invoke($manager, $event1));
         $this->assertFalse($_shouldRun->invoke($manager, $event2));
         $process->mockMethod('listenForChildren')->set([]);
         $manager->runEvents();
-
         $this->assertEquals($startTime, $storage->getLastRuntime($event1));
         $this->assertNull($storage->getLastRuntime($event2));
 
@@ -102,10 +102,13 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager = $managerMock->newInstance();
         $manager->setStorage($storage);
         $manager->registerEvent($event1);
+
         $this->assertFalse($_shouldRun->invoke($manager, $event1));
+        $manager->runEvents();
+        $this->assertEquals($startTime, $storage->getLastRuntime($event1));
+
         $currently->modify('1 second');
         $this->assertTrue($_shouldRun->invoke($manager, $event1));
-
         $process->mockMethod('listenForChildren')->set([1 => new CM_Process_WorkloadResult(null, null)]);
         $manager->runEvents();
         $this->assertEquals($currently, $storage->getLastRuntime($event1));
