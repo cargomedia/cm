@@ -45,8 +45,12 @@ class CM_Clockwork_Manager {
     public function runEvents() {
         $process = $this->_getProcess();
         foreach ($this->_events as $event) {
-            if (!$this->_isRunning($event) && $this->_shouldRun($event)) {
-                $this->_runEvent($event);
+            if (!$this->_isRunning($event)) {
+                if ($this->_shouldRun($event)) {
+                    $this->_runEvent($event);
+                } elseif (null === $this->_storage->getLastRuntime($event) && $this->_isIntervalEvent($event)) {
+                    $this->_storage->setRuntime($event, $this->_startTime);
+                }
             }
         }
         $resultList = $process->listenForChildren();

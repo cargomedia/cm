@@ -49,6 +49,51 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertFalse(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event2]));
     }
 
+    public function testIntervalEventsNotPushedBackByClockworkRestart() {
+        $currently = new DateTime('midnight', new DateTimeZone('UTC'));
+        $lastRuntime = null;
+        $process = $this->mockClass('CM_Process')->newInstanceWithoutConstructor();
+        $forkMock = $process->mockMethod('fork');
+        $forkMock->set(function () use ($forkMock) {
+            return $forkMock->getCallCount();
+        });
+        $storage = $this->mockObject('CM_Clockwork_Storage_Memory');
+        /** @var CM_Clockwork_Storage_Abstract $storage */
+        $managerMock = $this->mockClass('CM_Clockwork_Manager');
+        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
+            return clone $currently;
+        });
+        $managerMock->mockMethod('_getProcess')->set($process);
+        /** @var CM_Clockwork_Manager $manager */
+        $manager = $managerMock->newInstance();
+        $startTime = clone $currently;
+        $manager->setStorage($storage);
+        $event = new CM_Clockwork_Event('event1', '5 seconds');
+        $manager->registerEvent($event);
+
+        $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
+        $currently->modify('4 seconds');
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $process->mockMethod('listenForChildren')->set([]);
+        $manager->runEvents();
+
+        $this->assertEquals($startTime, $storage->getLastRuntime($event));
+        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
+            return clone $currently;
+        });
+        $manager = $managerMock->newInstance();
+        $manager->setStorage($storage);
+        $manager->registerEvent($event);
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $currently->modify('1 second');
+        $this->assertTrue($_shouldRun->invoke($manager, $event));
+
+        $process->mockMethod('listenForChildren')->set([1 => new CM_Process_WorkloadResult(null, null)]);
+        $manager->runEvents();
+        $this->assertEquals($currently, $storage->getLastRuntime($event));
+        $this->assertFalse($_shouldRun->invoke($manager, $event));
+    }
+
     public function testShouldRunFixedTimeMode() {
         $timeZone = CM_Bootloader::getInstance()->getTimeZone();
         $currently = new DateTime('midnight', new DateTimeZone('UTC'));
