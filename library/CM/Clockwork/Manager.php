@@ -37,8 +37,16 @@ class CM_Clockwork_Manager {
 
     /**
      * @param CM_Clockwork_Event $event
+     * @throws CM_Exception
      */
     public function registerEvent(CM_Clockwork_Event $event) {
+        $eventName = $event->getName();
+        $duplicateEventName = \Functional\some($this->_events, function (CM_Clockwork_Event $event) use ($eventName) {
+            return $event->getName() == $eventName;
+        });
+        if ($duplicateEventName) {
+            throw new CM_Exception('Duplicate event-name', ['name' => $eventName]);
+        }
         $this->_events[] = $event;
     }
 

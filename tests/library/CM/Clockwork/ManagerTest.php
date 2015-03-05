@@ -2,6 +2,18 @@
 
 class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
+    public function testRegisterEvent() {
+        $manager = new CM_Clockwork_Manager();
+        $manager->registerEvent(new CM_Clockwork_Event('foo', '1 second'));
+        $manager->registerEvent(new CM_Clockwork_Event('bar', '1 second'));
+        try {
+            $manager->registerEvent(new CM_Clockwork_Event('foo', '1 second'));
+            $this->fail('Registered duplicate event');
+        } catch (CM_Exception $ex) {
+            $this->assertSame('Duplicate event-name', $ex->getMessage());
+        }
+    }
+
     public function testRunNonBlocking() {
         $process = $this->mockClass('CM_Process')->newInstanceWithoutConstructor();
         $forkMock = $process->mockMethod('fork');
