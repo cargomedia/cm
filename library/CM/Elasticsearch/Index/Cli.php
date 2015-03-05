@@ -76,7 +76,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public function optimize() {
-        foreach (CM_Service_Manager::getInstance()->getElasticsearch()->getClients() as $client) {
+        foreach (CM_Service_Manager::getInstance()->getElasticsearch()->getClientList() as $client) {
             $client->optimizeAll();
         }
     }

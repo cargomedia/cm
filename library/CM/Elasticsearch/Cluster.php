@@ -1,6 +1,8 @@
 <?php
 
-class CM_Elasticsearch_Cluster extends CM_Class_Abstract {
+class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var Elastica\Client[] */
     private $_clients;
@@ -23,7 +25,7 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract {
     /**
      * @return \Elastica\Client[]
      */
-    public function getClients() {
+    public function getClientList() {
         return $this->_clients;
     }
 
@@ -58,17 +60,18 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract {
         if (!$this->getEnabled()) {
             return array();
         }
-        CM_Service_Manager::getInstance()->getDebug()->incStats('search', json_encode($data));
+        $this->getServiceManager()->getDebug()->incStats('search', json_encode($data));
+        $client = $this->getRandomClient();
 
-        $search = new Elastica\Search($this->getRandomClient());
+        $search = new Elastica\Search($client);
         foreach ($types as $type) {
             $search->addIndex($type->getIndex());
             $search->addType($type->getType());
         }
         try {
-            $response = $this->getRandomClient()->request($search->getPath(), 'GET', $data);
+            $response = $client->request($search->getPath(), 'GET', $data);
         } catch (Elastica\Exception\ConnectionException $ex) {
-            foreach ($this->getRandomClient()->getConnections() as $connection) {
+            foreach ($client->getConnections() as $connection) {
                 $connection->setEnabled();
             }
             throw $ex;

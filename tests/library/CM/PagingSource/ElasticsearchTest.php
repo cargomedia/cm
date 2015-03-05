@@ -16,7 +16,7 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
     }
 
     public function setUp() {
-        CM_Service_Manager::getInstance()->getElasticsearch()->setEnabled(true);
+        CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(true);
         $type1 = new CM_Elasticsearch_Type_Mock1();
         $type2 = new CM_Elasticsearch_Type_Mock2();
         $type3 = new CM_Elasticsearch_Type_Mock3();
@@ -29,7 +29,7 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
     }
 
     public function tearDown() {
-        CM_Service_Manager::getInstance()->getElasticsearch()->setEnabled(false);
+        CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(false);
         CMTest_TH::clearEnv();
     }
 
