@@ -118,6 +118,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
       }
       if (anchor) {
         anchor.scrollIntoView();
+        $(document).scrollTop($(document).scrollTop() - page.$el.offset().top);
       }
     }
   },
