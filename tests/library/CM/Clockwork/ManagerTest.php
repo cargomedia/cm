@@ -73,7 +73,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $storage = new CM_Clockwork_Storage_Memory();
         /** @var CM_Clockwork_Storage_Abstract $storage */
         $managerMock = $this->mockClass('CM_Clockwork_Manager');
-        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
+        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use ($currently) {
             return clone $currently;
         });
         $managerMock->mockMethod('_getProcess')->set($process);
@@ -96,7 +96,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertEquals($startTime, $storage->getLastRuntime($event1));
         $this->assertNull($storage->getLastRuntime($event2));
 
-        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
+        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use ($currently) {
             return clone $currently;
         });
         $manager = $managerMock->newInstance();
