@@ -185,8 +185,8 @@ EOL;
      */
     private function _getServiceManagerWithGA($code) {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('googleanalytics', 'CMService_GoogleAnalytics_Client', [$code]);
-        $serviceManager->register('trackings', 'CM_Service_Trackings', [['googleanalytics']]);
+        $serviceManager->registerInstance('googleanalytics', new CMService_GoogleAnalytics_Client($code));
+        $serviceManager->registerInstance('trackings', new CM_Service_Trackings(['googleanalytics']));
         return $serviceManager;
     }
 }

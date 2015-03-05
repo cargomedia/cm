@@ -4,7 +4,7 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
 
     public function testHas() {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('foo', 'DummyService', array('bar'));
+        $serviceManager->register('foo', 'DummyService', array('foo' => 'bar'));
         $serviceManager->registerInstance('bar', 'my-service');
 
         $this->assertTrue($serviceManager->has('foo'));
@@ -14,7 +14,7 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
 
     public function testGet() {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('DummyService', 'DummyService', array('bar'));
+        $serviceManager->register('DummyService', 'DummyService', array('foo' => 'bar'));
 
         /** @var DummyService $service */
         $service = $serviceManager->get('DummyService');
@@ -23,7 +23,7 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
 
     public function testGetAssertInstanceOf() {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('DummyService', 'DummyService', array('bar'));
+        $serviceManager->register('DummyService', 'DummyService', array('foo' => 'bar'));
 
         /** @var DummyService $service */
         $service = $serviceManager->get('DummyService', 'DummyService');
@@ -32,7 +32,7 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
 
     public function testGetWithMethod() {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('DummyService', 'DummyService', array('bar'), 'getArray', array('foo', 1234));
+        $serviceManager->register('DummyService', 'DummyService', array('foo' => 'bar'), 'getArray', array('key' => 'foo', 'value' => 1234));
 
         /** @var DummyService $service */
         $service = $serviceManager->get('DummyService');
@@ -45,14 +45,14 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
      */
     public function testGetAssertInstanceOfInvalid() {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('DummyService', 'DummyService', array('bar'));
+        $serviceManager->register('DummyService', 'DummyService', array('foo' => 'bar'));
 
         $serviceManager->get('DummyService', 'SomethingElse');
     }
 
     public function testServiceMethod() {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('DummyService', 'DummyService', array('bar'));
+        $serviceManager->register('DummyService', 'DummyService', array('foo' => 'bar'));
 
         /** @var DummyService $service */
         $service = $serviceManager->get('DummyService');
@@ -61,7 +61,7 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
 
     public function testInstanceCaching() {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('DummyService', 'DummyService', array('bar'));
+        $serviceManager->register('DummyService', 'DummyService', array('foo' => 'bar'));
 
         $service1 = $serviceManager->get('DummyService');
         $service2 = $serviceManager->get('DummyService');
@@ -80,7 +80,7 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
 
     public function testMagicGet() {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('DummyService', 'DummyService', array('bar'));
+        $serviceManager->register('DummyService', 'DummyService', array('foo' => 'bar'));
 
         $service1 = $serviceManager->getDummyService();
         $service2 = $serviceManager->get('DummyService');
@@ -93,8 +93,8 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
      */
     public function testRegisterTwice() {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('DummyService', 'DummyService', array('bar'));
-        $serviceManager->register('DummyService', 'DummyService', array('bar'));
+        $serviceManager->register('DummyService', 'DummyService', array('foo' => 'bar'));
+        $serviceManager->register('DummyService', 'DummyService', array('foo' => 'bar'));
     }
 
     public function testRegisterInstance() {
