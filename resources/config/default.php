@@ -201,7 +201,7 @@ return function (CM_Config_Node $config) {
     $config->services['memcache'] = array(
         'class'     => 'CM_Memcache_Client',
         'arguments' => array(
-            array(
+            'servers' => array(
                 ['host' => 'localhost', 'port' => 11211],
             ),
         ),
