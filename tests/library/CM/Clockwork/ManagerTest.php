@@ -69,30 +69,35 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager = $managerMock->newInstance();
         $startTime = clone $currently;
         $manager->setStorage($storage);
-        $event = new CM_Clockwork_Event('event1', '5 seconds');
-        $manager->registerEvent($event);
-
         $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
+
+        $event1 = new CM_Clockwork_Event('event1', '5 seconds');
+        $event2 = new CM_Clockwork_Event('event2', '01:00');
+        $manager->registerEvent($event1);
+        $manager->registerEvent($event2);
         $currently->modify('4 seconds');
-        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $this->assertFalse($_shouldRun->invoke($manager, $event1));
+        $this->assertFalse($_shouldRun->invoke($manager, $event2));
         $process->mockMethod('listenForChildren')->set([]);
         $manager->runEvents();
 
-        $this->assertEquals($startTime, $storage->getLastRuntime($event));
+        $this->assertEquals($startTime, $storage->getLastRuntime($event1));
+        $this->assertNull($storage->getLastRuntime($event2));
+
         $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
             return clone $currently;
         });
         $manager = $managerMock->newInstance();
         $manager->setStorage($storage);
-        $manager->registerEvent($event);
-        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $manager->registerEvent($event1);
+        $this->assertFalse($_shouldRun->invoke($manager, $event1));
         $currently->modify('1 second');
-        $this->assertTrue($_shouldRun->invoke($manager, $event));
+        $this->assertTrue($_shouldRun->invoke($manager, $event1));
 
         $process->mockMethod('listenForChildren')->set([1 => new CM_Process_WorkloadResult(null, null)]);
         $manager->runEvents();
-        $this->assertEquals($currently, $storage->getLastRuntime($event));
-        $this->assertFalse($_shouldRun->invoke($manager, $event));
+        $this->assertEquals($currently, $storage->getLastRuntime($event1));
+        $this->assertFalse($_shouldRun->invoke($manager, $event1));
     }
 
     public function testShouldRunFixedTimeMode() {
