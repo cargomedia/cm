@@ -50,6 +50,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
     }
 
     public function testIntervalEventsNotPushedBackByClockworkRestart() {
+        // infinite pushback on restart problem for long intervals
         $currently = new DateTime('midnight', new DateTimeZone('UTC'));
         $lastRuntime = null;
         $process = $this->mockClass('CM_Process')->newInstanceWithoutConstructor();
@@ -57,7 +58,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $forkMock->set(function () use ($forkMock) {
             return $forkMock->getCallCount();
         });
-        $storage = $this->mockObject('CM_Clockwork_Storage_Memory');
+        $storage = new CM_Clockwork_Storage_Memory();
         /** @var CM_Clockwork_Storage_Abstract $storage */
         $managerMock = $this->mockClass('CM_Clockwork_Manager');
         $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
@@ -98,7 +99,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $timeZone = CM_Bootloader::getInstance()->getTimeZone();
         $currently = new DateTime('midnight', new DateTimeZone('UTC'));
         $lastRuntime = null;
-        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Abstract');
         $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
             if ($lastRuntime instanceof DateTime) {
                 return clone $lastRuntime;
@@ -111,7 +112,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         });
         $_shouldRun = CMTest_TH::getProtectedMethod('CM_Clockwork_Manager', '_shouldRun');
         /** @var CM_Clockwork_Storage_FileSystem $storage */
-        $storage = $storageClass->newInstance();
+        $storage = $storageClass->newInstanceWithoutConstructor();
 
         $currently = new DateTime('13:59:59', $timeZone);
         /** @var CM_Clockwork_Manager $manager */
@@ -172,7 +173,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
     public function testShouldRunIntervalMode() {
         $currently = new DateTime('now', new DateTimeZone('UTC'));
         $lastRuntime = null;
-        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Abstract');
         $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
             if ($lastRuntime instanceof DateTime) {
                 return clone $lastRuntime;
@@ -183,8 +184,8 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
             return clone $currently;
         });
-        /** @var CM_Clockwork_Storage_FileSystem $storage */
-        $storage = $storageClass->newInstance();
+        /** @var CM_Clockwork_Storage_Abstract $storage */
+        $storage = $storageClass->newInstanceWithoutConstructor();
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
         $manager->setStorage($storage);
@@ -229,7 +230,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
             return clone $currently;
         });
-        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Abstract');
         $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
             if ($lastRuntime instanceof DateTime) {
                 return clone $lastRuntime;
@@ -237,7 +238,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
             return $lastRuntime;
         });
         /** @var CM_Clockwork_Storage_FileSystem $storage */
-        $storage = $storageClass->newInstance();
+        $storage = $storageClass->newInstanceWithoutConstructor();
 
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
@@ -273,7 +274,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
             return clone $currently;
         });
-        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Abstract');
         $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
             if ($lastRuntime instanceof DateTime) {
                 return clone $lastRuntime;
@@ -281,7 +282,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
             return $lastRuntime;
         });
         /** @var CM_Clockwork_Storage_FileSystem $storage */
-        $storage = $storageClass->newInstance();
+        $storage = $storageClass->newInstanceWithoutConstructor();
 
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
@@ -312,7 +313,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
             return clone $currently;
         });
-        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Abstract');
         $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
             if ($lastRuntime instanceof DateTime) {
                 return clone $lastRuntime;
@@ -320,7 +321,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
             return $lastRuntime;
         });
         /** @var CM_Clockwork_Storage_FileSystem $storage */
-        $storage = $storageClass->newInstance();
+        $storage = $storageClass->newInstanceWithoutConstructor();
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
         $manager->setStorage($storage);
@@ -349,7 +350,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
             return clone $currently;
         });
-        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Abstract');
         $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
             if ($lastRuntime instanceof DateTime) {
                 return clone $lastRuntime;
@@ -357,7 +358,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
             return $lastRuntime;
         });
         /** @var CM_Clockwork_Storage_FileSystem $storage */
-        $storage = $storageClass->newInstance();
+        $storage = $storageClass->newInstanceWithoutConstructor();
 
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
@@ -395,7 +396,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
             return clone $currently;
         });
-        $storageClass = $this->mockClass('CM_Clockwork_Storage_Memory');
+        $storageClass = $this->mockClass('CM_Clockwork_Storage_Abstract');
         $storageClass->mockMethod('getLastRuntime')->set(function () use (&$lastRuntime) {
             if ($lastRuntime instanceof DateTime) {
                 return clone $lastRuntime;
@@ -403,7 +404,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
             return $lastRuntime;
         });
         /** @var CM_Clockwork_Storage_FileSystem $storage */
-        $storage = $storageClass->newInstance();
+        $storage = $storageClass->newInstanceWithoutConstructor();
         /** @var CM_Clockwork_Manager $manager */
         $manager = $managerMock->newInstance();
         $manager->setStorage($storage);
