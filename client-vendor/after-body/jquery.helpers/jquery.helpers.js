@@ -40,17 +40,22 @@
       }
     },
 
-    scrollTo: function(target) {
-      if (target.length == 0) {
+    scrollTo: function($target) {
+      if ($target.length == 0) {
         return;
       }
+      var target = $target[0];
+
       return this.each(function() {
         var scrollable = this;
         var scrollableOffsetTop = 0;
         if (scrollable !== document) {
+          if (!$.contains(scrollable, target)) {
+            throw new Error('Scrollable does not contain target');
+          }
           scrollableOffsetTop = $(scrollable).offset().top;
         }
-        $(scrollable).scrollTop(target.offset().top - scrollableOffsetTop + $(scrollable).scrollTop());
+        $(scrollable).scrollTop($target.offset().top - scrollableOffsetTop + $(scrollable).scrollTop());
       });
     },
 
