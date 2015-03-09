@@ -2,53 +2,82 @@
  * Author: CM
  */
 (function($) {
-  $.fn.toggleNext = function(methodName, value) {
-    return this.each(function() {
-      var $toggler = $(this);
-      var $content = $toggler.next('.toggleNext-content');
-      var $icon = $toggler.find('.icon-arrow-right');
 
-      if (!$content.length || ($toggler.data('toggleNext') && !methodName)) {
-        return;
-      }
-      if ('toggle' === methodName && $toggler.data('toggleNext')) {
-        return toggle(value);
-      }
+  function ToggleNext($toggler) {
+    this.$toggler = $toggler;
+    this.$content = $toggler.next('.toggleNext-content');
 
-      $icon = $('<span />').addClass('icon-arrow-right');
-      $toggler.prepend($icon);
+    if (this.$content.length) {
+      this.initialize();
+    }
+  }
 
-      if ($toggler.hasClass('active')) {
-        $icon.addClass('active');
-        $content.show();
-      }
+  ToggleNext.prototype.initialize = function() {
+    this.$icon = $('<span/>').addClass('icon-arrow-right');
+    this.$toggler.prepend(this.$icon);
 
-      $toggler.on('click.toggleNext', toggle);
-      $toggler.data('toggleNext', true);
+    if (this.$toggler.hasClass('active')) {
+      this.$icon.addClass('active');
+      this.$content.show();
+    }
 
-      function toggle(state) {
-        var currentState = $toggler.hasClass('active');
-        if ('undefined' === typeof state) {
-          state = !currentState;
-        } else if (state === currentState) {
-          return;
-        }
-        $toggler.toggleClass('active', state);
-        $icon.toggleClass('active', state);
-        $content.slideToggle(100, function() {
-          var eventData = {
-            toggler: $toggler,
-            content: $content
-          };
-          $toggler.trigger('toggleNext', eventData);
-          if (state) {
-            $toggler.trigger('toggleNext-open', eventData);
-          } else {
-            $toggler.trigger('toggleNext-close', eventData);
-          }
-        });
+    var self = this;
+    this.$toggler.on('click.toggleNext', function() {
+      self.toggle()
+    });
+    this.$toggler.data('toggleNext', true);
+  };
+
+  /**
+   * @param {Boolean} [newState]
+   */
+  ToggleNext.prototype.toggle = function(newState) {
+    var currentState = this.$toggler.hasClass('active');
+    if ('undefined' === typeof newState) {
+      newState = !currentState;
+    } else if (newState === currentState) {
+      return;
+    }
+    this.$toggler.toggleClass('active', newState);
+    this.$icon.toggleClass('active', newState);
+
+    var self = this;
+    this.$content.slideToggle(100, function() {
+      var eventData = {
+        toggler: self.$toggler,
+        content: self.$content
+      };
+      self.$toggler.trigger('toggleNext', eventData);
+      if (newState) {
+        self.$toggler.trigger('toggleNext-open', eventData);
+      } else {
+        self.$toggler.trigger('toggleNext-close', eventData);
       }
     });
-
   };
+
+  /**
+   * @param {String} [action]
+   * @param {Object} [value]
+   * @return {jQuery}
+   */
+  $.fn.toggleNext = function(action, value) {
+    return this.each(function() {
+      var $self = $(this);
+      var instance = $self.data('toggleNext');
+      if (!instance) {
+        instance = new ToggleNext($self);
+        $self.data('toggleNext', instance);
+      }
+
+      switch (action) {
+        case 'toggle':
+          instance.toggle(value);
+          break;
+        default:
+          break;
+      }
+    });
+  };
+
 })(jQuery);
