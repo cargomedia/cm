@@ -73,7 +73,7 @@
 
       var loadCallback = function(html) {
         $element.html(html);
-        var hasContent = $.trim(html).length > 0;
+        var hasContent = ($element.children(':not([id*=beacon])').length > 0);
         $element.trigger('openx-loaded', {hasContent: hasContent});
 
         if (hasContent) {
