@@ -58,7 +58,8 @@ return function (CM_Config_Node $config) {
     );
 
     $config->CM_Http_Response_View_Abstract->exceptionsToCatch = array(
-        'CM_Exception_Nonexistent'  => [],
+        'CM_Exception_Nonexistent'  => ['log' => 'CM_Paging_Log_NotFound'],
+        'CM_Exception_InvalidParam' => ['log' => 'CM_Paging_Log_NotFound'],
         'CM_Exception_AuthRequired' => [],
         'CM_Exception_NotAllowed'   => [],
         'CM_Exception_Blocked'      => [],
