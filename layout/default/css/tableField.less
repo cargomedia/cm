@@ -1,5 +1,5 @@
 .tableField {
-  padding: 5px 0 5px 5px;
+  padding: 6px
 }
 
 .tableField:first-child {
@@ -7,23 +7,10 @@
 }
 
 .tableField > .label {
-  box-sizing: border-box;
   font-weight: bold;
   color: @fontColorStrong;
-
-  @media (min-width: @breakpointSmall) {
-    width: 100px;
-    float: left;
-    text-align: right;
-  }
 }
 
 .tableField > .label:after {
   content: ":";
-}
-
-.tableField > .value {
-  @media (min-width: @breakpointSmall) {
-    margin-left: 110px;
-  }
 }
