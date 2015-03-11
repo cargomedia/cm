@@ -17,11 +17,11 @@
     /** @type {Boolean} */
     this.state = false;
 
-    if (this.$content.length) {
-      this.initialize();
-    } else {
+    if (!this.$content.length) {
       throw new Error('toggleNext must have a next sibling with css class "toggleNext-content"');
     }
+
+    this.initialize();
   }
 
   ToggleNext.prototype.initialize = function() {
