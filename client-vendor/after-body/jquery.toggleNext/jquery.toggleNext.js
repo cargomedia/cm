@@ -3,12 +3,24 @@
  */
 (function($) {
 
+  /**
+   * @param {jQuery} $toggler
+   * @constructor
+   */
   function ToggleNext($toggler) {
+    /** @type {jQuery} */
     this.$toggler = $toggler;
+    /** @type {jQuery} */
     this.$content = $toggler.next('.toggleNext-content');
+    /** @type {jQuery} */
+    this.$icon = null;
+    /** @type {Boolean} */
+    this.state = false;
 
     if (this.$content.length) {
       this.initialize();
+    } else {
+      throw new Error('toggleNext must have a next sibling with css class "toggleNext-content"');
     }
   }
 
@@ -19,25 +31,25 @@
     if (this.$toggler.hasClass('active')) {
       this.$icon.addClass('active');
       this.$content.show();
+      this.state = true;
     }
 
     var self = this;
     this.$toggler.on('click.toggleNext', function() {
       self.toggle()
     });
-    this.$toggler.data('toggleNext', true);
   };
 
   /**
    * @param {Boolean} [newState]
    */
   ToggleNext.prototype.toggle = function(newState) {
-    var currentState = this.$toggler.hasClass('active');
     if ('undefined' === typeof newState) {
-      newState = !currentState;
-    } else if (newState === currentState) {
+      newState = !this.state;
+    } else if (newState === this.state) {
       return;
     }
+    this.state = newState;
     this.$toggler.toggleClass('active', newState);
     this.$icon.toggleClass('active', newState);
 
