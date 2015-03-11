@@ -29,9 +29,7 @@
     this.$toggler.prepend(this.$icon);
 
     if (this.$toggler.hasClass('active')) {
-      this.$icon.addClass('active');
-      this.$content.show();
-      this.state = true;
+      this.toggle(true, true);
     }
 
     var self = this;
@@ -42,8 +40,9 @@
 
   /**
    * @param {Boolean} [newState]
+   * @param {Boolean} [skipAnimation]
    */
-  ToggleNext.prototype.toggle = function(newState) {
+  ToggleNext.prototype.toggle = function(newState, skipAnimation) {
     if ('undefined' === typeof newState) {
       newState = !this.state;
     } else if (newState === this.state) {
@@ -54,7 +53,8 @@
     this.$icon.toggleClass('active', newState);
 
     var self = this;
-    this.$content.slideToggle(100, function() {
+    var duration = skipAnimation ? 0 : 100;
+    this.$content.slideToggle(duration, function() {
       var eventData = {
         toggler: self.$toggler,
         content: self.$content
