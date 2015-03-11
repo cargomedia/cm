@@ -24,48 +24,50 @@
     }
   }
 
-  ToggleNext.prototype.initialize = function() {
-    this.$icon = $('<span/>').addClass('icon-arrow-right');
-    this.$toggler.prepend(this.$icon);
+  ToggleNext.prototype = {
+    initialize: function() {
+      this.$icon = $('<span/>').addClass('icon-arrow-right');
+      this.$toggler.prepend(this.$icon);
 
-    if (this.$toggler.hasClass('active')) {
-      this.$icon.addClass('active');
-      this.$content.show();
-      this.state = true;
-    }
-
-    var self = this;
-    this.$toggler.on('click.toggleNext', function() {
-      self.toggle()
-    });
-  };
-
-  /**
-   * @param {Boolean} [newState]
-   */
-  ToggleNext.prototype.toggle = function(newState) {
-    if ('undefined' === typeof newState) {
-      newState = !this.state;
-    } else if (newState === this.state) {
-      return;
-    }
-    this.state = newState;
-    this.$toggler.toggleClass('active', newState);
-    this.$icon.toggleClass('active', newState);
-
-    var self = this;
-    this.$content.slideToggle(100, function() {
-      var eventData = {
-        toggler: self.$toggler,
-        content: self.$content
-      };
-      self.$toggler.trigger('toggleNext', eventData);
-      if (newState) {
-        self.$toggler.trigger('toggleNext-open', eventData);
-      } else {
-        self.$toggler.trigger('toggleNext-close', eventData);
+      if (this.$toggler.hasClass('active')) {
+        this.$icon.addClass('active');
+        this.$content.show();
+        this.state = true;
       }
-    });
+
+      var self = this;
+      this.$toggler.on('click.toggleNext', function() {
+        self.toggle()
+      });
+    },
+
+    /**
+     * @param {Boolean} [newState]
+     */
+    toggle: function(newState) {
+      if ('undefined' === typeof newState) {
+        newState = !this.state;
+      } else if (newState === this.state) {
+        return;
+      }
+      this.state = newState;
+      this.$toggler.toggleClass('active', newState);
+      this.$icon.toggleClass('active', newState);
+
+      var self = this;
+      this.$content.slideToggle(100, function() {
+        var eventData = {
+          toggler: self.$toggler,
+          content: self.$content
+        };
+        self.$toggler.trigger('toggleNext', eventData);
+        if (newState) {
+          self.$toggler.trigger('toggleNext-open', eventData);
+        } else {
+          self.$toggler.trigger('toggleNext-close', eventData);
+        }
+      });
+    }
   };
 
   /**
