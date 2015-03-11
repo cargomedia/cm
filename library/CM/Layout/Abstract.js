@@ -35,7 +35,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
    * @param {String} path
    */
   loadPage: function(path) {
-    this.trigger('navigate', path);
+    cm.event.trigger('navigate', path);
 
     if (!this._$pagePlaceholder) {
       this._$pagePlaceholder = $('<div class="router-placeholder" />');
