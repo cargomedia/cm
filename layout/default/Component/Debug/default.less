@@ -20,7 +20,7 @@
 
     &:hover, &.active {
       background-color: @colorNotice;
-      color: @colorFgTheme;
+      color: contrast(@colorNotice, @colorFg, @colorBg);
       text-decoration: none;
     }
 
@@ -68,7 +68,7 @@
     padding: 0 5px;
     line-height: 22px;
     background-color: @colorNotice;
-    color: @colorFgTheme;
+    color: contrast(@colorNotice, @colorFg, @colorBg);
     border-top: 1px solid @colorNotice;
     border-left: 1px solid @colorNotice;
   }
