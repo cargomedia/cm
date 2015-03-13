@@ -90,18 +90,18 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
 
     protected function _processContentOrRedirect() {
         $render = $this->getRender();
-        if ($this->_site->getHost() !== $this->_request->getHost()) {
-            $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
-            $this->redirectUrl($render->getUrl($path, $this->_site));
+        if ($this->getSite()->getHost() !== $this->getRequest()->getHost()) {
+            $path = CM_Util::link($this->getRequest()->getPath(), $this->getRequest()->getQuery());
+            $this->redirectUrl($render->getUrl($path, $this->getSite()));
         }
-        if ($this->_request->getLanguageUrl() && $this->getViewer()) {
-            $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
-            $this->redirectUrl($render->getUrl($path, $this->_site));
-            $this->_request->setLanguageUrl(null);
+        if ($this->getRequest()->getLanguageUrl() && $this->getViewer()) {
+            $path = CM_Util::link($this->getRequest()->getPath(), $this->getRequest()->getQuery());
+            $this->redirectUrl($render->getUrl($path, $this->getSite()));
+            $this->getRequest()->setLanguageUrl(null);
         }
         if (!$this->getRedirectUrl()) {
-            $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
-            $render->getServiceManager()->getTrackings()->trackPageView($render->getEnvironment(), $path);
+            $path = CM_Util::link($this->getRequest()->getPath(), $this->getRequest()->getQuery());
+            $render->getServiceManager()->getTrackings()->trackPageView($render->getEnvironment(), $this->getRequest(), $path);
             $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);
         }
@@ -156,7 +156,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
         }, function (CM_Exception $ex, array $errorOptions) use ($request) {
             $this->getRender()->getGlobalResponse()->clear();
             /** @var CM_Page_Abstract $errorPage */
-            $errorPage =  $errorOptions['errorPage'];
+            $errorPage = $errorOptions['errorPage'];
             $request->setPath($errorPage::getPath());
             $request->setQuery(array());
             return false;

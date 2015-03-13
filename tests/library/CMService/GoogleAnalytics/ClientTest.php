@@ -8,7 +8,7 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $environment = new CM_Frontend_Environment($site);
         $request = new CM_Http_Request_Get('/pseudo-request', ['Cookie' => 'clientId=222']);
 
-        $html = $googleAnalytics->getHtml($environment);
+        $html = $googleAnalytics->getHtml($environment, $request);
         $this->assertContains('ga("create", "key123", {"cookieDomain":"www.my-website.net","clientId":"222"}', $html);
     }
 
@@ -19,7 +19,7 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $environment = new CM_Frontend_Environment($site, $viewer);
         $request = new CM_Http_Request_Get('/pseudo-request', ['Cookie' => 'clientId=222']);
 
-        $html = $googleAnalytics->getHtml($environment);
+        $html = $googleAnalytics->getHtml($environment, $request);
         $this->assertContains('ga("create", "key123", {"cookieDomain":"www.my-website.net","clientId":"222","userId":' . $viewer->getId() . '}',
             $html);
     }
@@ -117,7 +117,7 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
 
         $viewer = CMTest_TH::createUser();
         $environmentWithViewer = new CM_Frontend_Environment(null, $viewer);
-        $googleAnalytics->trackPageView($environmentWithViewer, '/foo');
+        $googleAnalytics->trackPageView($environmentWithViewer, null, '/foo');
         $js = $googleAnalytics->getJs($environment);
         $this->assertContains('ga("set", "userId", "' . $viewer->getId() . '")', $js);
     }

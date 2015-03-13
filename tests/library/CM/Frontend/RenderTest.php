@@ -86,7 +86,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
         $render = new CM_Frontend_Render();
         $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
-        $render = new CM_Frontend_Render(null, true); // This should never happen in application, but lets test it
+        $render = new CM_Frontend_Render(null, null, true); // This should never happen in application, but lets test it
         $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
 
         $language = CMTest_TH::createLanguage('en');
@@ -94,7 +94,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $environment = new CM_Frontend_Environment(null, null, $language);
         $render = new CM_Frontend_Render($environment);
         $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
-        $render = new CM_Frontend_Render($environment, true);
+        $render = new CM_Frontend_Render($environment, null, true);
         $this->assertSame($baseUrl . '/en/test', $render->getUrlPage($page));
     }
 

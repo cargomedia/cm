@@ -22,7 +22,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
             'id'   => $location->getLevel() . '.' . $location->getId(),
             'name' => implode(', ', array_filter($names)),
             'img'  => $render->getUrlResource('layout',
-                    'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),
+                'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),
         );
     }
 
@@ -70,8 +70,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
     }
 
     protected function _getSuggestions($term, array $options, CM_Frontend_Render $render) {
-        $ip = CM_Http_Request_Abstract::getInstance()->getIp();
-        $locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $options['levelMax'], CM_Model_Location::findByIp($ip), $options['scopeLocation']);
+        $locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $options['levelMax'], $render->getEnvironment()->getLocation(), $options['scopeLocation']);
         $locations->setPage(1, 15);
         $out = array();
         foreach ($locations as $location) {

@@ -147,7 +147,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
         return $js;
     }
 
-    public function getHtml(CM_Frontend_Environment $environment) {
+    public function getHtml(CM_Frontend_Environment $environment, CM_Http_Request_Abstract $request = null) {
         $scriptName = 'analytics.js';
         if ($environment->isDebug()) {
             $scriptName = 'analytics_debug.js';
@@ -164,8 +164,8 @@ EOF;
         $fieldList = [
             'cookieDomain' => $environment->getSite()->getHost(),
         ];
-        if (CM_Http_Request_Abstract::hasInstance()) {
-            $fieldList['clientId'] = (string) CM_Http_Request_Abstract::getInstance()->getClientId();
+        if ($request) {
+            $fieldList['clientId'] = (string) $request->getClientId();
         }
         if ($user = $environment->getViewer()) {
             $fieldList['userId'] = $user->getId();
@@ -184,7 +184,7 @@ EOF;
     public function trackAffiliate($requestClientId, $affiliateName) {
     }
 
-    public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
+    public function trackPageView(CM_Frontend_Environment $environment, CM_Http_Request_Abstract $request = null, $path = null) {
         if ($viewer = $environment->getViewer()) {
             $this->setUserId($viewer->getId());
         }

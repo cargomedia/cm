@@ -15,7 +15,7 @@ class CMService_KissMetrics_Client implements CM_Service_Tracking_ClientInterfac
         $this->_code = (string) $code;
     }
 
-    public function getHtml(CM_Frontend_Environment $environment) {
+    public function getHtml(CM_Frontend_Environment $environment, CM_Http_Request_Abstract $request = null) {
         $html = '<script type="text/javascript">';
         $html .= 'var _kmq = _kmq || [];';
         $html .= "var _kmk = _kmk || '" . $this->_getCode() . "';";
@@ -127,12 +127,12 @@ EOF;
         $kissMetrics->submit();
     }
 
-    public function trackPageView(CM_Frontend_Environment $environment, $path) {
+    public function trackPageView(CM_Frontend_Environment $environment, CM_Http_Request_Abstract $request = null, $path) {
         if ($viewer = $environment->getViewer()) {
             $this->setUserId($viewer->getId());
         }
-        if (CM_Http_Request_Abstract::hasInstance()) {
-            $this->setRequestClientId(CM_Http_Request_Abstract::getInstance()->getClientId());
+        if ($request) {
+            $this->setRequestClientId($request->getClientId());
         }
     }
 

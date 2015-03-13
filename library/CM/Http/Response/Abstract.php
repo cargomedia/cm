@@ -104,7 +104,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
         if (!$this->_render) {
             $languageRewrite = !$this->getViewer() && $this->getRequest()->getLanguageUrl();
             $environment = new CM_Frontend_Environment($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), null, null, $this->getRequest()->getLocation());
-            $this->_render = new CM_Frontend_Render($environment, $languageRewrite, $this->getServiceManager());
+            $this->_render = new CM_Frontend_Render($environment, $this->getRequest(), $languageRewrite, $this->getServiceManager());
         }
         return $this->_render;
     }
