@@ -174,11 +174,15 @@ class CM_Process {
             $this->_forkHandlerList[$sequence] = new CM_Process_ForkHandler($pid, $workload, $sockets[1]);
         } else {
             // child
-            fclose($sockets[1]);
-            $this->_reset();
-            $forkHandler = new CM_Process_ForkHandler($this->getProcessId(), $workload, $sockets[0]);
-            $forkHandler->runAndSendWorkload();
-            $forkHandler->closeIpcStream();
+            try {
+                fclose($sockets[1]);
+                $this->_reset();
+                $forkHandler = new CM_Process_ForkHandler($this->getProcessId(), $workload, $sockets[0]);
+                $forkHandler->runAndSendWorkload();
+                $forkHandler->closeIpcStream();
+            } catch (Exception $e) {
+                CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
+            }
             exit;
         }
     }
