@@ -1,6 +1,7 @@
 {
   "classPrefix" : "",
   "options": [
+    "addTest",
     "setClasses",
     "html5printshiv"
   ],
