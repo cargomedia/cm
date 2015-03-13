@@ -59,7 +59,8 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
     }
 
     public function getServerId() {
-        $ipAddress = long2ip(CM_Http_Request_Abstract::factoryFromGlobals()->getIp());
+        $request = CM_Http_Request_Abstract::factoryFromGlobals();
+        $ipAddress = $request ? long2ip($request->getIp()) : '';
 
         $servers = CM_Stream_Video::_getConfig()->servers;
         foreach ($servers as $serverId => $server) {
