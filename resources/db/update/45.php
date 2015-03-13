@@ -10,8 +10,6 @@ $config = CM_Config::get();
 $IpsWithoutExpirationStamp = CM_Db_Db::select('cm_ipBlocked', '*', ['expirationStamp' => 0])->fetchAll();
 
 foreach ($IpsWithoutExpirationStamp as $row) {
-    if ($row['expirationStamp'] == 0) {
-        $expirationStamp = $row['createStamp'] + $config->CM_Paging_Ip_Blocked->maxAge;
-        CM_Db_Db::update('cm_ipBlocked', ['expirationStamp' => $expirationStamp], ['ip' => $row['ip']]);
-    }
+    $expirationStamp = $row['createStamp'] + $config->CM_Paging_Ip_Blocked->maxAge;
+    CM_Db_Db::update('cm_ipBlocked', ['expirationStamp' => $expirationStamp], ['ip' => $row['ip']]);
 }
