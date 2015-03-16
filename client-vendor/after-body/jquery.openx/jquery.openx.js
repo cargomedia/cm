@@ -77,6 +77,7 @@
         $element.trigger('openx-loaded', {hasContent: hasContent});
 
         if (hasContent) {
+          $element.addClass('openx-loaded');
           trackEvent('Banner', 'Impression', 'zone-' + zoneId);
           var $link = $element.find('a[href]');
           if ($element.is(':visible') && $link.length > 0) {
