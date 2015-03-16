@@ -5,7 +5,7 @@ return function (CM_Config_Node $config) {
     $config->CM_App->setupScriptClasses[] = 'CM_File_Filesystem_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_Db_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_MongoDb_SetupScript';
-    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Core';
+    $config->CM_App->setupScriptClasses[] = 'CM_Http_SetupScript';
 
     $config->CM_Mail->send = false;
 
@@ -29,9 +29,19 @@ return function (CM_Config_Node $config) {
                 'username'         => 'root',
                 'password'         => '',
                 'db'               => 'cm_test',
-                'reconnectTimeout' => 300
             )
         )
+    );
+
+    $config->services['redis'] = array(
+        'class'     => 'CM_Redis_Client',
+        'arguments' => array(
+            array(
+                'host'     => 'localhost',
+                'port'     => '6379',
+                'database' => 2,
+            )
+        ),
     );
 
     $config->services['filesystem-data'] = array(

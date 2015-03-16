@@ -13,12 +13,13 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
 
     public function fileToDb() {
         $manager = CM_Service_Manager::getInstance();
+        $output = $this->_getStreamOutput();
 
-        $loader = new CM_Provision_Loader($this->_getStreamOutput());
+        $loader = new CM_Provision_Loader();
         $loader->registerScript(new CM_Db_SetupScript($manager));
         $loader->registerScript(new CM_MongoDb_SetupScript($manager));
-        $loader->unload();
-        $loader->load();
+        $loader->unload($output);
+        $loader->load($output);
     }
 
     public function runUpdates() {

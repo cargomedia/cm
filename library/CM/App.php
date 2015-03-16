@@ -24,17 +24,13 @@ class CM_App implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * @param CM_OutputStream_Interface $output
-     * @param bool|null                 $reload
+     * @throws CM_Exception_Invalid
+     * @return CM_Provision_Loader
      */
-    public function setup(CM_OutputStream_Interface $output, $reload = null) {
-        $loader = new CM_Provision_Loader($output);
+    public function getProvisionLoader() {
+        $loader = new CM_Provision_Loader();
         $loader->registerScriptFromClassNames(CM_Config::get()->CM_App->setupScriptClasses, $this->getServiceManager());
-        if ($reload) {
-            $loader->reload();
-        } else {
-            $loader->load();
-        }
+        return $loader;
     }
 
     public function fillCaches() {
@@ -70,7 +66,7 @@ class CM_App implements CM_Service_ManagerAwareInterface {
         if ($namespace) {
             $namespace = '.' . $namespace;
         }
-        return (int) CM_Option::getInstance()->get('app.version' . $namespace);
+        return (int) $this->getServiceManager()->getOptions()->get('app.version' . $namespace);
     }
 
     /**
@@ -83,7 +79,7 @@ class CM_App implements CM_Service_ManagerAwareInterface {
         if ($namespace) {
             $namespace = '.' . $namespace;
         }
-        CM_Option::getInstance()->set('app.version' . $namespace, $version);
+        $this->getServiceManager()->getOptions()->set('app.version' . $namespace, $version);
     }
 
     /**
@@ -159,6 +155,13 @@ class CM_App implements CM_Service_ManagerAwareInterface {
             $callbackAfter($version);
         }
         return 1;
+    }
+
+    /**
+     * @return CM_Http_Handler
+     */
+    public function getHttpHandler() {
+        return new CM_Http_Handler(CM_Service_Manager::getInstance());
     }
 
     /**

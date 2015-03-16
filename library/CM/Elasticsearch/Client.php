@@ -28,7 +28,7 @@ class CM_Elasticsearch_Client extends CM_Class_Abstract {
         if (!$this->getEnabled()) {
             return array();
         }
-        CM_Debug::getInstance()->incStats('search', json_encode($data));
+        CM_Service_Manager::getInstance()->getDebug()->incStats('search', json_encode($data));
 
         $search = new Elastica\Search($this->_client);
         foreach ($types as $type) {

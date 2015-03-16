@@ -7,7 +7,7 @@
   "require": {
     "composer/composer": "1.0.0-alpha8",
     "smarty/smarty": "3.1.16",
-    "leafo/lessphp": "0.3.*",
+    "leafo/lessphp": "~0.5.0",
     "easybook/geshi": "1.0.8.11",
     "ruflin/Elastica": "v1.3.0.0",
     "phpmailer/phpmailer": "5.2.6",

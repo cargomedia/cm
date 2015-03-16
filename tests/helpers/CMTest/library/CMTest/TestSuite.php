@@ -10,6 +10,19 @@ class CMTest_TestSuite {
     }
 
     public function bootstrap() {
+        $this->generateInternalConfig();
         CMTest_TH::init();
+    }
+
+    public function generateInternalConfig() {
+        if (isset(CM_Config::get()->CM_Class_Abstract->typesMaxValue)) {
+            return;
+        }
+        $generator = new CM_Config_Generator();
+        $config = new CM_Config_Node();
+        $config->extendWithConfig($generator->getConfigClassTypes());
+        $config->extendWithConfig($generator->getConfigActionVerbs());
+        $config->extendWithConfig(CM_Config::get());
+        CM_Config::set($config->export());
     }
 }

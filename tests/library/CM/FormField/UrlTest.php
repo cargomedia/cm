@@ -5,7 +5,7 @@ class CM_FormField_UrlTest extends CMTest_TestCase {
     public function testValidate() {
         $field = new CM_FormField_Url(['name' => 'foo']);
         $environment = new CM_Frontend_Environment();
-        $response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
+        $response = $this->getMockForAbstractClass('CM_Http_Response_Abstract', array(), '', false);
 
         $this->assertSame('http://www.example.com/', $field->validate($environment, 'http://www.example.com/'));
         $this->assertSame('http://www.example.com/foo/bar', $field->validate($environment, 'http://www.example.com/foo/bar'));

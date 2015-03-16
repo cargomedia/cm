@@ -12,8 +12,8 @@ class CM_Clockwork_Event {
     private $_name;
 
     /**
-     * @param string      $name
-     * @param string      $dateTimeString see http://php.net/manual/en/datetime.formats.php
+     * @param string $name
+     * @param string $dateTimeString see http://php.net/manual/en/datetime.formats.php
      */
     public function __construct($name, $dateTimeString) {
         $this->_name = (string) $name;

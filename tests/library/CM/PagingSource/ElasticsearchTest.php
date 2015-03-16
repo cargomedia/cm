@@ -6,9 +6,6 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
         CM_Db_Db::exec("CREATE TABLE `indexTest_1` (`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, `name` VARCHAR(8))");
         CM_Db_Db::exec("CREATE TABLE `indexTest_2` (`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, `price` INT UNSIGNED)");
         CM_Db_Db::exec("CREATE TABLE `indexTest_3` (`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, `price` INT UNSIGNED)");
-        $config = CM_Config::get();
-        $config->CM_Elasticsearch_Client->enabled = true;
-        CM_Config::set($config);
     }
 
     public static function tearDownAfterClass() {
@@ -18,11 +15,8 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
         parent::tearDownAfterClass();
     }
 
-    public function tearDown() {
-        CMTest_TH::clearDb();
-    }
-
     public function setUp() {
+        CM_Config::get()->CM_Elasticsearch_Client->enabled = true;
         $type1 = new CM_Elasticsearch_Type_Mock1();
         $type2 = new CM_Elasticsearch_Type_Mock2();
         $type3 = new CM_Elasticsearch_Type_Mock3();
@@ -32,6 +26,10 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
         $type1->getIndex()->refresh();
         $type2->getIndex()->refresh();
         $type3->getIndex()->refresh();
+    }
+
+    public function tearDown() {
+        CMTest_TH::clearEnv();
     }
 
     public function testGet() {

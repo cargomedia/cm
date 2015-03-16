@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="300px" height="300px" viewBox="0 0 300 300" style="enable-background:new 0 0 300 300;" xml:space="preserve">
-<path d="M10.978,150.718l39.722,97.185l56.963,14.525l193.315-79.015L234.772,21.439L41.457,100.454L10.978,150.718z
-	 M88.992,207.354c-11.325,4.629-25.679-3.796-31.815-18.809c-6.136-15.012-1.792-31.08,9.532-35.709
-	c11.457-4.684,25.68,3.796,31.816,18.808S100.449,202.671,88.992,207.354z"/>
-<g id="Restricted">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+<g id="Layer_1">
+	<path d="M485.7,68.2c-0.9-22.5-19.3-40.6-41.9-41.2c-0.5,0-1.2,0-1.7,0H269.9c-0.9,0-1.8,0-2.7,0.2c-10.2,0.8-19.9,5.2-27.2,12.5
+		c-0.6,0.5-1.2,1-1.7,1.6L36.9,258.6c-0.5,0.6-1,1.1-1.4,1.7c-4.5,5.5-7.5,12.1-8.9,19.7c-0.2,1.1-0.4,2.3-0.4,2.9
+		c-0.2,1.4-0.2,2.9-0.2,4.3c0,12.6,5.5,24.5,15.1,32.7l181.2,155c20.3,17.1,44.7,9.4,58.6-3.7l191.9-198.8
+		c7.8-7.7,12.5-17.9,12.9-28.8c0.1-0.6,0.3-1.2,0.3-1.8V70C486,69.4,485.7,68.8,485.7,68.2z M382.3,153.5
+		c-13.4,0-24.2-10.9-24.2-24.2s10.9-24.2,24.2-24.2s24.2,10.9,24.2,24.2S395.7,153.5,382.3,153.5z"/>
 </g>
-<g id="Help">
+<g id="Layer_2">
 </g>
 </svg>

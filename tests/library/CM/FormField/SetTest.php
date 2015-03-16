@@ -25,7 +25,7 @@ class CM_FormField_SetTest extends CMTest_TestCase {
 
         $environment = new CM_Frontend_Environment();
         $userInputGood = array(32, 64, 128);
-        $response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
+        $response = $this->getMockForAbstractClass('CM_Http_Response_Abstract', array(), '', false);
         $validationResult = $field->validate($environment, $userInputGood);
         $this->assertSame($userInputGood, $validationResult);
 
@@ -48,9 +48,7 @@ class CM_FormField_SetTest extends CMTest_TestCase {
         $this->assertSame(count($data), $doc->find('input')->count());
         foreach ($data as $value => $label) {
             $this->assertTrue($doc->has('li.' . $name . '-value-' . $value));
-            $spanQuery = 'label[class="' . $name . '-label-' . $value . '"]';
-            $this->assertTrue($doc->has($spanQuery));
-            $this->assertSame($label, trim($doc->find($spanQuery)->getText()));
+            $this->assertTrue($doc->has('label[for]'));
             $this->assertTrue($doc->has('input[value="' . $value . '"]'));
             if (in_array($value, $values)) {
                 $this->assertSame('checked', $doc->find('input[value="' . $value . '"]')->getAttribute('checked'));

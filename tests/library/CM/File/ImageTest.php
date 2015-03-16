@@ -306,6 +306,15 @@ class CM_File_ImageTest extends CMTest_TestCase {
         $this->assertEquals(1682, $image->getSize(), '', 100);
     }
 
+    public function testResizeSpecific() {
+        $imageOriginal = new CM_File_Image(DIR_TEST_DATA . 'img/test.jpg');
+        $image = CM_File_Image::createTmp(null, $imageOriginal->read());
+
+        $image->resizeSpecific(50, 50, 20, 20);
+        $this->assertSame(50, $image->getWidth());
+        $this->assertSame(50, $image->getHeight());
+    }
+
     public function testGetExtensionByFormat() {
         $this->assertSame('jpg', CM_File_Image::getExtensionByFormat(CM_File_Image::FORMAT_JPEG));
         $this->assertSame('gif', CM_File_Image::getExtensionByFormat(CM_File_Image::FORMAT_GIF));
@@ -327,4 +336,25 @@ class CM_File_ImageTest extends CMTest_TestCase {
         $image->delete();
     }
 
+    public function testFreeMemory() {
+        $getMemoryUsage = function () {
+            $pid = CM_Process::getInstance()->getProcessId();
+            $memory = CM_Util::exec('ps', ['-o', 'rss', '--no-headers', '--pid', $pid]);
+            return (int) $memory;
+        };
+
+        $imageOriginal = new CM_File_Image(DIR_TEST_DATA . 'img/test.jpg');
+        $image = CM_File_Image::createTmp(null, $imageOriginal->read());
+
+        $memoryUsage = $getMemoryUsage();
+        $memoryUsageMaxExpected = $memoryUsage + 20 * 1000;
+
+        $image->resizeSpecific(3000, 3000);
+        $this->assertGreaterThan($memoryUsageMaxExpected, $getMemoryUsage());
+
+        $image->freeMemory();
+        $this->assertLessThan($memoryUsageMaxExpected, $getMemoryUsage());
+
+        $image->validateImage();
+    }
 }

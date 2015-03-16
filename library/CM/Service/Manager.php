@@ -150,10 +150,25 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Options
+     * @throws CM_Exception_Invalid
+     */
+    public function getOptions() {
+        return $this->get('options', 'CM_Options');
+    }
+
+    /**
      * @return CM_Service_Filesystems
      */
     public function getFilesystems() {
         return $this->get('filesystems', 'CM_Service_Filesystems');
+    }
+
+    /**
+     * @return CM_Debug
+     */
+    public function getDebug() {
+        return $this->get('debug' ,'CM_Debug');
     }
 
     /**
@@ -168,6 +183,20 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public function getUserContent() {
         return $this->get('usercontent', 'CM_Service_UserContent');
+    }
+
+    /**
+     * @return CM_Memcache_Client
+     */
+    public function getMemcache() {
+        return $this->get('memcache', 'CM_Memcache_Client');
+    }
+
+    /**
+     * @return CM_Redis_Client
+     */
+    public function getRedis() {
+        return $this->get('redis', 'CM_Redis_Client');
     }
 
     /**

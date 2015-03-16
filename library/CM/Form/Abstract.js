@@ -87,6 +87,13 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
+   * @return Boolean
+   */
+  hasField: function(name) {
+    return !!this._fields[name];
+  },
+
+  /**
    * @return jQuery
    */
   $: function(selector) {
@@ -98,7 +105,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String|Null} actionName
+   * @param {String|Null} [actionName]
    */
   getData: function(actionName) {
     var form_data = this.$().serializeArray();

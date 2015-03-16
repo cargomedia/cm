@@ -12,7 +12,7 @@ class CM_Splittest_Fixture extends CM_Class_Abstract {
     protected $_id;
 
     /**
-     * @param CM_Request_Abstract|CM_Model_User|int $fixture
+     * @param CM_Http_Request_Abstract|CM_Model_User|int $fixture
      * @param int|null                              $type
      * @throws CM_Exception_Invalid
      */
@@ -23,7 +23,7 @@ class CM_Splittest_Fixture extends CM_Class_Abstract {
             }
             $this->_id = (int) $fixture;
             $this->_type = (int) $type;
-        } elseif ($fixture instanceof CM_Request_Abstract) {
+        } elseif ($fixture instanceof CM_Http_Request_Abstract) {
             $this->_id = $fixture->getClientId();
             $this->_type = self::TYPE_REQUEST_CLIENT;
         } elseif ($fixture instanceof CM_Model_User) {
@@ -54,10 +54,10 @@ class CM_Splittest_Fixture extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Http_Request_Abstract $request
      * @param CM_Model_User       $user
      */
-    public static function setUserForRequestClient(CM_Request_Abstract $request, CM_Model_User $user) {
+    public static function setUserForRequestClient(CM_Http_Request_Abstract $request, CM_Model_User $user) {
         $requestClientId = $request->getClientId();
         $userId = $user->getId();
         CM_Db_Db::updateIgnore('cm_splittestVariation_fixture', array('userId' => $userId), array('requestClientId' => $requestClientId));

@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="300px" height="300px" viewBox="0 0 300 300" style="enable-background:new 0 0 300 300;" xml:space="preserve">
-<path d="M26.589,269.706l-5.8-2.255l-1.934-4.674c-1.771-6.927,2.899-13.856,18.045-33.351c4.35-5.638,10.472-13.532,13.371-18.366
-	C21.433,191.405,5,163.855,5,134.856C5,77.177,69.927,30.294,150,30.294s145,46.883,145,104.562c0,57.839-64.927,104.56-145,104.56
-	c-17.561,0-34.639-2.255-50.911-6.606c-4.189,1.291-20.139,10.797-30.934,17.239C43.828,264.228,34,269.706,28.038,269.706H26.589z"
-	/>
-<g id="Restricted">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+<g id="Layer_1">
+	<g>
+		<path d="M152.4,440.1c-3.3,0-6.7-0.7-9.9-2.2c-8-3.8-13.2-11.9-13.2-20.8v-53.7H49c-12.7,0-23-10.3-23-23V94.9
+			c0-12.7,10.3-23,23-23h414c12.7,0,23,10.3,23,23v245.5c0,12.7-10.3,23-23,23H245.9L167,434.9C162.8,438.4,157.6,440.1,152.4,440.1
+			z"/>
+	</g>
 </g>
-<g id="Help">
+<g id="Layer_2">
 </g>
 </svg>

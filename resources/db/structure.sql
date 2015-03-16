@@ -45,26 +45,16 @@ CREATE TABLE `cm_captcha` (
   KEY `create_time` (`create_time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_emoticon`;
-
-
-CREATE TABLE `cm_emoticon` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `code` varchar(50) NOT NULL,
-  `codeAdditional` varchar(50) DEFAULT NULL,
-  `file` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `code` (`code`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
 DROP TABLE IF EXISTS `cm_ipBlocked`;
 
 
 CREATE TABLE `cm_ipBlocked` (
   `ip` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
+  `expirationStamp` int(10) unsigned NOT NULL,
   PRIMARY KEY (`ip`),
-  KEY `createStamp` (`createStamp`)
+  KEY `createStamp` (`createStamp`),
+  KEY `expirationStamp` (`expirationStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_model_language`;

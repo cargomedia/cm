@@ -14,7 +14,7 @@ class CM_Service_Trackings extends CM_Service_ManagerAware implements CM_Service
 
     public function getHtml(CM_Frontend_Environment $environment) {
         $html = '';
-        foreach ($this->_getTrackingServiceList() as $trackingService) {
+        foreach ($this->getTrackingServiceList() as $trackingService) {
             $html .= $trackingService->getHtml($environment);
         }
         return $html;
@@ -22,32 +22,32 @@ class CM_Service_Trackings extends CM_Service_ManagerAware implements CM_Service
 
     public function getJs() {
         $js = '';
-        foreach ($this->_getTrackingServiceList() as $trackingService) {
+        foreach ($this->getTrackingServiceList() as $trackingService) {
             $js .= $trackingService->getJs();
         }
         return $js;
     }
 
     public function trackAction(CM_Action_Abstract $action) {
-        foreach ($this->_getTrackingServiceList() as $trackingService) {
+        foreach ($this->getTrackingServiceList() as $trackingService) {
             $trackingService->trackAction($action);
         }
     }
 
     public function trackAffiliate($requestClientId, $affiliateName) {
-        foreach ($this->_getTrackingServiceList() as $trackingService) {
+        foreach ($this->getTrackingServiceList() as $trackingService) {
             $trackingService->trackAffiliate($requestClientId, $affiliateName);
         }
     }
 
-    public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
-        foreach ($this->_getTrackingServiceList() as $trackingService) {
+    public function trackPageView(CM_Frontend_Environment $environment, $path) {
+        foreach ($this->getTrackingServiceList() as $trackingService) {
             $trackingService->trackPageView($environment, $path);
         }
     }
 
     public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
-        foreach ($this->_getTrackingServiceList() as $trackingService) {
+        foreach ($this->getTrackingServiceList() as $trackingService) {
             $trackingService->trackSplittest($fixture, $variation);
         }
     }
@@ -55,7 +55,7 @@ class CM_Service_Trackings extends CM_Service_ManagerAware implements CM_Service
     /**
      * @return CM_Service_Tracking_ClientInterface[]
      */
-    protected function _getTrackingServiceList() {
+    public function getTrackingServiceList() {
         return array_map(function ($trackingServiceName) {
             return $this->getServiceManager()->get($trackingServiceName, 'CM_Service_Tracking_ClientInterface');
         }, $this->_trackingServiceNameList);

@@ -121,4 +121,24 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
             $this->assertSame('Job failed', $ex->getMessage());
         }
     }
+
+    public function testVerifyParamsThrows() {
+        $job = $this->getMockForAbstractClass('CM_Jobdistribution_Job_Abstract');
+
+        /** @var CM_Jobdistribution_Job_Abstract $job */
+        try {
+            $job->run(array('foo' => 'foo', 'bar' => new stdClass()));
+            $this->fail('Job should have thrown an exception');
+        } catch (Exception $ex) {
+            $this->assertSame('Object of class `stdClass` is not an instance of CM_ArrayConvertible', $ex->getMessage());
+        }
+
+        /** @var CM_Jobdistribution_Job_Abstract $job */
+        try {
+            $job->queue(array('foo' => 'foo', 'bar' => ['bar' => new stdClass()]));
+            $this->fail('Job should have thrown an exception');
+        } catch (Exception $ex) {
+            $this->assertSame('Object of class `stdClass` is not an instance of CM_ArrayConvertible', $ex->getMessage());
+        }
+    }
 }

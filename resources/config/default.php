@@ -6,7 +6,7 @@ return function (CM_Config_Node $config) {
     $config->CM_App->setupScriptClasses[] = 'CM_Db_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_MongoDb_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_Elasticsearch_SetupScript';
-    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Core';
+    $config->CM_App->setupScriptClasses[] = 'CM_Http_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Translations';
 
     $config->timeZone = 'UTC';
@@ -15,8 +15,6 @@ return function (CM_Config_Node $config) {
     $config->CM_Mail->mailDeliveryAgent = null;
 
     $config->CM_Site_Abstract->class = null;
-
-    $config->CM_Splittesting_Abstract->enabled = false;
 
     $config->CM_Elasticsearch_Client->enabled = true;
     $config->CM_Elasticsearch_Client->servers = array(
@@ -29,11 +27,7 @@ return function (CM_Config_Node $config) {
     $config->CM_Cache_Shared->storage = 'CM_Cache_Storage_Memcache';
     $config->CM_Cache_Shared->lifetime = 3600;
 
-    $config->CM_Memcache_Client->servers = array(
-        array('host' => 'localhost', 'port' => 11211),
-    );
-
-    $config->CM_Redis_Client->server = array('host' => 'localhost', 'port' => 6379);
+    $config->CM_Paging_Ip_Blocked->maxAge = (7 * 86400);
 
     $config->classConfigCacheEnabled = true;
 
@@ -48,31 +42,36 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Db_Db->delayedEnabled = true;
 
+    $config->CM_MongoDb_Client->batchSize = null;
+
     $config->CM_Model_User->class = 'CM_Model_User';
 
     $config->CM_Params->class = 'CM_Params';
 
     $config->CM_Usertext_Usertext->class = 'CM_Usertext_Usertext';
 
-    $config->CM_Response_Page->catch = array(
-        'CM_Exception_Nonexistent'  => '/error/not-found',
-        'CM_Exception_InvalidParam' => '/error/not-found',
-        'CM_Exception_AuthRequired' => '/error/auth-required',
-        'CM_Exception_NotAllowed'   => '/error/not-allowed',
+    $config->CM_Http_Response_Page->exceptionsToCatch = array(
+        'CM_Exception_Nonexistent'  => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => 'CM_Paging_Log_NotFound'],
+        'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => 'CM_Paging_Log_NotFound'],
+        'CM_Exception_AuthRequired' => ['errorPage' => 'CM_Page_Error_AuthRequired', 'log' => null],
+        'CM_Exception_NotAllowed'   => ['errorPage' => 'CM_Page_Error_NotAllowed', 'log' => null],
     );
 
-    $config->CM_Response_View_Abstract->catch = array(
-        'CM_Exception_Nonexistent',
-        'CM_Exception_AuthRequired',
-        'CM_Exception_NotAllowed',
-        'CM_Exception_Blocked',
-        'CM_Exception_ActionLimit',
+    $config->CM_Http_Response_View_Abstract->exceptionsToCatch = array(
+        'CM_Exception_Nonexistent'  => ['log' => 'CM_Paging_Log_NotFound'],
+        'CM_Exception_InvalidParam' => ['log' => 'CM_Paging_Log_NotFound'],
+        'CM_Exception_AuthRequired' => [],
+        'CM_Exception_NotAllowed'   => [],
+        'CM_Exception_Blocked'      => [],
+        'CM_Exception_ActionLimit'  => [],
     );
+    $config->CM_Http_Response_View_Abstract->catchPublicExceptions = true;
 
-    $config->CM_Response_RPC->catch = array(
-        'CM_Exception_AuthRequired',
-        'CM_Exception_NotAllowed',
+    $config->CM_Http_Response_RPC->exceptionsToCatch = array(
+        'CM_Exception_AuthRequired' => [],
+        'CM_Exception_NotAllowed'   => [],
     );
+    $config->CM_Http_Response_RPC->catchPublicExceptions = true;
 
     $config->CM_Stream_Video->adapter = 'CM_Stream_Adapter_Video_Wowza';
     $config->CM_Stream_Video->servers = array(
@@ -93,8 +92,7 @@ return function (CM_Config_Node $config) {
     $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
     $config->CM_Jobdistribution_Job_Abstract->servers = array(array('host' => 'localhost', 'port' => 4730));
 
-    $config->CMService_Amazon_Abstract->accessKey = '';
-    $config->CMService_Amazon_Abstract->secretKey = '';
+    $config->CMService_MaxMind->licenseKey = null;
 
     $config->CMService_Newrelic->enabled = false;
     $config->CMService_Newrelic->appName = 'CM Application';
@@ -109,12 +107,11 @@ return function (CM_Config_Node $config) {
         'class'     => 'CM_Db_Client',
         'arguments' => array(
             array(
-                'host'             => 'localhost',
-                'port'             => 3306,
-                'username'         => 'root',
-                'password'         => '',
-                'db'               => 'cm',
-                'reconnectTimeout' => 300
+                'host'     => 'localhost',
+                'port'     => 3306,
+                'username' => 'root',
+                'password' => '',
+                'db'       => 'cm',
             )
         )
     );
@@ -126,6 +123,16 @@ return function (CM_Config_Node $config) {
                 'db'      => 'cm',
                 'server'  => 'mongodb://localhost:27017',
                 'options' => array('connect' => true),
+            )
+        ),
+    );
+
+    $config->services['redis'] = array(
+        'class'     => 'CM_Redis_Client',
+        'arguments' => array(
+            array(
+                'host' => 'localhost',
+                'port' => '6379',
             )
         ),
     );
@@ -184,5 +191,19 @@ return function (CM_Config_Node $config) {
     $config->services['email-verification'] = array(
         'class'     => 'CM_Service_EmailVerification_Standard',
         'arguments' => array()
+    );
+
+    $config->services['memcache'] = array(
+        'class'     => 'CM_Memcache_Client',
+        'arguments' => array(
+            array(
+                ['host' => 'localhost', 'port' => 11211],
+            ),
+        ),
+    );
+
+    $config->services['options'] = array(
+        'class'     => 'CM_Options',
+        'arguments' => array(),
     );
 };

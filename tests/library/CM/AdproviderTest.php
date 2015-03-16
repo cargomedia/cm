@@ -3,8 +3,7 @@
 class CM_AdproviderTest extends CMTest_TestCase {
 
     protected function tearDown() {
-        CMTest_TH::clearConfig();
-        CMTest_TH::clearCache();
+        CMTest_TH::clearEnv();
     }
 
     public function testGetHtml() {

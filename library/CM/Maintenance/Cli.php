@@ -7,19 +7,25 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
      * @synchronized
+     * @keepalive
      */
     public function start() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
-        $this->_clockworkManager->setServiceManager(CM_Service_Manager::getInstance());
-        $this->_clockworkManager->setStorage(new CM_Clockwork_Storage_FileSystem('app-maintenance'));
+        $storage = new CM_Clockwork_Storage_FileSystem('app-maintenance');
+        $storage->setServiceManager(CM_Service_Manager::getInstance());
+        $this->_clockworkManager->setStorage($storage);
         $this->_registerCallbacks();
         $this->_clockworkManager->start();
     }
 
+    /**
+     * @keepalive
+     */
     public function startLocal() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
-        $this->_clockworkManager->setServiceManager(CM_Service_Manager::getInstance());
-        $this->_clockworkManager->setStorage(new CM_Clockwork_Storage_FileSystem('app-maintenance-local'));
+        $storage = new CM_Clockwork_Storage_FileSystem('app-maintenance-local');
+        $storage->setServiceManager(CM_Service_Manager::getInstance());
+        $this->_clockworkManager->setStorage($storage);
         $this->_registerCallbacksLocal();
         $this->_clockworkManager->start();
     }
@@ -47,7 +53,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 CM_SVM_Model::deleteOldTrainings(3000);
             },
             'CM_Paging_Ip_Blocked::deleteOlder'         => function () {
-                CM_Paging_Ip_Blocked::deleteOlder(7 * 86400);
+                CM_Paging_Ip_Blocked::deleteOld();
             },
             'CM_Captcha::deleteOlder'                   => function () {
                 CM_Captcha::deleteOlder(3600);
@@ -80,6 +86,24 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                     /** @var CM_Paging_Log_Abstract $log */
                     $log = new $logClass();
                     $log->cleanUp();
+                }
+            }
+        ));
+        $this->_registerClockworkCallbacks('8 days', array(
+            'CMService_MaxMind::upgrade' => function () {
+                try {
+                    $maxMind = new CMService_MaxMind();
+                    $maxMind->upgrade();
+                } catch (Exception $exception) {
+                    if (!is_a($exception, 'CM_Exception')) {
+                        $exception = new CM_Exception($exception->getMessage(), [
+                            'file'  => $exception->getFile(),
+                            'line'  => $exception->getLine(),
+                            'trace' => $exception->getTraceAsString(),
+                        ]);
+                    }
+                    $exception->setSeverity(CM_Exception::FATAL);
+                    throw $exception;
                 }
             }
         ));

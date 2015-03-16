@@ -1,6 +1,6 @@
 <?php
 
-class CM_Mongo_ClientTest extends CMTest_TestCase {
+class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
     public function tearDown() {
         CM_Service_Manager::getInstance()->getMongoDb()->dropDatabase();
@@ -9,11 +9,11 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
 
     public function testDatabaseExists() {
         $client = CM_Service_Manager::getInstance()->getMongoDb();
+        $client->dropDatabase();
         $this->assertFalse($client->databaseExists());
         $client->createCollection('foo');
         $this->assertTrue($client->databaseExists());
     }
-
 
     public function testInsert() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
@@ -144,6 +144,25 @@ class CM_Mongo_ClientTest extends CMTest_TestCase {
             return $val;
         });
         $this->assertEquals([['foo' => 1], ['foo' => 1], ['foo' => 2], ['foo' => 3]], $actual);
+    }
+
+    public function testFindBatchSize() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = 'findBatchSize';
+        CM_Config::get()->CM_MongoDb_Client->batchSize = null;
+
+        $cursor = $mongoDb->find($collectionName);
+        $this->assertSame(0, $cursor->info()['batchSize']);
+        $cursor = $mongoDb->find($collectionName, null, null, ['$match' => ['foo' => 'bar']]);
+        $this->assertSame(0, $cursor->info()['batchSize']);
+
+        CM_Config::get()->CM_MongoDb_Client->batchSize = 10;
+
+        $cursor = $mongoDb->find($collectionName);
+        $this->assertSame(10, $cursor->info()['batchSize']);
+        $cursor = $mongoDb->find($collectionName, null, null, ['$match' => ['foo' => 'bar']]);
+        $this->assertSame(10, $cursor->info()['batchSize']);
+        $this->assertSame(10, $cursor->info()['query']['cursor']['batchSize']);
     }
 
     public function testFindAndModify() {

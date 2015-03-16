@@ -21,18 +21,18 @@ before_script:
   - "until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done"
   - tests/travis/install-php-runkit.sh
   - tests/travis/install-php-svm.sh
-  - printf "\n" | pecl install imagick
-  - pecl install stats
-  - sudo apt-get install libgearman-dev && pecl install gearman-1.0.3
-  - sh -c "if [ `php-config --vernum` -ge 50500 ]; then printf "yes\n" | pecl install apcu-beta; fi"
+  - yes '' | travis_retry pecl install imagick
+  - travis_retry pecl install stats
+  - sudo apt-get install libgearman-dev && travis_retry pecl install gearman-1.0.3
+  - if [ `php-config --vernum` -ge 50500 ]; then yes '' | travis_retry pecl install apcu-beta; fi
   - phpenv config-add tests/travis/php.ini
   - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
-  - npm install -g autoprefixer
+  - npm install -g autoprefixer@4.0.0
+  - npm install -g uglify-js@2.4.13
 
   - composer self-update
-  - composer install --dev
+  - composer install
   - cp tests/travis/config.php resources/config/local.php
-  - bin/cm app generate-config-internal
   - bin/cm app set-deploy-version
 
 script: bin/phpunit

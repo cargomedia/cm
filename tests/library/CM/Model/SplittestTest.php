@@ -40,6 +40,35 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $this->assertGreaterThanOrEqual($time, $test->getCreated());
     }
 
+    public function testFlush() {
+        $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $created = $test->getCreated();
+        CMTest_TH::timeForward(1);
+        $test->flush();
+        $this->assertGreaterThan($created, $test->getCreated());
+    }
+
+    public function testFlushVariationCache() {
+        $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $variation1 = new CM_Model_SplittestVariation(CM_Db_Db::select('cm_splittestVariation', 'id', ['name' => 'v1'])->fetchColumn());
+        $variation2 = new CM_Model_SplittestVariation(CM_Db_Db::select('cm_splittestVariation', 'id', ['name' => 'v2'])->fetchColumn());
+        $variation2->setEnabled(false);
+        $fixture = $this->mockClass('CM_Splittest_Fixture')->newInstanceWithoutConstructor();
+        $fixture->mockMethod('getId')->set(1);
+        $fixture->mockMethod('getFixtureType')->set(1);
+
+        CMTest_TH::timeForward(1);
+        $variation = CMTest_TH::callProtectedMethod($test, '_getVariationFixture', [$fixture]);
+        $this->assertSame('v1', $variation);
+
+        $test->flush();
+        $variation2->setEnabled(true);
+        $variation1->setEnabled(false);
+
+        $variation = CMTest_TH::callProtectedMethod($test, '_getVariationFixture', [$fixture]);
+        $this->assertSame('v2', $variation);
+    }
+
     public function testGetVariations() {
         /** @var CM_Model_Splittest $test */
         $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
@@ -96,9 +125,9 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
     }
 
     public function testTracking_RequestClient() {
-        $request = $this->getMockForAbstractClass('CM_Request_Abstract', array(''), '', true, true, true, array('getClientId'));
+        $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array(''), '', true, true, true, array('getClientId'));
         $request->expects($this->any())->method('getClientId')->will($this->returnValue(1));
-        /** @var CM_Request_Abstract $request */
+        /** @var CM_Http_Request_Abstract $request */
         $fixture = new CM_Splittest_Fixture($request);
 
         /** @var CM_Model_Splittest_Mock $test */
@@ -111,10 +140,8 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $kissMetrics->expects($this->once())->method('trackSplittest')->with($fixture, $this->equalTo($variation));
 
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->registerInstance('tracking-kissmetrics-test', $kissMetrics);
-        $serviceManager->unregister('trackings');
-        $serviceManager->register('trackings', 'CM_Service_Trackings', array(array('tracking-kissmetrics-test')));
-
+        $serviceManager->registerInstance('kissmetrics', $kissMetrics);
+        $serviceManager->register('trackings', 'CM_Service_Trackings', [['kissmetrics']]);
         $test->setServiceManager($serviceManager);
 
         $test->getVariationFixture($fixture);

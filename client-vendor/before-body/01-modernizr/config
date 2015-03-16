@@ -1,11 +1,12 @@
 {
   "classPrefix" : "",
   "options": [
+    "addTest",
     "setClasses",
     "html5printshiv"
   ],
   "feature-detects": [
-    "test/svg",
+    "test/css/objectfit",
     "test/forms/fileinput",
     "test/dom/classlist",
     "test/requestanimationframe",

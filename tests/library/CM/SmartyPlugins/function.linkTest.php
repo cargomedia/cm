@@ -22,18 +22,18 @@ class smarty_function_linkTest extends CMTest_TestCase {
             'label' => 'Label',
             'class' => 'testClass',
         ));
-        $this->_assertSame('<a href="javascript:;" class="link hasIcon hasLabel"><span class="icon icon-delete"></span><span class="label">Label</span></a>', array(
+        $this->_assertSame('<a href="javascript:;" class="link hasIcon hasLabel"><span class="icon icon-trash"></span><span class="label">Label</span></a>', array(
             'label' => 'Label',
-            'icon'  => 'delete',
+            'icon'  => 'trash',
         ));
         $this->_assertSame('<a href="javascript:;" class="link hasLabel" title="Title"><span class="label">Label</span></a>', array(
             'label' => 'Label',
             'title' => 'Title',
         ));
-        $this->_assertSame('<a href="javascript:;" class="link testClass hasIcon hasLabel" title="Title"><span class="icon icon-delete"></span><span class="label">Label</span></a>', array(
+        $this->_assertSame('<a href="javascript:;" class="link testClass hasIcon hasLabel" title="Title"><span class="icon icon-trash"></span><span class="label">Label</span></a>', array(
             'label' => 'Label',
             'class' => 'testClass',
-            'icon'  => 'delete',
+            'icon'  => 'trash',
             'title' => 'Title',
         ));
         $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Test', false);
@@ -46,21 +46,21 @@ class smarty_function_linkTest extends CMTest_TestCase {
             'label' => 'Label',
             'class' => 'testClass',
         ));
-        $this->_assertSame('<a href="http://www.default.dev/test" class="link hasIcon hasLabel"><span class="icon icon-delete"></span><span class="label">Label</span></a>', array(
+        $this->_assertSame('<a href="http://www.default.dev/test" class="link hasIcon hasLabel"><span class="icon icon-trash"></span><span class="label">Label</span></a>', array(
             'page'  => 'CM_Page_Test',
             'label' => 'Label',
-            'icon'  => 'delete',
+            'icon'  => 'trash',
         ));
         $this->_assertSame('<a href="http://www.default.dev/test" class="link hasLabel" title="Title"><span class="label">Label</span></a>', array(
             'page'  => 'CM_Page_Test',
             'label' => 'Label',
             'title' => 'Title',
         ));
-        $this->_assertSame('<a href="http://www.default.dev/test" class="link testClass hasIcon hasLabel" title="Title"><span class="icon icon-delete"></span><span class="label">Label</span></a>', array(
+        $this->_assertSame('<a href="http://www.default.dev/test" class="link testClass hasIcon hasLabel" title="Title"><span class="icon icon-trash"></span><span class="label">Label</span></a>', array(
             'page'  => 'CM_Page_Test',
             'label' => 'Label',
             'class' => 'testClass',
-            'icon'  => 'delete',
+            'icon'  => 'trash',
             'title' => 'Title',
         ));
     }
@@ -68,11 +68,11 @@ class smarty_function_linkTest extends CMTest_TestCase {
     public function testWithoutLabel() {
         $this->_assertSame('<a href="javascript:;" class="link"></a>', array());
         $this->_assertSame('<a href="javascript:;" class="link testClass"></a>', array('class' => 'testClass'));
-        $this->_assertSame('<a href="javascript:;" class="link hasIcon"><span class="icon icon-delete"></span></a>', array('icon' => 'delete'));
+        $this->_assertSame('<a href="javascript:;" class="link hasIcon"><span class="icon icon-trash"></span></a>', array('icon' => 'trash'));
         $this->_assertSame('<a href="javascript:;" class="link" title="Title"></a>', array('title' => 'Title'));
-        $this->_assertSame('<a href="javascript:;" class="link testClass hasIcon" title="Title"><span class="icon icon-delete"></span></a>', array(
+        $this->_assertSame('<a href="javascript:;" class="link testClass hasIcon" title="Title"><span class="icon icon-trash"></span></a>', array(
             'class' => 'testClass',
-            'icon'  => 'delete',
+            'icon'  => 'trash',
             'title' => 'Title',
         ));
         $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Test', false);
@@ -81,18 +81,18 @@ class smarty_function_linkTest extends CMTest_TestCase {
             'page'  => 'CM_Page_Test',
             'class' => 'testClass',
         ));
-        $this->_assertSame('<a href="http://www.default.dev/test" class="link hasIcon"><span class="icon icon-delete"></span></a>', array(
+        $this->_assertSame('<a href="http://www.default.dev/test" class="link hasIcon"><span class="icon icon-trash"></span></a>', array(
             'page' => 'CM_Page_Test',
-            'icon' => 'delete',
+            'icon' => 'trash',
         ));
         $this->_assertSame('<a href="http://www.default.dev/test" class="link" title="Title"></a>', array(
             'page'  => 'CM_Page_Test',
             'title' => 'Title',
         ));
-        $this->_assertSame('<a href="http://www.default.dev/test" class="link testClass hasIcon" title="Title"><span class="icon icon-delete"></span></a>', array(
+        $this->_assertSame('<a href="http://www.default.dev/test" class="link testClass hasIcon" title="Title"><span class="icon icon-trash"></span></a>', array(
             'page'  => 'CM_Page_Test',
             'class' => 'testClass',
-            'icon'  => 'delete',
+            'icon'  => 'trash',
             'title' => 'Title',
         ));
     }

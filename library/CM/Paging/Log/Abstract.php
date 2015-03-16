@@ -3,6 +3,15 @@
 abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_Typed {
 
     /**
+     * @param string     $msg
+     * @param array|null $metaInfo
+     */
+    public function add($msg, array $metaInfo = null) {
+        $metaInfo = array_merge((array) $metaInfo, $this->_getDefaultMetaInfo());
+        $this->_add($msg, $metaInfo);
+    }
+
+    /**
      * @param boolean $aggregate
      * @param int     $ageMax
      */
@@ -61,8 +70,8 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
         if ($fqdn = CM_Util::getFqdn()) {
             $metaInfo['fqdn'] = $fqdn;
         }
-        if (CM_Request_Abstract::hasInstance()) {
-            $request = CM_Request_Abstract::getInstance();
+        if (CM_Http_Request_Abstract::hasInstance()) {
+            $request = CM_Http_Request_Abstract::getInstance();
             $metaInfo['uri'] = $request->getUri();
             if ($viewer = $request->getViewer()) {
                 $metaInfo['userId'] = $viewer->getId();

@@ -35,7 +35,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
    * @param {String} path
    */
   loadPage: function(path) {
-    this.trigger('navigate', path);
+    cm.event.trigger('navigate', path);
 
     if (!this._$pagePlaceholder) {
       this._$pagePlaceholder = $('<div class="router-placeholder" />');
@@ -59,7 +59,6 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
         }
         var layout = this;
         this._injectView(response, function(response) {
-          var fragment = response.url.substr(cm.getUrl().length);
           var reload = (layout.getClass() != response.layoutClass);
           if (reload) {
             window.location.replace(response.url);
@@ -67,8 +66,12 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
           }
           layout._$pagePlaceholder.replaceWith(this.$el);
           layout._$pagePlaceholder = null;
+          var fragment = response.url.substr(cm.getUrl().length);
+          if (path === fragment + window.location.hash) {
+            fragment = path;
+          }
           window.history.replaceState(null, null, fragment);
-          layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList);
+          layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList, response.jsTracking);
         });
       },
       error: function(msg, type, isPublic) {
@@ -92,14 +95,25 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
    * @param {String} title
    * @param {String} url
    * @param {String[]} menuEntryHashList
+   * @param {String} [jsTracking]
    */
-  _onPageSetup: function(page, title, url, menuEntryHashList) {
-    document.title = title;
+  _onPageSetup: function(page, title, url, menuEntryHashList, jsTracking) {
+    cm.window.title.setText(title);
     $('[data-menu-entry-hash]').removeClass('active');
     var menuEntrySelectors = _.map(menuEntryHashList, function(menuEntryHash) {
       return '[data-menu-entry-hash=' + menuEntryHash + ']';
     });
     $(menuEntrySelectors.join(',')).addClass('active');
+    if (jsTracking) {
+      new Function(jsTracking).call(this);
+    }
+    if (window.location.hash) {
+      var hash = window.location.hash.substring(1);
+      var $anchor = $('#' + hash).add('[name=' + hash + ']');
+      if ($anchor.length) {
+        $(document).scrollTop($anchor.offset().top - page.$el.offset().top);
+      }
+    }
   },
 
   _onPageError: function() {

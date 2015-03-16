@@ -86,9 +86,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
             $asset->_onModelDelete();
         }
         $this->_onDelete();
-        if ($persistence = $this->_getPersistence()) {
-            $persistence->delete($this->getType(), $this->getIdRaw());
-        }
         if ($cache = $this->_getCache()) {
             $cache->delete($this->getType(), $this->getIdRaw());
         }
@@ -308,6 +305,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
     }
 
     protected function _onDelete() {
+        if ($persistence = $this->_getPersistence()) {
+            $persistence->delete($this->getType(), $this->getIdRaw());
+        }
     }
 
     protected function _onDeleteAfter() {
@@ -498,6 +498,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
      */
     public static function getClassName($type) {
         return self::_getClassName($type);
+    }
+
+    /**
+     * @return string
+     */
+    public static function getTableName() {
+        return strtolower(get_called_class());
     }
 
     /**

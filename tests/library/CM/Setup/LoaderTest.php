@@ -29,9 +29,9 @@ class CM_Provision_LoaderTest extends CMTest_TestCase {
         });
         /** @var CM_Provision_Script_Abstract $script */
 
-        $loader = new CM_Provision_Loader($outputStream);
+        $loader = new CM_Provision_Loader();
         $loader->registerScript($script);
-        $loader->load();
+        $loader->load($outputStream);
         $this->assertSame(1, $loadMethod->getCallCount());
     }
 
@@ -48,11 +48,11 @@ class CM_Provision_LoaderTest extends CMTest_TestCase {
         });
         /** @var CM_Provision_Script_Abstract $script */
 
-        $loader = new CM_Provision_Loader($outputStream);
+        $loader = new CM_Provision_Loader();
         $loader->registerScript($script);
         $loader->registerScript($script);
         $loader->registerScript($script);
-        $loader->unload();
+        $loader->unload($outputStream);
         $this->assertSame(2, $unloadMethod->getCallCount());
     }
 }

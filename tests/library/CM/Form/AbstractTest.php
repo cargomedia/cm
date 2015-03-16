@@ -85,16 +85,6 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
         $this->assertSame('foo', $form->getField('text')->getValue());
         $this->assertNull($form->getField('color')->getValue());
     }
-
-    /**
-     * @return array
-     */
-    private function _getData() {
-        return array(
-            'action'    => 'TestExampleAction',
-            'classname' => 'CM_Form_MockForm',
-            'data'      => array('color' => '#123123', 'must_check' => 'checked', 'text' => 'foo'));
-    }
 }
 
 class CM_Form_MockForm extends CM_Form_Abstract {
@@ -115,7 +105,7 @@ class CM_FormAction_MockForm_TestExampleAction extends CM_FormAction_Abstract {
         return array('must_check', 'text');
     }
 
-    protected function _process(CM_Params $params, CM_Response_View_Form $response, CM_Form_Abstract $form) {
+    protected function _process(CM_Params $params, CM_Http_Response_View_Form $response, CM_Form_Abstract $form) {
         CM_Form_AbstractTest::$formActionProcessCount++;
         CM_Form_AbstractTest::$formActionData = $params;
     }

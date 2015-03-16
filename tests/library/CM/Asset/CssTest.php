@@ -107,7 +107,7 @@ EOD;
 }
 EOD;
         $css = new CM_Asset_Css($render, $css, [
-            'autoprefixerBrowsers' => 'Safari 6',
+            'autoprefixerBrowsers' => 'Android 4.3',
         ]);
         $this->assertSame(trim($expected), $css->get());
     }
@@ -141,12 +141,12 @@ EOD;
         $render = new CM_Frontend_Render();
         $css = <<<'EOD'
 .foo {
-	transition: transform 1s;
+	color: red;
 }
 EOD;
-        $expected = '.foo{-webkit-transition:-webkit-transform 1s;transition:transform 1s;}';
+        $expected = '.foo{color:red;}';
         $css = new CM_Asset_Css($render, $css, [
-            'autoprefixerBrowsers' => 'Safari 6',
+            'autoprefixerBrowsers' => 'Chrome 30',
         ]);
         $this->assertSame(trim($expected), $css->get(true));
     }

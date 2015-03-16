@@ -1,6 +1,6 @@
 <?php
 
-class CM_Clockwork_Manager extends CM_Service_ManagerAware {
+class CM_Clockwork_Manager {
 
     /** @var CM_Clockwork_Event[] */
     private $_events;
@@ -14,6 +14,9 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     /** @var DateTimeZone */
     private $_timeZone;
 
+    /** @var array */
+    private $_eventsRunning = [];
+
     public function __construct() {
         $this->_events = array();
         $this->_storage = new CM_Clockwork_Storage_Memory();
@@ -22,9 +25,9 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     }
 
     /**
-     * @param string      $name
-     * @param string      $dateTimeString
-     * @param callable    $callback
+     * @param string   $name
+     * @param string   $dateTimeString
+     * @param callable $callback
      */
     public function registerCallback($name, $dateTimeString, $callback) {
         $event = new CM_Clockwork_Event($name, $dateTimeString);
@@ -34,21 +37,34 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
 
     /**
      * @param CM_Clockwork_Event $event
+     * @throws CM_Exception
      */
     public function registerEvent(CM_Clockwork_Event $event) {
+        $eventName = $event->getName();
+        $duplicateEventName = \Functional\some($this->_events, function (CM_Clockwork_Event $event) use ($eventName) {
+            return $event->getName() == $eventName;
+        });
+        if ($duplicateEventName) {
+            throw new CM_Exception('Duplicate event-name', ['name' => $eventName]);
+        }
         $this->_events[] = $event;
     }
 
     public function runEvents() {
-        /** @var CM_Clockwork_Event[] $eventsToRun */
-        $eventsToRun = array();
+        $process = $this->_getProcess();
         foreach ($this->_events as $event) {
-            if ($this->_shouldRun($event)) {
-                $eventsToRun[] = $event;
+            if (!$this->_isRunning($event)) {
+                if ($this->_shouldRun($event)) {
+                    $this->_runEvent($event);
+                } elseif (null === $this->_storage->getLastRuntime($event) && $this->_isIntervalEvent($event)) {
+                    $this->_storage->setRuntime($event, $this->_startTime);
+                }
             }
         }
-        foreach ($eventsToRun as $event) {
-            $event->run();
+        $resultList = $process->listenForChildren();
+        foreach ($resultList as $identifier => $result) {
+            $event = $this->_getRunningEvent($identifier);
+            $this->_markStopped($event);
             $this->_storage->setRuntime($event, $this->_getCurrentDateTime());
         }
     }
@@ -58,7 +74,6 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
      */
     public function setStorage(CM_Clockwork_Storage_Abstract $storage) {
         $this->_storage = $storage;
-        $this->_storage->setServiceManager($this->getServiceManager());
     }
 
     /**
@@ -73,6 +88,19 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
             $this->runEvents();
             sleep(1);
         }
+    }
+
+    /**
+     * @param int $identifier
+     * @return CM_Clockwork_Event
+     * @throws CM_Exception
+     */
+    protected function _getRunningEvent($identifier) {
+        $eventName = array_search($identifier, \Functional\pluck($this->_eventsRunning, 'identifier'));
+        if (false === $eventName) {
+            throw new CM_Exception('Could not find event', ['identifier' => $identifier]);
+        }
+        return $this->_eventsRunning[$eventName]['event'];
     }
 
     /**
@@ -114,6 +142,13 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
     }
 
     /**
+     * @return CM_Process
+     */
+    protected function _getProcess() {
+        return CM_Process::getInstance();
+    }
+
+    /**
      * @param CM_Clockwork_Event $event
      * @return boolean
      */
@@ -123,5 +158,43 @@ class CM_Clockwork_Manager extends CM_Service_ManagerAware {
         $dateModified = new DateTime();
         $dateModified->modify($dateTimeString);
         return $date->modify($dateTimeString) != $dateModified->modify($dateTimeString);
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     * @return boolean
+     */
+    protected function _isRunning(CM_Clockwork_Event $event) {
+        return array_key_exists($event->getName(), $this->_eventsRunning);
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     * @param int                $identifier
+     */
+    protected function _markRunning(CM_Clockwork_Event $event, $identifier) {
+        if (!$this->_isRunning($event)) {
+            $this->_eventsRunning[$event->getName()] = ['event' => $event, 'identifier' => $identifier];
+        }
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     */
+    protected function _markStopped(CM_Clockwork_Event $event) {
+        if ($this->_isRunning($event)) {
+            unset($this->_eventsRunning[$event->getName()]);
+        }
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     */
+    protected function _runEvent(CM_Clockwork_Event $event) {
+        $process = $this->_getProcess();
+        $identifier = $process->fork(function () use ($event) {
+            $event->run();
+        });
+        $this->_markRunning($event, $identifier);
     }
 }

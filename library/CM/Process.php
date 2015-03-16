@@ -27,11 +27,13 @@ class CM_Process {
 
     /**
      * @param Closure $workload
+     * @return int
      * @throws CM_Exception
      */
     public function fork(Closure $workload) {
         $sequence = ++$this->_forkHandlerCounter;
         $this->_fork($workload, $sequence);
+        return $sequence;
     }
 
     /**
@@ -114,37 +116,23 @@ class CM_Process {
     }
 
     /**
+     * @param boolean|null $keepAlive
+     * @param Closure|null $terminationCallback
+     * @return CM_Process_WorkloadResult[]
+     * @throws CM_Exception
+     */
+    public function listenForChildren($keepAlive = null, Closure $terminationCallback = null) {
+        return $this->_wait($keepAlive, $terminationCallback, true);
+    }
+
+    /**
      * @param bool|null    $keepAlive
      * @param Closure|null $terminationCallback
      * @return CM_Process_WorkloadResult[]
      * @throws CM_Exception
      */
     public function waitForChildren($keepAlive = null, Closure $terminationCallback = null) {
-        $keepAlive = (bool) $keepAlive;
-        $this->_terminationCallback = $terminationCallback;
-        $workloadResultList = array();
-        do {
-            $pid = pcntl_wait($status);
-            pcntl_signal_dispatch();
-            if (-1 === $pid) {
-                throw new CM_Exception('Waiting on child processes failed');
-            }
-            $forkHandlerSequence = $this->_getForkHandlerSequenceByPid($pid);
-            $forkHandler = $this->_forkHandlerList[$forkHandlerSequence];
-            $workloadResultList[$forkHandlerSequence] = $forkHandler->receiveWorkloadResult();
-            $forkHandler->closeIpcStream();
-            unset($this->_forkHandlerList[$forkHandlerSequence]);
-            if ($keepAlive) {
-                $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, array('severity' => CM_Exception::WARN));
-                CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
-                usleep(self::RESPAWN_TIMEOUT * 1000000);
-                $this->_fork($forkHandler->getWorkload(), $forkHandlerSequence);
-            }
-        } while (!empty($this->_forkHandlerList));
-        $this->executeTerminationCallback();
-
-        ksort($workloadResultList);
-        return $workloadResultList;
+        return $this->_wait($keepAlive, $terminationCallback, false);
     }
 
     /**
@@ -169,6 +157,7 @@ class CM_Process {
      * @param Closure $workload
      * @param int     $sequence
      * @throws CM_Exception
+     * @return int
      */
     private function _fork(Closure $workload, $sequence) {
         $sockets = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
@@ -185,11 +174,15 @@ class CM_Process {
             $this->_forkHandlerList[$sequence] = new CM_Process_ForkHandler($pid, $workload, $sockets[1]);
         } else {
             // child
-            fclose($sockets[1]);
-            $this->_reset();
-            $forkHandler = new CM_Process_ForkHandler($this->getProcessId(), $workload, $sockets[0]);
-            $forkHandler->runAndSendWorkload();
-            $forkHandler->closeIpcStream();
+            try {
+                fclose($sockets[1]);
+                $this->_reset();
+                $forkHandler = new CM_Process_ForkHandler($this->getProcessId(), $workload, $sockets[0]);
+                $forkHandler->runAndSendWorkload();
+                $forkHandler->closeIpcStream();
+            } catch (Exception $e) {
+                CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
+            }
             exit;
         }
     }
@@ -210,6 +203,45 @@ class CM_Process {
         $this->_forkHandlerList = array();
         pcntl_signal(SIGTERM, SIG_DFL);
         pcntl_signal(SIGINT, SIG_DFL);
+    }
+
+    /**
+     * @param bool|null    $keepAlive
+     * @param Closure|null $terminationCallback
+     * @param boolean      $nohang
+     * @throws CM_Exception
+     * @return CM_Process_WorkloadResult[]
+     */
+    private function _wait($keepAlive = null, Closure $terminationCallback = null, $nohang = null) {
+        $keepAlive = (bool) $keepAlive;
+        $this->_terminationCallback = $terminationCallback;
+        $workloadResultList = array();
+        $waitOption = $nohang ? WNOHANG : 0;
+        if (!empty($this->_forkHandlerList)) {
+            do {
+                $pid = pcntl_wait($status, $waitOption);
+                pcntl_signal_dispatch();
+                if (-1 === $pid) {
+                    throw new CM_Exception('Waiting on child processes failed');
+                } elseif ($pid > 0) {
+                    $forkHandlerSequence = $this->_getForkHandlerSequenceByPid($pid);
+                    $forkHandler = $this->_forkHandlerList[$forkHandlerSequence];
+                    $workloadResultList[$forkHandlerSequence] = $forkHandler->receiveWorkloadResult();
+                    $forkHandler->closeIpcStream();
+                    unset($this->_forkHandlerList[$forkHandlerSequence]);
+                    if ($keepAlive) {
+                        $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, array('severity' => CM_Exception::WARN));
+                        CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
+                        usleep(self::RESPAWN_TIMEOUT * 1000000);
+                        $this->_fork($forkHandler->getWorkload(), $forkHandlerSequence);
+                    }
+                }
+            } while (!empty($this->_forkHandlerList) && $pid > 0);
+        }
+        $this->executeTerminationCallback();
+
+        ksort($workloadResultList);
+        return $workloadResultList;
     }
 
     /**

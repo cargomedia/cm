@@ -3,8 +3,10 @@
 class CM_Paging_Ip_BlockedTest extends CMTest_TestCase {
 
     public function testAdd() {
+        CM_Config::get()->CM_Paging_Ip_Blocked->maxAge = (3 * 86400);
         $ip = '127.0.0.1';
         $ip2 = '127.0.0.2';
+
         $paging = new CM_Paging_Ip_Blocked();
         $paging->add(ip2long($ip));
         $this->assertEquals(1, $paging->getCount());
@@ -16,12 +18,12 @@ class CM_Paging_Ip_BlockedTest extends CMTest_TestCase {
         $paging->_change();
         $this->assertEquals(2, $paging->getCount());
         CMTest_TH::timeDaysForward(2);
-        CM_Paging_Ip_Blocked::deleteOlder(3 * 86400);
+        CM_Paging_Ip_Blocked::deleteOld();
         CM_Cache_Local::getInstance()->flush();
         $paging->_change();
         $this->assertEquals(1, $paging->getCount());
         CMTest_TH::timeDaysForward(2);
-        CM_Paging_Ip_Blocked::deleteOlder(3 * 86400);
+        CM_Paging_Ip_Blocked::deleteOld();
         CM_Cache_Local::getInstance()->flush();
         $this->assertEquals(1, $paging->getCount());
         $paging->_change();
