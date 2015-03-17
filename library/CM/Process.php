@@ -177,6 +177,7 @@ class CM_Process {
             try {
                 fclose($sockets[1]);
                 $this->_reset();
+                CM_Service_Manager::getInstance()->resetServiceInstances();
                 $forkHandler = new CM_Process_ForkHandler($this->getProcessId(), $workload, $sockets[0]);
                 $forkHandler->runAndSendWorkload();
                 $forkHandler->closeIpcStream();

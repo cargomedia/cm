@@ -107,6 +107,10 @@ class CM_Service_Manager extends CM_Class_Abstract {
         $this->_serviceInstanceList[$serviceName] = $instance;
     }
 
+    public function resetServiceInstances() {
+        $this->_serviceInstanceList = [];
+    }
+
     /**
      * @param string $serviceName
      */
