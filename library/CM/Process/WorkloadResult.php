@@ -1,5 +1,9 @@
 <?php
 
+class bla extends CM_Process_WorkloadResult {
+
+}
+
 class CM_Process_WorkloadResult {
 
     /** @var mixed */
@@ -33,7 +37,7 @@ class CM_Process_WorkloadResult {
 
     /**
      * @param Exception $exception
-     * @return $this
+     * @return static
      */
     public function setException(Exception $exception) {
         $this->_exception = new CM_ExceptionHandling_SerializableException($exception);
