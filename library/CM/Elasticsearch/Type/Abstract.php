@@ -78,18 +78,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         return Elastica\Util::convertDate($date);
     }
 
-    /**
-     * @param bool|null $recreate
-     */
-    public function create($recreate = null) {
-        $this->getIndex()->create($this->_indexParams, $recreate);
-
-        $mapping = new Elastica\Type\Mapping($this->getType(), $this->_mapping);
-        $mapping->setSource(array('enabled' => $this->_source));
-        $mapping->send();
-    }
-
-    public function createVersioned() {
+    public function createIndex() {
         // Remove old unfinished indices
         foreach ($this->_client->getStatus()->getIndicesWithAlias($this->getIndex()->getName() . '.tmp') as $index) {
             /** @var Elastica\Index $index */
@@ -105,7 +94,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         $version = time();
         /** @var $indexNew CM_Elasticsearch_Type_Abstract */
         $indexNew = new static($this->_client, $version);
-        $indexNew->create(true);
+        $indexNew->_create(true);
         $indexNew->getIndex()->addAlias($this->getIndex()->getName() . '.tmp');
 
         $settings = $indexNew->getIndex()->getSettings();
@@ -130,6 +119,39 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
                 $index->delete();
             }
         }
+    }
+
+    /**
+     * @throws CM_Exception_Invalid
+     */
+    public function updateIndex() {
+        $redis = CM_Service_Manager::getInstance()->getRedis();
+        $indexName = $this->getIndex()->getName();
+        $key = 'Search.Updates_' . $this->getType()->getName();
+        try {
+            $ids = $redis->sFlush($key);
+            $ids = array_filter(array_unique($ids));
+            $this->update($ids);
+            $this->refreshIndex;
+        } catch (Exception $e) {
+            $message = $indexName . '-updates failed.' . PHP_EOL;
+            if (isset($ids)) {
+                $message .= 'Re-adding ' . count($ids) . ' ids to queue.' . PHP_EOL;
+                foreach ($ids as $id) {
+                    $redis->sAdd($key, $id);
+                }
+            }
+            $message .= 'Reason: ' . $e->getMessage() . PHP_EOL;
+            throw new CM_Exception_Invalid($message);
+        }
+    }
+
+    public function deleteIndex() {
+        $this->getIndex()->delete();
+    }
+
+    public function refreshIndex() {
+        $this->getIndex()->refresh();
     }
 
     /**
@@ -188,6 +210,17 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
             $idsDelete = array_keys($idsDelete);
             $this->getIndex()->getClient()->deleteIds($idsDelete, $this->getIndex()->getName(), $this->getType()->getName());
         }
+    }
+
+    /**
+     * @param bool|null $recreate
+     */
+    protected function _create($recreate = null) {
+        $this->getIndex()->create($this->_indexParams, $recreate);
+
+        $mapping = new Elastica\Type\Mapping($this->getType(), $this->_mapping);
+        $mapping->setSource(array('enabled' => $this->_source));
+        $mapping->send();
     }
 
     /**

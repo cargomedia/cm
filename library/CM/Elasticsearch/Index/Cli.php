@@ -7,12 +7,12 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
      * @param bool|null   $skipIfExist
      */
     public function create($indexName = null, $skipIfExist = null) {
-        $elasticsearchCluster = CM_Service_Manager::getInstance()->getElasticsearch();
         $types = $this->_getTypes($indexName);
         foreach ($types as $type) {
             if (!$type->indexExists() || !$skipIfExist) {
                 $this->_getStreamOutput()->writeln('Creating elasticsearch index `' . $type->getIndex()->getName() . '`…');
-                $elasticsearchCluster->createIndex($type, $skipIfExist);
+                $type->createIndex();
+                $type->refreshIndex();
             }
         }
     }
@@ -21,11 +21,10 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
      * @param string|null $indexName
      */
     public function update($indexName = null) {
-        $elasticsearchCluster = CM_Service_Manager::getInstance()->getElasticsearch();
         $types = $this->_getTypes($indexName);
         foreach ($types as $type) {
             $this->_getStreamOutput()->writeln('Updating elasticsearch index `' . $type->getIndex()->getName() . '`...');
-            $elasticsearchCluster->updateIndex($type);
+            $type->updateIndex();
         }
     }
 
@@ -33,12 +32,11 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
      * @param string|null $indexName
      */
     public function delete($indexName = null) {
-        $elasticsearchCluster = CM_Service_Manager::getInstance()->getElasticsearch();
         $types = $this->_getTypes($indexName);
         foreach ($types as $type) {
             if ($type->indexExists()) {
                 $this->_getStreamOutput()->writeln('Deleting elasticsearch index `' . $type->getIndex()->getName() . '`…');
-                $elasticsearchCluster->deleteIndex($type);
+                $type->deleteIndex();
             }
         }
     }

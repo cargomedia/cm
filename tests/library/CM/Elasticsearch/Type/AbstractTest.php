@@ -17,7 +17,7 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
     public function setUp() {
         CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(true);
         $this->_type = new CM_Elasticsearch_Type_AbstractMock();
-        $this->_type->createVersioned();
+        $this->_type->createIndex();
         $this->_type->getIndex()->refresh();
     }
 
