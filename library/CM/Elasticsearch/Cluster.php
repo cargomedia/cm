@@ -66,15 +66,10 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
      * @return CM_Elasticsearch_Type_Abstract
      * @throws CM_Exception_Invalid
      */
-    public function getTypeByIndexName($indexName) {
-        $indexName = (string) $indexName;
-        $type = \Functional\first($this->getTypes(), function (CM_Elasticsearch_Type_Abstract $type) use ($indexName) {
+    public function findType($indexName) {
+        return \Functional\first($this->getTypes(), function (CM_Elasticsearch_Type_Abstract $type) use ($indexName) {
             return $type->getIndex()->getName() === $indexName;
         });
-        if (!$type) {
-            throw new CM_Exception_Invalid('No type with such index name: ' . $indexName);
-        }
-        return $type;
     }
 
     /**

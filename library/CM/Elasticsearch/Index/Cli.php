@@ -8,11 +8,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function create($indexName = null, $skipIfExist = null) {
         $elasticsearchCluster = CM_Service_Manager::getInstance()->getElasticsearch();
-        if (null !== $indexName) {
-            $types = [$elasticsearchCluster->getTypeByIndexName($indexName)];
-        } else {
-            $types = $elasticsearchCluster->getTypes();
-        }
+        $types = $this->_getTypes($indexName);
         foreach ($types as $type) {
             if (!$type->indexExists() || !$skipIfExist) {
                 $this->_getStreamOutput()->writeln('Creating elasticsearch index `' . $type->getIndex()->getName() . '`…');
@@ -26,11 +22,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function update($indexName = null) {
         $elasticsearchCluster = CM_Service_Manager::getInstance()->getElasticsearch();
-        if (null !== $indexName) {
-            $types = [$elasticsearchCluster->getTypeByIndexName($indexName)];
-        } else {
-            $types = $elasticsearchCluster->getTypes();
-        }
+        $types = $this->_getTypes($indexName);
         foreach ($types as $type) {
             $this->_getStreamOutput()->writeln('Updating elasticsearch index `' . $type->getIndex()->getName() . '`...');
             $elasticsearchCluster->updateIndex($type);
@@ -42,11 +34,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function delete($indexName = null) {
         $elasticsearchCluster = CM_Service_Manager::getInstance()->getElasticsearch();
-        if (null !== $indexName) {
-            $types = [$elasticsearchCluster->getTypeByIndexName($indexName)];
-        } else {
-            $types = $elasticsearchCluster->getTypes();
-        }
+        $types = $this->_getTypes($indexName);
         foreach ($types as $type) {
             if ($type->indexExists()) {
                 $this->_getStreamOutput()->writeln('Deleting elasticsearch index `' . $type->getIndex()->getName() . '`…');
@@ -72,6 +60,25 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
         $clockwork->registerCallback('search-index-update', '1 minute', array($this, 'update'));
         $clockwork->registerCallback('search-index-optimize', '1 hour', array($this, 'optimize'));
         $clockwork->start();
+    }
+
+    /**
+     * @param string|null $filterIndexName
+     * @throws CM_Exception_Invalid
+     * @return CM_Elasticsearch_Type_Abstract[]
+     */
+    protected function _getTypes($filterIndexName = null) {
+        $types = CM_Service_Manager::getInstance()->getElasticsearch()->getTypes();
+
+        if (null !== $filterIndexName) {
+            $types = \Functional\filter($types, function (CM_Elasticsearch_Type_Abstract $type) use ($filterIndexName) {
+                return $type->getIndex()->getName() === $filterIndexName;
+            });
+            if (count($types) === 0) {
+                throw new CM_Exception_Invalid('No type with such index name: ' . $filterIndexName);
+            }
+        }
+        return $types;
     }
 
     public static function getPackageName() {
