@@ -85,6 +85,18 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     });
   },
 
+  /**
+   * @param {jQuery} $el
+   */
+  scrollTo: function($el) {
+    var pageOffsetTop = 0;
+    var page = cm.findView('CM_Page_Abstract');
+    if (page) {
+      pageOffsetTop = page.$el.offset().top;
+    }
+    $(document).scrollTop($el.offset().top - pageOffsetTop);
+  },
+
   _onPageTeardown: function() {
     $(document).scrollTop(0);
     $('.floatbox-layer').floatIn();
@@ -110,9 +122,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     if (window.location.hash) {
       var hash = window.location.hash.substring(1);
       var $anchor = $('#' + hash).add('[name=' + hash + ']');
-      if ($anchor.length) {
-        $(document).scrollTop($anchor.offset().top - page.$el.offset().top);
-      }
+      this.scrollTo($anchor);
     }
   },
 
