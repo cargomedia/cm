@@ -16,11 +16,6 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Site_Abstract->class = null;
 
-    $config->CM_Elasticsearch_Client->enabled = true;
-    $config->CM_Elasticsearch_Client->servers = array(
-        array('host' => 'localhost', 'port' => 9200),
-    );
-
     $config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
     $config->CM_Cache_Local->lifetime = 86400;
 
@@ -198,6 +193,15 @@ return function (CM_Config_Node $config) {
         'arguments' => array(
             array(
                 ['host' => 'localhost', 'port' => 11211],
+            ),
+        ),
+    );
+
+    $config->services['elasticsearch'] = array(
+        'class'     => 'CM_Elasticsearch_Cluster',
+        'arguments' => array(
+            array(
+                ['host' => 'localhost', 'port' => 9200]
             ),
         ),
     );

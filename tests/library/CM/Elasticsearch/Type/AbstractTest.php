@@ -15,7 +15,7 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
     }
 
     public function setUp() {
-        CM_Config::get()->CM_Elasticsearch_Client->enabled = true;
+        CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(true);
         $this->_type = new CM_Elasticsearch_Type_AbstractMock();
         $this->_type->createVersioned();
         $this->_type->getIndex()->refresh();
@@ -23,7 +23,7 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
 
     public function tearDown() {
         $this->_type->getIndex()->delete();
-
+        CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(false);
         CMTest_TH::clearEnv();
     }
 
