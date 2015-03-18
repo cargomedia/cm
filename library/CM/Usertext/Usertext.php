@@ -106,7 +106,6 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
                 if (null !== $maxLength) {
                     throw new CM_Exception_Invalid('MaxLength is not allowed in mode markdown.');
                 }
-                $this->addFilter(new CM_Usertext_Filter_Markdown_UserContent());
                 $this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
                 $this->addFilter(new CM_Usertext_Filter_Markdown_UnescapeBlockquote());
                 $this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors));
@@ -114,7 +113,6 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
                 $this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
                 break;
             case 'markdownPlain':
-                $this->addFilter(new CM_Usertext_Filter_Markdown_UserContent());
                 $this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
                 $this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors));
                 $this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
