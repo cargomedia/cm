@@ -122,7 +122,9 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     if (window.location.hash) {
       var hash = window.location.hash.substring(1);
       var $anchor = $('#' + hash).add('[name=' + hash + ']');
-      this.scrollTo($anchor);
+      if ($anchor.length) {
+        this.scrollTo($anchor);
+      }
     }
   },
 
