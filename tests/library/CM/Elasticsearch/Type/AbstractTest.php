@@ -40,7 +40,7 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
 
         CM_Db_Db::update('index_mock', array('name' => 'bar'), array('id' => $id2));
         $this->_type->updateItem(array('id' => $id2));
-        $this->getServiceManager()->getElasticsearch()->updateIndex($this->_type);
+        $this->_type->updateIndex();
         $this->assertSame(1, $source->getCount());
         $this->assertEquals(array($id1), $source->getItems());
     }
