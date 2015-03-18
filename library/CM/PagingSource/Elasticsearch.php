@@ -69,7 +69,7 @@ class CM_PagingSource_Elasticsearch extends CM_PagingSource_Abstract {
             if ($count !== null) {
                 $data['size'] = $count;
             }
-            $searchResult = CM_Elasticsearch_Client::getInstance()->query($this->_types, $data);
+            $searchResult = CM_Service_Manager::getInstance()->getElasticsearch()->query($this->_types, $data);
             $result = array('items' => array(), 'total' => 0);
             if (isset($searchResult['hits'])) {
                 foreach ($searchResult['hits']['hits'] as $hit) {

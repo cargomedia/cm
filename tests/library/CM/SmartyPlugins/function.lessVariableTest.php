@@ -23,8 +23,8 @@ class smarty_function_lessVariableTest extends CMTest_TestCase {
     }
 
     /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Cannot detect variable
+     * @expectedException Exception
+     * @expectedExceptionMessage is undefined
      */
     public function testInvalidName() {
         smarty_function_lessVariable(['name' => 'helloworld'], $this->_template);

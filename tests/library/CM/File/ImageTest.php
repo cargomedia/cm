@@ -255,6 +255,18 @@ class CM_File_ImageTest extends CMTest_TestCase {
         $this->assertSame($heightExpected, $image->getHeight());
     }
 
+    public function testResizeNoInvalidDimensions() {
+        $imageOriginal = new CM_File_Image(DIR_TEST_DATA . 'img/test.jpg');
+        $image = CM_File_Image::createTmp(null, $imageOriginal->read());
+        $width = $image->getWidth();
+        $height = $image->getHeight();
+        $widthResize = ($width > $height) ? 1 : (int) round($width / $height);
+        $heightResize = ($height > $width) ? 1 : (int) round($height / $width);
+        $image->resize($widthResize, $heightResize);
+        $this->assertSame($widthResize, $image->getWidth());
+        $this->assertSame($heightResize, $image->getHeight());
+    }
+
     public function testResizeSquare() {
         $imageOriginal = new CM_File_Image(DIR_TEST_DATA . 'img/test.jpg');
         $image = CM_File_Image::createTmp(null, $imageOriginal->read());

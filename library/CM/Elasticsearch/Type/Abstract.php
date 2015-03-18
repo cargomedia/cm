@@ -25,12 +25,11 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
     protected $_type = null;
 
     /**
-     * @param string|null $host
-     * @param string|null $port
-     * @param int|null    $version
+     * @param \Elastica\Client|null $client
+     * @param int|null              $version
      * @throws CM_Exception_Invalid
      */
-    public function __construct($host = null, $port = null, $version = null) {
+    public function __construct(Elastica\Client $client = null, $version = null) {
         if (null === static::INDEX_NAME) {
             throw new CM_Exception_Invalid('Index name has to be set');
         }
@@ -41,13 +40,10 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         }
         $typeName = static::INDEX_NAME;
 
-        if (!$host || !$port) {
-            $servers = CM_Config::get()->CM_Elasticsearch_Client->servers;
-            $server = $servers[array_rand($servers)];
-            $host = $server['host'];
-            $port = $server['port'];
+        if (!$client) {
+            $client = CM_Service_Manager::getInstance()->getElasticsearch()->getRandomClient();
         }
-        $this->_client = new Elastica\Client(array('host' => $host, 'port' => $port));
+        $this->_client = $client;
 
         $this->_index = new Elastica\Index($this->_client, $indexName);
         $this->_type = new Elastica\Type($this->_index, $typeName);
@@ -101,7 +97,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         // Create new index and switch alias
         $version = time();
         /** @var $indexNew CM_Elasticsearch_Type_Abstract */
-        $indexNew = new static($this->_client->getConfig('host'), $this->_client->getConfig('port'), $version);
+        $indexNew = new static($this->_client, $version);
         $indexNew->create(true);
         $indexNew->getIndex()->addAlias($this->getIndex()->getName() . '.tmp');
 
@@ -212,7 +208,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * @param mixed $item
      */
     public static function updateItem($item) {
-        if (!CM_Elasticsearch_Client::getInstance()->getEnabled()) {
+        if (!CM_Service_Manager::getInstance()->getElasticsearch()->getEnabled()) {
             return;
         }
         $id = self::getIdForItem($item);
@@ -224,7 +220,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * @param mixed $item
      */
     public static function updateItemWithJob($item) {
-        if (!CM_Elasticsearch_Client::getInstance()->getEnabled()) {
+        if (!CM_Service_Manager::getInstance()->getElasticsearch()->getEnabled()) {
             return;
         }
         $job = new CM_Elasticsearch_UpdateDocumentJob();
