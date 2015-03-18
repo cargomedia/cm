@@ -40,6 +40,52 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
         if ($isMail) {
             $emoticonFixedHeight = 16;
         }
+        $this->_setMode($mode, $maxLength, $isMail, $skipAnchors, $emoticonFixedHeight);
+    }
+
+    /**
+     * @param string $text
+     * @return string
+     */
+    public function transform($text) {
+        $cacheKey = $this->_getCacheKey($text);
+        $cache = CM_Cache_Local::getInstance();
+        if (($result = $cache->get($cacheKey)) === false) {
+            $result = $text;
+            foreach ($this->_getFilters() as $filter) {
+                $result = $filter->transform($result, $this->_render);
+            }
+            $cache->set($cacheKey, $result);
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $text
+     * @return string
+     */
+    protected function _getCacheKey($text) {
+        $cacheKey = CM_CacheConst::Usertext . '_text:' . md5($text);
+        $filterList = $this->_getFilters();
+        if (0 !== count($filterList)) {
+            $cacheKeyListFilter = array_map(function (CM_Usertext_Filter_Interface $filter) {
+                return $filter->getCacheKey();
+            }, $filterList);
+            $cache = CM_Cache_Local::getInstance();
+            $cacheKey .= '_filter:' . $cache->key($cacheKeyListFilter);
+        }
+        return $cacheKey;
+    }
+
+    /**
+     * @param string     $mode
+     * @param int|null $maxLength
+     * @param boolean|null $isMail
+     * @param boolean|null $skipAnchors
+     * @param int|null $emoticonFixedHeight
+     * @throws CM_Exception_Invalid
+     */
+    protected function _setMode($mode, $maxLength = null, $isMail = null, $skipAnchors = null, $emoticonFixedHeight = null) {
         $this->addFilter(new CM_Usertext_Filter_Badwords());
         if ('escape' != $mode) {
             $this->addFilter(new CM_Usertext_Filter_Emoticon_ReplaceAdditional());
@@ -82,40 +128,6 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
         if ('markdownPlain' != $mode) {
             $this->addFilter(new CM_Usertext_Filter_CutWhitespace());
         }
-    }
-
-    /**
-     * @param string $text
-     * @return string
-     */
-    public function transform($text) {
-        $cacheKey = $this->_getCacheKey($text);
-        $cache = CM_Cache_Local::getInstance();
-        if (($result = $cache->get($cacheKey)) === false) {
-            $result = $text;
-            foreach ($this->_getFilters() as $filter) {
-                $result = $filter->transform($result, $this->_render);
-            }
-            $cache->set($cacheKey, $result);
-        }
-        return $result;
-    }
-
-    /**
-     * @param string $text
-     * @return string
-     */
-    protected function _getCacheKey($text) {
-        $cacheKey = CM_CacheConst::Usertext . '_text:' . md5($text);
-        $filterList = $this->_getFilters();
-        if (0 !== count($filterList)) {
-            $cacheKeyListFilter = array_map(function (CM_Usertext_Filter_Interface $filter) {
-                return $filter->getCacheKey();
-            }, $filterList);
-            $cache = CM_Cache_Local::getInstance();
-            $cacheKey .= '_filter:' . $cache->key($cacheKeyListFilter);
-        }
-        return $cacheKey;
     }
 
     private function _clearFilters() {
