@@ -40,7 +40,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
         if ($isMail) {
             $emoticonFixedHeight = 16;
         }
-        $this->_setMode($mode, $maxLength, $isMail, $skipAnchors, $emoticonFixedHeight);
+        $this->_setMode($mode, $maxLength, $skipAnchors, $emoticonFixedHeight);
     }
 
     /**
@@ -80,12 +80,11 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     /**
      * @param string     $mode
      * @param int|null $maxLength
-     * @param boolean|null $isMail
      * @param boolean|null $skipAnchors
      * @param int|null $emoticonFixedHeight
      * @throws CM_Exception_Invalid
      */
-    protected function _setMode($mode, $maxLength = null, $isMail = null, $skipAnchors = null, $emoticonFixedHeight = null) {
+    protected function _setMode($mode, $maxLength = null, $skipAnchors = null, $emoticonFixedHeight = null) {
         $this->addFilter(new CM_Usertext_Filter_Badwords());
         if ('escape' != $mode) {
             $this->addFilter(new CM_Usertext_Filter_Emoticon_ReplaceAdditional());
