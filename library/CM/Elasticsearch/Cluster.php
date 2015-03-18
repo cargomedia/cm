@@ -52,6 +52,75 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
     }
 
     /**
+     * @return CM_Elasticsearch_Type_Abstract[]
+     */
+    public function getTypes() {
+        $types = CM_Util::getClassChildren('CM_Elasticsearch_Type_Abstract');
+        return \Functional\map($types, function ($className) {
+            return new $className($this->getRandomClient());
+        });
+    }
+
+    /**
+     * @param string $indexName
+     * @return CM_Elasticsearch_Type_Abstract
+     * @throws CM_Exception_Invalid
+     */
+    public function getTypeByIndexName($indexName) {
+        $indexName = (string) $indexName;
+        $type = \Functional\first($this->getTypes(), function (CM_Elasticsearch_Type_Abstract $type) use ($indexName) {
+            return $type->getIndex()->getName() === $indexName;
+        });
+        if (!$type) {
+            throw new CM_Exception_Invalid('No type with such index name: ' . $indexName);
+        }
+        return $type;
+    }
+
+    /**
+     * @param CM_Elasticsearch_Type_Abstract $type
+     */
+    public function createIndex(CM_Elasticsearch_Type_Abstract $type) {
+        $type->createVersioned();
+        $type->getIndex()->refresh();
+    }
+
+    /**
+     * @param CM_Elasticsearch_Type_Abstract $type
+     * @throws CM_Exception_Invalid
+     */
+    public function updateIndex(CM_Elasticsearch_Type_Abstract $type) {
+        $redis = $this->getServiceManager()->getRedis();
+        $indexName = $type->getIndex()->getName();
+        $key = 'Search.Updates_' . $type->getType()->getName();
+        try {
+            $ids = $redis->sFlush($key);
+            $ids = array_filter(array_unique($ids));
+            $type->update($ids);
+            $type->getIndex()->refresh();
+        } catch (Exception $e) {
+            $message = $indexName . '-updates failed.' . PHP_EOL;
+            if (isset($ids)) {
+                $message .= 'Re-adding ' . count($ids) . ' ids to queue.' . PHP_EOL;
+                foreach ($ids as $id) {
+                    $redis->sAdd($key, $id);
+                }
+            }
+            $message .= 'Reason: ' . $e->getMessage() . PHP_EOL;
+            throw new CM_Exception_Invalid($message);
+        }
+    }
+
+    /**
+     * @param CM_Elasticsearch_Type_Abstract $type
+     */
+    public function deleteIndex(CM_Elasticsearch_Type_Abstract $type) {
+        if ($type->getIndex()->exists()) {
+            $type->getIndex()->delete();
+        }
+    }
+
+    /**
      * @param CM_Elasticsearch_Type_Abstract[] $types
      * @param array|null                       $data
      * @return array

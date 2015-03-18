@@ -57,6 +57,13 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
     }
 
     /**
+     * @return bool
+     */
+    public function indexExists() {
+        return $this->getIndex()->exists();
+    }
+
+    /**
      * @return Elastica\Type
      */
     public function getType() {
