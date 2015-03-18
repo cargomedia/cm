@@ -289,6 +289,32 @@ Parent terminated.
     }
 
     /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testServicesReset() {
+        $mysql = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+        $mysql->setBuffered(false);
+
+        $process = CM_Process::getInstance();
+        $process->fork(function () {
+            $mysql = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+            $mysql->setBuffered(false);
+            for ($i = 0; $i < 1000; $i++) {
+                $result2 = $mysql->createStatement('SELECT "bar"')->execute()->fetchColumn();
+                $this->assertSame('bar', $result2, 'Separate processes should not share connections to services');
+            }
+        });
+
+        for ($i = 0; $i < 1000; $i++) {
+            $result1 = $mysql->createStatement('SELECT "foo"')->execute()->fetchColumn();
+            $this->assertSame('foo', $result1, 'Separate processes should not share connection to services');
+        }
+
+        $process->waitForChildren();
+    }
+
+    /**
      * @param string $message
      */
     public static function writeln($message) {

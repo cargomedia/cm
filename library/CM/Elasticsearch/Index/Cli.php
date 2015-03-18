@@ -76,9 +76,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public function optimize() {
-        $servers = CM_Config::get()->CM_Elasticsearch_Client->servers;
-        foreach ($servers as $server) {
-            $client = new Elastica\Client($server);
+        foreach (CM_Service_Manager::getInstance()->getElasticsearch()->getClientList() as $client) {
             $client->optimizeAll();
         }
     }

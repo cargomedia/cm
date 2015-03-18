@@ -18,7 +18,7 @@
 
 textarea.textinput {
   height: @heightInputTextarea;
-  padding-top: (@heightInputText - 2px - @fontSize*@fontLineHeight) / 2;
+  padding-top: (@heightInputText - @fontSize*@fontLineHeight) / 2;
   overflow: auto;
   resize: vertical;
 }
@@ -32,12 +32,9 @@ textarea.textinput {
   ::-webkit-input-placeholder {
     color: @color;
   }
-  :-moz-placeholder {
-    // < FF 19
-    color: @color;
-  }
   ::-moz-placeholder {
     color: @color;
+    opacity: 1;
   }
   :-ms-input-placeholder {
     color: @color;
@@ -304,7 +301,7 @@ input[type=checkbox].checkbox-switch {
         margin: 0 5px;
         content: 'OFF';
         font-weight: bold;
-        line-height: @sizeSwitch - 2px;
+        line-height: @sizeSwitch;
         font-size: @sizeSwitch * 0.4;
         text-transform: uppercase;
         color: lighten(@colorFgSubtle, 10);
@@ -342,7 +339,7 @@ input[type=checkbox].checkbox-switch {
       right: 0;
       left: 0;
       content: 'ON';
-      color: @colorFgTheme;
+      color: contrast(darken(@colorFocus, 30), black, white);
     }
 
     &:after {
@@ -357,9 +354,8 @@ input[type=checkbox].checkbox-switch {
 }
 
 .formField, .formAction {
-  box-sizing: border-box;
-  max-width: 100%;
-  padding: 6px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .formField {
@@ -367,34 +363,10 @@ input[type=checkbox].checkbox-switch {
     box-sizing: border-box;
     color: @fontColorStrong;
     padding-left: 2px;
-    .word_wrap;
-
-    @media (min-width: 600px) {
-      width: 100px;
-      float: left;
-      padding-top: (@heightInputText - @fontSize * @fontLineHeight) / 2;
-      text-align: right;
-    }
 
     &:after {
       content: ":";
     }
-
-    .CM_FormField_Abstract {
-      float: left;
-      margin-right: 3px;
-    }
-  }
-
-  > .input {
-
-    @media (min-width: 600px) {
-      margin-left: 110px;
-    }
-  }
-
-  &.noLabel > .input {
-    margin-left: 0;
   }
 }
 

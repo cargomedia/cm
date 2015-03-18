@@ -35,7 +35,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
    * @param {String} path
    */
   loadPage: function(path) {
-    this.trigger('navigate', path);
+    cm.event.trigger('navigate', path);
 
     if (!this._$pagePlaceholder) {
       this._$pagePlaceholder = $('<div class="router-placeholder" />');
@@ -109,15 +109,9 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     }
     if (window.location.hash) {
       var hash = window.location.hash.substring(1);
-      var anchor = document.getElementById(hash);
-      if (!anchor) {
-        var anchorList = document.getElementsByName(hash);
-        if (anchorList.length) {
-          anchor = anchorList[0];
-        }
-      }
-      if (anchor) {
-        anchor.scrollIntoView();
+      var $anchor = $('#' + hash).add('[name=' + hash + ']');
+      if ($anchor.length) {
+        $(document).scrollTop($anchor.offset().top - page.$el.offset().top);
       }
     }
   },

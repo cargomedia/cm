@@ -415,6 +415,6 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         $msg = '* ' . $subject . ' *' . PHP_EOL . PHP_EOL;
         $msg .= $text . PHP_EOL;
         $log = new CM_Paging_Log_Mail();
-        $log->add($this, $msg);
+        $log->addMail($this, $msg);
     }
 }

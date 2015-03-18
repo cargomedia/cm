@@ -16,11 +16,6 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Site_Abstract->class = null;
 
-    $config->CM_Elasticsearch_Client->enabled = true;
-    $config->CM_Elasticsearch_Client->servers = array(
-        array('host' => 'localhost', 'port' => 9200),
-    );
-
     $config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
     $config->CM_Cache_Local->lifetime = 86400;
 
@@ -50,25 +45,28 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Usertext_Usertext->class = 'CM_Usertext_Usertext';
 
-    $config->CM_Http_Response_Page->catch = array(
-        'CM_Exception_Nonexistent'  => ['path' => '/error/not-found', 'log' => true],
-        'CM_Exception_InvalidParam' => ['path' => '/error/not-found', 'log' => true],
-        'CM_Exception_AuthRequired' => ['path' => '/error/auth-required', 'log' => false],
-        'CM_Exception_NotAllowed'   => ['path' => '/error/not-allowed', 'log' => false],
+    $config->CM_Http_Response_Page->exceptionsToCatch = array(
+        'CM_Exception_Nonexistent'  => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => 'CM_Paging_Log_NotFound'],
+        'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => 'CM_Paging_Log_NotFound'],
+        'CM_Exception_AuthRequired' => ['errorPage' => 'CM_Page_Error_AuthRequired', 'log' => null],
+        'CM_Exception_NotAllowed'   => ['errorPage' => 'CM_Page_Error_NotAllowed', 'log' => null],
     );
 
-    $config->CM_Http_Response_View_Abstract->catch = array(
-        'CM_Exception_Nonexistent',
-        'CM_Exception_AuthRequired',
-        'CM_Exception_NotAllowed',
-        'CM_Exception_Blocked',
-        'CM_Exception_ActionLimit',
+    $config->CM_Http_Response_View_Abstract->exceptionsToCatch = array(
+        'CM_Exception_Nonexistent'  => ['log' => 'CM_Paging_Log_NotFound'],
+        'CM_Exception_InvalidParam' => ['log' => 'CM_Paging_Log_NotFound'],
+        'CM_Exception_AuthRequired' => [],
+        'CM_Exception_NotAllowed'   => [],
+        'CM_Exception_Blocked'      => [],
+        'CM_Exception_ActionLimit'  => [],
     );
+    $config->CM_Http_Response_View_Abstract->catchPublicExceptions = true;
 
-    $config->CM_Http_Response_RPC->catch = array(
-        'CM_Exception_AuthRequired',
-        'CM_Exception_NotAllowed',
+    $config->CM_Http_Response_RPC->exceptionsToCatch = array(
+        'CM_Exception_AuthRequired' => [],
+        'CM_Exception_NotAllowed'   => [],
     );
+    $config->CM_Http_Response_RPC->catchPublicExceptions = true;
 
     $config->CM_Stream_Video->adapter = 'CM_Stream_Adapter_Video_Wowza';
     $config->CM_Stream_Video->servers = array(
@@ -203,6 +201,15 @@ return function (CM_Config_Node $config) {
         'arguments' => array(
             'servers' => array(
                 ['host' => 'localhost', 'port' => 11211],
+            ),
+        ),
+    );
+
+    $config->services['elasticsearch'] = array(
+        'class'     => 'CM_Elasticsearch_Cluster',
+        'arguments' => array(
+            array(
+                ['host' => 'localhost', 'port' => 9200]
             ),
         ),
     );

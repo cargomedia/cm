@@ -3,6 +3,15 @@
 abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_Typed {
 
     /**
+     * @param string     $msg
+     * @param array|null $metaInfo
+     */
+    public function add($msg, array $metaInfo = null) {
+        $metaInfo = array_merge((array) $metaInfo, $this->_getDefaultMetaInfo());
+        $this->_add($msg, $metaInfo);
+    }
+
+    /**
      * @param boolean $aggregate
      * @param int     $ageMax
      */
