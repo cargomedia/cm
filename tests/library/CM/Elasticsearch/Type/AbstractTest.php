@@ -17,7 +17,7 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
     public function setUp() {
         CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(true);
         $this->_type = new CM_Elasticsearch_Type_AbstractMock();
-        $this->_type->createVersioned();
+        $this->_type->createIndex();
         $this->_type->getIndex()->refresh();
     }
 
@@ -40,8 +40,7 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
 
         CM_Db_Db::update('index_mock', array('name' => 'bar'), array('id' => $id2));
         $this->_type->updateItem(array('id' => $id2));
-        $searchCli = new CM_Elasticsearch_Index_Cli();
-        $searchCli->update($this->_type);
+        $this->_type->updateIndex();
         $this->assertSame(1, $source->getCount());
         $this->assertEquals(array($id1), $source->getItems());
     }

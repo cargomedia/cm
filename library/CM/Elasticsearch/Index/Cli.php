@@ -7,53 +7,12 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
      * @param bool|null   $skipIfExist
      */
     public function create($indexName = null, $skipIfExist = null) {
-        if (null !== $indexName) {
-            $indexes = array($this->_getIndex($indexName));
-        } else {
-            $indexes = $this->_getIndexes();
-        }
-        foreach ($indexes as $index) {
-            if (!$index->getIndex()->exists() || !$skipIfExist) {
-                $this->_getStreamOutput()->writeln('Creating elasticsearch index `' . $index->getIndex()->getName() . '`…');
-                $index->createVersioned();
-                $index->getIndex()->refresh();
-            }
-        }
-    }
-
-    /**
-     * @param string|CM_Elasticsearch_Type_Abstract|null $indexName
-     * @param string|null                                $host Elasticsearch host
-     * @param int|null                                   $port Elasticsearch port
-     * @throws CM_Exception_Invalid
-     */
-    public function update($indexName = null, $host = null, $port = null) {
-        if ($indexName instanceof CM_Elasticsearch_Type_Abstract) {
-            $indexes = array($indexName);
-        } elseif (null !== $indexName) {
-            $indexes = array($this->_getIndex($indexName, $host, $port));
-        } else {
-            $indexes = $this->_getIndexes($host, $port);
-        }
-        foreach ($indexes as $index) {
-            $this->_getStreamOutput()->writeln('Updating elasticsearch index `' . $index->getIndex()->getName() . '`...');
-            $indexName = $index->getIndex()->getName();
-            $key = 'Search.Updates_' . $index->getType()->getName();
-            try {
-                $ids = $this->_getRedis()->sFlush($key);
-                $ids = array_filter(array_unique($ids));
-                $index->update($ids);
-                $index->getIndex()->refresh();
-            } catch (Exception $e) {
-                $message = $indexName . '-updates failed.' . PHP_EOL;
-                if (isset($ids)) {
-                    $message .= 'Re-adding ' . count($ids) . ' ids to queue.' . PHP_EOL;
-                    foreach ($ids as $id) {
-                        $this->_getRedis()->sAdd($key, $id);
-                    }
-                }
-                $message .= 'Reason: ' . $e->getMessage() . PHP_EOL;
-                throw new CM_Exception_Invalid($message);
+        $types = $this->_getTypes($indexName);
+        foreach ($types as $type) {
+            if (!$type->indexExists() || !$skipIfExist) {
+                $this->_getStreamOutput()->writeln('Creating elasticsearch index `' . $type->getIndex()->getName() . '`…');
+                $type->createIndex();
+                $type->refreshIndex();
             }
         }
     }
@@ -61,16 +20,23 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
     /**
      * @param string|null $indexName
      */
-    public function delete($indexName = null) {
-        if (null !== $indexName) {
-            $indexes = array($this->_getIndex($indexName));
-        } else {
-            $indexes = $this->_getIndexes();
+    public function update($indexName = null) {
+        $types = $this->_getTypes($indexName);
+        foreach ($types as $type) {
+            $this->_getStreamOutput()->writeln('Updating elasticsearch index `' . $type->getIndex()->getName() . '`...');
+            $type->updateIndex();
         }
-        foreach ($indexes as $index) {
-            if ($index->getIndex()->exists()) {
-                $this->_getStreamOutput()->writeln('Deleting elasticsearch index `' . $index->getIndex()->getName() . '`…');
-                $index->getIndex()->delete();
+    }
+
+    /**
+     * @param string|null $indexName
+     */
+    public function delete($indexName = null) {
+        $types = $this->_getTypes($indexName);
+        foreach ($types as $type) {
+            if ($type->indexExists()) {
+                $this->_getStreamOutput()->writeln('Deleting elasticsearch index `' . $type->getIndex()->getName() . '`…');
+                $type->deleteIndex();
             }
         }
     }
@@ -95,39 +61,22 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param string|null $host
-     * @param int|null    $port
+     * @param string|null $filterIndexName
+     * @throws CM_Exception_Invalid
      * @return CM_Elasticsearch_Type_Abstract[]
      */
-    private function _getIndexes($host = null, $port = null) {
-        $indexTypes = CM_Util::getClassChildren('CM_Elasticsearch_Type_Abstract');
-        return array_map(function ($indexType) use ($host, $port) {
-            return new $indexType($host, $port);
-        }, $indexTypes);
-    }
+    protected function _getTypes($filterIndexName = null) {
+        $types = CM_Service_Manager::getInstance()->getElasticsearch()->getTypes();
 
-    /**
-     * @param string      $indexName
-     * @param string|null $host
-     * @param int|null    $port
-     * @throws CM_Exception_Invalid
-     * @return CM_Elasticsearch_Type_Abstract
-     */
-    private function _getIndex($indexName, $host = null, $port = null) {
-        $indexes = array_filter($this->_getIndexes($host, $port), function (CM_Elasticsearch_Type_Abstract $index) use ($indexName) {
-            return $index->getIndex()->getName() == $indexName;
-        });
-        if (!$indexes) {
-            throw new CM_Exception_Invalid('No such index: ' . $indexName);
+        if (null !== $filterIndexName) {
+            $types = \Functional\filter($types, function (CM_Elasticsearch_Type_Abstract $type) use ($filterIndexName) {
+                return $type->getIndex()->getName() === $filterIndexName;
+            });
+            if (count($types) === 0) {
+                throw new CM_Exception_Invalid('No type with such index name: ' . $filterIndexName);
+            }
         }
-        return current($indexes);
-    }
-
-    /**
-     * @return CM_Redis_Client
-     */
-    private function _getRedis() {
-        return CM_Service_Manager::getInstance()->getRedis();
+        return $types;
     }
 
     public static function getPackageName() {
