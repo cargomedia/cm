@@ -94,7 +94,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         $version = time();
         /** @var $indexNew CM_Elasticsearch_Type_Abstract */
         $indexNew = new static($this->_client, $version);
-        $indexNew->_create(true);
+        $indexNew->_createIndex(true);
         $indexNew->getIndex()->addAlias($this->getIndex()->getName() . '.tmp');
 
         $settings = $indexNew->getIndex()->getSettings();
@@ -215,7 +215,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
     /**
      * @param bool|null $recreate
      */
-    protected function _create($recreate = null) {
+    protected function _createIndex($recreate = null) {
         $this->getIndex()->create($this->_indexParams, $recreate);
 
         $mapping = new Elastica\Type\Mapping($this->getType(), $this->_mapping);
