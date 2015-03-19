@@ -170,7 +170,7 @@ class CM_Cli_CommandManager {
             $streamOutput = $this->_streamOutput;
             $streamError = $this->_streamError;
 
-            $workload = $this->_getProcessWorkLoad($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError);
+            $workload = $this->_getProcessWorkload($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError);
 
             $forks = max($this->_forks, 1);
             $process = $this->_getProcess();
