@@ -132,7 +132,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
             $ids = $redis->sFlush($key);
             $ids = array_filter(array_unique($ids));
             $this->update($ids);
-            $this->refreshIndex;
+            $this->refreshIndex();
         } catch (Exception $e) {
             $message = $indexName . '-updates failed.' . PHP_EOL;
             if (isset($ids)) {
