@@ -9,6 +9,10 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
     CM_View_Abstract.prototype._ready.call(this);
 
     cm.dom.setup(this.$());
+
+    this.on('destruct', function() {
+      cm.dom.teardown(this.$());
+    })
   },
 
   /**

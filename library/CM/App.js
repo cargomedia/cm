@@ -311,6 +311,14 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('.fancySelect').fancySelect();
     },
     /**
+     * @param {jQuery} $dom
+     */
+    teardown: function($dom) {
+      $dom.find('.timeago').timeago('dispose');
+      $dom.find('textarea.autosize, .autosize textarea').trigger('autosize.destroy');
+      $dom.find('.showTooltip[title]').tooltip('destroy');
+    },
+    /**
      * @param {jQuery} $element
      * @param {Function} [success] fn(MediaElement, Element)
      * @param {Boolean} [preferPlugins]
