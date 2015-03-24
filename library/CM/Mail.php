@@ -364,7 +364,6 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 
     /**
      * @throws CM_Exception_Invalid
-     * @throws CM_Exception_NotAllowed
      * @throws phpmailerException
      */
     protected function _send($subject, $text, $html = null) {
