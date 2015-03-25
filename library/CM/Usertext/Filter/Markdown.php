@@ -3,7 +3,7 @@
 class CM_Usertext_Filter_Markdown extends CM_Usertext_Filter_Abstract {
 
     /** @var bool $_skipAnchors */
-    private $_skipAnchors;
+    protected $_skipAnchors;
 
     /**
      * @param bool|null $skipAnchors
