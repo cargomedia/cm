@@ -80,7 +80,7 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
      * @return string
      */
     private function _addLazyAttrs($tagText) {
-        $tagText = str_replace('>', ' class="lazy">', $tagText);
+        $tagText = str_replace('/>', 'class="lazy"/>', $tagText);
         return str_replace('src=', 'data-original=', $tagText);
     }
 }
