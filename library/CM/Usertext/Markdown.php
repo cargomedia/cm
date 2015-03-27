@@ -12,13 +12,13 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
      * @param bool|null $skipAnchors
      * @param bool|null $imgLazy
      */
-    function __construct($skipAnchors = null, $imgLazy = null) {
+    public function __construct($skipAnchors = null, $imgLazy = null) {
         $this->_skipAnchors = (boolean) $skipAnchors;
         $this->_imgLazy = (boolean) $imgLazy;
         parent::__construct();
     }
 
-    function formParagraphs($text) {
+    protected function formParagraphs($text) {
         $text = preg_replace('/\A\n+|\n+\z/', '', $text);
         $grafs = preg_split('/\n{1,}/', $text, -1, PREG_SPLIT_NO_EMPTY);
 
@@ -41,7 +41,7 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
         return implode("\n", $grafs);
     }
 
-    function _doAnchors_inline_callback($matches) {
+    protected function _doAnchors_inline_callback($matches) {
         if (!$this->_skipAnchors) {
             return parent::_doAnchors_inline_callback($matches);
         }
@@ -49,7 +49,7 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
         return $this->hashPart($link_text);
     }
 
-    function _doAnchors_reference_callback($matches) {
+    protected function _doAnchors_reference_callback($matches) {
         if (!$this->_skipAnchors) {
             return parent::_doAnchors_inline_callback($matches);
         }
