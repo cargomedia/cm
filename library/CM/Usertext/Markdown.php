@@ -5,11 +5,16 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
     /** @var bool $_skipAnchors */
     private $_skipAnchors;
 
+    /** @var bool $_imgLazy */
+    private $_imgLazy;
+
     /**
      * @param bool|null $skipAnchors
+     * @param bool|null $imgLazy
      */
-    function __construct($skipAnchors = null) {
+    function __construct($skipAnchors = null, $imgLazy = null) {
         $this->_skipAnchors = (boolean) $skipAnchors;
+        $this->_imgLazy = (boolean) $imgLazy;
         parent::__construct();
     }
 
@@ -50,5 +55,32 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
         }
         $link_text = $matches[2];
         return $link_text;
+    }
+
+    protected function _doImages_reference_callback($matches) {
+        if (!$this->_imgLazy) {
+            return parent::_doImages_reference_callback($matches);
+        }
+        $key = parent::_doImages_reference_callback($matches);
+        $this->html_hashes[$key] = $this->_addLazyAttrs($this->html_hashes[$key]);
+        return $key;
+    }
+
+    protected function _doImages_inline_callback($matches) {
+        if (!$this->_imgLazy) {
+            return parent::_doImages_inline_callback($matches);
+        }
+        $key = parent::_doImages_inline_callback($matches);
+        $this->html_hashes[$key] = $this->_addLazyAttrs($this->html_hashes[$key]);
+        return $key;
+    }
+
+    /**
+     * @param string $tagText
+     * @return string
+     */
+    private function _addLazyAttrs($tagText) {
+        $tagText = str_replace('>', ' class="lazy">', $tagText);
+        return str_replace('src=', 'data-original=', $tagText);
     }
 }
