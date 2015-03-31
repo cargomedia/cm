@@ -46,6 +46,8 @@
         }
       };
 
+      variables['window_width'] = $(window).width();
+      variables['window_height'] = $(window).height();
       variables['format'] = 'jsonp';
       $.getJSON(src + '?callback=?', variables, loadCallback);
     });
