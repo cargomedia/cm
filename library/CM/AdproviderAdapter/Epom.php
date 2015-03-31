@@ -2,10 +2,17 @@
 
 class CM_AdproviderAdapter_Epom extends CM_AdproviderAdapter_Abstract {
 
+    /**
+     * @return string
+     */
+    private function _getAccessKey() {
+        return self::_getConfig()->accessKey;
+    }
+
     public function getHtml($zoneData, array $variables) {
         $zoneId = CM_Util::htmlspecialchars($zoneData['zoneId']);
         $variables = $this->_variableKeysToUnderscore($variables);
-        $variables['key'] = '2ea5b261f06ca771033a5fa9e22493f1';
+        $variables['key'] = $this->_getAccessKey();
 
         $html = '<div id="epom-' . $zoneId . '" class="epom-ad" data-zone-id="' . $zoneId . '" data-variables="' .
             CM_Util::htmlspecialchars(json_encode($variables, JSON_FORCE_OBJECT)) . '"></div>';
