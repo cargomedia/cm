@@ -76,7 +76,7 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
     /**
      * @param string $tagText
      * @return string
-     * @throws
+     * @throws CM_Exception_Invalid
      */
     private function _addLazyAttrs($tagText) {
         $tagText = preg_replace('/^<img src="([^"]+)" alt="(.+?)" \/>$/i', '<img data-src="${1}" alt="${2}" class="lazy" />', $tagText, -1, $count);
