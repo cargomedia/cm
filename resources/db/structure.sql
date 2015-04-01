@@ -277,6 +277,7 @@ DROP TABLE IF EXISTS `cm_splittest`;
 CREATE TABLE `cm_splittest` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
+  `optimized` int(1) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),

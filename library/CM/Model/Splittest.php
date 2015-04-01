@@ -46,6 +46,21 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
     }
 
     /**
+     * @return bool
+     */
+    public function getOptimized() {
+        return (bool) $this->_get('optimized');
+    }
+
+    /**
+     * @param bool $optimized
+     */
+    public function setOptimized($optimized) {
+        $optimized = (bool) $optimized;
+        $this->_set('optimized', $optimized);
+    }
+
+    /**
      * @return CM_Paging_SplittestVariation_Splittest
      */
     public function getVariations() {
@@ -151,8 +166,9 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
         if (empty($variations)) {
             throw new CM_Exception('Cannot create splittest without variations');
         }
+        $optimized = !empty($data['optimized']);
 
-        $id = CM_Db_Db::insert('cm_splittest', array('name' => $name, 'createStamp' => time()));
+        $id = CM_Db_Db::insert('cm_splittest', array('name' => $name, 'optimized' => $optimized, 'createStamp' => time()));
         try {
             foreach ($variations as $variation) {
                 CM_Db_Db::insert('cm_splittestVariation', array('splittestId' => $id, 'name' => $variation));
@@ -235,7 +251,9 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
                 $this->getServiceManager()->getTrackings()->trackSplittest($fixture, $variation);
             } catch (CM_Db_Exception $exception) {
                 $variationListFixture = $this->_getVariationListFixture($fixture, true);
-                if (!array_key_exists($this->getId(), $variationListFixture) || $variationListFixture[$this->getId()]['flushStamp'] != $this->getCreated()) {
+                if (!array_key_exists($this->getId(), $variationListFixture) ||
+                    $variationListFixture[$this->getId()]['flushStamp'] != $this->getCreated()
+                ) {
                     throw $exception;
                 }
             }
@@ -274,9 +292,40 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
      * @return CM_Model_SplittestVariation
      */
     protected function _getVariationRandom() {
+        $variation = null;
         if (!isset($this->_variationWeightList)) {
-            $variation = $this->getVariationsEnabled()->getItemRand();
+            $variationList = $this->getVariationsEnabled();
+            if (!$variationList->isEmpty()) {
+                if ($this->getOptimized()) {
+                    // UCB1-Tuned allocation optimization
+                    $variationListUninitialized = [];
+                    /** @var CM_Model_SplittestVariation $variation */
+                    foreach ($variationList as $variation) {
+                        if (0. === $variation->getStandardDeviation()) {
+                            $variationListUninitialized[$variation->getFixtureCount()] = $variation;
+                        }
+                    }
+                    if (!empty($variationListUninitialized)) {
+                        ksort($variationListUninitialized);
+                        $variation = reset($variationListUninitialized);
+                    } else {
+                        $upperConfidenceBoundMax = null;
+                        /** @var CM_Model_SplittestVariation $variationEnabled */
+                        foreach ($variationList as $variationEnabled) {
+                            $upperConfidenceBound = $variationEnabled->getUpperConfidenceBound();
+                            if ((null === $upperConfidenceBoundMax) || ($upperConfidenceBound > $upperConfidenceBoundMax)) {
+                                $upperConfidenceBoundMax = $upperConfidenceBound;
+                                $variation = $variationEnabled;
+                            }
+                        }
+                    }
+                } else {
+                    // Uniform allocation
+                    $variation = $variationList->getItemRand();
+                }
+            }
         } else {
+            // Fixed-rate allocation
             $variationList = array();
             $variationWeightList = array();
             /** @var CM_Model_SplittestVariation $variation */

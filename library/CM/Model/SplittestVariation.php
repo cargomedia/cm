@@ -53,10 +53,19 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
      * @param bool $refreshCache
      * @return float
      */
+    public function getConversionWeightSquared($refreshCache = null) {
+        $aggregationData = $this->_getAggregationData($refreshCache);
+        return $aggregationData['conversionWeightSquared'];
+    }
+
+    /**
+     * @param bool $refreshCache
+     * @return float
+     */
     public function getConversionRate($refreshCache = null) {
         $fixtureCount = $this->getFixtureCount($refreshCache);
-        if (0 == $fixtureCount) {
-            return 0;
+        if (0 === $fixtureCount) {
+            return 0.;
         }
         return $this->getConversionWeight($refreshCache) / $fixtureCount;
     }
@@ -140,6 +149,40 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
     }
 
     /**
+     * @param bool|null $refreshCache
+     * @return float
+     */
+    public function getStandardDeviation($refreshCache = null) {
+        $fixtureCount = $this->getFixtureCount($refreshCache);
+        if (0 === $fixtureCount) {
+            return 0.;
+        }
+        $conversionRate = $this->getConversionRate();
+        $conversionWeightSquared = $this->getConversionWeightSquared();
+        return sqrt($conversionWeightSquared / $fixtureCount - $conversionRate * $conversionRate);
+    }
+
+    /**
+     * @param bool|null $refreshCache
+     * @return float
+     */
+    public function getUpperConfidenceBound($refreshCache = null) {
+        $conversionRate = $this->getConversionRate($refreshCache);
+        $fixtureCount = $this->getFixtureCount();
+        if (0 === $fixtureCount) {
+            return $conversionRate;
+        }
+        $fixtureCountSplittest = 0;
+        foreach ($this->getSplittest()->getVariations() as $variation) {
+            /** @var CM_Model_SplittestVariation $variation */
+            $fixtureCountSplittest += $variation->getFixtureCount();
+        }
+        $standardDeviation = $this->getStandardDeviation();
+        $upperConfidenceBound = $conversionRate + $standardDeviation * sqrt(log($fixtureCountSplittest) / $fixtureCount);
+        return $upperConfidenceBound;
+    }
+
+    /**
      * @param CM_Model_SplittestVariation $variationWorse
      * @return bool
      */
@@ -159,16 +202,19 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
         $cacheKey = $this->_getCacheKeyAggregation();
         $cache = CM_Cache_Local::getInstance();
         if ($refreshCache || false === ($aggregationData = $cache->get($cacheKey))) {
-            $conversionData = CM_Db_Db::execRead('SELECT COUNT(1) as `conversionCount`, SUM(`conversionWeight`) as `conversionWeight` FROM `cm_splittestVariation_fixture`
+            $conversionData = CM_Db_Db::execRead('
+              SELECT COUNT(1) as `conversionCount`, SUM(`conversionWeight`) as `conversionWeight`, SUM(`conversionWeight` * `conversionWeight`) as `conversionWeightSquared`
+                FROM `cm_splittestVariation_fixture`
 				WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL',
                 array($this->_getSplittestId(), $this->getId()))->fetch();
             $fixtureCount = (int) CM_Db_Db::execRead('SELECT COUNT(1) FROM `cm_splittestVariation_fixture`
 				WHERE `splittestId`=? AND `variationId`=?',
                 array($this->_getSplittestId(), $this->getId()))->fetchColumn();
             $aggregationData = array(
-                'conversionCount'  => (int) $conversionData['conversionCount'],
-                'conversionWeight' => (float) $conversionData['conversionWeight'],
-                'fixtureCount'     => $fixtureCount,
+                'conversionCount'         => (int) $conversionData['conversionCount'],
+                'conversionWeight'        => (float) $conversionData['conversionWeight'],
+                'conversionWeightSquared' => (float) $conversionData['conversionWeightSquared'],
+                'fixtureCount'            => $fixtureCount,
             );
             $cache->set($cacheKey, $aggregationData, 30);
         }

@@ -157,6 +157,84 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $test->delete();
     }
 
+    public function testGetConversionWeightSquared() {
+        $user1 = CMTest_TH::createUser();
+        $user2 = CMTest_TH::createUser();
+
+        /** @var CM_Model_Splittest_User $test */
+        $test = CM_Model_Splittest_User::createStatic(array('name' => 'bar', 'variations' => array('v1')));
+        /** @var CM_Model_SplittestVariation $variation */
+        $variation = $test->getVariations()->getItem(0);
+
+        $this->assertSame(0., $variation->getConversionWeightSquared(true));
+
+        $test->isVariationFixture($user1, 'v1');
+        $this->assertSame(0., $variation->getConversionWeightSquared(true));
+
+        $test->setConversion($user1, 10.);
+        $this->assertSame(100., $variation->getConversionWeightSquared(true));
+
+        $test->isVariationFixture($user2, 'v1');
+        $this->assertSame(100., $variation->getConversionWeightSquared(true));
+
+        $test->setConversion($user2, 2.);
+        $this->assertSame(104., $variation->getConversionWeightSquared(true));
+
+        $test->delete();
+    }
+
+    public function testGetStandardDeviation() {
+        $user1 = CMTest_TH::createUser();
+        $user2 = CMTest_TH::createUser();
+
+        /** @var CM_Model_Splittest_User $test */
+        $test = CM_Model_Splittest_User::createStatic(array('name' => 'bar', 'variations' => array('v1')));
+        /** @var CM_Model_SplittestVariation $variation */
+        $variation = $test->getVariations()->getItem(0);
+
+        $this->assertSame(0., $variation->getStandardDeviation(true));
+
+        $test->isVariationFixture($user1, 'v1');
+        $this->assertSame(0., $variation->getStandardDeviation(true));
+
+        $test->setConversion($user1, 10.);
+        $this->assertSame(0., $variation->getStandardDeviation(true));
+
+        $test->isVariationFixture($user2, 'v1');
+        $this->assertSame(5., $variation->getStandardDeviation(true));
+
+        $test->setConversion($user2, 2.);
+        $this->assertSame(4., $variation->getStandardDeviation(true));
+
+        $test->delete();
+    }
+
+    public function testGetUpperConfidenceBound() {
+        $user1 = CMTest_TH::createUser();
+        $user2 = CMTest_TH::createUser();
+
+        /** @var CM_Model_Splittest_User $test */
+        $test = CM_Model_Splittest_User::createStatic(array('name' => 'bar', 'variations' => array('v1')));
+        /** @var CM_Model_SplittestVariation $variation */
+        $variation = $test->getVariations()->getItem(0);
+
+        $this->assertSame(0., $variation->getUpperConfidenceBound(true));
+
+        $test->isVariationFixture($user1, 'v1');
+        $this->assertSame(0., $variation->getUpperConfidenceBound(true));
+
+        $test->setConversion($user1, 10.);
+        $this->assertSame(10., $variation->getUpperConfidenceBound(true));
+
+        $test->isVariationFixture($user2, 'v1');
+        $this->assertSame(7.9435250562887, $variation->getUpperConfidenceBound(true));
+
+        $test->setConversion($user2, 2.);
+        $this->assertSame(8.3548200450309, $variation->getUpperConfidenceBound(true));
+
+        $test->delete();
+    }
+
     public function testGetFixtureCount() {
         $user1 = CMTest_TH::createUser();
         $user2 = CMTest_TH::createUser();
@@ -175,6 +253,59 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $this->assertSame(1, $variation->getFixtureCount(true));
         $test->isVariationFixture($user2, 'v1');
         $this->assertSame(2, $variation->getFixtureCount(true));
+
+        $test->delete();
+    }
+
+    public function testOptimized() {
+        /** @var CM_Model_Splittest_User $test */
+        $test = CM_Model_Splittest_User::createStatic(array('name' => 'testOptimized', 'optimized' => true, 'variations' => array('v1', 'v2')));
+
+        foreach ([
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 0, 'v2' => 0]],
+                     ['variation' => 'v1', 'conversionWeight' => 0, 'UCB' => ['v1' => 0, 'v2' => 0]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 0, 'v2' => 0]],
+                     ['variation' => 'v1', 'conversionWeight' => 10, 'UCB' => ['v1' => 0, 'v2' => 9.5763354702607]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 9.1627730557885, 'v2' => 10.079050361367]],
+                     ['variation' => 'v1', 'conversionWeight' => 0, 'UCB' => ['v1' => 9.1627730557885, 'v2' => 7.4647362290016]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 6.9764490828879, 'v2' => 7.6740939911766]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 6.9764490828879, 'v2' => 9.3361367939935]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.1299303954748, 'v2' => 7.8752548790091]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.2580334083849, 'v2' => 8.8283139741822]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.3676533020391, 'v2' => 7.8363661837493]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.4632468764998, 'v2' => 8.5111528523589]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.547854326983, 'v2' => 7.7609849274971]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.6236382087886, 'v2' => 8.2854930993131]],
+                     ['variation' => 'v1', 'conversionWeight' => 10, 'UCB' => ['v1' => 7.6921892463093, 'v2' => 7.6828024677134]],
+                     ['variation' => 'v1', 'conversionWeight' => 0, 'UCB' => ['v1' => 9.1140386187892, 'v2' => 7.7176444685704]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.6480715270881, 'v2' => 7.7498373781205]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.6480715270881, 'v2' => 8.1724630283957]],
+                     ['variation' => 'v1', 'conversionWeight' => 10, 'UCB' => ['v1' => 7.6877396941039, 'v2' => 7.6626291437821]],
+                     ['variation' => 'v1', 'conversionWeight' => 0, 'UCB' => ['v1' => 8.5026412529014, 'v2' => 7.6867011689518]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.5231045928555, 'v2' => 7.7093347077617]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.5231045928555, 'v2' => 8.0648280886575]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.5493610883994, 'v2' => 7.6244971942451]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.5742006691383, 'v2' => 7.9347574318587]],
+                     ['variation' => 'v1', 'conversionWeight' => 10, 'UCB' => ['v1' => 7.5977618494541, 'v2' => 7.5503911157322]],
+                     ['variation' => 'v1', 'conversionWeight' => 0, 'UCB' => ['v1' => 8.1715906029488, 'v2' => 7.565588932245]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.4341829707168, 'v2' => 7.5801000881577]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.4341829707168, 'v2' => 7.8534733810622]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.4514490087814, 'v2' => 7.5106403210843]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.4679937673471, 'v2' => 7.7567753416888]],
+                     ['variation' => 'v1', 'conversionWeight' => 10, 'UCB' => ['v1' => 7.483872514059, 'v2' => 7.4490303850766]],
+                     ['variation' => 'v1', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.930011605986, 'v2' => 7.4596622703966]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.3403742293396, 'v2' => 7.4699083170757]],
+                 ] as $fixtureData) {
+            $upperConfidenceBoundList = [];
+            /** @var CM_Model_SplittestVariation $variation */
+            foreach ($test->getVariations() as $variation) {
+                $upperConfidenceBoundList[$variation->getName()] = $variation->getUpperConfidenceBound(true);
+            }
+            $this->assertEquals($fixtureData['UCB'], $upperConfidenceBoundList);
+            $user = CMTest_TH::createUser();
+            $this->assertTrue($test->isVariationFixture($user, $fixtureData['variation']));
+            $test->setConversion($user, $fixtureData['conversionWeight']);
+        }
 
         $test->delete();
     }
