@@ -58,29 +58,31 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
     }
 
     protected function _doImages_reference_callback($matches) {
-        if (!$this->_imgLazy) {
-            return parent::_doImages_reference_callback($matches);
-        }
         $key = parent::_doImages_reference_callback($matches);
-        $this->html_hashes[$key] = $this->_addLazyAttrs($this->html_hashes[$key]);
+        if ($this->_imgLazy) {
+            $this->html_hashes[$key] = $this->_addLazyAttrs($this->html_hashes[$key]);
+        }
         return $key;
     }
 
     protected function _doImages_inline_callback($matches) {
-        if (!$this->_imgLazy) {
-            return parent::_doImages_inline_callback($matches);
-        }
         $key = parent::_doImages_inline_callback($matches);
-        $this->html_hashes[$key] = $this->_addLazyAttrs($this->html_hashes[$key]);
+        if ($this->_imgLazy) {
+            $this->html_hashes[$key] = $this->_addLazyAttrs($this->html_hashes[$key]);
+        }
         return $key;
     }
 
     /**
      * @param string $tagText
      * @return string
+     * @throws
      */
     private function _addLazyAttrs($tagText) {
-        $tagText = str_replace('/>', 'class="lazy"/>', $tagText);
-        return str_replace('src=', 'data-src=', $tagText);
+        $tagText = preg_replace('/^<img src="([^"]+)" alt="(.+?)" \/>$/i', '<img data-src="${1}" alt="${2}" class="lazy" />', $tagText, -1, $count);
+        if (0 === $count) {
+            throw new CM_Exception_Invalid('Cannot replace img-tag `' . $tagText . '`.');
+        }
+        return $tagText;
     }
 }
