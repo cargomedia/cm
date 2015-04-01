@@ -175,7 +175,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
         $fixtureCountSplittest = 0;
         foreach ($this->getSplittest()->getVariations() as $variation) {
             /** @var CM_Model_SplittestVariation $variation */
-            $fixtureCountSplittest += $variation->getFixtureCount();
+            $fixtureCountSplittest += $variation->getFixtureCount($refreshCache);
         }
         $standardDeviation = $this->getStandardDeviation();
         $upperConfidenceBound = $conversionRate + $standardDeviation * sqrt(log($fixtureCountSplittest) / $fixtureCount);
