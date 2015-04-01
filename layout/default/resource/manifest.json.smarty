@@ -1,5 +1,7 @@
 {
 	"name": "{$render->getSite()->getName()}",
+	"display": "standalone",
+	"start_url": "/",
 	"icons": [
 		{
 			"src": "{resourceUrl path='img/meta/android-chrome-36x36.png' type='layout'}",
