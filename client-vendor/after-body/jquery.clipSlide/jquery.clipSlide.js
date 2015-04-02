@@ -18,7 +18,7 @@
     this.$content.css({display: 'block'});
 
     var self = this;
-    this.$elem.imagesLoaded().always(function() {
+    this.$elem.find('img').on('load', function() {
       self.toggle(false);
     });
   }
