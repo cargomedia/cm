@@ -38,7 +38,7 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
 
     public function testSetUserForRequestClient_userGetsFirstRequestClientVariation() {
         /** @var CM_Model_Splittest_RequestClient_Mock $splittestRequestClient */
-        $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::createStatic(array('name' => 'foo', 'variations' => range(1, 100)));
+        $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::create('foo', range(1, 100));
         /** @var CM_Model_Splittest_User_Mock $splittestUser */
         $splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
@@ -62,7 +62,7 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
     public function testSetUserForRequestClient_usersFromSameClientGetSameVariation() {
 
         /** @var CM_Model_Splittest_RequestClient_Mock $splittestRequestClient */
-        $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::createStatic(array('name' => 'foo', 'variations' => range(1, 100)));
+        $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::create('foo', range(1, 100));
         /** @var CM_Model_Splittest_User_Mock $splittestUser */
         $splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
@@ -86,7 +86,7 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
     public function testSetUserForRequestClient_onLogin() {
 
         /** @var CM_Model_Splittest_RequestClient_Mock $splittestRequestClient */
-        $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::createStatic(array('name' => 'foo', 'variations' => range(1, 100)));
+        $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::create('foo', range(1, 100));
         /** @var CM_Model_Splittest_User_Mock $splittestUser */
         $splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
@@ -104,7 +104,7 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
     public function testSetUserForRequestClient_userConversionAfterLogin() {
 
         /** @var CM_Model_Splittest_RequestClient_Mock $splittestRequestClient */
-        $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::createStatic(array('name' => 'foo', 'variations' => array('v')));
+        $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::create('foo', ['v']);
         /** @var CM_Model_Splittest_User_Mock $splittestUser */
         $splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
@@ -163,7 +163,7 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
     public function testSetUserForRequestClient_userConversionBeforeLogin() {
 
         /** @var CM_Model_Splittest_RequestClient_Mock $splittestRequestClient */
-        $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::createStatic(array('name' => 'foo', 'variations' => array('v')));
+        $splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::create('foo', ['v']);
         /** @var CM_Model_Splittest_User_Mock $splittestUser */
         $splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
