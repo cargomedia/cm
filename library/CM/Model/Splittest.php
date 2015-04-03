@@ -292,59 +292,72 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
      * @return CM_Model_SplittestVariation
      */
     protected function _getVariationRandom() {
-        $variation = null;
-        if (!isset($this->_variationWeightList)) {
-            $variationList = $this->getVariationsEnabled();
-            if (!$variationList->isEmpty()) {
-                if ($this->getOptimized()) {
-                    // UCB1-Tuned allocation optimization
-                    $variationListUninitialized = [];
-                    /** @var CM_Model_SplittestVariation $variation */
-                    foreach ($variationList as $variation) {
-                        if (0. === $variation->getStandardDeviation()) {
-                            $variationListUninitialized[$variation->getFixtureCount()] = $variation;
-                        }
-                    }
-                    if (!empty($variationListUninitialized)) {
-                        ksort($variationListUninitialized);
-                        $variation = reset($variationListUninitialized);
-                    } else {
-                        $upperConfidenceBoundMax = null;
-                        /** @var CM_Model_SplittestVariation $variationEnabled */
-                        foreach ($variationList as $variationEnabled) {
-                            $upperConfidenceBound = $variationEnabled->getUpperConfidenceBound();
-                            if ((null === $upperConfidenceBoundMax) || ($upperConfidenceBound > $upperConfidenceBoundMax)) {
-                                $upperConfidenceBoundMax = $upperConfidenceBound;
-                                $variation = $variationEnabled;
-                            }
-                        }
-                    }
-                } else {
-                    // Uniform allocation
-                    $variation = $variationList->getItemRand();
-                }
-            }
+        if (isset($this->_variationWeightList)) {
+            $variation = $this->_getVariationWithFixedWeightPolicy();
+        } elseif ($this->getOptimized()) {
+            $variation = $this->_getVariationWithUpperConfidenceBoundPolicy();
         } else {
-            // Fixed-rate allocation
-            $variationList = array();
-            $variationWeightList = array();
-            /** @var CM_Model_SplittestVariation $variation */
-            foreach ($this->getVariationsEnabled()->getItems() as $variation) {
-                $variationName = $variation->getName();
-                if (isset($this->_variationWeightList[$variationName])) {
-                    $variationList[] = $variation;
-                    $variationWeightList[] = $this->_variationWeightList[$variationName];
-                }
-            }
-            if (empty($variationList)) {
-                $variation = null;
-            } else {
-                $weightedRandom = new CM_WeightedRandom($variationList, $variationWeightList);
-                $variation = $weightedRandom->lookup();
-            }
+            $variation = $this->_getVariationWithUniformPolicy();
         }
         if (!$variation) {
             throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
+        }
+        return $variation;
+    }
+
+    /**
+     * @return CM_Model_SplittestVariation|null
+     */
+    protected function _getVariationWithFixedWeightPolicy() {
+        $variationList = [];
+        $variationWeightList = [];
+        /** @var CM_Model_SplittestVariation $variation */
+        foreach ($this->getVariationsEnabled()->getItems() as $variation) {
+            $variationName = $variation->getName();
+            if (isset($this->_variationWeightList[$variationName])) {
+                $variationList[] = $variation;
+                $variationWeightList[] = $this->_variationWeightList[$variationName];
+            }
+        }
+        if (empty($variationList)) {
+            return null;
+        }
+        $weightedRandom = new CM_WeightedRandom($variationList, $variationWeightList);
+        return $weightedRandom->lookup();
+    }
+
+    /**
+     * @return CM_Model_SplittestVariation|null
+     */
+    protected function _getVariationWithUniformPolicy() {
+        $variationList = $this->getVariationsEnabled();
+        return $variationList->getItemRand();
+    }
+
+    /**
+     * @return CM_Model_SplittestVariation|null
+     */
+    protected function _getVariationWithUpperConfidenceBoundPolicy() {
+        $variationList = $this->getVariationsEnabled();
+        $variationListUninitialized = [];
+        /** @var CM_Model_SplittestVariation $variationEnabled */
+        foreach ($variationList as $variationEnabled) {
+            if (0. === $variationEnabled->getStandardDeviation()) {
+                $variationListUninitialized[$variationEnabled->getFixtureCount()] = $variationEnabled;
+            }
+        }
+        if (!empty($variationListUninitialized)) {
+            ksort($variationListUninitialized);
+            return reset($variationListUninitialized);
+        }
+        $variation = null;
+        $upperConfidenceBoundMax = null;
+        foreach ($variationList as $variationEnabled) {
+            $upperConfidenceBound = $variationEnabled->getUpperConfidenceBound();
+            if ((null === $upperConfidenceBoundMax) || ($upperConfidenceBound > $upperConfidenceBoundMax)) {
+                $variation = $variationEnabled;
+                $upperConfidenceBoundMax = $upperConfidenceBound;
+            }
         }
         return $variation;
     }
