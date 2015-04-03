@@ -76,9 +76,10 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $variation = $test->getVariations()->getItem(0);
 
         $test->isVariationFixture($user, 'v1');
-        $this->assertSame(0, $variation->getConversionCount(true));
+        $this->assertSame(0, $variation->getConversionCount());
         $test->setConversion($user);
-        $this->assertSame(1, $variation->getConversionCount(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getConversionCount());
 
         $test->delete();
     }
@@ -96,17 +97,19 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $test->isVariationFixture($user, 'v1');
         $test->isVariationFixture($user2, 'v1');
         $test->isVariationFixture($user3, 'v1');
-        $this->assertSame(0, $variation->getConversionCount(true));
-        $this->assertSame(0.0, $variation->getConversionWeight(true));
+        $this->assertSame(0, $variation->getConversionCount());
+        $this->assertSame(0.0, $variation->getConversionWeight());
         $test->setConversion($user, 3.75);
         $test->setConversion($user2, 3.29);
-        $this->assertSame(2, $variation->getConversionCount(true));
-        $this->assertSame(7.04, $variation->getConversionWeight(true));
-        $this->assertSame(2.3466666666667, $variation->getConversionRate(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(2, $variation->getConversionCount());
+        $this->assertSame(7.04, $variation->getConversionWeight());
+        $this->assertSame(2.3466666666667, $variation->getConversionRate());
         $test->setConversion($user, -2);
-        $this->assertSame(2, $variation->getConversionCount(true));
-        $this->assertSame(5.04, $variation->getConversionWeight(true));
-        $this->assertSame(1.68, $variation->getConversionRate(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(2, $variation->getConversionCount());
+        $this->assertSame(5.04, $variation->getConversionWeight());
+        $this->assertSame(1.68, $variation->getConversionRate());
 
         $test->delete();
     }
@@ -120,16 +123,18 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $variation = $test->getVariations()->getItem(0);
 
         $test->isVariationFixture($user, 'v1');
-        $this->assertSame(0, $variation->getConversionCount(true));
-        $this->assertSame(0.0, $variation->getConversionWeight(true));
+        $this->assertSame(0, $variation->getConversionCount());
+        $this->assertSame(0.0, $variation->getConversionWeight());
         $test->setConversion($user);
-        $this->assertSame(1, $variation->getConversionCount(true));
-        $this->assertSame(1., $variation->getConversionWeight(true));
-        $this->assertSame(1., $variation->getConversionRate(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getConversionCount());
+        $this->assertSame(1., $variation->getConversionWeight());
+        $this->assertSame(1., $variation->getConversionRate());
         $test->setConversion($user);
-        $this->assertSame(1, $variation->getConversionCount(true));
-        $this->assertSame(1., $variation->getConversionWeight(true));
-        $this->assertSame(1., $variation->getConversionRate(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getConversionCount());
+        $this->assertSame(1., $variation->getConversionWeight());
+        $this->assertSame(1., $variation->getConversionRate());
 
         $test->delete();
     }
@@ -143,16 +148,18 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $variation = $test->getVariations()->getItem(0);
 
         $test->isVariationFixture($user, 'v1');
-        $this->assertSame(0, $variation->getConversionCount(true));
-        $this->assertSame(0.0, $variation->getConversionWeight(true));
+        $this->assertSame(0, $variation->getConversionCount());
+        $this->assertSame(0.0, $variation->getConversionWeight());
         $test->setConversion($user, 1.);
-        $this->assertSame(1, $variation->getConversionCount(true));
-        $this->assertSame(1., $variation->getConversionWeight(true));
-        $this->assertSame(1., $variation->getConversionRate(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getConversionCount());
+        $this->assertSame(1., $variation->getConversionWeight());
+        $this->assertSame(1., $variation->getConversionRate());
         $test->setConversion($user, 1.);
-        $this->assertSame(1, $variation->getConversionCount(true));
-        $this->assertSame(2., $variation->getConversionWeight(true));
-        $this->assertSame(2., $variation->getConversionRate(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getConversionCount());
+        $this->assertSame(2., $variation->getConversionWeight());
+        $this->assertSame(2., $variation->getConversionRate());
 
         $test->delete();
     }
@@ -166,19 +173,23 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         /** @var CM_Model_SplittestVariation $variation */
         $variation = $test->getVariations()->getItem(0);
 
-        $this->assertSame(0., $variation->getConversionWeightSquared(true));
+        $this->assertSame(0., $variation->getConversionWeightSquared());
 
         $test->isVariationFixture($user1, 'v1');
-        $this->assertSame(0., $variation->getConversionWeightSquared(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(0., $variation->getConversionWeightSquared());
 
         $test->setConversion($user1, 10.);
-        $this->assertSame(100., $variation->getConversionWeightSquared(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(100., $variation->getConversionWeightSquared());
 
         $test->isVariationFixture($user2, 'v1');
-        $this->assertSame(100., $variation->getConversionWeightSquared(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(100., $variation->getConversionWeightSquared());
 
         $test->setConversion($user2, 2.);
-        $this->assertSame(104., $variation->getConversionWeightSquared(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(104., $variation->getConversionWeightSquared());
 
         $test->delete();
     }
@@ -192,19 +203,23 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         /** @var CM_Model_SplittestVariation $variation */
         $variation = $test->getVariations()->getItem(0);
 
-        $this->assertSame(0., $variation->getStandardDeviation(true));
+        $this->assertSame(0., $variation->getStandardDeviation());
 
         $test->isVariationFixture($user1, 'v1');
-        $this->assertSame(0., $variation->getStandardDeviation(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(0., $variation->getStandardDeviation());
 
         $test->setConversion($user1, 10.);
-        $this->assertSame(0., $variation->getStandardDeviation(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(0., $variation->getStandardDeviation());
 
         $test->isVariationFixture($user2, 'v1');
-        $this->assertSame(5., $variation->getStandardDeviation(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(5., $variation->getStandardDeviation());
 
         $test->setConversion($user2, 2.);
-        $this->assertSame(4., $variation->getStandardDeviation(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(4., $variation->getStandardDeviation());
 
         $test->delete();
     }
@@ -218,19 +233,23 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         /** @var CM_Model_SplittestVariation $variation */
         $variation = $test->getVariations()->getItem(0);
 
-        $this->assertSame(0., $variation->getUpperConfidenceBound(true));
+        $this->assertSame(0., $variation->getUpperConfidenceBound());
 
         $test->isVariationFixture($user1, 'v1');
-        $this->assertSame(0., $variation->getUpperConfidenceBound(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(0., $variation->getUpperConfidenceBound());
 
         $test->setConversion($user1, 10.);
-        $this->assertSame(10., $variation->getUpperConfidenceBound(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(10., $variation->getUpperConfidenceBound());
 
         $test->isVariationFixture($user2, 'v1');
-        $this->assertSame(7.9435250562887, $variation->getUpperConfidenceBound(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(7.9435250562887, $variation->getUpperConfidenceBound());
 
         $test->setConversion($user2, 2.);
-        $this->assertSame(8.3548200450309, $variation->getUpperConfidenceBound(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(8.3548200450309, $variation->getUpperConfidenceBound());
 
         $test->delete();
     }
@@ -245,14 +264,17 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         /** @var CM_Model_SplittestVariation $variation */
         $variation = $test->getVariations()->getItem(0);
 
-        $this->assertSame(0, $variation->getFixtureCount(true));
+        $this->assertSame(0, $variation->getFixtureCount());
 
         $test->isVariationFixture($user1, 'v1');
-        $this->assertSame(1, $variation->getFixtureCount(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getFixtureCount());
         $test->isVariationFixture($user1, 'v1');
-        $this->assertSame(1, $variation->getFixtureCount(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getFixtureCount());
         $test->isVariationFixture($user2, 'v1');
-        $this->assertSame(2, $variation->getFixtureCount(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(2, $variation->getFixtureCount());
 
         $test->delete();
     }
@@ -296,10 +318,11 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
                      ['variation' => 'v1', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.930011605986, 'v2' => 7.4596622703966]],
                      ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.3403742293396, 'v2' => 7.4699083170757]],
                  ] as $fixtureData) {
+            CMTest_TH::clearCache();
             $upperConfidenceBoundList = [];
             /** @var CM_Model_SplittestVariation $variation */
             foreach ($test->getVariations() as $variation) {
-                $upperConfidenceBoundList[$variation->getName()] = $variation->getUpperConfidenceBound(true);
+                $upperConfidenceBoundList[$variation->getName()] = $variation->getUpperConfidenceBound();
             }
             $this->assertEquals($fixtureData['UCB'], $upperConfidenceBoundList);
             $user = CMTest_TH::createUser();

@@ -28,11 +28,13 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
 
         $test->isVariationFixture($request, 'v1');
         $test->isVariationFixture($request2, 'v1');
-        $this->assertSame(0, $variation->getConversionCount(true));
+        $this->assertSame(0, $variation->getConversionCount());
         $test->setConversion($request);
-        $this->assertSame(1, $variation->getConversionCount(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getConversionCount());
         $test->setConversion($request2, 2.5);
-        $this->assertSame(1.75, $variation->getConversionRate(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1.75, $variation->getConversionRate());
     }
 
     public function testIgnoreBots() {
@@ -61,10 +63,12 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
         $splittest->isVariationFixture($request1, 'bar');
         $splittest->isVariationFixture($request2, 'bar');
 
-        $this->assertSame(0, $variation->getConversionCount(true));
+        $this->assertSame(0, $variation->getConversionCount());
         CM_Model_Splittest_RequestClient::setConversionStatic('foo', $request1);
-        $this->assertSame(1, $variation->getConversionCount(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getConversionCount());
         CM_Model_Splittest_RequestClient::setConversionStatic('foo', $request2, 2.5);
-        $this->assertSame(1.75, $variation->getConversionRate(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1.75, $variation->getConversionRate());
     }
 }
