@@ -225,11 +225,12 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
-     * @param string|null $type
-     * @param string|null $path
+     * @param string|null  $type
+     * @param string|null  $path
+     * @param boolean|null $sameOrigin
      * @return string
      */
-    public function getUrlResource($type = null, $path = null) {
+    public function getUrlResource($type = null, $path = null, $sameOrigin = null) {
         $url = '';
         if (!is_null($type) && !is_null($path)) {
             $type = (string) $type;
@@ -240,7 +241,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             }
             $url .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getDeployVersion() . '/' . $path;
         }
-        if ($urlCdn = $this->getSite()->getUrlCdn()) {
+        if (!$sameOrigin && $urlCdn = $this->getSite()->getUrlCdn()) {
             $url = $urlCdn . $url;
         } else {
             $url = $this->getSite()->getUrl() . $url;
@@ -262,15 +263,16 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
-     * @param string|null $path
+     * @param string|null  $path
+     * @param boolean|null $sameOrigin
      * @return string
      */
-    public function getUrlStatic($path = null) {
+    public function getUrlStatic($path = null, $sameOrigin = null) {
         $url = '/static';
         if (null !== $path) {
             $url .= $path . '?' . CM_App::getInstance()->getDeployVersion();
         }
-        if ($urlCdn = $this->getSite()->getUrlCdn()) {
+        if (!$sameOrigin && $urlCdn = $this->getSite()->getUrlCdn()) {
             $url = $urlCdn . $url;
         } else {
             $url = $this->getSite()->getUrl() . $url;
