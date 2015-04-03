@@ -334,6 +334,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
     }
 
     /**
+     * @see Section 4 of http://homes.di.unimi.it/~cesabian/Pubblicazioni/ml-02.pdf
      * @return CM_Model_SplittestVariation|null
      */
     protected function _getVariationWithUpperConfidenceBoundPolicy() {
