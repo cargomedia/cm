@@ -277,6 +277,7 @@ DROP TABLE IF EXISTS `cm_splittest`;
 CREATE TABLE `cm_splittest` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
+  `optimized` int(1) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
@@ -312,9 +313,8 @@ CREATE TABLE `cm_splittestVariation_fixture` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `userSplittest` (`userId`,`splittestId`),
   UNIQUE KEY `requestClientSplittest` (`requestClientId`,`splittestId`),
-  KEY `splittestId` (`splittestId`),
-  KEY `conversionStamp` (`conversionStamp`),
-  KEY `createStamp` (`createStamp`)
+  KEY `splittestVariationCreateStamp` (`splittestId`,`variationId`,`createStamp`),
+  KEY `splittestVariationConversionStamp` (`splittestId`,`variationId`,`conversionStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_streamChannel`;
