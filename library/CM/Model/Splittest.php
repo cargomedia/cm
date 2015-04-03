@@ -350,12 +350,15 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
     }
 
     /**
-     * @param string   $name
-     * @param string[] $variations
+     * @param string    $name
+     * @param string[]  $variations
+     * @param bool|null $optimized
      * @return static
      */
-    public static function create($name, array $variations) {
-        return static::createStatic(['name' => (string) $name, 'variations' => (array) $variations]);
+    public static function create($name, array $variations, $optimized = null) {
+        $name = (string) $name;
+        $optimized = (bool) $optimized;
+        return static::createStatic(['name' => $name, 'variations' => $variations, 'optimized' => $optimized]);
     }
 
     /**
