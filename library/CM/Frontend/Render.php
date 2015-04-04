@@ -263,16 +263,15 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
-     * @param string|null  $path
-     * @param boolean|null $sameOrigin
+     * @param string|null $path
      * @return string
      */
-    public function getUrlStatic($path = null, $sameOrigin = null) {
+    public function getUrlStatic($path = null) {
         $url = '/static';
         if (null !== $path) {
             $url .= $path . '?' . CM_App::getInstance()->getDeployVersion();
         }
-        if (!$sameOrigin && $urlCdn = $this->getSite()->getUrlCdn()) {
+        if ($urlCdn = $this->getSite()->getUrlCdn()) {
             $url = $urlCdn . $url;
         } else {
             $url = $this->getSite()->getUrl() . $url;

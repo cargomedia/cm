@@ -136,15 +136,14 @@ var CM_App = CM_Class_Abstract.extend({
 
   /**
    * @param {String} path
-   * @param {Boolean} [sameOrigin]
    * @return {String}
    */
-  getUrlStatic: function(path, sameOrigin) {
+  getUrlStatic: function(path) {
     var url = '/static';
     if (path) {
       url += path + '?' + cm.options.deployVersion;
     }
-    if (!sameOrigin && cm.options.urlCdn) {
+    if (cm.options.urlCdn) {
       url = cm.options.urlCdn + url;
     } else {
       url = cm.options.url + url;
