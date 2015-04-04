@@ -136,12 +136,18 @@ var CM_App = CM_Class_Abstract.extend({
 
   /**
    * @param {String} path
+   * @param {Boolean} [sameOrigin]
    * @return {String}
    */
-  getUrlStatic: function(path) {
-    var url = cm.options.urlStatic;
+  getUrlStatic: function(path, sameOrigin) {
+    var url = '/static';
     if (path) {
       url += path + '?' + cm.options.deployVersion;
+    }
+    if (!sameOrigin && cm.options.urlCdn) {
+      url = cm.options.urlCdn + url;
+    } else {
+      url = cm.options.url + url;
     }
     return url;
   },
@@ -149,18 +155,24 @@ var CM_App = CM_Class_Abstract.extend({
   /**
    * @param {String} type
    * @param {String} path
+   * @param {Boolean} [sameOrigin]
    * @return {String}
    */
-  getUrlResource: function(type, path) {
-    var urlPath = '';
+  getUrlResource: function(type, path, sameOrigin) {
+    var url = '';
     if (type && path) {
-      urlPath += '/' + type;
+      url += '/' + type;
       if (cm.options.language) {
-        urlPath += '/' + cm.options.language.abbreviation;
+        url += '/' + cm.options.language.abbreviation;
       }
-      urlPath += '/' + cm.getSiteId() + '/' + cm.options.deployVersion + '/' + path;
+      url += '/' + cm.getSiteId() + '/' + cm.options.deployVersion + '/' + path;
     }
-    return cm.options.urlResource + urlPath;
+    if (!sameOrigin && cm.options.urlCdn) {
+      url = cm.options.urlCdn + url;
+    } else {
+      url = cm.options.url + url;
+    }
+    return url;
   },
 
   /**
