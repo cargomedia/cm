@@ -3,14 +3,7 @@
 class CM_Http_Response_Resource_Layout extends CM_Http_Response_Resource_Abstract {
 
     protected function _process() {
-        $this->_processPath($this->getRequest()->getPath());
-    }
-
-    /**
-     * @param string $path
-     * @throws CM_Exception_Nonexistent
-     */
-    protected function _processPath($path) {
+        $path = $this->getRequest()->getPath();
         $content = null;
         $mimeType = null;
 
