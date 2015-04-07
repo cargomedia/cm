@@ -141,7 +141,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
 
         $serviceManager = new CM_Service_Manager();
         $serviceManager->registerInstance('kissmetrics', $kissMetrics);
-        $serviceManager->register('trackings', 'CM_Service_Trackings', ['trackingServiceNameList' => ['kissmetrics']]);
+        $serviceManager->registerInstance('trackings', new CM_Service_Trackings(['kissmetrics']));
         $test->setServiceManager($serviceManager);
 
         $test->getVariationFixture($fixture);
