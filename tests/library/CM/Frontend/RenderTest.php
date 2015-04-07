@@ -116,7 +116,19 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $siteType = CM_Site_Abstract::factory()->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame(
-            'http://www.default.dev/layout/' . $siteType . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('layout', 'foo.jpg', true));
+            'http://www.default.dev/layout/' . $siteType . '/' . $deployVersion . '/foo.jpg',
+            $render->getUrlResource('layout', 'foo.jpg', ['sameOrigin' => true])
+        );
+    }
+
+    public function testGetUrlResourceSameRoot() {
+        $render = new CM_Frontend_Render();
+        $siteType = CM_Site_Abstract::factory()->getType();
+        $deployVersion = CM_App::getInstance()->getDeployVersion();
+        $this->assertSame(
+            'http://cdn.default.dev/resource-layout--' . $siteType . '--' . $deployVersion . '--foo.jpg',
+            $render->getUrlResource('layout', 'foo.jpg', ['root' => true])
+        );
     }
 
     public function testGetUrlResourceWithoutCdn() {
@@ -127,7 +139,10 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame('http://www.default.dev/layout/' . $site->getType() . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('layout', 'foo.jpg'));
+        $this->assertSame(
+            'http://www.default.dev/layout/' . $site->getType() . '/' . $deployVersion .
+            '/foo.jpg', $render->getUrlResource('layout', 'foo.jpg')
+        );
     }
 
     public function testGetUrlStatic() {
@@ -136,12 +151,6 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $this->assertSame('http://cdn.default.dev/static', $render->getUrlStatic());
         $this->assertSame('http://cdn.default.dev/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
         $this->assertSame('http://cdn.default.dev/static/0?' . $deployVersion, $render->getUrlStatic('/0'));
-    }
-
-    public function testGetUrlStaticSameOrigin() {
-        $render = new CM_Frontend_Render();
-        $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame('http://www.default.dev/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg', true));
     }
 
     public function testGetUrlStaticWithoutCdn() {

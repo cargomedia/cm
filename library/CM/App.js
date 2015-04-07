@@ -42,8 +42,8 @@ var CM_App = CM_Class_Abstract.extend({
       return view;
     }
     return _.find(this.views, function(view) {
-        return view.hasClass(className);
-      }) || null;
+      return view.hasClass(className);
+    }) || null;
   },
 
   /**
@@ -139,28 +139,58 @@ var CM_App = CM_Class_Abstract.extend({
    * @return {String}
    */
   getUrlStatic: function(path) {
-    var url = cm.options.urlStatic;
+    var url = '';
+    if (cm.options.urlCdn) {
+      url = cm.options.urlCdn + url;
+    } else {
+      url = cm.options.url + url;
+    }
+
+    url += '/static';
     if (path) {
       url += path + '?' + cm.options.deployVersion;
     }
+
     return url;
   },
 
   /**
    * @param {String} type
    * @param {String} path
+   * @param {Object} [options]
    * @return {String}
    */
-  getUrlResource: function(type, path) {
-    var urlPath = '';
-    if (type && path) {
-      urlPath += '/' + type;
-      if (cm.options.language) {
-        urlPath += '/' + cm.options.language.abbreviation;
-      }
-      urlPath += '/' + cm.getSiteId() + '/' + cm.options.deployVersion + '/' + path;
+  getUrlResource: function(type, path, options) {
+    options = _.defaults(options || {}, {
+      'sameOrigin': false,
+      'root': false
+    });
+
+    var url = '';
+    if (!options['sameOrigin'] && cm.options.urlCdn) {
+      url = cm.options.urlCdn + url;
+    } else {
+      url = cm.options.url + url;
     }
-    return cm.options.urlResource + urlPath;
+
+    if (type && path) {
+      var urlParts = [];
+      urlParts.push(type);
+      if (cm.options.language) {
+        urlParts.push(cm.options.language.abbreviation);
+      }
+      urlParts.push(cm.getSiteId());
+      urlParts.push(cm.options.deployVersion);
+      urlParts = urlParts.concat(path.split('/'));
+
+      if (options['root']) {
+        url += '/resource-' + urlParts.join('--');
+      } else {
+        url += '/' + urlParts.join('/');
+      }
+    }
+
+    return url;
   },
 
   /**
