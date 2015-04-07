@@ -2,27 +2,15 @@
 
 class CM_Stream_Video {
 
-    /** @var bool */
-    private $_enabled;
-
     /** @var CM_Stream_Adapter_Video_Abstract */
     private $_adapter;
 
     /**
-     * @param bool                             $enabled
      * @param CM_Stream_Adapter_Video_Abstract $adapter
      * @throws CM_Exception_Invalid
      */
-    public function __construct($enabled, CM_Stream_Adapter_Video_Abstract $adapter) {
-        $this->_enabled = (bool) $enabled;
+    public function __construct(CM_Stream_Adapter_Video_Abstract $adapter) {
         $this->_adapter = $adapter;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getEnabled() {
-        return $this->_enabled;
     }
 
     /**

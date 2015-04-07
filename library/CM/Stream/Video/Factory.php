@@ -18,13 +18,13 @@ class CM_Stream_Video_Factory {
     }
 
     /**
-     * @param bool  $enabled
-     * @param array $adapterConfig
-     * @return CM_Stream_Video
+     * @param string     $adapterClass
+     * @param array|null $adapterArguments
      * @throws CM_Exception_Invalid
+     * @return CM_Stream_Video
      */
-    public function createClient($enabled, array $adapterConfig) {
-        $adapter = $this->createAdapter($adapterConfig['class'], $adapterConfig['arguments']);
-        return new CM_Stream_Video($enabled, $adapter);
+    public function createClient($adapterClass, $adapterArguments = null) {
+        $adapter = $this->createAdapter($adapterClass, $adapterArguments);
+        return new CM_Stream_Video($adapter);
     }
 }

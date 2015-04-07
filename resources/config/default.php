@@ -208,18 +208,15 @@ return function (CM_Config_Node $config) {
         'method' => array(
             'name'      => 'createClient',
             'arguments' => array(
-                'enabled'       => true,
-                'adapterConfig' => array(
-                    'class'     => 'CM_Stream_Adapter_Video_Wowza',
-                    'arguments' => array(
-                        'servers' => array(
-                            ['publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'],
-                        ),
-                        'config'  => array(
-                            'httpPort'  => '8086',
-                            'wowzaPort' => '1935'
-                        ),
-                    )
+                'adapterClass'     => 'CM_Stream_Adapter_Video_Wowza',
+                'adapterArguments' => array(
+                    'servers' => array(
+                        ['publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'],
+                    ),
+                    'config'  => array(
+                        'httpPort'  => '8086',
+                        'wowzaPort' => '1935'
+                    ),
                 )
             )
         )
