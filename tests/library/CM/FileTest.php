@@ -132,6 +132,16 @@ class CM_FileTest extends CMTest_TestCase {
         $this->assertSame('image/jpeg', $file->getMimeType());
     }
 
+    public function testGetMimeTypeJavascript() {
+        $file = CM_File::createTmp('js', 'alert("foo");');
+        $this->assertSame('text/javascript', $file->getMimeType());
+    }
+
+    public function testFindMimeTypeByExtension(){
+        $this->assertSame('text/javascript', CM_File::findMimeTypeByExtension('js'));
+        $this->assertSame(null, CM_File::findMimeTypeByExtension('unknown'));
+    }
+
     public function testListFiles() {
         $adapter = $this->mockObject('CM_File_Filesystem_Adapter');
         $fs = new CM_File_Filesystem($adapter);
