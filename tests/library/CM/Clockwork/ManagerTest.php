@@ -39,7 +39,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event2]));
 
         // event 2 finishes
-        $process->mockMethod('listenForChildren')->set([2 => new CM_Process_WorkloadResult(null, null)]);
+        $process->mockMethod('listenForChildren')->set([2 => new CM_Process_WorkloadResult()]);
         $manager->runEvents();
         $this->assertSame(2, $forkMock->getCallCount());
         $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event1]));
@@ -53,8 +53,8 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event2]));
 
         // both events finish, event 2 finishes with an error
-        $process->mockMethod('listenForChildren')->set([1 => new CM_Process_WorkloadResult(null, null),
-                                                        3 => new CM_Process_WorkloadResult(null, new CM_Exception())]);
+        $process->mockMethod('listenForChildren')->set([1 => new CM_Process_WorkloadResult(),
+                                                        3 => (new CM_Process_WorkloadResult())->setException(new CM_Exception())]);
         $manager->runEvents();
 
         $this->assertFalse(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event1]));
