@@ -60,6 +60,9 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
      * @throws CM_Exception
      */
     public function getMimeType() {
+        if ($mimeType = self::findMimeTypeByExtension($this->getExtension())) {
+            return $mimeType;
+        }
         try {
             return self::getMimeTypeByContent($this->read());
         } catch (CM_Exception $ex) {
@@ -323,6 +326,22 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
         }
         $mime = explode(';', $infoFile);
         return $mime[0];
+    }
+
+    /**
+     * @param string $extension
+     * @return string|null
+     */
+    public static function findMimeTypeByExtension($extension) {
+        $extension = strtolower($extension);
+        $mimeType = null;
+        $extensionToMimeType = [
+            'js' => 'text/javascript',
+        ];
+        if (array_key_exists($extension, $extensionToMimeType)) {
+            $mimeType = $extensionToMimeType[$extension];
+        }
+        return $mimeType;
     }
 
     /**

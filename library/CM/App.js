@@ -139,28 +139,58 @@ var CM_App = CM_Class_Abstract.extend({
    * @return {String}
    */
   getUrlStatic: function(path) {
-    var url = cm.options.urlStatic;
+    var url = '';
+    if (cm.options.urlCdn) {
+      url = cm.options.urlCdn + url;
+    } else {
+      url = cm.options.url + url;
+    }
+
+    url += '/static';
     if (path) {
       url += path + '?' + cm.options.deployVersion;
     }
+
     return url;
   },
 
   /**
    * @param {String} type
    * @param {String} path
+   * @param {Object} [options]
    * @return {String}
    */
-  getUrlResource: function(type, path) {
-    var urlPath = '';
-    if (type && path) {
-      urlPath += '/' + type;
-      if (cm.options.language) {
-        urlPath += '/' + cm.options.language.abbreviation;
-      }
-      urlPath += '/' + cm.getSiteId() + '/' + cm.options.deployVersion + '/' + path;
+  getUrlResource: function(type, path, options) {
+    options = _.defaults(options || {}, {
+      'sameOrigin': false,
+      'root': false
+    });
+
+    var url = '';
+    if (!options['sameOrigin'] && cm.options.urlCdn) {
+      url = cm.options.urlCdn + url;
+    } else {
+      url = cm.options.url + url;
     }
-    return cm.options.urlResource + urlPath;
+
+    if (type && path) {
+      var urlParts = [];
+      urlParts.push(type);
+      if (cm.options.language) {
+        urlParts.push(cm.options.language.abbreviation);
+      }
+      urlParts.push(cm.getSiteId());
+      urlParts.push(cm.options.deployVersion);
+      urlParts = urlParts.concat(path.split('/'));
+
+      if (options['root']) {
+        url += '/resource-' + urlParts.join('--');
+      } else {
+        url += '/' + urlParts.join('/');
+      }
+    }
+
+    return url;
   },
 
   /**
@@ -308,7 +338,16 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('.toggleNext').toggleNext();
       $dom.find('.tabs').tabs();
       $dom.find('.openx-ad:visible').openx();
+      $dom.find('.epom-ad').epom();
       $dom.find('.fancySelect').fancySelect();
+    },
+    /**
+     * @param {jQuery} $dom
+     */
+    teardown: function($dom) {
+      $dom.find('.timeago').timeago('dispose');
+      $dom.find('textarea.autosize, .autosize textarea').trigger('autosize.destroy');
+      $dom.find('.showTooltip[title]').tooltip('destroy');
     },
     /**
      * @param {jQuery} $element
@@ -1026,8 +1065,7 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   model: {
-    types: {
-    }
+    types: {}
   },
 
   action: {
@@ -1174,7 +1212,7 @@ var CM_App = CM_Class_Abstract.extend({
      */
     _getFragment: function() {
       var location = window.location;
-      return location.pathname + location.search;
+      return location.pathname + location.search + location.hash;
     },
 
     /**

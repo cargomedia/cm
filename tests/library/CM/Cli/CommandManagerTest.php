@@ -150,6 +150,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $command = $this->mockClass('CM_Cli_Command')->newInstanceWithoutConstructor();
         $command->mockMethod('getSynchronized');
         $command->mockMethod('getKeepalive');
+        $command->mockMethod('extractParameters');
 
         $commandManager = $this->mockObject('CM_Cli_CommandManager');
         $commandManager->mockMethod('_getCommand')->set($command);
@@ -157,20 +158,20 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
             ->at(0, function () use ($processMock) {
                 $processSuccess = $processMock->newInstance();
                 $processSuccess->mockMethod('waitForChildren')->set([
-                    new CM_Process_WorkloadResult(true),
-                    new CM_Process_WorkloadResult(true),
-                    new CM_Process_WorkloadResult(true),
-                    new CM_Process_WorkloadResult(true),
+                    (new CM_Process_WorkloadResult())->setResult(true),
+                    (new CM_Process_WorkloadResult())->setResult(true),
+                    (new CM_Process_WorkloadResult())->setResult(true),
+                    (new CM_Process_WorkloadResult())->setResult(true),
                 ]);
                 return $processSuccess;
             })
             ->at(1, function () use ($processMock) {
                 $processFailure = $processMock->newInstance();
                 $processFailure->mockMethod('waitForChildren')->set([
-                    new CM_Process_WorkloadResult(true),
-                    new CM_Process_WorkloadResult(false, new Exception('Workload failed')),
-                    new CM_Process_WorkloadResult(true),
-                    new CM_Process_WorkloadResult(true),
+                    (new CM_Process_WorkloadResult())->setResult(true),
+                    (new CM_Process_WorkloadResult())->setResult(false)->setException(new Exception('Workload failed')),
+                    (new CM_Process_WorkloadResult())->setResult(true),
+                    (new CM_Process_WorkloadResult())->setResult(true),
                 ]);
                 return $processFailure;
             });
@@ -189,7 +190,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $keepAliveExpected = $commandMock->getKeepalive();
         $processMock = $this->_getProcessMock($keepAliveExpected);
         $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
-            array('getCommands', '_getProcess', '_findLock', '_lockCommand', 'unlockCommand', '_outputError'));
+            array('getCommands', '_getProcess', '_findLock', '_lockCommand', 'unlockCommand', '_outputError', '_checkUnusedArguments'));
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         if (null === $errorMessageExpected) {
             $commandManagerMock->expects($this->never())->method('_outputError');
@@ -197,6 +198,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
             $commandManagerMock->expects($this->once())->method('_outputError')->with($errorMessageExpected);
         }
         $commandManagerMock->expects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
+        $commandManagerMock->expects($this->any())->method('_checkUnusedArguments');
         return $commandManagerMock;
     }
 
@@ -208,13 +210,14 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
      */
     protected function _getCommandMock($synchronized, $keepAlive, $expectedRuns) {
         $commandMock = $this->getMock('CM_Cli_Command',
-            array('getPackageName', '_getMethodName', 'isAbstract', 'getSynchronized', 'getKeepalive', 'run'),
+            array('getPackageName', '_getMethodName', 'isAbstract', 'getSynchronized', 'getKeepalive', 'run', 'extractParameters'),
             array(), '', false);
         $commandMock->expects($this->any())->method('getPackageName')->will($this->returnValue('package-mock'));
         $commandMock->expects($this->any())->method('_getMethodName')->will($this->returnValue('command-mock'));
         $commandMock->expects($this->any())->method('isAbstract')->will($this->returnValue(false));
         $commandMock->expects($this->any())->method('getSynchronized')->will($this->returnValue($synchronized));
         $commandMock->expects($this->any())->method('getKeepalive')->will($this->returnValue($keepAlive));
+        $commandMock->expects($this->any())->method('extractParameters')->will($this->returnValue([]));
         $commandMock->expects($this->exactly($expectedRuns))->method('run');
         return $commandMock;
     }
@@ -226,7 +229,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
     protected function _getProcessMock($keepAliveExpected) {
         $processMock = $this->getMock('CM_Process', array('fork', 'waitForChildren'), array(), '', false);
         $processMock->expects($this->any())->method('fork')->will($this->returnCallback(function ($workload) {
-            $workload();
+            $workload(new CM_Process_WorkloadResult());
         }));
         $waitForChildrenMock = function ($keepAlive, $terminationCallback) {
             if (isset($terminationCallback)) {

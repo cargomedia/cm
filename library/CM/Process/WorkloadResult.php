@@ -1,5 +1,9 @@
 <?php
 
+class bla extends CM_Process_WorkloadResult {
+
+}
+
 class CM_Process_WorkloadResult {
 
     /** @var mixed */
@@ -9,18 +13,6 @@ class CM_Process_WorkloadResult {
     private $_exception;
 
     /**
-     * @param mixed          $result
-     * @param Exception|null $exception
-     */
-    public function __construct($result, Exception $exception = null) {
-        if (null !== $exception) {
-            $exception = new CM_ExceptionHandling_SerializableException($exception);
-        }
-        $this->_result = $result;
-        $this->_exception = $exception;
-    }
-
-    /**
      * @return mixed
      */
     public function getResult() {
@@ -28,10 +20,28 @@ class CM_Process_WorkloadResult {
     }
 
     /**
+     * @param mixed $result
+     * @return $this
+     */
+    public function setResult($result) {
+        $this->_result = $result;
+        return $this;
+    }
+
+    /**
      * @return CM_ExceptionHandling_SerializableException|null
      */
     public function getException() {
         return $this->_exception;
+    }
+
+    /**
+     * @param Exception $exception
+     * @return static
+     */
+    public function setException(Exception $exception) {
+        $this->_exception = new CM_ExceptionHandling_SerializableException($exception);
+        return $this;
     }
 
     /**
