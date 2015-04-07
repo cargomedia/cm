@@ -42,8 +42,8 @@ var CM_App = CM_Class_Abstract.extend({
       return view;
     }
     return _.find(this.views, function(view) {
-        return view.hasClass(className);
-      }) || null;
+      return view.hasClass(className);
+    }) || null;
   },
 
   /**
@@ -139,38 +139,57 @@ var CM_App = CM_Class_Abstract.extend({
    * @return {String}
    */
   getUrlStatic: function(path) {
-    var url = '/static';
-    if (path) {
-      url += path + '?' + cm.options.deployVersion;
-    }
+    var url = '';
     if (cm.options.urlCdn) {
       url = cm.options.urlCdn + url;
     } else {
       url = cm.options.url + url;
     }
+
+    url += '/static';
+    if (path) {
+      url += path + '?' + cm.options.deployVersion;
+    }
+
     return url;
   },
 
   /**
    * @param {String} type
    * @param {String} path
-   * @param {Boolean} [sameOrigin]
+   * @param {Object} [options]
    * @return {String}
    */
-  getUrlResource: function(type, path, sameOrigin) {
+  getUrlResource: function(type, path, options) {
+    options = _.defaults(options || {}, {
+      'sameOrigin': false,
+      'root': false
+    });
+
     var url = '';
-    if (type && path) {
-      url += '/' + type;
-      if (cm.options.language) {
-        url += '/' + cm.options.language.abbreviation;
-      }
-      url += '/' + cm.getSiteId() + '/' + cm.options.deployVersion + '/' + path;
-    }
-    if (!sameOrigin && cm.options.urlCdn) {
+    if (!options['sameOrigin'] && cm.options.urlCdn) {
       url = cm.options.urlCdn + url;
     } else {
       url = cm.options.url + url;
     }
+
+    if (type && path) {
+      var urlParts = [];
+      urlParts.push(type);
+      if (cm.options.language) {
+        urlParts.push(cm.options.language.abbreviation);
+      }
+      urlParts.push(cm.getSiteId());
+      urlParts.push(cm.options.deployVersion);
+      urlParts = urlParts.concat(path.split('/'));
+
+      if (options['root']) {
+        url += '/resource-' + urlParts.join('--');
+      } else {
+        url += '/' + urlParts.join('/');
+      }
+    }
+
     return url;
   },
 
