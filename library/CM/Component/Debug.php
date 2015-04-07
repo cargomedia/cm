@@ -9,7 +9,7 @@ class CM_Component_Debug extends CM_Component_Abstract {
     }
 
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
-        $debug = CM_Debug::getInstance();
+        $debug = CM_Service_Manager::getInstance()->getDebug();
         $stats = $debug->getStats();
         ksort($stats);
         $viewResponse->set('stats', $stats);

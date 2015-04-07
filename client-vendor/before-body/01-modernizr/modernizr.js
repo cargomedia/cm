@@ -819,57 +819,6 @@
 
   
 
-  var createElement = function() {
-    if (typeof document.createElement !== 'function') {
-      // This is the case in IE7, where the type of createElement is "object".
-      // For this reason, we cannot call apply() as Object is not a Function.
-      return document.createElement(arguments[0]);
-    } else {
-      return document.createElement.apply(document, arguments);
-    }
-  };
-  
-/*!
-{
-  "name": "input[file] Attribute",
-  "property": "fileinput",
-  "caniuse" : "forms",
-  "tags": ["file", "forms", "input"],
-  "builderAliases": ["forms_fileinput"]
-}
-!*/
-/* DOC
-Detects whether input type="file" is available on the platform
-
-E.g. iOS < 6 and some android version don't support this
-*/
-
-  Modernizr.addTest('fileinput', function() {
-    if(navigator.userAgent.match(/(Android (1.0|1.1|1.5|1.6|2.0|2.1))|(Windows Phone (OS 7|8.0))|(XBLWP)|(ZuneWP)|(w(eb)?OSBrowser)|(webOS)|(Kindle\/(1.0|2.0|2.5|3.0))/)) {
-      return false;
-    }
-    var elem = createElement('input');
-    elem.type = 'file';
-    return !elem.disabled;
-  });
-
-/*!
-{
-  "name": "classList",
-  "caniuse": "classlist",
-  "property": "classlist",
-  "tags": ["dom"],
-  "builderAliases": ["dataview_api"],
-  "notes": [{
-    "name": "MDN Docs",
-    "href": "https://developer.mozilla.org/en/DOM/element.classList"
-  }]
-}
-!*/
-
-  Modernizr.addTest('classlist', 'classList' in docElement);
-
-
   // Following spec is to expose vendor-specific style properties as:
   //   elem.style.WebkitBorderRadius
   // and the following would be incorrect:
@@ -895,6 +844,17 @@ E.g. iOS < 6 and some android version don't support this
   }
 
   ;
+
+  var createElement = function() {
+    if (typeof document.createElement !== 'function') {
+      // This is the case in IE7, where the type of createElement is "object".
+      // For this reason, we cannot call apply() as Object is not a Function.
+      return document.createElement(arguments[0]);
+    } else {
+      return document.createElement.apply(document, arguments);
+    }
+  };
+  
 
   /**
    * Create our "modernizr" element that we do most feature tests on.
@@ -1292,6 +1252,62 @@ E.g. iOS < 6 and some android version don't support this
   };
 
   
+/*!
+{
+  "name": "CSS Object Fit",
+  "caniuse": "object-fit",
+  "property": "objectfit",
+  "tags": ["css"],
+  "builderAliases": ["css_objectfit"],
+  "notes": [{
+    "name": "Opera Article on Object Fit",
+    "href": "http://dev.opera.com/articles/view/css3-object-fit-object-position/"
+  }]
+}
+!*/
+
+  Modernizr.addTest('objectfit', !!prefixed('objectFit'), { aliases: ['object-fit'] });
+
+/*!
+{
+  "name": "input[file] Attribute",
+  "property": "fileinput",
+  "caniuse" : "forms",
+  "tags": ["file", "forms", "input"],
+  "builderAliases": ["forms_fileinput"]
+}
+!*/
+/* DOC
+Detects whether input type="file" is available on the platform
+
+E.g. iOS < 6 and some android version don't support this
+*/
+
+  Modernizr.addTest('fileinput', function() {
+    if(navigator.userAgent.match(/(Android (1.0|1.1|1.5|1.6|2.0|2.1))|(Windows Phone (OS 7|8.0))|(XBLWP)|(ZuneWP)|(w(eb)?OSBrowser)|(webOS)|(Kindle\/(1.0|2.0|2.5|3.0))/)) {
+      return false;
+    }
+    var elem = createElement('input');
+    elem.type = 'file';
+    return !elem.disabled;
+  });
+
+/*!
+{
+  "name": "classList",
+  "caniuse": "classlist",
+  "property": "classlist",
+  "tags": ["dom"],
+  "builderAliases": ["dataview_api"],
+  "notes": [{
+    "name": "MDN Docs",
+    "href": "https://developer.mozilla.org/en/DOM/element.classList"
+  }]
+}
+!*/
+
+  Modernizr.addTest('classlist', 'classList' in docElement);
+
 /*!
 {
   "name": "requestAnimationFrame",

@@ -25,6 +25,7 @@ class CMTest_TH {
         self::clearCache();
         self::timeReset();
         self::clearFilesystem();
+        CM_Service_Manager::getInstance()->resetServiceInstances();
         CM_Config::set(unserialize(self::$_configBackup));
     }
 

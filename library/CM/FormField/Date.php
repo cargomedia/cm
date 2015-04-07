@@ -19,7 +19,7 @@ class CM_FormField_Date extends CM_FormField_Abstract {
         $mm = (int) trim($userInput['month']);
         $yy = (int) trim($userInput['year']);
 
-        return new DateTime($yy . '-' . $mm . '-' . $dd);
+        return new DateTime($yy . '-' . $mm . '-' . $dd, $environment->getTimeZone());
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
@@ -33,10 +33,19 @@ class CM_FormField_Date extends CM_FormField_Abstract {
         $viewResponse->set('months', array_combine($months, $months));
         $viewResponse->set('days', array_combine($days, $days));
 
+        /** @var DateTime|null $value */
         $value = $this->getValue();
-        $viewResponse->set('yy', $value ? $value->format('Y') : null);
-        $viewResponse->set('mm', $value ? $value->format('n') : null);
-        $viewResponse->set('dd', $value ? $value->format('j') : null);
+        $year = $month = $day = null;
+        if (null !== $value) {
+            $value->setTimezone($environment->getTimeZone());
+            $year = $value->format('Y');
+            $month = $value->format('n');
+            $day = $value->format('j');
+        }
+
+        $viewResponse->set('yy', $year);
+        $viewResponse->set('mm', $month);
+        $viewResponse->set('dd', $day);
     }
 
     public function isEmpty($userInput) {

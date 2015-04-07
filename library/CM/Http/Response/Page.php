@@ -132,7 +132,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
      * @return string|null|boolean
      */
     private function _processPage(CM_Http_Request_Abstract $request) {
-        try {
+        return $this->_runWithCatching(function () use ($request) {
             $this->getSite()->rewrite($request);
             $pageParams = CM_Params::factory($request->getQuery(), true);
 
@@ -153,23 +153,13 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             $this->_page = $page;
             $this->_pageParams = $pageParams;
             return $html;
-        } catch (CM_Exception $e) {
-            $exceptionClass = get_class($e);
-            $configCatch = $this->_getConfig()->catch;
-            if (!array_key_exists($exceptionClass, $configCatch)) {
-                throw $e;
-            } else {
-                $options = $configCatch[$exceptionClass];
-                $this->getRender()->getGlobalResponse()->clear();
-                $request->setPath($options['path']);
-                $request->setQuery(array());
-                if (true === $options['log']) {
-                    $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
-                    $log = new CM_Paging_Log_NotFound();
-                    $log->add($formatter->formatException($e), $e->getMetaInfo());
-                }
-            }
-        }
-        return false;
+        }, function (CM_Exception $ex, array $errorOptions) use ($request) {
+            $this->getRender()->getGlobalResponse()->clear();
+            /** @var CM_Page_Abstract $errorPage */
+            $errorPage =  $errorOptions['errorPage'];
+            $request->setPath($errorPage::getPath());
+            $request->setQuery(array());
+            return false;
+        });
     }
 }

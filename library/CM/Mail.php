@@ -355,6 +355,16 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         return $renderAdapter->fetch();
     }
 
+    /**
+     * @return string|null
+     */
+    protected function _getMailDeliveryAgent() {
+        return $this->_getConfig()->mailDeliveryAgent;
+    }
+
+    /**
+     * @throws CM_Exception_Invalid
+     */
     protected function _send($subject, $text, $html = null) {
         if (!self::_getConfig()->send) {
             $this->_log($subject, $text);
@@ -374,7 +384,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             foreach ($this->_bcc as $bcc) {
                 $mail->AddBCC($bcc['address'], $bcc['name']);
             }
-            if ($mailDeliveryAgent = $this->_getConfig()->mailDeliveryAgent) {
+            if ($mailDeliveryAgent = $this->_getMailDeliveryAgent()) {
                 $mail->AddCustomHeader('X-MDA: ' . $mailDeliveryAgent);
             }
             $mail->SetFrom($this->_sender['address'], $this->_sender['name']);
@@ -415,6 +425,6 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         $msg = '* ' . $subject . ' *' . PHP_EOL . PHP_EOL;
         $msg .= $text . PHP_EOL;
         $log = new CM_Paging_Log_Mail();
-        $log->add($this, $msg);
+        $log->addMail($this, $msg);
     }
 }
