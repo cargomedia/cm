@@ -35,7 +35,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
    * @param {String} path
    */
   loadPage: function(path) {
-    this.trigger('navigate', path);
+    cm.event.trigger('navigate', path);
 
     if (!this._$pagePlaceholder) {
       this._$pagePlaceholder = $('<div class="router-placeholder" />');
@@ -59,7 +59,6 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
         }
         var layout = this;
         this._injectView(response, function(response) {
-          var fragment = response.url.substr(cm.getUrl().length);
           var reload = (layout.getClass() != response.layoutClass);
           if (reload) {
             window.location.replace(response.url);
@@ -67,6 +66,10 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
           }
           layout._$pagePlaceholder.replaceWith(this.$el);
           layout._$pagePlaceholder = null;
+          var fragment = response.url.substr(cm.getUrl().length);
+          if (path === fragment + window.location.hash) {
+            fragment = path;
+          }
           window.history.replaceState(null, null, fragment);
           layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList, response.jsTracking);
         });
@@ -80,6 +83,18 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
         window.clearTimeout(timeoutLoading);
       }
     });
+  },
+
+  /**
+   * @param {jQuery} $el
+   */
+  scrollTo: function($el) {
+    var pageOffsetTop = 0;
+    var page = cm.findView('CM_Page_Abstract');
+    if (page) {
+      pageOffsetTop = page.$el.offset().top;
+    }
+    $(document).scrollTop($el.offset().top - pageOffsetTop);
   },
 
   _onPageTeardown: function() {
@@ -103,6 +118,13 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     $(menuEntrySelectors.join(',')).addClass('active');
     if (jsTracking) {
       new Function(jsTracking).call(this);
+    }
+    if (window.location.hash) {
+      var hash = window.location.hash.substring(1);
+      var $anchor = $('#' + hash).add('[name=' + hash + ']');
+      if ($anchor.length) {
+        this.scrollTo($anchor);
+      }
     }
   },
 

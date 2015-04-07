@@ -75,6 +75,8 @@ class CM_File_Image extends CM_File {
             $heightResize = $height;
             $widthResize = $width;
         }
+        $heightResize = max($heightResize, 1);
+        $widthResize = max($widthResize, 1);
 
         $this->resizeSpecific($widthResize, $heightResize, $offsetX, $offsetY, $formatNew, $fileNew);
     }

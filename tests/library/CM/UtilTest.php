@@ -96,6 +96,13 @@ class CM_UtilTest extends CMTest_TestCase {
         }
     }
 
+    public function testLink() {
+        $this->assertSame('/test', CM_Util::link('/test'));
+        $this->assertSame('/test?a=1&b=%C3%B8', CM_Util::link('/test', ['a' => 1, 'b' => 'ø']));
+        $this->assertSame('/test?a=1#anchor', CM_Util::link('/test', ['a' => 1], 'anchor'));
+        $this->assertSame('/test#anchor', CM_Util::link('/test', null, 'anchor'));
+    }
+
     public function testParseXml() {
         $xml = CM_Util::parseXml('<?xml version="1.0" encoding="utf-8"?><document><foo>bar</foo></document>');
         $this->assertInstanceOf('SimpleXMLElement', $xml);

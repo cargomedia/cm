@@ -107,6 +107,10 @@ class CM_Service_Manager extends CM_Class_Abstract {
         $this->_serviceInstanceList[$serviceName] = $instance;
     }
 
+    public function resetServiceInstances() {
+        $this->_serviceInstanceList = [];
+    }
+
     /**
      * @param string $serviceName
      */
@@ -147,6 +151,14 @@ class CM_Service_Manager extends CM_Class_Abstract {
             $serviceName = 'MongoDb';
         }
         return $this->get($serviceName, 'CM_MongoDb_Client');
+    }
+
+    /**
+     * @return CM_Options
+     * @throws CM_Exception_Invalid
+     */
+    public function getOptions() {
+        return $this->get('options', 'CM_Options');
     }
 
     /**
@@ -196,6 +208,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public function getRedis() {
         return $this->get('redis', 'CM_Redis_Client');
+    }
+
+    /**
+     * @return CM_Elasticsearch_Cluster
+     */
+    public function getElasticsearch() {
+        return $this->get('elasticsearch', 'CM_Elasticsearch_Cluster');
     }
 
     /**

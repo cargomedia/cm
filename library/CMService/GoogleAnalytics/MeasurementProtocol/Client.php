@@ -103,6 +103,9 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
             'ev'  => [
                 'aliasList'   => ['eventValue'],
                 'hitTypeList' => ['event'],
+                'validator'   => function ($value) {
+                    return ctype_digit((string) $value);
+                }
             ],
             'exd' => [
                 'aliasList'   => ['exDescription'],
@@ -111,6 +114,9 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
             'exf' => [
                 'aliasList'   => ['exFatal'],
                 'hitTypeList' => ['exception'],
+                'validator'   => function ($value) {
+                    return in_array($value, [0, 1], true);
+                }
             ],
         ];
     }
@@ -154,6 +160,11 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
             $definition = $parameterDefinition[$name];
             if (isset($definition['hitTypeList']) && !in_array($hitType, $definition['hitTypeList'], true)) {
                 throw new CM_Exception('Unexpected parameter `' . $name . '` for hitType `' . $hitType . '`.');
+            }
+            if (isset($definition['validator'])) {
+                if (true !== $definition['validator']($value)) {
+                    throw new CM_Exception('Value `' . $value . '` for parameter `' . $name . '` did not pass validation');
+                }
             }
         }
         return $parameterList;
