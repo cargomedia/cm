@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstract {
+abstract class CM_VideoStream_Adapter_Abstract extends CM_Class_Abstract implements CM_Typed {
 
     /** @var array */
     protected $_servers;

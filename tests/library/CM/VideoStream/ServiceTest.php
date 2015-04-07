@@ -1,6 +1,6 @@
 <?php
 
-class CM_Stream_VideoTest extends CMTest_TestCase {
+class CM_VideoStream_ServiceTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
@@ -10,12 +10,12 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
         $servers = array(
             ['publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109', 'privateIp' => '10.0.3.108'],
         );
-        $adapter = $this->mockObject('CM_Stream_Adapter_Video_Abstract', [$servers]);
+        $adapter = $this->mockObject('CM_VideoStream_Adapter_Abstract', [$servers]);
         $adapter->mockMethod('getType')->set(1);
         $stopStreamMethod = $adapter->mockMethod('_stopStream')->set(1);
-        /** @var CM_Stream_Adapter_Video_Abstract $adapter */
+        /** @var CM_VideoStream_Adapter_Abstract $adapter */
 
-        $stream = new CM_Stream_Video(true, $adapter);
+        $stream = new CM_VideoStream_Service($adapter);
 
         CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Video_Mock';
 

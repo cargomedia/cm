@@ -1,6 +1,6 @@
 <?php
 
-class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
+class CM_VideoStream_Adapter_Wowza extends CM_VideoStream_Adapter_Abstract {
 
     /** @var array */
     protected $_config;

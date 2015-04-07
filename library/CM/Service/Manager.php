@@ -190,7 +190,7 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_Stream_Video
+     * @return CM_VideoStream_Service
      */
     public function getStreamVideo() {
         return $this->get('stream-video', 'CM_Stream_Video');

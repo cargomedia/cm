@@ -1,20 +1,20 @@
 <?php
 
-class CM_Stream_Video {
+class CM_VideoStream_Service {
 
-    /** @var CM_Stream_Adapter_Video_Abstract */
+    /** @var CM_VideoStream_Adapter_Abstract */
     private $_adapter;
 
     /**
-     * @param CM_Stream_Adapter_Video_Abstract $adapter
+     * @param CM_VideoStream_Adapter_Abstract $adapter
      * @throws CM_Exception_Invalid
      */
-    public function __construct(CM_Stream_Adapter_Video_Abstract $adapter) {
+    public function __construct(CM_VideoStream_Adapter_Abstract $adapter) {
         $this->_adapter = $adapter;
     }
 
     /**
-     * @return CM_Stream_Adapter_Video_Abstract
+     * @return CM_VideoStream_Adapter_Abstract
      */
     public function getAdapter() {
         return $this->_adapter;
@@ -92,7 +92,7 @@ class CM_Stream_Video {
 
     /**
      * @deprecated use CM_Service_Manager::getInstance()->getStreamVideo()
-     * @return CM_Stream_Video
+     * @return CM_VideoStream_Service
      */
     public static function getInstance() {
         return CM_Service_Manager::getInstance()->getStreamVideo();
