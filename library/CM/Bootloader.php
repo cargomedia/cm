@@ -187,7 +187,7 @@ class CM_Bootloader {
 
     protected function _defaults() {
         date_default_timezone_set($this->getTimeZone()->getName());
-        CMService_Newrelic::getInstance()->setConfig();
+        CM_Service_Manager::getInstance()->getNewrelic()->setConfig();
     }
 
     /**

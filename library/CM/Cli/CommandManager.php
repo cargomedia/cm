@@ -280,10 +280,11 @@ class CM_Cli_CommandManager {
                 $parameters = $command->extractParameters($arguments);
                 $this->_checkUnusedArguments($arguments);
                 if ($command->getKeepalive()) {
-                    CMService_Newrelic::getInstance()->ignoreTransaction();
+                    CM_Service_Manager::getInstance()->getNewrelic()->ignoreTransaction();
                 } else {
-                    CMService_Newrelic::getInstance()->startTransaction($transactionName);
+                    CM_Service_Manager::getInstance()->getNewrelic()->startTransaction($transactionName);
                 }
+
                 $command->run($parameters, $streamInput, $streamOutput, $streamError);
             } catch (CM_Cli_Exception_InvalidArguments $ex) {
                 $this->_outputError('ERROR: ' . $ex->getMessage() . PHP_EOL);

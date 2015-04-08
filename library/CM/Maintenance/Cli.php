@@ -133,13 +133,13 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
         foreach ($callbacks as $name => $callback) {
             $transactionName = 'cm ' . static::getPackageName() . ' start: ' . $name;
             $this->_clockworkManager->registerCallback($name, $dateTimeString, function () use ($transactionName, $callback) {
-                CMService_Newrelic::getInstance()->startTransaction($transactionName);
+                CM_Service_Manager::getInstance()->getNewrelic()->startTransaction($transactionName);
                 try {
                     $callback();
                 } catch (CM_Exception $e) {
                     CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
                 }
-                CMService_Newrelic::getInstance()->endTransaction();
+                CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
             });
         }
     }
