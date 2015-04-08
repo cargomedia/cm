@@ -45,7 +45,8 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         /** @var CM_Model_Splittest $test */
         $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
         $test->setCreated($time + 10);
-        $test = new CM_Model_Splittest($test->getName());
+        CMTest_TH::clearCache();
+        CMTest_TH::reinstantiateModel($test);
         $this->assertSame($time + 10, $test->getCreated());
     }
 
@@ -54,7 +55,8 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $test = CM_Model_Splittest::create('foo', ['v1']);
         $this->assertSame(false, $test->getOptimized());
         $test->setOptimized(true);
-        $test = new CM_Model_Splittest($test->getName());
+        CMTest_TH::clearCache();
+        CMTest_TH::reinstantiateModel($test);
         $this->assertSame(true, $test->getOptimized());
     }
 
