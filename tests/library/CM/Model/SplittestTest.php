@@ -15,7 +15,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Model_Splittest', $test);
 
         try {
-            $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
+            CM_Model_Splittest::create('foo', ['v1', 'v2']);
             $this->fail('Could create duplicate splittest');
         } catch (CM_Exception $e) {
             $this->assertTrue(true);
@@ -37,7 +37,27 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $time = time();
         /** @var CM_Model_Splittest $test */
         $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
-        $this->assertGreaterThanOrEqual($time, $test->getCreated());
+        $this->assertSame($time, $test->getCreated());
+    }
+
+    public function testSetCreated() {
+        $time = time();
+        /** @var CM_Model_Splittest $test */
+        $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
+        $test->setCreated($time + 10);
+        CMTest_TH::clearCache();
+        CMTest_TH::reinstantiateModel($test);
+        $this->assertSame($time + 10, $test->getCreated());
+    }
+
+    public function testSetOptimized() {
+        /** @var CM_Model_Splittest $test */
+        $test = CM_Model_Splittest::create('foo', ['v1']);
+        $this->assertSame(false, $test->getOptimized());
+        $test->setOptimized(true);
+        CMTest_TH::clearCache();
+        CMTest_TH::reinstantiateModel($test);
+        $this->assertSame(true, $test->getOptimized());
     }
 
     public function testFlush() {
