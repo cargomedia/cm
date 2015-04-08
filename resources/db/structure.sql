@@ -51,8 +51,10 @@ DROP TABLE IF EXISTS `cm_ipBlocked`;
 CREATE TABLE `cm_ipBlocked` (
   `ip` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
+  `expirationStamp` int(10) unsigned NOT NULL,
   PRIMARY KEY (`ip`),
-  KEY `createStamp` (`createStamp`)
+  KEY `createStamp` (`createStamp`),
+  KEY `expirationStamp` (`expirationStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_model_language`;
@@ -275,6 +277,7 @@ DROP TABLE IF EXISTS `cm_splittest`;
 CREATE TABLE `cm_splittest` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
+  `optimized` int(1) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
@@ -310,9 +313,8 @@ CREATE TABLE `cm_splittestVariation_fixture` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `userSplittest` (`userId`,`splittestId`),
   UNIQUE KEY `requestClientSplittest` (`requestClientId`,`splittestId`),
-  KEY `splittestId` (`splittestId`),
-  KEY `conversionStamp` (`conversionStamp`),
-  KEY `createStamp` (`createStamp`)
+  KEY `splittestVariationCreateStamp` (`splittestId`,`variationId`,`createStamp`),
+  KEY `splittestVariationConversionStamp` (`splittestId`,`variationId`,`conversionStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_streamChannel`;

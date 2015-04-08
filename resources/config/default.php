@@ -16,11 +16,6 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Site_Abstract->class = null;
 
-    $config->CM_Elasticsearch_Client->enabled = true;
-    $config->CM_Elasticsearch_Client->servers = array(
-        array('host' => 'localhost', 'port' => 9200),
-    );
-
     $config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
     $config->CM_Cache_Local->lifetime = 86400;
 
@@ -58,7 +53,8 @@ return function (CM_Config_Node $config) {
     );
 
     $config->CM_Http_Response_View_Abstract->exceptionsToCatch = array(
-        'CM_Exception_Nonexistent'  => [],
+        'CM_Exception_Nonexistent'  => ['log' => 'CM_Paging_Log_NotFound'],
+        'CM_Exception_InvalidParam' => ['log' => 'CM_Paging_Log_NotFound'],
         'CM_Exception_AuthRequired' => [],
         'CM_Exception_NotAllowed'   => [],
         'CM_Exception_Blocked'      => [],
@@ -92,9 +88,6 @@ return function (CM_Config_Node $config) {
     $config->CM_Jobdistribution_Job_Abstract->servers = array(array('host' => 'localhost', 'port' => 4730));
 
     $config->CMService_MaxMind->licenseKey = null;
-
-    $config->CMService_Newrelic->enabled = false;
-    $config->CMService_Newrelic->appName = 'CM Application';
 
     $config->services = array();
 
@@ -201,8 +194,25 @@ return function (CM_Config_Node $config) {
         ),
     );
 
+    $config->services['elasticsearch'] = array(
+        'class'     => 'CM_Elasticsearch_Cluster',
+        'arguments' => array(
+            array(
+                ['host' => 'localhost', 'port' => 9200]
+            ),
+        ),
+    );
+
     $config->services['options'] = array(
         'class'     => 'CM_Options',
         'arguments' => array(),
+    );
+
+    $config->services['newrelic'] = array(
+        'class'     => 'CMService_Newrelic',
+        'arguments' => array(
+            'enabled' => false,
+            'appName' => 'CM Application',
+        )
     );
 };

@@ -107,6 +107,10 @@ class CM_Service_Manager extends CM_Class_Abstract {
         $this->_serviceInstanceList[$serviceName] = $instance;
     }
 
+    public function resetServiceInstances() {
+        $this->_serviceInstanceList = [];
+    }
+
     /**
      * @param string $serviceName
      */
@@ -197,6 +201,20 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public function getRedis() {
         return $this->get('redis', 'CM_Redis_Client');
+    }
+
+    /**
+     * @return CM_Elasticsearch_Cluster
+     */
+    public function getElasticsearch() {
+        return $this->get('elasticsearch', 'CM_Elasticsearch_Cluster');
+    }
+
+    /**
+     * @return CMService_Newrelic
+     */
+    public function getNewrelic() {
+        return $this->get('newrelic', 'CMService_Newrelic');
     }
 
     /**

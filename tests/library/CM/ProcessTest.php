@@ -170,25 +170,37 @@ Parent terminated.
             usleep(50 * 1000);
             return array('msg' => 'Child 2 finished');
         });
-        $process->fork(function () {
+        $process->fork(function (CM_Process_WorkloadResult $result) {
             usleep(150 * 1000);
             throw new CM_Exception('Child 3 finished');
         });
+        $process->fork(function (CM_Process_WorkloadResult $result) {
+            usleep(200 * 1000);
+            $result->setException(new CM_Exception('Child 4 finished'));
+        });
 
         $workloadResultList = $process->waitForChildren();
-        $this->assertCount(3, $workloadResultList);
+        $this->assertCount(4, $workloadResultList);
 
         $this->assertSame('Child 1 finished', $workloadResultList[1]->getResult());
         $this->assertSame(null, $workloadResultList[1]->getException());
+        $this->assertTrue($workloadResultList[1]->isSuccess());
 
         $this->assertSame(array('msg' => 'Child 2 finished'), $workloadResultList[2]->getResult());
         $this->assertSame(null, $workloadResultList[2]->getException());
+        $this->assertTrue($workloadResultList[2]->isSuccess());
 
         $this->assertSame(null, $workloadResultList[3]->getResult());
         $this->assertSame('Child 3 finished', $workloadResultList[3]->getException()->getMessage());
+        $this->assertFalse($workloadResultList[3]->isSuccess());
         $errorLog = new CM_Paging_Log_Error();
         $this->assertSame(1, $errorLog->getCount());
+
         $this->assertContains('Child 3 finished', $errorLog->getItem(0)['msg']);
+        $this->assertSame(null, $workloadResultList[4]->getResult());
+        $this->assertSame('Child 4 finished', $workloadResultList[4]->getException()->getMessage());
+        $this->assertFalse($workloadResultList[4]->isSuccess());
+        $this->assertSame(1, $errorLog->getCount());
 
         $bootloader->setExceptionHandler($exceptionHandlerBackup);
     }
@@ -286,6 +298,32 @@ Parent terminated.
         $logError = new CM_Paging_Log_Error();
         $this->assertSame(1, $logError->getCount());
         $this->assertContains('killing with signal `9`', $logError->getItem(0)['msg']);
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testServicesReset() {
+        $mysql = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+        $mysql->setBuffered(false);
+
+        $process = CM_Process::getInstance();
+        $process->fork(function () {
+            $mysql = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+            $mysql->setBuffered(false);
+            for ($i = 0; $i < 1000; $i++) {
+                $result2 = $mysql->createStatement('SELECT "bar"')->execute()->fetchColumn();
+                $this->assertSame('bar', $result2, 'Separate processes should not share connections to services');
+            }
+        });
+
+        for ($i = 0; $i < 1000; $i++) {
+            $result1 = $mysql->createStatement('SELECT "foo"')->execute()->fetchColumn();
+            $this->assertSame('foo', $result1, 'Separate processes should not share connection to services');
+        }
+
+        $process->waitForChildren();
     }
 
     /**

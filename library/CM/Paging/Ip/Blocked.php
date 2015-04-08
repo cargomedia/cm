@@ -13,7 +13,11 @@ class CM_Paging_Ip_Blocked extends CM_Paging_Ip_Abstract {
      */
     public function add($ip) {
         $ip = (int) $ip;
-        CM_Db_Db::replace('cm_ipBlocked', array('ip' => $ip, 'createStamp' => time()));
+        CM_Db_Db::replace('cm_ipBlocked', [
+            'ip'              => $ip,
+            'createStamp'     => time(),
+            'expirationStamp' => (time() + $this->_getMaxAge()),
+        ]);
     }
 
     /**
@@ -21,11 +25,11 @@ class CM_Paging_Ip_Blocked extends CM_Paging_Ip_Abstract {
      */
     public function remove($ip) {
         $ip = (int) $ip;
-        CM_Db_Db::delete('cm_ipBlocked', array('ip' => $ip));
+        CM_Db_Db::delete('cm_ipBlocked', ['ip' => $ip]);
     }
 
     public static function deleteOld() {
-        CM_Db_Db::delete('cm_ipBlocked', '`createStamp` < ' . (time() - self::_getMaxAge()));
+        CM_Db_Db::delete('cm_ipBlocked', '`expirationStamp` < ' . time());
     }
 
     /**

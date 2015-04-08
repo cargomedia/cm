@@ -174,7 +174,7 @@ class CM_Bootloader {
     protected function _registerServices() {
         $serviceManager = CM_Service_Manager::getInstance();
 
-        $serviceManager->registerInstance('debug', new CM_Debug($this->isDebug()));
+        $serviceManager->register('debug', 'CM_Debug', ['enabled' => $this->isDebug()]);
         $serviceManager->register('filesystems', 'CM_Service_Filesystems');
         $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', array(
             new CM_File_Filesystem_Adapter_Local($this->getDirTmp()),
@@ -187,7 +187,7 @@ class CM_Bootloader {
 
     protected function _defaults() {
         date_default_timezone_set($this->getTimeZone()->getName());
-        CMService_Newrelic::getInstance()->setConfig();
+        CM_Service_Manager::getInstance()->getNewrelic()->setConfig();
     }
 
     /**
