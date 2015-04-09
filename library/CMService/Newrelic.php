@@ -5,9 +5,24 @@ class CMService_Newrelic extends CM_Class_Abstract {
     /** @var CMService_Newrelic */
     protected static $_instance;
 
+    /** @var bool */
+    private $_enabled;
+
+    /** @var string */
+    private $_appName;
+
+    /**
+     * @param bool   $enabled
+     * @param string $appName
+     */
+    public function __construct($enabled, $appName) {
+        $this->_enabled = (bool) $enabled;
+        $this->_appName = (string) $appName;
+    }
+
     public function setConfig() {
-        if ($this->_isEnabled()) {
-            newrelic_set_appname($this->_getAppName());
+        if ($this->_getEnabled()) {
+            newrelic_set_appname($this->_appName);
         }
     }
 
@@ -15,7 +30,7 @@ class CMService_Newrelic extends CM_Class_Abstract {
      * @param Exception $exception
      */
     public function setNoticeError(Exception $exception) {
-        if ($this->_isEnabled()) {
+        if ($this->_getEnabled()) {
             newrelic_notice_error($exception->getMessage(), $exception);
         }
     }
@@ -24,9 +39,9 @@ class CMService_Newrelic extends CM_Class_Abstract {
      * @param string $name
      */
     public function startTransaction($name) {
-        if ($this->_isEnabled()) {
+        if ($this->_getEnabled()) {
             $this->endTransaction();
-            newrelic_start_transaction($this->_getAppName());
+            newrelic_start_transaction($this->_appName);
             $this->setNameTransaction($name);
         }
     }
@@ -36,19 +51,19 @@ class CMService_Newrelic extends CM_Class_Abstract {
      */
     public function setNameTransaction($name) {
         $name = (string) $name;
-        if ($this->_isEnabled()) {
+        if ($this->_getEnabled()) {
             newrelic_name_transaction($name);
         }
     }
 
     public function endTransaction() {
-        if ($this->_isEnabled()) {
+        if ($this->_getEnabled()) {
             newrelic_end_transaction();
         }
     }
 
     public function ignoreTransaction() {
-        if ($this->_isEnabled()) {
+        if ($this->_getEnabled()) {
             newrelic_ignore_transaction();
         }
     }
@@ -60,7 +75,7 @@ class CMService_Newrelic extends CM_Class_Abstract {
         if (null === $flag) {
             $flag = true;
         }
-        if ($this->_isEnabled()) {
+        if ($this->_getEnabled()) {
             newrelic_background_job($flag);;
         }
     }
@@ -72,7 +87,7 @@ class CMService_Newrelic extends CM_Class_Abstract {
     public function setCustomMetric($name, $milliseconds) {
         $name = 'Custom/' . (string) $name;
         $milliseconds = (int) $milliseconds;
-        if ($this->_isEnabled()) {
+        if ($this->_getEnabled()) {
             newrelic_custom_metric($name, $milliseconds);
         }
     }
@@ -81,8 +96,8 @@ class CMService_Newrelic extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      * @return bool
      */
-    private function _isEnabled() {
-        if (self::_getConfig()->enabled) {
+    protected function _getEnabled() {
+        if ($this->_enabled) {
             if (!extension_loaded('newrelic')) {
                 throw new CM_Exception_Invalid('Newrelic Extension is not installed.');
             }
@@ -92,20 +107,11 @@ class CMService_Newrelic extends CM_Class_Abstract {
     }
 
     /**
-     * @return string
-     */
-    private function _getAppName() {
-        return (string) $this->_getConfig()->appName;
-    }
-
-    /**
+     * @deprecated
      * @return CMService_Newrelic
      * @throws Exception
      */
     public static function getInstance() {
-        if (!self::$_instance) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
+        return CM_Service_Manager::getInstance()->getNewrelic();
     }
 }

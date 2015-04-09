@@ -39,10 +39,12 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
 
     /**
      * @param int $timestamp
+     * @return CM_Model_Splittest
      */
     public function setCreated($timestamp) {
         $timestamp = (int) $timestamp;
-        $this->_set('createStamp', $timestamp);
+        CM_Db_Db::update('cm_splittest', ['createStamp' => $timestamp], ['id' => $this->getId()]);
+        return $this->_change();
     }
 
     /**
@@ -54,10 +56,12 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
 
     /**
      * @param bool $optimized
+     * @return CM_Model_Splittest
      */
     public function setOptimized($optimized) {
         $optimized = (bool) $optimized;
-        $this->_set('optimized', $optimized);
+        CM_Db_Db::update('cm_splittest', ['optimized' => $optimized], ['id' => $this->getId()]);
+        return $this->_change();
     }
 
     /**
