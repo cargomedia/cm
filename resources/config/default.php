@@ -205,7 +205,7 @@ return function (CM_Config_Node $config) {
     $config->services['elasticsearch'] = array(
         'class'     => 'CM_Elasticsearch_Cluster',
         'arguments' => array(
-            array(
+            'servers' => array(
                 ['host' => 'localhost', 'port' => 9200]
             ),
         ),
