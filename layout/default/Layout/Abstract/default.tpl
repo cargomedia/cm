@@ -54,6 +54,8 @@
     {block name='head'}{/block}
   </head>
   <body id="{$viewResponse->getAutoId()}" class="{$viewResponse->getCssClasses()|implode:' '}">
+    {capture name='pageContent'}{$renderAdapter->fetchPage()}{/capture}
+
     {$render->getServiceManager()->getTrackings()->getHtml($render->getEnvironment())}
 
     {if CM_Http_Request_Abstract::hasInstance() && !CM_Http_Request_Abstract::getInstance()->isSupported()}
@@ -67,7 +69,7 @@
     {block name='body-start'}{/block}
     <div id="body-container">
       {block name='body'}
-        {$renderAdapter->fetchPage()}
+        {$smarty.capture.pageContent}
       {/block}
     </div>
     {if CM_Bootloader::getInstance()->isDebug()}{component name='CM_Component_Debug'}{/if}
