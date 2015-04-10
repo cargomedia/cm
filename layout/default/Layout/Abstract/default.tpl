@@ -4,8 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge; requiresActiveX=true">
     {if isset($pageDescription)}<meta name="description" content="{$pageDescription|escape}">{/if}
-    {if isset($pageKeywords)}
-      <meta name="keywords" content="{$pageKeywords|escape}">{/if}
+    {if isset($pageKeywords)}<meta name="keywords" content="{$pageKeywords|escape}">{/if}
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="{$render->getSite()->getName()|escape}">
@@ -55,6 +54,7 @@
     {block name='head'}{/block}
   </head>
   <body id="{$viewResponse->getAutoId()}" class="{$viewResponse->getCssClasses()|implode:' '}">
+    {$render->getServiceManager()->getTrackings()->getHtml($render->getEnvironment())}
 
     {if CM_Http_Request_Abstract::hasInstance() && !CM_Http_Request_Abstract::getInstance()->isSupported()}
       <div id="browserNotSupported">
@@ -77,7 +77,6 @@
       {resourceJs file="translations/{CM_Model_Language::getVersionJavascript()}.js" type="library"}
     {/if}
     {$render->getGlobalResponse()->getHtml()}
-    {$render->getServiceManager()->getTrackings()->getHtml($render->getEnvironment())}
     {block name='body-end'}{/block}
   </body>
 </html>
