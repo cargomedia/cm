@@ -211,6 +211,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CMService_Newrelic
+     */
+    public function getNewrelic() {
+        return $this->get('newrelic', 'CMService_Newrelic');
+    }
+
+    /**
      * @param string $serviceName
      * @throws CM_Exception_Invalid
      * @return mixed
