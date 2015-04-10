@@ -228,14 +228,38 @@ class CM_Service_Manager extends CM_Class_Abstract {
         }
         $config = $this->_serviceConfigList[$serviceName];
         $reflection = new ReflectionClass($config['class']);
-        $instance = $reflection->newInstanceArgs($config['arguments']);
+
+        $arguments = $config['arguments'];
+        if ($constructor = $reflection->getConstructor()) {
+            $arguments = $this->_matchNamedArgs($serviceName, $constructor, $arguments);
+        }
+        $instance = $reflection->newInstanceArgs($arguments);
+
         if (null !== $config['method']) {
-            $instance = call_user_func_array(array($instance, $config['method']['name']), $config['method']['arguments']);
+            $method = $reflection->getMethod($config['method']['name']);
+            $methodArguments = $this->_matchNamedArgs($serviceName, $method, $config['method']['arguments']);
+            $instance = $method->invokeArgs($instance, $methodArguments);
         }
         if ($instance instanceof CM_Service_ManagerAwareInterface) {
             $instance->setServiceManager($this);
         }
         return $instance;
+    }
+
+    /**
+     * @param string           $serviceName
+     * @param ReflectionMethod $method
+     * @param array            $arguments
+     * @throws CM_Exception_Invalid
+     * @return array
+     */
+    protected function _matchNamedArgs($serviceName, ReflectionMethod $method, array $arguments) {
+        $namedArgs = new CM_Util_NamedArgs();
+        try {
+            return $namedArgs->matchNamedArgs($method, $arguments);
+        } catch (CM_Exception_Invalid $e) {
+            throw new CM_Exception_Invalid("Cannot match arguments for `{$serviceName}`: {$e->getMessage()}");
+        }
     }
 
     /**
