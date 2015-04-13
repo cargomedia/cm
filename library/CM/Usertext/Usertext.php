@@ -27,9 +27,10 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
      * @param int|null  $maxLength
      * @param bool|null $isMail
      * @param bool|null $skipAnchors
+     * @param bool|null $allowBadwords
      * @throws CM_Exception_Invalid
      */
-    public function setMode($mode, $maxLength = null, $isMail = null, $skipAnchors = null) {
+    public function setMode($mode, $maxLength = null, $isMail = null, $skipAnchors = null, $allowBadwords = null) {
         $acceptedModes = array('escape', 'oneline', 'simple', 'markdown', 'markdownPlain');
         if (!in_array($mode, $acceptedModes)) {
             throw new CM_Exception_Invalid('Invalid mode `' . $mode . '`');
@@ -40,7 +41,9 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
         if ($isMail) {
             $emoticonFixedHeight = 16;
         }
-        $this->addFilter(new CM_Usertext_Filter_Badwords());
+        if (!$allowBadwords) {
+            $this->addFilter(new CM_Usertext_Filter_Badwords());
+        }
         if ('escape' != $mode) {
             $this->addFilter(new CM_Usertext_Filter_Emoticon_ReplaceAdditional());
         }
