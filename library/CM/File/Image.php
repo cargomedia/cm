@@ -45,7 +45,7 @@ class CM_File_Image extends CM_File {
     public function resize($widthMax, $heightMax, $square = null, $formatNew = null, CM_File $fileNew = null) {
         $square = isset($square) ? (bool) $square : false;
 
-        $dimensions = self::calculateDimensions($widthMax, $heightMax, $this->getWidth(), $this->getHeight(), $square);
+        $dimensions = self::calculateDimensions($this->getWidth(), $this->getHeight(), $widthMax, $heightMax, $square);
         $this->resizeSpecific($dimensions['width'], $dimensions['height'], $dimensions['offsetX'], $dimensions['offsetY'], $formatNew, $fileNew);
     }
 
