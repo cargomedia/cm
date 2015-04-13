@@ -369,4 +369,31 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
         $image->validateImage();
     }
+
+    public function testCalculateDimensions() {
+        $dimensions = CM_File_Image::calculateDimensions( 2000, 1600, 500, 600, false );
+
+        $this->assertEquals( 500, $dimensions['width']);
+        $this->assertEquals( 400, $dimensions['height']);
+        $this->assertEquals( 0, $dimensions['offsetX']);
+        $this->assertEquals( 0, $dimensions['offsetY']);
+    }
+
+    public function testCalculateDimensionsSquare() {
+        $dimensions = CM_File_Image::calculateDimensions( 2000, 1600, 500, 500, true );
+
+        $this->assertEquals( 500, $dimensions['width']);
+        $this->assertEquals( 500, $dimensions['height']);
+        $this->assertEquals( 200, $dimensions['offsetX']);
+        $this->assertEquals( 0, $dimensions['offsetY']);
+    }
+
+    public function testCalculateDimensionsLower() {
+        $dimensions = CM_File_Image::calculateDimensions( 100, 200, 1000, 500, false );
+
+        $this->assertEquals( 100, $dimensions['width']);
+        $this->assertEquals( 200, $dimensions['height']);
+        $this->assertEquals( 0, $dimensions['offsetX']);
+        $this->assertEquals( 0, $dimensions['offsetY']);
+    }
 }

@@ -45,40 +45,8 @@ class CM_File_Image extends CM_File {
     public function resize($widthMax, $heightMax, $square = null, $formatNew = null, CM_File $fileNew = null) {
         $square = isset($square) ? (bool) $square : false;
 
-        $width = $this->getWidth();
-        $height = $this->getHeight();
-        $offsetX = null;
-        $offsetY = null;
-
-        if ($square) {
-            if ($width > $height) {
-                $offsetX = floor(($width - $height) / 2);
-                $offsetY = 0;
-                $width = $height;
-            } elseif ($width < $height) {
-                $offsetX = 0;
-                $offsetY = floor(($height - $width) / 2);
-                $height = $width;
-            }
-        }
-
-        if (($width > $widthMax) || ($height > $heightMax)) {
-            if ($height / $heightMax > $width / $widthMax) {
-                $scaleCoefficient = $heightMax / $height;
-            } else {
-                $scaleCoefficient = $widthMax / $width;
-            }
-            $heightResize = $height * $scaleCoefficient;
-            $widthResize = $width * $scaleCoefficient;
-        } else {
-            // Don't blow image up
-            $heightResize = $height;
-            $widthResize = $width;
-        }
-        $heightResize = max($heightResize, 1);
-        $widthResize = max($widthResize, 1);
-
-        $this->resizeSpecific($widthResize, $heightResize, $offsetX, $offsetY, $formatNew, $fileNew);
+        $dimensions = self::calculateDimensions($widthMax, $heightMax, $this->getWidth(), $this->getHeight(), $square);
+        $this->resizeSpecific($dimensions['width'], $dimensions['height'], $dimensions['offsetX'], $dimensions['offsetY'], $formatNew, $fileNew);
     }
 
     /**
@@ -342,5 +310,54 @@ class CM_File_Image extends CM_File {
             default:
                 throw new CM_Exception_Invalid('Invalid format `' . $format . '`.');
         }
+    }
+
+    /**
+     * @param int  $width
+     * @param int  $height
+     * @param int  $widthMax
+     * @param int  $heightMax
+     * @param bool $square
+     * @return array
+     */
+    public static function calculateDimensions($width, $height, $widthMax, $heightMax, $square) {
+        $offsetX = null;
+        $offsetY = null;
+
+        if ($square) {
+            if ($width > $height) {
+                $offsetX = floor(($width - $height) / 2);
+                $offsetY = 0;
+                $width = $height;
+            } elseif ($width < $height) {
+                $offsetX = 0;
+                $offsetY = floor(($height - $width) / 2);
+                $height = $width;
+            }
+        }
+
+        if (($width > $widthMax) || ($height > $heightMax)) {
+            if ($height / $heightMax > $width / $widthMax) {
+                $scaleCoefficient = $heightMax / $height;
+            } else {
+                $scaleCoefficient = $widthMax / $width;
+            }
+            $heightResize = $height * $scaleCoefficient;
+            $widthResize = $width * $scaleCoefficient;
+        } else {
+            // Don't blow image up
+            $heightResize = $height;
+            $widthResize = $width;
+        }
+
+        $heightResize = max($heightResize, 1);
+        $widthResize = max($widthResize, 1);
+
+        return [
+            'offsetX' => (int) $offsetX,
+            'offsetY' => (int) $offsetY,
+            'width'   => (int) $widthResize,
+            'height'  => (int) $heightResize,
+        ];
     }
 }
