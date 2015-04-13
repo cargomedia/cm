@@ -89,12 +89,4 @@ class CM_VideoStream_Service {
         $adapter->unsubscribe($streamName, $clientKey);
         return true;
     }
-
-    /**
-     * @deprecated use CM_Service_Manager::getInstance()->getStreamVideo()
-     * @return CM_VideoStream_Service
-     */
-    public static function getInstance() {
-        return CM_Service_Manager::getInstance()->getStreamVideo();
-    }
 }
