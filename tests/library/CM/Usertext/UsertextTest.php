@@ -37,11 +37,9 @@ class CM_Usertext_UsertextTest extends CMTest_TestCase {
         $usertext = new CM_Usertext_Usertext(new CM_Frontend_Render());
         $usertext->setMode('escape', null, null, null, true);
 
-        $badwordList = new CM_Paging_ContentList_Badwords;
-
+        $badwordList = new CM_Paging_ContentList_Badwords();
         $badWord = 'testBad';
         $badwordList->add($badWord);
-
         $sentString = 'Hello i am ' . $badWord . ' !';
 
         $this->assertSame($sentString, $usertext->transform($sentString));
