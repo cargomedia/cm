@@ -206,7 +206,7 @@ return function (CM_Config_Node $config) {
     $config->services['stream-video'] = array(
         'class'  => 'CM_VideoStream_Factory',
         'method' => array(
-            'name'      => 'createClient',
+            'name'      => 'createService',
             'arguments' => array(
                 'adapterClass'     => 'CM_VideoStream_Adapter_Wowza',
                 'adapterArguments' => array(

@@ -23,7 +23,7 @@ class CM_VideoStream_Factory {
      * @throws CM_Exception_Invalid
      * @return CM_VideoStream_Service
      */
-    public function createClient($adapterClass, $adapterArguments = null) {
+    public function createService($adapterClass, $adapterArguments = null) {
         $adapter = $this->createAdapter($adapterClass, $adapterArguments);
         return new CM_VideoStream_Service($adapter);
     }
