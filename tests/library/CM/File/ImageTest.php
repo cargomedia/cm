@@ -244,15 +244,25 @@ class CM_File_ImageTest extends CMTest_TestCase {
     }
 
     public function testResize() {
-        $imageOriginal = new CM_File_Image(DIR_TEST_DATA . 'img/test.jpg');
-        $image = CM_File_Image::createTmp(null, $imageOriginal->read());
+        $image = $this->mockClass('CM_File_Image')->newInstanceWithoutConstructor();
+        $image->mockMethod('getWidth')->set(250);
+        $image->mockMethod('getHeight')->set(150);
 
-        $image->resize(50, 50, false);
-        $scale = ($image->getWidth() / 50 > $image->getHeight() / 50) ? 50 / $image->getWidth() : 50 / $image->getHeight();
-        $widthExpected = (int) ($image->getWidth() * $scale);
-        $heightExpected = (int) ($image->getHeight() * $scale);
-        $this->assertSame($widthExpected, $image->getWidth());
-        $this->assertSame($heightExpected, $image->getHeight());
+        $targetFile = CM_File::createTmp();
+        $format = 'jpg';
+
+        $resizeSpecificMethod = $image->mockMethod('resizeSpecific')
+            ->set(function ($width, $height, $offsetX, $offsetY, $formatNew, $fileNew) use ($format, $targetFile) {
+                $this->assertSame(250, $width);
+                $this->assertSame(150, $height);
+                $this->assertSame(0, $offsetX);
+                $this->assertSame(0, $offsetY);
+                $this->assertSame($format, $formatNew);
+                $this->assertSame($targetFile, $fileNew);
+            });
+        /** @var CM_File_Image $image */
+        $image->resize(500, 400, false, $format, $targetFile);
+        $this->assertSame(1, $resizeSpecificMethod->getCallCount());
     }
 
     public function testResizeNoInvalidDimensions() {
