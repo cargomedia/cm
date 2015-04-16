@@ -36,38 +36,43 @@ class CM_ProcessTest extends CMTest_TestCase {
      */
     public function testForkAndWaitForChildren() {
         $process = CM_Process::getInstance();
+        $parentOutput = [];
         for ($i = 1; $i <= 4; $i++) {
-            CM_ProcessTest::writeln("Child $i forked.");
+            $parentOutput[] = "Child $i forked.";
             $process->fork(function () use ($i) {
                 $ms = 100 * $i;
                 usleep($ms * 1000);
                 CM_ProcessTest::writeln("Child $i terminated after $ms ms.");
             });
         }
-        CM_ProcessTest::writeln('Parent waiting for 250 ms...');
+        $parentOutput[] = 'Parent waiting for 250 ms...';
         usleep(250000);
-        CM_ProcessTest::writeln('Parent listening to children...');
-        $process->waitForChildren(null, function () {
-            CM_ProcessTest::writeln('All children terminated.');
+        $parentOutput[] = 'Parent listening to children...';
+        $process->waitForChildren(null, function () use (&$parentOutput) {
+            $parentOutput[] = 'All children terminated.';
         });
-        CM_ProcessTest::writeln('Parent terminated.');
+        $parentOutput[] = 'Parent terminated.';
 
-        $outputFileExpected = 'Child 1 forked.
-Child 2 forked.
-Child 3 forked.
-Child 4 forked.
-Parent waiting for 250 ms...
-Child 1 terminated after 100 ms.
-Child 2 terminated after 200 ms.
-Parent listening to children...
-Child 3 terminated after 300 ms.
-Child 4 terminated after 400 ms.
-All children terminated.
-Parent terminated.
-';
         rewind(self::$_file);
-        $outputFileActual = fread(self::$_file, 8192);
-        $this->assertEquals($outputFileExpected, $outputFileActual);
+        $childrenOutput = explode("\n", fread(self::$_file, 8192));
+
+        $this->assertSame([
+            'Child 1 forked.',
+            'Child 2 forked.',
+            'Child 3 forked.',
+            'Child 4 forked.',
+            'Parent waiting for 250 ms...',
+            'Parent listening to children...',
+            'All children terminated.',
+            'Parent terminated.'
+        ], $parentOutput);
+
+        $this->assertContainsAll([
+            'Child 2 terminated after 200 ms.',
+            'Child 1 terminated after 100 ms.',
+            'Child 3 terminated after 300 ms.',
+            'Child 4 terminated after 400 ms.',
+        ], $childrenOutput);
     }
 
     /**
