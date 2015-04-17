@@ -8,9 +8,6 @@ class CM_Model_Splittest_User extends CM_Model_Splittest {
      * @return bool
      */
     public function isVariationFixture(CM_Model_User $user, $variationName) {
-        if ($user->getId() < $this->getUserIdMin()) {
-            return false;
-        }
         return $this->_isVariationFixture(new CM_Splittest_Fixture($user), $variationName);
     }
 

@@ -227,16 +227,6 @@ class CM_Model_User extends CM_Model_Abstract {
     }
 
     /**
-     * @return int
-     */
-    public static function getIdNext() {
-        return (int) CM_Db_Db::exec('SELECT `AUTO_INCREMENT` FROM  `INFORMATION_SCHEMA`.`TABLES` WHERE `TABLE_SCHEMA` = ? AND `TABLE_NAME` = ?', [
-            CM_Db_Db::getClient()->getDatabaseName(),
-            'cm_user'
-        ])->fetchColumn();
-    }
-
-    /**
      * @param int $id
      * @return CM_Model_User|null
      */

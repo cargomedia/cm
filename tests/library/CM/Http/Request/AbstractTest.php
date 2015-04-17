@@ -239,12 +239,6 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertSame(true, $request->isSupported());
     }
 
-    public function testGetClientIdNext() {
-        $id = CM_Http_Request_Abstract::getClientIdNext();
-        $request = new CM_Http_Request_Get('/');
-        $this->assertSame($id, $request->getClientId());
-    }
-
     /**
      * @param string             $uri
      * @param array|null         $additionalHeaders

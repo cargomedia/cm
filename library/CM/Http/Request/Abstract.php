@@ -557,11 +557,4 @@ abstract class CM_Http_Request_Abstract {
 
         return self::factory($method, $uri, $headers, $server, $body);
     }
-
-    /**
-     * @return int
-     */
-    public static function getClientIdNext() {
-        return CM_Db_Db::select('cm_requestClientCounter', 'counter')->fetchColumn() + 1;
-    }
 }

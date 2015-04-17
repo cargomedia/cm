@@ -140,10 +140,4 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $userOnlinePaging = new CM_Paging_User_Online();
         $this->assertEquals([$user2, $user3], $userOnlinePaging);
     }
-
-    public function testGetIdNext() {
-        $id = CM_Model_User::getIdNext();
-        $user = CMTest_TH::createUser();
-        $this->assertSame($id, $user->getId());
-    }
 }
