@@ -4,19 +4,6 @@ require_once dirname(dirname(__DIR__)) . '/bootstrap.php'; // Bootstrap the test
 
 class CM_ProcessTest extends CMTest_TestCase {
 
-    /** @var resource */
-    protected static $_file;
-
-    public static function setupBeforeClass() {
-        parent::setUpBeforeClass();
-        self::$_file = tmpfile();
-    }
-
-    public static function tearDownAfterClass() {
-        fclose(self::$_file);
-        parent::tearDownAfterClass();
-    }
-
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
@@ -85,15 +72,15 @@ class CM_ProcessTest extends CMTest_TestCase {
             return 'foo';
         });
         $process->fork(function () {
-            usleep(200000);
+            usleep(1000000);
             return 'bar';
         });
-        usleep(100000);
+        usleep(500000);
         $responses = $process->listenForChildren();
         $this->assertCount(1, $responses);
         $this->assertContainsOnlyInstancesOf('CM_Process_WorkloadResult', $responses);
         $this->assertSame([1 => 'foo'], \Functional\invoke($responses, 'getResult'));
-        usleep(200000);
+        usleep(1000000);
         $responses = $process->listenForChildren();
         $this->assertCount(1, $responses);
         $this->assertContainsOnlyInstancesOf('CM_Process_WorkloadResult', $responses);
@@ -278,13 +265,6 @@ class CM_ProcessTest extends CMTest_TestCase {
         }
 
         $process->waitForChildren();
-    }
-
-    /**
-     * @param string $message
-     */
-    public static function writeln($message) {
-        fwrite(self::$_file, "$message\n");
     }
 
     /**
