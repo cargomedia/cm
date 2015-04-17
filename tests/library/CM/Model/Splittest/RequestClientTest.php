@@ -17,13 +17,6 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
         }
     }
 
-    public function testIsVariationFixtureOldRequestClient() {
-        $request = new CM_Http_Request_Get('/');
-        $request->getClientId();
-        $test = CM_Model_Splittest_RequestClient::create('foo', ['v1']);
-        $this->assertFalse($test->isVariationFixture($request, 'v1'));
-    }
-
     public function testSetConversion() {
         $request = new CM_Http_Request_Post('/foo/null');
         $request2 = new CM_Http_Request_Post('/foo/null');

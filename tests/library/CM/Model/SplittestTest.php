@@ -60,31 +60,12 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $this->assertSame(true, $test->getOptimized());
     }
 
-    public function testGetRequestClientIdMin() {
-        $test = CM_Model_Splittest::create('foo', ['v1']);
-        $request = new CM_Http_Request_Get('/');
-        $this->assertSame($request->getClientId(), $test->getRequestClientIdMin());
-    }
-
-    public function testGetUserIdMin() {
-        $test = CM_Model_Splittest::create('foo', ['v1']);
-        $user = CMTest_TH::createUser();
-        $this->assertSame($user->getId(), $test->getUserIdMin());
-    }
-
     public function testFlush() {
         $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
-        $userIdMin = $test->getUserIdMin();
-        $requestClientIdMin = $test->getRequestClientIdMin();
         $created = $test->getCreated();
-        CMTest_TH::createUser();
-        $request = new CM_Http_Request_Get('/');
-        $request->getClientId();
         CMTest_TH::timeForward(1);
         $test->flush();
-        $this->assertSame($userIdMin + 1, $test->getUserIdMin());
-        $this->assertSame($requestClientIdMin + 1, $test->getRequestClientIdMin());
-        $this->assertSame($created + 1, $test->getCreated());
+        $this->assertGreaterThan($created, $test->getCreated());
     }
 
     public function testFlushVariationCache() {
@@ -93,7 +74,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $variation2 = new CM_Model_SplittestVariation(CM_Db_Db::select('cm_splittestVariation', 'id', ['name' => 'v2'])->fetchColumn());
         $variation2->setEnabled(false);
         $fixture = $this->mockClass('CM_Splittest_Fixture')->newInstanceWithoutConstructor();
-        $fixture->mockMethod('getId')->set(CM_Http_Request_Abstract::getClientIdNext());
+        $fixture->mockMethod('getId')->set(1);
         $fixture->mockMethod('getFixtureType')->set(1);
 
         CMTest_TH::timeForward(1);
@@ -141,13 +122,13 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
     }
 
     public function testGetVariationFixtureMultiple() {
+        $user = CMTest_TH::createUser();
+        $fixture = new CM_Splittest_Fixture($user);
+
         /** @var CM_Model_Splittest_Mock $test1 */
         $test1 = CM_Model_Splittest_Mock::create('foo1', ['v1', 'v2']);
         /** @var CM_Model_Splittest_Mock $test2 */
         $test2 = CM_Model_Splittest_Mock::create('foo2', ['w1', 'w2']);
-
-        $user = CMTest_TH::createUser();
-        $fixture = new CM_Splittest_Fixture($user);
 
         $this->assertContains($test1->getVariationFixture($fixture), array('v1', 'v2'));
         $this->assertContains($test2->getVariationFixture($fixture), array('w1', 'w2'));
@@ -164,14 +145,13 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
     }
 
     public function testTracking_RequestClient() {
-        /** @var CM_Model_Splittest_Mock $test */
-        $test = CM_Model_Splittest_Mock::create('foo1', ['v1']);
-
         $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array(''), '', true, true, true, array('getClientId'));
-        $request->expects($this->any())->method('getClientId')->will($this->returnValue(CM_Http_Request_Abstract::getClientIdNext()));
+        $request->expects($this->any())->method('getClientId')->will($this->returnValue(1));
         /** @var CM_Http_Request_Abstract $request */
         $fixture = new CM_Splittest_Fixture($request);
 
+        /** @var CM_Model_Splittest_Mock $test */
+        $test = CM_Model_Splittest_Mock::create('foo1', ['v1']);
         /** @var CM_Model_SplittestVariation $variation */
         $variation = $test->getVariations()->getItem(0);
         $variation->getName(); // Fill data
@@ -188,12 +168,11 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
     }
 
     public function testTracking_User() {
-        /** @var CM_Model_Splittest_Mock $test */
-        $test = CM_Model_Splittest_Mock::create('foo1', ['v1']);
-
         $user = CMTest_TH::createUser();
         $fixture = new CM_Splittest_Fixture($user);
 
+        /** @var CM_Model_Splittest_Mock $test */
+        $test = CM_Model_Splittest_Mock::create('foo1', ['v1']);
         /** @var CM_Model_SplittestVariation $variation */
         $variation = $test->getVariations()->getItem(0);
         $variation->getName(); // Fill data
