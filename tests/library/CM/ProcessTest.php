@@ -85,19 +85,19 @@ class CM_ProcessTest extends CMTest_TestCase {
             return 'foo';
         });
         $process->fork(function () {
-            usleep(500000);
+            usleep(200000);
             return 'bar';
         });
-        usleep(250000);
+        usleep(100000);
         $responses = $process->listenForChildren();
         $this->assertCount(1, $responses);
         $this->assertContainsOnlyInstancesOf('CM_Process_WorkloadResult', $responses);
-        $this->assertSame(['foo'], \Functional\invoke($responses, 'getResult'));
-        usleep(500000);
+        $this->assertSame([1 => 'foo'], \Functional\invoke($responses, 'getResult'));
+        usleep(200000);
         $responses = $process->listenForChildren();
         $this->assertCount(1, $responses);
         $this->assertContainsOnlyInstancesOf('CM_Process_WorkloadResult', $responses);
-        $this->assertSame(['bar'], \Functional\invoke($responses, 'getResult'));
+        $this->assertSame([2 => 'bar'], \Functional\invoke($responses, 'getResult'));
     }
 
     /**
