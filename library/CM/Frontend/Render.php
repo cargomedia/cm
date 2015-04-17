@@ -19,19 +19,24 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     /** @var CM_Frontend_Environment */
     private $_environment;
 
+    /** @var CM_Http_Request_Abstract|null */
+    private $_request;
+
     /** @var Smarty|null */
     private static $_smarty;
 
     /**
-     * @param CM_Frontend_Environment|null $environment
-     * @param boolean|null                 $languageRewrite
-     * @param CM_Service_Manager|null      $serviceManager
+     * @param CM_Frontend_Environment|null  $environment
+     * @param CM_Http_Request_Abstract|null $request
+     * @param boolean|null                  $languageRewrite
+     * @param CM_Service_Manager|null       $serviceManager
      */
-    public function __construct(CM_Frontend_Environment $environment = null, $languageRewrite = null, CM_Service_Manager $serviceManager = null) {
+    public function __construct(CM_Frontend_Environment $environment = null, CM_Http_Request_Abstract $request = null, $languageRewrite = null, CM_Service_Manager $serviceManager = null) {
         if (!$environment) {
             $environment = new CM_Frontend_Environment();
         }
         $this->_environment = $environment;
+        $this->_request = $request;
         $this->_languageRewrite = (bool) $languageRewrite;
         if (null === $serviceManager) {
             $serviceManager = CM_Service_Manager::getInstance();
@@ -64,6 +69,13 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
+     * @return CM_Http_Request_Abstract|null
+     */
+    public function getRequest() {
+        return $this->_request;
+    }
+
+    /**
      * @param string        $path
      * @param array|null    $variables
      * @param string[]|null $compileId
@@ -79,6 +91,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         $template = $this->_getSmarty()->createTemplate($path, null, join('_', $compileId));
         $template->assignGlobal('render', $this);
         $template->assignGlobal('viewer', $this->getViewer());
+        $template->assignGlobal('request', $this->getRequest());
         if ($variables) {
             $template->assign($variables);
         }

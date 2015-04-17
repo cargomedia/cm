@@ -55,23 +55,23 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
     public function testGetServerId() {
         $adapter = new CM_Stream_Adapter_Video_Wowza();
         $ipAddresses = array('10.0.3.109', '10.0.3.108');
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/';
         foreach ($ipAddresses as $ipAddress) {
-            $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($ipAddress), 'CM_Http_Request_Mock', true, true, true, array('getIp',
-                'getHost'));
-            $request->expects($this->any())->method('getIp')->will($this->returnValue(sprintf('%u', ip2long($ipAddress))));
-            $this->assertEquals(1, $adapter->getServerId($request));
+            $_SERVER['REMOTE_ADDR'] = $ipAddress;
+            $this->assertEquals(1, $adapter->getServerId());
         }
         try {
-            $ipAddress = '66.66.66.66';
-            $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($ipAddress), 'CM_Http_Request_Mock', true, true, true, array('getIp',
-                'getHost'));
-            $request->expects($this->any())->method('getIp')->will($this->returnValue(sprintf('%u', ip2long($ipAddress))));
-            $adapter->getServerId($request);
+            $_SERVER['REMOTE_ADDR'] = '66.66.66.66';
+            $adapter->getServerId();
             $this->fail('Found server with incorrect ipAddress');
         } catch (CM_Exception_Invalid $e) {
             $this->assertContains('No video server', $e->getMessage());
             $this->assertContains('`66.66.66.66`', $e->getMessage());
         }
+        unset($_SERVER['REQUEST_METHOD']);
+        unset($_SERVER['REQUEST_URI']);
+        unset($_SERVER['REMOTE_ADDR']);
     }
 
     private function _generateWowzaData(array $streamChannels) {

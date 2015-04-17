@@ -12,10 +12,10 @@ class CM_Service_Trackings extends CM_Service_ManagerAware implements CM_Service
         $this->_trackingServiceNameList = $trackingServiceNameList;
     }
 
-    public function getHtml(CM_Frontend_Environment $environment) {
+    public function getHtml(CM_Frontend_Environment $environment, CM_Http_Request_Abstract $request = null) {
         $html = '';
         foreach ($this->getTrackingServiceList() as $trackingService) {
-            $html .= $trackingService->getHtml($environment);
+            $html .= $trackingService->getHtml($environment, $request);
         }
         return $html;
     }
@@ -40,9 +40,9 @@ class CM_Service_Trackings extends CM_Service_ManagerAware implements CM_Service
         }
     }
 
-    public function trackPageView(CM_Frontend_Environment $environment, $path) {
+    public function trackPageView(CM_Frontend_Environment $environment, CM_Http_Request_Abstract $request = null, $path) {
         foreach ($this->getTrackingServiceList() as $trackingService) {
-            $trackingService->trackPageView($environment, $path);
+            $trackingService->trackPageView($environment, $request, $path);
         }
     }
 

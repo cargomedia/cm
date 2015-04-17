@@ -35,9 +35,6 @@ abstract class CM_Http_Request_Abstract {
     /** @var int */
     private $_clientId;
 
-    /** @var CM_Http_Request_Abstract */
-    private static $_instance;
-
     /**
      * @param string             $uri
      * @param array|null         $headers OPTIONAL
@@ -63,8 +60,6 @@ abstract class CM_Http_Request_Abstract {
         if ($viewer) {
             $this->_viewer = $viewer;
         }
-
-        self::$_instance = $this;
     }
 
     /**
@@ -488,24 +483,6 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
-     * @return bool
-     */
-    public static function hasInstance() {
-        return isset(self::$_instance);
-    }
-
-    /**
-     * @throws CM_Exception_Invalid
-     * @return CM_Http_Request_Abstract
-     */
-    public static function getInstance() {
-        if (!self::hasInstance()) {
-            throw new CM_Exception_Invalid('No request set');
-        }
-        return self::$_instance;
-    }
-
-    /**
      * @param string      $method
      * @param string      $uri
      * @param array|null  $headers
@@ -532,9 +509,12 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
-     * @return CM_Http_Request_Abstract
+     * @return CM_Http_Request_Abstract|null
      */
     public static function factoryFromGlobals() {
+        if (!isset($_SERVER['REQUEST_METHOD']) || !isset($_SERVER['REQUEST_URI'])) {
+            return null;
+        }
         $method = $_SERVER['REQUEST_METHOD'];
         $uri = $_SERVER['REQUEST_URI'];
         $body = file_get_contents('php://input');
@@ -543,7 +523,7 @@ abstract class CM_Http_Request_Abstract {
         if (function_exists('getallheaders')) {
             $headers = getallheaders();
         } else {
-            $headers = array();
+            $headers = [];
             foreach ($_SERVER as $name => $value) {
                 if (substr($name, 0, 5) == 'HTTP_') {
                     $headers[strtolower(str_replace('_', '-', substr($name, 5)))] = $value;

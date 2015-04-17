@@ -3,10 +3,11 @@
 interface CM_Service_Tracking_ClientInterface {
 
     /**
-     * @param CM_Frontend_Environment $environment
+     * @param CM_Frontend_Environment       $environment
+     * @param CM_Http_Request_Abstract|null $request
      * @return string
      */
-    public function getHtml(CM_Frontend_Environment $environment);
+    public function getHtml(CM_Frontend_Environment $environment, CM_Http_Request_Abstract $request = null);
 
     /**
      * @return string
@@ -25,10 +26,11 @@ interface CM_Service_Tracking_ClientInterface {
     public function trackAffiliate($requestClientId, $affiliateName);
 
     /**
-     * @param CM_Frontend_Environment $environment
-     * @param string                  $path
+     * @param CM_Frontend_Environment       $environment
+     * @param CM_Http_Request_Abstract|null $request
+     * @param string                        $path
      */
-    public function trackPageView(CM_Frontend_Environment $environment, $path);
+    public function trackPageView(CM_Frontend_Environment $environment, CM_Http_Request_Abstract $request = null, $path);
 
     /**
      * @param CM_Splittest_Fixture        $fixture

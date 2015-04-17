@@ -23,11 +23,8 @@ class CM_Form_Example extends CM_Form_Abstract {
     }
 
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
-        if (CM_Http_Request_Abstract::hasInstance()) {
-            $ip = CM_Http_Request_Abstract::getInstance()->getIp();
-            if ($locationGuess = CM_Model_Location::findByIp($ip)) {
-                $this->getField('location')->setValue($locationGuess);
-            }
+        if ($location = $environment->getLocation()) {
+            $this->getField('location')->setValue($location);
         }
     }
 }
