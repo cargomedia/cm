@@ -35,14 +35,16 @@ class CM_ProcessTest extends CMTest_TestCase {
      * @preserveGlobalState disabled
      */
     public function testForkAndWaitForChildren() {
+        $file = CM_File::createTmp();
+
         $process = CM_Process::getInstance();
         $parentOutput = [];
         for ($i = 1; $i <= 4; $i++) {
             $parentOutput[] = "Child $i forked.";
-            $process->fork(function () use ($i) {
+            $process->fork(function () use ($i, $file) {
                 $ms = 100 * $i;
                 usleep($ms * 1000);
-                CM_ProcessTest::writeln("Child $i terminated after $ms ms.");
+                $file->appendLine("Child $i terminated after $ms ms.");
             });
         }
         $parentOutput[] = 'Parent waiting for 250 ms...';
@@ -52,9 +54,7 @@ class CM_ProcessTest extends CMTest_TestCase {
             $parentOutput[] = 'All children terminated.';
         });
         $parentOutput[] = 'Parent terminated.';
-
-        rewind(self::$_file);
-        $childrenOutput = explode("\n", fread(self::$_file, 8192));
+        $childrenOutput = explode(PHP_EOL, $file->read());
 
         $this->assertSame([
             'Child 1 forked.',
