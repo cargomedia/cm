@@ -129,21 +129,6 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         }
     }
 
-    public function testIsVariationFixtureOldRequestClient() {
-        $request = new CM_Http_Request_Get('/');
-        $request->getClientId();
-        /** @var CM_Model_Splittest_Mock $test */
-        $test = CM_Model_Splittest_Mock::create('foo', ['v1']);
-        $this->assertFalse($test->isVariationFixture(new CM_Splittest_Fixture($request), 'v1'));
-    }
-
-    public function testIsVariationFixtureOldUser() {
-        $user = CMTest_TH::createUser();
-        /** @var CM_Model_Splittest_Mock $test */
-        $test = CM_Model_Splittest_Mock::create('foo', ['v1']);
-        $this->assertFalse($test->isVariationFixture(new CM_Splittest_Fixture($user), 'v1'));
-    }
-
     public function testDelete() {
         $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
         $test->delete();

@@ -13,7 +13,7 @@ class CM_Splittest_Fixture extends CM_Class_Abstract {
 
     /**
      * @param CM_Http_Request_Abstract|CM_Model_User|int $fixture
-     * @param int|null                              $type
+     * @param int|null                                   $type
      * @throws CM_Exception_Invalid
      */
     public function __construct($fixture, $type = null) {
@@ -55,7 +55,7 @@ class CM_Splittest_Fixture extends CM_Class_Abstract {
 
     /**
      * @param CM_Http_Request_Abstract $request
-     * @param CM_Model_User       $user
+     * @param CM_Model_User            $user
      */
     public static function setUserForRequestClient(CM_Http_Request_Abstract $request, CM_Model_User $user) {
         $requestClientId = $request->getClientId();

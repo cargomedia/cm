@@ -282,19 +282,6 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
         $columnId = $fixture->getColumnId();
         $fixtureId = $fixture->getId();
 
-        switch ($fixture->getFixtureType()) {
-            case CM_Splittest_Fixture::TYPE_REQUEST_CLIENT:
-                if ($fixtureId < $this->getRequestClientIdMin()) {
-                    return '';
-                }
-                break;
-            case CM_Splittest_Fixture::TYPE_USER:
-                if ($fixtureId < $this->getUserIdMin()) {
-                    return '';
-                }
-                break;
-        }
-
         $variationListFixture = $this->_getVariationListFixture($fixture);
         if (!array_key_exists($this->getId(), $variationListFixture) || $variationListFixture[$this->getId()]['flushStamp'] != $this->getCreated()) {
             $variation = $this->_getVariationRandom();

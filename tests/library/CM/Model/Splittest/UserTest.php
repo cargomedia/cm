@@ -18,6 +18,12 @@ class CM_Model_Splittest_UserTest extends CMTest_TestCase {
         }
     }
 
+    public function testIsVariationFixtureOldUser() {
+        $user = CMTest_TH::createUser();
+        $test = CM_Model_Splittest_User::create('foo', ['v1']);
+        $this->assertFalse($test->isVariationFixture($user, 'v1'));
+    }
+
     public function testSetConversion() {
         /** @var CM_Model_Splittest_User $test */
         $test = CM_Model_Splittest_User::create('bar', ['v1']);
