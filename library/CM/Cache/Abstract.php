@@ -42,11 +42,19 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $key
+     * @param string       $key
+     * @param Closure|null $getter fn(string $key)
      * @return mixed|false
      */
-    public final function get($key) {
-        return $this->_getStorage()->get($key);
+    public final function get($key, Closure $getter = null) {
+        $value = $this->_getStorage()->get($key);
+        if (false === $value && null !== $getter) {
+            $value = $getter($key);
+            if (false !== $value) {
+                $this->set($key, $value);
+            }
+        }
+        return $value;
     }
 
     /**

@@ -37,4 +37,37 @@ class CM_Cache_AbstractTest extends CMTest_TestCase {
         $this->assertFalse($cache->getTagged('tag1', 'key2'));
         $this->assertEquals('data3', $cache->getTagged('tag2', 'key3'));
     }
+
+    public function testGetWithGetter() {
+        $cache = $this->mockClass('CM_Cache_Abstract')->newInstance([new CM_Cache_Storage_Runtime(), 30]);
+        /** @var CM_Cache_Abstract $cache */
+
+        $getterCallCount = 0;
+
+        $getter = function ($key) use (&$getterCallCount) {
+            $this->assertSame('foo', $key);
+            $getterCallCount++;
+            return 12;
+        };
+
+        $this->assertSame(12, $cache->get('foo', $getter));
+        $this->assertSame(12, $cache->get('foo', $getter));
+        $this->assertSame(1, $getterCallCount);
+    }
+
+    public function testGetWithGetterReturningFalse() {
+        $cache = $this->mockClass('CM_Cache_Abstract')->newInstance([new CM_Cache_Storage_Runtime(), 30]);
+        /** @var CM_Cache_Abstract $cache */
+
+        $getterCallCount = 0;
+
+        $getter = function () use (&$getterCallCount) {
+            $getterCallCount++;
+            return false;
+        };
+
+        $this->assertSame(false, $cache->get('foo', $getter));
+        $this->assertSame(false, $cache->get('foo', $getter));
+        $this->assertSame(2, $getterCallCount);
+    }
 }
