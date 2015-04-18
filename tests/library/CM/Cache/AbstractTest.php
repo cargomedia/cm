@@ -1,9 +1,11 @@
 <?php
 
-class CM_Cache_SharedTest extends CMTest_TestCase {
+class CM_Cache_AbstractTest extends CMTest_TestCase {
 
     public function testKeys() {
-        $cache = CM_Cache_Shared::getInstance();
+        $cache = $this->mockClass('CM_Cache_Abstract')->newInstance([new CM_Cache_Storage_Runtime(), 30]);
+        /** @var CM_Cache_Abstract $cache */
+
         $cache->set('key1', 'data1');
         $cache->set('key2', 'data2');
         $this->assertEquals('data1', $cache->get('key1'));
@@ -17,7 +19,9 @@ class CM_Cache_SharedTest extends CMTest_TestCase {
     }
 
     public function testTagged() {
-        $cache = CM_Cache_Shared::getInstance();
+        $cache = $this->mockClass('CM_Cache_Abstract')->newInstance([new CM_Cache_Storage_Runtime(), 30]);
+        /** @var CM_Cache_Abstract $cache */
+
         $cache->setTagged('tag1', 'key1', 'data1');
         $cache->setTagged('tag1', 'key2', 'data2');
         $cache->setTagged('tag2', 'key3', 'data3');
