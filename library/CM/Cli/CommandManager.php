@@ -158,7 +158,7 @@ class CM_Cli_CommandManager {
                 $this->monitorSynchronizedCommands();
                 $this->_checkLock($command);
                 $this->_lockCommand($command);
-                $process->setTerminationCallback(function () use ($command) {
+                $process->registerTerminationCallback(function () use ($command) {
                     $this->unlockCommand($command);
                 });
             }

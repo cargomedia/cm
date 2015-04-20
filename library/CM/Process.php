@@ -23,9 +23,9 @@ class CM_Process {
     }
 
     /**
-     * @param callable $terminationCallback
+     * @param Closure $terminationCallback
      */
-    public function setTerminationCallback(Closure $terminationCallback) {
+    public function registerTerminationCallback(Closure $terminationCallback) {
         $this->bind('close', $terminationCallback);
     }
 
