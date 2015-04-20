@@ -1,6 +1,6 @@
 <?php
 
-class CM_Mail extends CM_View_Abstract implements CM_Typed {
+class CM_Mail extends CM_View_Abstract implements CM_Class_TypedInterface {
 
     /** @var CM_Model_User|null */
     private $_recipient;

@@ -14,11 +14,7 @@ class CM_Frontend_ViewResponseTest extends CMTest_TestCase {
 
     public function testGetCssClasses() {
         $view = $this->getMock('CM_View_Abstract', ['getClassHierarchy']);
-        $classNames = [
-            'foo',
-            'bar',
-        ];
-        $view->expects($this->any())->method('getClassHierarchy')->will($this->returnValue($classNames));
+        $classNames = [get_class($view), 'CM_View_Abstract'];
         /** @var CM_View_Abstract $view */
         $viewResponse = new CM_Frontend_ViewResponse($view);
         $this->assertSame($classNames, $viewResponse->getCssClasses());

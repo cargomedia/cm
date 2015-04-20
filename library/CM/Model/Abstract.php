@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable, CM_Typed {
+abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable, CM_Class_TypedInterface {
 
     /** @var array|null */
     protected $_id;
@@ -45,7 +45,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
             $this->_setData($data);
         }
         foreach ($this->_getAssets() as $asset) {
-            $this->_assets = array_merge($this->_assets, array_fill_keys($asset->getClassHierarchy(), $asset));
+            $this->_assets = array_merge($this->_assets, array_fill_keys(CM_Util::getClassHierarchy(get_class($asset)), $asset));
         }
         $this->_getData(); // Make sure data can be loaded
     }

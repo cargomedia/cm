@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract implements CM_Typed, CM_ArrayConvertible {
+abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract implements CM_Class_TypedInterface, CM_ArrayConvertible {
 
     /**
      * @var int

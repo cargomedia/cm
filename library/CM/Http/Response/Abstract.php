@@ -270,7 +270,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      */
     public static function getResponseClassName(CM_Http_Request_Abstract $request) {
         /** @var $responseClass CM_Http_Response_Abstract */
-        foreach (array_reverse(self::getClassChildren()) as $responseClass) {
+        foreach (array_reverse(CM_Util::getClassChildren(get_called_class())) as $responseClass) {
             if ($responseClass::match($request)) {
                 return $responseClass;
             }

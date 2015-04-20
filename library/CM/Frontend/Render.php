@@ -396,7 +396,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      */
     public function getTemplatePath(CM_View_Abstract $view, $templateName) {
         $templateName = (string) $templateName;
-        foreach ($view->getClassHierarchy() as $className) {
+        foreach (CM_Util::getClassHierarchy(get_class($view)) as $className) {
             if (!preg_match('/^([a-zA-Z]+)_([a-zA-Z]+)_(.+)$/', $className, $matches)) {
                 throw new CM_Exception('Cannot detect namespace/view-class/view-name for `' . $className . '`.');
             }

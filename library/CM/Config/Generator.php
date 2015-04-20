@@ -104,12 +104,12 @@ class CM_Config_Generator extends CM_Class_Abstract {
         if (isset(CM_Config::get()->CM_Class_Abstract->typesMaxValue)) {
             $this->_typesMaxValue = CM_Config::get()->CM_Class_Abstract->typesMaxValue;
         }
-        $typedClasses = CM_Util::getClassChildren('CM_Typed', true);
+        $typedClasses = CM_Util::getClassChildren('CM_Class_TypedInterface', true);
         /** @var CM_Class_Abstract[]|string[] $namespaceClassList */
         $namespaceClassList = array();
         // fetch type-namespaces
         foreach ($typedClasses as $class) {
-            if (!is_subclass_of(get_parent_class($class), 'CM_Typed')) {
+            if (!is_subclass_of(get_parent_class($class), 'CM_Class_TypedInterface')) {
                 $namespaceClassList[] = $class;
             }
         }
@@ -132,7 +132,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
         // generate new types
         foreach ($namespaceClassList as $namespaceClass) {
             $this->_namespaceTypes[$namespaceClass] = array();
-            $containedClasses = $namespaceClass::getClassChildren();
+            $containedClasses = CM_Util::getClassChildren($namespaceClass);
             $reflectionClass = new ReflectionClass($namespaceClass);
             if (!$reflectionClass->isAbstract()) {
                 array_unshift($containedClasses, $namespaceClass);
@@ -156,7 +156,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
     public function getActionVerbs() {
         $actionVerbs = array();
         $actionVerbsValues = array();
-        $classNames = CM_Action_Abstract::getClassChildren(true);
+        $classNames = CM_Util::getClassChildren('CM_Action_Abstract', true);
         array_unshift($classNames, 'CM_Action_Abstract');
         foreach ($classNames as $className) {
             $class = new ReflectionClass($className);
