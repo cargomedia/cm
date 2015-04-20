@@ -59,7 +59,6 @@
     var self = this;
     this.$handle.on('click.clipSlide', function() {
       self.toggle(true);
-      self.$elem.trigger('toggle.clipSlide');
     });
   };
 
