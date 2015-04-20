@@ -41,50 +41,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
         if ($isMail) {
             $emoticonFixedHeight = 16;
         }
-        if (!$allowBadwords) {
-            $this->addFilter(new CM_Usertext_Filter_Badwords());
-        }
-        if ('escape' != $mode) {
-            $this->addFilter(new CM_Usertext_Filter_Emoticon_ReplaceAdditional());
-        }
-        $this->addFilter(new CM_Usertext_Filter_Escape());
-        switch ($mode) {
-            case 'escape':
-                break;
-            case 'oneline':
-                $this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
-                $this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
-                break;
-            case 'simple':
-                $this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
-                $this->addFilter(new CM_Usertext_Filter_NewlineToLinebreak(3));
-                $this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
-                break;
-            case 'markdown':
-                if (null !== $maxLength) {
-                    throw new CM_Exception_Invalid('MaxLength is not allowed in mode markdown.');
-                }
-                $this->addFilter(new CM_Usertext_Filter_Markdown_UserContent());
-                $this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
-                $this->addFilter(new CM_Usertext_Filter_Markdown_UnescapeBlockquote());
-                $this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors));
-                $this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
-                $this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
-                break;
-            case 'markdownPlain':
-                $this->addFilter(new CM_Usertext_Filter_Markdown_UserContent());
-                $this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
-                $this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors));
-                $this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
-                $this->addFilter(new CM_Usertext_Filter_Striptags());
-                $this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
-                $this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
-                break;
-        }
-
-        if ('markdownPlain' != $mode) {
-            $this->addFilter(new CM_Usertext_Filter_CutWhitespace());
-        }
+        $this->_setMode($mode, $maxLength, $skipAnchors, $emoticonFixedHeight, $allowBadwords);
     }
 
     /**
@@ -119,6 +76,59 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
             $cacheKey .= '_filter:' . $cache->key($cacheKeyListFilter);
         }
         return $cacheKey;
+    }
+
+    /**
+     * @param string       $mode
+     * @param int|null     $maxLength
+     * @param boolean|null $skipAnchors
+     * @param int|null     $emoticonFixedHeight
+     * @param boolean|null $allowBadwords
+     * @throws CM_Exception_Invalid
+     */
+    protected function _setMode($mode, $maxLength = null, $skipAnchors = null, $emoticonFixedHeight = null, $allowBadwords = null) {
+        if (!$allowBadwords) {
+            $this->addFilter(new CM_Usertext_Filter_Badwords());
+        }
+        if ('escape' != $mode) {
+            $this->addFilter(new CM_Usertext_Filter_Emoticon_ReplaceAdditional());
+        }
+        $this->addFilter(new CM_Usertext_Filter_Escape());
+        switch ($mode) {
+            case 'escape':
+                break;
+            case 'oneline':
+                $this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
+                $this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
+                break;
+            case 'simple':
+                $this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
+                $this->addFilter(new CM_Usertext_Filter_NewlineToLinebreak(3));
+                $this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
+                break;
+            case 'markdown':
+                if (null !== $maxLength) {
+                    throw new CM_Exception_Invalid('MaxLength is not allowed in mode markdown.');
+                }
+                $this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
+                $this->addFilter(new CM_Usertext_Filter_Markdown_UnescapeBlockquote());
+                $this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors));
+                $this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
+                $this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
+                break;
+            case 'markdownPlain':
+                $this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
+                $this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors));
+                $this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
+                $this->addFilter(new CM_Usertext_Filter_Striptags());
+                $this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
+                $this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
+                break;
+        }
+
+        if ('markdownPlain' != $mode) {
+            $this->addFilter(new CM_Usertext_Filter_CutWhitespace());
+        }
     }
 
     private function _clearFilters() {

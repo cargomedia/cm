@@ -27,9 +27,7 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
             $html = $htmlBody;
         }
         if ($mail->getRecipient()) {
-            $imageTag = '<img style="display: none; width: 0px; height: 0px;" src="' .
-                CM_Util::htmlspecialchars($this->getRender()->getUrlEmailTracking($mail)) . '" />';
-            $html = preg_replace('#</body>#', $imageTag . '$0', $html);
+            $html = preg_replace('#</body>#', $this->_getTrackingImageTag($mail) . '$0', $html);
         }
 
         if (!($text = $mail->getText())) {
@@ -54,6 +52,15 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
             $text = $this->getRender()->fetchTemplate($tplPath, $assign);
         }
         return array($subject, $html, $text);
+    }
+
+    /**
+     * @param CM_Mail $mail
+     * @return string
+     */
+    protected function _getTrackingImageTag(CM_Mail $mail) {
+        return '<img style="display: none; width: 0px; height: 0px;" src="' .
+        CM_Util::htmlspecialchars($this->getRender()->getUrlEmailTracking($mail)) . '" />';
     }
 
     /**
