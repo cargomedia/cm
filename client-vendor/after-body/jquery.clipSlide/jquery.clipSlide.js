@@ -18,13 +18,9 @@
     this.$content.css({display: 'block'});
 
     var self = this;
-    if (this.$elem.find('img').length) {
-      this.$elem.find('img').on('load', function() {
-        self.toggle(false);
-      });
-    } else {
+    this.$elem.find('img').on('load', function() {
       self.toggle(false);
-    }
+    });
   }
 
   /**
@@ -34,8 +30,8 @@
     var $elem = this.$elem;
     var self = this;
 
-    if (state) {
-      if ($elem.height() < this.$content.outerHeight(true)) {
+    if ($elem.height() < this.$content.outerHeight(true)) {
+      if (state) {
         $elem.height($elem.height());
         $elem.css('max-height', 'none');
         $elem.animate({
@@ -44,15 +40,11 @@
           self.$handle.toggle(false);
           $elem.css('height', 'auto');
         });
-      }
-    } else {
-      if ($elem.height() < this.$content.outerHeight(true)) {
+      } else {
         if (!this.isEnabled()) {
           this.enable();
         }
         this.$handle.toggle(true);
-      } else {
-        $elem.trigger('toggle.clipSlide');
       }
     }
   };
