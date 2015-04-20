@@ -17,6 +17,13 @@ class CM_Process {
         $this->_installSignalHandlers();
     }
 
+    /**
+     * @param callable $terminationCallback
+     */
+    public function setTerminationCallback(Closure $terminationCallback) {
+        $this->_terminationCallback = $terminationCallback;
+    }
+
     public function executeTerminationCallback() {
         $terminationCallback = $this->_terminationCallback;
         if (null !== $terminationCallback) {
@@ -117,22 +124,20 @@ class CM_Process {
 
     /**
      * @param boolean|null $keepAlive
-     * @param Closure|null $terminationCallback
      * @return CM_Process_WorkloadResult[]
      * @throws CM_Exception
      */
-    public function listenForChildren($keepAlive = null, Closure $terminationCallback = null) {
-        return $this->_wait($keepAlive, $terminationCallback, true);
+    public function listenForChildren($keepAlive = null) {
+        return $this->_wait($keepAlive, true);
     }
 
     /**
-     * @param bool|null    $keepAlive
-     * @param Closure|null $terminationCallback
+     * @param bool|null $keepAlive
      * @return CM_Process_WorkloadResult[]
      * @throws CM_Exception
      */
-    public function waitForChildren($keepAlive = null, Closure $terminationCallback = null) {
-        return $this->_wait($keepAlive, $terminationCallback, false);
+    public function waitForChildren($keepAlive = null) {
+        return $this->_wait($keepAlive, false);
     }
 
     /**
@@ -207,15 +212,15 @@ class CM_Process {
     }
 
     /**
-     * @param bool|null    $keepAlive
-     * @param Closure|null $terminationCallback
-     * @param boolean      $nohang
-     * @throws CM_Exception
+     * @param bool|null $keepAlive
+     * @param boolean   $nohang
      * @return CM_Process_WorkloadResult[]
+     * @throws CM_Exception
+     * @throws Exception
+     * @internal param callable|null $terminationCallback
      */
-    private function _wait($keepAlive = null, Closure $terminationCallback = null, $nohang = null) {
+    private function _wait($keepAlive = null, $nohang = null) {
         $keepAlive = (bool) $keepAlive;
-        $this->_terminationCallback = $terminationCallback;
         $workloadResultList = array();
         $waitOption = $nohang ? WNOHANG : 0;
         if (!empty($this->_forkHandlerList)) {
@@ -239,8 +244,6 @@ class CM_Process {
                 }
             } while (!empty($this->_forkHandlerList) && $pid > 0);
         }
-        $this->executeTerminationCallback();
-
         ksort($workloadResultList);
         return $workloadResultList;
     }

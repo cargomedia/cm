@@ -37,9 +37,7 @@ class CM_ProcessTest extends CMTest_TestCase {
         $parentOutput[] = 'Parent waiting for 250 ms...';
         usleep(250000);
         $parentOutput[] = 'Parent listening to children...';
-        $process->waitForChildren(null, function () use (&$parentOutput) {
-            $parentOutput[] = 'All children terminated.';
-        });
+        $process->waitForChildren(null);
         $parentOutput[] = 'Parent terminated.';
         $childrenOutput = explode(PHP_EOL, $file->read());
 
