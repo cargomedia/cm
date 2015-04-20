@@ -2,6 +2,8 @@
 
 class CM_Process {
 
+    use CM_EventHandler_EventHandlerTrait;
+
     const RESPAWN_TIMEOUT = 10;
 
     /** @var Closure|null */
@@ -15,21 +17,16 @@ class CM_Process {
 
     private function __construct() {
         $this->_installSignalHandlers();
+        $this->bind('close', function() {
+            $this->killChildren();
+        });
     }
 
     /**
      * @param callable $terminationCallback
      */
     public function setTerminationCallback(Closure $terminationCallback) {
-        $this->_terminationCallback = $terminationCallback;
-    }
-
-    public function executeTerminationCallback() {
-        $terminationCallback = $this->_terminationCallback;
-        if (null !== $terminationCallback) {
-            $terminationCallback();
-            $this->_terminationCallback = null;
-        }
+        $this->bind('close', $terminationCallback);
     }
 
     /**
@@ -196,8 +193,7 @@ class CM_Process {
     private function _installSignalHandlers() {
         $process = $this;
         $handler = function ($signal) use ($process) {
-            $process->killChildren();
-            $process->executeTerminationCallback();
+            $process->trigger('close', $signal);
             exit(0);
         };
         pcntl_signal(SIGTERM, $handler, false);
