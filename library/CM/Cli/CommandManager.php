@@ -151,8 +151,8 @@ class CM_Cli_CommandManager {
                 $this->_outputError($this->getHelp($packageName));
                 return 1;
             }
-            $command = $this->_getCommand($packageName, $methodName);
             $process = $this->_getProcess();
+            $command = $this->_getCommand($packageName, $methodName);
 
             if ($command->getSynchronized()) {
                 $this->monitorSynchronizedCommands();
@@ -171,7 +171,6 @@ class CM_Cli_CommandManager {
             $workload = $this->_getProcessWorkload($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError);
 
             $forks = max($this->_forks, 1);
-
             for ($i = 0; $i < $forks; $i++) {
                 $process->fork($workload);
             }
