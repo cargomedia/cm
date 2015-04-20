@@ -2,82 +2,43 @@
  * Author: CM
  */
 (function($) {
-  /**
-   * @param {jQuery} $elem
-   * @constructor
-   */
-  function ClipSlide($elem) {
-    /** @type {jQuery} */
-    this.$elem = $elem;
-    /** @type {jQuery} */
-    this.$content = this.$elem.children();
-    /** @type {jQuery} */
-    this.$handle = null;
+	$.fn.clipSlide = function(speed) {
+		var speed = speed || 'fast';
+		return this.each(function() {
+			var $this = $(this);
+			if ($this.data('clipSlide')) {
+				return;
+			}
 
-    this.$elem.addClass('clipSlide');
-    this.$content.css({display: 'block'});
+			$this.addClass('clipSlide').data('clipSlide', true);
+			var $content = $this.children();
+			$content.css({display: 'block'});
 
-    var self = this;
-    this.$elem.imagesLoaded().always(function() {
-      self.toggle(false);
-    });
-  }
+			$this.imagesLoaded().always(function() {
+				if ($this.height() < $content.outerHeight(true)) {
+					var $handle = $('<a href="javascript:;" class="clipSlide-handle"><div class="icon icon-arrow-down"></div></a>').appendTo($this);
 
-  /**
-   * @param {Boolean} [state]
-   */
-  ClipSlide.prototype.toggle = function(state) {
-    var $elem = this.$elem;
-    var self = this;
+					$this.css({
+						position: 'relative'
+					});
+					$handle.css({
+						position: 'absolute',
+						bottom: '0',
+						width: '100%'
+					});
 
-    if ($elem.height() < this.$content.outerHeight(true)) {
-      if (state) {
-        $elem.height($elem.height());
-        $elem.css('max-height', 'none');
-        $elem.animate({
-          'height': this.$content.outerHeight(true)
-        }, 'fast', function() {
-          self.$handle.toggle(false);
-          $elem.css('height', 'auto');
-        });
-      } else {
-        if (!this.isEnabled()) {
-          this.enable();
-        }
-        this.$handle.toggle(true);
-      }
-    }
-  };
-
-  ClipSlide.prototype.isEnabled = function() {
-    return this.$elem.hasClass('clipSlide-enabled');
-  };
-
-  ClipSlide.prototype.enable = function() {
-    this.$elem.addClass('clipSlide-enabled');
-    this.$handle = $('<a href="javascript:;" class="clipSlide-handle"><div class="icon icon-arrow-down"></div></a>').appendTo(this.$elem);
-    var self = this;
-    this.$handle.on('click.clipSlide', function() {
-      self.toggle(true);
-    });
-  };
-
-  $.fn.clipSlide = function(action, value) {
-    return this.each(function() {
-      var $self = $(this);
-      var instance = $self.data('clipSlide');
-      if (!instance) {
-        instance = new ClipSlide($self);
-        $self.data('clipSlide', instance);
-      }
-
-      switch (action) {
-        case 'toggle':
-          instance.toggle(value);
-          break;
-        default:
-          break;
-      }
-    });
-  };
+					$handle.on("click.clipSlide", function() {
+						$this.height($this.height());
+						$this.css('max-height', 'none');
+						$this.animate({
+							'height': $content.outerHeight(true)
+						}, speed, function() {
+							$handle.remove();
+							$this.css('height', 'auto');
+						});
+					});
+				}
+			});
+		});
+	};
 })(jQuery);
