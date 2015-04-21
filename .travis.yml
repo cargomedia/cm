@@ -23,6 +23,7 @@ before_script:
   - tests/travis/install-php-svm.sh
   - yes '' | travis_retry pecl install imagick
   - travis_retry pecl install stats
+  - sudo apt-get install gearman-job-server
   - sudo apt-get install libgearman-dev && travis_retry pecl install gearman-1.0.3
   - if [ `php-config --vernum` -ge 50500 ]; then yes '' | travis_retry pecl install apcu-beta; fi
   - phpenv config-add tests/travis/php.ini
