@@ -2,7 +2,6 @@
 
 class CM_Process {
 
-    const FORKING_DELAY = 200;
     const RESPAWN_TIMEOUT = 10;
 
     /** @var Closure|null */
@@ -166,7 +165,6 @@ class CM_Process {
             throw new CM_Exception('Cannot open stream socket pair');
         }
         $pid = pcntl_fork();
-        usleep(self::FORKING_DELAY);
         if ($pid === -1) {
             throw new CM_Exception('Could not spawn child process');
         }
