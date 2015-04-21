@@ -57,6 +57,40 @@ class CMService_GoogleAnalytics_MeasurementProtocol_ClientTest extends CMTest_Te
 
     /**
      * @expectedException CM_Exception
+     * @expectedExceptionMessage Value `12.23` for parameter `ev` did not pass validation
+     */
+    public function testTrackEventFloatValue() {
+        $clientMock = $this->mockClass('CMService_GoogleAnalytics_MeasurementProtocol_Client');
+        /** @var CMService_GoogleAnalytics_MeasurementProtocol_Client $client */
+        $client = $clientMock->newInstance(['prop1']);
+
+        $client->trackEvent([
+            'eventCategory' => 'MyCategory',
+            'eventAction'   => 'MyAction',
+            'eventLabel'    => 'MyLabel',
+            'eventValue'    => 12.23,
+        ]);
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Value `-12` for parameter `ev` did not pass validation
+     */
+    public function testTrackEventNegativeValue() {
+        $clientMock = $this->mockClass('CMService_GoogleAnalytics_MeasurementProtocol_Client');
+        /** @var CMService_GoogleAnalytics_MeasurementProtocol_Client $client */
+        $client = $clientMock->newInstance(['prop1']);
+
+        $client->trackEvent([
+            'eventCategory' => 'MyCategory',
+            'eventAction'   => 'MyAction',
+            'eventLabel'    => 'MyLabel',
+            'eventValue'    => -12,
+        ]);
+    }
+
+    /**
+     * @expectedException CM_Exception
      * @expectedExceptionMessage Unexpected parameter `exd` for hitType `event`
      */
     public function testTrackEventParamForWrongHitType() {

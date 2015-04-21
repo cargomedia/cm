@@ -6,7 +6,7 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
     private $_test;
 
     public function setUp() {
-        $this->_test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $this->_test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
     }
 
     public function tearDown() {
@@ -71,14 +71,15 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $user = CMTest_TH::createUser();
 
         /** @var CM_Model_Splittest_User $test */
-        $test = CM_Model_Splittest_User::createStatic(array('name' => 'bar', 'variations' => array('v1')));
+        $test = CM_Model_Splittest_User::create('bar', ['v1']);
         /** @var CM_Model_SplittestVariation $variation */
         $variation = $test->getVariations()->getItem(0);
 
         $test->isVariationFixture($user, 'v1');
-        $this->assertSame(0, $variation->getConversionCount(true));
+        $this->assertSame(0, $variation->getConversionCount());
         $test->setConversion($user);
-        $this->assertSame(1, $variation->getConversionCount(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getConversionCount());
 
         $test->delete();
     }
@@ -89,24 +90,26 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $user3 = CMTest_TH::createUser();
 
         /** @var CM_Model_Splittest_User $test */
-        $test = CM_Model_Splittest_User::createStatic(array('name' => 'bar', 'variations' => array('v1')));
+        $test = CM_Model_Splittest_User::create('bar', ['v1']);
         /** @var CM_Model_SplittestVariation $variation */
         $variation = $test->getVariations()->getItem(0);
 
         $test->isVariationFixture($user, 'v1');
         $test->isVariationFixture($user2, 'v1');
         $test->isVariationFixture($user3, 'v1');
-        $this->assertSame(0, $variation->getConversionCount(true));
-        $this->assertSame(0.0, $variation->getConversionWeight(true));
+        $this->assertSame(0, $variation->getConversionCount());
+        $this->assertSame(0.0, $variation->getConversionWeight());
         $test->setConversion($user, 3.75);
         $test->setConversion($user2, 3.29);
-        $this->assertSame(2, $variation->getConversionCount(true));
-        $this->assertSame(7.04, $variation->getConversionWeight(true));
-        $this->assertSame(2.3466666666667, $variation->getConversionRate(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(2, $variation->getConversionCount());
+        $this->assertSame(7.04, $variation->getConversionWeight());
+        $this->assertSame(2.3466666666667, $variation->getConversionRate());
         $test->setConversion($user, -2);
-        $this->assertSame(2, $variation->getConversionCount(true));
-        $this->assertSame(5.04, $variation->getConversionWeight(true));
-        $this->assertSame(1.68, $variation->getConversionRate(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(2, $variation->getConversionCount());
+        $this->assertSame(5.04, $variation->getConversionWeight());
+        $this->assertSame(1.68, $variation->getConversionRate());
 
         $test->delete();
     }
@@ -115,21 +118,23 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $user = CMTest_TH::createUser();
 
         /** @var CM_Model_Splittest_User $test */
-        $test = CM_Model_Splittest_User::createStatic(array('name' => 'bar', 'variations' => array('v1')));
+        $test = CM_Model_Splittest_User::create('bar', ['v1']);
         /** @var CM_Model_SplittestVariation $variation */
         $variation = $test->getVariations()->getItem(0);
 
         $test->isVariationFixture($user, 'v1');
-        $this->assertSame(0, $variation->getConversionCount(true));
-        $this->assertSame(0.0, $variation->getConversionWeight(true));
+        $this->assertSame(0, $variation->getConversionCount());
+        $this->assertSame(0.0, $variation->getConversionWeight());
         $test->setConversion($user);
-        $this->assertSame(1, $variation->getConversionCount(true));
-        $this->assertSame(1., $variation->getConversionWeight(true));
-        $this->assertSame(1., $variation->getConversionRate(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getConversionCount());
+        $this->assertSame(1., $variation->getConversionWeight());
+        $this->assertSame(1., $variation->getConversionRate());
         $test->setConversion($user);
-        $this->assertSame(1, $variation->getConversionCount(true));
-        $this->assertSame(1., $variation->getConversionWeight(true));
-        $this->assertSame(1., $variation->getConversionRate(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getConversionCount());
+        $this->assertSame(1., $variation->getConversionWeight());
+        $this->assertSame(1., $variation->getConversionRate());
 
         $test->delete();
     }
@@ -138,21 +143,113 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $user = CMTest_TH::createUser();
 
         /** @var CM_Model_Splittest_User $test */
-        $test = CM_Model_Splittest_User::createStatic(array('name' => 'bar', 'variations' => array('v1')));
+        $test = CM_Model_Splittest_User::create('bar', ['v1']);
         /** @var CM_Model_SplittestVariation $variation */
         $variation = $test->getVariations()->getItem(0);
 
         $test->isVariationFixture($user, 'v1');
-        $this->assertSame(0, $variation->getConversionCount(true));
-        $this->assertSame(0.0, $variation->getConversionWeight(true));
+        $this->assertSame(0, $variation->getConversionCount());
+        $this->assertSame(0.0, $variation->getConversionWeight());
         $test->setConversion($user, 1.);
-        $this->assertSame(1, $variation->getConversionCount(true));
-        $this->assertSame(1., $variation->getConversionWeight(true));
-        $this->assertSame(1., $variation->getConversionRate(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getConversionCount());
+        $this->assertSame(1., $variation->getConversionWeight());
+        $this->assertSame(1., $variation->getConversionRate());
         $test->setConversion($user, 1.);
-        $this->assertSame(1, $variation->getConversionCount(true));
-        $this->assertSame(2., $variation->getConversionWeight(true));
-        $this->assertSame(2., $variation->getConversionRate(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getConversionCount());
+        $this->assertSame(2., $variation->getConversionWeight());
+        $this->assertSame(2., $variation->getConversionRate());
+
+        $test->delete();
+    }
+
+    public function testGetConversionWeightSquared() {
+        $user1 = CMTest_TH::createUser();
+        $user2 = CMTest_TH::createUser();
+
+        /** @var CM_Model_Splittest_User $test */
+        $test = CM_Model_Splittest_User::create('bar', ['v1']);
+        /** @var CM_Model_SplittestVariation $variation */
+        $variation = $test->getVariations()->getItem(0);
+
+        $this->assertSame(0., $variation->getConversionWeightSquared());
+
+        $test->isVariationFixture($user1, 'v1');
+        CMTest_TH::clearCache();
+        $this->assertSame(0., $variation->getConversionWeightSquared());
+
+        $test->setConversion($user1, 10.);
+        CMTest_TH::clearCache();
+        $this->assertSame(100., $variation->getConversionWeightSquared());
+
+        $test->isVariationFixture($user2, 'v1');
+        CMTest_TH::clearCache();
+        $this->assertSame(100., $variation->getConversionWeightSquared());
+
+        $test->setConversion($user2, 2.);
+        CMTest_TH::clearCache();
+        $this->assertSame(104., $variation->getConversionWeightSquared());
+
+        $test->delete();
+    }
+
+    public function testGetStandardDeviation() {
+        $user1 = CMTest_TH::createUser();
+        $user2 = CMTest_TH::createUser();
+
+        /** @var CM_Model_Splittest_User $test */
+        $test = CM_Model_Splittest_User::create('bar', ['v1']);
+        /** @var CM_Model_SplittestVariation $variation */
+        $variation = $test->getVariations()->getItem(0);
+
+        $this->assertSame(0., $variation->getStandardDeviation());
+
+        $test->isVariationFixture($user1, 'v1');
+        CMTest_TH::clearCache();
+        $this->assertSame(0., $variation->getStandardDeviation());
+
+        $test->setConversion($user1, 10.);
+        CMTest_TH::clearCache();
+        $this->assertSame(0., $variation->getStandardDeviation());
+
+        $test->isVariationFixture($user2, 'v1');
+        CMTest_TH::clearCache();
+        $this->assertSame(5., $variation->getStandardDeviation());
+
+        $test->setConversion($user2, 2.);
+        CMTest_TH::clearCache();
+        $this->assertSame(4., $variation->getStandardDeviation());
+
+        $test->delete();
+    }
+
+    public function testGetUpperConfidenceBound() {
+        $user1 = CMTest_TH::createUser();
+        $user2 = CMTest_TH::createUser();
+
+        /** @var CM_Model_Splittest_User $test */
+        $test = CM_Model_Splittest_User::create('bar', ['v1']);
+        /** @var CM_Model_SplittestVariation $variation */
+        $variation = $test->getVariations()->getItem(0);
+
+        $this->assertSame(0., $variation->getUpperConfidenceBound());
+
+        $test->isVariationFixture($user1, 'v1');
+        CMTest_TH::clearCache();
+        $this->assertSame(0., $variation->getUpperConfidenceBound());
+
+        $test->setConversion($user1, 10.);
+        CMTest_TH::clearCache();
+        $this->assertSame(10., $variation->getUpperConfidenceBound());
+
+        $test->isVariationFixture($user2, 'v1');
+        CMTest_TH::clearCache();
+        $this->assertSame(7.9435250562887, $variation->getUpperConfidenceBound());
+
+        $test->setConversion($user2, 2.);
+        CMTest_TH::clearCache();
+        $this->assertSame(8.3548200450309, $variation->getUpperConfidenceBound());
 
         $test->delete();
     }
@@ -162,19 +259,76 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $user2 = CMTest_TH::createUser();
 
         /** @var CM_Model_Splittest_User $test */
-        $test = CM_Model_Splittest_User::createStatic(array('name' => 'bar', 'variations' => array('v1')));
+        $test = CM_Model_Splittest_User::create('bar', ['v1']);
 
         /** @var CM_Model_SplittestVariation $variation */
         $variation = $test->getVariations()->getItem(0);
 
-        $this->assertSame(0, $variation->getFixtureCount(true));
+        $this->assertSame(0, $variation->getFixtureCount());
 
         $test->isVariationFixture($user1, 'v1');
-        $this->assertSame(1, $variation->getFixtureCount(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getFixtureCount());
         $test->isVariationFixture($user1, 'v1');
-        $this->assertSame(1, $variation->getFixtureCount(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(1, $variation->getFixtureCount());
         $test->isVariationFixture($user2, 'v1');
-        $this->assertSame(2, $variation->getFixtureCount(true));
+        CMTest_TH::clearCache();
+        $this->assertSame(2, $variation->getFixtureCount());
+
+        $test->delete();
+    }
+
+    public function testOptimized() {
+        /** @var CM_Model_Splittest_User $test */
+        $test = CM_Model_Splittest_User::create('testOptimized', ['v1', 'v2'], true);
+
+        foreach ([
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 0, 'v2' => 0]],
+                     ['variation' => 'v1', 'conversionWeight' => 0, 'UCB' => ['v1' => 0, 'v2' => 0]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 0, 'v2' => 0]],
+                     ['variation' => 'v1', 'conversionWeight' => 10, 'UCB' => ['v1' => 0, 'v2' => 9.5763354702607]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 9.1627730557885, 'v2' => 10.079050361367]],
+                     ['variation' => 'v1', 'conversionWeight' => 0, 'UCB' => ['v1' => 9.4853064449853, 'v2' => 7.4647362290016]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 6.9764490828879, 'v2' => 7.6740939911766]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.1299303954748, 'v2' => 9.3361367939935]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.2580334083849, 'v2' => 7.8752548790091]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.3676533020391, 'v2' => 8.8283139741822]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.4632468764998, 'v2' => 7.8363661837493]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.547854326983, 'v2' => 8.5111528523589]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.6236382087886, 'v2' => 7.7609849274971]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.6921892463093, 'v2' => 8.2854930993131]],
+                     ['variation' => 'v1', 'conversionWeight' => 10, 'UCB' => ['v1' => 7.7547101338294, 'v2' => 7.6828024677134]],
+                     ['variation' => 'v1', 'conversionWeight' => 0, 'UCB' => ['v1' => 9.1140386187892, 'v2' => 7.7176444685704]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.6480715270881, 'v2' => 7.7498373781205]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.6877396941039, 'v2' => 8.1724630283957]],
+                     ['variation' => 'v1', 'conversionWeight' => 10, 'UCB' => ['v1' => 7.7247529364914, 'v2' => 7.6626291437821]],
+                     ['variation' => 'v1', 'conversionWeight' => 0, 'UCB' => ['v1' => 8.5026412529014, 'v2' => 7.6867011689518]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.5231045928555, 'v2' => 7.7093347077617]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.5493610883994, 'v2' => 8.0648280886575]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.5742006691383, 'v2' => 7.6244971942451]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.5977618494541, 'v2' => 7.9347574318587]],
+                     ['variation' => 'v1', 'conversionWeight' => 10, 'UCB' => ['v1' => 7.6201641165989, 'v2' => 7.5503911157322]],
+                     ['variation' => 'v1', 'conversionWeight' => 0, 'UCB' => ['v1' => 8.1715906029488, 'v2' => 7.565588932245]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.4341829707168, 'v2' => 7.5801000881577]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.4514490087814, 'v2' => 7.8534733810622]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.4679937673471, 'v2' => 7.5106403210843]],
+                     ['variation' => 'v2', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.483872514059, 'v2' => 7.7567753416888]],
+                     ['variation' => 'v1', 'conversionWeight' => 10, 'UCB' => ['v1' => 7.4991345044317, 'v2' => 7.4490303850766]],
+                     ['variation' => 'v1', 'conversionWeight' => 0, 'UCB' => ['v1' => 7.930011605986, 'v2' => 7.4596622703966]],
+                     ['variation' => 'v2', 'conversionWeight' => 11, 'UCB' => ['v1' => 7.3403742293396, 'v2' => 7.4699083170757]],
+                 ] as $fixtureData) {
+            CMTest_TH::clearCache();
+            $upperConfidenceBoundList = [];
+            /** @var CM_Model_SplittestVariation $variation */
+            foreach ($test->getVariations() as $variation) {
+                $upperConfidenceBoundList[$variation->getName()] = $variation->getUpperConfidenceBound();
+            }
+            $this->assertEquals($fixtureData['UCB'], $upperConfidenceBoundList);
+            $user = CMTest_TH::createUser();
+            $this->assertTrue($test->isVariationFixture($user, $fixtureData['variation']));
+            $test->setConversion($user, $fixtureData['conversionWeight']);
+        }
 
         $test->delete();
     }

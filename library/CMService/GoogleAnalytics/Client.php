@@ -164,9 +164,6 @@ EOF;
         $fieldList = [
             'cookieDomain' => $environment->getSite()->getHost(),
         ];
-        if (CM_Http_Request_Abstract::hasInstance()) {
-            $fieldList['clientId'] = (string) CM_Http_Request_Abstract::getInstance()->getClientId();
-        }
         if ($user = $environment->getViewer()) {
             $fieldList['userId'] = $user->getId();
         }

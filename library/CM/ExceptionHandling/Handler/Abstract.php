@@ -79,7 +79,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
         }
 
         if (!$exception instanceof CM_Exception || $exception->getSeverity() >= CM_Exception::ERROR) {
-            CMService_Newrelic::getInstance()->setNoticeError($exception);
+            CM_Service_Manager::getInstance()->getNewrelic()->setNoticeError($exception);
         }
     }
 

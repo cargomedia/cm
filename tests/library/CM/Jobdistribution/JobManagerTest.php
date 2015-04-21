@@ -73,4 +73,27 @@ class CM_Jobdistribution_JobManagerTest extends CMTest_TestCase {
         $this->assertSame('foo', $file->read());
         $process->killChildren();
     }
+
+    /**
+     * @expectedException CM_Exception_InvalidParam
+     * @expectedExceptionMessage is not an instance of CM_ArrayConvertible
+     */
+    public function testVerifyParamsThrows() {
+        $nonConvertible = $this->mockObject(null);
+        $params = ['foo' => 'foo', 'object' => $nonConvertible];
+        $job = $this->mockClass('CM_Jobdistribution_Job_Abstract')->newInstance([$params]);
+
+        CMTest_TH::callProtectedMethod(new CM_Jobdistribution_JobManager(), '_convertJobToWorkload', [$job]);
+    }
+
+    public function testVerifyParams() {
+        $convertible = $this->mockInterface('CM_ArrayConvertible')->newInstance();
+        $convertible->mockMethod('toArray')->set(['property' => 'bar']);
+        $params = ['object' => $convertible];
+        $job = $this->mockClass('CM_Jobdistribution_Job_Abstract')->newInstance([$params]);
+
+        $workload = CMTest_TH::callProtectedMethod(new CM_Jobdistribution_JobManager(), '_convertJobToWorkload', [$job]);
+        $jobParams = json_decode($workload, true)['jobParams'];
+        $this->assertSame(['object' => ['property' => 'bar', '_class' => get_class($convertible)]], $jobParams);
+    }
 }

@@ -3,11 +3,12 @@
 class CM_Paging_Location_SearchTextTest extends CMTest_TestCase {
 
     public function setUp() {
-        CM_Config::get()->CM_Elasticsearch_Client->enabled = true;
+        CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(true);
     }
 
     public function tearDown() {
         (new CM_Elasticsearch_Type_Location())->getIndex()->delete();
+        CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(false);
         CMTest_TH::clearEnv();
     }
 

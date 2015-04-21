@@ -118,16 +118,24 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $this->assertContains("_kmq.push(['alias', 'Guest {$clientId}', '1']);", $html);
     }
 
-    public function testNotFoundErrorLogging() {
-        $log = new CM_Paging_Log_NotFound();
-        $this->assertCount(0, $log);
-
+    public function testProcessExceptionCatching() {
+        CM_Config::get()->CM_Http_Response_Page->exceptionsToCatch = [
+            'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => null],
+        ];
         $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
-        $response = CMTest_TH::createResponsePage('/NotExists');
-        $response->process();
+        $request = CMTest_TH::createResponsePage('/example')->getRequest();
+        $response = $this->mockObject('CM_Http_Response_Page', [$request, CMTest_TH::getServiceManager()]);
+        $response->mockMethod('_renderPage')->set(function () {
+            static $counter = 0;
+            if ($counter++ === 0) { // don't throw when rendering the error-page the request was redirected to
+                throw new CM_Exception_InvalidParam();
+            }
+        });
+        /** @var CM_Http_Response_Page $response */
 
-        $log = new CM_Paging_Log_NotFound();
-        $this->assertCount(1, $log);
+        $this->assertSame('/example', $response->getRequest()->getPath());
+        $response->process();
+        $this->assertSame('/error/not-found', $response->getRequest()->getPath());
     }
 
     /**
@@ -137,9 +145,9 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
      */
     protected function _getServiceManager($codeGoogleAnalytics, $codeKissMetrics) {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('googleanalytics', 'CMService_GoogleAnalytics_Client', [$codeGoogleAnalytics]);
-        $serviceManager->register('kissmetrics', 'CMService_KissMetrics_Client', array($codeKissMetrics));
-        $serviceManager->register('trackings', 'CM_Service_Trackings', [['googleanalytics', 'kissmetrics']]);
+        $serviceManager->registerInstance('googleanalytics', new CMService_GoogleAnalytics_Client($codeGoogleAnalytics));
+        $serviceManager->registerInstance('kissmetrics', new CMService_KissMetrics_Client($codeKissMetrics));
+        $serviceManager->registerInstance('trackings', new CM_Service_Trackings(['googleanalytics', 'kissmetrics']));
         return $serviceManager;
     }
 }

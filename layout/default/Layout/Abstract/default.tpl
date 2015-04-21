@@ -4,8 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge; requiresActiveX=true">
     {if isset($pageDescription)}<meta name="description" content="{$pageDescription|escape}">{/if}
-    {if isset($pageKeywords)}
-      <meta name="keywords" content="{$pageKeywords|escape}">{/if}
+    {if isset($pageKeywords)}<meta name="keywords" content="{$pageKeywords|escape}">{/if}
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="{$render->getSite()->getName()|escape}">
@@ -40,7 +39,7 @@
     <link rel="icon" type="image/png" href="{resourceUrl path='img/meta/favicon-96x96.png' type='layout'}" sizes="96x96">
     <link rel="icon" type="image/png" href="{resourceUrl path='img/meta/favicon-16x16.png' type='layout'}" sizes="16x16">
 
-    <link rel="manifest" href="{resourceUrl path='manifest.json' type='layout'}">
+    <link rel="manifest" href="{resourceUrl path='manifest.json' type='layout' sameOrigin=true}">
     <link rel="shortcut icon" href="{resourceUrl path='img/meta/favicon.ico' type='layout'}">
 
     <link rel="alternate" href="{$renderDefault->getUrlPage($page, $page->getParams()->getParamsEncoded())|escape}" hreflang="x-default">
@@ -55,6 +54,9 @@
     {block name='head'}{/block}
   </head>
   <body id="{$viewResponse->getAutoId()}" class="{$viewResponse->getCssClasses()|implode:' '}">
+    {capture name='pageContent'}{$renderAdapter->fetchPage()}{/capture}
+
+    {$render->getServiceManager()->getTrackings()->getHtml($render->getEnvironment())}
 
     {if CM_Http_Request_Abstract::hasInstance() && !CM_Http_Request_Abstract::getInstance()->isSupported()}
       <div id="browserNotSupported">
@@ -67,7 +69,7 @@
     {block name='body-start'}{/block}
     <div id="body-container">
       {block name='body'}
-        {$renderAdapter->fetchPage()}
+        {$smarty.capture.pageContent}
       {/block}
     </div>
     {if CM_Bootloader::getInstance()->isDebug()}{component name='CM_Component_Debug'}{/if}
@@ -77,7 +79,6 @@
       {resourceJs file="translations/{CM_Model_Language::getVersionJavascript()}.js" type="library"}
     {/if}
     {$render->getGlobalResponse()->getHtml()}
-    {$render->getServiceManager()->getTrackings()->getHtml($render->getEnvironment())}
     {block name='body-end'}{/block}
   </body>
 </html>

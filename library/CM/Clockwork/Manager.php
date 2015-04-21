@@ -37,16 +37,28 @@ class CM_Clockwork_Manager {
 
     /**
      * @param CM_Clockwork_Event $event
+     * @throws CM_Exception
      */
     public function registerEvent(CM_Clockwork_Event $event) {
+        $eventName = $event->getName();
+        $duplicateEventName = \Functional\some($this->_events, function (CM_Clockwork_Event $event) use ($eventName) {
+            return $event->getName() == $eventName;
+        });
+        if ($duplicateEventName) {
+            throw new CM_Exception('Duplicate event-name', ['name' => $eventName]);
+        }
         $this->_events[] = $event;
     }
 
     public function runEvents() {
         $process = $this->_getProcess();
         foreach ($this->_events as $event) {
-            if (!$this->_isRunning($event) && $this->_shouldRun($event)) {
-                $this->_runEvent($event);
+            if (!$this->_isRunning($event)) {
+                if ($this->_shouldRun($event)) {
+                    $this->_runEvent($event);
+                } elseif (null === $this->_storage->getLastRuntime($event) && $this->_isIntervalEvent($event)) {
+                    $this->_storage->setRuntime($event, $this->_startTime);
+                }
             }
         }
         $resultList = $process->listenForChildren();

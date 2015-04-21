@@ -227,24 +227,38 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     /**
      * @param string|null $type
      * @param string|null $path
+     * @param array|null  $options
      * @return string
      */
-    public function getUrlResource($type = null, $path = null) {
-        $url = '';
-        if (!is_null($type) && !is_null($path)) {
-            $type = (string) $type;
-            $path = (string) $path;
-            $url .= '/' . $type;
-            if ($this->getLanguage()) {
-                $url .= '/' . $this->getLanguage()->getAbbreviation();
-            }
-            $url .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getDeployVersion() . '/' . $path;
-        }
-        if ($urlCdn = $this->getSite()->getUrlCdn()) {
-            $url = $urlCdn . $url;
+    public function getUrlResource($type = null, $path = null, array $options = null) {
+        $options = array_merge([
+            'sameOrigin' => false,
+            'root'       => false,
+        ], (array) $options);
+
+        if (!$options['sameOrigin'] && $this->getSite()->getUrlCdn()) {
+            $url = $this->getSite()->getUrlCdn();
         } else {
-            $url = $this->getSite()->getUrl() . $url;
+            $url = $this->getSite()->getUrl();
         }
+
+        if (!is_null($type) && !is_null($path)) {
+            $pathParts = [];
+            $pathParts[] = (string) $type;
+            if ($this->getLanguage()) {
+                $pathParts[] = $this->getLanguage()->getAbbreviation();
+            }
+            $pathParts[] = $this->getSite()->getId();
+            $pathParts[] = CM_App::getInstance()->getDeployVersion();
+            $pathParts = array_merge($pathParts, explode('/', $path));
+
+            if ($options['root']) {
+                $url .= '/resource-' . implode('--', $pathParts);
+            } else {
+                $url .= '/' . implode('/', $pathParts);
+            }
+        }
+
         return $url;
     }
 
@@ -266,15 +280,17 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     public function getUrlStatic($path = null) {
-        $url = '/static';
+        if ($this->getSite()->getUrlCdn()) {
+            $url = $this->getSite()->getUrlCdn();
+        } else {
+            $url = $this->getSite()->getUrl();
+        }
+
+        $url .= '/static';
         if (null !== $path) {
             $url .= $path . '?' . CM_App::getInstance()->getDeployVersion();
         }
-        if ($urlCdn = $this->getSite()->getUrlCdn()) {
-            $url = $urlCdn . $url;
-        } else {
-            $url = $this->getSite()->getUrl() . $url;
-        }
+
         return $url;
     }
 

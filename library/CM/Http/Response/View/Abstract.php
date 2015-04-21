@@ -3,6 +3,12 @@
 abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract {
 
     /**
+     * @param array $output
+     * @return array
+     */
+    abstract protected function _processView(array $output);
+
+    /**
      * @param array|null $additionalParams
      */
     public function reloadComponent(array $additionalParams = null) {
@@ -145,6 +151,18 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $forceReload = (boolean) $forceReload;
         $js = 'cm.router.route(' . json_encode($url) . ', ' . json_encode($forceReload) . ');';
         $this->getRender()->getGlobalResponse()->getOnloadPrepareJs()->append($js);
+    }
+
+    protected function _process() {
+        $output = array();
+        $this->_runWithCatching(function () use (&$output) {
+            $output = $this->_processView($output);
+        }, function (CM_Exception $e, array $errorOptions) use (&$output) {
+            $output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());
+        });
+
+        $this->setHeader('Content-Type', 'application/json');
+        $this->_setContent(json_encode($output));
     }
 
     /**

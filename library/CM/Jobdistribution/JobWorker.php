@@ -55,13 +55,13 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract implements CM_Servi
      * @throws Exception
      */
     public function execute(CM_Jobdistribution_Job_Abstract $job) {
-        CMService_Newrelic::getInstance()->startTransaction('CM Job: ' . $job->getJobName());
+        CM_Service_Manager::getInstance()->getNewrelic()->startTransaction('CM Job: ' . $job->getJobName());
         try {
             $result = $job->execute();
-            CMService_Newrelic::getInstance()->endTransaction();
+            CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
             return $result;
         } catch (Exception $ex) {
-            CMService_Newrelic::getInstance()->endTransaction();
+            CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
             throw $ex;
         }
     }

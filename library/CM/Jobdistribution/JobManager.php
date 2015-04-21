@@ -101,7 +101,7 @@ class CM_Jobdistribution_JobManager implements CM_Service_ManagerAwareInterface 
      * @return GearmanClient
      * @throws CM_Exception
      */
-    protected  function _getGearmanClient() {
+    protected function _getGearmanClient() {
         if (!extension_loaded('gearman')) {
             throw new CM_Exception('Missing `gearman` extension');
         }
@@ -124,10 +124,26 @@ class CM_Jobdistribution_JobManager implements CM_Service_ManagerAwareInterface 
      * @return string
      */
     protected function _convertJobToWorkload(CM_Jobdistribution_Job_Abstract $job) {
+        $this->_verifyParams($job->getParams()->getParamsDecoded());
         $workloadParams = array(
             'jobClassName' => get_class($job),
-            'jobParams' => $job->getParams()->getParamsEncoded(),
+            'jobParams'    => $job->getParams()->getParamsEncoded(),
         );
         return CM_Params::encode($workloadParams, true);
+    }
+
+    /**
+     * @param mixed $value
+     * @throws CM_Exception_InvalidParam
+     */
+    protected function _verifyParams($value) {
+        if (is_array($value)) {
+            \Functional\each($value, function ($value) {
+                $this->_verifyParams($value);
+            });
+        }
+        if (is_object($value) && !$value instanceof CM_ArrayConvertible) {
+            throw new CM_Exception_InvalidParam('Object of class `' . get_class($value) . '` is not an instance of CM_ArrayConvertible');
+        }
     }
 }

@@ -11,11 +11,11 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
     }
 
     public function testCreate() {
-        $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
         $this->assertInstanceOf('CM_Model_Splittest', $test);
 
         try {
-            $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+            CM_Model_Splittest::create('foo', ['v1', 'v2']);
             $this->fail('Could create duplicate splittest');
         } catch (CM_Exception $e) {
             $this->assertTrue(true);
@@ -23,25 +23,45 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
     }
 
     public function testConstruct() {
-        $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
         $test2 = new CM_Model_Splittest('foo');
         $this->assertEquals($test, $test2);
     }
 
     public function testGetId() {
-        $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
         $this->assertGreaterThanOrEqual(1, $test->getId());
     }
 
     public function testGetCreated() {
         $time = time();
         /** @var CM_Model_Splittest $test */
-        $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
-        $this->assertGreaterThanOrEqual($time, $test->getCreated());
+        $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
+        $this->assertSame($time, $test->getCreated());
+    }
+
+    public function testSetCreated() {
+        $time = time();
+        /** @var CM_Model_Splittest $test */
+        $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
+        $test->setCreated($time + 10);
+        CMTest_TH::clearCache();
+        CMTest_TH::reinstantiateModel($test);
+        $this->assertSame($time + 10, $test->getCreated());
+    }
+
+    public function testSetOptimized() {
+        /** @var CM_Model_Splittest $test */
+        $test = CM_Model_Splittest::create('foo', ['v1']);
+        $this->assertSame(false, $test->getOptimized());
+        $test->setOptimized(true);
+        CMTest_TH::clearCache();
+        CMTest_TH::reinstantiateModel($test);
+        $this->assertSame(true, $test->getOptimized());
     }
 
     public function testFlush() {
-        $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
         $created = $test->getCreated();
         CMTest_TH::timeForward(1);
         $test->flush();
@@ -49,7 +69,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
     }
 
     public function testFlushVariationCache() {
-        $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
         $variation1 = new CM_Model_SplittestVariation(CM_Db_Db::select('cm_splittestVariation', 'id', ['name' => 'v1'])->fetchColumn());
         $variation2 = new CM_Model_SplittestVariation(CM_Db_Db::select('cm_splittestVariation', 'id', ['name' => 'v2'])->fetchColumn());
         $variation2->setEnabled(false);
@@ -71,13 +91,13 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
 
     public function testGetVariations() {
         /** @var CM_Model_Splittest $test */
-        $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
         $this->assertInstanceOf('CM_Paging_SplittestVariation_Splittest', $test->getVariations());
     }
 
     public function testIsVariationFixtureDisabledVariation() {
         /** @var CM_Model_Splittest_Mock $test */
-        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest_Mock::create('foo', ['v1', 'v2']);
         /** @var CM_Model_SplittestVariation $variation1 */
         $variation1 = $test->getVariations()->getItem(0);
         /** @var CM_Model_SplittestVariation $variation2 */
@@ -91,7 +111,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
     }
 
     public function testDelete() {
-        $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
         $test->delete();
         try {
             new CM_Model_Splittest($test->getId());
@@ -106,9 +126,9 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $fixture = new CM_Splittest_Fixture($user);
 
         /** @var CM_Model_Splittest_Mock $test1 */
-        $test1 = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo1', 'variations' => array('v1', 'v2')));
+        $test1 = CM_Model_Splittest_Mock::create('foo1', ['v1', 'v2']);
         /** @var CM_Model_Splittest_Mock $test2 */
-        $test2 = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo2', 'variations' => array('w1', 'w2')));
+        $test2 = CM_Model_Splittest_Mock::create('foo2', ['w1', 'w2']);
 
         $this->assertContains($test1->getVariationFixture($fixture), array('v1', 'v2'));
         $this->assertContains($test2->getVariationFixture($fixture), array('w1', 'w2'));
@@ -119,7 +139,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $fixture = new CM_Splittest_Fixture($user);
 
         /** @var CM_Model_Splittest_Mock $test */
-        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo1', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest_Mock::create('foo1', ['v1', 'v2']);
         $this->assertTrue($test->isVariationFixture($fixture, $test->getVariationFixture($fixture)));
         $this->assertFalse($test->isVariationFixture($fixture, 'noVariation'));
     }
@@ -131,7 +151,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $fixture = new CM_Splittest_Fixture($request);
 
         /** @var CM_Model_Splittest_Mock $test */
-        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo1', 'variations' => array('v1')));
+        $test = CM_Model_Splittest_Mock::create('foo1', ['v1']);
         /** @var CM_Model_SplittestVariation $variation */
         $variation = $test->getVariations()->getItem(0);
         $variation->getName(); // Fill data
@@ -141,7 +161,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
 
         $serviceManager = new CM_Service_Manager();
         $serviceManager->registerInstance('kissmetrics', $kissMetrics);
-        $serviceManager->register('trackings', 'CM_Service_Trackings', [['kissmetrics']]);
+        $serviceManager->registerInstance('trackings', new CM_Service_Trackings(['kissmetrics']));
         $test->setServiceManager($serviceManager);
 
         $test->getVariationFixture($fixture);
@@ -152,7 +172,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $fixture = new CM_Splittest_Fixture($user);
 
         /** @var CM_Model_Splittest_Mock $test */
-        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo1', 'variations' => array('v1')));
+        $test = CM_Model_Splittest_Mock::create('foo1', ['v1']);
         /** @var CM_Model_SplittestVariation $variation */
         $variation = $test->getVariations()->getItem(0);
         $variation->getName(); // Fill data
@@ -163,7 +183,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $serviceManager = new CM_Service_Manager();
         $serviceManager->registerInstance('tracking-kissmetrics-test', $kissMetrics);
         $serviceManager->unregister('trackings');
-        $serviceManager->register('trackings', 'CM_Service_Trackings', array(array('tracking-kissmetrics-test')));
+        $serviceManager->registerInstance('trackings', new CM_Service_Trackings(['tracking-kissmetrics-test']));
 
         $test->setServiceManager($serviceManager);
 
@@ -171,7 +191,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
     }
 
     public function testWeightedSplittest() {
-        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest_Mock::create('foo', ['v1', 'v2']);
         $test->setVariationWeightList(array('v1' => .3, 'v2' => .7));
         $v1 = 0;
         for ($i = 0; $i < 100; $i++) {
@@ -192,12 +212,12 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
      * @expectedExceptionMessage Empty variation weight list
      */
     public function testWeightedSplittest_empty() {
-        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest_Mock::create('foo', ['v1', 'v2']);
         $test->setVariationWeightList(array());
     }
 
     public function testWeightedSplittest_variationDisabled() {
-        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2', 'v3')));
+        $test = CM_Model_Splittest_Mock::create('foo', ['v1', 'v2', 'v3']);
         $test->getVariations()->findByName('v1')->setEnabled(false);
         $test->setVariationWeightList(array('v1' => 3, 'v2' => 7, 'v3' => 10));
         $v1 = 0;
@@ -214,7 +234,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
     }
 
     public function testWeightedSplittest_variationMissing() {
-        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2', 'v3')));
+        $test = CM_Model_Splittest_Mock::create('foo', ['v1', 'v2', 'v3']);
         $test->setVariationWeightList(array('v2' => 3, 'v3' => 7));
         $v1 = 0;
         for ($i = 0; $i < 10; $i++) {
@@ -234,7 +254,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
      * @expectedExceptionMessage `v3`
      */
     public function testWeightedSplittest_variationNonExistent() {
-        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest_Mock::create('foo', ['v1', 'v2']);
         $test->setVariationWeightList(array('v1' => 1, 'v2' => 2, 'v3' => 3));
     }
 
@@ -243,7 +263,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
      * @expectedExceptionMessage At least one enabled split test variation should have a positive weight
      */
     public function testWeightedSplittest_variationsAllDisabled() {
-        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2', 'v3')));
+        $test = CM_Model_Splittest_Mock::create('foo', ['v1', 'v2', 'v3']);
         $test->getVariations()->findByName('v1')->setEnabled(false);
         $test->getVariations()->findByName('v2')->setEnabled(false);
         $test->setVariationWeightList(array('v1' => 3, 'v2' => 7));
@@ -254,7 +274,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
      * @expectedExceptionMessage At least one enabled split test variation should have a positive weight
      */
     public function testWeightedSplittest_variationsAllZeroWeight() {
-        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest_Mock::create('foo', ['v1', 'v2']);
         $test->setVariationWeightList(array('v1' => 0, 'v2' => 0.));
     }
 
@@ -263,12 +283,12 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
      * @expectedExceptionMessage `-2`
      */
     public function testWeightedSplittest_weightNegative() {
-        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest_Mock::create('foo', ['v1', 'v2']);
         $test->setVariationWeightList(array('v1' => 1, 'v2' => -2, 'v3' => 3));
     }
 
     public function testWeightedSplittest_weightZero() {
-        $test = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+        $test = CM_Model_Splittest_Mock::create('foo', ['v1', 'v2']);
         $test->setVariationWeightList(array('v1' => 0, 'v2' => 1));
         $v1 = 0;
         for ($i = 0; $i < 10; $i++) {
@@ -292,8 +312,8 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
     }
 
     public function testOutdatedLocalCache() {
-        $test1 = CM_Model_Splittest_Mock::createStatic(array('name' => 'foo', 'variations' => range(1, 10)));
-        $test2 = CM_Model_Splittest_Mock::createStatic(array('name' => 'bar', 'variations' => range(1, 10)));
+        $test1 = CM_Model_Splittest_Mock::create('foo', range(1, 10));
+        $test2 = CM_Model_Splittest_Mock::create('bar', range(1, 10));
         $userMock = $this->getMock('CM_Model_User', array('getId'));
         $userMock->expects($this->any())->method('getId')->will($this->returnValue(mt_rand()));
         /** @var CM_Model_User $userMock */
