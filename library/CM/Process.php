@@ -201,7 +201,7 @@ class CM_Process {
     }
 
     private function _reset() {
-        $this->_terminationCallback = null;
+        $this->unbind('close');
         $this->_forkHandlerList = array();
         pcntl_signal(SIGTERM, SIG_DFL);
         pcntl_signal(SIGINT, SIG_DFL);
