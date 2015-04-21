@@ -5,12 +5,28 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
     /** @var CM_Cache_Storage_Abstract */
     protected $_storage;
 
-    public function __construct() {
-        $storageClassName = static::_getConfig()->storage;
-        if (!is_subclass_of($storageClassName, 'CM_Cache_Storage_Abstract')) {
-            throw new CM_Exception('Invalid cache storage: `' . $storageClassName . '`');
+    /** @var int */
+    protected $_lifetime;
+
+    /**
+     * @param CM_Cache_Storage_Abstract|null $storage
+     * @param int|null                       $lifetime
+     * @throws CM_Exception
+     */
+    public function __construct(CM_Cache_Storage_Abstract $storage = null, $lifetime = null) {
+        if (null === $storage) {
+            $storageClassName = static::_getConfig()->storage;
+            if (!is_subclass_of($storageClassName, 'CM_Cache_Storage_Abstract')) {
+                throw new CM_Exception('Invalid cache storage: `' . $storageClassName . '`');
+            }
+            $storage = new $storageClassName();
         }
-        $this->_storage = new $storageClassName();
+        $this->_storage = $storage;
+
+        if (null === $lifetime) {
+            $lifetime = static::_getConfig()->lifetime;
+        }
+        $this->_lifetime = (int) $lifetime;
     }
 
     /**
@@ -20,17 +36,25 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
      */
     public final function set($key, $value, $lifeTime = null) {
         if (!$lifeTime) {
-            $lifeTime = static::_getConfig()->lifetime;
+            $lifeTime = $this->_lifetime;
         }
         $this->_getStorage()->set($key, $value, $lifeTime);
     }
 
     /**
-     * @param string $key
+     * @param string       $key
+     * @param Closure|null $getter fn(string $key)
      * @return mixed|false
      */
-    public final function get($key) {
-        return $this->_getStorage()->get($key);
+    public final function get($key, Closure $getter = null) {
+        $value = $this->_getStorage()->get($key);
+        if (false === $value && null !== $getter) {
+            $value = $getter($key);
+            if (false !== $value) {
+                $this->set($key, $value);
+            }
+        }
+        return $value;
     }
 
     /**

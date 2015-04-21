@@ -1,6 +1,17 @@
 .clipSlide {
-	overflow: hidden;
+  overflow: hidden;
 }
+
 .clipSlide-handle {
-	background-color: #ffffff;
+  background-color: #ffffff;
+}
+
+.clipSlide.clipSlide-enabled {
+  position: relative;
+}
+
+.clipSlide.clipSlide-enabled .clipSlide-handle {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
 }

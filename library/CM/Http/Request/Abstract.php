@@ -495,6 +495,8 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @deprecated Singleton access to HTTP-request is unreliable and should not be used.
+     *
      * @throws CM_Exception_Invalid
      * @return CM_Http_Request_Abstract
      */
