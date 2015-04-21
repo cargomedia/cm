@@ -79,6 +79,9 @@ return function (CM_Config_Node $config) {
     $config->services['job-manager'] = array(
         'class'     => 'CM_Jobdistribution_JobManager',
         'arguments' => array(
+            array(
+                ['host' => 'localhost', 'port' => 4730],
+            )
         )
     );
 
