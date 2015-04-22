@@ -189,7 +189,7 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['stream-message'] = array(
-        'class'     => 'CM_Stream_Message',
+        'class'     => 'CM_MessageStream',
         'arguments' => array(
             'enabled' => true,
             'adapter' => array(

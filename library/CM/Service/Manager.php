@@ -197,10 +197,10 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_Stream_Message
+     * @return CM_MessageStream
      */
     public function getStreamMessage() {
-        return $this->get('stream-message', 'CM_Stream_Message');
+        return $this->get('stream-message', 'CM_MessageStream');
     }
 
     /**
