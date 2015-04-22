@@ -5,16 +5,11 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
     /** @var bool $_skipAnchors */
     private $_skipAnchors;
 
-    /** @var bool $_imgLazy */
-    private $_imgLazy;
-
     /**
      * @param bool|null $skipAnchors
-     * @param bool|null $imgLazy
      */
-    public function __construct($skipAnchors = null, $imgLazy = null) {
+    public function __construct($skipAnchors = null) {
         $this->_skipAnchors = (boolean) $skipAnchors;
-        $this->_imgLazy = (boolean) $imgLazy;
         parent::__construct();
     }
 
@@ -55,34 +50,5 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
         }
         $link_text = $matches[2];
         return $link_text;
-    }
-
-    protected function _doImages_reference_callback($matches) {
-        $key = parent::_doImages_reference_callback($matches);
-        if ($this->_imgLazy) {
-            $this->html_hashes[$key] = $this->_addLazyAttrs($this->html_hashes[$key]);
-        }
-        return $key;
-    }
-
-    protected function _doImages_inline_callback($matches) {
-        $key = parent::_doImages_inline_callback($matches);
-        if ($this->_imgLazy) {
-            $this->html_hashes[$key] = $this->_addLazyAttrs($this->html_hashes[$key]);
-        }
-        return $key;
-    }
-
-    /**
-     * @param string $tagText
-     * @return string
-     * @throws CM_Exception_Invalid
-     */
-    private function _addLazyAttrs($tagText) {
-        $tagText = preg_replace('/^<img src="([^"]+)" alt="(.+?)" \/>$/i', '<img data-src="${1}" alt="${2}" class="lazy" />', $tagText, -1, $count);
-        if (0 === $count) {
-            throw new CM_Exception_Invalid('Cannot replace img-tag `' . $tagText . '`.');
-        }
-        return $tagText;
     }
 }

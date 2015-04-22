@@ -83,10 +83,9 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
      * @param int|null $maxLength
      * @param boolean|null $skipAnchors
      * @param int|null $emoticonFixedHeight
-     * @param bool|null $imgLazy
      * @throws CM_Exception_Invalid
      */
-    protected function _setMode($mode, $maxLength = null, $skipAnchors = null, $emoticonFixedHeight = null, $imgLazy = null) {
+    protected function _setMode($mode, $maxLength = null, $skipAnchors = null, $emoticonFixedHeight = null) {
         $this->addFilter(new CM_Usertext_Filter_Badwords());
         if ('escape' != $mode) {
             $this->addFilter(new CM_Usertext_Filter_Emoticon_ReplaceAdditional());
@@ -110,7 +109,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
                 }
                 $this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
                 $this->addFilter(new CM_Usertext_Filter_Markdown_UnescapeBlockquote());
-                $this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors, $imgLazy));
+                $this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors));
                 $this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
                 $this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
                 break;
