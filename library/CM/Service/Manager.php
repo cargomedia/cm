@@ -196,6 +196,7 @@ class CM_Service_Manager extends CM_Class_Abstract {
         return $this->get('memcache', 'CM_Memcache_Client');
     }
 
+
     /**
      * @return CM_MessageStream
      */
