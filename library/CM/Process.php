@@ -2,12 +2,13 @@
 
 class CM_Process {
 
-    use CM_EventHandler_EventHandlerTrait;
-
     const RESPAWN_TIMEOUT = 10;
 
     /** @var Closure|null */
     private $_terminationCallback = null;
+
+    /** @var CM_EventHandler_EventHandler|null */
+    private $_eventHandler;
 
     /** @var CM_Process_ForkHandler[] */
     private $_forkHandlerList = array();
@@ -15,11 +16,22 @@ class CM_Process {
     /** @var int */
     private $_forkHandlerCounter = 0;
 
-    private function __construct() {
-        $this->_installSignalHandlers();
-        $this->bind('close', function() {
-            $this->killChildren();
-        });
+    /**
+     * @param string  $event
+     * @param Closure $callback
+     */
+    public function bind($event, Closure $callback) {
+        if (null === $this->_eventHandler) {
+            $this->_eventHandler = new CM_EventHandler_EventHandler();
+
+            $handler = function ($signal) {
+                $this->_eventHandler->trigger('close', $signal);
+                exit(0);
+            };
+            pcntl_signal(SIGTERM, $handler, false);
+            pcntl_signal(SIGINT, $handler, false);
+        }
+        $this->_eventHandler->bind($event, $callback);
     }
 
     /**
@@ -35,6 +47,11 @@ class CM_Process {
      * @throws CM_Exception
      */
     public function fork(Closure $workload) {
+        if (!$this->_hasForks()) {
+            $this->bind('close', function () {
+                $this->killChildren();
+            });
+        }
         $sequence = ++$this->_forkHandlerCounter;
         $this->_fork($workload, $sequence);
         return $sequence;
@@ -156,6 +173,13 @@ class CM_Process {
     }
 
     /**
+     * @return bool
+     */
+    protected function _hasForks() {
+        return count($this->_forkHandlerList) > 0;
+    }
+
+    /**
      * @param Closure $workload
      * @param int     $sequence
      * @throws CM_Exception
@@ -190,18 +214,8 @@ class CM_Process {
         }
     }
 
-    private function _installSignalHandlers() {
-        $process = $this;
-        $handler = function ($signal) use ($process) {
-            $process->trigger('close', $signal);
-            exit(0);
-        };
-        pcntl_signal(SIGTERM, $handler, false);
-        pcntl_signal(SIGINT, $handler, false);
-    }
-
     protected function _reset() {
-        $this->_callbacks = [];
+        $this->_eventHandler = null;
         $this->_forkHandlerList = array();
         pcntl_signal(SIGTERM, SIG_DFL);
         pcntl_signal(SIGINT, SIG_DFL);
