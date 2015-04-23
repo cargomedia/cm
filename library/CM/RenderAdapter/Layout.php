@@ -39,20 +39,21 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $viewResponse->set('renderDefault', $renderDefault);
         $viewResponse->set('languageList', new CM_Paging_Language_Enabled());
 
+        $serviceManager = CM_Service_Manager::getInstance();
         $options = array();
         $options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
         $options['renderStamp'] = floor(microtime(true) * 1000);
         $options['site'] = CM_Params::encode($this->getRender()->getSite());
         $options['url'] = $this->getRender()->getSite()->getUrl();
         $options['urlCdn'] = $this->getRender()->getSite()->getUrlCdn();
-        $options['urlUserContentList'] = CM_Service_Manager::getInstance()->getUserContent()->getUrlList();
+        $options['urlUserContentList'] = $serviceManager->getUserContent()->getUrlList();
         $options['language'] = $this->getRender()->getLanguage();
         $options['debug'] = CM_Bootloader::getInstance()->isDebug();
         $options['stream'] = array();
-        $options['stream']['enabled'] = CM_Service_Manager::getInstance()->getStreamMessage()->getEnabled();
-        if (CM_Service_Manager::getInstance()->getStreamMessage()->getEnabled()) {
-            $options['stream']['adapter'] = CM_Service_Manager::getInstance()->getStreamMessage()->getAdapterClass();
-            $options['stream']['options'] = CM_Service_Manager::getInstance()->getStreamMessage()->getOptions();
+        $options['stream']['enabled'] = $serviceManager->getStreamMessage()->getEnabled();
+        if ($serviceManager->getStreamMessage()->getEnabled()) {
+            $options['stream']['adapter'] = $serviceManager->getStreamMessage()->getAdapterClass();
+            $options['stream']['options'] = $serviceManager->getStreamMessage()->getOptions();
         }
         if ($viewer = $this->getRender()->getViewer()) {
             $options['stream']['channel']['key'] = CM_Model_StreamChannel_Message_User::getKeyByUser($viewer);
