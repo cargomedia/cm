@@ -25,13 +25,37 @@ class CM_Process {
             $this->_eventHandler = new CM_EventHandler_EventHandler();
 
             $handler = function ($signal) {
-                $this->_eventHandler->trigger('close', $signal);
+                $this->trigger('close', $signal);
                 exit(0);
             };
             pcntl_signal(SIGTERM, $handler, false);
             pcntl_signal(SIGINT, $handler, false);
         }
         $this->_eventHandler->bind($event, $callback);
+    }
+
+    /**
+     * @param string       $event
+     * @param Closure|null $callback
+     */
+    public function unbind($event, Closure $callback = null) {
+        if (null === $this->_eventHandler) {
+            return;
+        }
+        $this->_eventHandler->unbind($event, $callback);
+    }
+
+    /**
+     * @param string     $event
+     * @param mixed|null $param1
+     * @param mixed|null $param2
+     */
+    public function trigger($event, $param1 = null, $param2 = null) {
+        if (null === $this->_eventHandler) {
+            return;
+        }
+        $arguments = func_get_args();
+        call_user_func_array(array($this->_eventHandler, 'trigger'), $arguments);
     }
 
     /**
