@@ -191,7 +191,6 @@ return function (CM_Config_Node $config) {
     $config->services['stream-message'] = array(
         'class'     => 'CM_MessageStream_Service',
         'arguments' => array(
-            'enabled' => true,
             'adapter' => array(
                 'class' => 'CM_MessageStream_Adapter_SocketRedis',
                 'arguments'   => array(

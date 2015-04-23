@@ -2,19 +2,14 @@
 
 class CM_MessageStream_Service {
 
-    /** @var bool */
-    private $_enabled;
-
-    /** @var CM_MessageStream_Adapter_Abstract */
+    /** @var CM_MessageStream_Adapter_Abstract|null */
     private $_adapter;
 
     /**
-     * @param bool       $enabled
      * @param array|null $adapter
      * @throws CM_Exception_Invalid
      */
-    public function __construct($enabled, array $adapter = null) {
-        $this->_enabled = (bool) $enabled;
+    public function __construct(array $adapter = null) {
 
         if (null !== $adapter) {
             $reflectionClass = new ReflectionClass($adapter['class']);
@@ -29,11 +24,11 @@ class CM_MessageStream_Service {
      * @return boolean
      */
     public function getEnabled() {
-        return $this->_enabled;
+        return null !== $this->_adapter;
     }
 
     /**
-     * @return CM_MessageStream_Adapter_Abstract
+     * @return CM_MessageStream_Adapter_Abstract|null
      */
     public function getAdapter() {
         return $this->_adapter;
