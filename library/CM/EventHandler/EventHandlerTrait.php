@@ -5,7 +5,7 @@ trait CM_EventHandler_EventHandlerTrait {
     /**
      * @var array[] $_callbacks
      */
-    private $_callbacks = array();
+    protected $_callbacks = array();
 
     /**
      * @param string  $event
@@ -45,5 +45,9 @@ trait CM_EventHandler_EventHandlerTrait {
                 call_user_func_array($callback, $params);
             }
         }
+    }
+
+    protected function _unbindAll() {
+        $this->_callbacks = [];
     }
 }
