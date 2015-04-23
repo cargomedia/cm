@@ -264,19 +264,20 @@ class CM_ProcessTest extends CMTest_TestCase {
         $process->waitForChildren();
     }
 
-    public function testRegisterTerminationCallback() {
+    public function testEventHandler() {
         $counter = 0;
         $process = CM_Process::getInstance();
-        $process->trigger('close');
-        $this->assertSame(0, $counter);
-
-        $process->registerTerminationCallback(function() use (&$counter) {
+        $process->bind('foo', function() use (&$counter) {
             $counter++;
         });
-        $process->trigger('close');
+        $process->trigger('foo');
         $this->assertSame(1, $counter);
 
-        $process->trigger('close');
+        $process->trigger('foo');
+        $this->assertSame(2, $counter);
+
+        $process->unbind('foo');
+        $process->trigger('foo');
         $this->assertSame(2, $counter);
     }
 
