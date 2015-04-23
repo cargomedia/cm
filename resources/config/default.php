@@ -189,17 +189,18 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['stream-message'] = array(
-        'class'     => 'CM_MessageStream_Service',
-        'arguments' => array(
-            'adapter' => array(
-                'class' => 'CM_MessageStream_Adapter_SocketRedis',
-                'arguments'   => array(
-                    'servers' => array(
+        'class'  => 'CM_MessageStream_Factory',
+        'method' => [
+            'name'      => 'createService',
+            'arguments' => [
+                'adapterClass'     => 'CM_MessageStream_Adapter_SocketRedis',
+                'adapterArguments' => [
+                    'servers' => [
                         ['httpHost' => 'localhost', 'httpPort' => 8085, 'sockjsUrls' => ['http://localhost:8090']],
-                    ),
-                )
-            ),
-        ),
+                    ],
+                ],
+            ],
+        ]
     );
 
     $config->services['elasticsearch'] = array(

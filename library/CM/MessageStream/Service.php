@@ -6,18 +6,11 @@ class CM_MessageStream_Service {
     private $_adapter;
 
     /**
-     * @param array|null $adapter
+     * @param CM_MessageStream_Adapter_Abstract|null $adapter
      * @throws CM_Exception_Invalid
      */
-    public function __construct(array $adapter = null) {
-
-        if (null !== $adapter) {
-            $reflectionClass = new ReflectionClass($adapter['class']);
-            $this->_adapter = $reflectionClass->newInstanceArgs($adapter['arguments']);
-            if (!$this->_adapter instanceof CM_MessageStream_Adapter_Abstract) {
-                throw new CM_Exception_Invalid('Invalid stream message adapter');
-            }
-        }
+    public function __construct(CM_MessageStream_Adapter_Abstract $adapter = null) {
+        $this->_adapter = $adapter;
     }
 
     /**
