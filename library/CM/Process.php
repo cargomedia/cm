@@ -25,7 +25,7 @@ class CM_Process {
             $this->_eventHandler = new CM_EventHandler_EventHandler();
 
             $handler = function ($signal) {
-                $this->trigger('close', $signal);
+                $this->trigger('exit', $signal);
                 exit(0);
             };
             pcntl_signal(SIGTERM, $handler, false);
@@ -62,7 +62,7 @@ class CM_Process {
      * @param Closure $terminationCallback
      */
     public function registerTerminationCallback(Closure $terminationCallback) {
-        $this->bind('close', $terminationCallback);
+        $this->bind('exit', $terminationCallback);
     }
 
     /**
@@ -72,7 +72,7 @@ class CM_Process {
      */
     public function fork(Closure $workload) {
         if (!$this->_hasForks()) {
-            $this->bind('close', function () {
+            $this->bind('exit', function () {
                 $this->killChildren();
             });
         }
