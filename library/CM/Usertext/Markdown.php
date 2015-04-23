@@ -83,11 +83,17 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
      * @throws CM_Exception_Invalid
      */
     private function _addLazyAttrs($tagText) {
-        $tagText = preg_replace(
-            '/^<img src="([^"]+)" alt="(.+?)" id="img(\d+)-(\d+)" \/>$/i',
-            '<img data-src="${1}" alt="${2}" class="lazy" width="${3}" height="${4}"/>',
-            $tagText, -1, $count
-        );
+        $tagText = preg_replace_callback('/^<img src="([^"]+)" alt="(.+?)" id="img(\d+)-(\d+)" \/>$/i', function ($matches) {
+            $src = $matches[1];
+            $alt = $matches[2];
+            $width = (int) $matches[3];
+            $height = (int) $matches[4];
+            $ratio = (($height / $width) * 100) % 100;
+            $imgHtml = '<div class="embeddedWrapper" width="' . $width . '" style="padding-bottom:' . $ratio . '%;">';
+            $imgHtml .= '<img data-src="' . $src . '" alt="' . $alt . '" class="lazy embeddedWrapper-object"/>';
+            $imgHtml .= '</div>';
+            return $imgHtml;
+        }, $tagText, -1, $count);
         if (0 === $count) {
             throw new CM_Exception_Invalid('Cannot replace img-tag `' . $tagText . '`.');
         }
