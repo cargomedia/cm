@@ -28,11 +28,11 @@ class CM_MessageStream_Service {
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getAdapterClass() {
         $adapter = $this->getAdapter();
-        if (!$adapter) {
+        if (null === $adapter) {
             return null;
         }
         return get_class($adapter);
