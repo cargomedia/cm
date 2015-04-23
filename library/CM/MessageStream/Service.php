@@ -31,11 +31,10 @@ class CM_MessageStream_Service {
      * @return string|null
      */
     public function getAdapterClass() {
-        $adapter = $this->getAdapter();
-        if (null === $adapter) {
+        if (null === $this->getAdapter()) {
             return null;
         }
-        return get_class($adapter);
+        return get_class($this->getAdapter());
     }
 
     public function startSynchronization() {
@@ -56,6 +55,9 @@ class CM_MessageStream_Service {
      * @return array
      */
     public function getOptions() {
+        if (null === $this->getAdapter()) {
+            return [];
+        }
         return $this->getAdapter()->getOptions();
     }
 
