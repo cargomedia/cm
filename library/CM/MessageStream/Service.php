@@ -77,12 +77,4 @@ class CM_MessageStream_Service {
         }
         $this->getAdapter()->publish($channel, $event, CM_Params::encode($data));
     }
-
-    /**
-     * @deprecated use CM_Service_Manager::getInstance()->getStreamMessage()
-     * @return CM_MessageStream_Service
-     */
-    public static function getInstance() {
-        return CM_Service_Manager::getInstance()->getStreamMessage();
-    }
 }
