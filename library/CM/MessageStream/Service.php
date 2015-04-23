@@ -1,6 +1,6 @@
 <?php
 
-class CM_MessageStream {
+class CM_MessageStream_Service {
 
     /** @var bool */
     private $_enabled;
@@ -85,7 +85,7 @@ class CM_MessageStream {
 
     /**
      * @deprecated use CM_Service_Manager::getInstance()->getStreamMessage()
-     * @return CM_MessageStream
+     * @return CM_MessageStream_Service
      */
     public static function getInstance() {
         return CM_Service_Manager::getInstance()->getStreamMessage();
