@@ -49,12 +49,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $options['urlUserContentList'] = $serviceManager->getUserContent()->getUrlList();
         $options['language'] = $this->getRender()->getLanguage();
         $options['debug'] = CM_Bootloader::getInstance()->isDebug();
-        $options['stream'] = array();
-        $options['stream']['enabled'] = $serviceManager->getStreamMessage()->getEnabled();
-        if ($serviceManager->getStreamMessage()->getEnabled()) {
-            $options['stream']['adapter'] = $serviceManager->getStreamMessage()->getAdapterClass();
-            $options['stream']['options'] = $serviceManager->getStreamMessage()->getOptions();
-        }
+        $options['stream'] = $serviceManager->getStreamMessage()->getClientOptions();
         if ($viewer = $this->getRender()->getViewer()) {
             $options['stream']['channel']['key'] = CM_Model_StreamChannel_Message_User::getKeyByUser($viewer);
             $options['stream']['channel']['type'] = CM_Model_StreamChannel_Message_User::getTypeStatic();

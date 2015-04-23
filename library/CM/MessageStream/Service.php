@@ -27,16 +27,6 @@ class CM_MessageStream_Service {
         return $this->_adapter;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getAdapterClass() {
-        if (null === $this->getAdapter()) {
-            return null;
-        }
-        return get_class($this->getAdapter());
-    }
-
     public function startSynchronization() {
         if (!$this->getEnabled()) {
             throw new CM_Exception('Stream is not enabled');
@@ -54,11 +44,17 @@ class CM_MessageStream_Service {
     /**
      * @return array
      */
-    public function getOptions() {
-        if (null === $this->getAdapter()) {
-            return [];
+    public function getClientOptions() {
+        $options = [
+            'enabled' => $this->getEnabled(),
+        ];
+
+        $adapter = $this->getAdapter();
+        if ($adapter) {
+            $options['adapter'] = get_class($adapter);
+            $options['options'] = $adapter->getOptions();
         }
-        return $this->getAdapter()->getOptions();
+        return $options;
     }
 
     /**
