@@ -175,7 +175,9 @@ class CM_Cli_CommandManager {
                 $process->fork($workload);
             }
             $resultList = $process->waitForChildren($command->getKeepalive());
-            $this->unlockCommand($command);
+            if ($command->getSynchronized()) {
+                $this->unlockCommand($command);
+            }
             $failure = Functional\some($resultList, function (CM_Process_WorkloadResult $result) {
                 return !$result->isSuccess();
             });
