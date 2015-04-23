@@ -193,7 +193,7 @@ return function (CM_Config_Node $config) {
         'arguments' => array(
             'enabled' => true,
             'adapter' => array(
-                'class' => 'CM_Stream_Adapter_Message_SocketRedis',
+                'class' => 'CM_MessageStream_Adapter_SocketRedis',
                 'arguments'   => array(
                     'servers' => array(
                         ['httpHost' => 'localhost', 'httpPort' => 8085, 'sockjsUrls' => ['http://localhost:8090']],

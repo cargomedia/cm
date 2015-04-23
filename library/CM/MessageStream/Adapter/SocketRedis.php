@@ -1,6 +1,6 @@
 <?php
 
-class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Abstract {
+class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abstract {
 
     const SYNCHRONIZE_DELAY = 10;
 

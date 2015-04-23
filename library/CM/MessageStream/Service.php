@@ -5,7 +5,7 @@ class CM_MessageStream_Service {
     /** @var bool */
     private $_enabled;
 
-    /** @var CM_Stream_Adapter_Message_Abstract */
+    /** @var CM_MessageStream_Adapter_Abstract */
     private $_adapter;
 
     /**
@@ -19,7 +19,7 @@ class CM_MessageStream_Service {
         if (null !== $adapter) {
             $reflectionClass = new ReflectionClass($adapter['class']);
             $this->_adapter = $reflectionClass->newInstanceArgs($adapter['arguments']);
-            if (!$this->_adapter instanceof CM_Stream_Adapter_Message_Abstract) {
+            if (!$this->_adapter instanceof CM_MessageStream_Adapter_Abstract) {
                 throw new CM_Exception_Invalid('Invalid stream message adapter');
             }
         }
@@ -33,7 +33,7 @@ class CM_MessageStream_Service {
     }
 
     /**
-     * @return CM_Stream_Adapter_Message_Abstract
+     * @return CM_MessageStream_Adapter_Abstract
      */
     public function getAdapter() {
         return $this->_adapter;
