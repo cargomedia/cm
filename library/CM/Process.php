@@ -59,13 +59,6 @@ class CM_Process {
     }
 
     /**
-     * @param Closure $terminationCallback
-     */
-    public function registerTerminationCallback(Closure $terminationCallback) {
-        $this->bind('exit', $terminationCallback);
-    }
-
-    /**
      * @param Closure $workload
      * @return int
      * @throws CM_Exception
