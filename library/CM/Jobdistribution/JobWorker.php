@@ -28,7 +28,7 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract implements CM_Servi
         while (true) {
             $workFailed = false;
             try {
-                $workFailed = !$this->_getGearmanWorker()->work();
+                $workFailed = !$this->_work();
             } catch (Exception $ex) {
                 $this->_handleException($ex);
             }
@@ -67,6 +67,14 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract implements CM_Servi
     }
 
     /**
+     * @return bool
+     * @throws CM_Exception
+     */
+    protected function _work() {
+        return $this->_getGearmanWorker()->work();
+    }
+
+    /**
      * @param Exception $exception
      */
     protected function _handleException(Exception $exception) {
@@ -83,6 +91,9 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract implements CM_Servi
                 throw new CM_Exception('Missing `gearman` extension');
             }
             $gearmanWorker = new GearmanWorker();
+            if (count($this->_gearmanServers) === 0) {
+                throw new CM_Exception_Invalid('Cannot instantiate gearman worker without servers');
+            }
             foreach ($this->_gearmanServers as $server) {
                 $gearmanWorker->addServer($server['host'], $server['port']);
             }
