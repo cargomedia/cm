@@ -608,6 +608,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
+     * @deprecated Usually checking DB rows is not desired, rather test the public interface
+     *
      * @param string            $table
      * @param array|string|null $where WHERE conditions: ('attr' => 'value', 'attr2' => 'value')
      * @param int|null          $rowCount
@@ -622,6 +624,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
+     * @deprecated Usually checking DB rows is not desired, rather test the public interface
+     *
      * @param string            $table
      * @param array|string|null $where
      */
