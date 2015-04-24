@@ -2,7 +2,7 @@
 
 class CM_AdproviderAdapter_Epom extends CM_AdproviderAdapter_Abstract {
 
-    public function getHtml($zoneData, array $variables) {
+    public function getHtml($zoneName, $zoneData, array $variables) {
         $zoneId = CM_Util::htmlspecialchars($zoneData['zoneId']);
         $variables = $this->_variableKeysToUnderscore($variables);
         $variables['key'] = $zoneData['accessKey'];

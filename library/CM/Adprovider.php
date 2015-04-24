@@ -27,7 +27,7 @@ class CM_Adprovider extends CM_Class_Abstract {
         }
         $adapterClassName = (string) $zoneData['adapter'];
         unset($zoneData['adapter']);
-        return (string) $this->_getAdapter($adapterClassName)->getHtml($zoneData, $variables);
+        return (string) $this->_getAdapter($adapterClassName)->getHtml($zoneName, $zoneData, $variables);
     }
 
     /**
