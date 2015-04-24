@@ -11,7 +11,7 @@ abstract class CM_AdproviderAdapter_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param string    $zoneName
+     * @param string   $zoneName
      * @param array    $zoneData
      * @param string[] $variables
      * @return string
