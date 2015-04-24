@@ -76,12 +76,6 @@ return function (CM_Config_Node $config) {
     $config->CM_Stream_Adapter_Video_Wowza->httpPort = '8086';
     $config->CM_Stream_Adapter_Video_Wowza->wowzaPort = '1935';
 
-    $config->CM_Adprovider->enabled = true;
-    $config->CM_Adprovider->zones = array();
-
-    $config->CM_AdproviderAdapter_Abstract->class = 'CM_AdproviderAdapter_Openx';
-    $config->CM_AdproviderAdapter_Openx->host = 'www.example.dev';
-
     $config->CM_Jobdistribution_JobWorker->servers = array(array('host' => 'localhost', 'port' => 4730));
 
     $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
@@ -209,6 +203,24 @@ return function (CM_Config_Node $config) {
                 ['host' => 'localhost', 'port' => 9200]
             ),
         ),
+    );
+
+    $config->services['adprovider'] = array(
+        'class'  => 'CM_Adprovider_Factory',
+        'method' => array(
+            'name'      => 'createClient',
+            'arguments' => array(
+                'enabled'  => true,
+                'zones'    => array(
+                    'square-medium' => ['adapter' => 'CM_Adprovider_Adapter_Openx', 'zoneId' => 4],
+                ),
+                'adapters' => array(
+                    'CM_Adprovider_Adapter_Openx' => array(
+                        'host' => 'www.example.dev',
+                    )
+                )
+            )
+        )
     );
 
     $config->services['options'] = array(

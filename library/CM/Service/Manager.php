@@ -183,6 +183,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Adprovider_Client
+     */
+    public function getAdprovider() {
+        return $this->get('adprovider', 'CM_Adprovider_Client');
+    }
+
+    /**
      * @return CM_Service_UserContent
      */
     public function getUserContent() {
