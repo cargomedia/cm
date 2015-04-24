@@ -2,6 +2,10 @@
 
 class CM_Http_Response_RPCTest extends CMTest_TestCase {
 
+    protected function tearDown() {
+        CMTest_TH::clearEnv();
+    }
+
     public function testProcessExceptionCatching() {
         CM_Config::get()->CM_Http_Response_RPC->catchPublicExceptions = true;
         CM_Config::get()->CM_Http_Response_RPC->exceptionsToCatch = ['CM_Exception_Nonexistent' => []];
@@ -9,26 +13,26 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
         $request->mockMethod('getQuery')->set(function () {
             throw new CM_Exception_Invalid('foo', null, ['messagePublic' => 'bar']);
         });
-        /** @var CM_Http_Request_Abstract $response */
-        $response = new CM_Http_Response_RPC($request, CMTest_TH::getServiceManager());
+        /** @var CM_Http_Request_Abstract|\Mocka\AbstractClassTrait $request */
+        $response = new CM_Http_Response_RPC($request, $this->getServiceManager());
 
-        CMTest_TH::callProtectedMethod($response, '_process');
+        $response->process();
         $responseData = CM_Params::jsonDecode($response->getContent());
 
-        $this->assertSame(
-            ['error' =>
-                 ['type'     => 'CM_Exception_Invalid',
-                  'msg'      => 'bar',
-                  'isPublic' => true
-                 ]
-            ], $responseData);
+        $this->assertSame([
+            'error' => [
+                'type'     => 'CM_Exception_Invalid',
+                'msg'      => 'bar',
+                'isPublic' => true,
+            ]
+        ], $responseData);
 
         $request->mockMethod('getQuery')->set(function () {
             throw new CM_Exception_Nonexistent('foo');
         });
         $response = new CM_Http_Response_RPC($request, CMTest_TH::getServiceManager());
 
-        CMTest_TH::callProtectedMethod($response, '_process');
+        $response->process();
         $responseData = CM_Params::jsonDecode($response->getContent());
 
         $this->assertSame(
@@ -42,14 +46,18 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
 
     public function testProcessingWithoutMethod() {
         $request = $this->mockObject('CM_Http_Request_Abstract', ['/rpc/' . CM_Site_Abstract::factory()->getType() . '/foo']);
-        /** @var CM_Http_Request_Abstract $request */
+        /** @var CM_Http_Request_Abstract|\Mocka\AbstractClassTrait $request */
 
         $response = new CM_Http_Response_RPC($request, $this->getServiceManager());
         $response->process();
 
-        $result = CM_Params::jsonDecode($response->getContent());
-        $this->assertEquals([
-            'error' => ['type' => 'CM_Exception_InvalidParam', 'msg' => 'Internal server error', 'isPublic' => false]
-        ], $result);
+        $responseData = CM_Params::jsonDecode($response->getContent());
+        $this->assertSame([
+            'error' => [
+                'type'     => 'CM_Exception_InvalidParam',
+                'msg'      => 'Internal server error',
+                'isPublic' => false,
+            ]
+        ], $responseData);
     }
 }
