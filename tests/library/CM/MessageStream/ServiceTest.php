@@ -45,7 +45,12 @@ class CM_MessageStream_ServiceTest extends CMTest_TestCase {
             $this->assertSame('event', $event);
             $this->assertSame(['foo' => 'bar'], CM_Params::decode($data));
         });
-        $stream = new CM_MessageStream_Service($adapter);
+        /** @var CM_MessageStream_Service|\Mocka\AbstractClassTrait $stream */
+        $stream = $this->mockObject('CM_MessageStream_Service', [$adapter]);
+        $stream->publish('channel', 'event', ['foo' => 'bar']);
+        $this->assertSame(1, $publishMethod->getCallCount());
+
+        $stream->mockMethod('getEnabled')->set(false);
         $stream->publish('channel', 'event', ['foo' => 'bar']);
         $this->assertSame(1, $publishMethod->getCallCount());
     }
