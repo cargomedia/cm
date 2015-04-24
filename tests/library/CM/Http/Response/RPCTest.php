@@ -39,4 +39,17 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
                  ]
             ], $responseData);
     }
+
+    public function testProcessingWithoutMethod() {
+        $request = $this->mockObject('CM_Http_Request_Abstract', ['/rpc/' . CM_Site_Abstract::factory()->getType() . '/foo']);
+        /** @var CM_Http_Request_Abstract $request */
+
+        $response = new CM_Http_Response_RPC($request, $this->getServiceManager());
+        $response->process();
+
+        $result = CM_Params::jsonDecode($response->getContent());
+        $this->assertEquals([
+            'error' => ['type' => 'CM_Exception_InvalidParam', 'msg' => 'Internal server error', 'isPublic' => false]
+        ], $result);
+    }
 }
