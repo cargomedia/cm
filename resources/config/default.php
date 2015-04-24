@@ -63,6 +63,7 @@ return function (CM_Config_Node $config) {
     $config->CM_Http_Response_View_Abstract->catchPublicExceptions = true;
 
     $config->CM_Http_Response_RPC->exceptionsToCatch = array(
+        'CM_Exception_InvalidParam' => [],
         'CM_Exception_AuthRequired' => [],
         'CM_Exception_NotAllowed'   => [],
     );

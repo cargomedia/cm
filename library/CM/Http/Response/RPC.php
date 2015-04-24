@@ -5,15 +5,16 @@ class CM_Http_Response_RPC extends CM_Http_Response_Abstract {
     protected function _process() {
         $output = array();
         $this->_runWithCatching(function () use (&$output) {
-            $query = $this->_request->getQuery();
-            if (!isset($query['method']) || 1 != substr_count($query['method'], '.') || !preg_match('/^[\w_\.]+$/i', $query['method'])) {
-                throw new CM_Exception_Invalid('Illegal method: `' . $query['method'] . '`', null, array('severity' => CM_Exception::WARN));
+            $query = CM_Params::factory($this->_request->getQuery());
+
+            $method = $query->getString('method');
+            if (!preg_match('/^(?<class>[\w_]+)\.(?<function>[\w_]+)$/', $method, $matches)) {
+                throw new CM_Exception_InvalidParam('Illegal method: `' . $method . '`.');
             }
-            if (!isset($query['params']) || !is_array($query['params'])) {
-                throw new CM_Exception_Invalid('Illegal params', null, null, CM_Exception::WARN);
-            }
-            $params = $query['params'];
-            list($class, $function) = explode('.', $query['method']);
+            $class = $matches['class'];
+            $function = $matches['function'];
+            $params = $query->getArray('params');
+
             $output['success'] = array('result' => call_user_func_array(array($class, 'rpc_' . $function), $params));
         }, function (CM_Exception $e) use (&$output) {
             $output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());

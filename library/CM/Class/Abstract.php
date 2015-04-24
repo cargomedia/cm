@@ -42,6 +42,8 @@ abstract class CM_Class_Abstract {
     }
 
     /**
+     * @deprecated Configuration should not be accessed by class, rather register a service with configuration
+     *
      * @return stdClass
      * @throws CM_Exception_Invalid
      */
