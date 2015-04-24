@@ -8,7 +8,7 @@ class CM_Http_Response_RPC extends CM_Http_Response_Abstract {
             $query = CM_Params::factory($this->_request->getQuery());
 
             $method = $query->getString('method');
-            if (false === preg_match('/^(?<class>[\w_]+)\.(?<function>[\w_]+)$/', $method, $matches)) {
+            if (!preg_match('/^(?<class>[\w_]+)\.(?<function>[\w_]+)$/', $method, $matches)) {
                 throw new CM_Exception_InvalidParam('Illegal method: `' . $method . '`.');
             }
             $class = $matches['class'];
