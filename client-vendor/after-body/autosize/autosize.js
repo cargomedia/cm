@@ -1,5 +1,5 @@
 /*!
-	Autosize 3.0.0
+	Autosize 3.0.2
 	license: MIT
 	http://www.jacklmoore.com/autosize
 */
@@ -21,8 +21,7 @@
 	function assign(ta) {
 		if (!ta || !ta.nodeName || ta.nodeName !== 'TEXTAREA' || ta.hasAttribute('data-autosize-on')) {
 			return;
-		}var maxHeight;
-		var heightOffset;
+		}var heightOffset;
 
 		function init() {
 			var style = window.getComputedStyle(ta, null);
@@ -33,19 +32,6 @@
 				ta.style.resize = 'horizontal';
 			}
 
-			// Chrome/Safari-specific fix:
-			// When the textarea y-over is hidden, Chrome/Safari doesn't reflow the text to account for the space
-			// made available by removing the scrollbar. This workaround will cause the text to reflow.
-			var width = ta.style.width;
-			ta.style.width = '0px';
-			// Force reflow:
-			/* jshint ignore:start */
-			ta.offsetWidth;
-			/* jshint ignore:end */
-			ta.style.width = width;
-
-			maxHeight = style.maxHeight !== 'none' ? parseFloat(style.maxHeight) : false;
-
 			if (style.boxSizing === 'content-box') {
 				heightOffset = -(parseFloat(style.paddingTop) + parseFloat(style.paddingBottom));
 			} else {
@@ -55,22 +41,38 @@
 			update();
 		}
 
+		function changeOverflow(value) {
+			{
+				// Chrome/Safari-specific fix:
+				// When the textarea y-overflow is hidden, Chrome/Safari do not reflow the text to account for the space
+				// made available by removing the scrollbar. The following forces the necessary text reflow.
+				var width = ta.style.width;
+				ta.style.width = '0px';
+				// Force reflow:
+				/* jshint ignore:start */
+				ta.offsetWidth;
+				/* jshint ignore:end */
+				ta.style.width = width;
+			}
+
+			ta.style.overflowY = value;
+			update();
+		}
+
 		function update() {
 			var startHeight = ta.style.height;
 			var htmlTop = document.documentElement.scrollTop;
 			var bodyTop = document.body.scrollTop;
+			var originalHeight = ta.style.height;
 
 			ta.style.height = 'auto';
 
 			var endHeight = ta.scrollHeight + heightOffset;
 
-			if (maxHeight !== false && maxHeight < endHeight) {
-				endHeight = maxHeight;
-				if (ta.style.overflowY !== 'scroll') {
-					ta.style.overflowY = 'scroll';
-				}
-			} else if (ta.style.overflowY !== 'hidden') {
-				ta.style.overflowY = 'hidden';
+			if (ta.scrollHeight === 0) {
+				// If the scrollHeight is 0, then the element probably has display:none or is detached from the DOM.
+				ta.style.height = originalHeight;
+				return;
 			}
 
 			ta.style.height = endHeight + 'px';
@@ -79,6 +81,21 @@
 			document.documentElement.scrollTop = htmlTop;
 			document.body.scrollTop = bodyTop;
 
+			var style = window.getComputedStyle(ta, null);
+
+			if (style.height !== ta.style.height) {
+				if (ta.style.overflowY !== 'visible') {
+					changeOverflow('visible');
+					return;
+				}
+			} else {
+				if (ta.style.overflowY !== 'hidden') {
+					changeOverflow('hidden');
+					autosize();
+					return;
+				}
+			}
+
 			if (startHeight !== ta.style.height) {
 				var evt = document.createEvent('Event');
 				evt.initEvent('autosize:resized', true, false);
@@ -86,21 +103,22 @@
 			}
 		}
 
-		ta.addEventListener('autosize:destroy', (function (style) {
+		var destroy = (function (style) {
 			window.removeEventListener('resize', update);
 			ta.removeEventListener('input', update);
 			ta.removeEventListener('keyup', update);
 			ta.removeAttribute('data-autosize-on');
-			ta.removeEventListener('autosize:destroy');
+			ta.removeEventListener('autosize:destroy', destroy);
 
 			Object.keys(style).forEach(function (key) {
 				ta.style[key] = style[key];
 			});
 		}).bind(ta, {
 			height: ta.style.height,
-			overflowY: ta.style.overflowY,
-			resize: ta.style.resize
-		}));
+			resize: ta.style.resize,
+			overflowY: ta.style.overflowY });
+
+		ta.addEventListener('autosize:destroy', destroy);
 
 		// IE9 does not fire onpropertychange or oninput for deletions,
 		// so binding to onkeyup to catch most of those events.
@@ -113,7 +131,6 @@
 		ta.addEventListener('input', update);
 		ta.addEventListener('autosize:update', update);
 		ta.setAttribute('data-autosize-on', true);
-		ta.style.overflowY = 'hidden';
 		init();
 	}
 
