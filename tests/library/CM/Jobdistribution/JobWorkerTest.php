@@ -6,23 +6,24 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
         if (!extension_loaded('gearman')) {
             $this->markTestSkipped('Gearman Pecl Extension not installed.');
         }
-        $counter = 0;
-        $gearmanWorkerMock = $this->getMock('GearmanWorker', array('work'));
-        $gearmanWorkerMock->expects($this->exactly(2))->method('work')->will($this->returnCallback(function () use (&$counter) {
-            if (++$counter >= 2) {
-                return false;
-            }
-            throw new Exception('foo-bar');
-        }));
-        $jobWorkerMock = $this->getMock('CM_Jobdistribution_JobWorker', array('_getGearmanWorker', '_handleException'), array(), '', false);
-        $jobWorkerMock->expects($this->any())->method('_getGearmanWorker')->will($this->returnValue($gearmanWorkerMock));
-        $jobWorkerMock->expects($this->once())->method('_handleException')->with(new PHPUnit_Framework_Constraint_ExceptionMessage('foo-bar'));
-        /** @var CM_JobDistribution_JobWorker $jobWorkerMock */
+        $gearmanWorker = $this->mockObject('GearmanWorker');
+        $gearmanWorker->mockMethod('work')
+            ->set(false)
+            ->at(0, function() {
+                throw new Exception('foo-bar');
+            });
+        $jobWorker = $this->mockClass('CM_Jobdistribution_JobWorker')->newInstanceWithoutConstructor();
+        $jobWorker->mockMethod('_getGearmanWorker')->set($gearmanWorker);
+        $jobWorker->mockMethod('_handleException')->set(function(Exception $exception) {
+            $this->assertSame('foo-bar', $exception->getMessage());
+        });
+        /** @var CM_JobDistribution_JobWorker $jobWorker */
         try {
-            $jobWorkerMock->run();
+            $jobWorker->run();
         } catch (CM_Exception_Invalid $ex) {
             $this->assertContains('Worker failed', $ex->getMessage());
-            $this->assertSame(2, $counter);
+            $this->assertSame(2, $gearmanWorker->mockMethod('work')->getCallCount());
+            $this->assertSame(1, $jobWorker->mockMethod('_handleException')->getCallCount());
         } catch (Exception $ex) {
             $this->fail('Exception not caught.');
         }

@@ -76,6 +76,15 @@ return function (CM_Config_Node $config) {
         ),
     );
 
+    $config->services['job-manager'] = array(
+        'class'     => 'CM_Jobdistribution_JobManager',
+        'arguments' => array(
+            array(
+                ['host' => 'localhost', 'port' => 4730],
+            )
+        )
+    );
+
     $config->CMService_AwsS3Versioning_ClientTest->region = 'eu-west-1';
     $config->CMService_AwsS3Versioning_ClientTest->key = null;
     $config->CMService_AwsS3Versioning_ClientTest->secret = null;

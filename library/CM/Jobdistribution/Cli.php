@@ -6,10 +6,9 @@ class CM_Jobdistribution_Cli extends CM_Cli_Runnable_Abstract {
      * @keepalive
      */
     public function startWorker() {
-        $worker = new CM_Jobdistribution_JobWorker();
+        $worker = CM_Service_Manager::getInstance()->getJobManager()->getWorker();
         foreach (CM_Jobdistribution_Job_Abstract::getClassChildren() as $jobClassName) {
-            $job = new $jobClassName();
-            $worker->registerJob($job);
+            $worker->registerJob($jobClassName);
         }
         $worker->run();
     }

@@ -1,30 +1,34 @@
 <?php
 
-class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
+class CM_Jobdistribution_JobWorker extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var GearmanWorker */
     private $_gearmanWorker;
 
-    public function __construct() {
-        $worker = $this->_getGearmanWorker();
-        $config = self::_getConfig();
-        foreach ($config->servers as $server) {
-            $worker->addServer($server['host'], $server['port']);
-        }
+    /** @var array */
+    private $_gearmanServers;
+
+    /**
+     * @param array|null $gearmanServers
+     */
+    public function __construct(array $gearmanServers = null) {
+        $this->_gearmanServers = (array) $gearmanServers;
     }
 
     /**
-     * @param CM_Jobdistribution_Job_Abstract $job
+     * @param string $jobName
      */
-    public function registerJob(CM_Jobdistribution_Job_Abstract $job) {
-        $this->_gearmanWorker->addFunction(get_class($job), array($job, '__executeGearman'));
+    public function registerJob($jobName) {
+        $this->_getGearmanWorker()->addFunction($jobName, array($this, 'executeGearmanJob'));
     }
 
     public function run() {
         while (true) {
             $workFailed = false;
             try {
-                $workFailed = !$this->_getGearmanWorker()->work();
+                $workFailed = !$this->_work();
             } catch (Exception $ex) {
                 $this->_handleException($ex);
             }
@@ -32,6 +36,42 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
                 throw new CM_Exception_Invalid('Worker failed');
             }
         }
+    }
+
+    /**
+     * @param GearmanJob $gearmanJob
+     * @return string
+     * @throws CM_Exception_Nonexistent
+     */
+    public function executeGearmanJob(GearmanJob $gearmanJob) {
+        $job = $this->_convertGearmanJobToJob($gearmanJob);
+        $result = $this->execute($job);
+        return CM_Params::encode($result, true);
+    }
+
+    /**
+     * @param CM_Jobdistribution_Job_Abstract $job
+     * @return mixed
+     * @throws Exception
+     */
+    public function execute(CM_Jobdistribution_Job_Abstract $job) {
+        CM_Service_Manager::getInstance()->getNewrelic()->startTransaction('CM Job: ' . $job->getJobName());
+        try {
+            $result = $job->execute();
+            CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
+            return $result;
+        } catch (Exception $ex) {
+            CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
+            throw $ex;
+        }
+    }
+
+    /**
+     * @return bool
+     * @throws CM_Exception
+     */
+    protected function _work() {
+        return $this->_getGearmanWorker()->work();
     }
 
     /**
@@ -46,12 +86,41 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
      * @throws CM_Exception
      */
     protected function _getGearmanWorker() {
-        if (!$this->_gearmanWorker) {
+        if (null === $this->_gearmanWorker) {
             if (!extension_loaded('gearman')) {
                 throw new CM_Exception('Missing `gearman` extension');
             }
-            $this->_gearmanWorker = new GearmanWorker();
+            $gearmanWorker = new GearmanWorker();
+            if (count($this->_gearmanServers) === 0) {
+                throw new CM_Exception_Invalid('Cannot instantiate gearman worker without servers');
+            }
+            foreach ($this->_gearmanServers as $server) {
+                $gearmanWorker->addServer($server['host'], $server['port']);
+            }
+            $this->_gearmanWorker = $gearmanWorker;
         }
         return $this->_gearmanWorker;
+    }
+
+    /**
+     * @param GearmanJob $gearmanJob
+     * @return CM_Jobdistribution_Job_Abstract
+     * @throws CM_Exception_Invalid
+     * @throws CM_Exception_Nonexistent
+     */
+    protected function _convertGearmanJobToJob(GearmanJob $gearmanJob) {
+        $workload = $gearmanJob->workload();
+        try {
+            $workloadParams = CM_Params::jsonDecode($workload);
+        } catch (CM_Exception_Nonexistent $ex) {
+            throw new CM_Exception_Nonexistent("Cannot decode workload `{$ex->getMessage()}`, workload: `${workload}'", null, null, CM_Exception::WARN);
+        }
+        $jobClassName = $workloadParams['jobClassName'];
+        $params = $workloadParams['jobParams'];
+        $job = new $jobClassName($params);
+        if ($job instanceof CM_Service_ManagerAwareInterface) {
+            $job->setServiceManager($this->getServiceManager());
+        }
+        return $job;
     }
 }

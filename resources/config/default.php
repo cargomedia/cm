@@ -85,9 +85,6 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Jobdistribution_JobWorker->servers = array(array('host' => 'localhost', 'port' => 4730));
 
-    $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
-    $config->CM_Jobdistribution_Job_Abstract->servers = array(array('host' => 'localhost', 'port' => 4730));
-
     $config->CMService_MaxMind->licenseKey = null;
 
     $config->services = array();
@@ -192,6 +189,15 @@ return function (CM_Config_Node $config) {
     $config->services['email-verification'] = array(
         'class'     => 'CM_Service_EmailVerification_Standard',
         'arguments' => array()
+    );
+
+    $config->services['job-manager'] = array(
+        'class'     => 'CM_Jobdistribution_JobManager',
+        'arguments' => array(
+            array(
+                ['host' => 'localhost', 'port' => 4730],
+            )
+        )
     );
 
     $config->services['memcache'] = array(

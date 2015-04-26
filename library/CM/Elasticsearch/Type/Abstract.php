@@ -263,11 +263,11 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         if (!CM_Service_Manager::getInstance()->getElasticsearch()->getEnabled()) {
             return;
         }
-        $job = new CM_Elasticsearch_UpdateDocumentJob();
-        $job->queue(array(
+        $job = new CM_Elasticsearch_UpdateDocumentJob(array(
             'indexClassName' => get_called_class(),
             'id'             => static::getIdForItem($item),
         ));
+        CM_Service_Manager::getInstance()->getJobManager()->queue($job);
     }
 
     /**
