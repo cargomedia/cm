@@ -8,7 +8,7 @@ trait CM_EventHandler_EventHandlerTrait {
     private $_callbacks = array();
 
     /**
-     * @param string  $event
+     * @param string   $event
      * @param callable $callback
      */
     public function bind($event, callable $callback) {
