@@ -26,15 +26,6 @@ return function (CM_Config_Node $config) {
 
     $config->classConfigCacheEnabled = true;
 
-    $config->CM_Stream_Message->enabled = true;
-    $config->CM_Stream_Message->adapter = 'CM_Stream_Adapter_Message_SocketRedis';
-
-    $config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
-        array('httpHost' => 'localhost', 'httpPort' => 8085, 'sockjsUrls' => array(
-            'http://localhost:8090',
-        )),
-    );
-
     $config->CM_Db_Db->delayedEnabled = true;
 
     $config->CM_MongoDb_Client->batchSize = null;
@@ -63,6 +54,7 @@ return function (CM_Config_Node $config) {
     $config->CM_Http_Response_View_Abstract->catchPublicExceptions = true;
 
     $config->CM_Http_Response_RPC->exceptionsToCatch = array(
+        'CM_Exception_InvalidParam' => [],
         'CM_Exception_AuthRequired' => [],
         'CM_Exception_NotAllowed'   => [],
     );
@@ -192,6 +184,21 @@ return function (CM_Config_Node $config) {
                 ['host' => 'localhost', 'port' => 11211],
             ),
         ),
+    );
+
+    $config->services['stream-message'] = array(
+        'class'  => 'CM_MessageStream_Factory',
+        'method' => [
+            'name'      => 'createService',
+            'arguments' => [
+                'adapterClass'     => 'CM_MessageStream_Adapter_SocketRedis',
+                'adapterArguments' => [
+                    'servers' => [
+                        ['httpHost' => 'localhost', 'httpPort' => 8085, 'sockjsUrls' => ['http://localhost:8090']],
+                    ],
+                ],
+            ],
+        ]
     );
 
     $config->services['elasticsearch'] = array(

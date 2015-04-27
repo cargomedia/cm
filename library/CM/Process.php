@@ -4,8 +4,8 @@ class CM_Process {
 
     const RESPAWN_TIMEOUT = 10;
 
-    /** @var Closure|null */
-    private $_terminationCallback = null;
+    /** @var CM_EventHandler_EventHandler|null */
+    private $_eventHandler;
 
     /** @var CM_Process_ForkHandler[] */
     private $_forkHandlerList = array();
@@ -13,16 +13,46 @@ class CM_Process {
     /** @var int */
     private $_forkHandlerCounter = 0;
 
-    private function __construct() {
-        $this->_installSignalHandlers();
+    /**
+     * @param string  $event
+     * @param callable $callback
+     */
+    public function bind($event, callable $callback) {
+        if (null === $this->_eventHandler) {
+            $this->_eventHandler = new CM_EventHandler_EventHandler();
+
+            $handler = function ($signal) {
+                $this->trigger('exit', $signal);
+                exit(0);
+            };
+            pcntl_signal(SIGTERM, $handler, false);
+            pcntl_signal(SIGINT, $handler, false);
+        }
+        $this->_eventHandler->bind($event, $callback);
     }
 
-    public function executeTerminationCallback() {
-        $terminationCallback = $this->_terminationCallback;
-        if (null !== $terminationCallback) {
-            $terminationCallback();
-            $this->_terminationCallback = null;
+    /**
+     * @param string       $event
+     * @param callable|null $callback
+     */
+    public function unbind($event, callable $callback = null) {
+        if (null === $this->_eventHandler) {
+            return;
         }
+        $this->_eventHandler->unbind($event, $callback);
+    }
+
+    /**
+     * @param string     $event
+     * @param mixed|null $param1
+     * @param mixed|null $param2
+     */
+    public function trigger($event, $param1 = null, $param2 = null) {
+        if (null === $this->_eventHandler) {
+            return;
+        }
+        $arguments = func_get_args();
+        call_user_func_array(array($this->_eventHandler, 'trigger'), $arguments);
     }
 
     /**
@@ -31,6 +61,9 @@ class CM_Process {
      * @throws CM_Exception
      */
     public function fork(Closure $workload) {
+        if (!$this->_hasForks()) {
+            $this->bind('exit', [$this, 'killChildren']);
+        }
         $sequence = ++$this->_forkHandlerCounter;
         $this->_fork($workload, $sequence);
         return $sequence;
@@ -110,6 +143,9 @@ class CM_Process {
                     $forkHandler = $this->_forkHandlerList[$forkHandlerSequence];
                     $forkHandler->closeIpcStream();
                     unset($this->_forkHandlerList[$forkHandlerSequence]);
+                    if (!$this->_hasForks()) {
+                        $this->unbind('exit', [$this, 'killChildren']);
+                    }
                 }
             }
         }
@@ -117,22 +153,20 @@ class CM_Process {
 
     /**
      * @param boolean|null $keepAlive
-     * @param Closure|null $terminationCallback
      * @return CM_Process_WorkloadResult[]
      * @throws CM_Exception
      */
-    public function listenForChildren($keepAlive = null, Closure $terminationCallback = null) {
-        return $this->_wait($keepAlive, $terminationCallback, true);
+    public function listenForChildren($keepAlive = null) {
+        return $this->_wait($keepAlive, true);
     }
 
     /**
-     * @param bool|null    $keepAlive
-     * @param Closure|null $terminationCallback
+     * @param bool|null $keepAlive
      * @return CM_Process_WorkloadResult[]
      * @throws CM_Exception
      */
-    public function waitForChildren($keepAlive = null, Closure $terminationCallback = null) {
-        return $this->_wait($keepAlive, $terminationCallback, false);
+    public function waitForChildren($keepAlive = null) {
+        return $this->_wait($keepAlive, false);
     }
 
     /**
@@ -151,6 +185,13 @@ class CM_Process {
             $instance = new self();
         }
         return $instance;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _hasForks() {
+        return count($this->_forkHandlerList) > 0;
     }
 
     /**
@@ -188,34 +229,23 @@ class CM_Process {
         }
     }
 
-    private function _installSignalHandlers() {
-        $process = $this;
-        $handler = function ($signal) use ($process) {
-            $process->killChildren();
-            $process->executeTerminationCallback();
-            exit(0);
-        };
-        pcntl_signal(SIGTERM, $handler, false);
-        pcntl_signal(SIGINT, $handler, false);
-    }
-
-    private function _reset() {
-        $this->_terminationCallback = null;
+    protected function _reset() {
+        $this->_eventHandler = null;
         $this->_forkHandlerList = array();
         pcntl_signal(SIGTERM, SIG_DFL);
         pcntl_signal(SIGINT, SIG_DFL);
     }
 
     /**
-     * @param bool|null    $keepAlive
-     * @param Closure|null $terminationCallback
-     * @param boolean      $nohang
-     * @throws CM_Exception
+     * @param bool|null $keepAlive
+     * @param boolean   $nohang
      * @return CM_Process_WorkloadResult[]
+     * @throws CM_Exception
+     * @throws Exception
+     * @internal param callable|null $terminationCallback
      */
-    private function _wait($keepAlive = null, Closure $terminationCallback = null, $nohang = null) {
+    private function _wait($keepAlive = null, $nohang = null) {
         $keepAlive = (bool) $keepAlive;
-        $this->_terminationCallback = $terminationCallback;
         $workloadResultList = array();
         $waitOption = $nohang ? WNOHANG : 0;
         if (!empty($this->_forkHandlerList)) {
@@ -230,6 +260,9 @@ class CM_Process {
                     $workloadResultList[$forkHandlerSequence] = $forkHandler->receiveWorkloadResult();
                     $forkHandler->closeIpcStream();
                     unset($this->_forkHandlerList[$forkHandlerSequence]);
+                    if (!$this->_hasForks()) {
+                        $this->unbind('exit', [$this, 'killChildren']);
+                    }
                     if ($keepAlive) {
                         $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, array('severity' => CM_Exception::WARN));
                         CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
@@ -239,8 +272,6 @@ class CM_Process {
                 }
             } while (!empty($this->_forkHandlerList) && $pid > 0);
         }
-        $this->executeTerminationCallback();
-
         ksort($workloadResultList);
         return $workloadResultList;
     }

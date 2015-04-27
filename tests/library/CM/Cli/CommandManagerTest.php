@@ -231,13 +231,10 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $processMock->expects($this->any())->method('fork')->will($this->returnCallback(function ($workload) {
             $workload(new CM_Process_WorkloadResult());
         }));
-        $waitForChildrenMock = function ($keepAlive, $terminationCallback) {
-            if (isset($terminationCallback)) {
-                $terminationCallback();
-            }
+        $waitForChildrenMock = function ($keepAlive) {
             return array();
         };
-        $processMock->expects($this->any())->method('waitForChildren')->with($keepAliveExpected, $this->anything())->will($this->returnCallback($waitForChildrenMock));
+        $processMock->expects($this->any())->method('waitForChildren')->with($keepAliveExpected)->will($this->returnCallback($waitForChildrenMock));
         return $processMock;
     }
 

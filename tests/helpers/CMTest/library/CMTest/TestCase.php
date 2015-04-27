@@ -546,6 +546,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @param string|null                $msg
      */
     public static function assertFormResponseSuccess(CM_Http_Response_View_Form $response, $msg = null) {
+        self::assertViewResponseSuccess($response);
         $responseContent = json_decode($response->getContent(), true);
         self::assertFalse($response->hasErrors(), 'Response has errors.');
         if (null !== $msg) {
@@ -560,6 +561,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @param string|null                $formFieldName
      */
     public static function assertFormResponseError(CM_Http_Response_View_Form $response, $errorMsg = null, $formFieldName = null) {
+        self::assertViewResponseSuccess($response);
         $responseContent = json_decode($response->getContent(), true);
         self::assertTrue($response->hasErrors());
         if (null !== $errorMsg) {
@@ -606,6 +608,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
+     * @deprecated Usually checking DB rows is not desired, rather test the public interface
+     *
      * @param string            $table
      * @param array|string|null $where WHERE conditions: ('attr' => 'value', 'attr2' => 'value')
      * @param int|null          $rowCount
@@ -620,6 +624,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
+     * @deprecated Usually checking DB rows is not desired, rather test the public interface
+     *
      * @param string            $table
      * @param array|string|null $where
      */
