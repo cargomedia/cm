@@ -17,9 +17,10 @@ function smarty_function_usertext($params, Smarty_Internal_Template $template) {
     $maxLength = isset($params['maxLength']) ? (int) $params['maxLength'] : null;
     $isMail = isset($params['isMail']) ? (bool) $params['isMail'] : null;
     $skipAnchors = isset($params['skipAnchors']) ? (bool) $params['skipAnchors'] : null;
+    $allowBadwords = isset($params['allowBadwords']) ? (bool) $params['allowBadwords'] : null;
 
     $usertext = CM_Usertext_Usertext::factory($render);
-    $usertext->setMode($mode, $maxLength, $isMail, $skipAnchors);
+    $usertext->setMode($mode, $maxLength, $isMail, $skipAnchors, $allowBadwords);
 
     $text = $usertext->transform($text);
 

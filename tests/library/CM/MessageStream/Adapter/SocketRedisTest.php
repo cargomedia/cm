@@ -1,23 +1,22 @@
 <?php
 
-class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
+class CM_MessageStream_Adapter_SocketRedisTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
     }
 
     public function testGetOptions() {
-        CM_Config::get()->CM_Stream_Adapter_Message_SocketRedis->servers = array(
+        $adapter = new CM_MessageStream_Adapter_SocketRedis(array(
             array('httpHost' => 'foo', 'httpPort' => 8085, 'sockjsUrls' => array('http://stream:8090'))
-        );
-        $adapter = new CM_Stream_Adapter_Message_SocketRedis();
+        ));
         $options = $adapter->getOptions();
         $this->assertArrayHasKey('sockjsUrl', $options);
         $this->assertSame('http://stream:8090', $options['sockjsUrl']);
     }
 
     public function testOnRedisMessageSubscribe() {
-        $adapter = new CM_Stream_Adapter_Message_SocketRedis();
+        $adapter = new CM_MessageStream_Adapter_SocketRedis([]);
         $message = array('type' => 'subscribe',
                          'data' => array('channel' => 'foo:' . CM_Model_StreamChannel_Message::getTypeStatic(), 'clientKey' => 'bar',
                                          'data'    => array()));
@@ -35,7 +34,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
         $this->assertSameTime($streamChannel->canSubscribe(null, time()), $streamSubscribe->getAllowedUntil());
         $this->assertNull($streamSubscribe->getUser());
 
-        CMTest_TH::timeForward(CM_Stream_Adapter_Message_SocketRedis::SYNCHRONIZE_DELAY);
+        CMTest_TH::timeForward(CM_MessageStream_Adapter_SocketRedis::SYNCHRONIZE_DELAY);
         $adapter->onRedisMessage(json_encode($message));
         $streamChannels = new CM_Paging_StreamChannel_AdapterType($adapter->getType());
         $this->assertSame(1, $streamChannels->getCount());
@@ -46,7 +45,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
     }
 
     public function testOnRedisMessageSubscribeUser() {
-        $adapter = new CM_Stream_Adapter_Message_SocketRedis();
+        $adapter = new CM_MessageStream_Adapter_SocketRedis([]);
         $user = CMTest_TH::createUser();
         $session = new CM_Session();
         $session->setUser($user);
@@ -62,7 +61,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
     }
 
     public function testOnRedisMessageSubscribeSessionInvalid() {
-        $adapter = new CM_Stream_Adapter_Message_SocketRedis();
+        $adapter = new CM_MessageStream_Adapter_SocketRedis([]);
         $message = array('type' => 'subscribe',
                          'data' => array('channel' => 'foo:' . CM_Model_StreamChannel_Message::getTypeStatic(), 'clientKey' => 'bar',
                                          'data'    => array('sessionId' => 'foo')));
@@ -74,7 +73,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
     }
 
     public function testOnRedisMessageUnsubscribe() {
-        $adapter = new CM_Stream_Adapter_Message_SocketRedis();
+        $adapter = new CM_MessageStream_Adapter_SocketRedis([]);
         $streamChannel = CM_Model_StreamChannel_Message::createStatic(array('key' => 'foo', 'adapterType' => $adapter->getType()));
         CM_Model_Stream_Subscribe::createStatic(array('key' => 'foo', 'streamChannel' => $streamChannel, 'start' => time()));
         CM_Model_Stream_Subscribe::createStatic(array('key' => 'bar', 'streamChannel' => $streamChannel, 'start' => time()));
@@ -95,7 +94,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
     }
 
     public function testSynchronize() {
-        $jsTime = (time() - CM_Stream_Adapter_Message_SocketRedis::SYNCHRONIZE_DELAY - 1) * 1000;
+        $jsTime = (time() - CM_MessageStream_Adapter_SocketRedis::SYNCHRONIZE_DELAY - 1) * 1000;
         for ($i = 0; $i < 2; $i++) {
             $status = array(
                 'channel-foo:' . CM_Model_StreamChannel_Message::getTypeStatic() => array('subscribers' => array(
@@ -124,9 +123,9 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
                 'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
             ))
         );
-        $adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus'))->getMock();
-        $adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
-        /** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
+        $adapter = $this->mockClass('CM_MessageStream_Adapter_SocketRedis')->newInstanceWithoutConstructor();
+        $adapter->mockMethod('_fetchStatus')->set($status);
+        /** @var $adapter CM_MessageStream_Adapter_SocketRedis */
         $adapter->synchronize();
 
         $this->assertNull(CM_Model_StreamChannel_Message::findByKeyAndAdapter('channel-foo', $adapter->getType()));
@@ -135,26 +134,30 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
     }
 
     public function testSynchronizeInvalidType() {
-        $jsTime = (time() - CM_Stream_Adapter_Message_SocketRedis::SYNCHRONIZE_DELAY - 1) * 1000;
+        $jsTime = (time() - CM_MessageStream_Adapter_SocketRedis::SYNCHRONIZE_DELAY - 1) * 1000;
         $status = array(
             'channel-foo:invalid-type' => array('subscribers' => array(
                 'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
             ))
         );
-        $adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus', '_handleException'))->getMock();
-        $adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
-        $adapter->expects($this->once())->method('_handleException')->with(new PHPUnit_Framework_Constraint_ExceptionMessage('Type `0` not configured for class `CM_Model_StreamChannel_Message`.'));
-        /** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
+
+        $adapter = $this->mockClass('CM_MessageStream_Adapter_SocketRedis')->newInstanceWithoutConstructor();
+        $adapter->mockMethod('_fetchStatus')->set($status);
+        $handleExceptionMethod = $adapter->mockMethod('_handleException')->set(function (Exception $exception) {
+            $this->assertSame('Type `0` not configured for class `CM_Model_StreamChannel_Message`.', $exception->getMessage());
+        });
+        /** @var $adapter CM_MessageStream_Adapter_SocketRedis */
         $adapter->synchronize();
+        $this->assertSame(1, $handleExceptionMethod->getCallCount());
     }
 
     /**
      * @param array $status
      */
     private function _testSynchronize($status) {
-        $adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus'))->getMock();
+        $adapter = $this->getMockBuilder('CM_MessageStream_Adapter_SocketRedis')->disableOriginalConstructor()->setMethods(array('_fetchStatus'))->getMock();
         $adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
-        /** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
+        /** @var $adapter CM_MessageStream_Adapter_SocketRedis */
         $adapter->synchronize();
 
         $streamChannels = new CM_Paging_StreamChannel_AdapterType($adapter->getType());
@@ -172,7 +175,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
             foreach ($channelData['subscribers'] as $clientKey => $subscriberData) {
                 $subscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel($clientKey, $streamChannel);
                 $this->assertInstanceOf('CM_Model_Stream_Subscribe', $subscribe);
-                $this->assertSameTime(time() - CM_Stream_Adapter_Message_SocketRedis::SYNCHRONIZE_DELAY - 1, $subscribe->getStart());
+                $this->assertSameTime(time() - CM_MessageStream_Adapter_SocketRedis::SYNCHRONIZE_DELAY - 1, $subscribe->getStart());
                 $this->assertSameTime($streamChannel->canSubscribe(null, time()), $subscribe->getAllowedUntil());
             }
         }

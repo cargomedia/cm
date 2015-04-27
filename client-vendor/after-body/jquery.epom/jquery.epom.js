@@ -21,7 +21,7 @@
 
   $.fn.epom = function() {
     return this.each(function() {
-      var zoneId = $(this).data('zone-id');
+      var zoneName = $(this).data('zone-name');
       var variables = $(this).data('variables');
       var src = (location.protocol == 'https:' ? 'https:' : 'http:') + '//n181adserv.com\/ads-api';
       var $element = $(this);
@@ -34,12 +34,12 @@
 
           if (hasContent) {
             $element.addClass('advertisement-hasContent');
-            trackEvent('Banner', 'Impression', 'zone-' + zoneId);
+            trackEvent('Banner', 'Impression', 'zone-' + zoneName);
             var $link = $element.find('a[href]');
             if ($element.is(':visible') && $link.length > 0) {
-              trackEvent('Banner', 'Impression-Clickable', 'zone-' + zoneId);
+              trackEvent('Banner', 'Impression-Clickable', 'zone-' + zoneName);
               $link.on('click', function() {
-                trackEvent('Banner', 'Click', 'zone-' + zoneId);
+                trackEvent('Banner', 'Click', 'zone-' + zoneName);
               });
             }
           }
