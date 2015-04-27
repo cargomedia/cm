@@ -27,10 +27,10 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
      * @param int|null  $maxLength
      * @param bool|null $isMail
      * @param bool|null $skipAnchors
-     * @param bool|null $imgLazy
+     * @param bool|null $imgDimensions
      * @throws CM_Exception_Invalid
      */
-    public function setMode($mode, $maxLength = null, $isMail = null, $skipAnchors = null, $imgLazy = null) {
+    public function setMode($mode, $maxLength = null, $isMail = null, $skipAnchors = null, $imgDimensions = null) {
         $acceptedModes = array('escape', 'oneline', 'simple', 'markdown', 'markdownPlain');
         if (!in_array($mode, $acceptedModes)) {
             throw new CM_Exception_Invalid('Invalid mode `' . $mode . '`');
@@ -41,7 +41,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
         if ($isMail) {
             $emoticonFixedHeight = 16;
         }
-        $this->_setMode($mode, $maxLength, $skipAnchors, $emoticonFixedHeight, $imgLazy);
+        $this->_setMode($mode, $maxLength, $skipAnchors, $emoticonFixedHeight, $imgDimensions);
     }
 
     /**
@@ -83,10 +83,10 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
      * @param int|null $maxLength
      * @param boolean|null $skipAnchors
      * @param int|null $emoticonFixedHeight
-     * @param bool|null $imgLazy
+     * @param bool|null $imgDimensions
      * @throws CM_Exception_Invalid
      */
-    protected function _setMode($mode, $maxLength = null, $skipAnchors = null, $emoticonFixedHeight = null, $imgLazy = null) {
+    protected function _setMode($mode, $maxLength = null, $skipAnchors = null, $emoticonFixedHeight = null, $imgDimensions = null) {
         $this->addFilter(new CM_Usertext_Filter_Badwords());
         if ('escape' != $mode) {
             $this->addFilter(new CM_Usertext_Filter_Emoticon_ReplaceAdditional());
@@ -110,7 +110,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
                 }
                 $this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
                 $this->addFilter(new CM_Usertext_Filter_Markdown_UnescapeBlockquote());
-                $this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors, $imgLazy));
+                $this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors, $imgDimensions));
                 $this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
                 $this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
                 break;

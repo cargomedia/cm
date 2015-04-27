@@ -8,16 +8,16 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
     /** @var bool $_skipAnchors */
     private $_skipAnchors;
 
-    /** @var bool $_imgLazy */
-    private $_imgLazy;
+    /** @var bool $_imgDimensions */
+    private $_imgDimensions;
 
     /**
      * @param bool|null $skipAnchors
-     * @param bool|null $imgLazy
+     * @param bool|null $imgDimensions
      */
-    public function __construct($skipAnchors = null, $imgLazy = null) {
+    public function __construct($skipAnchors = null, $imgDimensions = null) {
         $this->_skipAnchors = (boolean) $skipAnchors;
-        $this->_imgLazy = (boolean) $imgLazy;
+        $this->_imgDimensions = (boolean) $imgDimensions;
         parent::__construct();
     }
 
@@ -62,8 +62,8 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
 
     protected function _doImages_reference_callback($matches) {
         $key = parent::_doImages_reference_callback($matches);
-        if ($this->_imgLazy) {
-            $this->html_hashes[$key] = $this->_addLazyAttrs($this->html_hashes[$key]);
+        if ($this->_imgDimensions) {
+            $this->html_hashes[$key] = $this->_addDimensions($this->html_hashes[$key]);
         }
         return $key;
     }
@@ -81,8 +81,8 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
 
     protected function _doImages_inline_callback($matches) {
         $key = parent::_doImages_inline_callback($matches);
-        if ($this->_imgLazy) {
-            $this->html_hashes[$key] = $this->_addLazyAttrs($this->html_hashes[$key]);
+        if ($this->_imgDimensions) {
+            $this->html_hashes[$key] = $this->_addDimensions($this->html_hashes[$key]);
         }
         return $key;
     }
@@ -92,15 +92,16 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
      * @return string
      * @throws CM_Exception_Invalid
      */
-    private function _addLazyAttrs($tagText) {
-        $tagText = preg_replace_callback('/^<img src="([^"]+)" alt="(.+?)" width="(\d+)" height="(\d+)" \/>$/i', function ($matches) {
+    private function _addDimensions($tagText) {
+        $tagText = preg_replace_callback('/^<img src="([^"]+)" alt="(.+?)" (?:class="([^"]+)") width="(\d+)" height="(\d+)" \/>$/i', function ($matches) {
             $src = $matches[1];
             $alt = $matches[2];
-            $width = (int) $matches[3];
-            $height = (int) $matches[4];
+            $class = $matches[3];
+            $width = (int) $matches[4];
+            $height = (int) $matches[5];
             $ratio = (($height / $width) * 100) % 100;
             $imgHtml = '<div class="embeddedWrapper" width="' . $width . '" style="padding-bottom:' . $ratio . '%;">';
-            $imgHtml .= '<img data-src="' . $src . '" alt="' . $alt . '" class="lazy embeddedWrapper-object"/>';
+            $imgHtml .= '<img data-src="' . $src . '" alt="' . $alt . '" class="' . $class . ' embeddedWrapper-object"/>';
             $imgHtml .= '</div>';
             return $imgHtml;
         }, $tagText, -1, $count);

@@ -17,10 +17,10 @@ function smarty_function_usertext($params, Smarty_Internal_Template $template) {
     $maxLength = isset($params['maxLength']) ? (int) $params['maxLength'] : null;
     $isMail = isset($params['isMail']) ? (bool) $params['isMail'] : null;
     $skipAnchors = isset($params['skipAnchors']) ? (bool) $params['skipAnchors'] : null;
-    $imgLazy = isset($params['imgLazy']) ? (bool) $params['imgLazy'] : null;
+    $imgDimensions = isset($params['imgLazy']) ? (bool) $params['imgLazy'] : null;
 
     $usertext = CM_Usertext_Usertext::factory($render);
-    $usertext->setMode($mode, $maxLength, $isMail, $skipAnchors, $imgLazy);
+    $usertext->setMode($mode, $maxLength, $isMail, $skipAnchors, $imgDimensions);
 
     $text = $usertext->transform($text);
 
