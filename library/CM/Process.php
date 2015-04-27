@@ -4,9 +4,6 @@ class CM_Process {
 
     const RESPAWN_TIMEOUT = 10;
 
-    /** @var Closure|null */
-    private $_terminationCallback = null;
-
     /** @var CM_EventHandler_EventHandler|null */
     private $_eventHandler;
 
