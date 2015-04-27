@@ -18,9 +18,9 @@ class CM_Process {
 
     /**
      * @param string  $event
-     * @param Closure $callback
+     * @param callable $callback
      */
-    public function bind($event, Closure $callback) {
+    public function bind($event, callable $callback) {
         if (null === $this->_eventHandler) {
             $this->_eventHandler = new CM_EventHandler_EventHandler();
 
@@ -36,9 +36,9 @@ class CM_Process {
 
     /**
      * @param string       $event
-     * @param Closure|null $callback
+     * @param callable|null $callback
      */
-    public function unbind($event, Closure $callback = null) {
+    public function unbind($event, callable $callback = null) {
         if (null === $this->_eventHandler) {
             return;
         }
@@ -65,9 +65,7 @@ class CM_Process {
      */
     public function fork(Closure $workload) {
         if (!$this->_hasForks()) {
-            $this->bind('exit', function () {
-                $this->killChildren();
-            });
+            $this->bind('exit', [$this, 'killChildren']);
         }
         $sequence = ++$this->_forkHandlerCounter;
         $this->_fork($workload, $sequence);
@@ -262,6 +260,9 @@ class CM_Process {
                     $workloadResultList[$forkHandlerSequence] = $forkHandler->receiveWorkloadResult();
                     $forkHandler->closeIpcStream();
                     unset($this->_forkHandlerList[$forkHandlerSequence]);
+                    if (!$this->_hasForks()) {
+                        $this->unbind('exit', [$this, 'killChildren']);
+                    }
                     if ($keepAlive) {
                         $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, array('severity' => CM_Exception::WARN));
                         CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);

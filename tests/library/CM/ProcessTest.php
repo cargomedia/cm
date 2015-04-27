@@ -200,6 +200,28 @@ class CM_ProcessTest extends CMTest_TestCase {
         $this->assertCount(0, $this->_getChildrenPidList());
     }
 
+    public function testKillChildrenOnExit() {
+        $loopEcho = function () {
+            usleep(50000);
+        };
+
+        $process = $this->mockObject('CM_Process');
+        $killChildrenMethod = $process->mockMethod('killChildren');
+        /** @var CM_Process $process */
+        $this->assertSame(0, $killChildrenMethod->getCallCount());
+
+        $process->trigger('exit');
+        $this->assertSame(0, $killChildrenMethod->getCallCount());
+
+        $process->fork($loopEcho);
+        $process->trigger('exit');
+        $this->assertSame(1, $killChildrenMethod->getCallCount());
+
+        $process->waitForChildren();
+        $process->trigger('exit');
+        $this->assertSame(1, $killChildrenMethod->getCallCount());
+    }
+
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
