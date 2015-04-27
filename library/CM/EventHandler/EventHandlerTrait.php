@@ -9,9 +9,9 @@ trait CM_EventHandler_EventHandlerTrait {
 
     /**
      * @param string  $event
-     * @param closure $callback
+     * @param callable $callback
      */
-    public function bind($event, Closure $callback) {
+    public function bind($event, callable $callback) {
         $event = (string) $event;
         $this->_callbacks[$event][] = $callback;
     }
