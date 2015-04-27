@@ -23,7 +23,7 @@ class CM_Usertext_Filter_MarkdownTest extends CMTest_TestCase {
     public function testProcessWithImgLazy() {
         $text = "#Headline#\n * element1\n * element1\n\nparagraph\n\nfoo_bar_foo\nfoo _bar_ foo\nLink: [google.com](http://www.google.com)\ntest2\n![Img text](/path/to/img.jpg){.lazy \$200x100}";
         $expected = "<h1>Headline</h1>\n<ul>\n<li>element1</li>\n<li>element1</li>\n</ul>\n<p>paragraph</p>\n<p>foo_bar_foo</p>\n<p>foo <em>bar</em> foo</p>\n<p>Link: <a href=\"http://www.google.com\">google.com</a></p>\n<p>test2</p>\n<p><div class=\"embeddedWrapper\" width=\"200\" style=\"padding-bottom:50%;\"><img data-src=\"/path/to/img.jpg\" alt=\"Img text\" title=\"\" class=\"lazy embeddedWrapper-object\"/></div></p>\n";
-        $filter = new CM_Usertext_Filter_Markdown(null, true);
+        $filter = new CM_Usertext_Filter_Markdown(null);
         $actual = $filter->transform($text, new CM_Frontend_Render());
 
         $this->assertSame($expected, $actual);

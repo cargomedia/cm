@@ -340,7 +340,26 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('.openx-ad:visible').openx();
       $dom.find('.epom-ad').epom();
       $dom.find('.fancySelect').fancySelect();
+      this._setupLazyImages($dom);
     },
+
+    /**
+     * @param {jQuery} $dom
+     */
+    _setupLazyImages: function($dom) {
+      $dom.find('.clipSlide').on('toggle.clipSlide', function() {
+        $(this).find('img.lazy:gt(0)').unveil(600);
+      });
+
+      var $hiddenImageList = $();
+      $dom.find('.clipSlide').each(function() {
+        var $imageList = $(this).find('img.lazy:gt(0)');
+        $hiddenImageList = $hiddenImageList.add($imageList);
+      });
+
+      $dom.find('img.lazy').not($hiddenImageList).unveil(600);
+    },
+
     /**
      * @param {jQuery} $dom
      */
