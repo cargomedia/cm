@@ -143,6 +143,9 @@ class CM_Process {
                     $forkHandler = $this->_forkHandlerList[$forkHandlerSequence];
                     $forkHandler->closeIpcStream();
                     unset($this->_forkHandlerList[$forkHandlerSequence]);
+                    if (!$this->_hasForks()) {
+                        $this->unbind('exit', [$this, 'killChildren']);
+                    }
                 }
             }
         }
