@@ -4,7 +4,8 @@ class CM_EventHandler_EventHandlerTraitTest extends CMTest_TestCase {
 
     public function testBind() {
         $counter = 0;
-        $eventHandler = new CM_EventHandler_EventHandler();
+        $eventHandler = $this->mockTrait('CM_EventHandler_EventHandlerTrait')->newInstance();
+        /** @var CM_EventHandler_EventHandlerTrait $eventHandler */
         $eventHandler->bind('foo', function ($value) use (&$counter) {
             $counter += $value;
         });
@@ -24,7 +25,8 @@ class CM_EventHandler_EventHandlerTraitTest extends CMTest_TestCase {
      * @expectedExceptionMessage Missing argument 1
      */
     public function testBindMissingArguments() {
-        $eventHandler = new CM_EventHandler_EventHandler();
+        $eventHandler = $this->mockTrait('CM_EventHandler_EventHandlerTrait')->newInstance();
+        /** @var CM_EventHandler_EventHandlerTrait $eventHandler */
         $eventHandler->bind('foo', function ($requiredArgument) {
             // Do nothing
         });
@@ -33,7 +35,8 @@ class CM_EventHandler_EventHandlerTraitTest extends CMTest_TestCase {
 
     public function testUnbind() {
         $counter = 0;
-        $eventHandler = new CM_EventHandler_EventHandler();
+        $eventHandler = $this->mockTrait('CM_EventHandler_EventHandlerTrait')->newInstance();
+        /** @var CM_EventHandler_EventHandlerTrait $eventHandler */
         $callback = function () use (&$counter) {
             $counter++;
         };
@@ -53,7 +56,8 @@ class CM_EventHandler_EventHandlerTraitTest extends CMTest_TestCase {
 
     public function testUnbindAll() {
         $counter = 0;
-        $eventHandler = new CM_EventHandler_EventHandler();
+        $eventHandler = $this->mockTrait('CM_EventHandler_EventHandlerTrait')->newInstance();
+        /** @var CM_EventHandler_EventHandlerTrait $eventHandler */
         $eventHandler->bind('foo', function () use (&$counter) {
             $counter++;
         });
