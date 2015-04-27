@@ -2,6 +2,9 @@
 
 class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
 
+    protected $id_class_attr_catch_re = '\{((?:[ ]*[#.][-_:a-zA-Z0-9]+){0,2}(?:[ ]*\$[\d]+x[\d]+))[ ]*\}';
+    protected $id_class_attr_nocatch_re = '\{(?:[ ]*[#.][-_:a-zA-Z0-9]+){0,2}(?:[ ]*\$[\d]+x[\d]+)[ ]*\}';
+
     /** @var bool $_skipAnchors */
     private $_skipAnchors;
 
@@ -61,18 +64,25 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
         $key = parent::_doImages_reference_callback($matches);
         if ($this->_imgLazy) {
             $this->html_hashes[$key] = $this->_addLazyAttrs($this->html_hashes[$key]);
-        } else {
-            $this->html_hashes[$key] = $this->_deleteHiddenDimensionAttrs($this->html_hashes[$key]);
         }
         return $key;
+    }
+
+    protected function doExtraAttributes($tag_name, $attr) {
+        $extraAttrs = parent::doExtraAttributes($tag_name, $attr);
+        if ('img' == $tag_name) {
+            preg_match_all('/\$(\d+)x(\d+)/', $attr, $matches);
+            if ($matches[1] && $matches[2]) {
+                $extraAttrs .= ' width="' . $matches[1][0] . '" height="' . $matches[2][0] . '"';
+            }
+        }
+        return $extraAttrs;
     }
 
     protected function _doImages_inline_callback($matches) {
         $key = parent::_doImages_inline_callback($matches);
         if ($this->_imgLazy) {
             $this->html_hashes[$key] = $this->_addLazyAttrs($this->html_hashes[$key]);
-        } else {
-            $this->html_hashes[$key] = $this->_deleteHiddenDimensionAttrs($this->html_hashes[$key]);
         }
         return $key;
     }
@@ -83,7 +93,7 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
      * @throws CM_Exception_Invalid
      */
     private function _addLazyAttrs($tagText) {
-        $tagText = preg_replace_callback('/^<img src="([^"]+)" alt="(.+?)" id="img(\d+)-(\d+)" \/>$/i', function ($matches) {
+        $tagText = preg_replace_callback('/^<img src="([^"]+)" alt="(.+?)" width="(\d+)" height="(\d+)" \/>$/i', function ($matches) {
             $src = $matches[1];
             $alt = $matches[2];
             $width = (int) $matches[3];
@@ -98,14 +108,5 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
             throw new CM_Exception_Invalid('Cannot replace img-tag `' . $tagText . '`.');
         }
         return $tagText;
-    }
-
-    /**
-     * @param string $tagText
-     * @return string
-     * @throws CM_Exception_Invalid
-     */
-    private function _deleteHiddenDimensionAttrs($tagText) {
-        return preg_replace('#id="img\d+-\d+"#im', '', $tagText, -1);
     }
 }
