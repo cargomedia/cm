@@ -200,6 +200,10 @@ class CM_ProcessTest extends CMTest_TestCase {
         $this->assertCount(0, $this->_getChildrenPidList());
     }
 
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function testKillChildrenOnExit() {
         $loopEcho = function () {
             usleep(50000);
@@ -213,13 +217,20 @@ class CM_ProcessTest extends CMTest_TestCase {
         $process->trigger('exit');
         $this->assertSame(0, $killChildrenMethod->getCallCount());
 
+        // Bind killChildren
         $process->fork($loopEcho);
         $process->trigger('exit');
         $this->assertSame(1, $killChildrenMethod->getCallCount());
 
+        // Unbind killChildren
         $process->waitForChildren();
         $process->trigger('exit');
         $this->assertSame(1, $killChildrenMethod->getCallCount());
+
+        // Rebind killChildren
+        $process->fork($loopEcho);
+        $process->trigger('exit');
+        $this->assertSame(2, $killChildrenMethod->getCallCount());
     }
 
     /**
