@@ -5,13 +5,13 @@ trait CM_EventHandler_EventHandlerTrait {
     /**
      * @var array[] $_callbacks
      */
-    protected $_callbacks = array();
+    private $_callbacks = array();
 
     /**
      * @param string  $event
-     * @param closure $callback
+     * @param callable $callback
      */
-    public function bind($event, Closure $callback) {
+    public function bind($event, callable $callback) {
         $event = (string) $event;
         $this->_callbacks[$event][] = $callback;
     }
@@ -20,7 +20,7 @@ trait CM_EventHandler_EventHandlerTrait {
      * @param string        $event
      * @param callable|null $callback
      */
-    public function unbind($event, Closure $callback = null) {
+    public function unbind($event, callable $callback = null) {
         $event = (string) $event;
         if (null === $callback) {
             unset($this->_callbacks[$event]);
@@ -45,9 +45,5 @@ trait CM_EventHandler_EventHandlerTrait {
                 call_user_func_array($callback, $params);
             }
         }
-    }
-
-    protected function _unbindAll() {
-        $this->_callbacks = [];
     }
 }
