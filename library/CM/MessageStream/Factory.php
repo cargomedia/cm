@@ -22,7 +22,7 @@ class CM_MessageStream_Factory {
     public function createAdapter($adapterClass, array $adapterArguments = null) {
         $adapterArguments = (array) $adapterArguments;
         $reflectionClass = new ReflectionClass($adapterClass);
-        if ($reflectionClass->isSubclassOf('CM_MessageStream_Adapter_Abstract')) {
+        if (!$reflectionClass->isSubclassOf('CM_MessageStream_Adapter_Abstract')) {
             throw new CM_Exception_Invalid("`{$adapterClass}` is not valid stream message adapter");
         }
         return $reflectionClass->newInstanceArgs($adapterArguments);
