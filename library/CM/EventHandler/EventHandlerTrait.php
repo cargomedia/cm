@@ -20,7 +20,7 @@ trait CM_EventHandler_EventHandlerTrait {
      * @param string        $event
      * @param callable|null $callback
      */
-    public function unbind($event, Closure $callback = null) {
+    public function unbind($event, callable $callback = null) {
         $event = (string) $event;
         if (null === $callback) {
             unset($this->_callbacks[$event]);
