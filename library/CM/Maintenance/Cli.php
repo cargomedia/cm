@@ -67,8 +67,8 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_Stream_Video::checkStreams'             => function () {
                 CM_Stream_Video::getInstance()->checkStreams();
             },
-            'CM_Stream_Message::synchronize'            => function () {
-                CM_Stream_Message::getInstance()->synchronize();
+            'CM_MessageStream_Service::synchronize'            => function () {
+                CM_Service_Manager::getInstance()->getStreamMessage()->synchronize();
             }
         ));
         $this->_registerClockworkCallbacks('15 minutes', array(

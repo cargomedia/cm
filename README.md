@@ -191,28 +191,36 @@ Options:
  --forks=<value>
 
 Commands:
- app setup
- app fill-caches
  app deploy
+ app fill-caches
  app generate-config-internal
  app set-deploy-version [--deploy-version=<value>]
+ app setup [--reload]
+ cache clear
  console interactive
  css icon-refresh
  db db-to-file <namespace>
  db file-to-db
- db run-updates
  db run-update <version> [--namespace=<value>]
- generator create-view <class-name>
+ db run-updates
+ generator bootstrap-project [--project-name=<value>] [--domain=<value>] [--module-name=<value>]
  generator create-class <class-name>
- generator create-namespace <namespace>
- generator create-javascript-files
- job-distribution start-manager
+ generator create-module <module-name> [--single-module-structure] [--module-path=<value>]
+ generator create-site <class-name> <name> <domain>
+ generator create-view <class-name>
+ job-distribution start-worker
+ location outdated [--verbose]
+ location upgrade [--without-ip-blocks] [--verbose]
  maintenance start
- search-index create [--index-name=<value>]
- search-index update [--index-name=<value>] [--host=<Elasticsearch host>] [--port=<Elasticsearch port>]
+ maintenance start-local
+ message-stream start-synchronization
+ search-index create [--index-name=<value>] [--skip-if-exist]
+ search-index delete [--index-name=<value>]
  search-index optimize
  search-index start-maintenance
- stream start-message-synchronization
+ search-index update [--index-name=<value>]
+ stream import-video-archive <stream-channel-id> <archive-source>
+ stream import-video-thumbnail <stream-channel-id> <thumbnail-source>
 ```
 
 Deployment

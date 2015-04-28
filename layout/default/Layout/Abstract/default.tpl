@@ -1,5 +1,6 @@
 <!doctype html>{block name="before-html"}{/block}
 <html {if $render->getLanguage()}lang="{$render->getLanguage()->getAbbreviation()}"{/if} class="{block name='html-class'}{/block}">
+  {capture name='pageContent'}{$renderAdapter->fetchPage()}{/capture}
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge; requiresActiveX=true">
@@ -52,12 +53,10 @@
     {resourceCss file='all.css' type="library"}
     {resourceJs file='before-body.js' type="vendor"}
     {block name='head'}{/block}
-  </head>
-  <body id="{$viewResponse->getAutoId()}" class="{$viewResponse->getCssClasses()|implode:' '}">
-    {capture name='pageContent'}{$renderAdapter->fetchPage()}{/capture}
 
     {$render->getServiceManager()->getTrackings()->getHtml($render->getEnvironment())}
-
+  </head>
+  <body id="{$viewResponse->getAutoId()}" class="{$viewResponse->getCssClasses()|implode:' '}">
     {if CM_Http_Request_Abstract::hasInstance() && !CM_Http_Request_Abstract::getInstance()->isSupported()}
       <div id="browserNotSupported">
         <h2><span class="icon-warning"></span> {translate 'Your browser is no longer supported.'}</h2>
