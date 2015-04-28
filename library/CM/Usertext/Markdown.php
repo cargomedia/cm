@@ -84,14 +84,14 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
      * @throws CM_Exception_Invalid
      */
     private function _transformDimensions($tagText) {
-        $tagText = preg_replace_callback('/^<img src="([^"]+)" alt="(.+?)" (?:class="([^"]+)") (?:width="(\d+)") (?:height="(\d+)") \/>$/i', function ($matches) {
+        $tagText = preg_replace_callback('/^<img src="([^"]+)" alt="([^"]+)" title="(?:[^"]+)?" (?:class="([^"]+)")? (?:width="(\d+)") (?:height="(\d+)") \/>$/i', function ($matches) {
             $width = (int) $matches[4];
             $height = (int) $matches[5];
             if ($width > 0 && $height > 0) {
                 $src = $matches[1];
                 $alt = $matches[2];
                 $class = $matches[3];
-                $ratio = (($height / $width) * 100) % 100;
+                $ratio = (($height / $width) * 100);
                 $imgHtml = '<div class="embeddedWrapper" width="' . $width . '" style="padding-bottom:' . $ratio . '%;">';
                 $imgHtml .= '<img data-src="' . $src . '" alt="' . $alt . '" class="' . $class . ' embeddedWrapper-object"/>';
                 $imgHtml .= '</div>';
