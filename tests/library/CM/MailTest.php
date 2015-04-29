@@ -93,6 +93,9 @@ class CM_MailTest extends CMTest_TestCase {
         $this->assertSame(0, CM_Mail::getQueueSize());
         $mail->send(true);
         $this->assertSame(1, CM_Mail::getQueueSize());
+        $result = CM_Db_Db::select('cm_mail', 'customHeaders');
+        $row = $result->fetch();
+        $this->assertEmpty(unserialize($row['customHeaders']));
     }
 
     public function testProcessQueue() {
