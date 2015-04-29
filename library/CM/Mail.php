@@ -81,6 +81,9 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 
         $this->setTplParam('siteName', $this->_site->getName());
         $this->setSender($this->_site->getEmailAddress(), $this->_site->getName());
+        if ($mailDeliveryAgent = $this->_getMailDeliveryAgent()) {
+            $this->addCustomHeader('X-MDA', $mailDeliveryAgent);
+        }
     }
 
     /**
@@ -144,9 +147,15 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         $this->_to[] = array('address' => $address, 'name' => $name);
     }
 
+    /**
+     * @param string      $label
+     * @param string|null $value
+     */
     public function addCustomHeader($label, $value = null) {
         $label = (string) $label;
-        $value = is_null($value) ? $value : (string) $value;
+        if (null === $value) {
+            $value = (string) $value;
+        }
         $this->_customHeaders[] = array($label => $value);
     }
 
@@ -403,9 +412,6 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             foreach ($this->_bcc as $bcc) {
                 $mail->AddBCC($bcc['address'], $bcc['name']);
             }
-            if ($mailDeliveryAgent = $this->_getMailDeliveryAgent()) {
-                $mail->AddCustomHeader('X-MDA: ' . $mailDeliveryAgent);
-            }
             if ($headerList = $this->_getCustomHeaders()) {
                 $mail->_addCustomHeaders($mail, $headerList);
             }
@@ -451,6 +457,10 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         $log->addMail($this, $msg);
     }
 
+    /**
+     * @param CM_Mail $mail
+     * @param array $headerList
+     */
     private function _addCustomHeaders($mail, $headerList) {
         foreach ($headerList as $label => $value) {
             $mail->AddCustomHeader($label . ': ' . $value);
