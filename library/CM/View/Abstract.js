@@ -282,7 +282,7 @@ var CM_View_Abstract = Backbone.View.extend({
       }
     });
     this.on('destruct', function() {
-      promise.reject();
+      promise.cancel();
     });
     return promise;
   },

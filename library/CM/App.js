@@ -839,7 +839,7 @@ var CM_App = CM_Class_Abstract.extend({
         }
       });
 
-    });
+    }).cancellable();
   },
 
   /**
