@@ -145,14 +145,12 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
-     * @param string      $label
-     * @param string|null $value
+     * @param string $label
+     * @param string $value
      */
-    public function addCustomHeader($label, $value = null) {
+    public function addCustomHeader($label, $value) {
         $label = (string) $label;
-        if (null != $value) {
-            $value = (string) $value;
-        }
+        $value = (string) $value;
         $this->_customHeaders[] = array($label => $value);
     }
 
