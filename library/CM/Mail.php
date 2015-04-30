@@ -21,10 +21,13 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     private $_bcc = array();
 
     /** @var array */
-    private $_sender;
+    private $_sender = array();
 
     /** @var string|null */
     private $_subject = null;
+
+    /** @var array */
+    private $_customHeaders = array();
 
     /** @var string|null */
     private $_textBody = null;
@@ -139,6 +142,16 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
         $this->_to[] = array('address' => $address, 'name' => $name);
+    }
+
+    /**
+     * @param string $label
+     * @param string $value
+     */
+    public function addCustomHeader($label, $value) {
+        $label = (string) $label;
+        $value = (string) $value;
+        $this->_customHeaders[] = array($label => $value);
     }
 
     /**
@@ -338,6 +351,11 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             foreach (unserialize($row['bcc']) as $bcc) {
                 $mail->addBcc($bcc['address'], $bcc['name']);
             }
+            if ($headerList = unserialize($row['customHeaders'])) {
+                foreach ($headerList as $label => $value) {
+                    $mail->addCustomHeader($label, $value);
+                }
+            }
             $sender = unserialize($row['sender']);
             $mail->setSender($sender['address'], $sender['name']);
             $mail->_send($row['subject'], $row['text'], $row['html']);
@@ -363,6 +381,13 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
+     * @return array
+     */
+    protected function _getCustomHeaders() {
+        return $this->_customHeaders;
+    }
+
+    /**
      * @throws CM_Exception_Invalid
      */
     protected function _send($subject, $text, $html = null) {
@@ -385,7 +410,12 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
                 $mail->AddBCC($bcc['address'], $bcc['name']);
             }
             if ($mailDeliveryAgent = $this->_getMailDeliveryAgent()) {
-                $mail->AddCustomHeader('X-MDA: ' . $mailDeliveryAgent);
+                $this->addCustomHeader('X-MDA', $mailDeliveryAgent);
+            }
+            if ($headerList = $this->_getCustomHeaders()) {
+                foreach ($headerList as $label => $value) {
+                    $mail->AddCustomHeader($label . ': ' . $value);
+                }
             }
             $mail->SetFrom($this->_sender['address'], $this->_sender['name']);
 
@@ -409,15 +439,16 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 
     private function _queue($subject, $text, $html) {
         CM_Db_Db::insert('cm_mail', array(
-            'subject'     => $subject,
-            'text'        => $text,
-            'html'        => $html,
-            'createStamp' => time(),
-            'sender'      => serialize($this->getSender()),
-            'replyTo'     => serialize($this->getReplyTo()),
-            'to'          => serialize($this->getTo()),
-            'cc'          => serialize($this->getCc()),
-            'bcc'         => serialize($this->getBcc()),
+            'subject'       => $subject,
+            'text'          => $text,
+            'html'          => $html,
+            'createStamp'   => time(),
+            'sender'        => serialize($this->getSender()),
+            'replyTo'       => serialize($this->getReplyTo()),
+            'to'            => serialize($this->getTo()),
+            'cc'            => serialize($this->getCc()),
+            'bcc'           => serialize($this->getBcc()),
+            'customHeaders' => serialize($this->_getCustomHeaders()),
         ));
     }
 

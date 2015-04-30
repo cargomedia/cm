@@ -191,6 +191,7 @@ CREATE TABLE `cm_mail` (
   `to` text,
   `cc` text,
   `bcc` text,
+  `customHeaders` text,
   PRIMARY KEY (`id`),
   KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

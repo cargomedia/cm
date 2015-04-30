@@ -93,6 +93,9 @@ class CM_MailTest extends CMTest_TestCase {
         $this->assertSame(0, CM_Mail::getQueueSize());
         $mail->send(true);
         $this->assertSame(1, CM_Mail::getQueueSize());
+        $result = CM_Db_Db::select('cm_mail', 'customHeaders');
+        $row = $result->fetch();
+        $this->assertEmpty(unserialize($row['customHeaders']));
     }
 
     public function testProcessQueue() {
@@ -127,5 +130,18 @@ class CM_MailTest extends CMTest_TestCase {
         $recipient->setSite($site);
         $mail = new CM_Mail($recipient);
         $this->assertEquals($site, $mail->getSite());
+    }
+
+    public function testCustomHeaders() {
+        $mail = new CM_Mail();
+        $subject = uniqid();
+        $mail->setSubject($subject);
+        $mail->addCustomHeader('X-Foo', 'bar');
+        $mail->addTo('test');
+        $mail->setText('bla');
+        $mail->send(true);
+        $result = CM_Db_Db::select('cm_mail', 'customHeaders', array('subject' => $subject));
+        $row = $result->fetch();
+        $this->assertEquals(unserialize($row['customHeaders']), array(array('X-Foo' => 'bar')));
     }
 }
