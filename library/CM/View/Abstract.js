@@ -240,7 +240,7 @@ var CM_View_Abstract = Backbone.View.extend({
    * @param {String} functionName
    * @param {Object|Null} [params]
    * @param {Object|Null} [options]
-   * @return jqXHR
+   * @return Promise
    */
   ajax: function(functionName, params, options) {
     options = _.defaults(options || {}, {
@@ -261,7 +261,7 @@ var CM_View_Abstract = Backbone.View.extend({
       this.disable();
     }
 
-    var xhr = cm.ajax('ajax', {viewInfoList: options.view.getViewInfoList(), method: functionName, params: params}, {
+    var promise = cm.ajax('ajax', {viewInfoList: options.view.getViewInfoList(), method: functionName, params: params}, {
       success: function(response) {
         if (response.exec) {
           new Function(response.exec).call(handler);
@@ -282,9 +282,9 @@ var CM_View_Abstract = Backbone.View.extend({
       }
     });
     this.on('destruct', function() {
-      xhr.abort();
+      promise.reject();
     });
-    return xhr;
+    return promise;
   },
 
   /**

@@ -793,48 +793,53 @@ var CM_App = CM_Class_Abstract.extend({
    * @param {String} type
    * @param {Object} data
    * @param {Object} [callbacks]
-   * @return jqXHR
+   * @return Promise
    */
   ajax: function(type, data, callbacks) {
     callbacks = callbacks || {};
     var url = this.getUrlAjax(type);
-    var errorHandler = function(msg, type, isPublic, callback) {
-      if (!callback || callback(msg, type, isPublic) !== false) {
-        cm.error.trigger(msg, type, isPublic);
-      }
-    };
-    var jqXHR = $.ajax(url, {
-      data: JSON.stringify(data),
-      type: 'POST',
-      dataType: 'json',
-      contentType: 'application/json',
-      cache: false
-    });
-    jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
-      if (response.error) {
-        errorHandler(response.error.msg, response.error.type, response.error.isPublic, callbacks.error);
-      } else if (response.success) {
-        if (callbacks.success) {
-          callbacks.success(response.success);
+
+    return new Promise(function(resolve, reject) {
+      var errorHandler = function(msg, type, isPublic, callback) {
+        if (!callback || callback(msg, type, isPublic) !== false) {
+          reject(msg, type);
+          cm.error.trigger(msg, type, isPublic);
         }
-      }
-    }).fail(function(xhr, textStatus) {
-      if (xhr.status === 0) {
-        return; // Ignore interrupted ajax-request caused by leaving a page
-      }
+      };
 
-      var msg = cm.language.get('An unexpected connection problem occurred.');
-      if (cm.options.debug) {
-        msg = xhr.responseText || textStatus;
-      }
-      errorHandler(msg, null, false, callbacks.error);
-    }).always(function() {
-      if (callbacks.complete) {
-        callbacks.complete();
-      }
+      var jqXHR = $.ajax(url, {
+        data: JSON.stringify(data),
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        cache: false
+      });
+      jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
+        if (response.error) {
+          errorHandler(response.error.msg, response.error.type, response.error.isPublic, callbacks.error);
+        } else if (response.success) {
+          if (callbacks.success) {
+            resolve(response.success);
+            callbacks.success(response.success);
+          }
+        }
+      }).fail(function(xhr, textStatus) {
+        if (xhr.status === 0) {
+          return; // Ignore interrupted ajax-request caused by leaving a page
+        }
+
+        var msg = cm.language.get('An unexpected connection problem occurred.');
+        if (cm.options.debug) {
+          msg = xhr.responseText || textStatus;
+        }
+        errorHandler(msg, null, false, callbacks.error);
+      }).always(function() {
+        if (callbacks.complete) {
+          callbacks.complete();
+        }
+      });
+
     });
-
-    return jqXHR;
   },
 
   /**
