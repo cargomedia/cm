@@ -2,6 +2,8 @@
 
 class CM_MailTest extends CMTest_TestCase {
 
+    private $_mockPHPMailer;
+
     public function tearDown() {
         CMTest_TH::clearEnv();
     }
@@ -74,28 +76,65 @@ class CM_MailTest extends CMTest_TestCase {
         $this->assertSame($text, $mail->getText());
     }
 
+    public function getMockPhpMailer() {
+        return $this->_mockPHPMailer;
+    }
+
     public function testSend() {
-        $mail = $this->getMockBuilder('CM_Mail')->setMethods(array('_render', '_send'))->getMock();
-        $mail->expects($this->any())->method('_render');
-        $mail->expects($this->exactly(1))->method('_send');
-        /** @var $mail CM_Mail */
-        try {
-            $mail->send();
-            $this->fail('Sent mail without recipient');
-        } catch (Exception $e) {
-            $this->assertContains('No recipient specified', $e->getMessage());
-        }
-        $mail->addTo('tomasz@durka.pl');
-        $mail->setSubject('foo');
-        $mail->setText('bar');
-        $this->assertSame(0, CM_Mail::getQueueSize());
+        CM_Config::get()->CM_Mail->send = true;
+        $this->_mockPHPMailer = $this->mockObject('PHPMailer');
+
+        /** @var PHPMailer|\Mocka\AbstractClassTrait $phpMailer */
+        $phpMailer = $this->getMockPhpMailer();
+
+        $setFromMethod = $phpMailer->mockMethod('SetFrom')->set(function ($address, $name) {
+            $this->assertSame('sender@example.com', $address);
+            $this->assertSame('Sender', $name);
+        });
+        $addReplyToMethod = $phpMailer->mockMethod('AddReplyTo')->set(function ($address) {
+            $this->assertSame('foo@bar.com', $address);
+        });
+        $addAddress = $phpMailer->mockMethod('AddAddress')->set(function ($address) {
+            $this->assertSame('foo@example.com', $address);
+        });
+        $addCC = $phpMailer->mockMethod('AddCC')->set(function ($address, $name) {
+            $this->assertSame('foo@bar.org', $address);
+            $this->assertSame('foobar', $name);
+        });
+        $addBCC = $phpMailer->mockMethod('AddBCC')->set(function ($address) {
+            $this->assertSame('foo@bar.net', $address);
+        });
+        $addCustomHeader = $phpMailer->mockMethod('AddCustomHeader')
+            ->at(0, function ($name, $value) {
+                $this->assertSame('X-Foo', $name);
+                $this->assertSame('bar,foo', $value);
+            })
+            ->at(1, function ($name, $value) {
+                $this->assertSame('X-Bar', $name);
+                $this->assertSame('foo', $value);
+            });
+
+        $sendMethod = $phpMailer->mockMethod('Send');
+
+        $mail = new Test_CM_Mail('foo@example.com', null, null, $this);
+        $mail->setSender('sender@example.com', 'Sender');
+        $mail->setSubject('testSubject');
+        $mail->setHtml('<b>hallo</b>');
+        $mail->addReplyTo('foo@bar.com');
+        $mail->addCc('foo@bar.org', 'foobar');
+        $mail->addBcc('foo@bar.net');
+        $mail->setCustomHeader('X-Foo', 'bar');
+        $mail->setCustomHeader('X-Bar', 'foo');
+        $mail->setCustomHeader('X-Foo', 'foo');
         $mail->send();
-        $this->assertSame(0, CM_Mail::getQueueSize());
-        $mail->send(true);
-        $this->assertSame(1, CM_Mail::getQueueSize());
-        $result = CM_Db_Db::select('cm_mail', 'customHeaders');
-        $row = $result->fetch();
-        $this->assertEmpty(unserialize($row['customHeaders']));
+
+        $this->assertSame(1, $setFromMethod->getCallCount());
+        $this->assertSame(1, $addReplyToMethod->getCallCount());
+        $this->assertSame(1, $addAddress->getCallCount());
+        $this->assertSame(1, $addCC->getCallCount());
+        $this->assertSame(1, $addBCC->getCallCount());
+        $this->assertSame(2, $addCustomHeader->getCallCount());
+        $this->assertSame(1, $sendMethod->getCallCount());
     }
 
     public function testProcessQueue() {
@@ -136,14 +175,32 @@ class CM_MailTest extends CMTest_TestCase {
         $mail = new CM_Mail();
         $subject = uniqid();
         $mail->setSubject($subject);
-        $mail->addCustomHeader('X-Foo', 'bar');
-        $mail->addCustomHeader('X-Bar', 'foo');
-        $mail->addCustomHeader('X-Foo', 'baz');
+        $mail->setCustomHeader('X-Foo', 'bar');
+        $mail->setCustomHeader('X-Bar', 'foo');
+        $mail->setCustomHeader('X-Foo', 'baz');
         $mail->addTo('test');
         $mail->setText('bla');
         $mail->send(true);
         $result = CM_Db_Db::select('cm_mail', 'customHeaders', array('subject' => $subject));
         $row = $result->fetch();
-        $this->assertEquals(unserialize($row['customHeaders']), array(array('X-Foo' => 'bar'), array('X-Bar' => 'foo'), array('X-Foo' => 'baz')));
+        $this->assertEquals(unserialize($row['customHeaders']), array('X-Foo' => ['bar', 'baz'], 'X-Bar' => ['foo']));
+    }
+}
+
+class Test_CM_Mail extends CM_Mail {
+
+    /** @var CM_MailTest $_test */
+    private $_test = null;
+
+    /**
+     * @param CM_MailTest $test
+     */
+    public function __construct($recipient = null, array $tplParams = null, CM_Site_Abstract $site = null, $test) {
+        $this->_test = $test;
+        parent::__construct($recipient, $tplParams, $site);
+    }
+
+    protected function _getPHPMailer() {
+        return $this->_test->getMockPhpMailer();
     }
 }

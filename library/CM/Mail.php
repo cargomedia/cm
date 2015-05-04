@@ -148,10 +148,10 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @param string $label
      * @param string $value
      */
-    public function addCustomHeader($label, $value) {
+    public function setCustomHeader($label, $value) {
         $label = (string) $label;
         $value = (string) $value;
-        $this->_customHeaders[] = array($label => $value);
+        $this->_customHeaders[$label][] = $value;
     }
 
     /**
@@ -353,7 +353,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             }
             if ($headerList = unserialize($row['customHeaders'])) {
                 foreach ($headerList as $label => $value) {
-                    $mail->addCustomHeader($label, $value);
+                    $mail->setCustomHeader($label, $value);
                 }
             }
             $sender = unserialize($row['sender']);
@@ -417,14 +417,12 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
                 $phpMailer->AddBCC($bcc['address'], $bcc['name']);
             }
             if ($mailDeliveryAgent = $this->_getMailDeliveryAgent()) {
-                $this->addCustomHeader('X-MDA', $mailDeliveryAgent);
+                $this->setCustomHeader('X-MDA', $mailDeliveryAgent);
             }
             if ($headerList = $this->_getCustomHeaders()) {
-                \Functional\every($headerList, function ($value, $label, $header) use ($phpMailer) {
-                    if (null !== $label) {
-                        $phpMailer->AddCustomHeader($label . ': ' . $value);
-                    }
-                });
+                foreach ($headerList as $label => $value) {
+                    $phpMailer->AddCustomHeader($label, implode(',', $value));
+                }
             }
             $phpMailer->SetFrom($this->_sender['address'], $this->_sender['name']);
 
