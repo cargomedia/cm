@@ -8,7 +8,7 @@ class CM_Clockwork_Storage_FileSystem extends CM_Clockwork_Storage_Abstract impl
         $data = [];
         $file = $this->_getStorageFile();
         if ($file->exists()) {
-            $values = (array) CM_Params::jsonDecode($file->read(), true);
+            $values = (array) CM_Params::jsonDecode($file->read());
             $data = \Functional\map($values, function ($timeStamp) {
                 return new DateTime('@' . $timeStamp);
             });
