@@ -151,7 +151,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     public function addCustomHeader($label, $value) {
         $label = (string) $label;
         $value = (string) $value;
-        $this->_customHeaders[$label] = $value;
+        $this->_customHeaders[] = array($label => $value);
     }
 
     /**
@@ -413,9 +413,10 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
                 $this->addCustomHeader('X-MDA', $mailDeliveryAgent);
             }
             if ($headerList = $this->_getCustomHeaders()) {
-                foreach ($headerList as $label => $value) {
-                    $mail->AddCustomHeader($label . ': ' . $value);
-                }
+                \Functional\every($headerList, function($value, $label, $header) use ($mail) {
+                    if (null !== $label) {
+                        $mail->AddCustomHeader($label . ': ' . $value);
+                }});
             }
             $mail->SetFrom($this->_sender['address'], $this->_sender['name']);
 
