@@ -137,11 +137,12 @@ class CM_MailTest extends CMTest_TestCase {
         $subject = uniqid();
         $mail->setSubject($subject);
         $mail->addCustomHeader('X-Foo', 'bar');
+        $mail->addCustomHeader('X-Bar', 'foo');
         $mail->addTo('test');
         $mail->setText('bla');
         $mail->send(true);
         $result = CM_Db_Db::select('cm_mail', 'customHeaders', array('subject' => $subject));
         $row = $result->fetch();
-        $this->assertEquals(unserialize($row['customHeaders']), array(array('X-Foo' => 'bar')));
+        $this->assertEquals(unserialize($row['customHeaders']), array('X-Foo' => 'bar', 'X-Bar' => 'foo'));
     }
 }

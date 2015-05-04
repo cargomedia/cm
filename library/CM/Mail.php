@@ -151,7 +151,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     public function addCustomHeader($label, $value) {
         $label = (string) $label;
         $value = (string) $value;
-        $this->_customHeaders[] = array($label => $value);
+        $this->_customHeaders[$label] = $value;
     }
 
     /**
