@@ -413,10 +413,11 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
                 $this->addCustomHeader('X-MDA', $mailDeliveryAgent);
             }
             if ($headerList = $this->_getCustomHeaders()) {
-                \Functional\every($headerList, function($value, $label, $header) use ($mail) {
+                \Functional\every($headerList, function ($value, $label, $header) use ($mail) {
                     if (null !== $label) {
                         $mail->AddCustomHeader($label . ': ' . $value);
-                }});
+                    }
+                });
             }
             $mail->SetFrom($this->_sender['address'], $this->_sender['name']);
 
