@@ -2,6 +2,7 @@
 
 class CM_MailTest extends CMTest_TestCase {
 
+    /** @var PHPMailer|\Mocka\AbstractClassTrait $_mockPHPMailer*/
     private $_mockPHPMailer;
 
     public function tearDown() {
@@ -84,7 +85,6 @@ class CM_MailTest extends CMTest_TestCase {
         CM_Config::get()->CM_Mail->send = true;
         $this->_mockPHPMailer = $this->mockObject('PHPMailer');
 
-        /** @var PHPMailer|\Mocka\AbstractClassTrait $phpMailer */
         $phpMailer = $this->getMockPhpMailer();
 
         $setFromMethod = $phpMailer->mockMethod('SetFrom')->set(function ($address, $name) {
@@ -171,7 +171,7 @@ class CM_MailTest extends CMTest_TestCase {
         $this->assertEquals($site, $mail->getSite());
     }
 
-    public function testCustomHeaders() {
+    public function testCustomHeadersQueue() {
         $mail = new CM_Mail();
         $subject = uniqid();
         $mail->setSubject($subject);
