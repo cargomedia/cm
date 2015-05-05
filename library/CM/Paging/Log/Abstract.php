@@ -116,7 +116,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
      */
     protected function _serialize(array $valueList) {
         $valueListString = Functional\map($valueList, function ($value) {
-            return CM_Util::varDump($value, true);
+            return CM_Util::varDump($value, ['recursive' => true]);
         });
         return serialize($valueListString);
     }

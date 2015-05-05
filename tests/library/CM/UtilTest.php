@@ -147,7 +147,7 @@ class CM_UtilTest extends CMTest_TestCase {
      * @param mixed  $argument
      */
     public function testVarDumpRecursive($expected, $argument) {
-        $this->assertSame($expected, CM_Util::varDump($argument, true));
+        $this->assertSame($expected, CM_Util::varDump($argument, ['recursive' => true]));
     }
 
     public function varDumpProviderRecursive() {

@@ -31,18 +31,21 @@ class CM_Util {
     }
 
     /**
-     * @param mixed     $argument
-     * @param bool|null $recursive
+     * @param mixed      $argument
+     * @param array|null $options
      * @throws CM_Exception_Invalid
      * @return string
      */
-    public static function varDump($argument, $recursive = null) {
-        $recursive = (bool) $recursive;
+    public static function varDump($argument, array $options = null) {
+        $options = array_merge([
+            'recursive' => false,
+        ], (array) $options);
+        $recursive = (bool) $options['recursive'];
 
         if (is_array($argument)) {
             if ($recursive) {
-                $elementList = Functional\map($argument, function ($value, $key) use ($recursive) {
-                    return self::varDump($key, $recursive) . ' => ' . self::varDump($value, $recursive);
+                $elementList = Functional\map($argument, function ($value, $key) use ($options) {
+                    return self::varDump($key, $options) . ' => ' . self::varDump($value, $options);
                 });
                 return '[' . implode(', ', $elementList) . ']';
             } else {
