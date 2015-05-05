@@ -14,14 +14,13 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
 
         $add = CMTest_TH::getProtectedMethod('CM_Paging_Log_Abstract', '_add');
         $add->invoke($paging, 'foo');
-        $obj = CMTest_TH::createUser();
-        $add->invoke($paging, 'bar', array('meta1' => 12, 'meta2' => $obj));
+        $add->invoke($paging, 'bar', array('meta1' => 12, 'meta2' => new SplFixedArray()));
 
         $items = $paging->getItems();
         $this->assertSame(2, count($items));
 
         $this->assertSame('bar', $items[0]['msg']);
-        $this->assertSame(array('meta1' => 12, 'meta2' => CM_Util::varDump($obj)), $items[0]['metaInfo']);
+        $this->assertSame(['meta1' => '12', 'meta2' => 'SplFixedArray'], $items[0]['metaInfo']);
 
         $this->assertSame('foo', $items[1]['msg']);
         $this->assertSame(null, $items[1]['metaInfo']);

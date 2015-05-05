@@ -3,8 +3,8 @@
 abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_Typed {
 
     /**
-     * @param string     $msg
-     * @param array|null $metaInfo
+     * @param string       $msg
+     * @param mixed[]|null $metaInfo
      */
     public function add($msg, array $metaInfo = null) {
         $metaInfo = array_merge((array) $metaInfo, $this->_getDefaultMetaInfo());
@@ -90,14 +90,14 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
     }
 
     /**
-     * @param string     $msg
-     * @param array|null $metaInfo
+     * @param string       $msg
+     * @param mixed[]|null $metaInfo
      */
     protected function _add($msg, array $metaInfo = null) {
         $msg = (string) $msg;
         $values = array('type' => $this->getType(), 'msg' => $msg, 'timeStamp' => time());
         if (!empty($metaInfo)) {
-            $values['metaInfo'] = serialize($this->_dump($metaInfo));
+            $values['metaInfo'] = $this->_serialize($metaInfo);
         }
         CM_Db_Db::insertDelayed('cm_log', $values);
     }
@@ -111,27 +111,23 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
     }
 
     /**
-     * @param mixed $value
+     * @param mixed[] $valueList
      * @return string
      */
-    protected function _dump($value) {
-        if (is_array($value)) {
-            foreach ($value as &$element) {
-                $element = $this->_dump($element);
-            }
-        } elseif ($value instanceof CM_Model_Abstract) {
-            $value = CM_Util::varDump($value);
-        }
-        return $value;
+    protected function _serialize(array $valueList) {
+        $valueListString = Functional\map($valueList, function ($value) {
+            return CM_Util::varDump($value, true);
+        });
+        return serialize($valueListString);
     }
 
     /**
      * @param string $value
-     * @return mixed|null
+     * @return string[]|null
      */
     protected function _unserialize($value) {
         $result = @unserialize($value);
-        if (false === $result) {
+        if (!is_array($result)) {
             return null;
         }
         return $result;

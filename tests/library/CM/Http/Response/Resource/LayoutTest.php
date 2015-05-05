@@ -14,7 +14,7 @@ class CM_Http_Response_Resource_LayoutTest extends CMTest_TestCase {
             $this->getResponseResourceLayout($filePath);
         } catch (CM_Exception_Nonexistent $ex) {
             $this->assertSame('Forbidden filetype', $ex->getMessage());
-            $this->assertSame(['path' => '/browserconfig.xml.smarty'], $ex->getMetaInfo(true));
+            $this->assertSame(['path' => '/browserconfig.xml.smarty'], $ex->getMetaInfo());
         }
     }
 
@@ -37,7 +37,7 @@ class CM_Http_Response_Resource_LayoutTest extends CMTest_TestCase {
             $this->getResponseResourceLayout($filePath);
         } catch (CM_Exception_Nonexistent $ex) {
             $this->assertSame('Invalid filename', $ex->getMessage());
-            $this->assertSame(['path' => '/nonExistent.css'], $ex->getMetaInfo(true));
+            $this->assertSame(['path' => '/nonExistent.css'], $ex->getMetaInfo());
         }
     }
 
