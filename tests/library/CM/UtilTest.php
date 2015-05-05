@@ -129,7 +129,10 @@ class CM_UtilTest extends CMTest_TestCase {
     public function varDumpProvider() {
         return [
             ['array', array()],
+            ['array', array(['foo' => 12])],
             ['true', true],
+            ['12', 12],
+            ['-12.3', -12.3],
             ["'foo'", 'foo'],
             ["'foofoofoofoofoofoofo...'", 'foofoofoofoofoofoofoo'],
             ['object', new stdClass()],
