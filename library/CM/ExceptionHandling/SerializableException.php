@@ -88,7 +88,9 @@ class CM_ExceptionHandling_SerializableException {
         $this->line = $exception->getLine();
         $this->file = $exception->getFile();
         if ($exception instanceof CM_Exception) {
-            $this->metaInfo = $exception->getMetaInfo();
+            $this->metaInfo = Functional\map($exception->getMetaInfo(true), function ($value) {
+                return CM_Util::varDump($value);
+            });
         }
 
         try {
