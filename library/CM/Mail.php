@@ -148,7 +148,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @param string $label
      * @param string $value
      */
-    public function setCustomHeader($label, $value) {
+    public function addCustomHeader($label, $value) {
         $label = (string) $label;
         $value = (string) $value;
         $this->_customHeaders[$label][] = $value;
@@ -353,7 +353,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             }
             if ($headerList = unserialize($row['customHeaders'])) {
                 foreach ($headerList as $label => $value) {
-                    $mail->setCustomHeader($label, $value);
+                    $mail->addCustomHeader($label, $value);
                 }
             }
             $sender = unserialize($row['sender']);
@@ -417,7 +417,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
                 $phpMailer->AddBCC($bcc['address'], $bcc['name']);
             }
             if ($mailDeliveryAgent = $this->_getMailDeliveryAgent()) {
-                $this->setCustomHeader('X-MDA', $mailDeliveryAgent);
+                $this->addCustomHeader('X-MDA', $mailDeliveryAgent);
             }
             if ($headerList = $this->_getCustomHeaders()) {
                 foreach ($headerList as $label => $value) {
