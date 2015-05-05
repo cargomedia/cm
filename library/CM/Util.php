@@ -51,7 +51,7 @@ class CM_Util {
             if (strlen($argument) > 20) {
                 $argument = substr($argument, 0, 20) . '...';
             }
-            return '\'' . $argument . '\'';
+            return "'" . $argument . "'";
         }
         if (is_bool($argument) || is_numeric($argument)) {
             return var_export($argument, true);
