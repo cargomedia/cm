@@ -2,9 +2,6 @@
 
 class CM_MailTest extends CMTest_TestCase {
 
-    /** @var PHPMailer|\Mocka\AbstractClassTrait $_mockPHPMailer*/
-    private $_mockPHPMailer;
-
     public function tearDown() {
         CMTest_TH::clearEnv();
     }
@@ -77,15 +74,11 @@ class CM_MailTest extends CMTest_TestCase {
         $this->assertSame($text, $mail->getText());
     }
 
-    public function getMockPhpMailer() {
-        return $this->_mockPHPMailer;
-    }
-
     public function testSend() {
         CM_Config::get()->CM_Mail->send = true;
-        $this->_mockPHPMailer = $this->mockObject('PHPMailer');
 
-        $phpMailer = $this->getMockPhpMailer();
+        /** @var PHPMailer|\Mocka\AbstractClassTrait $_mockPHPMailer*/
+        $phpMailer = $this->mockObject('PHPMailer');
 
         $setFromMethod = $phpMailer->mockMethod('SetFrom')->set(function ($address, $name) {
             $this->assertSame('sender@example.com', $address);
@@ -116,7 +109,12 @@ class CM_MailTest extends CMTest_TestCase {
 
         $sendMethod = $phpMailer->mockMethod('Send');
 
-        $mail = new Test_CM_Mail('foo@example.com', null, null, $this);
+        $mail = $this->mockObject('CM_Mail', ['foo@example.com']);
+        $mail->mockMethod('_getPHPMailer')->set(function () use ($phpMailer) {
+            return $phpMailer;
+        });
+        /** @var CM_Mail $mail */
+
         $mail->setSender('sender@example.com', 'Sender');
         $mail->setSubject('testSubject');
         $mail->setHtml('<b>hallo</b>');
@@ -184,23 +182,5 @@ class CM_MailTest extends CMTest_TestCase {
         $result = CM_Db_Db::select('cm_mail', 'customHeaders', array('subject' => $subject));
         $row = $result->fetch();
         $this->assertEquals(unserialize($row['customHeaders']), array('X-Foo' => ['bar', 'baz'], 'X-Bar' => ['foo']));
-    }
-}
-
-class Test_CM_Mail extends CM_Mail {
-
-    /** @var CM_MailTest $_test */
-    private $_test = null;
-
-    /**
-     * @param CM_MailTest $test
-     */
-    public function __construct($recipient = null, array $tplParams = null, CM_Site_Abstract $site = null, $test) {
-        $this->_test = $test;
-        parent::__construct($recipient, $tplParams, $site);
-    }
-
-    protected function _getPHPMailer() {
-        return $this->_test->getMockPhpMailer();
     }
 }
