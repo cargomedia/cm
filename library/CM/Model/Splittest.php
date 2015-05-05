@@ -254,6 +254,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
                 $this->getServiceManager()->getTrackings()->trackSplittest($fixture, $variation);
             } catch (CM_Db_Exception $exception) {
                 $variationListFixture = $this->_getVariationListFixture($fixture, true);
+                $this->_change();
                 if (!array_key_exists($this->getId(), $variationListFixture) ||
                     $variationListFixture[$this->getId()]['flushStamp'] != $this->getCreated()
                 ) {
