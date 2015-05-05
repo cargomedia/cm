@@ -1,6 +1,6 @@
 <?php
 
-class CM_Params extends CM_Class_Abstract {
+class CM_Params extends CM_Class_Abstract implements CM_DebugInfo_DebugInfoInterface {
 
     private $_params;
 
@@ -405,6 +405,17 @@ class CM_Params extends CM_Class_Abstract {
      */
     public function remove($key) {
         unset($this->_params[$key]);
+    }
+
+    /**
+     * @return string
+     */
+    public function __debugInfo() {
+        try {
+            return CM_Util::varDump($this->getParamsDecoded(), ['recursive' => true]);
+        } catch (Exception $e) {
+            return '[Cannot dump params: `' . $e->getMessage() . '`]';
+        }
     }
 
     /**
