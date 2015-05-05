@@ -115,4 +115,25 @@ class CM_UtilTest extends CMTest_TestCase {
             $this->assertTrue(true);
         }
     }
+
+    /**
+     * @dataProvider varDumpProvider
+     *
+     * @param string $expected
+     * @param mixed  $argument
+     */
+    public function testVarDump($expected, $argument) {
+        $this->assertSame($expected, CM_Util::varDump($argument));
+    }
+
+    public function varDumpProvider() {
+        return [
+            ['array', array()],
+            ['true', true],
+            ["'foo'", 'foo'],
+            ["'foofoofoofoofoofoofo...'", 'foofoofoofoofoofoofoo'],
+            ['object', new stdClass()],
+            ['SplFixedArray', new SplFixedArray()],
+        ];
+    }
 }
