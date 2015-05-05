@@ -58,13 +58,10 @@ class CM_Util {
             if ($argument instanceof stdClass) {
                 return 'object';
             }
-            $value = get_class($argument);
-            if ($argument instanceof CM_Model_Abstract) {
-                if ($argument->hasIdRaw()) {
-                    $value .= '(' . implode(', ', (array) $argument->getIdRaw()) . ')';
-                }
+            if ($argument instanceof CM_DebugInfo_DebugInfoInterface) {
+                return $argument->__debugInfo();
             }
-            return $value;
+            return get_class($argument);
         }
         if (is_string($argument)) {
             if (null !== $lengthMax && strlen($argument) > $lengthMax) {

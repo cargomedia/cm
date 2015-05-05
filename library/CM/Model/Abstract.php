@@ -1,6 +1,7 @@
 <?php
 
-abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable, CM_Typed {
+abstract class CM_Model_Abstract extends CM_Class_Abstract
+    implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable, CM_Typed, CM_DebugInfo_DebugInfoInterface {
 
     /** @var array|null */
     protected $_id;
@@ -247,6 +248,14 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
             }
             $this->_onChange();
         }
+    }
+
+    public function __debugInfo() {
+        $debugInfo = get_class($this);
+        if ($this->hasIdRaw()) {
+            $debugInfo .= '(' . implode(', ', (array) $this->getIdRaw()) . ')';
+        }
+        return $debugInfo;
     }
 
     /**
