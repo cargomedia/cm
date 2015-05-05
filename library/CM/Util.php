@@ -31,10 +31,24 @@ class CM_Util {
     }
 
     /**
-     * @param mixed $argument
+     * @param mixed     $argument
+     * @param bool|null $recursive
+     * @throws CM_Exception_Invalid
      * @return string
      */
-    public static function varDump($argument) {
+    public static function varDump($argument, $recursive = null) {
+        $recursive = (bool) $recursive;
+
+        if (is_array($argument)) {
+            if ($recursive) {
+                $elementList = Functional\map($argument, function ($value, $key) use ($recursive) {
+                    return self::varDump($key, $recursive) . ' => ' . self::varDump($value, $recursive);
+                });
+                return '[' . implode(', ', $elementList) . ']';
+            } else {
+                return '[]';
+            }
+        }
         if (is_object($argument)) {
             if ($argument instanceof stdClass) {
                 return 'object';

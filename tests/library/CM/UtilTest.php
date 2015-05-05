@@ -117,7 +117,7 @@ class CM_UtilTest extends CMTest_TestCase {
     }
 
     /**
-     * @dataProvider varDumpProvider
+     * @dataProvider varDumpProviderFlat
      *
      * @param string $expected
      * @param mixed  $argument
@@ -126,10 +126,10 @@ class CM_UtilTest extends CMTest_TestCase {
         $this->assertSame($expected, CM_Util::varDump($argument));
     }
 
-    public function varDumpProvider() {
+    public function varDumpProviderFlat() {
         return [
-            ['array', array()],
-            ['array', array(['foo' => 12])],
+            ['[]', []],
+            ['[]', ['foo' => 12]],
             ['true', true],
             ['12', 12],
             ['-12.3', -12.3],
@@ -137,6 +137,25 @@ class CM_UtilTest extends CMTest_TestCase {
             ["'foofoofoofoofoofoofo...'", 'foofoofoofoofoofoofoo'],
             ['object', new stdClass()],
             ['SplFixedArray', new SplFixedArray()],
+        ];
+    }
+
+    /**
+     * @dataProvider varDumpProviderRecursive
+     *
+     * @param string $expected
+     * @param mixed  $argument
+     */
+    public function testVarDumpRecursive($expected, $argument) {
+        $this->assertSame($expected, CM_Util::varDump($argument, true));
+    }
+
+    public function varDumpProviderRecursive() {
+        return [
+            ['[]', []],
+            ["['foo' => 12]", ['foo' => 12]],
+            ["['foo' => SplFixedArray]", ['foo' => new SplFixedArray()]],
+            ["['foo' => ['bar' => 12, 0 => 13]]", ['foo' => ['bar' => 12, 13]]],
         ];
     }
 }
