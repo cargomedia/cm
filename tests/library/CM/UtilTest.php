@@ -117,7 +117,7 @@ class CM_UtilTest extends CMTest_TestCase {
     }
 
     /**
-     * @dataProvider varDumpProviderFlat
+     * @dataProvider varDumpProvider
      *
      * @param string $expected
      * @param mixed  $argument
