@@ -14,7 +14,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      * @return mixed
      * @throws CM_Exception_Invalid
      * @throws CM_Model_Exception_Validation
@@ -60,7 +60,7 @@ class CM_Model_Schema_Definition {
                             if (count($id) == 1) {
                                 $value = $value->getId();
                             } else {
-                                $value = CM_Params::encode($id, true);
+                                $value = CM_Params::jsonEncode($id);
                             }
                     }
                 }
@@ -71,7 +71,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      * @return mixed
      * @throws CM_Exception_Invalid
      * @throws CM_Model_Exception_Validation
@@ -104,7 +104,7 @@ class CM_Model_Schema_Definition {
                             $value = DateTime::createFromFormat('U', $value);
                             break;
                         default:
-                            $id = CM_Params::decode($value, true);
+                            $id = CM_Params::jsonDecode($value);
                             if (!is_array($id)) {
                                 $id = array('id' => $id);
                             }
@@ -143,7 +143,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      * @return mixed
      * @throws CM_Exception_Invalid
      * @throws CM_Model_Exception_Validation
@@ -246,17 +246,17 @@ class CM_Model_Schema_Definition {
      * @return bool
      */
     protected function _isModel($value) {
-        $value = CM_Params::decode($value, true);
+        // Hack proposed by Reto Kaiser in order to support multi-ids
+        if (substr($value, 0, 1) === '{') {
+            $value = CM_Params::jsonDecode($value);
+        }
         if (is_array($value)) {
             if (!array_key_exists('id', $value)) {
                 return false;
             }
             $value = $value['id'];
         }
-        if (!$this->_isInt($value)) {
-            return false;
-        }
-        return true;
+        return $this->_isInt($value) || $this->_isString($value);
     }
 
     /**
