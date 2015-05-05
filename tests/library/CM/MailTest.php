@@ -121,9 +121,9 @@ class CM_MailTest extends CMTest_TestCase {
         $mail->addReplyTo('foo@bar.com');
         $mail->addCc('foo@bar.org', 'foobar');
         $mail->addBcc('foo@bar.net');
-        $mail->setCustomHeader('X-Foo', 'bar');
-        $mail->setCustomHeader('X-Bar', 'foo');
-        $mail->setCustomHeader('X-Foo', 'foo');
+        $mail->addCustomHeader('X-Foo', 'bar');
+        $mail->addCustomHeader('X-Bar', 'foo');
+        $mail->addCustomHeader('X-Foo', 'foo');
         $mail->send();
 
         $this->assertSame(1, $setFromMethod->getCallCount());
@@ -173,9 +173,9 @@ class CM_MailTest extends CMTest_TestCase {
         $mail = new CM_Mail();
         $subject = uniqid();
         $mail->setSubject($subject);
-        $mail->setCustomHeader('X-Foo', 'bar');
-        $mail->setCustomHeader('X-Bar', 'foo');
-        $mail->setCustomHeader('X-Foo', 'baz');
+        $mail->addCustomHeader('X-Foo', 'bar');
+        $mail->addCustomHeader('X-Bar', 'foo');
+        $mail->addCustomHeader('X-Foo', 'baz');
         $mail->addTo('test');
         $mail->setText('bla');
         $mail->send(true);
