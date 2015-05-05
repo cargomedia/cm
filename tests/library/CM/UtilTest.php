@@ -126,7 +126,7 @@ class CM_UtilTest extends CMTest_TestCase {
         $this->assertSame($expected, CM_Util::varDump($argument));
     }
 
-    public function varDumpProviderFlat() {
+    public function varDumpProvider() {
         return [
             ['[]', []],
             ['[]', ['foo' => 12]],
@@ -134,10 +134,14 @@ class CM_UtilTest extends CMTest_TestCase {
             ['12', 12],
             ['-12.3', -12.3],
             ["'foo'", 'foo'],
-            ["'foofoofoofoofoofoofo...'", 'foofoofoofoofoofoofoo'],
             ['object', new stdClass()],
             ['SplFixedArray', new SplFixedArray()],
         ];
+    }
+
+    public function testVarDumpLengthMax() {
+        $this->assertSame("'foo...'", CM_Util::varDump('fooo', ['lengthMax' => 3]));
+        $this->assertSame("'fooo'", CM_Util::varDump('fooo', ['lengthMax' => 4]));
     }
 
     /**

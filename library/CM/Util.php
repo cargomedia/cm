@@ -39,8 +39,10 @@ class CM_Util {
     public static function varDump($argument, array $options = null) {
         $options = array_merge([
             'recursive' => false,
+            'lengthMax' => 20,
         ], (array) $options);
         $recursive = (bool) $options['recursive'];
+        $lengthMax = (int) $options['lengthMax'];
 
         if (is_array($argument)) {
             if ($recursive) {
@@ -65,8 +67,8 @@ class CM_Util {
             return $value;
         }
         if (is_string($argument)) {
-            if (strlen($argument) > 20) {
-                $argument = substr($argument, 0, 20) . '...';
+            if (strlen($argument) > $lengthMax) {
+                $argument = substr($argument, 0, $lengthMax) . '...';
             }
             return "'" . $argument . "'";
         }
