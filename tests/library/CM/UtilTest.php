@@ -142,6 +142,7 @@ class CM_UtilTest extends CMTest_TestCase {
     public function testVarDumpLengthMax() {
         $this->assertSame("'foo...'", CM_Util::varDump('fooo', ['lengthMax' => 3]));
         $this->assertSame("'fooo'", CM_Util::varDump('fooo', ['lengthMax' => 4]));
+        $this->assertSame("'fooo'", CM_Util::varDump('fooo', ['lengthMax' => null]));
     }
 
     /**

@@ -125,7 +125,7 @@ class CM_ExceptionHandling_SerializableException {
             if (array_key_exists('args', $row)) {
                 $arguments = array();
                 foreach ($row['args'] as $argument) {
-                    $arguments[] = CM_Util::varDump($argument);
+                    $arguments[] = CM_Util::varDump($argument, ['lengthMax' => 30]);
                 }
                 $code .= '(' . implode(', ', $arguments) . ')';
             }
