@@ -96,14 +96,10 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $this->assertSame('v1', $variationList[0]->getName());
         $this->assertSame('v2', $variationList[1]->getName());
 
-        $fixture = $this->mockClass('CM_Splittest_Fixture')->newInstanceWithoutConstructor();
-        $fixture->mockMethod('getId')->set(1);
-        $fixture->mockMethod('getFixtureType')->set(CM_Splittest_Fixture::TYPE_REQUEST_CLIENT);
-        /** @var CM_Splittest_Fixture $fixture */
-
         $request = new CM_Http_Request_Get('/');
         CM_Model_Splittest_RequestClient::isVariationFixtureStatic('foo', $request, 'v1');
         CM_Model_Splittest_RequestClient::setConversionStatic('foo', $request);
+        CMTest_TH::clearCache();
 
         $variationList = $test->getVariationListSorted();
         $this->assertTrue($variationList[0]->getConversionRate() > $variationList[1]->getConversionRate());
