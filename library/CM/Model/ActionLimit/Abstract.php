@@ -54,7 +54,11 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
             }
             return $this->getLimit();
         }
-        return $roles[$role]['limit'];
+        $limit = $roles[$role]['limit'];
+        if (null !== $limit) {
+            $limit = (int) $limit;
+        }
+        return $limit;
     }
 
     /**
@@ -159,6 +163,18 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
             'role'       => $role,
         ));
         $this->_change();
+    }
+
+    /**
+     * @param int|null $role
+     * @param int|null $limit
+     * @param int      $period
+     * @return $this
+     */
+    public function setLimitAndPeriod($role, $limit, $period) {
+        $this->setLimit($role, $limit);
+        $this->setPeriod($role, $period);
+        return $this;
     }
 
     protected function _loadData() {
