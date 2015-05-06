@@ -26,6 +26,9 @@ if (window.attachEvent) window.attachEvent('onload', __ldinsp);
 else window.addEventListener('load', __ldinsp, false);
 })();
 EOF;
+        if ($user = $environment->getViewer()) {
+            $this->_setUser($user);
+        }
         $html .= $this->getJs();
         $html .= '</script>';
         return $html;
