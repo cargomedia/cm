@@ -62,6 +62,15 @@ class CM_Model_ActionLimit_AbstractTest extends CMTest_TestCase {
         $this->assertFalse($actionLimit->hasLimit());
     }
 
+    public function testSetPeriodAndLimit() {
+        $actionLimit = new CM_Model_ActionLimit_AbstractMock($this->_actionType, $this->_actionVerb);
+
+        $result = $actionLimit->setLimitAndPeriod(12, 13, 14);
+        $this->assertSame(13, $actionLimit->getLimit(12));
+        $this->assertSame(14, $actionLimit->getPeriod(12));
+        $this->assertEquals($actionLimit, $result);
+    }
+
     public function testGetAll() {
         $this->assertInstanceOf('CM_Paging_ActionLimit_All', CM_Model_ActionLimit_Abstract::getAll(1));
     }
