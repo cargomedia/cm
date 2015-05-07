@@ -18,10 +18,11 @@ function smarty_block_ratioKeeper($params, $content, Smarty_Internal_Template $t
         }
 
         $output = '<div class="ratioKeeper">';
-        $output .= '<div class="ratioKeeper-ratio" style="padding-bottom: ' . $ratio . '%;' . ($width ? (' width: ' . $width . 'px;') : '') . ' "></div>';
+        $output .= '<div class="ratioKeeper-ratio" style="padding-bottom: ' . $ratio . '%;'
+            . ($width ? (' width: ' . $width . 'px;') : '') . ' "></div>';
 
         $contentAttrs = isset($params['contentAttrs']) ? $params['contentAttrs'] : [];
-        if(isset($contentAttrs['class'])){
+        if (isset($contentAttrs['class'])) {
             $contentAttrs['class'] .= ' ratioKeeper-content';
         } else {
             $contentAttrs['class'] = 'ratioKeeper-content';
@@ -30,8 +31,8 @@ function smarty_block_ratioKeeper($params, $content, Smarty_Internal_Template $t
         $contentAttrs['el'] = 'div';
         $contentAttrs['content'] = $content;
         $output .= smarty_function_tag($contentAttrs, $template);
-        $output .= '</div>';
 
+        $output .= '</div>';
         return $output;
     }
 }
