@@ -242,7 +242,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
         if ($updateCache) {
             $this->_change();
         }
-        if (!isset($variationListFixture[$this->getId()]) || $variationListFixture[$this->getId()]['flushStamp'] !== $this->getCreated()) {
+        if (!isset($variationListFixture[$this->getId()]) || (int) $variationListFixture[$this->getId()]['flushStamp'] !== $this->getCreated()) {
             return null;
         }
         return $variationListFixture[$this->getId()]['variation'];
