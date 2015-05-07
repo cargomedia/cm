@@ -93,7 +93,7 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
                 $class = $matches[3];
                 $ratio = (int)(($height / $width) * 100);
                 $imgHtml = '<div class="ratioKeeper">';
-                $imgHtml .= '<div class="ratioKeeper-ratio" width="' . $width . '" style="padding-bottom:' . $ratio . '%;"></div>';
+                $imgHtml .= '<div class="ratioKeeper-ratio" style="padding-bottom:' . $ratio . '%; width: ' . $width . 'px;"></div>';
                 $imgHtml .= '<img data-src="' . $src . '" alt="' . $alt . '" class="' . $class . ' ratioKeeper-content"/>';
                 $imgHtml .= '</div>';
                 return $imgHtml;
