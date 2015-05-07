@@ -244,36 +244,51 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
 
     /**
      * @param CM_Splittest_Fixture $fixture
+     * @param bool|null            $updateCache
+     * @return string|null
+     */
+    protected function _findVariationNameFixture(CM_Splittest_Fixture $fixture, $updateCache = null) {
+        $updateCache = (bool) $updateCache;
+        $variationListFixture = $this->_getVariationListFixture($fixture, $updateCache);
+        if ($updateCache) {
+            $this->_change();
+        }
+        if (!isset($variationListFixture[$this->getId()]) || (int) $variationListFixture[$this->getId()]['flushStamp'] !== $this->getCreated()) {
+            return null;
+        }
+        return $variationListFixture[$this->getId()]['variation'];
+    }
+
+    /**
+     * @param CM_Splittest_Fixture $fixture
      * @throws CM_Db_Exception
      * @throws CM_Exception_Invalid
      * @return string
      */
     protected function _getVariationFixture(CM_Splittest_Fixture $fixture) {
-        $columnId = $fixture->getColumnId();
-        $fixtureId = $fixture->getId();
-
-        $variationListFixture = $this->_getVariationListFixture($fixture);
-        if (!array_key_exists($this->getId(), $variationListFixture) || $variationListFixture[$this->getId()]['flushStamp'] != $this->getCreated()) {
+        $variationName = $this->_findVariationNameFixture($fixture);
+        if (null === $variationName) {
             $variation = $this->_getVariationRandom();
+            $variationName = $variation->getName();
             try {
+                $columnId = $fixture->getColumnId();
+                $fixtureId = $fixture->getId();
                 CM_Db_Db::insert('cm_splittestVariation_fixture',
                     array('splittestId' => $this->getId(), $columnId => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
-                $variationListFixture[$this->getId()] = ['variation' => $variation->getName(), 'flushStamp' => $this->getCreated()];
+                $variationListFixture = $this->_getVariationListFixture($fixture);
+                $variationListFixture[$this->getId()] = ['variation' => $variationName, 'flushStamp' => $this->getCreated()];
                 $cacheKey = self::_getCacheKeyFixture($fixture);
                 $cache = CM_Cache_Local::getInstance();
                 $cache->set($cacheKey, $variationListFixture);
                 $this->getServiceManager()->getTrackings()->trackSplittest($fixture, $variation);
             } catch (CM_Db_Exception $exception) {
-                $variationListFixture = $this->_getVariationListFixture($fixture, true);
-                if (!array_key_exists($this->getId(), $variationListFixture) ||
-                    $variationListFixture[$this->getId()]['flushStamp'] != $this->getCreated()
-                ) {
+                $variationName = $this->_findVariationNameFixture($fixture, true);
+                if (null === $variationName) {
                     throw $exception;
                 }
             }
         }
-
-        return $variationListFixture[$this->getId()]['variation'];
+        return $variationName;
     }
 
     /**
