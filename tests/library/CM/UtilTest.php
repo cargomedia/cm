@@ -132,7 +132,7 @@ class CM_UtilTest extends CMTest_TestCase {
             ['[]', ['foo' => 12]],
             ['true', true],
             ['12', 12],
-            ['-12.3', -12.3],
+            ['-12', -12],
             ["'foo'", 'foo'],
             ['object', new stdClass()],
             ['SplFixedArray', new SplFixedArray()],
