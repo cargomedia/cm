@@ -52,7 +52,6 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
     $depth = isset($params['depth']) ? (int) $params['depth'] : null;
 
     if (!empty($params['breadcrumb'])) {
-        /** @var CM_MenuEntry $entry */
         $entry = $menu->findEntry($pageClassName, $activeParams, $depth, $depth);
         if ($entry) {
             $menuEntries = $entry->getParents();

@@ -88,7 +88,9 @@ class CM_ExceptionHandling_SerializableException {
         $this->line = $exception->getLine();
         $this->file = $exception->getFile();
         if ($exception instanceof CM_Exception) {
-            $this->metaInfo = $exception->getMetaInfo();
+            $this->metaInfo = Functional\map($exception->getMetaInfo(), function ($value) {
+                return CM_Util::varDump($value);
+            });
         }
 
         try {
@@ -123,7 +125,7 @@ class CM_ExceptionHandling_SerializableException {
             if (array_key_exists('args', $row)) {
                 $arguments = array();
                 foreach ($row['args'] as $argument) {
-                    $arguments[] = CM_Util::varDump($argument);
+                    $arguments[] = CM_Util::varDump($argument, ['lengthMax' => 30]);
                 }
                 $code .= '(' . implode(', ', $arguments) . ')';
             }

@@ -59,8 +59,7 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
      * @return string
      */
     protected function _getTrackingImageTag(CM_Mail $mail) {
-        return '<img style="display: none; width: 0px; height: 0px;" src="' .
-        CM_Util::htmlspecialchars($this->getRender()->getUrlEmailTracking($mail)) . '" />';
+        return '<img src="' . CM_Util::htmlspecialchars($this->getRender()->getUrlEmailTracking($mail)) . '" width="1" height="1" />';
     }
 
     /**

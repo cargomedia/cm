@@ -283,13 +283,13 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         try {
             CMTest_TH::callProtectedMethod($mongoDb, '_checkResultForErrors', [false]);
         } catch (CM_MongoDb_Exception $ex) {
-            $this->assertSame(['result' => false], $ex->getMetaInfo(true));
+            $this->assertSame(['result' => false], $ex->getMetaInfo());
         }
 
         try {
             CMTest_TH::callProtectedMethod($mongoDb, '_checkResultForErrors', [['ok' => 0, 'errmsg' => 'foo']]);
         } catch (CM_MongoDb_Exception $ex) {
-            $this->assertSame(['result' => ['ok' => 0, 'errmsg' => 'foo']], $ex->getMetaInfo(true));
+            $this->assertSame(['result' => ['ok' => 0, 'errmsg' => 'foo']], $ex->getMetaInfo());
         }
     }
 }

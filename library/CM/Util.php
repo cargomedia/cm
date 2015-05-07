@@ -31,27 +31,43 @@ class CM_Util {
     }
 
     /**
-     * @param mixed $argument
+     * @param mixed      $argument
+     * @param array|null $options
+     * @throws CM_Exception_Invalid
      * @return string
      */
-    public static function varDump($argument) {
+    public static function varDump($argument, array $options = null) {
+        $options = array_merge([
+            'recursive' => false,
+            'lengthMax' => null,
+        ], (array) $options);
+        $recursive = (bool) $options['recursive'];
+        $lengthMax = (null === $options['lengthMax']) ? null : (int) $options['lengthMax'];
+
+        if (is_array($argument)) {
+            if ($recursive) {
+                $elementList = Functional\map($argument, function ($value, $key) use ($options) {
+                    return self::varDump($key, $options) . ' => ' . self::varDump($value, $options);
+                });
+                return '[' . implode(', ', $elementList) . ']';
+            } else {
+                return '[]';
+            }
+        }
         if (is_object($argument)) {
             if ($argument instanceof stdClass) {
                 return 'object';
             }
-            $value = get_class($argument);
-            if ($argument instanceof CM_Model_Abstract) {
-                if ($argument->hasIdRaw()) {
-                    $value .= '(' . implode(', ', (array) $argument->getIdRaw()) . ')';
-                }
+            if ($argument instanceof CM_Debug_DebugInfoInterface) {
+                return $argument->getDebugInfo();
             }
-            return $value;
+            return get_class($argument);
         }
         if (is_string($argument)) {
-            if (strlen($argument) > 20) {
-                $argument = substr($argument, 0, 20) . '...';
+            if (null !== $lengthMax && strlen($argument) > $lengthMax) {
+                $argument = substr($argument, 0, $lengthMax) . '...';
             }
-            return '\'' . $argument . '\'';
+            return "'" . $argument . "'";
         }
         if (is_bool($argument) || is_numeric($argument)) {
             return var_export($argument, true);
