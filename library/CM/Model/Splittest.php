@@ -65,6 +65,17 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
     }
 
     /**
+     * @return CM_Model_SplittestVariation[]
+     */
+    public function getVariationListSorted() {
+        $variationList = $this->getVariations()->getItems();
+        usort($variationList, function (CM_Model_SplittestVariation $variationA, CM_Model_SplittestVariation $variationB) {
+            return $variationA->getConversionRate() > $variationB->getConversionRate() ? -1 : 1;
+        });
+        return $variationList;
+    }
+
+    /**
      * @return CM_Paging_SplittestVariation_Splittest
      */
     public function getVariations() {
