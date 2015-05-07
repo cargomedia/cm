@@ -91,9 +91,10 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
                 $src = $matches[1];
                 $alt = $matches[2];
                 $class = $matches[3];
-                $ratio = (($height / $width) * 100);
-                $imgHtml = '<div class="embeddedWrapper" width="' . $width . '" style="padding-bottom:' . $ratio . '%;">';
-                $imgHtml .= '<img data-src="' . $src . '" alt="' . $alt . '" class="' . $class . ' embeddedWrapper-object"/>';
+                $ratio = (int)(($height / $width) * 100);
+                $imgHtml = '<div class="ratioKeeper">';
+                $imgHtml .= '<div class="ratioKeeper-ratio" width="' . $width . '" style="padding-bottom:' . $ratio . '%;"></div>';
+                $imgHtml .= '<img data-src="' . $src . '" alt="' . $alt . '" class="' . $class . ' ratioKeeper-content"/>';
                 $imgHtml .= '</div>';
                 return $imgHtml;
             }
