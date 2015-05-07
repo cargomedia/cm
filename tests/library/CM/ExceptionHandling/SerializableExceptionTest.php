@@ -62,11 +62,12 @@ class CM_ExceptionHandling_SerializableExceptionTest extends CMTest_TestCase {
     }
 
     public function testGetters() {
-        $exception = new CM_Exception('Foo bar');
+        $exception = new CM_Exception('Foo bar', ['foo' => new SplFixedArray(), 'bar' => [1, 2, 3]]);
         $serializableException = new CM_ExceptionHandling_SerializableException($exception);
         $this->assertSame('Foo bar', $serializableException->getMessage());
         $this->assertSame('CM_Exception', $serializableException->getClass());
         $this->assertSame(__FILE__, $serializableException->getFile());
         $this->assertInternalType('int', $serializableException->getLine());
+        $this->assertSame(['foo' => 'SplFixedArray', 'bar' => '[]'], $serializableException->getMeta());
     }
 }

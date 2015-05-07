@@ -334,4 +334,18 @@ class CM_ParamsTest extends CMTest_TestCase {
         $resource = fopen(sys_get_temp_dir(), 'r');
         CM_Params::jsonEncode(['foo' => $resource]);
     }
+
+    public function testDebugInfo() {
+        $params = new CM_Params(['foo' => 12, 'bar' => [1, 2]]);
+        $this->assertSame("['foo' => 12, 'bar' => [0 => 1, 1 => 2]]", $params->getDebugInfo());
+    }
+
+    public function testDebugInfoWithException() {
+        /** @var CM_Params|\Mocka\AbstractClassTrait $params */
+        $params = $this->mockObject('CM_Params');
+        $params->mockMethod('getParamsDecoded')->set(function() {
+            throw new Exception('foo');
+        });
+        $this->assertSame('[Cannot dump params: `foo`]', $params->getDebugInfo());
+    }
 }

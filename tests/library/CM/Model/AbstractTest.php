@@ -1066,6 +1066,31 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $user = CM_Model_Abstract::createType(CM_Model_User::getTypeStatic());
         $this->assertInstanceOf('CM_Model_User', $user);
     }
+
+    public function testDebugInfo() {
+        $modelClass = new \Mocka\ClassMock('CM_Model_DebugInfoMock1', 'CM_Model_Abstract');
+        /** @var CM_Model_Abstract|\Mocka\AbstractClassTrait $model */
+        $model = $modelClass->newInstance();
+        $model->mockMethod('hasIdRaw')->set(function () {
+            return true;
+        });
+        $model->mockMethod('getIdRaw')->set(function () {
+            return ['id' => 12];
+        });
+
+        $this->assertSame('CM_Model_DebugInfoMock1(12)', $model->getDebugInfo());
+    }
+
+    public function testDebugInfoWithoutId() {
+        $modelClass = new \Mocka\ClassMock('CM_Model_DebugInfoMock2', 'CM_Model_Abstract');
+        /** @var CM_Model_Abstract|\Mocka\AbstractClassTrait $model */
+        $model = $modelClass->newInstance();
+        $model->mockMethod('hasIdRaw')->set(function () {
+            return false;
+        });
+
+        $this->assertSame('CM_Model_DebugInfoMock2', $model->getDebugInfo());
+    }
 }
 
 class CM_ModelMock extends CM_Model_Abstract {
