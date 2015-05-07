@@ -49,7 +49,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     }, 750);
 
     if (this._pageRequest) {
-      this._pageRequest.abort();
+      this._pageRequest.cancel();
     }
     this._pageRequest = this.ajaxModal('loadPage', {path: path}, {
       success: function(response) {

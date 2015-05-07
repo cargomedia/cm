@@ -32,7 +32,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
       },
       query: function(options) {
         if (this._request) {
-          this._request.abort();
+          this._request.cancel();
         }
         this._request = field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()}, {
           success: function(results) {
