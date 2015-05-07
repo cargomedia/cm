@@ -1,6 +1,6 @@
 <?php
 
-interface CM_DebugInfo_DebugInfoInterface {
+interface CM_Debug_DebugInfoInterface {
 
     /**
      * @return string

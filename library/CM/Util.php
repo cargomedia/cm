@@ -58,7 +58,7 @@ class CM_Util {
             if ($argument instanceof stdClass) {
                 return 'object';
             }
-            if ($argument instanceof CM_DebugInfo_DebugInfoInterface) {
+            if ($argument instanceof CM_Debug_DebugInfoInterface) {
                 return $argument->getDebugInfo();
             }
             return get_class($argument);

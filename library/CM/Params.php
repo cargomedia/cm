@@ -1,6 +1,6 @@
 <?php
 
-class CM_Params extends CM_Class_Abstract implements CM_DebugInfo_DebugInfoInterface {
+class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface {
 
     private $_params;
 
