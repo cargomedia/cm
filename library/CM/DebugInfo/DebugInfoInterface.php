@@ -5,5 +5,5 @@ interface CM_DebugInfo_DebugInfoInterface {
     /**
      * @return string
      */
-    public function __debugInfo();
+    public function getDebugInfo();
 }

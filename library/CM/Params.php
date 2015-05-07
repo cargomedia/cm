@@ -410,7 +410,7 @@ class CM_Params extends CM_Class_Abstract implements CM_DebugInfo_DebugInfoInter
     /**
      * @return string
      */
-    public function __debugInfo() {
+    public function getDebugInfo() {
         try {
             return CM_Util::varDump($this->getParamsDecoded(), ['recursive' => true]);
         } catch (Exception $e) {

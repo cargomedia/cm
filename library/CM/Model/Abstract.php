@@ -250,7 +250,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         }
     }
 
-    public function __debugInfo() {
+    public function getDebugInfo() {
         $debugInfo = get_class($this);
         if ($this->hasIdRaw()) {
             $debugInfo .= '(' . implode(', ', (array) $this->getIdRaw()) . ')';

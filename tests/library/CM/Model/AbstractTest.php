@@ -1078,7 +1078,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
             return ['id' => 12];
         });
 
-        $this->assertSame('CM_Model_DebugInfoMock1(12)', $model->__debugInfo());
+        $this->assertSame('CM_Model_DebugInfoMock1(12)', $model->getDebugInfo());
     }
 
     public function testDebugInfoWithoutId() {
@@ -1089,7 +1089,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
             return false;
         });
 
-        $this->assertSame('CM_Model_DebugInfoMock2', $model->__debugInfo());
+        $this->assertSame('CM_Model_DebugInfoMock2', $model->getDebugInfo());
     }
 }
 

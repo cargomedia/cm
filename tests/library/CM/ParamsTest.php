@@ -337,7 +337,7 @@ class CM_ParamsTest extends CMTest_TestCase {
 
     public function testDebugInfo() {
         $params = new CM_Params(['foo' => 12, 'bar' => [1, 2]]);
-        $this->assertSame("['foo' => 12, 'bar' => [0 => 1, 1 => 2]]", $params->__debugInfo());
+        $this->assertSame("['foo' => 12, 'bar' => [0 => 1, 1 => 2]]", $params->getDebugInfo());
     }
 
     public function testDebugInfoWithException() {
@@ -346,6 +346,6 @@ class CM_ParamsTest extends CMTest_TestCase {
         $params->mockMethod('getParamsDecoded')->set(function() {
             throw new Exception('foo');
         });
-        $this->assertSame('[Cannot dump params: `foo`]', $params->__debugInfo());
+        $this->assertSame('[Cannot dump params: `foo`]', $params->getDebugInfo());
     }
 }
