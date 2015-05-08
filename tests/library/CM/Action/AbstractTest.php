@@ -49,19 +49,29 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         $actor = CMTest_TH::createUser();
         /** @var CM_Action_Abstract|\Mocka\AbstractClassTrait $action */
         $action = $this->mockObject('CM_Action_Abstract', ['foo', $actor]);
-        $action->mockMethod('getType')->set(function() {
+        $action->mockMethod('getType')->set(function () {
             return 12;
         });
-        $isAllowedFoo = $action->mockMethod('_isDisallowedFoo')->set(function($arg1, $config) {
+        $action->mockMethod('_isDisallowedFoo')->set(function ($arg1, $config) {
             $this->assertSame('myArg', $arg1);
             return $config['disallowed'];
         });
+        $action->mockMethod('_isAllowedFoo')->set(function ($arg1, $config) {
+            $this->assertSame('myArg', $arg1);
+            return $config['allowed'];
+        });
 
-        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => true]));
-        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => false]));
-        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => null]));
+        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => true, 'allowed' => true]));
+        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => true, 'allowed' => false]));
+        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => true, 'allowed' => null]));
 
-        $this->assertSame(3, $isAllowedFoo->getCallCount());
+        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => false, 'allowed' => true]));
+        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => false, 'allowed' => false]));
+        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => false, 'allowed' => null]));
+
+        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => null, 'allowed' => true]));
+        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => null, 'allowed' => false]));
+        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => null, 'allowed' => null]));
     }
 
     public function testPrepareUser() {

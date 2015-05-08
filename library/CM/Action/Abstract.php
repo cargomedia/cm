@@ -151,9 +151,12 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
      */
     public function isAllowed() {
         $arguments = func_get_args();
-        if (true === call_user_func_array(array($this, '_isDisallowed'), $arguments)) {
-            return false;
+
+        $allowedOrDisallowed = call_user_func_array(array($this, '_isAllowedOrDisallowed'), $arguments);
+        if (null !== $allowedOrDisallowed) {
+            return $allowedOrDisallowed;
         }
+
         $actionLimitList = $this->getActionLimitsTransgressed();
         foreach ($actionLimitList as $actionLimitData) {
             /** @var CM_Model_ActionLimit_Abstract $actionLimit */
@@ -162,6 +165,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
                 return false;
             }
         }
+
         return true;
     }
 
@@ -174,10 +178,15 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
     public function prepare() {
         $arguments = func_get_args();
-        if (true === call_user_func_array(array($this, '_isDisallowed'), $arguments)) {
+
+        $allowedOrDisallowed = call_user_func_array(array($this, '_isAllowedOrDisallowed'), $arguments);
+        if (false === $allowedOrDisallowed) {
             throw new CM_Exception_NotAllowed('Action not allowed', null, array('messagePublic' => 'The content you tried to interact with has become private.'));
         }
-        $this->_checkActionLimits();
+        if (true !== $allowedOrDisallowed) {
+            $this->_checkActionLimits();
+        }
+
         $this->_prepare();
     }
 
@@ -195,13 +204,23 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     /**
      * @return bool|null
      */
-    protected function _isDisallowed() {
+    protected function _isAllowedOrDisallowed() {
         $arguments = func_get_args();
-        $methodName = '_isDisallowed' . CM_Util::camelize($this->getVerbName());
 
-        if (is_callable([$this, $methodName])) {
-            return call_user_func_array(array($this, $methodName), $arguments);
+        $methodNameDisallowed = '_isDisallowed' . CM_Util::camelize($this->getVerbName());
+        if (is_callable([$this, $methodNameDisallowed])) {
+            if (true === call_user_func_array(array($this, $methodNameDisallowed), $arguments)) {
+                return false;
+            }
         }
+
+        $methodNameAllowed = '_isAllowed' . CM_Util::camelize($this->getVerbName());
+        if (is_callable([$this, $methodNameAllowed])) {
+            if (true === call_user_func_array(array($this, $methodNameAllowed), $arguments)) {
+                return true;
+            }
+        }
+
         return null;
     }
 
