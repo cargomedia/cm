@@ -47,11 +47,10 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
 
     public function testIsAllowed() {
         $actor = CMTest_TH::createUser();
+
         /** @var CM_Action_Abstract|\Mocka\AbstractClassTrait $action */
         $action = $this->mockObject('CM_Action_Abstract', ['foo', $actor]);
-        $action->mockMethod('getType')->set(function () {
-            return 12;
-        });
+        $action->mockMethod('getType')->set(12);
         $action->mockMethod('_isDisallowedFoo')->set(function ($arg1, $config) {
             $this->assertSame('myArg', $arg1);
             return $config['disallowed'];
@@ -63,15 +62,25 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
 
         $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => true, 'allowed' => true]));
         $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => true, 'allowed' => false]));
-        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => true, 'allowed' => null]));
 
         $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => false, 'allowed' => true]));
         $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => false, 'allowed' => false]));
-        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => false, 'allowed' => null]));
 
         $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => null, 'allowed' => true]));
         $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => null, 'allowed' => false]));
-        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => null, 'allowed' => null]));
+
+        $action->mockMethod('getActionLimitsTransgressed')->set(function () {
+            return [['actionLimit' => $this->_getActionLimitForbidden(), 'role' => null]];
+        });
+
+        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => true, 'allowed' => true]));
+        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => true, 'allowed' => false]));
+
+        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => false, 'allowed' => true]));
+        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => false, 'allowed' => false]));
+
+        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => null, 'allowed' => true]));
+        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => null, 'allowed' => false]));
     }
 
     public function testPrepareUser() {
@@ -339,5 +348,21 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         CM_Action_Abstract::deleteTransgressionsOlder(60);
         $transgressions->_change();
         $this->assertCount(0, $transgressions);
+    }
+
+    /**
+     * @return CM_Model_ActionLimit_Abstract
+     */
+    private function _getActionLimitForbidden() {
+        /** @var CM_Model_ActionLimit_Abstract|\Mocka\AbstractClassTrait $actionLimitForbidden */
+        $actionLimit = $this->mockClass('CM_Model_ActionLimit_Abstract')->newInstanceWithoutConstructor();
+        $actionLimit->mockMethod('getType')->set(1);
+        $actionLimit->mockMethod('getLimit')->set(12);
+        $actionLimit->mockMethod('getPeriod')->set(60);
+        $actionLimit->mockMethod('getOvershootAllowed')->set(false);
+        $actionLimit->mockMethod('overshoot')->set(function () {
+            throw new Exception('my overshoot');
+        });
+        return $actionLimit;
     }
 }
