@@ -65,8 +65,8 @@ class CM_Action_Mock extends CM_Action_Abstract {
      * @param bool $private
      * @return bool
      */
-    protected function _isAllowedTest($private = false) {
-        return !$private;
+    protected function _isDisallowedTest($private = false) {
+        return $private;
     }
 
     protected function _prepare() {
