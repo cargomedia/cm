@@ -199,7 +199,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         $arguments = func_get_args();
         $methodName = '_isDisallowed' . CM_Util::camelize($this->getVerbName());
 
-        if (method_exists($this, $methodName)) {
+        if (is_callable([$this, $methodName])) {
             return call_user_func_array(array($this, $methodName), $arguments);
         }
         return null;
@@ -209,7 +209,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         $arguments = func_get_args();
         $methodName = '_notify' . CM_Util::camelize($this->getVerbName());
 
-        if (method_exists($this, $methodName)) {
+        if (is_callable([$this, $methodName])) {
             call_user_func_array(array($this, $methodName), $arguments);
         }
 
