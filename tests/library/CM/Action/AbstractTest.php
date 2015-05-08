@@ -10,8 +10,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         $actor = CMTest_TH::createUser();
         $action = $this->getMockBuilder('CM_Action_Abstract')->setMethods(array('_notifyFoo', '_track'))
             ->setConstructorArgs(array('Foo', $actor))->getMockForAbstractClass();
-        // Cannot check due to https://github.com/sebastianbergmann/phpunit-mock-objects/issues/139
-        // $action->expects($this->once())->method('_notifyFoo')->with('bar');
+        $action->expects($this->once())->method('_notifyFoo')->with('bar');
 
         $method = CMTest_TH::getProtectedMethod('CM_Action_Abstract', '_notify');
         $method->invoke($action, 'bar');
