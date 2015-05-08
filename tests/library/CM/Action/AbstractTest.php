@@ -83,6 +83,70 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => null, 'allowed' => false]));
     }
 
+    public function testPrepareAllowed() {
+        /** @var CM_Action_Abstract|\Mocka\AbstractClassTrait $action */
+        $action = $this->mockObject('CM_Action_Abstract', ['foo', CMTest_TH::createUser()]);
+        $action->mockMethod('getType')->set(12);
+        $isAllowedOrDisallowed = $action->mockMethod('_isAllowedOrDisallowed')->set(function($arg1) {
+            $this->assertSame('myArg', $arg1);
+            return true;
+        });
+        $action->mockMethod('getActionLimitsTransgressed')->set(function () {
+            return [['actionLimit' => $this->_getActionLimitForbidden(), 'role' => null]];
+        });
+        $prepare = $action->mockMethod('_prepare');
+
+        $action->prepare('myArg');
+        $this->assertSame(1, $isAllowedOrDisallowed->getCallCount());
+        $this->assertSame(1, $prepare->getCallCount());
+    }
+
+    public function testPrepareDisallowed() {
+        /** @var CM_Action_Abstract|\Mocka\AbstractClassTrait $action */
+        $action = $this->mockObject('CM_Action_Abstract', ['foo', CMTest_TH::createUser()]);
+        $action->mockMethod('getType')->set(12);
+        $isAllowedOrDisallowed = $action->mockMethod('_isAllowedOrDisallowed')->set(function($arg1) {
+            $this->assertSame('myArg', $arg1);
+            return false;
+        });
+        $action->mockMethod('getActionLimitsTransgressed')->set(function () {
+            return [['actionLimit' => $this->_getActionLimitForbidden(), 'role' => null]];
+        });
+        $prepare = $action->mockMethod('_prepare');
+
+        try {
+            $action->prepare('myArg');
+            $this->fail('Prepare should throw');
+        } catch(CM_Exception_NotAllowed $e) {
+            $this->assertSame('Action not allowed', $e->getMessage());
+        }
+        $this->assertSame(1, $isAllowedOrDisallowed->getCallCount());
+        $this->assertSame(0, $prepare->getCallCount());
+    }
+
+    public function testPrepareActionLimit() {
+        /** @var CM_Action_Abstract|\Mocka\AbstractClassTrait $action */
+        $action = $this->mockObject('CM_Action_Abstract', ['foo', CMTest_TH::createUser()]);
+        $action->mockMethod('getType')->set(12);
+        $isAllowedOrDisallowed = $action->mockMethod('_isAllowedOrDisallowed')->set(function($arg1) {
+            $this->assertSame('myArg', $arg1);
+            return null;
+        });
+        $action->mockMethod('getActionLimitsTransgressed')->set(function () {
+            return [['actionLimit' => $this->_getActionLimitForbidden(), 'role' => null]];
+        });
+        $prepare = $action->mockMethod('_prepare');
+
+        try {
+            $action->prepare('myArg');
+            $this->fail('Prepare should throw');
+        } catch(Exception $e) {
+            $this->assertSame('my overshoot', $e->getMessage());
+        }
+        $this->assertSame(1, $isAllowedOrDisallowed->getCallCount());
+        $this->assertSame(0, $prepare->getCallCount());
+    }
+
     public function testPrepareUser() {
         $user = CMTest_TH::createUser();
         $hardLimit = $this->getMockBuilder('CM_Model_ActionLimit_Abstract')->disableOriginalConstructor()
