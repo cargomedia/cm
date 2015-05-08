@@ -38,13 +38,6 @@ class CM_Action_MockTest extends CMTest_TestCase {
         }
     }
 
-    public function testIsAllowed() {
-        $actor = CMTest_TH::createUser();
-        $action = new CM_Action_Mock('foo', $actor);
-        $this->assertTrue($action->isAllowed(false));
-        $this->assertFalse($action->isAllowed(true));
-    }
-
     /**
      * @expectedException CM_Exception_NotAllowed
      * @expectedExceptionMessage Action not allowed

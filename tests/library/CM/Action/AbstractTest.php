@@ -45,6 +45,25 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         }
     }
 
+    public function testIsAllowed() {
+        $actor = CMTest_TH::createUser();
+        /** @var CM_Action_Abstract|\Mocka\AbstractClassTrait $action */
+        $action = $this->mockObject('CM_Action_Abstract', ['foo', $actor]);
+        $action->mockMethod('getType')->set(function() {
+            return 12;
+        });
+        $isAllowedFoo = $action->mockMethod('_isDisallowedFoo')->set(function($arg1, $config) {
+            $this->assertSame('myArg', $arg1);
+            return $config['disallowed'];
+        });
+
+        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => true]));
+        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => false]));
+        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => null]));
+
+        $this->assertSame(3, $isAllowedFoo->getCallCount());
+    }
+
     public function testPrepareUser() {
         $user = CMTest_TH::createUser();
         $hardLimit = $this->getMockBuilder('CM_Model_ActionLimit_Abstract')->disableOriginalConstructor()
