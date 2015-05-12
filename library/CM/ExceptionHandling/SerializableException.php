@@ -88,8 +88,9 @@ class CM_ExceptionHandling_SerializableException {
         $this->line = $exception->getLine();
         $this->file = $exception->getFile();
         if ($exception instanceof CM_Exception) {
-            $this->metaInfo = Functional\map($exception->getMetaInfo(), function ($value) {
-                return CM_Util::varDump($value);
+            $variableInspector = new CM_Debug_VariableInspector();
+            $this->metaInfo = Functional\map($exception->getMetaInfo(), function ($value) use ($variableInspector) {
+                return $variableInspector->getDebugInfo($value);
             });
         }
 
@@ -124,8 +125,9 @@ class CM_ExceptionHandling_SerializableException {
             $code .= $row['function'];
             if (array_key_exists('args', $row)) {
                 $arguments = array();
+                $variableInspector = new CM_Debug_VariableInspector();
                 foreach ($row['args'] as $argument) {
-                    $arguments[] = CM_Util::varDump($argument, ['lengthMax' => 30]);
+                    $arguments[] = $variableInspector->getDebugInfo($argument, ['lengthMax' => 30]);
                 }
                 $code .= '(' . implode(', ', $arguments) . ')';
             }
