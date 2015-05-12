@@ -9,7 +9,8 @@ class CM_Debug_VariableInspectorTest extends CMTest_TestCase {
      * @param mixed  $argument
      */
     public function testGetDebugInfo($expected, $argument) {
-        $this->assertSame($expected, CM_Util::varDump($argument));
+        $variableInspector = new CM_Debug_VariableInspector();
+        $this->assertSame($expected, $variableInspector->getDebugInfo($argument));
     }
 
     public function debugInfoProvider() {
@@ -26,9 +27,10 @@ class CM_Debug_VariableInspectorTest extends CMTest_TestCase {
     }
 
     public function testGetDebugInfoLengthMax() {
-        $this->assertSame("'foo...'", CM_Util::varDump('fooo', ['lengthMax' => 3]));
-        $this->assertSame("'fooo'", CM_Util::varDump('fooo', ['lengthMax' => 4]));
-        $this->assertSame("'fooo'", CM_Util::varDump('fooo', ['lengthMax' => null]));
+        $variableInspector = new CM_Debug_VariableInspector();
+        $this->assertSame("'foo...'", $variableInspector->getDebugInfo('fooo', ['lengthMax' => 3]));
+        $this->assertSame("'fooo'", $variableInspector->getDebugInfo('fooo', ['lengthMax' => 4]));
+        $this->assertSame("'fooo'", $variableInspector->getDebugInfo('fooo', ['lengthMax' => null]));
     }
 
     /**
@@ -38,7 +40,8 @@ class CM_Debug_VariableInspectorTest extends CMTest_TestCase {
      * @param mixed  $argument
      */
     public function testGetDebugInfoRecursive($expected, $argument) {
-        $this->assertSame($expected, CM_Util::varDump($argument, ['recursive' => true]));
+        $variableInspector = new CM_Debug_VariableInspector();
+        $this->assertSame($expected, $variableInspector->getDebugInfo($argument, ['recursive' => true]));
     }
 
     public function debugInfoProviderRecursive() {
