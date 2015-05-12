@@ -30,6 +30,7 @@ class CM_Debug_VariableInspectorTest extends CMTest_TestCase {
         $variableInspector = new CM_Debug_VariableInspector();
         $this->assertSame("'foo...'", $variableInspector->getDebugInfo('fooo', ['lengthMax' => 3]));
         $this->assertSame("'fooo'", $variableInspector->getDebugInfo('fooo', ['lengthMax' => 4]));
+        $this->assertSame("'fooo'", $variableInspector->getDebugInfo('fooo', ['lengthMax' => 6]));
         $this->assertSame("'fooo'", $variableInspector->getDebugInfo('fooo', ['lengthMax' => null]));
     }
 
