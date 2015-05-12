@@ -46,48 +46,32 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
     }
 
     public function testIsAllowed() {
-        $actor = CMTest_TH::createUser();
-
         /** @var CM_Action_Abstract|\Mocka\AbstractClassTrait $action */
-        $action = $this->mockObject('CM_Action_Abstract', ['foo', $actor]);
+        $action = $this->mockObject('CM_Action_Abstract', ['foo', CMTest_TH::createUser()]);
         $action->mockMethod('getType')->set(12);
-        $action->mockMethod('_isDisallowedFoo')->set(function ($arg1, $config) {
-            $this->assertSame('myArg', $arg1);
-            return $config['disallowed'];
-        });
         $action->mockMethod('_isAllowedFoo')->set(function ($arg1, $config) {
             $this->assertSame('myArg', $arg1);
             return $config['allowed'];
         });
 
-        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => true, 'allowed' => true]));
-        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => true, 'allowed' => false]));
-
-        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => false, 'allowed' => true]));
-        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => false, 'allowed' => false]));
-
-        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => null, 'allowed' => true]));
-        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => null, 'allowed' => false]));
+        $this->assertSame(true, $action->isAllowed('myArg', ['allowed' => true]));
+        $this->assertSame(false, $action->isAllowed('myArg', ['allowed' => false]));
+        $this->assertSame(true, $action->isAllowed('myArg', ['allowed' => null]));
 
         $action->mockMethod('getActionLimitsTransgressed')->set(function () {
             return [['actionLimit' => $this->_getActionLimitForbidden(), 'role' => null]];
         });
 
-        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => true, 'allowed' => true]));
-        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => true, 'allowed' => false]));
-
-        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => false, 'allowed' => true]));
-        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => false, 'allowed' => false]));
-
-        $this->assertSame(true, $action->isAllowed('myArg', ['disallowed' => null, 'allowed' => true]));
-        $this->assertSame(false, $action->isAllowed('myArg', ['disallowed' => null, 'allowed' => false]));
+        $this->assertSame(true, $action->isAllowed('myArg', ['allowed' => true]));
+        $this->assertSame(false, $action->isAllowed('myArg', ['allowed' => false]));
+        $this->assertSame(false, $action->isAllowed('myArg', ['allowed' => null]));
     }
 
     public function testPrepareAllowed() {
         /** @var CM_Action_Abstract|\Mocka\AbstractClassTrait $action */
         $action = $this->mockObject('CM_Action_Abstract', ['foo', CMTest_TH::createUser()]);
         $action->mockMethod('getType')->set(12);
-        $isAllowedOrDisallowed = $action->mockMethod('_isAllowedOrDisallowed')->set(function($arg1) {
+        $isAllowed = $action->mockMethod('_isAllowed')->set(function($arg1) {
             $this->assertSame('myArg', $arg1);
             return true;
         });
@@ -97,7 +81,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         $prepare = $action->mockMethod('_prepare');
 
         $action->prepare('myArg');
-        $this->assertSame(1, $isAllowedOrDisallowed->getCallCount());
+        $this->assertSame(1, $isAllowed->getCallCount());
         $this->assertSame(1, $prepare->getCallCount());
     }
 
@@ -105,7 +89,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         /** @var CM_Action_Abstract|\Mocka\AbstractClassTrait $action */
         $action = $this->mockObject('CM_Action_Abstract', ['foo', CMTest_TH::createUser()]);
         $action->mockMethod('getType')->set(12);
-        $isAllowedOrDisallowed = $action->mockMethod('_isAllowedOrDisallowed')->set(function($arg1) {
+        $isAllowedOrDisallowed = $action->mockMethod('_isAllowed')->set(function($arg1) {
             $this->assertSame('myArg', $arg1);
             return false;
         });
@@ -128,7 +112,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         /** @var CM_Action_Abstract|\Mocka\AbstractClassTrait $action */
         $action = $this->mockObject('CM_Action_Abstract', ['foo', CMTest_TH::createUser()]);
         $action->mockMethod('getType')->set(12);
-        $isAllowedOrDisallowed = $action->mockMethod('_isAllowedOrDisallowed')->set(function($arg1) {
+        $isAllowedOrDisallowed = $action->mockMethod('_isAllowed')->set(function($arg1) {
             $this->assertSame('myArg', $arg1);
             return null;
         });

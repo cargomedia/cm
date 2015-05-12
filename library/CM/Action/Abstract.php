@@ -152,9 +152,9 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     public function isAllowed() {
         $arguments = func_get_args();
 
-        $allowedOrDisallowed = call_user_func_array(array($this, '_isAllowedOrDisallowed'), $arguments);
-        if (null !== $allowedOrDisallowed) {
-            return $allowedOrDisallowed;
+        $isAllowed = call_user_func_array(array($this, '_isAllowed'), $arguments);
+        if (null !== $isAllowed) {
+            return $isAllowed;
         }
 
         $actionLimitList = $this->getActionLimitsTransgressed();
@@ -179,11 +179,11 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     public function prepare() {
         $arguments = func_get_args();
 
-        $allowedOrDisallowed = call_user_func_array(array($this, '_isAllowedOrDisallowed'), $arguments);
-        if (false === $allowedOrDisallowed) {
+        $isAllowed = call_user_func_array(array($this, '_isAllowed'), $arguments);
+        if (false === $isAllowed) {
             throw new CM_Exception_NotAllowed('Action not allowed', null, array('messagePublic' => 'The content you tried to interact with has become private.'));
         }
-        if (true !== $allowedOrDisallowed) {
+        if (true !== $isAllowed) {
             $this->_checkActionLimits();
         }
 
@@ -204,20 +204,14 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     /**
      * @return bool|null
      */
-    protected function _isAllowedOrDisallowed() {
+    protected function _isAllowed() {
         $arguments = func_get_args();
-
-        $methodNameDisallowed = '_isDisallowed' . CM_Util::camelize($this->getVerbName());
-        if (is_callable([$this, $methodNameDisallowed])) {
-            if (true === call_user_func_array(array($this, $methodNameDisallowed), $arguments)) {
-                return false;
-            }
-        }
 
         $methodNameAllowed = '_isAllowed' . CM_Util::camelize($this->getVerbName());
         if (is_callable([$this, $methodNameAllowed])) {
-            if (true === call_user_func_array(array($this, $methodNameAllowed), $arguments)) {
-                return true;
+            $isAllowed = call_user_func_array(array($this, $methodNameAllowed), $arguments);
+            if (null !== $isAllowed) {
+                return (bool) $isAllowed;
             }
         }
 
