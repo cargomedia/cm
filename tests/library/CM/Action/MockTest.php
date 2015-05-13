@@ -26,12 +26,12 @@ class CM_Action_MockTest extends CMTest_TestCase {
     public function testPrepare() {
         $actor = CMTest_TH::createUser();
         $action = new CM_Action_Mock('foo', $actor);
-        $action->prepare();
+        $action->prepare(null);
 
         CM_Db_Db::insert('cm_actionLimit', array('type' => 1, 'actionType' => 1, 'actionVerb' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
         CMTest_TH::clearCache();
         try {
-            $action->prepare();
+            $action->prepare(null);
             $this->fail('Limited action did not throw exception');
         } catch (CM_Exception_ActionLimit $e) {
             $this->assertSame('Mock overshoot', $e->getMessage());
@@ -45,7 +45,7 @@ class CM_Action_MockTest extends CMTest_TestCase {
     public function testPrepareNotAllowed() {
         $actor = CMTest_TH::createUser();
         $action = new CM_Action_Mock('foo', $actor);
-        $action->prepare(true);
+        $action->prepare(false);
     }
 }
 
@@ -55,11 +55,11 @@ class CM_Action_Mock extends CM_Action_Abstract {
     }
 
     /**
-     * @param bool $private
+     * @param bool $isAllowed
      * @return bool
      */
-    protected function _isDisallowedTest($private = false) {
-        return $private;
+    protected function _isAllowedTest($isAllowed) {
+        return $isAllowed;
     }
 
     protected function _prepare() {
