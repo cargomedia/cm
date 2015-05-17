@@ -99,20 +99,44 @@
   </head>
   <body>
     {block name='body'}
-      <p>
-        {if isset($recipient)}
-          {translate 'Dear {$username}' username=$recipient->getDisplayName()|escape},
-        {else}
-          {translate 'Dear user'},
-        {/if}
-      </p>
-      <p>
-        {$body}
-      </p>
-      <p>
-        {translate 'Thanks'},<br />
-        {$siteName|escape}
-      </p>
+      <table class="body" style="{less}width: 100%; height: 100%; text-align: center; background-color: @colorBg;{/less}">
+        <tr>
+          <td style="padding: 20px;" valign="top">
+            <!--[if (gte mso 9)|(IE)]>
+            <table class="container-no-maxwidth" width="600" align="center">
+              <tr>
+                <td valign="top">
+            <![endif]-->
+            <table class="container" style="width: 100%; max-width: 600px; margin: 0 auto; text-align: left;">
+              <tr>
+                <td valign="top">
+
+                  {block name='content'}
+                    <p>
+                      {if isset($recipient)}
+                        {translate 'Dear {$username}' username=$recipient->getDisplayName()|escape},
+                      {else}
+                        {translate 'Dear user'},
+                      {/if}
+                    </p>
+                    <p>
+                      {$body}
+                    </p>
+                    <p>
+                      {translate 'Thanks'},<br />
+                      {$siteName|escape}
+                    </p>
+                  {/block}
+
+                </td>
+              </tr>
+            </table>
+            <!--[if (gte mso 9)|(IE)]>
+            </td></tr></table>
+            <![endif]-->
+          </td>
+        </tr>
+      </table>
     {/block}
   </body>
 </html>
