@@ -23,7 +23,6 @@
         -ms-interpolation-mode: bicubic;
         width: auto;
         max-width: 100%;
-        display: block;
       }
 
       a img {
