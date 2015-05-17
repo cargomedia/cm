@@ -31,7 +31,7 @@
       }
 
       p {
-        margin: 0;
+        margin: 0.5em 0 0.5em 0;
       }
 
       table {
