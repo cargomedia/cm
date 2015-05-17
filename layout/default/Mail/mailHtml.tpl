@@ -23,8 +23,6 @@
         -ms-interpolation-mode: bicubic;
         width: auto;
         max-width: 100%;
-        float: left;
-        clear: both;
         display: block;
       }
 
