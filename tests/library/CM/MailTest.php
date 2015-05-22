@@ -140,6 +140,7 @@ class CM_MailTest extends CMTest_TestCase {
         $mail->addTo('foo@example.com');
         $mail->setSubject('foo');
         $mail->setText('bar');
+        $mail->addCustomHeader('X-Foo', 'bar');
         $mail->send(true);
         $mail->send(true);
         $mail->send(true);
