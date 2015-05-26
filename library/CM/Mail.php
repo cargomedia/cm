@@ -352,8 +352,10 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
                 $mail->addBcc($bcc['address'], $bcc['name']);
             }
             if ($headerList = unserialize($row['customHeaders'])) {
-                foreach ($headerList as $label => $value) {
-                    $mail->addCustomHeader($label, $value);
+                foreach ($headerList as $label => $valueList) {
+                    foreach($valueList as $value){
+                        $mail->addCustomHeader($label, $value);
+                    }
                 }
             }
             $sender = unserialize($row['sender']);

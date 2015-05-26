@@ -8,7 +8,7 @@ var CM_Component_EmailPreview = CM_Component_Abstract.extend({
   html: null,
 
   ready: function() {
-    var $iframe = this.$('.htmlPreview');
+    var $iframe = this.$('.preview-html');
     $iframe.attr('src', 'data:text/html;charset=utf-8,' + encodeURI(this.html));
   }
 });

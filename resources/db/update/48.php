@@ -5,8 +5,9 @@ foreach ($rowList as $row) {
     $metaInfo = @unserialize($row['metaInfo']);
 
     if (is_array($metaInfo)) {
-        $metaInfo = Functional\map($metaInfo, function ($value) {
-            return CM_Util::varDump($value, ['recursive' => true]);
+        $variableInspector = new CM_Debug_VariableInspector();
+        $metaInfo = Functional\map($metaInfo, function ($value) use($variableInspector) {
+            return $variableInspector->getDebugInfo($value, ['recursive' => true]);
         });
     } else {
         $metaInfo = null;
