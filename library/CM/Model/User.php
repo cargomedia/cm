@@ -201,6 +201,13 @@ class CM_Model_User extends CM_Model_Abstract {
         $this->_change();
     }
 
+    /**
+     * @return CM_Frontend_Environment
+     */
+    public function getEnvironment() {
+        return new CM_Frontend_Environment($this->getSite(), $this, $this->getLanguage());
+    }
+
     public function updateLatestActivityThrottled() {
         if ($this->getLatestActivity() < time() - self::ACTIVITY_EXPIRATION) {
             $this->_updateLatestActivity();

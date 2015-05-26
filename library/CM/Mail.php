@@ -290,11 +290,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @return array array($subject, $html, $text)
      */
     public function render() {
-        $language = null;
-        if ($this->_recipient) {
-            $language = $this->_recipient->getLanguage();
-        }
-        return $this->_render($language);
+        return $this->_render();
     }
 
     /**
@@ -353,7 +349,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             }
             if ($headerList = unserialize($row['customHeaders'])) {
                 foreach ($headerList as $label => $valueList) {
-                    foreach($valueList as $value){
+                    foreach ($valueList as $value) {
                         $mail->addCustomHeader($label, $value);
                     }
                 }
@@ -366,11 +362,15 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
-     * @param CM_Model_Language|null $language
      * @return array array($subject, $html, $text)
      */
-    protected function _render($language) {
-        $render = new CM_Frontend_Render(new CM_Frontend_Environment($this->_site, $this->_recipient, $language));
+    protected function _render() {
+        if (null !== $this->_recipient) {
+            $environment = $this->_recipient->getEnvironment();
+        } else {
+            $environment = new CM_Frontend_Environment($this->_site);
+        }
+        $render = new CM_Frontend_Render($environment);
         $renderAdapter = new CM_RenderAdapter_Mail($render, $this);
         return $renderAdapter->fetch();
     }
