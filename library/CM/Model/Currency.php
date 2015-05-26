@@ -109,6 +109,18 @@ class CM_Model_Currency extends CM_Model_Abstract {
     }
 
     /**
+     * @param CM_Model_Location $location
+     * @return CM_Model_Currency|null
+     */
+    public static function findByLocation(CM_Model_Location $location) {
+        $country = $location->get(CM_Model_Location::LEVEL_COUNTRY);
+        if (null === $country) {
+            return null;
+        }
+        return self::findByCountry($country);
+    }
+
+    /**
      * @param CM_Model_Location|null $location
      * @return CM_Model_Currency
      */
