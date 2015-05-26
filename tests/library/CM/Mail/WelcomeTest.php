@@ -12,5 +12,11 @@ class CM_Mail_WelcomeTest extends CMTest_TestCase {
         $nodeList = new CM_Dom_NodeList($html);
 
         $this->assertContains('foo', $nodeList->getText());
+
+        $nodeLink = $nodeList->find('a');
+        $this->assertSame(1, $nodeLink->count());
+        $this->assertSame('http://www.default.dev/example', $nodeLink->getAttribute('href'));
+        $this->assertSame('Example Page', $nodeLink->getText());
+        $this->assertContains('border-style:solid;', $nodeLink->getAttribute('style'));
     }
 }

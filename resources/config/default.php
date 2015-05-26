@@ -180,6 +180,13 @@ return function (CM_Config_Node $config) {
         )
     );
 
+    $config->services['tracking-inspectlet'] = array(
+        'class'     => 'CMService_Inspectlet_Client',
+        'arguments' => array(
+            'code' => 'my-wid',
+        )
+    );
+
     $config->services['email-verification'] = array(
         'class'     => 'CM_Service_EmailVerification_Standard',
         'arguments' => array()
