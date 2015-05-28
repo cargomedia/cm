@@ -255,7 +255,7 @@ class CM_Process {
         if (!empty($this->_forkHandlerList)) {
             do {
                 $pid = pcntl_wait($status, $waitOption);
-                pcntl_signal_dispatch();
+                $this->handleSignals();
                 if (-1 === $pid) {
                     throw new CM_Exception('Waiting on child processes failed');
                 } elseif ($pid > 0) {
