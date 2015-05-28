@@ -18,7 +18,9 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $process = $this->mockClass('CM_Process')->newInstanceWithoutConstructor();
         $forkMock = $process->mockMethod('fork');
         $forkMock->set(function () use ($forkMock) {
-            return $forkMock->getCallCount();
+            $forkHandler = $this->mockClass('CM_Process_ForkHandler')->newInstanceWithoutConstructor();
+            $forkHandler->mockMethod('getIdentifier')->set($forkMock->getCallCount());
+            return $forkHandler;
         });
         $manager = $this->mockObject('CM_Clockwork_Manager');
         $manager->mockMethod('_shouldRun')->set(true);
@@ -68,7 +70,9 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $process = $this->mockClass('CM_Process')->newInstanceWithoutConstructor();
         $forkMock = $process->mockMethod('fork');
         $forkMock->set(function () use ($forkMock) {
-            return $forkMock->getCallCount();
+            $forkHandler = $this->mockClass('CM_Process_ForkHandler')->newInstanceWithoutConstructor();
+            $forkHandler->mockMethod('getIdentifier')->set($forkMock->getCallCount());
+            return $forkHandler;
         });
         $storage = new CM_Clockwork_Storage_Memory();
         /** @var CM_Clockwork_Storage_Abstract $storage */
