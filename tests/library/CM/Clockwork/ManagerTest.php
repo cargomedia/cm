@@ -405,6 +405,14 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertTrue($_shouldRun->invoke($manager, $event));
     }
 
+    public function testTerminate() {
+        $process = CM_Process::getInstance();
+        $process->fork(function () {
+            $clockworkManager = new CM_Clockwork_Manager();
+            $clockworkManager->start();
+        });
+    }
+
     /**
      * @param DateTime     $start
      * @param DateTimeZone $timeZone

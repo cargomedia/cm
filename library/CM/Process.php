@@ -14,7 +14,7 @@ class CM_Process {
     private $_forkHandlerCounter = 0;
 
     /**
-     * @param string  $event
+     * @param string   $event
      * @param callable $callback
      */
     public function bind($event, callable $callback) {
@@ -32,7 +32,7 @@ class CM_Process {
     }
 
     /**
-     * @param string       $event
+     * @param string        $event
      * @param callable|null $callback
      */
     public function unbind($event, callable $callback = null) {
@@ -64,9 +64,9 @@ class CM_Process {
         if (!$this->_hasForks()) {
             $this->bind('exit', [$this, 'killChildren']);
         }
-        $sequence = ++$this->_forkHandlerCounter;
-        $this->_fork($workload, $sequence);
-        return $sequence;
+        $identifier = ++$this->_forkHandlerCounter;
+        $this->_fork($workload, $identifier);
+        return $identifier;
     }
 
     /**
@@ -139,10 +139,9 @@ class CM_Process {
             foreach ($this->_forkHandlerList as $forkHandler) {
                 $pid = pcntl_waitpid($forkHandler->getPid(), $status, WNOHANG);
                 if ($pid > 0 || !$this->isRunning($pid)) {
-                    $forkHandlerSequence = $this->_getForkHandlerSequenceByPid($forkHandler->getPid());
-                    $forkHandler = $this->_forkHandlerList[$forkHandlerSequence];
+                    $forkHandler = $this->_getForkHandlerByPid($forkHandler->getPid());
+                    unset($this->_forkHandlerList[$forkHandler->getIdentifier()]);
                     $forkHandler->closeIpcStream();
-                    unset($this->_forkHandlerList[$forkHandlerSequence]);
                     if (!$this->_hasForks()) {
                         $this->unbind('exit', [$this, 'killChildren']);
                     }
@@ -196,11 +195,11 @@ class CM_Process {
 
     /**
      * @param Closure $workload
-     * @param int     $sequence
+     * @param int     $identifier
      * @throws CM_Exception
-     * @return int
+     * @return CM_Process_ForkHandler
      */
-    private function _fork(Closure $workload, $sequence) {
+    private function _fork(Closure $workload, $identifier) {
         $sockets = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
         if (false === $sockets) {
             throw new CM_Exception('Cannot open stream socket pair');
@@ -212,7 +211,9 @@ class CM_Process {
         if ($pid) {
             // parent
             fclose($sockets[0]);
-            $this->_forkHandlerList[$sequence] = new CM_Process_ForkHandler($pid, $workload, $sockets[1]);
+            $forkHandler = new CM_Process_ForkHandler($pid, $workload, $sockets[1], $identifier);
+            $this->_forkHandlerList[$identifier] = $forkHandler;
+            return $forkHandler;
         } else {
             // child
             try {
@@ -255,11 +256,10 @@ class CM_Process {
                 if (-1 === $pid) {
                     throw new CM_Exception('Waiting on child processes failed');
                 } elseif ($pid > 0) {
-                    $forkHandlerSequence = $this->_getForkHandlerSequenceByPid($pid);
-                    $forkHandler = $this->_forkHandlerList[$forkHandlerSequence];
-                    $workloadResultList[$forkHandlerSequence] = $forkHandler->receiveWorkloadResult();
+                    $forkHandler = $this->_getForkHandlerByPid($pid);
+                    unset($this->_forkHandlerList[$forkHandler->getIdentifier()]);
+                    $workloadResultList[$forkHandler->getIdentifier()] = $forkHandler->receiveWorkloadResult();
                     $forkHandler->closeIpcStream();
-                    unset($this->_forkHandlerList[$forkHandlerSequence]);
                     if (!$this->_hasForks()) {
                         $this->unbind('exit', [$this, 'killChildren']);
                     }
@@ -267,7 +267,7 @@ class CM_Process {
                         $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, array('severity' => CM_Exception::WARN));
                         CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
                         usleep(self::RESPAWN_TIMEOUT * 1000000);
-                        $this->_fork($forkHandler->getWorkload(), $forkHandlerSequence);
+                        $this->_fork($forkHandler->getWorkload(), $forkHandler->getIdentifier());
                     }
                 }
             } while (!empty($this->_forkHandlerList) && $pid > 0);
@@ -278,13 +278,13 @@ class CM_Process {
 
     /**
      * @param int $pid
-     * @return int
+     * @return CM_Process_ForkHandler
      * @throws CM_Exception
      */
-    private function _getForkHandlerSequenceByPid($pid) {
-        foreach ($this->_forkHandlerList as $sequence => $forkHandler) {
+    private function _getForkHandlerByPid($pid) {
+        foreach ($this->_forkHandlerList as $forkHandler) {
             if ($pid === $forkHandler->getPid()) {
-                return $sequence;
+                return $forkHandler;
             }
         }
         throw new CM_Exception('Cannot find reference to fork-handler with PID `' . $pid . '`.');
