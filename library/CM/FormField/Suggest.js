@@ -8,7 +8,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
   /** @type {jQuery} */
   _$input: null,
 
-  /** @type {jqXHR} */
+  /** @type {Promise} */
   _request: null,
 
   ready: function() {
@@ -34,13 +34,12 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
         if (this._request) {
           this._request.cancel();
         }
-        this._request = field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()}, {
-          success: function(results) {
+        this._request = field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()})
+          .then(function(results) {
             options.callback({
               results: results
             });
-          }
-        });
+          });
       },
       createSearchChoice: function(term, data) {
         if (field.getOption("enableChoiceCreate")) {

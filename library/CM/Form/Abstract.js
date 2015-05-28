@@ -157,8 +157,6 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     });
     var action = this._getAction(actionName);
     var data = this.getData(action.name);
-    var deferred = $.Deferred();
-
     var errorList = this._getErrorList(action.name);
 
     if (options.handleErrors) {
@@ -172,8 +170,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     }
 
     if (_.size(errorList)) {
-      deferred.reject();
-
+      return Promise.resolve();//TODO is this replacement ok. It is not rejected but resolved with empty value.
     } else {
       if (options.disableUI) {
         this.disable();
@@ -181,8 +178,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       this.trigger('submit', [data]);
 
       var handler = this;
-      cm.ajax('form', {viewInfoList: this.getViewInfoList(), actionName: action.name, data: data}, {
-        success: function(response) {
+      return cm.ajax('form', {viewInfoList: this.getViewInfoList(), actionName: action.name, data: data})
+        .then(function(response) {
           if (response.errors) {
             if (options.handleErrors) {
               for (var i = response.errors.length - 1, error; error = response.errors[i]; i--) {
@@ -194,8 +191,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
               }
             }
 
-            handler.trigger('error error.' + action.name);
-            deferred.reject();
+            throw cm.error.create({msg: 'error error.' + action.name, type: null, isPublic: true});//TODO is this replacement ok?
           }
 
           if (response.exec) {
@@ -209,27 +205,21 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
             }
           }
 
-          if (!response.errors) {
-            handler.trigger('success success.' + action.name, response.data);
-            deferred.resolve(response.data);
-          }
-        },
-        error: function(msg, type, isPublic) {
+          handler.trigger('success success.' + action.name, response.data);
+          return response.data;
+        })
+        .catch(function(error){
           handler._stopErrorPropagation = false;
-          handler.trigger('error error.' + action.name, msg, type, isPublic);
-          deferred.reject();
-          return !handler._stopErrorPropagation;
-        },
-        complete: function() {
+          handler.trigger('error error.' + action.name, error.msg, error.type, error.isPublic);
+          throw error;
+        })
+        .finally(function(){
           if (options.disableUI) {
             handler.enable();
           }
           handler.trigger('complete');
-        }
-      });
+        });
     }
-
-    return deferred.promise();
   },
 
   stopErrorPropagation: function() {

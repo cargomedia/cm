@@ -10,7 +10,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   /** @type jQuery|Null */
   _$pagePlaceholder: null,
 
-  /** @type jqXHR|Null */
+  /** @type Promise|Null */
   _pageRequest: null,
 
   /**
@@ -51,14 +51,14 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     if (this._pageRequest) {
       this._pageRequest.cancel();
     }
-    this._pageRequest = this.ajaxModal('loadPage', {path: path}, {
-      success: function(response) {
+    var layout = this;
+    this._pageRequest = this.ajaxModal('loadPage', {path: path})
+      .then(function(response) {
         if (response.redirectExternal) {
           cm.router.route(response.redirectExternal);
           return;
         }
-        var layout = this;
-        this._injectView(response, function(response) {
+        layout._injectView(response, function(response) {
           var reload = (layout.getClass() != response.layoutClass);
           if (reload) {
             window.location.replace(response.url);
@@ -73,16 +73,13 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
           window.history.replaceState(null, null, fragment);
           layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList, response.jsTracking);
         });
-      },
-      error: function(msg, type, isPublic) {
-        this._$pagePlaceholder.addClass('error').html('<pre>' + msg + '</pre>');
-        this._onPageError();
-        return false;
-      },
-      complete: function() {
+      })
+      .catch(function(error) {
+        layout._$pagePlaceholder.addClass('error').html('<pre>' + error.msg + '</pre>');
+        layout._onPageError();
+      }).finally(function() {
         window.clearTimeout(timeoutLoading);
-      }
-    });
+      });
   },
 
   /**

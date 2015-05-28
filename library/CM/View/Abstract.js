@@ -251,36 +251,22 @@ var CM_View_Abstract = Backbone.View.extend({
     var handler = this;
 
     if (options.modal) {
-      var callbackComplete = options.complete;
-      options.complete = function() {
-        handler.enable();
-        if (callbackComplete) {
-          return callbackComplete(handler);
-        }
-      };
       this.disable();
     }
 
-    var promise = cm.ajax('ajax', {viewInfoList: options.view.getViewInfoList(), method: functionName, params: params}, {
-      success: function(response) {
+    var promise = cm.ajax('ajax', {viewInfoList: options.view.getViewInfoList(), method: functionName, params: params})
+      .then(function(response) {
         if (response.exec) {
           new Function(response.exec).call(handler);
         }
-        if (options.success) {
-          return options.success.call(handler, response.data);
+        return response.data;
+      })
+      .finally(function() {
+        if (options.modal) {
+          handler.enable();
         }
-      },
-      error: function(msg, type, isPublic) {
-        if (options.error) {
-          return options.error.call(handler, msg, type, isPublic);
-        }
-      },
-      complete: function() {
-        if (options.complete) {
-          return options.complete.call(handler);
-        }
-      }
-    });
+      });
+
     this.on('destruct', function() {
       promise.cancel();
     });
@@ -291,7 +277,7 @@ var CM_View_Abstract = Backbone.View.extend({
    * @param {String} functionName
    * @param {Object|Null} [params]
    * @param {Object|Null} [options]
-   * @return jqXHR
+   * @return Promise
    */
   ajaxModal: function(functionName, params, options) {
     options = _.defaults(options || {}, {
@@ -304,7 +290,7 @@ var CM_View_Abstract = Backbone.View.extend({
    * @param {String} className
    * @param {Object|Null} [params]
    * @param {Object|Null} [options]
-   * @return jqXHR
+   * @return Promise
    */
   loadComponent: function(className, params, options) {
     options = _.defaults(options || {}, {
@@ -316,11 +302,11 @@ var CM_View_Abstract = Backbone.View.extend({
     });
     params = params || {};
     params.className = className;
-    var success = options.success;
-    options.success = function(response) {
-      this._injectView(response, success);
-    };
-    return this.ajax(options.method, params, options);
+    var self = this;
+    return this.ajax(options.method, params, options)
+      .then(function(response) {
+        self._injectView(response, options.success);
+      });
   },
 
   /**
