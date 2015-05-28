@@ -18,28 +18,36 @@ class smarty_block_ratioKeeperTest extends CMTest_TestCase {
 
     public function testRenderRatio() {
         $params = ['ratio' => 1];
-        $this->_assertContains('padding-bottom: 100%', $params);
+        $size = $this->_getImgSize($params);
+        $this->assertEquals($size['width'], $size['height']);
+
         $params = ['ratio' => 0.75];
-        $this->_assertContains('padding-bottom: 75%', $params);
-        $params = ['ratio' => 0.33];
-        $this->_assertContains('padding-bottom: 33%', $params);
+        $size = $this->_getImgSize($params);
+        $this->assertEquals($size['width'] * 0.75, $size['height']);
 
         $params = ['height' => 600, 'width' => 900];
-        $this->_assertContains('padding-bottom: 66%', $params);
-        $params = ['height' => 900, 'width' => 600];
-        $this->_assertContains('padding-bottom: 150%', $params);
+        $size = $this->_getImgSize($params);
+        $this->assertEquals(900, $size['width']);
+        $this->assertEquals(600, $size['height']);
     }
 
     public function testRenderContentAttrs() {
         $params = ['contentAttrs' => ['class' => 'test']];
-        $this->_assertContains('class="test ratioKeeper-content"', $params);
+        $output = smarty_block_ratioKeeper($params, '', $this->_template, false);
+        $this->assertContains('class="test ratioKeeper-content"', $output);
     }
 
     /**
-     * @param string $needle
-     * @param array  $params
+     * @param array $params
+     * @return String
      */
-    private function _assertContains($needle, array $params) {
-        $this->assertContains($needle, smarty_block_ratioKeeper($params, '', $this->_template, false));
+    private function _getImgSize(array $params) {
+        $output = smarty_block_ratioKeeper($params, '', $this->_template, false);
+        $matches = array();
+        preg_match('/class="ratioKeeper-size" src="([^"]+)"/', $output, $matches);
+        $imgSrc = $matches[1];
+        $this->assertStringStartsWith('data:image/png;base64,', $imgSrc);
+        $size = getimagesize($imgSrc);
+        return ['width' => $size[0], 'height' => $size[1]];
     }
 }

@@ -6,20 +6,27 @@ function smarty_block_ratioKeeper($params, $content, Smarty_Internal_Template $t
     if ($open) {
         return '';
     } else {
-        $ratio = 100;
-        if (isset($params['ratio'])) {
-            $ratio = $params['ratio'] * 100;
-        }
-        $width = null;
         if (isset($params['width']) && isset($params['height'])) {
             $width = (int) $params['width'];
             $height = (int) $params['height'];
-            $ratio = (int) (($height / $width) * 100);
+        } elseif (isset($params['ratio'])) {
+            $ratio = $params['ratio'];
+            $width = 100;
+            $height = $width * $ratio;
+        } else {
+            $width = $height = 1;
         }
 
+        $image = imagecreate($width, $height);
+        ob_start();
+        imagecolorallocate($image, 255, 255, 255);
+        imagepng($image);
+        $imageData = ob_get_contents();
+        ob_end_clean();
+        $imageSrc = 'data:image/png;base64,' . base64_encode($imageData);
+
         $output = '<div class="ratioKeeper">';
-        $output .= '<div class="ratioKeeper-ratio" style="padding-bottom: ' . $ratio . '%;'
-            . ($width ? (' width: ' . $width . 'px;') : '') . ' "></div>';
+        $output .= '<img class="ratioKeeper-size" src="' . $imageSrc . '">';
 
         $contentAttrs = isset($params['contentAttrs']) ? $params['contentAttrs'] : [];
         if (isset($contentAttrs['class'])) {
