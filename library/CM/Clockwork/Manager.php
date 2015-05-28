@@ -192,9 +192,9 @@ class CM_Clockwork_Manager {
      */
     protected function _runEvent(CM_Clockwork_Event $event) {
         $process = $this->_getProcess();
-        $identifier = $process->fork(function () use ($event) {
+        $forkHandler = $process->fork(function () use ($event) {
             $event->run();
         });
-        $this->_markRunning($event, $identifier);
+        $this->_markRunning($event, $forkHandler->getIdentifier());
     }
 }

@@ -57,7 +57,7 @@ class CM_Process {
 
     /**
      * @param Closure $workload
-     * @return int
+     * @return CM_Process_ForkHandler
      * @throws CM_Exception
      */
     public function fork(Closure $workload) {
@@ -65,8 +65,7 @@ class CM_Process {
             $this->bind('exit', [$this, 'killChildren']);
         }
         $identifier = ++$this->_forkHandlerCounter;
-        $this->_fork($workload, $identifier);
-        return $identifier;
+        return $this->_fork($workload, $identifier);
     }
 
     /**
