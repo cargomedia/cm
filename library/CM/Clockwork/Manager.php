@@ -84,9 +84,11 @@ class CM_Clockwork_Manager {
     }
 
     public function start() {
+        $process = CM_Process::getInstance();
         while (true) {
             $this->runEvents();
             sleep(1);
+            $process->handleSignals();
         }
     }
 

@@ -174,6 +174,10 @@ class CM_Process {
         return $_SERVER['argv'];
     }
 
+    public function handleSignals() {
+        pcntl_signal_dispatch();
+    }
+
     /**
      * @return CM_Process
      */

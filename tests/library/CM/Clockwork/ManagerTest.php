@@ -405,12 +405,22 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertTrue($_shouldRun->invoke($manager, $event));
     }
 
-    public function testTerminate() {
+    public function testStartTerminatable() {
         $process = CM_Process::getInstance();
-        $process->fork(function () {
+        $forkHandler = $process->fork(function () {
             $clockworkManager = new CM_Clockwork_Manager();
             $clockworkManager->start();
         });
+
+        usleep(1000000 * 0.1);
+        $process->listenForChildren();
+        $this->assertSame(true, $process->isRunning($forkHandler->getPid()));
+
+        posix_kill($forkHandler->getPid(), SIGTERM);
+
+        usleep(1000000 * 0.1);
+        $process->listenForChildren();
+        $this->assertSame(false, $process->isRunning($forkHandler->getPid()));
     }
 
     /**
