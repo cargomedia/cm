@@ -11,15 +11,23 @@ class CM_Process_ForkHandler {
     /** @var resource */
     private $_ipcStream;
 
+    /** @var int */
+    private $_identifier;
+
     /**
      * @param int      $pid
      * @param Closure  $workload
      * @param resource $ipcStream
+     * @param int|null $identifier
      */
-    public function __construct($pid, Closure $workload, $ipcStream) {
+    public function __construct($pid, Closure $workload, $ipcStream, $identifier = null) {
         $this->_pid = (int) $pid;
         $this->_workload = $workload;
         $this->_ipcStream = $ipcStream;
+        if (null !== $identifier) {
+            $identifier = (int) $identifier;
+        }
+        $this->_identifier = $identifier;
     }
 
     /**
@@ -45,6 +53,17 @@ class CM_Process_ForkHandler {
 
     public function closeIpcStream() {
         fclose($this->_ipcStream);
+    }
+
+    /**
+     * @throws CM_Exception
+     * @return int
+     */
+    public function getIdentifier() {
+        if (null === $this->_identifier) {
+            throw new CM_Exception('Fork-handler has no identifier');
+        }
+        return $this->_identifier;
     }
 
     /**
