@@ -10,6 +10,6 @@ class CM_App_SetupScript_Currency extends CM_Provision_Script_OptionBased {
     }
 
     public function getRunLevel() {
-        return 10;
+        return 5;
     }
 }
