@@ -58,21 +58,22 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
           cm.router.route(response.redirectExternal);
           return;
         }
-        layout._injectView(response, function(response) {
-          var reload = (layout.getClass() != response.layoutClass);
-          if (reload) {
-            window.location.replace(response.url);
-            return;
-          }
-          layout._$pagePlaceholder.replaceWith(this.$el);
-          layout._$pagePlaceholder = null;
-          var fragment = response.url.substr(cm.getUrl().length);
-          if (path === fragment + window.location.hash) {
-            fragment = path;
-          }
-          window.history.replaceState(null, null, fragment);
-          layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList, response.jsTracking);
-        });
+        var view = layout._injectView(response);
+        var reload = (layout.getClass() != response.layoutClass);
+        if (reload) {
+          window.location.replace(response.url);
+          return;
+        }
+        layout._$pagePlaceholder.replaceWith(view.$el);
+        layout._$pagePlaceholder = null;
+        var fragment = response.url.substr(cm.getUrl().length);
+        if (path === fragment + window.location.hash) {
+          fragment = path;
+        }
+        window.history.replaceState(null, null, fragment);
+        layout._onPageSetup(view, response.title, response.url, response.menuEntryHashList, response.jsTracking);
+        view._ready();
+        return view;
       })
       .catch(function(error) {
         layout._$pagePlaceholder.addClass('error').html('<pre>' + error.msg + '</pre>');

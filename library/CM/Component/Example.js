@@ -60,16 +60,15 @@ var CM_Component_Example = CM_Component_Abstract.extend({
   },
 
   loadExample: function() {
-    this.loadComponent('CM_Component_Example', {foo: 'value2', site: this.getParams().site});
+    this.showComponent('CM_Component_Example', {foo: 'value2', site: this.getParams().site});
   },
 
   loadExampleInline: function() {
     var handler = this;
-    this.getParent().loadComponent('CM_Component_Example', {foo: 'value3', site: this.getParams().site}, {
-      'success': function() {
-        this.$el.hide().insertBefore(handler.$el).slideDown(600);
-      }
-    });
+    this.getParent().prepareComponent('CM_Component_Example', {foo: 'value3', site: this.getParams().site})
+      .then(function(component) {
+        component.$el.hide().insertBefore(handler.$el).slideDown(600);
+      });
   },
 
   callAjaxTest: function() {

@@ -294,9 +294,6 @@ var CM_View_Abstract = Backbone.View.extend({
    */
   loadComponent: function(className, params, options) {
     options = _.defaults(options || {}, {
-      'success': function() {
-        this.popOut();
-      },
       'modal': true,
       'method': 'loadComponent'
     });
@@ -305,7 +302,35 @@ var CM_View_Abstract = Backbone.View.extend({
     var self = this;
     return this.ajax(options.method, params, options)
       .then(function(response) {
-        self._injectView(response, options.success);
+        return self._injectView(response);
+      });
+  },
+
+  /**
+   * @param {String} className
+   * @param {Object|Null} [params]
+   * @param {Object|Null} [options]
+   * @return Promise
+   */
+  prepareComponent: function(className, params, options) {
+    return this.loadComponent(className, params, options)
+      .then(function(component) {
+        component._ready();
+        return component;
+      });
+  },
+
+  /**
+   * @param {String} className
+   * @param {Object|Null} [params]
+   * @param {Object|Null} [options]
+   * @return Promise
+   */
+  showComponent: function(className, params, options) {
+    return this.prepareComponent(className, params, options)
+      .then(function(component) {
+        component.popOut();
+        return component;
       });
   },
 
@@ -639,18 +664,13 @@ var CM_View_Abstract = Backbone.View.extend({
 
   /**
    * @param {Object} response
-   * @param {Function} [successPre]
-   * @private
+   * @return CM_Abstract_View
    */
-  _injectView: function(response, successPre) {
+  _injectView: function(response) {
     cm.window.appendHidden(response.html);
     new Function(response.js).call(this);
     var view = cm.views[response.autoId];
     this.registerChild(view);
-    if (successPre) {
-      successPre.call(view, response);
-    }
-    view._ready();
     return view;
   }
 });
