@@ -17,12 +17,16 @@ function smarty_block_ratioKeeper($params, $content, Smarty_Internal_Template $t
             $width = $height = 1;
         }
 
-        $image = imagecreate($width, $height);
-        ob_start();
-        imagecolorallocate($image, 255, 255, 255);
-        imagepng($image);
-        $imageData = ob_get_contents();
-        ob_end_clean();
+        $cache = CM_Cache_Local::getInstance();
+        $imageData = $cache->get($cache->key('_ratioKeeper:', $width, $height), function () use ($width, $height) {
+            $image = imagecreate($width, $height);
+            ob_start();
+            imagecolorallocate($image, 255, 255, 255);
+            imagepng($image);
+            $imageData = ob_get_contents();
+            ob_end_clean();
+            return $imageData;
+        });
         $imageSrc = 'data:image/png;base64,' . base64_encode($imageData);
 
         $output = '<div class="ratioKeeper">';
