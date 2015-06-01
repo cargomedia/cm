@@ -33,6 +33,8 @@ class CM_Dom_NodeList implements Iterator, Countable, ArrayAccess {
         } else {
             $html = (string) $html;
 
+            $html = preg_replace('#<script[^>]+type=([\'"])text/template\1[^>]*>.*?</script>#si', '', $html);
+
             $this->_doc = new DOMDocument();
             $html = '<?xml version="1.0" encoding="UTF-8"?>' . $html;
 
