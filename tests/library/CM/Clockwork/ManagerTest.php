@@ -18,7 +18,9 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $process = $this->mockClass('CM_Process')->newInstanceWithoutConstructor();
         $forkMock = $process->mockMethod('fork');
         $forkMock->set(function () use ($forkMock) {
-            return $forkMock->getCallCount();
+            $forkHandler = $this->mockClass('CM_Process_ForkHandler')->newInstanceWithoutConstructor();
+            $forkHandler->mockMethod('getIdentifier')->set($forkMock->getCallCount());
+            return $forkHandler;
         });
         $manager = $this->mockObject('CM_Clockwork_Manager');
         $manager->mockMethod('_shouldRun')->set(true);
@@ -68,7 +70,9 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $process = $this->mockClass('CM_Process')->newInstanceWithoutConstructor();
         $forkMock = $process->mockMethod('fork');
         $forkMock->set(function () use ($forkMock) {
-            return $forkMock->getCallCount();
+            $forkHandler = $this->mockClass('CM_Process_ForkHandler')->newInstanceWithoutConstructor();
+            $forkHandler->mockMethod('getIdentifier')->set($forkMock->getCallCount());
+            return $forkHandler;
         });
         $storage = new CM_Clockwork_Storage_Memory();
         /** @var CM_Clockwork_Storage_Abstract $storage */
@@ -403,6 +407,24 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertFalse($_shouldRun->invoke($manager, $event));
         $currently->modify('1 second');
         $this->assertTrue($_shouldRun->invoke($manager, $event));
+    }
+
+    public function testStartTerminatable() {
+        $process = CM_Process::getInstance();
+        $forkHandler = $process->fork(function () {
+            $clockworkManager = new CM_Clockwork_Manager();
+            $clockworkManager->start();
+        });
+
+        usleep(1000000 * 0.1);
+        $process->listenForChildren();
+        $this->assertSame(true, $process->isRunning($forkHandler->getPid()));
+
+        posix_kill($forkHandler->getPid(), SIGTERM);
+
+        usleep(1000000 * 0.1);
+        $process->listenForChildren();
+        $this->assertSame(false, $process->isRunning($forkHandler->getPid()));
     }
 
     /**

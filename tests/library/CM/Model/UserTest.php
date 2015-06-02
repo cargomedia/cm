@@ -12,7 +12,10 @@ class CM_Model_UserTest extends CMTest_TestCase {
     public function testGetCreated() {
         $time = time();
         $user = CMTest_TH::createUser();
-        $this->assertGreaterThanOrEqual($time, $user->getCreated());
+        $created = $user->getCreated();
+
+        $this->assertInternalType('int', $created);
+        $this->assertGreaterThanOrEqual($time, $created);
     }
 
     public function testGetSetOnline() {

@@ -28,7 +28,7 @@ class CM_Model_User extends CM_Model_Abstract {
      * @return int
      */
     public function getCreated() {
-        return $this->_get('createStamp');
+        return (int) $this->_get('createStamp');
     }
 
     /**
