@@ -8,9 +8,6 @@
 .usertext {
   .word_wrap;
   hyphens: auto;
-  line-height: @usertextLineheight;
-  font-size: @usertextFontSize;
-  color: @usertextFontColor;
 
   img:not(.emoticon) {
     box-sizing: border-box;
@@ -69,6 +66,9 @@
 
   p {
     margin-bottom: 1em;
+    line-height: @usertextLineheight;
+    font-size: @usertextFontSize;
+    color: @usertextFontColor;
   }
 
   ul, ol {
