@@ -191,7 +191,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
               }
             }
 
-            throw cm.error.create({msg: 'error error.' + action.name, type: null, isPublic: true});//TODO is this replacement ok?
+            handler.trigger('error error.' + action.name);
+            return;
           }
 
           if (response.exec) {
