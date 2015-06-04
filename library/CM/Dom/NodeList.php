@@ -33,6 +33,8 @@ class CM_Dom_NodeList implements Iterator, Countable, ArrayAccess {
         } else {
             $html = (string) $html;
 
+            $html = $this->_stripJavascriptTemplate($html);
+
             $this->_doc = new DOMDocument();
             $html = '<?xml version="1.0" encoding="UTF-8"?>' . $html;
 
@@ -238,5 +240,14 @@ class CM_Dom_NodeList implements Iterator, Countable, ArrayAccess {
 
     public function offsetUnset($offset) {
         unset($this->_elementList[0]);
+    }
+
+    /**
+     * @param string $html
+     * @return string
+     */
+    private function _stripJavascriptTemplate($html) {
+        $html = preg_replace('#<script[^>]+type=([\'"])text/template\1[^>]*>.*?</script>#si', '', $html);
+        return $html;
     }
 }

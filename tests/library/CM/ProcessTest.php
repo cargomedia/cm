@@ -10,11 +10,14 @@ class CM_ProcessTest extends CMTest_TestCase {
      */
     public function testFork() {
         $process = CM_Process::getInstance();
-        $seq1 = $process->fork(function() {});
-        $seq2 = $process->fork(function() {});
-        $seq3 = $process->fork(function() {});
-        $this->assertSame(1, $seq2 - $seq1);
-        $this->assertSame(1, $seq3 - $seq2);
+        $forkHandler1 = $process->fork(function () {
+            });
+        $forkHandler2 = $process->fork(function () {
+            });
+        $forkHandler3 = $process->fork(function () {
+            });
+        $this->assertSame(1, $forkHandler2->getIdentifier() - $forkHandler1->getIdentifier());
+        $this->assertSame(1, $forkHandler3->getIdentifier() - $forkHandler2->getIdentifier());
     }
 
     /**
@@ -37,9 +40,7 @@ class CM_ProcessTest extends CMTest_TestCase {
         $parentOutput[] = 'Parent waiting for 250 ms...';
         usleep(250000);
         $parentOutput[] = 'Parent listening to children...';
-        $process->waitForChildren(null, function () use (&$parentOutput) {
-            $parentOutput[] = 'All children terminated.';
-        });
+        $process->waitForChildren();
         $parentOutput[] = 'Parent terminated.';
         $childrenOutput = explode(PHP_EOL, $file->read());
 
@@ -50,7 +51,6 @@ class CM_ProcessTest extends CMTest_TestCase {
             'Child 4 forked.',
             'Parent waiting for 250 ms...',
             'Parent listening to children...',
-            'All children terminated.',
             'Parent terminated.'
         ], $parentOutput);
 
@@ -207,6 +207,39 @@ class CM_ProcessTest extends CMTest_TestCase {
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
+    public function testKillChildrenOnExit() {
+        $loopEcho = function () {
+            usleep(50000);
+        };
+
+        $process = $this->mockObject('CM_Process');
+        $killChildrenMethod = $process->mockMethod('killChildren');
+        /** @var CM_Process $process */
+        $this->assertSame(0, $killChildrenMethod->getCallCount());
+
+        $process->trigger('exit');
+        $this->assertSame(0, $killChildrenMethod->getCallCount());
+
+        // Bind killChildren
+        $process->fork($loopEcho);
+        $process->trigger('exit');
+        $this->assertSame(1, $killChildrenMethod->getCallCount());
+
+        // Unbind killChildren
+        $process->waitForChildren();
+        $process->trigger('exit');
+        $this->assertSame(1, $killChildrenMethod->getCallCount());
+
+        // Rebind killChildren
+        $process->fork($loopEcho);
+        $process->trigger('exit');
+        $this->assertSame(2, $killChildrenMethod->getCallCount());
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function testKillChildrenSigKill() {
         $loopEcho = function () {
             while (true) {
@@ -265,6 +298,23 @@ class CM_ProcessTest extends CMTest_TestCase {
         }
 
         $process->waitForChildren();
+    }
+
+    public function testEventHandler() {
+        $counter = 0;
+        $process = CM_Process::getInstance();
+        $process->bind('foo', function () use (&$counter) {
+            $counter++;
+        });
+        $process->trigger('foo');
+        $this->assertSame(1, $counter);
+
+        $process->trigger('foo');
+        $this->assertSame(2, $counter);
+
+        $process->unbind('foo');
+        $process->trigger('foo');
+        $this->assertSame(2, $counter);
     }
 
     /**

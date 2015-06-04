@@ -860,7 +860,7 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   stream: {
-    /** @type {CM_Stream_Adapter_Message_Abstract} */
+    /** @type {CM_MessageStream_Adapter_Abstract} */
     _adapter: null,
 
     /** @type {Object} */
@@ -944,7 +944,7 @@ var CM_App = CM_Class_Abstract.extend({
     },
 
     /**
-     * @return {CM_Stream_Adapter_Message_Abstract}
+     * @return {CM_MessageStream_Adapter_Abstract}
      */
     _getAdapter: function() {
       if (!this._adapter) {

@@ -55,7 +55,7 @@ class CM_AdproviderTest extends CMTest_TestCase {
 
 class CM_AdproviderAdapter_Mock extends CM_AdproviderAdapter_Abstract {
 
-    public function getHtml($zoneData, array $variables) {
+    public function getHtml($zoneName, $zoneData, array $variables) {
         return json_encode(array('zoneData' => $zoneData, 'variables' => $variables));
     }
 }

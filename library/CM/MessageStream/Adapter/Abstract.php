@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Stream_Adapter_Message_Abstract extends CM_Stream_Adapter_Abstract {
+abstract class CM_MessageStream_Adapter_Abstract extends CM_Stream_Adapter_Abstract {
 
     /**
      * @return array

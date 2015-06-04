@@ -89,6 +89,22 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $this->assertSame('v2', $variation);
     }
 
+    public function testGetVariationListSorted() {
+        /** @var CM_Model_Splittest $test */
+        $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);
+        $variationList = $test->getVariationListSorted();
+        $this->assertSame('v1', $variationList[0]->getName());
+        $this->assertSame('v2', $variationList[1]->getName());
+
+        $request = new CM_Http_Request_Get('/');
+        CM_Model_Splittest_RequestClient::isVariationFixtureStatic('foo', $request, 'v1');
+        CM_Model_Splittest_RequestClient::setConversionStatic('foo', $request);
+        CMTest_TH::clearCache();
+
+        $variationList = $test->getVariationListSorted();
+        $this->assertTrue($variationList[0]->getConversionRate() > $variationList[1]->getConversionRate());
+    }
+
     public function testGetVariations() {
         /** @var CM_Model_Splittest $test */
         $test = CM_Model_Splittest::create('foo', ['v1', 'v2']);

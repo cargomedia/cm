@@ -1,8 +1,9 @@
 .emoticon {
   width: @emoticonSize;
   height: @emoticonSize;
-  display: inline-block;
-  margin: -0.25em 0;
+  margin-left: .1em;
+  margin-right: .1em;
+  vertical-align: top;
 }
 
 .usertext {
@@ -20,59 +21,55 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
+    line-height: 1.6;
+    margin: 0;
+    margin-top: 1em;
+  }
+
+  h1, h2, h3, h4, h5 {
     font-weight: bold;
     font-style: normal;
-    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4 {
+    margin-bottom: .5em;
+    color: @usertextFontColorHeading;
+  }
+
+  h5, h6 {
+    font-size: @fontSize;
+    color: contrast(@usertextFontColorHeading, lighten(@usertextFontColorHeading, 10), darken(@usertextFontColorHeading, 10));
   }
 
   h1 {
-    font-size: @usertextFontSizeH1;
-    color: @usertextColorFgH1;
-    margin-top: @usertextFontSizeH1;
-    margin-bottom: @usertextFontSizeH1*0.75;
+    font-size: round(@fontSize*1.8);
     border-bottom: 1px solid @colorFgBorderEmphasize2;
   }
 
   h2 {
-    font-size: @usertextFontSizeH2;
-    color: @usertextColorFgH2;
-    margin-top: @usertextFontSizeH2;
-    margin-bottom: @usertextFontSizeH2*0.75;
+    font-size: round(@fontSize*1.6);
     border-bottom: 1px solid @colorFgBorderEmphasize2;
   }
 
   h3 {
-    font-size: @usertextFontSizeH3;
-    color: @usertextColorFgH3;
-    margin-top: @usertextFontSizeH3;
-    margin-bottom: @usertextFontSizeH3*0.5;
+    font-size: round(@fontSize*1.4);
   }
 
   h4 {
-    font-size: @usertextFontSizeH4;
-    color: @usertextColorFgH4;
-    margin-top: @usertextFontSizeH4;
-    margin-bottom: @usertextFontSizeH4*0.5;
-  }
-
-  h5 {
-    font-size: @usertextFontSizeH5;
-    color: @usertextColorFgH5;
-    margin-top: @usertextFontSizeH5;
-    margin-bottom: @usertextFontSizeH5*0.5;
+    font-size: round(@fontSize*1.2);;
   }
 
   h6 {
-    margin-top: @usertextFontSizeH6;
-    margin-bottom: @usertextFontSizeH6*0.5;
     font-style: italic;
-    font-size: @usertextFontSizeH6;
-    color: @usertextColorFgH6;
+    font-weight: normal;
+    text-decoration: underline;
   }
 
   p {
+    margin-bottom: 1em;
+    line-height: @usertextLineheight;
     font-size: @usertextFontSize;
-    margin: 8px 0;
+    color: @usertextFontColor;
   }
 
   ul, ol {
@@ -90,15 +87,19 @@
 
   li {
     margin: 5px 0;
-    font-size: @usertextFontSize;
-    line-height: 1.6;
+    line-height: @usertextLineheight+.1;
+
   }
 
   blockquote {
     margin: 15px 0;
-    padding: 4px 10px;
-    border-left: 3px solid lighten(@colorFg, 50);
+    padding: 10px;
+    border-left: 3px solid contrast(@colorBgEmphasize1, darken(@colorBgEmphasize1, 10), lighten(@colorBgEmphasize1, 10));
     background-color: @colorBgEmphasize1;
-    color: lighten(@colorFg, 30);
+    color: contrast(@usertextFontColor, lighten(@usertextFontColor, 15), darken(@usertextFontColor, 15));
+
+    p:last-of-type {
+      margin: 0;
+    }
   }
 }

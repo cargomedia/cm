@@ -57,6 +57,11 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
         $this->assertSame('<p>hello</p>', $list->getHtml());
     }
 
+    public function testGetHtmlJavascriptTemplate() {
+        $list = new CM_Dom_NodeList('<script type="text/template"><div class="clclcl">TestText</div></script><span class="pr">Left</span>');
+        $this->assertSame('<span class="pr">Left</span>', $list->getHtml());
+    }
+
     public function testGetText() {
         $list = new CM_Dom_NodeList('<div>hello<strong>world</strong></div>');
         $this->assertSame('helloworld', $list->getText());

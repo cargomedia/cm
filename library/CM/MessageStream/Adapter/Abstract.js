@@ -1,8 +1,8 @@
 /**
- * @class CM_Stream_Adapter_Message_Abstract
+ * @class CM_MessageStream_Adapter_Abstract
  * @extends CM_Class_Abstract
  */
-var CM_Stream_Adapter_Message_Abstract = CM_Class_Abstract.extend({
+var CM_MessageStream_Adapter_Abstract = CM_Class_Abstract.extend({
   /**
    * @constructor
    * @param {Object} options

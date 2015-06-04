@@ -41,7 +41,7 @@
           {foreach $log.metaInfo as $key => $value}
             <div class="tableField clearfix">
               <div class="label">{$key|escape}</div>
-              <div class="value">{$value|@varline|escape}</div>
+              <div class="value">{$value|escape}</div>
             </div>
           {/foreach}
         </div>

@@ -1,9 +1,5 @@
 <?php
 
-class bla extends CM_Process_WorkloadResult {
-
-}
-
 class CM_Process_WorkloadResult {
 
     /** @var mixed */

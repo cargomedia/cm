@@ -1,8 +1,8 @@
 /**
- * @class CM_Stream_Adapter_Message_SocketRedis
- * @extends CM_Stream_Adapter_Message_Abstract
+ * @class CM_MessageStream_Adapter_SocketRedis
+ * @extends CM_MessageStream_Adapter_Abstract
  */
-var CM_Stream_Adapter_Message_SocketRedis = CM_Stream_Adapter_Message_Abstract.extend({
+var CM_MessageStream_Adapter_SocketRedis = CM_MessageStream_Adapter_Abstract.extend({
 
   /** @type {SocketRedis|Null} */
   _socketRedis: null,
