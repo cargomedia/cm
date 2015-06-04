@@ -85,6 +85,8 @@ class CM_Model_CurrencyTest extends CMTest_TestCase {
 
     public function testFindByLocationUseCityWithCountry() {
         $countryId = CM_Db_Db::insert('cm_model_location_country', array('abbreviation' => 'DE', 'name' => 'Germany'));
+        $country = new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $countryId);
+
         $cityId = CM_Db_Db::insert('cm_model_location_city', array(
             'stateId'   => null,
             'countryId' => $countryId,
@@ -96,8 +98,11 @@ class CM_Model_CurrencyTest extends CMTest_TestCase {
         $this->assertNull(CM_Model_Currency::findByLocation($city));
 
         $currency = CM_Model_Currency::create('780', 'EUR');
-        $currency->setCountryMapping($city);
+        $cache = CM_Cache_Local::getInstance();
+        $cacheKey = CM_CacheConst::Currency_CountryId . '_countryId:' . $country->getId();
+        $currency->setCountryMapping($country);
+        $cache->delete($cacheKey);
 
-        $this->assertSame($currency, CM_Model_Currency::findByLocation($city));
+        $this->assertEquals($currency, CM_Model_Currency::findByLocation($city));
     }
 }
