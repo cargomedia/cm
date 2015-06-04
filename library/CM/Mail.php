@@ -290,7 +290,14 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @return array array($subject, $html, $text)
      */
     public function render() {
-        return $this->_render();
+        if (null !== $this->_recipient) {
+            $environment = $this->_recipient->getEnvironment();
+        } else {
+            $environment = new CM_Frontend_Environment($this->_site);
+        }
+        $render = new CM_Frontend_Render($environment);
+        $renderAdapter = new CM_RenderAdapter_Mail($render, $this);
+        return $renderAdapter->fetch();
     }
 
     /**
@@ -359,20 +366,6 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             $mail->_send($row['subject'], $row['text'], $row['html']);
             CM_Db_Db::delete('cm_mail', array('id' => $row['id']));
         }
-    }
-
-    /**
-     * @return array array($subject, $html, $text)
-     */
-    protected function _render() {
-        if (null !== $this->_recipient) {
-            $environment = $this->_recipient->getEnvironment();
-        } else {
-            $environment = new CM_Frontend_Environment($this->_site);
-        }
-        $render = new CM_Frontend_Render($environment);
-        $renderAdapter = new CM_RenderAdapter_Mail($render, $this);
-        return $renderAdapter->fetch();
     }
 
     /**
