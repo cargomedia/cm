@@ -85,17 +85,17 @@ class CM_Model_Currency extends CM_Model_Abstract {
     }
 
     /**
-     * @param CM_Model_Location $country
+     * @param CM_Model_Location $location
      * @return CM_Model_Currency|null
-     * @throws CM_Exception_Invalid
      */
-    public static function findByCountry(CM_Model_Location $country) {
-        if (CM_Model_Location::LEVEL_COUNTRY !== $country->getLevel()) {
-            throw new CM_Exception_Invalid('Location must be a country');
+    public static function findByLocation(CM_Model_Location $location) {
+        $country = $location->get(CM_Model_Location::LEVEL_COUNTRY);
+        if (null === $country) {
+            return null;
         }
+
         $cache = CM_Cache_Local::getInstance();
         $cacheKey = CM_CacheConst::Currency_CountryId . '_countryId:' . $country->getId();
-
         if (false === ($currencyId = $cache->get($cacheKey))) {
             $currencyId = CM_Db_Db::select('cm_model_currency_country', 'currencyId', ['countryId' => $country->getId()])->fetchColumn();
             $currencyId = $currencyId ? (int) $currencyId : null;
@@ -106,40 +106,6 @@ class CM_Model_Currency extends CM_Model_Abstract {
             return null;
         }
         return new self($currencyId);
-    }
-
-    /**
-     * @param CM_Model_Location $location
-     * @return CM_Model_Currency|null
-     */
-    public static function findByLocation(CM_Model_Location $location) {
-        $country = $location->get(CM_Model_Location::LEVEL_COUNTRY);
-        if (null === $country) {
-            return null;
-        }
-        return self::findByCountry($country);
-    }
-
-    /**
-     * @param CM_Model_Location|null $location
-     * @return CM_Model_Currency
-     */
-    public static function getByLocation(CM_Model_Location $location = null) {
-        if (null === $location) {
-            return self::getDefaultCurrency();
-        }
-
-        $country = $location->get(CM_Model_Location::LEVEL_COUNTRY);
-        if (null === $country) {
-            return self::getDefaultCurrency();
-        }
-
-        $currency = self::findByCountry($country);
-        if (null === $currency) {
-            return self::getDefaultCurrency();
-        }
-
-        return $currency;
     }
 
     /**

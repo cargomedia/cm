@@ -65,7 +65,7 @@ class CM_Model_CurrencyTest extends CMTest_TestCase {
         CM_Model_Currency::getDefaultCurrency();
     }
 
-    public function testFindByCountry() {
+    public function testFindByLocation() {
         $currency = CM_Model_Currency::create('780', 'EUR');
         $countryId = CM_Db_Db::insert('cm_model_location_country', array('abbreviation' => 'DE', 'name' => 'Germany'));
         $country = new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $countryId);
@@ -73,21 +73,29 @@ class CM_Model_CurrencyTest extends CMTest_TestCase {
         $cache = CM_Cache_Local::getInstance();
         $cacheKey = CM_CacheConst::Currency_CountryId . '_countryId:' . $country->getId();
 
-        $this->assertNull(CM_Model_Currency::findByCountry($country));
+        $this->assertNull(CM_Model_Currency::findByLocation($country));
         $this->assertNull($cache->get($cacheKey));
 
         $currency->setCountryMapping($country);
         $cache->delete($cacheKey);
 
-        $this->assertEquals($currency, CM_Model_Currency::findByCountry($country));
+        $this->assertEquals($currency, CM_Model_Currency::findByLocation($country));
         $this->assertSame($currency->getId(), $cache->get($cacheKey));
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Location must be a country
-     */
-    public function testFindByCountryUseCity() {
+    public function testFindByLocationUseCityWithoutCountry() {
+        $cityId = CM_Db_Db::insert('cm_model_location_city', array(
+            'stateId'   => null,
+            'countryId' => null,
+            'name'      => 'Berlin',
+            'lat'       => 12.345678,
+            'lon'       => 12.345678,
+        ));
+        $city = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $cityId);
+        $this->assertNull(CM_Model_Currency::findByLocation($city));
+    }
+
+    public function testFindByLocationUseCityWithCountry() {
         $countryId = CM_Db_Db::insert('cm_model_location_country', array('abbreviation' => 'DE', 'name' => 'Germany'));
         $cityId = CM_Db_Db::insert('cm_model_location_city', array(
             'stateId'   => null,
@@ -97,7 +105,12 @@ class CM_Model_CurrencyTest extends CMTest_TestCase {
             'lon'       => 12.345678,
         ));
         $city = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $cityId);
-        CM_Model_Currency::findByCountry($city);
+        $this->assertNull(CM_Model_Currency::findByLocation($city));
+
+        $currency = CM_Model_Currency::create('780', 'EUR');
+        $currency->setCountryMapping($city);
+
+        $this->assertSame($currency, CM_Model_Currency::findByLocation($city));
     }
 
     public function testGetByLocation() {
@@ -115,11 +128,5 @@ class CM_Model_CurrencyTest extends CMTest_TestCase {
         $currency->setCountryMapping($country);
 
         $this->assertEquals($currency, CM_Model_Currency::getByLocation($city));
-    }
-
-    public function testGetByLocationWithLocationNull() {
-        $currency = CMTest_TH::createDefaultCurrency();
-
-        $this->assertEquals($currency, CM_Model_Currency::getByLocation());
     }
 }
