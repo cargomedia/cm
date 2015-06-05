@@ -19,7 +19,7 @@
 
     var self = this;
     if (this.$elem.find('img').length) {
-      this.$elem.find('img').on('load', function() {
+      $(this).imagesLoaded().always(function() {
         self.toggle(false);
       });
     } else {
