@@ -61,12 +61,12 @@ class CM_Model_CurrencyTest extends CMTest_TestCase {
      * @expectedExceptionMessage No default currency set
      */
     public function testGetDefaultCurrencyThrowsNoUSD() {
-        CM_Model_Currency::create('780', 'EUR');
+        CM_Model_Currency::create('978', 'EUR');
         CM_Model_Currency::getDefaultCurrency();
     }
 
     public function testFindByLocation() {
-        $currency = CM_Model_Currency::create('780', 'EUR');
+        $currency = CM_Model_Currency::create('978', 'EUR');
         $countryId = CM_Db_Db::insert('cm_model_location_country', array('abbreviation' => 'DE', 'name' => 'Germany'));
         $country = new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $countryId);
 
@@ -97,12 +97,30 @@ class CM_Model_CurrencyTest extends CMTest_TestCase {
         $city = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $cityId);
         $this->assertNull(CM_Model_Currency::findByLocation($city));
 
-        $currency = CM_Model_Currency::create('780', 'EUR');
+        $currency = CM_Model_Currency::create('978', 'EUR');
         $cache = CM_Cache_Local::getInstance();
         $cacheKey = CM_CacheConst::Currency_CountryId . '_countryId:' . $country->getId();
         $currency->setCountryMapping($country);
         $cache->delete($cacheKey);
 
         $this->assertEquals($currency, CM_Model_Currency::findByLocation($city));
+    }
+
+    public function testGetByLocation() {
+        $currencyDefault= CMTest_TH::createDefaultCurrency();
+        $currencyEUR = CM_Model_Currency::create('978', 'EUR');
+        $this->assertEquals($currencyDefault, CM_Model_Currency::getByLocation(null));
+
+        $countryId = CM_Db_Db::insert('cm_model_location_country', array('abbreviation' => 'DE', 'name' => 'Germany'));
+        $country = new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $countryId);
+
+        $this->assertEquals($currencyDefault, CM_Model_Currency::getByLocation($country));
+
+        $currencyEUR->setCountryMapping($country);
+        $cache = CM_Cache_Local::getInstance();
+        $cacheKey = CM_CacheConst::Currency_CountryId . '_countryId:' . $country->getId();
+        $cache->delete($cacheKey);
+
+        $this->assertEquals($currencyEUR, CM_Model_Currency::getByLocation($country));
     }
 }

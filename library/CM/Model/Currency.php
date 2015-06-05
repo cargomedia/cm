@@ -109,6 +109,23 @@ class CM_Model_Currency extends CM_Model_Abstract {
     }
 
     /**
+     * @param CM_Model_Location|null $location
+     * @return CM_Model_Currency
+     */
+    public static function getByLocation(CM_Model_Location $location = null) {
+        if (null === $location) {
+            return self::getDefaultCurrency();
+        }
+
+        $currency = self::findByLocation($location);
+        if (null === $currency) {
+            return self::getDefaultCurrency();
+        }
+
+        return $currency;
+    }
+
+    /**
      * @param string $abbreviation
      * @return CM_Model_Currency
      * @throws CM_Exception_Invalid
