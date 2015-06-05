@@ -2,17 +2,40 @@
 
 class CM_Model_UserTest extends CMTest_TestCase {
 
-    public static function setupBeforeClass() {
+    /** @var CM_Model_Currency */
+    private $_currencyDefault;
+
+    public function setUp() {
+        $this->_currencyDefault = CMTest_TH::createDefaultCurrency();
     }
 
     public function tearDown() {
         CMTest_TH::clearEnv();
     }
 
-    public function testGetCreated() {
-        $time = time();
-        $user = CMTest_TH::createUser();
-        $this->assertGreaterThanOrEqual($time, $user->getCreated());
+    public function testCreate() {
+        $user = CM_Model_User::createStatic();
+        $this->assertEquals(time(), $user->getCreated());
+        $this->assertEquals(time(), $user->getLatestActivity());
+        $this->assertEquals(CM_Site_Abstract::factory(), $user->getSite());
+        $this->assertSame(null, $user->getLanguage());
+        $this->assertEquals($this->_currencyDefault, $user->getCurrency());
+    }
+
+    public function testCreateAllData() {
+        $site = $this->getMockSite();
+        $language = CM_Model_Language::create('English', 'en', true);
+        $currency = CM_Model_Currency::create('978', 'EUR');
+        $user = CM_Model_User::createStatic([
+            'site'     => $site,
+            'language' => $language,
+            'currency' => $currency,
+        ]);
+        $this->assertEquals(time(), $user->getCreated());
+        $this->assertEquals(time(), $user->getLatestActivity());
+        $this->assertEquals($site, $user->getSite());
+        $this->assertEquals($language, $user->getLanguage());
+        $this->assertEquals($currency, $user->getCurrency());
     }
 
     public function testGetSetOnline() {
@@ -48,11 +71,6 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertFalse($user->getVisible());
         $user->setVisible(true);
         $this->assertTrue($user->getVisible());
-    }
-
-    public function testCreate() {
-        $user = CM_Model_User::createStatic();
-        $this->assertRow('cm_user', array('userId' => $user->getId()));
     }
 
     public function testCreateWithSite() {

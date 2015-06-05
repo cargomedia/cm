@@ -495,6 +495,7 @@ CREATE TABLE `cm_user` (
   `createStamp` int(10) unsigned NOT NULL,
   `site` int(10) unsigned DEFAULT NULL,
   `languageId` int(10) unsigned DEFAULT NULL,
+  `currencyId` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`userId`),
   KEY `activityStamp` (`activityStamp`),
   KEY `createStamp` (`createStamp`),
