@@ -32,7 +32,7 @@ class smarty_block_ratioKeeperTest extends CMTest_TestCase {
     }
 
     public function testRenderContentAttrs() {
-        $params = ['contentAttrs' => ['class' => 'test']];
+        $params = ['contentClass' => 'test'];
         $output = smarty_block_ratioKeeper($params, '', $this->_template, false);
         $this->assertContains('class="test ratioKeeper-content"', $output);
     }
