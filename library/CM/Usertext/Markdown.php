@@ -57,7 +57,7 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
 
     protected function _doImages_reference_callback($matches) {
         $key = parent::_doImages_reference_callback($matches);
-        $this->html_hashes[$key] = $this->_transformDimensions($this->html_hashes[$key]);
+        $this->html_hashes[$key] = $this->_transformToLazyImages($this->html_hashes[$key]);
         return $key;
     }
 
@@ -74,7 +74,7 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
 
     protected function _doImages_inline_callback($matches) {
         $key = parent::_doImages_inline_callback($matches);
-        $this->html_hashes[$key] = $this->_transformDimensions($this->html_hashes[$key]);
+        $this->html_hashes[$key] = $this->_transformToLazyImages($this->html_hashes[$key]);
         return $key;
     }
 
@@ -83,14 +83,14 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
      * @return string
      * @throws CM_Exception_Invalid
      */
-    private function _transformDimensions($tagText) {
-        $tagText = preg_replace_callback('/^<img src="([^"]+)" alt="([^"]+)" title="(?:[^"]+)?" (?:class="([^"]+)")? (?:width="(\d+)") (?:height="(\d+)") \/>$/i', function ($matches) {
+    private function _transformToLazyImages($tagText) {
+        $tagText = preg_replace_callback('/^<img src="([^"]+)" alt="([^"]+)" title="(?:[^"]+)?"(?: class="([^"]+)")? (?:width="(\d+)") (?:height="(\d+)") \/>$/i', function ($matches) {
             $width = (int) $matches[4];
             $height = (int) $matches[5];
             if ($width > 0 && $height > 0) {
                 $src = $matches[1];
                 $alt = $matches[2];
-                $class = $matches[3];
+                $class = $matches[3] ? 'lazy ' . $matches[3] : 'lazy';
                 $imgHtml = '<img data-src="' . $src . '" alt="' . $alt . '" class="' . $class . '"/>';
                 return CM_Frontend_TemplateHelper_RatioKeeper::create(['width' => $width, 'height' => $height, 'content' => $imgHtml]) . '</br>';
             }
