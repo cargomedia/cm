@@ -34,7 +34,7 @@ class CM_Frontend_TemplateHelper_RatioKeeper {
             $contentClass .= ' ' . $params['contentClass'];
         }
 
-        $output .= '<div class="' . $contentClass . '" >';
+        $output .= '<div class="' . $contentClass . '">';
         $output .= $params['content']. '</div>';
 
         $output .= '</div>';
