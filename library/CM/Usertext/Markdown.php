@@ -88,14 +88,7 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
             $width = (int) $matches[4];
             $height = (int) $matches[5];
             if ($width > 0 && $height > 0) {
-                $src = $matches[1];
-                $alt = $matches[2];
-                $class = $matches[3];
-                $imgHtml = '<div class="ratioKeeper">';
-                $imgHtml .= '<img class="ratioKeeper-size" src=""/>';
-                $imgHtml .= '<img data-src="' . $src . '" alt="' . $alt . '" class="' . $class . ' ratioKeeper-content"/>';
-                $imgHtml .= '</div>';
-                return $imgHtml;
+                return CM_Frontend_TemplateHelper_RatioKeeper::create(['width' => $width, 'height' => $height, 'content' => $matches[0]]);
             }
             return $matches[0];
         }, $tagText);
