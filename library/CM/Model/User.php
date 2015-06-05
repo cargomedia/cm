@@ -320,7 +320,7 @@ class CM_Model_User extends CM_Model_Abstract {
             $language = $data['language'];
             $languageId = $language->getId();
         }
-        $currencyId = CM_Model_Currency::getDefaultCurrency()->getId();
+        $currencyId = null;
         if (isset($data['currency'])) {
             /** @var CM_Model_Currency $currency */
             $currency = $data['currency'];

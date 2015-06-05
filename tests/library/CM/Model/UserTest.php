@@ -2,34 +2,29 @@
 
 class CM_Model_UserTest extends CMTest_TestCase {
 
-    /** @var CM_Model_Currency */
-    private $_currencyDefault;
-
-    public function setUp() {
-        $this->_currencyDefault = CMTest_TH::createDefaultCurrency();
-    }
-
     public function tearDown() {
         CMTest_TH::clearEnv();
     }
 
     public function testCreate() {
+        $currencyDefault = CMTest_TH::createDefaultCurrency();
         $user = CM_Model_User::createStatic();
         $this->assertEquals(time(), $user->getCreated());
         $this->assertEquals(time(), $user->getLatestActivity());
         $this->assertEquals(CM_Site_Abstract::factory(), $user->getSite());
         $this->assertSame(null, $user->getLanguage());
-        $this->assertEquals($this->_currencyDefault, $user->getCurrency());
+        $this->assertEquals($currencyDefault, $user->getCurrency());
     }
 
     public function testCreateAllData() {
+        CMTest_TH::createDefaultCurrency();
         $site = $this->getMockSite();
         $language = CM_Model_Language::create('English', 'en', true);
         $currency = CM_Model_Currency::create('978', 'EUR');
         $user = CM_Model_User::createStatic([
             'site'     => $site,
             'language' => $language,
-            'currency' => $currency,
+            'currency'  => $currency,
         ]);
         $this->assertEquals(time(), $user->getCreated());
         $this->assertEquals(time(), $user->getLatestActivity());
