@@ -7,13 +7,12 @@ class CM_Model_UserTest extends CMTest_TestCase {
     }
 
     public function testCreate() {
-        $currencyDefault = CMTest_TH::createDefaultCurrency();
         $user = CM_Model_User::createStatic();
         $this->assertEquals(time(), $user->getCreated());
         $this->assertEquals(time(), $user->getLatestActivity());
         $this->assertEquals(CM_Site_Abstract::factory(), $user->getSite());
         $this->assertSame(null, $user->getLanguage());
-        $this->assertEquals($currencyDefault, $user->getCurrency());
+        $this->assertSame(null, $user->getCurrency());
     }
 
     public function testCreateAllData() {
