@@ -849,7 +849,7 @@ var CM_App = CM_Class_Abstract.extend({
     return this.ajax('rpc', {method: methodName, params: params})
       .then(function(response) {
         if (typeof(response.result) === 'undefined') {
-          cm.error.trigger('RPC response has undefined result');
+          throw cm.error.create({msg: 'RPC response has undefined result', type: null, isPublic: false});
         }
         return response.result;
       });
