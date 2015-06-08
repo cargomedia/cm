@@ -28,14 +28,7 @@ class CM_Frontend_TemplateHelper_RatioKeeper {
 
         $output = '<div class="ratioKeeper' . ((isset($params['stretch']) && $params['stretch']) ? ' stretch' : '') . '">';
         $output .= '<img class="ratioKeeper-size" src="' . $imageSrc . '">';
-
-        $contentClass = 'ratioKeeper-content';
-        if (isset($params['contentClass'])) {
-            $contentClass .= ' ' . $params['contentClass'];
-        }
-
-        $output .= '<div class="' . $contentClass . '">';
-        $output .= $params['content']. '</div>';
+        $output .= $params['content'];
 
         $output .= '</div>';
         return $output;
