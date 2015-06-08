@@ -60,7 +60,7 @@ var CM_Component_Example = CM_Component_Abstract.extend({
   },
 
   loadExample: function() {
-    this.showComponent('CM_Component_Example', {foo: 'value2', site: this.getParams().site});
+    this.popOutComponent('CM_Component_Example', {foo: 'value2', site: this.getParams().site});
   },
 
   loadExampleInline: function() {

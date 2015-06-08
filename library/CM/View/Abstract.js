@@ -326,7 +326,7 @@ var CM_View_Abstract = Backbone.View.extend({
    * @param {Object|Null} [options]
    * @return Promise
    */
-  showComponent: function(className, params, options) {
+  popOutComponent: function(className, params, options) {
     return this.prepareComponent(className, params, options)
       .then(function(component) {
         component.popOut();
