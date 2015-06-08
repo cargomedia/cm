@@ -170,7 +170,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     }
 
     if (_.size(errorList)) {
-      return Promise.resolve();//TODO is this replacement ok. It is not rejected but resolved with empty value.
+      return Promise.resolve();
     } else {
       if (options.disableUI) {
         this.disable();
