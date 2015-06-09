@@ -1,6 +1,7 @@
 .ratioKeeper {
   position: relative;
   display: inline-block;
+  max-width: 100%;
 
   .ratioKeeper-size {
     max-width: 100%;
@@ -16,12 +17,11 @@
   }
 
   &.stretch {
-    width: 100%;
-    height: 100%;
+    display: block;
+    max-width: none;
 
     .ratioKeeper-size {
       width: 100%;
-      height: 100%;
     }
   }
 }
