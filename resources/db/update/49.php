@@ -18,3 +18,7 @@ if (!CM_Db_Db::existsTable('cm_model_currency_country')) {
                       UNIQUE KEY `countryId` (`countryId`)
                     ) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
 }
+
+if (!CM_Db_Db::existsColumn('cm_user', 'currencyId')) {
+    CM_Db_Db::exec("ALTER TABLE `cm_user` ADD `currencyId` INT(10) UNSIGNED DEFAULT NULL");
+}
