@@ -25,6 +25,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
             'language' => $language,
             'currency'  => $currency,
         ]);
+        $this->assertInternalType('int', $user->getCreated());
         $this->assertEquals(time(), $user->getCreated());
         $this->assertEquals(time(), $user->getLatestActivity());
         $this->assertEquals($site, $user->getSite());

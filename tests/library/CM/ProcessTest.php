@@ -10,11 +10,14 @@ class CM_ProcessTest extends CMTest_TestCase {
      */
     public function testFork() {
         $process = CM_Process::getInstance();
-        $seq1 = $process->fork(function() {});
-        $seq2 = $process->fork(function() {});
-        $seq3 = $process->fork(function() {});
-        $this->assertSame(1, $seq2 - $seq1);
-        $this->assertSame(1, $seq3 - $seq2);
+        $forkHandler1 = $process->fork(function () {
+            });
+        $forkHandler2 = $process->fork(function () {
+            });
+        $forkHandler3 = $process->fork(function () {
+            });
+        $this->assertSame(1, $forkHandler2->getIdentifier() - $forkHandler1->getIdentifier());
+        $this->assertSame(1, $forkHandler3->getIdentifier() - $forkHandler2->getIdentifier());
     }
 
     /**
@@ -300,7 +303,7 @@ class CM_ProcessTest extends CMTest_TestCase {
     public function testEventHandler() {
         $counter = 0;
         $process = CM_Process::getInstance();
-        $process->bind('foo', function() use (&$counter) {
+        $process->bind('foo', function () use (&$counter) {
             $counter++;
         });
         $process->trigger('foo');
