@@ -2,20 +2,33 @@
 
 class CM_Frontend_TemplateHelper_RatioKeeper {
 
-    public static function create($params) {
-        if (isset($params['width']) && isset($params['height'])) {
-            $width = (int) $params['width'];
-            $height = (int) $params['height'];
-        } elseif (isset($params['ratio'])) {
-            $ratio = $params['ratio'];
-            $width = 100;
-            $height = $width * $ratio;
-        } else {
-            $width = $height = 1;
-        }
+    /**
+     * @param string $content
+     * @param int    $width
+     * @param int    $height
+     * @param bool   $stretch
+     * @return string
+     */
+    public static function create($content, $width = 1, $height = 1, $stretch = false) {
+        $imageData = self::_createBlankImage($width, $height);
+        $imageSrc = 'data:image/png;base64,' . base64_encode($imageData);
 
+        $output = '<div class="ratioKeeper' . ($stretch ? ' stretch' : '') . '">';
+        $output .= '<img class="ratioKeeper-size" src="' . $imageSrc . '">';
+        $output .= $content;
+
+        $output .= '</div>';
+        return $output;
+    }
+
+    /**
+     * @param int $width
+     * @param int $height
+     * @return string
+     */
+    private static function _createBlankImage($width, $height) {
         $cache = CM_Cache_Local::getInstance();
-        $imageData = $cache->get($cache->key(CM_CacheConst::Frontend_TemplateHelper_RatioKeeper, $width, $height), function () use ($width, $height) {
+        return $cache->get($cache->key(CM_CacheConst::Frontend_TemplateHelper_RatioKeeper, $width, $height), function () use ($width, $height) {
             $image = imagecreate($width, $height);
             ob_start();
             imagecolorallocate($image, 255, 255, 255);
@@ -24,13 +37,5 @@ class CM_Frontend_TemplateHelper_RatioKeeper {
             ob_end_clean();
             return $imageData;
         });
-        $imageSrc = 'data:image/png;base64,' . base64_encode($imageData);
-
-        $output = '<div class="ratioKeeper' . ((isset($params['stretch']) && $params['stretch']) ? ' stretch' : '') . '">';
-        $output .= '<img class="ratioKeeper-size" src="' . $imageSrc . '">';
-        $output .= $params['content'];
-
-        $output .= '</div>';
-        return $output;
     }
 }

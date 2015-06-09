@@ -17,14 +17,6 @@ class smarty_block_ratioKeeperTest extends CMTest_TestCase {
     }
 
     public function testRenderRatio() {
-        $params = ['ratio' => 1];
-        $size = $this->_getImgSize($params);
-        $this->assertEquals($size['width'], $size['height']);
-
-        $params = ['ratio' => 0.75];
-        $size = $this->_getImgSize($params);
-        $this->assertEquals($size['width'] * 0.75, $size['height']);
-
         $params = ['height' => 600, 'width' => 900];
         $size = $this->_getImgSize($params);
         $this->assertEquals(900, $size['width']);
