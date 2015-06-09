@@ -107,7 +107,7 @@ class CM_Model_CurrencyTest extends CMTest_TestCase {
     }
 
     public function testGetByLocation() {
-        $currencyDefault= CMTest_TH::createDefaultCurrency();
+        $currencyDefault = CMTest_TH::createDefaultCurrency();
         $currencyEUR = CM_Model_Currency::create('978', 'EUR');
         $this->assertEquals($currencyDefault, CM_Model_Currency::getByLocation(null));
 
@@ -122,5 +122,21 @@ class CM_Model_CurrencyTest extends CMTest_TestCase {
         $cache->delete($cacheKey);
 
         $this->assertEquals($currencyEUR, CM_Model_Currency::getByLocation($country));
+    }
+
+    public function testDelete() {
+        $currencyDefault = CMTest_TH::createDefaultCurrency();
+        $currencyEUR = CM_Model_Currency::create('978', 'EUR');
+
+        $paging = new CM_Paging_Currency_All();
+        $this->assertCount(2, $paging);
+        $this->assertContainsAll([$currencyDefault, $currencyEUR], $paging->getItems());
+
+        $currencyEUR->delete();
+
+        $paging = new CM_Paging_Currency_All();
+        $this->assertCount(1, $paging);
+        $this->assertContains($currencyDefault, $paging->getItems());
+        $this->assertNotContains($currencyEUR, $paging->getItems());
     }
 }
