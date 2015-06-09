@@ -6,6 +6,6 @@ function smarty_block_ratioKeeper($params, $content, Smarty_Internal_Template $t
     if ($open) {
         return '';
     } else {
-        return CM_Frontend_TemplateHelper_RatioKeeper::create($content, $params['width'], $params['height'], (isset($params['stretch']) ? ' stretch' : false));
+        return CM_Frontend_TemplateHelper_ContentPlaceholder::create($content, $params['width'], $params['height'], (isset($params['stretch']) ? ' stretch' : false));
     }
 }

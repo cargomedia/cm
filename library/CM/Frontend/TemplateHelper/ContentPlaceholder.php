@@ -1,6 +1,6 @@
 <?php
 
-class CM_Frontend_TemplateHelper_RatioKeeper {
+class CM_Frontend_TemplateHelper_ContentPlaceholder {
 
     /**
      * @param string $content
