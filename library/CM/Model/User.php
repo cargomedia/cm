@@ -202,14 +202,10 @@ class CM_Model_User extends CM_Model_Abstract {
     }
 
     /**
-     * @param bool|null $withDefault
      * @return CM_Model_Currency|null
      */
-    public function getCurrency($withDefault = null) {
+    public function getCurrency() {
         if (!$this->_get('currencyId')) {
-            if ($withDefault) {
-                return CM_Model_Currency::getDefaultCurrency();
-            }
             return null;
         }
         return new CM_Model_Currency($this->_get('currencyId'));
