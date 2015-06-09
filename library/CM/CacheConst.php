@@ -89,4 +89,6 @@ class CM_CacheConst {
     const AdproviderZones = 'AdproviderZones';
 
     const Emoticons = 'Emoticons';
+
+    const Frontend_TemplateHelper_RatioKeeper = 'Frontend_TemplateHelper_RatioKeeper';
 }

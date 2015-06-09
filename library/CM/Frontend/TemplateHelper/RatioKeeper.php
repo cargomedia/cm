@@ -15,7 +15,7 @@ class CM_Frontend_TemplateHelper_RatioKeeper {
         }
 
         $cache = CM_Cache_Local::getInstance();
-        $imageData = $cache->get($cache->key('_ratioKeeper:', $width, $height), function () use ($width, $height) {
+        $imageData = $cache->get($cache->key(CM_CacheConst::Frontend_TemplateHelper_RatioKeeper, $width, $height), function () use ($width, $height) {
             $image = imagecreate($width, $height);
             ob_start();
             imagecolorallocate($image, 255, 255, 255);
