@@ -5,6 +5,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     use \Mocka\MockaTrait;
 
     use CM_Service_ManagerAwareTrait;
+    use CM_ExceptionHandling_CatcherTrait;
 
     public function runBare() {
         if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
