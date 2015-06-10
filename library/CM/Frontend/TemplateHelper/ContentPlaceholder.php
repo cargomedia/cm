@@ -21,7 +21,7 @@ class CM_Frontend_TemplateHelper_ContentPlaceholder {
         $imageSrc = 'data:image/png;base64,' . base64_encode($imageData);
 
         $output = '<div class="contentPlaceholder' . ($stretch ? ' stretch' : '') . '">';
-        $output .= '<img class="contentPlaceholder-size" src="' . $imageSrc . '">';
+        $output .= '<img class="contentPlaceholder-size" src="' . $imageSrc . '"/>';
         $output .= $content;
 
         $output .= '</div>';

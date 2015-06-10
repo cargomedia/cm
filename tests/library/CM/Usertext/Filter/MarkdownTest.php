@@ -26,7 +26,7 @@ class CM_Usertext_Filter_MarkdownTest extends CMTest_TestCase {
         $actual = $filter->transform($text, new CM_Frontend_Render());
         $this->assertStringStartsWith("<h1>Headline</h1>\n<ul>\n<li>element1</li>\n<li>element1</li>\n</ul>\n<p>paragraph</p>\n<p>foo_bar_foo</p>\n<p>foo <em>bar</em> foo</p>\n<p>Link: <a href=\"http://www.google.com\">google.com</a></p>\n<p>test2</p>", $actual);
 
-        $expected = '/<div class="contentPlaceholder"><img class="contentPlaceholder-size" src="[^"]+"><img data-src="\/path\/to\/img\.jpg" alt="Img text" class="lazy"\/><\/div>/';
+        $expected = '/<div class="contentPlaceholder"><img class="contentPlaceholder-size" src="[^"]+"\/><img data-src="\/path\/to\/img\.jpg" alt="Img text" class="lazy"\/><\/div>/';
         $this->assertRegExp($expected, $actual);
     }
 }
