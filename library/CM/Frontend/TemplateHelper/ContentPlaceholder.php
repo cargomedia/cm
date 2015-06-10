@@ -3,13 +3,20 @@
 class CM_Frontend_TemplateHelper_ContentPlaceholder {
 
     /**
-     * @param string $content
-     * @param int    $width
-     * @param int    $height
-     * @param bool   $stretch
+     * @param string    $content
+     * @param int|null  $width
+     * @param int|null  $height
+     * @param bool|null $stretch
      * @return string
      */
-    public static function create($content, $width = 1, $height = 1, $stretch = false) {
+    public static function create($content, $width = null, $height = null, $stretch = null) {
+        if (null === $width) {
+            $width = 1;
+        }
+        if (null === $height) {
+            $height = 1;
+        }
+        $stretch = (bool) $stretch;
         $imageData = self::_createBlankImage($width, $height);
         $imageSrc = 'data:image/png;base64,' . base64_encode($imageData);
 
