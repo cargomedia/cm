@@ -90,5 +90,5 @@ class CM_CacheConst {
 
     const Emoticons = 'Emoticons';
 
-    const Frontend_TemplateHelper_RatioKeeper = 'Frontend_TemplateHelper_RatioKeeper';
+    const Frontend_TemplateHelper_ContentPlaceholder = 'Frontend_TemplateHelper_ContentPlaceholder';
 }

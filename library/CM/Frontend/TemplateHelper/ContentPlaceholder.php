@@ -28,7 +28,7 @@ class CM_Frontend_TemplateHelper_ContentPlaceholder {
      */
     private static function _createBlankImage($width, $height) {
         $cache = CM_Cache_Local::getInstance();
-        return $cache->get($cache->key(CM_CacheConst::Frontend_TemplateHelper_RatioKeeper, $width, $height), function () use ($width, $height) {
+        return $cache->get($cache->key(CM_CacheConst::Frontend_TemplateHelper_ContentPlaceholder, $width, $height), function () use ($width, $height) {
             $image = imagecreate($width, $height);
             ob_start();
             imagecolorallocate($image, 255, 255, 255);
