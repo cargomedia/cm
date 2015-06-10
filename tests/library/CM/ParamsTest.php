@@ -231,7 +231,7 @@ class CM_ParamsTest extends CMTest_TestCase {
 
     public function testGetLocation() {
         $location = CMTest_TH::createLocation();
-        $params = new CM_Params(['location' => $location, 'locationParameters' => ['level' => $location->getLevel(), 'id' => $location->getId()], 'insufficientParameters' => 1]);
+        $params = new CM_Params(['location' => $location, 'locationParameters' => ['id' => $location->getId(), 'level' => $location->getLevel()], 'insufficientParameters' => 1]);
         $this->assertEquals($location, $params->getLocation('location'));
         $this->assertEquals($location, $params->getLocation('locationParameters'));
         try {

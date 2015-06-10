@@ -214,12 +214,16 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
         if (!$getter) {
             $getter = function ($className, $param) {
                 $reflectionClass = new ReflectionClass($className);
-                $countArgs = $reflectionClass->getConstructor()->getNumberOfRequiredParameters();
-                if ($countArgs > 1) {
-                    if (!is_array($param) || count($param) < $countArgs) {
+                $namedArgs = new CM_Util_NamedArgs();
+                $constructor = $reflectionClass->getConstructor();
+                $countArgs = $constructor->getNumberOfRequiredParameters();
+                if (is_array($param) || $countArgs > 1) {
+                    try {
+                        $arguments = $namedArgs->matchNamedArgs($constructor, (array) $param);
+                    } catch (CM_Exception_Invalid $ex) {
                         throw new CM_Exception_InvalidParam("Not enough parameters", ['parameters' => $param, 'class' => $className]);
                     }
-                    return $reflectionClass->newInstanceArgs($param);
+                    return $reflectionClass->newInstanceArgs($arguments);
                 }
                 return $reflectionClass->newInstance($param);
             };
