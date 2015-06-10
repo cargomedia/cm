@@ -20,8 +20,8 @@ class CM_Frontend_TemplateHelper_ContentPlaceholder {
         $imageData = self::_createBlankImage($width, $height);
         $imageSrc = 'data:image/png;base64,' . base64_encode($imageData);
 
-        $output = '<div class="ratioKeeper' . ($stretch ? ' stretch' : '') . '">';
-        $output .= '<img class="ratioKeeper-size" src="' . $imageSrc . '">';
+        $output = '<div class="contentPlaceholder' . ($stretch ? ' stretch' : '') . '">';
+        $output .= '<img class="contentPlaceholder-size" src="' . $imageSrc . '">';
         $output .= $content;
 
         $output .= '</div>';

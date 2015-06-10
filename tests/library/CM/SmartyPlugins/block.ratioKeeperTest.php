@@ -1,8 +1,8 @@
 <?php
 
-require_once CM_Util::getModulePath('CM') . 'library/CM/SmartyPlugins/block.ratioKeeper.php';
+require_once CM_Util::getModulePath('CM') . 'library/CM/SmartyPlugins/block.contentPlaceholder.php';
 
-class smarty_block_ratioKeeperTest extends CMTest_TestCase {
+class smarty_block_contentPlaceholderTest extends CMTest_TestCase {
 
     /**
      * @var Smarty_Internal_Template
@@ -28,9 +28,9 @@ class smarty_block_ratioKeeperTest extends CMTest_TestCase {
      * @return String
      */
     private function _getImgSize(array $params) {
-        $output = smarty_block_ratioKeeper($params, '', $this->_template, false);
+        $output = smarty_block_contentPlaceholder($params, '', $this->_template, false);
         $matches = array();
-        preg_match('/class="ratioKeeper-size" src="([^"]+)"/', $output, $matches);
+        preg_match('/class="contentPlaceholder-size" src="([^"]+)"/', $output, $matches);
         $imgSrc = $matches[1];
         $this->assertStringStartsWith('data:image/png;base64,', $imgSrc);
         $size = getimagesize($imgSrc);
