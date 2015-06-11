@@ -5,6 +5,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     use \Mocka\MockaTrait;
 
     use CM_Service_ManagerAwareTrait;
+    use CM_ExceptionHandling_CatcherTrait;
 
     public function runBare() {
         if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
@@ -429,12 +430,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         if (null === $expectedExceptionClass) {
             $expectedExceptionClass = 'CM_Exception';
         }
-        try {
+        $exception = $this->catchException(function() use ($component, $viewer) {
             $this->_renderComponent($component, $viewer);
-            $this->fail('Rendering page `' . get_class($component) . '` did not throw an exception');
-        } catch (Exception $e) {
-            $this->assertInstanceOf($expectedExceptionClass, $e);
-        }
+        });
+        $this->assertInstanceOf($expectedExceptionClass, $exception);
     }
 
     /**
@@ -599,12 +598,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         if (null === $expectedExceptionClass) {
             $expectedExceptionClass = 'CM_Exception';
         }
-        try {
+
+        $exception = $this->catchException(function() use ($page, $viewer) {
             $this->_renderPage($page, $viewer);
-            $this->fail('Rendering page `' . get_class($page) . '` did not throw an exception');
-        } catch (Exception $e) {
-            $this->assertInstanceOf($expectedExceptionClass, $e);
-        }
+        });
+        $this->assertInstanceOf($expectedExceptionClass, $exception);
     }
 
     /**
