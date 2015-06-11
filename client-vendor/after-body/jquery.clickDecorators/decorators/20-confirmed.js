@@ -9,9 +9,11 @@
 
 			var activateButton = function() {
 				$this.addClass('confirmClick');
+				$this.addClass('clickConfirmed-active');
 
 				var deactivateButton = function() {
 					$this.removeClass('confirmClick');
+					$this.removeClass('clickConfirmed-active');
 					$this.removeData('clickConfirmed.deactivate');
 					clearTimeout(deactivateTimeout);
 					$(document).off('click.clickConfirmed', documentClickHandler);
@@ -21,7 +23,7 @@
 
 				var deactivateTimeout = setTimeout(function() {
 					deactivateButton();
-				}, 3000);
+				}, 4000);
 
 				var documentClickHandler = function(e) {
 					if (!$this.length || e.target !== $this[0] && !$.contains($this[0], e.target)) {

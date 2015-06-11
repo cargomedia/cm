@@ -9,3 +9,22 @@
     display: none;
   }
 }
+
+[data-click-confirmed] {
+  &:after {
+    content: '';
+    box-sizing: border-box;
+    position: absolute;
+    bottom: 4px;
+    left: 5%;
+    width: 90%;
+    height: 2px;
+    transform: scale(1, 1);
+  }
+
+  &.clickConfirmed-active:after {
+    background-color: rgba(255, 255, 255, .5);
+    transition: transform 3000ms linear 800ms;
+    transform: scale(0, 1);
+  }
+}
