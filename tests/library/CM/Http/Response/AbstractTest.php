@@ -52,7 +52,7 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
         CM_Config::get()->$className = new stdClass();
         CM_Config::get()->$className->exceptionsToCatch = [
             'CM_Exception_Nonexistent'  => ['log' => 'CM_Paging_Log_NotFound', 'foo' => 'bar'],
-            'CM_Exception_InvalidParam' => ['log' => null],
+            'CM_Exception_InvalidParam' => [],
         ];
         $exceptionCodeExecutionCounter = 0;
         $errorCode = function (CM_Exception_Nonexistent $ex, $errorOptions) use (&$exceptionCodeExecutionCounter) {

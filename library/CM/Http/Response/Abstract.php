@@ -237,26 +237,23 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     protected function _runWithCatching(Closure $regularCode, Closure $errorCode) {
         try {
             return $regularCode();
-        } catch(CM_Exception $ex) {
-            $exceptionClass = get_class($ex);
+        } catch (CM_Exception $ex) {
             $config = self::_getConfig();
             $exceptionsToCatch = $config->exceptionsToCatch;
             $catchPublicExceptions = !empty($config->catchPublicExceptions);
-            $catchException = false;
-            $errorOptions = [];
-            foreach ($exceptionsToCatch as $exceptionClass => $errorOptions) {
-                if (is_a($ex, $exceptionClass)) {
-                    $catchException = true;
-                    if (isset($errorOptions['log'])) {
-                        $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
-                        /** @var CM_Paging_Log_Abstract $log */
-                        $log = new $errorOptions['log']();
-                        $log->add($formatter->formatException($ex), $ex->getMetaInfo());
-                    }
-                    break;
+            $catchException = null !== $errorOptions = \Functional\first($exceptionsToCatch, function ($options, $exceptionClass) use ($ex) {
+                return is_a($ex, $exceptionClass) ;
+            });
+            if ($catchException) {
+                if (isset($errorOptions['log'])) {
+                    $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
+                    /** @var CM_Paging_Log_Abstract $log */
+                    $log = new $errorOptions['log']();
+                    $log->add($formatter->formatException($ex), $ex->getMetaInfo());
                 }
             }
-            if ($catchPublicExceptions && $ex->isPublic()) {
+            if (!$catchException && ($catchPublicExceptions && $ex->isPublic())) {
+                $errorOptions = [];
                 $catchException = true;
             }
             if ($catchException) {
