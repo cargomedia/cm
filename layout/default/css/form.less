@@ -44,6 +44,7 @@ textarea.textinput {
 .placeholder(lighten(@colorFgSubtle, 25));
 
 .button {
+  position: relative;
   box-sizing: border-box;
   width: auto;
   height: @sizeButton;
@@ -109,11 +110,6 @@ textarea.textinput {
     border-color: darken(@colorBgButton, 5);
   }
 
-  &:not(:disabled):hover {
-    background-color: darken(@colorBgButton, 5);
-    border-color: darken(@colorFgButtonBorder, 5);
-  }
-
   &.active {
     .button-default-active;
   }
@@ -132,11 +128,6 @@ textarea.textinput {
   &:not(:disabled):active {
     border-color: darken(@colorBgButtonHighlight, 5);
   }
-
-  &:not(:disabled):hover {
-    background-color: darken(@colorBgButtonHighlight, 5);
-    border-color: darken(@colorBgButtonHighlight, 5);
-  }
 }
 
 .button-success {
@@ -147,11 +138,6 @@ textarea.textinput {
   &:not(:disabled):active {
     border-color: darken(@colorBgButtonSuccess, 5);
   }
-
-  &:not(:disabled):hover {
-    background-color: darken(@colorBgButtonSuccess, 5);
-    border-color: darken(@colorBgButtonSuccess, 5);
-  }
 }
 
 .button-danger {
@@ -160,11 +146,6 @@ textarea.textinput {
   color: @colorFgButtonDanger;
 
   &:not(:disabled):active {
-    border-color: darken(@colorBgButtonDanger, 5);
-  }
-
-  &:not(:disabled):hover {
-    background-color: darken(@colorBgButtonDanger, 5);
     border-color: darken(@colorBgButtonDanger, 5);
   }
 }
