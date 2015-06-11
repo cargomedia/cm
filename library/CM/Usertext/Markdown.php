@@ -92,7 +92,7 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
                 $alt = $matches[2];
                 $class = $matches[3] ? 'lazy ' . $matches[3] : 'lazy';
                 $imgHtml = '<img data-src="' . $src . '" alt="' . $alt . '" class="' . $class . '"/>';
-                return CM_Frontend_TemplateHelper_ContentPlaceholder::create($imgHtml, $width, $height) . '<br/>';
+                return '<div class="usertext-image">'.CM_Frontend_TemplateHelper_ContentPlaceholder::create($imgHtml, $width, $height) . '</div>';
             }
             return $matches[0];
         }, $tagText);

@@ -10,18 +10,12 @@
   .word_wrap;
   hyphens: auto;
 
-  img:not(.emoticon):not(.contentPlaceholder-size) {
-    box-sizing: border-box;
-    max-width: 100%;
-    max-height: 1500px;
-    margin: 5px 0;
-    display: block;
-    padding: 2px;
-    border: 1px solid @colorFgBorderEmphasize1;
-  }
+  .usertext-image {
+    margin: 7px 0;
 
-  .contentPlaceholder {
-    margin: 2px;
+    .contentPlaceholder .contentPlaceholder-size {
+      max-height: 500px;
+    }
   }
 
   h1, h2, h3, h4, h5, h6 {
