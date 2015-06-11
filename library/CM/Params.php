@@ -213,19 +213,20 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     public function getObject($key, $className, $default = null, Closure $getter = null) {
         if (!$getter) {
             $getter = function ($className, $param) {
+                $arguments = (array) $param;
                 $reflectionClass = new ReflectionClass($className);
-                $namedArgs = new CM_Util_NamedArgs();
                 $constructor = $reflectionClass->getConstructor();
-                $countArgs = $constructor->getNumberOfRequiredParameters();
-                if (is_array($param) || $countArgs > 1) {
+
+                if ($constructor->getNumberOfRequiredParameters() > 1) {
+                    $namedArgs = new CM_Util_NamedArgs();
                     try {
-                        $arguments = $namedArgs->matchNamedArgs($constructor, (array) $param);
+                        $arguments = $namedArgs->matchNamedArgs($constructor, $arguments);
                     } catch (CM_Exception_Invalid $ex) {
                         throw new CM_Exception_InvalidParam("Not enough parameters", ['parameters' => $param, 'class' => $className]);
                     }
-                    return $reflectionClass->newInstanceArgs($arguments);
                 }
-                return $reflectionClass->newInstance($param);
+                
+                return $reflectionClass->newInstanceArgs($arguments);
             };
         }
         $param = $this->_get($key, $default);
