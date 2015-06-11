@@ -76,8 +76,10 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
         return view;
       })
       .catch(function(error) {
-        layout._$pagePlaceholder.addClass('error').html('<pre>' + error.msg + '</pre>');
-        layout._onPageError();
+        if (!(error instanceof Promise.CancellationError)) {
+          layout._$pagePlaceholder.addClass('error').html('<pre>' + error.msg + '</pre>');
+          layout._onPageError();
+        }
       }).finally(function() {
         window.clearTimeout(timeoutLoading);
       });
