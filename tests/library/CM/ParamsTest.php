@@ -172,8 +172,8 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     /**
-     * @expectedException ErrorException
-     * @expectedExceptionMessage Missing argument 2
+     * @expectedException CM_Exception_InvalidParam
+     * @expectedExceptionMessage Not enough parameters
      */
     public function testGetGeoPointException() {
         $params = new CM_Params(array('point' => 'foo'));
@@ -226,6 +226,20 @@ class CM_ParamsTest extends CMTest_TestCase {
             $paramsArray = json_decode(json_encode(array('date' => $dateTime)), true);
             $params = new CM_Params($paramsArray, true);
             $this->assertEquals($params->getDateTime('date'), $dateTime);
+        }
+    }
+
+    public function testGetLocation() {
+        $location = CMTest_TH::createLocation();
+        $params = new CM_Params(['location' => $location, 'locationParameters' => ['id' => $location->getId(), 'level' => $location->getLevel()], 'insufficientParameters' => 1]);
+        $this->assertEquals($location, $params->getLocation('location'));
+        $this->assertEquals($location, $params->getLocation('locationParameters'));
+        try {
+            $params->getLocation('insufficientParameters');
+            $this->fail('Instantiating location with insufficient parameters');
+        } catch (CM_Exception_InvalidParam $ex) {
+            $this->assertSame('Not enough parameters', $ex->getMessage());
+            $this->assertSame(['parameters' => 1, 'class' => 'CM_Model_Location'], $ex->getMetaInfo());
         }
     }
 
