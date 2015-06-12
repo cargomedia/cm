@@ -71,7 +71,7 @@ class CM_File_Image extends CM_File {
                 if (null !== $offsetX && null !== $offsetY) {
                     $imagick->cropImage($width, $height, $offsetX, $offsetY);
                 }
-                $imagick->thumbnailImage($widthResize, $heightResize);
+                $imagick->resizeImage($widthResize, $heightResize, Imagick::FILTER_CATROM, 1);
             }, $format);
         } catch (ImagickException $e) {
             throw new CM_Exception('Error when resizing image: ' . $e->getMessage());
