@@ -337,6 +337,14 @@ class CM_File_ImageTest extends CMTest_TestCase {
         $this->assertSame(50, $image->getHeight());
     }
 
+    public function testResizeSpecificKeepExif() {
+        $imageOriginal = new CM_File_Image(DIR_TEST_DATA . 'img/test-rotated.jpg');
+        $image = CM_File_Image::createTmp(null, $imageOriginal->read());
+        $imageNew = CM_File_Image::createTmp(null);
+        $image->resize($image->getWidth(), $image->getHeight(), null, null, $imageNew);
+        $this->assertSame($image->getOrientation(), $imageNew->getOrientation());
+    }
+
     public function testGetExtensionByFormat() {
         $this->assertSame('jpg', CM_File_Image::getExtensionByFormat(CM_File_Image::FORMAT_JPEG));
         $this->assertSame('gif', CM_File_Image::getExtensionByFormat(CM_File_Image::FORMAT_GIF));

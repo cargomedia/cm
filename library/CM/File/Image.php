@@ -142,6 +142,13 @@ class CM_File_Image extends CM_File {
         }
     }
 
+    /**
+     * @return int
+     */
+    public function getOrientation() {
+        return $this->_getImagick()->getImageOrientation();
+    }
+
     public function validateImage() {
         $this->getFormat();
     }
