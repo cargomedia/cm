@@ -100,6 +100,35 @@ class CM_File_Image extends CM_File {
         $this->_writeImagick($imagick, $format, $fileNew);
     }
 
+    public function rotateByExif() {
+        $orientation = $this->getOrientation();
+        switch ($orientation) {
+            case Imagick::ORIENTATION_TOPRIGHT: // flipped
+            case Imagick::ORIENTATION_UNDEFINED: // undefined
+            case Imagick::ORIENTATION_TOPLEFT: // normal
+                break;
+            case Imagick::ORIENTATION_BOTTOMLEFT: // 180° flipped
+            case Imagick::ORIENTATION_BOTTOMRIGHT: // 180°
+                $this->rotate(180);
+                break;
+            case Imagick::ORIENTATION_LEFTTOP: // 270° flipped
+            case Imagick::ORIENTATION_RIGHTTOP: // 270°
+                $this->rotate(90);
+                break;
+            case Imagick::ORIENTATION_RIGHTBOTTOM: // 90° flipped
+            case Imagick::ORIENTATION_LEFTBOTTOM: // 90°
+                $this->rotate(270);
+                break;
+        }
+        $this->setOrientation(1);
+    }
+
+    public function stripProfileData() {
+        $imagick = $this->_getImagick();
+        $imagick->stripImage();
+        $this->_writeImagick($imagick, $this->getFormat());
+    }
+
     /**
      * @return int
      * @throws CM_Exception
@@ -147,6 +176,17 @@ class CM_File_Image extends CM_File {
      */
     public function getOrientation() {
         return $this->_getImagick()->getImageOrientation();
+    }
+
+    /**
+     * @param int $orientation
+     *
+     * Works only on images where the meta-data already contains orientation-information
+     */
+    public function setOrientation($orientation) {
+        $imagick = $this->_getImagick();
+        $imagick->setImageOrientation((int) $orientation);
+        $this->_writeImagick($imagick, $this->getFormat());
     }
 
     public function validateImage() {

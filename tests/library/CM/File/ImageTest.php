@@ -93,6 +93,36 @@ class CM_File_ImageTest extends CMTest_TestCase {
         $this->assertEquals(148987, $image->getSize(), '', 5000);
     }
 
+    public function testRotateByExif() {
+        $imageOriginal = new CM_File_Image(DIR_TEST_DATA . 'img/test-rotated.jpg');
+        $image = CM_File_Image::createTmp(null, $imageOriginal->read());
+        $this->assertSame(6, $image->getOrientation());
+        $image->rotateByExif();
+        $this->assertSame(1, $image->getOrientation());
+        $expectedWidth = $imageOriginal->getHeight();
+        $this->assertSame($expectedWidth, $image->getWidth());
+        $expectedHeight = $imageOriginal->getWidth();
+        $this->assertSame($expectedHeight, $image->getHeight());
+    }
+
+    public function testStripProfileData() {
+        $imageOriginal = new CM_File_Image(DIR_TEST_DATA . 'img/test-rotated.jpg');
+        $image = CM_File_Image::createTmp(null, $imageOriginal->read());
+        $this->assertSame(6, $image->getOrientation());
+        $image->stripProfileData();
+        $image = new CM_File_Image($image);
+        $this->assertSame(0, $image->getOrientation());
+    }
+
+    public function testSetOrientation() {
+        $imageOriginal = new CM_File_Image(DIR_TEST_DATA . 'img/test-rotated.jpg');
+        $image = CM_File_Image::createTmp(null, $imageOriginal->read());
+        $this->assertSame(6, $image->getOrientation());
+        $image->setOrientation(2);
+        $image = new CM_File_Image($image);
+        $this->assertSame(2, $image->getOrientation());
+    }
+
     public function testGetFormat() {
         $pathList = array(
             DIR_TEST_DATA . 'img/test.jpg'            => CM_File_Image::FORMAT_JPEG,
@@ -342,7 +372,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
         $image = CM_File_Image::createTmp(null, $imageOriginal->read());
         $imageNew = CM_File_Image::createTmp(null);
         $image->resize($image->getWidth(), $image->getHeight(), null, null, $imageNew);
-        $this->assertSame($image->getOrientation(), $imageNew->getOrientation());
+        $this->assertSame(6, $imageNew->getOrientation());
     }
 
     public function testGetExtensionByFormat() {
