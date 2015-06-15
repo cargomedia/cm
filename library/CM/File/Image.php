@@ -110,17 +110,19 @@ class CM_File_Image extends CM_File {
             case Imagick::ORIENTATION_BOTTOMLEFT: // 180° flipped
             case Imagick::ORIENTATION_BOTTOMRIGHT: // 180°
                 $this->rotate(180);
+                $this->setOrientation(1);
                 break;
             case Imagick::ORIENTATION_LEFTTOP: // 270° flipped
             case Imagick::ORIENTATION_RIGHTTOP: // 270°
                 $this->rotate(90);
+                $this->setOrientation(1);
                 break;
             case Imagick::ORIENTATION_RIGHTBOTTOM: // 90° flipped
             case Imagick::ORIENTATION_LEFTBOTTOM: // 90°
                 $this->rotate(270);
+                $this->setOrientation(1);
                 break;
         }
-        $this->setOrientation(1);
     }
 
     public function stripProfileData() {
