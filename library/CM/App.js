@@ -347,17 +347,17 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {jQuery} $dom
      */
     _setupLazyImages: function($dom) {
-      $dom.find('.clipSlide').on('toggle.clipSlide', function() {
-        $(this).find('img.lazy:gt(0)').unveil(600);
-      });
-
-      var $hiddenImageList = $();
+      var $imageListNotLoad = $();
       $dom.find('.clipSlide').each(function() {
-        var $imageList = $(this).find('img.lazy:gt(0)');
-        $hiddenImageList = $hiddenImageList.add($imageList);
+        var $notFirstImages = $(this).find('img.lazy:gt(0)');
+        $imageListNotLoad = $imageListNotLoad.add($notFirstImages);
+
+        $(this).on('toggle.clipSlide', function() {
+          $(this).find('img.lazy:gt(0)').unveil(600);
+        });
       });
 
-      $dom.find('img.lazy').not($hiddenImageList).unveil(600);
+      $dom.find('img.lazy').not($imageListNotLoad).unveil(600);
     },
 
     /**
