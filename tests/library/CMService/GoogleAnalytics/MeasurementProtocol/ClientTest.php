@@ -26,6 +26,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_ClientTest extends CMTest_Te
                 'ea' => 'MyAction',
                 'el' => 'MyLabel',
                 'ev' => 123,
+                'dh' => 'example.com',
                 't'  => 'event',
             ], $parameterList);
         });
@@ -37,6 +38,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_ClientTest extends CMTest_Te
             'eventAction'   => 'MyAction',
             'eventLabel'    => 'MyLabel',
             'eventValue'    => 123,
+            'hostname'      => 'example.com',
         ]);
         $this->assertSame(1, $submitRequestMock->getCallCount());
     }
