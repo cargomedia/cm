@@ -84,17 +84,22 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
      * @throws CM_Exception_Invalid
      */
     private function _transformToLazyImages($tagText) {
-        $tagText = preg_replace_callback('/^<img src="([^"]+)" alt="([^"]+)" title="(?:[^"]+)?"(?: class="([^"]+)")? (?:width="(\d+)") (?:height="(\d+)") \/>$/i', function ($matches) {
-            $width = (int) $matches[4];
-            $height = (int) $matches[5];
-            if ($width > 0 && $height > 0) {
-                $src = $matches[1];
-                $alt = $matches[2];
-                $class = $matches[3] ? 'lazy ' . $matches[3] : 'lazy';
-                $imgHtml = '<img data-src="' . $src . '" alt="' . $alt . '" class="' . $class . '"/>';
-                return '<div class="usertext-image">'.CM_Frontend_TemplateHelper_ContentPlaceholder::create($imgHtml, $width, $height) . '</div>';
+        $tagText = preg_replace_callback('/^<img src="([^"]+)" alt="([^"]+)"(?: title="(?:[^"]+)?")?(?: class="([^"]+)")?(?: width="(\d+)")?(?: height="(\d+)")? \/>$/i', function ($matches) {
+            $src = $matches[1];
+            $alt = $matches[2];
+            if (count($matches) > 5) {
+                $width = (int) $matches[4];
+                $height = (int) $matches[5];
+                if ($width > 0 && $height > 0) {
+                    $class = $matches[3] ? 'lazy ' . $matches[3] : 'lazy';
+                    $imgHtml = '<img data-src="' . $src . '" alt="' . $alt . '" class="' . $class . '"/>';
+                    return '<div class="usertext-image">' . CM_Frontend_TemplateHelper_ContentPlaceholder::create($imgHtml, $width, $height) .
+                    '</div>';
+                }
+                return $matches[0];
+            } else {
+                return $imgHtml = '<img src="' . $src . '" alt="' . $alt . '" class="external"/>';
             }
-            return $matches[0];
         }, $tagText);
         return $tagText;
     }
