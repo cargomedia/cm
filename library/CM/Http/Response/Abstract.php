@@ -240,15 +240,14 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
         try {
             return $regularCode();
         } catch (CM_Exception $ex) {
-            $exceptionClass = get_class($ex);
             $config = self::_getConfig();
             $exceptionsToCatch = $config->exceptionsToCatch;
             $catchPublicExceptions = !empty($config->catchPublicExceptions);
-            $catchException = false;
-            $errorOptions = [];
-            if (array_key_exists($exceptionClass, $exceptionsToCatch)) {
-                $catchException = true;
-                $errorOptions = $exceptionsToCatch[$exceptionClass];
+            $errorOptions = \Functional\first($exceptionsToCatch, function ($options, $exceptionClass) use ($ex) {
+                return is_a($ex, $exceptionClass) ;
+            });
+            $catchException = null !== $errorOptions;
+            if ($catchException) {
                 if (isset($errorOptions['log'])) {
                     $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
                     /** @var CM_Paging_Log_Abstract $log */
@@ -256,7 +255,8 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
                     $log->add($formatter->formatException($ex), $ex->getMetaInfo());
                 }
             }
-            if ($catchPublicExceptions && $ex->isPublic()) {
+            if (!$catchException && ($catchPublicExceptions && $ex->isPublic())) {
+                $errorOptions = [];
                 $catchException = true;
             }
             if ($catchException) {
