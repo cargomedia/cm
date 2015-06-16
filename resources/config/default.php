@@ -8,6 +8,7 @@ return function (CM_Config_Node $config) {
     $config->CM_App->setupScriptClasses[] = 'CM_Elasticsearch_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_Http_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Translations';
+    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Currency';
 
     $config->timeZone = 'UTC';
 
@@ -35,6 +36,8 @@ return function (CM_Config_Node $config) {
     $config->CM_Params->class = 'CM_Params';
 
     $config->CM_Usertext_Usertext->class = 'CM_Usertext_Usertext';
+
+    $config->CM_Model_Currency->default = ['code' => '840', 'abbreviation' => 'USD'];
 
     $config->CM_Http_Response_Page->exceptionsToCatch = array(
         'CM_Exception_Nonexistent'  => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => 'CM_Paging_Log_NotFound'],

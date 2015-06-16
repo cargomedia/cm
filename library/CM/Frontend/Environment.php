@@ -20,6 +20,9 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     /** @var CM_Model_Location|null */
     protected $_location;
 
+    /** @var CM_model_Currency|null */
+    protected $_currency;
+
     /**
      * @param CM_Site_Abstract|null  $site
      * @param CM_Model_User|null     $viewer
@@ -27,14 +30,16 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
      * @param DateTimeZone|null      $timeZone
      * @param bool|null              $debug
      * @param CM_Model_Location|null $location
+     * @param CM_Model_Currency|null $currency
      */
-    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, DateTimeZone $timeZone = null, $debug = null, CM_Model_Location $location = null) {
+    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, DateTimeZone $timeZone = null, $debug = null, CM_Model_Location $location = null, CM_Model_Currency $currency = null) {
         $this->setSite($site);
         $this->setViewer($viewer);
         $this->setLanguage($language);
         $this->setTimeZone($timeZone);
         $this->setDebug($debug);
         $this->setLocation($location);
+        $this->setCurrency($currency);
     }
 
     /**
@@ -160,5 +165,19 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
      */
     public function getLocation() {
         return $this->_location;
+    }
+
+    /**
+     * @param CM_Model_Currency|null $currency
+     */
+    public function setCurrency(CM_Model_Currency $currency = null) {
+        $this->_currency = $currency;
+    }
+
+    /**
+     * @return CM_Model_Currency|null
+     */
+    public function getCurrency() {
+        return $this->_currency;
     }
 }

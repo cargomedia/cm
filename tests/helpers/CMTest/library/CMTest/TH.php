@@ -258,6 +258,17 @@ class CMTest_TH {
     }
 
     /**
+     * @return CM_Model_Currency
+     */
+    public static function createDefaultCurrency() {
+        $defaultCurrencyConfig = CM_Config::get()->CM_Model_Currency->default;
+        if (!$defaultCurrency = CM_Model_Currency::findByAbbreviation($defaultCurrencyConfig['abbreviation'])) {
+            $defaultCurrency = CM_Model_Currency::create($defaultCurrencyConfig['code'], $defaultCurrencyConfig['abbreviation']);
+        }
+        return $defaultCurrency;
+    }
+
+    /**
      * @return CM_MongoDb_Client
      */
     public static function getMongoDb() {

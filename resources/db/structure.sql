@@ -57,6 +57,27 @@ CREATE TABLE `cm_ipBlocked` (
   KEY `expirationStamp` (`expirationStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_model_currency`;
+
+
+CREATE TABLE `cm_model_currency` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(3) NOT NULL DEFAULT '',
+  `abbreviation` varchar(3) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`),
+  UNIQUE KEY `string` (`abbreviation`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_model_currency_country`;
+
+
+CREATE TABLE `cm_model_currency_country` (
+  `currencyId` int(10) NOT NULL,
+  `countryId` int(10) NOT NULL,
+  UNIQUE KEY `countryId` (`countryId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `cm_model_language`;
 
 
@@ -474,6 +495,7 @@ CREATE TABLE `cm_user` (
   `createStamp` int(10) unsigned NOT NULL,
   `site` int(10) unsigned DEFAULT NULL,
   `languageId` int(10) unsigned DEFAULT NULL,
+  `currencyId` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`userId`),
   KEY `activityStamp` (`activityStamp`),
   KEY `createStamp` (`createStamp`),
