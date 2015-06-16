@@ -201,6 +201,31 @@ class CM_Model_User extends CM_Model_Abstract {
         $this->_change();
     }
 
+    /**
+     * @return CM_Model_Currency|null
+     */
+    public function getCurrency() {
+        if (!$this->_get('currencyId')) {
+            return null;
+        }
+        return new CM_Model_Currency($this->_get('currencyId'));
+    }
+
+    /**
+     * @param CM_Model_Currency $currency
+     */
+    public function setCurrency(CM_Model_Currency $currency) {
+        CM_Db_Db::update('cm_user', array('currencyId' => $currency->getId()), array('userId' => $this->getId()));
+        $this->_change();
+    }
+
+    /**
+     * @return CM_Frontend_Environment
+     */
+    public function getEnvironment() {
+        return new CM_Frontend_Environment($this->getSite(), $this, $this->getLanguage(), null, null, null, $this->getCurrency());
+    }
+
     public function updateLatestActivityThrottled() {
         if ($this->getLatestActivity() < time() - self::ACTIVITY_EXPIRATION) {
             $this->_updateLatestActivity();
@@ -293,8 +318,19 @@ class CM_Model_User extends CM_Model_Abstract {
             $language = $data['language'];
             $languageId = $language->getId();
         }
-        $userId = CM_Db_Db::insert('cm_user', array('createStamp' => time(), 'activityStamp' => time(), 'site' => $siteType,
-                                                    'languageId'  => $languageId));
+        $currencyId = null;
+        if (isset($data['currency'])) {
+            /** @var CM_Model_Currency $currency */
+            $currency = $data['currency'];
+            $currencyId = $currency->getId();
+        }
+        $userId = CM_Db_Db::insert('cm_user', array(
+            'createStamp'   => time(),
+            'activityStamp' => time(),
+            'site'          => $siteType,
+            'languageId'    => $languageId,
+            'currencyId'    => $currencyId,
+        ));
         return new static($userId);
     }
 

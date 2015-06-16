@@ -89,4 +89,11 @@ class CM_CacheConst {
     const AdproviderZones = 'AdproviderZones';
 
     const Emoticons = 'Emoticons';
+
+
+    // _abbreviation:X
+    const Currency_ByAbbreviation = 'Currency_ByAbbreviation';
+
+    // _countryId:X
+    const Currency_CountryId = 'Currency_CountryId';
 }
