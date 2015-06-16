@@ -4,6 +4,10 @@
 (function($) {
 
 	$.clickDecorators.confirmed = {
+    isApplicable: function($element) {
+      return $element.data('click-confirmed');
+    },
+
 		before: function(event) {
 			var $this = $(this);
 
