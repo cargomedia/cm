@@ -98,7 +98,7 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
                 }
                 return $matches[0];
             } else {
-                return $imgHtml = '<img src="' . $src . '" alt="' . $alt . '" class="external"/>';
+                return '<div class="usertext-image"><img src="' . $src . '" alt="' . $alt . '"/></div>';
             }
         }, $tagText);
         return $tagText;
