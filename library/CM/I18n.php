@@ -2,15 +2,15 @@
 
 class CM_I18n {
 
-    protected $string, $params;
+    protected $phrase, $variables;
 
     /**
-     * @param string $string
-     * @param array  $params
+     * @param string $phrase
+     * @param array  $variables
      */
-    public function __construct($string, array $params) {
-        $this->string = $string;
-        $this->params = $params;
+    public function __construct($phrase, array $variables) {
+        $this->phrase = $phrase;
+        $this->variables = $variables;
     }
 
     /**
@@ -18,6 +18,6 @@ class CM_I18n {
      * @return string
      */
     public function translate(CM_Frontend_Render $render) {
-        return $render->getTranslation($this->string, $this->params);
+        return $render->getTranslation($this->phrase, $this->variables);
     }
 }
