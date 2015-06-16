@@ -7,5 +7,10 @@ function smarty_function_translateVariable($params, Smarty_Internal_Template $te
     $key = $params['key'];
     unset($params['key']);
 
-    return $render->getTranslation($key, $params);
+    if ($key instanceof CM_I18n) {
+        /** @var CM_I18n $key */
+        return $key->translate($render);
+    } else {
+        return $render->getTranslation($key, $params);
+    }
 }
