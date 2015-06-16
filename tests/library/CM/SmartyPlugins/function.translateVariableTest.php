@@ -13,7 +13,7 @@ class smarty_function_translateVariableTest extends CMTest_TestCase {
         });
         /** @var CM_Frontend_Render $render */
 
-        $object = new CM_I18n('Bar value is {$bar}', ['bar' => 3]);
+        $object = new CM_Translate_Phrase('Bar value is {$bar}', ['bar' => 3]);
         $render->parseTemplateContent('{translateVariable key=$foo}', ['foo' => $object]);
         $this->assertSame(1, $getTranslationMethod->getCallCount());
     }
