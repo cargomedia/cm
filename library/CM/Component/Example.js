@@ -135,7 +135,6 @@ var CM_Component_Example = CM_Component_Abstract.extend({
   },
 
   confirmAction: function() {
-    console.log('Action Confirmed!');
     cm.window.hint('Action Confirmed!');
   },
 
