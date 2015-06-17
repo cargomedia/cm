@@ -2,6 +2,7 @@
  * Author: CM
  */
 (function($) {
+
 	$.clickDecorators = {};
 
 	$.event.special.click.handle = function(event) {
