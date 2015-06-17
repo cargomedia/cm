@@ -1,4 +1,4 @@
-<ul class="tabs menu-tabs example-navigation">
+<ul class="tabs menu menu-tabs example-navigation">
   {block name="tabs"}
     <li data-tab="components"><a href="{linkUrl page='CM_Page_Example' tab='components'}">Components</a></li>
     <li data-tab="menus"><a href="{linkUrl page='CM_Page_Example' tab='menus'}">Menus</a></li>
