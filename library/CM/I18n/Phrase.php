@@ -1,6 +1,6 @@
 <?php
 
-class CM_Translate_Phrase {
+class CM_I18n_Phrase {
 
     protected $phrase, $variables;
 
