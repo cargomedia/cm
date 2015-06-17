@@ -6,7 +6,7 @@
 
   $.clickDecorators.feedback = {
     isApplicable: function($element) {
-      return $element.is('.button');
+      return $element.is('.button, .menu a');
     },
 
     before: function(event) {
@@ -27,7 +27,9 @@
       $this.append($feedback);
       $feedback.transition({
         scale: 1
-      }, '300ms', 'in', function() {
+      }, '300ms', 'in').transition({
+        opacity: 0
+      }, '200ms', 'out', function() {
         $feedback.remove();
       });
     }
