@@ -9,8 +9,8 @@
 		var before = [], after = [], i;
 
 		_.each($.clickDecorators, function(decorator, name) {
-			if ($this.data('click-' + name)) {
-				if (decorator.before) {
+      if (decorator.isApplicable($this)) {
+        if (decorator.before) {
 					before.push(decorator.before);
 				}
 				if (decorator.after) {

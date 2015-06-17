@@ -44,6 +44,7 @@ textarea.textinput {
 .placeholder(lighten(@colorFgSubtle, 25));
 
 .button {
+  position: relative;
   box-sizing: border-box;
   width: auto;
   height: @sizeButton;
@@ -88,7 +89,6 @@ textarea.textinput {
 
 .button.confirmClick {
   .button-success;
-  .animation(clickConfirm, 3000ms, ease-out, 0s, 1);
 }
 
 .button.confirmClick.warning {
@@ -105,15 +105,6 @@ textarea.textinput {
   border: 1px solid @colorFgButtonBorder;
   color: @colorFgButton;
 
-  &:not(:disabled):active {
-    border-color: darken(@colorBgButton, 5);
-  }
-
-  &:not(:disabled):hover {
-    background-color: darken(@colorBgButton, 5);
-    border-color: darken(@colorFgButtonBorder, 5);
-  }
-
   &.active {
     .button-default-active;
   }
@@ -128,45 +119,18 @@ textarea.textinput {
   background-color: @colorBgButtonHighlight;
   border: 1px solid @colorBgButtonHighlight;
   color: @colorFgButtonHighlight;
-
-  &:not(:disabled):active {
-    border-color: darken(@colorBgButtonHighlight, 5);
-  }
-
-  &:not(:disabled):hover {
-    background-color: darken(@colorBgButtonHighlight, 5);
-    border-color: darken(@colorBgButtonHighlight, 5);
-  }
 }
 
 .button-success {
   background-color: @colorBgButtonSuccess;
   border: 1px solid @colorBgButtonSuccess;
   color: @colorFgButtonSuccess;
-
-  &:not(:disabled):active {
-    border-color: darken(@colorBgButtonSuccess, 5);
-  }
-
-  &:not(:disabled):hover {
-    background-color: darken(@colorBgButtonSuccess, 5);
-    border-color: darken(@colorBgButtonSuccess, 5);
-  }
 }
 
 .button-danger {
   background-color: @colorBgButtonDanger;
   border: 1px solid @colorBgButtonDanger;
   color: @colorFgButtonDanger;
-
-  &:not(:disabled):active {
-    border-color: darken(@colorBgButtonDanger, 5);
-  }
-
-  &:not(:disabled):hover {
-    background-color: darken(@colorBgButtonDanger, 5);
-    border-color: darken(@colorBgButtonDanger, 5);
-  }
 }
 
 .button-large {
@@ -261,7 +225,6 @@ input[type=radio] {
 input[type=checkbox] {
   &:checked + label:before {
     background-image: image('checkbox.svg');
-
     background-size: contain;
   }
 
