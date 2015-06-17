@@ -88,6 +88,9 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
             't'   => [
                 'aliasList' => ['hitType'],
             ],
+            'dh'  => [
+                'aliasList' => ['hostname'],
+            ],
             'ec'  => [
                 'aliasList'   => ['eventCategory'],
                 'hitTypeList' => ['event'],
