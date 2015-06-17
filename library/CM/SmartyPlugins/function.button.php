@@ -17,7 +17,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
     $theme = isset($params['theme']) ? (string) $params['theme'] : 'default';
     $isHtmlLabel = isset($params['isHtmlLabel']) ? (bool) $params['isHtmlLabel'] : false;
 
-    $class = 'button ' . 'button-' . $theme;
+    $class = 'button ' . 'button-' . $theme . ' clickFeedback';
     if (isset($params['class'])) {
         $class .= ' ' . trim($params['class']);
     }
