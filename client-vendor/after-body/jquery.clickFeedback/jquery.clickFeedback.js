@@ -23,7 +23,7 @@
     $this.append($feedback);
     $feedback.transition({
       scale: 1
-    }, '300ms', 'in').transition({
+    }, '200ms', 'in').transition({
       opacity: 0
     }, '200ms', 'out', function() {
       $feedback.remove();
