@@ -28,7 +28,6 @@
     }, '200ms', 'out', function() {
       $feedback.remove();
     });
-
   });
 
 })(jQuery);
