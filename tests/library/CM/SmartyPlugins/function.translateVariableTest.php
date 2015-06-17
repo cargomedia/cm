@@ -4,11 +4,7 @@ require_once CM_Util::getModulePath('CM') . 'library/CM/SmartyPlugins/prefilter.
 
 class smarty_function_translateVariableTest extends CMTest_TestCase {
 
-    /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage Passed params will be ignored as you provided CM_I18n_Phrase object
-     */
-    public function testTranslateObject() {
+    public function testTranslatePhrase() {
         /** @var CM_Frontend_Render|\Mocka\AbstractClassTrait $render */
         $render = $this->mockClass('CM_Frontend_Render')->newInstance();
         $getTranslationMethod = $render->mockMethod('getTranslation')->set(function ($key, $params) {
@@ -21,7 +17,10 @@ class smarty_function_translateVariableTest extends CMTest_TestCase {
         $render->parseTemplateContent('{translateVariable key=$foo}', ['foo' => $object]);
         $this->assertSame(1, $getTranslationMethod->getCallCount());
 
-        $render->parseTemplateContent('{translateVariable key=$foo more=one}', ['foo' => $object]);
-        $this->assertSame(0, $getTranslationMethod->getCallCount());
+        $exception = $this->catchException(function() use ($render, $object) {
+            $render->parseTemplateContent('{translateVariable key=$foo more=one}', ['foo' => $object]);
+        });
+        $this->assertInstanceOf('InvalidArgumentException', $exception);
+        $this->assertSame('Passed params will be ignored as you provided CM_I18n_Phrase object', $exception->getMessage());
     }
 }

@@ -2,14 +2,18 @@
 
 class CM_I18n_Phrase {
 
-    protected $phrase, $variables;
+    /** @var $phrase string */
+    protected $phrase;
+
+    /** @var $variables string[] */
+    protected $variables;
 
     /**
      * @param string $phrase
      * @param array  $variables
      */
     public function __construct($phrase, array $variables) {
-        $this->phrase = $phrase;
+        $this->phrase = (string) $phrase;
         $this->variables = $variables;
     }
 
