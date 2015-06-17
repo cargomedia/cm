@@ -147,7 +147,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $expected = <<<EOL
 cm.window.appendHidden("<div id=\\"$newAutoId\\" class=\\"CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\\">Sorry, this page was not found. It has been removed or never existed.\\n<\/div>");
 cm.views["$newAutoId"] = new CM_Component_Notfound({el:$("#$newAutoId").get(0),params:{"foo":"bar"}});
-cm.views["$oldAutoId"].getParent().registerChild(cm.views["$newAutoId"]);;
+cm.views["$oldAutoId"].getParent().registerChild(cm.views["$newAutoId"]);
 cm.views["$oldAutoId"].replaceWithHtml(cm.views["$newAutoId"].\$el);
 cm.views["$newAutoId"]._ready();
 EOL;
@@ -174,7 +174,7 @@ EOL;
         $expected = <<<EOL
 cm.window.appendHidden("<div id=\\"$newAutoId\\" class=\\"CM_Component_Mock CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\\">Sorry, this page was not found. It has been removed or never existed.\\n<\/div>");
 cm.views["$newAutoId"] = new CM_Component_Mock({el:$("#$newAutoId").get(0),params:{"entity":{"_type":123,"_id":{"id":"1"},"id":1,"path":null,"_class":"CM_Model_Entity_Mock2"}}});
-cm.views["$oldAutoId"].getParent().registerChild(cm.views["$newAutoId"]);;
+cm.views["$oldAutoId"].getParent().registerChild(cm.views["$newAutoId"]);
 cm.views["$oldAutoId"].replaceWithHtml(cm.views["$newAutoId"].\$el);
 cm.views["$newAutoId"]._ready();
 EOL;
