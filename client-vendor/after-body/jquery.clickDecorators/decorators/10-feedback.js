@@ -27,7 +27,7 @@
       $this.append($feedback);
       $feedback.transition({
         scale: 1
-      }, '500ms', 'ease', function() {
+      }, '300ms', 'in', function() {
         $feedback.remove();
       });
     }
