@@ -27,7 +27,6 @@ var CM_Component_Example = CM_Component_Abstract.extend({
     'click .throwError_CM_Exception_AuthRequired_public': 'error_CM_Exception_AuthRequired_public',
     'click .throwError_CM_Exception_AuthRequired': 'error_CM_Exception_AuthRequired',
     'click .callAjaxPing': 'ping',
-    'click button:not(.confirmAction)': 'clickFeedback',
     'click .confirmAction': 'confirmAction',
     'click .toggleWindow': function(e) {
       var $opener = $(e.currentTarget);
@@ -136,9 +135,6 @@ var CM_Component_Example = CM_Component_Abstract.extend({
 
   confirmAction: function() {
     cm.window.hint('Action Confirmed!');
-  },
-
-  clickFeedback: function() {
   },
 
   toggleWindow: function($opener) {
