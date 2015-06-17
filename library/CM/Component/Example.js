@@ -60,52 +60,45 @@ var CM_Component_Example = CM_Component_Abstract.extend({
   },
 
   loadExample: function() {
-    this.loadComponent('CM_Component_Example', {foo: 'value2', site: this.getParams().site});
+    this.popOutComponent('CM_Component_Example', {foo: 'value2', site: this.getParams().site});
   },
 
   loadExampleInline: function() {
     var handler = this;
-    this.getParent().loadComponent('CM_Component_Example', {foo: 'value3', site: this.getParams().site}, {
-      'success': function() {
-        this.$el.hide().insertBefore(handler.$el).slideDown(600);
-      }
-    });
+    this.getParent().prepareComponent('CM_Component_Example', {foo: 'value3', site: this.getParams().site})
+      .then(function(component) {
+        component.$el.hide().insertBefore(handler.$el).slideDown(600);
+      });
   },
 
   callAjaxTest: function() {
-    return this.ajax('test', {x: 'myX'}, {
-      success: function(data) {
-        this.message('ajax_test(): ' + data);
-      }
+    var self = this;
+    return this.ajax('test', {x: 'myX'}).then(function(data) {
+      self.message('ajax_test(): ' + data);
     });
   },
 
   callRpc: function() {
-    return cm.rpc('CM_Component_Example.time', [], {
-      success: function(timestamp) {
-        cm.window.hint("Time: " + timestamp);
-      }
+    return cm.rpc('CM_Component_Example.time', []).then(function(timestamp) {
+      cm.window.hint("Time: " + timestamp);
     });
   },
 
   error_500_text_callback: function() {
-    this.ajax('error', {status: 500, text: 'Errortext'}, {
-      error: function(msg, type) {
-        this.error('callback( type:' + type + ', msg:' + msg + ' )');
-        return false;
-      }
+    var self = this;
+    this.ajax('error', {status: 500, text: 'Errortext'}).catch(function(error) {
+      self.error('callback( type:' + error.type + ', msg:' + error.msg + ' )');
     });
   },
   error_599_text: function() {
     this.ajax('error', {status: 599, text: 'Errortext'});
   },
   error_CM_Exception_public_callback: function() {
-    this.ajax('error', {exception: 'CM_Exception', text: 'Errortext', 'public': true}, {
-      error: function(msg, type) {
-        this.error('callback( type:' + type + ', msg:' + msg + ' )');
-        return false;
-      }
-    });
+    var self = this;
+    this.ajax('error', {exception: 'CM_Exception', text: 'Errortext', 'public': true})
+      .catch(function(error) {
+        self.error('callback( type:' + error.type + ', msg:' + error.msg + ' )');
+      });
   },
   error_CM_Exception_public: function() {
     this.ajax('error', {exception: 'CM_Exception', text: 'Errortext', 'public': true});
@@ -114,12 +107,11 @@ var CM_Component_Example = CM_Component_Abstract.extend({
     this.ajax('error', {exception: 'CM_Exception', text: 'Errortext'});
   },
   error_CM_Exception_AuthRequired_public_callback: function() {
-    this.ajax('error', {exception: 'CM_Exception_AuthRequired', text: 'Errortext', 'public': true}, {
-      error: function(msg, type) {
-        this.error('callback( type:' + type + ', msg:' + msg + ' )');
-        return false;
-      }
-    });
+    var self = this;
+    this.ajax('error', {exception: 'CM_Exception_AuthRequired', text: 'Errortext', 'public': true})
+      .catch(function(error) {
+        self.error('callback( type:' + error.type + ', msg:' + error.msg + ' )');
+      });
   },
   error_CM_Exception_AuthRequired_public: function() {
     this.ajax('error', {exception: 'CM_Exception_AuthRequired', text: 'Errortext', 'public': true});

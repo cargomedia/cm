@@ -278,6 +278,14 @@ var CM_App = CM_Class_Abstract.extend({
         this._callbacks[type] = [];
       }
       this._callbacks[type].push(callback);
+    },
+    /**
+     * @param {Object} content
+     * @return {Error}
+     */
+    create: function(content) {
+      var error = new Error();
+      return _.extend(error, content);
     }
   },
 
@@ -647,6 +655,13 @@ var CM_App = CM_Class_Abstract.extend({
       $(window).on('beforeunload', function() {
         handler.focus.remove(handler.getId());
       });
+      $(window).on('unhandledrejection', function(e) {
+        e.preventDefault();
+        var error = e.originalEvent.detail.reason;
+        if (!(error instanceof Promise.CancellationError)) {
+          cm.error.trigger(error.msg, error.type, error.isPublic);
+        }
+      });
       $(window).focus(function() {
         handler.focus.add(handler.getId());
         handler._hasFocus = true;
@@ -792,71 +807,52 @@ var CM_App = CM_Class_Abstract.extend({
   /**
    * @param {String} type
    * @param {Object} data
-   * @param {Object} [callbacks]
-   * @return jqXHR
+   * @return Promise
    */
-  ajax: function(type, data, callbacks) {
-    callbacks = callbacks || {};
+  ajax: function(type, data) {
     var url = this.getUrlAjax(type);
-    var errorHandler = function(msg, type, isPublic, callback) {
-      if (!callback || callback(msg, type, isPublic) !== false) {
-        cm.error.trigger(msg, type, isPublic);
-      }
-    };
-    var jqXHR = $.ajax(url, {
-      data: JSON.stringify(data),
-      type: 'POST',
-      dataType: 'json',
-      contentType: 'application/json',
-      cache: false
-    });
-    jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
-      if (response.error) {
-        errorHandler(response.error.msg, response.error.type, response.error.isPublic, callbacks.error);
-      } else if (response.success) {
-        if (callbacks.success) {
-          callbacks.success(response.success);
+
+    return new Promise(function(resolve, reject) {
+      var jqXHR = $.ajax(url, {
+        data: JSON.stringify(data),
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        cache: false
+      });
+      jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
+        if (response.error) {
+          reject(cm.error.create(response.error));
+        } else {
+          resolve(response.success);
         }
-      }
-    }).fail(function(xhr, textStatus) {
-      if (xhr.status === 0) {
-        return; // Ignore interrupted ajax-request caused by leaving a page
-      }
+      }).fail(function(xhr, textStatus) {
+        if (xhr.status === 0) {
+          return; // Ignore interrupted ajax-request caused by leaving a page
+        }
 
-      var msg = cm.language.get('An unexpected connection problem occurred.');
-      if (cm.options.debug) {
-        msg = xhr.responseText || textStatus;
-      }
-      errorHandler(msg, null, false, callbacks.error);
-    }).always(function() {
-      if (callbacks.complete) {
-        callbacks.complete();
-      }
-    });
-
-    return jqXHR;
+        var msg = cm.language.get('An unexpected connection problem occurred.');
+        if (cm.options.debug) {
+          msg = xhr.responseText || textStatus;
+        }
+        reject(cm.error.create({msg: msg, type: null, isPublic: false}));
+      });
+    }).cancellable();
   },
 
   /**
    * @param {String} methodName
    * @param {Object} params
-   * @param {Object|Null} [callbacks]
-   * @return jqXHR
+   * @return Promise
    */
-  rpc: function(methodName, params, callbacks) {
-    callbacks = callbacks || {};
-    return this.ajax('rpc', {method: methodName, params: params}, {
-      success: function(response) {
+  rpc: function(methodName, params) {
+    return this.ajax('rpc', {method: methodName, params: params})
+      .then(function(response) {
         if (typeof(response.result) === 'undefined') {
-          cm.error.trigger('RPC response has undefined result');
+          throw cm.error.create({msg: 'RPC response has undefined result', type: null, isPublic: false});
         }
-        if (callbacks.success) {
-          callbacks.success(response.result);
-        }
-      },
-      error: callbacks.error,
-      complete: callbacks.complete
-    });
+        return response.result;
+      });
   },
 
   stream: {

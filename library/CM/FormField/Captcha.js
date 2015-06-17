@@ -16,14 +16,13 @@ var CM_FormField_Captcha = CM_FormField_Abstract.extend({
   },
 
   refresh: function() {
-    this.ajax('createNumber', {}, {
-      success: function(id) {
+    this.ajax('createNumber', {})
+      .then(function(id) {
         var $container = this.$(".captcha:eq(0)");
         var $img = $container.find("img");
         $img.attr("src", $img.attr("src").replace(/\?[^\?]+$/, '?id=' + id));
         $container.find("input[name=\'captcha[id]\']").val(id);
         $container.find("input[name=\'captcha[value]\']").val("").focus();
-      }
-    });
+      });
   }
 });
