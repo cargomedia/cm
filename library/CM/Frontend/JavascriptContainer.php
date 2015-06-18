@@ -36,8 +36,7 @@ class CM_Frontend_JavascriptContainer {
                 return '  ' . $operation;
             }, $operations);
         }
-        $code = implode(";\n", $operations);
-        $code = preg_replace("/;[;\n]+/", ";\n", $code);
+        $code = implode("\n", $operations);
         if (null !== $scope) {
             $code = "(function () { \n{$code}}).call({$scope});";
         }
