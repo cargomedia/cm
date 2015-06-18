@@ -39,7 +39,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
      */
     protected function registerField(CM_FormField_Abstract $field) {
         $fieldName = $field->getName();
-        if (isset($this->_fields[$fieldName])) {
+        if ($this->hasField($fieldName)) {
             throw new CM_Exception_Invalid('Form field `' . $fieldName . '` is already registered.');
         }
 
