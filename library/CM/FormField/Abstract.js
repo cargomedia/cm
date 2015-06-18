@@ -23,23 +23,20 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
       this.error(null);
       return;
     }
-    this.ajax('validate', {'userInput': value, 'form': this.getForm().getClass(), 'fieldName': this.getName()}, {
-      success: function() {
-        if (value != this.getValue()) {
-          return false;
+    var self = this;
+    this.ajax('validate', {'userInput': value, 'form': this.getForm().getClass(), 'fieldName': this.getName()})
+      .then(function() {
+        if (value == self.getValue()) {
+          self.error();
         }
-        this.error();
-      },
-      error: function(msg, type) {
-        if (value != this.getValue()) {
-          return false;
+      })
+      .catch(function(error) {
+        if ('CM_Exception_FormFieldValidation' == error.type) {
+          self.error(error.msg);
+        } else if (value == self.getValue()) {
+          throw error;
         }
-        if ('CM_Exception_FormFieldValidation' == type) {
-          this.error(msg);
-          return false;
-        }
-      }
-    });
+      });
   },
 
   reset: function() {
@@ -111,7 +108,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String|Null} message
+   * @param {String|Null} [message]
    */
   error: function(message) {
     var $container = this.$('.messages');
