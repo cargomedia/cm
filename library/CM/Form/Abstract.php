@@ -97,10 +97,18 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function getField($fieldName) {
-        if (!isset($this->_fields[$fieldName])) {
+        if (!$this->hasField($fieldName)) {
             throw new CM_Exception_Invalid('Unrecognized field `' . $fieldName . '`.');
         }
         return $this->_fields[$fieldName];
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasField($name) {
+        return array_key_exists($name, $this->_fields);
     }
 
     /**
