@@ -44,22 +44,6 @@ class CMService_Adagnit_Client implements CM_Service_Tracking_ClientInterface {
     }
 
     /**
-     * @param string $transactionId
-     * @param string $productId
-     * @param float  $amount
-     */
-    public function addSale($transactionId, $productId, $amount) {
-        $transactionId = (string) $transactionId;
-        $productId = (string) $productId;
-        $amount = (float) $amount;
-        $this->addEvent('purchaseSuccess', [
-            'transactionId' => $transactionId,
-            'productId'     => $productId,
-            'amount'        => $amount,
-        ]);
-    }
-
-    /**
      * @return string
      */
     public function getJs() {
@@ -95,16 +79,35 @@ EOD;
     public function trackAffiliate($requestClientId, $affiliateName) {
     }
 
-    public function trackLogin() {
-        $this->addEvent('login');
-    }
-
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
         $this->setPageView($path);
     }
 
-    public function trackSignUp() {
-        $this->addEvent('signup');
+    /**
+     * @param CM_Frontend_Environment $environment
+     */
+    public function trackSale(CM_Frontend_Environment $environment) {
+        $this->addEvent('purchaseSuccess', [
+            'site' => $environment->getSite()->getName(),
+        ]);
+    }
+
+    /**
+     * @param CM_Frontend_Environment $environment
+     */
+    public function trackSignIn(CM_Frontend_Environment $environment) {
+        $this->addEvent('login', [
+            'site' => $environment->getSite()->getName(),
+        ]);
+    }
+
+    /**
+     * @param CM_Frontend_Environment $environment
+     */
+    public function trackSignUp(CM_Frontend_Environment $environment) {
+        $this->addEvent('signup', [
+            'site' => $environment->getSite()->getName(),
+        ]);
     }
 
     public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
