@@ -305,6 +305,13 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame(count($paramsArray), $encodeMethod->getCallCount());
     }
 
+    public function testGetParamNames() {
+        $params = new CM_Params(['foo' => 'bar']);
+        $this->assertSame(['foo'], $params->getParamNames());
+        $params->set('bar', 'foo');
+        $this->assertSame(['foo', 'bar'], $params->getParamNames());
+    }
+
     /**
      * @expectedException CM_Exception_InvalidParam
      */
