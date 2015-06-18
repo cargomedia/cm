@@ -60,12 +60,12 @@ var CM_Component_Example = CM_Component_Abstract.extend({
   },
 
   loadExample: function() {
-    this.popOutComponent('CM_Component_Example', {foo: 'value2', site: this.getParams().site});
+    this.popOutComponent(this.getClass(), {foo: 'value2', site: this.getParams().site});
   },
 
   loadExampleInline: function() {
     var handler = this;
-    this.getParent().prepareComponent('CM_Component_Example', {foo: 'value3', site: this.getParams().site})
+    this.getParent().prepareComponent(this.getClass(), {foo: 'value3', site: this.getParams().site})
       .then(function(component) {
         component.$el.hide().insertBefore(handler.$el).slideDown(600);
       });
@@ -79,7 +79,7 @@ var CM_Component_Example = CM_Component_Abstract.extend({
   },
 
   callRpc: function() {
-    return cm.rpc('CM_Component_Example.time', []).then(function(timestamp) {
+    return cm.rpc(this.getClass() + '.time', []).then(function(timestamp) {
       cm.window.hint("Time: " + timestamp);
     });
   },
