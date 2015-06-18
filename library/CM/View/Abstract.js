@@ -533,8 +533,7 @@ var CM_View_Abstract = Backbone.View.extend({
     }
     var idSwf = id + '-object', attributes = {
       id: idSwf,
-      name: idSwf,
-      styleclass: 'ratioKeeper-content'
+      name: idSwf
     };
 
     var self = this;
