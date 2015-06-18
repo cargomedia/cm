@@ -88,7 +88,7 @@ EOD;
      */
     public function trackSale(CM_Frontend_Environment $environment) {
         $this->addEvent('purchaseSuccess', [
-            'site' => $environment->getSite()->getName(),
+            'site' => $environment->getSite()->getHost(),
         ]);
     }
 
@@ -97,7 +97,7 @@ EOD;
      */
     public function trackSignIn(CM_Frontend_Environment $environment) {
         $this->addEvent('login', [
-            'site' => $environment->getSite()->getName(),
+            'site' => $environment->getSite()->getHost(),
         ]);
     }
 
@@ -106,7 +106,7 @@ EOD;
      */
     public function trackSignUp(CM_Frontend_Environment $environment) {
         $this->addEvent('signup', [
-            'site' => $environment->getSite()->getName(),
+            'site' => $environment->getSite()->getHost(),
         ]);
     }
 

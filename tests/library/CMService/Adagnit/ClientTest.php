@@ -75,7 +75,7 @@ class CMService_Adagnit_ClientTest extends CMTest_TestCase {
     }
 
     public function testTrackSignIn() {
-        $site = $this->getMockSite(null, null, ['name' => 'My Site']);
+        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
         $adagnit = new CMService_Adagnit_Client();
         $environment = new CM_Frontend_Environment($site);
         $js = $adagnit->getJs($environment);
@@ -83,11 +83,11 @@ class CMService_Adagnit_ClientTest extends CMTest_TestCase {
 
         $adagnit->trackSignIn($environment);
         $js = $adagnit->getJs($environment);
-        $this->assertContains('ADGN.track.event(ADGN.eventTypes.login, {"site":"My Site"});', $js);
+        $this->assertContains('ADGN.track.event(ADGN.eventTypes.login, {"site":"www.my-website.net"});', $js);
     }
 
     public function testTrackSignUp() {
-        $site = $this->getMockSite(null, null, ['name' => 'My Site']);
+        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
         $adagnit = new CMService_Adagnit_Client();
         $environment = new CM_Frontend_Environment($site);
         $js = $adagnit->getJs($environment);
@@ -95,11 +95,11 @@ class CMService_Adagnit_ClientTest extends CMTest_TestCase {
 
         $adagnit->trackSignUp($environment);
         $js = $adagnit->getJs($environment);
-        $this->assertContains('ADGN.track.event(ADGN.eventTypes.signup, {"site":"My Site"});', $js);
+        $this->assertContains('ADGN.track.event(ADGN.eventTypes.signup, {"site":"www.my-website.net"});', $js);
     }
 
     public function testTrackSale() {
-        $site = $this->getMockSite(null, null, ['name' => 'My Site']);
+        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
         $adagnit = new CMService_Adagnit_Client();
         $environment = new CM_Frontend_Environment($site);
         $js = $adagnit->getJs($environment);
@@ -107,6 +107,6 @@ class CMService_Adagnit_ClientTest extends CMTest_TestCase {
 
         $adagnit->trackSale($environment);
         $js = $adagnit->getJs($environment);
-        $this->assertContains('ADGN.track.event(ADGN.eventTypes.purchaseSuccess, {"site":"My Site"});', $js);
+        $this->assertContains('ADGN.track.event(ADGN.eventTypes.purchaseSuccess, {"site":"www.my-website.net"});', $js);
     }
 }
