@@ -2,19 +2,19 @@
 
 class CM_I18n_Phrase {
 
-    /** @var $phrase string */
-    protected $phrase;
+    /** @var $_phrase string */
+    protected $_phrase;
 
-    /** @var $variables string[] */
-    protected $variables;
+    /** @var $_variables string[] */
+    protected $_variables;
 
     /**
      * @param string $phrase
-     * @param array  $variables
+     * @param string[] $variables
      */
     public function __construct($phrase, array $variables) {
-        $this->phrase = (string) $phrase;
-        $this->variables = $variables;
+        $this->_phrase = (string) $phrase;
+        $this->_variables = $variables;
     }
 
     /**
@@ -22,6 +22,6 @@ class CM_I18n_Phrase {
      * @return string
      */
     public function translate(CM_Frontend_Render $render) {
-        return $render->getTranslation($this->phrase, $this->variables);
+        return $render->getTranslation($this->_phrase, $this->_variables);
     }
 }
