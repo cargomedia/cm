@@ -25,6 +25,15 @@ class CMService_Adagnit_ClientTest extends CMTest_TestCase {
         $this->assertContains('ADGN.track.event(ADGN.eventTypes.purchaseSuccess, {"value":123});', $js);
     }
 
+    /**
+     * @expectedException CM_Exception_Invalid
+     * @expectedExceptionMessage Unknown event type `invalid`
+     */
+    public function testAddEventInvalid() {
+        $adagnit = new CMService_Adagnit_Client();
+        $adagnit->addEvent('invalid');
+    }
+
     public function testAddPageView() {
         $adagnit = new CMService_Adagnit_Client();
         $environment = new CM_Frontend_Environment();
