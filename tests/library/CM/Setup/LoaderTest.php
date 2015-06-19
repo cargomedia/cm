@@ -8,14 +8,20 @@ class CM_Provision_LoaderTest extends CMTest_TestCase {
         $script2->mockMethod('getRunLevel')->set(10);
         $script3 = $this->mockClass('CM_Provision_Script_Abstract')->newInstanceWithoutConstructor();
         $script3->mockMethod('getRunLevel')->set(1);
+        $script4 = $this->mockClass('CM_Provision_Script_Abstract')->newInstanceWithoutConstructor();
+        $script4->mockMethod('getRunLevel')->set(1);
+        $script5 = $this->mockClass('CM_Provision_Script_Abstract')->newInstanceWithoutConstructor();
+        $script5->mockMethod('getRunLevel')->set(1);
 
         $loader = new CM_Provision_Loader();
         $loader->registerScript($script1);
         $loader->registerScript($script2);
         $loader->registerScript($script3);
+        $loader->registerScript($script4);
+        $loader->registerScript($script5);
 
         $scriptList = CMTest_TH::callProtectedMethod($loader, '_getScriptList');
-        $expected = [$script3, $script1, $script2];
+        $expected = [$script3, $script4, $script5, $script1, $script2];
         $this->assertSame($expected, $scriptList);
     }
 

@@ -261,6 +261,11 @@ var CM_View_Abstract = Backbone.View.extend({
         }
         return response.data;
       })
+      .catch(function(error) {
+        if (!(error instanceof Promise.CancellationError)) {
+          throw error;
+        }
+      })
       .finally(function() {
         if (options.modal) {
           handler.enable();
