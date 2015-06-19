@@ -232,26 +232,21 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $image->mockMethod('getWidth')->set(250);
         $image->mockMethod('getHeight')->set(150);
 
-        $targetFile = CM_File::createTmp();
-        $format = 'jpg';
-
         $resizeSpecificMethod = $image->mockMethod('resizeSpecific')
-            ->set(function ($width, $height, $offsetX, $offsetY, $formatNew, $fileNew) use ($format, $targetFile) {
+            ->set(function ($width, $height, $offsetX, $offsetY) {
                 $this->assertSame(250, $width);
                 $this->assertSame(150, $height);
                 $this->assertSame(0, $offsetX);
                 $this->assertSame(0, $offsetY);
-                $this->assertSame($format, $formatNew);
-                $this->assertSame($targetFile, $fileNew);
             });
         /** @var CM_Image_Image $image */
-        $image->resize(500, 400, false, $format, $targetFile);
+        $image->resize(500, 400, false);
         $this->assertSame(1, $resizeSpecificMethod->getCallCount());
     }
 
     public function testResizeNoInvalidDimensions() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/test.jpg');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
+        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $image = new CM_Image_Image($imageFileOriginal->read());
         $width = $image->getWidth();
         $height = $image->getHeight();
         $widthResize = ($width > $height) ? 1 : (int) round($width / $height);
@@ -262,8 +257,8 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     }
 
     public function testResizeSquare() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/test.jpg');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
+        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $image = new CM_Image_Image($imageFileOriginal->read());
 
         $image->resize(50, 50, true);
         $this->assertSame(50, $image->getWidth());
@@ -271,8 +266,8 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     }
 
     public function testResizeSquareNoBlowup() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/test.jpg');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
+        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $image = new CM_Image_Image($imageFileOriginal->read());
 
         $sizeExpected = min($image->getWidth(), $image->getHeight());
         $image->resize(5000, 5000, true);
@@ -281,40 +276,43 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     }
 
     public function testResizeFileSize() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/test.jpg');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
-        $this->assertEquals(17661, $image->getSize(), '', 300);
+        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $image = new CM_Image_Image($imageFileOriginal->read());
+        $this->assertEquals(17661, $imageFileOriginal->getSize(), '', 300);
 
-        $image->setCompressionQuality(90);
-        $image->resize(100, 100);
-        $this->assertEquals(4620, $image->getSize(), '', 300);
+        $image->setCompressionQuality(90)->resize(100, 100);
+        $imageFile = CM_File::createTmp(null, $image->getBlob());
+        $this->assertEquals(4620, $imageFile->getSize(), '', 300);
     }
 
     public function testResizeAnimatedGif() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/animated.gif');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
+        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/animated.gif');
+        $image = new CM_Image_Image($imageFileOriginal->read());
 
-        $image->resize(50, 50, true, CM_Image_Image::FORMAT_GIF);
-        $this->assertSame('image/gif', $image->getMimeType());
+        $image->resize(50, 50, true);
+
+        $imageFile = CM_File::createTmp(null, $image->getBlob());
+        $this->assertSame('image/gif', $imageFile->getMimeType());
         $this->assertSame(50, $image->getWidth());
         $this->assertSame(50, $image->getHeight());
-        $this->assertEquals(25697, $image->getSize(), '', 2000);
+        $this->assertEquals(25697, $imageFile->getSize(), '', 2000);
     }
 
     public function testResizeAnimatedGifToJpeg() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/animated.gif');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
+        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/animated.gif');
+        $image = new CM_Image_Image($imageFileOriginal->read());
 
-        $image->resize(50, 50, true, CM_Image_Image::FORMAT_JPEG);
-        $this->assertSame('image/jpeg', $image->getMimeType());
+        $image->setFormat(CM_Image_Image::FORMAT_JPEG)->resize(50, 50, true);
+        $imageFile = CM_File::createTmp(null, $image->getBlob());
+        $this->assertSame('image/jpeg', $imageFile->getMimeType());
         $this->assertSame(50, $image->getWidth());
         $this->assertSame(50, $image->getHeight());
-        $this->assertEquals(1682, $image->getSize(), '', 100);
+        $this->assertEquals(1682, $imageFile->getSize(), '', 100);
     }
 
     public function testResizeSpecific() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/test.jpg');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
+        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $image = new CM_Image_Image($imageFileOriginal->read());
 
         $image->resizeSpecific(50, 50, 20, 20);
         $this->assertSame(50, $image->getWidth());
@@ -322,11 +320,12 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     }
 
     public function testResizeSpecificKeepExif() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/test-rotated.jpg');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
-        $imageNew = CM_Image_Image::createTmp(null);
-        $image->resize($image->getWidth(), $image->getHeight(), null, null, $imageNew);
-        $this->assertSame(6, $imageNew->getOrientation());
+        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test-rotated.jpg');
+        $image = new CM_Image_Image($imageFileOriginal->read());
+        $image->resize($image->getWidth(), $image->getHeight());
+        $imageFile = CM_File::createTmp(null, $image->getBlob());
+        $newImage = new CM_Image_Image($imageFile->read());
+        $this->assertSame(6, $newImage->getOrientation());
     }
 
     public function testGetExtensionByFormat() {

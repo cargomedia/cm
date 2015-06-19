@@ -54,49 +54,44 @@ class CM_Image_Image extends CM_File {
     }
 
     /**
-     * @param int          $widthMax
-     * @param int          $heightMax
-     * @param bool|null    $square
-     * @param int|null     $formatNew
-     * @param CM_File|null $fileNew
+     * @param int       $widthMax
+     * @param int       $heightMax
+     * @param bool|null $square
+     * @return $this
      * @throws CM_Exception
      */
-    public function resize($widthMax, $heightMax, $square = null, $formatNew = null, CM_File $fileNew = null) {
+    public function resize($widthMax, $heightMax, $square = null) {
         $square = isset($square) ? (bool) $square : false;
 
         $dimensions = self::calculateDimensions($this->getWidth(), $this->getHeight(), $widthMax, $heightMax, $square);
-        $this->resizeSpecific($dimensions['width'], $dimensions['height'], $dimensions['offsetX'], $dimensions['offsetY'], $formatNew, $fileNew);
+        $this->resizeSpecific($dimensions['width'], $dimensions['height'], $dimensions['offsetX'], $dimensions['offsetY']);
+        return $this;
     }
 
     /**
-     * @param int          $widthResize
-     * @param int          $heightResize
-     * @param int|null     $offsetX
-     * @param int|null     $offsetY
-     * @param int|null     $formatNew
-     * @param CM_File|null $fileNew
+     * @param int      $widthResize
+     * @param int      $heightResize
+     * @param int|null $offsetX
+     * @param int|null $offsetY
+     * @return $this
      * @throws CM_Exception
      * @throws CM_Exception_Invalid
      */
-    public function resizeSpecific($widthResize, $heightResize, $offsetX = null, $offsetY = null, $formatNew = null, CM_File $fileNew = null) {
-        $format = isset($formatNew) ? (int) $formatNew : $this->getFormat();
+    public function resizeSpecific($widthResize, $heightResize, $offsetX = null, $offsetY = null) {
         $width = $this->getWidth();
         $height = $this->getHeight();
 
-        $imagick = $this->_getImagickClone();
-
         try {
-            $this->_invokeOnEveryFrame($imagick, function (Imagick $imagick) use ($offsetX, $offsetY, $width, $height, $widthResize, $heightResize) {
+            $this->_invokeOnEveryFrame(function () use ($offsetX, $offsetY, $width, $height, $widthResize, $heightResize) {
                 if (null !== $offsetX && null !== $offsetY) {
-                    $imagick->cropImage($width, $height, $offsetX, $offsetY);
+                    $this->_imagick->cropImage($width, $height, $offsetX, $offsetY);
                 }
-                $imagick->resizeImage($widthResize, $heightResize, Imagick::FILTER_CATROM, 1);
-            }, $format);
+                $this->_imagick->resizeImage($widthResize, $heightResize, Imagick::FILTER_CATROM, 1);
+            });
         } catch (ImagickException $e) {
             throw new CM_Exception('Error when resizing image: ' . $e->getMessage());
         }
-
-        $this->_writeImagick($imagick, $format, $fileNew);
+        return $this;
     }
 
     /**
@@ -362,17 +357,15 @@ class CM_Image_Image extends CM_File {
     }
 
     /**
-     * @param Imagick $imagick
-     * @param Closure $callback fn(Imagick)
-     * @param int     $format
+     * @param Closure $callback
      */
-    private function _invokeOnEveryFrame(Imagick $imagick, Closure $callback, $format) {
-        if (!$this->_getAnimationRequired($format)) {
-            $callback($imagick);
+    private function _invokeOnEveryFrame(Closure $callback) {
+        if (!$this->_getAnimationRequired($this->getFormat())) {
+            $callback();
         } else {
             /** @var Imagick $frame */
-            foreach ($imagick as $frame) {
-                $callback($imagick);
+            foreach ($this->_imagick as $frame) {
+                $callback();
             }
         }
     }
