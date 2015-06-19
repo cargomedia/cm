@@ -16,6 +16,27 @@ class CM_Image_Image extends CM_File {
     private $_animated;
 
     /**
+     * @param string $imageBlob
+     * @throws CM_Exception
+     */
+    public function __construct($imageBlob) {
+        $imageBlob = (string) $imageBlob;
+        try {
+            $imagick = new Imagick();
+            $imagick->readImageBlob($imageBlob);
+            if ($imagick->getIteratorIndex() > 0) {
+                $this->_animated = true;
+                $imagick = $imagick->coalesceImages();
+            } else {
+                $this->_animated = false;
+            }
+        } catch (ImagickException $e) {
+            throw new CM_Exception('Cannot load Imagick instance for `' . $this->getPath() . '`: ' . $e->getMessage());
+        }
+        $this->_imagick = $imagick;
+    }
+
+    /**
      * @param int          $format
      * @param CM_File|null $fileNew
      */
@@ -32,6 +53,23 @@ class CM_Image_Image extends CM_File {
 
         $imagick = $this->_getImagickClone();
         $this->_writeImagick($imagick, $format, $fileNew);
+    }
+
+    /**
+     * @return string
+     * @throws CM_Exception
+     */
+    public function getBlob() {
+        try {
+            if ($this->_getAnimationRequired($this->getFormat())) {
+                $imageBlob = $this->_imagick->getImagesBlob();
+            } else {
+                $imageBlob = $this->_imagick->getImageBlob();
+            }
+        } catch (ImagickException $e) {
+            throw new CM_Exception('Cannot get image blob: ' . $e->getMessage());
+        }
+        return $imageBlob;
     }
 
     /**
@@ -199,9 +237,6 @@ class CM_Image_Image extends CM_File {
      * @return bool
      */
     public function isAnimated() {
-        if (null === $this->_animated) {
-            $this->_getImagick();
-        }
         return $this->_animated;
     }
 
