@@ -1,6 +1,6 @@
 <?php
 
-class CM_File_Image extends CM_File {
+class CM_Image_Image extends CM_File {
 
     const FORMAT_JPEG = 1;
     const FORMAT_GIF = 2;
