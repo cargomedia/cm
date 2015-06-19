@@ -26,10 +26,7 @@
 			if (window.onerror) {
 				this.onerrorBackup = window.onerror;
 			}
-			window.onerror = function(message, fileUrl, fileLine, fileColumn, error) {
-        if (error instanceof Promise.CancellationError) {
-          message = '###' + message + ' :' + fileColumn + ' ' + error.stack
-        }
+			window.onerror = function(message, fileUrl, fileLine) {
 				jserror.counter++;
 				var originatesFromLogging = (fileUrl.indexOf(jserror.logUrl) >= 0);
 				var detailsUnavailable = (0 === fileLine);
