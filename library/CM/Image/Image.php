@@ -37,6 +37,13 @@ class CM_Image_Image extends CM_File {
     }
 
     /**
+     * @return CM_Image_Image
+     */
+    public function getClone() {
+        return clone $this;
+    }
+
+    /**
      * @return string
      * @throws CM_Exception
      */
@@ -95,23 +102,18 @@ class CM_Image_Image extends CM_File {
     }
 
     /**
-     * @param int          $angle
-     * @param int|null     $formatNew
-     * @param CM_File|null $fileNew
+     * @param int $angle
+     * @return $this
      */
-    public function rotate($angle, $formatNew = null, CM_File $fileNew = null) {
+    public function rotate($angle) {
         $angle = (int) $angle;
-        $format = isset($formatNew) ? (int) $formatNew : $this->getFormat();
 
-        $imagick = $this->_getImagickClone();
-
-        $this->_invokeOnEveryFrame($imagick, function (Imagick $imagick) use ($angle) {
-            if (true !== $imagick->rotateImage(new ImagickPixel('#00000000'), $angle)) {
+        $this->_invokeOnEveryFrame(function () use ($angle) {
+            if (true !== $this->_imagick->rotateImage(new ImagickPixel('#00000000'), $angle)) {
                 throw new CM_Exception('Cannot rotate image by `' . $angle . '` degrees');
             }
-        }, $format);
-
-        $this->_writeImagick($imagick, $format, $fileNew);
+        });
+        return $this;
     }
 
     public function rotateByExif() {
@@ -435,5 +437,9 @@ class CM_Image_Image extends CM_File {
             'width'   => (int) $widthResize,
             'height'  => (int) $heightResize,
         ];
+    }
+
+    private function __clone() {
+        $this->_imagick = clone $this->_imagick;
     }
 }

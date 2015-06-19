@@ -73,24 +73,27 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     }
 
     public function testRotate() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/test.jpg');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
+        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $imageOriginal = new CM_Image_Image($imageFileOriginal->read());
         $this->assertNotSame($imageOriginal->getWidth(), $imageOriginal->getHeight());
 
-        $image->rotate(90);
+        $image = $imageOriginal->getClone()->rotate(90);
+
         $this->assertSame($imageOriginal->getHeight(), $image->getWidth());
         $this->assertSame($imageOriginal->getWidth(), $image->getHeight());
     }
 
     public function testRotateAnimatedGif() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/animated.gif');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
+        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/animated.gif');
+        $imageOriginal = new CM_Image_Image($imageFileOriginal->read());
         $this->assertNotSame($imageOriginal->getWidth(), $imageOriginal->getHeight());
 
-        $image->rotate(90, CM_Image_Image::FORMAT_GIF);
+        $image = $imageOriginal->getClone()->rotate(90);
+
         $this->assertSame($imageOriginal->getHeight(), $image->getWidth());
         $this->assertSame($imageOriginal->getWidth(), $image->getHeight());
-        $this->assertEquals(148987, $image->getSize(), '', 5000);
+        $imageFile = CM_File::createTmp(null, $image->getBlob());
+        $this->assertEquals(148987, $imageFile->getSize(), '', 5000);
     }
 
     public function testRotateByExif() {
