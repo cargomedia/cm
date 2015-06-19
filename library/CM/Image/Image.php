@@ -37,25 +37,6 @@ class CM_Image_Image extends CM_File {
     }
 
     /**
-     * @param int          $format
-     * @param CM_File|null $fileNew
-     */
-    public function convert($format, CM_File $fileNew = null) {
-        $format = (int) $format;
-
-        if ($format === $this->getFormat()) {
-            // Copy image if no conversion necessary
-            if ($fileNew && !$this->equals($fileNew)) {
-                $this->copyToFile($fileNew);
-            }
-            return;
-        }
-
-        $imagick = $this->_getImagickClone();
-        $this->_writeImagick($imagick, $format, $fileNew);
-    }
-
-    /**
      * @return string
      * @throws CM_Exception
      */
@@ -163,6 +144,19 @@ class CM_Image_Image extends CM_File {
         }
     }
 
+    /**
+     * @param int $format
+     * @return $this
+     * @throws CM_Exception
+     */
+    public function setFormat($format) {
+        if (true !== $this->_imagick->setImageFormat($this->_getImagickFormat($format))) {
+            throw new CM_Exception('Cannot set image format `' . $format . '`');
+        }
+        $this->_animated = $this->_getAnimationRequired($format);
+        return $this;
+    }
+
     public function stripProfileData() {
         $imagick = $this->_getImagick();
         $imagick->stripImage();
@@ -198,7 +192,7 @@ class CM_Image_Image extends CM_File {
      * @throws CM_Exception_Invalid
      */
     public function getFormat() {
-        $imagickFormat = $this->_getImagick()->getImageFormat();
+        $imagickFormat = $this->_imagick->getImageFormat();
         switch ($imagickFormat) {
             case 'JPEG':
                 return self::FORMAT_JPEG;
@@ -242,6 +236,8 @@ class CM_Image_Image extends CM_File {
 
     /**
      * @param int $quality 1-100
+     * @return $this
+     * @throws CM_Exception
      * @throws CM_Exception_Invalid
      */
     public function setCompressionQuality($quality) {
@@ -249,7 +245,10 @@ class CM_Image_Image extends CM_File {
         if ($quality < 1 || $quality > 100) {
             throw new CM_Exception_Invalid('Invalid compression quality `' . $quality . '`, should be between 1-100.');
         }
-        $this->_compressionQuality = $quality;
+        if (true !== $this->_imagick->setImageCompressionQuality($quality)) {
+            throw new CM_Exception('Cannot set compression quality to `' . $quality . '`.');
+        }
+        return $this;
     }
 
     public function freeMemory() {

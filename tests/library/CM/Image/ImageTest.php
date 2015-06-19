@@ -156,15 +156,15 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $this->assertTrue($imageAnimatedGif->isAnimated());
     }
 
-    public function testIsAnimatedConvertingToNonAnimated() {
-        $file = new CM_File(DIR_TEST_DATA . 'img/animated.gif');
-        $image = CM_Image_Image::createTmp('gif', $file->read());
+    public function testIsAnimatedSetFormatToNonAnimated() {
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/animated.gif');
+        $image = new CM_Image_Image($imageFile->read());
         $this->assertTrue($image->isAnimated());
 
-        $image->convert(CM_Image_Image::FORMAT_GIF);
+        $image->setFormat(CM_Image_Image::FORMAT_GIF);
         $this->assertTrue($image->isAnimated());
 
-        $image->convert(CM_Image_Image::FORMAT_JPEG);
+        $image->setFormat(CM_Image_Image::FORMAT_JPEG);
         $this->assertFalse($image->isAnimated());
     }
 
@@ -192,64 +192,17 @@ class CM_Image_ImageTest extends CMTest_TestCase {
      * @expectedExceptionMessage Invalid compression quality
      */
     public function testSetCompressionQualityInvalid() {
-        $path = DIR_TEST_DATA . 'img/test.jpg';
-        $image = new CM_Image_Image($path);
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $image = new CM_Image_Image($imageFile->read());
         $image->setCompressionQuality(-188);
     }
 
-    public function testConvert() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/test.jpg');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
-
-        $imageNew = CM_Image_Image::createTmp();
-        $image->convert(CM_Image_Image::FORMAT_GIF, $imageNew);
-        $this->assertSame($image->getWidth(), $imageNew->getWidth());
-        $this->assertSame($image->getHeight(), $imageNew->getHeight());
-        $this->assertNotSame($image->read(), $imageNew->read());
-    }
-
-    public function testConvertSameFile() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/test.jpg');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
-
-        $image->convert(CM_Image_Image::FORMAT_GIF);
-        $this->assertSame($imageOriginal->getWidth(), $image->getWidth());
-        $this->assertSame($imageOriginal->getHeight(), $image->getHeight());
-        $this->assertNotSame($imageOriginal->read(), $image->read());
-    }
-
-    public function testConvertSameFileSameFormat() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/test.jpg');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
-
-        $image->convert(CM_Image_Image::FORMAT_JPEG);
-        $this->assertSame($imageOriginal->getWidth(), $image->getWidth());
-        $this->assertSame($imageOriginal->getHeight(), $image->getHeight());
-        $this->assertSame($imageOriginal->read(), $image->read());
-    }
-
-    public function testConvertAllFormats() {
-        $formatList = array(
-            CM_Image_Image::FORMAT_JPEG,
-            CM_Image_Image::FORMAT_GIF,
-            CM_Image_Image::FORMAT_PNG,
-        );
-        $pathList = array(
-            DIR_TEST_DATA . 'img/test.jpg',
-            DIR_TEST_DATA . 'img/test.gif',
-            DIR_TEST_DATA . 'img/test.png',
-        );
-        foreach ($pathList as $path) {
-            foreach ($formatList as $format) {
-                $imageOriginal = new CM_Image_Image($path);
-                $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
-
-                $image->convert($format);
-                $this->assertSame($imageOriginal->getWidth(), $image->getWidth());
-                $this->assertSame($imageOriginal->getHeight(), $image->getHeight());
-                $this->assertGreaterThan(0, $image->getSize());
-            }
-        }
+    public function testSetFormat() {
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $image = new CM_Image_Image($imageFile->read());
+        $this->assertSame(CM_Image_Image::FORMAT_JPEG, $image->getFormat());
+        $image->setFormat(CM_Image_Image::FORMAT_GIF);
+        $this->assertSame(CM_Image_Image::FORMAT_GIF, $image->getFormat());
     }
 
     public function testConvertJpegCompression() {
@@ -262,14 +215,15 @@ class CM_Image_ImageTest extends CMTest_TestCase {
             100 => 37649,
         );
         $path = DIR_TEST_DATA . 'img/test.gif';
+        $imageFileOriginal = new CM_File($path);
         foreach ($qualityList as $quality => $expectedFileSize) {
-            $imageOriginal = new CM_Image_Image($path);
-            $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
+            $image = new CM_Image_Image($imageFileOriginal->read());
 
-            $image->setCompressionQuality($quality);
-            $image->convert(CM_Image_Image::FORMAT_JPEG);
+            $image->setFormat(CM_Image_Image::FORMAT_JPEG)->setCompressionQuality($quality);
+
+            $imageFile = CM_File::createTmp(null, $image->getBlob());
             $fileSizeDelta = $expectedFileSize * 0.05;
-            $this->assertEquals($expectedFileSize, $image->getSize(), 'File size mismatch for quality `' . $quality . '`', $fileSizeDelta);
+            $this->assertEquals($expectedFileSize, $imageFile->getSize(), 'File size mismatch for quality `' . $quality . '`', $fileSizeDelta);
         }
     }
 
