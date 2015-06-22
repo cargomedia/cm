@@ -168,7 +168,7 @@ class CM_Image_Image extends CM_File {
      */
     public function getWidth() {
         try {
-            return $this->_getImagick()->getImageWidth();
+            return $this->_imagick->getImageWidth();
         } catch (ImagickException $e) {
             throw new CM_Exception('Cannot detect image width: ' . $e->getMessage());
         }
@@ -180,7 +180,7 @@ class CM_Image_Image extends CM_File {
      */
     public function getHeight() {
         try {
-            return $this->_getImagick()->getImageHeight();
+            return $this->_imagick->getImageHeight();
         } catch (ImagickException $e) {
             throw new CM_Exception('Cannot detect image height: ' . $e->getMessage());
         }

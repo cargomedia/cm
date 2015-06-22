@@ -171,20 +171,22 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     }
 
     public function testGetWidthHeight() {
-        $pathList = array(
-            DIR_TEST_DATA . 'img/test.jpg',
-            DIR_TEST_DATA . 'img/test.gif',
-            DIR_TEST_DATA . 'img/test.png',
+        /** @var CM_File[] $fileList */
+        $fileList = array(
+            new CM_File(DIR_TEST_DATA . 'img/test.jpg'),
+            new CM_File(DIR_TEST_DATA . 'img/test.gif'),
+            new CM_File(DIR_TEST_DATA . 'img/test.png'),
         );
-        foreach ($pathList as $path) {
-            $image = new CM_Image_Image($path);
+        foreach ($fileList as $file) {
+            $image = new CM_Image_Image($file->read());
             $this->assertSame(363, $image->getWidth());
             $this->assertSame(214, $image->getHeight());
         }
     }
 
     public function testGetWidthHeightAnimatedGif() {
-        $image = new CM_Image_Image(DIR_TEST_DATA . 'img/animated.gif');
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/animated.gif');
+        $image = new CM_Image_Image($imageFile->read());
         $this->assertSame(180, $image->getWidth());
         $this->assertSame(135, $image->getHeight());
     }
