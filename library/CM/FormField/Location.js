@@ -66,12 +66,11 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
    * @param {Number} lon
    */
   _lookupCoordinates: function(lat, lon) {
-    this.ajax('getSuggestionByCoordinates', {lat: lat, lon: lon, levelMin: this.getOption('levelMin'), levelMax: this.getOption('levelMax')}, {
-      success: function(data) {
+    this.ajax('getSuggestionByCoordinates', {lat: lat, lon: lon, levelMin: this.getOption('levelMin'), levelMax: this.getOption('levelMax')})
+      .then(function(data) {
         if (data) {
           this.setValue(data);
         }
-      }
-    });
+      });
   }
 });

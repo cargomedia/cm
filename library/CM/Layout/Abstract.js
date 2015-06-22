@@ -10,7 +10,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   /** @type jQuery|Null */
   _$pagePlaceholder: null,
 
-  /** @type jqXHR|Null */
+  /** @type Promise|Null */
   _pageRequest: null,
 
   /**
@@ -49,40 +49,40 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     }, 750);
 
     if (this._pageRequest) {
-      this._pageRequest.abort();
+      this._pageRequest.cancel();
     }
-    this._pageRequest = this.ajaxModal('loadPage', {path: path}, {
-      success: function(response) {
+    var layout = this;
+    this._pageRequest = this.ajaxModal('loadPage', {path: path})
+      .then(function(response) {
         if (response.redirectExternal) {
           cm.router.route(response.redirectExternal);
           return;
         }
-        var layout = this;
-        this._injectView(response, function(response) {
-          var reload = (layout.getClass() != response.layoutClass);
-          if (reload) {
-            window.location.replace(response.url);
-            return;
-          }
-          layout._$pagePlaceholder.replaceWith(this.$el);
-          layout._$pagePlaceholder = null;
-          var fragment = response.url.substr(cm.getUrl().length);
-          if (path === fragment + window.location.hash) {
-            fragment = path;
-          }
-          window.history.replaceState(null, null, fragment);
-          layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList, response.jsTracking);
-        });
-      },
-      error: function(msg, type, isPublic) {
-        this._$pagePlaceholder.addClass('error').html('<pre>' + msg + '</pre>');
-        this._onPageError();
-        return false;
-      },
-      complete: function() {
+        var view = layout._injectView(response);
+        var reload = (layout.getClass() != response.layoutClass);
+        if (reload) {
+          window.location.replace(response.url);
+          return;
+        }
+        layout._$pagePlaceholder.replaceWith(view.$el);
+        layout._$pagePlaceholder = null;
+        var fragment = response.url.substr(cm.getUrl().length);
+        if (path === fragment + window.location.hash) {
+          fragment = path;
+        }
+        window.history.replaceState(null, null, fragment);
+        layout._onPageSetup(view, response.title, response.url, response.menuEntryHashList, response.jsTracking);
+        view._ready();
+        return view;
+      })
+      .catch(function(error) {
+        if (!(error instanceof Promise.CancellationError)) {
+          layout._$pagePlaceholder.addClass('error').html('<pre>' + error.msg + '</pre>');
+          layout._onPageError();
+        }
+      }).finally(function() {
         window.clearTimeout(timeoutLoading);
-      }
-    });
+      });
   },
 
   /**
