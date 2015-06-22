@@ -158,8 +158,12 @@ class CM_Image_Image extends CM_File {
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function stripProfileData() {
         $this->_imagick->stripImage();
+        return $this;
     }
 
     /**
@@ -213,15 +217,22 @@ class CM_Image_Image extends CM_File {
 
     /**
      * @param int $orientation
+     * @return $this
      *
      * Works only on images where the meta-data already contains orientation-information
      */
     public function setOrientation($orientation) {
         $this->_imagick->setImageOrientation((int) $orientation);
+        return $this;
     }
 
+    /**
+     * @return $this
+     * @throws CM_Exception_Invalid
+     */
     public function validateImage() {
         $this->getFormat();
+        return $this;
     }
 
     /**
