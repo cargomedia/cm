@@ -3,22 +3,22 @@
 class CM_Image_ImageTest extends CMTest_TestCase {
 
     public function testValidateImage() {
-        $path = DIR_TEST_DATA . 'img/test.jpg';
-        $image = new CM_Image_Image($path);
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $image = new CM_Image_Image($imageFile->read());
         $image->validateImage();
         $this->assertTrue(true);
     }
 
     public function testValidateImageCorruptContent() {
-        $path = DIR_TEST_DATA . 'img/corrupt-content.jpg';
-        $image = new CM_Image_Image($path);
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/corrupt-content.jpg');
+        $image = new CM_Image_Image($imageFile->read());
         $image->validateImage();
         $this->assertTrue(true);
     }
 
     public function testValidateImageJpgNoExtension() {
-        $path = DIR_TEST_DATA . 'img/jpg-no-extension';
-        $image = new CM_Image_Image($path);
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/jpg-no-extension');
+        $image = new CM_Image_Image($imageFile->read());
         $image->validateImage();
         $this->assertTrue(true);
     }
@@ -28,18 +28,8 @@ class CM_Image_ImageTest extends CMTest_TestCase {
      * @expectedExceptionMessage Unsupported format
      */
     public function testValidateImageUnsupportedFormat() {
-        $path = DIR_TEST_DATA . 'img/test.tiff';
-        $file = new CM_Image_Image($path);
-        $file->validateImage();
-    }
-
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot load Imagick instance
-     */
-    public function testValidateImageCorruptHeader() {
-        $path = DIR_TEST_DATA . 'img/corrupt-header.jpg';
-        $image = new CM_Image_Image($path);
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.tiff');
+        $image = new CM_Image_Image($imageFile->read());
         $image->validateImage();
     }
 
@@ -47,9 +37,18 @@ class CM_Image_ImageTest extends CMTest_TestCase {
      * @expectedException CM_Exception
      * @expectedExceptionMessage Cannot load Imagick instance
      */
+    public function testValidateImageCorruptHeader() {
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/corrupt-header.jpg');
+        $image = new CM_Image_Image($imageFile->read());
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot load Imagick instance
+     */
     public function testValidateImageEmptyFile() {
-        $path = DIR_TEST_DATA . 'img/empty.jpg';
-        $image = new CM_Image_Image($path);
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/empty.jpg');
+        $image = new CM_Image_Image($imageFile->read());
         $image->validateImage();
     }
 
@@ -58,18 +57,8 @@ class CM_Image_ImageTest extends CMTest_TestCase {
      * @expectedExceptionMessage Cannot load Imagick instance
      */
     public function testValidateImageNoImage() {
-        $path = DIR_TEST_DATA . 'test.jpg.zip';
-        $image = new CM_Image_Image($path);
-        $image->validateImage();
-    }
-
-    public function testDimensions() {
-        $path = DIR_TEST_DATA . 'img/test.jpg';
-        list($width, $height) = getimagesize($path);
-
-        $image = new CM_Image_Image($path);
-        $this->assertSame($width, $image->getWidth());
-        $this->assertSame($height, $image->getHeight());
+        $imageFile = new CM_File(DIR_TEST_DATA . 'test.jpg.zip');
+        $image = new CM_Image_Image($imageFile->read());
     }
 
     public function testRotate() {
@@ -135,7 +124,8 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         );
 
         foreach ($pathList as $path => $format) {
-            $image = new CM_Image_Image($path);
+            $imageFile = new CM_File($path);
+            $image = new CM_Image_Image($imageFile->read());
             $this->assertSame($format, $image->getFormat());
         }
     }
@@ -145,16 +135,18 @@ class CM_Image_ImageTest extends CMTest_TestCase {
      * @expectedExceptionMessage Unsupported format
      */
     public function testGetFormatUnsupportedFormat() {
-        $path = DIR_TEST_DATA . 'img/test.tiff';
-        $image = new CM_Image_Image($path);
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.tiff');
+        $image = new CM_Image_Image($imageFile->read());
         $image->getFormat();
     }
 
     public function testIsAnimated() {
-        $imageJpeg = new CM_Image_Image(DIR_TEST_DATA . 'img/test.jpg');
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $imageJpeg = new CM_Image_Image($imageFile->read());
         $this->assertFalse($imageJpeg->isAnimated());
 
-        $imageAnimatedGif = new CM_Image_Image(DIR_TEST_DATA . 'img/animated.gif');
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/animated.gif');
+        $imageAnimatedGif = new CM_Image_Image($imageFile->read());
         $this->assertTrue($imageAnimatedGif->isAnimated());
     }
 
@@ -344,13 +336,6 @@ class CM_Image_ImageTest extends CMTest_TestCase {
      */
     public function testGetExtensionByFormatInvalid() {
         CM_Image_Image::getExtensionByFormat(-999);
-    }
-
-    public function testCreate() {
-        $rawImageData = file_get_contents(DIR_TEST_DATA . 'img/test.jpg', 'r');
-        $image = CM_Image_Image::create(CM_Bootloader::getInstance()->getDirTmp() . 'test.jpg', $rawImageData);
-        $this->assertEquals('image/jpeg', $image->getMimeType());
-        $image->delete();
     }
 
     public function testCalculateDimensions() {

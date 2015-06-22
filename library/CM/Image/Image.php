@@ -1,6 +1,6 @@
 <?php
 
-class CM_Image_Image extends CM_File {
+class CM_Image_Image {
 
     const FORMAT_JPEG = 1;
     const FORMAT_GIF = 2;
@@ -8,9 +8,6 @@ class CM_Image_Image extends CM_File {
 
     /** @var Imagick|null */
     private $_imagick;
-
-    /** @var int */
-    private $_compressionQuality = 90;
 
     /** @var bool|null */
     private $_animated;
@@ -31,7 +28,7 @@ class CM_Image_Image extends CM_File {
                 $this->_animated = false;
             }
         } catch (ImagickException $e) {
-            throw new CM_Exception('Cannot load Imagick instance for `' . $this->getPath() . '`: ' . $e->getMessage());
+            throw new CM_Exception('Cannot load Imagick instance ' . $e->getMessage());
         }
         $this->_imagick = $imagick;
     }
@@ -257,83 +254,6 @@ class CM_Image_Image extends CM_File {
             throw new CM_Exception('Cannot set compression quality to `' . $quality . '`.');
         }
         return $this;
-    }
-
-    /**
-     * @return Imagick
-     * @throws CM_Exception
-     */
-    private function _getImagick() {
-        if (!extension_loaded('imagick')) {
-            throw new CM_Exception('Missing `imagick` extension');
-        }
-        if (null === $this->_imagick) {
-            try {
-                $imagick = new Imagick();
-                $imagick->readImageBlob($this->read());
-                if ($imagick->getIteratorIndex() > 0) {
-                    $this->_animated = true;
-                    $imagick = $imagick->coalesceImages();
-                } else {
-                    $this->_animated = false;
-                }
-            } catch (ImagickException $e) {
-                throw new CM_Exception('Cannot load Imagick instance for `' . $this->getPath() . '`: ' . $e->getMessage());
-            }
-            $this->_imagick = $imagick;
-        }
-        return $this->_imagick;
-    }
-
-    /**
-     * @return Imagick
-     */
-    private function _getImagickClone() {
-        $imagick = $this->_getImagick();
-        return clone $imagick;
-    }
-
-    /**
-     * @param Imagick      $imagick
-     * @param int          $format
-     * @param CM_File|null $fileNew
-     * @throws CM_Exception
-     */
-    private function _writeImagick(Imagick $imagick, $format, CM_File $fileNew = null) {
-        if (true !== $imagick->setFormat($this->_getImagickFormat($format))) {
-            throw new CM_Exception('Cannot set image format `' . $format . '`');
-        }
-        $compressionQuality = $this->_getCompressionQuality();
-        if (true !== $imagick->setImageCompressionQuality($compressionQuality)) {
-            throw new CM_Exception('Cannot set compression quality to `' . $compressionQuality . '`.');
-        }
-        if (!$this->_getAnimationRequired($format)) {
-            try {
-                $imageBlob = $imagick->getImageBlob();
-            } catch (ImagickException $e) {
-                throw new CM_Exception('Cannot get image blob: ' . $e->getMessage());
-            }
-        } else {
-            try {
-                $imageBlob = $imagick->getImagesBlob();
-            } catch (ImagickException $e) {
-                throw new CM_Exception('Cannot get images blob: ' . $e->getMessage());
-            }
-        }
-
-        $file = $fileNew ? $fileNew : $this;
-        $file->write($imageBlob);
-        if ($this->equals($file)) {
-            $this->_imagick = $imagick;
-            $this->_animated = $this->_getAnimationRequired($format);
-        }
-    }
-
-    /**
-     * @return int
-     */
-    private function _getCompressionQuality() {
-        return $this->_compressionQuality;
     }
 
     /**
