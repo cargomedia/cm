@@ -353,28 +353,6 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $image->delete();
     }
 
-    public function testFreeMemory() {
-        $getMemoryUsage = function () {
-            $pid = CM_Process::getInstance()->getProcessId();
-            $memory = CM_Util::exec('ps', ['-o', 'rss', '--no-headers', '--pid', $pid]);
-            return (int) $memory;
-        };
-
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/test.jpg');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
-
-        $memoryUsage = $getMemoryUsage();
-        $memoryUsageMaxExpected = $memoryUsage + 20 * 1000;
-
-        $image->resizeSpecific(3000, 3000);
-        $this->assertGreaterThan($memoryUsageMaxExpected, $getMemoryUsage());
-
-        $image->freeMemory();
-        $this->assertLessThan($memoryUsageMaxExpected, $getMemoryUsage());
-
-        $image->validateImage();
-    }
-
     public function testCalculateDimensions() {
         $dimensions = CM_Image_Image::calculateDimensions( 2000, 1600, 500, 600, false );
 

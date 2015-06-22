@@ -248,10 +248,6 @@ class CM_Image_Image extends CM_File {
         return $this;
     }
 
-    public function freeMemory() {
-        $this->_imagick = null;
-    }
-
     /**
      * @return Imagick
      * @throws CM_Exception
