@@ -159,9 +159,7 @@ class CM_Image_Image extends CM_File {
     }
 
     public function stripProfileData() {
-        $imagick = $this->_getImagick();
-        $imagick->stripImage();
-        $this->_writeImagick($imagick, $this->getFormat());
+        $this->_imagick->stripImage();
     }
 
     /**

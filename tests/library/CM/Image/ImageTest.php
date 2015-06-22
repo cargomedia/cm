@@ -108,11 +108,11 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     }
 
     public function testStripProfileData() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/test-rotated.jpg');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
+        $imageOriginal = new CM_File(DIR_TEST_DATA . 'img/test-rotated.jpg');
+        $image = new CM_Image_Image($imageOriginal->read());
         $this->assertSame(6, $image->getOrientation());
         $image->stripProfileData();
-        $image = new CM_Image_Image($image);
+        $image = new CM_Image_Image($image->getBlob());
         $this->assertSame(0, $image->getOrientation());
     }
 
