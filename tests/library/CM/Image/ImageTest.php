@@ -88,10 +88,10 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     public function testRotateByExif() {
         $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test-rotated.jpg');
         $imageOriginal = new CM_Image_Image($imageFileOriginal->read());
-        $this->assertSame(6, $imageOriginal->getOrientation());
+        $this->assertSame(6, $this->_getImagickObject($imageOriginal)->getImageOrientation());
         $image = $imageOriginal->getClone()->rotateByExif();
         $image = new CM_Image_Image($image->getBlob());
-        $this->assertSame(1, $image->getOrientation());
+        $this->assertSame(6, $this->_getImagickObject($imageOriginal)->getImageOrientation());
         $this->assertSame($imageOriginal->getHeight(), $image->getWidth());
         $this->assertSame($imageOriginal->getWidth(), $image->getHeight());
     }
@@ -99,19 +99,10 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     public function testStripProfileData() {
         $imageOriginal = new CM_File(DIR_TEST_DATA . 'img/test-rotated.jpg');
         $image = new CM_Image_Image($imageOriginal->read());
-        $this->assertSame(6, $image->getOrientation());
+        $this->assertSame(6, $this->_getImagickObject($image)->getImageOrientation());
         $image->stripProfileData();
         $image = new CM_Image_Image($image->getBlob());
-        $this->assertSame(0, $image->getOrientation());
-    }
-
-    public function testSetOrientation() {
-        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test-rotated.jpg');
-        $image = new CM_Image_Image($imageFileOriginal->read());
-        $this->assertSame(6, $image->getOrientation());
-        $image->setOrientation(2);
-        $image = new CM_Image_Image($image->getBlob());
-        $this->assertSame(2, $image->getOrientation());
+        $this->assertSame(0, $this->_getImagickObject($image)->getImageOrientation());
     }
 
     public function testGetFormat() {
@@ -321,7 +312,7 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $image->resize($image->getWidth(), $image->getHeight());
         $imageFile = CM_File::createTmp(null, $image->getBlob());
         $newImage = new CM_Image_Image($imageFile->read());
-        $this->assertSame(6, $newImage->getOrientation());
+        $this->assertSame(6, $this->_getImagickObject($newImage)->getImageOrientation());
     }
 
     public function testGetExtensionByFormat() {
@@ -364,4 +355,14 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $this->assertEquals( 0, $dimensions['offsetX']);
         $this->assertEquals( 0, $dimensions['offsetY']);
     }
-}
+
+    /**
+     * @param CM_Image_Image $image
+     * @return Imagick
+     */
+    private function _getImagickObject(CM_Image_Image $image) {
+        $reflectionProperty = new ReflectionProperty('CM_Image_Image', '_imagick');
+        $reflectionProperty->setAccessible(true);
+        return $reflectionProperty->getValue($image);
+    }
+ }
