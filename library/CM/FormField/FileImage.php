@@ -6,7 +6,7 @@ class CM_FormField_FileImage extends CM_FormField_File {
         parent::validateFile($file);
 
         try {
-            $image = new CM_Image_Image($file);
+            $image = new CM_Image_Image($file->read());
             $image->validateImage();
         } catch (CM_Exception $e) {
             throw new CM_Exception_FormFieldValidation('Invalid image');
