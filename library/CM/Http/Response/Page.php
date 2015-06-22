@@ -100,8 +100,6 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             $this->_request->setLanguageUrl(null);
         }
         if (!$this->getRedirectUrl()) {
-            $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
-            $render->getServiceManager()->getTrackings()->trackPageView($render->getEnvironment(), $path);
             $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);
         }
@@ -144,10 +142,15 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             }
 
             $this->_setStringRepresentation(get_class($page));
-            $page->prepareResponse($this->getRender()->getEnvironment(), $this);
+            $environment = $this->getRender()->getEnvironment();
+            $page->prepareResponse($environment, $this);
             if ($this->getRedirectUrl()) {
                 $request->setUri($this->getRedirectUrl());
                 return null;
+            }
+            if ($page->getTrackPageView()) {
+                $path = CM_Util::link($request->getPath(), $request->getQuery());
+                $this->getServiceManager()->getTrackings()->trackPageView($environment, $path);
             }
             $html = $this->_renderPage($page);
             $this->_page = $page;
@@ -156,7 +159,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
         }, function (CM_Exception $ex, array $errorOptions) use ($request) {
             $this->getRender()->getGlobalResponse()->clear();
             /** @var CM_Page_Abstract $errorPage */
-            $errorPage =  $errorOptions['errorPage'];
+            $errorPage = $errorOptions['errorPage'];
             $request->setPath($errorPage::getPath());
             $request->setQuery(array());
             return false;

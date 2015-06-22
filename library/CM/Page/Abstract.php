@@ -16,7 +16,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 
     /**
      * @param CM_Frontend_Environment $environment
-     * @param CM_Http_Response_Page        $response
+     * @param CM_Http_Response_Page   $response
      */
     public function prepareResponse(CM_Frontend_Environment $environment, CM_Http_Response_Page $response) {
     }
@@ -92,5 +92,12 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
         }
 
         throw new CM_Exception_Invalid('layout `' . $layoutName . '` is not defined in any namespace');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getTrackPageView() {
+        return true;
     }
 }

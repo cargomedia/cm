@@ -81,35 +81,64 @@ EOD;
 
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
         $this->setPageView($path);
+        if ($viewer = $environment->getViewer()) {
+            $trackingQueue = $this->_getTrackingQueue($viewer);
+            while ($tracking = $trackingQueue->pop()) {
+                $this->addEvent($tracking['eventType'], $tracking['data']);
+            }
+        }
     }
 
     /**
      * @param CM_Frontend_Environment $environment
      */
     public function trackSale(CM_Frontend_Environment $environment) {
-        $this->addEvent('purchaseSuccess', [
-            'site' => $environment->getSite()->getHost(),
-        ]);
+        if ($viewer = $environment->getViewer()) {
+            $this->_getTrackingQueue($viewer)->push([
+                'eventType' => 'purchaseSuccess',
+                'data'      => [
+                    'site' => $environment->getSite()->getHost(),
+                ]
+            ]);
+        }
     }
 
     /**
      * @param CM_Frontend_Environment $environment
      */
     public function trackSignIn(CM_Frontend_Environment $environment) {
-        $this->addEvent('login', [
-            'site' => $environment->getSite()->getHost(),
-        ]);
+        if ($viewer = $environment->getViewer()) {
+            $this->_getTrackingQueue($viewer)->push([
+                'eventType' => 'login',
+                'data'      => [
+                    'site' => $environment->getSite()->getHost(),
+                ]
+            ]);
+        }
     }
 
     /**
      * @param CM_Frontend_Environment $environment
      */
     public function trackSignUp(CM_Frontend_Environment $environment) {
-        $this->addEvent('signup', [
-            'site' => $environment->getSite()->getHost(),
-        ]);
+        if ($viewer = $environment->getViewer()) {
+            $this->_getTrackingQueue($viewer)->push([
+                'eventType' => 'signup',
+                'data'      => [
+                    'site' => $environment->getSite()->getHost(),
+                ]
+            ]);
+        }
     }
 
     public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
+    }
+
+    /**
+     * @param CM_Model_User $user
+     * @return CM_Queue
+     */
+    protected function _getTrackingQueue(CM_Model_User $user) {
+        return new CM_Queue(__METHOD__ . ':' . $user->getId());
     }
 }
