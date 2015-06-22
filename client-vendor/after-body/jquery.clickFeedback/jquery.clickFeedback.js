@@ -4,7 +4,7 @@
  */
 (function($) {
 
-  $(document).on('mousedown', '.clickFeedback', function(event) {
+  $(document).on('click', '.clickFeedback', function(event) {
     var $this = $(this);
 
     var buttonOffset = $this.offset();
