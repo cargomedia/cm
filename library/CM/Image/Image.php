@@ -86,11 +86,11 @@ class CM_Image_Image {
         $height = $this->getHeight();
 
         try {
-            $this->_invokeOnEveryFrame(function () use ($offsetX, $offsetY, $width, $height, $widthResize, $heightResize) {
+            $this->_invokeOnEveryFrame(function (Imagick $frame) use ($offsetX, $offsetY, $width, $height, $widthResize, $heightResize) {
                 if (null !== $offsetX && null !== $offsetY) {
-                    $this->_imagick->cropImage($width, $height, $offsetX, $offsetY);
+                    $frame->cropImage($width, $height, $offsetX, $offsetY);
                 }
-                $this->_imagick->resizeImage($widthResize, $heightResize, Imagick::FILTER_CATROM, 1);
+                $frame->resizeImage($widthResize, $heightResize, Imagick::FILTER_CATROM, 1);
             });
         } catch (ImagickException $e) {
             throw new CM_Exception('Error when resizing image: ' . $e->getMessage());
@@ -105,8 +105,8 @@ class CM_Image_Image {
     public function rotate($angle) {
         $angle = (int) $angle;
 
-        $this->_invokeOnEveryFrame(function () use ($angle) {
-            if (true !== $this->_imagick->rotateImage(new ImagickPixel('#00000000'), $angle)) {
+        $this->_invokeOnEveryFrame(function (Imagick $frame) use ($angle) {
+            if (true !== $frame->rotateImage(new ImagickPixel('#00000000'), $angle)) {
                 throw new CM_Exception('Cannot rotate image by `' . $angle . '` degrees');
             }
         });
@@ -290,11 +290,11 @@ class CM_Image_Image {
      */
     private function _invokeOnEveryFrame(Closure $callback) {
         if (!$this->_getAnimationRequired($this->getFormat())) {
-            $callback();
+            $callback($this->_imagick);
         } else {
             /** @var Imagick $frame */
             foreach ($this->_imagick as $frame) {
-                $callback();
+                $callback($frame);
             }
         }
     }
