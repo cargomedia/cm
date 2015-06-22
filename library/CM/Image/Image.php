@@ -116,6 +116,9 @@ class CM_Image_Image extends CM_File {
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function rotateByExif() {
         $orientation = $this->getOrientation();
         switch ($orientation) {
@@ -139,6 +142,7 @@ class CM_Image_Image extends CM_File {
                 $this->setOrientation(1);
                 break;
         }
+        return $this;
     }
 
     /**
@@ -206,7 +210,7 @@ class CM_Image_Image extends CM_File {
      * @return int
      */
     public function getOrientation() {
-        return $this->_getImagick()->getImageOrientation();
+        return $this->_imagick->getImageOrientation();
     }
 
     /**
@@ -215,9 +219,7 @@ class CM_Image_Image extends CM_File {
      * Works only on images where the meta-data already contains orientation-information
      */
     public function setOrientation($orientation) {
-        $imagick = $this->_getImagick();
-        $imagick->setImageOrientation((int) $orientation);
-        $this->_writeImagick($imagick, $this->getFormat());
+        $this->_imagick->setImageOrientation((int) $orientation);
     }
 
     public function validateImage() {

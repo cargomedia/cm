@@ -97,15 +97,14 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     }
 
     public function testRotateByExif() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/test-rotated.jpg');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
-        $this->assertSame(6, $image->getOrientation());
-        $image->rotateByExif();
+        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test-rotated.jpg');
+        $imageOriginal = new CM_Image_Image($imageFileOriginal->read());
+        $this->assertSame(6, $imageOriginal->getOrientation());
+        $image = $imageOriginal->getClone()->rotateByExif();
+        $image = new CM_Image_Image($image->getBlob());
         $this->assertSame(1, $image->getOrientation());
-        $expectedWidth = $imageOriginal->getHeight();
-        $this->assertSame($expectedWidth, $image->getWidth());
-        $expectedHeight = $imageOriginal->getWidth();
-        $this->assertSame($expectedHeight, $image->getHeight());
+        $this->assertSame($imageOriginal->getHeight(), $image->getWidth());
+        $this->assertSame($imageOriginal->getWidth(), $image->getHeight());
     }
 
     public function testStripProfileData() {
@@ -118,11 +117,11 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     }
 
     public function testSetOrientation() {
-        $imageOriginal = new CM_Image_Image(DIR_TEST_DATA . 'img/test-rotated.jpg');
-        $image = CM_Image_Image::createTmp(null, $imageOriginal->read());
+        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test-rotated.jpg');
+        $image = new CM_Image_Image($imageFileOriginal->read());
         $this->assertSame(6, $image->getOrientation());
         $image->setOrientation(2);
-        $image = new CM_Image_Image($image);
+        $image = new CM_Image_Image($image->getBlob());
         $this->assertSame(2, $image->getOrientation());
     }
 
