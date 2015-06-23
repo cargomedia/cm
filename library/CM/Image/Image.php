@@ -33,6 +33,10 @@ class CM_Image_Image {
         $this->_imagick = $imagick;
     }
 
+    public function __clone() {
+        $this->_imagick = clone $this->_imagick;
+    }
+
     /**
      * @return $this
      */
@@ -63,13 +67,6 @@ class CM_Image_Image {
     }
 
     /**
-     * @return CM_Image_Image
-     */
-    public function getClone() {
-        return clone $this;
-    }
-
-    /**
      * @return string
      * @throws CM_Exception
      */
@@ -84,6 +81,75 @@ class CM_Image_Image {
             throw new CM_Exception('Cannot get image blob: ' . $e->getMessage());
         }
         return $imageBlob;
+    }
+
+    /**
+     * @return CM_Image_Image
+     */
+    public function getClone() {
+        return clone $this;
+    }
+
+    /**
+     * @return int
+     * @throws CM_Exception_Invalid
+     */
+    public function getFormat() {
+        $imagickFormat = $this->_imagick->getImageFormat();
+        switch ($imagickFormat) {
+            case 'JPEG':
+                return self::FORMAT_JPEG;
+            case 'GIF':
+                return self::FORMAT_GIF;
+            case'PNG':
+                return self::FORMAT_PNG;
+            default:
+                throw new CM_Exception_Invalid('Unsupported format `' . $imagickFormat . '`.');
+        }
+    }
+
+    /**
+     * @param int $format
+     * @return $this
+     * @throws CM_Exception
+     */
+    public function setFormat($format) {
+        if (true !== $this->_imagick->setImageFormat($this->_getImagickFormat($format))) {
+            throw new CM_Exception('Cannot set image format `' . $format . '`');
+        }
+        $this->_animated = $this->_getAnimationRequired($format);
+        return $this;
+    }
+
+    /**
+     * @return int
+     * @throws CM_Exception
+     */
+    public function getHeight() {
+        try {
+            return $this->_imagick->getImageHeight();
+        } catch (ImagickException $e) {
+            throw new CM_Exception('Cannot detect image height: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * @return int
+     * @throws CM_Exception
+     */
+    public function getWidth() {
+        try {
+            return $this->_imagick->getImageWidth();
+        } catch (ImagickException $e) {
+            throw new CM_Exception('Cannot detect image width: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAnimated() {
+        return $this->_animated;
     }
 
     /**
@@ -143,85 +209,6 @@ class CM_Image_Image {
     }
 
     /**
-     * @param int $format
-     * @return $this
-     * @throws CM_Exception
-     */
-    public function setFormat($format) {
-        if (true !== $this->_imagick->setImageFormat($this->_getImagickFormat($format))) {
-            throw new CM_Exception('Cannot set image format `' . $format . '`');
-        }
-        $this->_animated = $this->_getAnimationRequired($format);
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function stripProfileData() {
-        $this->_imagick->stripImage();
-        return $this;
-    }
-
-    /**
-     * @return int
-     * @throws CM_Exception
-     */
-    public function getWidth() {
-        try {
-            return $this->_imagick->getImageWidth();
-        } catch (ImagickException $e) {
-            throw new CM_Exception('Cannot detect image width: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * @return int
-     * @throws CM_Exception
-     */
-    public function getHeight() {
-        try {
-            return $this->_imagick->getImageHeight();
-        } catch (ImagickException $e) {
-            throw new CM_Exception('Cannot detect image height: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * @return int
-     * @throws CM_Exception_Invalid
-     */
-    public function getFormat() {
-        $imagickFormat = $this->_imagick->getImageFormat();
-        switch ($imagickFormat) {
-            case 'JPEG':
-                return self::FORMAT_JPEG;
-            case 'GIF':
-                return self::FORMAT_GIF;
-            case'PNG':
-                return self::FORMAT_PNG;
-            default:
-                throw new CM_Exception_Invalid('Unsupported format `' . $imagickFormat . '`.');
-        }
-    }
-
-    /**
-     * @return $this
-     * @throws CM_Exception_Invalid
-     */
-    public function validateImage() {
-        $this->getFormat();
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAnimated() {
-        return $this->_animated;
-    }
-
-    /**
      * @param int $quality 1-100
      * @return $this
      * @throws CM_Exception
@@ -236,6 +223,34 @@ class CM_Image_Image {
             throw new CM_Exception('Cannot set compression quality to `' . $quality . '`.');
         }
         return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function stripProfileData() {
+        $this->_imagick->stripImage();
+        return $this;
+    }
+
+    /**
+     * @return $this
+     * @throws CM_Exception_Invalid
+     */
+    public function validateImage() {
+        $this->getFormat();
+        return $this;
+    }
+
+    /**
+     * @param int $format
+     * @return bool
+     */
+    private function _getAnimationRequired($format) {
+        if (self::FORMAT_GIF === $format && $this->isAnimated()) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -257,17 +272,6 @@ class CM_Image_Image {
     }
 
     /**
-     * @param int $format
-     * @return bool
-     */
-    private function _getAnimationRequired($format) {
-        if (self::FORMAT_GIF === $format && $this->isAnimated()) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * @param Closure $callback
      */
     private function _invokeOnEveryFrame(Closure $callback) {
@@ -278,24 +282,6 @@ class CM_Image_Image {
             foreach ($this->_imagick as $frame) {
                 $callback($frame);
             }
-        }
-    }
-
-    /**
-     * @param int $format
-     * @return string
-     * @throws CM_Exception_Invalid
-     */
-    public static function getExtensionByFormat($format) {
-        switch ($format) {
-            case self::FORMAT_JPEG:
-                return 'jpg';
-            case self::FORMAT_GIF:
-                return 'gif';
-            case self::FORMAT_PNG:
-                return 'png';
-            default:
-                throw new CM_Exception_Invalid('Invalid format `' . $format . '`.');
         }
     }
 
@@ -348,7 +334,21 @@ class CM_Image_Image {
         ];
     }
 
-    private function __clone() {
-        $this->_imagick = clone $this->_imagick;
+    /**
+     * @param int $format
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    public static function getExtensionByFormat($format) {
+        switch ($format) {
+            case self::FORMAT_JPEG:
+                return 'jpg';
+            case self::FORMAT_GIF:
+                return 'gif';
+            case self::FORMAT_PNG:
+                return 'png';
+            default:
+                throw new CM_Exception_Invalid('Invalid format `' . $format . '`.');
+        }
     }
 }
