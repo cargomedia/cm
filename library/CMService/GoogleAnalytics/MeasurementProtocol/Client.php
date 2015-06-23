@@ -58,18 +58,18 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
     /**
      * @param array $parameterList
      */
-    public function _queueHit(array $parameterList) {
-        $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob();
-        $job->queue($parameterList);
+    public function _submitHit(array $parameterList) {
+        $parameterList['v'] = 1;
+        $parameterList['tid'] = $this->getPropertyId();
+        $this->_submitRequest($parameterList);
     }
 
     /**
      * @param array $parameterList
      */
-    public function _submitHit(array $parameterList) {
-        $parameterList['v'] = 1;
-        $parameterList['tid'] = $this->getPropertyId();
-        $this->_submitRequest($parameterList);
+    protected function _queueHit(array $parameterList) {
+        $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob();
+        $job->queue($parameterList);
     }
 
     /**
