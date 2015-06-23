@@ -34,6 +34,35 @@ class CM_Image_Image {
     }
 
     /**
+     * @return $this
+     */
+    public function clearAndApplyExifRotation() {
+        $orientation = $this->_imagick->getImageOrientation();
+        switch ($orientation) {
+            case Imagick::ORIENTATION_TOPRIGHT: // flipped
+            case Imagick::ORIENTATION_UNDEFINED: // undefined
+            case Imagick::ORIENTATION_TOPLEFT: // normal
+                break;
+            case Imagick::ORIENTATION_BOTTOMLEFT: // 180° flipped
+            case Imagick::ORIENTATION_BOTTOMRIGHT: // 180°
+                $this->rotate(-180);
+                $this->_imagick->setImageOrientation(1);
+                break;
+            case Imagick::ORIENTATION_LEFTTOP: // 270° flipped
+            case Imagick::ORIENTATION_RIGHTTOP: // 270°
+                $this->rotate(-270);
+                $this->_imagick->setImageOrientation(1);
+                break;
+            case Imagick::ORIENTATION_RIGHTBOTTOM: // 90° flipped
+            case Imagick::ORIENTATION_LEFTBOTTOM: // 90°
+                $this->rotate(-90);
+                $this->_imagick->setImageOrientation(1);
+                break;
+        }
+        return $this;
+    }
+
+    /**
      * @return CM_Image_Image
      */
     public function getClone() {
@@ -110,35 +139,6 @@ class CM_Image_Image {
                 throw new CM_Exception('Cannot rotate image by `' . $angle . '` degrees');
             }
         });
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function rotateByExif() {
-        $orientation = $this->_imagick->getImageOrientation();
-        switch ($orientation) {
-            case Imagick::ORIENTATION_TOPRIGHT: // flipped
-            case Imagick::ORIENTATION_UNDEFINED: // undefined
-            case Imagick::ORIENTATION_TOPLEFT: // normal
-                break;
-            case Imagick::ORIENTATION_BOTTOMLEFT: // 180° flipped
-            case Imagick::ORIENTATION_BOTTOMRIGHT: // 180°
-                $this->rotate(-180);
-                $this->_imagick->setImageOrientation(1);
-                break;
-            case Imagick::ORIENTATION_LEFTTOP: // 270° flipped
-            case Imagick::ORIENTATION_RIGHTTOP: // 270°
-                $this->rotate(-270);
-                $this->_imagick->setImageOrientation(1);
-                break;
-            case Imagick::ORIENTATION_RIGHTBOTTOM: // 90° flipped
-            case Imagick::ORIENTATION_LEFTBOTTOM: // 90°
-                $this->rotate(-90);
-                $this->_imagick->setImageOrientation(1);
-                break;
-        }
         return $this;
     }
 

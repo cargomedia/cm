@@ -85,11 +85,11 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $this->assertEquals(148987, $imageFile->getSize(), '', 5000);
     }
 
-    public function testRotateByExif() {
+    public function testclearAndApplyExifRotation() {
         $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test-rotated.jpg');
         $imageOriginal = new CM_Image_Image($imageFileOriginal->read());
         $this->assertSame(6, $this->_getImagickObject($imageOriginal)->getImageOrientation());
-        $image = $imageOriginal->getClone()->rotateByExif();
+        $image = $imageOriginal->getClone()->clearAndApplyExifRotation();
         $image = new CM_Image_Image($image->getBlob());
         $this->assertSame(6, $this->_getImagickObject($imageOriginal)->getImageOrientation());
         $this->assertSame($imageOriginal->getHeight(), $image->getWidth());
