@@ -6,6 +6,11 @@
 
   var storage = {};
 
+  /**
+   * @param {String} name
+   * @param {Promise} promise
+   * @returns {Promise}
+   */
   function promiseThrottler(name, promise) {
     if (!storage[name]) {
       storage[name] = promise.finally(function() {
