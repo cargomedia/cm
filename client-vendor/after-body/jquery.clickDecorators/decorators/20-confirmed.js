@@ -4,7 +4,8 @@
 (function($) {
 
   /**
-   * @param $elem
+   * @param {jQuery} $elem
+   * @constructor
    */
   var Confirmation = function($elem) {
     this._$elem = $elem;
