@@ -29,7 +29,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
         $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob();
         $job->queue([
             'propertyId'    => $this->getPropertyId(),
-            'parameterList' => $parameterList,
+            'parameterList' => $this->_parseParameterList($parameterList),
         ]);
     }
 
@@ -38,7 +38,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      */
     public function trackEvent(array $parameterList) {
         $parameterList['hitType'] = 'event';
-        $this->trackHit($this->_parseParameterList($parameterList));
+        $this->trackHit($parameterList);
     }
 
     /**
