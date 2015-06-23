@@ -6,10 +6,17 @@
   var ConfirmationMonitor = function() {
   };
 
+  /**
+   * @param {jQuery} $elem
+   * @returns {Boolean}
+   */
   ConfirmationMonitor.prototype.isActivated = function($elem) {
     return $elem.hasClass('clickConfirmed-active');
   };
 
+  /**
+   * @param {jQuery} $elem
+   */
   ConfirmationMonitor.prototype.activate = function($elem) {
     $elem.addClass('confirmClick');
     $elem.addClass('clickConfirmed-active');
@@ -31,6 +38,9 @@
     }, 0);
   };
 
+  /**
+   * @param {jQuery} $elem
+   */
   ConfirmationMonitor.prototype.deactivate = function($elem) {
     $elem.removeClass('confirmClick');
     $elem.removeClass('clickConfirmed-active');
