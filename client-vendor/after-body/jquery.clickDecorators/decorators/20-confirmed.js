@@ -3,55 +3,42 @@
  */
 (function($) {
 
-  var ConfirmationMonitor = function() {
+  /**
+   * @param $elem
+   */
+  var Confirmation = function($elem) {
+    this._$elem = $elem;
   };
 
-  /**
-   * @param {jQuery} $elem
-   * @returns {Boolean}
-   */
-  ConfirmationMonitor.prototype.isActivated = function($elem) {
-    return $elem.hasClass('clickConfirmed-active');
-  };
-
-  /**
-   * @param {jQuery} $elem
-   */
-  ConfirmationMonitor.prototype.activate = function($elem) {
-    $elem.addClass('confirmClick');
-    $elem.addClass('clickConfirmed-active');
+  Confirmation.prototype.activate = function() {
+    this._$elem.addClass('confirmClick');
+    this._$elem.addClass('clickConfirmed-active');
 
     var self = this;
-    $elem.data('confirmClick-data', {
-      timeout: setTimeout(function() {
-        self.deactivate($elem);
-      }, 4000),
-      documentClickHandler: function(e) {
-        if (!$elem.length || e.target !== $elem[0] && !$.contains($elem[0], e.target)) {
-          self.deactivate($elem);
-        }
+
+    this._timeout = setTimeout(function() {
+      self.deactivate();
+    }, 4000);
+
+    this._documentClickHandler = function(e) {
+      if (!self.$elem.length || e.target !== self._$elem[0] && !$.contains(self._$elem[0], e.target)) {
+        self.deactivate();
       }
-    });
+    };
 
     setTimeout(function() {
-      $(document).on('click.clickConfirmed', $elem.data('confirmClick-data').documentClickHandler);
+      $(document).on('click.clickConfirmed', self._documentClickHandler);
     }, 0);
   };
 
-  /**
-   * @param {jQuery} $elem
-   */
-  ConfirmationMonitor.prototype.deactivate = function($elem) {
-    $elem.removeClass('confirmClick');
-    $elem.removeClass('clickConfirmed-active');
+  Confirmation.prototype.deactivate = function() {
+    this._$elem.removeClass('confirmClick');
+    this._$elem.removeClass('clickConfirmed-active');
 
-    var data = $elem.data('confirmClick-data');
-    clearTimeout(data.timeout);
-    $(document).off('click.clickConfirmed', data.documentClickHandler);
-    $elem.removeData('confirmClick-data');
+    clearTimeout(this._timeout);
+    $(document).off('click.clickConfirmed', this._documentClickHandler);
   };
 
-  var monitor = new ConfirmationMonitor();
 
   $.clickDecorators.confirmed = {
     isApplicable: function($element) {
@@ -60,9 +47,12 @@
 
     before: function(event) {
       var $this = $(this);
+      var confirmation = $this.data('confirmClick-data');
 
-      if (!monitor.isActivated($this)) {
-        monitor.activate($this);
+      if (!confirmation) {
+        confirmation = new Confirmation($this);
+        $this.data('confirmClick-data', confirmation);
+        confirmation.activate();
         event.preventDefault();
         event.stopImmediatePropagation();
       }
@@ -70,9 +60,11 @@
 
     after: function(event) {
       var $this = $(this);
+      var confirmation = $this.data('confirmClick-data');
 
-      if (monitor.isActivated($this)) {
-        monitor.deactivate($this);
+      if (confirmation) {
+        confirmation.deactivate();
+        $this.removeData('confirmClick-data');
       }
     }
   };
