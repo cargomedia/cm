@@ -4,21 +4,10 @@
  */
 (function($) {
 
-  function isApplicable(elem) {
-    do {
-      if (elem.classList.contains('clickFeedback')) {
-        return true;
-      }
-      elem = elem.parentNode;
-    } while (elem.parentNode);
-    return false;
-  }
-
   document.addEventListener('click', function(event) {
-    var target = event.target;
+    var $elem = $(event.target).closest('.clickFeedback');
 
-    if (isApplicable(target)) {
-      var $elem = $(event.target);
+    if ($elem.length) {
       var buttonOffset = $elem.offset();
       var feedbackSize = 2 * Math.sqrt(Math.pow($elem.outerWidth(), 2) + Math.pow($elem.outerHeight(), 2));
 
