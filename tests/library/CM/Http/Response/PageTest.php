@@ -71,7 +71,6 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessTrackingDisabled() {
-        /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock5');
         $response->process();
         $html = $response->getContent();
@@ -82,7 +81,6 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessTrackingCanNotTrackPageView() {
-        /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock8');
         $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
         $response->process();
@@ -94,7 +92,6 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessTrackingVirtualPageView() {
-        /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock9');
         $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
         $response->process();
@@ -109,8 +106,26 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $this->assertNotContains("_kmq.push(['alias'", $html);
     }
 
+    public function testProcessTrackingVirtualPageViewWithError() {
+        CM_Config::get()->CM_Http_Response_Page->exceptionsToCatch = [
+            'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => null],
+        ];
+        $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
+        $response = CMTest_TH::createResponsePage('/mock10');
+        $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
+        $response->process();
+        $html = $response->getContent();
+
+        $this->assertContains('ga("create", "ga123"', $html);
+        $this->assertContains('ga("send", "pageview", "/v/bar")', $html);
+        $this->assertContains('var _kmq = _kmq || [];', $html);
+        $this->assertContains("var _kmk = _kmk || 'km123';", $html);
+        $clientId = CM_Http_Request_Abstract::getInstance()->getClientId();
+        $this->assertContains("_kmq.push(['identify', 'Guest {$clientId}']);", $html);
+        $this->assertNotContains("_kmq.push(['alias'", $html);
+    }
+
     public function testProcessTrackingGuest() {
-        /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock5');
         $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
         $response->process();
@@ -206,6 +221,21 @@ class CM_Page_Mock9 extends CM_Page_Abstract {
 
     public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
         return new CM_Layout_Mock();
+    }
+}
+
+class CM_Page_Mock10 extends CM_Page_Abstract {
+
+    public function getPathVirtualPageView() {
+        return '/v/bar';
+    }
+
+    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
+        return new CM_Layout_Mock();
+    }
+
+    public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
+        throw new CM_Exception_InvalidParam();
     }
 }
 

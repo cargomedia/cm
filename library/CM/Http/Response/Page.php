@@ -151,8 +151,14 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
                 return null;
             }
             if ($page->getCanTrackPageView()) {
-                $path = $page->getPathVirtualPageView();
-                if (null === $path) {
+                try {
+                    $classNameOriginal = CM_Page_Abstract::getClassnameByPath($this->getRender(), $requestOriginal->getPath());
+                    $pageParamsOriginal = CM_Params::factory($requestOriginal->getQuery(), true);
+                    $pageOriginal = CM_Page_Abstract::factory($classNameOriginal, $pageParamsOriginal);
+                    $path = $pageOriginal->getPathVirtualPageView();
+                } catch (CM_Exception $ex) {
+                }
+                if (!isset($path)) {
                     $path = CM_Util::link($requestOriginal->getPath(), $requestOriginal->getQuery());
                 }
                 $this->getRender()->getServiceManager()->getTrackings()->trackPageView($environment, $path);
