@@ -81,6 +81,18 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $this->assertNotContains("_kmq.push(['alias'", $html);
     }
 
+    public function testProcessCanNotTrackPageView() {
+        /** @var CM_Model_User $viewer */
+        $response = CMTest_TH::createResponsePage('/mock8');
+        $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
+        $response->process();
+        $html = $response->getContent();
+
+        $this->assertNotContains('ga("send", "pageview"', $html);
+        $this->assertNotContains("_kmq.push(['identify'", $html);
+        $this->assertNotContains("_kmq.push(['alias'", $html);
+    }
+
     public function testProcessTrackingGuest() {
         /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock5');
@@ -156,6 +168,17 @@ class CM_Page_Mock5 extends CM_Page_Abstract {
 
     public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
         return new CM_Layout_Mock();
+    }
+}
+
+class CM_Page_Mock8 extends CM_Page_Abstract {
+
+    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
+        return new CM_Layout_Mock();
+    }
+
+    public function getCanTrackPageView() {
+        return false;
     }
 }
 

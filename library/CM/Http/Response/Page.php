@@ -148,9 +148,9 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
                 $request->setUri($this->getRedirectUrl());
                 return null;
             }
-            if ($page->getTrackPageView()) {
+            if ($page->getCanTrackPageView()) {
                 $path = CM_Util::link($request->getPath(), $request->getQuery());
-                $this->getServiceManager()->getTrackings()->trackPageView($environment, $path);
+                $this->getRender()->getServiceManager()->getTrackings()->trackPageView($environment, $path);
             }
             $html = $this->_renderPage($page);
             $this->_page = $page;

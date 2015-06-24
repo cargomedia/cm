@@ -2,6 +2,12 @@
 
 class CM_Page_AbstractTest extends CMTest_TestCase {
 
+    public function testGetCanTrackPageView() {
+        $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Test_Page_GetCanTrackPageView', false);
+        /** @var CM_Page_Abstract $page */
+        $this->assertSame(true, $page->getCanTrackPageView());
+    }
+
     public function testGetClassnameByPath() {
         $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getModules'))->getMock();
         $site->expects($this->any())->method('getModules')->will($this->returnValue(array('Foo', 'Bar')));

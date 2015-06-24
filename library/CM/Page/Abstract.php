@@ -25,6 +25,13 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
     }
 
     /**
+     * @return bool
+     */
+    public function getCanTrackPageView() {
+        return true;
+    }
+
+    /**
      * @param CM_Frontend_Render $render
      * @param string             $path
      * @throws CM_Exception_Invalid
@@ -92,12 +99,5 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
         }
 
         throw new CM_Exception_Invalid('layout `' . $layoutName . '` is not defined in any namespace');
-    }
-
-    /**
-     * @return bool
-     */
-    public function getTrackPageView() {
-        return true;
     }
 }
