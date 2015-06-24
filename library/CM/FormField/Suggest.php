@@ -21,7 +21,7 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
     }
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {
-        $values = explode(',', $userInput);
+        $values = explode('--SELECT2SEPARATOR--', $userInput);
         $values = array_unique($values);
         if ($this->_options['cardinality'] && count($values) > $this->_options['cardinality']) {
             throw new CM_Exception_FormFieldValidation('Too many elements.');

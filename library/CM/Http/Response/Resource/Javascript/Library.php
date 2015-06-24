@@ -4,13 +4,7 @@ class CM_Http_Response_Resource_Javascript_Library extends CM_Http_Response_Reso
 
     protected function _process() {
         if ($this->getRequest()->getPath() === '/library.js') {
-            $query = $this->getRequest()->getQuery();
-            $skipLibraries = !empty($query['debug']);
-            if ($skipLibraries) {
-                $this->_setAsset(new CM_Asset_Javascript_Internal($this->getSite()));
-            } else {
-                $this->_setAsset(new CM_Asset_Javascript_Library($this->getSite()));
-            }
+            $this->_setAsset(new CM_Asset_Javascript_Library($this->getSite()));
             return;
         }
         if ($this->getRequest()->getPathPart(0) === 'translations') {
