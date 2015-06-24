@@ -4,10 +4,6 @@
 (function($) {
 
   $.clickDecorators.spinner = {
-    isApplicable: function($element) {
-      return $element.data('click-spinner');
-    },
-
     after: function(event, returnValue) {
       if (returnValue && returnValue instanceof Promise && returnValue.isPending()) {
         var $inputTarget = $(event.currentTarget).closest('[data-click-spinner]');

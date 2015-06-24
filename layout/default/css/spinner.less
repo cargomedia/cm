@@ -37,13 +37,9 @@
   position: relative;
 
   &.hasSpinner {
-    > *:not(.spinner):not(.clickFeedback-ripple) {
-      opacity: 0.1;
-      transition: 200ms;
-    }
-
     .spinner {
       .spinner-expanded;
+      background-color: fadeout(@colorBg, 30);
     }
   }
 }

@@ -46,14 +46,14 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
                 'label'        => $render->getTranslation('.pagination.first'),
                 'icon'         => 'arrow-first',
                 'iconPosition' => 'left',
-                'class'        => 'pagingFirst clickFeedback',
+                'class'        => 'pagingFirst',
             ], $template);
         }
         $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $paging->getPage() - 1, [
             'label'        => $render->getTranslation('.pagination.previous'),
             'icon'         => 'arrow-left',
             'iconPosition' => 'left',
-            'class'        => 'pagingPrevious clickFeedback',
+            'class'        => 'pagingPrevious',
         ], $template);
     }
 
@@ -64,7 +64,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
         } else {
             $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $p, [
                 'label' => $labelNumber,
-                'class' => 'pagingNumber clickFeedback',
+                'class' => 'pagingNumber',
             ], $template);
         }
     }
@@ -74,14 +74,14 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
             'label'        => $render->getTranslation('.pagination.next'),
             'icon'         => 'arrow-right',
             'iconPosition' => 'right',
-            'class'        => 'pagingNext clickFeedback',
+            'class'        => 'pagingNext',
         ], $template);
         if ($pageMax < $paging->getPageCount()) {
             $html .= _smarty_function_paging_link($render, $urlPage, $urlParams, $component, $paging->getPageCount(), [
                 'label'        => $render->getTranslation('.pagination.last'),
                 'icon'         => 'arrow-last',
                 'iconPosition' => 'right',
-                'class'        => 'pagingLast clickFeedback',
+                'class'        => 'pagingLast',
             ], $template);
         }
     }

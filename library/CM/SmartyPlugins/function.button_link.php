@@ -41,7 +41,7 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
     unset($params['id']);
 
     $theme = isset($params['theme']) ? (string) $params['theme'] : 'default';
-    $class = 'button ' . 'button-' . $theme . ' clickFeedback' . ' ';
+    $class = 'button ' . 'button-' . $theme . ' ';
     if (isset($params['class'])) {
         $class .= $params['class'];
     }
