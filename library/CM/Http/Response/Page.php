@@ -135,7 +135,10 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
      */
     private function _processPage(CM_Http_Request_Abstract $request) {
         return $this->_runWithCatching(function () use ($request) {
-            $pathTracking = CM_Util::link($request->getPath(), $request->getQuery());
+            $hasPathTracking = null !== $this->_pathTracking;
+            if (!$hasPathTracking) {
+                $this->_pathTracking = CM_Util::link($request->getPath(), $request->getQuery());
+            }
             $this->getSite()->rewrite($request);
             $pageParams = CM_Params::factory($request->getQuery(), true);
 
@@ -145,8 +148,11 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             } catch (CM_Exception $ex) {
                 throw new CM_Exception_Nonexistent('Cannot load page `' . $request->getPath() . '`: ' . $ex->getMessage());
             }
-            if (null === $this->_pathTracking) {
-                $this->_pathTracking = $page->getPathVirtualPageView() ?: $pathTracking;
+            if (!$hasPathTracking) {
+                $pathVirtualPageView = $page->getPathVirtualPageView();
+                if (null !== $pathVirtualPageView) {
+                    $this->_pathTracking = $pathVirtualPageView;
+                }
             }
             $this->_setStringRepresentation(get_class($page));
             $environment = $this->getRender()->getEnvironment();
