@@ -113,24 +113,28 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     protected function _processPageLoop(CM_Http_Request_Abstract $request) {
         $count = 0;
         $paths = array($request->getPath());
-        while (false === ($html = $this->_processPage($request))) {
+        $requestInitial = clone $request;
+        $requestErrorTracking = null;
+        while (false === ($html = $this->_processPage($request, $requestErrorTracking))) {
             $paths[] = $request->getPath();
             if ($count++ > 10) {
                 throw new CM_Exception_Invalid('Page dispatch loop detected (' . implode(' -> ', $paths) . ').');
             }
+            $requestErrorTracking = $requestInitial;
         }
         return $html;
     }
 
     /**
-     * @param CM_Http_Request_Abstract $request
+     * @param CM_Http_Request_Abstract      $request
+     * @param CM_Http_Request_Abstract|null $requestErrorTracking
      * @throws CM_Exception_Nonexistent
      * @throws CM_Exception
      * @throws CM_Exception_Nonexistent
      * @return string|null|boolean
      */
-    private function _processPage(CM_Http_Request_Abstract $request) {
-        return $this->_runWithCatching(function () use ($request) {
+    private function _processPage(CM_Http_Request_Abstract $request, CM_Http_Request_Abstract $requestErrorTracking = null) {
+        return $this->_runWithCatching(function () use ($request, $requestErrorTracking) {
             $this->getSite()->rewrite($request);
             $pageParams = CM_Params::factory($request->getQuery(), true);
 
@@ -149,7 +153,8 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
                 return null;
             }
             if ($page->getCanTrackPageView()) {
-                $path = CM_Util::link($request->getPath(), $request->getQuery());
+                $requestTracking = $requestErrorTracking ?: $request;
+                $path = CM_Util::link($requestTracking->getPath(), $requestTracking->getQuery());
                 $this->getRender()->getServiceManager()->getTrackings()->trackPageView($environment, $path);
             }
             $html = $this->_renderPage($page);
