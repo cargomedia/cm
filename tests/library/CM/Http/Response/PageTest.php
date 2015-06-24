@@ -93,6 +93,22 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $this->assertNotContains("_kmq.push(['alias'", $html);
     }
 
+    public function testProcessVirtualPath() {
+        /** @var CM_Model_User $viewer */
+        $response = CMTest_TH::createResponsePage('/mock9');
+        $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
+        $response->process();
+        $html = $response->getContent();
+
+        $this->assertContains('ga("create", "ga123"', $html);
+        $this->assertContains('ga("send", "pageview", "/v/foo")', $html);
+        $this->assertContains('var _kmq = _kmq || [];', $html);
+        $this->assertContains("var _kmk = _kmk || 'km123';", $html);
+        $clientId = CM_Http_Request_Abstract::getInstance()->getClientId();
+        $this->assertContains("_kmq.push(['identify', 'Guest {$clientId}']);", $html);
+        $this->assertNotContains("_kmq.push(['alias'", $html);
+    }
+
     public function testProcessTrackingGuest() {
         /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock5');
@@ -173,12 +189,23 @@ class CM_Page_Mock5 extends CM_Page_Abstract {
 
 class CM_Page_Mock8 extends CM_Page_Abstract {
 
+    public function getCanTrackPageView() {
+        return false;
+    }
+
     public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
         return new CM_Layout_Mock();
     }
+}
 
-    public function getCanTrackPageView() {
-        return false;
+class CM_Page_Mock9 extends CM_Page_Abstract {
+
+    public function getPathTracking() {
+        return '/v/foo';
+    }
+
+    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
+        return new CM_Layout_Mock();
     }
 }
 
