@@ -187,31 +187,48 @@ class CM_Image_Image {
      * @throws CM_Exception
      */
     public function resize($widthMax, $heightMax, $square = null) {
-        $square = isset($square) ? (bool) $square : false;
+        $square = (boolean) $square;
 
-        $dimensions = self::calculateDimensions($this->getWidth(), $this->getHeight(), $widthMax, $heightMax, $square);
-        $this->resizeSpecific($dimensions['width'], $dimensions['height'], $dimensions['offsetX'], $dimensions['offsetY']);
+        $width = $this->getWidth();
+        $height = $this->getHeight();
+        $dimensions = self::calculateDimensions($width, $height, $widthMax, $heightMax, $square);
+        $widthResize = $dimensions['width'];
+        $heightResize = $dimensions['height'];
+
+        if ($square) {
+            $widthCrop = $width;
+            $heightCrop = $height;
+            $offsetX = 0;
+            $offsetY = 0;
+            if ($width > $height) {
+                $offsetX = (int) floor(($width - $height) / 2);
+                $widthCrop = $height;
+            } elseif ($width < $height) {
+                $offsetY = (int) floor(($height - $width) / 2);
+                $heightCrop = $width;
+            }
+            if ($offsetX || $offsetY) {
+                $this->crop($widthCrop, $heightCrop, $offsetX, $offsetY);
+            }
+        }
+
+        $this->resizeSpecific($widthResize, $heightResize);
         return $this;
     }
 
     /**
-     * @param int      $widthResize
-     * @param int      $heightResize
-     * @param int|null $offsetX
-     * @param int|null $offsetY
+     * @param int $widthResize
+     * @param int $heightResize
      * @return $this
      * @throws CM_Exception
      * @throws CM_Exception_Invalid
      */
-    public function resizeSpecific($widthResize, $heightResize, $offsetX = null, $offsetY = null) {
+    public function resizeSpecific($widthResize, $heightResize) {
         $width = $this->getWidth();
         $height = $this->getHeight();
 
         try {
-            $this->_invokeOnEveryFrame(function (Imagick $frame) use ($offsetX, $offsetY, $width, $height, $widthResize, $heightResize) {
-                if (null !== $offsetX && null !== $offsetY) {
-                    $frame->cropImage($width, $height, $offsetX, $offsetY);
-                }
+            $this->_invokeOnEveryFrame(function (Imagick $frame) use ($width, $height, $widthResize, $heightResize) {
                 $frame->resizeImage($widthResize, $heightResize, Imagick::FILTER_CATROM, 1);
             });
         } catch (ImagickException $e) {
@@ -318,22 +335,11 @@ class CM_Image_Image {
      * @param int  $widthMax
      * @param int  $heightMax
      * @param bool $square
-     * @return array
+     * @return array ['width' => int, 'height' => int]
      */
     public static function calculateDimensions($width, $height, $widthMax, $heightMax, $square) {
-        $offsetX = null;
-        $offsetY = null;
-
         if ($square) {
-            if ($width > $height) {
-                $offsetX = floor(($width - $height) / 2);
-                $offsetY = 0;
-                $width = $height;
-            } elseif ($width < $height) {
-                $offsetX = 0;
-                $offsetY = floor(($height - $width) / 2);
-                $height = $width;
-            }
+            $width = $height = min($width, $height);
         }
 
         if (($width > $widthMax) || ($height > $heightMax)) {
@@ -354,10 +360,8 @@ class CM_Image_Image {
         $widthResize = max($widthResize, 1);
 
         return [
-            'offsetX' => (int) $offsetX,
-            'offsetY' => (int) $offsetY,
-            'width'   => (int) $widthResize,
-            'height'  => (int) $heightResize,
+            'width'  => (int) $widthResize,
+            'height' => (int) $heightResize,
         ];
     }
 

@@ -240,11 +240,9 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $image->mockMethod('getHeight')->set(150);
 
         $resizeSpecificMethod = $image->mockMethod('resizeSpecific')
-            ->set(function ($width, $height, $offsetX, $offsetY) {
+            ->set(function ($width, $height) {
                 $this->assertSame(250, $width);
                 $this->assertSame(150, $height);
-                $this->assertSame(0, $offsetX);
-                $this->assertSame(0, $offsetY);
             });
         /** @var CM_Image_Image $image */
         $image->resize(500, 400, false);
@@ -264,12 +262,70 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     }
 
     public function testResizeSquare() {
-        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
-        $image = new CM_Image_Image($imageFileOriginal->read());
+        // width > height
+        $image = $this->mockClass('CM_Image_Image')->newInstanceWithoutConstructor();
+        $image->mockMethod('getWidth')->set(250);
+        $image->mockMethod('getHeight')->set(150);
 
-        $image->resize(50, 50, true);
-        $this->assertSame(50, $image->getWidth());
-        $this->assertSame(50, $image->getHeight());
+        $resizeSpecificMethod = $image->mockMethod('resizeSpecific')
+            ->set(function ($width, $height) {
+                $this->assertSame(150, $width);
+                $this->assertSame(150, $height);
+            });
+        $cropMethod = $image->mockMethod('crop')
+            ->set(function($width, $height, $offsetX, $offsetY) {
+                $this->assertSame(150, $width);
+                $this->assertSame(150, $height);
+                $this->assertSame(50, $offsetX);
+                $this->assertSame(0, $offsetY);
+            });
+        /** @var CM_Image_Image $image */
+        $image->resize(500, 400, true);
+        $this->assertSame(1, $resizeSpecificMethod->getCallCount());
+        $this->assertSame(1, $cropMethod->getCallCount());
+
+        // height > width
+        /** @var \Mocka\ClassMock $image */
+        $image = $this->mockClass('CM_Image_Image')->newInstanceWithoutConstructor();
+        $image->mockMethod('getWidth')->set(150);
+        $image->mockMethod('getHeight')->set(250);
+
+        $resizeSpecificMethod = $image->mockMethod('resizeSpecific')
+            ->set(function ($width, $height) {
+                $this->assertSame(150, $width);
+                $this->assertSame(150, $height);
+            });
+        $cropMethod = $image->mockMethod('crop')
+            ->set(function($width, $height, $offsetX, $offsetY) {
+                $this->assertSame(150, $width);
+                $this->assertSame(150, $height);
+                $this->assertSame(0, $offsetX);
+                $this->assertSame(50, $offsetY);
+            });
+        /** @var CM_Image_Image $image */
+        $image->resize(500, 400, true);
+        $this->assertSame(1, $resizeSpecificMethod->getCallCount());
+        $this->assertSame(1, $cropMethod->getCallCount());
+
+        // height == width
+        /** @var \Mocka\ClassMock $image */
+        $image = $this->mockClass('CM_Image_Image')->newInstanceWithoutConstructor();
+        $image->mockMethod('getWidth')->set(150);
+        $image->mockMethod('getHeight')->set(150);
+
+        $resizeSpecificMethod = $image->mockMethod('resizeSpecific')
+            ->set(function ($width, $height) {
+                $this->assertSame(150, $width);
+                $this->assertSame(150, $height);
+            });
+        $cropMethod = $image->mockMethod('crop')
+            ->set(function($width, $height, $offsetX, $offsetY) {
+            });
+        /** @var CM_Image_Image $image */
+        $image->resize(500, 400, true);
+        $this->assertSame(1, $resizeSpecificMethod->getCallCount());
+        $this->assertSame(0, $cropMethod->getCallCount());
+
     }
 
     public function testResizeSquareNoBlowup() {
@@ -354,8 +410,6 @@ class CM_Image_ImageTest extends CMTest_TestCase {
 
         $this->assertEquals( 500, $dimensions['width']);
         $this->assertEquals( 400, $dimensions['height']);
-        $this->assertEquals( 0, $dimensions['offsetX']);
-        $this->assertEquals( 0, $dimensions['offsetY']);
     }
 
     public function testCalculateDimensionsSquare() {
@@ -363,8 +417,6 @@ class CM_Image_ImageTest extends CMTest_TestCase {
 
         $this->assertEquals( 500, $dimensions['width']);
         $this->assertEquals( 500, $dimensions['height']);
-        $this->assertEquals( 200, $dimensions['offsetX']);
-        $this->assertEquals( 0, $dimensions['offsetY']);
     }
 
     public function testCalculateDimensionsLower() {
@@ -372,8 +424,6 @@ class CM_Image_ImageTest extends CMTest_TestCase {
 
         $this->assertEquals( 100, $dimensions['width']);
         $this->assertEquals( 200, $dimensions['height']);
-        $this->assertEquals( 0, $dimensions['offsetX']);
-        $this->assertEquals( 0, $dimensions['offsetY']);
     }
 
     /**
