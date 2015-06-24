@@ -15,7 +15,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
     /**
      * @return string|null
      */
-    public function getPathTracking() {
+    public function getPathVirtualPageView() {
         return null;
     }
 

@@ -151,7 +151,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
                 return null;
             }
             if ($page->getCanTrackPageView()) {
-                $path = $page->getPathTracking();
+                $path = $page->getPathVirtualPageView();
                 if (null === $path) {
                     $path = CM_Util::link($requestOriginal->getPath(), $requestOriginal->getQuery());
                 }

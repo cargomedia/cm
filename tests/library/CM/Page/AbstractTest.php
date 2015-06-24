@@ -8,10 +8,10 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
         $this->assertSame(true, $page->getCanTrackPageView());
     }
 
-    public function testGetPathTracking() {
-        $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Test_Page_GetPathTracking', false);
+    public function testGetPathVirtualPageView() {
+        $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Test_Page_GetPathVirtualPageView', false);
         /** @var CM_Page_Abstract $page */
-        $this->assertSame(null, $page->getPathTracking());
+        $this->assertSame(null, $page->getPathVirtualPageView());
     }
 
     public function testGetClassnameByPath() {

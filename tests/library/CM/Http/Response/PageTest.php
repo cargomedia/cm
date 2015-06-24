@@ -81,7 +81,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $this->assertNotContains("_kmq.push(['alias'", $html);
     }
 
-    public function testProcessCanNotTrackPageView() {
+    public function testProcessTrackingCanNotTrackPageView() {
         /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock8');
         $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
@@ -93,7 +93,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $this->assertNotContains("_kmq.push(['alias'", $html);
     }
 
-    public function testProcessVirtualPath() {
+    public function testProcessTrackingVirtualPageView() {
         /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock9');
         $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
@@ -200,7 +200,7 @@ class CM_Page_Mock8 extends CM_Page_Abstract {
 
 class CM_Page_Mock9 extends CM_Page_Abstract {
 
-    public function getPathTracking() {
+    public function getPathVirtualPageView() {
         return '/v/foo';
     }
 
