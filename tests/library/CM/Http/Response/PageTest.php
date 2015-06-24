@@ -6,6 +6,12 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         CMTest_TH::clearEnv();
     }
 
+    public function testProcessRedirect() {
+        $response = CMTest_TH::createResponsePage('/mock11?count=3');
+        $response->process();
+        $this->assertContains('Location: ' . $response->getSite()->getUrl() . '/mock11?count=2', $response->getHeaders());
+    }
+
     public function testProcessLanguageRedirect() {
         CMTest_TH::createLanguage('en');
         $user = CMTest_TH::createUser();
@@ -82,7 +88,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
 
     public function testProcessTrackingCanNotTrackPageView() {
         $response = CMTest_TH::createResponsePage('/mock8');
-        $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
+        $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
         $response->process();
         $html = $response->getContent();
 
@@ -93,7 +99,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
 
     public function testProcessTrackingVirtualPageView() {
         $response = CMTest_TH::createResponsePage('/mock9');
-        $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
+        $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
         $response->process();
         $html = $response->getContent();
 
@@ -112,7 +118,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         ];
         $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
         $response = CMTest_TH::createResponsePage('/mock10');
-        $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
+        $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
         $response->process();
         $html = $response->getContent();
 
@@ -127,7 +133,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
 
     public function testProcessTrackingGuest() {
         $response = CMTest_TH::createResponsePage('/mock5');
-        $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
+        $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
         $response->process();
         $html = $response->getContent();
 
@@ -147,7 +153,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $viewer->expects($this->any())->method('getLanguage')->will($this->returnValue(null));
         /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock5', null, $viewer);
-        $response->getRender()->setServiceManager($this->_getServiceManager('ga123', 'km123'));
+        $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
         $response->process();
         $html = $response->getContent();
 
@@ -167,14 +173,15 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         ];
         $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
         $request = CMTest_TH::createResponsePage('/example')->getRequest();
+
+        /** @var CM_Http_Response_Page|\Mocka\AbstractClassTrait $response */
         $response = $this->mockObject('CM_Http_Response_Page', [$request, CMTest_TH::getServiceManager()]);
-        $response->mockMethod('_renderPage')->set(function () {
-            static $counter = 0;
-            if ($counter++ === 0) { // don't throw when rendering the error-page the request was redirected to
+        $response->mockMethod('_renderPage')->set(function (CM_Page_Abstract $page) {
+            if ($page instanceof CM_Page_Example) {
                 throw new CM_Exception_InvalidParam();
             }
+            return '<html>Error</html>';
         });
-        /** @var CM_Http_Response_Page $response */
 
         $this->assertSame('/example', $response->getRequest()->getPath());
         $response->process();
@@ -236,6 +243,20 @@ class CM_Page_Mock10 extends CM_Page_Abstract {
 
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         throw new CM_Exception_InvalidParam();
+    }
+}
+
+class CM_Page_Mock11 extends CM_Page_Abstract {
+
+    public function prepareResponse(CM_Frontend_Environment $environment, CM_Http_Response_Page $response) {
+        $count = $this->_params->getInt('count');
+        if ($count > 0) {
+            $response->redirect($this, ['count' => --$count]);
+        }
+    }
+
+    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
+        return new CM_Layout_Mock();
     }
 }
 
