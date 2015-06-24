@@ -4,7 +4,7 @@
  */
 (function($) {
 
-  document.addEventListener('click', function(event) {
+  document.addEventListener('mousedown', function(event) {
     var $elem = $(event.target).closest('.clickFeedback');
 
     if ($elem.length) {
