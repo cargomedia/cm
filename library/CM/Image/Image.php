@@ -67,6 +67,33 @@ class CM_Image_Image {
     }
 
     /**
+     * @param int      $width
+     * @param int      $height
+     * @param int|null $offsetX
+     * @param int|null $offsetY
+     * @return $this
+     * @throws CM_Exception
+     */
+    public function crop($width, $height, $offsetX = null, $offsetY = null) {
+        $width = (int) $width;
+        $height = (int) $height;
+        $offsetX = (null !== $offsetX) ? (int) $offsetX : null;
+        $offsetY = (null !== $offsetY) ? (int) $offsetY : null;
+
+        if (null === $offsetX) {
+            $offsetX = ($this->getWidth() - $width) / 2;
+        }
+        if (null === $offsetY) {
+            $offsetY = ($this->getHeight() - $height) / 2;
+        }
+
+        $this->_invokeOnEveryFrame(function (Imagick $frame) use ($width, $height, $offsetX, $offsetY) {
+            $frame->cropImage($width, $height, $offsetX, $offsetY);
+        });
+        return $this;
+    }
+
+    /**
      * @return string
      * @throws CM_Exception
      */

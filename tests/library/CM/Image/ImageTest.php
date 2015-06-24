@@ -2,6 +2,26 @@
 
 class CM_Image_ImageTest extends CMTest_TestCase {
 
+    public function testCrop() {
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $imageOriginal = new CM_Image_Image($imageFile->read());
+
+        // centered cutout
+        $image = $imageOriginal->getClone()->crop(100, 50);
+        $this->assertSame(100, $image->getWidth());
+        $this->assertSame(50, $image->getHeight());
+
+        // cutout that exceeds the bottom right corner
+        $image = $imageOriginal->getClone()->crop(100, 100, $imageOriginal->getWidth() - 60, $imageOriginal->getHeight() - 30);
+        $this->assertSame(60, $image->getWidth());
+        $this->assertSame(30, $image->getHeight());
+
+        // cutout that exceeds the top left corner
+        $image = $imageOriginal->getClone()->crop(100, 100, -30, -40);
+        $this->assertSame(70, $image->getWidth());
+        $this->assertSame(60, $image->getHeight());
+    }
+
     public function testValidateImage() {
         $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
         $image = new CM_Image_Image($imageFile->read());
