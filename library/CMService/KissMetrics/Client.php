@@ -178,7 +178,9 @@ EOF;
      */
     protected function _addIdentity($identity) {
         $identity = (string) $identity;
-        $this->_identityList[] = $identity;
+        if (!in_array($identity, $this->_identityList, true)) {
+            $this->_identityList[] = $identity;
+        }
     }
 
     /**
