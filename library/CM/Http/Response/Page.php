@@ -11,6 +11,9 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     /** @var string|null */
     private $_redirectUrl;
 
+    /** @var string|null */
+    private $_pathTracking;
+
     public function __construct(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
         $this->_request = clone $request;
         $this->_site = CM_Site_Abstract::findByRequest($this->_request);
@@ -112,9 +115,9 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
      */
     protected function _processPageLoop(CM_Http_Request_Abstract $request) {
         $count = 0;
+        $this->_pathTracking = null;
         $paths = array($request->getPath());
-        $requestOriginal = clone $request;
-        while (false === ($html = $this->_processPage($request, $requestOriginal))) {
+        while (false === ($html = $this->_processPage($request))) {
             $paths[] = $request->getPath();
             if ($count++ > 10) {
                 throw new CM_Exception_Invalid('Page dispatch loop detected (' . implode(' -> ', $paths) . ').');
@@ -125,14 +128,14 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
 
     /**
      * @param CM_Http_Request_Abstract $request
-     * @param CM_Http_Request_Abstract $requestOriginal
      * @throws CM_Exception_Nonexistent
      * @throws CM_Exception
      * @throws CM_Exception_Nonexistent
      * @return string|null|boolean
      */
-    private function _processPage(CM_Http_Request_Abstract $request, CM_Http_Request_Abstract $requestOriginal) {
-        return $this->_runWithCatching(function () use ($request, $requestOriginal) {
+    private function _processPage(CM_Http_Request_Abstract $request) {
+        return $this->_runWithCatching(function () use ($request) {
+            $pathTracking = CM_Util::link($request->getPath(), $request->getQuery());
             $this->getSite()->rewrite($request);
             $pageParams = CM_Params::factory($request->getQuery(), true);
 
@@ -142,7 +145,9 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             } catch (CM_Exception $ex) {
                 throw new CM_Exception_Nonexistent('Cannot load page `' . $request->getPath() . '`: ' . $ex->getMessage());
             }
-
+            if (null === $this->_pathTracking) {
+                $this->_pathTracking = $page->getPathVirtualPageView() ?: $pathTracking;
+            }
             $this->_setStringRepresentation(get_class($page));
             $environment = $this->getRender()->getEnvironment();
             $page->prepareResponse($environment, $this);
@@ -151,17 +156,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
                 return null;
             }
             if ($page->getCanTrackPageView()) {
-                try {
-                    $classNameOriginal = CM_Page_Abstract::getClassnameByPath($this->getRender(), $requestOriginal->getPath());
-                    $pageParamsOriginal = CM_Params::factory($requestOriginal->getQuery(), true);
-                    $pageOriginal = CM_Page_Abstract::factory($classNameOriginal, $pageParamsOriginal);
-                    $path = $pageOriginal->getPathVirtualPageView();
-                } catch (CM_Exception $ex) {
-                }
-                if (!isset($path)) {
-                    $path = CM_Util::link($requestOriginal->getPath(), $requestOriginal->getQuery());
-                }
-                $this->getRender()->getServiceManager()->getTrackings()->trackPageView($environment, $path);
+                $this->getRender()->getServiceManager()->getTrackings()->trackPageView($environment, $this->_pathTracking);
             }
             $html = $this->_renderPage($page);
             $this->_page = $page;
