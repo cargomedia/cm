@@ -195,21 +195,9 @@ class CM_Image_Image {
         $widthResize = $dimensions['width'];
         $heightResize = $dimensions['height'];
 
-        if ($square) {
-            $widthCrop = $width;
-            $heightCrop = $height;
-            $offsetX = 0;
-            $offsetY = 0;
-            if ($width > $height) {
-                $offsetX = (int) floor(($width - $height) / 2);
-                $widthCrop = $height;
-            } elseif ($width < $height) {
-                $offsetY = (int) floor(($height - $width) / 2);
-                $heightCrop = $width;
-            }
-            if ($offsetX || $offsetY) {
-                $this->crop($widthCrop, $heightCrop, $offsetX, $offsetY);
-            }
+        if ($square && ($width !== $height )) {
+            $cropSize = min($width, $height);
+            $this->crop($cropSize, $cropSize);
         }
 
         $this->resizeSpecific($widthResize, $heightResize);

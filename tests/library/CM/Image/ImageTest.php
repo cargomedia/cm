@@ -273,11 +273,11 @@ class CM_Image_ImageTest extends CMTest_TestCase {
                 $this->assertSame(150, $height);
             });
         $cropMethod = $image->mockMethod('crop')
-            ->set(function($width, $height, $offsetX, $offsetY) {
+            ->set(function($width, $height, $offsetX = null, $offsetY = null) {
                 $this->assertSame(150, $width);
                 $this->assertSame(150, $height);
-                $this->assertSame(50, $offsetX);
-                $this->assertSame(0, $offsetY);
+                $this->assertSame(null, $offsetX);
+                $this->assertSame(null, $offsetY);
             });
         /** @var CM_Image_Image $image */
         $image->resize(500, 400, true);
@@ -296,11 +296,11 @@ class CM_Image_ImageTest extends CMTest_TestCase {
                 $this->assertSame(150, $height);
             });
         $cropMethod = $image->mockMethod('crop')
-            ->set(function($width, $height, $offsetX, $offsetY) {
+            ->set(function($width, $height, $offsetX = null, $offsetY = null) {
                 $this->assertSame(150, $width);
                 $this->assertSame(150, $height);
-                $this->assertSame(0, $offsetX);
-                $this->assertSame(50, $offsetY);
+                $this->assertSame(null, $offsetX);
+                $this->assertSame(null, $offsetY);
             });
         /** @var CM_Image_Image $image */
         $image->resize(500, 400, true);
@@ -319,7 +319,7 @@ class CM_Image_ImageTest extends CMTest_TestCase {
                 $this->assertSame(150, $height);
             });
         $cropMethod = $image->mockMethod('crop')
-            ->set(function($width, $height, $offsetX, $offsetY) {
+            ->set(function($width, $height, $offsetX = null, $offsetY = null) {
             });
         /** @var CM_Image_Image $image */
         $image->resize(500, 400, true);
