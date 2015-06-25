@@ -118,4 +118,28 @@ class CMService_Adagnit_ClientTest extends CMTest_TestCase {
         $js = $adagnit->getJs($environment);
         $this->assertContains('ADGN.track.event(ADGN.eventTypes.purchaseSuccess, {"site":"www.my-website.net"});', $js);
     }
+
+    public function testTtl() {
+        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
+        $user = CMTest_TH::createUser();
+        $environment = new CM_Frontend_Environment($site, $user);
+        $adagnit = new CMService_Adagnit_Client(1);
+        $adagnit->trackSale($environment);
+
+        $adagnit->trackPageView($environment);
+        $js = $adagnit->getJs($environment);
+        $this->assertContains('ADGN.track.event(ADGN.eventTypes.purchaseSuccess, {"site":"www.my-website.net"});', $js);
+    }
+
+    public function testTtlExpired() {
+        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
+        $user = CMTest_TH::createUser();
+        $environment = new CM_Frontend_Environment($site, $user);
+        $adagnit = new CMService_Adagnit_Client(0);
+        $adagnit->trackSale($environment);
+
+        $adagnit->trackPageView($environment);
+        $js = $adagnit->getJs($environment);
+        $this->assertNotContains('ADGN.track.event(ADGN.eventTypes.purchaseSuccess, {"site":"www.my-website.net"});', $js);
+    }
 }

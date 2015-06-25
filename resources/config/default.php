@@ -171,7 +171,9 @@ return function (CM_Config_Node $config) {
 
     $config->services['tracking-adagnit'] = [
         'class'     => 'CMService_Adagnit_Client',
-        'arguments' => [],
+        'arguments' => [
+            'ttl' => 86400,
+        ],
     ];
 
     $config->services['tracking-googleanalytics'] = array(
