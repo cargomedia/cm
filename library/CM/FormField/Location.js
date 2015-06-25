@@ -46,19 +46,21 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
     this.$('.detect-location').addClass('waiting');
 
     var self = this;
-    var deferred = $.Deferred();
-    navigator.geolocation.getCurrentPosition(deferred.resolve, deferred.reject);
 
-    deferred.then(function(position) {
-      self._lookupCoordinates(position.coords.latitude, position.coords.longitude);
-    }, function(error) {
-      cm.error.trigger('Unable to detect location: ' + error.message);
-    });
-    deferred.always(function() {
-      self.$('.detect-location').removeClass('waiting');
-    });
-
-    return deferred;
+    return new Promise(function(resolve, reject) {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    }).then(function(position) {
+        return self._lookupCoordinates(position.coords.latitude, position.coords.longitude);
+      }).then(function(data) {
+        if (data) {
+          self.setValue(data);
+        }
+      })
+      .catch(function(error) {
+        cm.error.trigger('Unable to detect location: ' + error.message);
+      }).finally(function() {
+        self.$('.detect-location').removeClass('waiting');
+      });
   },
 
   /**
@@ -66,11 +68,6 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
    * @param {Number} lon
    */
   _lookupCoordinates: function(lat, lon) {
-    this.ajax('getSuggestionByCoordinates', {lat: lat, lon: lon, levelMin: this.getOption('levelMin'), levelMax: this.getOption('levelMax')})
-      .then(function(data) {
-        if (data) {
-          this.setValue(data);
-        }
-      });
+    return this.ajax('getSuggestionByCoordinates', {lat: lat, lon: lon, levelMin: this.getOption('levelMin'), levelMax: this.getOption('levelMax')});
   }
 });
