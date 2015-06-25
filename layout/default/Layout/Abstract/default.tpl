@@ -53,15 +53,13 @@
     {resourceCss file='all.css' type="library"}
     {resourceJs file='before-body.js' type="vendor"}
     {block name='head'}{/block}
-
-    {$render->getServiceManager()->getTrackings()->getHtml($render->getEnvironment())}
   </head>
   <body id="{$viewResponse->getAutoId()}" class="{$viewResponse->getCssClasses()|implode:' '}">
+    {$render->getServiceManager()->getTrackings()->getHtml($render->getEnvironment())}
     {if CM_Http_Request_Abstract::hasInstance() && !CM_Http_Request_Abstract::getInstance()->isSupported()}
       <div id="browserNotSupported">
         <h2><span class="icon-warning"></span> {translate 'Your browser is no longer supported.'}</h2>
         <p>{translate 'We recommend upgrading to the latest Internet Explorer, Google Chrome, Firefox, or Opera. Click here for <a href="{$url}">more information</a>.' url='http://whatbrowser.org'}
-        <p>{translate 'If you are using IE 9 or later, make sure you <a href="{$url}">turn off "Compatibility View"</a>.' url='http://windows.microsoft.com/en-us/internet-explorer/use-compatibility-view'}</p>
       </div>
     {/if}
 

@@ -77,6 +77,13 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     }
 
     /**
+     * @return string[]
+     */
+    public function getParamNames() {
+        return array_keys($this->_params);
+    }
+
+    /**
      * @param string      $key
      * @param string|null $default
      * @return float
@@ -225,7 +232,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
                         throw new CM_Exception_InvalidParam("Not enough parameters", ['parameters' => $param, 'class' => $className]);
                     }
                 }
-                
+
                 return $reflectionClass->newInstanceArgs($arguments);
             };
         }

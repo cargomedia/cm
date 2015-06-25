@@ -76,7 +76,7 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @return jqXHR
+   * @return Promise
    */
   reload: function(params) {
     return this.ajaxModal('reloadComponent', params);
@@ -86,7 +86,7 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
    * @param {String} className
    * @param {Object|Null} [params]
    * @param {Object|Null} [options]
-   * @return jqXHR
+   * @return Promise
    */
   replaceWithComponent: function(className, params, options) {
     if (!this.getParent()) {
@@ -94,11 +94,12 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
     }
     var handler = this;
     options = _.defaults(options || {}, {
-      'success': function() {
-        handler.replaceWithHtml(this.$el);
-      },
       'modal': false
     });
-    return this.getParent().loadComponent(className, params, options);
+    return this.getParent().prepareComponent(className, params, options)
+      .then(function(component) {
+        component.replaceWithHtml(this.$el);
+        return component;
+      });
   }
 });

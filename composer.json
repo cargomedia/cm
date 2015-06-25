@@ -27,7 +27,11 @@
   "autoload": {
     "psr-0": {
       "CM_": "library/",
-      "CMService_": "library/",
+      "CMService_": "library/"
+    }
+  },
+  "autoload-dev": {
+    "psr-0": {
       "CMTest_": "tests/helpers/CMTest/library/"
     }
   },

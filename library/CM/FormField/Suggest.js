@@ -8,7 +8,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
   /** @type {jQuery} */
   _$input: null,
 
-  /** @type {jqXHR} */
+  /** @type {Promise} */
   _request: null,
 
   ready: function() {
@@ -19,6 +19,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 
     this._$input.removeClass('textinput');
     this._$input.select2({
+      separator: '--SELECT2SEPARATOR--',
       width: 'off',
       tags: null,
       dropdownCssClass: this.$el.attr('class'),
@@ -32,15 +33,14 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
       },
       query: function(options) {
         if (this._request) {
-          this._request.abort();
+          this._request.cancel();
         }
-        this._request = field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()}, {
-          success: function(results) {
+        this._request = field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()})
+          .then(function(results) {
             options.callback({
               results: results
             });
-          }
-        });
+          });
       },
       createSearchChoice: function(term, data) {
         if (field.getOption("enableChoiceCreate")) {
