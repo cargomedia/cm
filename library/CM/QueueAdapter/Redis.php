@@ -30,6 +30,11 @@ class CM_QueueAdapter_Redis extends CM_QueueAdapter_Abstract {
         return $value;
     }
 
+    public function setTtl($key, $ttl) {
+        $redis = $this->_getRedisClient();
+        $redis->expire($this->_getInternalKey($key), $ttl);
+    }
+
     /**
      * @param string $key
      * @return string

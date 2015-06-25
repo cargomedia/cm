@@ -64,6 +64,14 @@ class CM_Redis_Client extends CM_Class_Abstract {
 
     /**
      * @param string $key
+     * @param int    $ttl
+     */
+    public function expire($key, $ttl) {
+        $this->_redis->expire($key, $ttl);
+    }
+
+    /**
+     * @param string $key
      * @param int    $timestamp
      */
     public function expireAt($key, $timestamp) {

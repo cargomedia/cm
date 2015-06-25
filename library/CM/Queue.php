@@ -60,4 +60,11 @@ class CM_Queue {
         }
         return $value;
     }
+
+    /**
+     * @param int $ttl
+     */
+    public function setTtl($ttl) {
+        $this->_adapter->setTtl($this->getKey(), $ttl);
+    }
 }

@@ -27,4 +27,10 @@ abstract class CM_QueueAdapter_Abstract {
      * @return String[]
      */
     abstract public function popDelayed($key, $timestampMax);
+
+    /**
+     * @param string $key
+     * @param int    $ttl
+     */
+    abstract public function setTtl($key, $ttl);
 }
