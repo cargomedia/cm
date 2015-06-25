@@ -14,6 +14,7 @@
   Confirmation.prototype.activate = function() {
     this._$elem.addClass('confirmClick');
     this._$elem.addClass('clickConfirmed-active');
+    this._$elem.data('confirmClick-data', this);
 
     var self = this;
 
@@ -22,7 +23,7 @@
     }, 4000);
 
     this._documentClickHandler = function(e) {
-      if (!self.$elem.length || e.target !== self._$elem[0] && !$.contains(self._$elem[0], e.target)) {
+      if (!self._$elem.length || e.target !== self._$elem[0] && !$.contains(self._$elem[0], e.target)) {
         self.deactivate();
       }
     };
@@ -35,6 +36,7 @@
   Confirmation.prototype.deactivate = function() {
     this._$elem.removeClass('confirmClick');
     this._$elem.removeClass('clickConfirmed-active');
+    this._$elem.removeData('confirmClick-data');
 
     clearTimeout(this._timeout);
     $(document).off('click.clickConfirmed', this._documentClickHandler);
@@ -52,7 +54,6 @@
 
       if (!confirmation) {
         confirmation = new Confirmation($this);
-        $this.data('confirmClick-data', confirmation);
         confirmation.activate();
         event.preventDefault();
         event.stopImmediatePropagation();
@@ -65,7 +66,6 @@
 
       if (confirmation) {
         confirmation.deactivate();
-        $this.removeData('confirmClick-data');
       }
     }
   };
