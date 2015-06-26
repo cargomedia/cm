@@ -39,6 +39,9 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
     }
   },
 
+  /**
+   * @returns {Promise}
+   */
   detectLocation: function() {
     if (!'geolocation' in navigator) {
       cm.error.triggerThrow('Geolocation support unavailable');
@@ -49,16 +52,19 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
 
     return new Promise(function(resolve, reject) {
       navigator.geolocation.getCurrentPosition(resolve, reject);
-    }).then(function(position) {
+    })
+      .then(function(position) {
         return self._lookupCoordinates(position.coords.latitude, position.coords.longitude);
-      }).then(function(data) {
+      })
+      .then(function(data) {
         if (data) {
           self.setValue(data);
         }
       })
       .catch(function(error) {
-        cm.error.trigger('Unable to detect location: ' + error.message);
-      }).finally(function() {
+        cm.error.trigger('Unable to detect location: ' + error ? error.message : '');
+      })
+      .finally(function() {
         self.$('.detect-location').removeClass('waiting');
       });
   },
@@ -66,6 +72,7 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
   /**
    * @param {Number} lat
    * @param {Number} lon
+   * @return {Promise}
    */
   _lookupCoordinates: function(lat, lon) {
     return this.ajax('getSuggestionByCoordinates', {lat: lat, lon: lon, levelMin: this.getOption('levelMin'), levelMax: this.getOption('levelMax')});
