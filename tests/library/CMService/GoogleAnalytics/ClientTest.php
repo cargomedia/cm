@@ -165,8 +165,14 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $googleAnalytics = new CMService_GoogleAnalytics_Client('');
         $user = CMTest_TH::createUser();
         $environment = new CM_Frontend_Environment(null, $user);
-        $this->forceInvokeMethod($googleAnalytics, '_pushEvent', [$user, 'event', ['User', 'Create', null, null, true]]);
-        $this->forceInvokeMethod($googleAnalytics, '_pushEvent', [$user, 'pageview', ['/v/join/done']]);
+        $this->forceInvokeMethod($googleAnalytics, '_pushEvent', [$user, 'event', [
+            'category'       => 'User',
+            'action'         => 'Create',
+            'label'          => 'foo',
+            'value'          => 123,
+            'nonInteraction' => true,
+        ]]);
+        $this->forceInvokeMethod($googleAnalytics, '_pushEvent', [$user, 'pageview', ['path' => '/v/join/done']]);
         $js = $googleAnalytics->getJs($environment);
         $this->assertSame('', $js);
 
@@ -175,14 +181,14 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $this->assertContains('ga("set", "userId", "' . $user->getId() . '");', $js);
         $this->assertContains('ga("send", "pageview", "/foo");', $js);
         $this->assertContains('ga("send", "pageview", "/v/join/done");', $js);
-        $this->assertContains('ga("send", {"hitType":"event","eventCategory":"User","eventAction":"Create","nonInteraction":true});', $js);
+        $this->assertContains('ga("send", {"hitType":"event","eventCategory":"User","eventAction":"Create","eventLabel":"foo","eventValue":123,"nonInteraction":true});', $js);
     }
 
     public function testTtl() {
         $googleAnalytics = new CMService_GoogleAnalytics_Client('', 1);
         $user = CMTest_TH::createUser();
         $environment = new CM_Frontend_Environment(null, $user);
-        $this->forceInvokeMethod($googleAnalytics, '_pushEvent', [$user, 'pageview', ['/v/join/done']]);
+        $this->forceInvokeMethod($googleAnalytics, '_pushEvent', [$user, 'pageview', ['path' => '/v/join/done']]);
         $googleAnalytics->trackPageView($environment, '/foo');
         $js = $googleAnalytics->getJs($environment);
         $this->assertContains('ga("send", "pageview", "/v/join/done");', $js);
@@ -192,7 +198,7 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $googleAnalytics = new CMService_GoogleAnalytics_Client('', 0);
         $user = CMTest_TH::createUser();
         $environment = new CM_Frontend_Environment(null, $user);
-        $this->forceInvokeMethod($googleAnalytics, '_pushEvent', [$user, 'pageview', ['/v/join/done']]);
+        $this->forceInvokeMethod($googleAnalytics, '_pushEvent', [$user, 'pageview', ['path' => '/v/join/done']]);
         $googleAnalytics->trackPageView($environment, '/foo');
         $js = $googleAnalytics->getJs($environment);
         $this->assertNotContains('ga("send", "pageview", "/v/join/done");', $js);

@@ -208,10 +208,16 @@ EOF;
         while ($tracking = $trackingQueue->pop()) {
             switch ($tracking['eventType']) {
                 case 'event':
-                    call_user_func_array([$this, 'addEvent'], $tracking['data']);
+                    $eventCategory = $tracking['data']['category'];
+                    $eventAction = $tracking['data']['action'];
+                    $eventLabel = isset($tracking['data']['label']) ? $tracking['data']['label'] : null;
+                    $eventValue = isset($tracking['data']['value']) ? $tracking['data']['value'] : null;
+                    $nonInteraction = isset($tracking['data']['nonInteraction']) ? $tracking['data']['nonInteraction'] : null;
+                    $this->addEvent($eventCategory, $eventAction, $eventLabel, $eventValue, $nonInteraction);
                     break;
                 case 'pageview':
-                    call_user_func_array([$this, 'addPageView'], $tracking['data']);
+                    $path = $tracking['data']['path'];
+                    $this->addPageView($path);
                     break;
             }
         }
