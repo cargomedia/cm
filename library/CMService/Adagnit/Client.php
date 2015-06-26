@@ -8,6 +8,9 @@ class CMService_Adagnit_Client implements CM_Service_Tracking_ClientInterface {
     /** @var int|null */
     protected $_ttl = null;
 
+    /**
+     * @param int|null $ttl
+     */
     public function __construct($ttl = null) {
         if (null !== $ttl) {
             $this->_ttl = (int) $ttl;
@@ -103,14 +106,7 @@ EOD;
      */
     public function trackSale(CM_Frontend_Environment $environment) {
         if ($viewer = $environment->getViewer()) {
-            $trackingQueue = $this->_getTrackingQueue($viewer);
-            $trackingQueue->push([
-                'eventType' => 'purchaseSuccess',
-                'data'      => [
-                    'site' => $environment->getSite()->getHost(),
-                ]
-            ]);
-            $this->_setTtl($trackingQueue);
+            $this->_pushEvent($viewer, 'purchaseSuccess', ['site' => $environment->getSite()->getHost()]);
         }
     }
 
@@ -119,14 +115,7 @@ EOD;
      */
     public function trackSignIn(CM_Frontend_Environment $environment) {
         if ($viewer = $environment->getViewer()) {
-            $trackingQueue = $this->_getTrackingQueue($viewer);
-            $trackingQueue->push([
-                'eventType' => 'login',
-                'data'      => [
-                    'site' => $environment->getSite()->getHost(),
-                ]
-            ]);
-            $this->_setTtl($trackingQueue);
+            $this->_pushEvent($viewer, 'login', ['site' => $environment->getSite()->getHost()]);
         }
     }
 
@@ -135,14 +124,7 @@ EOD;
      */
     public function trackSignUp(CM_Frontend_Environment $environment) {
         if ($viewer = $environment->getViewer()) {
-            $trackingQueue = $this->_getTrackingQueue($viewer);
-            $trackingQueue->push([
-                'eventType' => 'signup',
-                'data'      => [
-                    'site' => $environment->getSite()->getHost(),
-                ]
-            ]);
-            $this->_setTtl($trackingQueue);
+            $this->_pushEvent($viewer, 'signup', ['site' => $environment->getSite()->getHost()]);
         }
     }
 
@@ -154,11 +136,18 @@ EOD;
      * @return CM_Queue
      */
     protected function _getTrackingQueue(CM_Model_User $user) {
-        $trackingQueue = new CM_Queue(__METHOD__ . ':' . $user->getId());
-        if (null !== $this->_ttl) {
-            $trackingQueue->setTtl($this->_ttl);
-        }
-        return $trackingQueue;
+        return new CM_Queue(__METHOD__ . ':' . $user->getId());
+    }
+
+    /**
+     * @param CM_Model_User $user
+     * @param string        $eventType
+     * @param array|null    $data
+     */
+    protected function _pushEvent(CM_Model_User $user, $eventType, array $data = null) {
+        $trackingQueue = $this->_getTrackingQueue($user);
+        $trackingQueue->push(['eventType' => $eventType, 'data' => $data]);
+        $this->_setTtl($trackingQueue);
     }
 
     /**
