@@ -11,8 +11,7 @@
 }
 
 [data-click-confirmed] {
-  &:after {
-    content: '';
+  .clickConfirmed-bar {
     box-sizing: border-box;
     position: absolute;
     bottom: 4px;
@@ -20,11 +19,11 @@
     width: 90%;
     height: 2px;
     transform: scale(1, 1);
+    background-color: rgba(255, 255, 255, .5);
+    transition: transform 3200ms linear 800ms;
   }
 
-  &.clickConfirmed-active:after {
-    background-color: rgba(255, 255, 255, .5);
-    transition: transform 3000ms linear 800ms;
+  &.clickConfirmed-active .clickConfirmed-bar {
     transform: scale(0, 1);
   }
 }

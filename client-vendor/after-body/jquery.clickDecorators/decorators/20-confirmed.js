@@ -13,11 +13,15 @@
 
   Confirmation.prototype.activate = function() {
     this._$elem.addClass('confirmClick');
-    this._$elem.addClass('clickConfirmed-active');
     this._$elem.data('confirmClick-data', this);
 
-    var self = this;
+    var $progressBar = $('<div class="clickConfirmed-bar" />');
+    this._$elem.append($progressBar);
+    $progressBar[0].offsetHeight; // Trigger repaint
 
+    this._$elem.addClass('clickConfirmed-active');
+
+    var self = this;
     this._timeout = setTimeout(function() {
       self.deactivate();
     }, 4000);
@@ -28,15 +32,16 @@
       }
     };
 
-    setTimeout(function() {
+    _.defer(function() {
       $(document).on('click.clickConfirmed', self._documentClickHandler);
-    }, 0);
+    });
   };
 
   Confirmation.prototype.deactivate = function() {
     this._$elem.removeClass('confirmClick');
     this._$elem.removeClass('clickConfirmed-active');
     this._$elem.removeData('confirmClick-data');
+    this._$elem.find('.clickConfirmed-bar').remove();
 
     clearTimeout(this._timeout);
     $(document).off('click.clickConfirmed', this._documentClickHandler);
