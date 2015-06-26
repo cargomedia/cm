@@ -95,10 +95,7 @@ EOD;
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
         $this->setPageView($path);
         if ($viewer = $environment->getViewer()) {
-            $trackingQueue = $this->_getTrackingQueue($viewer);
-            while ($tracking = $trackingQueue->pop()) {
-                $this->addEvent($tracking['eventType'], $tracking['data']);
-            }
+            $this->_flushTrackingQueue($viewer);
         }
     }
 
@@ -130,6 +127,16 @@ EOD;
     }
 
     public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
+    }
+
+    /**
+     * @param CM_Model_User $user
+     */
+    protected function _flushTrackingQueue(CM_Model_User $user) {
+        $trackingQueue = $this->_getTrackingQueue($user);
+        while ($tracking = $trackingQueue->pop()) {
+            $this->addEvent($tracking['eventType'], $tracking['data']);
+        }
     }
 
     /**

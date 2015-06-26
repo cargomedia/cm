@@ -193,21 +193,28 @@ EOF;
         $this->setPageView($path);
         if ($viewer = $environment->getViewer()) {
             $this->setUserId($viewer->getId());
-            $trackingQueue = $this->_getTrackingQueue($viewer);
-            while ($tracking = $trackingQueue->pop()) {
-                switch ($tracking['eventType']) {
-                    case 'event':
-                        call_user_func_array([$this, 'addEvent'], $tracking['data']);
-                        break;
-                    case 'pageview':
-                        call_user_func_array([$this, 'addPageView'], $tracking['data']);
-                        break;
-                }
-            }
+            $this->_flushTrackingQueue($viewer);
         }
     }
 
     public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
+    }
+
+    /**
+     * @param CM_Model_User $user
+     */
+    protected function _flushTrackingQueue(CM_Model_User $user) {
+        $trackingQueue = $this->_getTrackingQueue($user);
+        while ($tracking = $trackingQueue->pop()) {
+            switch ($tracking['eventType']) {
+                case 'event':
+                    call_user_func_array([$this, 'addEvent'], $tracking['data']);
+                    break;
+                case 'pageview':
+                    call_user_func_array([$this, 'addPageView'], $tracking['data']);
+                    break;
+            }
+        }
     }
 
     /**
