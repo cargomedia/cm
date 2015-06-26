@@ -29,6 +29,8 @@ abstract class CM_QueueAdapter_Abstract {
     abstract public function popDelayed($key, $timestampMax);
 
     /**
+     * Updates the time to live of the whole queue, not of single entries
+     *
      * @param string $key
      * @param int    $ttl
      */
