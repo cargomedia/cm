@@ -6,15 +6,16 @@ class CMService_Adagnit_Client implements CM_Service_Tracking_ClientInterface {
     protected $_eventList = array(), $_pageViewList = array();
 
     /** @var int|null */
-    protected $_ttl = null;
+    protected $_ttl;
 
     /**
      * @param int|null $ttl
      */
     public function __construct($ttl = null) {
         if (null !== $ttl) {
-            $this->_ttl = (int) $ttl;
+            $ttl = (int) $ttl;
         }
+        $this->_ttl = $ttl;
     }
 
     /**
