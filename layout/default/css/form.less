@@ -10,10 +10,6 @@
   background: @colorBg;
   border: 1px solid @colorFgBorderEmphasize2;
   transition: border-color .1s;
-
-  &:hover {
-    border-left: 1px solid @colorFocus;
-  }
 }
 
 textarea.textinput {
@@ -194,7 +190,7 @@ input[type=checkbox], input[type=radio] {
     }
   }
 
-  &:hover, &:focus {
+  &:focus {
     &:not(:disabled) + label:before {
       .input_focus;
     }
