@@ -206,17 +206,18 @@ EOF;
     protected function _flushTrackingQueue(CM_Model_User $user) {
         $trackingQueue = $this->_getTrackingQueue($user);
         while ($tracking = $trackingQueue->pop()) {
-            switch ($tracking['eventType']) {
+            $data = $tracking['data'];
+            switch ($tracking['hitType']) {
                 case 'event':
-                    $eventCategory = $tracking['data']['category'];
-                    $eventAction = $tracking['data']['action'];
-                    $eventLabel = isset($tracking['data']['label']) ? $tracking['data']['label'] : null;
-                    $eventValue = isset($tracking['data']['value']) ? $tracking['data']['value'] : null;
-                    $nonInteraction = isset($tracking['data']['nonInteraction']) ? $tracking['data']['nonInteraction'] : null;
+                    $eventCategory = $data['category'];
+                    $eventAction = $data['action'];
+                    $eventLabel = isset($data['label']) ? $data['label'] : null;
+                    $eventValue = isset($data['value']) ? $data['value'] : null;
+                    $nonInteraction = isset($data['nonInteraction']) ? $data['nonInteraction'] : null;
                     $this->addEvent($eventCategory, $eventAction, $eventLabel, $eventValue, $nonInteraction);
                     break;
                 case 'pageview':
-                    $path = $tracking['data']['path'];
+                    $path = $data['path'];
                     $this->addPageView($path);
                     break;
             }
@@ -240,12 +241,12 @@ EOF;
 
     /**
      * @param CM_Model_User $user
-     * @param string        $eventType
+     * @param string        $hitType
      * @param array|null    $data
      */
-    protected function _pushEvent(CM_Model_User $user, $eventType, array $data = null) {
+    protected function _pushHit(CM_Model_User $user, $hitType, array $data = null) {
         $trackingQueue = $this->_getTrackingQueue($user);
-        $trackingQueue->push(['eventType' => $eventType, 'data' => $data]);
+        $trackingQueue->push(['hitType' => $hitType, 'data' => $data]);
         $trackingQueue->setTtl($this->_ttl);
     }
 
