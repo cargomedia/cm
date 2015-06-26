@@ -148,13 +148,6 @@ EOD;
     protected function _pushEvent(CM_Model_User $user, $eventType, array $data = null) {
         $trackingQueue = $this->_getTrackingQueue($user);
         $trackingQueue->push(['eventType' => $eventType, 'data' => $data]);
-        $this->_setTtl($trackingQueue);
-    }
-
-    /**
-     * @param CM_Queue $trackingQueue
-     */
-    protected function _setTtl(CM_Queue $trackingQueue) {
         if (null !== $this->_ttl) {
             $trackingQueue->setTtl($this->_ttl);
         }
