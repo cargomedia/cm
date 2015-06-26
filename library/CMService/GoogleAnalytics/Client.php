@@ -17,10 +17,10 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
      */
     public function __construct($code, $ttl = null) {
         $this->_code = (string) $code;
-        if (null !== $ttl) {
-            $ttl = (int) $ttl;
+        if (null === $ttl) {
+            $ttl = 86400;
         }
-        $this->_ttl = $ttl;
+        $this->_ttl = (int) $ttl;
     }
 
     /**

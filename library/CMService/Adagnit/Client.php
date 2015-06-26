@@ -12,10 +12,10 @@ class CMService_Adagnit_Client implements CM_Service_Tracking_ClientInterface {
      * @param int|null $ttl
      */
     public function __construct($ttl = null) {
-        if (null !== $ttl) {
-            $ttl = (int) $ttl;
+        if (null === $ttl) {
+            $ttl = 86400;
         }
-        $this->_ttl = $ttl;
+        $this->_ttl = (int) $ttl;
     }
 
     /**
