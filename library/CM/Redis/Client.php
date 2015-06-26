@@ -63,8 +63,6 @@ class CM_Redis_Client extends CM_Class_Abstract {
     }
 
     /**
-     * Updates the time to live of the whole queue, not of single entries
-     *
      * @param string $key
      * @param int    $ttl
      */
