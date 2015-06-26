@@ -8,11 +8,19 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     /** @var array */
     protected $_eventList = array(), $_transactionList = array(), $_pageViewList = array(), $_fieldList = array();
 
+    /** @var int|null */
+    protected $_ttl;
+
     /**
-     * @param string $code
+     * @param string   $code
+     * @param int|null $ttl
      */
-    public function __construct($code) {
+    public function __construct($code, $ttl = null) {
         $this->_code = (string) $code;
+        if (null !== $ttl) {
+            $ttl = (int) $ttl;
+        }
+        $this->_ttl = $ttl;
     }
 
     /**
@@ -182,13 +190,52 @@ EOF;
     }
 
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
+        $this->setPageView($path);
         if ($viewer = $environment->getViewer()) {
             $this->setUserId($viewer->getId());
+            $trackingQueue = $this->_getTrackingQueue($viewer);
+            while ($tracking = $trackingQueue->pop()) {
+                switch ($tracking['eventType']) {
+                    case 'event':
+                        call_user_func_array([$this, 'addEvent'], $tracking['data']);
+                        break;
+                    case 'pageview':
+                        call_user_func_array([$this, 'addPageView'], $tracking['data']);
+                        break;
+                }
+            }
         }
-        $this->setPageView($path);
     }
 
     public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getCode() {
+        return $this->_code;
+    }
+
+    /**
+     * @param CM_Model_User $user
+     * @return CM_Queue
+     */
+    protected function _getTrackingQueue(CM_Model_User $user) {
+        return new CM_Queue(__METHOD__ . ':' . $user->getId());
+    }
+
+    /**
+     * @param CM_Model_User $user
+     * @param string        $eventType
+     * @param array|null    $data
+     */
+    protected function _pushEvent(CM_Model_User $user, $eventType, array $data = null) {
+        $trackingQueue = $this->_getTrackingQueue($user);
+        $trackingQueue->push(['eventType' => $eventType, 'data' => $data]);
+        if (null !== $this->_ttl) {
+            $trackingQueue->setTtl($this->_ttl);
+        }
     }
 
     /**
@@ -199,12 +246,5 @@ EOF;
         $name = (string) $name;
         $value = (string) $value;
         $this->_fieldList[$name] = $value;
-    }
-
-    /**
-     * @return string
-     */
-    protected function _getCode() {
-        return $this->_code;
     }
 }
