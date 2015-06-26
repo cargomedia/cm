@@ -5,17 +5,17 @@ class CMService_Adagnit_Client implements CM_Service_Tracking_ClientInterface {
     /** @var array */
     protected $_eventList = array(), $_pageViewList = array();
 
-    /** @var int|null */
+    /** @var int */
     protected $_ttl;
 
     /**
      * @param int|null $ttl
      */
     public function __construct($ttl = null) {
-        if (null !== $ttl) {
-            $ttl = (int) $ttl;
+        if (null === $ttl) {
+            $ttl = 86400;
         }
-        $this->_ttl = $ttl;
+        $this->_ttl = (int) $ttl;
     }
 
     /**
@@ -95,10 +95,7 @@ EOD;
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
         $this->setPageView($path);
         if ($viewer = $environment->getViewer()) {
-            $trackingQueue = $this->_getTrackingQueue($viewer);
-            while ($tracking = $trackingQueue->pop()) {
-                $this->addEvent($tracking['eventType'], $tracking['data']);
-            }
+            $this->_flushTrackingQueue($viewer);
         }
     }
 
@@ -134,6 +131,16 @@ EOD;
 
     /**
      * @param CM_Model_User $user
+     */
+    protected function _flushTrackingQueue(CM_Model_User $user) {
+        $trackingQueue = $this->_getTrackingQueue($user);
+        while ($tracking = $trackingQueue->pop()) {
+            $this->addEvent($tracking['eventType'], $tracking['data']);
+        }
+    }
+
+    /**
+     * @param CM_Model_User $user
      * @return CM_Queue
      */
     protected function _getTrackingQueue(CM_Model_User $user) {
@@ -148,8 +155,6 @@ EOD;
     protected function _pushEvent(CM_Model_User $user, $eventType, array $data = null) {
         $trackingQueue = $this->_getTrackingQueue($user);
         $trackingQueue->push(['eventType' => $eventType, 'data' => $data]);
-        if (null !== $this->_ttl) {
-            $trackingQueue->setTtl($this->_ttl);
-        }
+        $trackingQueue->setTtl($this->_ttl);
     }
 }
