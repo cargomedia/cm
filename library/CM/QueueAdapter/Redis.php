@@ -31,6 +31,17 @@ class CM_QueueAdapter_Redis extends CM_QueueAdapter_Abstract {
     }
 
     /**
+     * Updates the time to live of the whole queue, not of single entries
+     *
+     * @param string $key
+     * @param int    $ttl
+     */
+    public function setTtl($key, $ttl) {
+        $redis = $this->_getRedisClient();
+        $redis->expire($this->_getInternalKey($key), $ttl);
+    }
+
+    /**
      * @param string $key
      * @return string
      */

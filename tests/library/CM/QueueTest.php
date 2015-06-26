@@ -57,4 +57,11 @@ class CM_QueueTest extends CMTest_TestCase {
         $this->assertSame(array('two', array(3 => 'three')), $queue->pop($timeStamp3));
         $this->assertSame(array(), $queue->pop($timeStamp3));
     }
+
+    public function testSetTtl() {
+        $queue = new CM_Queue('ttl');
+        $queue->push('foo');
+        $queue->setTtl(0);
+        $this->assertSame(false, $queue->pop());
+    }
 }
