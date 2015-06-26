@@ -5,7 +5,7 @@ class CMService_Adagnit_Client implements CM_Service_Tracking_ClientInterface {
     /** @var array */
     protected $_eventList = array(), $_pageViewList = array();
 
-    /** @var int|null */
+    /** @var int */
     protected $_ttl;
 
     /**
@@ -155,8 +155,6 @@ EOD;
     protected function _pushEvent(CM_Model_User $user, $eventType, array $data = null) {
         $trackingQueue = $this->_getTrackingQueue($user);
         $trackingQueue->push(['eventType' => $eventType, 'data' => $data]);
-        if (null !== $this->_ttl) {
-            $trackingQueue->setTtl($this->_ttl);
-        }
+        $trackingQueue->setTtl($this->_ttl);
     }
 }
