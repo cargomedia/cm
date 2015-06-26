@@ -13,7 +13,7 @@
     <p class="dropInfo-divide">- {translate 'or'} -</p>
   </div>
 {/if}
-<div class="uploadButton">
+<div class="uploadButton clickFeedback">
   <input type="file" name="{$name}-file" multiple />
   {if $text}{$text}{else}{block name="button-text"}{translate 'Upload Files'}{/block}{/if}
 </div>
