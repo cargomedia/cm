@@ -62,6 +62,8 @@ class CM_Queue {
     }
 
     /**
+     * Updates the time to live of the whole queue, not of single entries
+     *
      * @param int $ttl
      */
     public function setTtl($ttl) {
