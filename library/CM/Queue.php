@@ -60,4 +60,13 @@ class CM_Queue {
         }
         return $value;
     }
+
+    /**
+     * Updates the time to live of the whole queue, not of single entries
+     *
+     * @param int $ttl
+     */
+    public function setTtl($ttl) {
+        $this->_adapter->setTtl($this->getKey(), $ttl);
+    }
 }

@@ -126,7 +126,7 @@ var CM_App = CM_Class_Abstract.extend({
     params = params || null;
     relative = relative || false;
     if (params) {
-      path += '?' + jQuery.param(params, true);
+      path += '?' + jQuery.param(params);
     }
     if (!relative) {
       path = cm.options.url + path
@@ -847,7 +847,7 @@ var CM_App = CM_Class_Abstract.extend({
         }
       }).fail(function(xhr, textStatus) {
         if (xhr.status === 0) {
-          return; // Ignore interrupted ajax-request caused by leaving a page
+          reject(Promise.CancellationError());
         }
 
         var msg = cm.language.get('An unexpected connection problem occurred.');

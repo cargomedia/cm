@@ -23,7 +23,7 @@
  * 
  */
 /**
- * bluebird build version 2.9.25
+ * bluebird build version 2.9.30
  * Features enabled: core, cancel
  * Features disabled: race, call_get, generators, map, nodeify, promisify, props, reduce, settle, some, using, filter, any, each, timers
 */
@@ -162,13 +162,18 @@ if (!util.hasDevTools) {
     Async.prototype.invoke = AsyncInvoke;
     Async.prototype.settlePromises = AsyncSettlePromises;
 } else {
+    if (schedule.isStatic) {
+        schedule = function(fn) { setTimeout(fn, 0); };
+    }
     Async.prototype.invokeLater = function (fn, receiver, arg) {
         if (this._trampolineEnabled) {
             AsyncInvokeLater.call(this, fn, receiver, arg);
         } else {
-            setTimeout(function() {
-                fn.call(receiver, arg);
-            }, 100);
+            this._schedule(function() {
+                setTimeout(function() {
+                    fn.call(receiver, arg);
+                }, 100);
+            });
         }
     };
 
@@ -176,9 +181,9 @@ if (!util.hasDevTools) {
         if (this._trampolineEnabled) {
             AsyncInvoke.call(this, fn, receiver, arg);
         } else {
-            setTimeout(function() {
+            this._schedule(function() {
                 fn.call(receiver, arg);
-            }, 0);
+            });
         }
     };
 
@@ -186,9 +191,9 @@ if (!util.hasDevTools) {
         if (this._trampolineEnabled) {
             AsyncSettlePromises.call(this, promise);
         } else {
-            setTimeout(function() {
+            this._schedule(function() {
                 promise._settlePromises();
-            }, 0);
+            });
         }
     };
 }
@@ -990,7 +995,13 @@ if (debugging) {
     async.disableTrampolineIfNecessary();
 }
 
+Promise.prototype._ignoreRejections = function() {
+    this._unsetRejectionIsUnhandled();
+    this._bitField = this._bitField | 16777216;
+};
+
 Promise.prototype._ensurePossibleRejectionHandled = function () {
+    if ((this._bitField & 16777216) !== 0) return;
     this._setRejectionIsUnhandled();
     async.invokeLater(this._notifyUnhandledRejection, this, undefined);
 };
@@ -1135,6 +1146,10 @@ var returner = function () {
 var thrower = function () {
     throw this;
 };
+var returnUndefined = function() {};
+var throwUndefined = function() {
+    throw undefined;
+};
 
 var wrapper = function (value, action) {
     if (action === 1) {
@@ -1151,6 +1166,8 @@ var wrapper = function (value, action) {
 
 Promise.prototype["return"] =
 Promise.prototype.thenReturn = function (value) {
+    if (value === undefined) return this.then(returnUndefined);
+
     if (wrapsPrimitiveReceiver && isPrimitive(value)) {
         return this._then(
             wrapper(value, 2),
@@ -1165,6 +1182,8 @@ Promise.prototype.thenReturn = function (value) {
 
 Promise.prototype["throw"] =
 Promise.prototype.thenThrow = function (reason) {
+    if (reason === undefined) return this.then(throwUndefined);
+
     if (wrapsPrimitiveReceiver && isPrimitive(reason)) {
         return this._then(
             wrapper(reason, 1),
@@ -2477,7 +2496,7 @@ PromiseArray.prototype._init = function init(_, resolveValueIfEmpty) {
         if (maybePromise instanceof Promise) {
             maybePromise = maybePromise._target();
             if (isResolved) {
-                maybePromise._unsetRejectionIsUnhandled();
+                maybePromise._ignoreRejections();
             } else if (maybePromise._isPending()) {
                 maybePromise._proxyPromiseArray(this, i);
             } else if (maybePromise._isFulfilled()) {
@@ -2758,23 +2777,16 @@ module.exports = Queue;
 },{}],20:[function(_dereq_,module,exports){
 "use strict";
 var schedule;
+var util = _dereq_("./util");
 var noAsyncScheduler = function() {
     throw new Error("No async scheduler available\u000a\u000a    See http://goo.gl/m3OTXk\u000a");
 };
-if (_dereq_("./util.js").isNode) {
-    var version = process.versions.node.split(".").map(Number);
-    schedule = (version[0] === 0 && version[1] > 10) || (version[0] > 0)
-        ? global.setImmediate : process.nextTick;
-
-    if (!schedule) {
-        if (typeof setImmediate !== "undefined") {
-            schedule = setImmediate;
-        } else if (typeof setTimeout !== "undefined") {
-            schedule = setTimeout;
-        } else {
-            schedule = noAsyncScheduler;
-        }
-    }
+if (util.isNode && typeof MutationObserver === "undefined") {
+    var GlobalSetImmediate = global.setImmediate;
+    var ProcessNextTick = process.nextTick;
+    schedule = util.isRecentNode
+                ? function(fn) { GlobalSetImmediate.call(global, fn); }
+                : function(fn) { ProcessNextTick.call(process, fn); };
 } else if (typeof MutationObserver !== "undefined") {
     schedule = function(fn) {
         var div = document.createElement("div");
@@ -2796,7 +2808,7 @@ if (_dereq_("./util.js").isNode) {
 }
 module.exports = schedule;
 
-},{"./util.js":23}],21:[function(_dereq_,module,exports){
+},{"./util":23}],21:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise) {
 function PromiseInspection(promise) {
@@ -3139,13 +3151,17 @@ var inheritedDataKeys = (function() {
 
 })();
 
+var thisAssignmentPattern = /this\s*\.\s*\S+\s*=/;
 function isClass(fn) {
     try {
         if (typeof fn === "function") {
             var keys = es5.names(fn.prototype);
-            if (es5.isES5) return keys.length > 1;
-            return keys.length > 0 &&
-                   !(keys.length === 1 && keys[0] === "constructor");
+            if (((es5.isES5 && keys.length > 1) ||
+                (keys.length > 0 &&
+                !(keys.length === 1 && keys[0] === "constructor"))) ||
+                thisAssignmentPattern.test(fn + "")) {
+                return true;
+            }
         }
         return false;
     } catch (e) {
@@ -3230,6 +3246,13 @@ function copyDescriptors(from, to, filter) {
     }
 }
 
+function isNativeFunctionMethod(fn) {
+    return fn === fn.call ||
+           fn === fn.toString ||
+           fn === fn.bind ||
+           fn === fn.apply;
+}
+
 var ret = {
     isClass: isClass,
     isIdentifier: isIdentifier,
@@ -3260,8 +3283,13 @@ var ret = {
     hasDevTools: typeof chrome !== "undefined" && chrome &&
                  typeof chrome.loadTimes === "function",
     isNode: typeof process !== "undefined" &&
-        classString(process).toLowerCase() === "[object process]"
+        classString(process).toLowerCase() === "[object process]",
+    isNativeFunctionMethod: isNativeFunctionMethod
 };
+ret.isRecentNode = ret.isNode && (function() {
+    var version = process.versions.node.split(".").map(Number);
+    return (version[0] === 0 && version[1] > 10) || (version[0] > 0);
+})();
 try {throw new Error(); } catch (e) {ret.lastLineError = e;}
 module.exports = ret;
 

@@ -26,10 +26,9 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      * @param array $parameterList
      */
     public function trackHit(array $parameterList) {
-        $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob();
-        $job->queue([
+        $this->_queueHit([
             'propertyId'    => $this->getPropertyId(),
-            'parameterList' => $parameterList,
+            'parameterList' => $this->_parseParameterList($parameterList),
         ]);
     }
 
@@ -38,7 +37,15 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      */
     public function trackEvent(array $parameterList) {
         $parameterList['hitType'] = 'event';
-        $this->trackHit($this->_parseParameterList($parameterList));
+        $this->trackHit($parameterList);
+    }
+
+    /**
+     * @param array $parameterList
+     */
+    public function trackPageView(array $parameterList) {
+        $parameterList['hitType'] = 'pageview';
+        $this->trackHit($parameterList);
     }
 
     /**
@@ -55,6 +62,14 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
         $parameterList['v'] = 1;
         $parameterList['tid'] = $this->getPropertyId();
         $this->_submitRequest($parameterList);
+    }
+
+    /**
+     * @param array $parameterList
+     */
+    protected function _queueHit(array $parameterList) {
+        $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob();
+        $job->queue($parameterList);
     }
 
     /**
@@ -88,8 +103,14 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
             't'   => [
                 'aliasList' => ['hitType'],
             ],
+            'dl'  => [
+                'aliasList' => ['location'],
+            ],
             'dh'  => [
                 'aliasList' => ['hostname'],
+            ],
+            'dp'  => [
+                'aliasList' => ['page'],
             ],
             'ec'  => [
                 'aliasList'   => ['eventCategory'],

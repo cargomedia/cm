@@ -6,6 +6,20 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
     }
 
     /**
+     * @return bool
+     */
+    public function getCanTrackPageView() {
+        return true;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPathVirtualPageView() {
+        return null;
+    }
+
+    /**
      * Checks if the page is viewable by the current user
      *
      * @return bool True if page is visible
@@ -16,7 +30,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 
     /**
      * @param CM_Frontend_Environment $environment
-     * @param CM_Http_Response_Page        $response
+     * @param CM_Http_Response_Page   $response
      */
     public function prepareResponse(CM_Frontend_Environment $environment, CM_Http_Response_Page $response) {
     }
