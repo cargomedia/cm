@@ -42,7 +42,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             $this->_id = self::_castIdRaw($id);
         }
         if (null !== $data) {
-            $this->_validateFields($data);
             $this->_setData($data);
         }
         foreach ($this->_getAssets() as $asset) {
@@ -266,19 +265,16 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         if (null === $this->_data) {
             if ($cache = $this->_getCache()) {
                 if (false !== ($data = $cache->load($this->getType(), $this->getIdRaw()))) {
-                    $this->_validateFields($data);
                     $this->_setData($data);
                 }
             }
             if (null === $this->_data) {
                 if ($persistence = $this->_getPersistence()) {
                     if (false !== ($data = $persistence->load($this->getType(), $this->getIdRaw()))) {
-                        $this->_validateFields($data);
                         $this->_setData($data);
                     }
                 } else {
                     if (is_array($data = $this->_loadData())) {
-                        $this->_validateFields($data);
                         $this->_setData($data);
                     }
                 }
@@ -299,6 +295,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
      * @param array $data
      */
     protected function _setData(array $data) {
+        $this->_validateFields($data);
         $this->_data = $data;
     }
 

@@ -108,6 +108,19 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $this->assertSame($data, $getData->invoke($modelMock));
     }
 
+    public function testSetDataValidatesFields() {
+        $data = array('foo' => 12, 'bar' => 23);
+
+        $modelMock = $this->mockObject('CM_Model_Abstract');
+        $methodValidateFields = $modelMock->mockMethod('_validateFields');
+        $methodValidateFields->set(function ($dataActual) use ($data) {
+            $this->assertEquals($dataActual, $data);
+        });
+
+        $this->forceInvokeMethod($modelMock, '_setData', [$data]);
+        $this->assertSame(1, $methodValidateFields->getCallCount());
+    }
+
     public function testCommit() {
         $schema = new CM_Model_Schema_Definition(array('foo' => array()));
         $idRaw = array('id' => '909');
