@@ -6,9 +6,9 @@
 
   &.clickFeedback-circle {
     border-radius: 50%;
-    /* The new way of doing it - needed for Chrome */
+    /* fix for newer Chrome */
     clip-path: circle(50% at center);
-    /* this fixes the overflow:hidden in Safari, older Chrome */
+    /* fix for Safari, older Chrome */
     -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
   }
 }
