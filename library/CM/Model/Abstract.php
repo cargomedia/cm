@@ -66,6 +66,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             }
             $this->_onChange();
         } else {
+            $this->_validateFields($this->_getData());
             $this->_id = self::_castIdRaw($persistence->create($this->getType(), $this->_getSchemaData()));
 
             if ($cache = $this->_getCache()) {

@@ -121,6 +121,26 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $this->assertSame(1, $methodValidateFields->getCallCount());
     }
 
+    public function testCreateValidatesFields() {
+        $modelMock = $this->mockObject('CM_Model_Abstract');
+        $methodValidateFields = $modelMock->mockMethod('_validateFields');
+        $methodValidateFields->set(function ($data) {
+            $this->assertSame([], $data);
+        });
+        $modelMock->mockMethod('_getPersistence')->set(function () {
+            return new CM_Model_StorageAdapter_Database();
+        });
+        $modelMock->mockMethod('getType')->set(function () {
+            return 12;
+        });
+        $modelMock->mockMethod('_getSchema')->set(function () {
+            return new CM_Model_Schema_Definition([]);
+        });
+        /** @var CM_Model_Abstract $modelMock */
+        $modelMock->commit();
+        $this->assertSame(1, $methodValidateFields->getCallCount());
+    }
+
     public function testCommit() {
         $schema = new CM_Model_Schema_Definition(array('foo' => array()));
         $idRaw = array('id' => '909');
