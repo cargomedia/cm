@@ -173,7 +173,7 @@ EOF;
             'cookieDomain' => $environment->getSite()->getHost(),
         ];
         if ($user = $environment->getViewer()) {
-            $fieldList['userId'] = $user->getId();
+            $fieldList['userId'] = (string) $user->getId();
         }
 
         $html .= 'ga("create", "' . $this->_getCode() . '", ' . CM_Params::jsonEncode(array_filter($fieldList)) . ');';

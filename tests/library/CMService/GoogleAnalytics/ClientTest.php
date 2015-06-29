@@ -20,7 +20,7 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $request = new CM_Http_Request_Get('/pseudo-request');
 
         $html = $googleAnalytics->getHtml($environment);
-        $this->assertContains('ga("create", "key123", {"cookieDomain":"www.my-website.net","userId":' . $viewer->getId() . '}',
+        $this->assertContains('ga("create", "key123", {"cookieDomain":"www.my-website.net","userId":"' . $viewer->getId() . '"}',
             $html);
     }
 
