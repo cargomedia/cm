@@ -7,17 +7,27 @@
   var storage = {};
 
   /**
-   * @param {String} name
-   * @param {Promise} promise
-   * @returns {Promise}
+   * @callback PromiseThrottled
+   * @param {...Object|String|Number} any number of optional params
+   * @return {Promise}
    */
-  function promiseThrottler(name, promise) {
-    if (!storage[name]) {
-      storage[name] = promise.finally(function() {
-        delete storage[name];
-      });
-    }
-    return storage[name];
+
+  /**
+   * @param {PromiseThrottled} fn
+   * @param {Boolean} cancel
+   * @returns {PromiseThrottled}
+   */
+  function promiseThrottler(fn, cancel) {
+    var promise;
+    return function() {
+      if (cancel && promise && promise.isPending()) {
+        promise.cancel();
+      }
+      if (!promise || !promise.isPending()) {
+        promise = fn.apply(null, arguments);
+      }
+      return promise;
+    };
   }
 
   global.promiseThrottler = promiseThrottler;
