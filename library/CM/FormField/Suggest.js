@@ -31,17 +31,14 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
       escapeMarkup: function(item) {
         return item;
       },
-      query: function(options) {
-        if (this._request) {
-          this._request.cancel();
-        }
-        this._request = field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()})
+      query: promiseThrottler(function(options) {
+        return field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()})
           .then(function(results) {
             options.callback({
               results: results
             });
           });
-      },
+      }, true),
       createSearchChoice: function(term, data) {
         if (field.getOption("enableChoiceCreate")) {
           var existingMatches = $(data).filter(function() {
