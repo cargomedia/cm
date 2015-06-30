@@ -8,9 +8,6 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
   /** @type {jQuery} */
   _$input: null,
 
-  /** @type {Promise} */
-  _request: null,
-
   ready: function() {
     var field = this;
     var cardinality = this.getOption("cardinality");
@@ -38,7 +35,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
               results: results
             });
           });
-      }, true),
+      }, {cancel: true}),
       createSearchChoice: function(term, data) {
         if (field.getOption("enableChoiceCreate")) {
           var existingMatches = $(data).filter(function() {
