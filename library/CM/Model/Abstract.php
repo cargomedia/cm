@@ -66,7 +66,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             }
             $this->_onChange();
         } else {
-            $this->_validateFields($this->_getData());
+            $this->_validateFields($this->_getData(), true);
             $this->_id = self::_castIdRaw($persistence->create($this->getType(), $this->_getSchemaData()));
 
             if ($cache = $this->_getCache()) {
@@ -434,12 +434,20 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
     }
 
     /**
-     * @param array $data
+     * @param array     $data
+     * @param bool|null $checkMissingFields
      */
-    protected function _validateFields(array $data) {
+    protected function _validateFields(array $data, $checkMissingFields = null) {
         if ($schema = $this->_getSchema()) {
-            foreach ($data as $key => $value) {
-                $schema->validateField($key, $value);
+            if ($checkMissingFields) {
+                foreach ($schema->getFieldNames() as $key) {
+                    $value = isset($data[$key]) ? $data[$key] : null;
+                    $schema->validateField($key, $value);
+                }
+            } else {
+                foreach ($data as $key => $value) {
+                    $schema->validateField($key, $value);
+                }
             }
         }
     }
