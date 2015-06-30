@@ -19,10 +19,11 @@
   function promiseThrottler(fn, options) {
     options = _.defaults(options, {cancel: false});
     var promise;
-    
+
     return function() {
-      if (options.cancel && promise && promise.isPending()) {
+      if (options.cancel && promise && promise.isPending() && promise.isCancellable()) {
         promise.cancel();
+        promise = null;
       }
       if (!promise || !promise.isPending()) {
         promise = fn.apply(null, arguments);
