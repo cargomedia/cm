@@ -4,8 +4,6 @@
 
 (function(global) {
 
-  var storage = {};
-
   /**
    * @callback PromiseThrottled
    * @param {...Object|String|Number} any number of optional params
@@ -14,13 +12,16 @@
 
   /**
    * @param {PromiseThrottled} fn
-   * @param {Boolean} cancel
+   * @param {Object|null} options
+   * @param {Boolean} options.cancel Whether to cancel the previous promise if it is still running.
    * @returns {PromiseThrottled}
    */
-  function promiseThrottler(fn, cancel) {
+  function promiseThrottler(fn, options) {
+    options = _.defaults(options, {cancel: false});
     var promise;
+    
     return function() {
-      if (cancel && promise && promise.isPending()) {
+      if (options.cancel && promise && promise.isPending()) {
         promise.cancel();
       }
       if (!promise || !promise.isPending()) {
