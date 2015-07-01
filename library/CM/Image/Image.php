@@ -269,7 +269,7 @@ class CM_Image_Image {
      * @return $this
      * @throws CM_Exception_Invalid
      */
-    public function validateImage() {
+    public function validate() {
         $this->getFormat();
         return $this;
     }

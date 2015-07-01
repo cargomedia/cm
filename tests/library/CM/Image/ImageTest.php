@@ -22,24 +22,24 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $this->assertSame(60, $image->getHeight());
     }
 
-    public function testValidateImage() {
+    public function testValidate() {
         $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
         $image = new CM_Image_Image($imageFile->read());
-        $image->validateImage();
+        $image->validate();
         $this->assertTrue(true);
     }
 
-    public function testValidateImageCorruptContent() {
+    public function testValidateCorruptContent() {
         $imageFile = new CM_File(DIR_TEST_DATA . 'img/corrupt-content.jpg');
         $image = new CM_Image_Image($imageFile->read());
-        $image->validateImage();
+        $image->validate();
         $this->assertTrue(true);
     }
 
-    public function testValidateImageJpgNoExtension() {
+    public function testValidateJpgNoExtension() {
         $imageFile = new CM_File(DIR_TEST_DATA . 'img/jpg-no-extension');
         $image = new CM_Image_Image($imageFile->read());
-        $image->validateImage();
+        $image->validate();
         $this->assertTrue(true);
     }
 
@@ -47,17 +47,17 @@ class CM_Image_ImageTest extends CMTest_TestCase {
      * @expectedException CM_Exception
      * @expectedExceptionMessage Unsupported format
      */
-    public function testValidateImageUnsupportedFormat() {
+    public function testValidateUnsupportedFormat() {
         $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.tiff');
         $image = new CM_Image_Image($imageFile->read());
-        $image->validateImage();
+        $image->validate();
     }
 
     /**
      * @expectedException CM_Exception
      * @expectedExceptionMessage Cannot load Imagick instance
      */
-    public function testValidateImageCorruptHeader() {
+    public function testValidateCorruptHeader() {
         $imageFile = new CM_File(DIR_TEST_DATA . 'img/corrupt-header.jpg');
         $image = new CM_Image_Image($imageFile->read());
     }
@@ -66,17 +66,17 @@ class CM_Image_ImageTest extends CMTest_TestCase {
      * @expectedException CM_Exception
      * @expectedExceptionMessage Cannot load Imagick instance
      */
-    public function testValidateImageEmptyFile() {
+    public function testValidateEmptyFile() {
         $imageFile = new CM_File(DIR_TEST_DATA . 'img/empty.jpg');
         $image = new CM_Image_Image($imageFile->read());
-        $image->validateImage();
+        $image->validate();
     }
 
     /**
      * @expectedException CM_Exception
      * @expectedExceptionMessage Cannot load Imagick instance
      */
-    public function testValidateImageNoImage() {
+    public function testValidateNoImage() {
         $imageFile = new CM_File(DIR_TEST_DATA . 'test.jpg.zip');
         $image = new CM_Image_Image($imageFile->read());
     }
