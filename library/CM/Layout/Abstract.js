@@ -50,6 +50,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
             window.clearTimeout(layout._timeoutLoading);
             layout._$pagePlaceholder.addClass('error').html('<pre>' + error.msg + '</pre>');
             layout._onPageError();
+            throw error;
           }
         });
     }, {cancel: true});

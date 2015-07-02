@@ -281,10 +281,13 @@ var CM_App = CM_Class_Abstract.extend({
     },
     /**
      * @param {Object} content
+     * @param {String} content.msg
+     * @param {String} content.type
+     * @param {Boolean} content.isPublic
      * @return {Error}
      */
     create: function(content) {
-      var error = new Error();
+      var error = new Error(content.msg);
       return _.extend(error, content);
     }
   },
@@ -678,7 +681,7 @@ var CM_App = CM_Class_Abstract.extend({
         e.preventDefault();
         var error = e.originalEvent.detail.reason;
         if (!(error instanceof Promise.CancellationError)) {
-          cm.error.trigger(error.msg, error.type, error.isPublic);
+          throw error;
         }
       });
       $(window).focus(function() {
