@@ -195,7 +195,7 @@ class CM_Image_Image {
         $widthResize = $dimensions['width'];
         $heightResize = $dimensions['height'];
 
-        if ($square && ($width !== $height )) {
+        if ($square && ($width !== $height)) {
             $cropSize = min($width, $height);
             $this->crop($cropSize, $cropSize);
         }
@@ -243,7 +243,6 @@ class CM_Image_Image {
     /**
      * @param int $quality 1-100
      * @return $this
-     * @throws CM_Exception
      * @throws CM_Exception_Invalid
      */
     public function setCompressionQuality($quality) {
@@ -251,9 +250,7 @@ class CM_Image_Image {
         if ($quality < 1 || $quality > 100) {
             throw new CM_Exception_Invalid('Invalid compression quality `' . $quality . '`, should be between 1-100.');
         }
-        if (true !== $this->_imagick->setImageCompressionQuality($quality)) {
-            throw new CM_Exception('Cannot set compression quality to `' . $quality . '`.');
-        }
+        $this->_imagick->setImageCompressionQuality($quality);
         return $this;
     }
 
