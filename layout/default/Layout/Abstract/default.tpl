@@ -10,6 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="{$render->getSite()->getName()|escape}">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name=”msapplication-tap-highlight” content=”no” />
     <meta name="msapplication-TileColor" content="{block name='tileColor'}{lessVariable name='colorBrand'}{/block}">
     <meta name="msapplication-TileImage" content="{resourceUrl path='img/meta/mstile-144x144.png' type='layout'}">
     <meta name="msapplication-config" content="{resourceUrl path='browserconfig.xml' type='layout'}">
@@ -53,10 +54,9 @@
     {resourceCss file='all.css' type="library"}
     {resourceJs file='before-body.js' type="vendor"}
     {block name='head'}{/block}
-
-    {$render->getServiceManager()->getTrackings()->getHtml($render->getEnvironment())}
   </head>
   <body id="{$viewResponse->getAutoId()}" class="{$viewResponse->getCssClasses()|implode:' '}">
+    {$render->getServiceManager()->getTrackings()->getHtml($render->getEnvironment())}
     {if CM_Http_Request_Abstract::hasInstance() && !CM_Http_Request_Abstract::getInstance()->isSupported()}
       <div id="browserNotSupported">
         <h2><span class="icon-warning"></span> {translate 'Your browser is no longer supported.'}</h2>
