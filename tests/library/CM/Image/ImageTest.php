@@ -2,6 +2,31 @@
 
 class CM_Image_ImageTest extends CMTest_TestCase {
 
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot load Imagick instance
+     */
+    public function testConstructCorruptHeader() {
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/corrupt-header.jpg');
+        new CM_Image_Image($imageFile->read());
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot load Imagick instance
+     */
+    public function testConstructEmptyData() {
+        new CM_Image_Image('');
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot load Imagick instance
+     */
+    public function testConstructInvalidData() {
+        new CM_Image_Image('foobar');
+    }
+
     public function testCrop() {
         $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
         $imageOriginal = new CM_Image_Image($imageFile->read());
@@ -36,13 +61,6 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $this->assertTrue(true);
     }
 
-    public function testValidateJpgNoExtension() {
-        $imageFile = new CM_File(DIR_TEST_DATA . 'img/jpg-no-extension');
-        $image = new CM_Image_Image($imageFile->read());
-        $image->validate();
-        $this->assertTrue(true);
-    }
-
     /**
      * @expectedException CM_Exception
      * @expectedExceptionMessage Unsupported format
@@ -51,34 +69,6 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.tiff');
         $image = new CM_Image_Image($imageFile->read());
         $image->validate();
-    }
-
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot load Imagick instance
-     */
-    public function testValidateCorruptHeader() {
-        $imageFile = new CM_File(DIR_TEST_DATA . 'img/corrupt-header.jpg');
-        $image = new CM_Image_Image($imageFile->read());
-    }
-
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot load Imagick instance
-     */
-    public function testValidateEmptyFile() {
-        $imageFile = new CM_File(DIR_TEST_DATA . 'img/empty.jpg');
-        $image = new CM_Image_Image($imageFile->read());
-        $image->validate();
-    }
-
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot load Imagick instance
-     */
-    public function testValidateNoImage() {
-        $imageFile = new CM_File(DIR_TEST_DATA . 'test.jpg.zip');
-        $image = new CM_Image_Image($imageFile->read());
     }
 
     public function testRotate() {
@@ -130,7 +120,6 @@ class CM_Image_ImageTest extends CMTest_TestCase {
             DIR_TEST_DATA . 'img/test.jpg'            => CM_Image_Image::FORMAT_JPEG,
             DIR_TEST_DATA . 'img/test.gif'            => CM_Image_Image::FORMAT_GIF,
             DIR_TEST_DATA . 'img/test.png'            => CM_Image_Image::FORMAT_PNG,
-            DIR_TEST_DATA . 'img/jpg-no-extension'    => CM_Image_Image::FORMAT_JPEG,
             DIR_TEST_DATA . 'img/corrupt-content.jpg' => CM_Image_Image::FORMAT_JPEG,
         );
 
