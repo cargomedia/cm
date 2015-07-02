@@ -180,6 +180,7 @@ return function (CM_Config_Node $config) {
         'class'     => 'CMService_GoogleAnalytics_Client',
         'arguments' => array(
             'code' => 'my-web-property-id',
+            'ttl'  => 86400,
         )
     );
 
