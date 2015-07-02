@@ -16,8 +16,8 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   /** @type {Number} timeout ID */
   _timeoutLoading: null,
 
-  _ready: function() {
-    CM_View_Abstract.prototype._ready.call(this);
+  initialize: function() {
+    CM_View_Abstract.prototype.initialize.call(this);
 
     var layout = this;
     this._pageRequest = promiseThrottler(function(path) {
