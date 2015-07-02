@@ -132,7 +132,7 @@ class CM_Tools_Generator_Cli extends CM_Cli_Runnable_Abstract {
         });
         list($vendorName, $appName) = explode('/', $projectName);
 
-        $defaultDomain = $appName . '.dev';
+        $defaultDomain = $appName . '.dev.cargomedia.net';
         $hint = "Please provide local domain [{$defaultDomain}]:";
         $domain = $this->_read($hint, $domain, $defaultDomain, function ($value) use ($generatorApp) {
             if (!$generatorApp->isValidDomain($value)) {
