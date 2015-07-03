@@ -212,7 +212,6 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
         .catch(function(error){
           handler._stopErrorPropagation = false;
           handler.trigger('error error.' + action.name, error.msg, error.type, error.isPublic);
-          throw error;
         })
         .finally(function(){
           if (options.disableUI) {
