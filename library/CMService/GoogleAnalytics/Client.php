@@ -176,7 +176,7 @@ EOF;
             $fieldList['userId'] = (string) $user->getId();
         }
 
-        $html .= 'ga("create", "' . $this->_getCode() . '", ' . CM_Params::jsonEncode(array_filter($fieldList)) . ');';
+        $html .= 'ga("create", ' . CM_Params::jsonEncode($this->_getCode()) . ', ' . CM_Params::jsonEncode(array_filter($fieldList)) . ');';
         $html .= $this->getJs();
         $html .= '</script>';
 
