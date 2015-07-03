@@ -10,8 +10,8 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   /** @type jQuery|Null */
   _$pagePlaceholder: null,
 
-  /** @type Promise|Null */
-  _pageRequest: null,
+  /** @type PromiseThrottled|Null */
+  _loadPageThrottled: null,
 
   /** @type {Number} timeout ID */
   _timeoutLoading: null,
@@ -20,7 +20,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     CM_View_Abstract.prototype.initialize.call(this);
 
     var layout = this;
-    this._pageRequest = promiseThrottler(function(path) {
+    this._loadPageThrottled = promiseThrottler(function(path) {
       return layout.ajaxModal('loadPage', {path: path})
         .then(function(response) {
           window.clearTimeout(layout._timeoutLoading);
@@ -90,7 +90,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     this._timeoutLoading = this.setTimeout(function() {
       this._$pagePlaceholder.html('<div class="spinner spinner-expanded" />');
     }, 750);
-    this._pageRequest(path);
+    this._loadPageThrottled(path);
   },
 
   /**
