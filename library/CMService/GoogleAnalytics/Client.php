@@ -114,10 +114,10 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     public function getJs() {
         $js = '';
         foreach ($this->_fieldList as $fieldName => $fieldValue) {
-            $js .= 'ga("set", "' . $fieldName . '", "' . $fieldValue . '");';
+            $js .= 'ga("set", ' . CM_Params::jsonEncode($fieldName) . ', ' . CM_Params::jsonEncode($fieldValue) . ');';
         }
         foreach ($this->_pageViewList as $pageView) {
-            $js .= 'ga("send", "pageview", "' . $pageView . '");';
+            $js .= 'ga("send", "pageview", ' . CM_Params::jsonEncode($pageView) . ');';
         }
         foreach ($this->_eventList as $event) {
             $js .= 'ga("send", ' . CM_Params::jsonEncode(array_filter([
@@ -176,7 +176,7 @@ EOF;
             $fieldList['userId'] = (string) $user->getId();
         }
 
-        $html .= 'ga("create", "' . $this->_getCode() . '", ' . CM_Params::jsonEncode(array_filter($fieldList)) . ');';
+        $html .= 'ga("create", ' . CM_Params::jsonEncode($this->_getCode()) . ', ' . CM_Params::jsonEncode(array_filter($fieldList)) . ');';
         $html .= $this->getJs();
         $html .= '</script>';
 
