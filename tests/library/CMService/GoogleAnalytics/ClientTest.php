@@ -50,8 +50,10 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $this->assertNotContains('ga("set", "dimension', $js);
 
         $googleAnalytics->setCustomDimension(3, 'foo');
+        $googleAnalytics->setCustomDimension(4, '{"name":"müller"}');
         $js = $googleAnalytics->getJs($environment);
         $this->assertContains('ga("set", "dimension3", "foo")', $js);
+        $this->assertContains('ga("set", "dimension4", "{\"name\":\"m\u00fcller\"}")', $js);
     }
 
     public function testAddEvent() {
@@ -78,18 +80,18 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $googleAnalytics->addPageView(' / foo');
         $js = $googleAnalytics->getJs($environment);
         $this->assertSame(1, substr_count($js, 'ga("send", "pageview"'));
-        $this->assertSame(1, substr_count($js, 'ga("send", "pageview", " / foo");'));
+        $this->assertSame(1, substr_count($js, 'ga("send", "pageview", " \/ foo");'));
 
         $googleAnalytics->addPageView(' / foo');
         $js = $googleAnalytics->getJs($environment);
         $this->assertSame(2, substr_count($js, 'ga("send", "pageview"'));
-        $this->assertSame(2, substr_count($js, 'ga("send", "pageview", " / foo");'));
+        $this->assertSame(2, substr_count($js, 'ga("send", "pageview", " \/ foo");'));
 
         $googleAnalytics->addPageView(' / bar');
         $js = $googleAnalytics->getJs($environment);
         $this->assertSame(3, substr_count($js, 'ga("send", "pageview"'));
-        $this->assertSame(2, substr_count($js, 'ga("send", "pageview", " / foo");'));
-        $this->assertSame(1, substr_count($js, 'ga("send", "pageview", " / bar");'));
+        $this->assertSame(2, substr_count($js, 'ga("send", "pageview", " \/ foo");'));
+        $this->assertSame(1, substr_count($js, 'ga("send", "pageview", " \/ bar");'));
     }
 
     public function testSetPageView() {
@@ -101,12 +103,12 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $googleAnalytics->addPageView('/foo');
         $js = $googleAnalytics->getJs($environment);
         $this->assertSame(1, substr_count($js, 'ga("send", "pageview"'));
-        $this->assertSame(1, substr_count($js, 'ga("send", "pageview", "/foo");'));
+        $this->assertSame(1, substr_count($js, 'ga("send", "pageview", "\/foo");'));
 
         $googleAnalytics->setPageView('/bar');
         $js = $googleAnalytics->getJs($environment);
         $this->assertSame(1, substr_count($js, 'ga("send", "pageview"'));
-        $this->assertSame(1, substr_count($js, 'ga("send", "pageview", "/bar");'));
+        $this->assertSame(1, substr_count($js, 'ga("send", "pageview", "\/bar");'));
     }
 
     public function testTrackPageViewSetsUser() {
@@ -179,8 +181,8 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $googleAnalytics->trackPageView($environment, '/foo');
         $js = $googleAnalytics->getJs($environment);
         $this->assertContains('ga("set", "userId", "' . $user->getId() . '");', $js);
-        $this->assertContains('ga("send", "pageview", "/foo");', $js);
-        $this->assertContains('ga("send", "pageview", "/v/join/done");', $js);
+        $this->assertContains('ga("send", "pageview", "\/foo");', $js);
+        $this->assertContains('ga("send", "pageview", "\/v\/join\/done");', $js);
         $this->assertContains('ga("send", {"hitType":"event","eventCategory":"User","eventAction":"Create","eventLabel":"foo","eventValue":123,"nonInteraction":true});', $js);
     }
 
@@ -191,7 +193,7 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $this->forceInvokeMethod($googleAnalytics, '_pushHit', [$user, 'pageview', ['path' => '/v/join/done']]);
         $googleAnalytics->trackPageView($environment, '/foo');
         $js = $googleAnalytics->getJs($environment);
-        $this->assertContains('ga("send", "pageview", "/v/join/done");', $js);
+        $this->assertContains('ga("send", "pageview", "\/v\/join\/done");', $js);
     }
 
     public function testTtlExpired() {
@@ -201,6 +203,6 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $this->forceInvokeMethod($googleAnalytics, '_pushHit', [$user, 'pageview', ['path' => '/v/join/done']]);
         $googleAnalytics->trackPageView($environment, '/foo');
         $js = $googleAnalytics->getJs($environment);
-        $this->assertNotContains('ga("send", "pageview", "/v/join/done");', $js);
+        $this->assertNotContains('ga("send", "pageview", "\/v\/join\/done");', $js);
     }
 }

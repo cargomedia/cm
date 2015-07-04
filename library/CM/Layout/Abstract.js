@@ -79,6 +79,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
         if (!(error instanceof Promise.CancellationError)) {
           layout._$pagePlaceholder.addClass('error').html('<pre>' + error.msg + '</pre>');
           layout._onPageError();
+          throw error;
         }
       }).finally(function() {
         window.clearTimeout(timeoutLoading);
