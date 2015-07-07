@@ -56,7 +56,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
         if (cardinality && items.length > cardinality) {
           items.pop();
           field._$input.select2('data', items);
-          field.$el.popover('destroy').popoverInfo(cm.language.get('You can only select {$cardinality} items.', {'cardinality': cardinality}), 2000);
+          field.error(cm.language.get('You can only select {$cardinality} items.', {'cardinality': cardinality}));
           return false;
         }
         field.trigger('add', e.added);
