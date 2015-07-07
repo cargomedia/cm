@@ -13,6 +13,7 @@ var CM_App = CM_Class_Abstract.extend({
   options: {},
 
   ready: function() {
+    this.error.ready();
     this.dom.ready();
     this.window.ready();
     this.date.ready();
@@ -223,6 +224,16 @@ var CM_App = CM_Class_Abstract.extend({
 
   error: {
     _callbacks: {_all: []},
+
+    ready: function() {
+      $(window).on('unhandledrejection', function(e) {
+        e.preventDefault();
+        var error = e.originalEvent.detail.reason;
+        if (!(error instanceof Promise.CancellationError)) {
+          cm.error._globalHandler(error);
+        }
+      });
+    },
     /**
      * @param {String} msg
      * @param {String} [type]
@@ -289,6 +300,18 @@ var CM_App = CM_Class_Abstract.extend({
     create: function(content) {
       var error = new Error(content.msg);
       return _.extend(error, content);
+    },
+
+    setGlobalHandler: function(fn) {
+      cm.error._globalHandler = fn;
+    },
+
+    /**
+     * @param error
+     * @throws Error
+     */
+    _globalHandler: function(error) {
+      throw error;
     }
   },
 
@@ -676,13 +699,6 @@ var CM_App = CM_Class_Abstract.extend({
       handler.focus.add(handler.getId());
       $(window).on('beforeunload', function() {
         handler.focus.remove(handler.getId());
-      });
-      $(window).on('unhandledrejection', function(e) {
-        e.preventDefault();
-        var error = e.originalEvent.detail.reason;
-        if (!(error instanceof Promise.CancellationError)) {
-          throw error;
-        }
       });
       $(window).focus(function() {
         handler.focus.add(handler.getId());
