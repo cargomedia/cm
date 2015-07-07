@@ -129,8 +129,6 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
         }
         this.setFocus();
 
-      } else {
-        cm.error.trigger('FormField `' + this.getName() + '`: ' + message);
       }
     } else {
       $errorMessage.remove();

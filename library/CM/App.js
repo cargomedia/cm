@@ -235,62 +235,6 @@ var CM_App = CM_Class_Abstract.extend({
       });
     },
     /**
-     * @param {String} msg
-     * @param {String} [type]
-     * @param {Boolean} [isPublic]
-     */
-    trigger: function(msg, type, isPublic) {
-      for (var i = 0; i < this._callbacks._all.length; i++) {
-        if (false === this._callbacks._all[i](msg, type, isPublic)) {
-          return;
-        }
-      }
-      if (this._callbacks[type]) {
-        for (var j = 0; j < this._callbacks[type].length; j++) {
-          if (false === this._callbacks[type][j](msg, type, isPublic)) {
-            return;
-          }
-        }
-      }
-      if (isPublic) {
-        cm.window.hint(msg);
-      } else {
-        if (type) {
-          msg = type + ': ' + msg;
-        }
-        cm.window.hint(msg);
-        if (window.console && console.error) {
-          console.error('Error: ' + msg);
-        }
-      }
-    },
-    /**
-     * @param {String} msg
-     * @param {String} [type]
-     * @param {Boolean} [isPublic]
-     * @throws {String}
-     */
-    triggerThrow: function(msg, type, isPublic) {
-      this.trigger(msg, type, isPublic);
-      throw msg;
-    },
-    /**
-     * @param {Function} callback fn(msg, type, isPublic)
-     */
-    bind: function(callback) {
-      this.bindType('_all', callback);
-    },
-    /**
-     * @param {String} type
-     * @param {Function} callback fn(msg, type, isPublic)
-     */
-    bindType: function(type, callback) {
-      if (!this._callbacks[type]) {
-        this._callbacks[type] = [];
-      }
-      this._callbacks[type].push(callback);
-    },
-    /**
      * @param {Object} content
      * @param {String} content.msg
      * @param {String} content.type

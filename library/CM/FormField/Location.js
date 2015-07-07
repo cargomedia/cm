@@ -62,7 +62,7 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
         }
       })
       .catch(function(error) {
-        cm.error.trigger('Unable to detect location: ' + error ? error.message : '');
+        cm.window.hint('Unable to detect location');
       })
       .finally(function() {
         self.$('.detect-location').removeClass('waiting');
