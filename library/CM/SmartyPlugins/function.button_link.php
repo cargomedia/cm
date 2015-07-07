@@ -68,10 +68,6 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
         }
     }
 
-    if ($title) {
-        $class .= ' showTooltip';
-    }
-
     $onclick = false;
     if (isset($params['onclick'])) {
         $onclick = $params['onclick'];
