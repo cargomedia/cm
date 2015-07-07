@@ -44,7 +44,7 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
    */
   detectLocation: function() {
     if (!'geolocation' in navigator) {
-      cm.error.triggerThrow('Geolocation support unavailable');
+      throw cm.error.create({msg: 'Geolocation support unavailable'});
     }
     this.$('.detect-location').addClass('waiting');
 

@@ -69,7 +69,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   getPage: function() {
     var page = this.findPage();
     if (!page) {
-      cm.error.triggerThrow('Layout doesn\'t have a page');
+      throw cm.error.create({msg: 'Layout doesn\'t have a page'});
     }
     return page;
   },

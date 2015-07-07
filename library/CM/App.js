@@ -37,7 +37,7 @@ var CM_App = CM_Class_Abstract.extend({
         return !view.getParent();
       });
       if (!view) {
-        cm.error.triggerThrow('Cannot find root component');
+        throw cm.error.create({msg: 'Cannot find root component'});
       }
       return view;
     }
@@ -65,7 +65,7 @@ var CM_App = CM_Class_Abstract.extend({
   getLayout: function() {
     var layout = this.findView('CM_Layout_Abstract');
     if (!layout) {
-      cm.error.triggerThrow('Cannot find layout');
+      throw cm.error.create({msg: 'Cannot find layout'});
     }
     return layout;
   },
@@ -200,7 +200,7 @@ var CM_App = CM_Class_Abstract.extend({
   getUrlUserContent: function(path) {
     var matches = path.match(new RegExp('^([^/]+)/'));
     if (null === matches) {
-      cm.error.triggerThrow('Cannot detect namespace for user-content file `' + path + '`.');
+      throw cm.error.create({msg: 'Cannot detect namespace for user-content file `' + path + '`.'});
     }
     var namespace = matches[1];
     var urlList = cm.options.urlUserContentList;
@@ -898,7 +898,7 @@ var CM_App = CM_Class_Abstract.extend({
         return;
       }
       if (!channelKey || !channelType) {
-        cm.error.triggerThrow('No channel provided');
+        throw cm.error.create({msg: 'No channel provided'});
       }
       if (!this._channelDispatchers[channel]) {
         this._subscribe(channel);
@@ -919,7 +919,7 @@ var CM_App = CM_Class_Abstract.extend({
         return;
       }
       if (!channelKey || !channelType) {
-        cm.error.triggerThrow('No channel provided');
+        throw cm.error.create({msg: 'No channel provided'});
       }
       this._channelDispatchers[channel].off(this._getEventNames(namespace, true), callback, context);
       if (this._getBindCount(channel) === 0) {

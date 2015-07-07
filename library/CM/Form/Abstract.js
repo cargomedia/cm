@@ -81,7 +81,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    */
   getField: function(name) {
     if (!this._fields[name]) {
-      cm.error.triggerThrow(this.getClass() + ' cannot find form field `' + name + '`');
+      throw cm.error.create({msg: this.getClass() + ' cannot find form field `' + name + '`'});
     }
     return this._fields[name];
   },
@@ -266,7 +266,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     actionName = actionName || _.first(_.keys(this._actions));
     var action = this._actions[actionName];
     if (!action) {
-      cm.error.triggerThrow('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
+      throw cm.error.create({msg: 'Form `' + this.getClass() + '` has no action `' + actionName + '`.'});
     }
     action.name = actionName;
     return action;
