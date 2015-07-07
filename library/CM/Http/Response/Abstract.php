@@ -103,12 +103,20 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     public function getRender() {
         if (!$this->_render) {
             $languageRewrite = !$this->getViewer() && $this->getRequest()->getLanguageUrl();
-            $location = $this->getRequest()->getLocation();
-            $currency = null !== $location ? CM_Model_Currency::findByLocation($location) : null;
-            $environment = new CM_Frontend_Environment($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), null, null, $location, $currency);
+            $environment = $this->getEnvironment();
             $this->_render = new CM_Frontend_Render($environment, $languageRewrite, $this->getServiceManager());
         }
         return $this->_render;
+    }
+
+    /**
+     * @return CM_Frontend_Environment
+     * @throws CM_Exception_AuthRequired
+     */
+    public function getEnvironment() {
+        $location = $this->getRequest()->getLocation();
+        $currency = (null !== $location) ? CM_Model_Currency::findByLocation($location) : null;
+        return new CM_Frontend_Environment($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), null, null, $location, $currency);
     }
 
     /**
