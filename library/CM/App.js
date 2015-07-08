@@ -38,7 +38,7 @@ var CM_App = CM_Class_Abstract.extend({
         return !view.getParent();
       });
       if (!view) {
-        throw cm.error.create({msg: 'Cannot find root component'});
+        throw new CM_Exception('Cannot find root component');
       }
       return view;
     }
@@ -66,7 +66,7 @@ var CM_App = CM_Class_Abstract.extend({
   getLayout: function() {
     var layout = this.findView('CM_Layout_Abstract');
     if (!layout) {
-      throw cm.error.create({msg: 'Cannot find layout'});
+      throw new CM_Exception('Cannot find layout');
     }
     return layout;
   },
@@ -201,7 +201,7 @@ var CM_App = CM_Class_Abstract.extend({
   getUrlUserContent: function(path) {
     var matches = path.match(new RegExp('^([^/]+)/'));
     if (null === matches) {
-      throw cm.error.create({msg: 'Cannot detect namespace for user-content file `' + path + '`.'});
+      throw new CM_Exception('Cannot detect namespace for user-content file `' + path + '`.');
     }
     var namespace = matches[1];
     var urlList = cm.options.urlUserContentList;
@@ -233,17 +233,6 @@ var CM_App = CM_Class_Abstract.extend({
           cm.error._globalHandler(error);
         }
       });
-    },
-    /**
-     * @param {Object} content
-     * @param {String} content.msg
-     * @param {String} content.type
-     * @param {Boolean} content.isPublic
-     * @return {Error}
-     */
-    create: function(content) {
-      var error = new Error(content.msg);
-      return _.extend(error, content);
     },
 
     /**
@@ -807,7 +796,7 @@ var CM_App = CM_Class_Abstract.extend({
       });
       jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
         if (response.error) {
-          reject(cm.error.create(response.error));
+          reject(new CM_Exception(response.error.msg, response.error.type, response.error.isPublic));
         } else {
           resolve(response.success);
         }
@@ -820,7 +809,7 @@ var CM_App = CM_Class_Abstract.extend({
         if (cm.options.debug) {
           msg = xhr.responseText || textStatus;
         }
-        reject(cm.error.create({msg: msg, type: null, isPublic: false}));
+        reject(new CM_Exception(msg));
       });
     }).cancellable();
   },
@@ -834,7 +823,7 @@ var CM_App = CM_Class_Abstract.extend({
     return this.ajax('rpc', {method: methodName, params: params})
       .then(function(response) {
         if (typeof(response.result) === 'undefined') {
-          throw cm.error.create({msg: 'RPC response has undefined result', type: null, isPublic: false});
+          throw new CM_Exception('RPC response has undefined result');
         }
         return response.result;
       });
@@ -861,7 +850,7 @@ var CM_App = CM_Class_Abstract.extend({
         return;
       }
       if (!channelKey || !channelType) {
-        throw cm.error.create({msg: 'No channel provided'});
+        throw new CM_Exception('No channel provided');
       }
       if (!this._channelDispatchers[channel]) {
         this._subscribe(channel);
@@ -882,7 +871,7 @@ var CM_App = CM_Class_Abstract.extend({
         return;
       }
       if (!channelKey || !channelType) {
-        throw cm.error.create({msg: 'No channel provided'});
+        throw new CM_Exception('No channel provided');
       }
       this._channelDispatchers[channel].off(this._getEventNames(namespace, true), callback, context);
       if (this._getBindCount(channel) === 0) {

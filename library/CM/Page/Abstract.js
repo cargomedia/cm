@@ -46,7 +46,7 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
    */
   getStateParams: function() {
     if (!this.hasStateParams()) {
-      throw cm.error.create({msg: 'Page has no state params'});
+      throw new CM_Exception('Page has no state params');
     }
     return this._stateParams;
   },
@@ -56,7 +56,7 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
    */
   getState: function() {
     if (!this.hasStateParams()) {
-      throw cm.error.create({msg: 'Page has no state params'});
+      throw new CM_Exception('Page has no state params');
     }
     return this._state;
   },
@@ -66,7 +66,7 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
    */
   setState: function(state) {
     if (!_.isEmpty(_.difference(_.keys(state), this.getStateParams()))) {
-      throw cm.error.create({msg: 'Invalid state'});
+      throw new CM_Exception('Invalid state');
     }
     this._state = state;
   },
