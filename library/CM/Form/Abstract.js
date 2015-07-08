@@ -211,7 +211,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
         })
         .catch(function(error){
           handler._stopErrorPropagation = false;
-          handler.trigger('error error.' + action.name, error.msg, error.type, error.isPublic);
+          handler.trigger('error error.' + action.name, error.message, error.type, error.isPublic);
           if (!handler._stopErrorPropagation) {
             throw error;
           }
