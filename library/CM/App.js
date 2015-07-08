@@ -796,7 +796,7 @@ var CM_App = CM_Class_Abstract.extend({
       });
       jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
         if (response.error) {
-          reject(new CM_Exception(response.error.msg, response.error.type, response.error.isPublic));
+          reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
         } else {
           resolve(response.success);
         }
