@@ -209,7 +209,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
           handler.trigger('success success.' + action.name, response.data);
           return response.data;
         })
-        .catch(function(error){
+        .catch(CM_Exception, function(error){
           handler._stopErrorPropagation = false;
           handler.trigger('error error.' + action.name, error.message, error.type, error.isPublic);
           if (!handler._stopErrorPropagation) {

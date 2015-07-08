@@ -30,7 +30,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
           self.error();
         }
       })
-      .catch(function(error) {
+      .catch(CM_Exception, function(error) {
         if ('CM_Exception_FormFieldValidation' == error.type) {
           self.error(error.message);
         } else if (value == self.getValue()) {
