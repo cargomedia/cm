@@ -246,12 +246,15 @@ var CM_App = CM_Class_Abstract.extend({
       return _.extend(error, content);
     },
 
+    /**
+     * @param {Function} fn
+     */
     setGlobalHandler: function(fn) {
       cm.error._globalHandler = fn;
     },
 
     /**
-     * @param error
+     * @param {Error} error
      * @throws Error
      */
     _globalHandler: function(error) {
