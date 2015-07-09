@@ -1,4 +1,4 @@
-(function(global) {
+(function(scope) {
 
   /**
    * @class CM_Exception
@@ -55,8 +55,6 @@
     return extension;
   };
 
-  global.CM_Exception_AuthRequired = CM_Exception.extend('CM_Exception_AuthRequired');
-  global.CM_Exception_Nonexistent = CM_Exception.extend('CM_Exception_Nonexistent');
-  global['CM_Exception'] = CM_Exception;
+  scope['CM_Exception'] = CM_Exception;
 
 })(window);
