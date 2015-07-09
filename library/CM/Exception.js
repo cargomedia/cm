@@ -10,7 +10,7 @@
    */
   function CM_Exception(message, isPublic) {
     var temp = Error.call(this, message);
-    temp.name = this.name = 'CM_Exception';
+    this.name = 'CM_Exception';
     this.stack = temp.stack;
     this.message = temp.message;
     this.isPublic = isPublic;
@@ -39,7 +39,7 @@
     };
     extension.prototype = Object.create(CM_Exception.prototype);
     extension.prototype.constructor = CM_Exception;
-    exceptionMap[className] = global[className] = extension;
+    exceptionMap[className] = extension;
     return extension;
   };
 
@@ -50,13 +50,13 @@
   CM_Exception.factory = function(className) {
     var extension = exceptionMap[className];
     if (!extension) {
-      throw new CM_Exception_Nonexistent('No such exception as ' + className);
+      throw new CM_Exception('No such exception ' + className);
     }
     return extension;
   };
 
-  CM_Exception.extend('CM_Exception_AuthRequired');
-  CM_Exception.extend('CM_Exception_Nonexistent');
+  global.CM_Exception_AuthRequired = CM_Exception.extend('CM_Exception_AuthRequired');
+  global.CM_Exception_Nonexistent = CM_Exception.extend('CM_Exception_Nonexistent');
   global['CM_Exception'] = CM_Exception;
 
 })(window);
