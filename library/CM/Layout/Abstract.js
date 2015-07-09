@@ -10,8 +10,51 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   /** @type jQuery|Null */
   _$pagePlaceholder: null,
 
-  /** @type Promise|Null */
-  _pageRequest: null,
+  /** @type PromiseThrottled|Null */
+  _loadPageThrottled: null,
+
+  /** @type {Number} timeout ID */
+  _timeoutLoading: null,
+
+  initialize: function() {
+    CM_View_Abstract.prototype.initialize.call(this);
+
+    var layout = this;
+    this._loadPageThrottled = promiseThrottler(function(path) {
+      return layout.ajaxModal('loadPage', {path: path})
+        .then(function(response) {
+          window.clearTimeout(layout._timeoutLoading);
+          if (response.redirectExternal) {
+            cm.router.route(response.redirectExternal);
+            return;
+          }
+          var view = layout._injectView(response);
+          var reload = (layout.getClass() != response.layoutClass);
+          if (reload) {
+            window.location.replace(response.url);
+            return;
+          }
+          layout._$pagePlaceholder.replaceWith(view.$el);
+          layout._$pagePlaceholder = null;
+          var fragment = response.url.substr(cm.getUrl().length);
+          if (path === fragment + window.location.hash) {
+            fragment = path;
+          }
+          window.history.replaceState(null, null, fragment);
+          layout._onPageSetup(view, response.title, response.url, response.menuEntryHashList, response.jsTracking);
+          view._ready();
+          return view;
+        })
+        .catch(function(error) {
+          if (!(error instanceof Promise.CancellationError)) {
+            window.clearTimeout(layout._timeoutLoading);
+            layout._$pagePlaceholder.addClass('error').html('<pre>' + error.msg + '</pre>');
+            layout._onPageError();
+            throw error;
+          }
+        });
+    }, {cancel: true});
+  },
 
   /**
    * @returns {CM_View_Abstract|null}
@@ -44,46 +87,10 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     } else {
       this._$pagePlaceholder.removeClass('error').html('');
     }
-    var timeoutLoading = this.setTimeout(function() {
+    this._timeoutLoading = this.setTimeout(function() {
       this._$pagePlaceholder.html('<div class="spinner spinner-expanded" />');
     }, 750);
-
-    if (this._pageRequest) {
-      this._pageRequest.cancel();
-    }
-    var layout = this;
-    this._pageRequest = this.ajaxModal('loadPage', {path: path})
-      .then(function(response) {
-        if (response.redirectExternal) {
-          cm.router.route(response.redirectExternal);
-          return;
-        }
-        var view = layout._injectView(response);
-        var reload = (layout.getClass() != response.layoutClass);
-        if (reload) {
-          window.location.replace(response.url);
-          return;
-        }
-        layout._$pagePlaceholder.replaceWith(view.$el);
-        layout._$pagePlaceholder = null;
-        var fragment = response.url.substr(cm.getUrl().length);
-        if (path === fragment + window.location.hash) {
-          fragment = path;
-        }
-        window.history.replaceState(null, null, fragment);
-        layout._onPageSetup(view, response.title, response.url, response.menuEntryHashList, response.jsTracking);
-        view._ready();
-        return view;
-      })
-      .catch(function(error) {
-        if (!(error instanceof Promise.CancellationError)) {
-          layout._$pagePlaceholder.addClass('error').html('<pre>' + error.msg + '</pre>');
-          layout._onPageError();
-          throw error;
-        }
-      }).finally(function() {
-        window.clearTimeout(timeoutLoading);
-      });
+    this._loadPageThrottled(path);
   },
 
   /**

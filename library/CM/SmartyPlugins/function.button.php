@@ -54,9 +54,6 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
     if ($icon) {
         $class .= ' hasIcon';
     }
-    if ($title) {
-        $class .= ' showTooltip';
-    }
 
     $id = $viewResponse->getAutoId() . '-' . $action->getName() . '-button';
 

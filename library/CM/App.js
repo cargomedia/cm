@@ -345,7 +345,6 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('.timeago').timeago();
       autosize($dom.find('textarea.autosize, .autosize textarea'));
       $dom.find('.clipSlide').clipSlide();
-      $dom.find('.showTooltip[title]').tooltip();
       $dom.find('.toggleNext').toggleNext();
       $dom.find('.tabs').tabs();
       $dom.find('.openx-ad:visible').openx();
@@ -377,7 +376,6 @@ var CM_App = CM_Class_Abstract.extend({
     teardown: function($dom) {
       $dom.find('.timeago').timeago('dispose');
       autosize.destroy($dom.find('textarea.autosize, .autosize textarea'));
-      $dom.find('.showTooltip[title]').tooltip('destroy');
     },
     /**
      * @param {jQuery} $element
