@@ -247,7 +247,9 @@ var CM_App = CM_Class_Abstract.extend({
      * @throws Error
      */
     _globalHandler: function(error) {
-      cm.window.hint(error.message);
+      if (error instanceof CM_Exception) {
+        cm.window.hint(error.message);
+      }
       throw error;
     }
   },
