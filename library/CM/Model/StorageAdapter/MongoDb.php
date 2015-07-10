@@ -56,7 +56,10 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
         $this->_getMongoDb()->update($collectionName, ['_id' => $mongoId], $data);
     }
 
-    public function create($type, array $data) {
+    public function create($type, array $data, array $options = null) {
+        if (null !== $options) {
+            throw new CM_Exception_NotImplemented('Options are not supported yet');
+        }
         $type = (int) $type;
         $data = ['_type' => $type] + $data;
         $collectionName = $this->_getCollectionName($type);

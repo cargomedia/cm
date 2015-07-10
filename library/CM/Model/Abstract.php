@@ -51,7 +51,12 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         $this->_getData(); // Make sure data can be loaded
     }
 
-    public function commit() {
+    /**
+     * @param array $options
+     * @throws CM_Exception_Invalid
+     * @throws CM_Exception_Nonexistent
+     */
+    public function commit(array $options = null) {
         $persistence = $this->_getPersistence();
         if (!$persistence) {
             throw new CM_Exception_Invalid('Cannot create model without persistence');
@@ -67,7 +72,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             }
             $this->_onChange();
         } else {
-            $this->_id = self::_castIdRaw($persistence->create($this->getType(), $this->_getSchemaData()));
+            $this->_id = self::_castIdRaw($persistence->create($this->getType(), $this->_getSchemaData(), $options));
 
             if ($cache = $this->_getCache()) {
                 $this->_loadAssets(true);
