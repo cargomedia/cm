@@ -52,7 +52,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
     }
 
     /**
-     * @param array $options
+     * @param array $options|null
      * @throws CM_Exception_Invalid
      * @throws CM_Exception_Nonexistent
      */
