@@ -7,7 +7,7 @@
   -webkit-overflow-scrolling: touch;
 }
 
-.scrollShadow:before, .scrollShadow:after {
+.scrollShadow::before, .scrollShadow::after {
   position: absolute;
   content: '';
   left: 0;
@@ -18,14 +18,14 @@
   opacity: 0;
 }
 
-.scrollShadow:before {
+.scrollShadow::before {
   top: 0;
 }
 
-.scrollShadow:after {
+.scrollShadow::after {
   bottom: 0;
 }
 
-.scrollShadow.notScrolledTop:before, .scrollShadow.notScrolledBottom:after {
+.scrollShadow.notScrolledTop::before, .scrollShadow.notScrolledBottom::after {
   opacity: 1;
 }
