@@ -191,7 +191,6 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
               }
             }
 
-            handler.trigger('error error.' + action.name);
             throw cm.error.create('error error.' + action.name);
           }
 
