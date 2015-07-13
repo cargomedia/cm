@@ -25,7 +25,7 @@ class CM_Model_StorageAdapter_Cache extends CM_Model_StorageAdapter_AbstractAdap
         CM_Cache_Shared::getInstance()->set($this->_getCacheKey($type, $id), $data);
     }
 
-    public function create($type, array $data, array $options = null) {
+    public function create($type, array $data, $useReplace = false) {
         throw new CM_Exception_NotImplemented();
     }
 

@@ -45,11 +45,8 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
         CM_Db_Db::update($this->_getTableName($type), $data, $id);
     }
 
-    public function create($type, array $data, array $options = null) {
-        $statement = 'INSERT';
-        if (null !== $options && !empty($options['useReplace'])) {
-            $statement = 'REPLACE';
-        }
+    public function create($type, array $data, $useReplace = false) {
+        $statement = ((boolean) $useReplace) ? 'REPLACE' : 'INSERT';
 
         $id = CM_Db_Db::insert($this->_getTableName($type), $data, null, null, $statement);
         if (null === $id) {

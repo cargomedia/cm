@@ -52,13 +52,15 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
     }
 
     /**
-     * @param array $createOptions |null
+     * @param bool $useReplace
      * @throws CM_Exception_Invalid
      * @throws CM_Exception_InvalidParam
      * @throws CM_Exception_Nonexistent
      * @throws CM_Exception_NotImplemented
      */
-    public function commit(array $createOptions = null) {
+    public function commit($useReplace = false) {
+        $useReplace = (boolean) $useReplace;
+
         $persistence = $this->_getPersistence();
         if (!$persistence) {
             throw new CM_Exception_Invalid('Cannot create model without persistence');
@@ -76,14 +78,11 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             }
             $this->_onChange();
         } else {
-            if (null !== $createOptions) {
-                $this->_validateCreateOptions($createOptions);
-                if (!empty($createOptions['useReplace']) && !($persistence instanceof CM_Model_StorageAdapter_ReplaceableInterface)) {
-                    throw new CM_Exception_NotImplemented('Param `useReplace` is not allowed for this adapter');
-                }
+            if ($useReplace && !($persistence instanceof CM_Model_StorageAdapter_ReplaceableInterface)) {
+                throw new CM_Exception_NotImplemented('Param `useReplace` is not allowed for this adapter');
             }
 
-            $idRaw = $persistence->create($type, $this->_getSchemaData(), $createOptions);
+            $idRaw = $persistence->create($type, $this->_getSchemaData(), $useReplace);
             $this->_id = self::_castIdRaw($idRaw);
 
             if ($cache = $this->_getCache()) {
@@ -459,22 +458,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         if ($schema = $this->_getSchema()) {
             foreach ($data as $key => $value) {
                 $schema->validateField($key, $value);
-            }
-        }
-    }
-
-    /**
-     * @param array $options
-     * @throws CM_Exception_InvalidParam
-     */
-    protected function _validateCreateOptions(array $options) {
-        $validKeys = ['useReplace'];
-        if (sizeof($validKeys) < sizeof($options)) {
-            throw new CM_Exception_InvalidParam('Invalid createOptions param');
-        }
-        foreach ($options as $key => $val) {
-            if (!in_array($key, $validKeys)) {
-                throw new CM_Exception_InvalidParam('Invalid createOptions key: `' . $key . '`');
             }
         }
     }

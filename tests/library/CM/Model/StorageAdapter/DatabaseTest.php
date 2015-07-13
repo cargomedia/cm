@@ -94,14 +94,14 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
         $adapter->expects($this->any())->method('_getTableName')->will($this->returnValue('mock_modelStorageAdapter'));
         /** @var CM_Model_StorageAdapter_Database $adapter */
 
-        $id1 = $adapter->create($type, array('foo' => 'foo1', 'bar' => 23, 'baz' => 1, 'qux' => 3), array('useReplace' => true));
+        $id1 = $adapter->create($type, array('foo' => 'foo1', 'bar' => 23, 'baz' => 1, 'qux' => 3), true);
         $this->assertInternalType('array', $id1);
         $this->assertCount(1, $id1);
         $this->assertArrayHasKey('id', $id1);
         $this->assertInternalType('int', $id1['id']);
         $this->assertRow('mock_modelStorageAdapter', array('id' => $id1['id'], 'foo' => 'foo1', 'bar' => '23', 'baz' => '1', 'qux' => '3'));
 
-        $id2 = $adapter->create($type, array('foo' => 'foo2', 'bar' => 24, 'baz' => 1, 'qux' => 3), array('useReplace' => true));
+        $id2 = $adapter->create($type, array('foo' => 'foo2', 'bar' => 24, 'baz' => 1, 'qux' => 3), true);
         $this->assertInternalType('array', $id2);
         $this->assertCount(1, $id2);
         $this->assertArrayHasKey('id', $id2);
