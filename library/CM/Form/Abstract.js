@@ -45,7 +45,9 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       $btn.on(event, {action: name}, function(event) {
         event.preventDefault();
         event.stopPropagation();
-        return handler.submit(event.data.action).catch(function(error){});
+        return handler.submit(event.data.action).catch(function(error) {
+          //error is already handled and displayed in `submit`
+        });
       });
     }, this);
 
