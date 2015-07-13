@@ -54,4 +54,5 @@ return function (CM_Model_Language $language) {
     $language->setTranslation('{$file} has an invalid extension. Only {$extensions} are allowed.', '{$file} has an invalid extension. Only {$extensions} are allowed.',
         array('file', 'extensions'));
     $language->setTranslation('An unexpected connection problem occurred.', 'An unexpected connection problem occurred.');
+    $language->setTranslation('Unable to detect location', 'Unable to detect location');
 };
