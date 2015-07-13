@@ -16,22 +16,52 @@
    * @param {Boolean} options.cancel Whether to cancel the previous promise if it is still running.
    * @returns {PromiseThrottled}
    */
-  function promiseThrottler(fn, options) {
-    options = _.defaults(options, {cancel: false});
+  function throttleFunction(fn, options) {
+    options = _.defaults(options || {}, {cancel: false});
     var promise;
 
     return function() {
-      if (options.cancel && promise && promise.isPending() && promise.isCancellable()) {
-        promise.cancel();
-        promise = null;
+      if (promise && promise.isPending()) {
+        if (options.cancel && promise.isCancellable()) {
+          promise.cancel();
+          promise = null;
+        }
       }
+
       if (!promise || !promise.isPending()) {
-        promise = fn.apply(null, arguments);
+        var result = fn.apply(null, arguments);
+        if (!result instanceof Promise) {
+          result = Promise.resolve(result);
+        }
       }
-      return promise;
+      result.then(function() {
+        promise = null;
+      });
+      return result;
     };
   }
 
-  global.promiseThrottler = promiseThrottler;
+  var throttlersStorage = {};
+
+  /**
+   * @param {String} namespace
+   * @param {PromiseThrottled} fn
+   * @param {Object|null} options
+   * @param {Boolean} options.cancel Whether to cancel the previous promise if it is still running
+   * @returns {Promise}
+   */
+  function throttle(namespace, fn, options) {
+    if (!throttlersStorage[namespace]) {
+      throttlersStorage[namespace] = throttleFunction(fn, options);
+
+    }
+    return throttlersStorage[namespace]();
+  }
+
+  global.throttleFunction = throttleFunction;
+  global.throttle = throttle;
+
+  // temporary backward compatibility
+  global.promiseThrottler = throttleFunction;
 
 })(window);
