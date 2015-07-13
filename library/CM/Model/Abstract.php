@@ -52,31 +52,43 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
     }
 
     /**
-     * @param array $options|null
+     * @param array $createOptions |null
      * @throws CM_Exception_Invalid
+     * @throws CM_Exception_InvalidParam
      * @throws CM_Exception_Nonexistent
+     * @throws CM_Exception_NotImplemented
      */
-    public function commit(array $options = null) {
+    public function commit(array $createOptions = null) {
         $persistence = $this->_getPersistence();
         if (!$persistence) {
             throw new CM_Exception_Invalid('Cannot create model without persistence');
         }
+        $type = $this->getType();
+
         if ($this->hasIdRaw()) {
             $dataSchema = $this->_getSchemaData();
             if (!empty($dataSchema)) {
-                $persistence->save($this->getType(), $this->getIdRaw(), $dataSchema);
+                $persistence->save($type, $this->getIdRaw(), $dataSchema);
             }
 
             if ($cache = $this->_getCache()) {
-                $cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
+                $cache->save($type, $this->getIdRaw(), $this->_getData());
             }
             $this->_onChange();
         } else {
-            $this->_id = self::_castIdRaw($persistence->create($this->getType(), $this->_getSchemaData(), $options));
+            if (null !== $createOptions) {
+                $this->_validateCreateOptions($createOptions);
+                if (!empty($createOptions['useReplace']) && !($persistence instanceof CM_Model_StorageAdapter_ReplaceableInterface)) {
+                    throw new CM_Exception_NotImplemented('Param `useReplace` is not allowed for this adapter');
+                }
+            }
+
+            $idRaw = $persistence->create($type, $this->_getSchemaData(), $createOptions);
+            $this->_id = self::_castIdRaw($idRaw);
 
             if ($cache = $this->_getCache()) {
                 $this->_loadAssets(true);
-                $cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
+                $cache->save($type, $this->getIdRaw(), $this->_getData());
             }
             $this->_onChange();
             $this->_changeContainingCacheables();
@@ -447,6 +459,22 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         if ($schema = $this->_getSchema()) {
             foreach ($data as $key => $value) {
                 $schema->validateField($key, $value);
+            }
+        }
+    }
+
+    /**
+     * @param array $options
+     * @throws CM_Exception_InvalidParam
+     */
+    protected function _validateCreateOptions(array $options) {
+        $validKeys = ['useReplace'];
+        if (sizeof($validKeys) < sizeof($options)) {
+            throw new CM_Exception_InvalidParam('Invalid createOptions param');
+        }
+        foreach ($options as $key => $val) {
+            if (!in_array($key, $validKeys)) {
+                throw new CM_Exception_InvalidParam('Invalid createOptions key: `' . $key . '`');
             }
         }
     }

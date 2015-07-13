@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractAdapter implements CM_Model_StorageAdapter_FindableInterface {
+class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractAdapter implements CM_Model_StorageAdapter_FindableInterface, CM_Model_StorageAdapter_ReplaceableInterface {
 
     public function load($type, array $id) {
         return CM_Db_Db::select($this->_getTableName($type), '*', $id)->fetch();

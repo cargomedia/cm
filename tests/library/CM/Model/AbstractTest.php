@@ -1091,6 +1091,36 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
         $this->assertSame('CM_Model_DebugInfoMock2', $model->getDebugInfo());
     }
+
+    public function testValidateCreateOptions() {
+        $model = new CM_ModelMock2();
+
+        CMTest_TH::callProtectedMethod($model, '_validateCreateOptions', [['useReplace' => true]]);
+
+        $exception = $this->catchException(function () use ($model) {
+            CMTest_TH::callProtectedMethod($model, '_validateCreateOptions', [['useReplace' => true, 'foo' => 'bar']]);
+        });
+        $this->isInstanceOf('CM_Exception_InvalidParam', $exception);
+        $this->assertSame('Invalid createOptions param', $exception->getMessage());
+
+        $exception = $this->catchException(function () use ($model) {
+            CMTest_TH::callProtectedMethod($model, '_validateCreateOptions', [['foo' => 'bar']]);
+        });
+        $this->isInstanceOf('CM_Exception_InvalidParam', $exception);
+        $this->assertSame('Invalid createOptions key: `foo`', $exception->getMessage());
+    }
+
+    public function testCommitWithReplace() {
+        $dbModel = new CM_ModelMock3();
+        $dbModel->commit(['useReplace' => true]);
+
+        $cacheModel = new CM_ModelMock4();
+        $exception = $this->catchException(function () use ($cacheModel) {
+            $cacheModel->commit(['useReplace' => true]);
+        });
+        $this->isInstanceOf('CM_Exception_NotImplemented', $exception);
+        $this->assertSame('Param `useReplace` is not allowed for this adapter', $exception->getMessage());
+    }
 }
 
 class CM_ModelMock extends CM_Model_Abstract {
@@ -1268,3 +1298,19 @@ class CM_ModelMock3 extends CM_Model_Abstract {
         return 4;
     }
 }
+
+class CM_ModelMock4 extends CM_Model_Abstract {
+
+    public function _getSchema() {
+        return new CM_Model_Schema_Definition(array('bar' => array('type' => 'int')));
+    }
+
+    public static function getPersistenceClass() {
+        return 'CM_Model_StorageAdapter_Cache';
+    }
+
+    public static function getTypeStatic() {
+        return 5;
+    }
+}
+
