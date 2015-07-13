@@ -27,10 +27,9 @@ abstract class CM_Model_StorageAdapter_AbstractAdapter extends CM_Class_Abstract
     /**
      * @param int   $type
      * @param array $data
-     * @param bool  $useReplace
      * @return array
      */
-    abstract public function create($type, array $data, $useReplace = false);
+    abstract public function create($type, array $data);
 
     /**
      * @param int   $type

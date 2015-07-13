@@ -1101,7 +1101,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
             $cacheModel->commit(true);
         });
         $this->isInstanceOf('CM_Exception_NotImplemented', $exception);
-        $this->assertSame('Param `useReplace` is not allowed for this adapter', $exception->getMessage());
+        $this->assertSame('Param `useReplace` is not allowed with '.CM_ModelMock4::getPersistenceClass(), $exception->getMessage());
     }
 }
 

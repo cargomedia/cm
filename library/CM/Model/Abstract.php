@@ -65,24 +65,28 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         if (!$persistence) {
             throw new CM_Exception_Invalid('Cannot create model without persistence');
         }
-        $type = $this->getType();
 
+        $type = $this->getType();
+        $dataSchema = $this->_getSchemaData();
         if ($this->hasIdRaw()) {
-            $dataSchema = $this->_getSchemaData();
             if (!empty($dataSchema)) {
                 $persistence->save($type, $this->getIdRaw(), $dataSchema);
             }
-
             if ($cache = $this->_getCache()) {
                 $cache->save($type, $this->getIdRaw(), $this->_getData());
             }
             $this->_onChange();
         } else {
-            if ($useReplace && !($persistence instanceof CM_Model_StorageAdapter_ReplaceableInterface)) {
-                throw new CM_Exception_NotImplemented('Param `useReplace` is not allowed for this adapter');
+            if ($useReplace) {
+                if (!$persistence instanceof CM_Model_StorageAdapter_ReplaceableInterface) {
+                    $adapterName = get_class($persistence);
+                    throw new CM_Exception_NotImplemented("Param `useReplace` is not allowed with {$adapterName}");
+                }
+                $idRaw = $persistence->replace($type, $dataSchema);
+            } else {
+                $idRaw = $persistence->create($type, $dataSchema);
             }
 
-            $idRaw = $persistence->create($type, $this->_getSchemaData(), $useReplace);
             $this->_id = self::_castIdRaw($idRaw);
 
             if ($cache = $this->_getCache()) {
