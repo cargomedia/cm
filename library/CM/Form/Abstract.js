@@ -45,7 +45,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       $btn.on(event, {action: name}, function(event) {
         event.preventDefault();
         event.stopPropagation();
-        return handler.submit(event.data.action);
+        return handler.submit(event.data.action).catch(function(error){});
       });
     }, this);
 
@@ -170,7 +170,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     }
 
     if (_.size(errorList)) {
-      return Promise.resolve();
+      return Promise.reject();
     } else {
       if (options.disableUI) {
         this.disable();
@@ -192,7 +192,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
             }
 
             handler.trigger('error error.' + action.name);
-            return;
+            throw cm.error.create('error error.' + action.name);
           }
 
           if (response.exec) {
@@ -212,6 +212,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
         .catch(function(error){
           handler._stopErrorPropagation = false;
           handler.trigger('error error.' + action.name, error.msg, error.type, error.isPublic);
+          throw error;
         })
         .finally(function(){
           if (options.disableUI) {
