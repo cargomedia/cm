@@ -16,15 +16,7 @@
 
     this.$elem.addClass('clipSlide');
     this.$content.css({display: 'block'});
-
-    var self = this;
-    if (this.$elem.find('img').length) {
-      $(this).imagesLoaded().always(function() {
-        self.toggle(false);
-      });
-    } else {
-      self.toggle(false);
-    }
+    this.toggle(false);
   }
 
   /**
