@@ -29,15 +29,9 @@
       }
 
       if (!promise || !promise.isPending()) {
-        var result = fn.apply(null, arguments);
-        if (!result instanceof Promise) {
-          result = Promise.resolve(result);
-        }
+        promise = fn.apply(null, arguments);
       }
-      result.then(function() {
-        promise = null;
-      });
-      return result;
+      return promise;
     };
   }
 
