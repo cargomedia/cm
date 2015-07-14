@@ -19,7 +19,6 @@
   function throttleFunction(fn, options) {
     options = _.defaults(options || {}, {cancel: false});
     var promise;
-    var laterPromiseToCancel;
 
     return function() {
       console.log('promise is ', promise);
@@ -39,18 +38,8 @@
           promise = Promise.resolve();
         }
       } else if (!options.cancel) {
-        if (!laterPromiseToCancel) {
-          console.log('create redundant promise');
-          laterPromiseToCancel = promise.finally(function() {
-            console.log('cancel redundant promise');
-            //redundantPromise.cancel();
-            laterPromiseToCancel = null;
-            promise = null;
-            throw new Promise.CancellationError();
-          });
-        }
-        console.log('return redundant promise');
-        return laterPromiseToCancel;
+        console.log('return a cancelled promise');
+        return Promise.reject(new Promise.CancellationError());
       }
       console.log('return promise');
       return promise;
