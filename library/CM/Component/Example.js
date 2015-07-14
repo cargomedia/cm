@@ -86,8 +86,8 @@ var CM_Component_Example = CM_Component_Abstract.extend({
 
   error_500_text_callback: function() {
     var self = this;
-    this.ajax('error', {status: 500, text: 'Errortext'}).catch(function(error) {
-      self.error('callback( type:' + error.type + ', msg:' + error.msg + ' )');
+    this.ajax('error', {status: 500, text: 'Errortext'}).catch(CM_Exception, function(error) {
+      self.error('callback( type:' + error.name + ', msg:' + error.message + ' )');
     });
   },
   error_599_text: function() {
@@ -96,8 +96,8 @@ var CM_Component_Example = CM_Component_Abstract.extend({
   error_CM_Exception_public_callback: function() {
     var self = this;
     this.ajax('error', {exception: 'CM_Exception', text: 'Errortext', 'public': true})
-      .catch(function(error) {
-        self.error('callback( type:' + error.type + ', msg:' + error.msg + ' )');
+      .catch(CM_Exception, function(error) {
+        self.error('callback( type:' + error.name + ', msg:' + error.message + ' )');
       });
   },
   error_CM_Exception_public: function() {
@@ -109,8 +109,8 @@ var CM_Component_Example = CM_Component_Abstract.extend({
   error_CM_Exception_AuthRequired_public_callback: function() {
     var self = this;
     this.ajax('error', {exception: 'CM_Exception_AuthRequired', text: 'Errortext', 'public': true})
-      .catch(function(error) {
-        self.error('callback( type:' + error.type + ', msg:' + error.msg + ' )');
+      .catch(CM_Exception, function(error) {
+        self.error('callback( type:' + error.name + ', msg:' + error.message + ' )');
       });
   },
   error_CM_Exception_AuthRequired_public: function() {

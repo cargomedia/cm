@@ -174,7 +174,7 @@ input[type=checkbox], input[type=radio] {
     cursor: pointer;
     margin-left: @sizeCheckbox+4px;
 
-    &:before {
+    &::before {
       box-sizing: border-box;
       position: absolute;
       content: "";
@@ -191,12 +191,12 @@ input[type=checkbox], input[type=radio] {
   }
 
   &:focus {
-    &:not(:disabled) + label:before {
+    &:not(:disabled) + label::before {
       .input_focus;
     }
   }
 
-  &:checked + label:before {
+  &:checked + label::before {
     background-color: @colorFocus;
     border-color: @colorFocus;
   }
@@ -207,25 +207,25 @@ input[type=checkbox], input[type=radio] {
 }
 
 input[type=radio] {
-  &:checked + label:before {
+  &:checked + label::before {
     box-shadow: inset 0 0 0 .2em @colorBgEmphasize1;
   }
 
   + label {
-    &:before {
+    &::before {
       border-radius: 50%;
     }
   }
 }
 
 input[type=checkbox] {
-  &:checked + label:before {
+  &:checked + label::before {
     background-image: image('checkbox.svg');
     background-size: contain;
   }
 
   + label {
-    &:before {
+    &::before {
       border-radius: 20%;
     }
   }
@@ -250,12 +250,12 @@ input[type=checkbox].checkbox-switch {
       background-color: @colorBgEmphasize1;
       box-shadow: 0 .1em .1em rgba(0, 0, 0, 0.02) inset;
 
-      &:before, &:after {
+      &::before, &::after {
         position: absolute;
         top: 0;
       }
 
-      &:before {
+      &::before {
         right: 0;
         margin: 0 5px;
         content: 'OFF';
@@ -266,7 +266,7 @@ input[type=checkbox].checkbox-switch {
         color: lighten(@colorFgSubtle, 10);
       }
 
-      &:after {
+      &::after {
         box-sizing: border-box;
         left: 0;
         content: '';
@@ -285,7 +285,7 @@ input[type=checkbox].checkbox-switch {
       vertical-align: middle;
     }
 
-    &:before {
+    &::before {
       display: none;
     }
   }
@@ -294,14 +294,14 @@ input[type=checkbox].checkbox-switch {
     background-color: @colorFocus;
     border-color: @colorFocus;
 
-    &:before {
+    &::before {
       right: 0;
       left: 0;
       content: 'ON';
       color: contrast(darken(@colorFocus, 30), black, white);
     }
 
-    &:after {
+    &::after {
       transform: translateX(@sizeSwitch + 4px);
       background-color: lighten(@colorFocus, 30);
     }
@@ -323,7 +323,7 @@ input[type=checkbox].checkbox-switch {
     color: @fontColorStrong;
     padding-left: 2px;
 
-    &:after {
+    &::after {
       content: ":";
     }
   }
