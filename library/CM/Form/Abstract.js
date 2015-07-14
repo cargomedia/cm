@@ -46,7 +46,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
         event.preventDefault();
         event.stopPropagation();
         return handler.submit(event.data.action).catch(CM_Exception_FormFieldValidation, function(error) {
-          //this error type is already handled and displayed in `submit`
+          // this error type is already handled and displayed in `submit`
         });
       });
     }, this);
