@@ -42,7 +42,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             $this->_id = self::_castIdRaw($id);
         }
         if (null !== $data) {
-            $this->_validateFields($data);
             $this->_setData($data);
         }
         foreach ($this->_getAssets() as $asset) {
@@ -67,6 +66,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             }
             $this->_onChange();
         } else {
+            $this->_validateFields($this->_getData(), true);
             $this->_id = self::_castIdRaw($persistence->create($this->getType(), $this->_getSchemaData()));
 
             if ($cache = $this->_getCache()) {
@@ -266,19 +266,16 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         if (null === $this->_data) {
             if ($cache = $this->_getCache()) {
                 if (false !== ($data = $cache->load($this->getType(), $this->getIdRaw()))) {
-                    $this->_validateFields($data);
                     $this->_setData($data);
                 }
             }
             if (null === $this->_data) {
                 if ($persistence = $this->_getPersistence()) {
                     if (false !== ($data = $persistence->load($this->getType(), $this->getIdRaw()))) {
-                        $this->_validateFields($data);
                         $this->_setData($data);
                     }
                 } else {
                     if (is_array($data = $this->_loadData())) {
-                        $this->_validateFields($data);
                         $this->_setData($data);
                     }
                 }
@@ -299,6 +296,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
      * @param array $data
      */
     protected function _setData(array $data) {
+        $this->_validateFields($data);
         $this->_data = $data;
     }
 
@@ -436,12 +434,20 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
     }
 
     /**
-     * @param array $data
+     * @param array     $data
+     * @param bool|null $checkMissingFields
      */
-    protected function _validateFields(array $data) {
+    protected function _validateFields(array $data, $checkMissingFields = null) {
         if ($schema = $this->_getSchema()) {
-            foreach ($data as $key => $value) {
-                $schema->validateField($key, $value);
+            if ($checkMissingFields) {
+                foreach ($schema->getFieldNames() as $key) {
+                    $value = isset($data[$key]) ? $data[$key] : null;
+                    $schema->validateField($key, $value);
+                }
+            } else {
+                foreach ($data as $key => $value) {
+                    $schema->validateField($key, $value);
+                }
             }
         }
     }
