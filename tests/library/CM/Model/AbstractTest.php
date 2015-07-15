@@ -108,6 +108,59 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $this->assertSame($data, $getData->invoke($modelMock));
     }
 
+    public function testSetDataValidatesFields() {
+        $data = array('foo' => 12, 'bar' => 23);
+
+        $modelMock = $this->mockObject('CM_Model_Abstract');
+        $methodValidateFields = $modelMock->mockMethod('_validateFields');
+        $methodValidateFields->set(function ($dataActual) use ($data) {
+            $this->assertEquals($dataActual, $data);
+        });
+
+        $this->forceInvokeMethod($modelMock, '_setData', [$data]);
+        $this->assertSame(1, $methodValidateFields->getCallCount());
+    }
+
+    public function testCreateValidatesFields() {
+        $modelMock = $this->mockObject('CM_Model_Abstract');
+        $methodValidateFields = $modelMock->mockMethod('_validateFields');
+        $methodValidateFields->set(function ($data, $checkMissingFields) {
+            $this->assertSame([], $data);
+            $this->assertSame(true, $checkMissingFields);
+        });
+        $modelMock->mockMethod('_getPersistence')->set(function () {
+            return new CM_Model_StorageAdapter_Database();
+        });
+        $modelMock->mockMethod('getType')->set(function () {
+            return 12;
+        });
+        $modelMock->mockMethod('_getSchema')->set(function () {
+            return new CM_Model_Schema_Definition([]);
+        });
+        /** @var CM_Model_Abstract $modelMock */
+        $modelMock->commit();
+        $this->assertSame(1, $methodValidateFields->getCallCount());
+    }
+
+    /**
+     * @expectedException CM_Model_Exception_Validation
+     * @expectedExceptionMessage Field `foo` is mandatory
+     */
+    public function testCreateMissingField() {
+        $modelMock = $this->mockObject('CM_Model_Abstract');
+        $modelMock->mockMethod('_getPersistence')->set(function () {
+            return new CM_Model_StorageAdapter_Database();
+        });
+        $modelMock->mockMethod('getType')->set(function () {
+            return 12;
+        });
+        $modelMock->mockMethod('_getSchema')->set(function () {
+            return new CM_Model_Schema_Definition(['foo' => ['type' => 'int']]);
+        });
+        /** @var CM_Model_Abstract $modelMock */
+        $modelMock->commit();
+    }
+
     public function testCommit() {
         $schema = new CM_Model_Schema_Definition(array('foo' => array()));
         $idRaw = array('id' => '909');
