@@ -1,12 +1,12 @@
 <?php
 
 return function (CM_Model_Language $language) {
-    $language->setTranslation('Ok', 'Ok');
-    $language->setTranslation('Cancel', 'Cancel');
-    $language->setTranslation('Close', 'Close');
-    $language->setTranslation('{$label} is required.', '{$label} is required.', array('label'));
-    $language->setTranslation('Confirmation', 'Confirmation');
-    $language->setTranslation('Required', 'Required');
+    $language->setTranslation('Ok');
+    $language->setTranslation('Cancel');
+    $language->setTranslation('Close');
+    $language->setTranslation('{$label} is required.', null, array('label'));
+    $language->setTranslation('Confirmation');
+    $language->setTranslation('Required');
     $language->setTranslation('.date.month.1', 'January');
     $language->setTranslation('.date.month.2', 'February');
     $language->setTranslation('.date.month.3', 'March');
@@ -50,10 +50,9 @@ return function (CM_Model_Language $language) {
     $language->setTranslation('.pagination.next', 'Next');
     $language->setTranslation('.pagination.previous', 'Previous');
     $language->setTranslation('.pagination.last', 'Last');
-    $language->setTranslation('You can only select {$cardinality} items.', 'You can only select {$cardinality} items.', array('cardinality'));
-    $language->setTranslation('{$file} has an invalid extension. Only {$extensions} are allowed.', '{$file} has an invalid extension. Only {$extensions} are allowed.',
-        array('file', 'extensions'));
-    $language->setTranslation('An unexpected connection problem occurred.', 'An unexpected connection problem occurred.');
-    $language->setTranslation('Unable to detect location', 'Unable to detect location');
-    $language->setTranslation('No Internet connection', 'No Internet connection');
+    $language->setTranslation('You can only select {$cardinality} items.', null, array('cardinality'));
+    $language->setTranslation('{$file} has an invalid extension. Only {$extensions} are allowed.', null, array('file', 'extensions'));
+    $language->setTranslation('An unexpected connection problem occurred.');
+    $language->setTranslation('Unable to detect location');
+    $language->setTranslation('No Internet connection');
 };
