@@ -55,4 +55,5 @@ return function (CM_Model_Language $language) {
         array('file', 'extensions'));
     $language->setTranslation('An unexpected connection problem occurred.', 'An unexpected connection problem occurred.');
     $language->setTranslation('Unable to detect location', 'Unable to detect location');
+    $language->setTranslation('No Internet connection', 'No Internet connection');
 };

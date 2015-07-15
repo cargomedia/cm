@@ -803,7 +803,7 @@ var CM_App = CM_Class_Abstract.extend({
         }
       }).fail(function(xhr, textStatus) {
         if (xhr.status === 0) {
-          reject(new CM_Exception_RequestFailed(cm.language.get('Unable connect to the site')));
+          reject(new CM_Exception_RequestFailed(cm.language.get('No Internet connection')));
         }
 
         var msg = cm.language.get('An unexpected connection problem occurred.');
