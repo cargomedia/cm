@@ -45,7 +45,9 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       $btn.on(event, {action: name}, function(event) {
         event.preventDefault();
         event.stopPropagation();
-        return handler.submit(event.data.action);
+        return handler.submit(event.data.action).catch(CM_Exception_FormFieldValidation, function(error) {
+          // this error type is already handled and displayed in `submit`
+        });
       });
     }, this);
 
@@ -170,7 +172,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     }
 
     if (_.size(errorList)) {
-      return Promise.resolve();
+      return Promise.reject(new CM_Exception_FormFieldValidation(errorList));
     } else {
       if (options.disableUI) {
         this.disable();
@@ -191,8 +193,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
               }
             }
 
-            handler.trigger('error error.' + action.name);
-            return;
+            throw new CM_Exception_FormFieldValidation(response.errors);
           }
 
           if (response.exec) {
@@ -209,7 +210,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
           handler.trigger('success success.' + action.name, response.data);
           return response.data;
         })
-        .catch(CM_Exception, function(error){
+        .catch(CM_Exception_FormFieldValidation, function(error){
           handler._stopErrorPropagation = false;
           handler.trigger('error error.' + action.name, error.message, error.name, error.isPublic);
           if (!handler._stopErrorPropagation) {
