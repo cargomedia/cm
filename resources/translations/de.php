@@ -63,4 +63,5 @@ return function (CM_Model_Language $language) {
     $language->setTranslation('Year', 'Jahr');
     $language->setTranslation('Month', 'Monat');
     $language->setTranslation('Day', 'Tag');
+    $language->setTranslation('No Internet connection', 'Keine Internetverbindung');
 };
