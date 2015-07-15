@@ -90,7 +90,7 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
    */
   replaceWithComponent: function(className, params, options) {
     if (!this.getParent()) {
-      cm.error.triggerThrow('Cannot replace root component');
+      throw new CM_Exception('Cannot replace root component');
     }
     var handler = this;
     options = _.defaults(options || {}, {

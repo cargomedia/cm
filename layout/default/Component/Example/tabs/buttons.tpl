@@ -1,7 +1,6 @@
 <h3>Basic</h3>
 {button_link label="Button"}
 {button_link label="Button with html <em>tags</em>" isHtmlLabel=true}
-{button_link label="With Tooltip" title="With Tooltip"}
 {button_link icon="like"}
 {button_link icon="trophy" label="With Icon"}
 <hr />

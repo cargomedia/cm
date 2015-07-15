@@ -81,7 +81,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    */
   getField: function(name) {
     if (!this._fields[name]) {
-      cm.error.triggerThrow(this.getClass() + ' cannot find form field `' + name + '`');
+      throw new CM_Exception(this.getClass() + ' cannot find form field `' + name + '`');
     }
     return this._fields[name];
   },
@@ -209,10 +209,12 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
           handler.trigger('success success.' + action.name, response.data);
           return response.data;
         })
-        .catch(function(error){
+        .catch(CM_Exception, function(error){
           handler._stopErrorPropagation = false;
-          handler.trigger('error error.' + action.name, error.msg, error.type, error.isPublic);
-          throw error;
+          handler.trigger('error error.' + action.name, error.message, error.name, error.isPublic);
+          if (!handler._stopErrorPropagation) {
+            throw error;
+          }
         })
         .finally(function(){
           if (options.disableUI) {
@@ -267,7 +269,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     actionName = actionName || _.first(_.keys(this._actions));
     var action = this._actions[actionName];
     if (!action) {
-      cm.error.triggerThrow('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
+      throw new CM_Exception('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
     }
     action.name = actionName;
     return action;

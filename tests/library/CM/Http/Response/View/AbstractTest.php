@@ -97,7 +97,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
         $this->assertViewResponseSuccess($response);
         $responseContent = CM_Params::decode($response->getContent(), true);
-        $this->assertContains('ga("send", "pageview", "' . $page::getPath() . '")', $responseContent['success']['data']['jsTracking']);
+        $pageview = CM_Params::jsonEncode($page::getPath());
+        $this->assertContains('ga("send", "pageview", ' . $pageview . ')', $responseContent['success']['data']['jsTracking']);
     }
 
     public function testLoadPageTrackingRedirect() {
@@ -110,7 +111,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $responseContent = CM_Params::decode($response->getContent(), true);
         $jsTracking = $responseContent['success']['data']['jsTracking'];
         $this->assertSame(1, substr_count($jsTracking, 'ga("send", "pageview"'));
-        $this->assertContains('ga("send", "pageview", "' . $page::getPath() . '?count=0")', $jsTracking);
+        $pageview = CM_Params::jsonEncode($page::getPath() . '?count=0');
+        $this->assertContains('ga("send", "pageview", ' . $pageview . ')', $jsTracking);
     }
 
     public function testLoadPageTrackingError() {
@@ -129,7 +131,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $html = $responseContent['success']['data']['html'];
 
         $this->assertSame(1, substr_count($jsTracking, 'ga("send", "pageview"'));
-        $this->assertContains('ga("send", "pageview", "/iwhdfkjlsh")', $jsTracking);
+        $this->assertContains('ga("send", "pageview", "\/iwhdfkjlsh")', $jsTracking);
         $this->assertContains('CM_Page_View_Ajax_Test_Mock', $html);
     }
 
