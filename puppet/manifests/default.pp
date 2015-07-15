@@ -7,7 +7,7 @@ node default {
   }
 
   environment::variable {'PHP_IDE_CONFIG':
-    value => 'serverName=www.cm.dev.cargomedia.net',
+    value => 'serverName=www.cm.dev.cargomedia.ch',
   }
 
 }
