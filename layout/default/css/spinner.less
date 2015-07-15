@@ -5,7 +5,7 @@
   min-height: @spinnerSize;
   min-width: @spinnerSize;
 
-  &:before {
+  &::before {
     box-sizing: border-box;
     content: '';
     position: absolute;
@@ -25,7 +25,7 @@
   bottom: 0;
   left: 0;
 
-  &:before {
+  &::before {
     top: 50%;
     left: 50%;
     margin-top: -@spinnerSize/2;

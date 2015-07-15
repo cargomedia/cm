@@ -48,7 +48,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
         .catch(function(error) {
           if (!(error instanceof Promise.CancellationError)) {
             window.clearTimeout(layout._timeoutLoading);
-            layout._$pagePlaceholder.addClass('error').html('<pre>' + error.msg + '</pre>');
+            layout._$pagePlaceholder.addClass('error').html('<pre>' + error.message + '</pre>');
             layout._onPageError();
             throw error;
           }
@@ -69,7 +69,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   getPage: function() {
     var page = this.findPage();
     if (!page) {
-      cm.error.triggerThrow('Layout doesn\'t have a page');
+      throw new CM_Exception('Layout doesn\'t have a page');
     }
     return page;
   },

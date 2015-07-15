@@ -17,7 +17,7 @@
    * @returns {PromiseThrottled}
    */
   function promiseThrottler(fn, options) {
-    options = _.defaults(options, {cancel: false});
+    options = _.defaults(options || {}, {cancel: false});
     var promise;
 
     return function() {
