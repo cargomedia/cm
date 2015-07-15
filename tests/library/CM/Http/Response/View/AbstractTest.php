@@ -57,6 +57,13 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
             ], $responseData);
     }
 
+    public function testProcessReturnDeployVersion() {
+        $response = $this->getResponseAjax(new CM_Page_View_Ajax_Test_Mock(), 'loadPage', ['path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()]);
+        $responseDecoded = CM_Params::jsonDecode($response->getContent());
+        $this->assertArrayHasKey('deployVersion', $responseDecoded);
+        $this->assertSame(CM_App::getInstance()->getDeployVersion(), $responseDecoded['deployVersion']);
+    }
+
     public function testLoadPageRedirectExternal() {
         $response = $this->getResponseAjax(new CM_Page_View_Ajax_Test_Mock(), 'loadPage', ['path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()]);
         $this->assertViewResponseSuccess($response, array('redirectExternal' => 'http://www.foo.bar'));
