@@ -33,28 +33,15 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $response->mockMethod('getRender')->set(new CM_Frontend_Render());
         /** @var CM_Http_Response_View_Abstract $response */
         CMTest_TH::callProtectedMethod($response, '_process');
-        $responseData = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame(
-            ['error' =>
-                 ['type'     => 'CM_Exception_Invalid',
-                  'msg'      => 'bar',
-                  'isPublic' => true
-                 ]
-            ], $responseData);
+        $this->assertViewResponseError($response, 'CM_Exception_Invalid', 'bar', true);
+
 
         $response->mockMethod('_processView')->set(function () {
             throw new CM_Exception_Nonexistent('foo');
         });
 
         CMTest_TH::callProtectedMethod($response, '_process');
-        $responseData = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame(
-            ['error' =>
-                 ['type'     => 'CM_Exception_Nonexistent',
-                  'msg'      => 'Internal server error',
-                  'isPublic' => false
-                 ]
-            ], $responseData);
+        $this->assertViewResponseError($response, 'CM_Exception_Nonexistent', 'Internal server error', false);
     }
 
     public function testProcessReturnDeployVersion() {
