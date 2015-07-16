@@ -131,13 +131,13 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
     public function testReloadComponent() {
         $component = new CM_Component_Notfound([]);
-        $scopeView = new CM_Frontend_ViewResponse($component);
-        $request = $this->createRequestAjax($component, 'reloadComponent', ['foo' => 'bar'], $scopeView, $scopeView);
+        $viewResponse = new CM_Frontend_ViewResponse($component);
+        $request = $this->createRequestAjax($component, 'reloadComponent', ['foo' => 'bar'], $viewResponse);
         $response = $this->processRequest($request);
         $this->assertViewResponseSuccess($response);
 
         $frontend = $response->getRender()->getGlobalResponse();
-        $oldAutoId = $scopeView->getAutoId();
+        $oldAutoId = $viewResponse->getAutoId();
         $newAutoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
         $expected = <<<EOL
@@ -158,13 +158,13 @@ EOL;
         $config->CM_Model_Entity_Mock2->type = CM_Model_Entity_Mock2::getTypeStatic();
 
         $component = new CM_Component_Mock();
-        $scopeView = new CM_Frontend_ViewResponse($component);
-        $request = $this->createRequestAjax($component, 'reloadComponent', ['entity' => $entity], $scopeView, $scopeView);
+        $viewResponse = new CM_Frontend_ViewResponse($component);
+        $request = $this->createRequestAjax($component, 'reloadComponent', ['entity' => $entity], $viewResponse);
         $response = $this->processRequest($request);
 
         $this->assertViewResponseSuccess($response);
         $frontend = $response->getRender()->getGlobalResponse();
-        $oldAutoId = $scopeView->getAutoId();
+        $oldAutoId = $viewResponse->getAutoId();
         $newAutoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
         $expected = <<<EOL
