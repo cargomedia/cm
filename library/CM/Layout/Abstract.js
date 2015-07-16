@@ -76,6 +76,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
 
   /**
    * @param {String} path
+   * @return Promise
    */
   loadPage: function(path) {
     cm.event.trigger('navigate', path);
@@ -90,7 +91,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     this._timeoutLoading = this.setTimeout(function() {
       this._$pagePlaceholder.html('<div class="spinner spinner-expanded" />');
     }, 750);
-    this._loadPageThrottled(path);
+    return this._loadPageThrottled(path);
   },
 
   /**
