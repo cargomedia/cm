@@ -160,6 +160,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         }, function (CM_Exception $e, array $errorOptions) use (&$output) {
             $output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());
         });
+        $output['deployVersion'] = CM_App::getInstance()->getDeployVersion();
 
         $this->setHeader('Content-Type', 'application/json');
         $this->_setContent(json_encode($output));

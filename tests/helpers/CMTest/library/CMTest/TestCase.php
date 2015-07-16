@@ -356,8 +356,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @param CM_Http_Response_View_Abstract $response
      * @param string|null                    $type
      * @param string|null                    $message
+     * @param boolean|null                   $isPublic
      */
-    public static function assertViewResponseError(CM_Http_Response_View_Abstract $response, $type = null, $message = null) {
+    public static function assertViewResponseError(CM_Http_Response_View_Abstract $response, $type = null, $message = null, $isPublic = null) {
         $responseContent = json_decode($response->getContent(), true);
         self::assertArrayHasKey('error', $responseContent, 'View response successful');
         if (null !== $type) {
@@ -365,6 +366,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         }
         if (null !== $message) {
             self::assertSame($message, $responseContent['error']['msg']);
+        }
+        if (null !== $isPublic) {
+            self::assertSame($isPublic, $responseContent['error']['isPublic']);
         }
     }
 
@@ -430,7 +434,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         if (null === $expectedExceptionClass) {
             $expectedExceptionClass = 'CM_Exception';
         }
-        $exception = $this->catchException(function() use ($component, $viewer) {
+        $exception = $this->catchException(function () use ($component, $viewer) {
             $this->_renderComponent($component, $viewer);
         });
         $this->assertInstanceOf($expectedExceptionClass, $exception);
@@ -599,7 +603,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             $expectedExceptionClass = 'CM_Exception';
         }
 
-        $exception = $this->catchException(function() use ($page, $viewer) {
+        $exception = $this->catchException(function () use ($page, $viewer) {
             $this->_renderPage($page, $viewer);
         });
         $this->assertInstanceOf($expectedExceptionClass, $exception);
