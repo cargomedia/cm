@@ -79,19 +79,24 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
    * @return Promise
    */
   loadPage: function(path) {
-    cm.event.trigger('navigate', path);
-
-    if (!this._$pagePlaceholder) {
-      this._$pagePlaceholder = $('<div class="router-placeholder" />');
-      this.getPage().replaceWithHtml(this._$pagePlaceholder);
-      this._onPageTeardown();
+    if (cm._shouldReload) {
+      window.location.href = cm.getUrl(path);
+      return Promise.resolve();
     } else {
-      this._$pagePlaceholder.removeClass('error').html('');
+      cm.event.trigger('navigate', path);
+
+      if (!this._$pagePlaceholder) {
+        this._$pagePlaceholder = $('<div class="router-placeholder" />');
+        this.getPage().replaceWithHtml(this._$pagePlaceholder);
+        this._onPageTeardown();
+      } else {
+        this._$pagePlaceholder.removeClass('error').html('');
+      }
+      this._timeoutLoading = this.setTimeout(function() {
+        this._$pagePlaceholder.html('<div class="spinner spinner-expanded" />');
+      }, 750);
+      return this._loadPageThrottled(path);
     }
-    this._timeoutLoading = this.setTimeout(function() {
-      this._$pagePlaceholder.html('<div class="spinner spinner-expanded" />');
-    }, 750);
-    return this._loadPageThrottled(path);
   },
 
   /**

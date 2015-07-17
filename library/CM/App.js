@@ -12,6 +12,12 @@ var CM_App = CM_Class_Abstract.extend({
   /** @type Object **/
   options: {},
 
+  /** @type {Boolean} **/
+  _shouldReload: false,
+
+  /** @type {Number|Null} **/
+  _deployVersion: null,
+
   ready: function() {
     this.error.ready();
     this.dom.ready();
@@ -19,6 +25,14 @@ var CM_App = CM_Class_Abstract.extend({
     this.date.ready();
     this.template.ready();
     this.router.ready();
+  },
+
+  updateDeployVersion: function(version) {
+    if (this._deployVersion && this._deployVersion != version) {
+      this._shouldReload = true;
+    } else {
+      this._deployVersion = version;
+    }
   },
 
   /**
@@ -786,6 +800,7 @@ var CM_App = CM_Class_Abstract.extend({
    */
   ajax: function(type, data) {
     var url = this.getUrlAjax(type);
+    var self = this;
 
     return new Promise(function(resolve, reject) {
       var jqXHR = $.ajax(url, {
@@ -796,6 +811,7 @@ var CM_App = CM_Class_Abstract.extend({
         cache: false
       });
       jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
+        self.updateDeployVersion(response.deployVersion);
         if (response.error) {
           reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
         } else {
