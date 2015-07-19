@@ -16,18 +16,15 @@
    * @param {Boolean} options.cancel Whether to cancel the previous promise if it is still running.
    * @returns {PromiseThrottled}
    */
-  function throttleFunction(fn, options) {
+  function promiseThrottler(fn, options) {
     options = _.defaults(options || {}, {cancel: false});
     var promise;
 
     return function() {
-      if (promise && promise.isPending()) {
-        if (options.cancel && promise.isCancellable()) {
-          promise.cancel();
-          promise = null;
-        }
+      if (options.cancel && promise && promise.isPending() && promise.isCancellable()) {
+        promise.cancel();
+        promise = null;
       }
-
       if (!promise || !promise.isPending()) {
         promise = fn.apply(null, arguments);
       }
@@ -35,7 +32,6 @@
     };
   }
 
-  // temporary backward compatibility
-  global.promiseThrottler = throttleFunction;
+  global.promiseThrottler = promiseThrottler;
 
 })(window);
