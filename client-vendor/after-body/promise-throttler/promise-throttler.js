@@ -35,26 +35,6 @@
     };
   }
 
-  var throttlersStorage = {};
-
-  /**
-   * @param {String} namespace
-   * @param {PromiseThrottled} fn
-   * @param {Object|null} options
-   * @param {Boolean} options.cancel Whether to cancel the previous promise if it is still running
-   * @returns {Promise}
-   */
-  function throttle(namespace, fn, options) {
-    if (!throttlersStorage[namespace]) {
-      throttlersStorage[namespace] = throttleFunction(fn, options);
-
-    }
-    return throttlersStorage[namespace]();
-  }
-
-  global.throttleFunction = throttleFunction;
-  global.throttle = throttle;
-
   // temporary backward compatibility
   global.promiseThrottler = throttleFunction;
 
