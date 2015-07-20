@@ -1149,7 +1149,7 @@ var CM_App = CM_Class_Abstract.extend({
     },
 
     forceReload: function() {
-      cm.router._shouldReload = true;
+      this._shouldReload = true;
     },
 
     /**
@@ -1158,7 +1158,7 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {Boolean|Null} [replaceState]
      */
     route: function(url, forceReload, replaceState) {
-      forceReload = cm.router._shouldReload || forceReload || false;
+      forceReload = this._shouldReload || forceReload || false;
       replaceState = replaceState || false;
       var urlBase = cm.getUrl();
       var fragment = url;
