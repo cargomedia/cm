@@ -805,7 +805,7 @@ var CM_App = CM_Class_Abstract.extend({
       });
       jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
         if (cm.getDeployVersion() != response.deployVersion) {
-          cm.router._shouldReload = true;
+          cm.router.forceReload();
         }
         if (response.error) {
           reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
@@ -1148,13 +1148,17 @@ var CM_App = CM_Class_Abstract.extend({
       });
     },
 
+    forceReload: function() {
+      cm.router._shouldReload = true;
+    },
+
     /**
      * @param {String} url
      * @param {Boolean|Null} [forceReload]
      * @param {Boolean|Null} [replaceState]
      */
     route: function(url, forceReload, replaceState) {
-      forceReload = this._shouldReload || forceReload || false;
+      forceReload = cm.router._shouldReload || forceReload || false;
       replaceState = replaceState || false;
       var urlBase = cm.getUrl();
       var fragment = url;
