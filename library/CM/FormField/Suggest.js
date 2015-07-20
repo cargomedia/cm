@@ -15,7 +15,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
     var prePopulate = this._$input.data('pre-populate');
 
     this._$input.removeClass('textinput');
-    this._$input.select2({
+    this._$input.select2(_.extend({
       separator: '--SELECT2SEPARATOR--',
       width: 'off',
       tags: null,
@@ -47,7 +47,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
         }
       },
       formatSelectionTooBig: null
-    }).select2('data', prePopulate);
+    }, this._select2Options)).select2('data', prePopulate);
     this.$('.select2-choices').addClass('textinput');
 
     this._$input.on("change", function(e) {
