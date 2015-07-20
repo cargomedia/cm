@@ -44,7 +44,7 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
    */
   detectLocation: function() {
     if (!'geolocation' in navigator) {
-      cm.error.triggerThrow('Geolocation support unavailable');
+      throw new CM_Exception('Geolocation support unavailable');
     }
     this.$('.detect-location').addClass('waiting');
 
@@ -62,7 +62,7 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
         }
       })
       .catch(function(error) {
-        cm.error.trigger('Unable to detect location: ' + error ? error.message : '');
+        self.error(cm.language.get('Unable to detect location'));
       })
       .finally(function() {
         self.$('.detect-location').removeClass('waiting');

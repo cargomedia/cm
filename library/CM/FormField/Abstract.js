@@ -30,9 +30,9 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
           self.error();
         }
       })
-      .catch(function(error) {
-        if ('CM_Exception_FormFieldValidation' == error.type) {
-          self.error(error.msg);
+      .catch(CM_Exception, function(error) {
+        if (error instanceof CM_Exception_FormFieldValidation) {
+          self.error(error.message);
         } else if (value == self.getValue()) {
           throw error;
         }
@@ -130,7 +130,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
         this.setFocus();
 
       } else {
-        cm.error.trigger('FormField `' + this.getName() + '`: ' + message);
+        throw new CM_Exception('FormField `' + this.getName() + '`: ' + message);
       }
     } else {
       $errorMessage.remove();

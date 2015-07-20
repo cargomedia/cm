@@ -13,6 +13,7 @@ var CM_App = CM_Class_Abstract.extend({
   options: {},
 
   ready: function() {
+    this.error.ready();
     this.dom.ready();
     this.window.ready();
     this.date.ready();
@@ -37,7 +38,7 @@ var CM_App = CM_Class_Abstract.extend({
         return !view.getParent();
       });
       if (!view) {
-        cm.error.triggerThrow('Cannot find root component');
+        throw new CM_Exception('Cannot find root component');
       }
       return view;
     }
@@ -65,7 +66,7 @@ var CM_App = CM_Class_Abstract.extend({
   getLayout: function() {
     var layout = this.findView('CM_Layout_Abstract');
     if (!layout) {
-      cm.error.triggerThrow('Cannot find layout');
+      throw new CM_Exception('Cannot find layout');
     }
     return layout;
   },
@@ -200,7 +201,7 @@ var CM_App = CM_Class_Abstract.extend({
   getUrlUserContent: function(path) {
     var matches = path.match(new RegExp('^([^/]+)/'));
     if (null === matches) {
-      cm.error.triggerThrow('Cannot detect namespace for user-content file `' + path + '`.');
+      throw new CM_Exception('Cannot detect namespace for user-content file `' + path + '`.');
     }
     var namespace = matches[1];
     var urlList = cm.options.urlUserContentList;
@@ -223,72 +224,33 @@ var CM_App = CM_Class_Abstract.extend({
 
   error: {
     _callbacks: {_all: []},
-    /**
-     * @param {String} msg
-     * @param {String} [type]
-     * @param {Boolean} [isPublic]
-     */
-    trigger: function(msg, type, isPublic) {
-      for (var i = 0; i < this._callbacks._all.length; i++) {
-        if (false === this._callbacks._all[i](msg, type, isPublic)) {
-          return;
+
+    ready: function() {
+      $(window).on('unhandledrejection', function(e) {
+        e.preventDefault();
+        var error = e.originalEvent.detail.reason;
+        if (!(error instanceof Promise.CancellationError)) {
+          cm.error._globalHandler(error);
         }
-      }
-      if (this._callbacks[type]) {
-        for (var j = 0; j < this._callbacks[type].length; j++) {
-          if (false === this._callbacks[type][j](msg, type, isPublic)) {
-            return;
-          }
-        }
-      }
-      if (isPublic) {
-        cm.window.hint(msg);
-      } else {
-        if (type) {
-          msg = type + ': ' + msg;
-        }
-        cm.window.hint(msg);
-        if (window.console && console.error) {
-          console.error('Error: ' + msg);
-        }
-      }
+      });
     },
+
     /**
-     * @param {String} msg
-     * @param {String} [type]
-     * @param {Boolean} [isPublic]
-     * @throws {String}
+     * @param {Function} fn
      */
-    triggerThrow: function(msg, type, isPublic) {
-      this.trigger(msg, type, isPublic);
-      throw msg;
+    setGlobalHandler: function(fn) {
+      cm.error._globalHandler = fn;
     },
+
     /**
-     * @param {Function} callback fn(msg, type, isPublic)
+     * @param {Error} error
+     * @throws Error
      */
-    bind: function(callback) {
-      this.bindType('_all', callback);
-    },
-    /**
-     * @param {String} type
-     * @param {Function} callback fn(msg, type, isPublic)
-     */
-    bindType: function(type, callback) {
-      if (!this._callbacks[type]) {
-        this._callbacks[type] = [];
+    _globalHandler: function(error) {
+      if (error instanceof CM_Exception) {
+        cm.window.hint(error.message);
       }
-      this._callbacks[type].push(callback);
-    },
-    /**
-     * @param {Object} content
-     * @param {String} content.msg
-     * @param {String} content.type
-     * @param {Boolean} content.isPublic
-     * @return {Error}
-     */
-    create: function(content) {
-      var error = new Error(content.msg);
-      return _.extend(error, content);
+      throw error;
     }
   },
 
@@ -675,13 +637,6 @@ var CM_App = CM_Class_Abstract.extend({
       $(window).on('beforeunload', function() {
         handler.focus.remove(handler.getId());
       });
-      $(window).on('unhandledrejection', function(e) {
-        e.preventDefault();
-        var error = e.originalEvent.detail.reason;
-        if (!(error instanceof Promise.CancellationError)) {
-          throw error;
-        }
-      });
       $(window).focus(function() {
         handler.focus.add(handler.getId());
         handler._hasFocus = true;
@@ -842,20 +797,20 @@ var CM_App = CM_Class_Abstract.extend({
       });
       jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
         if (response.error) {
-          reject(cm.error.create(response.error));
+          reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
         } else {
           resolve(response.success);
         }
       }).fail(function(xhr, textStatus) {
         if (xhr.status === 0) {
-          reject(Promise.CancellationError());
+          reject(new CM_Exception_RequestFailed(cm.language.get('No Internet connection')));
         }
 
         var msg = cm.language.get('An unexpected connection problem occurred.');
         if (cm.options.debug) {
           msg = xhr.responseText || textStatus;
         }
-        reject(cm.error.create({msg: msg, type: null, isPublic: false}));
+        reject(new CM_Exception(msg));
       });
     }).cancellable();
   },
@@ -869,7 +824,7 @@ var CM_App = CM_Class_Abstract.extend({
     return this.ajax('rpc', {method: methodName, params: params})
       .then(function(response) {
         if (typeof(response.result) === 'undefined') {
-          throw cm.error.create({msg: 'RPC response has undefined result', type: null, isPublic: false});
+          throw new CM_Exception('RPC response has undefined result');
         }
         return response.result;
       });
@@ -896,7 +851,7 @@ var CM_App = CM_Class_Abstract.extend({
         return;
       }
       if (!channelKey || !channelType) {
-        cm.error.triggerThrow('No channel provided');
+        throw new CM_Exception('No channel provided');
       }
       if (!this._channelDispatchers[channel]) {
         this._subscribe(channel);
@@ -917,7 +872,7 @@ var CM_App = CM_Class_Abstract.extend({
         return;
       }
       if (!channelKey || !channelType) {
-        cm.error.triggerThrow('No channel provided');
+        throw new CM_Exception('No channel provided');
       }
       this._channelDispatchers[channel].off(this._getEventNames(namespace, true), callback, context);
       if (this._getBindCount(channel) === 0) {
