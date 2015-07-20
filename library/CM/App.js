@@ -12,12 +12,6 @@ var CM_App = CM_Class_Abstract.extend({
   /** @type Object **/
   options: {},
 
-  /** @type {Boolean} **/
-  _shouldReload: false,
-
-  /** @type {Number|Null} **/
-  _deployVersion: null,
-
   ready: function() {
     this.error.ready();
     this.dom.ready();
@@ -27,12 +21,11 @@ var CM_App = CM_Class_Abstract.extend({
     this.router.ready();
   },
 
-  updateDeployVersion: function(version) {
-    if (this._deployVersion && this._deployVersion != version) {
-      this._shouldReload = true;
-    } else {
-      this._deployVersion = version;
-    }
+  /**
+   * @returns {Number}
+   */
+  getDeployVersion: function() {
+    return cm.options.deployVersion;
   },
 
   /**
@@ -811,7 +804,9 @@ var CM_App = CM_Class_Abstract.extend({
         cache: false
       });
       jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
-        self.updateDeployVersion(response.deployVersion);
+        if (cm.getDeployVersion() != response.deployVersion) {
+          cm.router._shouldReload = true;
+        }
         if (response.error) {
           reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
         } else {
@@ -1119,6 +1114,10 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   router: {
+
+    /** @type {Boolean} **/
+    _shouldReload: false,
+
     /** @type {String|Null} */
     hrefInitialIgnore: null,
 
@@ -1155,7 +1154,7 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {Boolean|Null} [replaceState]
      */
     route: function(url, forceReload, replaceState) {
-      forceReload = forceReload || false;
+      forceReload = this._shouldReload || forceReload || false;
       replaceState = replaceState || false;
       var urlBase = cm.getUrl();
       var fragment = url;
