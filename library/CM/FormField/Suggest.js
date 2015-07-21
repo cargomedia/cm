@@ -47,7 +47,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
         }
       },
       formatSelectionTooBig: null
-    }, this._select2Options)).select2('data', prePopulate);
+    }, this._getSelect2Options())).select2('data', prePopulate);
     this.$('.select2-choices').addClass('textinput');
 
     this._$input.on("change", function(e) {
@@ -137,5 +137,9 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
       output = '<div class="suggestItem-image"><img src="' + item.img + '" /></div>' + output;
     }
     return output;
+  },
+
+  _getSelect2Options: function() {
+    return null;
   }
 });
