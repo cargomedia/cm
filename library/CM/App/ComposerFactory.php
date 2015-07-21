@@ -23,14 +23,12 @@ class CM_App_ComposerFactory extends CM_Class_Abstract {
     }
 
     /**
-     * @param array $localConfig
-     * @param string|null $baseDir
+     * @param array  $localConfig
+     * @param string $baseDir
      * @return \Composer\Composer
      */
-    public function createComposer(array $localConfig, $baseDir = null) {
-        if (null !== $baseDir) {
-            $baseDir = rtrim($baseDir, '/');
-        }
+    public function createComposer(array $localConfig, $baseDir) {
+        $baseDir = rtrim($baseDir, '/');
 
         $io = new \Composer\IO\NullIO();
         $composer = new \Composer\Composer();
