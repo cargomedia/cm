@@ -19,8 +19,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
             $names[] = $location->getName($level);
         }
         return array(
-            'id'    => $location->getId(),
-            'level' => $location->getLevel(),
+            'id'    => CM_Params::jsonEncode($location->toArray()),
             'name'  => implode(', ', array_filter($names)),
             'img'   => $render->getUrlResource('layout',
                 'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),
@@ -35,7 +34,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
      */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         $value = parent::validate($environment, $userInput);
-        $value = json_decode($value, true);
+        $value = CM_Params::jsonDecode($value);
         return CM_Model_Location::fromArray($value);
     }
 

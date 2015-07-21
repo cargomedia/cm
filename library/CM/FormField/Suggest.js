@@ -15,7 +15,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
     var prePopulate = this._$input.data('pre-populate');
 
     this._$input.removeClass('textinput');
-    this._$input.select2(_.extend({
+    this._$input.select2({
       separator: '--SELECT2SEPARATOR--',
       width: 'off',
       tags: null,
@@ -47,7 +47,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
         }
       },
       formatSelectionTooBig: null
-    }, this._getSelect2Options())).select2('data', prePopulate);
+    }).select2('data', prePopulate);
     this.$('.select2-choices').addClass('textinput');
 
     this._$input.on("change", function(e) {
@@ -137,9 +137,5 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
       output = '<div class="suggestItem-image"><img src="' + item.img + '" /></div>' + output;
     }
     return output;
-  },
-
-  _getSelect2Options: function() {
-    return null;
   }
 });

@@ -76,13 +76,5 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
    */
   _lookupCoordinates: function(lat, lon) {
     return this.ajax('getSuggestionByCoordinates', {lat: lat, lon: lon, levelMin: this.getOption('levelMin'), levelMax: this.getOption('levelMax')});
-  },
-
-  _getSelect2Options: function() {
-    return {
-      id: function(data) {
-        return JSON.stringify(_.pick(data, 'id', 'level'));
-      }
-    }
   }
 });
