@@ -13,9 +13,9 @@ class CM_App_ComposerFactory extends CM_Class_Abstract {
         $localConfig = $composerFile->read();
 
         $composerFactory = new CM_App_ComposerFactory();
-        $composer = $composerFactory->createComposer($localConfig);
+        $composer = $composerFactory->createComposer($localConfig, $rootDir);
 
-        $vendorDir = $rootDir . $composer->getConfig()->get('vendor-dir');
+        $vendorDir = $composer->getConfig()->get('vendor-dir');
         $vendorConfig = new Composer\Json\JsonFile($vendorDir . '/composer/installed.json');
         $vendorRepository = new Composer\Repository\InstalledFilesystemRepository($vendorConfig);
         $composer->getRepositoryManager()->setLocalRepository($vendorRepository);
@@ -24,13 +24,18 @@ class CM_App_ComposerFactory extends CM_Class_Abstract {
 
     /**
      * @param array $localConfig
+     * @param string|null $baseDir
      * @return \Composer\Composer
      */
-    public function createComposer(array $localConfig) {
+    public function createComposer(array $localConfig, $baseDir = null) {
+        if (null !== $baseDir) {
+            $baseDir = rtrim($baseDir, '/');
+        }
+
         $io = new \Composer\IO\NullIO();
         $composer = new \Composer\Composer();
 
-        $composerConfig = new \Composer\Config();
+        $composerConfig = new \Composer\Config(false, $baseDir);
         $composerConfig->merge(array('config' => array('home' => CM_Bootloader::getInstance()->getDirTmp() . 'composer/')));
         $composerConfig->merge($localConfig);
         $composer->setConfig($composerConfig);
