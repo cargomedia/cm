@@ -5,9 +5,16 @@
 (function(global) {
 
   /**
+   * @callback PromiseThrottled
+   * @param {*} any number of optional params
+   * @return {Promise}
+   */
+
+  /**
    * @param {PromiseThrottled} fn
    * @param {Object|null} [options]
    * @param {Boolean} options.cancel Whether to cancel the previous promise if it is still running.
+   * @param {String} options.key A custom key to store the resulted PromiseThrottled.
    * @returns {PromiseThrottled}
    */
   function promiseThrottler(fn, options) {
