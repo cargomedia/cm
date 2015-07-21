@@ -16,7 +16,11 @@
 
     this.$elem.addClass('clipSlide');
     this.$content.css({display: 'block'});
-    this.toggle(false);
+
+    var self = this;
+    _.defer(function() {
+      self.toggle(false);
+    });
   }
 
   /**
