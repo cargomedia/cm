@@ -22,6 +22,13 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   /**
+   * @returns {Number}
+   */
+  getDeployVersion: function() {
+    return cm.options.deployVersion;
+  },
+
+  /**
    * @return {Number}
    */
   getSiteId: function() {
@@ -786,6 +793,7 @@ var CM_App = CM_Class_Abstract.extend({
    */
   ajax: function(type, data) {
     var url = this.getUrlAjax(type);
+    var self = this;
 
     return new Promise(function(resolve, reject) {
       var jqXHR = $.ajax(url, {
@@ -796,6 +804,9 @@ var CM_App = CM_Class_Abstract.extend({
         cache: false
       });
       jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
+        if (cm.getDeployVersion() != response.deployVersion) {
+          cm.router.forceReload();
+        }
         if (response.error) {
           reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
         } else {
@@ -1103,6 +1114,10 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   router: {
+
+    /** @type {Boolean} **/
+    _shouldReload: false,
+
     /** @type {String|Null} */
     hrefInitialIgnore: null,
 
@@ -1133,13 +1148,17 @@ var CM_App = CM_Class_Abstract.extend({
       });
     },
 
+    forceReload: function() {
+      this._shouldReload = true;
+    },
+
     /**
      * @param {String} url
      * @param {Boolean|Null} [forceReload]
      * @param {Boolean|Null} [replaceState]
      */
     route: function(url, forceReload, replaceState) {
-      forceReload = forceReload || false;
+      forceReload = this._shouldReload || forceReload || false;
       replaceState = replaceState || false;
       var urlBase = cm.getUrl();
       var fragment = url;
