@@ -18,11 +18,13 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         for ($level = $location->getLevel(); $level >= CM_Model_Location::LEVEL_COUNTRY; $level--) {
             $names[] = $location->getName($level);
         }
-        $result = $location->toArray();
-        $result['name'] = implode(', ', array_filter($names));
-        $result['img'] = $render->getUrlResource('layout',
-            'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png');
-        return $result;
+        return array(
+            'id'    => $location->getId(),
+            'level' => $location->getLevel(),
+            'name'  => implode(', ', array_filter($names)),
+            'img'   => $render->getUrlResource('layout',
+                'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),
+        );
     }
 
     /**
