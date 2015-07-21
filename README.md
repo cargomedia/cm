@@ -1,4 +1,4 @@
-CM Framework  [![Build Status](https://travis-ci.org/cargomedia/CM.png)](https://travis-ci.org/cargomedia/CM)
+CM Framework  [![Build Status](https://travis-ci.org/cargomedia/cm.png)](https://travis-ci.org/cargomedia/cm)
 ============
 
 Major concepts
