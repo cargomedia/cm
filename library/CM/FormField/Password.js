@@ -10,18 +10,16 @@ var CM_FormField_Password = CM_FormField_Text.extend({
   },
 
   togglePasswordMask: function() {
-    var $inputPassword = this.$('input[type=password]');
-    var $inputText = this.$('input[type=text]');
+    var $input = this.$('input');
 
-    if ($inputText.is(':visible')) {
-      $inputPassword.val($inputText.val());
+    if ($input.attr('type') === 'text') {
+      this.$('input').attr('type', 'password');
       this.$('.mode-visible').hide();
       this.$('.mode-hidden').show();
-
     } else {
-      $inputText.val($inputPassword.val());
-      this.$('.mode-visible').show();
+      this.$('input').attr('type', 'text');
       this.$('.mode-hidden').hide();
+      this.$('.mode-visible').show();
     }
   }
 });
