@@ -18,9 +18,9 @@
     this.$content.css({display: 'block'});
 
     var self = this;
-    _.defer(function() {
+    setTimeout(function() {
       self.toggle(false);
-    });
+    }, 0);
   }
 
   /**
