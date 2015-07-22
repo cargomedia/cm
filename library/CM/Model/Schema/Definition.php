@@ -104,7 +104,11 @@ class CM_Model_Schema_Definition {
                             $value = DateTime::createFromFormat('U', $value);
                             break;
                         default:
-                            $id = CM_Params::jsonDecode($value);
+                            if ($this->_isJson($value)) {
+                                $value = CM_Params::jsonDecode($value);
+                            }
+                            $id = $value;
+
                             if (!is_array($id)) {
                                 $id = array('id' => $id);
                             }
@@ -246,8 +250,7 @@ class CM_Model_Schema_Definition {
      * @return bool
      */
     protected function _isModel($value) {
-        // Hack proposed by Reto Kaiser in order to support multi-ids
-        if (substr($value, 0, 1) === '{') {
+        if ($this->_isJson($value)) {
             $value = CM_Params::jsonDecode($value);
         }
         if (is_array($value)) {
@@ -265,5 +268,14 @@ class CM_Model_Schema_Definition {
      */
     protected function _isString($value) {
         return is_string($value);
+    }
+
+    /**
+     * @param string $value
+     * @return bool
+     */
+    protected function _isJson($value) {
+        // Hack proposed by Reto Kaiser in order to support multi-ids
+        return substr($value, 0, 1) === '{';
     }
 }
