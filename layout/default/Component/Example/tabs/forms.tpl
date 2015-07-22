@@ -1,5 +1,6 @@
 {form name="CM_Form_Example" viewer=$viewer}
 {formField name='text' label="{translate 'Text'}" placeholder="{translate 'Placeholder'}"}
+{formField name='password' label="{translate 'Password'}" placeholder="{translate 'Password'}"}
 {formField name='textarea' label="{translate 'Textarea'}" placeholder="{translate 'Placeholder'}"}
 {formField name='int' label="{translate 'Integer'}"}
 {formField name='location' label="{translate 'Location'}"}
