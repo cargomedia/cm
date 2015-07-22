@@ -35,12 +35,12 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         $value = parent::validate($environment, $userInput);
         if (!preg_match('/^(\d+)\.(\d+)$/', $value, $matches)) {
-            throw new CM_Exception_FormFieldValidation('Invalid input format');
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid input format'));
         }
         $level = $matches[1];
         $id = $matches[2];
         if ($level < $this->_options['levelMin'] || $level > $this->_options['levelMax']) {
-            throw new CM_Exception_FormFieldValidation('Invalid location level.');
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid location level.'));
         }
         return new CM_Model_Location($level, $id);
     }

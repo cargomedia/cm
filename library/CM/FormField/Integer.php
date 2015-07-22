@@ -8,11 +8,11 @@ class CM_FormField_Integer extends CM_FormField_Abstract {
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (!is_numeric($userInput)) {
-            throw new CM_Exception_FormFieldValidation('Invalid number');
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid number'));
         }
         $value = (int) $userInput;
         if ($value < $this->_options['min'] || $value > $this->_options['max']) {
-            throw new CM_Exception_FormFieldValidation('Value not in range.');
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Value not in range.'));
         }
         return $value;
     }

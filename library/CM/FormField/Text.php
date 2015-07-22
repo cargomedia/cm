@@ -16,15 +16,15 @@ class CM_FormField_Text extends CM_FormField_Abstract {
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (isset($this->_options['lengthMax']) && mb_strlen($userInput) > $this->_options['lengthMax']) {
-            throw new CM_Exception_FormFieldValidation('Too long');
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Too long'));
         }
         if (isset($this->_options['lengthMin']) && mb_strlen($userInput) < $this->_options['lengthMin']) {
-            throw new CM_Exception_FormFieldValidation('Too short');
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Too short'));
         }
         if (!empty($this->_options['forbidBadwords'])) {
             $badwordList = new CM_Paging_ContentList_Badwords();
             if ($badword = $badwordList->getMatch($userInput)) {
-                throw new CM_Exception_FormFieldValidation('The word `{$badword}` is not allowed', array('badword' => $badword));
+                throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('The word `{$badword}` is not allowed', ['badword' => $badword]));
             }
         }
         return $userInput;
