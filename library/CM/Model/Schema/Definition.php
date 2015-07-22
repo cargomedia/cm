@@ -104,7 +104,12 @@ class CM_Model_Schema_Definition {
                             $value = DateTime::createFromFormat('U', $value);
                             break;
                         default:
-                            $id = CM_Params::jsonDecode($value);
+                            // See _isModel() method
+                            if (substr($value, 0, 1) === '{') {
+                                $value = CM_Params::jsonDecode($value);
+                            }
+                            $id = $value;
+
                             if (!is_array($id)) {
                                 $id = array('id' => $id);
                             }
