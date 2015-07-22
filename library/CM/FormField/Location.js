@@ -33,7 +33,7 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
       var distanceEnabled = false;
       var items = this.getValue();
       if (items.length > 0) {
-        distanceEnabled = items[0].level >= this.getOption("distanceLevelMin");
+        distanceEnabled = JSON.parse(items[0].id).level >= this.getOption("distanceLevelMin");
       }
       this.getDistanceField().$("input").prop("disabled", !distanceEnabled);
     }
