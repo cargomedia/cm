@@ -6,17 +6,14 @@ class CM_Exception extends Exception {
     const ERROR = 2;
     const FATAL = 3;
 
-    /** @var string|null */
-    private $_messagePublic;
-
-    /** @var array|null */
-    private $_messagePublicVariables;
-
     /** @var int */
     protected $_severity = self::ERROR;
 
     /** @var array */
     private $_metaInfo;
+
+    /** @var CM_I18n_Phrase|null */
+    private $_messagePublicPhrase;
 
     /**
      * @param string|null $message
@@ -25,8 +22,12 @@ class CM_Exception extends Exception {
      */
     public function __construct($message = null, array $metaInfo = null, array $options = null) {
         $this->_metaInfo = null !== $metaInfo ? $metaInfo : array();
-        $this->_messagePublic = isset($options['messagePublic']) ? (string) $options['messagePublic'] : null;
-        $this->_messagePublicVariables = isset($options['messagePublicVariables']) ? (array) $options['messagePublicVariables'] : null;
+
+        if (isset($options['messagePublic'])) {
+            $phraseVariables = isset($options['messagePublicVariables']) ? (array) $options['messagePublicVariables'] : [];
+            $this->_messagePublicPhrase = new CM_I18n_Phrase($options['messagePublic'], $phraseVariables);
+        }
+
         if (isset($options['severity'])) {
             $this->setSeverity($options['severity']);
         }
@@ -41,14 +42,14 @@ class CM_Exception extends Exception {
         if (!$this->isPublic()) {
             return 'Internal server error';
         }
-        return $render->getTranslation($this->_messagePublic, $this->_messagePublicVariables);
+        return $this->_messagePublicPhrase->translate($render);
     }
 
     /**
      * @return boolean
      */
     public function isPublic() {
-        return (null !== $this->_messagePublic);
+        return (null !== $this->_messagePublicPhrase);
     }
 
     /**
