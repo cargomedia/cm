@@ -33,10 +33,31 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
       var distanceEnabled = false;
       var items = this.getValue();
       if (items.length > 0) {
-        distanceEnabled = JSON.parse(items[0].id).level >= this.getOption("distanceLevelMin");
+        distanceEnabled = items[0].id.level >= this.getOption("distanceLevelMin");
       }
       this.getDistanceField().$("input").prop("disabled", !distanceEnabled);
     }
+  },
+
+  /**
+   * @return {Array}
+   */
+  getValue: function() {
+    var value = CM_FormField_SuggestOne.prototype.getValue.call(this);
+    if (_.isString(value[0].id)) {
+      value[0].id = JSON.parse(value[0].id);
+    }
+    return value;
+  },
+
+  /**
+   * @param {Array} value
+   */
+  setValue: function(value) {
+    if (_.isObject(value[0].id)) {
+      value[0].id = JSON.stringify(value[0].id);
+    }
+    return CM_FormField_SuggestOne.prototype.setValue.call(this, value);
   },
 
   /**
