@@ -35,7 +35,11 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         $value = parent::validate($environment, $userInput);
         $value = CM_Params::jsonDecode($value);
-        return CM_Model_Location::fromArray($value);
+        $location = CM_Model_Location::fromArray($value);
+        if ($location->getLevel() < $this->_options['levelMin'] || $location->getLevel() > $this->_options['levelMax']) {
+            throw new CM_Exception_FormFieldValidation('Invalid location level.');
+        }
+        return $location;
     }
 
     /**
