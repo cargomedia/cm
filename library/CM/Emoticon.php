@@ -58,7 +58,7 @@ class CM_Emoticon extends CM_Class_Abstract {
             $dataList = static::getEmoticonData();
             $name = $this->getName();
             if (empty($dataList[$name])) {
-                throw new CM_Exception_Invalid('Nonexistent Emoticon', ['name' => $name]);
+                throw new CM_Exception_Invalid('Nonexistent Emoticon', null, null, ['name' => $name]);
             }
             $data = $dataList[$name];
         }
@@ -149,11 +149,12 @@ class CM_Emoticon extends CM_Class_Abstract {
                     $codeList[$code] = $name;
                     $dataList[$name]['codes'][] = $code;
                 } else {
-                    throw new CM_Exception('Emoticon codes overlap',
+                    throw new CM_Exception('Emoticon codes overlap', null, null,
                         [
                             'overlapping emoticons' => [$name, $codeList[$code]],
                             'code'                  => $code
-                        ]);
+                        ]
+                    );
                 }
             }
         }

@@ -5,13 +5,13 @@ class CM_ExceptionTest extends CMTest_TestCase {
     public function testConstructor() {
         $user = CMTest_TH::createUser();
         $metaInfo = array('meta' => 'foo', 'user' => $user);
-        $options = array('messagePublic' => 'foo {$bar}', 'messagePublicVariables' => array('bar' => 'foo'), 'severity' => CM_Exception::ERROR);
-        $exception = new CM_Exception('foo', $metaInfo, $options);
+        $severity = CM_Exception::ERROR;
+        $exception = new CM_Exception('foo', new CM_I18n_Phrase('foo {$bar}', ['bar' => 'foo']), $severity, $metaInfo);
         $render = new CM_Frontend_Render();
 
         $this->assertSame('foo', $exception->getMessage());
         $this->assertSame('foo foo', $exception->getMessagePublic($render));
-        $this->assertSame(CM_Exception::ERROR, $exception->getSeverity());
+        $this->assertSame($severity, $exception->getSeverity());
         $this->assertSame($metaInfo, $exception->getMetaInfo());
     }
 

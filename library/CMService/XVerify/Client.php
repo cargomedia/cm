@@ -80,7 +80,7 @@ class CMService_XVerify_Client implements CM_Service_EmailVerification_ClientInt
                 503 => 'Invalid API Key/Service Not Active',
             );
             if (null === $responseCode || isset($responseCodeInvalidList[$responseCode])) {
-                throw new CM_Exception('Invalid XVerify email validation response', array(
+                throw new CM_Exception('Invalid XVerify email validation response', null, null, array(
                     'email'   => $email,
                     'code'    => $response->getStatusCode(),
                     'headers' => $response->getHeaders(),

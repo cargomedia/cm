@@ -7,9 +7,7 @@ class CM_Exception_FormFieldValidation extends CM_Exception {
      * @param array|null $variables
      */
     public function __construct($messagePublic, array $variables = null) {
-        parent::__construct('FormField Validation failed', null, array(
-            'messagePublic'          => $messagePublic,
-            'messagePublicVariables' => $variables
-        ));
+        $messagePublic = (string) $messagePublic;
+        parent::__construct('FormField Validation failed', new CM_I18n_Phrase($messagePublic, $variables));
     }
 }

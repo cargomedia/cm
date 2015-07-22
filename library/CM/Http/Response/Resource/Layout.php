@@ -10,7 +10,7 @@ class CM_Http_Response_Resource_Layout extends CM_Http_Response_Resource_Abstrac
         if ($pathRaw = $this->getRender()->getLayoutPath('resource/' . $path, null, null, true, false)) {
             $file = new CM_File($pathRaw);
             if (in_array($file->getExtension(), $this->_getFiletypesForbidden())) {
-                throw new CM_Exception_Nonexistent('Forbidden filetype', ['path' => $path], ['severity' => CM_Exception::WARN]);
+                throw new CM_Exception_Nonexistent('Forbidden filetype', null, CM_Exception::WARN, ['path' => $path]);
             }
             $content = $file->read();
             $mimeType = $file->getMimeType();
@@ -18,7 +18,7 @@ class CM_Http_Response_Resource_Layout extends CM_Http_Response_Resource_Abstrac
             $content = $this->getRender()->fetchTemplate($pathTpl);
             $mimeType = CM_File::getMimeTypeByContent($content);
         } else {
-            throw new CM_Exception_Nonexistent('Invalid filename', ['path' => $path], ['severity' => CM_Exception::WARN]);
+            throw new CM_Exception_Nonexistent('Invalid filename', null, CM_Exception::WARN, ['path' => $path]);
         }
         $this->setHeader('Content-Type', $mimeType);
         $this->_setContent($content);

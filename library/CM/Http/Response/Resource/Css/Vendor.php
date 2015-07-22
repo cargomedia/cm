@@ -8,7 +8,7 @@ class CM_Http_Response_Resource_Css_Vendor extends CM_Http_Response_Resource_Css
                 $this->_setAsset(new CM_Asset_Css_Vendor($this->getRender()));
                 break;
             default:
-                throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', null, array('severity' => CM_Exception::WARN));
+                throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', null, CM_Exception::WARN);
         }
     }
 

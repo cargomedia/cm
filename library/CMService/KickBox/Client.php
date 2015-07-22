@@ -79,7 +79,7 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
         try {
             $response = $this->_getResponse($email);
             if ($response->code !== 200 || !is_array($response->body)) {
-                throw new CM_Exception('Invalid KickBox email validation response', array(
+                throw new CM_Exception('Invalid KickBox email validation response', null, null, array(
                     'email'   => $email,
                     'code'    => $response->code,
                     'headers' => $response->headers,

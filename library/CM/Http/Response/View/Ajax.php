@@ -6,13 +6,13 @@ class CM_Http_Response_View_Ajax extends CM_Http_Response_View_Abstract {
         $success = array();
         $query = $this->_request->getQuery();
         if (!isset($query['method'])) {
-            throw new CM_Exception_Invalid('No method specified', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('No method specified', null, CM_Exception::WARN);
         }
         if (!preg_match('/^[\w_]+$/i', $query['method'])) {
-            throw new CM_Exception_Invalid('Illegal method: `' . $query['method'] . '`', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('Illegal method: `' . $query['method'] . '`', null, CM_Exception::WARN);
         }
         if (!isset($query['params']) || !is_array($query['params'])) {
-            throw new CM_Exception_Invalid('Illegal params', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('Illegal params', null, CM_Exception::WARN);
         }
 
         $view = $this->_getView();

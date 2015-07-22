@@ -11,12 +11,12 @@ class CMService_XVerify_ClientTest extends CMTest_TestCase {
 
     public function testEmptyResponse() {
         $responseBodyMock = '';
-        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', array(
+        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', null, null, [
             'email'   => 'testEmptyResponse@example.com',
             'code'    => '500',
             'headers' => array('Content-Length' => array(0), 'Content-Type' => array('application/json')),
             'body'    => '',
-        ));
+        ]);
         $headerList = array('Content-Length' => 0, 'Content-Type' => 'application/json');
         $xVerifyMock = $this->_getXVerifyMock($responseBodyMock, 500, $headerList, $exceptionExpected);
         $this->assertTrue($xVerifyMock->isValid('testEmptyResponse@example.com'));
@@ -24,36 +24,36 @@ class CMService_XVerify_ClientTest extends CMTest_TestCase {
 
     public function testInvalidResponse() {
         $responseBodyMock = '{"address":{"status":"invalid","responsecode":2}}';
-        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', array(
+        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', null, null, [
             'email'   => 'testInvalidResponse@example.com',
             'code'    => '200',
             'headers' => array(),
             'body'    => '{"address":{"status":"invalid","responsecode":2}}',
-        ));
+        ]);
         $xVerifyMock = $this->_getXVerifyMock($responseBodyMock, 200, array(), $exceptionExpected);
         $this->assertTrue($xVerifyMock->isValid('testInvalidResponse@example.com'));
     }
 
     public function testInvalidResponseCode() {
         $responseBodyMock = '{"email":{"status":"bad_request","responsecode":503}}';
-        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', array(
+        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', null, null, [
             'email'   => 'testInvalidResponseCode@example.com',
             'code'    => '200',
             'headers' => array(),
             'body'    => '{"email":{"status":"bad_request","responsecode":503}}',
-        ));
+        ]);
         $xVerifyMock = $this->_getXVerifyMock($responseBodyMock, 200, array(), $exceptionExpected);
         $this->assertTrue($xVerifyMock->isValid('testInvalidResponseCode@example.com'));
     }
 
     public function testMissingResponseCode() {
         $responseBodyMock = '{"email":{"status":"invalid"}}';
-        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', array(
+        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', null, null, [
             'email'   => 'testMissingResponseCode@example.com',
             'code'    => '200',
             'headers' => array(),
             'body'    => '{"email":{"status":"invalid"}}',
-        ));
+        ]);
         $xVerifyMock = $this->_getXVerifyMock($responseBodyMock, 200, array(), $exceptionExpected);
         $this->assertTrue($xVerifyMock->isValid('testMissingResponseCode@example.com'));
     }

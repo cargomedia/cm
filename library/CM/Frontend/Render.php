@@ -398,7 +398,8 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         $templateName = (string) $templateName;
         foreach ($view->getClassHierarchy() as $className) {
             if (!preg_match('/^([a-zA-Z]+)_([a-zA-Z]+)_(.+)$/', $className, $matches)) {
-                throw new CM_Exception('Cannot detect namespace/view-class/view-name for className:`' . $className . '` templateName: `' . $templateName . '`.');
+                throw new CM_Exception('Cannot detect namespace/view-class/view-name for className:`' . $className . '` templateName: `' .
+                    $templateName . '`.');
             }
             $templatePathRelative = $matches[2] . DIRECTORY_SEPARATOR . $matches[3] . DIRECTORY_SEPARATOR . $templateName . '.tpl';
             $namespace = $matches[1];
@@ -446,7 +447,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
                 return $classnameWithNamespace;
             }
         }
-        throw new CM_Exception_Invalid('The class was not found in any namespace.', array('name' => $classname));
+        throw new CM_Exception_Invalid('The class was not found in any namespace.', null, null, ['name' => $classname]);
     }
 
     /**

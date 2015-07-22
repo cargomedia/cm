@@ -23,7 +23,7 @@ class CM_Model_Currency extends CM_Model_Abstract {
     public function setCountryMapping(CM_Model_Location $location) {
         $country = $location->get(CM_Model_Location::LEVEL_COUNTRY);
         if (null === $country) {
-            throw new CM_Exception_Invalid('Location has no country', ['location' => $location->getName()]);
+            throw new CM_Exception_Invalid('Location has no country', null, null, ['location' => $location->getName()]);
         }
         CM_Db_Db::replace('cm_model_currency_country', ['currencyId' => $this->getId(), 'countryId' => $country->getId()]);
     }

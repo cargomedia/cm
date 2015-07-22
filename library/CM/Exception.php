@@ -13,24 +13,21 @@ class CM_Exception extends Exception {
     private $_metaInfo;
 
     /** @var CM_I18n_Phrase|null */
-    private $_messagePublicPhrase;
+    private $_messagePublic;
 
     /**
-     * @param string|null $message
-     * @param array|null  $metaInfo
-     * @param array|null  $options
+     * @param string|null         $message
+     * @param CM_I18n_Phrase|null $messagePublic
+     * @param int|null            $severity
+     * @param array|null          $metaInfo
      */
-    public function __construct($message = null, array $metaInfo = null, array $options = null) {
+    public function __construct($message = null, CM_I18n_Phrase $messagePublic = null, $severity = null, array $metaInfo = null) {
         $this->_metaInfo = null !== $metaInfo ? $metaInfo : array();
 
-        if (isset($options['messagePublic'])) {
-            $phraseVariables = isset($options['messagePublicVariables']) ? (array) $options['messagePublicVariables'] : [];
-            $this->_messagePublicPhrase = new CM_I18n_Phrase($options['messagePublic'], $phraseVariables);
+        if (null !== $severity) {
+            $this->setSeverity((int) $severity);
         }
-
-        if (isset($options['severity'])) {
-            $this->setSeverity($options['severity']);
-        }
+        $this->_messagePublic = $messagePublic;
         parent::__construct($message);
     }
 
@@ -42,14 +39,14 @@ class CM_Exception extends Exception {
         if (!$this->isPublic()) {
             return 'Internal server error';
         }
-        return $this->_messagePublicPhrase->translate($render);
+        return $this->_messagePublic->translate($render);
     }
 
     /**
      * @return boolean
      */
     public function isPublic() {
-        return (null !== $this->_messagePublicPhrase);
+        return (null !== $this->_messagePublic);
     }
 
     /**
