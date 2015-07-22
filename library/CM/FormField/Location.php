@@ -19,10 +19,10 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
             $names[] = $location->getName($level);
         }
         return array(
-            'id'   => $location->getLevel() . '.' . $location->getId(),
-            'name' => implode(', ', array_filter($names)),
-            'img'  => $render->getUrlResource('layout',
-                    'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),
+            'id'    => CM_Params::jsonEncode($location->toArray()),
+            'name'  => implode(', ', array_filter($names)),
+            'img'   => $render->getUrlResource('layout',
+                'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),
         );
     }
 
@@ -34,15 +34,12 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
      */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         $value = parent::validate($environment, $userInput);
-        if (!preg_match('/^(\d+)\.(\d+)$/', $value, $matches)) {
-            throw new CM_Exception_FormFieldValidation('Invalid input format');
-        }
-        $level = $matches[1];
-        $id = $matches[2];
-        if ($level < $this->_options['levelMin'] || $level > $this->_options['levelMax']) {
+        $value = CM_Params::jsonDecode($value);
+        $location = CM_Model_Location::fromArray($value);
+        if ($location->getLevel() < $this->_options['levelMin'] || $location->getLevel() > $this->_options['levelMax']) {
             throw new CM_Exception_FormFieldValidation('Invalid location level.');
         }
-        return new CM_Model_Location($level, $id);
+        return $location;
     }
 
     /**
