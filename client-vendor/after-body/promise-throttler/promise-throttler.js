@@ -13,12 +13,12 @@
   /**
    * @param {PromiseThrottled} fn
    * @param {Object|null} [options]
-   * @param {Boolean} options.cancel Whether to cancel the previous promise if it is still running.
+   * @param {Boolean} options.cancelLeading Whether to cancel the previous promise if it is still running.
    * @param {String} options.key A custom key to store the resulted PromiseThrottled.
    * @returns {PromiseThrottled}
    */
   function promiseThrottler(fn, options) {
-    options = _.defaults(options || {}, {cancel: false});
+    options = _.defaults(options || {}, {cancelLeading: false});
     if (options.key) {
       return namespaceThrottler(options.key, fn, options);
     } else {
@@ -33,7 +33,7 @@
     var promise;
 
     return function() {
-      if (options.cancel && promise && promise.isPending() && promise.isCancellable()) {
+      if (options.cancelLeading && promise && promise.isPending() && promise.isCancellable()) {
         promise.cancel();
         promise = null;
       }
@@ -50,7 +50,7 @@
    * @param {String} namespace
    * @param {PromiseThrottled} fn
    * @param {Object|null} options
-   * @param {Boolean} options.cancel Whether to cancel the previous promise if it is still running
+   * @param {Boolean} options.cancelLeading Whether to cancel the previous promise if it is still running
    * @returns {Promise}
    */
   function namespaceThrottler(namespace, fn, options) {

@@ -53,7 +53,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
             throw error;
           }
         });
-    }, {cancel: true});
+    }, {cancelLeading: true});
   },
 
   /**
