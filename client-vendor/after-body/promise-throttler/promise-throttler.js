@@ -56,11 +56,7 @@
   var storage = {};
 
   /**
-   * @param {String} namespace
-   * @param {PromiseThrottled} fn
-   * @param {Object|null} options
-   * @param {Boolean} options.cancelLeading Whether to cancel the previous promise if it is still running
-   * @returns {Promise}
+   * @see promiseThrottler
    */
   function namespaceThrottler(namespace, fn, options) {
     if (!storage[namespace]) {
