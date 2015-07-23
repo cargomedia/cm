@@ -27,6 +27,9 @@
         queue: false
       }
     );
+    if ((+options.cancelLeading) + (+options.cancelTrailing) + (+options.queue) > 1) {
+      throw new Error('PromiseThrottler options "cancelLeading", "cancelTrailing", "queue" exclude each other.');
+    }
     if (options.key) {
       return namespaceThrottler(options.key, fn, options);
     } else {
