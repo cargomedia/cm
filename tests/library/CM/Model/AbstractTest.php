@@ -1144,6 +1144,21 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
         $this->assertSame('CM_Model_DebugInfoMock2', $model->getDebugInfo());
     }
+
+    public function testCommitWithReplace() {
+        CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::getTypeStatic()] = 'CM_ModelMock3';
+        $dbModel = new CM_ModelMock3();
+        $dbModel->_set('foo', 'bar1');
+        $dbModel->commit(true);
+
+        $cacheModel = new CM_ModelMock4();
+        $cacheModel->_set('bar', 5);
+        $exception = $this->catchException(function () use ($cacheModel) {
+            $cacheModel->commit(true);
+        });
+        $this->isInstanceOf('CM_Exception_NotImplemented', $exception);
+        $this->assertSame('Param `useReplace` is not allowed with ' . CM_ModelMock4::getPersistenceClass(), $exception->getMessage());
+    }
 }
 
 class CM_ModelMock extends CM_Model_Abstract {
@@ -1319,5 +1334,20 @@ class CM_ModelMock3 extends CM_Model_Abstract {
 
     public static function getTypeStatic() {
         return 4;
+    }
+}
+
+class CM_ModelMock4 extends CM_Model_Abstract {
+
+    public function _getSchema() {
+        return new CM_Model_Schema_Definition(array('bar' => array('type' => 'int')));
+    }
+
+    public static function getPersistenceClass() {
+        return 'CM_Model_StorageAdapter_Cache';
+    }
+
+    public static function getTypeStatic() {
+        return 5;
     }
 }

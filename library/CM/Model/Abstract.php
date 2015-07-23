@@ -50,28 +50,49 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         $this->_getData(); // Make sure data can be loaded
     }
 
-    public function commit() {
+    /**
+     * @param bool|null $useReplace
+     * @throws CM_Exception_Invalid
+     * @throws CM_Exception_InvalidParam
+     * @throws CM_Exception_Nonexistent
+     * @throws CM_Exception_NotImplemented
+     */
+    public function commit($useReplace = null) {
+        $useReplace = (boolean) $useReplace;
+
         $persistence = $this->_getPersistence();
         if (!$persistence) {
             throw new CM_Exception_Invalid('Cannot create model without persistence');
         }
+
+        $type = $this->getType();
+        $dataSchema = $this->_getSchemaData();
         if ($this->hasIdRaw()) {
-            $dataSchema = $this->_getSchemaData();
             if (!empty($dataSchema)) {
-                $persistence->save($this->getType(), $this->getIdRaw(), $dataSchema);
+                $persistence->save($type, $this->getIdRaw(), $dataSchema);
             }
 
             if ($cache = $this->_getCache()) {
-                $cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
+                $cache->save($type, $this->getIdRaw(), $this->_getData());
             }
             $this->_onChange();
         } else {
             $this->_validateFields($this->_getData(), true);
-            $this->_id = self::_castIdRaw($persistence->create($this->getType(), $this->_getSchemaData()));
+            if ($useReplace) {
+                if (!$persistence instanceof CM_Model_StorageAdapter_ReplaceableInterface) {
+                    $adapterName = get_class($persistence);
+                    throw new CM_Exception_NotImplemented("Param `useReplace` is not allowed with {$adapterName}");
+                }
+                $idRaw = $persistence->replace($type, $dataSchema);
+            } else {
+                $idRaw = $persistence->create($type, $dataSchema);
+            }
+
+            $this->_id = self::_castIdRaw($idRaw);
 
             if ($cache = $this->_getCache()) {
                 $this->_loadAssets(true);
-                $cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
+                $cache->save($type, $this->getIdRaw(), $this->_getData());
             }
             $this->_onChange();
             $this->_changeContainingCacheables();
