@@ -51,13 +51,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
     }
 
     /**
-     * @param bool $useReplace
+     * @param bool|null $useReplace
      * @throws CM_Exception_Invalid
      * @throws CM_Exception_InvalidParam
      * @throws CM_Exception_Nonexistent
      * @throws CM_Exception_NotImplemented
      */
-    public function commit($useReplace = false) {
+    public function commit($useReplace = null) {
         $useReplace = (boolean) $useReplace;
 
         $persistence = $this->_getPersistence();
