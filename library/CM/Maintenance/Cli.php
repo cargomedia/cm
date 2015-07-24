@@ -96,7 +96,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                     $maxMind->upgrade();
                 } catch (Exception $exception) {
                     if (!is_a($exception, 'CM_Exception')) {
-                        $exception = new CM_Exception($exception->getMessage(), null, null, [
+                        $exception = new CM_Exception($exception->getMessage(), null, [
                             'file'  => $exception->getFile(),
                             'line'  => $exception->getLine(),
                             'trace' => $exception->getTraceAsString(),

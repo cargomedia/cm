@@ -42,7 +42,7 @@ class CM_Component_Example extends CM_Component_Abstract {
         if (!in_array($exception, array('CM_Exception', 'CM_Exception_AuthRequired'), true)) {
             $exception = 'CM_Exception';
         }
-        throw new $exception($message, new CM_I18n_Phrase($messagePublic));
+        throw new $exception($message, null, null, new CM_I18n_Phrase($messagePublic));
     }
 
     public function ajax_ping(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {

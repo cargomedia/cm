@@ -51,7 +51,7 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
     public function testPrintException() {
         $errorException = new CM_Exception();
         $nativeException = new Exception();
-        $fatalException = new CM_Exception(null, null, CM_Exception::FATAL);
+        $fatalException = new CM_Exception(null, CM_Exception::FATAL);
 
         $exceptionHandler = $this->getMockBuilder('CM_ExceptionHandling_Handler_Abstract')
             ->setMethods(array('logException', '_printException'))->getMockForAbstractClass();
@@ -68,7 +68,7 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
     public function testPrintExceptionPrintSeverity() {
         $errorException = new CM_Exception();
         $nativeException = new Exception();
-        $fatalException = new CM_Exception(null, null, CM_Exception::FATAL);
+        $fatalException = new CM_Exception(null, CM_Exception::FATAL);
 
         $exceptionHandler = $this->getMockBuilder('CM_ExceptionHandling_Handler_Abstract')
             ->setMethods(array('logException', '_printException'))->getMockForAbstractClass();

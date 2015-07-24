@@ -447,7 +447,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
                 return $classnameWithNamespace;
             }
         }
-        throw new CM_Exception_Invalid('The class was not found in any namespace.', null, null, ['name' => $classname]);
+        throw new CM_Exception_Invalid('The class was not found in any namespace.', null, ['name' => $classname]);
     }
 
     /**

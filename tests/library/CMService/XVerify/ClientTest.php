@@ -11,7 +11,7 @@ class CMService_XVerify_ClientTest extends CMTest_TestCase {
 
     public function testEmptyResponse() {
         $responseBodyMock = '';
-        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', null, null, [
+        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', null, [
             'email'   => 'testEmptyResponse@example.com',
             'code'    => '500',
             'headers' => array('Content-Length' => array(0), 'Content-Type' => array('application/json')),
@@ -24,7 +24,7 @@ class CMService_XVerify_ClientTest extends CMTest_TestCase {
 
     public function testInvalidResponse() {
         $responseBodyMock = '{"address":{"status":"invalid","responsecode":2}}';
-        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', null, null, [
+        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', null, [
             'email'   => 'testInvalidResponse@example.com',
             'code'    => '200',
             'headers' => array(),
@@ -36,7 +36,7 @@ class CMService_XVerify_ClientTest extends CMTest_TestCase {
 
     public function testInvalidResponseCode() {
         $responseBodyMock = '{"email":{"status":"bad_request","responsecode":503}}';
-        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', null, null, [
+        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', null, [
             'email'   => 'testInvalidResponseCode@example.com',
             'code'    => '200',
             'headers' => array(),
@@ -48,7 +48,7 @@ class CMService_XVerify_ClientTest extends CMTest_TestCase {
 
     public function testMissingResponseCode() {
         $responseBodyMock = '{"email":{"status":"invalid"}}';
-        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', null, null, [
+        $exceptionExpected = new CM_Exception('Invalid XVerify email validation response', null, [
             'email'   => 'testMissingResponseCode@example.com',
             'code'    => '200',
             'headers' => array(),

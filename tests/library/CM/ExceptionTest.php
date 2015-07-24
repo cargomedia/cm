@@ -6,7 +6,7 @@ class CM_ExceptionTest extends CMTest_TestCase {
         $user = CMTest_TH::createUser();
         $metaInfo = array('meta' => 'foo', 'user' => $user);
         $severity = CM_Exception::ERROR;
-        $exception = new CM_Exception('foo', new CM_I18n_Phrase('foo {$bar}', ['bar' => 'foo']), $severity, $metaInfo);
+        $exception = new CM_Exception('foo', $severity, $metaInfo, new CM_I18n_Phrase('foo {$bar}', ['bar' => 'foo']));
         $render = new CM_Frontend_Render();
 
         $this->assertSame('foo', $exception->getMessage());

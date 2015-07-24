@@ -17,11 +17,11 @@ class CM_Exception extends Exception {
 
     /**
      * @param string|null         $message
-     * @param CM_I18n_Phrase|null $messagePublic
      * @param int|null            $severity
      * @param array|null          $metaInfo
+     * @param CM_I18n_Phrase|null $messagePublic
      */
-    public function __construct($message = null, CM_I18n_Phrase $messagePublic = null, $severity = null, array $metaInfo = null) {
+    public function __construct($message = null, $severity = null, array $metaInfo = null, CM_I18n_Phrase $messagePublic = null) {
         $this->_metaInfo = null !== $metaInfo ? $metaInfo : array();
 
         if (null !== $severity) {

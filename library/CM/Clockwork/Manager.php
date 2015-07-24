@@ -45,7 +45,7 @@ class CM_Clockwork_Manager {
             return $event->getName() == $eventName;
         });
         if ($duplicateEventName) {
-            throw new CM_Exception('Duplicate event-name', null, null, ['name' => $eventName]);
+            throw new CM_Exception('Duplicate event-name', null, ['name' => $eventName]);
         }
         $this->_events[] = $event;
     }
@@ -99,7 +99,7 @@ class CM_Clockwork_Manager {
     protected function _getRunningEvent($identifier) {
         $eventName = array_search($identifier, \Functional\pluck($this->_eventsRunning, 'identifier'));
         if (false === $eventName) {
-            throw new CM_Exception('Could not find event', null, null, ['identifier' => $identifier]);
+            throw new CM_Exception('Could not find event', null, ['identifier' => $identifier]);
         }
         return $this->_eventsRunning[$eventName]['event'];
     }
