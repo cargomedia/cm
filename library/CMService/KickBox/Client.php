@@ -67,7 +67,7 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
      * @throws Exception
      */
     protected function _getResponse($email) {
-        $kickBox = new \Kickbox\Client($this->_getCode());
+        $kickBox = new \Kickbox\Client($this->_getCode(), [\Guzzle\Http\Client::CURL_OPTIONS => [CURLOPT_TIMEOUT => 7]]);
         return $kickBox->kickbox()->verify($email);
     }
 
