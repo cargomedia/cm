@@ -28,7 +28,9 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
         CM_Config::get()->CM_Http_Response_RPC->exceptionsToCatch = ['CM_Exception_Nonexistent' => []];
         $request = $this->mockObject('CM_Http_Request_Abstract', ['/rpc/' . CM_Site_Abstract::factory()->getType() . '/foo']);
         $request->mockMethod('getQuery')->set(function () {
-            throw new CM_Exception_Invalid('foo', new CM_I18n_Phrase('bar'));
+            throw new CM_Exception_Invalid('foo', null, null, [
+                'messagePublic' => new CM_I18n_Phrase('bar'),
+            ]);
         });
         /** @var CM_Http_Request_Abstract|\Mocka\AbstractClassTrait $request */
         $response = new CM_Http_Response_RPC($request, $this->getServiceManager());

@@ -28,7 +28,9 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         CM_Config::get()->CM_Http_Response_View_Abstract->exceptionsToCatch = ['CM_Exception_Nonexistent' => []];
         $response = $this->mockClass('CM_Http_Response_View_Abstract')->newInstanceWithoutConstructor();
         $response->mockMethod('_processView')->set(function () {
-            throw new CM_Exception_Invalid('foo', new CM_I18n_Phrase('bar'));
+            throw new CM_Exception_Invalid('foo', null, null, [
+                'messagePublic' => new CM_I18n_Phrase('bar'),
+            ]);
         });
         $response->mockMethod('getRender')->set(new CM_Frontend_Render());
         /** @var CM_Http_Response_View_Abstract $response */
