@@ -28,7 +28,9 @@ class CM_Exception extends Exception {
         if (null !== $severity) {
             $this->setSeverity((int) $severity);
         }
-        $this->_messagePublic = $options['messagePublic'];
+        if (isset($options['messagePublic'])) {
+            $this->_messagePublic = $options['messagePublic'];
+        }
         parent::__construct($message);
     }
 
