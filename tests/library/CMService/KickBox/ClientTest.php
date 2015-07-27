@@ -79,13 +79,15 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
 
     public function testLogExceptionTimeout() {
         $kickBoxMock = $this->mockObject('CMService_KickBox_Client', array('', true, false, 0));
-        $kickBoxMock->mockMethod('_getResponse')->set(function () {
-            throw new RuntimeException('[curl] 28: Operation timed out after 1595 milliseconds with 0 out of -1 bytes received [url] https://api.kickbox.io/v1/verify?email=testLogExceptionTimeout%40example.com');
+        $exceptionMessage = '[curl] 28: Operation timed out after 1595 milliseconds with 0 out of -1 bytes received [url] https://api.kickbox.io/v1/verify?email=testLogExceptionTimeout%40example.com';
+        $kickBoxMock->mockMethod('_getResponse')->set(function () use ($exceptionMessage) {
+            throw new RuntimeException($exceptionMessage);
         });
         $exceptionHandlerMock = $this->mockObject('CM_ExceptionHandling_Handler_Cli');
-        $printException = $exceptionHandlerMock->mockMethod('logException')->set(function (Exception $exception) {
+        $printException = $exceptionHandlerMock->mockMethod('logException')->set(function (Exception $exception) use ($exceptionMessage) {
             $this->assertTrue($exception instanceof CM_Exception);
             /** @var CM_Exception $exception */
+            $this->assertSame($exceptionMessage, $exception->getMessage());
             $this->assertSame(CM_Exception::WARN, $exception->getSeverity());
         });
         $exceptionHandler = CM_Bootloader::getInstance()->getExceptionHandler();
@@ -101,8 +103,9 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
 
     public function testLogExceptionOther() {
         $kickBoxMock = $this->mockObject('CMService_KickBox_Client', array('', true, false, 0));
-        $kickBoxMock->mockMethod('_getResponse')->set(function () {
-            throw new RuntimeException('[curl] 6: Couldn\'t resolve host \'apiz.kickbox.io\' [url] https://apiz.kickbox.io/v1/ewporopjgr?email=testLogExceptionOther%40example.com');
+        $exceptionMessage = '[curl] 6: Couldn\'t resolve host \'apiz.kickbox.io\' [url] https://apiz.kickbox.io/v1/ewporopjgr?email=testLogExceptionOther%40example.com';
+        $kickBoxMock->mockMethod('_getResponse')->set(function () use ($exceptionMessage) {
+            throw new RuntimeException($exceptionMessage);
         });
         $exceptionHandlerMock = $this->mockObject('CM_ExceptionHandling_Handler_Cli');
         $printException = $exceptionHandlerMock->mockMethod('logException')->set(function (Exception $exception) {
