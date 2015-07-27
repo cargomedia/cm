@@ -66,12 +66,12 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
         $responseMock = new \Kickbox\HttpClient\Response(array('result' => 'unknown'), 403, array('header' => 'value'));
         $kickBoxMock = $this->getMock('CMService_KickBox_Client', array('_getResponse', '_logException'), array('', true, false, 0));
         $kickBoxMock->expects($this->once())->method('_getResponse')->will($this->returnValue($responseMock));
-        $exception = new CM_Exception('Invalid KickBox email validation response', array(
+        $exception = new CM_Exception('Invalid KickBox email validation response', null, [
             'email'   => 'test@example.com',
             'code'    => 403,
             'headers' => array('header' => 'value'),
             'body'    => array('result' => 'unknown'),
-        ));
+        ]);
         $kickBoxMock->expects($this->once())->method('_logException')->with($exception);
         /** @var CMService_KickBox_Client $kickBoxMock */
         $kickBoxMock->isValid('test@example.com');

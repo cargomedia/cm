@@ -96,7 +96,9 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
         try {
             CMTest_TH::callProtectedMethod($response, '_runWithCatching', [
                 function () {
-                    throw new CM_Exception_Nonexistent('foo', null, ['messagePublic' => 'bar']);
+                    throw new CM_Exception_Nonexistent('foo', null, null, [
+                        'messagePublic' => new CM_I18n_Phrase('bar'),
+                    ]);
                 }, $errorCode]);
             $this->fail('Caught public exception with public exception catching disabled');
         } catch (CM_Exception_Nonexistent $ex) {
@@ -123,7 +125,9 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
         try {
             $returnValue = CMTest_TH::callProtectedMethod($response, '_runWithCatching', [
                 function () {
-                    throw new CM_Exception_Nonexistent('foo', null, ['messagePublic' => 'bar']);
+                    throw new CM_Exception_Nonexistent('foo', null, null, [
+                        'messagePublic' => new CM_I18n_Phrase('bar'),
+                    ]);
                 }, $errorCode]);
             $this->assertNull($returnValue);
         } catch (CM_Exception_Nonexistent $ex) {

@@ -42,7 +42,7 @@ class CM_Http_Response_Upload extends CM_Http_Response_Abstract {
 
             $fileTmp = new CM_File($fileInfo['tmp_name']);
             if ($fileTmp->getSize() > self::MAX_FILE_SIZE) {
-                throw new CM_Exception_FormFieldValidation('File too big');
+                throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('File too big'));
             }
 
             $file = CM_File_UserContent_Temp::create($fileInfo['name'], $fileTmp->read());

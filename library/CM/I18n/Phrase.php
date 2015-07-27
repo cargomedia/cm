@@ -9,11 +9,14 @@ class CM_I18n_Phrase {
     protected $_variables;
 
     /**
-     * @param string $phrase
-     * @param string[] $variables
+     * @param string        $phrase
+     * @param string[]|null $variables
      */
-    public function __construct($phrase, array $variables) {
+    public function __construct($phrase, array $variables = null) {
         $this->_phrase = (string) $phrase;
+        if (null === $variables) {
+            $variables = [];
+        }
         $this->_variables = $variables;
     }
 

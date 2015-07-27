@@ -7,7 +7,7 @@ class CM_FormField_Email extends CM_FormField_Text {
 
         $emailVerification = $this->_getEmailVerification();
         if (!$emailVerification->isValid($userInput)) {
-            throw new CM_Exception_FormFieldValidation('Invalid email address');
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid email address'));
         }
 
         return $userInput;

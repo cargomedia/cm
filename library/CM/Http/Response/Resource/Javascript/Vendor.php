@@ -11,7 +11,7 @@ class CM_Http_Response_Resource_Javascript_Vendor extends CM_Http_Response_Resou
                 $this->_setAsset(new CM_Asset_Javascript_VendorAfterBody($this->getSite()));
                 break;
             default:
-                throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', null, array('severity' => CM_Exception::WARN));
+                throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', CM_Exception::WARN);
         }
     }
 
