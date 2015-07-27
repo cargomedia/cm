@@ -4,6 +4,7 @@ class CM_Form_Example extends CM_Form_Abstract {
 
     protected function _initialize() {
         $this->registerField(new CM_FormField_Text(['name' => 'text']));
+        $this->registerField(new CM_FormField_Password(['name' => 'password']));
         $this->registerField(new CM_FormField_Textarea(['name' => 'textarea']));
         $this->registerField(new CM_FormField_Integer(['name' => 'int', 'min' => -10, 'max' => 20, 'step' => 2]));
         $this->registerField(new CM_FormField_Distance(['name' => 'locationSlider']));
