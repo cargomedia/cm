@@ -103,7 +103,7 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
 
     public function testLogExceptionOther() {
         $kickBoxMock = $this->mockObject('CMService_KickBox_Client', array('', true, false, 0));
-        $exceptionMessage = '[curl] 6: Couldn\'t resolve host \'apiz.kickbox.io\' [url] https://apiz.kickbox.io/v1/ewporopjgr?email=testLogExceptionOther%40example.com';
+        $exceptionMessage = '[curl] 6: Couldn\'t resolve host \'api.kickbox.io\' [url] https://api.kickbox.io/v1/verify?email=testLogExceptionOther%40example.com';
         $kickBoxMock->mockMethod('_getResponse')->set(function () use ($exceptionMessage) {
             throw new RuntimeException($exceptionMessage);
         });
