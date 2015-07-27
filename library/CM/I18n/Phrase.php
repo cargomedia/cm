@@ -14,12 +14,10 @@ class CM_I18n_Phrase {
      */
     public function __construct($phrase, array $variables = null) {
         $this->_phrase = (string) $phrase;
-
-        if (null !== $variables) {
-            $this->_variables = $variables;
-        } else {
+        if (null === $variables) {
             $this->_variables = [];
         }
+        $this->_variables = $variables;
     }
 
     /**

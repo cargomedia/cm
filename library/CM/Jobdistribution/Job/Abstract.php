@@ -104,9 +104,8 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
         try {
             $params = CM_Params::factory(CM_Params::jsonDecode($workload), true);
         } catch (CM_Exception_Nonexistent $ex) {
-            throw new CM_Exception_Nonexistent(
-                'Cannot decode workload for Job `' . get_class($this) . '`: Original exception message `' . $ex->getMessage() .
-                '`', CM_Exception::WARN);
+            throw new CM_Exception_Nonexistent('Cannot decode workload for Job `' . get_class($this) . '`: Original exception message `' .
+                $ex->getMessage() . '`', CM_Exception::WARN);
         }
         return CM_Params::encode($this->_executeJob($params), true);
     }
