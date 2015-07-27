@@ -97,6 +97,9 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
      * @param Exception $exception
      */
     protected function _logException(Exception $exception) {
+        if ($exception instanceof CM_Exception) {
+            $exception->setSeverity(CM_Exception::WARN);
+        }
         CM_Bootloader::getInstance()->getExceptionHandler()->logException($exception);
     }
 }
