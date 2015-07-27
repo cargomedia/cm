@@ -15,25 +15,6 @@ class CM_ExceptionTest extends CMTest_TestCase {
         $this->assertSame('foo foo', $exception->getMessagePublic($render));
         $this->assertSame($severity, $exception->getSeverity());
         $this->assertSame($metaInfo, $exception->getMetaInfo());
-
-        $exception = $this->catchException(function () {
-            new CM_Exception(null, null, null, ['foo' => 'bar', 'bar' => 'qux']);
-        });
-        $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
-        $this->assertSame('$options parameter contains invalid key(s)', $exception->getMessage());
-
-        $exception = $this->catchException(function () {
-            new CM_Exception(null, null, null, ['foo' => 'bar']);
-        });
-        $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
-        $this->assertSame('Invalid key for $options: `foo`', $exception->getMessage());
-
-        $exception = $this->catchException(function () {
-            new CM_Exception(null, null, null, ['messagePublic' => array('333')]);
-        });
-
-        $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
-        $this->assertSame('Invalid type for key `messagePublic`', $exception->getMessage());
     }
 
     public function testGetSetSeverity() {
