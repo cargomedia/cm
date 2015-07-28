@@ -8,4 +8,4 @@ git checkout ${VERSION}
 phpize
 ./configure
 make
-sudo make install
+make install
