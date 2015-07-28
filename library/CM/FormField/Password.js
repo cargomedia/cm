@@ -5,28 +5,46 @@
 var CM_FormField_Password = CM_FormField_Text.extend({
     _class: 'CM_FormField_Password',
 
+    _visibilityDesired: true,
 
     events: {
-        'focus input[type=password]': function (e) {
-            this.togglePasswordMask(e);
-        },
-        'click .togglePasswordMask': function (e) {
-            this.togglePasswordMask(e);
+        'click .togglePasswordVisibility': function () {
+            this.togglePasswordVisibility();
         }
     },
 
-    togglePasswordMask: function (e) {
-        var $input = this.$('input');
-        var $buttonText = this.$('.mode-text');
-        var $buttonPassword = this.$('.mode-password');
-        var showText = ($input.attr('type') === 'password');
+    ready: function () {
+        this.enableTriggerChangeOnInput();
+        this.on('change', function () {
+            this._applyDesiredPasswordVisibility();
+        });
+    },
 
-        if (e.type === 'focusin' && $input.val().length !== 0) {
-            return;
+    /**
+     * @param {Boolean} [state]
+     */
+    togglePasswordVisibility: function (state) {
+        if ('undefined' === typeof state) {
+            state = !this._visibilityDesired;
         }
+        this._visibilityDesired = state;
+        this.$('.mode-text').toggle(state);
+        this.$('.mode-password').toggle(!state);
+        this._applyDesiredPasswordVisibility();
+    },
 
-        $input.attr('type', showText ? 'text' : 'password');
-        $buttonText.toggle(showText);
-        $buttonPassword.toggle(!showText);
+    _applyDesiredPasswordVisibility: function () {
+        if (0 === this.getValue().length) {
+            this._togglePasswordVisibilityInput(false);
+        } else {
+            this._togglePasswordVisibilityInput(this._visibilityDesired);
+        }
+    },
+
+    /**
+     * @param {Boolean} state
+     */
+    _togglePasswordVisibilityInput: function (state) {
+        this.getInput().attr('type', state ? 'text' : 'password');
     }
 });
