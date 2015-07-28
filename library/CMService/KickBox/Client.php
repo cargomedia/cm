@@ -97,6 +97,9 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
      * @param Exception $exception
      */
     protected function _logException(Exception $exception) {
+        if ('RuntimeException' === get_class($exception) && false !== strpos($exception->getMessage(), 'Operation timed out')) {
+            $exception = new CM_Exception($exception->getMessage(), null, ['severity' => CM_Exception::WARN]);
+        }
         CM_Bootloader::getInstance()->getExceptionHandler()->logException($exception);
     }
 }
