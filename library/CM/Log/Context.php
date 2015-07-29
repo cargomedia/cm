@@ -1,8 +1,8 @@
 <?php
 
-class CM_Logging_Context {
+class CM_Log_Context {
 
-    /** @var CM_Logging_Context_ComputerInfo */
+    /** @var CM_Log_Context_ComputerInfo */
     private $_computerInfo;
 
     /** @var CM_Model_User|null */

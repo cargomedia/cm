@@ -1,6 +1,6 @@
 <?php
 
-class CM_Logging_Handler_HandlerInterface {
+class CM_Log_Handler_HandlerInterface {
 
     /** @var bool */
     private $_bubble;
@@ -12,10 +12,10 @@ class CM_Logging_Handler_HandlerInterface {
     }
 
     /**
-     * @param CM_Logging_Record $record
+     * @param CM_Log_Record $record
      * @return bool Whether the record was successfully handled
      */
-    public function handleRecord(CM_Logging_Record $record) {
+    public function handleRecord(CM_Log_Record $record) {
     }
 
 }

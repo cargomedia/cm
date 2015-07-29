@@ -1,6 +1,6 @@
 <?php
 
-class CM_Logging_Context_ComputerInfo {
+class CM_Log_Context_ComputerInfo {
 
     /** @var string|null */
     private $_fqdn;

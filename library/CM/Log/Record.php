@@ -1,6 +1,6 @@
 <?php
 
-class CM_Logging_Record {
+class CM_Log_Record {
 
     /** @var int */
     private $_level;
@@ -8,10 +8,10 @@ class CM_Logging_Record {
     /** @var string */
     private $_message;
 
-    /** @var Exception|CM_ExceptionHandling_SerializableException|null */
+    /** @var CM_ExceptionHandling_SerializableException|null */
     private $_exception;
 
-    /** @var CM_Logging_Context */
+    /** @var CM_Log_Context */
     private $_context;
 
 }
