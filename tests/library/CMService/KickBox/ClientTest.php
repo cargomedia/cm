@@ -79,25 +79,32 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
 
     public function testLogExceptionTimeout() {
         $kickBoxMock = $this->mockObject('CMService_KickBox_Client', array('', true, false, 0));
-        $exceptionMessage = '[curl] 28: Operation timed out after 1595 milliseconds with 0 out of -1 bytes received [url] https://api.kickbox.io/v1/verify?email=testLogExceptionTimeout%40example.com';
-        $kickBoxMock->mockMethod('_getResponse')->set(function () use ($exceptionMessage) {
-            throw new RuntimeException($exceptionMessage);
-        });
         $exceptionHandlerMock = $this->mockObject('CM_ExceptionHandling_Handler_Cli');
-        $printException = $exceptionHandlerMock->mockMethod('logException')->set(function (Exception $exception) use ($exceptionMessage) {
-            $this->assertTrue($exception instanceof CM_Exception);
-            /** @var CM_Exception $exception */
-            $this->assertSame($exceptionMessage, $exception->getMessage());
-            $this->assertSame(CM_Exception::WARN, $exception->getSeverity());
-        });
+        $printException = $exceptionHandlerMock->mockMethod('logException');
         $exceptionHandler = CM_Bootloader::getInstance()->getExceptionHandler();
         /** @var CM_ExceptionHandling_Handler_Abstract $exceptionHandlerMock */
         CM_Bootloader::getInstance()->setExceptionHandler($exceptionHandlerMock);
+        $i = 0;
+        foreach ([
+                     '[curl] 28: Operation timed out after 1595 milliseconds with 0 out of -1 bytes received [url] https://api.kickbox.io/v1/verify?email=testLogExceptionTimeout%40example.com',
+                     '[curl] 6: name lookup timed out [url] https://api.kickbox.io/v1/verify?email=testLogExceptionTimeout%40example.com',
+                     '[curl] 28: Connection timed out after 7007 milliseconds [url] https://api.kickbox.io/v1/verify?email=testLogExceptionTimeout%40example.com',
+                 ] as $exceptionMessage) {
+            $kickBoxMock->mockMethod('_getResponse')->set(function () use ($exceptionMessage) {
+                throw new RuntimeException($exceptionMessage);
+            });
+            $printException->set(function (Exception $exception) use ($exceptionMessage) {
+                $this->assertTrue($exception instanceof CM_Exception);
+                /** @var CM_Exception $exception */
+                $this->assertSame($exceptionMessage, $exception->getMessage());
+                $this->assertSame(CM_Exception::WARN, $exception->getSeverity());
+            });
 
-        /** @var CMService_KickBox_Client $kickBoxMock */
-        $kickBoxMock->isValid('testLogExceptionTimeout@example.com');
+            /** @var CMService_KickBox_Client $kickBoxMock */
+            $kickBoxMock->isValid('testLogExceptionTimeout@example.com');
 
-        $this->assertSame(1, $printException->getCallCount());
+            $this->assertSame(++$i, $printException->getCallCount());
+        }
         CM_Bootloader::getInstance()->setExceptionHandler($exceptionHandler);
     }
 
