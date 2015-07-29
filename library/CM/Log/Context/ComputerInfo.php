@@ -6,9 +6,6 @@ class CM_Log_Context_ComputerInfo {
     private $_fqdn;
 
     /** @var string|null */
-    private $_interpreterName;
-
-    /** @var string|null */
-    private $_interpreterVersion;
+    private $_phpVersion;
 
 }
