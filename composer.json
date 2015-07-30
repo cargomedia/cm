@@ -22,7 +22,7 @@
   },
   "require-dev": {
     "phpunit/phpunit": "~4.3.5",
-    "tomaszdurka/mocka": "~0.10.0"
+    "tomaszdurka/mocka": "~0.11.0"
   },
   "autoload": {
     "psr-0": {
