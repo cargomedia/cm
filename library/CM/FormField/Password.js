@@ -7,6 +7,8 @@ var CM_FormField_Password = CM_FormField_Text.extend({
 
   _visibilityDesired: true,
 
+  _valueLast: '',
+
   events: {
     'click .togglePasswordVisibility': function() {
       this.togglePasswordVisibility();
@@ -22,6 +24,15 @@ var CM_FormField_Password = CM_FormField_Text.extend({
     this.getForm().on('submit', function() {
       self.togglePasswordVisibility(false);
     });
+  },
+
+  triggerChange: function() {
+    var valueCurrent = this.getInput().val();
+    //it means we that 'paste' event has occurred.
+    if (valueCurrent.length - this._valueLast.length > 1) {
+      this.togglePasswordVisibility(false);
+    }
+    CM_FormField_Text.prototype.triggerChange.apply(this, arguments);
   },
 
   /**
