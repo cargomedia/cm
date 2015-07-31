@@ -17,9 +17,8 @@ var CM_FormField_Password = CM_FormField_Text.extend({
 
   ready: function() {
     this.enableTriggerChangeOnInput();
-    this.on('change', function() {
-      this._applyDesiredPasswordVisibility();
-    });
+    this._applyDesiredPasswordVisibility();
+
     var self = this;
     this.getForm().on('submit', function() {
       self.togglePasswordVisibility(false);
@@ -49,11 +48,7 @@ var CM_FormField_Password = CM_FormField_Text.extend({
   },
 
   _applyDesiredPasswordVisibility: function() {
-    if (0 === this.getValue().length) {
-      this._togglePasswordVisibilityInput(false);
-    } else {
-      this._togglePasswordVisibilityInput(this._visibilityDesired);
-    }
+    this._togglePasswordVisibilityInput(this._visibilityDesired);
   },
 
   /**
