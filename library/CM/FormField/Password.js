@@ -20,9 +20,15 @@ var CM_FormField_Password = CM_FormField_Text.extend({
     this._applyDesiredPasswordVisibility();
 
     var self = this;
-    this.getForm().on('submit', function() {
-      self.togglePasswordVisibility(false);
-    });
+    var visibilityDesired;
+    this.getForm()
+      .on('submit', function() {
+        visibilityDesired = self._visibilityDesired;
+        self.togglePasswordVisibility(false);
+      })
+      .on('error', function() {
+        self.togglePasswordVisibility(visibilityDesired);
+      });
   },
 
   triggerChange: function() {
