@@ -9,20 +9,20 @@ services:
   - memcached
   - elasticsearch
   - redis-server
-  - mongodb
 
 addons:
   apt:
-    sources:
-      - mongodb-upstart
     packages:
-      - mongodb-org-server
       - libgearman-dev
       - libsvm-dev
       - re2c
 
 before_script:
-  - "until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done"
+  - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.0.4.tgz -O /tmp/mongodb.tgz
+  - tar -xvf /tmp/mongodb.tgz
+  - mkdir /tmp/data
+  - ${PWD}/mongodb-linux-x86_64-3.0.4/bin/mongod --dbpath /tmp/data --bind_ip 127.0.0.1 --auth &> /dev/null &
+  - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
   - tests/travis/install-php-runkit.sh
   - tests/travis/install-php-svm.sh
   - yes '' | travis_retry pecl install imagick
