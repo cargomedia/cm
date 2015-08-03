@@ -351,9 +351,6 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      */
     protected function _listDatabaseNames() {
         $databasesInfo = $this->_getClient()->listDBs();
-        if (!isset($databasesInfo['databases'])) {
-            return [];
-        }
         return \Functional\pluck($databasesInfo['databases'], 'name');
     }
 
