@@ -11,12 +11,12 @@ class CM_I18n_Phrase {
     /**
      * @param string        $phrase
      * @param string[]|null $variables
-     * @throws CM_Exception_InvalidParam
+     * @throws CM_Exception_Invalid
      */
     public function __construct($phrase, array $variables = null) {
         $phrase = (string) $phrase;
-        if (empty($phrase)) {
-            throw new CM_Exception_InvalidParam('I18n phrase should not be empty');
+        if ('' === $phrase) {
+            throw new CM_Exception_Invalid('I18n phrase should not be empty');
         }
         $this->_phrase = $phrase;
         if (null === $variables) {
