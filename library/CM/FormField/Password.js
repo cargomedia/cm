@@ -44,7 +44,7 @@ var CM_FormField_Password = CM_FormField_Text.extend({
    * @param {Boolean} [state]
    */
   togglePasswordVisibility: function(state) {
-    if ('undefined' === typeof state) {
+    if (_.isUndefined(state)) {
       state = !this._visibilityDesired;
     }
     this._visibilityDesired = state;
@@ -54,13 +54,13 @@ var CM_FormField_Password = CM_FormField_Text.extend({
   },
 
   _applyDesiredPasswordVisibility: function() {
-    this._togglePasswordVisibilityInput(this._visibilityDesired);
+    this._setInputTypeByState(this._visibilityDesired);
   },
 
   /**
    * @param {Boolean} state
    */
-  _togglePasswordVisibilityInput: function(state) {
+  _setInputTypeByState: function(state) {
     this.getInput().attr('type', state ? 'text' : 'password');
   }
 });
