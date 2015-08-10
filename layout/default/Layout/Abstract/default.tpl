@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge; requiresActiveX=true">
     {if isset($pageDescription)}<meta name="description" content="{$pageDescription|escape}">{/if}
     {if isset($pageKeywords)}<meta name="keywords" content="{$pageKeywords|escape}">{/if}
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="{$render->getSite()->getName()|escape}">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
