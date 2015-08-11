@@ -5,7 +5,7 @@
 var CM_FormField_Password = CM_FormField_Text.extend({
   _class: 'CM_FormField_Password',
 
-  _visibilityDesired: true,
+  _visibilityDesired: false,
 
   _valueLast: '',
 
@@ -17,7 +17,7 @@ var CM_FormField_Password = CM_FormField_Text.extend({
 
   ready: function() {
     this.enableTriggerChangeOnInput();
-    this._applyDesiredPasswordVisibility();
+    this.togglePasswordVisibility(this._visibilityDesired);
 
     var self = this;
     var visibilityDesired;
