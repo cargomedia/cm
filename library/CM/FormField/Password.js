@@ -61,6 +61,6 @@ var CM_FormField_Password = CM_FormField_Text.extend({
    * @param {Boolean} state
    */
   _setInputTypeByState: function(state) {
-    this.getInput().attr('type', state ? 'text' : 'password');
+    this.getInput().attr('type', state ? 'text' : 'password').focus();
   }
 });
