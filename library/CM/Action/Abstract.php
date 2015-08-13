@@ -181,7 +181,9 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
         $isAllowed = call_user_func_array(array($this, '_isAllowed'), $arguments);
         if (false === $isAllowed) {
-            throw new CM_Exception_NotAllowed('Action not allowed', null, array('messagePublic' => 'The content you tried to interact with has become private.'));
+            throw new CM_Exception_NotAllowed('Action not allowed', null, null, [
+                'messagePublic' => new CM_I18n_Phrase('The content you tried to interact with has become private.'),
+            ]);
         }
         if (true !== $isAllowed) {
             $this->_checkActionLimits();

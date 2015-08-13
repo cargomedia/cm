@@ -35,7 +35,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
               results: results
             });
           });
-      }, {cancel: true}),
+      }, {cancelLeading: true}),
       createSearchChoice: function(term, data) {
         if (field.getOption("enableChoiceCreate")) {
           var existingMatches = $(data).filter(function() {

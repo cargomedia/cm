@@ -50,7 +50,7 @@ class CM_Config_Node {
                 return $base . '[' . $key . ']';
             };
         } else {
-            throw new CM_Exception_Invalid('Invalid property type', ['property' => $property]);
+            throw new CM_Exception_Invalid('Invalid property type', null, ['property' => $property]);
         }
         foreach ($property as $key => $value) {
             if (is_array($value)) {

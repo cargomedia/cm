@@ -46,14 +46,14 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
           return view;
         })
         .catch(function(error) {
+          window.clearTimeout(layout._timeoutLoading);
           if (!(error instanceof Promise.CancellationError)) {
-            window.clearTimeout(layout._timeoutLoading);
             layout._$pagePlaceholder.addClass('error').html('<pre>' + error.message + '</pre>');
             layout._onPageError();
             throw error;
           }
         });
-    }, {cancel: true});
+    }, {cancelLeading: true});
   },
 
   /**

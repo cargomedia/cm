@@ -9,21 +9,27 @@ services:
   - memcached
   - elasticsearch
   - redis-server
-  - mongodb
+
+addons:
+  apt:
+    packages:
+      - libgearman-dev
+      - libsvm-dev
+      - re2c
 
 before_install:
-  - "sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10"
-  - "echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list"
-  - "sudo apt-get update"
-  - "sudo apt-get install mongodb-org-server"
+  - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.0.4.tgz -O /tmp/mongodb.tgz
+  - tar -xvf /tmp/mongodb.tgz
+  - mkdir /tmp/data
+  - ${PWD}/mongodb-linux-x86_64-3.0.4/bin/mongod --dbpath /tmp/data --bind_ip 127.0.0.1 --noauth &> /dev/null &
 
 before_script:
-  - "until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done"
+  - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
   - tests/travis/install-php-runkit.sh
   - tests/travis/install-php-svm.sh
   - yes '' | travis_retry pecl install imagick
   - travis_retry pecl install stats
-  - sudo apt-get install libgearman-dev && travis_retry pecl install gearman-1.0.3
+  - travis_retry pecl install gearman-1.0.3
   - if [ `php-config --vernum` -ge 50500 ]; then yes '' | travis_retry pecl install apcu-beta; fi
   - phpenv config-add tests/travis/php.ini
   - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
@@ -35,6 +41,8 @@ before_script:
   - bin/cm app set-deploy-version
 
 script: bin/phpunit
+
+sudo: false
 
 notifications:
   email: false

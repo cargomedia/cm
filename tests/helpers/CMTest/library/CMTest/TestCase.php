@@ -162,23 +162,39 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @param CM_View_Abstract              $view
      * @param string                        $methodName
      * @param array|null                    $params
-     * @param CM_Frontend_ViewResponse|null $scopeView
-     * @param CM_Frontend_ViewResponse|null $scopeComponent
+     * @param CM_Frontend_ViewResponse|null $viewResponse
+     * @param CM_Frontend_ViewResponse|null $componentResponse
+     * @throws CM_Exception_Invalid
      * @return CM_Http_Request_Post|\Mocka\AbstractClassTrait
      */
-    public function createRequestAjax(CM_View_Abstract $view, $methodName, array $params = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
-        $viewResponseComponent = new CM_Frontend_ViewResponse($view);
-        if (null === $scopeView) {
-            $scopeView = $viewResponseComponent;
+    public function createRequestAjax(CM_View_Abstract $view, $methodName, array $params = null, CM_Frontend_ViewResponse $viewResponse = null, CM_Frontend_ViewResponse $componentResponse = null) {
+        if (null === $viewResponse) {
+            $viewResponse = new CM_Frontend_ViewResponse($view);
+        } else {
+            if ($viewResponse->getView() !== $view) {
+                throw new CM_Exception_Invalid("View doesn't match value from scopeView");
+            }
         }
-        if (null === $scopeComponent) {
-            $scopeComponent = $viewResponseComponent;
+
+        if (null === $componentResponse) {
+            if ($viewResponse->getView() instanceof CM_Component_Abstract) {
+                $componentResponse = $viewResponse;
+            } else {
+                /** @var CM_Component_Abstract $component */
+                $component = $this->mockClass('CM_Component_Abstract')->newInstance();
+                $componentResponse = new CM_Frontend_ViewResponse($component);
+            }
+        } else {
+            if (!$componentResponse->getView() instanceof CM_Component_Abstract) {
+                throw new CM_Exception_Invalid("ScopeComponent's view is not a component");
+            }
         }
+
         $query = array(
             'method' => (string) $methodName,
             'params' => (array) $params,
         );
-        return $this->createRequest('/ajax/null', $query, null, $scopeView, $scopeComponent);
+        return $this->createRequest('/ajax/null', $query, null, $viewResponse, $componentResponse);
     }
 
     /**

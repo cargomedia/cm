@@ -21,7 +21,7 @@ class CM_FormField_Birthdate extends CM_FormField_Date {
         $userInput = parent::validate($environment, $userInput);
         $age = $userInput->diff(new DateTime())->y;
         if ($age < $this->_minAge || $age > $this->_maxAge) {
-            throw new CM_Exception_FormFieldValidation('Invalid birthdate');
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid birthdate'));
         }
         return $userInput;
     }
