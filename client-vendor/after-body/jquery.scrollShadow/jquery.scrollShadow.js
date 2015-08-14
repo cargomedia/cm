@@ -30,6 +30,7 @@
       var cssClass = 'scrollShadow';
 
       if (this.iOS) {
+        // Fix for iOS Safari: Absolute positioned elements in combination with -webkit-overflow-scrolling: touch; Demo: http://jsfiddle.net/vfz1t4tj/4/
         cssClass += ' noShadows';
       }
 
