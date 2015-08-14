@@ -8,6 +8,9 @@
    * @param {jQuery} $element
    * @constructor
    */
+
+  var iOS = !navigator.userAgent.match(/(iPad|iPhone|iPod)/i);
+
   var ScrollShadow = function($element) {
     this.$element = $element;
     this.initialized = false;
@@ -24,7 +27,13 @@
       }
       var self = this;
 
-      this.$element.addClass('scrollShadow');
+      var cssClass = 'scrollShadow';
+
+      if (this.iOS) {
+        cssClass += ' noShadows';
+      }
+
+      this.$element.addClass(cssClass);
       this.$element.wrap('<div class="scrollShadow-wrapper"></div>');
 
       this.$element.on('scroll.scrollShadow', _.throttle(function() {
@@ -39,7 +48,7 @@
       if (!this.initialized) {
         return;
       }
-      this.$element.unwrap().removeClass('scrollShadow');
+      this.$element.unwrap().removeClass('scrollShadow noShadows');
       this.$element.off('scroll.scrollShadow');
       this.initialized = false;
     },
