@@ -9,7 +9,7 @@
    * @constructor
    */
 
-  var iOS = !navigator.userAgent.match(/(iPad|iPhone|iPod)/i);
+  var iOS = navigator.userAgent.match(/(iPad|iPhone|iPod)/i);
 
   var ScrollShadow = function($element) {
     this.$element = $element;
