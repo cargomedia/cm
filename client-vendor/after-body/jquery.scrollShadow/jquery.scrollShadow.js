@@ -30,7 +30,7 @@
 
       if (iOS) {
         // Fix for iOS Safari: Absolute positioned elements in combination with -webkit-overflow-scrolling: touch; Demo: http://jsfiddle.net/vfz1t4tj/4/
-        cssClass += ' noShadows';
+        cssClass += ' scrollShadow-noShadows';
       }
 
       this.$element.addClass(cssClass);
@@ -49,7 +49,7 @@
       if (!this.initialized) {
         return;
       }
-      this.$element.unwrap().removeClass('scrollShadow noShadows');
+      this.$element.unwrap().removeClass('scrollShadow scrollShadow-noShadows');
       this.$element.off('scroll.scrollShadow');
       this.initialized = false;
     },
