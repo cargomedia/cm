@@ -51,5 +51,26 @@ class CM_Paging_Ip_BlockedTest extends CMTest_TestCase {
         $this->assertEquals(1, $paging->getCount());
         $paging->_change();
         $this->assertEquals(0, $paging->getCount());
+
+        $paging->add(ip2long($ip));
+        CMTest_TH::timeDaysForward(5);
+        $paging->add(ip2long($ip));
+        CM_Cache_Local::getInstance()->flush();
+        $paging->_change();
+        $this->assertEquals(1, $paging->getCount());
+        $this->assertTrue($paging->contains(ip2long($ip)));
+
+        CMTest_TH::timeDaysForward(2);
+        CM_Paging_Ip_Blocked::deleteOld();
+        CM_Cache_Local::getInstance()->flush();
+        $paging->_change();
+        $this->assertEquals(1, $paging->getCount());
+
+        CMTest_TH::timeDaysForward(2);
+        CM_Paging_Ip_Blocked::deleteOld();
+        CM_Cache_Local::getInstance()->flush();
+        $this->assertEquals(1, $paging->getCount());
+        $paging->_change();
+        $this->assertEquals(0, $paging->getCount());
     }
 }
