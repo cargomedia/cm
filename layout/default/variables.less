@@ -5,7 +5,6 @@
 @colorNotice: #ea8e0b;
 @colorError: #C2113D;
 @colorClose: #C2113D;
-@colorFocus: @colorBrand;
 
 // Basic Color
 @colorFg: #444444;
@@ -65,10 +64,15 @@
 @colorBgButtonDanger: #d6162a;
 @colorFgButtonDanger: #ffffff;
 
-//Textinput
+//Forms
 @heightInputText: @sizeButton;
 @heightInputTextarea: 65px;
 @borderRadiusInput: 3px;
+@colorInputBorder: @colorFgBorderEmphasize3;
+@colorInputPlaceholder: lighten(@colorFgSubtle, 22);
+@colorInputBg: darken(@colorBg, 1);
+@colorInputFg: @colorFg;
+@colorInputFocus: @colorBrand;
 
 //Usertext
 @usertextLineheight: 1.4;
