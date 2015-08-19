@@ -33,6 +33,7 @@
 
 .dropInfo {
   display: none;
+  padding: 12px;
   color: @colorFgSubtle;
 
   @media (min-width: 400px) {
@@ -49,20 +50,12 @@
   .dropInfo-message {
     font-size: 1.3em;
   }
-
-  .dropInfo-divide {
-    margin-bottom: 12px;
-    font-size: @fontSizeSmall;
-  }
 }
 
-.uploadButton {
-  .button;
-  .button-default;
+.upload {
   display: inline-block;
-  height: @sizeButton;
-  line-height: @sizeButton;
   position: relative;
+  overflow: hidden;
 
   input {
     position: absolute;
@@ -75,8 +68,10 @@
     opacity: 0;
   }
 
-  &.disabled {
-    opacity: .5;
+  .uploadButton {
+    &.disabled {
+      opacity: .5;
+    }
   }
 }
 
