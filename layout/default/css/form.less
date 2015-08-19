@@ -232,7 +232,7 @@ input[type=checkbox] {
 }
 
 input[type=checkbox].checkbox-switch {
-  @sizeSwitch: @sizeCheckbox + 4px;
+  @sizeSwitch: @sizeCheckbox;
 
   + label {
     margin-left: 0;
@@ -241,7 +241,7 @@ input[type=checkbox].checkbox-switch {
       box-sizing: border-box;
       position: relative;
       display: inline-block;
-      width: 2 * @sizeSwitch + 5px;
+      width: 1.6 * @sizeSwitch;
       height: @sizeSwitch;
       margin-right: 5px;
       vertical-align: middle;
@@ -250,32 +250,18 @@ input[type=checkbox].checkbox-switch {
       background-color: @colorInputBg;
       box-shadow: 0 .1em .1em rgba(0, 0, 0, 0.02) inset;
 
-      &::before, &::after {
-        position: absolute;
-        top: 0;
-      }
-
-      &::before {
-        right: 0;
-        margin: 0 5px;
-        content: 'OFF';
-        font-weight: bold;
-        line-height: @sizeSwitch;
-        font-size: @sizeSwitch * 0.4;
-        text-transform: uppercase;
-        color: @colorInputPlaceholder;
-      }
-
       &::after {
         box-sizing: border-box;
+        position: absolute;
+        top: 0;
         left: 0;
         content: '';
-        width: @sizeSwitch - 6px;
-        height: @sizeSwitch - 6px;
-        margin: 2px;
-        border: 1px solid @colorInputBg;
+        width: @sizeSwitch - 4px;
+        height: @sizeSwitch - 4px;
+        margin: 1px;
+        border: 1px solid lighten(@colorInputBorder, 12);
         border-radius: 50%;
-        background-color: @colorInputBorder;
+        background-color: @colorInputBg;
         transform: translateX(0);
         transition: 200ms;
       }
@@ -294,16 +280,10 @@ input[type=checkbox].checkbox-switch {
     background-color: @colorInputFocus;
     border-color: @colorInputFocus;
 
-    &::before {
-      right: 0;
-      left: 0;
-      content: 'ON';
-      color: contrast(darken(@colorInputFocus, 30), black, white);
-    }
-
     &::after {
-      transform: translateX(@sizeSwitch + 4px);
-      background-color: lighten(@colorInputFocus, 30);
+      transform: translateX(0.6 * @sizeSwitch);
+      background-color: @colorInputBg;
+      border-color: @colorInputBg;
     }
   }
 
