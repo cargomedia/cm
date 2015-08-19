@@ -7,8 +7,8 @@
   padding-left: 10px;
   padding-right: 10px;
   border-radius: @borderRadiusInput;
-  background: @colorBg;
-  border: 1px solid @colorFgBorderEmphasize2;
+  background: @colorInputBg;
+  border: 1px solid @colorInputBorder;
   transition: border-color .1s;
 }
 
@@ -21,7 +21,7 @@ textarea.textinput {
 
 .input_focus {
   outline: none;
-  border-color: @colorFocus;
+  border-color: @colorInputFocus;
 }
 
 .placeholder(@color) {
@@ -37,7 +37,7 @@ textarea.textinput {
   }
 }
 
-.placeholder(lighten(@colorFgSubtle, 25));
+.placeholder(@colorInputPlaceholder);
 
 .button {
   position: relative;
@@ -181,11 +181,11 @@ input[type=checkbox], input[type=radio] {
       display: block;
       width: @sizeCheckbox;
       height: @sizeCheckbox;
-      background-color: @colorBgEmphasize1;
+      background-color: @colorInputBg;
       top: 50%;
       left: -(@sizeCheckbox+4px);
       margin-top: -@sizeCheckbox/2;
-      border: 1px solid @colorFgBorderEmphasize3;
+      border: 1px solid @colorInputBorder;
       transition: 100ms;
     }
   }
@@ -197,8 +197,8 @@ input[type=checkbox], input[type=radio] {
   }
 
   &:checked + label::before {
-    background-color: @colorFocus;
-    border-color: @colorFocus;
+    background-color: @colorInputFocus;
+    border-color: @colorInputFocus;
   }
 
   &:disabled + label {
@@ -208,7 +208,7 @@ input[type=checkbox], input[type=radio] {
 
 input[type=radio] {
   &:checked + label::before {
-    box-shadow: inset 0 0 0 .2em @colorBgEmphasize1;
+    box-shadow: inset 0 0 0 .2em @colorInputBg;
   }
 
   + label {
@@ -245,9 +245,9 @@ input[type=checkbox].checkbox-switch {
       height: @sizeSwitch;
       margin-right: 5px;
       vertical-align: middle;
-      border: 1px solid @colorFgBorderEmphasize3;
+      border: 1px solid @colorInputBorder;
       border-radius: .5 * @sizeSwitch;
-      background-color: @colorBgEmphasize1;
+      background-color: @colorInputBg;
       box-shadow: 0 .1em .1em rgba(0, 0, 0, 0.02) inset;
 
       &::before, &::after {
@@ -263,7 +263,7 @@ input[type=checkbox].checkbox-switch {
         line-height: @sizeSwitch;
         font-size: @sizeSwitch * 0.4;
         text-transform: uppercase;
-        color: lighten(@colorFgSubtle, 10);
+        color: @colorInputPlaceholder;
       }
 
       &::after {
@@ -273,9 +273,9 @@ input[type=checkbox].checkbox-switch {
         width: @sizeSwitch - 6px;
         height: @sizeSwitch - 6px;
         margin: 2px;
-        border: 1px solid @colorBg;
+        border: 1px solid @colorInputBg;
         border-radius: 50%;
-        background-color: lighten(@colorFgSubtle, 10);
+        background-color: @colorInputBorder;
         transform: translateX(0);
         transition: 200ms;
       }
@@ -291,24 +291,24 @@ input[type=checkbox].checkbox-switch {
   }
 
   &:checked + label .handle {
-    background-color: @colorFocus;
-    border-color: @colorFocus;
+    background-color: @colorInputFocus;
+    border-color: @colorInputFocus;
 
     &::before {
       right: 0;
       left: 0;
       content: 'ON';
-      color: contrast(darken(@colorFocus, 30), black, white);
+      color: contrast(darken(@colorInputFocus, 30), black, white);
     }
 
     &::after {
       transform: translateX(@sizeSwitch + 4px);
-      background-color: lighten(@colorFocus, 30);
+      background-color: lighten(@colorInputFocus, 30);
     }
   }
 
   &:focus + label .handle {
-    border-color: @colorFocus;
+    border-color: @colorInputFocus;
   }
 }
 
@@ -319,9 +319,12 @@ input[type=checkbox].checkbox-switch {
 
 .formField {
   > label {
-    box-sizing: border-box;
-    color: @fontColorStrong;
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 5px;
     padding-left: 2px;
+    color: lighten(@colorInputFg, 20);
+    font-weight: bold;
 
     &::after {
       content: ":";
