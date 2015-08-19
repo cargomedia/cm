@@ -76,7 +76,7 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
     }
     $html .= '</select>';
 
-    $html .= '<div class="button button-default hasLabel hasIconRight nowrap">';
+    $html .= '<div class="fancySelect-select nowrap">';
 
     if ($labelPrefix) {
         $html .= '<span class="labelPrefix">' . CM_Util::htmlspecialchars($labelPrefix) . '</span>';
