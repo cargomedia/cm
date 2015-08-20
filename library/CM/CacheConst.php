@@ -23,7 +23,8 @@ class CM_CacheConst {
     // _text:X_filter:X
     const Usertext = 'Usertext';
 
-    const ContentList_BadwordRegex = 'ContentList_BadwordRegex';
+    // _phrasesHash:X
+    const Usertext_Filter_ReplaceList = 'Usertext_Filter_ReplaceList';
 
     // _fixedHeight:X
     const Usertext_Filter_EmoticonList = 'Usertext_Filter_EmoticonList';
