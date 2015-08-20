@@ -300,7 +300,6 @@ input[type=checkbox].checkbox-switch {
 .formField {
   > label {
     display: block;
-    margin-top: 5px;
     margin-bottom: 5px;
     padding-left: 2px;
     color: lighten(@colorInputFg, 20);
@@ -309,6 +308,10 @@ input[type=checkbox].checkbox-switch {
     &::after {
       content: ":";
     }
+  }
+
+  &:not(:first-child) > label {
+    margin-top: 5px;
   }
 }
 
