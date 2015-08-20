@@ -246,8 +246,8 @@ input[type=checkbox].checkbox-switch {
       margin-right: 5px;
       vertical-align: middle;
       border: 1px solid @colorInputBorder;
+      background-color: @colorInputBorder;
       border-radius: .5 * @sizeSwitch;
-      background-color: @colorInputBg;
       box-shadow: 0 .1em .1em rgba(0, 0, 0, 0.02) inset;
 
       &::after {
@@ -259,7 +259,7 @@ input[type=checkbox].checkbox-switch {
         width: @sizeSwitch - 4px;
         height: @sizeSwitch - 4px;
         margin: 1px;
-        border: 1px solid lighten(@colorInputBorder, 12);
+        border: 1px solid @colorInputBg;
         border-radius: 50%;
         background-color: @colorInputBg;
         transform: translateX(0);
