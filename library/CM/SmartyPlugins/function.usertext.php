@@ -18,9 +18,15 @@ function smarty_function_usertext($params, Smarty_Internal_Template $template) {
     $isMail = isset($params['isMail']) ? (bool) $params['isMail'] : null;
     $skipAnchors = isset($params['skipAnchors']) ? (bool) $params['skipAnchors'] : null;
     $allowBadwords = isset($params['allowBadwords']) ? (bool) $params['allowBadwords'] : null;
+    /** @var CM_Usertext_Usertext $usertext */
+    $usertext = isset($params['usertext']) ? $params['usertext'] : null;
 
-    $usertext = CM_Usertext_Usertext::factory($render);
-    $usertext->setMode($mode, $maxLength, $isMail, $skipAnchors, $allowBadwords);
+    if (!$usertext) {
+        $usertext = CM_Usertext_Usertext::factory($render);
+        $usertext->setMode($mode, $maxLength, $isMail, $skipAnchors, $allowBadwords);
+    } else {
+        $usertext->setRender($render);
+    }
 
     $text = $usertext->transform($text);
 
