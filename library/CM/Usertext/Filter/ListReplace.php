@@ -30,7 +30,7 @@ class CM_Usertext_Filter_ListReplace extends CM_Usertext_Filter_Abstract {
     }
 
     public function transform($text, CM_Frontend_Render $render) {
-        return $this->replaceMatch($text);
+        return $this->replaceMatch((string) $text);
     }
 
     /**
