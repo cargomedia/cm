@@ -24,10 +24,7 @@ class CM_Usertext_Filter_ListReplace extends CM_Usertext_Filter_Abstract {
     public function replaceMatch($text) {
         $text = (string) $text;
         $regex = $this->_toRegex();
-        $count = preg_match_all($regex, $text);
-        if ($count) {
-            $text = preg_replace($regex, $this->_replace, $text);
-        }
+        $text = preg_replace($regex, $this->_replace, $text);
 
         return $text;
     }
@@ -80,7 +77,6 @@ class CM_Usertext_Filter_ListReplace extends CM_Usertext_Filter_Abstract {
     private function _toRegex() {
         $cacheKey = $this->_getCacheKey();
         $cache = CM_Cache_Shared::getInstance();
-        $phrasesRegex = null;
         if (false == ($phrasesRegex = $cache->get($cacheKey))) {
             if (0 === iterator_count($this->_phrases)) {
                 $phrasesRegex = '#\z.#';
