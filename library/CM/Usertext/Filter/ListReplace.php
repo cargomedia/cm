@@ -6,15 +6,15 @@ class CM_Usertext_Filter_ListReplace extends CM_Usertext_Filter_Abstract {
     private $_phrases;
 
     /** @var string */
-    private $_replace;
+    private $_replacementPattern;
 
     /**
      * @param Traversable $phrases
-     * @param string      $replace
+     * @param string      $replacementPattern
      */
-    public function __construct(Traversable $phrases, $replace) {
+    public function __construct(Traversable $phrases, $replacementPattern) {
         $this->_phrases = $phrases;
-        $this->_replace = (string) $replace;
+        $this->_replacementPattern = (string) $replacementPattern;
     }
 
     /**
@@ -24,7 +24,7 @@ class CM_Usertext_Filter_ListReplace extends CM_Usertext_Filter_Abstract {
     public function replaceMatch($text) {
         $text = (string) $text;
         $regex = $this->_toRegex();
-        $text = preg_replace($regex, $this->_replace, $text);
+        $text = preg_replace($regex, $this->_replacementPattern, $text);
 
         return $text;
     }
