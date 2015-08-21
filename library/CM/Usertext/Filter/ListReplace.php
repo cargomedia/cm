@@ -63,29 +63,16 @@ class CM_Usertext_Filter_ListReplace extends CM_Usertext_Filter_Abstract {
     /**
      * @return string
      */
-    private function _getCacheKey() {
-        return CM_CacheConst::Usertext_Filter_ReplaceList . '_phrasesHash:' . md5(implode('', iterator_to_array($this->_phrases)));
-    }
-
-    /**
-     * @return string
-     */
     private function _toRegex() {
-        $cacheKey = $this->_getCacheKey();
-        $cache = CM_Cache_Shared::getInstance();
-        if (false === ($phrasesRegex = $cache->get($cacheKey))) {
-            if (0 === iterator_count($this->_phrases)) {
-                $phrasesRegex = '#\z.#';
-            } else {
-                $regexList = [];
-                foreach ($this->_phrases as $phrase) {
-                    $regexList[] = $this->_transformItemToRegex($phrase);
-                }
-                $phrasesRegex = '#' . implode('|', $regexList) . '#i';
+        if (0 === iterator_count($this->_phrases)) {
+            $phrasesRegex = '#\z.#';
+        } else {
+            $regexList = [];
+            foreach ($this->_phrases as $phrase) {
+                $regexList[] = $this->_transformItemToRegex($phrase);
             }
-            $cache->set($cacheKey, $phrasesRegex);
+            $phrasesRegex = '#' . implode('|', $regexList) . '#i';
         }
-
         return $phrasesRegex;
     }
 
