@@ -54,14 +54,10 @@ class CM_Usertext_Filter_ListReplace extends CM_Usertext_Filter_Abstract {
 
     /**
      * @param string $userInput
-     * @return bool
+     * @return boolean
      */
     public function isMatch($userInput) {
-        if (preg_match($this->_toRegex(), (string) $userInput)) {
-            return true;
-        }
-
-        return false;
+        return (boolean) preg_match($this->_toRegex(), (string) $userInput);
     }
 
     /**
@@ -77,7 +73,7 @@ class CM_Usertext_Filter_ListReplace extends CM_Usertext_Filter_Abstract {
     private function _toRegex() {
         $cacheKey = $this->_getCacheKey();
         $cache = CM_Cache_Shared::getInstance();
-        if (false == ($phrasesRegex = $cache->get($cacheKey))) {
+        if (false === ($phrasesRegex = $cache->get($cacheKey))) {
             if (0 === iterator_count($this->_phrases)) {
                 $phrasesRegex = '#\z.#';
             } else {
