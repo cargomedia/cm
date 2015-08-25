@@ -9,6 +9,8 @@ var CM_FormField_Date = CM_FormField_Abstract.extend({
     this.bindJquery(this.$('select'), 'change', function() {
       this.trigger('change');
     });
+
+    this.$('input').inputmask();
   },
 
   isEmpty: function(value) {

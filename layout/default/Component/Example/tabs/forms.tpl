@@ -8,7 +8,7 @@
 {formField name='file' label="{translate 'Upload Files'}"}
 {formField name='image' label="{translate 'Upload {$count} Photos' count='0-2'}"}
 {formField name='color' label="{translate 'Color'}"}
-{formField name='date' label="{translate 'Date'}"}
+{formField name='date' label="{translate 'Date'}" placeholder='dd/mm/yyyy'}
 {formField name='set' label="{translate 'Set'}"}
 {formField name='boolean' text="{translate 'Bool'}"}
 {formField name='booleanSwitch' text="{translate 'Bool Switch'}" display='switch'}

@@ -46,6 +46,7 @@ class CM_FormField_Date extends CM_FormField_Abstract {
         $viewResponse->set('yy', $year);
         $viewResponse->set('mm', $month);
         $viewResponse->set('dd', $day);
+        $viewResponse->set('placeholder', $renderParams->has('placeholder') ? $renderParams->getString('placeholder') : null);
     }
 
     public function isEmpty($userInput) {
