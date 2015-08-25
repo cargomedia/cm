@@ -49,7 +49,7 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
 
     protected function _doAnchors_reference_callback($matches) {
         if (!$this->_skipAnchors) {
-            return parent::_doAnchors_inline_callback($matches);
+            return parent::_doAnchors_reference_callback($matches);
         }
         $link_text = $matches[2];
         return $link_text;
