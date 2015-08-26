@@ -17,7 +17,6 @@ var CM_FormField_Password = CM_FormField_Text.extend({
 
   ready: function() {
     this.enableTriggerChangeOnInput();
-    this.togglePasswordVisibility(this._visibilityDesired);
 
     var self = this;
     var visibilityDesired;

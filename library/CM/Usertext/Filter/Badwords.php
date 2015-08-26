@@ -1,12 +1,12 @@
 <?php
 
-class CM_Usertext_Filter_Badwords extends CM_Usertext_Filter_Abstract {
+class CM_Usertext_Filter_Badwords extends CM_Usertext_Filter_ListReplace {
 
-    public function transform($text, CM_Frontend_Render $render) {
-        $text = (string) $text;
-        $badwordList = new CM_Paging_ContentList_Badwords;
-        $text = $badwordList->replaceMatch($text, '…');
-
-        return $text;
+    /**
+     * @param string|null $replacementPattern
+     */
+    public function __construct($replacementPattern = null) {
+        $replacementPattern = null !== $replacementPattern ? (string) $replacementPattern : '…';
+        parent::__construct(new CM_Paging_ContentList_Badwords(), $replacementPattern);
     }
 }
