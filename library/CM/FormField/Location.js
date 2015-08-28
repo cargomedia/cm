@@ -15,7 +15,12 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
     this.on('change', function() {
       this.updateDistanceField();
     }, this);
-    this.updateDistanceField();
+    if (this.getDistanceField()) {
+      var self = this;
+      this.getDistanceField().on('ready', function() {
+        self.updateDistanceField();
+      });
+    }
   },
 
   /**
