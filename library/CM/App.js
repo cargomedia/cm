@@ -319,24 +319,24 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('.openx-ad:visible').openx();
       $dom.find('.epom-ad').epom();
       $dom.find('.fancySelect').fancySelect();
-      this._setupLazyImages($dom);
+      this._setupContentPlaceholder($dom);
     },
 
     /**
      * @param {jQuery} $dom
      */
-    _setupLazyImages: function($dom) {
-      var $imageListNotLoad = $();
+    _setupContentPlaceholder: function($dom) {
+      var $doNotLoadOnReady = $();
       $dom.find('.clipSlide').each(function() {
-        var $notFirstImages = $(this).find('img.lazy:gt(0)');
-        $imageListNotLoad = $imageListNotLoad.add($notFirstImages);
+        var $notFirstImages = $(this).find('.contentPlaceholder:gt(0)');
+        $doNotLoadOnReady = $doNotLoadOnReady.add($notFirstImages);
 
         $(this).on('toggle.clipSlide', function() {
-          $(this).find('img.lazy:gt(0)').lazyload();
+          $(this).find('.contentPlaceholder:gt(0)').contentPlaceholder();
         });
       });
 
-      $dom.find('img.lazy').not($imageListNotLoad).lazyload();
+      $dom.find('.contentPlaceholder').not($doNotLoadOnReady).contentPlaceholder();
     },
 
     /**
