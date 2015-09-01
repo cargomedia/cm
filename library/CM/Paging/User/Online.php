@@ -7,4 +7,17 @@ class CM_Paging_User_Online extends CM_Paging_User_Abstract {
 
         parent::__construct($source);
     }
+
+    /**
+     * @param int|CM_Model_User $user
+     * @return bool
+     */
+    public function contains($user) {
+        if ($user instanceof CM_Model_User) {
+            $userId = $user->getId();
+        } else {
+            $userId = (int) $user;
+        }
+        return in_array($userId, $this->getItemsRaw());
+    }
 }
