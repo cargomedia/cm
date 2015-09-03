@@ -9,6 +9,7 @@ class CM_Paging_User_OnlineTest extends CMTest_TestCase {
         $user2->setOnline(false);
         $this->assertEquals([$user1], (new CM_Paging_User_Online())->getItems());
 
+        CM_Cache_Local::getInstance()->flush();
         $user2->setOnline(true);
         $this->assertEquals([$user1, $user2], (new CM_Paging_User_Online())->getItems());
     }
@@ -17,9 +18,11 @@ class CM_Paging_User_OnlineTest extends CMTest_TestCase {
         $user = CMTest_TH::createUser();
         $this->assertFalse((new CM_Paging_User_Online())->contains($user));
 
+        CM_Cache_Local::getInstance()->flush();
         $user->setOnline(true);
         $this->assertTrue((new CM_Paging_User_Online())->contains($user));
 
+        CM_Cache_Local::getInstance()->flush();
         $user->setOnline(false);
         $this->assertFalse((new CM_Paging_User_Online())->contains($user));
     }
