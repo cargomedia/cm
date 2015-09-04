@@ -218,6 +218,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Elasticsearch_Cluster
+     */
+    public function getElasticsearchLong() {
+        return $this->get('elasticsearch-long', 'CM_Elasticsearch_Cluster');
+    }
+
+    /**
      * @return CMService_Newrelic
      */
     public function getNewrelic() {
