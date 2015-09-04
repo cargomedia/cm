@@ -66,7 +66,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
      * @return CM_Elasticsearch_Type_Abstract[]
      */
     protected function _getTypes($filterIndexName = null) {
-        $types = CM_Service_Manager::getInstance()->getElasticsearch()->getTypes();
+        $types = CM_Service_Manager::getInstance()->getElasticsearchLong()->getTypes();
 
         if (null !== $filterIndexName) {
             $types = \Functional\filter($types, function (CM_Elasticsearch_Type_Abstract $type) use ($filterIndexName) {
