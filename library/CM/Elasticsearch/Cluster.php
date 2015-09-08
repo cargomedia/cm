@@ -4,22 +4,26 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
 
     use CM_Service_ManagerAwareTrait;
 
+    /** @var array */
+    private $_serverList;
+
     /** @var Elastica\Client[] */
     private $_clients;
+
+    /** @var Elastica\Client[] */
+    private $_longTimeoutClients;
 
     /** @var bool */
     private $_enabled;
 
     /**
-     * @param array[]   $servers
+     * @param array[]   $serverList
      * @param bool|null $disabled
      */
-    public function __construct(array $servers, $disabled = null) {
+    public function __construct(array $serverList, $disabled = null) {
         $this->setEnabled(!$disabled);
-        foreach ($servers as $server) {
-            $config = array_merge(['timeout' => 10], $server);
-            $this->_clients[] = new Elastica\Client($config);
-        }
+        $this->_serverList = $serverList;
+        $this->_clients = $this->_initClients(10);
     }
 
     /**
@@ -30,11 +34,18 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
     }
 
     /**
+     * @param boolean|null $selectLongTimeoutClient
      * @return \Elastica\Client
      */
-    public function getRandomClient() {
-        $index = array_rand($this->_clients);
-        return $this->_clients[$index];
+    public function getRandomClient($selectLongTimeoutClient = null) {
+        if (true === $selectLongTimeoutClient && null !== $this->_longTimeoutClients) {
+            $index = array_rand($this->_longTimeoutClients);
+            return $this->_longTimeoutClients[$index];
+        }
+        else {
+            $index = array_rand($this->_clients);
+            return $this->_clients[$index];
+        }
     }
 
     /**
@@ -52,12 +63,18 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
     }
 
     /**
+     * @param boolean|null $useLongTimeout
      * @return CM_Elasticsearch_Type_Abstract[]
      */
-    public function getTypes() {
+    public function getTypes($useLongTimeout = null) {
         $types = CM_Util::getClassChildren('CM_Elasticsearch_Type_Abstract');
-        return \Functional\map($types, function ($className) {
-            return new $className($this->getRandomClient());
+
+        if (true === $useLongTimeout && null === $this->_longTimeoutClients) {
+            $this->_longTimeoutClients = $this->_initClients(20);
+        }
+
+        return \Functional\map($types, function ($className) use ($useLongTimeout) {
+            return new $className($this->getRandomClient($useLongTimeout));
         });
     }
 
@@ -98,5 +115,23 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
             throw $ex;
         }
         return $response->getData();
+    }
+
+    /**
+     * @param int $timeout
+     * @return array
+     */
+    private function _initClients($timeout) {
+        $timeout = (int) $timeout;
+        if (0 === $timeout) {
+            $timeout = 10;
+        }
+
+        $clients = [];
+        foreach ($this->_serverList as $server) {
+            $config = array_merge(['timeout' => $timeout], $server);
+            $clients[] = new Elastica\Client($config);
+        }
+        return $clients;
     }
 }
