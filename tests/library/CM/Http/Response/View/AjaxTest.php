@@ -2,10 +2,6 @@
 
 class CM_Http_Response_View_AjaxTest extends CMTest_TestCase {
 
-    public function tearDown() {
-        CMTest_TH::clearEnv();
-    }
-
     /**
      * @expectedException CM_Exception_Invalid
      * @expectedExceptionMessage Illegal method: `_ad_!!!##`
