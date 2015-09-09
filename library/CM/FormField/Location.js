@@ -44,7 +44,7 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
    */
   getValue: function() {
     var value = CM_FormField_SuggestOne.prototype.getValue.call(this);
-    if (_.isString(value.id)) {
+    if (value && _.isString(value.id)) {
       value.id = JSON.parse(value.id);
     }
     return value;
