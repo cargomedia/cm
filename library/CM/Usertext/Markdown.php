@@ -49,7 +49,7 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
 
     protected function _doAnchors_reference_callback($matches) {
         if (!$this->_skipAnchors) {
-            return parent::_doAnchors_inline_callback($matches);
+            return parent::_doAnchors_reference_callback($matches);
         }
         $link_text = $matches[2];
         return $link_text;
@@ -92,7 +92,7 @@ class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
                 $height = (int) $matches[5];
                 if ($width > 0 && $height > 0) {
                     $class = $matches[3] ? 'lazy ' . $matches[3] : 'lazy';
-                    $imgHtml = '<img data-src="' . $src . '" alt="' . $alt . '" class="' . $class . '"/>';
+                    $imgHtml = '<img data-original="' . $src . '" alt="' . $alt . '" class="' . $class . '"/>';
                     return '<div class="usertext-image">' . CM_Frontend_TemplateHelper_ContentPlaceholder::create($imgHtml, $width, $height) .
                     '</div>';
                 }

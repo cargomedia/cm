@@ -18,6 +18,12 @@
     background-color: @colorBgBody;
   }
 
+  &.loaded {
+    .contentPlaceholder-size + * {
+      background-color: inherit;
+    }
+  }
+
   &.stretch {
     display: block;
     max-width: none;

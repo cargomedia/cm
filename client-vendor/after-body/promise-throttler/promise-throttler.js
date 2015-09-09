@@ -53,7 +53,9 @@
       }
       if (options.queue && promise && promise.isPending()) {
         var args = arguments;
-        promise = promise.finally(function() {
+        promise = promise.then(function() {
+          return fn.apply(null, args);
+        }).catch(function() {
           return fn.apply(null, args);
         });
       }

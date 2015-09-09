@@ -48,11 +48,10 @@
    * @returns {Function} exception constructor
    */
   CM_Exception.factory = function(className) {
-    var extension = exceptionMap[className];
-    if (!extension) {
-      throw new CM_Exception('No such exception ' + className);
+    if (!exceptionMap[className]) {
+      window[className] = exceptionMap[className] = CM_Exception.extend(className);
     }
-    return extension;
+    return exceptionMap[className];
   };
 
   scope['CM_Exception'] = CM_Exception;

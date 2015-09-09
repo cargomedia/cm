@@ -8,7 +8,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     /**
      * @param CM_Frontend_Render $render
      */
-    function __construct(CM_Frontend_Render $render) {
+    function __construct(CM_Frontend_Render $render = null) {
         $this->_render = $render;
     }
 
@@ -20,6 +20,24 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
      */
     public function addFilter(CM_Usertext_Filter_Interface $filter) {
         $this->_filterList[] = $filter;
+    }
+
+    /**
+     * @return CM_Frontend_Render
+     * @throws CM_Exception_Invalid
+     */
+    public function getRender() {
+        if (!$this->_render) {
+            throw new CM_Exception_Invalid('Render not set');
+        }
+        return $this->_render;
+    }
+
+    /**
+     * @param CM_Frontend_Render $render
+     */
+    public function setRender(CM_Frontend_Render $render) {
+        $this->_render = $render;
     }
 
     /**
@@ -51,10 +69,11 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     public function transform($text) {
         $cacheKey = $this->_getCacheKey($text);
         $cache = CM_Cache_Local::getInstance();
+        $render = $this->getRender();
         if (($result = $cache->get($cacheKey)) === false) {
             $result = $text;
             foreach ($this->_getFilters() as $filter) {
-                $result = $filter->transform($result, $this->_render);
+                $result = $filter->transform($result, $render);
             }
             $cache->set($cacheKey, $result);
         }
