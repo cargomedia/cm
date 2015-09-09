@@ -17,7 +17,7 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
     public function __construct(array $servers, $disabled = null) {
         $this->setEnabled(!$disabled);
         foreach ($servers as $server) {
-            $config = array_merge(['timeout' => 10], $server);
+            $config = array_merge(['timeout' => 30], $server);
             $this->_clients[] = new Elastica\Client($config);
         }
     }
