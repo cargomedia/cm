@@ -79,64 +79,45 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
     }
 
     public function createIndex() {
-        $connectionList = $this->_client->getConnections();
-        $savedTimeouts = array_map(function (Elastica\Connection $el) {
-            return $el->getTimeout();
-        }, $connectionList);
-
-        foreach ($connectionList as $connection) {
-            $connection->setTimeout(100);
+        // Remove old unfinished indices
+        foreach ($this->_client->getStatus()->getIndicesWithAlias($this->getIndex()->getName() . '.tmp') as $index) {
+            /** @var Elastica\Index $index */
+            $index->delete();
         }
 
-        try {
-            // Remove old unfinished indices
-            foreach ($this->_client->getStatus()->getIndicesWithAlias($this->getIndex()->getName() . '.tmp') as $index) {
-                /** @var Elastica\Index $index */
+        // Set current index to read-only
+        foreach ($this->_client->getStatus()->getIndicesWithAlias($this->getIndex()->getName()) as $index) {
+            $index->getSettings()->setBlocksWrite(true);
+        }
+
+        // Create new index and switch alias
+        $version = time();
+        /** @var $indexNew CM_Elasticsearch_Type_Abstract */
+        $indexNew = new static($this->_client, $version);
+        $indexNew->_createIndex(true);
+        $indexNew->getIndex()->addAlias($this->getIndex()->getName() . '.tmp');
+
+        $settings = $indexNew->getIndex()->getSettings();
+        $refreshInterval = $settings->getRefreshInterval();
+        //$mergeFactor = $settings->getMergePolicy('merge_factor');
+
+        //$settings->setMergePolicy('merge_factor', 50);
+        $settings->setRefreshInterval('-1');
+
+        $indexNew->update(null, true);
+
+        //$settings->setMergePolicy('merge_factor', $mergeFactor);
+        $settings->setRefreshInterval($refreshInterval);
+
+        $indexNew->getIndex()->addAlias($this->getIndex()->getName());
+        $indexNew->getIndex()->removeAlias($this->getIndex()->getName() . '.tmp');
+
+        // Remove old index
+        foreach ($this->_client->getStatus()->getIndicesWithAlias($this->getIndex()->getName()) as $index) {
+            /** @var Elastica\Index $index */
+            if ($index->getName() != $indexNew->getIndex()->getName()) {
                 $index->delete();
             }
-
-            // Set current index to read-only
-            foreach ($this->_client->getStatus()->getIndicesWithAlias($this->getIndex()->getName()) as $index) {
-                $index->getSettings()->setBlocksWrite(true);
-            }
-
-            // Create new index and switch alias
-            $version = time();
-            /** @var $indexNew CM_Elasticsearch_Type_Abstract */
-            $indexNew = new static($this->_client, $version);
-            $indexNew->_createIndex(true);
-            $indexNew->getIndex()->addAlias($this->getIndex()->getName() . '.tmp');
-
-            $settings = $indexNew->getIndex()->getSettings();
-            $refreshInterval = $settings->getRefreshInterval();
-            //$mergeFactor = $settings->getMergePolicy('merge_factor');
-
-            //$settings->setMergePolicy('merge_factor', 50);
-            $settings->setRefreshInterval('-1');
-
-            $indexNew->update(null, true);
-
-            //$settings->setMergePolicy('merge_factor', $mergeFactor);
-            $settings->setRefreshInterval($refreshInterval);
-
-            $indexNew->getIndex()->addAlias($this->getIndex()->getName());
-            $indexNew->getIndex()->removeAlias($this->getIndex()->getName() . '.tmp');
-
-            // Remove old index
-            foreach ($this->_client->getStatus()->getIndicesWithAlias($this->getIndex()->getName()) as $index) {
-                /** @var Elastica\Index $index */
-                if ($index->getName() != $indexNew->getIndex()->getName()) {
-                    $index->delete();
-                }
-            }
-        } catch (\Exception $e) {
-            for ($i = 0, $n = sizeof($connectionList); $i < $n; $i++) {
-                $connectionList[$i]->setTimeout($savedTimeouts[$i]);
-            }
-        }
-
-        for ($i = 0, $n = sizeof($connectionList); $i < $n; $i++) {
-            $connectionList[$i]->setTimeout($savedTimeouts[$i]);
         }
     }
 
