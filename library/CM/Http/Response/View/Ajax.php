@@ -26,7 +26,13 @@ class CM_Http_Response_View_Ajax extends CM_Http_Response_View_Abstract {
         $componentHandler = new CM_Frontend_JavascriptContainer_View();
 
         $this->_setStringRepresentation(get_class($view) . '::' . $ajaxMethodName);
-        $data = $view->$ajaxMethodName($params, $componentHandler, $this);
+
+        if (method_exists($view, $ajaxMethodName)) {
+            $data = $view->$ajaxMethodName($params, $componentHandler, $this);
+        } else {
+            throw new CM_Exception_Invalid('Method not found: `' . $ajaxMethodName . '`', CM_Exception::WARN);
+        }
+
         $success['data'] = CM_Params::encode($data);
 
         $frontend = $this->getRender()->getGlobalResponse();
