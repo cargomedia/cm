@@ -191,19 +191,6 @@ EOL;
         $this->assertContains('new CM_Component_Graph', $successContent['data']['js']);
     }
 
-    public function testNonexistentAjaxMethodException() {
-        $page = new CM_Page_View_Ajax_Test_MockRedirectSelf();
-        $request = $this->createRequestAjax($page, 'someReallyBadMethod', ['params' => 'foo']);
-        $response = new CM_Http_Response_View_Ajax($request, $this->getServiceManager());
-
-        $exception = $this->catchException(function () use ($response) {
-            $response->process();
-        });
-
-        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Method not found: `ajax_someReallyBadMethod`', $exception->getMessage());
-    }
-
     /**
      * @param string $code
      * @return CM_Service_Manager
