@@ -10,7 +10,7 @@
    */
   $.fn.contentPlaceholder = function(lazyLoadOptions) {
     return this.each(function() {
-      var options = _.defaults(lazyLoadOptions ? lazyLoadOptions : {}, {
+      var options = _.defaults(lazyLoadOptions || {}, {
         threshold: 600,
         failure_limit: 10
       });
