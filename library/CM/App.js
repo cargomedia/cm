@@ -332,11 +332,11 @@ var CM_App = CM_Class_Abstract.extend({
         $doNotLoadOnReady = $doNotLoadOnReady.add($notFirstImages);
 
         $(this).on('toggle.clipSlide', function() {
-          $(this).find('.contentPlaceholder:gt(0)').contentPlaceholder();
+          $(this).find('.contentPlaceholder:gt(0)').lazyImageSetup();
         });
       });
 
-      $dom.find('.contentPlaceholder').not($doNotLoadOnReady).contentPlaceholder();
+      $dom.find('.contentPlaceholder').not($doNotLoadOnReady).lazyImageSetup();
     },
 
     /**

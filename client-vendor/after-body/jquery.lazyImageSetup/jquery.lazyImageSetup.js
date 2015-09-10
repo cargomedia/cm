@@ -8,7 +8,7 @@
    * @param {Object} [lazyLoadOptions] options to lazy-load-images plugin.
    * @returns {jQuery}
    */
-  $.fn.contentPlaceholder = function(lazyLoadOptions) {
+  $.fn.lazyImageSetup = function(lazyLoadOptions) {
     return this.each(function() {
       var options = _.defaults(lazyLoadOptions || {}, {
         threshold: 600,
