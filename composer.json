@@ -16,7 +16,8 @@
     "aws/aws-sdk-php": "~2.7",
     "nicmart/tree": "~0.2.0",
     "kissmetrics/kissmetrics-php": "~0.1.0",
-    "guzzlehttp/guzzle": "~4.1.7",
+    "elasticsearch/elasticsearch": "~2.0.0",
+    "guzzlehttp/guzzle": "~5.3.0",
     "kickbox/kickbox": "~1.0.3",
     "tomaszdurka/codegenerator": "~0.5.0"
   },
