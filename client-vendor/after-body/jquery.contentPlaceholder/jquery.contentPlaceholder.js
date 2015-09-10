@@ -15,9 +15,7 @@
         failure_limit: 10
       });
       var self = this;
-      $(this).imagesLoaded(function() {
-        self.classList.add('loaded');
-      }).find('img.lazy').lazyload(options);
+      $(this).find('img.lazy').lazyload(options);
     });
   };
 
