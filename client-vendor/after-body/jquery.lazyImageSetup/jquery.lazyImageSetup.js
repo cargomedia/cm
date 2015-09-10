@@ -14,8 +14,11 @@
         threshold: 600,
         failure_limit: 10
       });
-      var self = this;
-      $(this).find('img.lazy').lazyload(options);
+      var $this = $(this);
+      if ($this.hasClass('scrollable')) {
+        options.container = $this;
+      }
+      $this.find('img.lazy').lazyload(options);
     });
   };
 
