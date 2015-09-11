@@ -92,8 +92,8 @@ class CM_Model_User extends CM_Model_Abstract {
         return (int) $offlineStamp;
     }
 
-    public function setOfflineStamp() {
-        $offlineStamp = time();
+    public function setOfflineStamp($offlineStamp) {
+        $offlineStamp = null !== $offlineStamp ? (int) $offlineStamp : $offlineStamp;
         CM_Db_Db::update('cm_user_online', ['offlineStamp' => $offlineStamp], ['userId' => $this->getId()]);
         $this->_set('offlineStamp', $offlineStamp);
     }

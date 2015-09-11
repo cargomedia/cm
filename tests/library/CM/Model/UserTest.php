@@ -46,8 +46,10 @@ class CM_Model_UserTest extends CMTest_TestCase {
     public function testGetSetOfflineStamp() {
         $user = CMTest_TH::createUser();
         $this->assertNull($user->getOfflineStamp());
-        $user->setOfflineStamp();
+        $user->setOfflineStamp(time());
         $this->assertSame(time(), $user->getOfflineStamp());
+        $user->setOfflineStamp(null);
+        $this->assertNull($user->getOfflineStamp());
     }
 
     public function testGetPreferences() {
