@@ -13,6 +13,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertEquals(CM_Site_Abstract::factory(), $user->getSite());
         $this->assertSame(null, $user->getLanguage());
         $this->assertSame(null, $user->getCurrency());
+        $this->assertSame(null, $user->getOfflineStamp());
     }
 
     public function testCreateAllData() {
@@ -40,6 +41,13 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertTrue($user->getOnline());
         $user->setOnline(false);
         $this->assertFalse($user->getOnline());
+    }
+
+    public function testGetSetOfflineStamp() {
+        $user = CMTest_TH::createUser();
+        $this->assertNull($user->getOfflineStamp());
+        $user->setOfflineStamp();
+        $this->assertSame(time(), $user->getOfflineStamp());
     }
 
     public function testGetPreferences() {
