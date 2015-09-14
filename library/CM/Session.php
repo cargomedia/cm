@@ -221,7 +221,7 @@ class CM_Session implements CM_Comparable {
             if (!$user->getOnline()) {
                 $user->setOnline(true);
             }
-            if ($user->getOfflineStamp()) {
+            if (null !== $user->getOfflineStamp()) {
                 $user->setOfflineStamp(null);
             }
         }
