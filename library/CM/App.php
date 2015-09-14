@@ -107,11 +107,13 @@ class CM_App implements CM_Service_ManagerAwareInterface {
     }
 
     /**
+     * @param boolean|null $skipBlocking
      * @param Closure|null $callbackBefore fn($version)
-     * @param Closure|null $callbackAfter fn($version)
+     * @param Closure|null $callbackAfter  fn($version)
      * @return int Number of version bumps
      */
-    public function runUpdateScripts(Closure $callbackBefore = null, Closure $callbackAfter = null) {
+    public function runUpdateScripts($skipBlocking = null, Closure $callbackBefore = null, Closure $callbackAfter = null) {
+        $skipBlocking = (boolean) $skipBlocking;
         CM_Cache_Shared::getInstance()->flush();
         CM_Cache_Local::getInstance()->flush();
         $versionBumps = 0;
@@ -119,7 +121,7 @@ class CM_App implements CM_Service_ManagerAwareInterface {
             $version = $versionStart = $this->getVersion($namespace);
             while (true) {
                 $version++;
-                if (!$this->runUpdateScript($namespace, $version, $callbackBefore, $callbackAfter)) {
+                if (!$this->runUpdateScript($namespace, $version, $skipBlocking, $callbackBefore, $callbackAfter)) {
                     $version--;
                     break;
                 }
@@ -137,20 +139,26 @@ class CM_App implements CM_Service_ManagerAwareInterface {
     /**
      * @param string       $namespace
      * @param int          $version
+     * @param boolean      $skipBlocking
      * @param Closure|null $callbackBefore
      * @param Closure|null $callbackAfter
      * @return int
      */
-    public function runUpdateScript($namespace, $version, Closure $callbackBefore = null, Closure $callbackAfter = null) {
+    public function runUpdateScript($namespace, $version, $skipBlocking = null, Closure $callbackBefore = null, Closure $callbackAfter = null) {
+        $skipBlocking = (boolean) $skipBlocking;
         try {
-            $updateScript = $this->_getUpdateScriptPath($version, $namespace);
+            $updateScriptPath = $this->_getUpdateScriptPath($version, $namespace);
         } catch (CM_Exception_Invalid $e) {
             return 0;
         }
         if ($callbackBefore) {
             $callbackBefore($version);
         }
-        require $updateScript;
+        /** @var CM_Provision_UpdateScript $updateScript */
+        $updateScript = require $updateScriptPath;
+        if ($updateScript instanceof CM_Provision_UpdateScript && !($updateScript->isBlocking() && $skipBlocking)) {
+            $updateScript->run();
+        }
         if ($callbackAfter) {
             $callbackAfter($version);
         }
