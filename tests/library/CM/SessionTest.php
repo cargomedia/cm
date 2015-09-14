@@ -209,6 +209,20 @@ class CM_SessionTest extends CMTest_TestCase {
         $this->assertEquals('bar', $session->get('foo'));
     }
 
+    public function testStartResetOfflineStamp() {
+        $user = CMTest_TH::createUser();
+        $offlineStamp = time();
+        $user->setOfflineStamp($offlineStamp);
+        $session = new CM_Session();
+        $session->setUser($user);
+        $this->assertSame($offlineStamp, $user->getOfflineStamp());
+
+        $session->start();
+        CMTest_TH::reinstantiateModel($user);
+        $this->assertSame(null, $user->getOfflineStamp());
+
+    }
+
     public function testExpiration() {
         $session = new CM_Session();
         $session->set('foo', 'bar');
