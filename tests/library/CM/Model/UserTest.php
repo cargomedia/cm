@@ -145,10 +145,10 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $user2->setOnline();
         $user3->setOnline();
 
-        $user1->setOfflineStamp();
-        $user2->setOfflineStamp();
+        $user1->setOfflineStamp(time());
+        $user2->setOfflineStamp(time());
         CMTest_TH::timeForward(CM_Model_User::OFFLINE_DELAY);
-        $user3->setOfflineStamp();
+        $user3->setOfflineStamp(time());
         $user2->setOnline();
 
         $userOnlinePaging = new CM_Paging_User_Online();
