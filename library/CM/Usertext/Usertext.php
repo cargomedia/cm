@@ -67,7 +67,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
             'maxLength'           => null,
             'skipAnchors'         => null,
             'emoticonFixedHeight' => null,
-            'allowBadwords'       => false
+            'allowBadwords'       => null
         ];
 
         $options = $options + $optionsDefault;
