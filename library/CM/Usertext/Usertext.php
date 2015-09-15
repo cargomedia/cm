@@ -63,7 +63,8 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
      * @param array $options
      * @throws CM_Exception_Invalid
      */
-    public function setMode($mode, $options = []) {
+    public function setMode($mode, $options = null) {
+        $options = $options ? $options : [];
         $acceptedModes = array('escape', 'oneline', 'simple', 'markdown', 'markdownPlain');
         if (!in_array($mode, $acceptedModes)) {
             throw new CM_Exception_Invalid('Invalid mode `' . $mode . '`');
