@@ -16,8 +16,8 @@ class CM_Usertext_UsertextTest extends CMTest_TestCase {
 
     public function testProcessNoRender() {
         $usertext = new CM_Usertext_Usertext();
-        $exception = $this->catchException(function() use ($usertext) {
-           $usertext->transform('foo bar');
+        $exception = $this->catchException(function () use ($usertext) {
+            $usertext->transform('foo bar');
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertSame('Render not set', $exception->getMessage());
@@ -59,5 +59,32 @@ class CM_Usertext_UsertextTest extends CMTest_TestCase {
         $sentString = 'Hello i am ' . $badWord . ' !';
 
         $this->assertSame($sentString, $usertext->transform($sentString));
+    }
+
+    public function testTransformWithFilterBefore() {
+        $filter1 = $this->mockInterface('CM_Usertext_Filter_Interface')->newInstance();
+        $filter2 = $this->mockInterface('CM_Usertext_Filter_Interface')->newInstance();
+        $filterBetween = $this->mockInterface('CM_Usertext_Filter_Interface')->newInstance();
+        $filter1->mockMethod('transform')->set(function ($input) {
+            $this->assertSame('.', $input);
+            return $input . '.';
+        });
+        /** @var CM_Usertext_Filter_Interface $filter1 */
+        $filter2->mockMethod('transform')->set(function ($input) {
+            $this->assertSame('...', $input);
+            return $input . '.';
+        });
+        /** @var CM_Usertext_Filter_Interface $filter2 */
+        $filterBetween->mockMethod('transform')->set(function ($input) {
+            $this->assertSame('..', $input);
+            return $input . '.';
+        });
+        /** @var CM_Usertext_Filter_Interface $filterBetween */
+        $usertext = new CM_Usertext_Usertext(new CM_Frontend_Render());
+        $usertext->addFilter($filter1);
+        $usertext->addFilter($filter2);
+        $usertext->addFilterAfter(get_class($filter1), $filterBetween);
+
+        $this->assertSame('....', $usertext->transform('.'));
     }
 }

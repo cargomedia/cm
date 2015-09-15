@@ -23,6 +23,25 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     }
 
     /**
+     * @param string                       $filterName
+     * @param CM_Usertext_Filter_Interface $filter
+     */
+    public function addFilterAfter($filterName, CM_Usertext_Filter_Interface $filter) {
+        $filterName = (string) $filterName;
+        $filterPosition = null;
+        foreach ($this->_getFilters() as $index => $filterExisting) {
+            if (get_class($filterExisting) === $filterName) {
+                $filterPosition = $index + 1;
+                break;
+            }
+        }
+        if (null !== $filterPosition) {
+            array_splice($this->_filterList, $filterPosition, 0, [$filter]);
+        }
+
+    }
+
+    /**
      * @return CM_Frontend_Render
      * @throws CM_Exception_Invalid
      */
