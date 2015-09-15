@@ -235,12 +235,12 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         $requestParams = [
             'index' => $newIndexName,
             'body'  => [
-                'setting' => $indexParams,
+                'settings' => $indexParams,
             ]
         ];
 
         if (!empty($this->_mapping)) {
-            $requestParams['body']['mappings'][$newIndexName] = [
+            $requestParams['body']['mappings'][$this->getTypeName()] = [
                 '_source'    => [
                     'enabled' => (bool) $this->_source,
                 ],

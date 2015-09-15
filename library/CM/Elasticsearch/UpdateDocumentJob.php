@@ -9,7 +9,7 @@ class CM_Elasticsearch_UpdateDocumentJob extends CM_Jobdistribution_Job_Abstract
         /** @var CM_Elasticsearch_Type_Abstract $index */
         $index = new $indexClassName();
 
-        $index->update(array($id));
-        $index->getIndex()->refresh();
+        $index->updateDocuments(array($id));
+        $index->refreshIndex();
     }
 }
