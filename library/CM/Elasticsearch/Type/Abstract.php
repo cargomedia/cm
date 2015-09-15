@@ -87,9 +87,11 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
 
         // Set current index to read-only
         $currentIndexList = $this->_getIndexesByAlias($this->getIndexName());
-        $this->_putIndexSettings($currentIndexList, [
-            'index.blocks.write' => 1,
-        ]);
+        if (!empty($currentIndexList)) {
+            $this->_putIndexSettings($currentIndexList, [
+                'index.blocks.write' => 1,
+            ]);
+        }
 
         // Create new index and switch alias
         $indexCreatedName = self::_buildIndexName(time());
@@ -99,8 +101,8 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         $this->_putAlias($indexCreatedName, $this->getIndexName() . '.tmp');
 
         //save refresh_interval
-        $indexNewSettings = $indicesHandler->getSettings(['index' => $indexCreatedName]);
-        $refreshInterval = $indexNewSettings[$indexCreatedName]['settings']['index']['refresh_interval'];
+        $refreshInterval = $this->_getIndexSettings($this->getIndexName(), 'refresh_interval') ?: '1s';
+
         $this->_putIndexSettings($indexCreatedName, ['refresh_interval' => -1]);
 
         $this->_updateDocuments($indexCreatedName, null, true);
@@ -185,19 +187,46 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
 
     /**
      * @param string[]|string $indexName
+     * @param string|null     $settingKey
+     * @return mixed|null
+     * @throws CM_Exception_Invalid
+     */
+    protected function _getIndexSettings($indexName, $settingKey = null) {
+        $paramIndex = self::_prepareIndexName($indexName);
+        if ('' === $paramIndex) {
+            throw new CM_Exception_Invalid('Invalid elasticsearch index value');
+        }
+        $settingsResponse = $this->getClient()->indices()->getSettings(['index' => $paramIndex]);
+        if (null !== $settingKey) {
+            $settingKey = (string) $settingKey;
+            $settingsList = current($settingsResponse); //{"photo.1441893401":{"settings":{"index":{"blocks":{"write":"0"},...
+            if (isset($settingsList['settings']['index'][$settingKey])) {
+                return $settingsList['settings']['index'][$settingKey];
+            } else {
+                return null;
+            }
+        } else {
+            return $settingsResponse;
+        }
+    }
+
+    /**
+     * @param string[]|string $indexName
      * @param array           $settings
+     * @throws CM_Exception_Invalid
      */
     protected function _putIndexSettings($indexName, array $settings) {
         $paramIndex = self::_prepareIndexName($indexName);
-
-        if ('' !== $paramIndex) {
-            $this->getClient()->indices()->putSettings([
-                'index' => $paramIndex,
-                'body'  => [
-                    'settings' => $settings,
-                ]
-            ]);
+        if ('' === $paramIndex) {
+            throw new CM_Exception_Invalid('Invalid elasticsearch index value');
         }
+
+        $this->getClient()->indices()->putSettings([
+            'index' => $paramIndex,
+            'body'  => [
+                'settings' => $settings,
+            ]
+        ]);
     }
 
     /**
@@ -266,14 +295,17 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
 
     /**
      * @param string[]|string $indexName
+     * @throws CM_Exception_Invalid
      */
     protected function _refreshIndex($indexName) {
         $paramIndex = self::_prepareIndexName($indexName);
-        if ('' !== $paramIndex) {
-            $this->getClient()->indices()->refresh([
-                'index' => $paramIndex,
-            ]);
+        if ('' === $paramIndex) {
+            throw new CM_Exception_Invalid('Invalid elasticsearch index value');
         }
+
+        $this->getClient()->indices()->refresh([
+            'index' => $paramIndex,
+        ]);
     }
 
     /**
@@ -352,9 +384,9 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_Elasticsearch_Document[]  $documentList
-     * @param string $indexName
-     * @param string $typeName
+     * @param CM_Elasticsearch_Document[] $documentList
+     * @param string                      $indexName
+     * @param string                      $typeName
      */
     public function bulkAddDocuments(array $documentList, $indexName, $typeName) {
         $requestBody = [];
