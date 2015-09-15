@@ -52,13 +52,6 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_Frontend_Render $render
-     */
-    public function setRender(CM_Frontend_Render $render) {
-        $this->_render = $render;
-    }
-
-    /**
      * @param string $mode
      * @param array $options
      * @throws CM_Exception_Invalid

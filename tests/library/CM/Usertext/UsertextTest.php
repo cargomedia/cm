@@ -7,13 +7,6 @@ class CM_Usertext_UsertextTest extends CMTest_TestCase {
         $this->assertSame('foo bar', $usertext->transform('foo bar'));
     }
 
-    public function testSetRender() {
-        $render = new CM_Frontend_Render();
-        $usertext = new CM_Usertext_Usertext(new CM_Frontend_Render());
-        $usertext->setRender($render);
-        $this->assertSame($render, $usertext->getRender());
-    }
-
     public function testProcessNoRender() {
         $usertext = new CM_Usertext_Usertext();
         $exception = $this->catchException(function () use ($usertext) {
