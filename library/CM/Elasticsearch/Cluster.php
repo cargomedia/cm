@@ -4,11 +4,11 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
 
     use CM_Service_ManagerAwareTrait;
 
-    /** @var Elastica\Client[] */
-    private $_clients;
-
     /** @var bool */
     private $_enabled;
+
+    /** @var Elasticsearch\Client */
+    protected $_client;
 
     /**
      * @param array[]   $servers
@@ -16,25 +16,23 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
      */
     public function __construct(array $servers, $disabled = null) {
         $this->setEnabled(!$disabled);
-        foreach ($servers as $server) {
-            $config = array_merge(['timeout' => 30], $server);
-            $this->_clients[] = new Elastica\Client($config);
-        }
+
+        $hosts = array_map(function (array $el) {
+            return $el['host'] . (!empty($el['port']) ? ':' . $el['port'] : '');
+        }, $servers);
+
+        $this->_client = \Elasticsearch\ClientBuilder::create()
+            ->setHosts($hosts)
+            ->build();
+        //By default it uses RoundRobinSelector and number of retries equals to nodes quantity
+        //TODO probably use Service Manager to obtain ClientBuilder, or even pass ClientBuilder instance from outside.
     }
 
     /**
-     * @return \Elastica\Client[]
+     * @return \Elasticsearch\Client
      */
-    public function getClientList() {
-        return $this->_clients;
-    }
-
-    /**
-     * @return \Elastica\Client
-     */
-    public function getRandomClient() {
-        $index = array_rand($this->_clients);
-        return $this->_clients[$index];
+    public function getClient() {
+        return $this->_client;
     }
 
     /**
@@ -57,7 +55,7 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
     public function getTypes() {
         $types = CM_Util::getClassChildren('CM_Elasticsearch_Type_Abstract');
         return \Functional\map($types, function ($className) {
-            return new $className($this->getRandomClient());
+            return new $className($this->getClient());
         });
     }
 
@@ -68,7 +66,7 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
      */
     public function findType($indexName) {
         return \Functional\first($this->getTypes(), function (CM_Elasticsearch_Type_Abstract $type) use ($indexName) {
-            return $type->getIndex()->getName() === $indexName;
+            return $type->getIndexName() === $indexName;
         });
     }
 
@@ -82,21 +80,24 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
             return array();
         }
         $this->getServiceManager()->getDebug()->incStats('search', json_encode($data));
-        $client = $this->getRandomClient();
+        $client = $this->getClient();
 
-        $search = new Elastica\Search($client);
+        $indexNameList = [];
+        $typeNameList = [];
         foreach ($types as $type) {
-            $search->addIndex($type->getIndex());
-            $search->addType($type->getType());
+            $indexNameList[] = $type->getIndexName();
+            $typeNameList[] = $type->getTypeName();
         }
-        try {
-            $response = $client->request($search->getPath(), 'GET', $data);
-        } catch (Elastica\Exception\ConnectionException $ex) {
-            foreach ($client->getConnections() as $connection) {
-                $connection->setEnabled();
-            }
-            throw $ex;
-        }
-        return $response->getData();
+
+        $params = [
+            'index' => join(',', $indexNameList),
+            'type'  => join(',', $typeNameList),
+            'body'  => $data,
+        ];
+
+        $response = $client->search($params);
+        //TODO probably handle exceptions
+
+        return $response;
     }
 }
