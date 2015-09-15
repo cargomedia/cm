@@ -38,7 +38,6 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
         if (null !== $filterPosition) {
             array_splice($this->_filterList, $filterPosition, 0, [$filter]);
         }
-
     }
 
     /**
@@ -60,25 +59,24 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     }
 
     /**
-     * @param string    $mode
-     * @param int|null  $maxLength
-     * @param bool|null $isMail
-     * @param bool|null $skipAnchors
-     * @param bool|null $allowBadwords
+     * @param string $mode
+     * @param array $options
      * @throws CM_Exception_Invalid
      */
-    public function setMode($mode, $maxLength = null, $isMail = null, $skipAnchors = null, $allowBadwords = null) {
+    public function setMode($mode, $options = []) {
         $acceptedModes = array('escape', 'oneline', 'simple', 'markdown', 'markdownPlain');
         if (!in_array($mode, $acceptedModes)) {
             throw new CM_Exception_Invalid('Invalid mode `' . $mode . '`');
         }
         $mode = (string) $mode;
+        $optionsDefault = ['maxLength'           => null,
+                           'skipAnchors'         => null,
+                           'emoticonFixedHeight' => null,
+                           'allowBadwords'       => false];
+        $options = $options + $optionsDefault;
         $this->_clearFilters();
         $emoticonFixedHeight = null;
-        if ($isMail) {
-            $emoticonFixedHeight = 16;
-        }
-        $this->_setMode($mode, $maxLength, $skipAnchors, $emoticonFixedHeight, $allowBadwords);
+        $this->_setMode($mode, $options);
     }
 
     /**
@@ -117,14 +115,15 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     }
 
     /**
-     * @param string       $mode
-     * @param int|null     $maxLength
-     * @param boolean|null $skipAnchors
-     * @param int|null     $emoticonFixedHeight
-     * @param boolean|null $allowBadwords
+     * @param string $mode
+     * @param array $options
      * @throws CM_Exception_Invalid
      */
-    protected function _setMode($mode, $maxLength = null, $skipAnchors = null, $emoticonFixedHeight = null, $allowBadwords = null) {
+    protected function _setMode($mode, array $options = []) {
+        $maxLength = $options['maxLength'];
+        $skipAnchors = $options['skipAnchors'];
+        $emoticonFixedHeight = $options['emoticonFixedHeight'];
+        $allowBadwords = $options['allowBadwords'];
         if (!$allowBadwords) {
             $this->addFilter(new CM_Usertext_Filter_Badwords());
         }

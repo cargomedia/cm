@@ -51,7 +51,7 @@ class CM_Usertext_UsertextTest extends CMTest_TestCase {
 
     public function testAllowBadwords() {
         $usertext = new CM_Usertext_Usertext(new CM_Frontend_Render());
-        $usertext->setMode('escape', null, null, null, true);
+        $usertext->setMode('escape', ['allowBadwords' => true]);
 
         $badwordList = new CM_Paging_ContentList_Badwords();
         $badWord = 'testBad';

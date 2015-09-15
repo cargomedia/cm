@@ -12,21 +12,20 @@
 function smarty_function_usertext($params, Smarty_Internal_Template $template) {
     /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
+    $options = $params;
     $text = (string) $params['text'];
+    unset($options['text']);
     $mode = (string) $params['mode'];
-    $maxLength = isset($params['maxLength']) ? (int) $params['maxLength'] : null;
-    $isMail = isset($params['isMail']) ? (bool) $params['isMail'] : null;
-    $skipAnchors = isset($params['skipAnchors']) ? (bool) $params['skipAnchors'] : null;
-    $allowBadwords = isset($params['allowBadwords']) ? (bool) $params['allowBadwords'] : null;
-    /** @var CM_Usertext_Usertext $usertext */
-    $usertext = isset($params['usertext']) ? $params['usertext'] : null;
-
-    if (!$usertext) {
-        $usertext = CM_Usertext_Usertext::factory($render);
-        $usertext->setMode($mode, $maxLength, $isMail, $skipAnchors, $allowBadwords);
-    } else {
-        $usertext->setRender($render);
+    unset($options['mode']);
+    if (isset($params['isMail'])) {
+        if ($params['isMail']) {
+            $options['emoticonFixedHeight'] = 16;
+        }
+        unset($options['isMail']);
     }
+
+    $usertext = CM_Usertext_Usertext::factory($render);
+    $usertext->setMode($mode, $options);
 
     $text = $usertext->transform($text);
 
