@@ -53,7 +53,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 
     /**
      * @param string $mode
-     * @param array $options
+     * @param array  $options
      * @throws CM_Exception_Invalid
      */
     public function setMode($mode, $options = null) {
@@ -63,10 +63,13 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
             throw new CM_Exception_Invalid('Invalid mode `' . $mode . '`');
         }
         $mode = (string) $mode;
-        $optionsDefault = ['maxLength'           => null,
-                           'skipAnchors'         => null,
-                           'emoticonFixedHeight' => null,
-                           'allowBadwords'       => false];
+        $optionsDefault = [
+            'maxLength'           => null,
+            'skipAnchors'         => null,
+            'emoticonFixedHeight' => null,
+            'allowBadwords'       => false
+        ];
+
         $options = $options + $optionsDefault;
         $this->_clearFilters();
         $emoticonFixedHeight = null;
@@ -110,7 +113,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 
     /**
      * @param string $mode
-     * @param array $options
+     * @param array  $options
      * @throws CM_Exception_Invalid
      */
     protected function _setMode($mode, array $options = []) {
