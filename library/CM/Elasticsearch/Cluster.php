@@ -52,7 +52,7 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
     /**
      * @return CM_Elasticsearch_Type_Abstract[]
      */
-    public function getTypes() {
+    public function getTypeList() {
         $types = CM_Util::getClassChildren('CM_Elasticsearch_Type_Abstract');
         return \Functional\map($types, function ($className) {
             return new $className($this->getClient());
@@ -60,13 +60,13 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
     }
 
     /**
-     * @param string $indexName
+     * @param string $typeName
      * @return CM_Elasticsearch_Type_Abstract
      * @throws CM_Exception_Invalid
      */
-    public function findType($indexName) {
-        return \Functional\first($this->getTypes(), function (CM_Elasticsearch_Type_Abstract $type) use ($indexName) {
-            return $type->getIndexName() === $indexName;
+    public function findType($typeName) {
+        return \Functional\first($this->getTypeList(), function (CM_Elasticsearch_Type_Abstract $type) use ($typeName) {
+            return $type->getIndexName() === $typeName; //One type per one index with same name
         });
     }
 
