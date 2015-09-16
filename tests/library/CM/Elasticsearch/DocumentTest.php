@@ -7,15 +7,9 @@ class CM_Elasticsearch_DocumentTest extends CMTest_TestCase {
         $document = new CM_Elasticsearch_Document('1', $data);
 
         $this->assertInstanceOf('CM_Elasticsearch_Document', $document);
-
         $this->assertSame('1', $document->getId());
         $this->assertSame('John', $document->get('name'));
         $this->assertSame(54, $document->get('age'));
-
-        $data2 = ['surname' => 'Doe', 'height' => '165'];
-        $document = CM_Elasticsearch_Document::create($data2);
-        $this->assertInstanceOf('CM_Elasticsearch_Document', $document);
-        $this->assertNull($document->getId());
     }
 
     public function testSetters() {
@@ -32,5 +26,12 @@ class CM_Elasticsearch_DocumentTest extends CMTest_TestCase {
         $this->assertEquals($data2, $document->getData());
 
         $this->assertEquals(array_merge($data2, ['_id' => '1']), $document->toArray());
+    }
+
+    public function testCreate() {
+        $data = ['surname' => 'Doe', 'height' => 165];
+        $document = CM_Elasticsearch_Document::create($data);
+        $this->assertInstanceOf('CM_Elasticsearch_Document', $document);
+        $this->assertNull($document->getId());
     }
 }
