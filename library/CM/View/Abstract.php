@@ -23,6 +23,10 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
     }
 
     public function ajax_loadComponent(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
+        $className = $params->getString('className');
+        if (!class_exists($className)) {
+            throw new CM_Exception_Invalid('Class not found: `' . $className . '`', CM_Exception::WARN);
+        }
         return $response->loadComponent($params);
     }
 
@@ -48,7 +52,7 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
      */
     public static function factory($className, $params = null) {
         if (!class_exists($className) || !is_a($className, get_called_class(), true)) {
-            throw new CM_Exception_Invalid('Cannot find valid class definition for view `' . $className . '`.', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('Cannot find valid class definition for view `' . $className . '`.');
         }
         $view = new $className($params);
         return $view;
