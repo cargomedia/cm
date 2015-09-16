@@ -15,6 +15,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     /**
      * @param string                       $filterName
      * @param CM_Usertext_Filter_Interface $filter
+     * @throws CM_Exception_Invalid
      */
     public function addFilterAfter($filterName, CM_Usertext_Filter_Interface $filter) {
         $filterName = (string) $filterName;
@@ -25,9 +26,10 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
                 break;
             }
         }
-        if (null !== $filterPosition) {
-            array_splice($this->_filterList, $filterPosition, 0, [$filter]);
+        if (null === $filterPosition) {
+            throw new CM_Exception_Invalid("No filter called `{$filterName}` found", ['filterName' => $filterName]);
         }
+        array_splice($this->_filterList, $filterPosition, 0, [$filter]);
     }
 
     /**
