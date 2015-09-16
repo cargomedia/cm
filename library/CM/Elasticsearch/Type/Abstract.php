@@ -195,7 +195,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      */
     protected function _getIndexSettings($indexName, $settingKey = null) {
-        $paramIndex = self::_prepareIndexName($indexName);
+        $paramIndex = self::_prepareIndexNameParam($indexName);
         if ('' === $paramIndex) {
             throw new CM_Exception_Invalid('Invalid elasticsearch index value');
         }
@@ -223,7 +223,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      */
     protected function _putIndexSettings($indexName, array $settings) {
-        $paramIndex = self::_prepareIndexName($indexName);
+        $paramIndex = self::_prepareIndexNameParam($indexName);
         if ('' === $paramIndex) {
             throw new CM_Exception_Invalid('Invalid elasticsearch index value');
         }
@@ -291,7 +291,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * @param string[]|string $indexName
      */
     protected function _deleteIndex($indexName) {
-        $paramIndex = self::_prepareIndexName($indexName);
+        $paramIndex = self::_prepareIndexNameParam($indexName);
         if ('' !== $paramIndex) {
             $this->getClient()->indices()->delete([
                 'index'  => $paramIndex,
@@ -305,7 +305,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      */
     protected function _refreshIndex($indexName) {
-        $paramIndex = self::_prepareIndexName($indexName);
+        $paramIndex = self::_prepareIndexNameParam($indexName);
         if ('' === $paramIndex) {
             throw new CM_Exception_Invalid('Invalid elasticsearch index value');
         }
@@ -356,20 +356,20 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
 
             // Add documents to index and empty documents array
             if ($i++ % $maxDocsPerRequest == 0) {
-                $this->bulkAddDocuments($docs, $indexName, $this->getTypeName());
+                $this->_bulkAddDocuments($docs, $indexName, $this->getTypeName());
                 $docs = [];
             }
         }
 
         // Add not yet sent documents to index
         if (!empty($docs)) {
-            $this->bulkAddDocuments($docs, $indexName, $this->getTypeName());
+            $this->_bulkAddDocuments($docs, $indexName, $this->getTypeName());
         }
 
         // Delete documents that were not updated (=not found)
         if (!empty($idsDelete)) {
             $idsDelete = array_keys($idsDelete);
-            $this->bulkDeleteDocuments($idsDelete, $indexName, $this->getTypeName());
+            $this->_bulkDeleteDocuments($idsDelete, $indexName, $this->getTypeName());
         }
     }
 
@@ -378,7 +378,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * @param string $indexName
      * @param string $typeName
      */
-    public function bulkDeleteDocuments(array $idsDelete, $indexName, $typeName) {
+    protected function _bulkDeleteDocuments(array $idsDelete, $indexName, $typeName) {
         $requestBody = [];
         foreach ($idsDelete as $id) {
             $requestBody[] = ['delete' => ['_id' => (string) $id]];
@@ -395,7 +395,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * @param string                      $indexName
      * @param string                      $typeName
      */
-    public function bulkAddDocuments(array $documentList, $indexName, $typeName) {
+    protected function _bulkAddDocuments(array $documentList, $indexName, $typeName) {
         $requestBody = [];
 
         foreach ($documentList as $document) {
@@ -508,7 +508,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * @param string[]|string $indexName
      * @return string
      */
-    protected static function _prepareIndexName($indexName) {
+    protected static function _prepareIndexNameParam($indexName) {
         return is_array($indexName) ? join(',', $indexName) : (string) $indexName;
     }
 }
