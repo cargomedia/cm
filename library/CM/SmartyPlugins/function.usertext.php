@@ -24,10 +24,10 @@ function smarty_function_usertext($params, Smarty_Internal_Template $template) {
         unset($options['isMail']);
     }
 
-    $usertext = CM_Usertext_Usertext::factory($render);
+    $usertext = CM_Usertext_Usertext::factory();
     $usertext->setMode($mode, $options);
 
-    $text = $usertext->transform($text);
+    $text = $usertext->transform($text, $render);
 
     switch ($mode) {
         case 'escape':

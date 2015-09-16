@@ -2,16 +2,6 @@
 
 class CM_Usertext_Usertext extends CM_Class_Abstract {
 
-    /** @var CM_Frontend_Render */
-    private $_render;
-
-    /**
-     * @param CM_Frontend_Render $render
-     */
-    function __construct(CM_Frontend_Render $render) {
-        $this->_render = $render;
-    }
-
     /** @var CM_Usertext_Filter_Interface[] */
     private $_filterList = array();
 
@@ -41,13 +31,6 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_Frontend_Render
-     */
-    public function getRender() {
-        return $this->_render;
-    }
-
-    /**
      * @param string $mode
      * @param array|null  $options
      * @throws CM_Exception_Invalid
@@ -74,12 +57,12 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 
     /**
      * @param string $text
+     * @param CM_Frontend_Render $render
      * @return string
      */
-    public function transform($text) {
+    public function transform($text, CM_Frontend_Render $render) {
         $cacheKey = $this->_getCacheKey($text);
         $cache = CM_Cache_Local::getInstance();
-        $render = $this->getRender();
         if (($result = $cache->get($cacheKey)) === false) {
             $result = $text;
             foreach ($this->_getFilters() as $filter) {
@@ -173,11 +156,10 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_Frontend_Render $render
      * @return CM_Usertext_Usertext
      */
-    public static function factory(CM_Frontend_Render $render) {
+    public static function factory() {
         $className = self::_getClassName();
-        return new $className($render);
+        return new $className();
     }
 }
