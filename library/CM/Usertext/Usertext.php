@@ -53,7 +53,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 
     /**
      * @param string $mode
-     * @param array  $options
+     * @param array|null  $options
      * @throws CM_Exception_Invalid
      */
     public function setMode($mode, $options = null) {
@@ -67,7 +67,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
             'maxLength'           => null,
             'skipAnchors'         => null,
             'emoticonFixedHeight' => null,
-            'allowBadwords'       => null
+            'allowBadwords'       => null,
         ];
 
         $options = $options + $optionsDefault;
@@ -116,7 +116,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
      * @param array  $options
      * @throws CM_Exception_Invalid
      */
-    protected function _setMode($mode, array $options = []) {
+    protected function _setMode($mode, array $options) {
         $maxLength = $options['maxLength'];
         $skipAnchors = $options['skipAnchors'];
         $emoticonFixedHeight = $options['emoticonFixedHeight'];
