@@ -8,7 +8,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     /**
      * @param CM_Frontend_Render $render
      */
-    function __construct(CM_Frontend_Render $render = null) {
+    function __construct(CM_Frontend_Render $render) {
         $this->_render = $render;
     }
 
@@ -42,12 +42,8 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 
     /**
      * @return CM_Frontend_Render
-     * @throws CM_Exception_Invalid
      */
     public function getRender() {
-        if (!$this->_render) {
-            throw new CM_Exception_Invalid('Render not set');
-        }
         return $this->_render;
     }
 
