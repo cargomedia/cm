@@ -101,7 +101,10 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         $this->_putAlias($indexCreatedName, $this->getIndexName() . '.tmp');
 
         //save refresh_interval
-        $refreshInterval = $this->_getIndexSettings($this->getIndexName(), 'refresh_interval') ?: '1s';
+        $refreshInterval = $this->_getIndexSettings($this->getIndexName(), 'refresh_interval');
+        if (null === $refreshInterval) {
+            $refreshInterval = '1s';
+        }
 
         $this->_putIndexSettings($indexCreatedName, ['refresh_interval' => -1]);
 
@@ -196,7 +199,11 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         if ('' === $paramIndex) {
             throw new CM_Exception_Invalid('Invalid elasticsearch index value');
         }
-        $settingsResponse = $this->getClient()->indices()->getSettings(['index' => $paramIndex]);
+        $settingsResponse = $this->getClient()->indices()->getSettings([
+            'index' => $paramIndex,
+            'client' => ['ignore' => 404],
+        ]);
+
         if (null !== $settingKey) {
             $settingKey = (string) $settingKey;
             $settingsList = current($settingsResponse); //{"photo.1441893401":{"settings":{"index":{"blocks":{"write":"0"},...
