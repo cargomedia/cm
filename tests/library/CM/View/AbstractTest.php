@@ -7,7 +7,6 @@ class CM_View_AbstractTest extends CMTest_TestCase {
         /** @var CM_View_Abstract $view */
         $view = $this->getMockForAbstractClass('CM_View_Abstract', ['params' => $params]);
 
-        $this->assertInstanceOf('CM_View_Abstract', $view);
         $viewParams = $view->getParams();
         $this->assertInstanceOf('CM_Params', $viewParams);
         $this->assertEquals($params, $viewParams);
