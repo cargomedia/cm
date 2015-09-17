@@ -88,9 +88,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         // Set current index to read-only
         $currentIndexList = $this->_getIndexesByAlias($this->getIndexName());
         if (!empty($currentIndexList)) {
-            $this->_putIndexSettings($currentIndexList, [
-                'index.blocks.write' => 1,
-            ]);
+            $this->_putIndexSettings($currentIndexList, ['index.blocks.write' => 1]);
         }
 
         // Create new index and switch alias
@@ -199,7 +197,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
             throw new CM_Exception_Invalid('Invalid elasticsearch index value');
         }
         $settingsResponse = $this->getClient()->indices()->getSettings([
-            'index' => $paramIndex,
+            'index'  => $paramIndex,
             'client' => ['ignore' => 404],
         ]);
 
@@ -410,7 +408,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
 
     /**
      * @param string $alias
-     * @return array
+     * @return string[]
      */
     protected function _getIndexesByAlias($alias) {
         $indices = $this->getClient()->indices();
