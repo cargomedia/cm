@@ -172,20 +172,19 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param  int|string $date
+     * @param  Datetime|int $date
      * @return string
-     *
-     * Copied from Elastica\Utils
+     * @throws CM_Exception_Invalid
      */
     public function convertDate($date) {
-        if (is_int($date)) {
+        if ($date instanceof DateTime) {
+            $timestamp = $date->getTimestamp();
+        } elseif (is_int($date)) {
             $timestamp = $date;
         } else {
-            $timestamp = strtotime($date);
+            throw new CM_Exception_Invalid('convertDate argument should be integer or DateTime');
         }
-        $string = date('Y-m-d\TH:i:s\Z', $timestamp);
-
-        return $string;
+        return date('Y-m-d\TH:i:s\Z', $timestamp);
     }
 
     /**
