@@ -20,7 +20,8 @@ class CM_View_AbstractTest extends CMTest_TestCase {
 
         $mockClassResponse = $this->mockClass('CM_Http_Response_View_Ajax');
         $mockLoadComponentMethod = $mockClassResponse->mockMethod('loadComponent');
-        $mockLoadComponentMethod->set(function (CM_Params $params) {
+        $mockLoadComponentMethod->set(function ($className, CM_Params $params) {
+            $this->assertSame('CM_Component_Abstract', $className);
             $this->assertEquals(['className' => 'CM_Component_Abstract'], $params->getParamsDecoded());
         });
         /** @var CM_Http_Response_View_Ajax|\Mocka\AbstractClassTrait $mockResponse */
