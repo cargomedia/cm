@@ -27,7 +27,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
             }
         }
         if (null === $filterPosition) {
-            throw new CM_Exception_Invalid("No filter called `{$filterName}` found", ['filterName' => $filterName]);
+            throw new CM_Exception_Invalid("No filter called `{$filterName}` found");
         }
         array_splice($this->_filterList, $filterPosition, 0, [$filter]);
     }
