@@ -1,8 +1,6 @@
 <?php
 
-abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
-
-    const INDEX_NAME = null;
+abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implements CM_Elasticsearch_Alias {
 
     const MAX_DOCS_PER_REQUEST = 1000;
 
@@ -30,17 +28,27 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function __construct(Elasticsearch\Client $client = null, $version = null) {
-        if (null === static::INDEX_NAME) {
-            throw new CM_Exception_Invalid('Index name has to be set');
-        }
-        $this->_indexName = self::_buildIndexName($version);
-        $this->_typeName = static::INDEX_NAME;
+        $this->_indexName = $this->_buildIndexName($version);
+        $this->_typeName = self::getAliasName();
 
         if (!$client) {
             $client = CM_Service_Manager::getInstance()->getElasticsearch()->getClient();
         }
         $this->_client = $client; //TODO maybe make a facade for it
     }
+
+    /**
+     * @param array $data
+     * @return CM_Elasticsearch_Document Document with data
+     */
+    abstract protected function _getDocument(array $data);
+
+    /**
+     * @param array $ids
+     * @param int   $limit
+     * @return string SQL-query
+     */
+    abstract protected function _getQuery($ids = null, $limit = null);
 
     /**
      * @return string
@@ -79,7 +87,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
     }
 
     public function createIndex() {
-        $indicesHandler = $this->getClient()->indices();
+        $indicesNamespace = $this->getClient()->indices();
 
         // Remove old unfinished indices
         $unfinishedIndexList = $this->_getIndexesByAlias($this->getIndexName() . '.tmp');
@@ -92,7 +100,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         }
 
         // Create new index and switch alias
-        $indexCreatedName = self::_buildIndexName(time());
+        $indexCreatedName = $this->_buildIndexName(time());
 
         $this->_createIndex($indexCreatedName, true);
 
@@ -111,7 +119,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         $this->_putIndexSettings($indexCreatedName, ['refresh_interval' => $refreshInterval]);
 
         $this->_putAlias($indexCreatedName, $this->getIndexName());
-        $indicesHandler->deleteAlias([
+        $indicesNamespace->deleteAlias([
             'index' => $indexCreatedName,
             'name'  => $this->getIndexName() . '.tmp',
         ]);
@@ -242,6 +250,18 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
             'index' => (string) $indexName,
             'name'  => (string) $aliasName,
         ]);
+    }
+
+    /**
+     * @param string|null $version
+     * @return string
+     */
+    protected function _buildIndexName($version = null) {
+        $indexName = CM_Bootloader::getInstance()->getDataPrefix() . self::getAliasName();
+        if ($version) {
+            $indexName .= '.' . $version;
+        }
+        return $indexName;
     }
 
     /**
@@ -423,19 +443,6 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param array $data
-     * @return CM_Elasticsearch_Document Document with data
-     */
-    abstract protected function _getDocument(array $data);
-
-    /**
-     * @param array $ids
-     * @param int   $limit
-     * @return string SQL-query
-     */
-    abstract protected function _getQuery($ids = null, $limit = null);
-
-    /**
      * @param mixed $item
      * @return string
      */
@@ -452,7 +459,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         }
         $id = self::getIdForItem($item);
         $redis = CM_Service_Manager::getInstance()->getRedis();
-        $redis->sAdd('Search.Updates_' . static::INDEX_NAME, (string) $id);
+        $redis->sAdd('Search.Updates_' . static::getAliasName(), (string) $id);
     }
 
     /**
@@ -487,18 +494,6 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
             return (string) $id;
         }
         return CM_Params::encode($id, true);
-    }
-
-    /**
-     * @param string|null $version
-     * @return string
-     */
-    protected static function _buildIndexName($version = null) {
-        $indexName = CM_Bootloader::getInstance()->getDataPrefix() . static::INDEX_NAME;
-        if ($version) {
-            $indexName .= '.' . $version;
-        }
-        return $indexName;
     }
 
     /**
