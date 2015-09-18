@@ -660,7 +660,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         if (null === $delta) {
             $delta = 1;
         }
-
         self::assertEquals($expected, $actual, '', $delta);
     }
 
