@@ -1351,7 +1351,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         CM_Model_Location::createAggregation();
         $type = new CM_Elasticsearch_Type_Location();
         $searchIndexCli = new CM_Elasticsearch_Index_Cli(null, $this->_streamOutput, $this->_streamError);
-        $searchIndexCli->create($type->getIndex()->getName());
+        $searchIndexCli->create($type->getIndexName());
     }
 
     /**
