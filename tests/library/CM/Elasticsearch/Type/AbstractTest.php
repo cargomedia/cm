@@ -15,14 +15,15 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
     }
 
     public function setUp() {
-        CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(true);
-        $this->_type = new CM_Elasticsearch_Type_AbstractMock();
+        $elasticCluster =  CMTest_TH::getServiceManager()->getElasticsearch();
+        $elasticCluster->setEnabled(true);
+        $this->_type = new CM_Elasticsearch_Type_AbstractMock($elasticCluster->getClient());
         $this->_type->createIndex();
-        $this->_type->getIndex()->refresh();
+        $this->_type->refreshIndex();
     }
 
     public function tearDown() {
-        $this->_type->getIndex()->delete();
+        $this->_type->deleteIndex();
         CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(false);
         CMTest_TH::clearEnv();
     }
@@ -65,8 +66,6 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
 
 class CM_Elasticsearch_Type_AbstractMock extends CM_Elasticsearch_Type_Abstract {
 
-    const INDEX_NAME = 'index_mock';
-
     protected $_mapping = array(
         'name' => array('type' => 'string'),
     );
@@ -84,21 +83,29 @@ class CM_Elasticsearch_Type_AbstractMock extends CM_Elasticsearch_Type_Abstract 
      */
     public function createEntry($name) {
         $id = CM_Db_Db::insert('index_mock', array('name' => (string) $name));
-        $this->update($id);
-        $this->getIndex()->refresh();
+        $this->updateDocuments($id);
+        $this->refreshIndex();
         return (int) $id;
     }
 
     protected function _getQuery($ids = null, $limit = null) {
-        return 'SELECT * FROM index_mock';
+        $query = 'SELECT * FROM index_mock';
+        if (is_array($ids)) {
+            $query .= ' WHERE `id` IN (' . implode(',', $ids) . ')';
+        }
+        return $query;
     }
 
     protected function _getDocument(array $data) {
-        return new Elastica\Document($data['id'],
+        return new CM_Elasticsearch_Document($data['id'],
             array(
                 'name' => $data['name'],
             )
         );
+    }
+
+    public static function getAliasName() {
+        return 'index_mock';
     }
 
     protected static function _getIdForItem($item) {

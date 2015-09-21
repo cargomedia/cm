@@ -29,11 +29,13 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
      */
     public function __construct(Elasticsearch\Client $client = null, $version = null) {
         $this->_indexName = $this->_buildIndexName($version);
-        $this->_typeName = self::getAliasName();
+        $this->_typeName = static::getAliasName();
 
         if (!$client) {
             $client = CM_Service_Manager::getInstance()->getElasticsearch()->getClient();
         }
+        //TODO remove creating $client here
+
         $this->_client = $client; //TODO maybe make a facade for it
     }
 
@@ -257,7 +259,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
      * @return string
      */
     protected function _buildIndexName($version = null) {
-        $indexName = CM_Bootloader::getInstance()->getDataPrefix() . self::getAliasName();
+        $indexName = CM_Bootloader::getInstance()->getDataPrefix() . static::getAliasName();
         if ($version) {
             $indexName .= '.' . $version;
         }
@@ -372,7 +374,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
             }
 
             // Add documents to index and empty documents array
-            if ($i++ % $maxDocsPerRequest == 0) {
+            if (++$i % $maxDocsPerRequest == 0) {
                 $this->_bulkAddDocuments($docs, $indexName, $this->getTypeName());
                 $docs = [];
             }
@@ -416,7 +418,12 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
         $requestBody = [];
 
         foreach ($documentList as $document) {
-            $requestBody[] = ['create' => []];
+            $createParams = [];
+            $documentId = $document->getId();
+            if (null !== $documentId) {
+                $createParams = ['_id' => $documentId];
+            }
+            $requestBody[] = ['index' => $createParams];
             $requestBody[] = $document->toArray();
         }
         $this->getClient()->bulk([
