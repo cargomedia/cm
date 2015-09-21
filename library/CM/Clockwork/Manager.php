@@ -133,6 +133,7 @@ class CM_Clockwork_Manager {
 
     /**
      * @return DateTime
+     * @return DateTime
      */
     protected function _getCurrentDateTime() {
         return $this->_getCurrentDateTimeUTC()->setTimezone($this->_timeZone);
@@ -193,8 +194,9 @@ class CM_Clockwork_Manager {
      */
     protected function _runEvent(CM_Clockwork_Event $event) {
         $process = $this->_getProcess();
-        $forkHandler = $process->fork(function () use ($event) {
-            $event->run();
+        $lastRuntime = $this->_storage->getLastRuntime($event);
+        $forkHandler = $process->fork(function () use ($event, $lastRuntime) {
+            $event->run($lastRuntime);
         });
         $this->_markRunning($event, $forkHandler->getIdentifier());
     }
