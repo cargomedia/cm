@@ -47,9 +47,9 @@ class CM_Clockwork_Event {
     }
 
     /**
-     * @param DateTime|null  $lastRuntime
+     * @param DateTime|null $lastRuntime
      */
-    public function run(DateTime $lastRuntime=null) {
+    public function run(DateTime $lastRuntime = null) {
         foreach ($this->_callbacks as $callback) {
             call_user_func($callback, $lastRuntime);
         }

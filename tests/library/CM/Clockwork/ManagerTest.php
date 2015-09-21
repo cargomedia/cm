@@ -42,7 +42,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
         $lastRuntimeActual = null;
         $callbackCallCount = 0;
-        $event->registerCallback(function($lastRuntime) use (&$lastRuntimeActual, &$callbackCallCount) {
+        $event->registerCallback(function ($lastRuntime) use (&$lastRuntimeActual, &$callbackCallCount) {
             $lastRuntimeActual = $lastRuntime;
             $callbackCallCount++;
         });
@@ -59,7 +59,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertSame(2, $callbackCallCount);
         $this->assertSameTime($expectedLastRuntime, $lastRuntimeActual);
 
-        $event->registerCallback(function() use (&$secondCallbackCallCount) {
+        $event->registerCallback(function () use (&$secondCallbackCallCount) {
             $secondCallbackCallCount++;
         });
         $expectedLastRuntime = clone $currently;
