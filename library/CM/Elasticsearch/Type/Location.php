@@ -2,8 +2,6 @@
 
 class CM_Elasticsearch_Type_Location extends CM_Elasticsearch_Type_Abstract {
 
-    protected $_source = true;//TODO change, set for debugging
-
     protected $_mapping = array(
         'level'       => array('type' => 'integer', 'store' => 'yes'),
         'id'          => array('type' => 'integer', 'store' => 'yes'),
