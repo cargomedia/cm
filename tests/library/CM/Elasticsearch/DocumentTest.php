@@ -25,7 +25,8 @@ class CM_Elasticsearch_DocumentTest extends CMTest_TestCase {
         $document->setData(['name' => 'Bill', 'height' => 178]);
         $this->assertEquals($data2, $document->getData());
 
-        $this->assertEquals(array_merge($data2, ['_id' => '1']), $document->toArray());
+        $this->assertEquals(array_merge($data2), $document->toArray());
+        $this->assertSame('1', $document->getId());
     }
 
     public function testCreate() {

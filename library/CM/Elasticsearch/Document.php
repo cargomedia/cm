@@ -120,13 +120,7 @@ class CM_Elasticsearch_Document {
      * @return array
      */
     public function toArray() {
-        $doc = $this->getData();
-
-        $id = $this->getId();
-        if (null !== $id) {
-            $doc['_id'] = (string) $id;
-        }
-        return $doc;
+        return $this->getData();
     }
 
     /**
