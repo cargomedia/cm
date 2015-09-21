@@ -1,13 +1,17 @@
 <?php
 
 class CM_Paging_Location_SearchTextTest extends CMTest_TestCase {
+    /** @var   */
+    private $_client;
 
     public function setUp() {
-        CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(true);
+        $elasticCluster = CMTest_TH::getServiceManager()->getElasticsearch();
+        $elasticCluster->setEnabled(true);
+        $this->_client = $elasticCluster->getClient();
     }
 
     public function tearDown() {
-        (new CM_Elasticsearch_Type_Location())->deleteIndex();
+        (new CM_Elasticsearch_Type_Location($this->_client))->deleteIndex();
         CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(false);
         CMTest_TH::clearEnv();
     }
@@ -49,6 +53,6 @@ class CM_Paging_Location_SearchTextTest extends CMTest_TestCase {
     private function _recreateLocationIndex() {
         CM_Model_Location::createAggregation();
         $searchIndexCli = new CM_Elasticsearch_Index_Cli();
-        $searchIndexCli->create((new CM_Elasticsearch_Type_Location())->getIndexName());
+        $searchIndexCli->create((new CM_Elasticsearch_Type_Location($this->_client))->getIndexName());
     }
 }
