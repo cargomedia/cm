@@ -65,7 +65,6 @@ class CM_Clockwork_Manager {
         foreach ($resultList as $identifier => $result) {
             $event = $this->_getRunningEvent($identifier);
             $this->_markStopped($event);
-            $this->_storage->setRuntime($event, $this->_getCurrentDateTime());
         }
     }
 
@@ -195,6 +194,7 @@ class CM_Clockwork_Manager {
     protected function _runEvent(CM_Clockwork_Event $event) {
         $process = $this->_getProcess();
         $lastRuntime = $this->_storage->getLastRuntime($event);
+        $this->_storage->setRuntime($event, $this->_getCurrentDateTime());
         $forkHandler = $process->fork(function () use ($event, $lastRuntime) {
             $event->run($lastRuntime);
         });
