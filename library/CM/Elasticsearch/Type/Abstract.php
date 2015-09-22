@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implements CM_Elasticsearch_Alias {
+abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implements CM_Elasticsearch_AliasInterface {
 
     const MAX_DOCS_PER_REQUEST = 1000;
 

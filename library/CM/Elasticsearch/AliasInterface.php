@@ -1,6 +1,6 @@
 <?php
 
-interface CM_Elasticsearch_Alias {
+interface CM_Elasticsearch_AliasInterface {
 
     /**
      * @return string
