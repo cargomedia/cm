@@ -1,13 +1,23 @@
 .function-location {
   .nowrap;
 
-  .flag {
-    margin-left: 3px;
-  }
-
   .distance {
     margin-left: 3px;
     color: lighten(@colorFgSubtle, 10);
     font-size: @fontSizeTiny;
+  }
+
+  &.contains-flag {
+    box-sizing: border-box;
+    display: inline-block;
+    position: relative;
+    max-width: 100%;
+    padding-right: 20px;
+
+    .flag {
+      position: absolute;
+      right: 0;
+      bottom: 5px;
+    }
   }
 }
