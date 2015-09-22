@@ -22,8 +22,8 @@ class CM_FormField_Text extends CM_FormField_Abstract {
             throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Too short'));
         }
         if (!empty($this->_options['forbidBadwords'])) {
-            $badwordList = new CM_Paging_ContentList_Badwords();
-            if ($badword = $badwordList->getMatch($userInput)) {
+            $badwordFilter = new CM_Usertext_Filter_Badwords();
+            if ($badword = $badwordFilter->getMatch($userInput)) {
                 throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('The word `{$badword}` is not allowed', ['badword' => $badword]));
             }
         }

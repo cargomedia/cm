@@ -13,7 +13,7 @@ class CM_Tools_Generator_Class_Javascript extends CM_Tools_Generator_Class_Abstr
         $content[] = 'var ' . $className . ' = ' . $parentClassName . '.extend({';
         $content[] = '';
         if ($parentClassName === 'CM_View_Abstract' || is_subclass_of($parentClassName, 'CM_View_Abstract')) {
-            $content[] = self::_getDoc('@type String', 1);
+            $content[] = self::_getDoc('@type {String}', 1);
             $content[] = "\t_class: '" . $className . "'";
         }
         $content[] = '});';

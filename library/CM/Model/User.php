@@ -81,8 +81,24 @@ class CM_Model_User extends CM_Model_Abstract {
         }
     }
 
-    public function setOfflineStamp() {
-        CM_Db_Db::update('cm_user_online', ['offlineStamp' => time()], ['userId' => $this->getId()]);
+    /**
+     * @return int|null
+     */
+    public function getOfflineStamp() {
+        $offlineStamp = $this->_get('offlineStamp');
+        if (null !== $offlineStamp) {
+            $offlineStamp = (int) $offlineStamp;
+        }
+        return $offlineStamp;
+    }
+
+    /**
+     * @param int|null $offlineStamp
+     */
+    public function setOfflineStamp($offlineStamp) {
+        $offlineStamp = null !== $offlineStamp ? (int) $offlineStamp : $offlineStamp;
+        CM_Db_Db::update('cm_user_online', ['offlineStamp' => $offlineStamp], ['userId' => $this->getId()]);
+        $this->_set('offlineStamp', $offlineStamp);
     }
 
     /**
@@ -244,7 +260,7 @@ class CM_Model_User extends CM_Model_Abstract {
 
     protected function _loadData() {
         return CM_Db_Db::exec('
-			SELECT `main`.*, `online`.`userId` AS `online`, `online`.`visible`
+			SELECT `main`.*, `online`.`userId` AS `online`, `online`.`visible`, `online`.`offlineStamp`
 			FROM `cm_user` AS `main`
 			LEFT JOIN `cm_user_online` AS `online` USING (`userId`)
 			WHERE `main`.`userId`=?',
