@@ -13,13 +13,13 @@ class CM_Elasticsearch_Client {
     }
 
     /**
-     * @param string[] $idsDelete
+     * @param string[] $idList
      * @param string   $indexName
      * @param string   $typeName
      */
-    public function bulkDeleteDocuments(array $idsDelete, $indexName, $typeName) {
+    public function bulkDeleteDocuments(array $idList, $indexName, $typeName) {
         $requestBody = [];
-        foreach ($idsDelete as $id) {
+        foreach ($idList as $id) {
             $requestBody[] = ['delete' => ['_id' => (string) $id]];
         }
         $this->_getClient()->bulk([
@@ -82,13 +82,11 @@ class CM_Elasticsearch_Client {
      * @param array|null $indexParams
      * @param array|null $mapping
      * @param bool|null  $useSource
-     * @param bool|null  $recreate
      */
-    public function createIndex($indexName, $typeName, array $indexParams = null, array $mapping = null, $useSource = null, $recreate = null) {
+    public function createIndex($indexName, $typeName, array $indexParams = null, array $mapping = null, $useSource = null) {
         $indexName = (string) $indexName;
-        if (true === $recreate) {
-            $this->deleteIndex($indexName);
-        }
+
+        $this->deleteIndex($indexName);
 
         //HACK Different index settings params
         if (!empty($indexParams['index'])) {
