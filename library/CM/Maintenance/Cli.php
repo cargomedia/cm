@@ -67,7 +67,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_Stream_Video::checkStreams'             => function () {
                 CM_Stream_Video::getInstance()->checkStreams();
             },
-            'CM_MessageStream_Service::synchronize'            => function () {
+            'CM_MessageStream_Service::synchronize'     => function () {
                 CM_Service_Manager::getInstance()->getStreamMessage()->synchronize();
             }
         ));
@@ -137,7 +137,9 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 try {
                     call_user_func_array($callback, func_get_args());
                 } catch (CM_Exception $e) {
+                    CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
                     CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
+                    throw $e;
                 }
                 CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
             });
