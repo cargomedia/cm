@@ -54,8 +54,8 @@ class CM_Elasticsearch_Client {
     }
 
     /**
-     * @param  string                     $indexName
-     * @param  string                     $typeName
+     * @param string                      $indexName
+     * @param string                      $typeName
      * @param CM_Elasticsearch_Query|null $query
      * @return int
      */
@@ -85,22 +85,11 @@ class CM_Elasticsearch_Client {
      */
     public function createIndex($indexName, $typeName, array $indexParams = null, array $mapping = null, $useSource = null) {
         $indexName = (string) $indexName;
-
         if (true !== $useSource) {
             $useSource = false;
         }
 
         $this->deleteIndex($indexName);
-
-        //HACK Different index settings params
-        if (!empty($indexParams['index'])) {
-            foreach ($indexParams['index'] as $settingKey => $settingValue) {
-                $indexParams[$settingKey] = $settingValue;
-            }
-            unset($indexParams['index']);
-        }
-        //EOF HACK
-        //TODO either fix it on all indices or create adapter method
 
         $requestParams = [
             'index' => $indexName,
@@ -118,7 +107,6 @@ class CM_Elasticsearch_Client {
                 'properties' => $mapping,
             ];
         }
-
         if (!empty($requestBody)) {
             $requestParams['body'] = $requestBody;
         }

@@ -92,10 +92,8 @@ class CM_Elasticsearch_Type_Mock1 extends CM_Elasticsearch_Type_Abstract {
     );
 
     protected $_indexParams = array(
-        'index' => array(
-            'number_of_shards'   => 1,
-            'number_of_replicas' => 0
-        ),
+        'number_of_shards'   => 1,
+        'number_of_replicas' => 0,
     );
 
     /**
@@ -129,10 +127,8 @@ class CM_Elasticsearch_Type_Mock2 extends CM_Elasticsearch_Type_Abstract {
     );
 
     protected $_indexParams = array(
-        'index' => array(
-            'number_of_shards'   => 1,
-            'number_of_replicas' => 0
-        ),
+        'number_of_shards'   => 1,
+        'number_of_replicas' => 0,
     );
 
     /**
@@ -166,10 +162,8 @@ class CM_Elasticsearch_Type_Mock3 extends CM_Elasticsearch_Type_Abstract {
     );
 
     protected $_indexParams = array(
-        'index' => array(
-            'number_of_shards'   => 1,
-            'number_of_replicas' => 0
-        ),
+        'number_of_shards'   => 1,
+        'number_of_replicas' => 0,
     );
 
     /**

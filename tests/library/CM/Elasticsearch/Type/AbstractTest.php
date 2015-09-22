@@ -15,7 +15,7 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
     }
 
     public function setUp() {
-        $elasticCluster =  CMTest_TH::getServiceManager()->getElasticsearch();
+        $elasticCluster = CMTest_TH::getServiceManager()->getElasticsearch();
         $elasticCluster->setEnabled(true);
         $this->_type = new CM_Elasticsearch_Type_AbstractMock($elasticCluster->getClient());
         $this->_type->createIndex();
@@ -71,10 +71,8 @@ class CM_Elasticsearch_Type_AbstractMock extends CM_Elasticsearch_Type_Abstract 
     );
 
     protected $_indexParams = array(
-        'index' => array(
-            'number_of_shards'   => 1,
-            'number_of_replicas' => 0
-        ),
+        'number_of_shards'   => 1,
+        'number_of_replicas' => 0,
     );
 
     /**

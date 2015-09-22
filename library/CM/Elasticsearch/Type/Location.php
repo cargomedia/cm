@@ -23,11 +23,9 @@ class CM_Elasticsearch_Type_Location extends CM_Elasticsearch_Type_Abstract {
     );
 
     protected $_indexParams = array(
-        'index'    => array(
-            'number_of_shards'   => 1,
-            'number_of_replicas' => 0
-        ),
-        'analysis' => array(
+        'number_of_shards'   => 1,
+        'number_of_replicas' => 0,
+        'analysis'           => array(
             'analyzer' => array(
                 'ngram_words' => array(
                     'type'      => 'custom',
