@@ -79,18 +79,23 @@ class CM_Elasticsearch_Client {
 
         $requestParams = [
             'index' => $newIndexName,
-            'body'  => [
-                'settings' => $indexParams,
-            ]
         ];
 
+        $requestBody = [];
+        if (!empty($indexParams)) {
+            $requestBody['settings'] = $indexParams;
+        }
         if (!empty($mapping)) {
-            $requestParams['body']['mappings'][$typeName] = [
+            $requestBody['mappings'][$typeName] = [
                 '_source'    => [
                     'enabled' => (null !== $useSource ? (bool) $useSource : false),
                 ],
                 'properties' => $mapping,
             ];
+        }
+
+        if (!empty($requestBody)) {
+            $requestParams['body'] = $requestBody;
         }
 
         $this->_getIndices()->create($requestParams);
@@ -159,6 +164,10 @@ class CM_Elasticsearch_Client {
             'index'  => $paramIndex,
             'client' => ['ignore' => 404],
         ]);
+
+        if (isset($settingsResponse['error'])) {
+            return null;
+        }
 
         if (null !== $settingKey) {
             $settingKey = (string) $settingKey;

@@ -84,7 +84,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
         // Set current index to read-only
         $currentIndexList = $this->getClient()->getIndexesByAlias($this->getIndexName());
         if (!empty($currentIndexList)) {
-            $this->getClient()->putIndexSettings($currentIndexList, ['index.blocks.write' => 1]);
+            $this->getClient()->putIndexSettings($currentIndexList, ['blocks.write' => 1]);
         }
 
         // Create new index and switch alias
@@ -100,7 +100,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
         }
 
         //temporary disable refresh_interval during documents updating and then put it back
-        $this->getClient()->putIndexSettings($indexCreatedName, ['refresh_interval' => -1]);
+        $this->getClient()->putIndexSettings($indexCreatedName, ['refresh_interval' => '-1']);
         $this->_updateDocuments($indexCreatedName, null, true);
         $this->getClient()->putIndexSettings($indexCreatedName, ['refresh_interval' => $refreshInterval]);
 
