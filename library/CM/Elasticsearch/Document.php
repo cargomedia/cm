@@ -45,15 +45,18 @@ class CM_Elasticsearch_Document {
     /**
      * @param string $key
      * @return mixed
+     * @throws CM_Exception_Invalid
      */
     public function get($key) {
+        if (!$this->has($key)) {
+            throw new CM_Exception_Invalid("Field `{$key}` does not exist");
+        }
         return $this->_data[$key];
     }
 
     /**
      * @param string $key
      * @param mixed  $value
-     * @return CM_Elasticsearch_Document
      */
     public function set($key, $value) {
         $this->_data[$key] = $value;
@@ -70,12 +73,8 @@ class CM_Elasticsearch_Document {
     /**
      * @param string $key
      * @throws CM_Exception_Invalid
-     * @return CM_Elasticsearch_Document
      */
     public function remove($key) {
-        if (!$this->has($key)) {
-            throw new CM_Exception_Invalid("Field `{$key}` does not exist");
-        }
         unset($this->_data[$key]);
     }
 
@@ -88,10 +87,9 @@ class CM_Elasticsearch_Document {
      * @param float  $latitude  Latitude value
      * @param float  $longitude Longitude value
      * @link http://www.elasticsearch.org/guide/reference/mapping/geo-point-type.html
-     * @return CM_Elasticsearch_Document
      */
     public function addGeoPoint($key, $latitude, $longitude) {
-        $value = array('lat' => $latitude, 'lon' => $longitude,);
+        $value = ['lat' => $latitude, 'lon' => $longitude];
 
         $this->set($key, $value);
     }
@@ -100,7 +98,6 @@ class CM_Elasticsearch_Document {
      * Overwrites the current document data with the given data
      *
      * @param  array $data Data
-     * @return CM_Elasticsearch_Document
      */
     public function setData(array $data) {
         $this->_data = $data;
@@ -113,14 +110,6 @@ class CM_Elasticsearch_Document {
      */
     public function getData() {
         return $this->_data;
-    }
-
-    /**
-     * Returns the document as an array
-     * @return array
-     */
-    public function toArray() {
-        return $this->getData();
     }
 
     /**

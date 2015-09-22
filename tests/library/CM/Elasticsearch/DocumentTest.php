@@ -17,15 +17,23 @@ class CM_Elasticsearch_DocumentTest extends CMTest_TestCase {
         $document = new CM_Elasticsearch_Document('1', $data);
 
         $this->assertEquals($data, $document->getData());
-        $document->set('sex', 'male');
 
+        $document->set('sex', 'male');
         $this->assertSame('male', $document->get('sex'));
+
+        $document->remove('sex');
+        $this->assertFalse($document->has('sex'));
+
+        $exception = $this->catchException(function () use ($document) {
+            $document->get('someReallyWeirdKey');
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Field `someReallyWeirdKey` does not exist', $exception->getMessage());
 
         $data2 = ['name' => 'Bill', 'height' => 178];
         $document->setData(['name' => 'Bill', 'height' => 178]);
-        $this->assertEquals($data2, $document->getData());
 
-        $this->assertEquals(array_merge($data2), $document->toArray());
+        $this->assertEquals($data2, $document->getData());
         $this->assertSame('1', $document->getId());
     }
 

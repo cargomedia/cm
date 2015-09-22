@@ -44,7 +44,7 @@ class CM_Elasticsearch_Client {
                 $createParams = ['_id' => $documentId];
             }
             $requestBody[] = ['index' => $createParams];
-            $requestBody[] = $document->toArray();
+            $requestBody[] = $document->getData();
         }
         $this->_getClient()->bulk([
             'index' => $indexName,
