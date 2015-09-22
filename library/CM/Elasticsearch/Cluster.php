@@ -7,7 +7,7 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
     /** @var bool */
     private $_enabled;
 
-    /** @var Elasticsearch\Client */
+    /** @var CM_Elasticsearch_Client */
     protected $_client;
 
     /**
@@ -21,15 +21,12 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
             return $el['host'] . (!empty($el['port']) ? ':' . $el['port'] : '');
         }, $servers);
 
-        $this->_client = \Elasticsearch\ClientBuilder::create()
-            ->setHosts($hosts)
-            ->build();
+        $this->_client = new CM_Elasticsearch_Client(\Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build());
         //By default it uses RoundRobinSelector and number of retries equals to nodes quantity
-        //TODO probably use Service Manager to obtain ClientBuilder, or even pass ClientBuilder instance from outside.
     }
 
     /**
-     * @return \Elasticsearch\Client
+     * @return CM_Elasticsearch_Client
      */
     public function getClient() {
         return $this->_client;
@@ -89,15 +86,6 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
             $typeNameList[] = $type->getTypeName();
         }
 
-        $params = [
-            'index' => join(',', $indexNameList),
-            'type'  => join(',', $typeNameList),
-            'body'  => $data,
-        ];
-
-        $response = $client->search($params);
-        //TODO probably handle exceptions
-
-        return $response;
+        return $client->search($indexNameList, $typeNameList, $data);
     }
 }

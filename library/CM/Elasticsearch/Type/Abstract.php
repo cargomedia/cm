@@ -23,14 +23,14 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
     protected $_typeName = null;
 
     /**
-     * @param Elasticsearch\Client $client
+     * @param CM_Elasticsearch_Client $client
      * @param int|null             $version
      * @throws CM_Exception_Invalid
      */
-    public function __construct(Elasticsearch\Client $client, $version = null) {
+    public function __construct(CM_Elasticsearch_Client $client, $version = null) {
         $this->_indexName = $this->_buildIndexName($version);
         $this->_typeName = static::getAliasName();
-        $this->_client = new CM_Elasticsearch_Client($client);
+        $this->_client = $client;
     }
 
     /**

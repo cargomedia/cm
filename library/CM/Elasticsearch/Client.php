@@ -197,6 +197,13 @@ class CM_Elasticsearch_Client {
 
     /**
      * @param string $indexName
+     */
+    public function optimizeIndex($indexName) {
+        $this->_getIndices()->optimize(['index' => $indexName]);
+    }
+
+    /**
+     * @param string $indexName
      * @param string $aliasName
      */
     public function putAlias($indexName, $aliasName) {
@@ -237,6 +244,25 @@ class CM_Elasticsearch_Client {
         $this->_getIndices()->refresh([
             'index' => $paramIndex,
         ]);
+    }
+
+    /**
+     * @param string[] $indexNameList
+     * @param string[] $typeNameList
+     * @param array    $data
+     * @return array
+     */
+    public function search(array $indexNameList, array $typeNameList, array $data) {
+        $params = [
+            'index' => join(',', $indexNameList),
+            'type'  => join(',', $typeNameList),
+            'body'  => $data,
+        ];
+
+        $response = $this->_getClient()->search($params);
+        //TODO probably handle exceptions
+
+        return $response;
     }
 
     /**

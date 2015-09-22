@@ -2,7 +2,7 @@
 
 class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
 
-    /** @var  \Elasticsearch\Client */
+    /** @var  CM_Elasticsearch_Client */
     private $_client;
 
     public static function setUpBeforeClass() {
