@@ -652,8 +652,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param number $expected
-     * @param number $actual
+     * @param DateTime|number $expected
+     * @param DateTime|number $actual
      * @param number|null
      */
     public static function assertSameTime($expected, $actual, $delta = null) {

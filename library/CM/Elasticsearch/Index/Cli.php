@@ -4,7 +4,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
      * @param string|null $indexName
-     * @param bool|null   $skipIfExist
+     * @param bool|null $skipIfExist
      */
     public function create($indexName = null, $skipIfExist = null) {
         $types = $this->_getTypes($indexName);
@@ -55,8 +55,12 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
         $storage = new CM_Clockwork_Storage_FileSystem('search-maintenance');
         $storage->setServiceManager(CM_Service_Manager::getInstance());
         $clockwork->setStorage($storage);
-        $clockwork->registerCallback('search-index-update', '1 minute', array($this, 'update'));
-        $clockwork->registerCallback('search-index-optimize', '1 hour', array($this, 'optimize'));
+        $clockwork->registerCallback('search-index-update', '1 minute', function () {
+            $this->update();
+        });
+        $clockwork->registerCallback('search-index-optimize', '1 hour', function () {
+            $this->optimize();
+        });
         $clockwork->start();
     }
 
