@@ -13,9 +13,9 @@ class CM_Elasticsearch_Client {
     }
 
     /**
-     * @param array  $idsDelete
-     * @param string $indexName
-     * @param string $typeName
+     * @param string[] $idsDelete
+     * @param string   $indexName
+     * @param string   $typeName
      */
     public function bulkDeleteDocuments(array $idsDelete, $indexName, $typeName) {
         $requestBody = [];
@@ -54,17 +54,40 @@ class CM_Elasticsearch_Client {
     }
 
     /**
-     * @param string     $newIndexName
+     * @param  string                     $indexName
+     * @param  string                     $typeName
+     * @param CM_Elasticsearch_Query|null $query
+     * @return int
+     */
+    public function count($indexName, $typeName, CM_Elasticsearch_Query $query = null) {
+        $requestParams = [
+            'index' => $indexName,
+            'type'  => $typeName,
+        ];
+        if (null !== $query) {
+            $requestParams['body']['query'] = $query->getQuery();
+        }
+        $responseCount = $this->_getClient()->count($requestParams);
+
+        if (isset($responseCount['count'])) {
+            return (int) $responseCount['count'];
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * @param string     $indexName
      * @param string     $typeName
      * @param array|null $indexParams
      * @param array|null $mapping
      * @param bool|null  $useSource
      * @param bool|null  $recreate
      */
-    public function createIndex($newIndexName, $typeName, array $indexParams = null, array $mapping = null, $useSource = null, $recreate = null) {
-        $newIndexName = (string) $newIndexName;
+    public function createIndex($indexName, $typeName, array $indexParams = null, array $mapping = null, $useSource = null, $recreate = null) {
+        $indexName = (string) $indexName;
         if (true === $recreate) {
-            $this->deleteIndex($newIndexName);
+            $this->deleteIndex($indexName);
         }
 
         //HACK Different index settings params
@@ -78,7 +101,7 @@ class CM_Elasticsearch_Client {
         //TODO either fix it on all indices or create adapter method
 
         $requestParams = [
-            'index' => $newIndexName,
+            'index' => $indexName,
         ];
 
         $requestBody = [];
