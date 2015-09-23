@@ -19,7 +19,7 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
         $cmClient = self::_getCmClient();
 
         $this->assertFalse($cmClient->indexExists($indexName));
-        $cmClient->createIndex($indexName, $indexName, [], [], false, true);
+        $cmClient->createIndex($indexName, $indexName, [], [], false);
         $this->assertTrue($cmClient->indexExists($indexName));
         $cmClient->deleteIndex($indexName);
         $this->assertFalse($cmClient->indexExists($indexName));
@@ -32,8 +32,8 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
         $indexName1 = 'index1';
         $indexName2 = 'index2';
         $aliasName = 'alias4';
-        $cmClient->createIndex($indexName1, 'typeName', [], [], false, true);
-        $cmClient->createIndex($indexName2, 'typeName', [], [], false, true);
+        $cmClient->createIndex($indexName1, 'typeName', [], [], false);
+        $cmClient->createIndex($indexName2, 'typeName', [], [], false);
 
         $this->assertSame([], $cmClient->getIndexesByAlias($aliasName));
 
@@ -52,7 +52,7 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
     public function testSetGetIndexSettings() {
         $cmClient = self::_getCmClient();
         $indexName = 'index1';
-        $cmClient->createIndex($indexName, 'typeName', [], [], false, true);
+        $cmClient->createIndex($indexName, 'typeName', [], [], false);
 
         $cmClient->putIndexSettings($indexName, ['refresh_interval' => '10s']);
         $this->assertSame('10s', $cmClient->getIndexSettings($indexName, 'refresh_interval'));
@@ -76,7 +76,7 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
         $cmClient = self::_getCmClient();
         $indexName = 'index1';
         $typeName = 'typeName';
-        $cmClient->createIndex($indexName, $typeName, [], [], false, true);
+        $cmClient->createIndex($indexName, $typeName, [], [], false);
 
         $documentList = [
             new CM_Elasticsearch_Document('1', ['name' => 'foo']),
