@@ -52,6 +52,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertSame(1, $callbackCallCount);
         $this->assertNull($lastRuntimeActual);
 
+        // check if we get the correct lastRuntime
         $expectedLastRuntime = clone $currently;
         $currently->modify('10 seconds');
         $process->mockMethod('listenForChildren')->set([2 => new CM_Process_WorkloadResult()]);
@@ -59,16 +60,38 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertSame(2, $callbackCallCount);
         $this->assertSameTime($expectedLastRuntime, $lastRuntimeActual);
 
+        // check if an event callback can be declared without the $lastRuntime argument
         $event->registerCallback(function () use (&$secondCallbackCallCount) {
             $secondCallbackCallCount++;
         });
         $expectedLastRuntime = clone $currently;
+        $currently->modify('10 seconds');
         $secondCallbackCallCount = 0;
         $process->mockMethod('listenForChildren')->set([3 => new CM_Process_WorkloadResult()]);
         $manager->runEvents();
         $this->assertSame(1, $secondCallbackCallCount);
         $this->assertSame(3, $callbackCallCount);
         $this->assertSameTime($expectedLastRuntime, $lastRuntimeActual);
+
+        // check if error in event callback will not update the lastRuntime
+        $expectedLastRuntime = clone $currently;
+        $currently->modify('10 seconds');
+        $workloadResult = new CM_Process_WorkloadResult();
+        $workloadResult->setException(new CM_Exception_Invalid());
+        $process->mockMethod('listenForChildren')->set([4 => $workloadResult]);
+        $manager->runEvents();
+        $this->assertSame(4, $callbackCallCount);
+        $this->assertSameTime($expectedLastRuntime, $lastRuntimeActual);
+
+        $process->mockMethod('listenForChildren')->set([5 => new CM_Process_WorkloadResult()]);
+        $manager->runEvents();
+        $this->assertSame(5, $callbackCallCount);
+        $this->assertSameTime($expectedLastRuntime, $lastRuntimeActual);
+
+        $process->mockMethod('listenForChildren')->set([6 => new CM_Process_WorkloadResult()]);
+        $manager->runEvents();
+        $this->assertSame(6, $callbackCallCount);
+        $this->assertSameTime($currently, $lastRuntimeActual);
     }
 
     public function testRunNonBlocking() {

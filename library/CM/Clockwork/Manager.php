@@ -51,7 +51,6 @@ class CM_Clockwork_Manager {
     }
 
     public function runEvents() {
-        $process = $this->_getProcess();
         foreach ($this->_events as $event) {
             if (!$this->_isRunning($event)) {
                 if ($this->_shouldRun($event)) {
@@ -61,11 +60,27 @@ class CM_Clockwork_Manager {
                 }
             }
         }
-        $resultList = $process->listenForChildren();
+        $this->handleCompletedEvents();
+    }
+
+    public function handleCompletedEvents() {
+        $resultList = $this->_getProcess()->listenForChildren();
         foreach ($resultList as $identifier => $result) {
             $event = $this->_getRunningEvent($identifier);
-            $this->_markStopped($event);
+            $this->handleEventResult($event, $result);
         }
+    }
+
+    /**
+     * @param CM_Clockwork_Event        $event
+     * @param CM_Process_WorkloadResult $result
+     * @throws CM_Exception_Invalid
+     */
+    public function handleEventResult(CM_Clockwork_Event $event, CM_Process_WorkloadResult $result) {
+        if ($result->isSuccess()) {
+            $this->_markCompleted($event);
+        }
+        $this->_markStopped($event);
     }
 
     /**
@@ -190,9 +205,15 @@ class CM_Clockwork_Manager {
         if (!$this->_isRunning($event)) {
             throw new CM_Exception_Invalid("Cannot stop event. `{$event->getName()}` is already running");
         }
+        unset($this->_eventsRunning[$event->getName()]);
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     */
+    protected function _markCompleted(CM_Clockwork_Event $event) {
         $startTime = $this->_eventsRunning[$event->getName()]['startTime'];
         $this->_storage->setRuntime($event, $startTime);
-        unset($this->_eventsRunning[$event->getName()]);
     }
 
     /**
