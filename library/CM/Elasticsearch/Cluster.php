@@ -77,7 +77,6 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
             return array();
         }
         $this->getServiceManager()->getDebug()->incStats('search', json_encode($data));
-        $client = $this->getClient();
 
         $indexNameList = [];
         $typeNameList = [];
@@ -86,6 +85,6 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
             $typeNameList[] = $type->getTypeName();
         }
 
-        return $client->search($indexNameList, $typeNameList, $data);
+        return $this->getClient()->search($indexNameList, $typeNameList, $data);
     }
 }

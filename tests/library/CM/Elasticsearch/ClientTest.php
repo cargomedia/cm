@@ -98,6 +98,34 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
         $cmClient->deleteIndex($indexName);
     }
 
+    public function testSearch() {
+        $cmClient = self::_getCmClient();
+        $indexName = 'index1';
+        $typeName = 'typeName';
+        $cmClient->createIndex($indexName, $typeName, [], [], false);
+
+        $documentId = '2';
+        $singleDocumentList = [new CM_Elasticsearch_Document($documentId, ['name' => 'fooboo'])];
+        $cmClient->bulkAddDocuments($singleDocumentList, $indexName, $typeName);
+        $cmClient->refreshIndex($indexName);
+
+        $query = new CM_Elasticsearch_Query();
+        $query->filterTerm('_id', $documentId);
+
+        $response = $cmClient->search([$indexName], [$typeName], ['query' => $query->getQuery()]);
+        $this->assertArrayHasKey('hits', $response);
+        $this->assertSame(1, $response['hits']['total']);
+
+        $this->assertNotEmpty( $response['hits']['hits']);
+        $foundDocument = $response['hits']['hits'][0];
+
+        $this->assertSame($documentId, $foundDocument['_id']);
+        $this->assertSame($indexName, $foundDocument['_index']);
+        $this->assertSame($typeName, $foundDocument['_type']);
+
+        $cmClient->deleteIndex($indexName);
+    }
+
     private static function _getElasticClient() {
         return \Elasticsearch\ClientBuilder::create()->build();
     }
