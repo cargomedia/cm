@@ -138,7 +138,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                     call_user_func_array($callback, func_get_args());
                 } catch (CM_Exception $e) {
                     CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
-                    CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
                     throw $e;
                 }
                 CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
