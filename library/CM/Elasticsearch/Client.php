@@ -275,7 +275,7 @@ class CM_Elasticsearch_Client {
         if (!empty ($response['errors'])) {
 
             if (empty($response['items']) || !is_array($response['items'])) {
-                throw new CM_Exception_Invalid('Unknown error during bulk operation');
+                throw new CM_Exception_Invalid('Unknown error in one or more bulk request actions');
             }
             $message = '';
             foreach ($response['items'] as $item) {
@@ -283,7 +283,7 @@ class CM_Elasticsearch_Client {
                 $message .= 'Operator `' . $operation . '` ' . $description['error'] . PHP_EOL;
             }
 
-            throw new CM_Exception_Invalid('Error during bulk operation' . PHP_EOL . $message);
+            throw new CM_Exception_Invalid('Error in one or more bulk request actions' . PHP_EOL . $message);
         }
     }
 

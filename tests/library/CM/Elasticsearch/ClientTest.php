@@ -101,7 +101,7 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertContainsAll([
-            'Error during bulk operation',
+            'Error in one or more bulk request actions',
             'Operator `delete` ClusterBlockException[blocked by: [FORBIDDEN/8/index write (api)];]'],
             $exception->getMessage()
         );
@@ -110,7 +110,7 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertContainsAll([
-            'Error during bulk operation',
+            'Error in one or more bulk request actions',
             'Operator `index` ClusterBlockException[blocked by: [FORBIDDEN/8/index write (api)];]'],
             $exception->getMessage()
         );
