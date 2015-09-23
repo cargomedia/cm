@@ -22,11 +22,12 @@ class CM_Elasticsearch_Client {
         foreach ($idList as $id) {
             $requestBody[] = ['delete' => ['_id' => (string) $id]];
         }
-        $this->_getClient()->bulk([
+        $response = $this->_getClient()->bulk([
             'index' => $indexName,
             'type'  => $typeName,
             'body'  => $requestBody,
         ]);
+        $this->_processBulkResponse($response);
     }
 
     /**
@@ -46,11 +47,12 @@ class CM_Elasticsearch_Client {
             $requestBody[] = ['index' => $createParams];
             $requestBody[] = $document->getData();
         }
-        $this->_getClient()->bulk([
+        $response = $this->_getClient()->bulk([
             'index' => $indexName,
             'type'  => $typeName,
             'body'  => $requestBody,
         ]);
+        $this->_processBulkResponse($response);
     }
 
     /**
@@ -263,6 +265,26 @@ class CM_Elasticsearch_Client {
         //TODO probably handle exceptions
 
         return $response;
+    }
+
+    /**
+     * @param array $response
+     * @throws CM_Exception_Invalid
+     */
+    protected function _processBulkResponse(array $response) {
+        if (!empty ($response['errors'])) {
+
+            if (empty($response['items']) || !is_array($response['items'])) {
+                throw new CM_Exception_Invalid('Unknown error during bulk operation');
+            }
+            $message = '';
+            foreach ($response['items'] as $item) {
+                list($operation, $description) = each($item);
+                $message .= 'Operator `' . $operation . '` ' . $description['error'] . PHP_EOL;
+            }
+
+            throw new CM_Exception_Invalid('Error during bulk operation' . PHP_EOL . $message);
+        }
     }
 
     /**

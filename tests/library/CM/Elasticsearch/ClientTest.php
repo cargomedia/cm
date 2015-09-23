@@ -95,6 +95,26 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
 
         $this->assertSame(2, $cmClient->count($indexName, $typeName));
 
+        $cmClient->putIndexSettings($indexName, ['blocks.write' => 1]);
+        $exception = $this->catchException(function () use ($cmClient, $indexName, $typeName) {
+            $cmClient->bulkDeleteDocuments(['11', '222'], $indexName, $typeName);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertContainsAll([
+            'Error during bulk operation',
+            'Operator `delete` ClusterBlockException[blocked by: [FORBIDDEN/8/index write (api)];]'],
+            $exception->getMessage()
+        );
+        $exception = $this->catchException(function () use ($cmClient, $indexName, $typeName) {
+            $cmClient->bulkAddDocuments([new CM_Elasticsearch_Document('434', ['name' => 'bar'])], $indexName, $typeName);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertContainsAll([
+            'Error during bulk operation',
+            'Operator `index` ClusterBlockException[blocked by: [FORBIDDEN/8/index write (api)];]'],
+            $exception->getMessage()
+        );
+
         $cmClient->deleteIndex($indexName);
     }
 
