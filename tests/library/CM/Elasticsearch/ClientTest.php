@@ -116,7 +116,7 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
         $this->assertArrayHasKey('hits', $response);
         $this->assertSame(1, $response['hits']['total']);
 
-        $this->assertNotEmpty( $response['hits']['hits']);
+        $this->assertNotEmpty($response['hits']['hits']);
         $foundDocument = $response['hits']['hits'][0];
 
         $this->assertSame($documentId, $foundDocument['_id']);
