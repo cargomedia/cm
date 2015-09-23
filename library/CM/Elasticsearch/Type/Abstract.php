@@ -117,6 +117,13 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
     }
 
     /**
+     * @return int
+     */
+    public function count() {
+        return $this->getClient()->count($this->getIndexName(), $this->getTypeName());
+    }
+
+    /**
      * @return bool
      */
     public function indexExists() {
