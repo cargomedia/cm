@@ -223,7 +223,7 @@ class CM_Clockwork_Manager {
         $process = $this->_getProcess();
         $lastRuntime = $this->_storage->getLastRuntime($event);
         $startTime = $this->_getCurrentDateTime();
-        $forkHandler = $process->fork(function () use ($event, $lastRuntime, $startTime) {
+        $forkHandler = $process->fork(function () use ($event, $lastRuntime) {
             $event->run($lastRuntime);
         });
         $this->_markRunning($event, $forkHandler->getIdentifier(), $startTime);
