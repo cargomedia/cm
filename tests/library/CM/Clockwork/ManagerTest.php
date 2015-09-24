@@ -14,6 +14,86 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         }
     }
 
+    public function testRegisterEventCallbackWithLastRuntime() {
+        $process = $this->mockClass('CM_Process')->newInstanceWithoutConstructor();
+        $forkMock = $process->mockMethod('fork');
+        $forkMock->set(function ($callback) use ($forkMock) {
+            $callback();
+            $forkHandler = $this->mockClass('CM_Process_ForkHandler')->newInstanceWithoutConstructor();
+            $forkHandler->mockMethod('getIdentifier')->set($forkMock->getCallCount());
+            return $forkHandler;
+        });
+
+        /** @var CM_Clockwork_Storage_Abstract $storage */
+        $storage = new CM_Clockwork_Storage_Memory();
+        $currently = new DateTime('midnight', new DateTimeZone('UTC'));
+
+        /** @var CM_Clockwork_Manager $manager */
+        $manager = $this->mockObject('CM_Clockwork_Manager');
+        $manager->mockMethod('_shouldRun')->set(true);
+        $manager->mockMethod('_getProcess')->set($process);
+        $manager->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
+            return $currently;
+        });
+        $manager->setStorage($storage);
+
+        $event = new CM_Clockwork_Event('bar', '1 second');
+        $manager->registerEvent($event);
+
+        $lastRuntimeActual = null;
+        $callbackCallCount = 0;
+        $event->registerCallback(function ($lastRuntime) use (&$lastRuntimeActual, &$callbackCallCount) {
+            $lastRuntimeActual = $lastRuntime;
+            $callbackCallCount++;
+        });
+
+        $process->mockMethod('listenForChildren')->set([1 => new CM_Process_WorkloadResult()]);
+        $manager->runEvents();
+        $this->assertSame(1, $callbackCallCount);
+        $this->assertNull($lastRuntimeActual);
+
+        // check if we get the correct lastRuntime
+        $expectedLastRuntime = clone $currently;
+        $currently->modify('10 seconds');
+        $process->mockMethod('listenForChildren')->set([2 => new CM_Process_WorkloadResult()]);
+        $manager->runEvents();
+        $this->assertSame(2, $callbackCallCount);
+        $this->assertSameTime($expectedLastRuntime, $lastRuntimeActual);
+
+        // check if an event callback can be declared without the $lastRuntime argument
+        $event->registerCallback(function () use (&$secondCallbackCallCount) {
+            $secondCallbackCallCount++;
+        });
+        $expectedLastRuntime = clone $currently;
+        $currently->modify('10 seconds');
+        $secondCallbackCallCount = 0;
+        $process->mockMethod('listenForChildren')->set([3 => new CM_Process_WorkloadResult()]);
+        $manager->runEvents();
+        $this->assertSame(1, $secondCallbackCallCount);
+        $this->assertSame(3, $callbackCallCount);
+        $this->assertSameTime($expectedLastRuntime, $lastRuntimeActual);
+
+        // check if error in event callback will not update the lastRuntime
+        $expectedLastRuntime = clone $currently;
+        $currently->modify('10 seconds');
+        $workloadResult = new CM_Process_WorkloadResult();
+        $workloadResult->setException(new CM_Exception_Invalid());
+        $process->mockMethod('listenForChildren')->set([4 => $workloadResult]);
+        $manager->runEvents();
+        $this->assertSame(4, $callbackCallCount);
+        $this->assertSameTime($expectedLastRuntime, $lastRuntimeActual);
+
+        $process->mockMethod('listenForChildren')->set([5 => new CM_Process_WorkloadResult()]);
+        $manager->runEvents();
+        $this->assertSame(5, $callbackCallCount);
+        $this->assertSameTime($expectedLastRuntime, $lastRuntimeActual);
+
+        $process->mockMethod('listenForChildren')->set([6 => new CM_Process_WorkloadResult()]);
+        $manager->runEvents();
+        $this->assertSame(6, $callbackCallCount);
+        $this->assertSameTime($currently, $lastRuntimeActual);
+    }
+
     public function testRunNonBlocking() {
         $process = $this->mockClass('CM_Process')->newInstanceWithoutConstructor();
         $forkMock = $process->mockMethod('fork');

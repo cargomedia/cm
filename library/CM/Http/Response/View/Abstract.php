@@ -38,11 +38,12 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
     }
 
     /**
+     * @param string    $className
      * @param CM_Params $params
      * @return array
      */
-    public function loadComponent(CM_Params $params) {
-        $component = CM_Component_Abstract::factory($params->getString('className'), $params);
+    public function loadComponent($className, CM_Params $params) {
+        $component = CM_Component_Abstract::factory($className, $params);
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
         $html = $renderAdapter->fetch();
 
@@ -204,7 +205,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
             throw new CM_Exception_Invalid('View id `' . $className . '` not set.', CM_Exception::WARN);
         }
         if (!isset($viewInfo['className']) || !class_exists($viewInfo['className']) || !is_a($viewInfo['className'], 'CM_View_Abstract', true)) {
-            throw new CM_Exception_Invalid('View className `' . $className . '` is illegal: `' . $viewInfo['className'] .'`.', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View className `' . $className . '` is illegal: `' . $viewInfo['className'] . '`.', CM_Exception::WARN);
         }
         if (!isset($viewInfo['params'])) {
             throw new CM_Exception_Invalid('View params `' . $className . '` not set.', CM_Exception::WARN);

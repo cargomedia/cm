@@ -332,11 +332,11 @@ var CM_App = CM_Class_Abstract.extend({
         $doNotLoadOnReady = $doNotLoadOnReady.add($notFirstImages);
 
         $(this).on('toggle.clipSlide', function() {
-          $(this).find('.contentPlaceholder:gt(0)').contentPlaceholder();
+          $(this).find('.contentPlaceholder:gt(0)').lazyImageSetup();
         });
       });
 
-      $dom.find('.contentPlaceholder').not($doNotLoadOnReady).contentPlaceholder();
+      $dom.find('.contentPlaceholder').not($doNotLoadOnReady).lazyImageSetup();
     },
 
     /**
@@ -1160,6 +1160,7 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {String} url
      * @param {Boolean|Null} [forceReload]
      * @param {Boolean|Null} [replaceState]
+     * @returns {Promise}
      */
     route: function(url, forceReload, replaceState) {
       forceReload = this._shouldReload || forceReload || false;
@@ -1173,7 +1174,7 @@ var CM_App = CM_Class_Abstract.extend({
       }
       if (forceReload || 0 !== url.indexOf(urlBase)) {
         window.location.assign(url);
-        return;
+        return Promise.resolve();
       }
       if (fragment !== this._getFragment()) {
         if (replaceState) {
@@ -1182,7 +1183,7 @@ var CM_App = CM_Class_Abstract.extend({
           this.pushState(fragment);
         }
       }
-      this._handleLocationChange(fragment);
+      return this._handleLocationChange(fragment);
     },
 
     /**
@@ -1223,6 +1224,7 @@ var CM_App = CM_Class_Abstract.extend({
 
     /**
      * @param {String} fragment
+     * @returns {Promise}
      */
     _handleLocationChange: function(fragment) {
       var paramsStateNext = null;
@@ -1249,10 +1251,10 @@ var CM_App = CM_Class_Abstract.extend({
 
       if (paramsStateNext) {
         if (false !== cm.getLayout().getPage().routeToState(paramsStateNext, fragment)) {
-          return;
+          return Promise.resolve();
         }
       }
-      cm.getLayout().loadPage(fragment);
+      return cm.getLayout().loadPage(fragment);
     }
   }
 });
