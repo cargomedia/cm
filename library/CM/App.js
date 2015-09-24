@@ -312,7 +312,6 @@ var CM_App = CM_Class_Abstract.extend({
      */
     setup: function($dom) {
       $dom.find('.timeago').timeago();
-      $dom.find('textarea.autosize, .autosize textarea').autosize({append: ''});
       $dom.find('.clipSlide').clipSlide();
       $dom.find('.toggleNext').toggleNext();
       $dom.find('.tabs').tabs();
@@ -344,7 +343,6 @@ var CM_App = CM_Class_Abstract.extend({
      */
     teardown: function($dom) {
       $dom.find('.timeago').timeago('dispose');
-      $dom.find('textarea.autosize, .autosize textarea').trigger('autosize.destroy');
     },
     /**
      * @param {jQuery} $element
