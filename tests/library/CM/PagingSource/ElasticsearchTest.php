@@ -3,7 +3,7 @@
 class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
 
     /** @var  CM_Elasticsearch_Client */
-    private $_client;
+    private $_elasticsearchClient;
 
     public static function setUpBeforeClass() {
         CM_Db_Db::exec("CREATE TABLE `indexTest_1` (`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, `name` VARCHAR(8))");
@@ -21,10 +21,10 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
     public function setUp() {
         $elasticCluster = CMTest_TH::getServiceManager()->getElasticsearch();
         $elasticCluster->setEnabled(true);
-        $this->_client = $elasticCluster->getClient();
-        $type1 = new CM_Elasticsearch_Type_Mock1($this->_client);
-        $type2 = new CM_Elasticsearch_Type_Mock2($this->_client);
-        $type3 = new CM_Elasticsearch_Type_Mock3($this->_client);
+        $this->_elasticsearchClient = $elasticCluster->getClient();
+        $type1 = new CM_Elasticsearch_Type_Mock1($this->_elasticsearchClient);
+        $type2 = new CM_Elasticsearch_Type_Mock2($this->_elasticsearchClient);
+        $type3 = new CM_Elasticsearch_Type_Mock3($this->_elasticsearchClient);
         $type1->createIndex();
         $type2->createIndex();
         $type3->createIndex();
@@ -39,7 +39,7 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
     }
 
     public function testGet() {
-        $type1 = new CM_Elasticsearch_Type_Mock1($this->_client);
+        $type1 = new CM_Elasticsearch_Type_Mock1($this->_elasticsearchClient);
         $source = new CM_PagingSource_Elasticsearch($type1, new CM_Elasticsearch_Query());
         $this->assertSame(0, $source->getCount());
 
@@ -47,7 +47,7 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
         $this->assertSame(1, $source->getCount());
         $this->assertSame(array((string) $id), $source->getItems());
 
-        $type3 = new CM_Elasticsearch_Type_Mock3($this->_client);
+        $type3 = new CM_Elasticsearch_Type_Mock3($this->_elasticsearchClient);
         $source = new CM_PagingSource_Elasticsearch($type3, new CM_Elasticsearch_Query(), array('price'));
         $this->assertSame(0, $source->getCount());
 
@@ -57,8 +57,8 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
     }
 
     public function testMultiGet() {
-        $type1 = new CM_Elasticsearch_Type_Mock1($this->_client);
-        $type2 = new CM_Elasticsearch_Type_Mock2($this->_client);
+        $type1 = new CM_Elasticsearch_Type_Mock1($this->_elasticsearchClient);
+        $type2 = new CM_Elasticsearch_Type_Mock2($this->_elasticsearchClient);
         $source = new CM_PagingSource_Elasticsearch(array($type1, $type2), new CM_Elasticsearch_Query());
         $this->assertSame(0, $source->getCount());
 
@@ -72,7 +72,7 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
             array('id' => (string) $id2, 'type' => 'index_2')
         ), $source->getItems());
 
-        $type3 = new CM_Elasticsearch_Type_Mock3($this->_client);
+        $type3 = new CM_Elasticsearch_Type_Mock3($this->_elasticsearchClient);
         $source = new CM_PagingSource_Elasticsearch(array($type1, $type2, $type3), new CM_Elasticsearch_Query(), array('price'));
         $id3 = $type3->createEntry(5);
 
