@@ -143,6 +143,14 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
         $this->assertSame($indexName, $foundDocument['_index']);
         $this->assertSame($typeName, $foundDocument['_type']);
 
+        $cmClient->putIndexSettings($indexName, ['blocks.read' => 1]);
+        $exception = $this->catchException(function () use ($cmClient, $indexName, $typeName, $query) {
+            $cmClient->search([$indexName], [$typeName], ['query' => $query->getQuery()]);
+        });
+        $this->assertInstanceOf('\Elasticsearch\Common\Exceptions\ElasticsearchException', $exception);
+        $this->assertContains('ClusterBlockException', $exception->getMessage());
+        $this->assertContains('"status":403', $exception->getMessage());
+
         $cmClient->deleteIndex($indexName);
     }
 

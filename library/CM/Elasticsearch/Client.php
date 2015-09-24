@@ -260,11 +260,7 @@ class CM_Elasticsearch_Client {
             'type'  => join(',', $typeNameList),
             'body'  => $data,
         ];
-
-        $response = $this->_getClient()->search($params);
-        //TODO probably handle exceptions
-
-        return $response;
+        return $this->_getClient()->search($params);
     }
 
     /**
