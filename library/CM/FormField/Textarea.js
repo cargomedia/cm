@@ -11,7 +11,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   },
 
   _initPlaceholder: function() {
-    this.$("[contenteditable]").focusout(function() {
+    this.$('[contenteditable]').focusout(function() {
       var $this = $(this);
       if (!$this.text().trim().length) {
         $this.empty();
@@ -21,7 +21,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
 
   _initPlaintextonly: function() {
     if (Modernizr['contenteditable-plaintext']) {
-      this.$("[contenteditable]").attr('contenteditable', 'plaintext-only')
+      this.$('[contenteditable]').attr('contenteditable', 'plaintext-only')
     } else {
 
     }
