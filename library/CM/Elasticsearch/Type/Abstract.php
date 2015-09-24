@@ -47,14 +47,6 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
     abstract protected function _getQuery($ids = null, $limit = null);
 
     /**
-     * @return string
-     */
-    public function getIndex() {
-        return $this->_indexName;
-    }
-    //TODO remove, now left for searching
-
-    /**
      * @return CM_Elasticsearch_Client
      */
     public function getClient() {
