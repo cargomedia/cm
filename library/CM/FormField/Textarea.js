@@ -23,7 +23,28 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
     if (Modernizr['contenteditable-plaintext']) {
       this.$('[contenteditable]').attr('contenteditable', 'plaintext-only')
     } else {
-
+      this.$('[contenteditable]').on('paste', function(e) {
+        e.preventDefault();
+        var text;
+        var clipboardData = (e.originalEvent || e).clipboardData;
+        if (_.isUndefined(clipboardData) || clipboardData === null) {
+          text = window.clipboardData.getData('text') || '';
+          if (text !== '') {
+            if (window.getSelection) {
+              var newNode = document.createElement('span');
+              newNode.innerHTML = text;
+              window.getSelection().getRangeAt(0).insertNode(newNode);
+            } else {
+              document.selection.createRange().pasteHTML(text);
+            }
+          }
+        } else {
+          text = clipboardData.getData('text/plain') || '';
+          if (text !== '') {
+            document.execCommand('insertText', false, text);
+          }
+        }
+      });
     }
   }
 
