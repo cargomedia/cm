@@ -68,44 +68,46 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
     }
 
     public function createIndex() {
-        // Remove old unfinished indices
+        $client = $this->getClient();
         $tempAliasName = $this->getIndexName() . '.tmp';
-        $unfinishedIndexList = $this->getClient()->getIndexesByAlias($tempAliasName);
-        $this->getClient()->deleteIndex($unfinishedIndexList);
+
+        // Remove old unfinished indices
+        $unfinishedIndexList = $client->getIndexesByAlias($tempAliasName);
+        $client->deleteIndex($unfinishedIndexList);
 
         // Set current index to read-only
-        $currentIndexList = $this->getClient()->getIndexesByAlias($this->getIndexName());
+        $currentIndexList = $client->getIndexesByAlias($this->getIndexName());
         if (!empty($currentIndexList)) {
-            $this->getClient()->putIndexSettings($currentIndexList, ['blocks.write' => 1]);
+            $client->putIndexSettings($currentIndexList, ['blocks.write' => 1]);
         }
 
         // Create new index and switch alias
         $indexCreatedName = $this->_buildIndexName(time());
 
-        $this->getClient()->createIndex($indexCreatedName, $this->getTypeName(), $this->_indexParams, $this->_mapping, $this->_source);
-        $this->getClient()->putAlias($indexCreatedName, $tempAliasName);
+        $client->createIndex($indexCreatedName, $this->getTypeName(), $this->_indexParams, $this->_mapping, $this->_source);
+        $client->putAlias($indexCreatedName, $tempAliasName);
 
         //save refresh_interval
-        $refreshInterval = $this->getClient()->getIndexSettings($this->getIndexName(), 'refresh_interval');
+        $refreshInterval = $client->getIndexSettings($this->getIndexName(), 'refresh_interval');
         if (null === $refreshInterval) {
             $refreshInterval = '1s';
         }
 
         //temporary disable refresh_interval during documents updating and then put it back
-        $this->getClient()->putIndexSettings($indexCreatedName, ['refresh_interval' => '-1']);
+        $client->putIndexSettings($indexCreatedName, ['refresh_interval' => '-1']);
         $this->_updateDocuments($indexCreatedName, null, true);
-        $this->getClient()->putIndexSettings($indexCreatedName, ['refresh_interval' => $refreshInterval]);
+        $client->putIndexSettings($indexCreatedName, ['refresh_interval' => $refreshInterval]);
 
         //switch aliases
-        $this->getClient()->putAlias($indexCreatedName, $this->getIndexName());
-        $this->getClient()->deleteAlias($indexCreatedName, $tempAliasName);
+        $client->putAlias($indexCreatedName, $this->getIndexName());
+        $client->deleteAlias($indexCreatedName, $tempAliasName);
 
         // Remove old index
-        $oldIndexList = $this->getClient()->getIndexesByAlias($this->getIndexName());
+        $oldIndexList = $client->getIndexesByAlias($this->getIndexName());
         $oldIndexList = array_filter($oldIndexList, function ($el) use ($indexCreatedName) {
             return ($el !== $indexCreatedName);
         });
-        $this->getClient()->deleteIndex($oldIndexList);
+        $client->deleteIndex($oldIndexList);
     }
 
     /**
