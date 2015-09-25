@@ -21,8 +21,10 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
             return $el['host'] . (!empty($el['port']) ? ':' . $el['port'] : '');
         }, $servers);
 
-        $this->_client = new CM_Elasticsearch_Client(\Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build());
+        $elasticsearchClient = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
         //By default it uses RoundRobinSelector and number of retries equals to nodes quantity
+
+        $this->_client = new CM_Elasticsearch_Client($elasticsearchClient);
     }
 
     /**
@@ -53,17 +55,6 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
         $types = CM_Util::getClassChildren('CM_Elasticsearch_Type_Abstract');
         return \Functional\map($types, function ($className) {
             return new $className($this->getClient());
-        });
-    }
-
-    /**
-     * @param string $typeName
-     * @return CM_Elasticsearch_Type_Abstract
-     * @throws CM_Exception_Invalid
-     */
-    public function findType($typeName) {
-        return \Functional\first($this->getTypeList(), function (CM_Elasticsearch_Type_Abstract $type) use ($typeName) {
-            return $type->getIndexName() === $typeName; //One type per one index with same name
         });
     }
 
