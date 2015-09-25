@@ -62,6 +62,13 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
         $this->assertSame(1, $source->getCount());
         $this->assertEquals(array($id1), $source->getItems());
     }
+
+    public function testCount() {
+        $this->assertSame(0, $this->_type->count());
+        $this->_type->createEntry('foo');
+        $this->_type->createEntry('foo bar');
+        $this->assertSame(2, $this->_type->count());
+    }
 }
 
 class CM_Elasticsearch_Type_AbstractMock extends CM_Elasticsearch_Type_Abstract {
