@@ -261,31 +261,34 @@ class CM_Redis_Client extends CM_Class_Abstract {
     /**
      * @param string $channel
      * @param string $msg
+     * @return int
      */
     public function publish($channel, $msg) {
-        $this->_redis->publish($channel, $msg);
+        return $this->_redis->publish($channel, $msg);
     }
 
     /**
      * @param string|string[] $channels
      * @param Closure         $callback
+     * @return mixed
      */
     public function subscribe($channels, Closure $callback) {
         $channels = (array) $channels;
         $this->_subscribeCallback = $callback;
         $this->_redis->setOption(Redis::OPT_READ_TIMEOUT, 86400 * 100);
-        $this->_redis->subscribe($channels, array($this, '_subscribeCallback'));
+        return $this->_redis->subscribe($channels, array($this, '_subscribeCallback'));
     }
 
     /**
      * @param Redis  $redis
      * @param string $channel
      * @param string $message
+     * @return mixed
      */
     public function _subscribeCallback($redis, $channel, $message) {
         try {
             $callback = $this->_subscribeCallback;
-            $callback($channel, $message);
+            return $callback($channel, $message);
         } catch (Exception $e) {
             CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
         }

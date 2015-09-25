@@ -111,4 +111,46 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
         $this->assertSame(array('foo' => '1', 'bar' => '1.5', 'foobar' => '2'), $this->_client->zRangeByScore($key, 1, 2, null, null, true));
         $this->assertSame(array(), $this->_client->zRangeByScore($key, 1, 2, 0, 0));
     }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testPubSub() {
+
+        $process = CM_Process::getInstance();
+        $process->fork(function () {
+            $redisClient = CM_Service_Manager::getInstance()->getRedis();
+            return $redisClient->subscribe('foo', function ($channel, $message) {
+                return [$channel, $message];
+            });
+       });
+
+        $break = false;
+        $loopCount = 0;
+        $retry = 40;
+        $waitTime = 50 * 1000;
+
+        // use a timeout because there's no easy way to know when the forked process will subscribe to the channel...
+        while(!$break) {
+            $clientCount = $this->_client->publish('foo', 'bar');
+            if($clientCount > 0){
+                $break = true;
+            }
+            if($loopCount > $retry){
+                $break = true;
+                $process->killChildren();
+                $this->fail('Failed to publish on a Redis subpub channel after ' . round(($waitTime * $retry) / (1000 * 1000), 3) . ' second(s).');
+            }
+            usleep($waitTime);
+            $loopCount++;
+        }
+
+        $resultList = $process->waitForChildren();
+        $this->assertCount(1, $resultList);
+
+        foreach ($resultList as $result) {
+            $this->assertSame(['foo', 'bar'], $result->getResult());
+        }
+    }
 }
