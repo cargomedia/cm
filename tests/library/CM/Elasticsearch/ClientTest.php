@@ -7,11 +7,11 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
     }
 
     public function testConstructor() {
-        $elasticClient = self::_getElasticClient();
-        $cmClient = new CM_Elasticsearch_Client($elasticClient);
+        $elasticsearchClient = self::_getElasticClient();
+        $cmClient = new CM_Elasticsearch_Client($elasticsearchClient);
 
         $this->assertInstanceOf('CM_Elasticsearch_Client', $cmClient);
-        $this->assertEquals($elasticClient, CMTest_TH::callProtectedMethod($cmClient, '_getClient'));
+        $this->assertEquals($elasticsearchClient, CMTest_TH::callProtectedMethod($cmClient, '_getClient'));
     }
 
     public function testIndexCreateDelete() {
@@ -154,10 +154,16 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
         $cmClient->deleteIndex($indexName);
     }
 
+    /**
+     * @return \Elasticsearch\Client
+     */
     private static function _getElasticClient() {
         return \Elasticsearch\ClientBuilder::create()->build();
     }
 
+    /**
+     * @return CM_Elasticsearch_Client
+     */
     private static function _getCmClient() {
         return new CM_Elasticsearch_Client(self::_getElasticClient());
     }
