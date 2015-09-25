@@ -263,15 +263,15 @@ class CM_Elasticsearch_Client {
     }
 
     /**
-     * @param string[] $indexNameList
-     * @param string[] $typeNameList
-     * @param array    $data
+     * @param string[]|string $indexNameList
+     * @param string[]|string $typeNameList
+     * @param array           $data
      * @return array
      */
-    public function search(array $indexNameList, array $typeNameList, array $data) {
+    public function search($indexNameList, $typeNameList, array $data) {
         $params = [
-            'index' => join(',', $indexNameList),
-            'type'  => join(',', $typeNameList),
+            'index' => self::_prepareIndexNameParam($indexNameList),
+            'type'  => self::_prepareIndexNameParam($typeNameList),
             'body'  => $data,
         ];
         return $this->_getClient()->search($params);
