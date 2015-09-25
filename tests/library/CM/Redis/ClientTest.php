@@ -7,6 +7,7 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
 
     public function setUp() {
         $this->_client = CM_Service_Manager::getInstance()->getRedis();
+        $this->_client->flush();
     }
 
     public function tearDown() {
@@ -112,10 +113,36 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
         $this->assertSame(array(), $this->_client->zRangeByScore($key, 1, 2, 0, 0));
     }
 
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
+    public function testSAdd() {
+        $reply = $this->_client->sAdd('foo', 'bar');
+        $this->assertSame(1, $reply);
+        $this->assertSame(1, $this->_client->sCard('foo'));
+
+        $reply = $this->_client->sAdd('foo', 'bar1');
+        $this->assertSame(1, $reply);
+        $this->assertSame(2, $this->_client->sCard('foo'));
+
+        $reply = $this->_client->sAdd('foo', 'bar1');
+        $this->assertSame(0, $reply);
+        $this->assertSame(2, $this->_client->sCard('foo'));
+    }
+
+    public function testSRem() {
+        $this->_client->sAdd('foo', 'bar');
+        $this->assertSame(1, $this->_client->sCard('foo'));
+        $this->_client->sRem('foo', 'bar');
+        $this->assertSame(0, $this->_client->sCard('foo'));
+    }
+
+    public function testSFlush() {
+        $this->_client->sAdd('foo', 'bar1');
+        $this->_client->sAdd('foo', 'bar2');
+        $this->_client->sAdd('foo', 'bar3');
+        $this->assertSame(3, $this->_client->sCard('foo'));
+        $this->_client->sFlush('foo');
+        $this->assertSame(0, $this->_client->sCard('foo'));
+    }
+
     public function testPubSub() {
 
         $process = CM_Process::getInstance();
@@ -124,7 +151,7 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
             return $redisClient->subscribe('foo', function ($channel, $message) {
                 return [$channel, $message];
             });
-       });
+        });
 
         $break = false;
         $loopCount = 0;
@@ -132,12 +159,12 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
         $waitTime = 50 * 1000;
 
         // use a timeout because there's no easy way to know when the forked process will subscribe to the channel...
-        while(!$break) {
+        while (!$break) {
             $clientCount = $this->_client->publish('foo', 'bar');
-            if($clientCount > 0){
+            if ($clientCount > 0) {
                 $break = true;
             }
-            if($loopCount > $retry){
+            if ($loopCount > $retry) {
                 $break = true;
                 $process->killChildren();
                 $this->fail('Failed to publish on a Redis subpub channel after ' . round(($waitTime * $retry) / (1000 * 1000), 3) . ' second(s).');
