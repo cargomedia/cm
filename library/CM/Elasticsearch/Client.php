@@ -101,7 +101,7 @@ class CM_Elasticsearch_Client {
      */
     public function createIndex($indexName, $typeName, array $indexParams = null, array $mapping = null, $useSource = null) {
         $indexName = (string) $indexName;
-        if (true !== $useSource) {
+        if (null === $useSource) {
             $useSource = false;
         }
 
@@ -118,7 +118,7 @@ class CM_Elasticsearch_Client {
         if (!empty($mapping)) {
             $requestBody['mappings'][$typeName] = [
                 '_source'    => [
-                    'enabled' => $useSource,
+                    'enabled' => (bool) $useSource,
                 ],
                 'properties' => $mapping,
             ];

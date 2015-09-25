@@ -84,6 +84,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
         // Create new index and switch alias
         $indexCreatedName = $this->_buildIndexName(time());
 
+        $client->deleteIndex($indexCreatedName);
         $client->createIndex($indexCreatedName, $this->getTypeName(), $this->_indexParams, $this->_mapping, $this->_source);
         $client->putAlias($indexCreatedName, $tempAliasName);
 
