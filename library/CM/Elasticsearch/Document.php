@@ -9,8 +9,6 @@ class CM_Elasticsearch_Document {
     protected $_data = array();
 
     /**
-     * Creates a new document
-     *
      * @param string|null $id   Id is create if empty
      * @param array|null  $data Data array
      */
@@ -72,17 +70,12 @@ class CM_Elasticsearch_Document {
 
     /**
      * @param string $key
-     * @throws CM_Exception_Invalid
      */
     public function remove($key) {
         unset($this->_data[$key]);
     }
 
     /**
-     * Adds a geopoint to the document
-     *
-     * Geohashes are not yet supported
-     *
      * @param string $key       Field key
      * @param float  $latitude  Latitude value
      * @param float  $longitude Longitude value
@@ -95,8 +88,6 @@ class CM_Elasticsearch_Document {
     }
 
     /**
-     * Overwrites the current document data with the given data
-     *
      * @param  array $data Data
      */
     public function setData(array $data) {
@@ -104,8 +95,6 @@ class CM_Elasticsearch_Document {
     }
 
     /**
-     * Returns the document data
-     *
      * @return array Document data
      */
     public function getData() {
