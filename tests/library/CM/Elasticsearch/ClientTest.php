@@ -154,6 +154,30 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
         $cmClient->deleteIndex($indexName);
     }
 
+    public function testCount() {
+        $cmClient = self::_getCmClient();
+        $indexName = 'index1';
+        $typeName = 'typeName';
+        $cmClient->createIndex($indexName, $typeName, [], [], false);
+        $this->assertSame(0, $cmClient->count($indexName, $typeName));
+
+        $cmClient->bulkAddDocuments([new CM_Elasticsearch_Document('3', ['11' => '22'])], $indexName, $typeName);
+        $cmClient->refreshIndex($indexName);
+        $this->assertSame(1, $cmClient->count($indexName, $typeName));
+
+        $cmClient->bulkDeleteDocuments([3], $indexName, $typeName);
+        $cmClient->refreshIndex($indexName);
+        $this->assertSame(0, $cmClient->count($indexName, $typeName));
+
+        $cmClientWithMock = new CM_Elasticsearch_Client(new ElasticClientMock());
+
+        $exception = $this->catchException(function () use ($cmClientWithMock, $indexName, $typeName) {
+            $cmClientWithMock->count($indexName, $typeName, new CM_Elasticsearch_Query());
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Count query to `' . $indexName . '`:`' . $typeName . '` returned invalid value', $exception->getMessage());
+    }
+
     /**
      * @return \Elasticsearch\Client
      */
@@ -166,5 +190,20 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
      */
     private static function _getCmClient() {
         return new CM_Elasticsearch_Client(self::_getElasticClient());
+    }
+}
+
+class ElasticClientMock extends \Elasticsearch\Client {
+
+    public function __construct() {
+    }
+
+    /**
+     * @param array $param
+     * @return array
+     * @internal param $params
+     */
+    public function count($param = []) {
+        return ['foo' => 'bar', 'bar' => 'baz'];
     }
 }

@@ -60,6 +60,8 @@ class CM_Elasticsearch_Client {
      * @param string                      $typeName
      * @param CM_Elasticsearch_Query|null $query
      * @return int
+     * @throws CM_Exception_Invalid
+     * @throws \Elasticsearch\Common\Exceptions\ServerErrorResponseException
      */
     public function count($indexName, $typeName, CM_Elasticsearch_Query $query = null) {
         $requestParams = [
@@ -69,13 +71,25 @@ class CM_Elasticsearch_Client {
         if (null !== $query) {
             $requestParams['body']['query'] = $query->getQuery();
         }
-        $responseCount = $this->_getClient()->count($requestParams);
 
-        if (isset($responseCount['count'])) {
-            return (int) $responseCount['count'];
-        } else {
-            return 0;
+        try {
+            $responseCount = $this->_getClient()->count($requestParams);
+        } catch (\Elasticsearch\Common\Exceptions\ServerErrorResponseException $e) {
+            //attempt to call 'count' on just index without type (before at least 1 document was added)
+            //leads to 503 response code but correct response body
+            $parsedErrorBody = json_decode($e->getMessage(), true);
+            if (JSON_ERROR_NONE === json_last_error() && isset($parsedErrorBody['count'])) {
+                return (int) $parsedErrorBody['count'];
+            } else { //rethrow
+                throw $e;
+            }
         }
+
+        if (!isset($responseCount['count'])) {
+            throw new CM_Exception_Invalid('Count query to `' . $indexName . '`:`' . $typeName . '` returned invalid value');
+        }
+
+        return (int) $responseCount['count'];
     }
 
     /**
