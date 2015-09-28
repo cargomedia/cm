@@ -21,9 +21,11 @@ class CM_Redis_Client extends CM_Class_Abstract {
 
         try {
             $this->_redis = new Predis\Client([
-                'scheme' => 'tcp',
-                'host'   => $host,
-                'port'   => $port,
+                'scheme'             => 'tcp',
+                'host'               => $host,
+                'port'               => $port,
+                'read_write_timeout' => -1,
+                'timeout'            => 60,
             ], ['profile' => '2.4']);
         } catch (Predis\Connection\ConnectionException $e) {
             throw new CM_Exception('Cannot connect to redis server `' . $host . '` on port `' . $port . '`: ' . $e->getMessage());
