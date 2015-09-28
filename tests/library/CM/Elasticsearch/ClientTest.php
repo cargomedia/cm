@@ -171,7 +171,14 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
         $cmClient->refreshIndex($indexName);
         $this->assertSame(0, $cmClient->count($indexName, $typeName));
 
-        $cmClientWithMock = new CM_Elasticsearch_Client(new ElasticClientMock());
+        $elasticClientMockClass = $this->mockClass('\Elasticsearch\Client');
+        $elasticClientMockClass->mockMethod('count')->set(function () {
+            return ['foo' => 'bar', 'bar' => 'baz'];
+        });
+        /** @var \Mocka\AbstractClassTrait|\Elasticsearch\Client $elasticClientMock */
+        $elasticClientMock = $elasticClientMockClass->newInstanceWithoutConstructor();
+
+        $cmClientWithMock = new CM_Elasticsearch_Client($elasticClientMock);
 
         $exception = $this->catchException(function () use ($cmClientWithMock, $indexName, $typeName) {
             $cmClientWithMock->count($indexName, $typeName, new CM_Elasticsearch_Query());
@@ -185,20 +192,5 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
      */
     private function _getCmClient() {
         return $this->getServiceManager()->getElasticsearch()->getClient();
-    }
-}
-
-class ElasticClientMock extends \Elasticsearch\Client {
-
-    public function __construct() {
-    }
-
-    /**
-     * @param array $param
-     * @return array
-     * @internal param $params
-     */
-    public function count($param = []) {
-        return ['foo' => 'bar', 'bar' => 'baz'];
     }
 }
