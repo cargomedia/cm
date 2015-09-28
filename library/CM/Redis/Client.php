@@ -115,11 +115,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
      * @return string|null
      */
     public function rPop($key) {
-        $result = $this->_redis->rPop($key);
-        if (false === $result) {
-            $result = null;
-        }
-        return $result;
+        return $this->_redis->rPop($key);
     }
 
     /**
@@ -178,6 +174,22 @@ class CM_Redis_Client extends CM_Class_Abstract {
     }
 
     /**
+     * @param string $key
+     * @param string $value
+     */
+    public function zRem($key, $value) {
+        $this->_redis->zRem($key, $value);
+    }
+
+    /**
+     * @param string $key
+     * @return int
+     */
+    public function zCard($key) {
+        return $this->_redis->zCard($key);
+    }
+
+    /**
      * @param string       $key
      * @param string       $start
      * @param string       $end
@@ -197,14 +209,6 @@ class CM_Redis_Client extends CM_Class_Abstract {
             $options['withscores'] = true;
         }
         return $this->_redis->zRangeByScore($key, $start, $end, $options);
-    }
-
-    /**
-     * @param string $key
-     * @param string $value
-     */
-    public function zRem($key, $value) {
-        $this->_redis->zRem($key, $value);
     }
 
     /**
@@ -270,13 +274,10 @@ class CM_Redis_Client extends CM_Class_Abstract {
      * @return string[]
      */
     public function sFlush($key) {
-        $members = $this->_redis->sMembers($key);
         $this->_redis->multi();
-        foreach ($members as $value) {
-            $this->_redis->sRem($key, $value);
-        }
-        $this->_redis->exec();
-        return $members;
+        $this->_redis->sMembers($key);
+        $this->_redis->del($key);
+        return $this->_redis->exec()[0];
     }
 
     /**
@@ -291,7 +292,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
     /**
      * @param string|string[] $channels
      * @param Closure         $callback
-     * @return mixed
+     * @return mixed return something else than null to exit the pubsub loop
      */
     public function subscribe($channels, Closure $callback) {
         $pubsub = $this->_redis->pubSubLoop(['subscribe' => $channels]);

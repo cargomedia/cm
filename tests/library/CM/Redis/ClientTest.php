@@ -69,6 +69,15 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
         $this->assertSame(2, $this->_client->lLen('foo'));
     }
 
+    public function testLTrim() {
+        $this->_client->lPush('foo', 'bar1');
+        $this->_client->lPush('foo', 'bar2');
+        $this->_client->lPush('foo', 'bar3');
+
+        $this->_client->lTrim('foo', 1, 1);
+        $this->assertSame(array('bar2'), $this->_client->lRange('foo'));
+    }
+
     /**
      * @expectedException CM_Exception_Invalid
      * @expectedExceptionMessage does not contain a list
@@ -78,13 +87,13 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
         $this->_client->lLen('foo');
     }
 
-    public function testLTrim() {
-        $this->_client->lPush('foo', 'bar1');
-        $this->_client->lPush('foo', 'bar2');
-        $this->_client->lPush('foo', 'bar3');
-
+    /**
+     * @expectedException CM_Exception_Invalid
+     * @expectedExceptionMessage does not contain a list
+     */
+    public function testLTrimNotList() {
+        $this->_client->zAdd('foo', 2, 'bar');
         $this->_client->lTrim('foo', 1, 1);
-        $this->assertSame(array('bar2'), $this->_client->lRange('foo'));
     }
 
     public function testLRange() {
@@ -102,14 +111,49 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
         $this->_client->zAdd($key, 1.5, 'bar');
         $this->_client->zAdd($key, 2, 'foobar');
         // normal behaviour
-        $this->assertSame(array('foo', 'bar', 'foobar'), $this->_client->zRangeByScore($key, 1, 2));
+        $this->assertSame(array('foo', 'bar', 'foobar'), $this->_client->zRangeByScore($key, '1', '2'));
         // count
-        $this->assertSame(array('foo', 'bar'), $this->_client->zRangeByScore($key, 1, 2, 2));
+        $this->assertSame(array('foo', 'bar'), $this->_client->zRangeByScore($key, '1', '2', 2));
         // offset
-        $this->assertSame(array('bar', 'foobar'), $this->_client->zRangeByScore($key, 1, 2, null, 1));
+        $this->assertSame(array('bar', 'foobar'), $this->_client->zRangeByScore($key, '1', '2', null, 1));
         // withscores
-        $this->assertSame(array('foo' => '1', 'bar' => '1.5', 'foobar' => '2'), $this->_client->zRangeByScore($key, 1, 2, null, null, true));
-        $this->assertSame(array(), $this->_client->zRangeByScore($key, 1, 2, 0, 0));
+        $this->assertSame(array('foo' => '1', 'bar' => '1.5', 'foobar' => '2'), $this->_client->zRangeByScore($key, '1', '2', null, null, true));
+        $this->assertSame(array(), $this->_client->zRangeByScore($key, '1', '2', 0, 0));
+    }
+
+    public function testZRem() {
+        $key = 'foo';
+        $this->_client->zAdd($key, 1, 'foo');
+        $this->_client->zAdd($key, 1.5, 'bar');
+        $this->_client->zAdd($key, 2, 'foobar');
+        $this->assertSame(array('foo', 'bar', 'foobar'), $this->_client->zRangeByScore($key, '1', '2'));
+        $this->_client->zRem($key, 'bar');
+        $this->assertSame(array('foo', 'foobar'), $this->_client->zRangeByScore($key, '1', '2'));
+    }
+
+    public function testZRemRangeByScore() {
+        $key = 'foo';
+        $this->_client->zAdd($key, 1, 'foo');
+        $this->_client->zAdd($key, 1.5, 'bar');
+        $this->_client->zAdd($key, 2, 'foobar');
+        $this->assertSame(array('foo', 'bar', 'foobar'), $this->_client->zRangeByScore($key, '1', '2'));
+        $this->_client->zRemRangeByScore($key, '1.2', '1.8');
+        $this->assertSame(array('foo', 'foobar'), $this->_client->zRangeByScore($key, '1', '2'));
+    }
+
+    public function testZPopRangeByScore() {
+        $key = 'foo';
+        $this->_client->zAdd($key, 1, 'foo');
+        $this->_client->zAdd($key, 1.5, 'bar');
+        $this->_client->zAdd($key, 2, 'foobar');
+        $this->assertSame(array('foo', 'bar', 'foobar'), $this->_client->zRangeByScore($key, '1', '2'));
+        $removedValues = $this->_client->zPopRangeByScore($key, '1.2', '1.8');
+        $this->assertSame(array('bar'), $removedValues);
+        $this->assertSame(2, $this->_client->zCard($key));
+
+        $removedValues = $this->_client->zPopRangeByScore($key, '0.8', '1.2', true);
+        $this->assertSame(array('foo', '1'), $removedValues);
+        $this->assertSame(1, $this->_client->zCard($key));
     }
 
     public function testSAdd() {
@@ -138,7 +182,9 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
         $this->_client->sAdd('foo', 'bar2');
         $this->_client->sAdd('foo', 'bar3');
         $this->assertSame(3, $this->_client->sCard('foo'));
-        $this->_client->sFlush('foo');
+        $members = $this->_client->sFlush('foo');
+        sort($members);
+        $this->assertSame(['bar1', 'bar2', 'bar3'], $members);
         $this->assertSame(0, $this->_client->sCard('foo'));
     }
 
@@ -147,40 +193,77 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
      * @preserveGlobalState disabled
      */
     public function testPubSub() {
-
         $process = CM_Process::getInstance();
         $process->fork(function () {
             $redisClient = CM_Service_Manager::getInstance()->getRedis();
             return $redisClient->subscribe('foo', function ($channel, $message) {
+                if ($message === 'test') {
+                    return null;
+                }
                 return [$channel, $message];
             });
         });
 
-        $break = false;
-        $loopCount = 0;
-        $retry = 40;
-        $waitTime = 50 * 1000;
-
+        $clientCount = 0;
         // use a timeout because there's no easy way to know when the forked process will subscribe to the channel...
-        while (!$break) {
-            $clientCount = $this->_client->publish('foo', 'bar');
-            if ($clientCount > 0) {
-                $break = true;
-            }
-            if ($loopCount > $retry) {
-                $break = true;
+        for ($loopCount = 0; 0 === $clientCount; $loopCount++) {
+            $clientCount = $this->_client->publish('foo', 'test');
+            if ($loopCount > 40) {
                 $process->killChildren();
-                $this->fail('Failed to publish on a Redis subpub channel after ' . round(($waitTime * $retry) / (1000 * 1000), 3) . ' second(s).');
+                $this->fail('Failed to publish on a Redis subpub channel.');
             }
-            usleep($waitTime);
-            $loopCount++;
+            usleep(50 * 1000);
         }
 
+        $this->_client->publish('foo', 'bar');
         $resultList = $process->waitForChildren();
         $this->assertCount(1, $resultList);
 
         foreach ($resultList as $result) {
             $this->assertSame(['foo', 'bar'], $result->getResult());
+        }
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testPubSubMultiple() {
+
+        $process = CM_Process::getInstance();
+        $process->fork(function () {
+            $redisClient = CM_Service_Manager::getInstance()->getRedis();
+            $messageList = [];
+            $messageCount = 0;
+            return $redisClient->subscribe('foo', function ($channel, $message) use (&$messageList, &$messageCount) {
+                if ($message === 'test') {
+                    return null;
+                }
+                $messageList[] = $message;
+                if (++$messageCount >= 2) {
+                    return [$channel, $messageList];
+                }
+            });
+        });
+
+        $clientCount = 0;
+        // use a timeout because there's no easy way to know when the forked process will subscribe to the channel...
+        for ($loopCount = 0; 0 === $clientCount; $loopCount++) {
+            $clientCount = $this->_client->publish('foo', 'test');
+            if ($loopCount > 40) {
+                $process->killChildren();
+                $this->fail('Failed to publish on a Redis subpub channel.');
+            }
+            usleep(50 * 1000);
+        }
+
+        $this->_client->publish('foo', 'bar1');
+        $this->_client->publish('foo', 'bar2');
+        $resultList = $process->waitForChildren();
+        $this->assertCount(1, $resultList);
+
+        foreach ($resultList as $result) {
+            $this->assertSame(['foo', ['bar1', 'bar2']], $result->getResult());
         }
     }
 }
