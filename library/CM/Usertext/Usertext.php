@@ -2,16 +2,6 @@
 
 class CM_Usertext_Usertext extends CM_Class_Abstract {
 
-    /** @var CM_Frontend_Render */
-    private $_render;
-
-    /**
-     * @param CM_Frontend_Render $render
-     */
-    function __construct(CM_Frontend_Render $render = null) {
-        $this->_render = $render;
-    }
-
     /** @var CM_Usertext_Filter_Interface[] */
     private $_filterList = array();
 
@@ -23,53 +13,58 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_Frontend_Render
+     * @param string                       $filterName
+     * @param CM_Usertext_Filter_Interface $filter
      * @throws CM_Exception_Invalid
      */
-    public function getRender() {
-        if (!$this->_render) {
-            throw new CM_Exception_Invalid('Render not set');
+    public function addFilterAfter($filterName, CM_Usertext_Filter_Interface $filter) {
+        $filterName = (string) $filterName;
+        $filterPosition = null;
+        foreach ($this->_getFilters() as $index => $filterExisting) {
+            if (get_class($filterExisting) === $filterName) {
+                $filterPosition = $index + 1;
+                break;
+            }
         }
-        return $this->_render;
+        if (null === $filterPosition) {
+            throw new CM_Exception_Invalid("No filter called `{$filterName}` found");
+        }
+        array_splice($this->_filterList, $filterPosition, 0, [$filter]);
     }
 
     /**
-     * @param CM_Frontend_Render $render
-     */
-    public function setRender(CM_Frontend_Render $render) {
-        $this->_render = $render;
-    }
-
-    /**
-     * @param string    $mode
-     * @param int|null  $maxLength
-     * @param bool|null $isMail
-     * @param bool|null $skipAnchors
-     * @param bool|null $allowBadwords
+     * @param string $mode
+     * @param array|null  $options
      * @throws CM_Exception_Invalid
      */
-    public function setMode($mode, $maxLength = null, $isMail = null, $skipAnchors = null, $allowBadwords = null) {
+    public function setMode($mode, $options = null) {
+        $options = $options ? $options : [];
         $acceptedModes = array('escape', 'oneline', 'simple', 'markdown', 'markdownPlain');
         if (!in_array($mode, $acceptedModes)) {
             throw new CM_Exception_Invalid('Invalid mode `' . $mode . '`');
         }
         $mode = (string) $mode;
+        $optionsDefault = [
+            'maxLength'           => null,
+            'skipAnchors'         => null,
+            'emoticonFixedHeight' => null,
+            'allowBadwords'       => null,
+        ];
+
+        $options = $options + $optionsDefault;
         $this->_clearFilters();
         $emoticonFixedHeight = null;
-        if ($isMail) {
-            $emoticonFixedHeight = 16;
-        }
-        $this->_setMode($mode, $maxLength, $skipAnchors, $emoticonFixedHeight, $allowBadwords);
+        $this->_setMode($mode, $options);
     }
 
     /**
      * @param string $text
+     * @param CM_Frontend_Render $render
      * @return string
      */
-    public function transform($text) {
+    public function transform($text, CM_Frontend_Render $render) {
         $cacheKey = $this->_getCacheKey($text);
         $cache = CM_Cache_Local::getInstance();
-        $render = $this->getRender();
         if (($result = $cache->get($cacheKey)) === false) {
             $result = $text;
             foreach ($this->_getFilters() as $filter) {
@@ -98,14 +93,15 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     }
 
     /**
-     * @param string       $mode
-     * @param int|null     $maxLength
-     * @param boolean|null $skipAnchors
-     * @param int|null     $emoticonFixedHeight
-     * @param boolean|null $allowBadwords
+     * @param string $mode
+     * @param array  $options
      * @throws CM_Exception_Invalid
      */
-    protected function _setMode($mode, $maxLength = null, $skipAnchors = null, $emoticonFixedHeight = null, $allowBadwords = null) {
+    protected function _setMode($mode, array $options) {
+        $maxLength = $options['maxLength'];
+        $skipAnchors = $options['skipAnchors'];
+        $emoticonFixedHeight = $options['emoticonFixedHeight'];
+        $allowBadwords = $options['allowBadwords'];
         if (!$allowBadwords) {
             $this->addFilter(new CM_Usertext_Filter_Badwords());
         }
@@ -162,11 +158,10 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_Frontend_Render $render
      * @return CM_Usertext_Usertext
      */
-    public static function factory(CM_Frontend_Render $render) {
+    public static function factory() {
         $className = self::_getClassName();
-        return new $className($render);
+        return new $className();
     }
 }

@@ -51,7 +51,6 @@ class CM_Clockwork_Manager {
     }
 
     public function runEvents() {
-        $process = $this->_getProcess();
         foreach ($this->_events as $event) {
             if (!$this->_isRunning($event)) {
                 if ($this->_shouldRun($event)) {
@@ -61,12 +60,27 @@ class CM_Clockwork_Manager {
                 }
             }
         }
-        $resultList = $process->listenForChildren();
+        $this->handleCompletedEvents();
+    }
+
+    public function handleCompletedEvents() {
+        $resultList = $this->_getProcess()->listenForChildren();
         foreach ($resultList as $identifier => $result) {
             $event = $this->_getRunningEvent($identifier);
-            $this->_markStopped($event);
-            $this->_storage->setRuntime($event, $this->_getCurrentDateTime());
+            $this->handleEventResult($event, $result);
         }
+    }
+
+    /**
+     * @param CM_Clockwork_Event        $event
+     * @param CM_Process_WorkloadResult $result
+     * @throws CM_Exception_Invalid
+     */
+    public function handleEventResult(CM_Clockwork_Event $event, CM_Process_WorkloadResult $result) {
+        if ($result->isSuccess()) {
+            $this->_markCompleted($event);
+        }
+        $this->_markStopped($event);
     }
 
     /**
@@ -133,6 +147,7 @@ class CM_Clockwork_Manager {
 
     /**
      * @return DateTime
+     * @return DateTime
      */
     protected function _getCurrentDateTime() {
         return $this->_getCurrentDateTimeUTC()->setTimezone($this->_timeZone);
@@ -172,20 +187,33 @@ class CM_Clockwork_Manager {
     /**
      * @param CM_Clockwork_Event $event
      * @param int                $identifier
+     * @param DateTime           $startTime
+     * @throws CM_Exception_Invalid
      */
-    protected function _markRunning(CM_Clockwork_Event $event, $identifier) {
-        if (!$this->_isRunning($event)) {
-            $this->_eventsRunning[$event->getName()] = ['event' => $event, 'identifier' => $identifier];
+    protected function _markRunning(CM_Clockwork_Event $event, $identifier, DateTime $startTime) {
+        if ($this->_isRunning($event)) {
+            throw new CM_Exception_Invalid("Event `{$event->getName()}` is already running");
         }
+        $this->_eventsRunning[$event->getName()] = ['event' => $event, 'identifier' => $identifier, 'startTime' => $startTime];
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     * @throws CM_Exception_Invalid
+     */
+    protected function _markStopped(CM_Clockwork_Event $event) {
+        if (!$this->_isRunning($event)) {
+            throw new CM_Exception_Invalid("Cannot stop event. `{$event->getName()}` is already running");
+        }
+        unset($this->_eventsRunning[$event->getName()]);
     }
 
     /**
      * @param CM_Clockwork_Event $event
      */
-    protected function _markStopped(CM_Clockwork_Event $event) {
-        if ($this->_isRunning($event)) {
-            unset($this->_eventsRunning[$event->getName()]);
-        }
+    protected function _markCompleted(CM_Clockwork_Event $event) {
+        $startTime = $this->_eventsRunning[$event->getName()]['startTime'];
+        $this->_storage->setRuntime($event, $startTime);
     }
 
     /**
@@ -193,9 +221,11 @@ class CM_Clockwork_Manager {
      */
     protected function _runEvent(CM_Clockwork_Event $event) {
         $process = $this->_getProcess();
-        $forkHandler = $process->fork(function () use ($event) {
-            $event->run();
+        $lastRuntime = $this->_storage->getLastRuntime($event);
+        $startTime = $this->_getCurrentDateTime();
+        $forkHandler = $process->fork(function () use ($event, $lastRuntime) {
+            $event->run($lastRuntime);
         });
-        $this->_markRunning($event, $forkHandler->getIdentifier());
+        $this->_markRunning($event, $forkHandler->getIdentifier(), $startTime);
     }
 }

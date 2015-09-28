@@ -38,11 +38,16 @@ function smarty_function_location(array $params, Smarty_Internal_Template $templ
     });
     $html = implode(', ', $partNameList);
 
+    $flag = '';
     if (null !== $location->getId(CM_Model_Location::LEVEL_COUNTRY)) {
         if (null !== $flagLabeler) {
-            $html .= $flagLabeler($location->get(CM_Model_Location::LEVEL_COUNTRY), $location);
+            $flag = $flagLabeler($location->get(CM_Model_Location::LEVEL_COUNTRY), $location);
         } else {
-            $html .= smarty_function_locationFlag(array('location' => $location), $template);
+            $flag = smarty_function_locationFlag(array('location' => $location), $template);
+        }
+
+        if ('' !== $flag) {
+            $html .= $flag;
         }
     }
 
@@ -52,5 +57,5 @@ function smarty_function_location(array $params, Smarty_Internal_Template $templ
         $html .= '<small class="distance" title="' . $distanceTitle . '">' . $distance . '</small>';
     }
 
-    return '<span class="function-location">' . $html . '</span>';
+    return '<span class="function-location' . ('' !== $flag ? ' contains-flag' : '') . '">' . $html . '</span>';
 }
