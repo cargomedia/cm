@@ -105,8 +105,6 @@ class CM_Elasticsearch_Client {
             $useSource = false;
         }
 
-        $this->deleteIndex($indexName);
-
         $requestParams = [
             'index' => $indexName,
         ];
