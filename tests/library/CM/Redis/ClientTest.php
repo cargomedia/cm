@@ -7,7 +7,6 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
 
     public function setUp() {
         $this->_client = CM_Service_Manager::getInstance()->getRedis();
-        $this->_client->flush();
     }
 
     public function tearDown() {
@@ -143,6 +142,10 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
         $this->assertSame(0, $this->_client->sCard('foo'));
     }
 
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function testPubSub() {
 
         $process = CM_Process::getInstance();
