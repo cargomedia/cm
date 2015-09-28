@@ -7,7 +7,7 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
     }
 
     public function testConstructor() {
-        $elasticsearchClient = self::_getElasticClient();
+        $elasticsearchClient = \Elasticsearch\ClientBuilder::create()->build();
         $cmClient = new CM_Elasticsearch_Client($elasticsearchClient);
 
         $this->assertInstanceOf('CM_Elasticsearch_Client', $cmClient);
@@ -16,7 +16,7 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
 
     public function testIndexCreateDelete() {
         $indexName = 'index1';
-        $cmClient = self::_getCmClient();
+        $cmClient = $this->_getCmClient();
 
         $cmClient->deleteIndex($indexName);
         $this->assertFalse($cmClient->indexExists($indexName));
@@ -29,7 +29,7 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
     }
 
     public function testPutGetDeleteAlias() {
-        $cmClient = self::_getCmClient();
+        $cmClient = $this->_getCmClient();
         $indexName1 = 'index1';
         $indexName2 = 'index2';
         $aliasName = 'alias4';
@@ -51,7 +51,7 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
     }
 
     public function testSetGetIndexSettings() {
-        $cmClient = self::_getCmClient();
+        $cmClient = $this->_getCmClient();
         $indexName = 'index1';
         $cmClient->createIndex($indexName, 'typeName', [], [], false);
 
@@ -74,7 +74,7 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
     }
 
     public function testBulkAddDelete() {
-        $cmClient = self::_getCmClient();
+        $cmClient = $this->_getCmClient();
         $indexName = 'index1';
         $typeName = 'typeName';
         $cmClient->createIndex($indexName, $typeName, [], [], false);
@@ -120,7 +120,7 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
     }
 
     public function testSearch() {
-        $cmClient = self::_getCmClient();
+        $cmClient = $this->_getCmClient();
         $indexName = 'index1';
         $typeName = 'typeName';
         $cmClient->createIndex($indexName, $typeName, [], [], false);
@@ -156,7 +156,7 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
     }
 
     public function testCount() {
-        $cmClient = self::_getCmClient();
+        $cmClient = $this->_getCmClient();
         $indexName = 'index1';
         $typeName = 'typeName';
         $cmClient->deleteIndex($indexName);
@@ -181,17 +181,10 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
     }
 
     /**
-     * @return \Elasticsearch\Client
-     */
-    private static function _getElasticClient() {
-        return \Elasticsearch\ClientBuilder::create()->build();
-    }
-
-    /**
      * @return CM_Elasticsearch_Client
      */
-    private static function _getCmClient() {
-        return CM_Service_Manager::getInstance()->getElasticsearch()->getClient();
+    private function _getCmClient() {
+        return $this->getServiceManager()->getElasticsearch()->getClient();
     }
 }
 
