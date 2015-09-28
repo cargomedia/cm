@@ -7,10 +7,10 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
      * @param bool|null $skipIfExist
      */
     public function create($indexName = null, $skipIfExist = null) {
-        $types = $this->_getTypes($indexName);
-        foreach ($types as $type) {
+        $typeList = $this->_getTypeList($indexName);
+        foreach ($typeList as $type) {
             if (!$type->indexExists() || !$skipIfExist) {
-                $this->_getStreamOutput()->writeln('Creating elasticsearch index `' . $type->getIndex()->getName() . '`…');
+                $this->_getStreamOutput()->writeln('Creating elasticsearch index `' . $type->getIndexName() . '`…');
                 $type->createIndex();
                 $type->refreshIndex();
             }
@@ -21,9 +21,9 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
      * @param string|null $indexName
      */
     public function update($indexName = null) {
-        $types = $this->_getTypes($indexName);
-        foreach ($types as $type) {
-            $this->_getStreamOutput()->writeln('Updating elasticsearch index `' . $type->getIndex()->getName() . '`...');
+        $typeList = $this->_getTypeList($indexName);
+        foreach ($typeList as $type) {
+            $this->_getStreamOutput()->writeln('Updating elasticsearch index `' . $type->getIndexName() . '`…');
             $type->updateIndex();
         }
     }
@@ -32,19 +32,17 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
      * @param string|null $indexName
      */
     public function delete($indexName = null) {
-        $types = $this->_getTypes($indexName);
-        foreach ($types as $type) {
+        $typeList = $this->_getTypeList($indexName);
+        foreach ($typeList as $type) {
             if ($type->indexExists()) {
-                $this->_getStreamOutput()->writeln('Deleting elasticsearch index `' . $type->getIndex()->getName() . '`…');
+                $this->_getStreamOutput()->writeln('Deleting elasticsearch index `' . $type->getIndexName() . '`…');
                 $type->deleteIndex();
             }
         }
     }
 
     public function optimize() {
-        foreach (CM_Service_Manager::getInstance()->getElasticsearch()->getClientList() as $client) {
-            $client->optimizeAll();
-        }
+        CM_Service_Manager::getInstance()->getElasticsearch()->getClient()->optimizeIndex('_all');
     }
 
     /**
@@ -69,18 +67,18 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
      * @throws CM_Exception_Invalid
      * @return CM_Elasticsearch_Type_Abstract[]
      */
-    protected function _getTypes($filterIndexName = null) {
-        $types = CM_Service_Manager::getInstance()->getElasticsearch()->getTypes();
+    protected function _getTypeList($filterIndexName = null) {
+        $typeList = CM_Service_Manager::getInstance()->getElasticsearch()->getTypeList();
 
         if (null !== $filterIndexName) {
-            $types = \Functional\filter($types, function (CM_Elasticsearch_Type_Abstract $type) use ($filterIndexName) {
-                return $type->getIndex()->getName() === $filterIndexName;
+            $typeList = \Functional\filter($typeList, function (CM_Elasticsearch_Type_Abstract $type) use ($filterIndexName) {
+                return $type->getIndexName() === $filterIndexName;
             });
-            if (count($types) === 0) {
+            if (count($typeList) === 0) {
                 throw new CM_Exception_Invalid('No type with such index name: ' . $filterIndexName);
             }
         }
-        return $types;
+        return $typeList;
     }
 
     public static function getPackageName() {
