@@ -21,8 +21,15 @@ var CM_FormField_Captcha = CM_FormField_Abstract.extend({
         var $container = this.$(".captcha:eq(0)");
         var $img = $container.find("img");
         $img.attr("src", $img.attr("src").replace(/\?[^\?]+$/, '?id=' + id));
-        $container.find("input[name=\'captcha[id]\']").val(id);
-        $container.find("input[name=\'captcha[value]\']").val("").focus();
+        $container.find("input[name*=id]").val(id);
+        $container.find("input[name*=value]").val("").focus();
       });
+  },
+
+  getValue: function() {
+    return {
+      id: this.$("input[name*=id]").val(),
+      value: this.$("input[name*=value]").val()
+    }
   }
 });

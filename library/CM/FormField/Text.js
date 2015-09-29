@@ -36,6 +36,10 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
     this._skipTriggerChange = false;
   },
 
+  getValue: function() {
+    return this.$('input, textarea').val();
+  },
+
   /**
    * @return {Boolean}
    */

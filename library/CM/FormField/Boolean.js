@@ -9,5 +9,9 @@ var CM_FormField_Boolean = CM_FormField_Abstract.extend({
     'change input': function() {
       this.trigger('change');
     }
+  },
+
+  getValue: function() {
+    return this.$('input[type=checkbox]').is(':checked') ? '1' : '0';
   }
 });

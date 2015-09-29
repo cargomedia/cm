@@ -46,6 +46,10 @@ var CM_FormField_TreeSelect = CM_FormField_Abstract.extend({
     this.selectNode(this.getSelectedItem());
   },
 
+  getValue: function() {
+    return this.getInputValue();
+  },
+
   toggleWindow: function() {
     this.$options.toggleModal();
     if (this.$options.is(':visible')) {

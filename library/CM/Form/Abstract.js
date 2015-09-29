@@ -110,38 +110,24 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    * @param {String|Null} [actionName]
    */
   getData: function(actionName) {
-    var form_data = this.$().serializeArray();
     var action = actionName ? this._actions[actionName] : null;
-
     var data = {};
-    var regex = /^([\w\-]+)(\[([^\]]+)?\])?$/;
-    var name, match;
 
-    for (var i = 0, item; item = form_data[i]; i++) {
-      match = regex.exec(item.name);
-      name = match[1];
-      item.value = item.value || '';
-
-      if (action && typeof action.fields[name] == 'undefined') {
-        continue;
-      }
-
-      if (!match[2]) {
-        // Scalar
-        data[name] = item.value;
-      } else if (match[2] == '[]') {
-        // Array
-        if (typeof data[name] == 'undefined') {
-          data[name] = [];
+    if (action) {
+      _.each(action.fields, function(isRequired, fieldName) {
+        if (this.hasField(fieldName)) {
+          var field = this.getField(fieldName);
+          var value = field.getValue();
+          if (value && value.toString()) {
+            //if (null !== value && 'undefined' !== typeof value) {
+            data[fieldName] = value;
+          }
+        } else {
+          if (isRequired) {
+            throw new CM_Exception(this.getClass() + ' does not contain a required form field `' + fieldName + '`');
+          }
         }
-        data[name].push(item.value);
-      } else if (match[3]) {
-        // Associative array
-        if (typeof data[name] == 'undefined') {
-          data[name] = {};
-        }
-        data[name][match[3]] = item.value;
-      }
+      }, this);
     }
 
     return data;

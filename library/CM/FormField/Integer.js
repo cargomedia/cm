@@ -48,6 +48,10 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
     });
   },
 
+  getValue: function() {
+    return this.getInputValue();
+  },
+
   /**
    * @param {Number} value
    */

@@ -97,6 +97,10 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
     }
   },
 
+  getValue: function() {
+    return this.getArrayValue();
+  },
+
   /**
    * @returns {Number}
    */

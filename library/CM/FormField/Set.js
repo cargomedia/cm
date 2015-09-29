@@ -9,5 +9,9 @@ var CM_FormField_Set = CM_FormField_Abstract.extend({
     'change input': function() {
       this.trigger('change');
     }
+  },
+
+  getValue: function() {
+    return this.getArrayValue();
   }
 });

@@ -9,7 +9,7 @@ var CM_FormField_Hidden = CM_FormField_Abstract.extend({
    * @return String
    */
   getValue: function() {
-    return this.$('input').val();
+    return this.getInputValue();
   },
 
   /**
