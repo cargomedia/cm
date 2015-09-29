@@ -51,4 +51,31 @@ class CM_Log_Context {
     public function getHttpRequest() {
         return $this->_httpRequest;
     }
+
+    /**
+     * @return string[]
+     */
+    public function getExtra() {
+        return $this->_extra;
+    }
+
+    /**
+     * Overrides all properties not defined on the current instance
+     *
+     * @param CM_Log_Context $context
+     * @return CM_Log_Context
+     */
+    public function merge(CM_Log_Context $context) {
+        if(!$this->getUser()){
+            $this->_user = $context->getUser();
+        }
+        if(!$this->getHttpRequest()){
+            $this->_httpRequest = $context->getHttpRequest();
+        }
+        if(!$this->getComputerInfo()){
+            $this->_computerInfo = $context->getComputerInfo();
+        }
+        $this->_extra = array_merge($context->getExtra(), $this->_extra);
+        return $this;
+    }
 }

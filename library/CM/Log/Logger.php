@@ -24,20 +24,25 @@ class CM_Log_Logger {
     );
 
     /** @var CM_Log_Handler_HandlerInterface[] */
-    private $_handlerList = [];
+    private $_handlerList;
 
     /** @var CM_Log_Handler_HandlerInterface[] */
-    private $_fallbackList = [];
+    private $_fallbackList;
+
+    /** @var CM_Log_Context  */
+    private $_globalContext;
 
     /**
-     * @param array|null $handlerList
-     * @param array|null $fallbackList
+     * @param array|null          $handlerList
+     * @param array|null          $fallbackList
+     * @param CM_Log_Context|null $globalContext
      */
-    public function __construct(array $handlerList = null, array $fallbackList = null) {
-        $handlerList = $handlerList ?: [];
-        $fallbackList = $fallbackList ?: [];
-        $this->addHandlers($handlerList);
-        $this->addFallbacks($fallbackList);
+    public function __construct(array $handlerList = null, array $fallbackList = null, CM_Log_Context $globalContext = null) {
+        $this->_handlerList = [];
+        $this->_fallbackList = [];
+        $this->_globalContext = $globalContext ?: new CM_Log_Context();
+        $this->addHandlers($handlerList ?: []);
+        $this->addFallbacks($fallbackList ?: []);
     }
 
     /**
@@ -52,21 +57,25 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param string     $message
-     * @param int        $level
-     * @param array|null $options
+     * @param                     $message
+     * @param int                 $level
+     * @param CM_Log_Context|null $context
      */
-    public function addMessage($message, $level = null, array $options = null) {
-        $level = is_null($level) ? CM_Log_Logger::NOTSET : (int) $level;
-        $this->addRecord(new CM_Log_Record($level ?: self::NOTSET, $message, new CM_Log_Context($options)));
+    public function addMessage($message, $level = null, CM_Log_Context $context = null) {
+        if(null === $level) {
+            $level = self::NOTSET;
+        }
+        $context = $this->_mergeToGlobalContext($context);
+        $this->addRecord(new CM_Log_Record($level, $message, $context));
     }
 
     /**
-     * @param Exception  $exception
-     * @param array|null $options
+     * @param Exception           $exception
+     * @param CM_Log_Context|null $context
      */
-    public function addException(Exception $exception, array $options = null) {
-        $this->addRecord(new CM_Log_Record_Exception($exception, new CM_Log_Context($options)));
+    public function addException(Exception $exception, CM_Log_Context $context = null) {
+        $context = $this->_mergeToGlobalContext($context);
+        $this->addRecord(new CM_Log_Record_Exception($exception, $context));
     }
 
     /**
@@ -115,43 +124,53 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param string     $message
-     * @param array|null $options
+     * @param                     $message
+     * @param CM_Log_Context|null $context
      */
-    public function debug($message, $options = null) {
-        $this->addMessage($message, self::DEBUG, $options);
+    public function debug($message, CM_Log_Context $context = null) {
+        $this->addMessage($message, self::DEBUG, $context);
     }
 
     /**
-     * @param string     $message
-     * @param array|null $options
+     * @param                     $message
+     * @param CM_Log_Context|null $context
      */
-    public function info($message, $options = null) {
-        $this->addMessage($message, self::INFO, $options);
+    public function info($message, CM_Log_Context $context = null) {
+        $this->addMessage($message, self::INFO, $context);
     }
 
     /**
-     * @param string     $message
-     * @param array|null $options
+     * @param                     $message
+     * @param CM_Log_Context|null $context
      */
-    public function warning($message, $options = null) {
-        $this->addMessage($message, self::WARNING, $options);
+    public function warning($message, CM_Log_Context $context = null) {
+        $this->addMessage($message, self::WARNING, $context);
     }
 
     /**
-     * @param string     $message
-     * @param array|null $options
+     * @param                     $message
+     * @param CM_Log_Context|null $context
      */
-    public function error($message, $options = null) {
-        $this->addMessage($message, self::ERROR, $options);
+    public function error($message, CM_Log_Context $context = null) {
+        $this->addMessage($message, self::ERROR, $context);
     }
 
     /**
-     * @param string     $message
-     * @param array|null $options
+     * @param                     $message
+     * @param CM_Log_Context|null $context
      */
-    public function critical($message, $options = null) {
-        $this->addMessage($message, self::CRITICAL, $options);
+    public function critical($message, CM_Log_Context $context = null) {
+        $this->addMessage($message, self::CRITICAL, $context);
+    }
+
+    /**
+     * @param CM_Log_Context|null $context
+     * @return CM_Log_Context
+     */
+    protected function _mergeToGlobalContext(CM_Log_Context $context = null) {
+        $mergedContext = clone($context ?: new CM_Log_Context());
+        $mergedContext->merge($this->_globalContext);
+        return $mergedContext;
     }
 
     /**

@@ -17,6 +17,53 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $this->assertSame(1, $mockHandleRecord->getCallCount());
     }
 
+    public function testLoggingWithContext() {
+        $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
+        $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
+
+        // without any context
+        $logger = new CM_Log_Logger([$mockLogHandler]);
+        $mockHandleRecord->set(function (CM_Log_Record $record) {
+            $context = $record->getContext();
+            $this->assertNull($context->getComputerInfo());
+            $this->assertNull($context->getUser());
+            $this->assertNull($context->getHttpRequest());
+            $this->assertSame([], $context->getExtra());
+        });
+        $logger->addMessage('foo');
+        $this->assertSame(1, $mockHandleRecord->getCallCount());
+
+        // with a global context
+        $computerInfo = new CM_Log_Context_ComputerInfo();
+        $globalContext = new CM_Log_Context(null, null, $computerInfo);
+        $logger = new CM_Log_Logger([$mockLogHandler], [], $globalContext);
+
+        $mockHandleRecord->set(function (CM_Log_Record $record) use ($computerInfo) {
+            $context = $record->getContext();
+            $this->assertSame($computerInfo, $context->getComputerInfo());
+            $this->assertNull($context->getUser());
+            $this->assertNull($context->getHttpRequest());
+            $this->assertSame([], $context->getExtra());
+        });
+        $logger->addMessage('foo');
+        $this->assertSame(2, $mockHandleRecord->getCallCount());
+
+        // with a global context + log context
+        $computerInfo = new CM_Log_Context_ComputerInfo();
+        $globalContext = new CM_Log_Context(null, null, $computerInfo);
+        $logger = new CM_Log_Logger([$mockLogHandler], [], $globalContext);
+
+        $mockHandleRecord->set(function (CM_Log_Record $record) use ($computerInfo) {
+            $context = $record->getContext();
+            $this->assertSame($computerInfo, $context->getComputerInfo());
+            $this->assertNull($context->getUser());
+            $this->assertNull($context->getHttpRequest());
+            $this->assertSame(['foo' => 10], $context->getExtra());
+        });
+        $logger->addMessage('foo', CM_Log_Logger::INFO, new CM_Log_Context(null, null, null, ['foo' => 10]));
+        $this->assertSame(3, $mockHandleRecord->getCallCount());
+    }
+
     public function testAddRecordWithBubblingHandlers() {
         $mockLogHandlerFoo = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
         $mockLogHandlerBar = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();

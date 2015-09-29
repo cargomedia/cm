@@ -8,6 +8,11 @@ interface CM_Log_Handler_HandlerInterface {
     public function getBubble();
 
     /**
+     * @param bool $bubbling
+     */
+    public function setBubble($bubbling);
+
+    /**
      * @param int
      */
     public function getLevel();
