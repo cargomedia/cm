@@ -13,8 +13,8 @@ class CM_MenuEntryTest extends CMTest_TestCase {
         $this->assertTrue($entry->compare('/mock', ['param1' => 'foo']));
 
         $entry = new CM_MenuEntry(['label' => $label, 'page' => $pageName, 'params' => ['param1' => 'foo']], $menu);
-        $this->assertTrue($entry->compare('/mock', ['param1' => 'foo']));
         $this->assertFalse($entry->compare('/mock'));
+        $this->assertTrue($entry->compare('/mock', ['param1' => 'foo']));
         $this->assertFalse($entry->compare('/mock', ['param2' => 'foo']));
         $this->assertTrue($entry->compare('/mock', ['param2' => 'bar', 'param1' => 'foo']));
 
@@ -22,6 +22,19 @@ class CM_MenuEntryTest extends CMTest_TestCase {
         $this->assertFalse($entry->compare('/mock', ['param1' => 'foo']));
         $this->assertFalse($entry->compare('/mock', ['param2' => 'bar']));
         $this->assertTrue($entry->compare('/mock', ['param2' => 'bar', 'param1' => 'foo']));
+
+        $entry = new CM_MenuEntry(['label' => $label, 'page' => $pageName, 'params' => ['param1' => ['foo' => 'bar', 'bar' => 'baz']]], $menu);
+        $this->assertTrue($entry->compare('/mock', ['param1' => ['foo' => 'bar', 'bar' => 'baz']]));
+        $this->assertTrue($entry->compare('/mock', ['param1' => ['bar' => 'baz', 'foo' => 'bar']]));
+        $this->assertFalse($entry->compare('/mock', ['param1' => ['foo' => 'bar', 'bar' => 'baz', 'baz' => 'bar']]));
+        $this->assertFalse($entry->compare('/mock', ['param1' => ['foo' => 'baz', 'bar' => 'foo']]));
+        $this->assertFalse($entry->compare('/mock', ['param1' => ['foo' => 'bar', 'bar' => 'foo']]));
+        $this->assertFalse($entry->compare('/mock', ['param1' => ['foo' => 'bar']]));
+
+        $entry = new CM_MenuEntry(['label' => $label, 'page' => $pageName, 'params' => ['param1' => ['foo', 'bar']]], $menu);
+        $this->assertFalse($entry->compare('/mock'));
+        $this->assertTrue($entry->compare('/mock', ['param1' => ['foo', 'bar']]));
+        $this->assertFalse($entry->compare('/mock', ['param1' => ['bar', 'foo']]));
     }
 
     public function testGetters() {

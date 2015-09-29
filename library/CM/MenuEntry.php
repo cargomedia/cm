@@ -46,8 +46,12 @@ class CM_MenuEntry {
     public final function compare($path, array $params = array()) {
         /** @var CM_Page_Abstract $pageClassName */
         $pageClassName = $this->getPageName();
-        if ($path == $pageClassName::getPath() && array_intersect_assoc($this->getParams(), $params) == $this->getParams()) {
-            return true;
+        $pathMatch = $path == $pageClassName::getPath();
+        if ($pathMatch) {
+            $paramsMatch = array_uintersect_assoc($this->getParams(), $params, function ($a, $b) {
+                    return $a != $b ? -1 : 0;
+                }) == $this->getParams();
+            return $paramsMatch;
         }
         return false;
     }
