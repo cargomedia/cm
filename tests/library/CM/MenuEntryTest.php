@@ -7,22 +7,26 @@ class CM_MenuEntryTest extends CMTest_TestCase {
         $label = 'helloworld';
         $menu = $this->_getMenu();
 
+        // no param
         $entry = new CM_MenuEntry(['label' => $label, 'page' => $pageName], $menu);
         $this->assertTrue($entry->compare('/mock'));
         $this->assertFalse($entry->compare('/foo'));
         $this->assertTrue($entry->compare('/mock', ['param1' => 'foo']));
 
+        // one param
         $entry = new CM_MenuEntry(['label' => $label, 'page' => $pageName, 'params' => ['param1' => 'foo']], $menu);
         $this->assertFalse($entry->compare('/mock'));
         $this->assertTrue($entry->compare('/mock', ['param1' => 'foo']));
         $this->assertFalse($entry->compare('/mock', ['param2' => 'foo']));
         $this->assertTrue($entry->compare('/mock', ['param2' => 'bar', 'param1' => 'foo']));
 
+        // two params
         $entry = new CM_MenuEntry(['label' => $label, 'page' => $pageName, 'params' => ['param1' => 'foo', 'param2' => 'bar']], $menu);
         $this->assertFalse($entry->compare('/mock', ['param1' => 'foo']));
         $this->assertFalse($entry->compare('/mock', ['param2' => 'bar']));
         $this->assertTrue($entry->compare('/mock', ['param2' => 'bar', 'param1' => 'foo']));
 
+        // array-param associative
         $entry = new CM_MenuEntry(['label' => $label, 'page' => $pageName, 'params' => ['param1' => ['foo' => 'bar', 'bar' => 'baz']]], $menu);
         $this->assertTrue($entry->compare('/mock', ['param1' => ['foo' => 'bar', 'bar' => 'baz']]));
         $this->assertTrue($entry->compare('/mock', ['param1' => ['bar' => 'baz', 'foo' => 'bar']]));
@@ -31,10 +35,23 @@ class CM_MenuEntryTest extends CMTest_TestCase {
         $this->assertFalse($entry->compare('/mock', ['param1' => ['foo' => 'bar', 'bar' => 'foo']]));
         $this->assertFalse($entry->compare('/mock', ['param1' => ['foo' => 'bar']]));
 
+        // array-param numeric
         $entry = new CM_MenuEntry(['label' => $label, 'page' => $pageName, 'params' => ['param1' => ['foo', 'bar']]], $menu);
         $this->assertFalse($entry->compare('/mock'));
         $this->assertTrue($entry->compare('/mock', ['param1' => ['foo', 'bar']]));
         $this->assertFalse($entry->compare('/mock', ['param1' => ['bar', 'foo']]));
+
+        // strict/nonstrict comparison
+        $params = ['param1' => ''];
+        $entry = new CM_MenuEntry(['label' => $label, 'page' => $pageName, 'params' => ['param1' => 0]], $menu);
+        $this->assertTrue($entry->compare('/mock', ['param1' => 0]));
+        $this->assertFalse($entry->compare('/mock', ['param1' => '']));
+        $this->assertTrue($entry->compare('/mock', ['param1' => '0']));
+
+        $entry = new CM_MenuEntry(['label' => $label, 'page' => $pageName, 'params' => ['param1' => ['foo' => 0]]], $menu);
+        $this->assertTrue($entry->compare('/mock', ['param1' => ['foo' => 0]]));
+        $this->assertFalse($entry->compare('/mock', ['param1' => ['foo' => '']]));
+        $this->assertTrue($entry->compare('/mock', ['param1' => ['foo' => '0']]));
     }
 
     public function testGetters() {
