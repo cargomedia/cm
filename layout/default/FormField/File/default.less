@@ -33,32 +33,8 @@ input {
   opacity: 0;
 }
 
-.dropZone {
-  position: relative;
-  overflow: hidden;
-  text-align: center;
-  outline: 2px dashed @colorFgBorderEmphasize1;
-  outline-offset: -2px;
-
-  .dropInfo {
-    padding: 12px;
-    color: @colorFgSubtle;
-
-    .dropInfo-icon {
-      font-size: 3em;
-      line-height: 1.2;
-      color: lighten(@colorFgSubtle, 30);
-      text-shadow: 1px 1px @colorBg;
-    }
-
-    .dropInfo-message {
-      font-size: 1.3em;
-    }
-  }
-}
-
 &.dragover .dropZone {
-  outline-color: darken(@colorFgBorderEmphasize1, 10);
+  border-style: dashed;
 }
 
 .button-upload {
