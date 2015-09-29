@@ -2,6 +2,28 @@
 
 class CM_MenuEntryTest extends CMTest_TestCase {
 
+    public function testCompare() {
+        $pageName = 'CM_Page_Mock';
+        $label = 'helloworld';
+        $menu = $this->_getMenu();
+
+        $entry = new CM_MenuEntry(['label' => $label, 'page' => $pageName], $menu);
+        $this->assertTrue($entry->compare('/mock'));
+        $this->assertFalse($entry->compare('/foo'));
+        $this->assertTrue($entry->compare('/mock', ['param1' => 'foo']));
+
+        $entry = new CM_MenuEntry(['label' => $label, 'page' => $pageName, 'params' => ['param1' => 'foo']], $menu);
+        $this->assertTrue($entry->compare('/mock', ['param1' => 'foo']));
+        $this->assertFalse($entry->compare('/mock'));
+        $this->assertFalse($entry->compare('/mock', ['param2' => 'foo']));
+        $this->assertTrue($entry->compare('/mock', ['param2' => 'bar', 'param1' => 'foo']));
+
+        $entry = new CM_MenuEntry(['label' => $label, 'page' => $pageName, 'params' => ['param1' => 'foo', 'param2' => 'bar']], $menu);
+        $this->assertFalse($entry->compare('/mock', ['param1' => 'foo']));
+        $this->assertFalse($entry->compare('/mock', ['param2' => 'bar']));
+        $this->assertTrue($entry->compare('/mock', ['param2' => 'bar', 'param1' => 'foo']));
+    }
+
     public function testGetters() {
         $pageName = 'CM_Page_Mock';
         $label = 'helloworld';
