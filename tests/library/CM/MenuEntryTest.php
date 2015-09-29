@@ -34,12 +34,14 @@ class CM_MenuEntryTest extends CMTest_TestCase {
         $this->assertFalse($entry->compare('/mock', ['param1' => ['foo' => 'baz', 'bar' => 'foo']]));
         $this->assertFalse($entry->compare('/mock', ['param1' => ['foo' => 'bar', 'bar' => 'foo']]));
         $this->assertFalse($entry->compare('/mock', ['param1' => ['foo' => 'bar']]));
+        $this->assertFalse($entry->compare('/mock', ['param1' => 'foo']));
 
         // array-param numeric
         $entry = new CM_MenuEntry(['label' => $label, 'page' => $pageName, 'params' => ['param1' => ['foo', 'bar']]], $menu);
         $this->assertFalse($entry->compare('/mock'));
         $this->assertTrue($entry->compare('/mock', ['param1' => ['foo', 'bar']]));
         $this->assertFalse($entry->compare('/mock', ['param1' => ['bar', 'foo']]));
+        $this->assertFalse($entry->compare('/mock', ['param1' => 'foo']));
 
         // strict/nonstrict comparison
         $params = ['param1' => ''];

@@ -51,6 +51,8 @@ class CM_MenuEntry {
             $paramsMatch = array_uintersect_assoc($this->getParams(), $params, function ($a, $b) {
                     if (is_array($a) && is_array($b)) {
                         return (array_diff_assoc($a, $b) === array_diff_assoc($b, $a)) ? 0 : -1;
+                    } elseif (is_array($a) || is_array($b)) {
+                        return -1;
                     }
                     return ((string) $a === (string) $b) ? 0 : -1;
                 }) == $this->getParams();
