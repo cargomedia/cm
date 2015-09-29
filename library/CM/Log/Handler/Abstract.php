@@ -18,7 +18,7 @@ abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterfac
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
      */
     public function getBubble() {
         return $this->_bubbling;
@@ -32,7 +32,7 @@ abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterfac
     }
 
     /**
-     * @return int
+     * {@inheritdoc}
      */
     public function getLevel() {
         return $this->_level;
@@ -49,8 +49,26 @@ abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterfac
     }
 
     /**
-     * @param CM_Log_Record $record
-     * @return bool Whether the record was successfully handled
+     * {@inheritdoc}
      */
-    abstract public function handleRecord(CM_Log_Record $record);
+    public function handleRecord(CM_Log_Record $record) {
+        $handled = false;
+        if ($this->isHandling($record)) {
+            $handled = $this->writeRecord($record);
+        }
+        return $handled;
+    }
+
+    /**
+     * @param CM_Log_Record $record
+     * @return bool
+     */
+    public function isHandling(CM_Log_Record $record) {
+        return $record->getLevel() >= $this->getLevel();
+    }
+
+    /**
+     * @param CM_Log_Record $record
+     */
+    abstract public function writeRecord(CM_Log_Record $record);
 }

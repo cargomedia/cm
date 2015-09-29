@@ -10,10 +10,9 @@ class CM_Log_Handler_Database extends CM_Log_Handler_Abstract {
     }
 
     /**
-     * @param CM_Log_Record $record
-     * @return bool Whether the record was successfully handled
+     * {@inheritdoc}
      */
-    public function handleRecord(CM_Log_Record $record) {
-        return false;
+    public function writeRecord(CM_Log_Record $record) {
+        throw new CM_Exception_NotImplemented(__CLASS__ . ' not implemented yet.');
     }
 }
