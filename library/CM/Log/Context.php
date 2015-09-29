@@ -12,22 +12,23 @@ class CM_Log_Context {
     private $_httpRequest;
 
     /** @var string[] */
-    private $_extra = [];
+    private $_extra;
 
     /**
-     * @param array|null $options ['user' => CM_Model_User|null, 'http-request' => CM_Http_Request_Abstract|null, 'extra' => []|null]
+     * @param CM_Model_User|null               $user
+     * @param CM_Http_Request_Abstract|null    $httpRequest
+     * @param CM_Log_Context_ComputerInfo|null $computerInfo
+     * @param array|null                       $extra
      */
-    public function __construct(array $options = null) {
-        $options = array_merge([
-            'user'         => null,
-            'http-request' => null,
-            'extra'        => null,
-        ], $options ?: []);
+    public function __construct(CM_Model_User $user = null,
+                                CM_Http_Request_Abstract $httpRequest = null,
+                                CM_Log_Context_ComputerInfo $computerInfo = null,
+                                array $extra = null) {
 
-        $this->_setComputerInfo();
-        $this->_setUser($options['user']);
-        $this->_setHttpRequest($options['http-request']);
-        $this->_setExtra($options['extra']);
+        $this->_user = $user;
+        $this->_httpRequest = $httpRequest;
+        $this->_computerInfo = $computerInfo;
+        $this->_extra = $extra ?: [];
     }
 
     /**
@@ -49,30 +50,5 @@ class CM_Log_Context {
      */
     public function getHttpRequest() {
         return $this->_httpRequest;
-    }
-
-    private function _setComputerInfo() {
-        $this->_computerInfo = new CM_Log_Context_ComputerInfo();
-    }
-
-    /**
-     * @param CM_Model_User|null $user
-     */
-    private function _setUser(CM_Model_User $user = null) {
-        $this->_user = $user;
-    }
-
-    /**
-     * @param CM_Http_Request_Abstract|null $httpRequest
-     */
-    private function _setHttpRequest(CM_Http_Request_Abstract $httpRequest = null) {
-        $this->_httpRequest = $httpRequest;
-    }
-
-    /**
-     * @param array|null $extra
-     */
-    private function _setExtra(array $extra = null) {
-        $this->_extra = $extra ?: [];
     }
 }
