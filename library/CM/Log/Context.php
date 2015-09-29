@@ -11,7 +11,7 @@ class CM_Log_Context {
     /** @var CM_Http_Request_Abstract|null */
     private $_httpRequest;
 
-    /** @var string[] */
+    /** @var array */
     private $_extra;
 
     /**

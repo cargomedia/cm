@@ -15,12 +15,12 @@ class CM_Log_Logger {
      * @var array $levels Logging levels
      */
     protected static $levels = array(
-        100 => 'DEBUG',
-        200 => 'INFO',
-        300 => 'WARNING',
-        400 => 'ERROR',
-        500 => 'CRITICAL',
-        999 => 'NOTSET',
+        self::DEBUG    => 'DEBUG',
+        self::INFO     => 'INFO',
+        self::WARNING  => 'WARNING',
+        self::ERROR    => 'ERROR',
+        self::CRITICAL => 'CRITICAL',
+        self::NOTSET   => 'NOTSET',
     );
 
     /** @var CM_Log_Handler_HandlerInterface[] */
@@ -56,8 +56,9 @@ class CM_Log_Logger {
      * @param int        $level
      * @param array|null $options
      */
-    public function addMessage($message, $level = self::NOTSET, array $options = null) {
-        $this->addRecord(new CM_Log_Record($level, $message, new CM_Log_Context($options)));
+    public function addMessage($message, $level = null, array $options = null) {
+        $level = is_null($level) ? CM_Log_Logger::NOTSET : (int) $level;
+        $this->addRecord(new CM_Log_Record($level ?: self::NOTSET, $message, new CM_Log_Context($options)));
     }
 
     /**
