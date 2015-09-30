@@ -15,7 +15,7 @@ var CM_FormField_Set_Select = CM_FormField_Set.extend({
     if (this.$('input[type=radio]').length) {
       return this.$('input[type=radio]:checked').val();
     } else {
-      return this.getSelectValue();
+      return this.$('select:not([disabled])').val();
     }
   }
 });

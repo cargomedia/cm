@@ -98,7 +98,11 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
   },
 
   getValue: function() {
-    return this.getArrayValue();
+    var array = this.$('input:not([disabled])[name="' + this.options.params.name + '[]"]').map(function() {
+      return $(this).val();
+    }).get();
+    var value = _.compact(array);
+    return value.length ? value : null;
   },
 
   /**

@@ -12,7 +12,7 @@ var CM_FormField_Color = CM_FormField_Abstract.extend({
   },
 
   getValue: function() {
-    return this.getInputValue();
+    return this.$('input:not([disabled])').val();
   }
 
 });
