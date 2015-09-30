@@ -1268,12 +1268,13 @@ var CM_App = CM_Class_Abstract.extend({
       var params = queryString.parse(queryParams);
       var arrayParamRegex = /^([\d\w]+)\[([\d\w]+)]$/;
       _.each(params, function(value, key) {
-        if (result = arrayParamRegex.exec(key)) {
+        var result = arrayParamRegex.exec(key);
+        if (result) {
           var paramName = result[1];
           var arrayKey = result[2];
           delete params[key];
           if (!params[paramName]) {
-            params[paramName] = {}
+            params[paramName] = {};
           }
           params[paramName][arrayKey] = value;
         }
