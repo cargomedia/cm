@@ -70,11 +70,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
    * @return string|null
    */
   getValue: function() {
-    var formData = this.getForm().getData();
-    if (!_.has(formData, this.getName())) {
-      return null;
-    }
-    return formData[this.getName()];
+    throw new CM_Exception('Please implement');
   },
 
   /**
