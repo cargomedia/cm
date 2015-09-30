@@ -7,11 +7,8 @@ class CM_Log_Logger {
     const WARNING = 300;
     const ERROR = 400;
     const CRITICAL = 500;
-    const NOTSET = 999;
 
     /**
-     * Logging levels from syslog protocol defined in RFC 5424
-     *
      * @var array $levels Logging levels
      */
     protected static $levels = array(
@@ -20,7 +17,6 @@ class CM_Log_Logger {
         self::WARNING  => 'WARNING',
         self::ERROR    => 'ERROR',
         self::CRITICAL => 'CRITICAL',
-        self::NOTSET   => 'NOTSET',
     );
 
     /** @var CM_Log_Handler_HandlerInterface[] */
@@ -60,22 +56,29 @@ class CM_Log_Logger {
      * @param CM_Log_Record $record
      */
     public function addRecord(CM_Log_Record $record) {
-        foreach ($this->getHandlers() as $handler) {
-            if ($handler->handleRecord($record) && !$handler->getBubble()) {
-                break;
+        $handlerHasFailed = false;
+        foreach ($this->_handlerList as $handler) {
+            if (!$handler->handleRecord($record)) {
+                $handlerHasFailed = true;
+            }
+        }
+        if (empty($this->_handlerList) || $handlerHasFailed) {
+            foreach ($this->_fallbackList as $handler) {
+                if ($handler->handleRecord($record)) {
+                    break;
+                }
             }
         }
     }
 
     /**
-     * @param                     $message
+     * @param string $message
      * @param int                 $level
      * @param CM_Log_Context|null $context
      */
-    public function addMessage($message, $level = null, CM_Log_Context $context = null) {
-        if (null === $level) {
-            $level = self::NOTSET;
-        }
+    public function addMessage($message, $level, CM_Log_Context $context = null) {
+        $message = (string) $message;
+        $level = (int) $level;
         $context = $this->_mergeWithGlobalContext($context);
         $this->addRecord(new CM_Log_Record($level, $message, $context));
     }
@@ -102,11 +105,6 @@ class CM_Log_Logger {
      * @param CM_Log_Handler_HandlerInterface $handler
      */
     public function addHandler(CM_Log_Handler_HandlerInterface $handler) {
-        /** @var CM_Log_Handler_HandlerInterface $handler */
-        foreach ($this->_handlerList as $currentHandler) {
-            $currentHandler->setBubble(true);
-        }
-        $handler->setBubble(false);
         $this->_handlerList[] = $handler;
     }
 
@@ -123,8 +121,7 @@ class CM_Log_Logger {
      * @param CM_Log_Handler_HandlerInterface $handler
      */
     public function addFallback(CM_Log_Handler_HandlerInterface $handler) {
-        $handler->setBubble(false);
-        $this->_handlerList[] = $handler;
+        $this->_fallbackList[] = $handler;
     }
 
     /**
@@ -200,11 +197,12 @@ class CM_Log_Logger {
     /**
      * Gets the name of the logging level.
      *
-     * @param  integer $level
+     * @param  int $level
      * @return string
      * @throws CM_Exception_Invalid
      */
     public static function getLevelName($level) {
+        $level = (int) $level;
         if (!isset(static::$levels[$level])) {
             throw new CM_Exception_Invalid('Level `' . $level . '` is not defined, use one of: ' . implode(', ', array_keys(static::$levels)));
         }
@@ -212,18 +210,11 @@ class CM_Log_Logger {
     }
 
     /**
-     * Gets the logging level associated with a name.
-     *
-     * @param  string $name
-     * @return int
-     * @throws CM_Exception_Invalid
+     * @param int $level
+     * @return bool
      */
-    public static function getLevelCode($name) {
-        $levels = self::getLevels();
-        $name = strtoupper($name);
-        if (!isset($levels[$name])) {
-            throw new CM_Exception_Invalid('Level `' . $name . '` is not defined, use one of: ' . implode(', ', array_keys($levels)));
-        }
-        return $levels[$name];
+    public static function hasLevel($level) {
+        $level = (int) $level;
+        return isset(static::$levels[(int) $level]);
     }
 }

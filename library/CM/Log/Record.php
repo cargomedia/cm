@@ -12,13 +12,20 @@ class CM_Log_Record {
     private $_context;
 
     /**
-     * @param int            $level
-     * @param string         $message
+     * @param                $level
+     * @param                $message
      * @param CM_Log_Context $context
+     * @throws CM_Exception_Invalid
      */
     public function __construct($level, $message, CM_Log_Context $context) {
-        $this->_level = (int) $level;
-        $this->_message = (string) $message;
+        $level = (int) $level;
+        $message = (string) $message;
+
+        if (!CM_Log_Logger::hasLevel($level)) {
+            throw new CM_Exception_Invalid('Log level `' . $level . '` does not exist.');
+        }
+        $this->_level = $level;
+        $this->_message = $message;
         $this->_context = $context;
     }
 

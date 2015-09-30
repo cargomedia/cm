@@ -3,16 +3,6 @@
 interface CM_Log_Handler_HandlerInterface {
 
     /**
-     * @return bool
-     */
-    public function getBubble();
-
-    /**
-     * @param bool $bubble
-     */
-    public function setBubble($bubble);
-
-    /**
      * @return int
      */
     public function getLevel();
