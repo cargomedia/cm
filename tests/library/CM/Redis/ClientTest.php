@@ -7,6 +7,7 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
 
     public function setUp() {
         $this->_client = CM_Service_Manager::getInstance()->getRedis();
+        $this->_client->flush();
     }
 
     public function tearDown() {
@@ -229,41 +230,53 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
      * @preserveGlobalState disabled
      */
     public function testPubSubMultiple() {
-
         $process = CM_Process::getInstance();
         $process->fork(function () {
             $redisClient = CM_Service_Manager::getInstance()->getRedis();
-            $messageList = [];
-            $messageCount = 0;
-            return $redisClient->subscribe('foo', function ($channel, $message) use (&$messageList, &$messageCount) {
-                if ($message === 'test') {
-                    return null;
+            $clientCallCount = 0;
+            while (1 >= $clientCallCount) {
+                if (0 != $redisClient->publish('foo', 'bar' . $clientCallCount)) {
+                    $clientCallCount++;
                 }
-                $messageList[] = $message;
-                if (++$messageCount >= 2) {
-                    return [$channel, $messageList];
-                }
-            });
+                usleep(50 * 1000);
+            }
         });
 
-        $clientCount = 0;
-        // use a timeout because there's no easy way to know when the forked process will subscribe to the channel...
-        for ($loopCount = 0; 0 === $clientCount; $loopCount++) {
-            $clientCount = $this->_client->publish('foo', 'test');
-            if ($loopCount > 40) {
-                $process->killChildren();
-                $this->fail('Failed to publish on a Redis subpub channel.');
+        $messageList = [];
+        $messageCount = 0;
+        $response = $this->_client->subscribe('foo', function ($channel, $message) use (&$messageList, &$messageCount) {
+            $messageList[] = $message;
+            if (2 <= ++$messageCount) {
+                return [$channel, $messageList];
             }
-            usleep(50 * 1000);
-        }
+            return null;
+        });
+        $this->assertSame(['foo', ['bar0', 'bar1']], $response);
+    }
 
-        $this->_client->publish('foo', 'bar1');
-        $this->_client->publish('foo', 'bar2');
-        $resultList = $process->waitForChildren();
-        $this->assertCount(1, $resultList);
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testPubSubWithClientUsedInSubClosure() {
+        $process = CM_Process::getInstance();
+        $process->fork(function () {
+            $redisClient = CM_Service_Manager::getInstance()->getRedis();
+            $clientCount = 0;
+            while ($clientCount == 0) {
+                $clientCount = $redisClient->publish('foo', 'test');
+                usleep(50 * 1000);
+            }
+        });
 
-        foreach ($resultList as $result) {
-            $this->assertSame(['foo', ['bar1', 'bar2']], $result->getResult());
-        }
+        $this->_client->set('check', 'bar');
+        $response = $this->_client->subscribe('foo', function ($channel, $message) {
+            if ($message == 'test') {
+                return [$channel, $message, $this->_client->get('check')];
+            } else {
+                return false;
+            }
+        });
+        $this->assertSame(['foo', 'test', 'bar'], $response);
     }
 }
