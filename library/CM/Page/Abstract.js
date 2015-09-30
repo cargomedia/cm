@@ -21,7 +21,7 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
 
     if (this.hasStateParams()) {
       var location = window.location;
-      var params = queryString.parse(location.search);
+      var params = this._parseQueryParams(location.search);
       var state = _.pick(params, _.intersection(_.keys(params), this.getStateParams()));
       this.routeToState(state, location.pathname + location.search);
     }
@@ -88,6 +88,27 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
    */
   _changeState: function(state) {
     return false;
+  },
+
+  /**
+   * @param {Object} queryParams
+   * @return {Object}
+   */
+  _parseQueryParams: function(queryParams) {
+    var params = queryString.parse(queryParams);
+    var arrayParamRegex = /^([\d\w]+)\[([\d\w]+)]$/;
+    _.each(params, function(value, key) {
+      if (result = arrayParamRegex.exec(key)) {
+        var paramName = result[1];
+        var arrayKey = result[2];
+        delete params[key];
+        if (!params[paramName]) {
+          params[paramName] = {}
+        }
+        params[paramName][arrayKey] = value;
+      }
+    });
+    return params;
   }
 
 });
