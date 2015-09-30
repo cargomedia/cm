@@ -6,21 +6,22 @@ class CM_Redis_Client extends CM_Class_Abstract {
     private $_redis = null;
 
     /** @var  array */
-    private $_connection;
+    private $_config;
 
     /**
      * @param array $config ['host' => string, 'port' => int, 'database' => int|null]
      * @throws CM_Exception
      */
     public function __construct(array $config) {
-        $this->_defineConnection($config);
-        $this->_redis = $this->_createPredisClient($this->_connection['host'], $this->_connection['port'], $this->_connection['database']);
+        $this->_config = $this->_parseConfig($config);
+        $this->_redis = $this->_createPredisClient($this->_config['host'], $this->_config['port'], $this->_config['database']);
     }
 
     /**
      * @param array $config ['host' => string, 'port' => int, 'database' => int|null]
+     * @return array
      */
-    private function _defineConnection(array $config) {
+    private function _parseConfig(array $config) {
         $config = array_merge([
             'host'     => '127.0.0.1',
             'port'     => 6379,
@@ -31,7 +32,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
             $config['database'] = (int) $config['database'];
         }
 
-        $this->_connection = [
+        return [
             'host'     => (string) $config['host'],
             'port'     => (int) $config['port'],
             'database' => $config['database'],
@@ -330,7 +331,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
      * @return mixed return something else than null to exit the pubsub loop
      */
     public function subscribe($channels, Closure $callback) {
-        $redisClient = $this->_createPredisClient($this->_connection['host'], $this->_connection['port'], $this->_connection['database'], 60, -1);
+        $redisClient = $this->_createPredisClient($this->_config['host'], $this->_config['port'], $this->_config['database'], 60, -1);
 
         $pubsub = $redisClient->pubSubLoop(['subscribe' => $channels]);
         $response = null;
