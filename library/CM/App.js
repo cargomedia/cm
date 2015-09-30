@@ -1266,7 +1266,7 @@ var CM_App = CM_Class_Abstract.extend({
      */
     parseQueryParams: function(queryParams) {
       var params = queryString.parse(queryParams);
-      var arrayParamRegex = /^([\d\w]+)\[([\d\w]+)]$/;
+      var arrayParamRegex = /^(\w+)\[(\w+)]$/;
       _.each(params, function(value, key) {
         var result = arrayParamRegex.exec(key);
         if (result) {
