@@ -17,8 +17,8 @@ class CM_Log_Record {
      * @param CM_Log_Context $context
      */
     public function __construct($level, $message, CM_Log_Context $context) {
-        $this->_level = $level;
-        $this->_message = $message;
+        $this->_level = (int) $level;
+        $this->_message = (string) $message;
         $this->_context = $context;
     }
 

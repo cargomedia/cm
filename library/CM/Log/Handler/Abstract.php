@@ -9,12 +9,16 @@ abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterfac
     protected $_level;
 
     /**
-     * @param int  $level    The minimum logging level at which this handler will be triggered
+     * @param int  $level  The minimum logging level at which this handler will be triggered
      * @param bool $bubble Whether the messages that are handled can bubble up the stack or not
      */
     public function __construct($level = null, $bubble = null) {
-        $level = is_null($level) ? CM_Log_Logger::DEBUG : $level;
-        $bubble = is_null($bubble) ? true : $bubble;
+        if (null === $level) {
+            $level = CM_Log_Logger::DEBUG;
+        }
+        if (null === $bubble) {
+            $bubble = true;
+        }
         $this->setLevel($level);
         $this->setBubble($bubble);
     }
@@ -23,9 +27,6 @@ abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterfac
         return $this->_bubble;
     }
 
-    /**
-     * @param bool $bubble
-     */
     public function setBubble($bubble) {
         $this->_bubble = (bool) $bubble;
     }
@@ -35,7 +36,7 @@ abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterfac
     }
 
     /**
-     * @param $level
+     * @param int $level
      * @throws CM_Exception_Invalid
      */
     public function setLevel($level) {

@@ -17,7 +17,7 @@ class CM_Log_Record_Exception extends CM_Log_Record {
     /**
      * @return CM_ExceptionHandling_SerializableException
      */
-    public function getException(){
+    public function getException() {
         return $this->_exception;
     }
 

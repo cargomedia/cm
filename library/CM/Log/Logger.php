@@ -29,7 +29,7 @@ class CM_Log_Logger {
     /** @var CM_Log_Handler_HandlerInterface[] */
     private $_fallbackList;
 
-    /** @var CM_Log_Context  */
+    /** @var CM_Log_Context */
     private $_globalContext;
 
     /**
@@ -38,11 +38,22 @@ class CM_Log_Logger {
      * @param CM_Log_Context|null $globalContext
      */
     public function __construct(array $handlerList = null, array $fallbackList = null, CM_Log_Context $globalContext = null) {
+        if (null === $handlerList) {
+            $handlerList = [];
+        }
+        if (null === $fallbackList) {
+            $fallbackList = [];
+        }
+        if (null === $globalContext) {
+            $globalContext = new CM_Log_Context();
+        }
+
+        $this->_globalContext = $globalContext;
         $this->_handlerList = [];
         $this->_fallbackList = [];
-        $this->_globalContext = $globalContext ?: new CM_Log_Context();
-        $this->addHandlers($handlerList ?: []);
-        $this->addFallbacks($fallbackList ?: []);
+
+        $this->addHandlers($handlerList);
+        $this->addFallbacks($fallbackList);
     }
 
     /**
@@ -62,10 +73,10 @@ class CM_Log_Logger {
      * @param CM_Log_Context|null $context
      */
     public function addMessage($message, $level = null, CM_Log_Context $context = null) {
-        if(null === $level) {
+        if (null === $level) {
             $level = self::NOTSET;
         }
-        $context = $this->_mergeToGlobalContext($context);
+        $context = $this->_mergeWithGlobalContext($context);
         $this->addRecord(new CM_Log_Record($level, $message, $context));
     }
 
@@ -74,7 +85,7 @@ class CM_Log_Logger {
      * @param CM_Log_Context|null $context
      */
     public function addException(Exception $exception, CM_Log_Context $context = null) {
-        $context = $this->_mergeToGlobalContext($context);
+        $context = $this->_mergeWithGlobalContext($context);
         $this->addRecord(new CM_Log_Record_Exception($exception, $context));
     }
 
@@ -167,8 +178,12 @@ class CM_Log_Logger {
      * @param CM_Log_Context|null $context
      * @return CM_Log_Context
      */
-    protected function _mergeToGlobalContext(CM_Log_Context $context = null) {
-        $mergedContext = clone($context ?: new CM_Log_Context());
+    protected function _mergeWithGlobalContext(CM_Log_Context $context = null) {
+        if (null === $context) {
+            $mergedContext = new CM_Log_Context();
+        } else {
+            $mergedContext = clone($context);
+        }
         $mergedContext->merge($this->_globalContext);
         return $mergedContext;
     }
@@ -191,7 +206,7 @@ class CM_Log_Logger {
      */
     public static function getLevelName($level) {
         if (!isset(static::$levels[$level])) {
-            throw new CM_Exception_Invalid('Level "' . $level . '" is not defined, use one of: ' . implode(', ', array_keys(static::$levels)));
+            throw new CM_Exception_Invalid('Level `' . $level . '` is not defined, use one of: ' . implode(', ', array_keys(static::$levels)));
         }
         return static::$levels[$level];
     }
@@ -207,7 +222,7 @@ class CM_Log_Logger {
         $levels = self::getLevels();
         $name = strtoupper($name);
         if (!isset($levels[$name])) {
-            throw new CM_Exception_Invalid('Level "' . $name . '" is not defined, use one of: ' . implode(', ', array_keys($levels)));
+            throw new CM_Exception_Invalid('Level `' . $name . '` is not defined, use one of: ' . implode(', ', array_keys($levels)));
         }
         return $levels[$name];
     }

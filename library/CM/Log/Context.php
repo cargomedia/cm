@@ -2,7 +2,7 @@
 
 class CM_Log_Context {
 
-    /** @var CM_Log_Context_ComputerInfo */
+    /** @var CM_Log_Context_ComputerInfo|null */
     private $_computerInfo;
 
     /** @var CM_Model_User|null */
@@ -24,15 +24,17 @@ class CM_Log_Context {
                                 CM_Http_Request_Abstract $httpRequest = null,
                                 CM_Log_Context_ComputerInfo $computerInfo = null,
                                 array $extra = null) {
-
+        if (null === $extra) {
+            $extra = [];
+        }
         $this->_user = $user;
         $this->_httpRequest = $httpRequest;
         $this->_computerInfo = $computerInfo;
-        $this->_extra = $extra ?: [];
+        $this->_extra = (array) $extra;
     }
 
     /**
-     * @return CM_Log_Context_ComputerInfo
+     * @return CM_Log_Context_ComputerInfo|null
      */
     public function getComputerInfo() {
         return $this->_computerInfo;
@@ -53,7 +55,7 @@ class CM_Log_Context {
     }
 
     /**
-     * @return string[]
+     * @return array
      */
     public function getExtra() {
         return $this->_extra;
@@ -66,13 +68,13 @@ class CM_Log_Context {
      * @return CM_Log_Context
      */
     public function merge(CM_Log_Context $context) {
-        if(!$this->getUser()){
+        if (null === $this->getUser()) {
             $this->_user = $context->getUser();
         }
-        if(!$this->getHttpRequest()){
+        if (null === $this->getHttpRequest()) {
             $this->_httpRequest = $context->getHttpRequest();
         }
-        if(!$this->getComputerInfo()){
+        if (null === $this->getComputerInfo()) {
             $this->_computerInfo = $context->getComputerInfo();
         }
         $this->_extra = array_merge($context->getExtra(), $this->_extra);
