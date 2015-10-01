@@ -44,18 +44,17 @@ class CM_Log_Logger {
      * @throws CM_Log_HandlingException
      */
     public function addRecord(CM_Log_Record $record) {
-        $handlerExceptionList = [];
-        $handlerNameList = [];
+        $exceptionList = [];
         foreach ($this->_handlerList as $handler) {
             try {
                 $handler->handleRecord($record);
             } catch (Exception $e) {
-                $handlerExceptionList[] = $e;
+                $exceptionList[] = $e;
             }
         }
-        if (!empty($handlerExceptionList)) {
-            $exceptionMessage = sizeof($handlerExceptionList) . ' handler(s) failed to process a record.';
-            throw new CM_Log_HandlingException($exceptionMessage, $handlerExceptionList);
+        if (!empty($exceptionList)) {
+            $exceptionMessage = sizeof($exceptionList) . ' handler(s) failed to process a record.';
+            throw new CM_Log_HandlingException($exceptionMessage, $exceptionList);
         }
     }
 
