@@ -34,7 +34,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $this->assertSame(1, $mockHandleRecord->getCallCount());
 
         // with a global context
-        $computerInfo = new CM_Log_Context_ComputerInfo();
+        $computerInfo = new CM_Log_Context_ComputerInfo('foo.dev', '42.0');
         $contextGlobal = new CM_Log_Context(null, null, $computerInfo);
         $logger = new CM_Log_Logger($contextGlobal, [$mockLogHandler], []);
 
@@ -49,7 +49,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $this->assertSame(2, $mockHandleRecord->getCallCount());
 
         // with a global context + log context
-        $computerInfo = new CM_Log_Context_ComputerInfo();
+        $computerInfo = new CM_Log_Context_ComputerInfo('foo.dev', '42.0');
         $contextGlobal = new CM_Log_Context(null, null, $computerInfo);
         $logger = new CM_Log_Logger($contextGlobal, [$mockLogHandler], []);
 

@@ -8,7 +8,7 @@ class CM_Log_ContextTest extends CMTest_TestCase {
 
     public function testMergeContext() {
         $user = CMTest_TH::createUser();
-        $computerInfo = new CM_Log_Context_ComputerInfo();
+        $computerInfo = new CM_Log_Context_ComputerInfo('foo.dev', '42.0');
 
         $mainContext = new CM_Log_Context(null, null, $computerInfo, ['foo' => 10, 'bar' => 10]);
         $targetContext = new CM_Log_Context($user, null, null, ['foo' => 20, 'foobar' => 42]);
