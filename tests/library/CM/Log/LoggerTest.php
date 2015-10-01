@@ -40,7 +40,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
 
         $mockHandleRecord->set(function (CM_Log_Record $record) use ($computerInfo) {
             $context = $record->getContext();
-            $this->assertSame($computerInfo, $context->getComputerInfo());
+            $this->assertEquals($computerInfo, $context->getComputerInfo());
             $this->assertNull($context->getUser());
             $this->assertNull($context->getHttpRequest());
             $this->assertSame([], $context->getExtra());
@@ -55,7 +55,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
 
         $mockHandleRecord->set(function (CM_Log_Record $record) use ($computerInfo) {
             $context = $record->getContext();
-            $this->assertSame($computerInfo, $context->getComputerInfo());
+            $this->assertEquals($computerInfo, $context->getComputerInfo());
             $this->assertNull($context->getUser());
             $this->assertNull($context->getHttpRequest());
             $this->assertSame(['foo' => 10], $context->getExtra());
