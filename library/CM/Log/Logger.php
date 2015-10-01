@@ -11,7 +11,7 @@ class CM_Log_Logger {
     /**
      * @var array $levels Logging levels
      */
-    protected static $levels = array(
+    protected static $_levels = array(
         self::DEBUG    => 'DEBUG',
         self::INFO     => 'INFO',
         self::WARNING  => 'WARNING',
@@ -188,7 +188,7 @@ class CM_Log_Logger {
      * @return array Assoc array with human-readable level names => level codes.
      */
     public static function getLevels() {
-        return array_flip(static::$levels);
+        return array_flip(self::$_levels);
     }
 
     /**
@@ -200,10 +200,10 @@ class CM_Log_Logger {
      */
     public static function getLevelName($level) {
         $level = (int) $level;
-        if (!isset(static::$levels[$level])) {
-            throw new CM_Exception_Invalid('Level `' . $level . '` is not defined, use one of: ' . implode(', ', array_keys(static::$levels)));
+        if (!isset(self::$_levels[$level])) {
+            throw new CM_Exception_Invalid('Level `' . $level . '` is not defined, use one of: ' . implode(', ', array_keys(self::$_levels)));
         }
-        return static::$levels[$level];
+        return self::$_levels[$level];
     }
 
     /**
@@ -212,6 +212,6 @@ class CM_Log_Logger {
      */
     public static function hasLevel($level) {
         $level = (int) $level;
-        return isset(static::$levels[(int) $level]);
+        return isset(self::$_levels[$level]);
     }
 }
