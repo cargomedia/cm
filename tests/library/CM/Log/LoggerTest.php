@@ -6,7 +6,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
         $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
 
-        $logger = new CM_Log_Logger([$mockLogHandler]);
+        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandler]);
 
         $expectedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
         $mockHandleRecord->set(function (CM_Log_Record $record) use ($expectedRecord) {
@@ -22,7 +22,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
 
         // without any context
-        $logger = new CM_Log_Logger([$mockLogHandler]);
+        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandler]);
         $mockHandleRecord->set(function (CM_Log_Record $record) {
             $context = $record->getContext();
             $this->assertNull($context->getComputerInfo());
@@ -35,8 +35,8 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
 
         // with a global context
         $computerInfo = new CM_Log_Context_ComputerInfo();
-        $globalContext = new CM_Log_Context(null, null, $computerInfo);
-        $logger = new CM_Log_Logger([$mockLogHandler], [], $globalContext);
+        $contextGlobal = new CM_Log_Context(null, null, $computerInfo);
+        $logger = new CM_Log_Logger($contextGlobal, [$mockLogHandler], []);
 
         $mockHandleRecord->set(function (CM_Log_Record $record) use ($computerInfo) {
             $context = $record->getContext();
@@ -50,8 +50,8 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
 
         // with a global context + log context
         $computerInfo = new CM_Log_Context_ComputerInfo();
-        $globalContext = new CM_Log_Context(null, null, $computerInfo);
-        $logger = new CM_Log_Logger([$mockLogHandler], [], $globalContext);
+        $contextGlobal = new CM_Log_Context(null, null, $computerInfo);
+        $logger = new CM_Log_Logger($contextGlobal, [$mockLogHandler], []);
 
         $mockHandleRecord->set(function (CM_Log_Record $record) use ($computerInfo) {
             $context = $record->getContext();
@@ -85,7 +85,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         /** @var CM_Log_Handler_Abstract|Mocka\FunctionMock $mockWriteRecordFallbackBar */
         $mockWriteRecordFallbackBar = $mockHandlerFallbackBar->mockMethod('writeRecord');
 
-        $logger = new CM_Log_Logger([$mockHandlerFoo, $mockHandlerBar], [$mockHandlerFallbackFoo, $mockHandlerFallbackBar]);
+        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockHandlerFoo, $mockHandlerBar], [$mockHandlerFallbackFoo, $mockHandlerFallbackBar]);
 
         $mockWriteRecordFoo->set(true);
         $mockWriteRecordBar->set(true);
@@ -133,7 +133,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
         $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
 
-        $logger = new CM_Log_Logger([$mockLogHandler]);
+        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandler]);
 
         $mockHandleRecord->set(function (CM_Log_Record $record) {
             $this->assertSame('message sent using debug method', $record->getMessage());
@@ -175,7 +175,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
         $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
 
-        $logger = new CM_Log_Logger([$mockLogHandler]);
+        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandler]);
 
         $exception = new Exception('foo');
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {

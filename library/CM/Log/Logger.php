@@ -26,27 +26,24 @@ class CM_Log_Logger {
     private $_fallbackList;
 
     /** @var CM_Log_Context */
-    private $_globalContext;
+    private $_contextGlobal;
 
     /**
-     * @param array|null          $handlerList
-     * @param array|null          $fallbackList
-     * @param CM_Log_Context|null $globalContext
+     * @param CM_Log_Context                         $contextGlobal
+     * @param CM_Log_Handler_HandlerInterface[]|null $handlerList
+     * @param CM_Log_Handler_HandlerInterface[]|null $fallbackList
      */
-    public function __construct(array $handlerList = null, array $fallbackList = null, CM_Log_Context $globalContext = null) {
+    public function __construct(CM_Log_Context $contextGlobal, array $handlerList = null, array $fallbackList = null) {
         if (null === $handlerList) {
             $handlerList = [];
         }
         if (null === $fallbackList) {
             $fallbackList = [];
         }
-        if (null === $globalContext) {
-            $globalContext = new CM_Log_Context();
-        }
 
-        $this->_globalContext = $globalContext;
         $this->_handlerList = [];
         $this->_fallbackList = [];
+        $this->_contextGlobal = $contextGlobal;
 
         $this->addHandlers($handlerList);
         $this->addFallbacks($fallbackList);
@@ -72,7 +69,7 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param string $message
+     * @param string              $message
      * @param int                 $level
      * @param CM_Log_Context|null $context
      */
@@ -177,9 +174,11 @@ class CM_Log_Logger {
      */
     protected function _mergeWithGlobalContext(CM_Log_Context $context = null) {
         if (null === $context) {
-            $context = new CM_Log_Context();
+            $mergedContext = clone($this->_contextGlobal);
+        } else {
+            $mergedContext = $this->_contextGlobal->merge($context);
         }
-        return $this->_globalContext->merge($context);
+        return $mergedContext;
     }
 
     /**
