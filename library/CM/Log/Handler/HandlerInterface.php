@@ -5,7 +5,7 @@ interface CM_Log_Handler_HandlerInterface {
     /**
      * @return int
      */
-    public function getLevel();
+    public function getLevelMin();
 
     /**
      * @param CM_Log_Record $record
