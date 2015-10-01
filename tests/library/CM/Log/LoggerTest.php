@@ -107,12 +107,12 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
     }
 
     public function testHandlingException() {
-        $mockLogHandlerFoo = $this->mockClass('CM_Log_Handler_Abstract')->newInstance(['foo']);
+        $mockLogHandlerFoo = $this->mockClass('CM_Log_Handler_Abstract')->newInstance();
         $mockLogHandlerFoo->mockMethod('handleRecord')->set(function () {
             throw new Exception('exception from foo');
         });
 
-        $mockLogHandlerBar = $this->mockClass('CM_Log_Handler_Abstract')->newInstance(['bar']);
+        $mockLogHandlerBar = $this->mockClass('CM_Log_Handler_Abstract')->newInstance();
         $mockLogHandlerBar->mockMethod('handleRecord')->set(function () {
             throw new Exception('exception from bar');
         });
@@ -123,9 +123,9 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
             $logger->info('test');
         } catch (CM_Log_HandlingException $e) {
             $exceptionList = $e->getExceptionList();
-            $this->assertSame('foo, bar handler(s) has/have failed.', $e->getMessage());
-            $this->assertSame('exception from foo', $exceptionList['foo']->getMessage());
-            $this->assertSame('exception from bar', $exceptionList['bar']->getMessage());
+            $this->assertSame('2 handler(s) failed to process a record.', $e->getMessage());
+            $this->assertSame('exception from foo', $exceptionList[0]->getMessage());
+            $this->assertSame('exception from bar', $exceptionList[1]->getMessage());
             return;
         }
 
