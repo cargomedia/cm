@@ -33,7 +33,6 @@ class CM_Log_Logger {
         if (null === $handlerList) {
             $handlerList = [];
         }
-
         $this->_handlerList = [];
         $this->_contextGlobal = $contextGlobal;
 
@@ -42,10 +41,20 @@ class CM_Log_Logger {
 
     /**
      * @param CM_Log_Record $record
+     * @throws CM_Log_HandlingException
      */
     public function addRecord(CM_Log_Record $record) {
+        $handlerExceptionList = [];
         foreach ($this->_handlerList as $handler) {
-            $handler->handleRecord($record);
+            try {
+                $handler->handleRecord($record);
+            } catch (Exception $e) {
+                $handlerExceptionList[$handler->getName()] = $e;
+            }
+        }
+        if (!empty($handlerExceptionList)) {
+            $handlerNameList = array_keys($handlerExceptionList);
+            throw new CM_Log_HandlingException(implode(', ', $handlerNameList) . ' handler(s) has/have failed.', $handlerExceptionList);
         }
     }
 

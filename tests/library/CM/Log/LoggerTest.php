@@ -106,6 +106,32 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $this->assertSame(5, $mockHandleRecord->getCallCount());
     }
 
+    public function testHandlingException() {
+        $mockLogHandlerFoo = $this->mockClass('CM_Log_Handler_Abstract')->newInstance(['foo']);
+        $mockLogHandlerFoo->mockMethod('handleRecord')->set(function () {
+            throw new Exception('exception from foo');
+        });
+
+        $mockLogHandlerBar = $this->mockClass('CM_Log_Handler_Abstract')->newInstance(['bar']);
+        $mockLogHandlerBar->mockMethod('handleRecord')->set(function () {
+            throw new Exception('exception from bar');
+        });
+
+        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandlerFoo, $mockLogHandlerBar]);
+
+        try {
+            $logger->info('test');
+        } catch (CM_Log_HandlingException $e) {
+            $exceptionList = $e->getExceptionList();
+            $this->assertSame('foo, bar handler(s) has/have failed.', $e->getMessage());
+            $this->assertSame('exception from foo', $exceptionList['foo']->getMessage());
+            $this->assertSame('exception from bar', $exceptionList['bar']->getMessage());
+            return;
+        }
+
+        $this->fail('CM_Log_HandlingException exception not caught.');
+    }
+
     public function testLogException() {
         $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
         $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');

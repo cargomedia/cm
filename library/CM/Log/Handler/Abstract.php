@@ -5,16 +5,29 @@ abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterfac
     /** @var int */
     protected $_level;
 
+    /** @var string */
+    protected $_name;
+
     /**
+     * @param string $name
      * @param int $level The minimum logging level at which this handler will be triggered
      */
-    public function __construct($level = null) {
+    public function __construct($name, $level = null) {
         $level = null === $level ? CM_Log_Logger::DEBUG : (int) $level;
+
+        $this->_name = (string) $name;
         $this->setLevel($level);
     }
 
     public function getLevel() {
         return $this->_level;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName() {
+        return $this->_name;
     }
 
     /**
@@ -24,16 +37,14 @@ abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterfac
     public function setLevel($level) {
         $level = (int) $level;
         if (CM_Log_Logger::hasLevel($level)) {
-            $this->_level = (int) $level;
+            $this->_level = $level;
         }
     }
 
     public function handleRecord(CM_Log_Record $record) {
-        $handled = false;
         if ($this->isHandling($record)) {
-            $handled = $this->writeRecord($record);
+            $this->_writeRecord($record);
         }
-        return $handled;
     }
 
     public function isHandling(CM_Log_Record $record) {
@@ -43,5 +54,5 @@ abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterfac
     /**
      * @param CM_Log_Record $record
      */
-    abstract public function writeRecord(CM_Log_Record $record);
+    abstract protected function _writeRecord(CM_Log_Record $record);
 }

@@ -8,6 +8,9 @@ class CM_Log_Record {
     /** @var string */
     private $_message;
 
+    /** @var DateTime */
+    private $_createdAt;
+
     /** @var CM_Log_Context */
     private $_context;
 
@@ -27,6 +30,7 @@ class CM_Log_Record {
         $this->_level = $level;
         $this->_message = $message;
         $this->_context = $context;
+        $this->_createdAt = new DateTime();
     }
 
     /**
@@ -48,5 +52,12 @@ class CM_Log_Record {
      */
     public function getContext() {
         return $this->_context;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getCreatedAt() {
+        return $this->_createdAt;
     }
 }

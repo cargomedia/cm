@@ -8,6 +8,11 @@ interface CM_Log_Handler_HandlerInterface {
     public function getLevel();
 
     /**
+     * @return string
+     */
+    public function getName();
+
+    /**
      * @param CM_Log_Record $record
      * @return bool Whether the record was successfully handled
      */
