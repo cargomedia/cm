@@ -8,31 +8,24 @@ class CM_Log_Handler_Stream extends CM_Log_Handler_Abstract {
     /** @var  string */
     private $_dateFormat;
 
-    /** @var  bool */
-    private $_useLock;
-
     /** @var resource */
-    private $_filename;
+    private $_stream;
 
     /**
-     * @param string      $name
-     * @param string      $filename   with the form "scheme://..."
-     * @param int|null    $level
-     * @param string|null $format     replace {datetime}, {levelname} and {message} by log record values
-     * @param string|null $dateFormat format accepted by date()
-     * @param bool|null   $useLock
+     * @param string                    $name
+     * @param CM_OutputStream_Interface $stream
+     * @param int|null                  $level
+     * @param string|null               $format     replace {datetime}, {levelname} and {message} by log record values
+     * @param string|null               $dateFormat format accepted by date()
      */
-    public function __construct($name, $filename, $level = null, $format = null, $dateFormat = null, $useLock = null) {
+    public function __construct($name, CM_OutputStream_Interface $stream, $level = null, $format = null, $dateFormat = null) {
         $format = null === $format ? '[{datetime} - {levelname}] {message}' : (string) $format;
         $dateFormat = null === $dateFormat ? 'd-m-Y H:i:s' : (string) $dateFormat;
-        $useLock = null === $useLock ? false : (bool) $useLock;
         $name = (string) $name;
-        $filename = (string) $filename;
 
         $this->_format = $format;
         $this->_dateFormat = $dateFormat;
-        $this->_useLock = $useLock;
-        $this->_filename = $filename;
+        $this->_stream = $stream;
 
         parent::__construct($name, $level);
     }
@@ -42,15 +35,7 @@ class CM_Log_Handler_Stream extends CM_Log_Handler_Abstract {
      * @return bool
      */
     protected function _writeRecord(CM_Log_Record $record) {
-        $stream = fopen($this->_filename, 'w+');
-        if ($this->_useLock) {
-            flock($stream, LOCK_EX);
-        }
-        fwrite($stream, $this->_formatRecord($record) . PHP_EOL);
-        if ($this->_useLock) {
-            flock($stream, LOCK_UN);
-        }
-        fclose($stream);
+        $this->_stream->writeln($this->_formatRecord($record));
     }
 
     /**
