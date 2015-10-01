@@ -15,7 +15,10 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
     this.on('change', function() {
       this.updateDistanceField();
     }, this);
-    this.updateDistanceField();
+    var self = this;
+    this.getDistanceField().on('ready', function() {
+      self.updateDistanceField();
+    });
   },
 
   /**
@@ -35,7 +38,7 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
       if (value) {
         distanceEnabled = value.level >= this.getOption("distanceLevelMin");
       }
-      this.getDistanceField().$("input").prop("disabled", !distanceEnabled);
+      this.getDistanceField().setDisabled(!distanceEnabled);
     }
   },
 

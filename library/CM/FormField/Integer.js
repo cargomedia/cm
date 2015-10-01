@@ -6,58 +6,61 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 
   _class: 'CM_FormField_Integer',
 
+  /** @type {jQuery} */
   _$noUiHandle: null,
+
+  /** @type {Element} */
+  _slider: null,
 
   ready: function() {
     var field = this;
-    var $input = this.$('input');
     var $slider = this.$('.noUiSlider');
     var $sliderValue = this.$('.noUiSlider-value');
+    this._slider = $slider[0];
 
-    $slider.noUiSlider({
+    noUiSlider.create(this._slider, {
       range: {min: field.getOption('min'), max: field.getOption('max')},
-      start: $input.val(),
+      start: $sliderValue.text(),
       step: field.getOption('step'),
       handles: 1,
       behaviour: 'tap'
     });
-    $slider.on('slide set', function(e, val) {
-      val = parseInt(val);
-      $input.val(val);
+    this._$noUiHandle = $slider.find('.noUi-handle');
+    this._$noUiHandle.attr('tabindex', '0');
+
+    this._slider.noUiSlider.on('update', function(values, handle) {
+      var val = parseInt(values[handle]);
       $sliderValue.html(val);
       field._onChange();
     });
 
-    this._$noUiHandle = $slider.find('.noUi-handle');
-    this._$noUiHandle.attr('tabindex', '0');
-
-    $input.watch('disabled', function(propName, oldVal, newVal) {
-      if (false === newVal) {
-        $slider.removeAttr('disabled');
-        field._$noUiHandle.attr('tabindex', '0');
-      } else {
-        $slider.attr('disabled', 'disabled');
-        field._$noUiHandle.attr('tabindex', '-1');
-      }
-    });
-
     this.bindJquery($(window), 'keydown', this._onKeyDown);
-
-    this.on('destruct', function() {
-      $input.unwatch('disabled');
-    });
   },
 
   getValue: function() {
-    return this.$('input:not([disabled])').val();
+    if (this._slider && this.isEnabled()) {
+      return +this._slider.noUiSlider.get();
+    }
+    return null;
   },
 
   /**
    * @param {Number} value
    */
   setValue: function(value) {
-    this.$('.noUiSlider').val(value);
-    this._onChange();
+    this._slider.noUiSlider.set(value);
+  },
+
+  setDisabled: function(disabled) {
+    if (disabled) {
+      this._slider.setAttribute('disabled', 'disabled');
+    } else {
+      this._slider.removeAttribute('disabled');
+    }
+  },
+
+  isEnabled: function() {
+    return !this._slider.getAttribute('disabled');
   },
 
   _onChange: function() {
@@ -65,7 +68,7 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
   },
 
   _onKeyDown: function(event) {
-    if (this._$noUiHandle.is(':focus')) {
+    if (this._$noUiHandle.is(':focus') && this.isEnabled()) {
       if (event.which === cm.keyCode.LEFT || event.which === cm.keyCode.DOWN) {
         this.setValue(this.getValue() - this.getOption('step'));
         event.preventDefault();
