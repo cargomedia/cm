@@ -142,11 +142,9 @@ class CM_Log_Logger {
      */
     protected function _mergeWithGlobalContext(CM_Log_Context $context = null) {
         if (null === $context) {
-            $mergedContext = clone($this->_contextGlobal);
-        } else {
-            $mergedContext = $this->_contextGlobal->merge($context);
+            $context = new CM_Log_Context();
         }
-        return $mergedContext;
+        return $this->_contextGlobal->merge($context);
     }
 
     /**
