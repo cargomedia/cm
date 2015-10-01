@@ -6,7 +6,7 @@ abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterfac
     protected $_level;
 
     /**
-     * @param int  $level  The minimum logging level at which this handler will be triggered
+     * @param int $level The minimum logging level at which this handler will be triggered
      */
     public function __construct($level = null) {
         $level = null === $level ? CM_Log_Logger::DEBUG : (int) $level;
@@ -36,10 +36,6 @@ abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterfac
         return $handled;
     }
 
-    /**
-     * @param CM_Log_Record $record
-     * @return bool
-     */
     public function isHandling(CM_Log_Record $record) {
         return $record->getLevel() >= $this->getLevel();
     }

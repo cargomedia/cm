@@ -58,13 +58,13 @@ class CM_Log_Logger {
     public function addRecord(CM_Log_Record $record) {
         $handlerHasFailed = false;
         foreach ($this->_handlerList as $handler) {
-            if (!$handler->handleRecord($record)) {
+            if (!$handler->handleRecord($record) && $handler->isHandling($record)) {
                 $handlerHasFailed = true;
             }
         }
         if (empty($this->_handlerList) || $handlerHasFailed) {
             foreach ($this->_fallbackList as $handler) {
-                if ($handler->handleRecord($record)) {
+                if ($handler->handleRecord($record) && $handler->isHandling($record)) {
                     break;
                 }
             }
@@ -93,7 +93,7 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param array $handlerList
+     * @param CM_Log_Handler_HandlerInterface[] $handlerList
      */
     public function addHandlers(array $handlerList) {
         foreach ($handlerList as $handler) {
@@ -109,7 +109,7 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param array $handlerList
+     * @param CM_Log_Handler_HandlerInterface[] $handlerList
      */
     public function addFallbacks(array $handlerList) {
         foreach ($handlerList as $handler) {
