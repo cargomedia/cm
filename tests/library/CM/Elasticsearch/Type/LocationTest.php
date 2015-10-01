@@ -25,16 +25,18 @@ class CM_Elasticsearch_Type_LocationTest extends CMTest_TestCase {
         CM_Model_Location_City::create($country, $state3, 'Arinsal', '42.567', '1.483', '209956');
         CM_Model_Location_City::create($country, $state3, 'El Serrat', '42.617', '1.55', '209961');
         CM_Model_Location::createAggregation();
-        CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(true);
 
-        self::$_type = new CM_Elasticsearch_Type_Location();
+        $elasticCluster = CMTest_TH::getServiceManager()->getElasticsearch();
+        $elasticCluster->setEnabled(true);
+
+        self::$_type = new CM_Elasticsearch_Type_Location($elasticCluster->getClient());
         self::$_searchIndexCli = new CM_Elasticsearch_Index_Cli();
-        self::$_searchIndexCli->create(self::$_type->getIndex()->getName());
+        self::$_searchIndexCli->create(self::$_type->getIndexName());
         self::$_cityId = $city->getId();
     }
 
     public static function tearDownAfterClass() {
-        self::$_type->getIndex()->delete();
+        self::$_type->deleteIndex();
         CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(false);
         parent::tearDownAfterClass();
     }

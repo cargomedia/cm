@@ -1,40 +1,75 @@
 <?php
 
-/**
- * Uses 'phpredis' extension: https://github.com/nicolasff/phpredis
- */
 class CM_Redis_Client extends CM_Class_Abstract {
 
-    /** @var Redis */
+    /** @var Predis\Client */
     private $_redis = null;
 
-    /** @var Closure|null */
-    private $_subscribeCallback;
+    /** @var  array */
+    private $_config;
 
     /**
      * @param array $config ['host' => string, 'port' => int, 'database' => int|null]
      * @throws CM_Exception
      */
     public function __construct(array $config) {
-        $defaults = [
-            'database' => null
+        $this->_config = $this->_parseConfig($config);
+        $this->_redis = $this->_createPredisClient($this->_config['host'], $this->_config['port'], $this->_config['database']);
+    }
+
+    /**
+     * @param array $config ['host' => string, 'port' => int, 'database' => int|null]
+     * @return array
+     */
+    private function _parseConfig(array $config) {
+        $config = array_merge([
+            'host'     => '127.0.0.1',
+            'port'     => 6379,
+            'database' => null,
+        ], $config);
+
+        if (null !== $config['database']) {
+            $config['database'] = (int) $config['database'];
+        }
+
+        return [
+            'host'     => (string) $config['host'],
+            'port'     => (int) $config['port'],
+            'database' => $config['database'],
         ];
-        $config = array_merge($defaults, $config);
+    }
 
-        $host = (string) $config['host'];
-        $port = (int) $config['port'];
-        $database = isset($config['database']) ? (int) $config['database'] : null;
-
-        $this->_redis = new Redis();
+    /**
+     * @param string      $host
+     * @param int         $port
+     * @param string|null $database
+     * @param float|null  $timeout            in seconds (default: 5.0)
+     * @param float|null  $read_write_timeout in seconds, disabled with -1 (default: 60.0)
+     * @return \Predis\Client
+     * @throws CM_Exception
+     */
+    private function _createPredisClient($host, $port, $database = null, $timeout = null, $read_write_timeout = null) {
+        if (null === $timeout) {
+            $timeout = 5.0;
+        }
+        if (null === $read_write_timeout) {
+            $timeout = 60.0;
+        }
         try {
-            $this->_redis->connect($host, $port);
-        } catch (RedisException $e) {
+            $client = new Predis\Client([
+                'scheme'             => 'tcp',
+                'host'               => (string) $host,
+                'port'               => (int) $port,
+                'read_write_timeout' => (float) $read_write_timeout,
+                'timeout'            => (float) $timeout,
+            ], ['profile' => '2.4']);
+        } catch (Predis\Connection\ConnectionException $e) {
             throw new CM_Exception('Cannot connect to redis server `' . $host . '` on port `' . $port . '`: ' . $e->getMessage());
         }
-
         if (null !== $database) {
-            $this->_redis->select($database);
+            $client->select($database);
         }
+        return $client;
     }
 
     /**
@@ -42,7 +77,8 @@ class CM_Redis_Client extends CM_Class_Abstract {
      * @return string|false
      */
     public function get($key) {
-        return $this->_redis->get($key);
+        $value = $this->_redis->get($key);
+        return is_null($value) ? false : $value;
     }
 
     /**
@@ -86,8 +122,9 @@ class CM_Redis_Client extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function lPush($key, $value) {
-        $length = $this->_redis->lPush($key, $value);
-        if (false === $length) {
+        try {
+            $this->_redis->lPush($key, $value);
+        } catch (Predis\Response\ServerException $e) {
             throw new CM_Exception_Invalid('Cannot push to list `' . $key . '`.');
         }
     }
@@ -100,8 +137,9 @@ class CM_Redis_Client extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function rPush($key, $value) {
-        $length = $this->_redis->rPush($key, $value);
-        if (false === $length) {
+        try {
+            $this->_redis->rPush($key, $value);
+        } catch (Predis\Response\ServerException $e) {
             throw new CM_Exception_Invalid('Cannot push to list `' . $key . '`.');
         }
     }
@@ -113,11 +151,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
      * @return string|null
      */
     public function rPop($key) {
-        $result = $this->_redis->rPop($key);
-        if (false === $result) {
-            $result = null;
-        }
-        return $result;
+        return $this->_redis->rPop($key);
     }
 
     /**
@@ -144,8 +178,9 @@ class CM_Redis_Client extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function lLen($key) {
-        $length = $this->_redis->lLen($key);
-        if (false === $length) {
+        try {
+            $length = $this->_redis->lLen($key);
+        } catch (Predis\Response\ServerException $e) {
             throw new CM_Exception_Invalid('Key `' . $key . '` does not contain a list');
         }
         return $length;
@@ -158,8 +193,9 @@ class CM_Redis_Client extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function lTrim($key, $start, $stop) {
-        $result = $this->_redis->lTrim($key, $start, $stop);
-        if (false === $result) {
+        try {
+            $this->_redis->lTrim($key, $start, $stop);
+        } catch (Predis\Response\ServerException $e) {
             throw new CM_Exception_Invalid('Key `' . $key . '` does not contain a list');
         }
     }
@@ -170,7 +206,23 @@ class CM_Redis_Client extends CM_Class_Abstract {
      * @param string $value
      */
     public function zAdd($key, $score, $value) {
-        $this->_redis->zAdd($key, $score, $value);
+        $this->_redis->zAdd($key, [$value => $score]);
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     */
+    public function zRem($key, $value) {
+        $this->_redis->zRem($key, $value);
+    }
+
+    /**
+     * @param string $key
+     * @return int
+     */
+    public function zCard($key) {
+        return $this->_redis->zCard($key);
     }
 
     /**
@@ -193,14 +245,6 @@ class CM_Redis_Client extends CM_Class_Abstract {
             $options['withscores'] = true;
         }
         return $this->_redis->zRangeByScore($key, $start, $end, $options);
-    }
-
-    /**
-     * @param string $key
-     * @param string $value
-     */
-    public function zRem($key, $value) {
-        $this->_redis->zRem($key, $value);
     }
 
     /**
@@ -228,13 +272,24 @@ class CM_Redis_Client extends CM_Class_Abstract {
     }
 
     /**
+     * Returns the set cardinality (number of elements) of the set stored at key.
+     *
+     * @param string $key
+     * @return int
+     */
+    public function sCard($key) {
+        return $this->_redis->sCard($key);
+    }
+
+    /**
      * Add a value to a set
      *
      * @param string $key
      * @param string $value
+     * @return int
      */
     public function sAdd($key, $value) {
-        $this->_redis->sAdd($key, $value);
+        return $this->_redis->sAdd($key, $value);
     }
 
     /**
@@ -242,9 +297,10 @@ class CM_Redis_Client extends CM_Class_Abstract {
      *
      * @param string $key
      * @param string $value
+     * @return int
      */
     public function sRem($key, $value) {
-        $this->_redis->sRem($key, $value);
+        return $this->_redis->sRem($key, $value);
     }
 
     /**
@@ -254,44 +310,53 @@ class CM_Redis_Client extends CM_Class_Abstract {
      * @return string[]
      */
     public function sFlush($key) {
-        $values = $this->_redis->multi()->sMembers($key)->delete($key)->exec();
-        return $values[0];
+        $this->_redis->multi();
+        $this->_redis->sMembers($key);
+        $this->_redis->del($key);
+        return $this->_redis->exec()[0];
     }
 
     /**
      * @param string $channel
-     * @param string $msg
+     * @param string $message
+     * @return int
      */
-    public function publish($channel, $msg) {
-        $this->_redis->publish($channel, $msg);
+    public function publish($channel, $message) {
+        return $this->_redis->publish($channel, $message);
     }
 
     /**
      * @param string|string[] $channels
      * @param Closure         $callback
+     * @return mixed return something else than null to exit the pubsub loop
      */
     public function subscribe($channels, Closure $callback) {
-        $channels = (array) $channels;
-        $this->_subscribeCallback = $callback;
-        $this->_redis->setOption(Redis::OPT_READ_TIMEOUT, 86400 * 100);
-        $this->_redis->subscribe($channels, array($this, '_subscribeCallback'));
-    }
+        $redisClient = $this->_createPredisClient($this->_config['host'], $this->_config['port'], $this->_config['database'], 60, -1);
 
-    /**
-     * @param Redis  $redis
-     * @param string $channel
-     * @param string $message
-     */
-    public function _subscribeCallback($redis, $channel, $message) {
-        try {
-            $callback = $this->_subscribeCallback;
-            $callback($channel, $message);
-        } catch (Exception $e) {
-            CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
+        $pubsub = $redisClient->pubSubLoop(['subscribe' => $channels]);
+        $response = null;
+
+        /** @var stdClass $message */
+        foreach ($pubsub as $message) {
+            try {
+                if ($message->kind == 'message') {
+                    $response = $callback($message->channel, $message->payload);
+                }
+            } catch (Exception $e) {
+                CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
+            }
+            if (!is_null($response)) {
+                break;
+            }
         }
+        return $response;
     }
 
     public function flush() {
+        $this->_redis->flushDb();
+    }
+
+    public function flushAll() {
         $this->_redis->flushAll();
     }
 
@@ -301,7 +366,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
      */
     protected function _select($database) {
         $database = (int) $database;
-        if (false === $this->_redis->select($database)) {
+        if ('OK' !== $this->_redis->select($database)) {
             throw new CM_Exception('Cannot select database `' . $database . '`.');
         }
     }
