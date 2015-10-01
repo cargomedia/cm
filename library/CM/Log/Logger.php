@@ -122,14 +122,7 @@ class CM_Log_Logger {
     }
 
     /**
-     * @return CM_Log_Handler_HandlerInterface[]
-     */
-    public function getHandlers() {
-        return array_merge($this->_handlerList, $this->_fallbackList);
-    }
-
-    /**
-     * @param                     $message
+     * @param string              $message
      * @param CM_Log_Context|null $context
      */
     public function debug($message, CM_Log_Context $context = null) {
@@ -137,7 +130,7 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param                     $message
+     * @param string              $message
      * @param CM_Log_Context|null $context
      */
     public function info($message, CM_Log_Context $context = null) {
@@ -145,7 +138,7 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param                     $message
+     * @param string              $message
      * @param CM_Log_Context|null $context
      */
     public function warning($message, CM_Log_Context $context = null) {
@@ -153,7 +146,7 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param                     $message
+     * @param string              $message
      * @param CM_Log_Context|null $context
      */
     public function error($message, CM_Log_Context $context = null) {
@@ -161,7 +154,7 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param                     $message
+     * @param string              $message
      * @param CM_Log_Context|null $context
      */
     public function critical($message, CM_Log_Context $context = null) {

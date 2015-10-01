@@ -12,8 +12,8 @@ class CM_Log_Record {
     private $_context;
 
     /**
-     * @param                $level
-     * @param                $message
+     * @param int            $level
+     * @param string         $message
      * @param CM_Log_Context $context
      * @throws CM_Exception_Invalid
      */

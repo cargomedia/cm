@@ -16,7 +16,7 @@ class CM_Log_Context_ComputerInfo {
     /**
      * @return string
      */
-    public function getFullQualifiedDomainName() {
+    public function getFullyQualifiedDomainName() {
         return $this->_fqdn;
     }
 
