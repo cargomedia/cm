@@ -4,11 +4,11 @@ class CM_Log_ContextTest extends CMTest_TestCase {
 
     public function testMergeContext() {
         $user = new CM_Model_User();
+        $computerInfo = new CM_Log_Context_ComputerInfo();
 
-        $computerInfo = new CM_Log_Context_ComputerInfo('foo.bar', '5.4');
         $mainContext = new CM_Log_Context(null, null, $computerInfo, ['foo' => 10, 'bar' => 10]);
         $targetContext = new CM_Log_Context($user, null, null, ['foo' => 20, 'foobar' => 42]);
-        $mergedContext = $targetContext->merge($mainContext);
+        $mergedContext = $mainContext->merge($targetContext);
 
         $this->assertSame($user, $mergedContext->getUser());
         $this->assertSame($computerInfo, $mergedContext->getComputerInfo());

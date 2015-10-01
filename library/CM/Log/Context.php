@@ -30,7 +30,7 @@ class CM_Log_Context {
         $this->_user = $user;
         $this->_httpRequest = $httpRequest;
         $this->_computerInfo = $computerInfo;
-        $this->_extra = (array) $extra;
+        $this->_extra = $extra;
     }
 
     /**
@@ -68,16 +68,21 @@ class CM_Log_Context {
      * @return CM_Log_Context
      */
     public function merge(CM_Log_Context $context) {
-        if (null === $this->getUser()) {
-            $this->_user = $context->getUser();
+        $user = $this->getUser();
+        $httpRequest = $this->getHttpRequest();
+        $computerInfo = $this->getComputerInfo();
+
+        if (null !== $context->getUser()) {
+            $user = $context->getUser();
         }
-        if (null === $this->getHttpRequest()) {
-            $this->_httpRequest = $context->getHttpRequest();
+        if (null !== $context->getHttpRequest()) {
+            $httpRequest = $context->getHttpRequest();
         }
-        if (null === $this->getComputerInfo()) {
-            $this->_computerInfo = $context->getComputerInfo();
+        if (null !== $context->getComputerInfo()) {
+            $computerInfo = $context->getComputerInfo();
         }
-        $this->_extra = array_merge($context->getExtra(), $this->_extra);
-        return $this;
+        $extra = array_merge($this->getExtra(), $context->getExtra());
+
+        return new CM_Log_Context($user, $httpRequest, $computerInfo, $extra);
     }
 }
