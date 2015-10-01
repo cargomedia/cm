@@ -22,49 +22,30 @@ class CM_Log_Logger {
     /** @var CM_Log_Handler_HandlerInterface[] */
     private $_handlerList;
 
-    /** @var CM_Log_Handler_HandlerInterface[] */
-    private $_fallbackList;
-
     /** @var CM_Log_Context */
     private $_contextGlobal;
 
     /**
      * @param CM_Log_Context                         $contextGlobal
      * @param CM_Log_Handler_HandlerInterface[]|null $handlerList
-     * @param CM_Log_Handler_HandlerInterface[]|null $fallbackList
      */
-    public function __construct(CM_Log_Context $contextGlobal, array $handlerList = null, array $fallbackList = null) {
+    public function __construct(CM_Log_Context $contextGlobal, array $handlerList = null) {
         if (null === $handlerList) {
             $handlerList = [];
         }
-        if (null === $fallbackList) {
-            $fallbackList = [];
-        }
 
         $this->_handlerList = [];
-        $this->_fallbackList = [];
         $this->_contextGlobal = $contextGlobal;
 
         $this->addHandlers($handlerList);
-        $this->addFallbacks($fallbackList);
     }
 
     /**
      * @param CM_Log_Record $record
      */
     public function addRecord(CM_Log_Record $record) {
-        $handlerHasFailed = false;
         foreach ($this->_handlerList as $handler) {
-            if (!$handler->handleRecord($record) && $handler->isHandling($record)) {
-                $handlerHasFailed = true;
-            }
-        }
-        if (empty($this->_handlerList) || $handlerHasFailed) {
-            foreach ($this->_fallbackList as $handler) {
-                if ($handler->handleRecord($record) && $handler->isHandling($record)) {
-                    break;
-                }
-            }
+            $handler->handleRecord($record);
         }
     }
 
@@ -103,22 +84,6 @@ class CM_Log_Logger {
      */
     public function addHandler(CM_Log_Handler_HandlerInterface $handler) {
         $this->_handlerList[] = $handler;
-    }
-
-    /**
-     * @param CM_Log_Handler_HandlerInterface[] $handlerList
-     */
-    public function addFallbacks(array $handlerList) {
-        foreach ($handlerList as $handler) {
-            $this->addFallback($handler);
-        }
-    }
-
-    /**
-     * @param CM_Log_Handler_HandlerInterface $handler
-     */
-    public function addFallback(CM_Log_Handler_HandlerInterface $handler) {
-        $this->_fallbackList[] = $handler;
     }
 
     /**

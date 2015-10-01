@@ -64,71 +64,6 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $this->assertSame(3, $mockHandleRecord->getCallCount());
     }
 
-    public function testLoggerFallbacks() {
-        /** @var CM_Log_Handler_Abstract|Mocka\AbstractClassTrait $mockHandlerFoo */
-        $mockHandlerFoo = $this->mockObject('CM_Log_Handler_Abstract');
-        /** @var CM_Log_Handler_Abstract|Mocka\FunctionMock $mockWriteRecordFoo */
-        $mockWriteRecordFoo = $mockHandlerFoo->mockMethod('writeRecord');
-
-        /** @var CM_Log_Handler_Abstract|Mocka\AbstractClassTrait $mockHandlerBar */
-        $mockHandlerBar = $this->mockObject('CM_Log_Handler_Abstract');
-        /** @var CM_Log_Handler_Abstract|Mocka\FunctionMock $mockWriteRecordBar */
-        $mockWriteRecordBar = $mockHandlerBar->mockMethod('writeRecord');
-
-        /** @var CM_Log_Handler_Abstract|Mocka\AbstractClassTrait $mockHandlerFallbackFoo */
-        $mockHandlerFallbackFoo = $this->mockObject('CM_Log_Handler_Abstract');
-        /** @var CM_Log_Handler_Abstract|Mocka\FunctionMock $mockWriteRecordFallbackFoo */
-        $mockWriteRecordFallbackFoo = $mockHandlerFallbackFoo->mockMethod('writeRecord');
-
-        /** @var CM_Log_Handler_Abstract|Mocka\AbstractClassTrait $mockHandlerFallbackBar */
-        $mockHandlerFallbackBar = $this->mockObject('CM_Log_Handler_Abstract');
-        /** @var CM_Log_Handler_Abstract|Mocka\FunctionMock $mockWriteRecordFallbackBar */
-        $mockWriteRecordFallbackBar = $mockHandlerFallbackBar->mockMethod('writeRecord');
-
-        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockHandlerFoo, $mockHandlerBar], [$mockHandlerFallbackFoo, $mockHandlerFallbackBar]);
-
-        $mockWriteRecordFoo->set(true);
-        $mockWriteRecordBar->set(true);
-        $mockWriteRecordFallbackFoo->set(true);
-        $mockWriteRecordFallbackBar->set(true);
-        $logger->info('foo');
-        $this->assertSame(1, $mockWriteRecordFoo->getCallCount());
-        $this->assertSame(1, $mockWriteRecordBar->getCallCount());
-        $this->assertSame(0, $mockWriteRecordFallbackFoo->getCallCount());
-        $this->assertSame(0, $mockWriteRecordFallbackBar->getCallCount());
-
-        $mockWriteRecordFoo->set(false);
-        $mockWriteRecordBar->set(false);
-        $mockWriteRecordFallbackFoo->set(true);
-        $mockWriteRecordFallbackBar->set(true);
-        $logger->info('foo');
-        $this->assertSame(2, $mockWriteRecordFoo->getCallCount());
-        $this->assertSame(2, $mockWriteRecordBar->getCallCount());
-        $this->assertSame(1, $mockWriteRecordFallbackFoo->getCallCount());
-        $this->assertSame(0, $mockWriteRecordFallbackBar->getCallCount());
-
-        $mockWriteRecordFoo->set(false);
-        $mockWriteRecordBar->set(false);
-        $mockWriteRecordFallbackFoo->set(false);
-        $mockWriteRecordFallbackBar->set(true);
-        $logger->info('foo');
-        $this->assertSame(3, $mockWriteRecordFoo->getCallCount());
-        $this->assertSame(3, $mockWriteRecordBar->getCallCount());
-        $this->assertSame(2, $mockWriteRecordFallbackFoo->getCallCount());
-        $this->assertSame(1, $mockWriteRecordFallbackBar->getCallCount());
-
-        $mockHandlerFoo->mockMethod('getLevel')->set(CM_Log_Logger::CRITICAL);
-        $mockWriteRecordFoo->set(true);
-        $mockWriteRecordBar->set(true);
-        $mockWriteRecordFallbackFoo->set(true);
-        $mockWriteRecordFallbackBar->set(true);
-        $logger->info('foo');
-        $this->assertSame(3, $mockWriteRecordFoo->getCallCount());
-        $this->assertSame(4, $mockWriteRecordBar->getCallCount());
-        $this->assertSame(2, $mockWriteRecordFallbackFoo->getCallCount());
-        $this->assertSame(1, $mockWriteRecordFallbackBar->getCallCount());
-    }
-
     public function testLogHelpers() {
         $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
         $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
@@ -215,14 +150,14 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $logger->addException($exception);
         $this->assertSame(3, $mockHandleRecord->getCallCount());
 
-        $exception = new CM_Exception('barfoo');
+        $exception = new CM_Exception('test');
         $exception->setSeverity(CM_Exception::FATAL);
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
             $contextException = $record->getException();
             $this->assertSame($exception->getMessage(), $contextException->getMessage());
             $this->assertSame($exception->getLine(), $contextException->getLine());
             $this->assertSame($exception->getFile(), $contextException->getFile());
-            $this->assertSame('barfoo', $record->getMessage());
+            $this->assertSame('test', $record->getMessage());
             $this->assertSame(CM_Log_Logger::CRITICAL, $record->getLevel());
         });
         $logger->addException($exception);
