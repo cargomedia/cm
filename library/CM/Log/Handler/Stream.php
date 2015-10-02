@@ -12,22 +12,20 @@ class CM_Log_Handler_Stream extends CM_Log_Handler_Abstract {
     private $_stream;
 
     /**
-     * @param string                    $name
      * @param CM_OutputStream_Interface $stream
      * @param int|null                  $level
      * @param string|null               $format     replace {datetime}, {levelname} and {message} by log record values
      * @param string|null               $dateFormat format accepted by date()
      */
-    public function __construct($name, CM_OutputStream_Interface $stream, $level = null, $format = null, $dateFormat = null) {
+    public function __construct(CM_OutputStream_Interface $stream, $level = null, $format = null, $dateFormat = null) {
         $format = null === $format ? '[{datetime} - {levelname}] {message}' : (string) $format;
         $dateFormat = null === $dateFormat ? 'd-m-Y H:i:s' : (string) $dateFormat;
-        $name = (string) $name;
 
         $this->_format = $format;
         $this->_dateFormat = $dateFormat;
         $this->_stream = $stream;
 
-        parent::__construct($name, $level);
+        parent::__construct($level);
     }
 
     /**
