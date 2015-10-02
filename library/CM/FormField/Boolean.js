@@ -11,7 +11,22 @@ var CM_FormField_Boolean = CM_FormField_Abstract.extend({
     }
   },
 
+  getInput: function() {
+    return this.$('input[type=checkbox]');
+  },
+
   getValue: function() {
-    return this.$('input[type=checkbox]').is(':checked') ? '1' : '0';
+    return this.getInput().is(':checked') ? '1' : '0';
+  },
+
+  /**
+   * @param {Boolean} checked
+   */
+  setValue: function(checked) {
+    if (checked) {
+      this.getInput().attr('checked', 'checked');
+    } else {
+      this.getInput().removeAttr('checked');
+    }
   }
 });
