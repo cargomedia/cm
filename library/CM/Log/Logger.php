@@ -53,7 +53,7 @@ class CM_Log_Logger {
             }
         }
         if (!empty($exceptionList)) {
-            $exceptionMessage = sizeof($exceptionList) . ' handler(s) failed to process a record.';
+            $exceptionMessage = count($exceptionList) . ' handler(s) failed to process a record.';
             throw new CM_Log_HandlingException($exceptionMessage, $exceptionList);
         }
     }
