@@ -37,7 +37,7 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
   },
 
   getValue: function() {
-    return this.$('input, textarea').val();
+    return this.$('input, textarea').filter(':not([disabled])').val();
   },
 
   /**
