@@ -13,7 +13,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 
   ready: function() {
     var field = this;
-    var $input = this.$('input[type="file"]');
+    var $input = this.getInput();
     var dropZoneEnabled = this.$('.dropInfo').length > 0;
     var allowedExtensions = field.getOption("allowedExtensions");
     var allowedExtensionsRegexp = _.isEmpty(allowedExtensions) ? null : new RegExp('\.(' + allowedExtensions.join('|') + ')$', 'i');
@@ -97,12 +97,20 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
     }
   },
 
+  getInput: function() {
+    return this.$('input[type="file"]');
+  },
+
   getValue: function() {
     var array = this.$('input:not([disabled])[name="' + this.options.params.name + '[]"]').map(function() {
       return $(this).val();
     }).get();
     var value = _.compact(array);
     return value.length ? value : null;
+  },
+
+  setValue: function(value) {
+    throw new CM_Exception('Not implemented');
   },
 
   /**
