@@ -26,10 +26,25 @@ var CM_FormField_Captcha = CM_FormField_Abstract.extend({
       });
   },
 
+  getInput: function() {
+    return this.$("input[name*=id], input[name*=value]");
+  },
+
+  /**
+   * @returns {{id: *, value: *}}
+   */
   getValue: function() {
     return {
       id: this.$("input[name*=id]").val(),
       value: this.$("input[name*=value]").val()
     }
+  },
+
+  /**
+   * @param {{id: *, value: *}} captcha
+   */
+  setValue: function(captcha) {
+    this.$("input[name*=id]").val(captcha.id);
+    this.$("input[name*=value]").val(captcha.value);
   }
 });
