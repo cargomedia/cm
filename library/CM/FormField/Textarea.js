@@ -8,6 +8,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   ready: function() {
     this._initPlaceholder();
     this._initPlaintextonly();
+    this._initChangeEmitter();
   },
 
   getValue: function() {
@@ -54,6 +55,20 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
         }
       });
     }
+  },
+
+  _initChangeEmitter: function() {
+    this.$('[contenteditable]').on('focus', function() {
+      var $this = $(this);
+      $this.data('before', $this.html());
+    }).on('blur keyup paste input', function() {
+      var $this = $(this);
+      if ($this.data('before') !== $this.html()) {
+        $this.data('before', $this.html());
+        $this.trigger('change');
+      }
+    });
   }
+
 
 });

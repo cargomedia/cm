@@ -12,13 +12,13 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
   _valueLast: null,
 
   events: {
-    'blur input, textarea': function() {
+    'blur input, textarea, [contenteditable]': function() {
       this.trigger('blur');
     },
-    'focus input, textarea': function() {
+    'focus input, textarea, [contenteditable]': function() {
       this.trigger('focus');
     },
-    'change input, textarea': function() {
+    'change input, textarea, [contenteditable]': function() {
       this.triggerChange();
     }
   },
