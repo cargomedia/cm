@@ -2,6 +2,9 @@
 
 class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
 
+    /** @var  CM_Elasticsearch_Client */
+    private $_elasticsearchClient;
+
     public static function setUpBeforeClass() {
         CM_Db_Db::exec("CREATE TABLE `indexTest_1` (`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, `name` VARCHAR(8))");
         CM_Db_Db::exec("CREATE TABLE `indexTest_2` (`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, `price` INT UNSIGNED)");
@@ -16,16 +19,18 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
     }
 
     public function setUp() {
-        CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(true);
-        $type1 = new CM_Elasticsearch_Type_Mock1();
-        $type2 = new CM_Elasticsearch_Type_Mock2();
-        $type3 = new CM_Elasticsearch_Type_Mock3();
+        $elasticCluster = CMTest_TH::getServiceManager()->getElasticsearch();
+        $elasticCluster->setEnabled(true);
+        $this->_elasticsearchClient = $elasticCluster->getClient();
+        $type1 = new CM_Elasticsearch_Type_Mock1($this->_elasticsearchClient);
+        $type2 = new CM_Elasticsearch_Type_Mock2($this->_elasticsearchClient);
+        $type3 = new CM_Elasticsearch_Type_Mock3($this->_elasticsearchClient);
         $type1->createIndex();
         $type2->createIndex();
         $type3->createIndex();
-        $type1->getIndex()->refresh();
-        $type2->getIndex()->refresh();
-        $type3->getIndex()->refresh();
+        $type1->refreshIndex();
+        $type2->refreshIndex();
+        $type3->refreshIndex();
     }
 
     public function tearDown() {
@@ -34,7 +39,7 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
     }
 
     public function testGet() {
-        $type1 = new CM_Elasticsearch_Type_Mock1();
+        $type1 = new CM_Elasticsearch_Type_Mock1($this->_elasticsearchClient);
         $source = new CM_PagingSource_Elasticsearch($type1, new CM_Elasticsearch_Query());
         $this->assertSame(0, $source->getCount());
 
@@ -42,7 +47,7 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
         $this->assertSame(1, $source->getCount());
         $this->assertSame(array((string) $id), $source->getItems());
 
-        $type3 = new CM_Elasticsearch_Type_Mock3();
+        $type3 = new CM_Elasticsearch_Type_Mock3($this->_elasticsearchClient);
         $source = new CM_PagingSource_Elasticsearch($type3, new CM_Elasticsearch_Query(), array('price'));
         $this->assertSame(0, $source->getCount());
 
@@ -52,8 +57,8 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
     }
 
     public function testMultiGet() {
-        $type1 = new CM_Elasticsearch_Type_Mock1();
-        $type2 = new CM_Elasticsearch_Type_Mock2();
+        $type1 = new CM_Elasticsearch_Type_Mock1($this->_elasticsearchClient);
+        $type2 = new CM_Elasticsearch_Type_Mock2($this->_elasticsearchClient);
         $source = new CM_PagingSource_Elasticsearch(array($type1, $type2), new CM_Elasticsearch_Query());
         $this->assertSame(0, $source->getCount());
 
@@ -67,7 +72,7 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
             array('id' => (string) $id2, 'type' => 'index_2')
         ), $source->getItems());
 
-        $type3 = new CM_Elasticsearch_Type_Mock3();
+        $type3 = new CM_Elasticsearch_Type_Mock3($this->_elasticsearchClient);
         $source = new CM_PagingSource_Elasticsearch(array($type1, $type2, $type3), new CM_Elasticsearch_Query(), array('price'));
         $id3 = $type3->createEntry(5);
 
@@ -82,17 +87,13 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
 
 class CM_Elasticsearch_Type_Mock1 extends CM_Elasticsearch_Type_Abstract {
 
-    const INDEX_NAME = 'index_1';
-
     protected $_mapping = array(
         'name' => array('type' => 'string'),
     );
 
     protected $_indexParams = array(
-        'index' => array(
-            'number_of_shards'   => 1,
-            'number_of_replicas' => 0
-        ),
+        'number_of_shards'   => 1,
+        'number_of_replicas' => 0,
     );
 
     /**
@@ -101,8 +102,8 @@ class CM_Elasticsearch_Type_Mock1 extends CM_Elasticsearch_Type_Abstract {
      */
     public function createEntry($name) {
         $id = CM_Db_Db::insert('indexTest_1', array('name' => (string) $name));
-        $this->update($id);
-        $this->getIndex()->refresh();
+        $this->updateDocuments($id);
+        $this->refreshIndex();
         return (int) $id;
     }
 
@@ -111,29 +112,23 @@ class CM_Elasticsearch_Type_Mock1 extends CM_Elasticsearch_Type_Abstract {
     }
 
     protected function _getDocument(array $data) {
-        $doc = new Elastica\Document($data['id'],
-            array(
-                'name' => $data['name'],
-            )
-        );
+        return new CM_Elasticsearch_Document($data['id'], ['name' => $data['name']]);
+    }
 
-        return $doc;
+    public static function getAliasName() {
+        return 'index_1';
     }
 }
 
 class CM_Elasticsearch_Type_Mock2 extends CM_Elasticsearch_Type_Abstract {
-
-    const INDEX_NAME = 'index_2';
 
     protected $_mapping = array(
         'price' => array('type' => 'integer'),
     );
 
     protected $_indexParams = array(
-        'index' => array(
-            'number_of_shards'   => 1,
-            'number_of_replicas' => 0
-        ),
+        'number_of_shards'   => 1,
+        'number_of_replicas' => 0,
     );
 
     /**
@@ -142,8 +137,8 @@ class CM_Elasticsearch_Type_Mock2 extends CM_Elasticsearch_Type_Abstract {
      */
     public function createEntry($price) {
         $id = CM_Db_Db::insert('indexTest_2', array('price' => (int) $price));
-        $this->update($id);
-        $this->getIndex()->refresh();
+        $this->updateDocuments($id);
+        $this->refreshIndex();
         return (int) $id;
     }
 
@@ -152,29 +147,23 @@ class CM_Elasticsearch_Type_Mock2 extends CM_Elasticsearch_Type_Abstract {
     }
 
     protected function _getDocument(array $data) {
-        $doc = new Elastica\Document($data['id'],
-            array(
-                'price' => $data['price'],
-            )
-        );
+        return new CM_Elasticsearch_Document($data['id'], ['price' => $data['price']]);
+    }
 
-        return $doc;
+    public static function getAliasName() {
+        return 'index_2';
     }
 }
 
 class CM_Elasticsearch_Type_Mock3 extends CM_Elasticsearch_Type_Abstract {
-
-    const INDEX_NAME = 'index_3';
 
     protected $_mapping = array(
         'price' => array('type' => 'integer', 'store' => 'yes'),
     );
 
     protected $_indexParams = array(
-        'index' => array(
-            'number_of_shards'   => 1,
-            'number_of_replicas' => 0
-        ),
+        'number_of_shards'   => 1,
+        'number_of_replicas' => 0,
     );
 
     /**
@@ -183,8 +172,8 @@ class CM_Elasticsearch_Type_Mock3 extends CM_Elasticsearch_Type_Abstract {
      */
     public function createEntry($price) {
         $id = CM_Db_Db::insert('indexTest_3', array('price' => (int) $price));
-        $this->update($id);
-        $this->getIndex()->refresh();
+        $this->updateDocuments($id);
+        $this->refreshIndex();
         return (int) $id;
     }
 
@@ -193,12 +182,10 @@ class CM_Elasticsearch_Type_Mock3 extends CM_Elasticsearch_Type_Abstract {
     }
 
     protected function _getDocument(array $data) {
-        $doc = new Elastica\Document($data['id'],
-            array(
-                'price' => $data['price'],
-            )
-        );
+        return new CM_Elasticsearch_Document($data['id'], ['price' => $data['price']]);
+    }
 
-        return $doc;
+    public static function getAliasName() {
+        return 'index_3';
     }
 }
