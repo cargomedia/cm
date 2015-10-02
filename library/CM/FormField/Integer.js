@@ -37,8 +37,12 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
     this.bindJquery($(window), 'keydown', this._onKeyDown);
   },
 
+  getInput: function() {
+    return this.$('.noUiSlider');
+  },
+
   getValue: function() {
-    if (this._slider && this.isEnabled()) {
+    if (this._slider) {
       return +this._slider.noUiSlider.get();
     }
     return null;
@@ -51,16 +55,19 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
     this._slider.noUiSlider.set(value);
   },
 
-  setDisabled: function(disabled) {
-    if (disabled) {
-      this._slider.setAttribute('disabled', 'disabled');
-    } else {
-      this._slider.removeAttribute('disabled');
-    }
+  getEnabled: function() {
+    return !this._slider.getAttribute('disabled');
   },
 
-  isEnabled: function() {
-    return !this._slider.getAttribute('disabled');
+  /**
+   * @param {Boolean} enabled
+   */
+  setEnabled: function(enabled) {
+    if (enabled) {
+      this._slider.removeAttribute('disabled');
+    } else {
+      this._slider.setAttribute('disabled', 'disabled');
+    }
   },
 
   _onChange: function() {
