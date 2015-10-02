@@ -9,10 +9,5 @@ var CM_FormField_Color = CM_FormField_Abstract.extend({
     'change input': function() {
       this.trigger('change');
     }
-  },
-
-  getValue: function() {
-    return this.$('input:not([disabled])').val();
   }
-
 });
