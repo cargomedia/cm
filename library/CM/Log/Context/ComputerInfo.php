@@ -8,9 +8,13 @@ class CM_Log_Context_ComputerInfo {
     /** @var string */
     private $_phpVersion;
 
-    public function __construct() {
-        $this->_fqdn = php_uname('a');
-        $this->_phpVersion = phpversion();
+    /**
+     * @param string $fqdn
+     * @param string $phpVersion
+     */
+    public function __construct($fqdn, $phpVersion) {
+        $this->_fqdn = (string) $fqdn;
+        $this->_phpVersion = (string) $phpVersion;
     }
 
     /**

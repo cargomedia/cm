@@ -44,17 +44,17 @@ class CM_Log_Logger {
      * @throws CM_Log_HandlingException
      */
     public function addRecord(CM_Log_Record $record) {
-        $handlerExceptionList = [];
+        $exceptionList = [];
         foreach ($this->_handlerList as $handler) {
             try {
                 $handler->handleRecord($record);
             } catch (Exception $e) {
-                $handlerExceptionList[$handler->getName()] = $e;
+                $exceptionList[] = $e;
             }
         }
-        if (!empty($handlerExceptionList)) {
-            $handlerNameList = array_keys($handlerExceptionList);
-            throw new CM_Log_HandlingException(implode(', ', $handlerNameList) . ' handler(s) has/have failed.', $handlerExceptionList);
+        if (!empty($exceptionList)) {
+            $exceptionMessage = count($exceptionList) . ' handler(s) failed to process a record.';
+            throw new CM_Log_HandlingException($exceptionMessage, $exceptionList);
         }
     }
 
@@ -141,11 +141,9 @@ class CM_Log_Logger {
      */
     protected function _mergeWithGlobalContext(CM_Log_Context $context = null) {
         if (null === $context) {
-            $mergedContext = clone($this->_contextGlobal);
-        } else {
-            $mergedContext = $this->_contextGlobal->merge($context);
+            $context = new CM_Log_Context();
         }
-        return $mergedContext;
+        return $this->_contextGlobal->merge($context);
     }
 
     /**

@@ -62,7 +62,7 @@ class CM_Log_Context {
     }
 
     /**
-     * Overrides all properties not defined on the current instance
+     * Merge two CM_Log_Context into a new CM_Log_Context instance
      *
      * @param CM_Log_Context $context
      * @return CM_Log_Context
