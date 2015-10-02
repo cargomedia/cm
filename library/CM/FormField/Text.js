@@ -32,12 +32,8 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
    */
   setValue: function(value) {
     this._skipTriggerChange = true;
-    this.$('input, textarea').val(value);
+    this.getInput().val(value);
     this._skipTriggerChange = false;
-  },
-
-  getValue: function() {
-    return this.$('input, textarea').filter(':not([disabled])').val();
   },
 
   /**
