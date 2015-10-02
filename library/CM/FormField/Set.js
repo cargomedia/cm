@@ -21,5 +21,9 @@ var CM_FormField_Set = CM_FormField_Abstract.extend({
     }).get();
     var value = _.compact(array);
     return value.length ? value : null;
+  },
+
+  setValue: function(value) {
+    throw new CM_Exception('Not implemented');
   }
 });

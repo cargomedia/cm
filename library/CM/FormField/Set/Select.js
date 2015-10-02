@@ -11,11 +11,19 @@ var CM_FormField_Set_Select = CM_FormField_Set.extend({
     }
   },
 
+  getInput: function() {
+    return this.$('input, select');
+  },
+
   getValue: function() {
-    if (this.$('input[type=radio]').length) {
-      return this.$('input[type=radio]:checked').val();
+    if (this._isRadio()) {
+      return this.getInput().filter(':checked').val();
     } else {
-      return this.$('select:not([disabled])').val();
+      return this.getInput().val();
     }
+  },
+
+  _isRadio: function() {
+    return this.getInput().is('[type=radio]');
   }
 });
