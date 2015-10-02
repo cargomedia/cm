@@ -100,7 +100,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
    * @returns {jQuery}
    */
   getInput: function() {
-    return this.$('input:first, select:first, textarea:first')
+    return this.$('input:first, select:first, textarea:first, [contenteditable]:first')
   },
 
   setFocus: function() {
