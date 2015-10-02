@@ -91,6 +91,10 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
     }, 10);
   },
 
+  getInput: function() {
+    return this._$input;
+  },
+
   /**
    * @return {Array}
    */
