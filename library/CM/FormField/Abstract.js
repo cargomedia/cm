@@ -67,10 +67,31 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @return string|null
+   * @returns {jQuery}
+   */
+  getInput: function() {
+    return this.$('input:first, select:first, textarea:first')
+  },
+
+  /**
+   * @returns {*|String|null}
    */
   getValue: function() {
-    throw new CM_Exception('Please implement');
+    return this.getInput().val();
+  },
+
+  /**
+   * @param {*|String|null} value
+   */
+  setValue: function(value) {
+    this.getInput().val(value);
+  },
+
+  /**
+   * @returns {Boolean}
+   */
+  getEnabled: function() {
+    return this.getInput().filter(':enabled').length > 0;
   },
 
   /**
@@ -90,13 +111,6 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
       return null;
     }
     return options[name];
-  },
-
-  /**
-   * @returns {jQuery}
-   */
-  getInput: function() {
-    return this.$('input:first, select:first, textarea:first')
   },
 
   setFocus: function() {
