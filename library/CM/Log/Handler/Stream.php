@@ -98,7 +98,10 @@ class CM_Log_Handler_Stream extends CM_Log_Handler_Abstract {
                 ]);
         }
 
-        return $message . PHP_EOL . $this->_formatArrayToLines(' - %s: %s', $data);
+        if(!empty($data)) {
+            $message .= PHP_EOL . $this->_formatArrayToLines(' - %s: %s', $data);
+        }
+        return $message;
     }
 
     /**
