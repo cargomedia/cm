@@ -10,6 +10,14 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
     this._initPlaintextonly();
   },
 
+  getValue: function() {
+    return this.$('[contenteditable]').html();
+  },
+
+  setValue: function(value) {
+    return this.$('[contenteditable]').html(value);
+  },
+
   _initPlaceholder: function() {
     this.$('[contenteditable]').focusout(function() {
       var $this = $(this);
