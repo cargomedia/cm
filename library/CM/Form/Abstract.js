@@ -115,9 +115,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
     if (action) {
       _.each(action.fields, function(isRequired, fieldName) {
-        if (this.hasField(fieldName)) {
-          var field = this.getField(fieldName);
-          var value = field.getValue();
+        if (this.hasField(fieldName) && this.getField(fieldName).getEnabled()) {
+          var value = this.getField(fieldName).getValue();
           if (value && value.toString()) {
             //if (null !== value && 'undefined' !== typeof value) {
             data[fieldName] = value;
