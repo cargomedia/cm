@@ -46,20 +46,6 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
   },
 
   /**
-   * @return {Object}
-   */
-  getValue: function() {
-    return CM_FormField_SuggestOne.prototype.getValue.call(this);
-  },
-
-  /**
-   * @param {Object} value
-   */
-  setValue: function(value) {
-    return CM_FormField_SuggestOne.prototype.setValue.call(this, value);
-  },
-
-  /**
    * @returns {Promise}
    */
   detectLocation: function() {
