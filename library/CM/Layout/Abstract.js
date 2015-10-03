@@ -21,9 +21,12 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
 
     var layout = this;
     this._loadPageThrottled = promiseThrottler(function(path) {
+      layout._createPagePlaceholder();
+      layout._chargeSpinnerTimeout();
+
       return layout.ajaxModal('loadPage', {path: path})
         .then(function(response) {
-          window.clearTimeout(layout._timeoutLoading);
+          layout._clearSpinnerTimeout();
           if (response.redirectExternal) {
             cm.router.route(response.redirectExternal);
             return;
@@ -34,21 +37,16 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
             window.location.replace(response.url);
             return;
           }
-          layout._$pagePlaceholder.replaceWith(view.$el);
-          layout._$pagePlaceholder = null;
-          var fragment = response.url.substr(cm.getUrl().length);
-          if (path === fragment + window.location.hash) {
-            fragment = path;
-          }
-          window.history.replaceState(null, null, fragment);
+          layout._removePagePlaceholder(view.$el);
+          layout._updateHistory(path, response.url);
           layout._onPageSetup(view, response.title, response.url, response.menuEntryHashList, response.jsTracking);
           view._ready();
           return view;
         })
         .catch(function(error) {
-          window.clearTimeout(layout._timeoutLoading);
+          layout._clearSpinnerTimeout();
           if (!(error instanceof Promise.CancellationError)) {
-            layout._$pagePlaceholder.addClass('error').html('<pre>' + error.message + '</pre>');
+            layout._errorPagePlaceholder(error);
             layout._onPageError();
             throw error;
           }
@@ -80,17 +78,6 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
    */
   loadPage: function(path) {
     cm.event.trigger('navigate', path);
-
-    if (!this._$pagePlaceholder) {
-      this._$pagePlaceholder = $('<div class="router-placeholder" />');
-      this.getPage().replaceWithHtml(this._$pagePlaceholder);
-      this._onPageTeardown();
-    } else {
-      this._$pagePlaceholder.removeClass('error').html('');
-    }
-    this._timeoutLoading = this.setTimeout(function() {
-      this._$pagePlaceholder.html('<div class="spinner spinner-expanded" />');
-    }, 750);
     return this._loadPageThrottled(path);
   },
 
@@ -139,5 +126,54 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
 
   _onPageError: function() {
     $('[data-menu-entry-hash]').removeClass('active');
+  },
+
+  _createPagePlaceholder: function() {
+    if (!this._$pagePlaceholder) {
+      this._$pagePlaceholder = $('<div class="router-placeholder" />');
+      this.getPage().replaceWithHtml(this._$pagePlaceholder);
+      this._onPageTeardown();
+    } else {
+      this._$pagePlaceholder.removeClass('error').html('');
+    }
+  },
+
+  /**
+   * @param {Element|String|jQuery} el
+   */
+  _removePagePlaceholder: function(el) {
+    this._$pagePlaceholder.replaceWith(el);
+    this._$pagePlaceholder = null;
+  },
+
+  /**
+   * @param {Error} error
+   */
+  _errorPagePlaceholder: function(error) {
+    this._$pagePlaceholder.addClass('error').html('<pre>' + error.message + '</pre>');
+  },
+
+  _chargeSpinnerTimeout: function() {
+    this._clearSpinnerTimeout();
+    this._timeoutLoading = this.setTimeout(function() {
+      this._$pagePlaceholder.html('<div class="spinner spinner-expanded" />');
+    }, 750);
+  },
+
+  _clearSpinnerTimeout: function() {
+    clearTimeout(this._timeoutLoading);
+  },
+
+  /**
+   * @param {String} path
+   * @param {String} url
+   */
+  _updateHistory: function(path, url) {
+    var fragment = url.substr(cm.getUrl().length);
+    if (path === fragment + window.location.hash) {
+      fragment = path;
+    }
+    window.history.replaceState(null, null, fragment);
   }
+
 });
