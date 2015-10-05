@@ -11,19 +11,40 @@ var CM_FormField_Set = CM_FormField_Abstract.extend({
     }
   },
 
+  getInput: function() {
+    return this.$(':checkbox[name="' + this.options.params.name + '[]"]');
+  },
+
   getValue: function() {
-    var array = this.$('input:not([disabled])[name="' + this.options.params.name + '[]"]').map(function() {
+    var array = this.getInput().filter(':not([disabled])').map(function() {
       var $this = $(this);
       if (!$this.is(':checkbox') || $this.is(':checked')) {
         return $(this).val();
       }
       return null;
     }).get();
-    var value = _.compact(array);
-    return value.length ? value : null;
+    return _.compact(array);
   },
 
-  setValue: function(value) {
-    throw new CM_Exception('Not implemented');
+  /**
+   * @param {Array} values
+   */
+  setValue: function(values) {
+    this.getInput().removeAttr('checked');
+    _.each(values, function(value) {
+      this.getInputByValue(value).prop('checked', 'checked');
+    }, this);
+  },
+
+  /**
+   * @param {*} value
+   * @returns {jQuery}
+   */
+  getInputByValue: function(value) {
+    var $input = this.getInput().filter('[value=' + value + ']');
+    if (!$input.length) {
+      throw new CM_Exception('Invalid value `' + value + '` for `' + this.getName() + '` form field');
+    }
+    return $input;
   }
 });
