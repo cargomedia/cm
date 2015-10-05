@@ -15,8 +15,11 @@ var CM_FormField_Boolean = CM_FormField_Abstract.extend({
     return this.$('input[type=checkbox]');
   },
 
+  /**
+   * @returns {Boolean}
+   */
   getValue: function() {
-    return this.getInput().is(':checked') ? '1' : '0';
+    return this.getInput().is(':checked');
   },
 
   /**
