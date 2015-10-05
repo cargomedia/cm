@@ -4,20 +4,9 @@ class CM_Log_Formatter_Html extends CM_Log_Formatter_Text {
 
     public function _getDefaults() {
         return [
-            'formatMessage' => '<h2>{message} (fqdn: {fqdn}, php version: {phpVersion})</h2>',
+            'formatMessage' => '<h1 style="margin-bottom: 0.2em;">{message}</h1><span class="font-size:10px;">{fqdn} - PHP {phpVersion}</span>',
             'formatDate'    => 'c',
         ];
-    }
-
-    public function renderMessage(CM_Log_Record $record) {
-        $message = parent::renderMessage($record);
-        if ($record instanceof CM_Log_Record_Exception) {
-            $message = $this->_format('<h1>{exceptionClass}</h1>{message}', [
-                'exceptionClass' => $record->getException()->getClass(),
-                'message'        => $message
-            ]);
-        }
-        return $message;
     }
 
     public function renderContext(CM_Log_Record $record) {
@@ -33,10 +22,22 @@ class CM_Log_Formatter_Html extends CM_Log_Formatter_Text {
     public function renderException(CM_Log_Record_Exception $record) {
         $exceptionText = parent::renderException($record);
         if (null !== $exceptionText) {
-            $exceptionText = $this->_format('<h3>Exception:</h3><pre>{exception}</pre>', [
+            $exceptionText = $this->_format('<pre>{exception}</pre>', [
                 'exception' => $exceptionText,
             ]);
         }
         return $exceptionText;
+    }
+
+    /**
+     * @param string $text
+     * @param array  $data
+     * @return string
+     */
+    protected function _format($text, array $data) {
+        $data = \Functional\map($data, function($value){
+            return CM_Util::htmlspecialchars($value);
+        });
+        return parent::_format($text, $data);
     }
 }

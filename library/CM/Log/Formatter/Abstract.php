@@ -22,6 +22,25 @@ abstract class CM_Log_Formatter_Abstract implements CM_Log_Formatter_Interface {
         $this->_formatDate = $formatDate;
     }
 
+    /**
+     * @param CM_Log_Record $record
+     * @return string
+     */
+    public function render(CM_Log_Record $record) {
+        $renderedText = [];
+        $renderedText[] = $this->renderMessage($record);
+
+        $contextText = $this->renderContext($record);
+        if (null !== $contextText) {
+            $renderedText[] = $contextText;
+        }
+
+        if ($record instanceof CM_Log_Record_Exception) {
+            $renderedText[] = $this->renderException($record);
+        }
+        return implode(PHP_EOL, $renderedText);
+    }
+
     abstract public function renderMessage(CM_Log_Record $record);
 
     abstract public function renderContext(CM_Log_Record $record);

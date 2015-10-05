@@ -26,11 +26,8 @@ class CM_Log_Handler_StreamTest extends CMTest_TestCase {
         /** @var Mocka\FunctionMock $mockWritelnMethod */
         $mockWritelnMethod = $mockStreamInterface->mockMethod('writeln');
 
-        $mockWritelnMethod->at(0, function ($message) {
-            $this->assertRegExp('/^\[[0-9T\:\-\+]+ - none - php none - INFO\] foo$/', $message);
-        });
-        $mockWritelnMethod->at(1, function ($message) {
-            $this->assertSame(' - extra: foo: bar', $message);
+        $mockWritelnMethod->set(function ($message) {
+            $this->assertRegExp('#^\[[0-9T\:\-\+]+ - none - php none - INFO\] foo\n - extra: foo: bar$#', $message);
         });
 
         $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context(null, null, null, ['foo' => 'bar']));
@@ -38,7 +35,7 @@ class CM_Log_Handler_StreamTest extends CMTest_TestCase {
         $handler = new CM_Log_Handler_Stream($mockStreamInterface, $formatter);
         $this->forceInvokeMethod($handler, '_writeRecord', [$record]);
 
-        $this->assertSame(2, $mockWritelnMethod->getCallCount());
+        $this->assertSame(1, $mockWritelnMethod->getCallCount());
     }
 
     public function testWriteRecordWithException() {
@@ -47,11 +44,8 @@ class CM_Log_Handler_StreamTest extends CMTest_TestCase {
         /** @var Mocka\FunctionMock $mockWritelnMethod */
         $mockWritelnMethod = $mockStreamInterface->mockMethod('writeln');
 
-        $mockWritelnMethod->at(0, function ($message) {
-            $this->assertRegExp('/^\[[0-9T\:\-\+]+ - none - php none - ERROR\] foo$/', $message);
-        });
-        $mockWritelnMethod->at(1, function ($message) {
-            $this->assertRegExp('#^ - exception:.*$#s', $message);
+        $mockWritelnMethod->set(function ($message) {
+            $this->assertRegExp('#^\[[0-9T\:\-\+]+ - none - php none - ERROR\] Exception: foo\n - exception:.*$#s', $message);
         });
 
         $record = new CM_Log_Record_Exception(new Exception('foo'), new CM_Log_Context());
@@ -59,6 +53,6 @@ class CM_Log_Handler_StreamTest extends CMTest_TestCase {
         $handler = new CM_Log_Handler_Stream($mockStreamInterface, $formatter);
         $this->forceInvokeMethod($handler, '_writeRecord', [$record]);
 
-        $this->assertSame(2, $mockWritelnMethod->getCallCount());
+        $this->assertSame(1, $mockWritelnMethod->getCallCount());
     }
 }

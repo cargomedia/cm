@@ -11,7 +11,8 @@ class CM_Log_Record_Exception extends CM_Log_Record {
      */
     public function __construct(Exception $exception, CM_Log_Context $context) {
         $this->_exception = new CM_ExceptionHandling_SerializableException($exception);
-        parent::__construct($this->_exceptionSeverityToLevel($exception), $exception->getMessage(), $context);
+        $message = $this->_exception->getClass() . ': ' . $this->_exception->getMessage();
+        parent::__construct($this->_exceptionSeverityToLevel($exception), $message, $context);
     }
 
     /**

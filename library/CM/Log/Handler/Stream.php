@@ -23,15 +23,6 @@ class CM_Log_Handler_Stream extends CM_Log_Handler_Abstract {
      * @param CM_Log_Record $record
      */
     protected function _writeRecord(CM_Log_Record $record) {
-        $this->_stream->writeln($this->_formatter->renderMessage($record));
-
-        $contextText = $this->_formatter->renderContext($record);
-        if(null !== $contextText) {
-            $this->_stream->writeln($contextText);
-        }
-
-        if ($record instanceof CM_Log_Record_Exception) {
-            $this->_stream->writeln($this->_formatter->renderException($record));
-        }
+        $this->_stream->writeln($this->_formatter->render($record));
     }
 }
