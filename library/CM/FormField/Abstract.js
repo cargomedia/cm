@@ -95,7 +95,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
    * @returns {Boolean}
    */
   getEnabled: function() {
-    return this.getInput().filter(':enabled').length > 0;
+    return this.getInput().is(':enabled');
   },
 
   /**
