@@ -139,10 +139,20 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   },
 
   /**
+   * @returns {jQuery}
+   */
+  _getPagePlaceholder: function() {
+    if (!this._$pagePlaceholder) {
+      this._createPagePlaceholder();
+    }
+    return this._$pagePlaceholder;
+  },
+
+  /**
    * @param {Element|String|jQuery} el
    */
   _removePagePlaceholder: function(el) {
-    this._$pagePlaceholder.replaceWith(el);
+    this._getPagePlaceholder().replaceWith(el);
     this._$pagePlaceholder = null;
   },
 
@@ -150,13 +160,13 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
    * @param {Error} error
    */
   _errorPagePlaceholder: function(error) {
-    this._$pagePlaceholder.addClass('error').html('<pre>' + error.message + '</pre>');
+    this._getPagePlaceholder().addClass('error').html('<pre>' + error.message + '</pre>');
   },
 
   _chargeSpinnerTimeout: function() {
     this._clearSpinnerTimeout();
     this._timeoutLoading = this.setTimeout(function() {
-      this._$pagePlaceholder.html('<div class="spinner spinner-expanded" />');
+      this._getPagePlaceholder().html('<div class="spinner spinner-expanded" />');
     }, 750);
   },
 
