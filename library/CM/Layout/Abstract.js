@@ -11,50 +11,44 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   _$pagePlaceholder: null,
 
   /** @type PromiseThrottled|Null */
-  _loadPageThrottled: null,
+  _loadPageThrottled: promiseThrottler(function(path) {
+    var layout = this;
+    return this.ajaxModal('loadPage', {path: path})
+      .then(function(response) {
+        window.clearTimeout(layout._timeoutLoading);
+        if (response.redirectExternal) {
+          cm.router.route(response.redirectExternal);
+          return;
+        }
+        var view = layout._injectView(response);
+        var reload = (layout.getClass() != response.layoutClass);
+        if (reload) {
+          window.location.replace(response.url);
+          return;
+        }
+        layout._$pagePlaceholder.replaceWith(view.$el);
+        layout._$pagePlaceholder = null;
+        var fragment = response.url.substr(cm.getUrl().length);
+        if (path === fragment + window.location.hash) {
+          fragment = path;
+        }
+        window.history.replaceState(null, null, fragment);
+        layout._onPageSetup(view, response.title, response.url, response.menuEntryHashList, response.jsTracking);
+        view._ready();
+        return view;
+      })
+      .catch(function(error) {
+        window.clearTimeout(layout._timeoutLoading);
+        if (!(error instanceof Promise.CancellationError)) {
+          layout._$pagePlaceholder.addClass('error').html('<pre>' + error.message + '</pre>');
+          layout._onPageError();
+          throw error;
+        }
+      });
+  }, {cancelLeading: true}),
 
   /** @type {Number} timeout ID */
   _timeoutLoading: null,
-
-  initialize: function() {
-    CM_View_Abstract.prototype.initialize.call(this);
-
-    var layout = this;
-    this._loadPageThrottled = promiseThrottler(function(path) {
-      return layout.ajaxModal('loadPage', {path: path})
-        .then(function(response) {
-          window.clearTimeout(layout._timeoutLoading);
-          if (response.redirectExternal) {
-            cm.router.route(response.redirectExternal);
-            return;
-          }
-          var view = layout._injectView(response);
-          var reload = (layout.getClass() != response.layoutClass);
-          if (reload) {
-            window.location.replace(response.url);
-            return;
-          }
-          layout._$pagePlaceholder.replaceWith(view.$el);
-          layout._$pagePlaceholder = null;
-          var fragment = response.url.substr(cm.getUrl().length);
-          if (path === fragment + window.location.hash) {
-            fragment = path;
-          }
-          window.history.replaceState(null, null, fragment);
-          layout._onPageSetup(view, response.title, response.url, response.menuEntryHashList, response.jsTracking);
-          view._ready();
-          return view;
-        })
-        .catch(function(error) {
-          window.clearTimeout(layout._timeoutLoading);
-          if (!(error instanceof Promise.CancellationError)) {
-            layout._$pagePlaceholder.addClass('error').html('<pre>' + error.message + '</pre>');
-            layout._onPageError();
-            throw error;
-          }
-        });
-    }, {cancelLeading: true});
-  },
 
   /**
    * @returns {CM_View_Abstract|null}
