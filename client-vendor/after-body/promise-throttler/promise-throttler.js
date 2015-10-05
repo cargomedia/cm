@@ -53,14 +53,15 @@
       }
       if (options.queue && promise && promise.isPending()) {
         var args = arguments;
+        var self = this;
         promise = promise.then(function() {
-          return fn.apply(null, args);
+          return fn.apply(self, args);
         }).catch(function() {
-          return fn.apply(null, args);
+          return fn.apply(self, args);
         });
       }
       if (!promise || !promise.isPending()) {
-        promise = fn.apply(null, arguments);
+        promise = fn.apply(this, arguments);
       }
       return promise;
     };
