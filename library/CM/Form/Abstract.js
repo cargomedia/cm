@@ -107,27 +107,21 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String|Null} [actionName]
+   * @param {String} actionName
+   * @returns {{}}
    */
   getData: function(actionName) {
-    var action = actionName ? this._actions[actionName] : null;
+    var action = this._getAction(actionName);
     var data = {};
 
-    if (action) {
-      _.each(action.fields, function(isRequired, fieldName) {
-        if (this.hasField(fieldName) && this.getField(fieldName).getEnabled()) {
-          var value = this.getField(fieldName).getValue();
-          if (value && value.toString()) {
-            //if (null !== value && 'undefined' !== typeof value) {
-            data[fieldName] = value;
-          }
-        } else {
-          if (isRequired) {
-            throw new CM_Exception(this.getClass() + ' does not contain a required form field `' + fieldName + '`');
-          }
+    _.each(action.fields, function(isRequired, fieldName) {
+      if (this.hasField(fieldName)) {
+        var field = this.getField(fieldName);
+        if (field.getEnabled()) {
+          data[field.getName()] = field.getValue();
         }
-      }, this);
-    }
+      }
+    }, this);
 
     return data;
   },
@@ -144,7 +138,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     });
     var action = this._getAction(actionName);
     var data = this.getData(action.name);
-    var errorList = this._getErrorList(action.name);
+    var errorList = this._getErrorList(action.name, data);
 
     if (options.handleErrors) {
       _.each(this._fields, function(field, fieldName) {
@@ -195,14 +189,14 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
           handler.trigger('success success.' + action.name, response.data);
           return response.data;
         })
-        .catch(CM_Exception_FormFieldValidation, function(error){
+        .catch(CM_Exception_FormFieldValidation, function(error) {
           handler._stopErrorPropagation = false;
           handler.trigger('error error.' + action.name, error.message, error.name, error.isPublic);
           if (!handler._stopErrorPropagation) {
             throw error;
           }
         })
-        .finally(function(){
+        .finally(function() {
           if (options.disableUI) {
             handler.enable();
           }
@@ -248,11 +242,10 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String} [actionName]
+   * @param {String} actionName
    * @returns {Object}
    */
   _getAction: function(actionName) {
-    actionName = actionName || _.first(_.keys(this._actions));
     var action = this._actions[actionName];
     if (!action) {
       throw new CM_Exception('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
@@ -262,28 +255,19 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String} [actionName]
+   * @param {String} actionName
+   * @param {Object} data
    * @returns {Object}
    */
-  _getErrorList: function(actionName) {
+  _getErrorList: function(actionName, data) {
     var action = this._getAction(actionName);
-    var data = this.getData(action.name);
-
     var errorList = {};
 
-    _.each(_.keys(action.fields).reverse(), function(fieldName) {
-      var required = action.fields[fieldName];
-      if (required) {
+    _.each(action.fields, function(isRequired, fieldName) {
+      if (isRequired) {
         var field = this.getField(fieldName);
         if (field.isEmpty(data[fieldName])) {
-          var label;
-          var $textInput = field.$('input, textarea');
-          var $labels = $('label[for="' + field.getAutoId() + '-input"]');
-          if ($labels.length) {
-            label = $labels.first().text();
-          } else if ($textInput.attr('placeholder')) {
-            label = $textInput.attr('placeholder');
-          }
+          var label = this._getFieldLabel(field);
           if (label) {
             errorList[fieldName] = cm.language.get('{$label} is required.', {label: label});
           } else {
@@ -294,5 +278,21 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     }, this);
 
     return errorList;
+  },
+
+  /**
+   * @param {CM_FormField_Abstract} field
+   * @returns {String|null}
+   * @private
+   */
+  _getFieldLabel: function(field) {
+    var $labels = this.$('label[for="' + field.getAutoId() + '-input"]');
+    if ($labels.length) {
+      return $labels.first().text();
+    }
+    if (field.getInput().attr('placeholder')) {
+      return field.getInput().attr('placeholder');
+    }
+    return null;
   }
 });
