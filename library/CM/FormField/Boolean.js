@@ -27,7 +27,7 @@ var CM_FormField_Boolean = CM_FormField_Abstract.extend({
    */
   setValue: function(checked) {
     if (checked) {
-      this.getInput().attr('checked', 'checked');
+      this.getInput().prop('checked', 'checked');
     } else {
       this.getInput().removeAttr('checked');
     }
