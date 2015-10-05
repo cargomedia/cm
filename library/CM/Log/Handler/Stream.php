@@ -5,8 +5,8 @@ class CM_Log_Handler_Stream extends CM_Log_Handler_Abstract {
     /** @var  CM_Log_Formatter_Interface */
     private $_formatter;
 
-    /** @var resource */
-    private $_stream;
+    /** @var CM_OutputStream_Interface */
+    protected $_stream;
 
     /**
      * @param CM_OutputStream_Interface  $stream
@@ -21,7 +21,6 @@ class CM_Log_Handler_Stream extends CM_Log_Handler_Abstract {
 
     /**
      * @param CM_Log_Record $record
-     * @return bool
      */
     protected function _writeRecord(CM_Log_Record $record) {
         $this->_stream->writeln($this->_formatter->renderMessage($record));

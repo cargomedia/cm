@@ -1,6 +1,6 @@
 <?php
 
-class CM_Log_Handler_Formatter_TextTest extends CMTest_TestCase {
+class CM_Log_Formatter_TextTest extends CMTest_TestCase {
 
     public function testRenderMessage() {
         $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
