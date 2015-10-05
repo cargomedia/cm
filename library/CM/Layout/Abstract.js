@@ -150,6 +150,10 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
    * @param {Error} error
    */
   _errorPagePlaceholder: function(error) {
+    if (null == this._$pagePlaceholder) {
+      // in case when error happened at the late stage when page replaced placeholder.
+      this._createPagePlaceholder();
+    }
     this._$pagePlaceholder.addClass('error').html('<pre>' + error.message + '</pre>');
   },
 
