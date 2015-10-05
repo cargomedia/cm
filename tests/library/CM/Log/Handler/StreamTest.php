@@ -9,7 +9,7 @@ class CM_Log_Handler_StreamTest extends CMTest_TestCase {
         $mockWritelnMethod = $mockStreamInterface->mockMethod('writeln');
 
         $mockWritelnMethod->set(function ($message) {
-            $this->assertRegExp('/^\[[0-9T\:\-\+]+ - INFO\] foo$/', $message);
+            $this->assertRegExp('/^\[[0-9T\:\-\+]+ - none - php none - INFO\] foo$/', $message);
         });
 
         $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());

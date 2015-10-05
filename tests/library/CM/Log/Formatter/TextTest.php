@@ -5,7 +5,7 @@ class CM_Log_Formatter_TextTest extends CMTest_TestCase {
     public function testRenderMessage() {
         $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
         $formatter = new CM_Log_Formatter_Text();
-        $this->assertRegExp('/^\[[0-9T\:\-\+]+ - INFO\] foo$/', $formatter->renderMessage($record));
+        $this->assertRegExp('/^\[[0-9T\:\-\+]+ - none - php none - INFO\] foo$/', $formatter->renderMessage($record));
     }
 
     public function testFormatMessageCustomized() {
@@ -15,14 +15,10 @@ class CM_Log_Formatter_TextTest extends CMTest_TestCase {
     }
 
     public function testFormatMessageComputerInfo() {
-        $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
-        $formatter = new CM_Log_Formatter_Text('{fqdn} | {phpVersion}');
-        $this->assertSame('none | none', $formatter->renderMessage($record));
-
+        $formatter = new CM_Log_Formatter_Text();
         $computerInfo = new CM_Log_Context_ComputerInfo('foo.com', '5.4');
         $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context(null, null, $computerInfo));
-        $formatter = new CM_Log_Formatter_Text('{fqdn} | {phpVersion}');
-        $this->assertSame('foo.com | 5.4', $formatter->renderMessage($record));
+        $this->assertRegExp('/^\[[0-9T\:\-\+]+ - foo.com - php 5.4 - INFO\] foo$/', $formatter->renderMessage($record));
     }
 
     public function testFormatContextWithHttpRequest() {

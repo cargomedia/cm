@@ -4,7 +4,7 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
 
     public function _getDefaults() {
         return [
-            'formatMessage' => '[{datetime} - {levelname}] {message}',
+            'formatMessage' => '[{datetime} - {fqdn} - php {phpVersion} - {levelname}] {message}',
             'formatDate'    => 'c',
         ];
     }
