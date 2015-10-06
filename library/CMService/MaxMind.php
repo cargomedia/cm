@@ -30,23 +30,33 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $_zipCodeListByCityAdded, $_zipCodeListByCityRemoved, $_zipCodeIdListByMaxMind,
         $_ipBlockListByLocation;
 
-    /**
-     * @param CM_OutputStream_Interface|null $streamOutput
-     * @param CM_OutputStream_Interface|null $streamError
-     * @param bool|null                      $withoutIpBlocks
-     * @param bool|null                      $verbose
-     */
-    public function __construct(CM_OutputStream_Interface $streamOutput = null, CM_OutputStream_Interface $streamError = null, $withoutIpBlocks = null, $verbose = null) {
-        if (null === $streamOutput) {
-            $streamOutput = new CM_OutputStream_Null();
-        }
-        if (null === $streamError) {
-            $streamError = new CM_OutputStream_Null();
-        }
-        $this->_streamOutput = $streamOutput;
+    public function __construct() {
+        $this->_streamOutput = new CM_OutputStream_Null();
+        $this->_streamError = new CM_OutputStream_Null();
+        $this->_withoutIpBlocks = false;
+        $this->_verbose = false;
+    }
+
+    public function setStreamError(CM_OutputStream_Interface $streamError) {
         $this->_streamError = $streamError;
-        $this->_withoutIpBlocks = (bool) $withoutIpBlocks;
+    }
+
+    public function setStreamOutput(CM_OutputStream_Interface $streamOutput) {
+        $this->_streamOutput = $streamOutput;
+    }
+
+    /**
+     * @param bool $verbose
+     */
+    public function setVerbose($verbose) {
         $this->_verbose = (bool) $verbose;
+    }
+
+    /**
+     * @param bool $withoutIpBlocks
+     */
+    public function setWithoutIpBlocks($withoutIpBlocks) {
+        $this->_withoutIpBlocks = (bool) $withoutIpBlocks;
     }
 
     public function outdated() {
