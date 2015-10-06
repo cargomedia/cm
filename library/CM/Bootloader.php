@@ -9,7 +9,10 @@ class CM_Bootloader {
     /** @var bool */
     private $_debug;
 
-    /** @var CM_ExceptionHandling_Handler_Abstract */
+    /** @var  CM_Log_Logger */
+    private $_loggerBasic;
+
+    /** @var CM_ExceptionHandling_Handler */
     private $_exceptionHandler;
 
     /** @var CM_EventHandler_EventHandler */
@@ -40,6 +43,7 @@ class CM_Bootloader {
         $this->_exceptionHandler();
         $this->_errorHandler();
         $this->_registerServices();
+        $this->_changeLoggerHandlers();
         $this->_defaults();
     }
 
@@ -54,23 +58,35 @@ class CM_Bootloader {
     }
 
     /**
-     * @return CM_ExceptionHandling_Handler_Abstract
+     * @return CM_Log_Logger
+     */
+    public function getLoggerBasic() {
+        if (!$this->_loggerBasic) {
+            $loggerFactory = new CM_Log_Factory();
+            if ($this->isCli()) {
+                $this->_loggerBasic = $loggerFactory->createLoggerBasicCli();
+            } else {
+                $this->_loggerBasic = $loggerFactory->createLoggerBasicHttp();
+            }
+        }
+        return $this->_loggerBasic;
+    }
+
+    /**
+     * @return CM_ExceptionHandling_Handler
      */
     public function getExceptionHandler() {
         if (!$this->_exceptionHandler) {
-            if ($this->isCli()) {
-                $this->_exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
-            } else {
-                $this->_exceptionHandler = new CM_ExceptionHandling_Handler_Http();
-            }
+            $this->_exceptionHandler = new CM_ExceptionHandling_Handler($this->getLoggerBasic());
+            $this->_exceptionHandler->setServiceManager(CM_Service_Manager::getInstance());
         }
         return $this->_exceptionHandler;
     }
 
     /**
-     * @param CM_ExceptionHandling_Handler_Abstract $exceptionHandler
+     * @param CM_ExceptionHandling_Handler $exceptionHandler
      */
-    public function setExceptionHandler(CM_ExceptionHandling_Handler_Abstract $exceptionHandler) {
+    public function setExceptionHandler(CM_ExceptionHandling_Handler $exceptionHandler) {
         $this->_exceptionHandler = $exceptionHandler;
     }
 
@@ -118,6 +134,7 @@ class CM_Bootloader {
     public function getModules() {
         return array_keys($this->_getModulePaths());
     }
+
 
     public function reloadModulePaths() {
         $cacheKey = CM_CacheConst::Modules;
@@ -179,8 +196,20 @@ class CM_Bootloader {
         $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', [
             'adapter' => new CM_File_Filesystem_Adapter_Local($this->getDirTmp())
         ]);
+        $serviceManager->register('logger-file-error', 'CM_Log_Handler_Factory', null, 'createFileHandler', [
+            'path' => 'logs/error.log',
+            'level' => CM_Log_Logger::WARNING,
+        ]);
         foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
             $serviceManager->registerWithArray($serviceKey, $serviceDefinition);
+        }
+    }
+
+    protected function _changeLoggerHandlers() {
+        $serviceManager = CM_Service_Manager::getInstance();
+        $logger = $this->getLoggerBasic();
+        if ($serviceManager->has('logger-file-error')) {
+            $logger->addHandler($serviceManager->get('logger-file-error'));
         }
     }
 

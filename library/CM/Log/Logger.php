@@ -86,7 +86,7 @@ class CM_Log_Logger {
 
     /**
      * @param CM_Log_Handler_HandlerInterface[] $handlerList
-     * @param null                              $prepend
+     * @param bool|null                         $prepend
      */
     public function addHandlers(array $handlerList, $prepend = null) {
         $prepend = null === $prepend ? false : (bool) $prepend;
