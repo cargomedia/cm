@@ -5,14 +5,24 @@ abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterfac
     /** @var int */
     protected $_levelMin;
 
+    /** @var  bool */
+    protected $_bubble;
+
     /**
-     * @param int $levelMin The minimum logging level at which this handler will be triggered
+     * @param int|null  $levelMin
+     * @param bool|null $bubble
      */
-    public function __construct($levelMin = null) {
+    public function __construct($levelMin = null, $bubble = null) {
         $levelMin = null === $levelMin ? CM_Log_Logger::DEBUG : (int) $levelMin;
+        $bubble = null === $bubble ? true : (bool) $bubble;
+
+        $this->_bubble = $bubble;
         $this->setLevelMin($levelMin);
     }
 
+    /**
+     * @return int
+     */
     public function getLevelMin() {
         return $this->_levelMin;
     }
@@ -28,14 +38,18 @@ abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterfac
         }
     }
 
-    public function handleRecord(CM_Log_Record $record) {
-        if ($this->isHandling($record)) {
-            $this->_writeRecord($record);
-        }
+    public function isBubbling() {
+        return $this->_bubble;
     }
 
     public function isHandling(CM_Log_Record $record) {
         return $record->getLevel() >= $this->getLevelMin();
+    }
+
+    public function handleRecord(CM_Log_Record $record) {
+        if ($this->isHandling($record)) {
+            $this->_writeRecord($record);
+        }
     }
 
     /**
