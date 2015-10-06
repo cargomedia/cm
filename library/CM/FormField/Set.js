@@ -16,14 +16,9 @@ var CM_FormField_Set = CM_FormField_Abstract.extend({
   },
 
   getValue: function() {
-    var array = this.getInput().filter(':not([disabled])').map(function() {
-      var $this = $(this);
-      if (!$this.is(':checkbox') || $this.is(':checked')) {
-        return $(this).val();
-      }
-      return null;
-    }).get();
-    return _.compact(array);
+    return this.getInput().filter(':enabled:checked').get().map(function(element) {
+      return $(element).val();
+    });
   },
 
   /**
