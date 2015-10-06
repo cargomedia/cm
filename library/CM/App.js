@@ -1235,8 +1235,8 @@ var CM_App = CM_Class_Abstract.extend({
         var locationNext = this._getLocationByFragment(fragment);
 
         if (locationCurrent.pathname === locationNext.pathname) {
-          var paramsCurrent = queryString.parse(locationCurrent.search);
-          var paramsNext = queryString.parse(locationNext.search);
+          var paramsCurrent = cm.request.parseQueryParams(locationCurrent.search);
+          var paramsNext = cm.request.parseQueryParams(locationNext.search);
 
           var stateParamNames = pageCurrent.getStateParams();
 
@@ -1255,6 +1255,31 @@ var CM_App = CM_Class_Abstract.extend({
         }
       }
       return cm.getLayout().loadPage(fragment);
+    }
+  },
+
+  request: {
+
+    /**
+     * @param {Object} queryParams
+     * @return {Object}
+     */
+    parseQueryParams: function(queryParams) {
+      var params = queryString.parse(queryParams);
+      var arrayParamRegex = /^(\w+)\[(\w+)]$/;
+      _.each(params, function(value, key) {
+        var result = arrayParamRegex.exec(key);
+        if (result) {
+          var paramName = result[1];
+          var arrayKey = result[2];
+          delete params[key];
+          if (!params[paramName]) {
+            params[paramName] = {};
+          }
+          params[paramName][arrayKey] = value;
+        }
+      });
+      return params;
     }
   }
 });

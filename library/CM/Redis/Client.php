@@ -5,35 +5,71 @@ class CM_Redis_Client extends CM_Class_Abstract {
     /** @var Predis\Client */
     private $_redis = null;
 
+    /** @var  array */
+    private $_config;
+
     /**
      * @param array $config ['host' => string, 'port' => int, 'database' => int|null]
      * @throws CM_Exception
      */
     public function __construct(array $config) {
-        $defaults = [
-            'database' => null
+        $this->_config = $this->_parseConfig($config);
+        $this->_redis = $this->_createPredisClient($this->_config['host'], $this->_config['port'], $this->_config['database']);
+    }
+
+    /**
+     * @param array $config ['host' => string, 'port' => int, 'database' => int|null]
+     * @return array
+     */
+    private function _parseConfig(array $config) {
+        $config = array_merge([
+            'host'     => '127.0.0.1',
+            'port'     => 6379,
+            'database' => null,
+        ], $config);
+
+        if (null !== $config['database']) {
+            $config['database'] = (int) $config['database'];
+        }
+
+        return [
+            'host'     => (string) $config['host'],
+            'port'     => (int) $config['port'],
+            'database' => $config['database'],
         ];
-        $config = array_merge($defaults, $config);
+    }
 
-        $host = (string) $config['host'];
-        $port = (int) $config['port'];
-        $database = isset($config['database']) ? (int) $config['database'] : null;
-
+    /**
+     * @param string      $host
+     * @param int         $port
+     * @param string|null $database
+     * @param float|null  $timeout            in seconds (default: 5.0)
+     * @param float|null  $read_write_timeout in seconds, disabled with -1 (default: 60.0)
+     * @return \Predis\Client
+     * @throws CM_Exception
+     */
+    private function _createPredisClient($host, $port, $database = null, $timeout = null, $read_write_timeout = null) {
+        if (null === $timeout) {
+            $timeout = 5.0;
+        }
+        if (null === $read_write_timeout) {
+            $timeout = 60.0;
+        }
         try {
-            $this->_redis = new Predis\Client([
+            $client = new Predis\Client([
                 'scheme'             => 'tcp',
-                'host'               => $host,
-                'port'               => $port,
-                'read_write_timeout' => -1,
-                'timeout'            => 60,
+                'host'               => (string) $host,
+                'port'               => (int) $port,
+                'read_write_timeout' => (float) $read_write_timeout,
+                'timeout'            => (float) $timeout,
             ], ['profile' => '2.4']);
         } catch (Predis\Connection\ConnectionException $e) {
             throw new CM_Exception('Cannot connect to redis server `' . $host . '` on port `' . $port . '`: ' . $e->getMessage());
         }
-
         if (null !== $database) {
-            $this->_redis->select($database);
+            $client->select($database);
         }
+        return $client;
     }
 
     /**
@@ -295,7 +331,9 @@ class CM_Redis_Client extends CM_Class_Abstract {
      * @return mixed return something else than null to exit the pubsub loop
      */
     public function subscribe($channels, Closure $callback) {
-        $pubsub = $this->_redis->pubSubLoop(['subscribe' => $channels]);
+        $redisClient = $this->_createPredisClient($this->_config['host'], $this->_config['port'], $this->_config['database'], 60, -1);
+
+        $pubsub = $redisClient->pubSubLoop(['subscribe' => $channels]);
         $response = null;
 
         /** @var stdClass $message */
@@ -311,7 +349,6 @@ class CM_Redis_Client extends CM_Class_Abstract {
                 break;
             }
         }
-
         return $response;
     }
 
