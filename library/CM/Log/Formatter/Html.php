@@ -4,7 +4,7 @@ class CM_Log_Formatter_Html extends CM_Log_Formatter_Text {
 
     public function _getDefaults() {
         return [
-            'formatMessage' => '<h1 style="margin-bottom: 0.2em;">{message}</h1><span class="font-size:10px;">{fqdn} - PHP {phpVersion}</span>',
+            'formatMessage' => '<h1>{message}</h1><span>{fqdn} - PHP {phpVersion}</span>',
             'formatDate'    => 'c',
         ];
     }

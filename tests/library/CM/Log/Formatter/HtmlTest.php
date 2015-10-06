@@ -6,7 +6,7 @@ class CM_Log_Formatter_HtmlTest extends CMTest_TestCase {
         $formatter = new CM_Log_Formatter_Html();
         $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
         $this->assertSame(
-            '<h1 style="margin-bottom: 0.2em;">foo</h1><span class="font-size:10px;">none - PHP none</span>',
+            '<h1>foo</h1><span>none - PHP none</span>',
             $formatter->renderMessage($record));
     }
 
@@ -14,7 +14,7 @@ class CM_Log_Formatter_HtmlTest extends CMTest_TestCase {
         $formatter = new CM_Log_Formatter_Html();
         $record = new CM_Log_Record_Exception(new Exception('foo'), new CM_Log_Context());
         $this->assertSame(
-            '<h1 style="margin-bottom: 0.2em;">Exception: foo</h1><span class="font-size:10px;">none - PHP none</span>',
+            '<h1>Exception: foo</h1><span>none - PHP none</span>',
             $formatter->renderMessage($record));
     }
 
@@ -23,7 +23,7 @@ class CM_Log_Formatter_HtmlTest extends CMTest_TestCase {
         $computerInfo = new CM_Log_Context_ComputerInfo('foo.com', '5.4');
         $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context(null, null, $computerInfo));
         $this->assertSame(
-            '<h1 style="margin-bottom: 0.2em;">foo</h1><span class="font-size:10px;">foo.com - PHP 5.4</span>',
+            '<h1>foo</h1><span>foo.com - PHP 5.4</span>',
             $formatter->renderMessage($record));
     }
 
