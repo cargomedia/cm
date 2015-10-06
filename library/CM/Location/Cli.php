@@ -7,7 +7,8 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
      * @synchronized
      */
     public function outdated($verbose = null) {
-        $maxMind = new CMService_MaxMind();
+        /** @var CMService_MaxMind $maxMind */
+        $maxMind = CM_Service_Manager::getInstance()->get('maxmind', 'CMService_MaxMind');
         $maxMind->setStreamOutput($this->_getStreamOutput());
         $maxMind->setStreamError($this->_getStreamError());
         $maxMind->setVerbose($verbose);
@@ -20,7 +21,8 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
      * @synchronized
      */
     public function upgrade($withoutIpBlocks = null, $verbose = null) {
-        $maxMind = new CMService_MaxMind();
+        /** @var CMService_MaxMind $maxMind */
+        $maxMind = CM_Service_Manager::getInstance()->get('maxmind', 'CMService_MaxMind');
         $maxMind->setStreamOutput($this->_getStreamOutput());
         $maxMind->setStreamError($this->_getStreamError());
         $maxMind->setWithoutIpBlocks($withoutIpBlocks);
