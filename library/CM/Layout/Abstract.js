@@ -21,7 +21,6 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
 
     var layout = this;
     this._loadPageThrottled = promiseThrottler(function(path) {
-      layout._createPagePlaceholder();
       layout._chargeSpinnerTimeout();
 
       return layout.ajaxModal('loadPage', {path: path})
@@ -39,7 +38,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
           }
           layout._removePagePlaceholder(view.$el);
           layout._updateHistory(path, response.url);
-          layout._onPageSetup(view, response.title, response.url, response.menuEntryHashList, response.jsTracking);
+          layout._onPageSetup(response.title, response.menuEntryHashList, response.jsTracking);
           view._ready();
           return view;
         })
@@ -99,13 +98,11 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {CM_Page_Abstract} page
    * @param {String} title
-   * @param {String} url
    * @param {String[]} menuEntryHashList
    * @param {String} [jsTracking]
    */
-  _onPageSetup: function(page, title, url, menuEntryHashList, jsTracking) {
+  _onPageSetup: function(title, menuEntryHashList, jsTracking) {
     cm.window.title.setText(title);
     $('[data-menu-entry-hash]').removeClass('active');
     var menuEntrySelectors = _.map(menuEntryHashList, function(menuEntryHash) {
@@ -175,15 +172,15 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String} path
-   * @param {String} url
+   * @param {String} requestPath
+   * @param {String} responseUrl
    */
-  _updateHistory: function(path, url) {
-    var fragment = url.substr(cm.getUrl().length);
-    if (path === fragment + window.location.hash) {
-      fragment = path;
+  _updateHistory: function(requestPath, responseUrl) {
+    var responseFragment = responseUrl.substr(cm.getUrl().length);
+    if (requestPath === responseFragment + window.location.hash) {
+      responseFragment = requestPath;
     }
-    window.history.replaceState(null, null, fragment);
+    window.history.replaceState(null, null, responseFragment);
   }
 
 });
