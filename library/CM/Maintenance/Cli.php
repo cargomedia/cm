@@ -89,12 +89,12 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 }
             }
         ));
-        if (CM_Service_Manager::getInstance()->has('maxmind')) {
+        if ($this->getServiceManager()->has('maxmind')) {
             $this->_registerClockworkCallbacks('8 days', array(
                 'CMService_MaxMind::upgrade' => function () {
                     try {
                         /** @var CMService_MaxMind $maxMind */
-                        $maxMind = CM_Service_Manager::getInstance()->get('maxmind', 'CMService_MaxMind');
+                        $maxMind = $this->getServiceManager()->get('maxmind', 'CMService_MaxMind');
                         $maxMind->upgrade();
                     } catch (Exception $exception) {
                         if (!is_a($exception, 'CM_Exception')) {
