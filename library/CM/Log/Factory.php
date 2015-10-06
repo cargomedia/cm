@@ -1,6 +1,8 @@
 <?php
 
-class CM_Log_Factory {
+class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /**
      * @param string[] $handlerList
@@ -8,9 +10,8 @@ class CM_Log_Factory {
      * @throws CM_Exception_Invalid
      */
     public function createLogger(array $handlerList) {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $handlers = \Functional\map($handlerList, function ($handlerService) use ($serviceManager) {
-            return $serviceManager->get($handlerService);
+        $handlers = \Functional\map($handlerList, function ($handlerService) {
+            return $this->getServiceManager()->get($handlerService);
         });
         return $this->_getLogger($handlers);
     }

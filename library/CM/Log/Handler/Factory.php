@@ -1,6 +1,8 @@
 <?php
 
-class CM_Log_Handler_Factory {
+class CM_Log_Handler_Factory implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /**
      * @param string      $streamClass
@@ -27,7 +29,8 @@ class CM_Log_Handler_Factory {
      */
     public function createFileHandler($path, $level = null, $formatMessage = null, $formatDate = null) {
         $path = (string) $path;
-        $file = new CM_File($path);
+        $filesystem = $this->getServiceManager()->getFilesystems()->getData();
+        $file = new CM_File($path, $filesystem);
         $stream = new CM_OutputStream_File($file);
         return $this->_createOutputStreamHandler($stream, $level, $formatMessage, $formatDate);
     }
