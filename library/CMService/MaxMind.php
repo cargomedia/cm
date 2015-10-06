@@ -871,14 +871,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
 				`country`.`name` AS `countryName`
 			FROM `cm_model_location_city` `city`
 			LEFT JOIN `cm_model_location_state` `state` ON `state`.`id` = `city`.`stateId`
-			LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `city`.`countryId`');
+			LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `city`.`countryId`
+			WHERE `city`.`_maxmind` IS NOT NULL');
         $count = $result->getAffectedRows();
         $item = 0;
         while (false !== ($row = $result->fetch())) {
             list($cityId, $cityCode, $cityName, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode, $countryName) = array_values($row);
-            if (null === $cityCode) {
-                throw new CM_Exception('City `' . $cityName . '` (' . $cityId . ') has no MaxMind code');
-            }
             if (null === $regionId) {
                 $regionCode = null;
             } else {
@@ -911,7 +909,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
 			FROM `cm_model_location_zip` `zip`
 			LEFT JOIN `cm_model_location_city` `city` ON `city`.`id` = `zip`.`cityId`
 			LEFT JOIN `cm_model_location_state` `state` ON `state`.`id` = `city`.`stateId`
-			LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `city`.`countryId`');
+			LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `city`.`countryId`
+			WHERE `city`.`_maxmind` IS NOT NULL');
         $count = $result->getAffectedRows();
         $item = 0;
         while (false !== ($row = $result->fetch())) {
