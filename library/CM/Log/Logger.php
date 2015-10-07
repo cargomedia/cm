@@ -41,6 +41,7 @@ class CM_Log_Logger {
 
     /**
      * @param CM_Log_Record $record
+     * @return CM_Log_Logger
      * @throws CM_Log_HandlingException
      */
     public function addRecord(CM_Log_Record $record) {
@@ -61,27 +62,30 @@ class CM_Log_Logger {
             $exceptionMessage = count($exceptionList) . ' handler(s) failed to process a record.';
             throw new CM_Log_HandlingException($exceptionMessage, $exceptionList);
         }
+        return $this;
     }
 
     /**
      * @param string              $message
      * @param int                 $level
      * @param CM_Log_Context|null $context
+     * @return CM_Log_Logger
      */
     public function addMessage($message, $level, CM_Log_Context $context = null) {
         $message = (string) $message;
         $level = (int) $level;
         $context = $this->_mergeWithGlobalContext($context);
-        $this->addRecord(new CM_Log_Record($level, $message, $context));
+        return $this->addRecord(new CM_Log_Record($level, $message, $context));
     }
 
     /**
      * @param Exception           $exception
      * @param CM_Log_Context|null $context
+     * @return CM_Log_Logger
      */
     public function addException(Exception $exception, CM_Log_Context $context = null) {
         $context = $this->_mergeWithGlobalContext($context);
-        $this->addRecord(new CM_Log_Record_Exception($exception, $context));
+        return $this->addRecord(new CM_Log_Record_Exception($exception, $context));
     }
 
     /**
@@ -111,41 +115,46 @@ class CM_Log_Logger {
     /**
      * @param string              $message
      * @param CM_Log_Context|null $context
+     * @return CM_Log_Logger
      */
     public function debug($message, CM_Log_Context $context = null) {
-        $this->addMessage($message, self::DEBUG, $context);
+        return $this->addMessage($message, self::DEBUG, $context);
     }
 
     /**
      * @param string              $message
      * @param CM_Log_Context|null $context
+     * @return CM_Log_Logger
      */
     public function info($message, CM_Log_Context $context = null) {
-        $this->addMessage($message, self::INFO, $context);
+        return $this->addMessage($message, self::INFO, $context);
     }
 
     /**
      * @param string              $message
      * @param CM_Log_Context|null $context
+     * @return CM_Log_Logger
      */
     public function warning($message, CM_Log_Context $context = null) {
-        $this->addMessage($message, self::WARNING, $context);
+        return $this->addMessage($message, self::WARNING, $context);
     }
 
     /**
      * @param string              $message
      * @param CM_Log_Context|null $context
+     * @return CM_Log_Logger
      */
     public function error($message, CM_Log_Context $context = null) {
-        $this->addMessage($message, self::ERROR, $context);
+        return $this->addMessage($message, self::ERROR, $context);
     }
 
     /**
      * @param string              $message
      * @param CM_Log_Context|null $context
+     * @return CM_Log_Logger
      */
     public function critical($message, CM_Log_Context $context = null) {
-        $this->addMessage($message, self::CRITICAL, $context);
+        return $this->addMessage($message, self::CRITICAL, $context);
     }
 
     /**

@@ -9,9 +9,6 @@ class CM_Bootloader {
     /** @var bool */
     private $_debug;
 
-    /** @var  CM_Log_Logger */
-    private $_loggerBasic;
-
     /** @var CM_ExceptionHandling_Handler */
     private $_exceptionHandler;
 
@@ -43,7 +40,6 @@ class CM_Bootloader {
         $this->_exceptionHandler();
         $this->_errorHandler();
         $this->_registerServices();
-        $this->_changeLoggerHandlers();
         $this->_defaults();
     }
 
@@ -58,26 +54,11 @@ class CM_Bootloader {
     }
 
     /**
-     * @return CM_Log_Logger
-     */
-    public function getLoggerBasic() {
-        if (!$this->_loggerBasic) {
-            $loggerFactory = new CM_Log_Factory();
-            if ($this->isCli()) {
-                $this->_loggerBasic = $loggerFactory->createLoggerBasicCli();
-            } else {
-                $this->_loggerBasic = $loggerFactory->createLoggerBasicHttp();
-            }
-        }
-        return $this->_loggerBasic;
-    }
-
-    /**
      * @return CM_ExceptionHandling_Handler
      */
     public function getExceptionHandler() {
         if (!$this->_exceptionHandler) {
-            $this->_exceptionHandler = new CM_ExceptionHandling_Handler($this->getLoggerBasic());
+            $this->_exceptionHandler = new CM_ExceptionHandling_Handler(new CM_Log_Factory());
             $this->_exceptionHandler->setServiceManager(CM_Service_Manager::getInstance());
         }
         return $this->_exceptionHandler;
@@ -134,7 +115,6 @@ class CM_Bootloader {
     public function getModules() {
         return array_keys($this->_getModulePaths());
     }
-
 
     public function reloadModulePaths() {
         $cacheKey = CM_CacheConst::Modules;
@@ -197,19 +177,11 @@ class CM_Bootloader {
             'adapter' => new CM_File_Filesystem_Adapter_Local($this->getDirTmp())
         ]);
         $serviceManager->register('logger-file-error', 'CM_Log_Handler_Factory', null, 'createFileHandler', [
-            'path' => 'logs/error.log',
+            'path'  => 'logs/error.log',
             'level' => CM_Log_Logger::WARNING,
         ]);
         foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
             $serviceManager->registerWithArray($serviceKey, $serviceDefinition);
-        }
-    }
-
-    protected function _changeLoggerHandlers() {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $logger = $this->getLoggerBasic();
-        if ($serviceManager->has('logger-file-error')) {
-            $logger->addHandler($serviceManager->get('logger-file-error'));
         }
     }
 

@@ -4,8 +4,8 @@ class CM_ExceptionHandling_Handler implements CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
 
-    /** @var CM_Log_Logger */
-    private $_loggerBasic;
+    /** @var CM_Log_Factory */
+    private $_loggerFactory;
 
     private $_errorCodes = array(
         E_ERROR             => 'E_ERROR',
@@ -27,10 +27,10 @@ class CM_ExceptionHandling_Handler implements CM_Service_ManagerAwareInterface {
     );
 
     /**
-     * @param CM_Log_Logger $loggerBasic
+     * @param CM_Log_Factory $loggerFactory
      */
-    public function __construct(CM_Log_Logger $loggerBasic) {
-        $this->_loggerBasic = $loggerBasic;
+    public function __construct(CM_Log_Factory $loggerFactory) {
+        $this->_loggerFactory = $loggerFactory;
     }
 
     public function handleErrorFatal() {
@@ -75,18 +75,26 @@ class CM_ExceptionHandling_Handler implements CM_Service_ManagerAwareInterface {
         try {
             $this->getServiceManager()->getLogger()->addException($exception);
         } catch (CM_Log_HandlingException $loggerException) {
-            $this->_loggerBasic->error('Origin exception:');
-            $this->_loggerBasic->addException($exception);
-            $this->_loggerBasic->error('Handlers exception:');
-            $this->_loggerBasic->error($loggerException->getMessage());
+            $backupLogger = $this->_getBackupLogger();
+            $backupLogger
+                ->error('Origin exception:')->addException($exception)
+                ->error('Handlers exception:')
+                ->error($loggerException->getMessage());
+
             foreach ($loggerException->getExceptionList() as $handlerException) {
-                $this->_loggerBasic->addException($handlerException);
+                $backupLogger->addException($handlerException);
             }
         } catch (Exception $loggerException) {
-            $this->_loggerBasic->error('Origin exception:');
-            $this->_loggerBasic->addException($exception);
-            $this->_loggerBasic->error('Logger exception:');
-            $this->_loggerBasic->addException($loggerException);
+            $this->_getBackupLogger()
+                ->error('Origin exception:')->addException($exception)
+                ->error('Logger exception:')->addException($loggerException);
         }
+    }
+
+    /**
+     * @return CM_Log_Logger
+     */
+    protected function _getBackupLogger() {
+        return $this->_loggerFactory->createBackupLogger();
     }
 }
