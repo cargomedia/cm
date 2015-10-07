@@ -56,6 +56,13 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
     this._onChange();
   },
 
+  /**
+   * @return {Number} value
+   */
+  getValue: function() {
+    return +CM_FormField_Abstract.prototype.getValue.apply(this, arguments);
+  },
+
   _onChange: function() {
     this.trigger('change');
   },

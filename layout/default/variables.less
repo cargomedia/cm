@@ -5,7 +5,6 @@
 @colorNotice: #ea8e0b;
 @colorError: #C2113D;
 @colorClose: #C2113D;
-@colorFocus: @colorBrand;
 
 // Basic Color
 @colorFg: #444444;
@@ -53,7 +52,6 @@
 
 //Buttons
 @sizeButton: 38px;
-@sizeCheckbox: 20px;
 @colorFgButtonBorder: rgb(199, 199, 199);
 @colorBgButton: @colorBg;
 @colorFgButton: @fontColorStrong;
@@ -65,10 +63,17 @@
 @colorBgButtonDanger: #d6162a;
 @colorFgButtonDanger: #ffffff;
 
-//Textinput
+//Forms
+@sizeCheckbox: 20px;
 @heightInputText: @sizeButton;
 @heightInputTextarea: 65px;
+@heightSelect: @sizeButton;
 @borderRadiusInput: 3px;
+@colorInputBorder: darken(@colorFgBorderEmphasize3, 5);
+@colorInputPlaceholder: lighten(@colorFgSubtle, 22);
+@colorInputBg: darken(@colorBg, 1);
+@colorInputFg: @colorFg;
+@colorInputFocus: lighten(@colorBrand, 10);
 
 //Usertext
 @usertextLineheight: 1.4;
