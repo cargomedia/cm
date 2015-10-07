@@ -16,7 +16,7 @@
         var label = $select.find('option').eq(index).text();
         $this.find('.button .label').text(label);
       };
-      $select.on('change', function() {
+      $select.on('change value-change', function() {
         updateLabel();
       });
       updateLabel();
