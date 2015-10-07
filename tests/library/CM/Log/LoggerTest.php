@@ -140,11 +140,11 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
 
         $exception = new Exception('foo');
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
-            $contextException = $record->getException();
-            $this->assertSame($exception->getMessage(), $contextException->getMessage());
-            $this->assertSame($exception->getLine(), $contextException->getLine());
-            $this->assertSame($exception->getFile(), $contextException->getFile());
-            $this->assertSame('foo', $record->getMessage());
+            $recordException = $record->getException();
+            $this->assertSame($exception->getMessage(), $recordException->getMessage());
+            $this->assertSame($exception->getLine(), $recordException->getLine());
+            $this->assertSame($exception->getFile(), $recordException->getFile());
+            $this->assertSame('Exception: foo', $record->getMessage());
             $this->assertSame(CM_Log_Logger::ERROR, $record->getLevel());
         });
         $logger->addException($exception);
@@ -153,11 +153,11 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $exception = new CM_Exception('bar');
         $exception->setSeverity(CM_Exception::WARN);
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
-            $contextException = $record->getException();
-            $this->assertSame($exception->getMessage(), $contextException->getMessage());
-            $this->assertSame($exception->getLine(), $contextException->getLine());
-            $this->assertSame($exception->getFile(), $contextException->getFile());
-            $this->assertSame('bar', $record->getMessage());
+            $recordException = $record->getException();
+            $this->assertSame($exception->getMessage(), $recordException->getMessage());
+            $this->assertSame($exception->getLine(), $recordException->getLine());
+            $this->assertSame($exception->getFile(), $recordException->getFile());
+            $this->assertSame('CM_Exception: bar', $record->getMessage());
             $this->assertSame(CM_Log_Logger::WARNING, $record->getLevel());
         });
         $logger->addException($exception);
@@ -166,11 +166,11 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $exception = new CM_Exception('foobar');
         $exception->setSeverity(CM_Exception::ERROR);
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
-            $contextException = $record->getException();
-            $this->assertSame($exception->getMessage(), $contextException->getMessage());
-            $this->assertSame($exception->getLine(), $contextException->getLine());
-            $this->assertSame($exception->getFile(), $contextException->getFile());
-            $this->assertSame('foobar', $record->getMessage());
+            $recordException = $record->getException();
+            $this->assertSame($exception->getMessage(), $recordException->getMessage());
+            $this->assertSame($exception->getLine(), $recordException->getLine());
+            $this->assertSame($exception->getFile(), $recordException->getFile());
+            $this->assertSame('CM_Exception: foobar', $record->getMessage());
             $this->assertSame(CM_Log_Logger::ERROR, $record->getLevel());
         });
         $logger->addException($exception);
@@ -179,11 +179,11 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $exception = new CM_Exception('test');
         $exception->setSeverity(CM_Exception::FATAL);
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
-            $contextException = $record->getException();
-            $this->assertSame($exception->getMessage(), $contextException->getMessage());
-            $this->assertSame($exception->getLine(), $contextException->getLine());
-            $this->assertSame($exception->getFile(), $contextException->getFile());
-            $this->assertSame('test', $record->getMessage());
+            $recordException = $record->getException();
+            $this->assertSame($exception->getMessage(), $recordException->getMessage());
+            $this->assertSame($exception->getLine(), $recordException->getLine());
+            $this->assertSame($exception->getFile(), $recordException->getFile());
+            $this->assertSame('CM_Exception: test', $record->getMessage());
             $this->assertSame(CM_Log_Logger::CRITICAL, $record->getLevel());
         });
         $logger->addException($exception);

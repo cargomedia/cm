@@ -1,14 +1,10 @@
-& {
-  text-align: center;
-}
-
 .previews {
-  overflow: hidden; /* Clearfix */
-  text-align: left;
+  &:not(:empty) {
+    margin-bottom: 12px;
+  }
 
   .preview {
-    display: block;
-    float: left;
+    display: inline-block;
     margin: 2px;
     line-height: @sizeButton;
 
@@ -26,54 +22,25 @@
   }
 }
 
-&.dragover {
-  outline: 3px dashed @colorFgBorderEmphasize1;
-  outline-offset: -3px;
+input {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 118px;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0;
 }
 
-.dropInfo {
-  display: none;
-  color: @colorFgSubtle;
-
-  @media (min-width: 400px) {
-    display: block;
-  }
-
-  .dropInfo-icon {
-    font-size: 3em;
-    line-height: 1.2;
-    color: lighten(@colorFgSubtle, 30);
-    text-shadow: 1px 1px @colorBg;
-  }
-
-  .dropInfo-message {
-    font-size: 1.3em;
-  }
-
-  .dropInfo-divide {
-    margin-bottom: 12px;
-    font-size: @fontSizeSmall;
-  }
+&.dragover .dropZone {
+  border-style: dashed;
 }
 
-.uploadButton {
-  .button;
-  .button-default;
+.button-upload {
   display: inline-block;
-  height: @sizeButton;
-  line-height: @sizeButton;
   position: relative;
-
-  input {
-    position: absolute;
-    right: 0;
-    top: 0;
-    font-size: 118px;
-    margin: 0;
-    padding: 0;
-    cursor: pointer;
-    opacity: 0;
-  }
+  overflow: hidden;
 
   &.disabled {
     opacity: .5;

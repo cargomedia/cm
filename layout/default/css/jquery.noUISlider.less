@@ -1,30 +1,45 @@
 .noUiSlider-wrapper {
-  padding: 0 1px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
 
-  .noUiSlider.noUi-horizontal {
-    background-color: @colorFocus;
-    box-shadow: none;
-    padding-right: 32px;
+.noUi-target {
+  border: 0;
+  background-color: @colorInputFocus;
+}
 
-    &[disabled] {
-      opacity: 0.5;
-      background-color: @colorBgEmphasize1;
-    }
+.noUi-handle {
+  border-radius: 50%;
+  box-shadow: none;
 
-    .noUi-origin {
-      background-color: @colorBgEmphasize1;
-    }
+  &::before, &::after {
+    display: none;
+  }
+}
 
-    .noUi-handle:focus, .noUi-active {
-      outline: none;
-      .input_focus;
-    }
+.noUi-origin {
+  border-radius: 4px;
+  background-color: @colorInputBorder;
+}
 
-    .noUi-handle {
-      left: -1px;
-    }
-    .noUi-origin  {
-      right: -32px;
-    }
+.noUi-handle:focus, .noUi-active {
+  .input_focus;
+}
+
+.noUi-horizontal {
+  height: 8px;
+  box-shadow: none;
+  background-color: @colorInputFocus;
+
+  &[disabled] {
+    opacity: 0.5;
+    background-color: @colorInputBg;
+  }
+
+  .noUi-handle {
+    width: 24px;
+    height: 24px;
+    top: -8px;
+    left: -12px;
   }
 }

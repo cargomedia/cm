@@ -12,12 +12,11 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
   ready: function() {
     CM_FormField_SuggestOne.prototype.ready.call(this);
 
+    this.on('change', function() {
+      this.updateDistanceField();
+    }, this);
     if (this.getDistanceField()) {
-      this.on('change', function() {
-        this.updateDistanceField();
-      }, this);
       var self = this;
-
       this.getDistanceField().on('ready', function() {
         self.updateDistanceField();
       });
