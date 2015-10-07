@@ -48,6 +48,6 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
 
   enableTriggerChangeOnInput: function() {
     // `propertychange` and `keyup` needed for IE9
-    this.getInput().on('input propertychange keyup', _.bind(this.triggerChange, this));
+    this.getInput().on('input propertychange paste keyup', _.bind(this.triggerChange, this));
   }
 });
