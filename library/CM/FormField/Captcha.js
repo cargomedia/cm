@@ -35,8 +35,8 @@ var CM_FormField_Captcha = CM_FormField_Abstract.extend({
    */
   getValue: function() {
     return {
-      id: this.$("input[name*=id]").val(),
-      value: this.$("input[name*=value]").val()
+      id: this._getIdInput().val(),
+      value: this._getValueInput().val()
     }
   },
 
@@ -44,7 +44,23 @@ var CM_FormField_Captcha = CM_FormField_Abstract.extend({
    * @param {{id: *, value: *}} captcha
    */
   setValue: function(captcha) {
-    this.$("input[name*=id]").val(captcha.id);
-    this.$("input[name*=value]").val(captcha.value);
+    this._getIdInput().val(captcha.id);
+    this._getValueInput().val(captcha.value);
+  },
+
+  /**
+   * @returns {jQuery}
+   * @private
+   */
+  _getIdInput: function() {
+    return this.getInput().filter("[name*=id]");
+  },
+
+  /**
+   * @returns {jQuery}
+   * @private
+   */
+  _getValueInput: function() {
+    return this.getInput().filter("[name*=value]");
   }
 });
