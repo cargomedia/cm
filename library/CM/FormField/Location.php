@@ -19,7 +19,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
             $names[] = $location->getName($level);
         }
         return array(
-            'id'    => CM_Params::jsonEncode($location->toArray()),
+            'id'    => $location->toArray(),
             'name'  => implode(', ', array_filter($names)),
             'img'   => $render->getUrlResource('layout',
                 'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),
@@ -34,7 +34,9 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
      */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         $value = parent::validate($environment, $userInput);
-        $value = CM_Params::jsonDecode($value);
+        if (null === $value) {
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid location data.'));
+        }
         $location = CM_Model_Location::fromArray($value);
         if ($location->getLevel() < $this->_options['levelMin'] || $location->getLevel() > $this->_options['levelMax']) {
             throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid location level.'));

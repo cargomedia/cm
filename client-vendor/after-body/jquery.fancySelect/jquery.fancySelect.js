@@ -16,7 +16,7 @@
         var label = $select.find('option').eq(index).text();
         $this.find('.fancySelect-select .label').text(label);
       };
-      $select.on('change', function() {
+      $select.on('change fancyselect:update', function() {
         updateLabel();
       });
       updateLabel();

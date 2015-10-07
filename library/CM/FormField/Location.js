@@ -38,31 +38,10 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
       var distanceEnabled = false;
       var value = this.getValue();
       if (value) {
-        distanceEnabled = value.id.level >= this.getOption("distanceLevelMin");
+        distanceEnabled = value.level >= this.getOption("distanceLevelMin");
       }
-      this.getDistanceField().$("input").prop("disabled", !distanceEnabled);
+      this.getDistanceField().setEnabled(distanceEnabled);
     }
-  },
-
-  /**
-   * @return {Object}
-   */
-  getValue: function() {
-    var value = CM_FormField_SuggestOne.prototype.getValue.call(this);
-    if (value && _.isString(value.id)) {
-      value.id = JSON.parse(value.id);
-    }
-    return value;
-  },
-
-  /**
-   * @param {Object} value
-   */
-  setValue: function(value) {
-    if (_.isObject(value.id)) {
-      value.id = JSON.stringify(value.id);
-    }
-    return CM_FormField_SuggestOne.prototype.setValue.call(this, value);
   },
 
   /**
