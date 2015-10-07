@@ -5,6 +5,18 @@ class CM_Log_Handler_Factory implements CM_Service_ManagerAwareInterface {
     use CM_Service_ManagerAwareTrait;
 
     /**
+     * @param int|null  $level
+     * @param bool|null $bubble
+     * @return CM_Log_Handler_Newrelic
+     */
+    public function createNewrelicHandler($level = null, $bubble = null) {
+        $level = null !== $level ? (int) $level : $level;
+        $bubble = null !== $bubble ? (bool) $bubble : $bubble;
+        $newrelic = $this->getServiceManager()->getNewrelic();
+        return new CM_Log_Handler_Newrelic($newrelic, $level, $bubble);
+    }
+
+    /**
      * @param string      $streamClass
      * @param array|null  $streamArguments
      * @param string|null $formatMessage
