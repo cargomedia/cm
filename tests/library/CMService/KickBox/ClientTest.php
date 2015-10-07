@@ -79,10 +79,10 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
 
     public function testLogExceptionTimeout() {
         $kickBoxMock = $this->mockObject('CMService_KickBox_Client', array('', true, false, 0));
-        $exceptionHandlerMock = $this->mockObject('CM_ExceptionHandling_Handler_Cli');
+        $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler')->newInstanceWithoutConstructor();
         $printException = $exceptionHandlerMock->mockMethod('logException');
         $exceptionHandler = CM_Bootloader::getInstance()->getExceptionHandler();
-        /** @var CM_ExceptionHandling_Handler_Abstract $exceptionHandlerMock */
+        /** @var CM_ExceptionHandling_Handler $exceptionHandlerMock */
         CM_Bootloader::getInstance()->setExceptionHandler($exceptionHandlerMock);
         $i = 0;
         foreach ([
@@ -114,12 +114,12 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
         $kickBoxMock->mockMethod('_getResponse')->set(function () use ($exceptionMessage) {
             throw new RuntimeException($exceptionMessage);
         });
-        $exceptionHandlerMock = $this->mockObject('CM_ExceptionHandling_Handler_Cli');
+        $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler')->newInstanceWithoutConstructor();
         $printException = $exceptionHandlerMock->mockMethod('logException')->set(function (Exception $exception) {
             $this->assertTrue('RuntimeException' === get_class($exception));
         });
         $exceptionHandler = CM_Bootloader::getInstance()->getExceptionHandler();
-        /** @var CM_ExceptionHandling_Handler_Abstract $exceptionHandlerMock */
+        /** @var CM_ExceptionHandling_Handler $exceptionHandlerMock */
         CM_Bootloader::getInstance()->setExceptionHandler($exceptionHandlerMock);
 
         /** @var CMService_KickBox_Client $kickBoxMock */
