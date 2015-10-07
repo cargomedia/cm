@@ -794,40 +794,49 @@ var CM_App = CM_Class_Abstract.extend({
   ajax: function(type, data) {
     var url = this.getUrlAjax(type);
     var self = this;
+    var jqXHR;
 
     return new Promise(function(resolve, reject) {
-      var jqXHR = $.ajax(url, {
+      jqXHR = $.ajax(url, {
         data: JSON.stringify(data),
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json',
         cache: false
       });
-      jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
-        if (cm.getDeployVersion() != response.deployVersion) {
-          cm.router.forceReload();
-        }
-        if (response.error) {
-          reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
-        } else {
-          resolve(response.success);
-        }
-      }).fail(function(xhr, textStatus) {
-        if (xhr.status === 0) {
-          if (window.navigator.onLine) {
-            reject(Promise.CancellationError());
-          } else {
-            reject(new CM_Exception_RequestFailed(cm.language.get('No Internet connection')));
+      jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]})
+        .done(function(response) {
+          if (cm.getDeployVersion() != response.deployVersion) {
+            cm.router.forceReload();
           }
-        }
+          if (response.error) {
+            reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
+          } else {
+            resolve(response.success);
+          }
+        })
+        .fail(function(xhr, textStatus) {
+          if (xhr.status === 0) {
+            if (window.navigator.onLine) {
+              reject(Promise.CancellationError());
+            } else {
+              reject(new CM_Exception_RequestFailed(cm.language.get('No Internet connection')));
+            }
+          }
 
-        var msg = cm.language.get('An unexpected connection problem occurred.');
-        if (cm.options.debug) {
-          msg = xhr.responseText || textStatus;
+          var msg = cm.language.get('An unexpected connection problem occurred.');
+          if (cm.options.debug) {
+            msg = xhr.responseText || textStatus;
+          }
+          reject(new CM_Exception(msg));
+        });
+    }).cancellable()
+      .catch(Promise.CancellationError, function(error) {
+        if (jqXHR) {
+          jqXHR.abort();
         }
-        reject(new CM_Exception(msg));
+        throw error;
       });
-    }).cancellable();
   },
 
   /**
