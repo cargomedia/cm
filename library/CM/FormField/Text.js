@@ -9,19 +9,19 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
   _valueLast: null,
 
   events: {
-    'blur input, textarea, [contenteditable]': function() {
+    'blur input, textarea': function() {
       this.trigger('blur');
     },
-    'focus input, textarea, [contenteditable]': function() {
+    'focus input, textarea': function() {
       this.trigger('focus');
     },
-    'change input, textarea, [contenteditable]': function() {
+    'change input, textarea': function() {
       this.triggerChange();
     }
   },
 
   ready: function() {
-    this._valueLast = this.getInput().val();
+    this._valueLast = this.getValue();
   },
 
   /**
@@ -39,7 +39,7 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
   },
 
   triggerChange: function() {
-    var valueCurrent = this.getInput().val();
+    var valueCurrent = this.getValue();
     if (this._valueLast !== valueCurrent) {
       this._valueLast = valueCurrent;
       this.trigger('change');

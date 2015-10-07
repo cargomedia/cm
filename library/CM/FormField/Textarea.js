@@ -5,22 +5,38 @@
 var CM_FormField_Textarea = CM_FormField_Text.extend({
   _class: 'CM_FormField_Textarea',
 
+  events: {
+    'blur [contenteditable]': function() {
+      this.trigger('blur');
+    },
+    'focus [contenteditable]': function() {
+      this.trigger('focus');
+    },
+    'change [contenteditable]': function() {
+      this.triggerChange();
+    }
+  },
+
   ready: function() {
     this._initPlaceholder();
     this._initPlaintextonly();
     this._initChangeEmitter();
   },
 
+  getInput: function() {
+    return this.$('[contenteditable]');
+  },
+
   getValue: function() {
-    return this.$('[contenteditable]').html();
+    return this.getInput().html();
   },
 
   setValue: function(value) {
-    return this.$('[contenteditable]').html(value);
+    this.getInput().html(value);
   },
 
   _initPlaceholder: function() {
-    this.$('[contenteditable]').focusout(function() {
+    this.getInput().focusout(function() {
       var $this = $(this);
       if (!$this.text().trim().length) {
         $this.empty();
@@ -30,9 +46,9 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
 
   _initPlaintextonly: function() {
     if (Modernizr['contenteditable-plaintext']) {
-      this.$('[contenteditable]').attr('contenteditable', 'plaintext-only')
+      this.getInput().attr('contenteditable', 'plaintext-only')
     } else {
-      this.$('[contenteditable]').on('paste', function(e) {
+      this.getInput().on('paste', function(e) {
         e.preventDefault();
         var text;
         var clipboardData = (e.originalEvent || e).clipboardData;
@@ -58,16 +74,18 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   },
 
   _initChangeEmitter: function() {
-    this.$('[contenteditable]').on('focus', function() {
-      var $this = $(this);
-      $this.data('before', $this.html());
-    }).on('blur keyup paste input', function() {
-      var $this = $(this);
-      if ($this.data('before') !== $this.html()) {
+    this.getInput()
+      .on('focus', function() {
+        var $this = $(this);
         $this.data('before', $this.html());
-        $this.trigger('change');
-      }
-    });
+      })
+      .on('blur keyup paste input', function() {
+        var $this = $(this);
+        if ($this.data('before') !== $this.html()) {
+          $this.data('before', $this.html());
+          $this.trigger('change');
+        }
+      });
   }
 
 
