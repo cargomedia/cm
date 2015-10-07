@@ -2,10 +2,6 @@
 
 class CM_Bootloader_Testing extends CM_Bootloader {
 
-    public function load() {
-        parent::load();
-    }
-
     public function getDataPrefix() {
         return 'test_';
     }

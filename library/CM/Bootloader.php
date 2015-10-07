@@ -58,8 +58,15 @@ class CM_Bootloader {
      */
     public function getExceptionHandler() {
         if (!$this->_exceptionHandler) {
-            $this->_exceptionHandler = new CM_ExceptionHandling_Handler(new CM_Log_Factory());
-            $this->_exceptionHandler->setServiceManager(CM_Service_Manager::getInstance());
+            $serviceManager = CM_Service_Manager::getInstance();
+
+            $logFactory = new CM_Log_Factory();
+            $logFactory->setServiceManager($serviceManager);
+
+            $exceptionHandler = new CM_ExceptionHandling_Handler($logFactory);
+            $exceptionHandler->setServiceManager($serviceManager);
+
+            $this->_exceptionHandler = $exceptionHandler;
         }
         return $this->_exceptionHandler;
     }
