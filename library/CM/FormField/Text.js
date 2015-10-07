@@ -9,13 +9,13 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
   _valueLast: null,
 
   events: {
-    'blur input, [contenteditable]': function() {
+    'blur input': function() {
       this.trigger('blur');
     },
-    'focus input, [contenteditable]': function() {
+    'focus input': function() {
       this.trigger('focus');
     },
-    'change input, [contenteditable]': function() {
+    'change input': function() {
       this.triggerChange();
     }
   },
@@ -41,6 +41,6 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
 
   enableTriggerChangeOnInput: function() {
     // `propertychange` and `keyup` needed for IE9
-    this.getInput().on('input propertychange keyup', _.bind(this.triggerChange, this));
+    this.getInput().on('input propertychange paste keyup', _.bind(this.triggerChange, this));
   }
 });

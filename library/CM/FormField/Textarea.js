@@ -5,15 +5,24 @@
 var CM_FormField_Textarea = CM_FormField_Text.extend({
   _class: 'CM_FormField_Textarea',
 
+  events: {
+    'blur [contenteditable]': function() {
+      this.trigger('blur');
+    },
+    'focus [contenteditable]': function() {
+      this.trigger('focus');
+    },
+    'change [contenteditable]': function() {
+      this.triggerChange();
+    }
+  },
+
   ready: function() {
     this._initPlaceholder();
     this._initPlaintextonly();
-    this._initChangeEmitter();
+    this.enableTriggerChangeOnInput();
   },
 
-  /**
-   * @returns {jQuery}
-   */
   getInput: function() {
     return this.$('[contenteditable]');
   },
@@ -23,7 +32,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   },
 
   setValue: function(value) {
-    return this.getInput().html(value);
+    this.getInput().html(value);
   },
 
   getEnabled: function() {
@@ -66,20 +75,5 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
         }
       });
     }
-  },
-
-  _initChangeEmitter: function() {
-    this.getInput().on('focus', function() {
-      var $this = $(this);
-      $this.data('before', $this.html());
-    }).on('blur keyup paste input', function() {
-      var $this = $(this);
-      if ($this.data('before') !== $this.html()) {
-        $this.data('before', $this.html());
-        $this.trigger('change');
-      }
-    });
   }
-
-
 });
