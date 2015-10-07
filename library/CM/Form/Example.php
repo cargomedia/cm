@@ -4,8 +4,12 @@ class CM_Form_Example extends CM_Form_Abstract {
 
     protected function _initialize() {
         $this->registerField(new CM_FormField_Text(['name' => 'text']));
+        $this->registerField(new CM_FormField_Email(['name' => 'email']));
         $this->registerField(new CM_FormField_Password(['name' => 'password']));
         $this->registerField(new CM_FormField_Textarea(['name' => 'textarea']));
+        $this->registerField(new CM_FormField_Float(['name' => 'float']));
+        $this->registerField(new CM_FormField_Money(['name' => 'money']));
+        $this->registerField(new CM_FormField_Url(['name' => 'url']));
         $this->registerField(new CM_FormField_Integer(['name' => 'int', 'min' => -10, 'max' => 20, 'step' => 2]));
         $this->registerField(new CM_FormField_Distance(['name' => 'locationSlider']));
         $this->registerField(new CM_FormField_Location(['name' => 'location', 'fieldNameDistance' => 'locationSlider']));
@@ -13,12 +17,15 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_FileImage(['name' => 'image', 'cardinality' => 2]));
         $this->registerField(new CM_FormField_Color(['name' => 'color']));
         $this->registerField(new CM_FormField_Date(['name' => 'date']));
+        $this->registerField(new CM_FormField_Birthdate(['name' => 'birthdate', 'minAge' => 18, 'maxAge' => 30]));
+        $this->registerField(new CM_FormField_GeoPoint(['name' => 'geopoint']));
         $this->registerField(new CM_FormField_Set(['name' => 'set', 'values' => array(1 => 'Eins', 2 => 'Zwei'), 'labelsInValues' => true]));
         $this->registerField(new CM_FormField_Boolean(['name' => 'boolean']));
         $this->registerField(new CM_FormField_Boolean(['name' => 'booleanSwitch']));
         $this->registerField(new CM_FormField_Set_Select(['name' => 'setSelect1', 'values' => [1 => 'Eins', 2 => 'Zwei'], 'labelsInValues' => true]));
         $this->registerField(new CM_FormField_Set_Select(['name' => 'setSelect2', 'values' => [1 => 'Eins', 2 => 'Zwei'], 'labelsInValues' => true]));
         $this->registerField(new CM_FormField_Set_Select(['name' => 'setSelect3', 'values' => [1 => 'Foo', 2 => 'Bar'], 'labelsInValues' => true]));
+        $this->registerField(new CM_FormField_TreeSelect(['name' => 'treeselect', 'tree' => CM_Model_LanguageKey::getTree()]));
 
         $this->registerAction(new CM_FormAction_Example_Go($this));
     }

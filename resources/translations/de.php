@@ -56,8 +56,7 @@ return function (CM_Model_Language $language) {
     $language->setTranslation('An unexpected connection problem occurred.', 'Ein unerwarteter Verbindungsfehler ist aufgetreten.');
 
     $language->setTranslation('The content you tried to interact with has been deleted.', 'Dieser Inhalt wurde gelöscht.');
-    $language->setTranslation('Drag files here', 'Ziehe deine Datein hierhin');
-    $language->setTranslation('or', 'oder');
+    $language->setTranslation('Click or drag files here', 'Klicke oder ziehe deine Dateien hierhin');
     $language->setTranslation('Upload Files', 'Dateien hochladen');
     $language->setTranslation('You', 'Du');
     $language->setTranslation('Year', 'Jahr');
