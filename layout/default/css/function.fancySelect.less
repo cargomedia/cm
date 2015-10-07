@@ -3,12 +3,20 @@
   position: relative;
   max-width: 100%;
 
-  .button {
+  .fancySelect-select {
+    box-sizing: border-box;
     position: relative;
     display: inline-block;
-    margin: 0;
+    padding-left: 15px;
     padding-right: 25px;
-    background: @colorBgEmphasize1;
+    max-width: 100%;
+    height: @heightSelect;
+    line-height: @heightSelect - 2px;
+    vertical-align: top;
+    border-radius: @borderRadiusInput;
+    background-color: @colorInputBg;
+    border: 1px solid @colorInputBorder;
+    cursor: pointer;
 
     .labelPrefix {
       margin-right: 10px;
@@ -40,12 +48,12 @@
     cursor: pointer;
 
     &:not(:disabled) {
-      &:focus + .button {
+      &:focus + .fancySelect-select {
         .input_focus;
       }
     }
 
-    &:disabled + .button {
+    &:disabled + .fancySelect-select {
       opacity: .5;
     }
   }
