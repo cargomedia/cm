@@ -67,14 +67,35 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @return string|null
+   * @returns {jQuery}
+   */
+  getInput: function() {
+    var $input = this.$('input:first, select:first, textarea:first');
+    if ($input.length === 0) {
+      throw new CM_Exception('Can\'t find input for `' + this.getName() + '` field');
+    }
+    return $input;
+  },
+
+  /**
+   * @returns {*|String|null}
    */
   getValue: function() {
-    var formData = this.getForm().getData();
-    if (!_.has(formData, this.getName())) {
-      return null;
-    }
-    return formData[this.getName()];
+    return this.getInput().val();
+  },
+
+  /**
+   * @param {*|String|null} value
+   */
+  setValue: function(value) {
+    this.getInput().val(value);
+  },
+
+  /**
+   * @returns {Boolean}
+   */
+  getEnabled: function() {
+    return this.getInput().is(':enabled');
   },
 
   /**
@@ -94,13 +115,6 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
       return null;
     }
     return options[name];
-  },
-
-  /**
-   * @returns {jQuery}
-   */
-  getInput: function() {
-    return this.$('input:first, select:first, textarea:first, [contenteditable]:first')
   },
 
   setFocus: function() {

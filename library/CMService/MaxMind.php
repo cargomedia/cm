@@ -30,23 +30,33 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $_zipCodeListByCityAdded, $_zipCodeListByCityRemoved, $_zipCodeIdListByMaxMind,
         $_ipBlockListByLocation;
 
-    /**
-     * @param CM_OutputStream_Interface|null $streamOutput
-     * @param CM_OutputStream_Interface|null $streamError
-     * @param bool|null                      $withoutIpBlocks
-     * @param bool|null                      $verbose
-     */
-    public function __construct(CM_OutputStream_Interface $streamOutput = null, CM_OutputStream_Interface $streamError = null, $withoutIpBlocks = null, $verbose = null) {
-        if (null === $streamOutput) {
-            $streamOutput = new CM_OutputStream_Null();
-        }
-        if (null === $streamError) {
-            $streamError = new CM_OutputStream_Null();
-        }
-        $this->_streamOutput = $streamOutput;
+    public function __construct() {
+        $this->_streamOutput = new CM_OutputStream_Null();
+        $this->_streamError = new CM_OutputStream_Null();
+        $this->_withoutIpBlocks = false;
+        $this->_verbose = false;
+    }
+
+    public function setStreamError(CM_OutputStream_Interface $streamError) {
         $this->_streamError = $streamError;
-        $this->_withoutIpBlocks = (bool) $withoutIpBlocks;
+    }
+
+    public function setStreamOutput(CM_OutputStream_Interface $streamOutput) {
+        $this->_streamOutput = $streamOutput;
+    }
+
+    /**
+     * @param bool $verbose
+     */
+    public function setVerbose($verbose) {
         $this->_verbose = (bool) $verbose;
+    }
+
+    /**
+     * @param bool $withoutIpBlocks
+     */
+    public function setWithoutIpBlocks($withoutIpBlocks) {
+        $this->_withoutIpBlocks = (bool) $withoutIpBlocks;
     }
 
     public function outdated() {
@@ -871,14 +881,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
 				`country`.`name` AS `countryName`
 			FROM `cm_model_location_city` `city`
 			LEFT JOIN `cm_model_location_state` `state` ON `state`.`id` = `city`.`stateId`
-			LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `city`.`countryId`');
+			LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `city`.`countryId`
+			WHERE `city`.`_maxmind` IS NOT NULL');
         $count = $result->getAffectedRows();
         $item = 0;
         while (false !== ($row = $result->fetch())) {
             list($cityId, $cityCode, $cityName, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode, $countryName) = array_values($row);
-            if (null === $cityCode) {
-                throw new CM_Exception('City `' . $cityName . '` (' . $cityId . ') has no MaxMind code');
-            }
             if (null === $regionId) {
                 $regionCode = null;
             } else {
@@ -911,7 +919,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
 			FROM `cm_model_location_zip` `zip`
 			LEFT JOIN `cm_model_location_city` `city` ON `city`.`id` = `zip`.`cityId`
 			LEFT JOIN `cm_model_location_state` `state` ON `state`.`id` = `city`.`stateId`
-			LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `city`.`countryId`');
+			LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `city`.`countryId`
+			WHERE `city`.`_maxmind` IS NOT NULL');
         $count = $result->getAffectedRows();
         $item = 0;
         while (false !== ($row = $result->fetch())) {
