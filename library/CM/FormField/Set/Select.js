@@ -34,7 +34,7 @@ var CM_FormField_Set_Select = CM_FormField_Set.extend({
       this.getInputByValue(value).prop('checked', 'checked');
     } else {
       this.getInput().val(value);
-      this.getInput().trigger('value-change');
+      this.getInput().trigger('fancyselect:update');
     }
   },
 
