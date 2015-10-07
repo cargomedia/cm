@@ -69,6 +69,14 @@ class CM_ExceptionHandling_Handler implements CM_Service_ManagerAwareInterface {
     }
 
     /**
+     * Implemented for retro compatibility
+     * @param Exception $exception
+     */
+    public function logException(Exception $exception) {
+        $this->handleException($exception);
+    }
+
+    /**
      * @param Exception $exception
      */
     public function handleException(Exception $exception) {
