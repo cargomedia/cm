@@ -32,6 +32,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
         layout._updateHistory(path, response.url);
         layout._onPageSetup(response.title, response.menuEntryHashList, response.jsTracking);
         view._ready();
+        cm.event.trigger('navigate:end', {page: view, path: path});
         return view;
       })
       .catch(function(error) {
@@ -70,7 +71,8 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
    * @return Promise
    */
   loadPage: function(path) {
-    cm.event.trigger('navigate', path);
+    cm.event.trigger('navigate', path); // deprecated
+    cm.event.trigger('navigate:start', {path: path});
     return this._loadPageThrottled(path);
   },
 
