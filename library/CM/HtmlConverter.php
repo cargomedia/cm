@@ -15,6 +15,7 @@ class CM_HtmlConverter {
         $html = preg_replace('/<p>/', '', $html);                           // remove opening p for IE 11 enter
         $html = preg_replace('/<\/p>/', PHP_EOL, $html);                    // replace closing p for IE 11 enter
         $html = preg_replace('/&nbsp;/', ' ', $html);                       // non-breaking space
+        $html = strip_tags($html);
         $html = html_entity_decode($html, null, 'UTF-8');
         return $html;
     }
