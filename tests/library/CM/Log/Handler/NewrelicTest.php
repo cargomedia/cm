@@ -5,7 +5,7 @@ class CM_Log_Handler_NewrelicTest extends CMTest_TestCase {
     public function testWriteRecordWithLogRecordException() {
         $expectedException = new Exception('foo');
 
-        /** @var CMService_Newrelic|Mocka\AbstractClassTrait $mockStreamInterface */
+        /** @var CMService_Newrelic|\Mocka\AbstractClassTrait $newrelic */
         $newrelic = $this->mockClass('CMService_Newrelic')->newInstanceWithoutConstructor();
         /** @var Mocka\FunctionMock $methodSetNoticeError */
         $methodSetNoticeError = $newrelic->mockMethod('setNoticeError');
@@ -22,7 +22,7 @@ class CM_Log_Handler_NewrelicTest extends CMTest_TestCase {
     }
 
     public function testWriteRecordWithLogRecord() {
-        /** @var CMService_Newrelic|Mocka\AbstractClassTrait $mockStreamInterface */
+        /** @var CMService_Newrelic|\Mocka\AbstractClassTrait $newrelic */
         $newrelic = $this->mockClass('CMService_Newrelic')->newInstanceWithoutConstructor();
         /** @var Mocka\FunctionMock $methodSetNoticeError */
         $methodSetNoticeError = $newrelic->mockMethod('setNoticeError');
@@ -43,7 +43,7 @@ class CM_Log_Handler_NewrelicTest extends CMTest_TestCase {
     }
 
     public function testIsHandling() {
-        /** @var CMService_Newrelic|Mocka\AbstractClassTrait $mockStreamInterface */
+        /** @var CMService_Newrelic|\Mocka\AbstractClassTrait $newrelic */
         $newrelic = $this->mockClass('CMService_Newrelic')->newInstanceWithoutConstructor();
 
         $context = new CM_Log_Context();
