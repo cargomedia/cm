@@ -11,8 +11,7 @@ var CM_Form_Example = CM_Form_Abstract.extend({
     },
     'click .showServerData': function() {
       this.ajax('validate', {data: this.getData()}).then(function(result) {
-        console.log(result.valid);
-        console.log(result.invalid);
+        console.log(result);
       });
     }
   }
