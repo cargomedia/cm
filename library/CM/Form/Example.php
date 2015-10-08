@@ -26,8 +26,6 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_Set_Select(['name' => 'setSelect2', 'values' => [1 => 'Eins', 2 => 'Zwei'], 'labelsInValues' => true]));
         $this->registerField(new CM_FormField_Set_Select(['name' => 'setSelect3', 'values' => [1 => 'Foo', 2 => 'Bar'], 'labelsInValues' => true]));
         $this->registerField(new CM_FormField_TreeSelect(['name' => 'treeselect', 'tree' => CM_Model_LanguageKey::getTree()]));
-
-        $this->registerAction(new CM_FormAction_Example_Go($this));
     }
 
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
@@ -37,5 +35,21 @@ class CM_Form_Example extends CM_Form_Abstract {
                 $this->getField('location')->setValue($locationGuess);
             }
         }
+    }
+
+    public function ajax_validate(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
+        $data = $params->getArray('data');
+        $result = [
+            'valid' => [],
+            'invalid' => [],
+        ];
+        foreach ($data as $name => $value) {
+            try {
+                $result['valid'][$name] = $this->getField($name)->validate($response->getEnvironment(), $value);
+            } catch (Exception $e) {
+                $result['invalid'][$name] = get_class($e) . ': ' . $e->getMessage();
+            }
+        }
+        return $result;
     }
 }
