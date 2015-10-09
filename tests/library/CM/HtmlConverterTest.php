@@ -5,13 +5,13 @@ class CM_HtmlConverterTest extends CMTest_TestCase {
     public function testConvertHtmlToPlainText() {
         $suites = [
             'Chrome, Firefox, Safari, iOS, Android' => [
-                'foo<br />&nbsp; bar<br /><br />' => "foo\nbar\n\n",
+                'foo<br />&nbsp; &lt;div&gt;<b>bar</b>&lt;/div&gt;<br /><br />' => "foo\n  <div>bar</div>\n\n",
             ],
-            'Internet Explorer 11' => [
-                '<p>foo<br />&nbsp; bar</p><p><br /></p>' => "foo\nbar\n\n",
+            'Internet Explorer 11'                  => [
+                '<p>foo<br />&nbsp; &lt;div&gt;<b>bar</b>&lt;/div&gt;</p><p><br /></p>' => "foo\n  <div>bar</div>\n\n",
             ],
-            'Internet Explorer Edge' => [
-                '<div>foo<br />&nbsp; bar</div><div></div>' => "foo\nbar\n\n",
+            'Internet Explorer Edge'                => [
+                '<div>foo<br />&nbsp; &lt;div&gt;<b>bar</b>&lt;/div&gt;</div><div></div>' => "foo\n  <div>bar</div>\n\n",
             ],
         ];
 
