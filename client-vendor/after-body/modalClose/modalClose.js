@@ -14,9 +14,7 @@
     /** @type {Function} */
     this.closeCallback = closeCallback;
     /** @type {Boolean} */
-    this.enabled = null;
-
-    this.enable();
+    this.enabled = false;
   };
 
   /**
@@ -48,9 +46,12 @@
     this.enabled = false;
   };
 
-  ModalClose.prototype.close = function() {
+  /**
+   * @param {Array} [callbackArguments]
+   */
+  ModalClose.prototype.close = function(callbackArguments) {
     if (this.getEnabled()) {
-      this.closeCallback.call();
+      this.closeCallback.apply(this, callbackArguments);
       this.disable();
     }
   };
