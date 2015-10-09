@@ -5,7 +5,7 @@
 
   /**
    * @param {jQuery} $element
-   * @param {Function} [callback] fn(state, callbackOptions)
+   * @param {Function} [callback] fn(state)
    */
   var ToggleModal = function($element, callback) {
     callback = callback || function(state) {
@@ -34,49 +34,37 @@
 
   /**
    * @param {Boolean} state
-   * @param {Object} [callbackOptions]
    */
-  ToggleModal.prototype.setState = function(state, callbackOptions) {
+  ToggleModal.prototype.setState = function(state) {
     if (state === this.getState()) {
       return;
     }
-    this._executeCallback(state, callbackOptions);
+    this._executeCallback(state);
     state ? this.modalClose.enable() : this.modalClose.disable();
     this.state = state;
   };
 
-  /**
-   * @param {Object} [callbackOptions]
-   */
-  ToggleModal.prototype.toggle = function(callbackOptions) {
-    this.setState(!this.getState(), callbackOptions);
+  ToggleModal.prototype.toggle = function() {
+    this.setState(!this.getState());
   };
 
 
   /**
    * @param {Boolean} state
-   * @param {Object} [callbackOptions]
    */
-  ToggleModal.prototype._executeCallback = function(state, callbackOptions) {
-    callbackOptions = callbackOptions || {};
-    this.callback.call(this.$element, state, callbackOptions);
+  ToggleModal.prototype._executeCallback = function(state) {
+    this.callback.call(this.$element, state);
   };
 
   /**
    * @param {String|Function} [action]
-   * @param {Object} [arg]
+   * @param {Function} [callback]
    * @return {jQuery}
    */
-  $.fn.toggleModal = function(action, arg) {
-    var callback, callbackOptions;
+  $.fn.toggleModal = function(action, callback) {
     if (typeof action === 'function') {
       callback = action;
       action = 'toggle';
-    }
-    if (typeof arg === 'function') {
-      callback = arg;
-    } else {
-      callbackOptions = arg;
     }
 
     return this.each(function() {
@@ -91,11 +79,11 @@
       switch (action) {
         case 'show':
         case 'open':
-          toggleModal.setState(true, callbackOptions);
+          toggleModal.setState(true);
           break;
         case 'hide':
         case 'close':
-          toggleModal.setState(false, callbackOptions);
+          toggleModal.setState(false);
           break;
         case 'toggle':
         default:
