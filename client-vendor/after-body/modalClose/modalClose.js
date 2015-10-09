@@ -46,12 +46,9 @@
     this.enabled = false;
   };
 
-  /**
-   * @param {Array} [callbackArguments]
-   */
-  ModalClose.prototype.close = function(callbackArguments) {
+  ModalClose.prototype.close = function() {
     if (this.getEnabled()) {
-      this.closeCallback.apply(this, callbackArguments);
+      this.closeCallback.call(this);
       this.disable();
     }
   };
