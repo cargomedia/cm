@@ -22,5 +22,13 @@
 {formField name='setSelect2' label="{translate 'Set Select'}"}
 {formField name='setSelect3' label="{translate 'Set Select with Prefix'}" labelPrefix="{translate 'Sex'}"}
 {formField name='treeselect' label="{translate 'Tree select'}"}
-{formAction action='Go' label="{translate 'Go'}"}
+  <div class="box">
+    <div class="box-header">
+      Below buttons' results show in developer console (please open it before)
+    </div>
+    <div class="box-body">
+      {button_link class="showClientData" theme="highlight" label="Show client data"}
+      {button_link class="showServerData" theme="highlight" label="Send and validate data"}
+    </div>
+  </div>
 {/form}

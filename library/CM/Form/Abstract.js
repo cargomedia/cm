@@ -107,10 +107,23 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
+   * @returns {{}}
+   */
+  getData: function() {
+    var data = {};
+    _.each(this._fields, function(field) {
+      if (field.getEnabled()) {
+        data[field.getName()] = field.getValue();
+      }
+    });
+    return data;
+  },
+
+  /**
    * @param {String} actionName
    * @returns {{}}
    */
-  getData: function(actionName) {
+  getActionData: function(actionName) {
     var action = this._getAction(actionName);
     var data = {};
 
@@ -137,7 +150,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       disableUI: true
     });
     var action = this._getAction(actionName);
-    var data = this.getData(action.name);
+    var data = this.getActionData(action.name);
     var errorList = this._getErrorList(action.name, data);
 
     if (options.handleErrors) {
