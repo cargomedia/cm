@@ -9,7 +9,7 @@
    */
   var ToggleModal = function($element, callback) {
     callback = callback || function(state) {
-        $(this).toggle();
+        state ? $(this).show() : $(this).hide();
       };
 
     /** @type {jQuery} */
