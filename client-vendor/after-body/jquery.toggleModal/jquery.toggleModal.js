@@ -4,68 +4,91 @@
 (function($) {
 
   /**
-   * @param {Function} [callback] fn(state, callbackOptions)
-   * @param {Object} [callbackOptions]
-   * @returns {jQuery}
+   * @param {jQuery} $element
+   * @param {Function} [callback] fn(state)
    */
-  $.fn.toggleModal = function(callback, callbackOptions) {
+  var ToggleModal = function($element, callback) {
     callback = callback || function(state) {
-      $(this).toggle();
-    };
-    callbackOptions = callbackOptions || {};
-    var $self = this;
-    if (!$self.length) {
-      return $self;
-    }
-
-    if (!$self.data('toggleModal')) {
-
-      var documentClick = function(e) {
-        if (!$self.length || e.target !== $self[0] && !$.contains($self[0], e.target)) {
-          close();
-        }
+        state ? $(this).show() : $(this).hide();
       };
 
-      var documentKeydown = function(e) {
-        if (e.which == 27) {
-          close();
-        }
-      };
+    /** @type {jQuery} */
+    this.$element = $element;
+    /** @type {Function} */
+    this.callback = callback;
+    /** @type {Boolean} */
+    this.state = false;
+    /** @type {ModalClose} */
+    this.modalClose = new ModalClose(this.$element[0], function() {
+      this.setState(false);
+    }.bind(this));
 
-      /**
-       * @param {Object} [callbackOptions]
-       */
-      var close = function(callbackOptions) {
-        callbackOptions = callbackOptions || {};
-        if (!$self.data('toggleModal')) {
-          return;	// Dont close twice (eg. if toggleModalClose() was called from the same event which was triggering the close)
-        }
-        callback.call($self, false, callbackOptions);
-        $self.removeData('toggleModal').off('.toggleModal');
-        $(document).off('click.toggleModal', documentClick);
-        $(document).off('keydown.toggleModal', documentKeydown);
-      };
-
-      callback.call($self, true, callbackOptions);
-      $self.data('toggleModal', close);
-      setTimeout(function() {
-        $(document).on('click.toggleModal', documentClick);
-        $(document).on('keydown.toggleModal', documentKeydown);
-      }, 0);
-    }
-
-    return $self;
   };
 
   /**
-   * @param {Object} [callbackOptions]
-   * @returns {jQuery}
+   * @returns {Boolean}
    */
-  $.fn.toggleModalClose = function(callbackOptions) {
+  ToggleModal.prototype.getState = function() {
+    return this.state;
+  };
+
+  /**
+   * @param {Boolean} state
+   */
+  ToggleModal.prototype.setState = function(state) {
+    if (state === this.getState()) {
+      return;
+    }
+    this._executeCallback(state);
+    state ? this.modalClose.enable() : this.modalClose.disable();
+    this.state = state;
+  };
+
+  ToggleModal.prototype.toggle = function() {
+    this.setState(!this.getState());
+  };
+
+
+  /**
+   * @param {Boolean} state
+   */
+  ToggleModal.prototype._executeCallback = function(state) {
+    this.callback.call(this.$element, state);
+  };
+
+  /**
+   * @param {String|Function} [action]
+   * @param {Function} [callback]
+   * @return {jQuery}
+   */
+  $.fn.toggleModal = function(action, callback) {
+    if (typeof action === 'function') {
+      callback = action;
+      action = 'toggle';
+    }
+
     return this.each(function() {
-      var close = $(this).data('toggleModal');
-      if (close) {
-        close(callbackOptions);
+      var $self = $(this);
+
+      var toggleModal = $self.data('toggleModal');
+      if (!toggleModal) {
+        toggleModal = new ToggleModal($self, callback);
+        $self.data('toggleModal', toggleModal);
+      }
+
+      switch (action) {
+        case 'show':
+        case 'open':
+          toggleModal.setState(true);
+          break;
+        case 'hide':
+        case 'close':
+          toggleModal.setState(false);
+          break;
+        case 'toggle':
+        default:
+          toggleModal.toggle();
+          break;
       }
     });
   };
