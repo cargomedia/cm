@@ -1,5 +1,5 @@
 <div class="example-info">
-Changes to form fields are validated and displayed in the developer console of the browser!
+  Changes to form fields are validated and displayed in the developer console of the browser!
 </div>
 
 {form name="CM_Form_Example" viewer=$viewer}
@@ -24,6 +24,6 @@ Changes to form fields are validated and displayed in the developer console of t
 {formField name='booleanSwitch' text="Bool Switch" display='switch'}
 {formField name='setSelect1' label="Set Select" display='radios'}
 {formField name='setSelect2' label="Set Select"}
-{formField name='setSelect3' label="Set Select with Prefix" labelPrefix="Sex"}
+{formField name='setSelect3' label="Set Select with Prefix" labelPrefix="FooBar"}
 {formField name='treeselect' label="Tree select"}
 {/form}

@@ -24,9 +24,7 @@
       {viewTemplate name='tabs/buttons'}
     </div>
     <div>
-      {block name="tabs-forms"}
-        {viewTemplate name='tabs/forms'}
-      {/block}
+      {viewTemplate name='tabs/forms'}
     </div>
     <div>
       {viewTemplate name='tabs/variables' colorStyles=$colorStyles}
