@@ -107,6 +107,20 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
+   * @returns {String[]}
+   */
+  getFieldNames: function() {
+    return _.keys(this._fields);
+  },
+
+  /**
+   * @returns {CM_FormField_Abstract[]}
+   */
+  getFields: function() {
+    return _.values(this._fields);
+  },
+
+  /**
    * @returns {{}}
    */
   getData: function() {

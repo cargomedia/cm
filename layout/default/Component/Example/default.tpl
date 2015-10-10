@@ -24,11 +24,7 @@
       {viewTemplate name='tabs/buttons'}
     </div>
     <div>
-      {block name="tabs-forms"}
-        <h2>CM_Form_Example</h2>
-        {code language="html5"}{load file='Component/Example/tabs/forms.tpl' namespace='CM' parse=false}{/code}
-        {viewTemplate name='tabs/forms'}
-      {/block}
+      {viewTemplate name='tabs/forms'}
     </div>
     <div>
       {viewTemplate name='tabs/variables' colorStyles=$colorStyles}

@@ -16,18 +16,23 @@ var CM_FormField_Set_Select = CM_FormField_Set.extend({
   },
 
   /**
-   * @returns {String}
+   * @returns {String|Null}
    */
   getValue: function() {
     if (this._isRadio()) {
-      return this.getInput().filter(':checked').val();
+      var $checked = this.getInput().filter(':checked');
+      if (0 === $checked.length) {
+        return null;
+      } else {
+        return $checked.val();
+      }
     } else {
       return this.getInput().val();
     }
   },
 
   /**
-   * @param {String} value
+   * @param {String|Null} value
    */
   setValue: function(value) {
     if (this._isRadio()) {

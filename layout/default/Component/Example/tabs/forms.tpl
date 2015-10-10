@@ -1,3 +1,7 @@
+<div class="example-info">
+  Changes to form fields are validated and displayed in the developer console of the browser!
+</div>
+
 {form name="CM_Form_Example" viewer=$viewer}
 {formField name='text' label="Text" placeholder="Placeholder"}
 {formField name='email' label="Email" placeholder="Email"}
@@ -19,16 +23,7 @@
 {formField name='boolean' text="Bool"}
 {formField name='booleanSwitch' text="Bool Switch" display='switch'}
 {formField name='setSelect1' label="Set Select" display='radios'}
-{formField name='setSelect2' label="Set Select"}
-{formField name='setSelect3' label="Set Select with Prefix" labelPrefix="Sex"}
+{formField name='setSelect2' label="Set Select" placeholder=true}
+{formField name='setSelect3' label="Set Select with Prefix" labelPrefix="FooBar" placeholder=true}
 {formField name='treeselect' label="Tree select"}
-  <div class="box">
-    <div class="box-header">
-      Below buttons' results show in developer console (please open it before)
-    </div>
-    <div class="box-body">
-      {button_link class="showClientData" theme="highlight" label="Show client data"}
-      {button_link class="showServerData" theme="highlight" label="Send and validate data"}
-    </div>
-  </div>
 {/form}
