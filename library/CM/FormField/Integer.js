@@ -70,19 +70,12 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
     }
   },
 
-  /**
-   * @return {Number} value
-   */
-  getValue: function() {
-    return +CM_FormField_Abstract.prototype.getValue.apply(this, arguments);
-  },
-
   _onChange: function() {
     this.trigger('change');
   },
 
   _onKeyDown: function(event) {
-    if (this._$noUiHandle.is(':focus') && this.isEnabled()) {
+    if (this._$noUiHandle.is(':focus') && this.getEnabled()) {
       if (event.which === cm.keyCode.LEFT || event.which === cm.keyCode.DOWN) {
         this.setValue(this.getValue() - this.getOption('step'));
         event.preventDefault();
