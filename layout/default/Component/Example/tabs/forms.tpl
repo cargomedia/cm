@@ -23,7 +23,7 @@
 {formField name='boolean' text="Bool"}
 {formField name='booleanSwitch' text="Bool Switch" display='switch'}
 {formField name='setSelect1' label="Set Select" display='radios'}
-{formField name='setSelect2' label="Set Select"}
-{formField name='setSelect3' label="Set Select with Prefix" labelPrefix="FooBar"}
+{formField name='setSelect2' label="Set Select" placeholder=true}
+{formField name='setSelect3' label="Set Select with Prefix" labelPrefix="FooBar" placeholder=true}
 {formField name='treeselect' label="Tree select"}
 {/form}
