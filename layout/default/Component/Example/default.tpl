@@ -25,8 +25,6 @@
     </div>
     <div>
       {block name="tabs-forms"}
-        <h2>CM_Form_Example</h2>
-        {code language="html5"}{load file='Component/Example/tabs/forms.tpl' namespace='CM' parse=false}{/code}
         {viewTemplate name='tabs/forms'}
       {/block}
     </div>

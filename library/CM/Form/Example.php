@@ -39,16 +39,24 @@ class CM_Form_Example extends CM_Form_Abstract {
 
     public function ajax_validate(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
         $data = $params->getArray('data');
-        $result = [
-            'valid' => [],
-            'invalid' => [],
-        ];
-        foreach ($data as $name => $value) {
-            try {
-                $result['valid'][$name] = $this->getField($name)->validate($response->getEnvironment(), $value);
-            } catch (Exception $e) {
-                $result['invalid'][$name] = get_class($e) . ': ' . $e->getMessage();
+        $result = [];
+        foreach ($data as $name => $userInput) {
+            $field = $this->getField($name);
+            $empty = $field->isEmpty($userInput);
+            $value = null;
+            $validationError = null;
+            if (!$empty) {
+                try {
+                    $value = $field->validate($response->getEnvironment(), $userInput);
+                } catch (CM_Exception_FormFieldValidation $e) {
+                    $validationError = $e->getMessagePublic($response->getRender());
+                }
             }
+            $result[$name] = [
+                'value'           => $value,
+                'empty'           => $empty,
+                'validationError' => $validationError,
+            ];
         }
         return $result;
     }
