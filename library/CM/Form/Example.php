@@ -28,15 +28,6 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_TreeSelect(['name' => 'treeselect', 'tree' => CM_Model_LanguageKey::getTree()]));
     }
 
-    public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
-        if (CM_Http_Request_Abstract::hasInstance()) {
-            $ip = CM_Http_Request_Abstract::getInstance()->getIp();
-            if ($locationGuess = CM_Model_Location::findByIp($ip)) {
-                $this->getField('location')->setValue($locationGuess);
-            }
-        }
-    }
-
     public function ajax_validate(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
         $data = $params->getArray('data');
         $result = [];
