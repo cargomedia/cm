@@ -20,11 +20,4 @@ class CM_FormField_BooleanTest extends CMTest_TestCase {
         $this->assertCount(1, $doc->find('input[name="switch"]'));
         $this->assertSame('1', $doc->find('input[name="switch"][type="checkbox"]')->getAttribute('value'));
     }
-
-    public function testIsEmpty() {
-        $field = new CM_FormField_Boolean(['name' => 'boolean']);
-
-        $this->assertSame(false, $field->isEmpty(true));
-        $this->assertSame(false, $field->isEmpty(false));
-    }
 }

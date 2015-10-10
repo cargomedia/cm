@@ -156,6 +156,15 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
    * @returns {Boolean}
    */
   isEmpty: function(value) {
-    return _.isEmpty(value);
+    if (_.isNull(value)) {
+      return true;
+    }
+    if (_.isArray(value)) {
+      return 0 === value.length;
+    }
+    if (_.isBoolean(value)) {
+      return false;
+    }
+    return 0 === String(value).trim().length;
   }
 });
