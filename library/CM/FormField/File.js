@@ -102,11 +102,11 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
   },
 
   getValue: function() {
-    var array = this.$('input:not([disabled])[name="' + this.options.params.name + '[]"]').map(function() {
+    var value = this.$('input[name="' + this.options.params.name + '[]"]').map(function() {
       return $(this).val();
     }).get();
-    var value = _.compact(array);
-    return value.length ? value : null;
+    value = _.compact(value);
+    return value;
   },
 
   setValue: function(value) {
