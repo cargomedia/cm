@@ -8,6 +8,9 @@
    * @param {jQuery} $element
    * @constructor
    */
+
+  var iOS = navigator.userAgent.match(/(iPad|iPhone|iPod)/i);
+
   var ScrollShadow = function($element) {
     this.$element = $element;
     this.initialized = false;
@@ -22,11 +25,18 @@
         this.updateShadow();
         return;
       }
-      var self = this;
 
-      this.$element.addClass('scrollShadow');
+      var cssClass = 'scrollShadow';
+
+      if (iOS) {
+        // Fix for iOS Safari: Absolute positioned elements in combination with -webkit-overflow-scrolling: touch; Demo: http://jsfiddle.net/vfz1t4tj/4/
+        cssClass += ' scrollShadow-noShadows';
+      }
+
+      this.$element.addClass(cssClass);
       this.$element.wrap('<div class="scrollShadow-wrapper"></div>');
 
+      var self = this;
       this.$element.on('scroll.scrollShadow', _.throttle(function() {
         self.updateShadow();
       }, 200));
@@ -39,7 +49,7 @@
       if (!this.initialized) {
         return;
       }
-      this.$element.unwrap().removeClass('scrollShadow');
+      this.$element.unwrap().removeClass('scrollShadow scrollShadow-noShadows');
       this.$element.off('scroll.scrollShadow');
       this.initialized = false;
     },

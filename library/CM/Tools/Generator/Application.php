@@ -131,7 +131,7 @@ class CM_Tools_Generator_Application extends CM_Class_Abstract {
         $config = clone $composer->getConfig();
         $config->merge([
             'config' => [
-                'vendor-dir' => $this->_installation->getDirRoot() . $config->get('vendor-dir')
+                'vendor-dir' => $this->_installation->getDirRoot() . $config->get('vendor-dir', Composer\Config::RELATIVE_PATHS)
             ]
         ]);
         $im = $composer->getInstallationManager();

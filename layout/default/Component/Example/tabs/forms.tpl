@@ -1,18 +1,29 @@
+<div class="example-info">
+  Changes to form fields are validated and displayed in the developer console of the browser!
+</div>
+
 {form name="CM_Form_Example" viewer=$viewer}
-{formField name='text' label="{translate 'Text'}" placeholder="{translate 'Placeholder'}"}
-{formField name='textarea' label="{translate 'Textarea'}" placeholder="{translate 'Placeholder'}"}
-{formField name='int' label="{translate 'Integer'}"}
-{formField name='location' label="{translate 'Location'}"}
-{formField name='locationSlider' label="{translate 'Radius'}"}
-{formField name='file' label="{translate 'Upload Files'}"}
-{formField name='image' label="{translate 'Upload {$count} Photos' count='0-2'}"}
-{formField name='color' label="{translate 'Color'}"}
-{formField name='date' label="{translate 'Date'}"}
-{formField name='set' label="{translate 'Set'}"}
-{formField name='boolean' text="{translate 'Bool'}"}
-{formField name='booleanSwitch' text="{translate 'Bool Switch'}" display='switch'}
-{formField name='setSelect1' label="{translate 'Set Select'}" display='radios'}
-{formField name='setSelect2' label="{translate 'Set Select'}"}
-{formField name='setSelect3' label="{translate 'Set Select with Prefix'}" labelPrefix="{translate 'Sex'}"}
-{formAction action='Go' label="{translate 'Go'}"}
+{formField name='text' label="Text" placeholder="Placeholder"}
+{formField name='email' label="Email" placeholder="Email"}
+{formField name='password' label="Password" placeholder="Password"}
+{formField name='textarea' label="Textarea" placeholder="Placeholder"}
+{formField name='float' label="Float" placeholder="Float"}
+{formField name='money' label="Money" placeholder="Money"}
+{formField name='url' label="Url" placeholder="Url"}
+{formField name='int' label="Integer"}
+{formField name='location' label="Location"}
+{formField name='locationSlider' label="Radius"}
+{formField name='file' label="Upload Files"}
+{formField name='image' label="Upload Photos"}
+{formField name='color' label="Color"}
+{formField name='date' label="Date"}
+{formField name='birthdate' label="Birth Date between 18 and 30"}
+{formField name='geopoint' label="Geo Point"}
+{formField name='set' label="Set"}
+{formField name='boolean' text="Bool"}
+{formField name='booleanSwitch' text="Bool Switch" display='switch'}
+{formField name='setSelect1' label="Set Select" display='radios'}
+{formField name='setSelect2' label="Set Select" placeholder=true}
+{formField name='setSelect3' label="Set Select with Prefix" labelPrefix="FooBar" placeholder=true}
+{formField name='treeselect' label="Tree select"}
 {/form}

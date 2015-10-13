@@ -113,7 +113,7 @@ class CM_App_Installation {
         $cacheKey = CM_CacheConst::ComposerVendorDir;
         $fileCache = new CM_Cache_Storage_File();
         if (false === ($vendorDir = $fileCache->get($cacheKey)) || $fileComposerJson->getModified() > $fileCache->getCreateStamp($cacheKey)) {
-            $vendorDir = rtrim($this->getComposer()->getConfig()->get('vendor-dir'), '/') . '/';
+            $vendorDir = rtrim($this->getComposer()->getConfig()->get('vendor-dir', Composer\Config::RELATIVE_PATHS), '/') . '/';
             $fileCache->set($cacheKey, $vendorDir);
         }
         return $vendorDir;

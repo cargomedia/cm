@@ -27,7 +27,7 @@
     },
 
     close: function() {
-      this.element.find('> .openerDropdown-window').toggleModalClose();
+      this.element.find('> .openerDropdown-window').toggleModal('hide');
     }
   };
 

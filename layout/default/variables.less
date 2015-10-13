@@ -5,7 +5,6 @@
 @colorNotice: #ea8e0b;
 @colorError: #C2113D;
 @colorClose: #C2113D;
-@colorFocus: @colorBrand;
 
 // Basic Color
 @colorFg: #444444;
@@ -30,10 +29,6 @@
 //Links
 @colorFgLink: #0a7bc3;
 
-// Tooltip
-@colorFgTooltip: @colorBg;
-@colorBgTooltip: lighten(@colorFg, 20);
-
 // Media Queries
 @breakpointMini: 400px;
 @breakpointSmall: 600px;
@@ -57,7 +52,6 @@
 
 //Buttons
 @sizeButton: 38px;
-@sizeCheckbox: 20px;
 @colorFgButtonBorder: rgb(199, 199, 199);
 @colorBgButton: @colorBg;
 @colorFgButton: @fontColorStrong;
@@ -69,25 +63,21 @@
 @colorBgButtonDanger: #d6162a;
 @colorFgButtonDanger: #ffffff;
 
-//Textinput
+//Forms
+@sizeCheckbox: 20px;
 @heightInputText: @sizeButton;
 @heightInputTextarea: 65px;
+@heightSelect: @sizeButton;
 @borderRadiusInput: 3px;
+@colorInputBorder: darken(@colorFgBorderEmphasize3, 5);
+@colorInputPlaceholder: lighten(@colorFgSubtle, 22);
+@colorInputBg: darken(@colorBg, 1);
+@colorInputFg: @colorFg;
+@colorInputFocus: lighten(@colorBrand, 10);
 
 //Usertext
-@usertextFontSizeH1: round(@fontSize*1.3);
-@usertextFontSizeH2: round(@fontSize*1.2);
-@usertextFontSizeH3: round(@fontSize*1.1);
-@usertextFontSizeH4: round(@fontSize*1.0);
-@usertextFontSizeH5: round(@fontSize*1.0);
-@usertextFontSizeH6: round(@fontSize*1.0);
+@usertextLineheight: 1.4;
 @usertextFontSize: @fontSize;
-
-@usertextColorFgH1: #505050;
-@usertextColorFgH2: #505050;
-@usertextColorFgH3: #505050;
-@usertextColorFgH4: #505050;
-@usertextColorFgH5: #737373;
-@usertextColorFgH6: #737373;
-
-@emoticonSize: 1.4em;
+@usertextFontColor: @colorFg;
+@usertextFontColorHeading: #505050;
+@emoticonSize: unit(@usertextLineheight, em);

@@ -8,9 +8,6 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
   /** @type {jQuery} */
   _$input: null,
 
-  /** @type {jqXHR} */
-  _request: null,
-
   ready: function() {
     var field = this;
     var cardinality = this.getOption("cardinality");
@@ -30,18 +27,14 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
       escapeMarkup: function(item) {
         return item;
       },
-      query: function(options) {
-        if (this._request) {
-          this._request.abort();
-        }
-        this._request = field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()}, {
-          success: function(results) {
+      query: promiseThrottler(function(options) {
+        return field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()})
+          .then(function(results) {
             options.callback({
               results: results
             });
-          }
-        });
-      },
+          });
+      }, {cancelLeading: true}),
       createSearchChoice: function(term, data) {
         if (field.getOption("enableChoiceCreate")) {
           var existingMatches = $(data).filter(function() {
@@ -62,7 +55,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
         if (cardinality && items.length > cardinality) {
           items.pop();
           field._$input.select2('data', items);
-          field.$el.popover('destroy').popoverInfo(cm.language.get('You can only select {$cardinality} items.', {'cardinality': cardinality}), 2000);
+          field.error(cm.language.get('You can only select {$cardinality} items.', {'cardinality': cardinality}));
           return false;
         }
         field.trigger('add', e.added);
@@ -96,6 +89,10 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
     this.setTimeout(function() {
       this.$('input.select2-input').blur();
     }, 10);
+  },
+
+  getInput: function() {
+    return this._$input;
   },
 
   /**

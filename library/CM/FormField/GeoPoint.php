@@ -10,16 +10,16 @@ class CM_FormField_GeoPoint extends CM_FormField_Abstract {
      */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (!isset($userInput['latitude']) || !is_numeric($userInput['latitude'])) {
-            throw new CM_Exception_FormFieldValidation('Latitude needs to be numeric');
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Latitude needs to be numeric'));
         }
         if (!isset($userInput['longitude']) || !is_numeric($userInput['longitude'])) {
-            throw new CM_Exception_FormFieldValidation('Longitude needs to be numeric');
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Longitude needs to be numeric'));
         }
 
         try {
             $point = new CM_Geo_Point($userInput['latitude'], $userInput['longitude']);
         } catch (CM_Exception_Invalid $e) {
-            throw new CM_Exception_FormFieldValidation('Invalid latitude or longitude value');
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid latitude or longitude value'));
         }
 
         return $point;

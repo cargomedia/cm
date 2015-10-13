@@ -1,12 +1,12 @@
-<ul class="tabs menu-tabs example-navigation">
+<ul class="tabs menu menu-tabs example-navigation">
   {block name="tabs"}
-    <li data-tab="components"><a href="{linkUrl page='CM_Page_Example' tab='components'}">Components</a></li>
-    <li data-tab="menus"><a href="{linkUrl page='CM_Page_Example' tab='menus'}">Menus</a></li>
-    <li data-tab="button"><a href="{linkUrl page='CM_Page_Example' tab='button'}">Buttons</a></li>
-    <li data-tab="forms"><a href="{linkUrl page='CM_Page_Example' tab='forms'}">Forms</a></li>
-    <li data-tab="variables"><a href="{linkUrl page='CM_Page_Example' tab='variables'}">Variables</a></li>
-    <li data-tab="icons"><a href="{linkUrl page='CM_Page_Example' tab='icons'}">Icons</a></li>
-    <li data-tab="styleguide"><a href="{linkUrl page='CM_Page_Example' tab='styleguide'}">Styleguide</a></li>
+    <li data-tab="components"><a href="{linkUrl page='CM_Page_Example' tab='components'}" class="clickFeedback">Components</a></li>
+    <li data-tab="menus"><a href="{linkUrl page='CM_Page_Example' tab='menus'}" class="clickFeedback">Menus</a></li>
+    <li data-tab="button"><a href="{linkUrl page='CM_Page_Example' tab='button'}" class="clickFeedback">Buttons</a></li>
+    <li data-tab="forms"><a href="{linkUrl page='CM_Page_Example' tab='forms'}" class="clickFeedback">Forms</a></li>
+    <li data-tab="variables"><a href="{linkUrl page='CM_Page_Example' tab='variables'}" class="clickFeedback">Variables</a></li>
+    <li data-tab="icons"><a href="{linkUrl page='CM_Page_Example' tab='icons'}" class="clickFeedback">Icons</a></li>
+    <li data-tab="styleguide"><a href="{linkUrl page='CM_Page_Example' tab='styleguide'}" class="clickFeedback">Styleguide</a></li>
   {/block}
 </ul>
 
@@ -24,7 +24,6 @@
       {viewTemplate name='tabs/buttons'}
     </div>
     <div>
-      {code language="html5"}{load file='Component/Example/tabs/forms.tpl' namespace='CM' parse=false}{/code}
       {viewTemplate name='tabs/forms'}
     </div>
     <div>

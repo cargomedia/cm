@@ -103,10 +103,20 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     public function getRender() {
         if (!$this->_render) {
             $languageRewrite = !$this->getViewer() && $this->getRequest()->getLanguageUrl();
-            $environment = new CM_Frontend_Environment($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), null, null, $this->getRequest()->getLocation());
+            $environment = $this->getEnvironment();
             $this->_render = new CM_Frontend_Render($environment, $languageRewrite, $this->getServiceManager());
         }
         return $this->_render;
+    }
+
+    /**
+     * @return CM_Frontend_Environment
+     * @throws CM_Exception_AuthRequired
+     */
+    public function getEnvironment() {
+        $location = $this->getRequest()->getLocation();
+        $currency = (null !== $location) ? CM_Model_Currency::findByLocation($location) : null;
+        return new CM_Frontend_Environment($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), null, null, $location, $currency);
     }
 
     /**
@@ -237,16 +247,15 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     protected function _runWithCatching(Closure $regularCode, Closure $errorCode) {
         try {
             return $regularCode();
-        } catch(CM_Exception $ex) {
-            $exceptionClass = get_class($ex);
+        } catch (CM_Exception $ex) {
             $config = self::_getConfig();
             $exceptionsToCatch = $config->exceptionsToCatch;
             $catchPublicExceptions = !empty($config->catchPublicExceptions);
-            $catchException = false;
-            $errorOptions = [];
-            if (array_key_exists($exceptionClass, $exceptionsToCatch)) {
-                $catchException = true;
-                $errorOptions = $exceptionsToCatch[$exceptionClass];
+            $errorOptions = \Functional\first($exceptionsToCatch, function ($options, $exceptionClass) use ($ex) {
+                return is_a($ex, $exceptionClass) ;
+            });
+            $catchException = null !== $errorOptions;
+            if ($catchException) {
                 if (isset($errorOptions['log'])) {
                     $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
                     /** @var CM_Paging_Log_Abstract $log */
@@ -254,7 +263,8 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
                     $log->add($formatter->formatException($ex), $ex->getMetaInfo());
                 }
             }
-            if ($catchPublicExceptions && $ex->isPublic()) {
+            if (!$catchException && ($catchPublicExceptions && $ex->isPublic())) {
+                $errorOptions = [];
                 $catchException = true;
             }
             if ($catchException) {

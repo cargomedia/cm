@@ -1,6 +1,7 @@
 <?php
 
-abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable, CM_Typed {
+abstract class CM_Model_Abstract extends CM_Class_Abstract
+    implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable, CM_Typed, CM_Debug_DebugInfoInterface {
 
     /** @var array|null */
     protected $_id;
@@ -41,7 +42,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
             $this->_id = self::_castIdRaw($id);
         }
         if (null !== $data) {
-            $this->_validateFields($data);
             $this->_setData($data);
         }
         foreach ($this->_getAssets() as $asset) {
@@ -50,27 +50,49 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         $this->_getData(); // Make sure data can be loaded
     }
 
-    public function commit() {
+    /**
+     * @param bool|null $useReplace
+     * @throws CM_Exception_Invalid
+     * @throws CM_Exception_InvalidParam
+     * @throws CM_Exception_Nonexistent
+     * @throws CM_Exception_NotImplemented
+     */
+    public function commit($useReplace = null) {
+        $useReplace = (boolean) $useReplace;
+
         $persistence = $this->_getPersistence();
         if (!$persistence) {
             throw new CM_Exception_Invalid('Cannot create model without persistence');
         }
+
+        $type = $this->getType();
+        $dataSchema = $this->_getSchemaData();
         if ($this->hasIdRaw()) {
-            $dataSchema = $this->_getSchemaData();
             if (!empty($dataSchema)) {
-                $persistence->save($this->getType(), $this->getIdRaw(), $dataSchema);
+                $persistence->save($type, $this->getIdRaw(), $dataSchema);
             }
 
             if ($cache = $this->_getCache()) {
-                $cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
+                $cache->save($type, $this->getIdRaw(), $this->_getData());
             }
             $this->_onChange();
         } else {
-            $this->_id = self::_castIdRaw($persistence->create($this->getType(), $this->_getSchemaData()));
+            $this->_validateFields($this->_getData(), true);
+            if ($useReplace) {
+                if (!$persistence instanceof CM_Model_StorageAdapter_ReplaceableInterface) {
+                    $adapterName = get_class($persistence);
+                    throw new CM_Exception_NotImplemented("Param `useReplace` is not allowed with {$adapterName}");
+                }
+                $idRaw = $persistence->replace($type, $dataSchema);
+            } else {
+                $idRaw = $persistence->create($type, $dataSchema);
+            }
+
+            $this->_id = self::_castIdRaw($idRaw);
 
             if ($cache = $this->_getCache()) {
                 $this->_loadAssets(true);
-                $cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
+                $cache->save($type, $this->getIdRaw(), $this->_getData());
             }
             $this->_onChange();
             $this->_changeContainingCacheables();
@@ -249,6 +271,14 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         }
     }
 
+    public function getDebugInfo() {
+        $debugInfo = get_class($this);
+        if ($this->hasIdRaw()) {
+            $debugInfo .= '(' . implode(', ', (array) $this->getIdRaw()) . ')';
+        }
+        return $debugInfo;
+    }
+
     /**
      * @return array
      * @throws CM_Exception_Nonexistent
@@ -257,19 +287,16 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         if (null === $this->_data) {
             if ($cache = $this->_getCache()) {
                 if (false !== ($data = $cache->load($this->getType(), $this->getIdRaw()))) {
-                    $this->_validateFields($data);
                     $this->_setData($data);
                 }
             }
             if (null === $this->_data) {
                 if ($persistence = $this->_getPersistence()) {
                     if (false !== ($data = $persistence->load($this->getType(), $this->getIdRaw()))) {
-                        $this->_validateFields($data);
                         $this->_setData($data);
                     }
                 } else {
                     if (is_array($data = $this->_loadData())) {
-                        $this->_validateFields($data);
                         $this->_setData($data);
                     }
                 }
@@ -290,6 +317,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
      * @param array $data
      */
     protected function _setData(array $data) {
+        $this->_validateFields($data);
         $this->_data = $data;
     }
 
@@ -427,12 +455,20 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
     }
 
     /**
-     * @param array $data
+     * @param array     $data
+     * @param bool|null $checkMissingFields
      */
-    protected function _validateFields(array $data) {
+    protected function _validateFields(array $data, $checkMissingFields = null) {
         if ($schema = $this->_getSchema()) {
-            foreach ($data as $key => $value) {
-                $schema->validateField($key, $value);
+            if ($checkMissingFields) {
+                foreach ($schema->getFieldNames() as $key) {
+                    $value = isset($data[$key]) ? $data[$key] : null;
+                    $schema->validateField($key, $value);
+                }
+            } else {
+                foreach ($data as $key => $value) {
+                    $schema->validateField($key, $value);
+                }
             }
         }
     }

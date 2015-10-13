@@ -172,7 +172,7 @@ class CM_Service_Manager extends CM_Class_Abstract {
      * @return CM_Debug
      */
     public function getDebug() {
-        return $this->get('debug' ,'CM_Debug');
+        return $this->get('debug', 'CM_Debug');
     }
 
     /**
@@ -249,13 +249,14 @@ class CM_Service_Manager extends CM_Class_Abstract {
         }
         $instance = $reflection->newInstanceArgs($arguments);
 
+        if ($instance instanceof CM_Service_ManagerAwareInterface) {
+            $instance->setServiceManager($this);
+        }
+
         if (null !== $config['method']) {
             $method = $reflection->getMethod($config['method']['name']);
             $methodArguments = $this->_matchNamedArgs($serviceName, $method, $config['method']['arguments']);
             $instance = $method->invokeArgs($instance, $methodArguments);
-        }
-        if ($instance instanceof CM_Service_ManagerAwareInterface) {
-            $instance->setServiceManager($this);
         }
         return $instance;
     }

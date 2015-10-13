@@ -21,10 +21,13 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     private $_bcc = array();
 
     /** @var array */
-    private $_sender;
+    private $_sender = array();
 
     /** @var string|null */
     private $_subject = null;
+
+    /** @var array */
+    private $_customHeaders = array();
 
     /** @var string|null */
     private $_textBody = null;
@@ -139,6 +142,16 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
         $this->_to[] = array('address' => $address, 'name' => $name);
+    }
+
+    /**
+     * @param string $label
+     * @param string $value
+     */
+    public function addCustomHeader($label, $value) {
+        $label = (string) $label;
+        $value = (string) $value;
+        $this->_customHeaders[$label][] = $value;
     }
 
     /**
@@ -277,11 +290,14 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @return array array($subject, $html, $text)
      */
     public function render() {
-        $language = null;
-        if ($this->_recipient) {
-            $language = $this->_recipient->getLanguage();
+        if (null !== $this->_recipient) {
+            $environment = $this->_recipient->getEnvironment();
+        } else {
+            $environment = new CM_Frontend_Environment($this->_site);
         }
-        return $this->_render($language);
+        $render = new CM_Frontend_Render($environment);
+        $renderAdapter = new CM_RenderAdapter_Mail($render, $this);
+        return $renderAdapter->fetch();
     }
 
     /**
@@ -338,21 +354,18 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             foreach (unserialize($row['bcc']) as $bcc) {
                 $mail->addBcc($bcc['address'], $bcc['name']);
             }
+            if ($headerList = unserialize($row['customHeaders'])) {
+                foreach ($headerList as $label => $valueList) {
+                    foreach ($valueList as $value) {
+                        $mail->addCustomHeader($label, $value);
+                    }
+                }
+            }
             $sender = unserialize($row['sender']);
             $mail->setSender($sender['address'], $sender['name']);
             $mail->_send($row['subject'], $row['text'], $row['html']);
             CM_Db_Db::delete('cm_mail', array('id' => $row['id']));
         }
-    }
-
-    /**
-     * @param CM_Model_Language|null $language
-     * @return array array($subject, $html, $text)
-     */
-    protected function _render($language) {
-        $render = new CM_Frontend_Render(new CM_Frontend_Environment($this->_site, $this->_recipient, $language));
-        $renderAdapter = new CM_RenderAdapter_Mail($render, $this);
-        return $renderAdapter->fetch();
     }
 
     /**
@@ -363,39 +376,58 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
+     * @return array
+     */
+    protected function _getCustomHeaders() {
+        return $this->_customHeaders;
+    }
+
+    /**
+     * @return PHPMailer
+     */
+    protected function _getPHPMailer() {
+        $phpMailer = new PHPMailer(true);
+        $phpMailer->CharSet = 'utf-8';
+        return $phpMailer;
+    }
+
+    /**
      * @throws CM_Exception_Invalid
      */
     protected function _send($subject, $text, $html = null) {
         if (!self::_getConfig()->send) {
             $this->_log($subject, $text);
         } else {
-            $mail = new PHPMailer(true);
-            $mail->CharSet = 'utf-8';
-
+            $phpMailer = $this->_getPHPMailer();
             foreach ($this->_replyTo as $replyTo) {
-                $mail->AddReplyTo($replyTo['address'], $replyTo['name']);
+                $phpMailer->AddReplyTo($replyTo['address'], $replyTo['name']);
             }
             foreach ($this->_to as $to) {
-                $mail->AddAddress($to['address'], $to['name']);
+                $phpMailer->AddAddress($to['address'], $to['name']);
             }
             foreach ($this->_cc as $cc) {
-                $mail->AddCC($cc['address'], $cc['name']);
+                $phpMailer->AddCC($cc['address'], $cc['name']);
             }
             foreach ($this->_bcc as $bcc) {
-                $mail->AddBCC($bcc['address'], $bcc['name']);
+                $phpMailer->AddBCC($bcc['address'], $bcc['name']);
             }
             if ($mailDeliveryAgent = $this->_getMailDeliveryAgent()) {
-                $mail->AddCustomHeader('X-MDA: ' . $mailDeliveryAgent);
+                $this->addCustomHeader('X-MDA', $mailDeliveryAgent);
             }
-            $mail->SetFrom($this->_sender['address'], $this->_sender['name']);
+            if ($headerList = $this->_getCustomHeaders()) {
+                foreach ($headerList as $label => $value) {
+                    $phpMailer->AddCustomHeader($label, implode(',', $value));
+                }
+            }
+            $phpMailer->SetFrom($this->_sender['address'], $this->_sender['name']);
 
-            $mail->Subject = $subject;
-            $mail->IsHTML($html);
-            $mail->Body = $html ? $html : $text;
-            $mail->AltBody = $html ? $text : '';
+            $phpMailer->Subject = $subject;
+            $phpMailer->IsHTML($html);
+            $phpMailer->Body = $html ? $html : $text;
+            $phpMailer->AltBody = $html ? $text : '';
 
             try {
-                $mail->Send();
+                $phpMailer->Send();
             } catch (phpmailerException $e) {
                 throw new CM_Exception_Invalid('Cannot send email, phpmailer reports: ' . $e->getMessage());
             }
@@ -409,15 +441,16 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 
     private function _queue($subject, $text, $html) {
         CM_Db_Db::insert('cm_mail', array(
-            'subject'     => $subject,
-            'text'        => $text,
-            'html'        => $html,
-            'createStamp' => time(),
-            'sender'      => serialize($this->getSender()),
-            'replyTo'     => serialize($this->getReplyTo()),
-            'to'          => serialize($this->getTo()),
-            'cc'          => serialize($this->getCc()),
-            'bcc'         => serialize($this->getBcc()),
+            'subject'       => $subject,
+            'text'          => $text,
+            'html'          => $html,
+            'createStamp'   => time(),
+            'sender'        => serialize($this->getSender()),
+            'replyTo'       => serialize($this->getReplyTo()),
+            'to'            => serialize($this->getTo()),
+            'cc'            => serialize($this->getCc()),
+            'bcc'           => serialize($this->getBcc()),
+            'customHeaders' => serialize($this->_getCustomHeaders()),
         ));
     }
 

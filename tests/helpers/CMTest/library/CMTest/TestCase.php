@@ -5,6 +5,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     use \Mocka\MockaTrait;
 
     use CM_Service_ManagerAwareTrait;
+    use CM_ExceptionHandling_CatcherTrait;
 
     public function runBare() {
         if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
@@ -161,23 +162,39 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @param CM_View_Abstract              $view
      * @param string                        $methodName
      * @param array|null                    $params
-     * @param CM_Frontend_ViewResponse|null $scopeView
-     * @param CM_Frontend_ViewResponse|null $scopeComponent
+     * @param CM_Frontend_ViewResponse|null $viewResponse
+     * @param CM_Frontend_ViewResponse|null $componentResponse
+     * @throws CM_Exception_Invalid
      * @return CM_Http_Request_Post|\Mocka\AbstractClassTrait
      */
-    public function createRequestAjax(CM_View_Abstract $view, $methodName, array $params = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
-        $viewResponseComponent = new CM_Frontend_ViewResponse($view);
-        if (null === $scopeView) {
-            $scopeView = $viewResponseComponent;
+    public function createRequestAjax(CM_View_Abstract $view, $methodName, array $params = null, CM_Frontend_ViewResponse $viewResponse = null, CM_Frontend_ViewResponse $componentResponse = null) {
+        if (null === $viewResponse) {
+            $viewResponse = new CM_Frontend_ViewResponse($view);
+        } else {
+            if ($viewResponse->getView() !== $view) {
+                throw new CM_Exception_Invalid("View doesn't match value from scopeView");
+            }
         }
-        if (null === $scopeComponent) {
-            $scopeComponent = $viewResponseComponent;
+
+        if (null === $componentResponse) {
+            if ($viewResponse->getView() instanceof CM_Component_Abstract) {
+                $componentResponse = $viewResponse;
+            } else {
+                /** @var CM_Component_Abstract $component */
+                $component = $this->mockClass('CM_Component_Abstract')->newInstance();
+                $componentResponse = new CM_Frontend_ViewResponse($component);
+            }
+        } else {
+            if (!$componentResponse->getView() instanceof CM_Component_Abstract) {
+                throw new CM_Exception_Invalid("ScopeComponent's view is not a component");
+            }
         }
+
         $query = array(
             'method' => (string) $methodName,
             'params' => (array) $params,
         );
-        return $this->createRequest('/ajax/null', $query, null, $scopeView, $scopeComponent);
+        return $this->createRequest('/ajax/null', $query, null, $viewResponse, $componentResponse);
     }
 
     /**
@@ -355,8 +372,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @param CM_Http_Response_View_Abstract $response
      * @param string|null                    $type
      * @param string|null                    $message
+     * @param boolean|null                   $isPublic
      */
-    public static function assertViewResponseError(CM_Http_Response_View_Abstract $response, $type = null, $message = null) {
+    public static function assertViewResponseError(CM_Http_Response_View_Abstract $response, $type = null, $message = null, $isPublic = null) {
         $responseContent = json_decode($response->getContent(), true);
         self::assertArrayHasKey('error', $responseContent, 'View response successful');
         if (null !== $type) {
@@ -364,6 +382,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         }
         if (null !== $message) {
             self::assertSame($message, $responseContent['error']['msg']);
+        }
+        if (null !== $isPublic) {
+            self::assertSame($isPublic, $responseContent['error']['isPublic']);
         }
     }
 
@@ -429,12 +450,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         if (null === $expectedExceptionClass) {
             $expectedExceptionClass = 'CM_Exception';
         }
-        try {
+        $exception = $this->catchException(function () use ($component, $viewer) {
             $this->_renderComponent($component, $viewer);
-            $this->fail('Rendering page `' . get_class($component) . '` did not throw an exception');
-        } catch (Exception $e) {
-            $this->assertInstanceOf($expectedExceptionClass, $e);
-        }
+        });
+        $this->assertInstanceOf($expectedExceptionClass, $exception);
     }
 
     /**
@@ -599,12 +618,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         if (null === $expectedExceptionClass) {
             $expectedExceptionClass = 'CM_Exception';
         }
-        try {
+
+        $exception = $this->catchException(function () use ($page, $viewer) {
             $this->_renderPage($page, $viewer);
-            $this->fail('Rendering page `' . get_class($page) . '` did not throw an exception');
-        } catch (Exception $e) {
-            $this->assertInstanceOf($expectedExceptionClass, $e);
-        }
+        });
+        $this->assertInstanceOf($expectedExceptionClass, $exception);
     }
 
     /**
@@ -634,8 +652,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param number $expected
-     * @param number $actual
+     * @param DateTime|number $expected
+     * @param DateTime|number $actual
      * @param number|null
      */
     public static function assertSameTime($expected, $actual, $delta = null) {

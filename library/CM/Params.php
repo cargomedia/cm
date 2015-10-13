@@ -1,6 +1,6 @@
 <?php
 
-class CM_Params extends CM_Class_Abstract {
+class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface {
 
     private $_params;
 
@@ -74,6 +74,13 @@ class CM_Params extends CM_Class_Abstract {
             $result[$key] = $param['encoded'];
         }
         return $result;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getParamNames() {
+        return array_keys($this->_params);
     }
 
     /**
@@ -213,7 +220,20 @@ class CM_Params extends CM_Class_Abstract {
     public function getObject($key, $className, $default = null, Closure $getter = null) {
         if (!$getter) {
             $getter = function ($className, $param) {
-                return new $className($param);
+                $arguments = (array) $param;
+                $reflectionClass = new ReflectionClass($className);
+                $constructor = $reflectionClass->getConstructor();
+
+                if ($constructor->getNumberOfRequiredParameters() > 1) {
+                    $namedArgs = new CM_Util_NamedArgs();
+                    try {
+                        $arguments = $namedArgs->matchNamedArgs($constructor, $arguments);
+                    } catch (CM_Exception_Invalid $ex) {
+                        throw new CM_Exception_InvalidParam("Not enough parameters", null, ['parameters' => $param, 'class' => $className]);
+                    }
+                }
+
+                return $reflectionClass->newInstanceArgs($arguments);
             };
         }
         $param = $this->_get($key, $default);
@@ -405,6 +425,18 @@ class CM_Params extends CM_Class_Abstract {
      */
     public function remove($key) {
         unset($this->_params[$key]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getDebugInfo() {
+        try {
+            $variableInspector = new CM_Debug_VariableInspector();
+            return $variableInspector->getDebugInfo($this->getParamsDecoded(), ['recursive' => true]);
+        } catch (Exception $e) {
+            return '[Cannot dump params: `' . $e->getMessage() . '`]';
+        }
     }
 
     /**

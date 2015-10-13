@@ -9,7 +9,8 @@ class CM_Frontend_EnvironmentTest extends CMTest_TestCase {
         $timezone = new DateTimeZone('Europe/London');
         $debug = true;
         $location = CM_Model_Location::createCountry('United Kingdom', 'UK');
-        $environment = new CM_Frontend_Environment($site, $user, $language, $timezone, $debug, $location);
+        $currency = CMTest_TH::createDefaultCurrency();
+        $environment = new CM_Frontend_Environment($site, $user, $language, $timezone, $debug, $location, $currency);
 
         $this->assertSame($site, $environment->getSite());
         $this->assertSame($user, $environment->getViewer(true));
@@ -18,6 +19,7 @@ class CM_Frontend_EnvironmentTest extends CMTest_TestCase {
         $this->assertSame($timezone, $environment->getTimeZone());
         $this->assertSame($debug, $environment->isDebug());
         $this->assertSame($location, $environment->getLocation());
+        $this->assertSame($currency, $environment->getCurrency());
     }
 
     public function testSetNull() {
@@ -29,6 +31,7 @@ class CM_Frontend_EnvironmentTest extends CMTest_TestCase {
         $this->assertEquals(CM_Bootloader::getInstance()->getTimeZone(), $environment->getTimeZone());
         $this->assertSame(CM_Bootloader::getInstance()->isDebug(), $environment->isDebug());
         $this->assertNull($environment->getLocation());
+        $this->assertNull($environment->getCurrency());
     }
 
     /**

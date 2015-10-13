@@ -67,7 +67,7 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
      * @throws Exception
      */
     protected function _getResponse($email) {
-        $kickBox = new \Kickbox\Client($this->_getCode());
+        $kickBox = new \Kickbox\Client($this->_getCode(), [\Guzzle\Http\Client::CURL_OPTIONS => [CURLOPT_TIMEOUT => 7]]);
         return $kickBox->kickbox()->verify($email);
     }
 
@@ -79,12 +79,12 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
         try {
             $response = $this->_getResponse($email);
             if ($response->code !== 200 || !is_array($response->body)) {
-                throw new CM_Exception('Invalid KickBox email validation response', array(
+                throw new CM_Exception('Invalid KickBox email validation response', null, [
                     'email'   => $email,
                     'code'    => $response->code,
                     'headers' => $response->headers,
                     'body'    => $response->body,
-                ));
+                ]);
             }
         } catch (Exception $exception) {
             $this->_logException($exception);
@@ -97,6 +97,9 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
      * @param Exception $exception
      */
     protected function _logException(Exception $exception) {
+        if ('RuntimeException' === get_class($exception) && false !== strpos($exception->getMessage(), ' timed out ')) {
+            $exception = new CM_Exception($exception->getMessage(), CM_Exception::WARN);
+        }
         CM_Bootloader::getInstance()->getExceptionHandler()->logException($exception);
     }
 }

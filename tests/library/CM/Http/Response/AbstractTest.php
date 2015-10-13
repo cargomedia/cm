@@ -52,7 +52,7 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
         CM_Config::get()->$className = new stdClass();
         CM_Config::get()->$className->exceptionsToCatch = [
             'CM_Exception_Nonexistent'  => ['log' => 'CM_Paging_Log_NotFound', 'foo' => 'bar'],
-            'CM_Exception_InvalidParam' => ['log' => null]
+            'CM_Exception_InvalidParam' => [],
         ];
         $exceptionCodeExecutionCounter = 0;
         $errorCode = function (CM_Exception_Nonexistent $ex, $errorOptions) use (&$exceptionCodeExecutionCounter) {
@@ -84,6 +84,9 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
         $this->assertCount(1, new CM_Paging_Log_NotFound());
 
         // test public/non-public exceptions not marked for catching
+
+        $exceptionCodeExecutionCounter = 0;
+
         // public exception, no public exception catching
         CM_Config::get()->$className->exceptionsToCatch = [];
         $errorCode = function (CM_Exception_Nonexistent $ex, $errorOptions) use (&$exceptionCodeExecutionCounter) {
@@ -93,14 +96,16 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
         try {
             CMTest_TH::callProtectedMethod($response, '_runWithCatching', [
                 function () {
-                    throw new CM_Exception_Nonexistent('foo', null, ['messagePublic' => 'bar']);
+                    throw new CM_Exception_Nonexistent('foo', null, null, [
+                        'messagePublic' => new CM_I18n_Phrase('bar'),
+                    ]);
                 }, $errorCode]);
             $this->fail('Caught public exception with public exception catching disabled');
         } catch (CM_Exception_Nonexistent $ex) {
             $this->assertTrue($ex->isPublic());
             $this->assertSame('foo', $ex->getMessage());
         }
-        $this->assertSame(2, $exceptionCodeExecutionCounter);
+        $this->assertSame(0, $exceptionCodeExecutionCounter);
 
         // non-public exception, public exception catching
         CM_Config::get()->$className->catchPublicExceptions = true;
@@ -114,18 +119,45 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
             $this->assertFalse($ex->isPublic());
             $this->assertSame('foo', $ex->getMessage());
         }
-        $this->assertSame(2, $exceptionCodeExecutionCounter);
+        $this->assertSame(0, $exceptionCodeExecutionCounter);
 
         // public exception, public exception catching
         try {
             $returnValue = CMTest_TH::callProtectedMethod($response, '_runWithCatching', [
                 function () {
-                    throw new CM_Exception_Nonexistent('foo', null, ['messagePublic' => 'bar']);
+                    throw new CM_Exception_Nonexistent('foo', null, null, [
+                        'messagePublic' => new CM_I18n_Phrase('bar'),
+                    ]);
                 }, $errorCode]);
             $this->assertNull($returnValue);
         } catch (CM_Exception_Nonexistent $ex) {
             $this->fail('Caught non-public exception');
         }
-        $this->assertSame(3, $exceptionCodeExecutionCounter);
+        $this->assertSame(1, $exceptionCodeExecutionCounter);
+
+        // test child exception catching
+
+        $response = $this->mockClass('CM_Http_Response_Abstract')->newInstanceWithoutConstructor();
+        $className = get_class($response);
+        CM_Config::get()->$className = new stdClass();
+        CM_Config::get()->$className->exceptionsToCatch = [
+            'CM_Exception' => []
+        ];
+        $exceptionCodeExecutionCounter = 0;
+        $errorCode = function (CM_Exception $ex, $errorOptions) use (&$exceptionCodeExecutionCounter) {
+            $exceptionCodeExecutionCounter++;
+        };
+
+        try {
+            $returnValue = CMTest_TH::callProtectedMethod($response, '_runWithCatching', [
+                function () {
+                    throw new CM_Exception_Invalid('foo');
+                }, $errorCode]);
+            $this->assertNull($returnValue);
+        } catch (CM_Exception_Nonexistent $ex) {
+            $this->fail("Didn't catch the child of an exception that was configured to be caught");
+        }
+
+        $this->assertSame(1, $exceptionCodeExecutionCounter);
     }
 }

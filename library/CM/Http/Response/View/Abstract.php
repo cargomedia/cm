@@ -38,11 +38,12 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
     }
 
     /**
+     * @param string    $className
      * @param CM_Params $params
      * @return array
      */
-    public function loadComponent(CM_Params $params) {
-        $component = CM_Component_Abstract::factory($params->getString('className'), $params);
+    public function loadComponent($className, CM_Params $params) {
+        $component = CM_Component_Abstract::factory($className, $params);
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
         $html = $renderAdapter->fetch();
 
@@ -103,7 +104,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $title = $responsePage->getTitle();
         $layoutClass = get_class($page->getLayout($this->getRender()->getEnvironment()));
         $menuList = array_merge($this->getSite()->getMenus(), $responsePage->getRender()->getMenuList());
-        $menuEntryHashList = $this->_getMenuEntryHashList($menuList, get_class($page), $responsePage->getPageParams());
+        $menuEntryHashList = $this->_getMenuEntryHashList($menuList, get_class($page), $page->getParams());
         $jsTracking = $responsePage->getRender()->getServiceManager()->getTrackings()->getJs();
 
         return array(
@@ -160,6 +161,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         }, function (CM_Exception $e, array $errorOptions) use (&$output) {
             $output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());
         });
+        $output['deployVersion'] = CM_App::getInstance()->getDeployVersion();
 
         $this->setHeader('Content-Type', 'application/json');
         $this->_setContent(json_encode($output));
@@ -189,25 +191,24 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         }
         $query = $this->_request->getQuery();
         if (!array_key_exists('viewInfoList', $query)) {
-            throw new CM_Exception_Invalid('viewInfoList param not found.', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('viewInfoList param not found.', CM_Exception::WARN);
         }
         $viewInfoList = $query['viewInfoList'];
         if (!array_key_exists($className, $viewInfoList)) {
-            throw new CM_Exception_Invalid('View `' . $className . '` not set.', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('View `' . $className . '` not set.', CM_Exception::WARN);
         }
         $viewInfo = $viewInfoList[$className];
         if (!is_array($viewInfo)) {
-            throw new CM_Exception_Invalid('View `' . $className . '` is not an array', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('View `' . $className . '` is not an array', CM_Exception::WARN);
         }
         if (!isset($viewInfo['id'])) {
-            throw new CM_Exception_Invalid('View id `' . $className . '` not set.', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('View id `' . $className . '` not set.', CM_Exception::WARN);
         }
         if (!isset($viewInfo['className']) || !class_exists($viewInfo['className']) || !is_a($viewInfo['className'], 'CM_View_Abstract', true)) {
-            throw new CM_Exception_Invalid('View className `' . $className . '` is illegal: `' . $viewInfo['className'] .
-                '`.', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('View className `' . $className . '` is illegal: `' . $viewInfo['className'] . '`.', CM_Exception::WARN);
         }
         if (!isset($viewInfo['params'])) {
-            throw new CM_Exception_Invalid('View params `' . $className . '` not set.', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('View params `' . $className . '` not set.', CM_Exception::WARN);
         }
         if (!isset($viewInfo['parentId'])) {
             $viewInfo['parentId'] = null;

@@ -18,13 +18,9 @@
     this.$content.css({display: 'block'});
 
     var self = this;
-    if (this.$elem.find('img').length) {
-      this.$elem.find('img').on('load', function() {
-        self.toggle(false);
-      });
-    } else {
+    setTimeout(function() {
       self.toggle(false);
-    }
+    }, 0);
   }
 
   /**

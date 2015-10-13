@@ -1,6 +1,8 @@
 <?php
 
-abstract class CM_Cli_Runnable_Abstract {
+abstract class CM_Cli_Runnable_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var CM_InputStream_Interface */
     private $_streamInput;
@@ -26,6 +28,7 @@ abstract class CM_Cli_Runnable_Abstract {
             $streamError = new CM_OutputStream_Null();
         }
         $this->_streamError = $streamError;
+        $this->setServiceManager(CM_Service_Manager::getInstance());
         $this->_initialize();
     }
 

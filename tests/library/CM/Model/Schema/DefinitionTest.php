@@ -232,11 +232,6 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
                 'expected' => true,
             ),
             array(
-                'value'    => '{"id": "foo"}',
-                'schema'   => array('type' => 'CM_Model_Mock_Validation'),
-                'expected' => 'CM_Model_Exception_Validation',
-            ),
-            array(
                 'value'    => '3',
                 'schema'   => array('type' => 'CM_Model_Mock_Validation'),
                 'expected' => true,
@@ -255,6 +250,11 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
                 'value'    => '1',
                 'schema'   => array('type' => 'CM_Class_Abstract'),
                 'expected' => 'CM_Exception_Invalid',
+            ),
+            array(
+                'value'    => 'mongo123mixed321id',
+                'schema'   => array('type' => 'CM_Model_Mock_Validation'),
+                'expected' => true,
             ),
 
             // type invalid
@@ -410,7 +410,12 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
                 'value'       => '{"id": "4", "foo": "bar"}',
                 'schema'      => array('type' => 'CM_Model_Mock_Validation2'),
                 'returnValue' => new CM_Model_Mock_Validation2('4', 'bar'),
-            )
+            ),
+            array(
+                'value'    => 'mongo123mixed321id',
+                'schema'   => array('type' => 'CM_Model_Mock_Validation'),
+                'returnValue' => new CM_Model_Mock_Validation('mongo123mixed321id'),
+            ),
         );
         foreach ($testDataList as $testData) {
             $schema = new CM_Model_Schema_Definition(array('foo' => $testData['schema']));

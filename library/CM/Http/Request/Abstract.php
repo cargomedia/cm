@@ -450,7 +450,7 @@ abstract class CM_Http_Request_Abstract {
         if (preg_match('#Opera Mini#', $userAgent)) {
             return false;
         }
-        if (preg_match('#MSIE (?<version>[\d\.]{1,6})#', $userAgent, $matches) && $matches['version'] < 10) {
+        if (preg_match('#MSIE (?<version>[\d\.]{1,6})#', $userAgent, $matches) && $matches['version'] < 11) {
             return false;
         }
         if (preg_match('#Android (?<version>[\d\.]{1,6})#', $userAgent, $matches) && $matches['version'] < 4) {

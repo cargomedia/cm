@@ -13,11 +13,19 @@ var CM_App = CM_Class_Abstract.extend({
   options: {},
 
   ready: function() {
+    this.error.ready();
     this.dom.ready();
     this.window.ready();
     this.date.ready();
     this.template.ready();
     this.router.ready();
+  },
+
+  /**
+   * @returns {Number}
+   */
+  getDeployVersion: function() {
+    return cm.options.deployVersion;
   },
 
   /**
@@ -37,7 +45,7 @@ var CM_App = CM_Class_Abstract.extend({
         return !view.getParent();
       });
       if (!view) {
-        cm.error.triggerThrow('Cannot find root component');
+        throw new CM_Exception('Cannot find root component');
       }
       return view;
     }
@@ -65,7 +73,7 @@ var CM_App = CM_Class_Abstract.extend({
   getLayout: function() {
     var layout = this.findView('CM_Layout_Abstract');
     if (!layout) {
-      cm.error.triggerThrow('Cannot find layout');
+      throw new CM_Exception('Cannot find layout');
     }
     return layout;
   },
@@ -126,7 +134,7 @@ var CM_App = CM_Class_Abstract.extend({
     params = params || null;
     relative = relative || false;
     if (params) {
-      path += '?' + jQuery.param(params, true);
+      path += '?' + jQuery.param(params);
     }
     if (!relative) {
       path = cm.options.url + path
@@ -200,7 +208,7 @@ var CM_App = CM_Class_Abstract.extend({
   getUrlUserContent: function(path) {
     var matches = path.match(new RegExp('^([^/]+)/'));
     if (null === matches) {
-      cm.error.triggerThrow('Cannot detect namespace for user-content file `' + path + '`.');
+      throw new CM_Exception('Cannot detect namespace for user-content file `' + path + '`.');
     }
     var namespace = matches[1];
     var urlList = cm.options.urlUserContentList;
@@ -223,61 +231,33 @@ var CM_App = CM_Class_Abstract.extend({
 
   error: {
     _callbacks: {_all: []},
-    /**
-     * @param {String} msg
-     * @param {String} [type]
-     * @param {Boolean} [isPublic]
-     */
-    trigger: function(msg, type, isPublic) {
-      for (var i = 0; i < this._callbacks._all.length; i++) {
-        if (false === this._callbacks._all[i](msg, type, isPublic)) {
-          return;
+
+    ready: function() {
+      $(window).on('unhandledrejection', function(e) {
+        e.preventDefault();
+        var error = e.originalEvent.detail.reason;
+        if (!(error instanceof Promise.CancellationError)) {
+          cm.error._globalHandler(error);
         }
-      }
-      if (this._callbacks[type]) {
-        for (var j = 0; j < this._callbacks[type].length; j++) {
-          if (false === this._callbacks[type][j](msg, type, isPublic)) {
-            return;
-          }
-        }
-      }
-      if (isPublic) {
-        cm.window.hint(msg);
-      } else {
-        if (type) {
-          msg = type + ': ' + msg;
-        }
-        cm.window.hint(msg);
-        if (window.console && console.error) {
-          console.error('Error: ' + msg);
-        }
-      }
+      });
     },
+
     /**
-     * @param {String} msg
-     * @param {String} [type]
-     * @param {Boolean} [isPublic]
-     * @throws {String}
+     * @param {Function} fn
      */
-    triggerThrow: function(msg, type, isPublic) {
-      this.trigger(msg, type, isPublic);
-      throw msg;
+    setGlobalHandler: function(fn) {
+      cm.error._globalHandler = fn;
     },
+
     /**
-     * @param {Function} callback fn(msg, type, isPublic)
+     * @param {Error} error
+     * @throws Error
      */
-    bind: function(callback) {
-      this.bindType('_all', callback);
-    },
-    /**
-     * @param {String} type
-     * @param {Function} callback fn(msg, type, isPublic)
-     */
-    bindType: function(type, callback) {
-      if (!this._callbacks[type]) {
-        this._callbacks[type] = [];
+    _globalHandler: function(error) {
+      if (error instanceof CM_Exception) {
+        cm.window.hint(error.message);
       }
-      this._callbacks[type].push(callback);
+      throw error;
     }
   },
 
@@ -334,20 +314,37 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('.timeago').timeago();
       $dom.find('textarea.autosize, .autosize textarea').autosize({append: ''});
       $dom.find('.clipSlide').clipSlide();
-      $dom.find('.showTooltip[title]').tooltip();
       $dom.find('.toggleNext').toggleNext();
       $dom.find('.tabs').tabs();
       $dom.find('.openx-ad:visible').openx();
       $dom.find('.epom-ad').epom();
       $dom.find('.fancySelect').fancySelect();
+      this._setupContentPlaceholder($dom);
     },
+
+    /**
+     * @param {jQuery} $dom
+     */
+    _setupContentPlaceholder: function($dom) {
+      var $doNotLoadOnReady = $();
+      $dom.find('.clipSlide').each(function() {
+        var $notFirstImages = $(this).find('.contentPlaceholder:gt(0)');
+        $doNotLoadOnReady = $doNotLoadOnReady.add($notFirstImages);
+
+        $(this).on('toggle.clipSlide', function() {
+          $(this).find('.contentPlaceholder:gt(0)').lazyImageSetup();
+        });
+      });
+
+      $dom.find('.contentPlaceholder').not($doNotLoadOnReady).lazyImageSetup();
+    },
+
     /**
      * @param {jQuery} $dom
      */
     teardown: function($dom) {
       $dom.find('.timeago').timeago('dispose');
       $dom.find('textarea.autosize, .autosize textarea').trigger('autosize.destroy');
-      $dom.find('.showTooltip[title]').tooltip('destroy');
     },
     /**
      * @param {jQuery} $element
@@ -792,71 +789,69 @@ var CM_App = CM_Class_Abstract.extend({
   /**
    * @param {String} type
    * @param {Object} data
-   * @param {Object} [callbacks]
-   * @return jqXHR
+   * @return Promise
    */
-  ajax: function(type, data, callbacks) {
-    callbacks = callbacks || {};
+  ajax: function(type, data) {
     var url = this.getUrlAjax(type);
-    var errorHandler = function(msg, type, isPublic, callback) {
-      if (!callback || callback(msg, type, isPublic) !== false) {
-        cm.error.trigger(msg, type, isPublic);
-      }
-    };
-    var jqXHR = $.ajax(url, {
-      data: JSON.stringify(data),
-      type: 'POST',
-      dataType: 'json',
-      contentType: 'application/json',
-      cache: false
-    });
-    jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
-      if (response.error) {
-        errorHandler(response.error.msg, response.error.type, response.error.isPublic, callbacks.error);
-      } else if (response.success) {
-        if (callbacks.success) {
-          callbacks.success(response.success);
+    var self = this;
+    var jqXHR;
+
+    return new Promise(function(resolve, reject) {
+      jqXHR = $.ajax(url, {
+        data: JSON.stringify(data),
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        cache: false
+      });
+      jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]})
+        .done(function(response) {
+          if (cm.getDeployVersion() != response.deployVersion) {
+            cm.router.forceReload();
+          }
+          if (response.error) {
+            reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
+          } else {
+            resolve(response.success);
+          }
+        })
+        .fail(function(xhr, textStatus) {
+          if (xhr.status === 0) {
+            if (window.navigator.onLine) {
+              reject(Promise.CancellationError());
+            } else {
+              reject(new CM_Exception_RequestFailed(cm.language.get('No Internet connection')));
+            }
+          }
+
+          var msg = cm.language.get('An unexpected connection problem occurred.');
+          if (cm.options.debug) {
+            msg = xhr.responseText || textStatus;
+          }
+          reject(new CM_Exception(msg));
+        });
+    }).cancellable()
+      .catch(Promise.CancellationError, function(error) {
+        if (jqXHR) {
+          jqXHR.abort();
         }
-      }
-    }).fail(function(xhr, textStatus) {
-      if (xhr.status === 0) {
-        return; // Ignore interrupted ajax-request caused by leaving a page
-      }
-
-      var msg = cm.language.get('An unexpected connection problem occurred.');
-      if (cm.options.debug) {
-        msg = xhr.responseText || textStatus;
-      }
-      errorHandler(msg, null, false, callbacks.error);
-    }).always(function() {
-      if (callbacks.complete) {
-        callbacks.complete();
-      }
-    });
-
-    return jqXHR;
+        throw error;
+      });
   },
 
   /**
    * @param {String} methodName
    * @param {Object} params
-   * @param {Object|Null} [callbacks]
-   * @return jqXHR
+   * @return Promise
    */
-  rpc: function(methodName, params, callbacks) {
-    callbacks = callbacks || {};
-    return this.ajax('rpc', {method: methodName, params: params}, {
-      success: function(response) {
+  rpc: function(methodName, params) {
+    return this.ajax('rpc', {method: methodName, params: params})
+      .then(function(response) {
         if (typeof(response.result) === 'undefined') {
-          cm.error.trigger('RPC response has undefined result');
+          throw new CM_Exception('RPC response has undefined result');
         }
-        if (callbacks.success) {
-          callbacks.success(response.result);
-        }
-      },
-      error: callbacks.error,
-      complete: callbacks.complete
-    });
+        return response.result;
+      });
   },
 
   stream: {
@@ -880,7 +875,7 @@ var CM_App = CM_Class_Abstract.extend({
         return;
       }
       if (!channelKey || !channelType) {
-        cm.error.triggerThrow('No channel provided');
+        throw new CM_Exception('No channel provided');
       }
       if (!this._channelDispatchers[channel]) {
         this._subscribe(channel);
@@ -901,7 +896,7 @@ var CM_App = CM_Class_Abstract.extend({
         return;
       }
       if (!channelKey || !channelType) {
-        cm.error.triggerThrow('No channel provided');
+        throw new CM_Exception('No channel provided');
       }
       this._channelDispatchers[channel].off(this._getEventNames(namespace, true), callback, context);
       if (this._getBindCount(channel) === 0) {
@@ -1132,6 +1127,10 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   router: {
+
+    /** @type {Boolean} **/
+    _shouldReload: false,
+
     /** @type {String|Null} */
     hrefInitialIgnore: null,
 
@@ -1162,13 +1161,18 @@ var CM_App = CM_Class_Abstract.extend({
       });
     },
 
+    forceReload: function() {
+      this._shouldReload = true;
+    },
+
     /**
      * @param {String} url
      * @param {Boolean|Null} [forceReload]
      * @param {Boolean|Null} [replaceState]
+     * @returns {Promise}
      */
     route: function(url, forceReload, replaceState) {
-      forceReload = forceReload || false;
+      forceReload = this._shouldReload || forceReload || false;
       replaceState = replaceState || false;
       var urlBase = cm.getUrl();
       var fragment = url;
@@ -1179,7 +1183,7 @@ var CM_App = CM_Class_Abstract.extend({
       }
       if (forceReload || 0 !== url.indexOf(urlBase)) {
         window.location.assign(url);
-        return;
+        return Promise.resolve();
       }
       if (fragment !== this._getFragment()) {
         if (replaceState) {
@@ -1188,7 +1192,7 @@ var CM_App = CM_Class_Abstract.extend({
           this.pushState(fragment);
         }
       }
-      this._handleLocationChange(fragment);
+      return this._handleLocationChange(fragment);
     },
 
     /**
@@ -1229,6 +1233,7 @@ var CM_App = CM_Class_Abstract.extend({
 
     /**
      * @param {String} fragment
+     * @returns {Promise}
      */
     _handleLocationChange: function(fragment) {
       var paramsStateNext = null;
@@ -1239,8 +1244,8 @@ var CM_App = CM_Class_Abstract.extend({
         var locationNext = this._getLocationByFragment(fragment);
 
         if (locationCurrent.pathname === locationNext.pathname) {
-          var paramsCurrent = queryString.parse(locationCurrent.search);
-          var paramsNext = queryString.parse(locationNext.search);
+          var paramsCurrent = cm.request.parseQueryParams(locationCurrent.search);
+          var paramsNext = cm.request.parseQueryParams(locationNext.search);
 
           var stateParamNames = pageCurrent.getStateParams();
 
@@ -1255,10 +1260,35 @@ var CM_App = CM_Class_Abstract.extend({
 
       if (paramsStateNext) {
         if (false !== cm.getLayout().getPage().routeToState(paramsStateNext, fragment)) {
-          return;
+          return Promise.resolve();
         }
       }
-      cm.getLayout().loadPage(fragment);
+      return cm.getLayout().loadPage(fragment);
+    }
+  },
+
+  request: {
+
+    /**
+     * @param {Object} queryParams
+     * @return {Object}
+     */
+    parseQueryParams: function(queryParams) {
+      var params = queryString.parse(queryParams);
+      var arrayParamRegex = /^(\w+)\[(\w+)]$/;
+      _.each(params, function(value, key) {
+        var result = arrayParamRegex.exec(key);
+        if (result) {
+          var paramName = result[1];
+          var arrayKey = result[2];
+          delete params[key];
+          if (!params[paramName]) {
+            params[paramName] = {};
+          }
+          params[paramName][arrayKey] = value;
+        }
+      });
+      return params;
     }
   }
 });

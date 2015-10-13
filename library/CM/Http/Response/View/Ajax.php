@@ -6,13 +6,13 @@ class CM_Http_Response_View_Ajax extends CM_Http_Response_View_Abstract {
         $success = array();
         $query = $this->_request->getQuery();
         if (!isset($query['method'])) {
-            throw new CM_Exception_Invalid('No method specified', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('No method specified', CM_Exception::WARN);
         }
         if (!preg_match('/^[\w_]+$/i', $query['method'])) {
-            throw new CM_Exception_Invalid('Illegal method: `' . $query['method'] . '`', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('Illegal method: `' . $query['method'] . '`', CM_Exception::WARN);
         }
         if (!isset($query['params']) || !is_array($query['params'])) {
-            throw new CM_Exception_Invalid('Illegal params', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('Illegal params', CM_Exception::WARN);
         }
 
         $view = $this->_getView();
@@ -26,6 +26,10 @@ class CM_Http_Response_View_Ajax extends CM_Http_Response_View_Abstract {
         $componentHandler = new CM_Frontend_JavascriptContainer_View();
 
         $this->_setStringRepresentation(get_class($view) . '::' . $ajaxMethodName);
+
+        if (!method_exists($view, $ajaxMethodName)) {
+            throw new CM_Exception_Invalid('Method not found: `' . $ajaxMethodName . '`', CM_Exception::WARN);
+        }
         $data = $view->$ajaxMethodName($params, $componentHandler, $this);
         $success['data'] = CM_Params::encode($data);
 

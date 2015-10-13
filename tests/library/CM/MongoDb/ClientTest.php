@@ -15,6 +15,21 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $this->assertTrue($client->databaseExists());
     }
 
+    public function testDeleteIndex() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = 'deleteIndex';
+        $mongoDb->createCollection($collectionName);
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo' => 1]));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['bar' => 1]));
+        $mongoDb->createIndex($collectionName, ['foo' => 1]);
+        $mongoDb->createIndex($collectionName, ['bar' => 1]);
+        $this->assertTrue($mongoDb->hasIndex($collectionName, ['foo' => 1]));
+        $this->assertTrue($mongoDb->hasIndex($collectionName, ['bar' => 1]));
+        $mongoDb->deleteIndex($collectionName, ['bar' => 1]);
+        $this->assertTrue($mongoDb->hasIndex($collectionName, ['foo' => 1]));
+        $this->assertFalse($mongoDb->hasIndex($collectionName, ['bar' => 1]));
+    }
+
     public function testInsert() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'insert';
@@ -64,7 +79,7 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
     public function testCreateIndex() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'createIndex';
-        $mongoDb->createCollection('' . $collectionName . '');
+        $mongoDb->createCollection($collectionName);
         $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo' => 1]));
         $mongoDb->createIndex($collectionName, ['foo' => 1]);
         $this->assertTrue($mongoDb->hasIndex($collectionName, ['foo' => 1]));
@@ -283,13 +298,13 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         try {
             CMTest_TH::callProtectedMethod($mongoDb, '_checkResultForErrors', [false]);
         } catch (CM_MongoDb_Exception $ex) {
-            $this->assertSame(['result' => false], $ex->getMetaInfo(true));
+            $this->assertSame(['result' => false], $ex->getMetaInfo());
         }
 
         try {
             CMTest_TH::callProtectedMethod($mongoDb, '_checkResultForErrors', [['ok' => 0, 'errmsg' => 'foo']]);
         } catch (CM_MongoDb_Exception $ex) {
-            $this->assertSame(['result' => ['ok' => 0, 'errmsg' => 'foo']], $ex->getMetaInfo(true));
+            $this->assertSame(['result' => ['ok' => 0, 'errmsg' => 'foo']], $ex->getMetaInfo());
         }
     }
 }

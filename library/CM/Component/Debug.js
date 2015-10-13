@@ -70,10 +70,8 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
     _.each(this.cacheNames, function(cacheName) {
       clearCacheArguments[cacheName] = this.$('.' + cacheName).is(':checked');
     });
-    this.ajax('clearCache', clearCacheArguments, {
-      success: function() {
-        location.reload();
-      }
+    this.ajax('clearCache', clearCacheArguments).then(function() {
+      location.reload();
     });
   }
 });

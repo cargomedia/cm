@@ -6,10 +6,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge; requiresActiveX=true">
     {if isset($pageDescription)}<meta name="description" content="{$pageDescription|escape}">{/if}
     {if isset($pageKeywords)}<meta name="keywords" content="{$pageKeywords|escape}">{/if}
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="{$render->getSite()->getName()|escape}">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name=”msapplication-tap-highlight” content=”no” />
     <meta name="msapplication-TileColor" content="{block name='tileColor'}{lessVariable name='colorBrand'}{/block}">
     <meta name="msapplication-TileImage" content="{resourceUrl path='img/meta/mstile-144x144.png' type='layout'}">
     <meta name="msapplication-config" content="{resourceUrl path='browserconfig.xml' type='layout'}">
@@ -53,15 +54,13 @@
     {resourceCss file='all.css' type="library"}
     {resourceJs file='before-body.js' type="vendor"}
     {block name='head'}{/block}
-
-    {$render->getServiceManager()->getTrackings()->getHtml($render->getEnvironment())}
   </head>
   <body id="{$viewResponse->getAutoId()}" class="{$viewResponse->getCssClasses()|implode:' '}">
+    {$render->getServiceManager()->getTrackings()->getHtml($render->getEnvironment())}
     {if CM_Http_Request_Abstract::hasInstance() && !CM_Http_Request_Abstract::getInstance()->isSupported()}
       <div id="browserNotSupported">
         <h2><span class="icon-warning"></span> {translate 'Your browser is no longer supported.'}</h2>
         <p>{translate 'We recommend upgrading to the latest Internet Explorer, Google Chrome, Firefox, or Opera. Click here for <a href="{$url}">more information</a>.' url='http://whatbrowser.org'}
-        <p>{translate 'If you are using IE 9 or later, make sure you <a href="{$url}">turn off "Compatibility View"</a>.' url='http://windows.microsoft.com/en-us/internet-explorer/use-compatibility-view'}</p>
       </div>
     {/if}
 

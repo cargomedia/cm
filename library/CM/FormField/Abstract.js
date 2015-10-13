@@ -23,23 +23,20 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
       this.error(null);
       return;
     }
-    this.ajax('validate', {'userInput': value, 'form': this.getForm().getClass(), 'fieldName': this.getName()}, {
-      success: function() {
-        if (value != this.getValue()) {
-          return false;
+    var self = this;
+    this.ajax('validate', {'userInput': value, 'form': this.getForm().getClass(), 'fieldName': this.getName()})
+      .then(function() {
+        if (value == self.getValue()) {
+          self.error();
         }
-        this.error();
-      },
-      error: function(msg, type) {
-        if (value != this.getValue()) {
-          return false;
+      })
+      .catch(CM_Exception, function(error) {
+        if (error instanceof CM_Exception_FormFieldValidation) {
+          self.error(error.message);
+        } else if (value == self.getValue()) {
+          throw error;
         }
-        if ('CM_Exception_FormFieldValidation' == type) {
-          this.error(msg);
-          return false;
-        }
-      }
-    });
+      });
   },
 
   reset: function() {
@@ -70,14 +67,35 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @return string|null
+   * @returns {jQuery}
+   */
+  getInput: function() {
+    var $input = this.$('input:first, select:first, textarea:first');
+    if ($input.length === 0) {
+      throw new CM_Exception('Can\'t find input for `' + this.getName() + '` field');
+    }
+    return $input;
+  },
+
+  /**
+   * @returns {*|String|null}
    */
   getValue: function() {
-    var formData = this.getForm().getData();
-    if (!_.has(formData, this.getName())) {
-      return null;
-    }
-    return formData[this.getName()];
+    return this.getInput().val();
+  },
+
+  /**
+   * @param {*|String|null} value
+   */
+  setValue: function(value) {
+    this.getInput().val(value);
+  },
+
+  /**
+   * @returns {Boolean}
+   */
+  getEnabled: function() {
+    return this.getInput().is(':enabled');
   },
 
   /**
@@ -99,19 +117,12 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
     return options[name];
   },
 
-  /**
-   * @returns {jQuery}
-   */
-  getInput: function() {
-    return this.$('input:first, select:first, textarea:first')
-  },
-
   setFocus: function() {
     this.getInput().focus();
   },
 
   /**
-   * @param {String|Null} message
+   * @param {String|Null} [message]
    */
   error: function(message) {
     var $container = this.$('.messages');
@@ -133,7 +144,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
         this.setFocus();
 
       } else {
-        cm.error.trigger('FormField `' + this.getName() + '`: ' + message);
+        throw new CM_Exception('FormField `' + this.getName() + '`: ' + message);
       }
     } else {
       $errorMessage.remove();
@@ -145,6 +156,15 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
    * @returns {Boolean}
    */
   isEmpty: function(value) {
-    return _.isEmpty(value);
+    if (_.isNull(value)) {
+      return true;
+    }
+    if (_.isArray(value)) {
+      return 0 === value.length;
+    }
+    if (_.isBoolean(value)) {
+      return false;
+    }
+    return 0 === String(value).trim().length;
   }
 });

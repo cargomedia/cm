@@ -67,7 +67,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_VideoStream_Service::checkStreams'      => function () {
                 CM_Service_Manager::getInstance()->getStreamVideo()->checkStreams();
             },
-            'CM_MessageStream_Service::synchronize'            => function () {
+            'CM_MessageStream_Service::synchronize'     => function () {
                 CM_Service_Manager::getInstance()->getStreamMessage()->synchronize();
             }
         ));
@@ -89,24 +89,27 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 }
             }
         ));
-        $this->_registerClockworkCallbacks('8 days', array(
-            'CMService_MaxMind::upgrade' => function () {
-                try {
-                    $maxMind = new CMService_MaxMind();
-                    $maxMind->upgrade();
-                } catch (Exception $exception) {
-                    if (!is_a($exception, 'CM_Exception')) {
-                        $exception = new CM_Exception($exception->getMessage(), [
-                            'file'  => $exception->getFile(),
-                            'line'  => $exception->getLine(),
-                            'trace' => $exception->getTraceAsString(),
-                        ]);
+        if ($this->getServiceManager()->has('maxmind')) {
+            $this->_registerClockworkCallbacks('8 days', array(
+                'CMService_MaxMind::upgrade' => function () {
+                    try {
+                        /** @var CMService_MaxMind $maxMind */
+                        $maxMind = $this->getServiceManager()->get('maxmind', 'CMService_MaxMind');
+                        $maxMind->upgrade();
+                    } catch (Exception $exception) {
+                        if (!is_a($exception, 'CM_Exception')) {
+                            $exception = new CM_Exception($exception->getMessage(), null, [
+                                'file'  => $exception->getFile(),
+                                'line'  => $exception->getLine(),
+                                'trace' => $exception->getTraceAsString(),
+                            ]);
+                        }
+                        $exception->setSeverity(CM_Exception::FATAL);
+                        throw $exception;
                     }
-                    $exception->setSeverity(CM_Exception::FATAL);
-                    throw $exception;
                 }
-            }
-        ));
+            ));
+        }
     }
 
     protected function _registerCallbacksLocal() {
@@ -135,9 +138,10 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             $this->_clockworkManager->registerCallback($name, $dateTimeString, function () use ($transactionName, $callback) {
                 CM_Service_Manager::getInstance()->getNewrelic()->startTransaction($transactionName);
                 try {
-                    $callback();
+                    call_user_func_array($callback, func_get_args());
                 } catch (CM_Exception $e) {
-                    CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
+                    CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
+                    throw $e;
                 }
                 CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
             });

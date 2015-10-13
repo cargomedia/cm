@@ -28,33 +28,28 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         CM_Config::get()->CM_Http_Response_View_Abstract->exceptionsToCatch = ['CM_Exception_Nonexistent' => []];
         $response = $this->mockClass('CM_Http_Response_View_Abstract')->newInstanceWithoutConstructor();
         $response->mockMethod('_processView')->set(function () {
-            throw new CM_Exception_Invalid('foo', null, ['messagePublic' => 'bar']);
+            throw new CM_Exception_Invalid('foo', null, null, [
+                'messagePublic' => new CM_I18n_Phrase('bar'),
+            ]);
         });
         $response->mockMethod('getRender')->set(new CM_Frontend_Render());
         /** @var CM_Http_Response_View_Abstract $response */
         CMTest_TH::callProtectedMethod($response, '_process');
-        $responseData = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame(
-            ['error' =>
-                 ['type'     => 'CM_Exception_Invalid',
-                  'msg'      => 'bar',
-                  'isPublic' => true
-                 ]
-            ], $responseData);
+        $this->assertViewResponseError($response, 'CM_Exception_Invalid', 'bar', true);
 
         $response->mockMethod('_processView')->set(function () {
             throw new CM_Exception_Nonexistent('foo');
         });
 
         CMTest_TH::callProtectedMethod($response, '_process');
-        $responseData = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame(
-            ['error' =>
-                 ['type'     => 'CM_Exception_Nonexistent',
-                  'msg'      => 'Internal server error',
-                  'isPublic' => false
-                 ]
-            ], $responseData);
+        $this->assertViewResponseError($response, 'CM_Exception_Nonexistent', 'Internal server error', false);
+    }
+
+    public function testProcessReturnDeployVersion() {
+        $response = $this->getResponseAjax(new CM_Page_View_Ajax_Test_Mock(), 'loadPage', ['path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()]);
+        $responseDecoded = CM_Params::jsonDecode($response->getContent());
+        $this->assertArrayHasKey('deployVersion', $responseDecoded);
+        $this->assertSame(CM_App::getInstance()->getDeployVersion(), $responseDecoded['deployVersion']);
     }
 
     public function testLoadPageRedirectExternal() {
@@ -97,7 +92,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
         $this->assertViewResponseSuccess($response);
         $responseContent = CM_Params::decode($response->getContent(), true);
-        $this->assertContains('ga("send", "pageview", "' . $page::getPath() . '")', $responseContent['success']['data']['jsTracking']);
+        $pageview = CM_Params::jsonEncode($page::getPath());
+        $this->assertContains('ga("send", "pageview", ' . $pageview . ')', $responseContent['success']['data']['jsTracking']);
     }
 
     public function testLoadPageTrackingRedirect() {
@@ -110,7 +106,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $responseContent = CM_Params::decode($response->getContent(), true);
         $jsTracking = $responseContent['success']['data']['jsTracking'];
         $this->assertSame(1, substr_count($jsTracking, 'ga("send", "pageview"'));
-        $this->assertContains('ga("send", "pageview", "' . $page::getPath() . '?count=0")', $jsTracking);
+        $pageview = CM_Params::jsonEncode($page::getPath() . '?count=0');
+        $this->assertContains('ga("send", "pageview", ' . $pageview . ')', $jsTracking);
     }
 
     public function testLoadPageTrackingError() {
@@ -129,19 +126,19 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $html = $responseContent['success']['data']['html'];
 
         $this->assertSame(1, substr_count($jsTracking, 'ga("send", "pageview"'));
-        $this->assertContains('ga("send", "pageview", "/iwhdfkjlsh")', $jsTracking);
+        $this->assertContains('ga("send", "pageview", "\/iwhdfkjlsh")', $jsTracking);
         $this->assertContains('CM_Page_View_Ajax_Test_Mock', $html);
     }
 
     public function testReloadComponent() {
         $component = new CM_Component_Notfound([]);
-        $scopeView = new CM_Frontend_ViewResponse($component);
-        $request = $this->createRequestAjax($component, 'reloadComponent', ['foo' => 'bar'], $scopeView, $scopeView);
+        $viewResponse = new CM_Frontend_ViewResponse($component);
+        $request = $this->createRequestAjax($component, 'reloadComponent', ['foo' => 'bar'], $viewResponse);
         $response = $this->processRequest($request);
         $this->assertViewResponseSuccess($response);
 
         $frontend = $response->getRender()->getGlobalResponse();
-        $oldAutoId = $scopeView->getAutoId();
+        $oldAutoId = $viewResponse->getAutoId();
         $newAutoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
         $expected = <<<EOL
@@ -162,13 +159,13 @@ EOL;
         $config->CM_Model_Entity_Mock2->type = CM_Model_Entity_Mock2::getTypeStatic();
 
         $component = new CM_Component_Mock();
-        $scopeView = new CM_Frontend_ViewResponse($component);
-        $request = $this->createRequestAjax($component, 'reloadComponent', ['entity' => $entity], $scopeView, $scopeView);
+        $viewResponse = new CM_Frontend_ViewResponse($component);
+        $request = $this->createRequestAjax($component, 'reloadComponent', ['entity' => $entity], $viewResponse);
         $response = $this->processRequest($request);
 
         $this->assertViewResponseSuccess($response);
         $frontend = $response->getRender()->getGlobalResponse();
-        $oldAutoId = $scopeView->getAutoId();
+        $oldAutoId = $viewResponse->getAutoId();
         $newAutoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
         $expected = <<<EOL

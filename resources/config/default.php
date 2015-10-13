@@ -8,6 +8,7 @@ return function (CM_Config_Node $config) {
     $config->CM_App->setupScriptClasses[] = 'CM_Elasticsearch_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_Http_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Translations';
+    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Currency';
 
     $config->timeZone = 'UTC';
 
@@ -35,6 +36,8 @@ return function (CM_Config_Node $config) {
     $config->CM_Params->class = 'CM_Params';
 
     $config->CM_Usertext_Usertext->class = 'CM_Usertext_Usertext';
+
+    $config->CM_Model_Currency->default = ['code' => '840', 'abbreviation' => 'USD'];
 
     $config->CM_Http_Response_Page->exceptionsToCatch = array(
         'CM_Exception_Nonexistent'  => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => 'CM_Paging_Log_NotFound'],
@@ -158,10 +161,18 @@ return function (CM_Config_Node $config) {
         )
     );
 
+    $config->services['tracking-adagnit'] = [
+        'class'     => 'CMService_Adagnit_Client',
+        'arguments' => [
+            'ttl' => 86400,
+        ],
+    ];
+
     $config->services['tracking-googleanalytics'] = array(
         'class'     => 'CMService_GoogleAnalytics_Client',
         'arguments' => array(
             'code' => 'my-web-property-id',
+            'ttl'  => 86400,
         )
     );
 
@@ -169,6 +180,13 @@ return function (CM_Config_Node $config) {
         'class'     => 'CMService_KissMetrics_Client',
         'arguments' => array(
             'code' => 'my-api-key',
+        )
+    );
+
+    $config->services['tracking-inspectlet'] = array(
+        'class'     => 'CMService_Inspectlet_Client',
+        'arguments' => array(
+            'code' => 'my-wid',
         )
     );
 

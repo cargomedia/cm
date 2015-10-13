@@ -28,7 +28,7 @@ class CM_Model_User extends CM_Model_Abstract {
      * @return int
      */
     public function getCreated() {
-        return $this->_get('createStamp');
+        return (int) $this->_get('createStamp');
     }
 
     /**
@@ -81,8 +81,24 @@ class CM_Model_User extends CM_Model_Abstract {
         }
     }
 
-    public function setOfflineStamp() {
-        CM_Db_Db::update('cm_user_online', ['offlineStamp' => time()], ['userId' => $this->getId()]);
+    /**
+     * @return int|null
+     */
+    public function getOfflineStamp() {
+        $offlineStamp = $this->_get('offlineStamp');
+        if (null !== $offlineStamp) {
+            $offlineStamp = (int) $offlineStamp;
+        }
+        return $offlineStamp;
+    }
+
+    /**
+     * @param int|null $offlineStamp
+     */
+    public function setOfflineStamp($offlineStamp) {
+        $offlineStamp = null !== $offlineStamp ? (int) $offlineStamp : $offlineStamp;
+        CM_Db_Db::update('cm_user_online', ['offlineStamp' => $offlineStamp], ['userId' => $this->getId()]);
+        $this->_set('offlineStamp', $offlineStamp);
     }
 
     /**
@@ -201,6 +217,31 @@ class CM_Model_User extends CM_Model_Abstract {
         $this->_change();
     }
 
+    /**
+     * @return CM_Model_Currency|null
+     */
+    public function getCurrency() {
+        if (!$this->_get('currencyId')) {
+            return null;
+        }
+        return new CM_Model_Currency($this->_get('currencyId'));
+    }
+
+    /**
+     * @param CM_Model_Currency $currency
+     */
+    public function setCurrency(CM_Model_Currency $currency) {
+        CM_Db_Db::update('cm_user', array('currencyId' => $currency->getId()), array('userId' => $this->getId()));
+        $this->_change();
+    }
+
+    /**
+     * @return CM_Frontend_Environment
+     */
+    public function getEnvironment() {
+        return new CM_Frontend_Environment($this->getSite(), $this, $this->getLanguage(), null, null, null, $this->getCurrency());
+    }
+
     public function updateLatestActivityThrottled() {
         if ($this->getLatestActivity() < time() - self::ACTIVITY_EXPIRATION) {
             $this->_updateLatestActivity();
@@ -219,7 +260,7 @@ class CM_Model_User extends CM_Model_Abstract {
 
     protected function _loadData() {
         return CM_Db_Db::exec('
-			SELECT `main`.*, `online`.`userId` AS `online`, `online`.`visible`
+			SELECT `main`.*, `online`.`userId` AS `online`, `online`.`visible`, `online`.`offlineStamp`
 			FROM `cm_user` AS `main`
 			LEFT JOIN `cm_user_online` AS `online` USING (`userId`)
 			WHERE `main`.`userId`=?',
@@ -293,8 +334,19 @@ class CM_Model_User extends CM_Model_Abstract {
             $language = $data['language'];
             $languageId = $language->getId();
         }
-        $userId = CM_Db_Db::insert('cm_user', array('createStamp' => time(), 'activityStamp' => time(), 'site' => $siteType,
-                                                    'languageId'  => $languageId));
+        $currencyId = null;
+        if (isset($data['currency'])) {
+            /** @var CM_Model_Currency $currency */
+            $currency = $data['currency'];
+            $currencyId = $currency->getId();
+        }
+        $userId = CM_Db_Db::insert('cm_user', array(
+            'createStamp'   => time(),
+            'activityStamp' => time(),
+            'site'          => $siteType,
+            'languageId'    => $languageId,
+            'currencyId'    => $currencyId,
+        ));
         return new static($userId);
     }
 
