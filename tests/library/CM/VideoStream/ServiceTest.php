@@ -1,6 +1,6 @@
 <?php
 
-class CM_VideoStream_ServiceTest extends CMTest_TestCase {
+class CM_MediaStream_ServiceTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
@@ -15,7 +15,7 @@ class CM_VideoStream_ServiceTest extends CMTest_TestCase {
         $stopStreamMethod = $adapter->mockMethod('_stopStream')->set(1);
         /** @var CM_VideoStream_Adapter_Abstract $adapter */
 
-        $stream = new CM_VideoStream_Service($adapter);
+        $stream = new CM_MediaStream_Service($adapter);
 
         CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Video_Mock';
 

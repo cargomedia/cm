@@ -21,10 +21,10 @@ class CM_MediaStream_Factory {
      * @param string     $adapterClass
      * @param array|null $adapterArguments
      * @throws CM_Exception_Invalid
-     * @return CM_VideoStream_Service
+     * @return CM_MediaStream_Service
      */
     public function createService($adapterClass, $adapterArguments = null) {
         $adapter = $this->createAdapter($adapterClass, $adapterArguments);
-        return new CM_VideoStream_Service($adapter);
+        return new CM_MediaStream_Service($adapter);
     }
 }

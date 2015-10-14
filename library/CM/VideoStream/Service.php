@@ -1,6 +1,6 @@
 <?php
 
-class CM_VideoStream_Service {
+class CM_MediaStream_Service {
 
     /** @var CM_VideoStream_Adapter_Abstract */
     private $_adapter;
