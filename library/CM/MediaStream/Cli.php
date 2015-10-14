@@ -6,7 +6,7 @@ class CM_MediaStream_Cli extends CM_Cli_Runnable_Abstract {
      * @param int     $streamChannelId
      * @param CM_File $thumbnailSource
      */
-    public function importThumbnail($streamChannelId, CM_File $thumbnailSource) {
+    public function importVideoThumbnail($streamChannelId, CM_File $thumbnailSource) {
         $streamChannel = CM_Model_StreamChannel_Video::factory($streamChannelId);
         $thumbnailCount = $streamChannel->getThumbnailCount();
         $thumbnailDestination = $streamChannel->getThumbnail($thumbnailCount + 1);
