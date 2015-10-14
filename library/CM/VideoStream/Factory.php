@@ -1,6 +1,6 @@
 <?php
 
-class CM_VideoStream_Factory {
+class CM_MediaStream_Factory {
 
     /**
      * @param string     $class

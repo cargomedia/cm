@@ -1,6 +1,6 @@
 <?php
 
-class CM_VideoStream_FactoryTest extends CMTest_TestCase {
+class CM_MediaStream_FactoryTest extends CMTest_TestCase {
 
     public function testCreateService() {
         $adapterClass = $this->mockClass('CM_VideoStream_Adapter_Abstract');
@@ -9,7 +9,7 @@ class CM_VideoStream_FactoryTest extends CMTest_TestCase {
         });
         $adapterClassName = $adapterClass->getClassName();
 
-        $factory = new CM_VideoStream_Factory();
+        $factory = new CM_MediaStream_Factory();
         $service = $factory->createService($adapterClassName, ['foo']);
         $this->assertInstanceOf('CM_VideoStream_Service', $service);
         $this->assertSame(1, $adapterConstructor->getCallCount());

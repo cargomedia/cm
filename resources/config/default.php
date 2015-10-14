@@ -234,7 +234,7 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['stream-video'] = array(
-        'class'  => 'CM_VideoStream_Factory',
+        'class'  => 'CM_MediaStream_Factory',
         'method' => array(
             'name'      => 'createService',
             'arguments' => array(
