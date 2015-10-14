@@ -154,7 +154,7 @@ class CMTest_TH {
     /**
      * @param CM_Model_StreamChannel_Video|null $streamChannel
      * @param CM_Model_User|null                $user
-     * @return CM_Model_StreamChannelArchive_Video
+     * @return CM_Model_StreamChannelArchive_Media
      */
     public static function createStreamChannelVideoArchive(CM_Model_StreamChannel_Video $streamChannel = null, CM_Model_User $user = null) {
         if (is_null($streamChannel)) {
@@ -164,7 +164,7 @@ class CMTest_TH {
         if (!$streamChannel->hasStreamPublish()) {
             self::createStreamPublish($user, $streamChannel);
         }
-        return CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
+        return CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel));
     }
 
     /**

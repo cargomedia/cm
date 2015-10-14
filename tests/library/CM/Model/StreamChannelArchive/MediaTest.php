@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
+class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
@@ -12,9 +12,9 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
         $user = CMTest_TH::createUser();
         $streamPublish = CMTest_TH::createStreamPublish($user, $streamChannel);
         CMTest_TH::timeForward(10);
-        /** @var CM_Model_StreamChannelArchive_Video $archive */
-        $archive = CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
-        $this->assertInstanceOf('CM_Model_StreamChannelArchive_Video', $archive);
+        /** @var CM_Model_StreamChannelArchive_Media $archive */
+        $archive = CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel));
+        $this->assertInstanceOf('CM_Model_StreamChannelArchive_Media', $archive);
         $this->assertSame($streamChannel->getId(), $archive->getId());
         $this->assertSame($user->getId(), $archive->getUserId());
         $this->assertEquals($user, $archive->getUser());
@@ -28,8 +28,8 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 
         $streamChannel = CMTest_TH::createStreamChannel();
         try {
-            CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
-            $this->fail('StreamChannelArchive_Video created without StreamPublish.');
+            CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel));
+            $this->fail('StreamChannelArchive_Media created without StreamPublish.');
         } catch (CM_Exception_Invalid $ex) {
             $this->assertTrue(true);
         }
@@ -42,8 +42,8 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
         $streamPublish = CMTest_TH::createStreamPublish($user, $streamChannel);
         $streamPublish->unsetUser();
 
-        /** @var CM_Model_StreamChannelArchive_Video $archive */
-        $archive = CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
+        /** @var CM_Model_StreamChannelArchive_Media $archive */
+        $archive = CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel));
 
         $this->assertNull($archive->getUser());
         $this->assertNull($archive->getUserId());
@@ -103,7 +103,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
             $this->assertFalse($file->exists());
         }
         try {
-            new CM_Model_StreamChannelArchive_Video($archive->getId());
+            new CM_Model_StreamChannelArchive_Media($archive->getId());
             $this->fail('StreamChannelArchive not deleted.');
         } catch (CM_Exception_Nonexistent $ex) {
             $this->assertTrue(true);
@@ -154,7 +154,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
         foreach ($filesDeleted as $file) {
             $this->assertTrue($file->exists());
         }
-        CM_Model_StreamChannelArchive_Video::deleteOlder(10, CM_Model_StreamChannel_Video::getTypeStatic());
+        CM_Model_StreamChannelArchive_Media::deleteOlder(10, CM_Model_StreamChannel_Video::getTypeStatic());
         foreach ($filesNotDeleted as $file) {
             $this->assertTrue($file->exists());
         }
@@ -181,18 +181,18 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 
     public function testFindById() {
         $streamChannel = $streamChannel = CMTest_TH::createStreamChannel();
-        $this->assertNull(CM_Model_StreamChannelArchive_Video::findById($streamChannel->getId()));
+        $this->assertNull(CM_Model_StreamChannelArchive_Media::findById($streamChannel->getId()));
 
         CMTest_TH::createStreamPublish(null, $streamChannel);
-        CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
-        $this->assertInstanceOf('CM_Model_StreamChannelArchive_Video', CM_Model_StreamChannelArchive_Video::findById($streamChannel->getId()));
+        CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel));
+        $this->assertInstanceOf('CM_Model_StreamChannelArchive_Media', CM_Model_StreamChannelArchive_Media::findById($streamChannel->getId()));
     }
 
     /**
-     * @param CM_Model_StreamChannelArchive_Video $archive
+     * @param CM_Model_StreamChannelArchive_Media $archive
      * @return CM_File[]
      */
-    private function _createArchiveFiles(CM_Model_StreamChannelArchive_Video $archive) {
+    private function _createArchiveFiles(CM_Model_StreamChannelArchive_Media $archive) {
         $files = array();
         if ($archive->getThumbnailCount() > 0) {
             /** @var CM_File_UserContent $thumbnailFirst */

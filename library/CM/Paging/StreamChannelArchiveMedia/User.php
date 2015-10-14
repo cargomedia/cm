@@ -1,6 +1,6 @@
 <?php
 
-class CM_Paging_StreamChannelArchiveVideo_User extends CM_Paging_StreamChannelArchiveVideo_Abstract {
+class CM_Paging_StreamChannelArchiveMedia_User extends CM_Paging_StreamChannelArchiveMedia_Abstract {
 
     /**
      * @param CM_Model_User $user

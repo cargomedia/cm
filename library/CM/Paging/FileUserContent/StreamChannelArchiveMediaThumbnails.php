@@ -1,16 +1,16 @@
 <?php
 
-class CM_Paging_FileUserContent_StreamChannelArchiveVideoThumbnails extends CM_Paging_FileUserContent_Abstract {
+class CM_Paging_FileUserContent_StreamChannelArchiveMediaThumbnails extends CM_Paging_FileUserContent_Abstract {
 
     /**
-     * @var CM_Model_StreamChannelArchive_Video
+     * @var CM_Model_StreamChannelArchive_Media
      */
     private $_streamChannelArchive;
 
     /**
-     * @param CM_Model_StreamChannelArchive_Video $streamChannelArchive
+     * @param CM_Model_StreamChannelArchive_Media $streamChannelArchive
      */
-    public function __construct(CM_Model_StreamChannelArchive_Video $streamChannelArchive) {
+    public function __construct(CM_Model_StreamChannelArchive_Media $streamChannelArchive) {
         $this->_streamChannelArchive = $streamChannelArchive;
         $input = $this->_streamChannelArchive->getThumbnailCount() ? range(1, $this->_streamChannelArchive->getThumbnailCount()) : array();
         $source = new CM_PagingSource_Array($input);

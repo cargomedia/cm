@@ -1,6 +1,6 @@
 <?php
 
-class CM_Paging_StreamChannelArchiveVideo_Type extends CM_Paging_StreamChannelArchiveVideo_Abstract {
+class CM_Paging_StreamChannelArchiveMedia_Type extends CM_Paging_StreamChannelArchiveMedia_Abstract {
 
     /**
      * @param int      $type

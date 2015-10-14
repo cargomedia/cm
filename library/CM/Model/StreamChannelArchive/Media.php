@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_Abstract {
+class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_Abstract {
 
     /**
      * @return int
@@ -63,10 +63,10 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
     }
 
     /**
-     * @return CM_Paging_FileUserContent_StreamChannelArchiveVideoThumbnails
+     * @return CM_Paging_FileUserContent_StreamChannelArchiveMediaThumbnails
      */
     public function getThumbnails() {
-        return new CM_Paging_FileUserContent_StreamChannelArchiveVideoThumbnails($this);
+        return new CM_Paging_FileUserContent_StreamChannelArchiveMediaThumbnails($this);
     }
 
     /**
@@ -159,8 +159,8 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
         $age = (int) $age;
         $streamChannelType = (int) $streamChannelType;
         $ageMax = time() - $age - 1;
-        $streamChannelArchives = new CM_Paging_StreamChannelArchiveVideo_Type($streamChannelType, $ageMax);
-        /** @var CM_Model_StreamChannelArchive_Video $streamChannelArchive */
+        $streamChannelArchives = new CM_Paging_StreamChannelArchiveMedia_Type($streamChannelType, $ageMax);
+        /** @var CM_Model_StreamChannelArchive_Media $streamChannelArchive */
         foreach ($streamChannelArchives as $streamChannelArchive) {
             $streamChannelArchive->delete();
         }
