@@ -2,19 +2,19 @@
 
 class CM_MediaStream_Service {
 
-    /** @var CM_VideoStream_Adapter_Abstract */
+    /** @var CM_MediaStream_Adapter_Abstract */
     private $_adapter;
 
     /**
-     * @param CM_VideoStream_Adapter_Abstract $adapter
+     * @param CM_MediaStream_Adapter_Abstract $adapter
      * @throws CM_Exception_Invalid
      */
-    public function __construct(CM_VideoStream_Adapter_Abstract $adapter) {
+    public function __construct(CM_MediaStream_Adapter_Abstract $adapter) {
         $this->_adapter = $adapter;
     }
 
     /**
-     * @return CM_VideoStream_Adapter_Abstract
+     * @return CM_MediaStream_Adapter_Abstract
      */
     public function getAdapter() {
         return $this->_adapter;

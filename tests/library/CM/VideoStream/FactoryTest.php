@@ -3,7 +3,7 @@
 class CM_MediaStream_FactoryTest extends CMTest_TestCase {
 
     public function testCreateService() {
-        $adapterClass = $this->mockClass('CM_VideoStream_Adapter_Abstract');
+        $adapterClass = $this->mockClass('CM_MediaStream_Adapter_Abstract');
         $adapterConstructor = $adapterClass->mockMethod('__construct')->set(function ($argument) {
             $this->assertSame('foo', $argument);
         });

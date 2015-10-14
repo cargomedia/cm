@@ -137,7 +137,7 @@ class CMTest_TH {
         }
 
         if (null === $adapterType) {
-            $adapterType = CM_VideoStream_Adapter_Wowza::getTypeStatic();
+            $adapterType = CM_MediaStream_Adapter_Wowza::getTypeStatic();
         }
 
         $data = array('key' => rand(1, 10000) . '_' . rand(1, 100));

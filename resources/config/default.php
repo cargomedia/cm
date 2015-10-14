@@ -238,7 +238,7 @@ return function (CM_Config_Node $config) {
         'method' => array(
             'name'      => 'createService',
             'arguments' => array(
-                'adapterClass'     => 'CM_VideoStream_Adapter_Wowza',
+                'adapterClass'     => 'CM_MediaStream_Adapter_Wowza',
                 'adapterArguments' => array(
                     'servers' => array(
                         ['publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'],
