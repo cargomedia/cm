@@ -1,11 +1,23 @@
 <?php
 
-class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
+class CM_VideoStream_Adapter_Wowza extends CM_VideoStream_Adapter_Abstract {
+
+    /** @var array */
+    protected $_config;
+
+    /**
+     * @param array|null $servers
+     * @param array|null $config
+     */
+    public function __construct(array $servers = null, array $config = null) {
+        parent::__construct($servers);
+        $this->_config = (array) $config;
+    }
 
     public function synchronize() {
         $startStampLimit = time() - 3;
         $status = array();
-        foreach (CM_Stream_Video::getInstance()->getServers() as $serverId => $wowzaServer) {
+        foreach ($this->_servers as $serverId => $wowzaServer) {
             $singleStatus = CM_Params::decode($this->_fetchStatus($wowzaServer['privateIp']), true);
             foreach ($singleStatus as $streamName => $publish) {
                 $publish['serverId'] = $serverId;
@@ -61,7 +73,7 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
     public function getServerId(CM_Http_Request_Abstract $request) {
         $ipAddress = long2ip($request->getIp());
 
-        $servers = CM_Stream_Video::_getConfig()->servers;
+        $servers = $this->_servers;
         foreach ($servers as $serverId => $server) {
             if ($server['publicIp'] == $ipAddress || $server['privateIp'] == $ipAddress) {
                 return (int) $serverId;
@@ -75,7 +87,7 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
      * @return string
      */
     protected function _fetchStatus($wowzaHost) {
-        return CM_Util::getContents('http://' . $wowzaHost . ':' . self::_getConfig()->httpPort . '/status');
+        return CM_Util::getContents('http://' . $wowzaHost . ':' . $this->_config['httpPort'] . '/status');
     }
 
     /**
@@ -84,10 +96,11 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
     protected function _stopStream(CM_Model_Stream_Abstract $stream) {
         /** @var $streamChannel CM_Model_StreamChannel_Video */
         $streamChannel = $stream->getStreamChannel();
-        $this->_stopClient($stream->getKey(), $streamChannel->getPrivateHost());
+        $privateHost = $this->getPrivateHost($streamChannel->getServerId());
+        $this->_stopClient($stream->getKey(), $privateHost);
     }
 
     protected function _stopClient($clientId, $serverHost) {
-        CM_Util::getContents('http://' . $serverHost . ':' . self::_getConfig()->httpPort . '/stop', array('clientId' => (string) $clientId), true);
+        CM_Util::getContents('http://' . $serverHost . ':' . $this->_config['httpPort'] . '/stop', array('clientId' => (string) $clientId), true);
     }
 }

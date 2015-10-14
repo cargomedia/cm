@@ -66,21 +66,10 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getPublicHost() {
-        $serverId = (int) $this->_get('serverId');
-        $serverArray = CM_Stream_Video::getInstance()->getServer($serverId);
-        return (string) $serverArray['publicHost'];
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrivateHost() {
-        $serverId = (int) $this->_get('serverId');
-        $serverArray = CM_Stream_Video::getInstance()->getServer($serverId);
-        return (string) $serverArray['privateIp'];
+    public function getServerId() {
+        return (int) $this->_get('serverId');
     }
 
     public function toArray() {
@@ -124,15 +113,6 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
     protected function _loadData() {
         return CM_Db_Db::exec("SELECT * FROM `cm_streamChannel` JOIN `cm_streamChannel_video` USING (`id`)
 								WHERE `id` = ?", array($this->getId()))->fetch();
-    }
-
-    /**
-     * @param string $key
-     * @return CM_Model_StreamChannel_Video|null
-     */
-    public static function findByKey($key) {
-        $adapterType = CM_Stream_Video::getInstance()->getAdapter()->getType();
-        return self::findByKeyAndAdapter($key, $adapterType);
     }
 
     protected static function _createStatic(array $data) {

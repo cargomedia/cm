@@ -61,11 +61,11 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_Session::deleteExpired'                 => function () {
                 CM_Session::deleteExpired();
             },
-            'CM_Stream_Video::synchronize'              => function () {
-                CM_Stream_Video::getInstance()->synchronize();
+            'CM_VideoStream_Service::synchronize'       => function () {
+                CM_Service_Manager::getInstance()->getStreamVideo()->synchronize();
             },
-            'CM_Stream_Video::checkStreams'             => function () {
-                CM_Stream_Video::getInstance()->checkStreams();
+            'CM_VideoStream_Service::checkStreams'      => function () {
+                CM_Service_Manager::getInstance()->getStreamVideo()->checkStreams();
             },
             'CM_MessageStream_Service::synchronize'     => function () {
                 CM_Service_Manager::getInstance()->getStreamMessage()->synchronize();

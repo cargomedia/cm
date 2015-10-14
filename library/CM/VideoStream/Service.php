@@ -1,9 +1,24 @@
 <?php
 
-class CM_Stream_Video extends CM_Stream_Abstract {
+class CM_VideoStream_Service {
 
-    /** @var CM_Stream_Video */
-    private static $_instance;
+    /** @var CM_VideoStream_Adapter_Abstract */
+    private $_adapter;
+
+    /**
+     * @param CM_VideoStream_Adapter_Abstract $adapter
+     * @throws CM_Exception_Invalid
+     */
+    public function __construct(CM_VideoStream_Adapter_Abstract $adapter) {
+        $this->_adapter = $adapter;
+    }
+
+    /**
+     * @return CM_VideoStream_Adapter_Abstract
+     */
+    public function getAdapter() {
+        return $this->_adapter;
+    }
 
     public function checkStreams() {
         $this->getAdapter()->checkStreams();
@@ -22,38 +37,6 @@ class CM_Stream_Video extends CM_Stream_Abstract {
     }
 
     /**
-     * @return array[]
-     */
-    public function getServers() {
-        return (array) self::_getConfig()->servers;
-    }
-
-    /**
-     * @param string|null $serverId
-     * @throws CM_Exception_Invalid
-     * @return array
-     */
-    public function getServer($serverId = null) {
-        $servers = $this->getServers();
-        if (null === $serverId) {
-            $serverId = array_rand($servers);
-        }
-
-        $serverId = (int) $serverId;
-        if (!array_key_exists($serverId, $servers)) {
-            throw new CM_Exception_Invalid("No video server with id `$serverId` found");
-        }
-        return $servers[$serverId];
-    }
-
-    /**
-     * @return CM_Stream_Adapter_Video_Abstract
-     */
-    public function getAdapter() {
-        return parent::getAdapter();
-    }
-
-    /**
      * @param string $streamName
      * @param string $clientKey
      * @param int    $start
@@ -64,9 +47,9 @@ class CM_Stream_Video extends CM_Stream_Abstract {
      */
     public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $data) {
         $request = CM_Http_Request_Abstract::getInstance();
-        $serverId = self::getInstance()->getAdapter()->getServerId($request);
+        $serverId = CM_Service_Manager::getInstance()->getStreamVideo()->getAdapter()->getServerId($request);
 
-        $channelId = self::getInstance()->getAdapter()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $data);
+        $channelId = CM_Service_Manager::getInstance()->getStreamVideo()->getAdapter()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $data);
         return $channelId;
     }
 
@@ -75,7 +58,7 @@ class CM_Stream_Video extends CM_Stream_Abstract {
      * @return bool
      */
     public static function rpc_unpublish($streamName) {
-        $adapter = self::getInstance()->getAdapter();
+        $adapter = CM_Service_Manager::getInstance()->getStreamVideo()->getAdapter();
         $adapter->getServerId(CM_Http_Request_Abstract::getInstance());
         $adapter->unpublish($streamName);
         return true;
@@ -89,7 +72,7 @@ class CM_Stream_Video extends CM_Stream_Abstract {
      * @return boolean
      */
     public static function rpc_subscribe($streamName, $clientKey, $start, $data) {
-        $adapter = self::getInstance()->getAdapter();
+        $adapter = CM_Service_Manager::getInstance()->getStreamVideo()->getAdapter();
         $adapter->getServerId(CM_Http_Request_Abstract::getInstance());
         $adapter->subscribe($streamName, $clientKey, $start, $data);
         return true;
@@ -101,19 +84,9 @@ class CM_Stream_Video extends CM_Stream_Abstract {
      * @return boolean
      */
     public static function rpc_unsubscribe($streamName, $clientKey) {
-        $adapter = self::getInstance()->getAdapter();
+        $adapter = CM_Service_Manager::getInstance()->getStreamVideo()->getAdapter();
         $adapter->getServerId(CM_Http_Request_Abstract::getInstance());
         $adapter->unsubscribe($streamName, $clientKey);
         return true;
-    }
-
-    /**
-     * @return CM_Stream_Video
-     */
-    public static function getInstance() {
-        if (!self::$_instance) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
     }
 }

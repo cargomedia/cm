@@ -63,14 +63,6 @@ return function (CM_Config_Node $config) {
     );
     $config->CM_Http_Response_RPC->catchPublicExceptions = true;
 
-    $config->CM_Stream_Video->adapter = 'CM_Stream_Adapter_Video_Wowza';
-    $config->CM_Stream_Video->servers = array(
-        array('publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'),
-    );
-
-    $config->CM_Stream_Adapter_Video_Wowza->httpPort = '8086';
-    $config->CM_Stream_Adapter_Video_Wowza->wowzaPort = '1935';
-
     $config->CM_Adprovider->enabled = true;
     $config->CM_Adprovider->zones = array();
 
@@ -239,6 +231,25 @@ return function (CM_Config_Node $config) {
     $config->services['options'] = array(
         'class'     => 'CM_Options',
         'arguments' => array(),
+    );
+
+    $config->services['stream-video'] = array(
+        'class'  => 'CM_VideoStream_Factory',
+        'method' => array(
+            'name'      => 'createService',
+            'arguments' => array(
+                'adapterClass'     => 'CM_VideoStream_Adapter_Wowza',
+                'adapterArguments' => array(
+                    'servers' => array(
+                        ['publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'],
+                    ),
+                    'config'  => array(
+                        'httpPort'  => '8086',
+                        'wowzaPort' => '1935'
+                    ),
+                )
+            )
+        )
     );
 
     $config->services['newrelic'] = array(

@@ -1,6 +1,9 @@
 <?php
 
-abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstract {
+abstract class CM_VideoStream_Adapter_Abstract extends CM_Class_Abstract implements CM_Typed {
+
+    /** @var array */
+    protected $_servers;
 
     abstract public function synchronize();
 
@@ -15,6 +18,13 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
      * @param CM_Model_Stream_Abstract $stream
      */
     abstract protected function _stopStream(CM_Model_Stream_Abstract $stream);
+
+    /**
+     * @param array|null $servers
+     */
+    public function __construct(array $servers = null) {
+        $this->_servers = (array) $servers;
+    }
 
     public function checkStreams() {
         /** @var CM_Model_StreamChannel_Video $streamChannel */
@@ -112,7 +122,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
     }
 
     /**
-     * @param string   $streamName
+     * @param string $streamName
      * @return null
      */
     public function unpublish($streamName) {
@@ -185,6 +195,46 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
         if (!$streamChannel->hasStreams()) {
             $streamChannel->delete();
         }
+    }
+
+    /**
+     * @param int|null $serverId
+     * @throws CM_Exception_Invalid
+     * @return array
+     */
+    public function getServer($serverId = null) {
+        $servers = $this->_servers;
+        if (null === $serverId) {
+            $serverId = array_rand($servers);
+        }
+
+        $serverId = (int) $serverId;
+        if (!array_key_exists($serverId, $servers)) {
+            throw new CM_Exception_Invalid("No video server with id `$serverId` found");
+        }
+        return $servers[$serverId];
+    }
+
+    /**
+     * @param int $serverId
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    public function getPublicHost($serverId) {
+        $serverId = (int) $serverId;
+        $server = $this->getServer($serverId);
+        return $server['publicHost'];
+    }
+
+    /**
+     * @param int $serverId
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    public function getPrivateHost($serverId) {
+        $serverId = (int) $serverId;
+        $server = $this->getServer($serverId);
+        return $server['privateIp'];
     }
 
     /**
