@@ -37,7 +37,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
     }
 
     public function testFactory() {
-        $streamChannel1 = CM_Model_StreamChannel_Video::createStatic(array('key'         => 'dsljkfk34asdd', 'serverId' => 1,
+        $streamChannel1 = CM_Model_StreamChannel_Media::createStatic(array('key'         => 'dsljkfk34asdd', 'serverId' => 1,
                                                                            'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic(),
                                                                            'width'       => 100,
                                                                            'height'      => 100, 'thumbnailCount' => 0));
@@ -57,12 +57,12 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
     public function testFactoryInvalidInstance() {
         $messageStreamChannel = CM_Model_StreamChannel_Message::createStatic(array('key'         => 'message-stream-channel',
                                                                                    'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic()));
-        CM_Model_StreamChannel_Video::factory($messageStreamChannel->getId());
+        CM_Model_StreamChannel_Media::factory($messageStreamChannel->getId());
     }
 
     public function testFindByKeyAndAdapter() {
         $adapterType = 1;
-        /** @var CM_Model_StreamChannel_Video $streamChannelOriginal */
+        /** @var CM_Model_StreamChannel_Media $streamChannelOriginal */
         $streamChannelOriginal = CMTest_TH::createStreamChannel(null, $adapterType);
         $streamChannelKey = $streamChannelOriginal->getKey();
         $streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamChannelKey, $adapterType);

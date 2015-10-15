@@ -130,7 +130,7 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     protected static function _createStatic(array $data) {
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = $data['streamChannel'];
         $streamPublish = $streamChannel->getStreamPublish();
         $createStamp = $streamPublish->getStart();

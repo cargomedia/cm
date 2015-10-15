@@ -27,7 +27,7 @@ abstract class CM_MediaStream_Adapter_Abstract extends CM_Class_Abstract impleme
     }
 
     public function checkStreams() {
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         foreach ($this->_getStreamChannels() as $streamChannel) {
             $streamChannelIsValid = $streamChannel->isValid();
             if ($streamChannel->hasStreamPublish()) {
@@ -65,9 +65,9 @@ abstract class CM_MediaStream_Adapter_Abstract extends CM_Class_Abstract impleme
      * @throws CM_Exception_Invalid
      */
     public function stopStream(CM_Model_Stream_Abstract $stream) {
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = $stream->getStreamChannel();
-        if (!$streamChannel instanceof CM_Model_StreamChannel_Video) {
+        if (!$streamChannel instanceof CM_Model_StreamChannel_Media) {
             throw new CM_Exception_Invalid('Cannot stop stream of non-video channel');
         }
         $this->_stopStream($stream);

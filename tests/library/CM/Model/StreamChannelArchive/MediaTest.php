@@ -7,7 +7,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
     }
 
     public function testCreate() {
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $user = CMTest_TH::createUser();
         $streamPublish = CMTest_TH::createStreamPublish($user, $streamChannel);
@@ -34,7 +34,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
     }
 
     public function testNoUser() {
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $user = CMTest_TH::createUser();
         $streamPublish = CMTest_TH::createStreamPublish($user, $streamChannel);
@@ -68,7 +68,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         $archive = CMTest_TH::createStreamChannelVideoArchive();
         $this->assertSame(array(), $archive->getThumbnails()->getItems());
 
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $streamChannel->setThumbnailCount(2);
         $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel);
@@ -87,7 +87,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
     }
 
     public function testOnDelete() {
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $streamChannel->setThumbnailCount(3);
         $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel);
@@ -110,7 +110,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
 
     public function testDeleteOlder() {
         $time = time();
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannelsDeleted = array();
         $archivesDeleted = array();
         /** @var $filesDeleted CM_File[] */
@@ -152,7 +152,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         foreach ($filesDeleted as $file) {
             $this->assertTrue($file->exists());
         }
-        CM_Model_StreamChannelArchive_Media::deleteOlder(10, CM_Model_StreamChannel_Video::getTypeStatic());
+        CM_Model_StreamChannelArchive_Media::deleteOlder(10, CM_Model_StreamChannel_Media::getTypeStatic());
         foreach ($filesNotDeleted as $file) {
             $this->assertTrue($file->exists());
         }

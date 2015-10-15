@@ -31,7 +31,7 @@ class CM_MediaStream_Adapter_WowzaTest extends CMTest_TestCase {
 
     public function testSynchronizeMissingInPhp() {
 
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
         $streamSubscribe = CMTest_TH::createStreamSubscribe(null, $streamChannel);
@@ -75,7 +75,7 @@ class CM_MediaStream_Adapter_WowzaTest extends CMTest_TestCase {
 
     private function _generateWowzaData(array $streamChannels) {
         $jsonData = array();
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         foreach ($streamChannels as $streamChannel) {
             $subscribes = array();
             /** @var CM_Model_Stream_Publish $streamPublish */

@@ -15,7 +15,7 @@ class CM_MediaStream_Adapter_AbstractTest extends CMTest_TestCase {
         $streamChannel->expects($this->any())->method('getStreamPublish')->will($this->returnValue($streamPublish));
         $streamChannel->expects($this->any())->method('getStreamSubscribes')->will($this->returnValue(array($streamSubscribe)));
         $streamChannel->expects($this->any())->method('isValid')->will($this->returnValue(false));
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
 
         $adapter = $this->getMockBuilder('CM_MediaStream_Adapter_Abstract')
             ->setMethods(array('_getStreamChannels', 'stopStream'))->getMockForAbstractClass();

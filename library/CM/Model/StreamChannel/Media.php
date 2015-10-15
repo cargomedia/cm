@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
+class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
 
     public function onPublish(CM_Model_Stream_Publish $streamPublish) {
     }
@@ -88,10 +88,10 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
     }
 
     /**
-     * @return CM_Paging_FileUserContent_StreamChannelVideoThumbnails
+     * @return CM_Paging_FileUserContent_StreamChannelMediaThumbnails
      */
     public function getThumbnails() {
-        return new CM_Paging_FileUserContent_StreamChannelVideoThumbnails($this);
+        return new CM_Paging_FileUserContent_StreamChannelMediaThumbnails($this);
     }
 
     /**

@@ -6,7 +6,7 @@ class CM_Paging_StreamChannelArchiveMedia_AllTest extends CMTest_TestCase {
         $archive = CMTest_TH::createStreamChannelVideoArchive();
         CMTest_TH::createStreamChannelVideoArchive();
         CMTest_TH::createStreamChannelVideoArchive();
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $streamChannel = $this->getMock('CM_Model_StreamChannel_Video', array('getType'), array($streamChannel->getId()));
         $streamChannel->expects($this->any())->method('getType')->will($this->returnValue(3));

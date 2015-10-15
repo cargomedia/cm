@@ -1,10 +1,10 @@
 <?php
 
-class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
+class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
 
     public function testCreate() {
-        /** @var CM_Model_StreamChannel_Video $channel */
-        $channel = CM_Model_StreamChannel_Video::createStatic(array(
+        /** @var CM_Model_StreamChannel_Media $channel */
+        $channel = CM_Model_StreamChannel_Media::createStatic(array(
             'key'            => 'foo',
             'serverId'       => 1,
             'thumbnailCount' => 2,
@@ -18,7 +18,7 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 
     public function testCreateWithoutServerId() {
         try {
-            CM_Model_StreamChannel_Video::createStatic(array(
+            CM_Model_StreamChannel_Media::createStatic(array(
                 'key'            => 'bar',
                 'serverId'       => null,
                 'thumbnailCount' => 2,
@@ -31,7 +31,7 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
     }
 
     public function testGetStreamPublish() {
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         try {
             $streamChannel->getStreamPublish();
@@ -44,7 +44,7 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
     }
 
     public function testHasStreamPublish() {
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $this->assertFalse($streamChannel->hasStreamPublish());
         CMTest_TH::createStreamPublish(null, $streamChannel);
@@ -52,7 +52,7 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
     }
 
     public function testThumbnailCount() {
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $streamChannel->setThumbnailCount(15);
         $this->assertSame(15, $streamChannel->getThumbnailCount());
@@ -62,7 +62,7 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
         $streamChannel = CMTest_TH::createStreamChannel();
         $streamChannel->delete();
         try {
-            new CM_Model_StreamChannel_Video($streamChannel->getId());
+            new CM_Model_StreamChannel_Media($streamChannel->getId());
         } catch (CM_Exception_Nonexistent $ex) {
             $this->assertTrue(true);
         }
@@ -93,7 +93,7 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
     }
 
     public function testGetThumbnails() {
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         CMTest_TH::createStreamPublish(null, $streamChannel);
         $this->assertSame(array(), $streamChannel->getThumbnails()->getItems());
@@ -106,7 +106,7 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
     }
 
     public function testGetThumbnail() {
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         CMTest_TH::createStreamPublish(null, $streamChannel);
         $thumbnail = $streamChannel->getThumbnail(3);
