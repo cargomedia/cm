@@ -6,11 +6,11 @@ class CM_Wowza_Service {
     private $_adapter;
 
     /**
-     * @param CM_MediaStream_Adapter_Wowza $adapter
-     * @throws CM_Exception_Invalid
+     * @param array|null $servers
+     * @param array|null $config
      */
-    public function __construct(CM_MediaStream_Adapter_Wowza $adapter) {
-        $this->_adapter = $adapter;
+    public function __construct(array $servers = null, array $config = null) {
+        $this->_adapter = new CM_MediaStream_Adapter_Wowza($servers, $config);
     }
 
     /**
