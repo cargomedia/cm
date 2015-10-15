@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_Abstract {
+class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_Abstract {
 
     /**
      * @return int
@@ -63,10 +63,10 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
     }
 
     /**
-     * @return CM_Paging_FileUserContent_StreamChannelArchiveVideoThumbnails
+     * @return CM_Paging_FileUserContent_StreamChannelArchiveMediaThumbnails
      */
     public function getThumbnails() {
-        return new CM_Paging_FileUserContent_StreamChannelArchiveVideoThumbnails($this);
+        return new CM_Paging_FileUserContent_StreamChannelArchiveMediaThumbnails($this);
     }
 
     /**
@@ -106,7 +106,7 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
      * @return array
      */
     protected function _loadData() {
-        return CM_Db_Db::select('cm_streamChannelArchive_video', '*', array('id' => $this->getId()))->fetch();
+        return CM_Db_Db::select('cm_streamChannelArchive_media', '*', array('id' => $this->getId()))->fetch();
     }
 
     protected function _onDeleteBefore() {
@@ -117,7 +117,7 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
     }
 
     protected function _onDelete() {
-        CM_Db_Db::delete('cm_streamChannelArchive_video', array('id' => $this->getId()));
+        CM_Db_Db::delete('cm_streamChannelArchive_media', array('id' => $this->getId()));
     }
 
     /**
@@ -125,7 +125,7 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
      * @return null|static
      */
     public static function findById($id) {
-        if (!CM_Db_Db::count('cm_streamChannelArchive_video', array('id' => $id))) {
+        if (!CM_Db_Db::count('cm_streamChannelArchive_media', array('id' => $id))) {
             return null;
         }
         return new static($id);
@@ -139,7 +139,7 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
         $thumbnailCount = $streamChannel->getThumbnailCount();
         $end = time();
         $duration = $end - $createStamp;
-        CM_Db_Db::insert('cm_streamChannelArchive_video', array(
+        CM_Db_Db::insert('cm_streamChannelArchive_media', array(
             'id'                => $streamChannel->getId(),
             'userId'            => $streamPublish->getUserId(),
             'width'             => $streamChannel->getWidth(),
@@ -159,8 +159,8 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
         $age = (int) $age;
         $streamChannelType = (int) $streamChannelType;
         $ageMax = time() - $age - 1;
-        $streamChannelArchives = new CM_Paging_StreamChannelArchiveVideo_Type($streamChannelType, $ageMax);
-        /** @var CM_Model_StreamChannelArchive_Video $streamChannelArchive */
+        $streamChannelArchives = new CM_Paging_StreamChannelArchiveMedia_Type($streamChannelType, $ageMax);
+        /** @var CM_Model_StreamChannelArchive_Media $streamChannelArchive */
         foreach ($streamChannelArchives as $streamChannelArchive) {
             $streamChannelArchive->delete();
         }

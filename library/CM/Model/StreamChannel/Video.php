@@ -9,8 +9,8 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
     }
 
     public function onUnpublish(CM_Model_Stream_Publish $streamPublish) {
-        if (!CM_Model_StreamChannelArchive_Video::findById($this->getId())) {
-            CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $this));
+        if (!CM_Model_StreamChannelArchive_Media::findById($this->getId())) {
+            CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $this));
         }
     }
 
@@ -22,7 +22,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
      */
     public function setThumbnailCount($thumbnailCount) {
         $thumbnailCount = (int) $thumbnailCount;
-        CM_Db_Db::update('cm_streamChannel_video', array('thumbnailCount' => $thumbnailCount), array('id' => $this->getId()));
+        CM_Db_Db::update('cm_streamChannel_media', array('thumbnailCount' => $thumbnailCount), array('id' => $this->getId()));
         $this->_change();
     }
 
@@ -106,12 +106,12 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
     }
 
     protected function _onDelete() {
-        CM_Db_Db::delete('cm_streamChannel_video', array('id' => $this->getId()));
+        CM_Db_Db::delete('cm_streamChannel_media', array('id' => $this->getId()));
         parent::_onDelete();
     }
 
     protected function _loadData() {
-        return CM_Db_Db::exec("SELECT * FROM `cm_streamChannel` JOIN `cm_streamChannel_video` USING (`id`)
+        return CM_Db_Db::exec("SELECT * FROM `cm_streamChannel` JOIN `cm_streamChannel_media` USING (`id`)
 								WHERE `id` = ?", array($this->getId()))->fetch();
     }
 
@@ -124,8 +124,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
         $adapterType = (int) $data['adapterType'];
         $id = CM_Db_Db::insert('cm_streamChannel', array('key' => $key, 'type' => static::getTypeStatic(), 'adapterType' => $adapterType));
         try {
-            CM_Db_Db::insert('cm_streamChannel_video', array('id'             => $id, 'width' => $width, 'height' => $height, 'serverId' => $serverId,
-                                                             'thumbnailCount' => $thumbnailCount));
+            CM_Db_Db::insert('cm_streamChannel_media', array('id' => $id, 'serverId' => $serverId, 'data' => CM_Params::encode(['thumbnailCount' => $thumbnailCount], true)));
         } catch (CM_Exception $ex) {
             CM_Db_Db::delete('cm_streamChannel', array('id' => $id));
             throw $ex;

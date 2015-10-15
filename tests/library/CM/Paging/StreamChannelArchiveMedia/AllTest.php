@@ -1,6 +1,6 @@
 <?php
 
-class CM_Paging_StreamChannelArchiveVideo_AllTest extends CMTest_TestCase {
+class CM_Paging_StreamChannelArchiveMedia_AllTest extends CMTest_TestCase {
 
     public function testPaging() {
         $archive = CMTest_TH::createStreamChannelVideoArchive();
@@ -12,12 +12,12 @@ class CM_Paging_StreamChannelArchiveVideo_AllTest extends CMTest_TestCase {
         $streamChannel->expects($this->any())->method('getType')->will($this->returnValue(3));
         CMTest_TH::createStreamChannelVideoArchive($streamChannel);
 
-        $paging = new CM_Paging_StreamChannelArchiveVideo_All();
+        $paging = new CM_Paging_StreamChannelArchiveMedia_All();
         $this->assertSame(4, $paging->getCount());
 
         $archive->delete();
 
-        $paging = new CM_Paging_StreamChannelArchiveVideo_All();
+        $paging = new CM_Paging_StreamChannelArchiveMedia_All();
         $this->assertSame(3, $paging->getCount());
     }
 }
