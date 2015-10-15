@@ -102,4 +102,49 @@ class CM_MediaStream_Adapter_WowzaTest extends CMTest_TestCase {
         }
         return json_encode($jsonData);
     }
+
+    public function testCheckStreamsInvalid() {
+        $streamPublish = $this->getMockBuilder('CM_Model_Stream_Publish')
+            ->disableOriginalConstructor()->getMock();
+
+        $streamSubscribe = $this->getMockBuilder('CM_Model_Stream_Subscribe')
+            ->disableOriginalConstructor()->getMock();
+
+        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')
+            ->setMethods(array('isValid', 'hasStreamPublish', 'getStreamPublish', 'getStreamSubscribes'))->getMockForAbstractClass();
+        $streamChannel->expects($this->any())->method('hasStreamPublish')->will($this->returnValue(true));
+        $streamChannel->expects($this->any())->method('getStreamPublish')->will($this->returnValue($streamPublish));
+        $streamChannel->expects($this->any())->method('getStreamSubscribes')->will($this->returnValue(array($streamSubscribe)));
+        $streamChannel->expects($this->any())->method('isValid')->will($this->returnValue(false));
+        /** @var CM_Model_StreamChannel_Video $streamChannel */
+
+        $adapter = $this->getMockBuilder('CM_MediaStream_Adapter_Wowza')
+            ->setMethods(array('_getStreamChannels', 'stopStream'))->getMockForAbstractClass();
+        $adapter->expects($this->any())->method('_getStreamChannels')->will($this->returnValue(array($streamChannel)));
+        $adapter->expects($this->at(1))->method('stopStream')->with($streamPublish);
+        $adapter->expects($this->at(2))->method('stopStream')->with($streamSubscribe);
+        /** @var CM_MediaStream_Adapter_Wowza $adapter */
+
+        $adapter->checkStreams();
+    }
+
+    public function testServerGetters() {
+        $servers = array(1 => ['publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109', 'privateIp' => '10.0.3.108']);
+        /** @var CM_MediaStream_Adapter_Wowza $adapter */
+        $adapter = $this->mockObject('CM_MediaStream_Adapter_Wowza', [$servers]);
+
+        $this->assertSame($servers[1], $adapter->getServer(1));
+        $this->assertSame('video.example.com', $adapter->getPublicHost(1));
+        $this->assertSame('10.0.3.108', $adapter->getPrivateHost(1));
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     * @expectedExceptionMessage No video server with id `5` found
+     */
+    public function testGetServerInvalid() {
+        /** @var CM_MediaStream_Adapter_Wowza $adapter */
+        $adapter = $this->mockObject('CM_MediaStream_Adapter_Wowza', []);
+        $adapter->getServer(5);
+    }
 }
