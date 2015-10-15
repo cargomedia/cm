@@ -1,6 +1,6 @@
 <?php
 
-class CM_MediaStream_Cli extends CM_Cli_Runnable_Abstract {
+class CM_Wowza_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
      * @param int     $streamChannelId
