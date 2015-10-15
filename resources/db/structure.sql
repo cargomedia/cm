@@ -375,7 +375,7 @@ DROP TABLE IF EXISTS `cm_streamChannel_media`;
 
 CREATE TABLE `cm_streamChannel_media` (
   `id` int(10) unsigned NOT NULL,
-  `thumbnailCount` int(10) unsigned NOT NULL,
+  `thumbnailCount` int(10) unsigned NOT NULL DEFAULT '0',
   `serverId` int(10) unsigned NOT NULL,
   `data` varchar(255) not null default '',
   PRIMARY KEY (`id`),
