@@ -352,7 +352,7 @@ CREATE TABLE `cm_streamChannel` (
   KEY `type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_streamChannelArchive_video`;
+DROP TABLE IF EXISTS `cm_streamChannelArchive_media`;
 
 
 CREATE TABLE `cm_streamChannelArchive_media` (

@@ -13,7 +13,7 @@ class CM_Paging_StreamChannelArchiveMedia_Type extends CM_Paging_StreamChannelAr
             $createStampMax = (int) $createStampMax;
             $where .= ' AND `createStamp` <= ' . $createStampMax;
         }
-        $source = new CM_PagingSource_Sql('id', 'cm_streamChannelArchive_video', $where);
+        $source = new CM_PagingSource_Sql('id', 'cm_streamChannelArchive_media', $where);
         parent::__construct($source);
     }
 }
