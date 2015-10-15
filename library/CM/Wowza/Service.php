@@ -1,31 +1,31 @@
 <?php
 
-class CM_Wowza_Service {
+class CM_Wowza_Service extends CM_StreamService {
 
-    /** @var CM_MediaStream_Adapter_Wowza */
-    private $_adapter;
+    /** @var CM_Wowza_Client */
+    private $_client;
 
     /**
      * @param array|null $servers
      * @param array|null $config
      */
     public function __construct(array $servers = null, array $config = null) {
-        $this->_adapter = new CM_MediaStream_Adapter_Wowza($servers, $config);
+        $this->_client = new CM_Wowza_Client($this->getType(), $servers, $config);
     }
 
     /**
-     * @return CM_MediaStream_Adapter_Wowza
+     * @return CM_Wowza_Client
      */
-    public function getAdapter() {
-        return $this->_adapter;
+    public function getClient() {
+        return $this->_client;
     }
 
     public function checkStreams() {
-        $this->getAdapter()->checkStreams();
+        $this->getClient()->checkStreams();
     }
 
     public function synchronize() {
-        $this->getAdapter()->synchronize();
+        $this->getClient()->synchronize();
     }
 
     /**
@@ -33,7 +33,7 @@ class CM_Wowza_Service {
      * @throws CM_Exception_Invalid
      */
     public function stopStream(CM_Model_Stream_Abstract $stream) {
-        $this->getAdapter()->stopStream($stream);
+        $this->getClient()->stopStream($stream);
     }
 
     /**
@@ -47,9 +47,9 @@ class CM_Wowza_Service {
      */
     public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $data) {
         $request = CM_Http_Request_Abstract::getInstance();
-        $serverId = CM_Service_Manager::getInstance()->getStreamVideo()->getAdapter()->getServerId($request);
+        $serverId = CM_Service_Manager::getInstance()->getStreamVideo()->getClient()->getServerId($request);
 
-        $channelId = CM_Service_Manager::getInstance()->getStreamVideo()->getAdapter()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $data);
+        $channelId = CM_Service_Manager::getInstance()->getStreamVideo()->getClient()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $data);
         return $channelId;
     }
 
@@ -58,7 +58,7 @@ class CM_Wowza_Service {
      * @return bool
      */
     public static function rpc_unpublish($streamName) {
-        $adapter = CM_Service_Manager::getInstance()->getStreamVideo()->getAdapter();
+        $adapter = CM_Service_Manager::getInstance()->getStreamVideo()->getClient();
         $adapter->getServerId(CM_Http_Request_Abstract::getInstance());
         $adapter->unpublish($streamName);
         return true;
@@ -72,7 +72,7 @@ class CM_Wowza_Service {
      * @return boolean
      */
     public static function rpc_subscribe($streamName, $clientKey, $start, $data) {
-        $adapter = CM_Service_Manager::getInstance()->getStreamVideo()->getAdapter();
+        $adapter = CM_Service_Manager::getInstance()->getStreamVideo()->getClient();
         $adapter->getServerId(CM_Http_Request_Abstract::getInstance());
         $adapter->subscribe($streamName, $clientKey, $start, $data);
         return true;
@@ -84,9 +84,11 @@ class CM_Wowza_Service {
      * @return boolean
      */
     public static function rpc_unsubscribe($streamName, $clientKey) {
-        $adapter = CM_Service_Manager::getInstance()->getStreamVideo()->getAdapter();
+        $adapter = CM_Service_Manager::getInstance()->getStreamVideo()->getClient();
         $adapter->getServerId(CM_Http_Request_Abstract::getInstance());
         $adapter->unsubscribe($streamName, $clientKey);
         return true;
     }
+
+
 }

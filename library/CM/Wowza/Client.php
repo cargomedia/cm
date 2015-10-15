@@ -1,6 +1,9 @@
 <?php
 
-class CM_MediaStream_Adapter_Wowza extends CM_Class_Abstract implements CM_Typed {
+class CM_Wowza_Client {
+
+    /** @var int */
+    protected $_type;
 
     /** @var array */
     protected $_servers;
@@ -9,11 +12,21 @@ class CM_MediaStream_Adapter_Wowza extends CM_Class_Abstract implements CM_Typed
     protected $_config;
 
     /**
+     * @param int $type
      * @param array|null $servers
      * @param array|null $config
      */
-    public function __construct(array $servers = null, array $config = null) {
+    public function __construct($type, array $servers = null, array $config = null) {
+        $this->_type = $type;
+        $this->_servers = (array) $servers;
         $this->_config = (array) $config;
+    }
+
+    /**
+     * @return int
+     */
+    public function getType() {
+        return $this->_type;
     }
 
     public function checkStreams() {
@@ -134,10 +147,10 @@ class CM_MediaStream_Adapter_Wowza extends CM_Class_Abstract implements CM_Typed
     /**
      * @param string $streamName
      * @param string $clientKey
-     * @param int    $start
-     * @param int    $width
-     * @param int    $height
-     * @param int    $serverId
+     * @param int $start
+     * @param int $width
+     * @param int $height
+     * @param int $serverId
      * @param string $data
      * @throws CM_Exception
      * @throws CM_Exception_NotAllowed
@@ -200,7 +213,7 @@ class CM_MediaStream_Adapter_Wowza extends CM_Class_Abstract implements CM_Typed
     /**
      * @param string $streamName
      * @param string $clientKey
-     * @param int    $start
+     * @param int $start
      * @param string $data
      * @throws CM_Exception_NotAllowed
      */

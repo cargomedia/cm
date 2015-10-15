@@ -13,7 +13,7 @@ class CM_Wowza_ServiceTest extends CMTest_TestCase {
         $adapter = $this->mockObject('CM_MediaStream_Adapter_Wowza', [$servers]);
         $adapter->mockMethod('getType')->set(1);
         $stopStreamMethod = $adapter->mockMethod('_stopStream')->set(1);
-        /** @var CM_MediaStream_Adapter_Wowza $adapter */
+        /** @var CM_Wowza_Client $adapter */
 
         $stream = new CM_Wowza_Service($adapter);
 

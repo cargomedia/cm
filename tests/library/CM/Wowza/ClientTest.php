@@ -1,6 +1,6 @@
 <?php
 
-class CM_MediaStream_Adapter_WowzaTest extends CMTest_TestCase {
+class CM_Wowza_ClientTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
@@ -15,7 +15,7 @@ class CM_MediaStream_Adapter_WowzaTest extends CMTest_TestCase {
         $wowza = $this->getMock('CM_MediaStream_Adapter_Wowza', array('_fetchStatus'), [$servers]);
         $json = $this->_generateWowzaData(array());
         $wowza->expects($this->any())->method('_fetchStatus')->will($this->returnValue($json));
-        /** @var $wowza CM_MediaStream_Adapter_Wowza */
+        /** @var $wowza CM_Wowza_Client */
 
         $wowza->synchronize();
         $this->assertEquals($streamChannel, CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamChannel->getKey(), $wowza->getType()));
@@ -44,7 +44,7 @@ class CM_MediaStream_Adapter_WowzaTest extends CMTest_TestCase {
         $adapter->expects($this->at(2))->method('_stopClient')->with($streamSubscribe->getKey(), '10.0.3.108');
         $adapter->expects($this->exactly(2))->method('_stopClient');
 
-        /** @var $adapter CM_MediaStream_Adapter_Wowza */
+        /** @var $adapter CM_Wowza_Client */
         $adapter->unpublish($streamChannel->getKey());
         $adapter->unsubscribe($streamChannel->getKey(), $streamSubscribe->getKey());
         $adapter->synchronize();
@@ -52,7 +52,7 @@ class CM_MediaStream_Adapter_WowzaTest extends CMTest_TestCase {
 
     public function testGetServerId() {
         $servers = array(1 => array('publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109', 'privateIp' => '10.0.3.108'));
-        $adapter = new CM_MediaStream_Adapter_Wowza($servers);
+        $adapter = new CM_Wowza_Client($servers);
         $ipAddresses = array('10.0.3.109', '10.0.3.108');
         foreach ($ipAddresses as $ipAddress) {
             $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($ipAddress), 'CM_Http_Request_Mock', true, true, true, array('getIp',
@@ -123,14 +123,14 @@ class CM_MediaStream_Adapter_WowzaTest extends CMTest_TestCase {
         $adapter->expects($this->any())->method('_getStreamChannels')->will($this->returnValue(array($streamChannel)));
         $adapter->expects($this->at(1))->method('stopStream')->with($streamPublish);
         $adapter->expects($this->at(2))->method('stopStream')->with($streamSubscribe);
-        /** @var CM_MediaStream_Adapter_Wowza $adapter */
+        /** @var CM_Wowza_Client $adapter */
 
         $adapter->checkStreams();
     }
 
     public function testServerGetters() {
         $servers = array(1 => ['publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109', 'privateIp' => '10.0.3.108']);
-        /** @var CM_MediaStream_Adapter_Wowza $adapter */
+        /** @var CM_Wowza_Client $adapter */
         $adapter = $this->mockObject('CM_MediaStream_Adapter_Wowza', [$servers]);
 
         $this->assertSame($servers[1], $adapter->getServer(1));
@@ -143,7 +143,7 @@ class CM_MediaStream_Adapter_WowzaTest extends CMTest_TestCase {
      * @expectedExceptionMessage No video server with id `5` found
      */
     public function testGetServerInvalid() {
-        /** @var CM_MediaStream_Adapter_Wowza $adapter */
+        /** @var CM_Wowza_Client $adapter */
         $adapter = $this->mockObject('CM_MediaStream_Adapter_Wowza', []);
         $adapter->getServer(5);
     }
