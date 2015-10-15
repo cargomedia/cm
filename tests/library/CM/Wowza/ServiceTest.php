@@ -1,6 +1,6 @@
 <?php
 
-class CM_MediaStream_ServiceTest extends CMTest_TestCase {
+class CM_Wowza_ServiceTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
