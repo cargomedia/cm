@@ -34,13 +34,6 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     /**
      * @return int
      */
-    public function getHeight() {
-        return (int) $this->_get('height');
-    }
-
-    /**
-     * @return int
-     */
     public function getStreamChannelType() {
         return (int) $this->_get('streamChannelType');
     }
@@ -49,7 +42,8 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
      * @return int
      */
     public function getThumbnailCount() {
-        return (int) $this->_get('thumbnailCount');
+        $params = $this->_getDataColumn();
+        return $params->getInt('thumbnailCount', 0);
     }
 
     /**
@@ -96,10 +90,14 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     /**
-     * @return int
+     * @return CM_Params
      */
-    public function getWidth() {
-        return (int) $this->_get('width');
+    protected function _getDataColumn() {
+        if (!$this->_has('data')) {
+            return CM_Params::factory();
+        } else {
+            return CM_Params::factory(CM_Params::jsonDecode($this->_get('data')));
+        }
     }
 
     /**
@@ -142,9 +140,8 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
         CM_Db_Db::insert('cm_streamChannelArchive_media', array(
             'id'                => $streamChannel->getId(),
             'userId'            => $streamPublish->getUserId(),
-            'width'             => $streamChannel->getWidth(),
-            'height'            => $streamChannel->getHeight(),
-            'duration'          => $duration, 'thumbnailCount' => $thumbnailCount,
+            'duration'          => $duration,
+            'thumbnailCount'    => $thumbnailCount,
             'hash'              => $streamChannel->getHash(),
             'streamChannelType' => $streamChannel->getType(), 'createStamp' => $createStamp,
         ));

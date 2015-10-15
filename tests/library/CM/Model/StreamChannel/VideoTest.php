@@ -6,15 +6,11 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
         /** @var CM_Model_StreamChannel_Video $channel */
         $channel = CM_Model_StreamChannel_Video::createStatic(array(
             'key'            => 'foo',
-            'width'          => 100,
-            'height'         => 200,
             'serverId'       => 1,
             'thumbnailCount' => 2,
             'adapterType'    => 1,
         ));
         $this->assertInstanceOf('CM_Model_StreamChannel_Video', $channel);
-        $this->assertSame(100, $channel->getWidth());
-        $this->assertSame(200, $channel->getHeight());
         $this->assertSame('foo', $channel->getKey());
         $this->assertSame(1, $channel->getAdapterType());
         $this->assertSame(2, $channel->getThumbnailCount());
@@ -24,8 +20,6 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
         try {
             CM_Model_StreamChannel_Video::createStatic(array(
                 'key'            => 'bar',
-                'width'          => 100,
-                'height'         => 200,
                 'serverId'       => null,
                 'thumbnailCount' => 2,
                 'adapterType'    => 1,
