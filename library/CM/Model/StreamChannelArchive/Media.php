@@ -141,7 +141,7 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
             'id'                => $streamChannel->getId(),
             'userId'            => $streamPublish->getUserId(),
             'duration'          => $duration,
-            'thumbnailCount'    => $thumbnailCount,
+            'data'              => CM_Params::jsonEncode(['thumbnailCount' => $thumbnailCount]),
             'hash'              => $streamChannel->getHash(),
             'streamChannelType' => $streamChannel->getType(), 'createStamp' => $createStamp,
         ));
