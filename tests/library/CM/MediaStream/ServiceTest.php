@@ -15,7 +15,7 @@ class CM_MediaStream_ServiceTest extends CMTest_TestCase {
         $stopStreamMethod = $adapter->mockMethod('_stopStream')->set(1);
         /** @var CM_MediaStream_Adapter_Abstract $adapter */
 
-        $stream = new CM_MediaStream_Service($adapter);
+        $stream = new CM_Wowza_Service($adapter);
 
         CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Video_Mock';
 

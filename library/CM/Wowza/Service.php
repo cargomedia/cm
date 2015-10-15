@@ -1,20 +1,20 @@
 <?php
 
-class CM_MediaStream_Service {
+class CM_Wowza_Service {
 
-    /** @var CM_MediaStream_Adapter_Abstract */
+    /** @var CM_MediaStream_Adapter_Wowza */
     private $_adapter;
 
     /**
-     * @param CM_MediaStream_Adapter_Abstract $adapter
+     * @param CM_MediaStream_Adapter_Wowza $adapter
      * @throws CM_Exception_Invalid
      */
-    public function __construct(CM_MediaStream_Adapter_Abstract $adapter) {
+    public function __construct(CM_MediaStream_Adapter_Wowza $adapter) {
         $this->_adapter = $adapter;
     }
 
     /**
-     * @return CM_MediaStream_Adapter_Abstract
+     * @return CM_MediaStream_Adapter_Wowza
      */
     public function getAdapter() {
         return $this->_adapter;

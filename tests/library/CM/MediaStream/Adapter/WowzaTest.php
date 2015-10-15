@@ -15,7 +15,7 @@ class CM_MediaStream_Adapter_WowzaTest extends CMTest_TestCase {
         $wowza = $this->getMock('CM_MediaStream_Adapter_Wowza', array('_fetchStatus'), [$servers]);
         $json = $this->_generateWowzaData(array());
         $wowza->expects($this->any())->method('_fetchStatus')->will($this->returnValue($json));
-        /** @var $wowza CM_MediaStream_Service */
+        /** @var $wowza CM_MediaStream_Adapter_Wowza */
 
         $wowza->synchronize();
         $this->assertEquals($streamChannel, CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamChannel->getKey(), $wowza->getType()));

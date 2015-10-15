@@ -11,7 +11,7 @@ class CM_MediaStream_FactoryTest extends CMTest_TestCase {
 
         $factory = new CM_MediaStream_Factory();
         $service = $factory->createService($adapterClassName, ['foo']);
-        $this->assertInstanceOf('CM_MediaStream_Service', $service);
+        $this->assertInstanceOf('CM_Wowza_Service', $service);
         $this->assertSame(1, $adapterConstructor->getCallCount());
     }
 }

@@ -61,10 +61,10 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_Session::deleteExpired'                 => function () {
                 CM_Session::deleteExpired();
             },
-            'CM_MediaStream_Service::synchronize'       => function () {
+            'CM_Wowza_Service::synchronize'       => function () {
                 CM_Service_Manager::getInstance()->getStreamVideo()->synchronize();
             },
-            'CM_MediaStream_Service::checkStreams'      => function () {
+            'CM_Wowza_Service::checkStreams'      => function () {
                 CM_Service_Manager::getInstance()->getStreamVideo()->checkStreams();
             },
             'CM_MessageStream_Service::synchronize'     => function () {
