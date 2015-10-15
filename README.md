@@ -143,6 +143,46 @@ CM_Paging_Photo_User                           # All photos of a given user
 CM_Paging_User_Country                         # All users from a given country
 ```
 
+Structuring files
+-----------------
+Class definitions should be grouped by topic and stored in a common directory.
+Within such a *topic module* directories should be used to group files with common parent classes.
+A *topic module* can again contain a directory for another (sub) topic module.
+
+Example of a topic module "Payments", inside another topic module "Accounting":
+```
+library/
+└── CM
+    └── Payments
+        ├── Accounting
+        │   ├── Account.php
+        │   ├── Transaction.php
+        │   └── TransactionList
+        │       ├── Abstract.php
+        │       └── User.php
+        ├── Bank.php
+        ├── BankList
+        │   ├── Abstract.php
+        │   ├── All.php
+        │   └── PaymentProvider.php
+        ├── ExchangeRateUpdater.php
+        └── SetupScript.php
+```
+
+Views like *components* and *pages* need to reside in their respective directory.
+It's recommended to group them by topic within a sub-directory.
+
+Example of *components* for the topic "Payments":
+```
+library/
+└── CM
+    └── Component
+        └── Payments
+            ├── AccountList.js
+            ├── AccountList.php
+            ├── TransactionList.js
+            └── TransactionList.php
+```
 
 Creating a new project
 ----------------------
