@@ -17,7 +17,7 @@ class CM_MediaStream_ServiceTest extends CMTest_TestCase {
 
         $stream = new CM_MediaStream_Service($adapter);
 
-        CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Media_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Video_Mock';
+        CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Media_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Media_Mock';
 
         // allowedUntil will be updated, if stream has expired and its user isn't $userUnchanged, hardcoded in CM_Model_StreamChannel_Video_Mock::canSubscribe() using getOnline()
         $userUnchanged = CMTest_TH::createUser();

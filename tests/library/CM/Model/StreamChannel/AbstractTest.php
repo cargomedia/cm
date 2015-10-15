@@ -66,7 +66,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
         $streamChannelOriginal = CMTest_TH::createStreamChannel(null, $adapterType);
         $streamChannelKey = $streamChannelOriginal->getKey();
         $streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamChannelKey, $adapterType);
-        $this->assertInstanceOf('CM_Model_StreamChannel_Video', $streamChannel);
+        $this->assertInstanceOf('CM_Model_StreamChannel_Media', $streamChannel);
         $this->assertEquals($streamChannelOriginal->getId(), $streamChannel->getId());
 
         $streamChannelOriginal->delete();

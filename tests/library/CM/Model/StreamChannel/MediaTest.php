@@ -10,7 +10,7 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
             'thumbnailCount' => 2,
             'adapterType'    => 1,
         ));
-        $this->assertInstanceOf('CM_Model_StreamChannel_Video', $channel);
+        $this->assertInstanceOf('CM_Model_StreamChannel_Media', $channel);
         $this->assertSame('foo', $channel->getKey());
         $this->assertSame(1, $channel->getAdapterType());
         $this->assertSame(2, $channel->getThumbnailCount());

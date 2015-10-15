@@ -9,7 +9,7 @@ class CM_MediaStream_Adapter_AbstractTest extends CMTest_TestCase {
         $streamSubscribe = $this->getMockBuilder('CM_Model_Stream_Subscribe')
             ->disableOriginalConstructor()->getMock();
 
-        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')
+        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Media')
             ->setMethods(array('isValid', 'hasStreamPublish', 'getStreamPublish', 'getStreamSubscribes'))->getMockForAbstractClass();
         $streamChannel->expects($this->any())->method('hasStreamPublish')->will($this->returnValue(true));
         $streamChannel->expects($this->any())->method('getStreamPublish')->will($this->returnValue($streamPublish));
