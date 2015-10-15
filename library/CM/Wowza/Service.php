@@ -1,6 +1,6 @@
 <?php
 
-class CM_Wowza_Service extends CM_StreamService {
+class CM_Wowza_Service extends CM_StreamServiceAdapter {
 
     /** @var CM_Wowza_Client */
     private $_client;

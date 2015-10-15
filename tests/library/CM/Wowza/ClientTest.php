@@ -12,7 +12,7 @@ class CM_Wowza_ClientTest extends CMTest_TestCase {
         $streamSubscribe = CMTest_TH::createStreamSubscribe(null, $streamChannel);
 
         $servers = array(1 => array('publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109', 'privateIp' => '10.0.3.108'));
-        $wowza = $this->getMock('CM_MediaStream_Adapter_Wowza', array('_fetchStatus'), [$servers]);
+        $wowza = $this->getMock('CM_Wowza_Client', array('_fetchStatus'), [CM_Wowza_Service::getTypeStatic(), $servers]);
         $json = $this->_generateWowzaData(array());
         $wowza->expects($this->any())->method('_fetchStatus')->will($this->returnValue($json));
         /** @var $wowza CM_Wowza_Client */
@@ -37,7 +37,7 @@ class CM_Wowza_ClientTest extends CMTest_TestCase {
         $streamSubscribe = CMTest_TH::createStreamSubscribe(null, $streamChannel);
 
         $servers = array(1 => array('publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109', 'privateIp' => '10.0.3.108'));
-        $adapter = $this->getMock('CM_MediaStream_Adapter_Wowza', array('_stopClient', '_fetchStatus'), [$servers]);
+        $adapter = $this->getMock('CM_Wowza_Client', array('_stopClient', '_fetchStatus'), [CM_Wowza_Service::getTypeStatic(), $servers]);
         $json = $this->_generateWowzaData(array($streamChannel));
         $adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($json));
         $adapter->expects($this->at(1))->method('_stopClient')->with($streamPublish->getKey(), '10.0.3.108');
@@ -52,7 +52,7 @@ class CM_Wowza_ClientTest extends CMTest_TestCase {
 
     public function testGetServerId() {
         $servers = array(1 => array('publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109', 'privateIp' => '10.0.3.108'));
-        $adapter = new CM_Wowza_Client($servers);
+        $adapter = new CM_Wowza_Client(CM_Wowza_Service::getTypeStatic(), $servers);
         $ipAddresses = array('10.0.3.109', '10.0.3.108');
         foreach ($ipAddresses as $ipAddress) {
             $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($ipAddress), 'CM_Http_Request_Mock', true, true, true, array('getIp',
@@ -118,8 +118,8 @@ class CM_Wowza_ClientTest extends CMTest_TestCase {
         $streamChannel->expects($this->any())->method('isValid')->will($this->returnValue(false));
         /** @var CM_Model_StreamChannel_Video $streamChannel */
 
-        $adapter = $this->getMockBuilder('CM_MediaStream_Adapter_Wowza')
-            ->setMethods(array('_getStreamChannels', 'stopStream'))->getMockForAbstractClass();
+        $adapter = $this->getMockBuilder('CM_Wowza_Client')
+            ->setMethods(array('_getStreamChannels', 'stopStream'))->disableOriginalConstructor()->getMockForAbstractClass();
         $adapter->expects($this->any())->method('_getStreamChannels')->will($this->returnValue(array($streamChannel)));
         $adapter->expects($this->at(1))->method('stopStream')->with($streamPublish);
         $adapter->expects($this->at(2))->method('stopStream')->with($streamSubscribe);
@@ -131,7 +131,7 @@ class CM_Wowza_ClientTest extends CMTest_TestCase {
     public function testServerGetters() {
         $servers = array(1 => ['publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109', 'privateIp' => '10.0.3.108']);
         /** @var CM_Wowza_Client $adapter */
-        $adapter = $this->mockObject('CM_MediaStream_Adapter_Wowza', [$servers]);
+        $adapter = $this->mockObject('CM_Wowza_Client', [CM_Wowza_Service::getTypeStatic(), $servers]);
 
         $this->assertSame($servers[1], $adapter->getServer(1));
         $this->assertSame('video.example.com', $adapter->getPublicHost(1));
@@ -144,7 +144,8 @@ class CM_Wowza_ClientTest extends CMTest_TestCase {
      */
     public function testGetServerInvalid() {
         /** @var CM_Wowza_Client $adapter */
-        $adapter = $this->mockObject('CM_MediaStream_Adapter_Wowza', []);
+        $servers = [];
+        $adapter = $this->mockObject('CM_Wowza_Client', [CM_Wowza_Service::getTypeStatic(), $servers]);
         $adapter->getServer(5);
     }
 }

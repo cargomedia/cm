@@ -137,7 +137,7 @@ class CMTest_TH {
         }
 
         if (null === $adapterType) {
-            $adapterType = CM_Wowza_Client::getTypeStatic();
+            $adapterType = CM_Wowza_Service::getTypeStatic();
         }
 
         $data = array('key' => rand(1, 10000) . '_' . rand(1, 100));

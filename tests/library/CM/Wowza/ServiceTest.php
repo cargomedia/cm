@@ -10,12 +10,7 @@ class CM_Wowza_ServiceTest extends CMTest_TestCase {
         $servers = array(
             ['publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109', 'privateIp' => '10.0.3.108'],
         );
-        $adapter = $this->mockObject('CM_MediaStream_Adapter_Wowza', [$servers]);
-        $adapter->mockMethod('getType')->set(1);
-        $stopStreamMethod = $adapter->mockMethod('_stopStream')->set(1);
-        /** @var CM_Wowza_Client $adapter */
-
-        $stream = new CM_Wowza_Service($adapter);
+        $stream = new CM_Wowza_Service($servers);
 
         CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Video_Mock';
 
