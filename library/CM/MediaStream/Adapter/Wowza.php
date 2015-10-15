@@ -1,6 +1,6 @@
 <?php
 
-class CM_MediaStream_Adapter_Wowza {
+class CM_MediaStream_Adapter_Wowza extends CM_Class_Abstract implements CM_Typed {
 
     /** @var array */
     protected $_servers;
