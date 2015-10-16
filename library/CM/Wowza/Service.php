@@ -48,11 +48,12 @@ class CM_Wowza_Service extends CM_StreamServiceAdapter {
      */
     public static function rpc_publish($streamName, $clientKey, $start, $data) {
         $wowza = CM_Service_Manager::getInstance()->getStreamVideo();
+        $serverId = $wowza->_extractServerIdFromRequest(CM_Http_Request_Abstract::getInstance());
+
         $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
         $session = new CM_Session($params->getString('sessionId'));
         $streamChannelType = $params->getInt('streamChannelType');
         $user = $session->getUser(true);
-        $serverId = $wowza->_extractServerIdFromRequest(CM_Http_Request_Abstract::getInstance());
 
         $streamRepository = $wowza->_getStreamRepository();
         $streamChannel = $streamRepository->createStreamChannel($streamName, $streamChannelType, $serverId, 0);
