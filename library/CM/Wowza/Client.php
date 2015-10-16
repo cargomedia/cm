@@ -139,35 +139,6 @@ class CM_Wowza_Client {
     /**
      * @param string $streamName
      * @param string $clientKey
-     * @param int $start
-     * @param string $data
-     * @throws CM_Exception_NotAllowed
-     */
-    public function subscribe($streamName, $clientKey, $start, $data) {
-        $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
-        $user = null;
-        if ($params->has('sessionId')) {
-            if ($session = CM_Session::findById($params->getString('sessionId'))) {
-                $user = $session->getUser(false);
-            }
-        }
-
-        $streamRepository = $this->_getStreamRepository();
-        $streamChannel = $streamRepository->findStreamChannelByKey($streamName);
-        if (!$streamChannel) {
-            throw new CM_Exception_NotAllowed();
-        }
-
-        try {
-            $streamRepository->createStreamSubscribe($streamChannel, $user, $clientKey, $start);
-        } catch (CM_Exception $ex) {
-            throw new CM_Exception_NotAllowed('Cannot subscribe: ' . $ex->getMessage());
-        }
-    }
-
-    /**
-     * @param string $streamName
-     * @param string $clientKey
      */
     public function unsubscribe($streamName, $clientKey) {
         $streamRepository = $this->_getStreamRepository();

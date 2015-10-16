@@ -94,7 +94,26 @@ class CM_Wowza_Service extends CM_StreamServiceAdapter {
     public static function rpc_subscribe($streamName, $clientKey, $start, $data) {
         $wowza = CM_Service_Manager::getInstance()->getStreamVideo();
         $wowza->_extractServerIdFromRequest(CM_Http_Request_Abstract::getInstance());
-        $wowza->getClient()->subscribe($streamName, $clientKey, $start, $data);
+
+        $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
+        $user = null;
+        if ($params->has('sessionId')) {
+            if ($session = CM_Session::findById($params->getString('sessionId'))) {
+                $user = $session->getUser(false);
+            }
+        }
+
+        $streamRepository = $wowza->_getStreamRepository();
+        $streamChannel = $streamRepository->findStreamChannelByKey($streamName);
+        if (!$streamChannel) {
+            throw new CM_Exception_NotAllowed();
+        }
+
+        try {
+            $streamRepository->createStreamSubscribe($streamChannel, $user, $clientKey, $start);
+        } catch (CM_Exception $ex) {
+            throw new CM_Exception_NotAllowed('Cannot subscribe: ' . $ex->getMessage());
+        }
         return true;
     }
 
