@@ -90,7 +90,10 @@ class CM_Wowza_Service extends CM_StreamServiceAdapter {
      * @param string $clientKey
      * @param string $start
      * @param string $data
-     * @return boolean
+     * @return bool
+     * @throws CM_Exception_AuthRequired
+     * @throws CM_Exception_Invalid
+     * @throws CM_Exception_NotAllowed
      */
     public static function rpc_subscribe($streamName, $clientKey, $start, $data) {
         $wowza = CM_Service_Manager::getInstance()->getStreamVideo();
