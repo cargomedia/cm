@@ -1,6 +1,6 @@
 <?php
 
-class CM_VideoStream_Adapter_Wowza extends CM_VideoStream_Adapter_Abstract {
+class CM_MediaStream_Adapter_Wowza extends CM_MediaStream_Adapter_Abstract {
 
     /** @var array */
     protected $_config;
@@ -94,7 +94,7 @@ class CM_VideoStream_Adapter_Wowza extends CM_VideoStream_Adapter_Abstract {
      * @param CM_Model_Stream_Abstract $stream
      */
     protected function _stopStream(CM_Model_Stream_Abstract $stream) {
-        /** @var $streamChannel CM_Model_StreamChannel_Video */
+        /** @var $streamChannel CM_Model_StreamChannel_Media */
         $streamChannel = $stream->getStreamChannel();
         $privateHost = $this->getPrivateHost($streamChannel->getServerId());
         $this->_stopClient($stream->getKey(), $privateHost);
