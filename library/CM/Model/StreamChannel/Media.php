@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
+class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
 
     public function onPublish(CM_Model_Stream_Publish $streamPublish) {
     }
@@ -22,15 +22,10 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
      */
     public function setThumbnailCount($thumbnailCount) {
         $thumbnailCount = (int) $thumbnailCount;
-        CM_Db_Db::update('cm_streamChannel_media', array('thumbnailCount' => $thumbnailCount), array('id' => $this->getId()));
+        $params = $this->_getDataColumn();
+        $params->set('thumbnailCount', $thumbnailCount);
+        CM_Db_Db::update('cm_streamChannel_media', ['data' => CM_Params::jsonEncode($params->getParamsEncoded())], ['id' => $this->getId()]);
         $this->_change();
-    }
-
-    /**
-     * @return int
-     */
-    public function getWidth() {
-        return (int) $this->_get('width');
     }
 
     /**
@@ -38,13 +33,6 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
      */
     public function getHash() {
         return md5($this->getStreamPublish()->getKey());
-    }
-
-    /**
-     * @return int
-     */
-    public function getHeight() {
-        return (int) $this->_get('height');
     }
 
     /**
@@ -85,7 +73,8 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
      * @return int
      */
     public function getThumbnailCount() {
-        return (int) $this->_get('thumbnailCount');
+        $params = $this->_getDataColumn();
+        return $params->getInt('thumbnailCount', 0);
     }
 
     /**
@@ -99,10 +88,21 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
     }
 
     /**
-     * @return CM_Paging_FileUserContent_StreamChannelVideoThumbnails
+     * @return CM_Paging_FileUserContent_StreamChannelMediaThumbnails
      */
     public function getThumbnails() {
-        return new CM_Paging_FileUserContent_StreamChannelVideoThumbnails($this);
+        return new CM_Paging_FileUserContent_StreamChannelMediaThumbnails($this);
+    }
+
+    /**
+     * @return CM_Params
+     */
+    protected function _getDataColumn() {
+        if (!$this->_has('data')) {
+            return CM_Params::factory();
+        } else {
+            return CM_Params::factory(CM_Params::jsonDecode($this->_get('data')));
+        }
     }
 
     protected function _onDelete() {
@@ -117,14 +117,13 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 
     protected static function _createStatic(array $data) {
         $key = (string) $data['key'];
-        $width = (int) $data['width'];
-        $height = (int) $data['height'];
         $serverId = $data['serverId'];
         $thumbnailCount = (int) $data['thumbnailCount'];
         $adapterType = (int) $data['adapterType'];
         $id = CM_Db_Db::insert('cm_streamChannel', array('key' => $key, 'type' => static::getTypeStatic(), 'adapterType' => $adapterType));
         try {
-            CM_Db_Db::insert('cm_streamChannel_media', array('id' => $id, 'serverId' => $serverId, 'data' => CM_Params::encode(['thumbnailCount' => $thumbnailCount], true)));
+            CM_Db_Db::insert('cm_streamChannel_media', array('id'   => $id, 'serverId' => $serverId,
+                                                             'data' => CM_Params::encode(['thumbnailCount' => $thumbnailCount], true)));
         } catch (CM_Exception $ex) {
             CM_Db_Db::delete('cm_streamChannel', array('id' => $id));
             throw $ex;

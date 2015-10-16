@@ -114,9 +114,9 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
      */
     public function testCreateInvalidStreamChannel() {
         $user = CMTest_TH::createUser();
-        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')->setMethods(array('isValid'))->getMock();
+        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Media')->setMethods(array('isValid'))->getMock();
         $streamChannel->expects($this->any())->method('isValid')->will($this->returnValue(false));
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
 
         CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(), 'key' => 'foo'));
     }
@@ -125,7 +125,7 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
         $streamPublish = $this->getMockBuilder('CM_Model_Stream_Publish')
             ->setMethods(array('getStreamChannel', 'getId'))->getMock();
 
-        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')
+        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Media')
             ->setMethods(array('isValid', 'onUnpublish'))->getMock();
 
         $streamPublish->expects($this->any())->method('getStreamChannel')->will($this->returnValue($streamChannel));
@@ -133,7 +133,7 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
         $streamChannel->expects($this->any())->method('isValid')->will($this->returnValue(true));
         $streamChannel->expects($this->once())->method('onUnpublish')->with($streamPublish);
 
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         /** @var CM_Model_Stream_Publish $streamPublish */
 
         $onDeleteBefore = CMTest_TH::getProtectedMethod('CM_Model_Stream_Publish', '_onDeleteBefore');
@@ -146,7 +146,7 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
         $streamPublish = $this->getMockBuilder('CM_Model_Stream_Publish')
             ->setMethods(array('getStreamChannel', 'getId'))->getMock();
 
-        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')
+        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Media')
             ->setMethods(array('isValid', 'onUnpublish'))->getMock();
 
         $streamPublish->expects($this->any())->method('getStreamChannel')->will($this->returnValue($streamChannel));
@@ -154,7 +154,7 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
         $streamChannel->expects($this->any())->method('isValid')->will($this->returnValue(false));
         $streamChannel->expects($this->never())->method('onUnpublish');
 
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         /** @var CM_Model_Stream_Publish $streamPublish */
 
         $onDelete = CMTest_TH::getProtectedMethod('CM_Model_Stream_Publish', '_onDelete');

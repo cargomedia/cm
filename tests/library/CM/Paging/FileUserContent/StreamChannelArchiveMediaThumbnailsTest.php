@@ -8,7 +8,7 @@ class CM_Paging_FileUserContent_StreamChannelArchiveMediaThumbnailsTest extends 
         $this->assertSame(0, $paging->getCount());
         $this->assertSame(array(), $paging->getItems());
 
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $streamChannel->setThumbnailCount(4);
         $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel);

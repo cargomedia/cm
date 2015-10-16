@@ -7,7 +7,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
     }
 
     public function testCreate() {
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $user = CMTest_TH::createUser();
         $streamPublish = CMTest_TH::createStreamPublish($user, $streamChannel);
@@ -18,8 +18,6 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         $this->assertSame($streamChannel->getId(), $archive->getId());
         $this->assertSame($user->getId(), $archive->getUserId());
         $this->assertEquals($user, $archive->getUser());
-        $this->assertSame($streamChannel->getWidth(), $archive->getWidth());
-        $this->assertSame($streamChannel->getHeight(), $archive->getHeight());
         $this->assertSame($streamPublish->getStart(), $archive->getCreated());
         $this->assertEquals(10, $archive->getDuration(), '', 1);
         $this->assertSame($streamChannel->getThumbnailCount(), $archive->getThumbnailCount());
@@ -36,7 +34,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
     }
 
     public function testNoUser() {
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $user = CMTest_TH::createUser();
         $streamPublish = CMTest_TH::createStreamPublish($user, $streamChannel);
@@ -70,7 +68,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         $archive = CMTest_TH::createStreamChannelVideoArchive();
         $this->assertSame(array(), $archive->getThumbnails()->getItems());
 
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $streamChannel->setThumbnailCount(2);
         $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel);
@@ -89,7 +87,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
     }
 
     public function testOnDelete() {
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $streamChannel->setThumbnailCount(3);
         $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel);
@@ -112,7 +110,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
 
     public function testDeleteOlder() {
         $time = time();
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannelsDeleted = array();
         $archivesDeleted = array();
         /** @var $filesDeleted CM_File[] */
@@ -131,7 +129,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         /** @var $filesNotDeleted CM_File[] */
         $filesNotDeleted = array();
         $streamChannel = CMTest_TH::createStreamChannel();
-        $streamChannel = $this->getMock('CM_Model_StreamChannel_Video', array('getType'), array($streamChannel->getId()));
+        $streamChannel = $this->getMock('CM_Model_StreamChannel_Media', array('getType'), array($streamChannel->getId()));
         $streamChannel->expects($this->any())->method('getType')->will($this->returnValue(3));
         $streamChannelsNotDeleted[] = $streamChannel;
         $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel);
@@ -154,7 +152,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         foreach ($filesDeleted as $file) {
             $this->assertTrue($file->exists());
         }
-        CM_Model_StreamChannelArchive_Media::deleteOlder(10, CM_Model_StreamChannel_Video::getTypeStatic());
+        CM_Model_StreamChannelArchive_Media::deleteOlder(10, CM_Model_StreamChannel_Media::getTypeStatic());
         foreach ($filesNotDeleted as $file) {
             $this->assertTrue($file->exists());
         }

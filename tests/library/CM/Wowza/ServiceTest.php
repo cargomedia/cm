@@ -12,12 +12,12 @@ class CM_Wowza_ServiceTest extends CMTest_TestCase {
         );
         $stream = new CM_Wowza_Service($servers);
 
-        CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Video_Mock';
+        CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Media_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Media_Mock';
 
         // allowedUntil will be updated, if stream has expired and its user isn't $userUnchanged, hardcoded in CM_Model_StreamChannel_Video_Mock::canSubscribe() using getOnline()
         $userUnchanged = CMTest_TH::createUser();
         $userUnchanged->setOnline();
-        $streamChannel = CM_Model_StreamChannel_Video_Mock::createStatic(array(
+        $streamChannel = CM_Model_StreamChannel_Media_Mock::createStatic(array(
             'key'            => 'foo1',
             'serverId'       => 1,
             'adapterType'    => 1,
@@ -49,7 +49,7 @@ class CM_Wowza_ServiceTest extends CMTest_TestCase {
             'start'         => time(),
         ));
         $streamPublishChanged1 = CM_Model_Stream_Publish::createStatic(array(
-            'streamChannel' => CM_Model_StreamChannel_Video_Mock::createStatic(array(
+            'streamChannel' => CM_Model_StreamChannel_Media_Mock::createStatic(array(
                 'key'            => 'foo2',
                 'serverId'       => 1,
                 'adapterType'    => 1,
@@ -80,7 +80,7 @@ class CM_Wowza_ServiceTest extends CMTest_TestCase {
     }
 }
 
-class CM_Model_StreamChannel_Video_Mock extends CM_Model_StreamChannel_Video {
+class CM_Model_StreamChannel_Media_Mock extends CM_Model_StreamChannel_Media {
 
     public function canPublish(CM_Model_User $user, $allowedUntil) {
         return $user->getOnline() ? $allowedUntil + 10 : $allowedUntil + 100;
