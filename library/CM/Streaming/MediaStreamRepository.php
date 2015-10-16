@@ -13,6 +13,13 @@ class CM_Streaming_MediaStreamRepository {
     }
 
     /**
+     * @return CM_Paging_StreamChannel_AdapterType
+     */
+    public function getStreamChannels() {
+        return new CM_Paging_StreamChannel_AdapterType($this->_adapterType);
+    }
+
+    /**
      * @param string $streamName
      * @return CM_Model_StreamChannel_Abstract|null
      */
@@ -54,7 +61,6 @@ class CM_Streaming_MediaStreamRepository {
             'start'         => (int) $start,
         ]);
     }
-
 
     /**
      * @param CM_Model_StreamChannel_Abstract $streamChannel
