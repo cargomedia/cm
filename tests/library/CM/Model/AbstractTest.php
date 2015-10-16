@@ -129,10 +129,12 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
             $this->assertSame(true, $checkMissingFields);
         });
         $modelMock->mockMethod('_getPersistence')->set(function () {
-            return new CM_Model_StorageAdapter_Database();
+            $persistence = $this->mockObject('CM_Model_StorageAdapter_AbstractAdapter');
+            $persistence->mockMethod('create')->set([rand()]);
+            return $persistence;
         });
         $modelMock->mockMethod('getType')->set(function () {
-            return 12;
+            return rand();
         });
         $modelMock->mockMethod('_getSchema')->set(function () {
             return new CM_Model_Schema_Definition([]);

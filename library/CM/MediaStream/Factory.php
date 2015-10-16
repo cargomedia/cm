@@ -1,17 +1,17 @@
 <?php
 
-class CM_VideoStream_Factory {
+class CM_MediaStream_Factory {
 
     /**
      * @param string     $class
      * @param array|null $arguments
-     * @return CM_VideoStream_Adapter_Abstract
+     * @return CM_MediaStream_Adapter_Abstract
      * @throws CM_Exception_Invalid
      */
     public function createAdapter($class, $arguments = null) {
         $arguments = (array) $arguments;
         $reflectionClass = new ReflectionClass($class);
-        if (!$reflectionClass->isSubclassOf('CM_VideoStream_Adapter_Abstract')) {
+        if (!$reflectionClass->isSubclassOf('CM_MediaStream_Adapter_Abstract')) {
             throw new CM_Exception_Invalid("Invalid stream video adapter `{$reflectionClass->getName()}`");
         }
         return $reflectionClass->newInstanceArgs($arguments);
@@ -21,10 +21,10 @@ class CM_VideoStream_Factory {
      * @param string     $adapterClass
      * @param array|null $adapterArguments
      * @throws CM_Exception_Invalid
-     * @return CM_VideoStream_Service
+     * @return CM_MediaStream_Service
      */
     public function createService($adapterClass, $adapterArguments = null) {
         $adapter = $this->createAdapter($adapterClass, $adapterArguments);
-        return new CM_VideoStream_Service($adapter);
+        return new CM_MediaStream_Service($adapter);
     }
 }

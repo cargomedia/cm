@@ -390,10 +390,10 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
 
     /**
      * @param string $key
-     * @return CM_Model_StreamChannel_Video
+     * @return CM_Model_StreamChannel_Media
      */
-    public function getStreamChannelVideo($key) {
-        return $this->getObject($key, 'CM_Model_StreamChannel_Video');
+    public function getStreamChannelMedia($key) {
+        return $this->getObject($key, 'CM_Model_StreamChannel_Media');
     }
 
     /**

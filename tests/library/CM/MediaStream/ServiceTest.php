@@ -1,6 +1,6 @@
 <?php
 
-class CM_VideoStream_ServiceTest extends CMTest_TestCase {
+class CM_MediaStream_ServiceTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
@@ -10,19 +10,19 @@ class CM_VideoStream_ServiceTest extends CMTest_TestCase {
         $servers = array(
             ['publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109', 'privateIp' => '10.0.3.108'],
         );
-        $adapter = $this->mockObject('CM_VideoStream_Adapter_Abstract', [$servers]);
+        $adapter = $this->mockObject('CM_MediaStream_Adapter_Abstract', [$servers]);
         $adapter->mockMethod('getType')->set(1);
         $stopStreamMethod = $adapter->mockMethod('_stopStream')->set(1);
-        /** @var CM_VideoStream_Adapter_Abstract $adapter */
+        /** @var CM_MediaStream_Adapter_Abstract $adapter */
 
-        $stream = new CM_VideoStream_Service($adapter);
+        $stream = new CM_MediaStream_Service($adapter);
 
-        CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Video_Mock';
+        CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Media_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Media_Mock';
 
         // allowedUntil will be updated, if stream has expired and its user isn't $userUnchanged, hardcoded in CM_Model_StreamChannel_Video_Mock::canSubscribe() using getOnline()
         $userUnchanged = CMTest_TH::createUser();
         $userUnchanged->setOnline();
-        $streamChannel = CM_Model_StreamChannel_Video_Mock::createStatic(array(
+        $streamChannel = CM_Model_StreamChannel_Media_Mock::createStatic(array(
             'key'            => 'foo1',
             'serverId'       => 1,
             'adapterType'    => 1,
@@ -54,7 +54,7 @@ class CM_VideoStream_ServiceTest extends CMTest_TestCase {
             'start'         => time(),
         ));
         $streamPublishChanged1 = CM_Model_Stream_Publish::createStatic(array(
-            'streamChannel' => CM_Model_StreamChannel_Video_Mock::createStatic(array(
+            'streamChannel' => CM_Model_StreamChannel_Media_Mock::createStatic(array(
                 'key'            => 'foo2',
                 'serverId'       => 1,
                 'adapterType'    => 1,
@@ -85,7 +85,7 @@ class CM_VideoStream_ServiceTest extends CMTest_TestCase {
     }
 }
 
-class CM_Model_StreamChannel_Video_Mock extends CM_Model_StreamChannel_Video {
+class CM_Model_StreamChannel_Media_Mock extends CM_Model_StreamChannel_Media {
 
     public function canPublish(CM_Model_User $user, $allowedUntil) {
         return $user->getOnline() ? $allowedUntil + 10 : $allowedUntil + 100;

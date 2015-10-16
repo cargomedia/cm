@@ -133,15 +133,15 @@ class CMTest_TH {
      */
     public static function createStreamChannel($type = null, $adapterType = null) {
         if (null === $type) {
-            $type = CM_Model_StreamChannel_Video::getTypeStatic();
+            $type = CM_Model_StreamChannel_Media::getTypeStatic();
         }
 
         if (null === $adapterType) {
-            $adapterType = CM_VideoStream_Adapter_Wowza::getTypeStatic();
+            $adapterType = CM_MediaStream_Adapter_Wowza::getTypeStatic();
         }
 
         $data = array('key' => rand(1, 10000) . '_' . rand(1, 100));
-        if (CM_Model_StreamChannel_Video::getTypeStatic() == $type) {
+        if (CM_Model_StreamChannel_Media::getTypeStatic() == $type) {
             $data['width'] = 480;
             $data['height'] = 720;
             $data['serverId'] = 1;
@@ -152,11 +152,11 @@ class CMTest_TH {
     }
 
     /**
-     * @param CM_Model_StreamChannel_Video|null $streamChannel
+     * @param CM_Model_StreamChannel_Media|null $streamChannel
      * @param CM_Model_User|null                $user
-     * @return CM_Model_StreamChannelArchive_Video
+     * @return CM_Model_StreamChannelArchive_Media
      */
-    public static function createStreamChannelVideoArchive(CM_Model_StreamChannel_Video $streamChannel = null, CM_Model_User $user = null) {
+    public static function createStreamChannelVideoArchive(CM_Model_StreamChannel_Media $streamChannel = null, CM_Model_User $user = null) {
         if (is_null($streamChannel)) {
             $streamChannel = self::createStreamChannel();
             self::createStreamPublish($user, $streamChannel);
@@ -164,7 +164,7 @@ class CMTest_TH {
         if (!$streamChannel->hasStreamPublish()) {
             self::createStreamPublish($user, $streamChannel);
         }
-        return CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
+        return CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel));
     }
 
     /**
