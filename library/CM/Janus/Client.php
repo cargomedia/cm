@@ -150,35 +150,20 @@ class CM_Janus_Client {
      * @param int    $start
      * @param int    $serverId
      * @param string $data
-     * @throws CM_Exception
-     * @throws CM_Exception_NotAllowed
      * @return int
+     * @throws CM_Exception_AuthRequired
+     * @throws CM_Exception_Invalid
+     * @throws CM_Exception_NotAllowed
      */
     public function publish($streamName, $clientKey, $start, $serverId, $data) {
-        $streamName = (string) $streamName;
-        $clientKey = (string) $clientKey;
-        $start = (int) $start;
-        $serverId = (int) $serverId;
-        $data = (string) $data;
         $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
-        $streamChannelType = $params->getInt('streamChannelType');
         $session = new CM_Session($params->getString('sessionId'));
         $user = $session->getUser(true);
-        /** @var CM_Model_StreamChannel_Abstract $streamChannel */
-        $streamChannel = CM_Model_StreamChannel_Abstract::createType($streamChannelType, array(
-            'key'            => $streamName,
-            'adapterType'    => $this->getType(),
-            'params'         => $params,
-            'serverId'       => $serverId,
-            'thumbnailCount' => 0,
-        ));
+        $streamChannelType = $params->getInt('streamChannelType');
+        $streamRepository = $this->_getStreamRepository();
+        $streamChannel = $streamRepository->createStreamChannel($streamName, $streamChannelType, $serverId, 0);
         try {
-            CM_Model_Stream_Publish::createStatic(array(
-                'streamChannel' => $streamChannel,
-                'user'          => $user,
-                'start'         => $start,
-                'key'           => $clientKey,
-            ));
+            $streamRepository->createStreamPublish($streamChannel, $user, $clientKey, $start);
         } catch (CM_Exception $ex) {
             $streamChannel->delete();
             throw new CM_Exception_NotAllowed('Cannot publish: ' . $ex->getMessage());
@@ -191,17 +176,13 @@ class CM_Janus_Client {
      * @return null
      */
     public function unpublish($streamName) {
-        $streamName = (string) $streamName;
-        /** @var CM_Model_StreamChannel_Abstract $streamChannel */
-        $streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamName, $this->getType());
+        $streamRepository = $this->_getStreamRepository();
+        $streamChannel = $streamRepository->findStreamChannelByKey($streamName);
         if (!$streamChannel) {
             return;
         }
-
-        $streamChannel->getStreamPublish()->delete();
-        if (!$streamChannel->hasStreams()) {
-            $streamChannel->delete();
-        }
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
+        $streamRepository->removeStream($streamChannel->getStreamPublish());
     }
 
     /**
@@ -212,30 +193,20 @@ class CM_Janus_Client {
      * @throws CM_Exception_NotAllowed
      */
     public function subscribe($streamName, $clientKey, $start, $data) {
-        $streamName = (string) $streamName;
-        $clientKey = (string) $clientKey;
-        $start = (int) $start;
-        $data = (string) $data;
-        $user = null;
         $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
+        $user = null;
         if ($params->has('sessionId')) {
             if ($session = CM_Session::findById($params->getString('sessionId'))) {
                 $user = $session->getUser(false);
             }
         }
-        /** @var CM_Model_StreamChannel_Abstract $streamChannel */
-        $streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamName, $this->getType());
+        $streamRepository = $this->_getStreamRepository();
+        $streamChannel = $streamRepository->findStreamChannelByKey($streamName);
         if (!$streamChannel) {
             throw new CM_Exception_NotAllowed();
         }
-
         try {
-            CM_Model_Stream_Subscribe::createStatic(array(
-                'streamChannel' => $streamChannel,
-                'user'          => $user,
-                'start'         => $start,
-                'key'           => $clientKey,
-            ));
+            $streamRepository->createStreamSubscribe($streamChannel, $user, $clientKey, $start);
         } catch (CM_Exception $ex) {
             throw new CM_Exception_NotAllowed('Cannot subscribe: ' . $ex->getMessage());
         }
@@ -246,19 +217,14 @@ class CM_Janus_Client {
      * @param string $clientKey
      */
     public function unsubscribe($streamName, $clientKey) {
-        $streamName = (string) $streamName;
-        $clientKey = (string) $clientKey;
-        /** @var CM_Model_StreamChannel_Abstract $streamChannel */
-        $streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamName, $this->getType());
+        $streamRepository = $this->_getStreamRepository();
+        $streamChannel = $streamRepository->findStreamChannelByKey($streamName);
         if (!$streamChannel) {
             return;
         }
         $streamSubscribe = $streamChannel->getStreamSubscribes()->findKey($clientKey);
         if ($streamSubscribe) {
-            $streamSubscribe->delete();
-        }
-        if (!$streamChannel->hasStreams()) {
-            $streamChannel->delete();
+            $streamRepository->removeStream($streamSubscribe);
         }
     }
 
@@ -329,5 +295,12 @@ class CM_Janus_Client {
 
     protected function _stopClient($clientId, $serverHost) {
         CM_Util::getContents('http://' . $serverHost . ':' . $this->_config['httpPort'] . '/stop', array('clientId' => (string) $clientId), true);
+    }
+
+    /**
+     * @return CM_Streaming_MediaStreamRepository
+     */
+    protected function _getStreamRepository() {
+        return new CM_Streaming_MediaStreamRepository($this->getType());
     }
 }
