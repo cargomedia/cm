@@ -120,15 +120,7 @@ class CM_Wowza_Client {
     }
 
     public function getServerId(CM_Http_Request_Abstract $request) {
-        $ipAddress = long2ip($request->getIp());
 
-        $servers = $this->_servers;
-        foreach ($servers as $serverId => $server) {
-            if ($server['publicIp'] == $ipAddress || $server['privateIp'] == $ipAddress) {
-                return (int) $serverId;
-            }
-        }
-        throw new CM_Exception_Invalid('No video server with ipAddress `' . $ipAddress . '` found');
     }
 
     /**
