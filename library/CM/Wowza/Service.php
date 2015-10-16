@@ -39,16 +39,30 @@ class CM_Wowza_Service extends CM_StreamServiceAdapter {
     /**
      * @param string $streamName
      * @param string $clientKey
-     * @param int    $start
+     * @param int $start
      * @param string $data
      * @return int
+     * @throws CM_Exception_AuthRequired
+     * @throws CM_Exception_Invalid
+     * @throws CM_Exception_NotAllowed
      */
     public static function rpc_publish($streamName, $clientKey, $start, $data) {
         $wowza = CM_Service_Manager::getInstance()->getStreamVideo();
+        $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
+        $session = new CM_Session($params->getString('sessionId'));
+        $streamChannelType = $params->getInt('streamChannelType');
+        $user = $session->getUser(true);
         $serverId = $wowza->_extractServerIdFromRequest(CM_Http_Request_Abstract::getInstance());
 
-        $channelId = $wowza->getClient()->publish($streamName, $clientKey, $start, $serverId, $data);
-        return $channelId;
+        $streamRepository = $wowza->_getStreamRepository();
+        $streamChannel = $streamRepository->createStreamChannel($streamName, $streamChannelType, $serverId, 0);
+        try {
+            $streamRepository->createStreamPublish($streamChannel, $user, $clientKey, $start);
+        } catch (CM_Exception $ex) {
+            $streamChannel->delete();
+            throw new CM_Exception_NotAllowed('Cannot publish: ' . $ex->getMessage());
+        }
+        return $streamChannel->getId();
     }
 
     /**
@@ -103,5 +117,9 @@ class CM_Wowza_Service extends CM_StreamServiceAdapter {
             }
         }
         throw new CM_Exception_Invalid('No video server with ipAddress `' . $ipAddress . '` found');
+    }
+
+    protected function _getStreamRepository() {
+        return new CM_Streaming_MediaStreamRepository($this->getType());
     }
 }

@@ -138,34 +138,6 @@ class CM_Wowza_Client {
 
     /**
      * @param string $streamName
-     * @param string $clientKey
-     * @param int $start
-     * @param int $serverId
-     * @param string $data
-     * @return int
-     * @throws CM_Exception_AuthRequired
-     * @throws CM_Exception_Invalid
-     * @throws CM_Exception_NotAllowed
-     */
-    public function publish($streamName, $clientKey, $start, $serverId, $data) {
-        $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
-        $session = new CM_Session($params->getString('sessionId'));
-        $user = $session->getUser(true);
-        $streamChannelType = $params->getInt('streamChannelType');
-        $streamRepository = $this->_getStreamRepository();
-
-        $streamChannel = $streamRepository->createStreamChannel($streamName, $streamChannelType, $serverId, 0);
-        try {
-            $streamRepository->createStreamPublish($streamChannel, $user, $clientKey, $start);
-        } catch (CM_Exception $ex) {
-            $streamChannel->delete();
-            throw new CM_Exception_NotAllowed('Cannot publish: ' . $ex->getMessage());
-        }
-        return $streamChannel->getId();
-    }
-
-    /**
-     * @param string $streamName
      * @return null
      */
     public function unpublish($streamName) {
