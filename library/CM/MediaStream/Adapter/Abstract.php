@@ -77,15 +77,14 @@ abstract class CM_MediaStream_Adapter_Abstract extends CM_Class_Abstract impleme
      * @param string $streamName
      * @param string $clientKey
      * @param int $start
-     * @param int $width
-     * @param int $height
      * @param int $serverId
      * @param string $data
-     * @throws CM_Exception
-     * @throws CM_Exception_NotAllowed
      * @return int
+     * @throws CM_Exception_AuthRequired
+     * @throws CM_Exception_Invalid
+     * @throws CM_Exception_NotAllowed
      */
-    public function publish($streamName, $clientKey, $start, $width, $height, $serverId, $data) {
+    public function publish($streamName, $clientKey, $start, $serverId, $data) {
         $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
         $session = new CM_Session($params->getString('sessionId'));
         $user = $session->getUser(true);

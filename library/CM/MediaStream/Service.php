@@ -40,16 +40,14 @@ class CM_MediaStream_Service {
      * @param string $streamName
      * @param string $clientKey
      * @param int    $start
-     * @param int    $width
-     * @param int    $height
      * @param string $data
      * @return int
      */
-    public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $data) {
+    public static function rpc_publish($streamName, $clientKey, $start, $data) {
         $request = CM_Http_Request_Abstract::getInstance();
         $serverId = CM_Service_Manager::getInstance()->getStreamVideo()->getAdapter()->getServerId($request);
 
-        $channelId = CM_Service_Manager::getInstance()->getStreamVideo()->getAdapter()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $data);
+        $channelId = CM_Service_Manager::getInstance()->getStreamVideo()->getAdapter()->publish($streamName, $clientKey, $start, $serverId, $data);
         return $channelId;
     }
 
