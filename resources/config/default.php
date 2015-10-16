@@ -234,14 +234,17 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['wowza'] = array(
-        'class'     => 'CM_Wowza_Service',
-        'arguments' => array(
-            'servers' => array(
-                ['publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'],
-            ),
-            'config'  => array(
-                'httpPort'  => '8086',
-                'wowzaPort' => '1935',
+        'class'  => 'CM_Wowza_Factory',
+        'method' => array(
+            'name'      => 'createService',
+            'arguments' => array(
+                'servers' => array(
+                    ['publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'],
+                ),
+                'config'  => array(
+                    'httpPort'  => '8086',
+                    'wowzaPort' => '1935',
+                ),
             ),
         ),
     );
