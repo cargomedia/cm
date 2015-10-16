@@ -72,8 +72,16 @@ class CM_Wowza_Service extends CM_StreamServiceAdapter {
     public static function rpc_unpublish($streamName) {
         $wowza = CM_Service_Manager::getInstance()->getStreamVideo();
         $wowza->_extractServerIdFromRequest(CM_Http_Request_Abstract::getInstance());
-        $wowza->getClient()->unpublish($streamName);
+
+        $streamRepository = $wowza->_getStreamRepository();
+        $streamChannel = $streamRepository->findStreamChannelByKey($streamName);
+
+        if ($streamChannel) {
+            /** @var CM_Model_StreamChannel_Media $streamChannel */
+            $streamRepository->removeStream($streamChannel->getStreamPublish());
+        }
         return true;
+
     }
 
     /**

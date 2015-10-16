@@ -138,21 +138,6 @@ class CM_Wowza_Client {
 
     /**
      * @param string $streamName
-     * @return null
-     */
-    public function unpublish($streamName) {
-        $streamRepository = $this->_getStreamRepository();
-        $streamChannel = $streamRepository->findStreamChannelByKey($streamName);
-
-        if (!$streamChannel) {
-            return;
-        }
-        /** @var CM_Model_StreamChannel_Media $streamChannel */
-        $streamRepository->removeStream($streamChannel->getStreamPublish());
-    }
-
-    /**
-     * @param string $streamName
      * @param string $clientKey
      * @param int $start
      * @param string $data
