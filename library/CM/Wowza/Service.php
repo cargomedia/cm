@@ -129,7 +129,16 @@ class CM_Wowza_Service extends CM_StreamServiceAdapter {
     public static function rpc_unsubscribe($streamName, $clientKey) {
         $wowza = CM_Service_Manager::getInstance()->getStreamVideo();
         $wowza->_extractServerIdFromRequest(CM_Http_Request_Abstract::getInstance());
-        $wowza->getClient()->unsubscribe($streamName, $clientKey);
+
+        $streamRepository = $wowza->_getStreamRepository();
+        $streamChannel = $streamRepository->findStreamChannelByKey($streamName);
+
+        if ($streamChannel) {
+            $streamSubscribe = $streamChannel->getStreamSubscribes()->findKey($clientKey);
+            if ($streamSubscribe) {
+                $streamRepository->removeStream($streamSubscribe);
+            }
+        }
         return true;
     }
 

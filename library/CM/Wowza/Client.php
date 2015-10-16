@@ -137,24 +137,6 @@ class CM_Wowza_Client {
     }
 
     /**
-     * @param string $streamName
-     * @param string $clientKey
-     */
-    public function unsubscribe($streamName, $clientKey) {
-        $streamRepository = $this->_getStreamRepository();
-
-        $streamChannel = $streamRepository->findStreamChannelByKey($streamName);
-        if (!$streamChannel) {
-            return;
-        }
-
-        $streamSubscribe = $streamChannel->getStreamSubscribes()->findKey($clientKey);
-        if ($streamSubscribe) {
-            $streamRepository->removeStream($streamSubscribe);
-        }
-    }
-
-    /**
      * @param int|null $serverId
      * @throws CM_Exception_Invalid
      * @return array
