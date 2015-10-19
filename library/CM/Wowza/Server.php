@@ -1,6 +1,6 @@
 <?php
 
-class CM_MediaStreams_Server {
+class CM_Wowza_Server {
 
     /** @var int */
     protected $_id;

@@ -2,7 +2,7 @@
 
 class CM_Wowza_Configuration {
 
-    /** @var CM_MediaStreams_Server[] */
+    /** @var CM_Wowza_Server[] */
     protected $_servers;
 
     /**
@@ -15,14 +15,14 @@ class CM_Wowza_Configuration {
     }
 
     /**
-     * @param CM_MediaStreams_Server $server
+     * @param CM_Wowza_Server $server
      */
-    public function addServer(CM_MediaStreams_Server $server) {
+    public function addServer(CM_Wowza_Server $server) {
         $this->_servers[] = $server;
     }
 
     /**
-     * @return CM_MediaStreams_Server[]
+     * @return CM_Wowza_Server[]
      */
     public function getServers() {
         return $this->_servers;
@@ -30,7 +30,7 @@ class CM_Wowza_Configuration {
 
     /**
      * @param string $ip
-     * @return CM_MediaStreams_Server|null
+     * @return CM_Wowza_Server|null
      */
     public function findServerByIp($ip) {
         foreach ($this->_servers as $server) {
@@ -43,7 +43,7 @@ class CM_Wowza_Configuration {
 
     /**
      * @param int $id
-     * @return CM_MediaStreams_Server
+     * @return CM_Wowza_Server
      * @throws CM_Exception_Invalid
      */
     public function getServer($id) {

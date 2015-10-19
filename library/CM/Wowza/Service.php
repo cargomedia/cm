@@ -38,7 +38,7 @@ class CM_Wowza_Service extends CM_MediaStreams_Service {
         }
 
         foreach ($status as $streamName => $publish) {
-            /** @var CM_MediaStreams_Server $server */
+            /** @var CM_Wowza_Server $server */
             $server = $publish['server'];
             /** @var CM_Model_StreamChannel_Abstract $streamChannel */
             $streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamName, $this->getType());
