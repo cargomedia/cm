@@ -14,18 +14,27 @@ class CM_Wowza_Server {
     /** @var string */
     protected $_publicHost;
 
+    /** @var int */
+    protected $_wowzaPort;
+
+    /** @var int */
+    protected $_httpPort;
+
     /**
      * @param int $serverId
      * @param string $publicHost
      * @param string $publicIp
      * @param string $privateIp
-     *
+     * @param int $httpPort
+     * @param int $wowzaPort
      */
-    public function __construct($serverId, $publicHost, $publicIp, $privateIp) {
+    public function __construct($serverId, $publicHost, $publicIp, $privateIp, $httpPort, $wowzaPort) {
         $this->_id = $serverId;
         $this->_publicHost = (string) $publicHost;
         $this->_publicIp = (string) $publicIp;
         $this->_privateIp = (string) $privateIp;
+        $this->_httpPort = (int) $httpPort;
+        $this->_wowzaPort = (int) $wowzaPort;
     }
 
     /**
