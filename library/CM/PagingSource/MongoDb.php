@@ -44,7 +44,7 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
         $cacheKey = array('count');
         if (($count = $this->_cacheGet($cacheKey)) === false) {
             $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-            $count = $mongoDb->count($this->_collection, $this->_criteria, $this->_aggregation, $count, $offset);
+            $count = $mongoDb->count($this->_collection, $this->_criteria, $this->_aggregation);
             $this->_cacheSet($cacheKey, $count);
         }
         return $count;

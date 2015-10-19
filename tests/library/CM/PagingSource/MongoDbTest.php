@@ -132,8 +132,8 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
         $source = new CM_PagingSource_MongoDb('my-collection');
 
         $this->assertSame(7, $source->getCount());
-        $this->assertSame(4, $source->getCount(3, 2));
-        $this->assertSame(5, $source->getCount(2));
+        $this->assertSame(7, $source->getCount(3, 2));
+        $this->assertSame(7, $source->getCount(2));
     }
 
     public function testCaching() {
