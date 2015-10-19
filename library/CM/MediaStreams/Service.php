@@ -1,11 +1,11 @@
 <?php
 
-abstract class CM_StreamService extends CM_Class_Abstract implements CM_Typed {
+abstract class CM_MediaStreams_Service extends CM_Class_Abstract implements CM_Typed {
 
     /**
      * @param CM_Model_Stream_Abstract $stream
      */
-    abstract public function _stopStream(CM_Model_Stream_Abstract $stream);
+    abstract protected function _stopStream(CM_Model_Stream_Abstract $stream);
 
     public function checkStreams() {
         $streamRepository = $this->_getStreamRepository();

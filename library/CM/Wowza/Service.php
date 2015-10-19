@@ -1,6 +1,6 @@
 <?php
 
-class CM_Wowza_Service extends CM_StreamService {
+class CM_Wowza_Service extends CM_MediaStreams_Service {
 
     /** @var CM_Wowza_Configuration */
     protected $_configuration;
@@ -18,25 +18,26 @@ class CM_Wowza_Service extends CM_StreamService {
         $startStampLimit = time() - 3;
         $status = array();
         foreach ($this->_configuration->getServers() as $server) {
-            $singleStatus = CM_Params::decode($this->_fetchStatus($server->getPrivateIp()), true);
+            $singleStatus = CM_Params::decode($this->_fetchStatus($server), true);
             foreach ($singleStatus as $streamName => $publish) {
-                $publish['serverId'] = $server->getId();
-                $publish['serverHost'] = $server->getPrivateIp();
+                $publish['server'] = $server;
                 $status[$streamName] = $publish;
             }
         }
 
         $streamChannels = $streamRepository->getStreamChannels();
         foreach ($status as $streamName => $publish) {
+            /** @var CM_MediaStreams_Server $server */
+            $server = $publish['server'];
             /** @var CM_Model_StreamChannel_Abstract $streamChannel */
             $streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamName, $this->getType());
             if (!$streamChannel || !$streamChannel->getStreamPublishs()->findKey($publish['clientId'])) {
-                $this->_stopClient($publish['serverHost'], $publish['clientId']);
+                $this->_stopClient($server, $publish['clientId']);
             }
 
             foreach ($publish['subscribers'] as $clientId => $subscribe) {
                 if (!$streamChannel || !$streamChannel->getStreamSubscribes()->findKey($clientId)) {
-                    $this->_stopClient($publish['serverHost'], $clientId);
+                    $this->_stopClient($server, $clientId);
                 }
             }
         }
@@ -82,6 +83,7 @@ class CM_Wowza_Service extends CM_StreamService {
      */
     public static function rpc_publish($streamName, $clientKey, $start, $data) {
         $wowza = CM_Service_Manager::getInstance()->getStreamVideo();
+
         $serverId = $wowza->_extractServerIdFromRequest(CM_Http_Request_Abstract::getInstance());
 
         $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
@@ -176,6 +178,35 @@ class CM_Wowza_Service extends CM_StreamService {
     }
 
     /**
+     * @param CM_Model_Stream_Abstract $stream
+     */
+    protected function _stopStream(CM_Model_Stream_Abstract $stream) {
+        /** @var $streamChannel CM_Model_StreamChannel_Media */
+        $streamChannel = $stream->getStreamChannel();
+        $server = $this->_configuration->getServer($streamChannel->getServerId());
+        $this->_stopClient($server, $stream->getKey());
+    }
+
+    /**
+     * @param CM_MediaStreams_Server $server
+     * @param string $clientKey
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    protected function _stopClient(CM_MediaStreams_Server $server, $clientKey) {
+        return CM_Util::getContents('http://' . $server->getPrivateHost() . '/stop', ['clientId' => (string) $clientKey], true);
+    }
+
+    /**
+     * @param CM_MediaStreams_Server $server
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    protected function _fetchStatus(CM_MediaStreams_Server $server) {
+        return CM_Util::getContents('http://' . $server->getPrivateHost() . '/status');
+    }
+
+    /**
      * @param CM_Http_Request_Abstract $request
      * @return int
      * @throws CM_Exception_Invalid
@@ -187,52 +218,5 @@ class CM_Wowza_Service extends CM_StreamService {
             throw new CM_Exception_Invalid('No video server with ipAddress `' . $ipAddress . '` found');
         }
         return $server->getId();
-    }
-
-    /**
-     * @param CM_Model_Stream_Abstract $stream
-     */
-    public function _stopStream(CM_Model_Stream_Abstract $stream) {
-        /** @var $streamChannel CM_Model_StreamChannel_Media */
-        $streamChannel = $stream->getStreamChannel();
-        $server = $this->_configuration->getServer($streamChannel->getServerId());
-        $this->_stopClient($server->getPrivateIp(), $stream->getKey());
-    }
-
-    /**
-     * @param string $serverHost
-     * @param string $clientKey
-     * @return string
-     * @throws CM_Exception_Invalid
-     */
-    protected function _stopClient($serverHost, $clientKey) {
-        return CM_Util::getContents('http://' . $serverHost . ':' . $this->_config['httpPort'] .
-            '/stop', array('clientId' => (string) $clientKey), true);
-    }
-
-    /**
-     * @param int|null $serverId
-     * @throws CM_Exception_Invalid
-     * @return array
-     */
-    protected function _getServer($serverId = null) {
-        $servers = $this->_servers;
-        if (null === $serverId) {
-            $serverId = array_rand($servers);
-        }
-
-        $serverId = (int) $serverId;
-        if (!array_key_exists($serverId, $servers)) {
-            throw new CM_Exception_Invalid("No video server with id `$serverId` found");
-        }
-        return $servers[$serverId];
-    }
-
-    /**
-     * @param string $wowzaHost
-     * @return string
-     */
-    protected function _fetchStatus($wowzaHost) {
-        return CM_Util::getContents('http://' . $wowzaHost . ':' . $this->_config['httpPort'] . '/status');
     }
 }

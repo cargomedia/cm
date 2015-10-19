@@ -5,20 +5,10 @@ class CM_Wowza_Configuration {
     /** @var CM_MediaStreams_Server[] */
     protected $_servers;
 
-    /** @var int */
-    protected $_httpPort;
-
-    /** @var int */
-    protected $_wowzaPort;
-
     /**
-     * @param int $httpPort
-     * @param int $wowzaPort
      * @param array|null $servers
      */
-    public function __construct($httpPort, $wowzaPort, array $servers = null) {
-        $this->_httpPort = (int) $httpPort;
-        $this->_wowzaPort = (int) $wowzaPort;
+    public function __construct(array $servers = null) {
         foreach ((array) $servers as $server) {
             $this->add($server);
         }

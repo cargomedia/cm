@@ -55,4 +55,11 @@ class CM_MediaStreams_Server {
     public function getPrivateIp() {
         return $this->_privateIp;
     }
+
+    /**
+     * @return string
+     */
+    public function getPrivateHost() {
+        return $this->_privateIp . ':' . $this->_httpPort;
+    }
 }
