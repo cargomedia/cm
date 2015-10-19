@@ -1,6 +1,6 @@
 <?php
 
-class CM_Streaming_MediaStreamRepository {
+class CM_MediaStreams_StreamRepository {
 
     /** @var int */
     protected $_adapterType;
