@@ -29,7 +29,7 @@ class CM_Wowza_Configuration {
     }
 
     /**
-     * @param int $ip
+     * @param string $ip
      * @return CM_MediaStreams_Server|null
      */
     public function findServerByIp($ip) {

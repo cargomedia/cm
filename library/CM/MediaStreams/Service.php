@@ -8,7 +8,7 @@ abstract class CM_MediaStreams_Service extends CM_Class_Abstract implements CM_T
     abstract protected function _stopStream(CM_Model_Stream_Abstract $stream);
 
     public function checkStreams() {
-        $streamRepository = $this->_getStreamRepository();
+        $streamRepository = $this->getStreamRepository();
 
         /** @var CM_Model_StreamChannel_Media $streamChannel */
         foreach ($streamRepository->getStreamChannels() as $streamChannel) {
@@ -46,7 +46,7 @@ abstract class CM_MediaStreams_Service extends CM_Class_Abstract implements CM_T
     /**
      * @return CM_MediaStreams_StreamRepository
      */
-    protected function _getStreamRepository() {
+    public function getStreamRepository() {
         return new CM_MediaStreams_StreamRepository($this->getType());
     }
 }
