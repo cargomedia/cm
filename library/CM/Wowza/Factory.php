@@ -9,7 +9,7 @@ class CM_Wowza_Factory {
     public function createService(array $servers) {
         $configuration = new CM_Wowza_Configuration();
         foreach ($servers as $serverId => $serverConfig) {
-            $configuration->add(new CM_MediaStreams_Server(
+            $configuration->addServer(new CM_MediaStreams_Server(
                 $serverId,
                 $serverConfig['publicHost'],
                 $serverConfig['publicIp'],

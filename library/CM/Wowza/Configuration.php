@@ -10,14 +10,14 @@ class CM_Wowza_Configuration {
      */
     public function __construct(array $servers = null) {
         foreach ((array) $servers as $server) {
-            $this->add($server);
+            $this->addServer($server);
         }
     }
 
     /**
      * @param CM_MediaStreams_Server $server
      */
-    public function add(CM_MediaStreams_Server $server) {
+    public function addServer(CM_MediaStreams_Server $server) {
         $this->_servers[] = $server;
     }
 
