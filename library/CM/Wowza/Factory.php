@@ -18,6 +18,7 @@ class CM_Wowza_Factory {
                 $serverConfig['httpPort']
             ));
         }
-        return new CM_Wowza_Service($configuration);
+        $httpClient = new CM_Wowza_HttpClient();
+        return new CM_Wowza_Service($configuration, $httpClient);
     }
 }
