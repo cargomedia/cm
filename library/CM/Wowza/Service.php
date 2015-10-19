@@ -2,19 +2,14 @@
 
 class CM_Wowza_Service extends CM_StreamService {
 
-    /** @var array */
-    protected $_servers;
-
-    /** @var array */
-    protected $_config;
+    /** @var CM_Wowza_Configuration */
+    protected $_configuration;
 
     /**
-     * @param array|null $servers
-     * @param array|null $config
+     * @param CM_Wowza_Configuration $configuration
      */
-    public function __construct(array $servers = null, array $config = null) {
-        $this->_servers = (array) $servers;
-        $this->_config = (array) $config;
+    public function __construct(CM_Wowza_Configuration $configuration) {
+        $this->_configuration = $configuration;
     }
 
     public function synchronize() {
@@ -22,11 +17,11 @@ class CM_Wowza_Service extends CM_StreamService {
 
         $startStampLimit = time() - 3;
         $status = array();
-        foreach ($this->_servers as $serverId => $wowzaServer) {
-            $singleStatus = CM_Params::decode($this->_fetchStatus($wowzaServer['privateIp']), true);
+        foreach ($this->_configuration->getServers() as $server) {
+            $singleStatus = CM_Params::decode($this->_fetchStatus($server->getPrivateIp()), true);
             foreach ($singleStatus as $streamName => $publish) {
-                $publish['serverId'] = $serverId;
-                $publish['serverHost'] = $wowzaServer['privateIp'];
+                $publish['serverId'] = $server->getId();
+                $publish['serverHost'] = $server->getPrivateIp();
                 $status[$streamName] = $publish;
             }
         }
@@ -187,13 +182,11 @@ class CM_Wowza_Service extends CM_StreamService {
      */
     protected function _extractServerIdFromRequest(CM_Http_Request_Abstract $request) {
         $ipAddress = long2ip($request->getIp());
-        $servers = $this->_servers;
-        foreach ($servers as $serverId => $server) {
-            if ($server['publicIp'] == $ipAddress || $server['privateIp'] == $ipAddress) {
-                return (int) $serverId;
-            }
+        $server = $this->_configuration->findServerByIp($ipAddress);
+        if (null === $server) {
+            throw new CM_Exception_Invalid('No video server with ipAddress `' . $ipAddress . '` found');
         }
-        throw new CM_Exception_Invalid('No video server with ipAddress `' . $ipAddress . '` found');
+        return $server->getId();
     }
 
     /**
@@ -202,8 +195,8 @@ class CM_Wowza_Service extends CM_StreamService {
     public function _stopStream(CM_Model_Stream_Abstract $stream) {
         /** @var $streamChannel CM_Model_StreamChannel_Media */
         $streamChannel = $stream->getStreamChannel();
-        $privateHost = $this->_getPrivateHost($streamChannel->getServerId());
-        $this->_stopClient($privateHost, $stream->getKey());
+        $server = $this->_configuration->getServer($streamChannel->getServerId());
+        $this->_stopClient($server->getPrivateIp(), $stream->getKey());
     }
 
     /**
@@ -233,28 +226,6 @@ class CM_Wowza_Service extends CM_StreamService {
             throw new CM_Exception_Invalid("No video server with id `$serverId` found");
         }
         return $servers[$serverId];
-    }
-
-    /**
-     * @param int $serverId
-     * @return string
-     * @throws CM_Exception_Invalid
-     */
-    protected function _getPublicHost($serverId) {
-        $serverId = (int) $serverId;
-        $server = $this->_getServer($serverId);
-        return $server['publicHost'];
-    }
-
-    /**
-     * @param int $serverId
-     * @return string
-     * @throws CM_Exception_Invalid
-     */
-    protected function _getPrivateHost($serverId) {
-        $serverId = (int) $serverId;
-        $server = $this->_getServer($serverId);
-        return $server['privateIp'];
     }
 
     /**

@@ -44,9 +44,9 @@ abstract class CM_StreamService extends CM_Class_Abstract implements CM_Typed {
     }
 
     /**
-     * @return CM_Streaming_MediaStreamRepository
+     * @return CM_MediaStreams_StreamRepository
      */
     protected function _getStreamRepository() {
-        return new CM_Streaming_MediaStreamRepository($this->getType());
+        return new CM_MediaStreams_StreamRepository($this->getType());
     }
 }

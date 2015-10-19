@@ -238,12 +238,10 @@ return function (CM_Config_Node $config) {
         'method' => array(
             'name'      => 'createService',
             'arguments' => array(
+                'httpPort'  => '8086',
+                'wowzaPort' => '1935',
                 'servers' => array(
                     ['publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'],
-                ),
-                'config'  => array(
-                    'httpPort'  => '8086',
-                    'wowzaPort' => '1935',
                 ),
             ),
         ),
