@@ -18,7 +18,8 @@ class CM_Wowza_Factory {
                 $serverConfig['wowzaHost']
             ));
         }
-        $httpApiClient = new CM_Wowza_HttpApiClient();
+        $httpClient = new GuzzleHttp\Client();
+        $httpApiClient = new CM_Wowza_HttpApiClient($httpClient);
         return new CM_Wowza_Service($configuration, $httpApiClient);
     }
 }
