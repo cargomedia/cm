@@ -286,12 +286,16 @@ class CM_Elasticsearch_Client {
                 throw new CM_Exception_Invalid('Unknown error in one or more bulk request actions');
             }
             $message = '';
+            $i = 0;
             foreach ($response['items'] as $item) {
                 list($operation, $description) = each($item);
                 $message .= 'Operator `' . $operation . '` ' . $description['error'] . PHP_EOL;
+                if (++$i > 2) {
+                    break;
+                }
             }
 
-            throw new CM_Exception_Invalid('Error in one or more bulk request actions' . PHP_EOL . $message);
+            throw new CM_Exception_Invalid('Error(s) in ' . count($response['items']) . ' bulk request action(s)' . PHP_EOL . $message);
         }
     }
 
