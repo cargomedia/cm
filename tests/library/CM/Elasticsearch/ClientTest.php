@@ -98,12 +98,14 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
 
         $cmClient->putIndexSettings($indexName, ['blocks.write' => 1]);
         $exception = $this->catchException(function () use ($cmClient, $indexName, $typeName) {
-            $cmClient->bulkDeleteDocuments(['11', '222'], $indexName, $typeName);
+            $cmClient->bulkDeleteDocuments(['11', '222', '3333', '4444', '555'], $indexName, $typeName);
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertContainsAll([
-            'Error in one or more bulk request actions',
-            'Operator `delete` ClusterBlockException[blocked by: [FORBIDDEN/8/index write (api)];]'],
+        $this->assertSame(
+            'Error(s) in 5 bulk request action(s)' . PHP_EOL .
+            'Operator `delete` ClusterBlockException[blocked by: [FORBIDDEN/8/index write (api)];]' . PHP_EOL .
+            'Operator `delete` ClusterBlockException[blocked by: [FORBIDDEN/8/index write (api)];]' . PHP_EOL .
+            'Operator `delete` ClusterBlockException[blocked by: [FORBIDDEN/8/index write (api)];]' . PHP_EOL,
             $exception->getMessage()
         );
         $exception = $this->catchException(function () use ($cmClient, $indexName, $typeName) {
@@ -111,10 +113,16 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertContainsAll([
-            'Error in one or more bulk request actions',
+            'Error(s) in 1 bulk request action(s)',
             'Operator `index` ClusterBlockException[blocked by: [FORBIDDEN/8/index write (api)];]'],
             $exception->getMessage()
         );
+
+        $exception = $this->catchException(function () use ($cmClient) {
+            CMTest_TH::callProtectedMethod($cmClient, '_processBulkResponse', [['errors' => 1]]);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Unknown error in one or more bulk request actions', $exception->getMessage());
 
         $cmClient->deleteIndex($indexName);
     }
