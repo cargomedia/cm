@@ -1,6 +1,6 @@
 <?php
 
-class CM_Streaming_MediaStreamRepository {
+class CM_MediaStreams_StreamRepository {
 
     /** @var int */
     protected $_adapterType;
@@ -10,6 +10,13 @@ class CM_Streaming_MediaStreamRepository {
      */
     public function __construct($adapterType) {
         $this->_adapterType = (int) $adapterType;
+    }
+
+    /**
+     * @return CM_Paging_StreamChannel_AdapterType
+     */
+    public function getStreamChannels() {
+        return new CM_Paging_StreamChannel_AdapterType($this->_adapterType);
     }
 
     /**
@@ -54,7 +61,6 @@ class CM_Streaming_MediaStreamRepository {
             'start'         => (int) $start,
         ]);
     }
-
 
     /**
      * @param CM_Model_StreamChannel_Abstract $streamChannel
