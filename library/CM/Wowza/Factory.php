@@ -18,7 +18,7 @@ class CM_Wowza_Factory {
                 $serverConfig['wowzaHost']
             ));
         }
-        $httpClient = new CM_Wowza_HttpClient();
-        return new CM_Wowza_Service($configuration, $httpClient);
+        $httpApiClient = new CM_Wowza_HttpApiClient();
+        return new CM_Wowza_Service($configuration, $httpApiClient);
     }
 }

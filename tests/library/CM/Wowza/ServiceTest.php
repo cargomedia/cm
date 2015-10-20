@@ -26,7 +26,7 @@ class CM_Wowza_ServiceTest extends CMTest_TestCase {
         $stopClientMethod = $httpClient->mockMethod('stopClient')->set(function ($clientKey) {
             $this->assertSame('foo', $clientKey);
         });
-        /** @var CM_Wowza_HttpClient $httpClient */
+        /** @var CM_Wowza_HttpApiClient $httpClient */
 
         $wowza = new CM_Wowza_Service($configuration, $httpClient);
         $this->callProtectedMethod($wowza, '_stopStream', [$stream]);

@@ -1,6 +1,6 @@
 <?php
 
-class CM_Wowza_HttpClient {
+class CM_Wowza_HttpApiClient {
 
     /**
      * @param CM_Wowza_Server $server

@@ -5,16 +5,16 @@ class CM_Wowza_Service extends CM_MediaStreams_Service {
     /** @var CM_Wowza_Configuration */
     protected $_configuration;
 
-    /** @var CM_Wowza_httpClient */
-    protected $_httpClient;
+    /** @var CM_Wowza_HttpApiClient */
+    protected $_httpApiClient;
 
     /**
      * @param CM_Wowza_Configuration $configuration
-     * @param CM_Wowza_httpClient $httpClient
+     * @param CM_Wowza_HttpApiClient $httpClient
      */
-    public function __construct(CM_Wowza_Configuration $configuration, CM_Wowza_httpClient $httpClient) {
+    public function __construct(CM_Wowza_Configuration $configuration, CM_Wowza_HttpApiClient $httpClient) {
         $this->_configuration = $configuration;
-        $this->_httpClient = $httpClient;
+        $this->_httpApiClient = $httpClient;
     }
 
     /**
@@ -30,7 +30,7 @@ class CM_Wowza_Service extends CM_MediaStreams_Service {
         $startStampLimit = time() - 3;
         $status = [];
         foreach ($this->_configuration->getServers() as $server) {
-            $singleServerStatus = $this->_httpClient->fetchStatus($server);
+            $singleServerStatus = $this->_httpApiClient->fetchStatus($server);
             foreach ($singleServerStatus as $streamName => $publish) {
                 $publish['server'] = $server;
                 $status[$streamName] = $publish;
@@ -43,12 +43,12 @@ class CM_Wowza_Service extends CM_MediaStreams_Service {
             /** @var CM_Model_StreamChannel_Abstract $streamChannel */
             $streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamName, $this->getType());
             if (!$streamChannel || !$streamChannel->getStreamPublishs()->findKey($publish['clientId'])) {
-                $this->_httpClient->stopClient($server, $publish['clientId']);
+                $this->_httpApiClient->stopClient($server, $publish['clientId']);
             }
 
             foreach ($publish['subscribers'] as $clientId => $subscribe) {
                 if (!$streamChannel || !$streamChannel->getStreamSubscribes()->findKey($clientId)) {
-                    $this->_httpClient->stopClient($server, $clientId);
+                    $this->_httpApiClient->stopClient($server, $clientId);
                 }
             }
         }
@@ -90,6 +90,6 @@ class CM_Wowza_Service extends CM_MediaStreams_Service {
         /** @var $streamChannel CM_Model_StreamChannel_Media */
         $streamChannel = $stream->getStreamChannel();
         $server = $this->_configuration->getServer($streamChannel->getServerId());
-        $this->_httpClient->stopClient($server, $stream->getKey());
+        $this->_httpApiClient->stopClient($server, $stream->getKey());
     }
 }
