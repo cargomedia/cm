@@ -11,10 +11,12 @@ class CM_Wowza_Service extends CM_MediaStreams_Service {
     /**
      * @param CM_Wowza_Configuration $configuration
      * @param CM_Wowza_HttpApiClient $httpClient
+     * @param CM_MediaStreams_StreamRepository|null $streamRepository
      */
-    public function __construct(CM_Wowza_Configuration $configuration, CM_Wowza_HttpApiClient $httpClient) {
+    public function __construct(CM_Wowza_Configuration $configuration, CM_Wowza_HttpApiClient $httpClient, CM_MediaStreams_StreamRepository $streamRepository = null) {
         $this->_configuration = $configuration;
         $this->_httpApiClient = $httpClient;
+        parent::__construct($streamRepository);
     }
 
     /**

@@ -2,10 +2,20 @@
 
 abstract class CM_MediaStreams_Service extends CM_Class_Abstract implements CM_Typed {
 
+    /** @var CM_MediaStreams_StreamRepository */
+    protected $_streamRepository;
+
     /**
      * @param CM_Model_Stream_Abstract $stream
      */
     abstract protected function _stopStream(CM_Model_Stream_Abstract $stream);
+
+    /**
+     * @param CM_MediaStreams_StreamRepository|null $streamRepository
+     */
+    public function __construct(CM_MediaStreams_StreamRepository $streamRepository = null) {
+        $this->_streamRepository = $streamRepository;
+    }
 
     public function checkStreams() {
         $streamRepository = $this->getStreamRepository();
@@ -44,9 +54,20 @@ abstract class CM_MediaStreams_Service extends CM_Class_Abstract implements CM_T
     }
 
     /**
+     * @param CM_MediaStreams_StreamRepository $streamRepository
+     */
+    public function setStreamRepository(CM_MediaStreams_StreamRepository $streamRepository) {
+        $this->_streamRepository = $streamRepository;
+    }
+
+    /**
      * @return CM_MediaStreams_StreamRepository
+     * @throws CM_Exception_Invalid
      */
     public function getStreamRepository() {
-        return new CM_MediaStreams_StreamRepository($this->getType());
+        if (null === $this->_streamRepository) {
+            throw new CM_Exception_Invalid('Stream repository not set');
+        }
+        return $this->_streamRepository;
     }
 }
