@@ -40,13 +40,13 @@ class CM_Wowza_HttpApiClient {
      * @param string $method
      * @param CM_Wowza_Server $server
      * @param string $path
-     * @param array|null $query
+     * @param array|null $body
      * @return string
      * @throws CM_Exception_Invalid
      */
-    protected function _request($method, CM_Wowza_Server $server, $path, array $query = null) {
+    protected function _request($method, CM_Wowza_Server $server, $path, array $body = null) {
         $url = 'http://' . $server->getPrivateHost() . $path;
-        $options = ['body' => $query];
+        $options = ['body' => $body];
         $request = $this->_httpClient->createRequest($method, $url, $options);
         try {
             $response = $this->_httpClient->send($request);
