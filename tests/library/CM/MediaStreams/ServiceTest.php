@@ -16,7 +16,7 @@ class CM_MediaStreams_ServiceTest extends CMTest_TestCase {
         $streamRepository->mockMethod('getStreamChannels')->set([$streamChannel]);
         /** @var CM_MediaStreams_StreamRepository $streamRepository */
 
-        $service = $this->mockObject('CM_MediaStreams_Service');
+        $service = $this->mockObject('CM_MediaStreams_Service', [$streamRepository]);
         $stopStreamMethod = $service->mockMethod('_stopStream')
             ->at(0, function ($stream) use ($streamPublish) {
                 $this->assertSame($streamPublish, $stream);
@@ -26,7 +26,6 @@ class CM_MediaStreams_ServiceTest extends CMTest_TestCase {
             });
 
         /** @var CM_MediaStreams_Service $service */
-        $service->setStreamRepository($streamRepository);
 
         $service->checkStreams();
         $this->assertSame(2, $stopStreamMethod->getCallCount());
@@ -46,7 +45,7 @@ class CM_MediaStreams_ServiceTest extends CMTest_TestCase {
         $streamRepository->mockMethod('getStreamChannels')->set([$streamChannel, $streamChannel]);
         /** @var CM_MediaStreams_StreamRepository $streamRepository */
 
-        $service = $this->mockObject('CM_MediaStreams_Service');
+        $service = $this->mockObject('CM_MediaStreams_Service', [$streamRepository]);
         $service->mockMethod('_isPublishAllowed')
             ->at(0, true)
             ->at(1, false);
@@ -65,7 +64,6 @@ class CM_MediaStreams_ServiceTest extends CMTest_TestCase {
             });
 
         /** @var CM_MediaStreams_Service $service */
-        $service->setStreamRepository($streamRepository);
 
         $service->checkStreams();
         $this->assertSame(3, $stopStreamMethod->getCallCount());
