@@ -7,7 +7,7 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
     }
 
     public function testSynchronizeMissingInJanus() {
-        $streamChannel = CMTest_TH::createStreamChannel();
+        $streamChannel = CMTest_TH::createStreamChannel(null, CM_Janus_Service::getTypeStatic());
         $streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
         $streamSubscribe = CMTest_TH::createStreamSubscribe(null, $streamChannel);
 
