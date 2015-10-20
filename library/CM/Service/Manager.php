@@ -192,7 +192,7 @@ class CM_Service_Manager extends CM_Class_Abstract {
     /**
      * @return CM_Wowza_Service
      */
-    public function getStreamVideo() {
+    public function getWowza() {
         return $this->get('wowza', 'CM_Wowza_Service');
     }
 
