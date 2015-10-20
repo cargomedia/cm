@@ -251,6 +251,23 @@ return function (CM_Config_Node $config) {
         ),
     );
 
+    $config->services['janus'] = [
+        'class'  => 'CM_Janus_Factory',
+        'method' => [
+            'name'      => 'createService',
+            'arguments' => [
+                'servers' => [
+                    ['publicHost' => 'localhost',
+                     'publicIp'   => '127.0.0.1',
+                     'privateIp'  => '127.0.0.1',
+                     'httpPort'   => '8086',
+                     'janusPort'  => '1935',
+                    ],
+                ],
+            ],
+        ],
+    ];
+
     $config->services['newrelic'] = array(
         'class'     => 'CMService_Newrelic',
         'arguments' => array(
