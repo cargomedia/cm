@@ -46,7 +46,7 @@ class CM_Wowza_HttpApiClient {
      */
     protected function _request($method, CM_Wowza_Server $server, $path, array $query = null) {
         $url = 'http://' . $server->getPrivateHost() . $path;
-        $options = ['query' => $query];
+        $options = ['body' => $query];
         $request = $this->_httpClient->createRequest($method, $url, $options);
         try {
             $response = $this->_httpClient->send($request);
