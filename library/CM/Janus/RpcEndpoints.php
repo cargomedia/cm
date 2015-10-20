@@ -5,7 +5,7 @@ class CM_Janus_RpcEndpoints {
     /**
      * @param string $streamName
      * @param string $clientKey
-     * @param int $start
+     * @param int    $start
      * @param string $data
      * @return int
      * @throws CM_Exception_AuthRequired
@@ -110,7 +110,7 @@ class CM_Janus_RpcEndpoints {
     }
 
     /**
-     * @param CM_Janus_Service $janus
+     * @param CM_Janus_Service         $janus
      * @param CM_Http_Request_Abstract $request
      * @throws CM_Exception_AuthFailed
      */

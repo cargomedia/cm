@@ -9,8 +9,8 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
     protected $_httpApiClient;
 
     /**
-     * @param CM_Janus_Configuration $configuration
-     * @param CM_Janus_HttpApiClient $httpClient
+     * @param CM_Janus_Configuration                $configuration
+     * @param CM_Janus_HttpApiClient                $httpClient
      * @param CM_MediaStreams_StreamRepository|null $streamRepository
      */
     public function __construct(CM_Janus_Configuration $configuration, CM_Janus_HttpApiClient $httpClient, CM_MediaStreams_StreamRepository $streamRepository = null) {

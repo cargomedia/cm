@@ -21,12 +21,12 @@ class CM_Janus_Server {
     protected $_httpPort;
 
     /**
-     * @param int $serverId
+     * @param int    $serverId
      * @param string $publicHost
      * @param string $publicIp
      * @param string $privateIp
-     * @param int $httpPort
-     * @param int $janusPort
+     * @param int    $httpPort
+     * @param int    $janusPort
      */
     public function __construct($serverId, $publicHost, $publicIp, $privateIp, $httpPort, $janusPort) {
         $this->_id = $serverId;

@@ -14,7 +14,7 @@ class CM_Janus_HttpApiClient {
 
     /**
      * @param CM_Janus_Server $server
-     * @param string $clientKey
+     * @param string          $clientKey
      * @return string
      * @throws CM_Exception_Invalid
      */
@@ -37,10 +37,10 @@ class CM_Janus_HttpApiClient {
     }
 
     /**
-     * @param string $method
+     * @param string          $method
      * @param CM_Janus_Server $server
-     * @param string $path
-     * @param array|null $body
+     * @param string          $path
+     * @param array|null      $body
      * @return string
      * @throws CM_Exception_Invalid
      */
