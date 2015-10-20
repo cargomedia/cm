@@ -2,122 +2,72 @@
 
 class CM_MediaStreams_ServiceTest extends CMTest_TestCase {
 
-    public function testCheckStreams() {
-        $serviceType = rand();
+    public function testCheckStreamsInvalidStreamChannel() {
+        $streamPublish = $this->mockClass('CM_Model_Stream_Publish')->newInstanceWithoutConstructor();
+        $streamSubscribe = $this->mockClass('CM_Model_Stream_Subscribe')->newInstanceWithoutConstructor();
+
+        $streamChannel = $this->mockClass('CM_Model_StreamChannel_Media')->newInstanceWithoutConstructor();
+        $streamChannel->mockMethod('isValid')->set(false);
+        $streamChannel->mockMethod('hasStreamPublish')->set(true);
+        $streamChannel->mockMethod('getStreamPublish')->set($streamPublish);
+        $streamChannel->mockMethod('getStreamSubscribes')->set([$streamSubscribe]);
+
+        $streamRepository = $this->mockClass('CM_MediaStreams_StreamRepository')->newInstanceWithoutConstructor();
+        $streamRepository->mockMethod('getStreamChannels')->set([$streamChannel]);
+        /** @var CM_MediaStreams_StreamRepository $streamRepository */
+
         $service = $this->mockObject('CM_MediaStreams_Service');
-        $service->mockMethod('getType')->set($serviceType);
-        $stopStreamMethod = $service->mockMethod('_stopStream');
+        $stopStreamMethod = $service->mockMethod('_stopStream')
+            ->at(0, function ($stream) use ($streamPublish) {
+                $this->assertSame($streamPublish, $stream);
+            })
+            ->at(1, function ($stream) use ($streamSubscribe) {
+                $this->assertSame($streamSubscribe, $stream);
+            });
+
         /** @var CM_MediaStreams_Service $service */
+        $service->setStreamRepository($streamRepository);
 
-        CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Media_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Media_Mock';
-
-        // allowedUntil will be updated, if stream has expired and its user isn't $userUnchanged, hardcoded in CM_Model_StreamChannel_Video_Mock::canSubscribe() using getOnline()
-        $userUnchanged = CMTest_TH::createUser();
-        $userUnchanged->setOnline();
-        $streamChannel = CM_Model_StreamChannel_Media_Mock::createStatic(array(
-            'key'            => 'foo1',
-            'serverId'       => 1,
-            'adapterType'    => 1,
-            'width'          => 100,
-            'height'         => 100,
-            'thumbnailCount' => 0,
-        ));
-
-        $streamSubscribeUnchanged1 = CM_Model_Stream_Subscribe::createStatic(array(
-            'streamChannel' => $streamChannel,
-            'user'          => $userUnchanged,
-            'key'           => 'foo1_2',
-            'start'         => time(),
-        ));
-        $streamSubscribeUnchanged2 = CM_Model_Stream_Subscribe::createStatic(array(
-            'streamChannel' => $streamChannel,
-            'user'          => CMTest_TH::createUser(),
-            'key'           => 'foo1_4',
-            'start'         => time(),
-        ));
-        $streamSubscribeChanged1 = CM_Model_Stream_Subscribe::createStatic(array(
-            'streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
-            'key'           => 'foo1_3',
-            'start'         => time(),
-        ));
-        $streamPublishUnchanged1 = CM_Model_Stream_Publish::createStatic(array(
-            'streamChannel' => $streamChannel, 'user' => $userUnchanged,
-            'key'           => 'foo1_2',
-            'start'         => time(),
-        ));
-        $streamPublishChanged1 = CM_Model_Stream_Publish::createStatic(array(
-            'streamChannel' => CM_Model_StreamChannel_Media_Mock::createStatic(array(
-                'key'            => 'foo2',
-                'serverId'       => 1,
-                'adapterType'    => 1,
-                'width'          => 100,
-                'height'         => 100,
-                'thumbnailCount' => 0,
-            )),
-            'user'          => CMTest_TH::createUser(),
-            'key'           => 'foo2_1', 'start' => time(),
-        ));
-
-        $this->assertSameTime($streamSubscribeUnchanged1->getAllowedUntil(), time() + 10);
-        $this->assertSameTime($streamSubscribeUnchanged2->getAllowedUntil(), time() + 100);
-        $this->assertSameTime($streamSubscribeChanged1->getAllowedUntil(), time() + 100);
-        $this->assertSameTime($streamPublishUnchanged1->getAllowedUntil(), time() + 10);
-        $this->assertSameTime($streamPublishChanged1->getAllowedUntil(), time() + 100);
-
-        CMTest_TH::timeForward(200);
         $service->checkStreams();
-
-        $this->assertEquals($streamSubscribeUnchanged1->getAllowedUntil() + 10, $streamSubscribeUnchanged1->_change()->getAllowedUntil());
-        $this->assertEquals($streamSubscribeUnchanged2->getAllowedUntil() + 100, $streamSubscribeUnchanged2->_change()->getAllowedUntil());
-        $this->assertEquals($streamSubscribeChanged1->getAllowedUntil() + 100, $streamSubscribeChanged1->_change()->getAllowedUntil());
-        $this->assertEquals($streamPublishUnchanged1->getAllowedUntil() + 10, $streamPublishUnchanged1->_change()->getAllowedUntil());
-        $this->assertEquals($streamPublishChanged1->getAllowedUntil() + 100, $streamPublishChanged1->_change()->getAllowedUntil());
-
         $this->assertSame(2, $stopStreamMethod->getCallCount());
     }
 
+    public function testCheckStreamsValidStreamChannel() {
+        $streamPublish = $this->mockClass('CM_Model_Stream_Publish')->newInstanceWithoutConstructor();
+        $streamSubscribe = $this->mockClass('CM_Model_Stream_Subscribe')->newInstanceWithoutConstructor();
 
-    public function testCheckStreamsInvalid() {
-        $streamPublish = $this->getMockBuilder('CM_Model_Stream_Publish')
-            ->disableOriginalConstructor()->getMock();
+        $streamChannel = $this->mockClass('CM_Model_StreamChannel_Media')->newInstanceWithoutConstructor();
+        $streamChannel->mockMethod('isValid')->set(true);
+        $streamChannel->mockMethod('hasStreamPublish')->set(true);
+        $streamChannel->mockMethod('getStreamPublish')->set($streamPublish);
+        $streamChannel->mockMethod('getStreamSubscribes')->set([$streamSubscribe]);
 
-        $streamSubscribe = $this->getMockBuilder('CM_Model_Stream_Subscribe')
-            ->disableOriginalConstructor()->getMock();
+        $streamRepository = $this->mockClass('CM_MediaStreams_StreamRepository')->newInstanceWithoutConstructor();
+        $streamRepository->mockMethod('getStreamChannels')->set([$streamChannel, $streamChannel]);
+        /** @var CM_MediaStreams_StreamRepository $streamRepository */
 
-        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')
-            ->setMethods(array('isValid', 'hasStreamPublish', 'getStreamPublish', 'getStreamSubscribes'))->getMockForAbstractClass();
-        $streamChannel->expects($this->any())->method('hasStreamPublish')->will($this->returnValue(true));
-        $streamChannel->expects($this->any())->method('getStreamPublish')->will($this->returnValue($streamPublish));
-        $streamChannel->expects($this->any())->method('getStreamSubscribes')->will($this->returnValue(array($streamSubscribe)));
-        $streamChannel->expects($this->any())->method('isValid')->will($this->returnValue(false));
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        $service = $this->mockObject('CM_MediaStreams_Service');
+        $service->mockMethod('_isPublishAllowed')
+            ->at(0, true)
+            ->at(1, false);
+        $service->mockMethod('_isSubscribeAllowed')
+            ->at(0, false)
+            ->at(1, false);
+        $stopStreamMethod = $service->mockMethod('_stopStream')
+            ->at(0, function ($stream) use ($streamSubscribe) {
+                $this->assertSame($streamSubscribe, $stream);
+            })
+            ->at(1, function ($stream) use ($streamPublish) {
+                $this->assertSame($streamPublish, $stream);
+            })
+            ->at(2, function ($stream) use ($streamSubscribe) {
+                $this->assertSame($streamSubscribe, $stream);
+            });
 
+        /** @var CM_MediaStreams_Service $service */
+        $service->setStreamRepository($streamRepository);
 
-
-        $adapter = $this->getMockBuilder('CM_Wowza_Client')
-            ->setMethods(array('_getStreamChannels', 'stopStream'))->disableOriginalConstructor()->getMockForAbstractClass();
-        $adapter->expects($this->any())->method('_getStreamChannels')->will($this->returnValue(array($streamChannel)));
-        $adapter->expects($this->at(1))->method('stopStream')->with($streamPublish);
-        $adapter->expects($this->at(2))->method('stopStream')->with($streamSubscribe);
-        /** @var CM_Wowza_Client $adapter */
-
-        $adapter->checkStreams();
-    }
-
-}
-
-
-class CM_Model_StreamChannel_Media_Mock extends CM_Model_StreamChannel_Media {
-
-    public function canPublish(CM_Model_User $user, $allowedUntil) {
-        return $user->getOnline() ? $allowedUntil + 10 : $allowedUntil + 100;
-    }
-
-    public function canSubscribe(CM_Model_User $user, $allowedUntil) {
-        return $user->getOnline() ? $allowedUntil + 10 : $allowedUntil + 100;
-    }
-
-    public static function getTypeStatic() {
-        return 1;
+        $service->checkStreams();
+        $this->assertSame(3, $stopStreamMethod->getCallCount());
     }
 }

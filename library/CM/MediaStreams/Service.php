@@ -26,28 +26,14 @@ abstract class CM_MediaStreams_Service extends CM_Class_Abstract implements CM_T
             if ($streamChannel->hasStreamPublish()) {
                 /** @var CM_Model_Stream_Publish $streamPublish */
                 $streamPublish = $streamChannel->getStreamPublish();
-                if (!$streamChannelIsValid) {
+                if (!$streamChannelIsValid || !$this->_isPublishAllowed($streamPublish)) {
                     $this->_stopStream($streamPublish);
-                } else {
-                    if ($streamPublish->getAllowedUntil() < time()) {
-                        $streamPublish->setAllowedUntil($streamChannel->canPublish($streamPublish->getUser(), $streamPublish->getAllowedUntil()));
-                        if ($streamPublish->getAllowedUntil() < time()) {
-                            $this->_stopStream($streamPublish);
-                        }
-                    }
                 }
             }
             /** @var CM_Model_Stream_Subscribe $streamSubscribe */
             foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
-                if (!$streamChannelIsValid) {
+                if (!$streamChannelIsValid || !$this->_isSubscribeAllowed($streamSubscribe)) {
                     $this->_stopStream($streamSubscribe);
-                } else {
-                    if ($streamSubscribe->getAllowedUntil() < time()) {
-                        $streamSubscribe->setAllowedUntil($streamChannel->canSubscribe($streamSubscribe->getUser(), $streamSubscribe->getAllowedUntil()));
-                        if ($streamSubscribe->getAllowedUntil() < time()) {
-                            $this->_stopStream($streamSubscribe);
-                        }
-                    }
                 }
             }
         }
@@ -69,5 +55,37 @@ abstract class CM_MediaStreams_Service extends CM_Class_Abstract implements CM_T
             throw new CM_Exception_Invalid('Stream repository not set');
         }
         return $this->_streamRepository;
+    }
+
+    /**
+     * @param CM_Model_Stream_Publish $streamPublish
+     * @return bool
+     */
+    protected function _isPublishAllowed(CM_Model_Stream_Publish $streamPublish) {
+        if ($streamPublish->getAllowedUntil() < time()) {
+            $streamChannel = $streamPublish->getStreamChannel();
+            $canPublishUntil = $streamChannel->canPublish($streamPublish->getUser(), $streamPublish->getAllowedUntil());
+            $streamPublish->setAllowedUntil($canPublishUntil);
+            if ($streamPublish->getAllowedUntil() < time()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param CM_Model_Stream_Subscribe $streamSubscribe
+     * @return bool
+     */
+    protected function _isSubscribeAllowed(CM_Model_Stream_Subscribe $streamSubscribe) {
+        if ($streamSubscribe->getAllowedUntil() < time()) {
+            $streamChannel = $streamSubscribe->getStreamChannel();
+            $canSubscribeUntil = $streamChannel->canSubscribe($streamSubscribe->getUser(), $streamSubscribe->getAllowedUntil());
+            $streamSubscribe->setAllowedUntil($canSubscribeUntil);
+            if ($streamSubscribe->getAllowedUntil() < time()) {
+                return false;
+            }
+        }
+        return true;
     }
 }
