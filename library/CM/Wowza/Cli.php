@@ -1,6 +1,6 @@
 <?php
 
-class CM_MediaStream_Cli extends CM_Cli_Runnable_Abstract {
+class CM_MediaStreams_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
      * @param int     $streamChannelId
@@ -29,6 +29,6 @@ class CM_MediaStream_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public static function getPackageName() {
-        return 'video-stream';
+        return 'media-streams';
     }
 }

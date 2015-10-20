@@ -91,8 +91,8 @@ return function (CM_Config_Node $config) {
                 'username' => 'root',
                 'password' => '',
                 'db'       => 'cm',
-            )
-        )
+            ),
+        ),
     );
 
     $config->services['MongoDb'] = array(
@@ -102,8 +102,8 @@ return function (CM_Config_Node $config) {
                 'db'      => 'cm',
                 'server'  => 'mongodb://localhost:27017',
                 'options' => array('connect' => true),
-            )
-        )
+            ),
+        ),
     );
 
     $config->services['redis'] = array(
@@ -112,8 +112,8 @@ return function (CM_Config_Node $config) {
             'config' => array(
                 'host' => 'localhost',
                 'port' => '6379',
-            )
-        )
+            ),
+        ),
     );
 
     $config->services['filesystem-data'] = array(
@@ -124,9 +124,9 @@ return function (CM_Config_Node $config) {
                 'adapterClassName' => 'CM_File_Filesystem_Adapter_Local',
                 'options'          => array(
                     'pathPrefix' => DIR_ROOT . 'data/',
-                )
-            )
-        )
+                ),
+            ),
+        ),
     );
 
     $config->services['filesystem-usercontent'] = array(
@@ -137,9 +137,9 @@ return function (CM_Config_Node $config) {
                 'adapterClassName' => 'CM_File_Filesystem_Adapter_Local',
                 'options'          => array(
                     'pathPrefix' => DIR_PUBLIC . 'userfiles/',
-                )
-            )
-        )
+                ),
+            ),
+        ),
     );
 
     $config->services['usercontent'] = array(
@@ -150,15 +150,15 @@ return function (CM_Config_Node $config) {
                     'filesystem' => 'filesystem-usercontent',
                     'url'        => 'http://localhost/userfiles',
                 ),
-            )
-        )
+            ),
+        ),
     );
 
     $config->services['trackings'] = array(
         'class'     => 'CM_Service_Trackings',
         'arguments' => array(
-            'trackingServiceNameList' => array()
-        )
+            'trackingServiceNameList' => array(),
+        ),
     );
 
     $config->services['tracking-adagnit'] = [
@@ -173,26 +173,26 @@ return function (CM_Config_Node $config) {
         'arguments' => array(
             'code' => 'my-web-property-id',
             'ttl'  => 86400,
-        )
+        ),
     );
 
     $config->services['tracking-kissmetrics'] = array(
         'class'     => 'CMService_KissMetrics_Client',
         'arguments' => array(
             'code' => 'my-api-key',
-        )
+        ),
     );
 
     $config->services['tracking-inspectlet'] = array(
         'class'     => 'CMService_Inspectlet_Client',
         'arguments' => array(
             'code' => 'my-wid',
-        )
+        ),
     );
 
     $config->services['email-verification'] = array(
         'class'     => 'CM_Service_EmailVerification_Standard',
-        'arguments' => array()
+        'arguments' => array(),
     );
 
     $config->services['memcache'] = array(
@@ -216,14 +216,14 @@ return function (CM_Config_Node $config) {
                     ],
                 ],
             ],
-        ]
+        ],
     );
 
     $config->services['elasticsearch'] = array(
         'class'     => 'CM_Elasticsearch_Cluster',
         'arguments' => array(
             'servers' => array(
-                ['host' => 'localhost', 'port' => 9200]
+                ['host' => 'localhost', 'port' => 9200],
             ),
         ),
     );
@@ -233,23 +233,22 @@ return function (CM_Config_Node $config) {
         'arguments' => array(),
     );
 
-    $config->services['stream-video'] = array(
-        'class'  => 'CM_MediaStream_Factory',
+    $config->services['wowza'] = array(
+        'class'  => 'CM_Wowza_Factory',
         'method' => array(
             'name'      => 'createService',
             'arguments' => array(
-                'adapterClass'     => 'CM_MediaStream_Adapter_Wowza',
-                'adapterArguments' => array(
-                    'servers' => array(
-                        ['publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'],
-                    ),
-                    'config'  => array(
-                        'httpPort'  => '8086',
-                        'wowzaPort' => '1935'
-                    ),
-                )
-            )
-        )
+
+                'servers' => array(
+                    ['publicHost' => 'localhost',
+                     'publicIp'   => '127.0.0.1',
+                     'privateIp'  => '127.0.0.1',
+                     'httpPort'   => '8086',
+                     'wowzaPort'  => '1935',
+                    ],
+                ),
+            ),
+        ),
     );
 
     $config->services['newrelic'] = array(
@@ -257,6 +256,6 @@ return function (CM_Config_Node $config) {
         'arguments' => array(
             'enabled' => false,
             'appName' => 'CM Application',
-        )
+        ),
     );
 };
