@@ -197,6 +197,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Janus_Service
+     */
+    public function getJanus() {
+        return $this->get('janus', 'CM_Janus_Service');
+    }
+
+    /**
      * @return CM_Memcache_Client
      */
     public function getMemcache() {
