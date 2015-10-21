@@ -5,7 +5,7 @@ class CM_Wowza_HttpApiClientTest extends CMTest_TestCase {
     public function testStopClient() {
         $httpClient = $this->mockObject('GuzzleHttp\Client');
         $sendRequestMethod = $httpClient->mockMethod('send')->set(function (\GuzzleHttp\Message\RequestInterface $request) {
-            $this->assertSame('http://example.com/stop', $request->getUrl());
+            $this->assertSame('http://example.com:8080/stop', $request->getUrl());
             $this->assertSame('POST', $request->getMethod());
             $this->assertSame('clientId=foo', $request->getBody()->getContents());
 
@@ -16,7 +16,8 @@ class CM_Wowza_HttpApiClientTest extends CMTest_TestCase {
         /** @var GuzzleHttp\Client $httpClient */
 
         $wowzaServer = $this->mockClass('CM_Wowza_Server')->newInstanceWithoutConstructor();
-        $wowzaServer->mockMethod('getPrivateHost')->set('example.com');
+        $wowzaServer->mockMethod('getPrivateIp')->set('example.com');
+        $wowzaServer->mockMethod('getHttpPort')->set(8080);
         /** @var CM_Wowza_Server $wowzaServer */
 
         $api = new CM_Wowza_HttpApiClient($httpClient);
@@ -27,7 +28,7 @@ class CM_Wowza_HttpApiClientTest extends CMTest_TestCase {
     public function testFetchStatus() {
         $httpClient = $this->mockObject('GuzzleHttp\Client');
         $sendRequestMethod = $httpClient->mockMethod('send')->set(function (\GuzzleHttp\Message\RequestInterface $request) {
-            $this->assertSame('http://example.com/status', $request->getUrl());
+            $this->assertSame('http://example.com:8080/status', $request->getUrl());
             $this->assertSame('GET', $request->getMethod());
 
             $response = $this->mockClass('\GuzzleHttp\Message\Response')->newInstanceWithoutConstructor();
@@ -37,7 +38,8 @@ class CM_Wowza_HttpApiClientTest extends CMTest_TestCase {
         /** @var GuzzleHttp\Client $httpClient */
 
         $wowzaServer = $this->mockClass('CM_Wowza_Server')->newInstanceWithoutConstructor();
-        $wowzaServer->mockMethod('getPrivateHost')->set('example.com');
+        $wowzaServer->mockMethod('getPrivateIp')->set('example.com');
+        $wowzaServer->mockMethod('getHttpPort')->set(8080);
         /** @var CM_Wowza_Server $wowzaServer */
 
         $api = new CM_Wowza_HttpApiClient($httpClient);
