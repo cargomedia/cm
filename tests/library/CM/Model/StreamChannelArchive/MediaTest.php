@@ -58,10 +58,11 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
     }
 
     public function testGetVideo() {
-        $archive = CMTest_TH::createStreamChannelVideoArchive();
+        $filename = 'testArchive.mp4';
+        $archive = CMTest_TH::createStreamChannelVideoArchive(null, null, $filename);
         $videoFile = $archive->getFile();
-        $this->assertSame('streamChannels/' . $archive->getId() . '/' . $archive->getId() . '-' . $archive->getHash() .
-            '-original.mp4', $videoFile->getPathRelative());
+
+        $this->assertSame('streamChannels/' . $archive->getId() . '/' . $filename, $videoFile->getPathRelative());
     }
 
     public function testGetThumbnails() {
@@ -90,7 +91,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $streamChannel->setThumbnailCount(3);
-        $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel);
+        $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel, null, 'tempFileName.mp4');
         $files = $this->_createArchiveFiles($archive);
         foreach ($files as $file) {
             $this->assertTrue($file->exists());
@@ -119,7 +120,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
             $streamChannel = CMTest_TH::createStreamChannel();
             $streamChannel->setThumbnailCount(4);
             $streamChannelsDeleted[] = $streamChannel;
-            $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel);
+            $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel, null, 'tempFileName.mp4');
             $archivesDeleted[] = $archive;
             $filesDeleted = array_merge($filesDeleted, $this->_createArchiveFiles($archive));
         }
@@ -141,7 +142,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
             $streamChannel = CMTest_TH::createStreamChannel();
             $streamChannel->setThumbnailCount(4);
             $streamChannelsNotDeleted[] = $streamChannel;
-            $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel);
+            $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel, null, 'tempFileName.mp4');
             $archivesNotDeleted[] = $archive;
             $filesNotDeleted = array_merge($filesNotDeleted, $this->_createArchiveFiles($archive));
         }
