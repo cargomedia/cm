@@ -23,9 +23,11 @@ class CM_MediaStreams_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function importArchive($streamChannelId, CM_File $archiveSource) {
         $streamChannelArchive = new CM_Model_StreamChannelArchive_Media($streamChannelId);
-        $archiveDestination = $streamChannelArchive->getFile();
+        $filename = $streamChannelArchive->getId() . '-' . $streamChannelArchive->getHash() . '-original' . $archiveSource->getExtension();
+        $archiveDestination = new CM_File_UserContent('streamChannels', $filename, $streamChannelArchive->getId());
         $archiveDestination->ensureParentDirectory();
         $archiveSource->copyToFile($archiveDestination);
+        $streamChannelArchive->setFile($archiveDestination);
     }
 
     public static function getPackageName() {

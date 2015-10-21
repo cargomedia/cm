@@ -17,11 +17,18 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     /**
+     * @param CM_File_UserContent $file
+     */
+    public function setFile(CM_File_UserContent $file) {
+        CM_Db_Db::update('cm_streamChannelArchive_media', ['file' => $file->getPath()], ['id' => $this->getId()]);
+        $this->_change();
+    }
+
+    /**
      * @return CM_File_UserContent
      */
     public function getFile() {
-        $filename = $this->getId() . '-' . $this->getHash() . '-original.mp4';
-        return new CM_File_UserContent('streamChannels', $filename, $this->getId());
+        return new CM_File_UserContent('streamChannels', $this->_get('file'), $this->getId());
     }
 
     /**
@@ -135,15 +142,18 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
         $streamPublish = $streamChannel->getStreamPublish();
         $createStamp = $streamPublish->getStart();
         $thumbnailCount = $streamChannel->getThumbnailCount();
+        $file = isset($data['file']) ? $data['file'] : null;
         $end = time();
         $duration = $end - $createStamp;
         CM_Db_Db::insert('cm_streamChannelArchive_media', array(
             'id'                => $streamChannel->getId(),
             'userId'            => $streamPublish->getUserId(),
             'duration'          => $duration,
-            'data'              => CM_Params::jsonEncode(['thumbnailCount' => $thumbnailCount]),
             'hash'              => $streamChannel->getHash(),
-            'streamChannelType' => $streamChannel->getType(), 'createStamp' => $createStamp,
+            'file'              => $file,
+            'streamChannelType' => $streamChannel->getType(),
+            'createStamp'       => $createStamp,
+            'data'              => CM_Params::jsonEncode(['thumbnailCount' => $thumbnailCount]),
         ));
         return new self($streamChannel->getId());
     }

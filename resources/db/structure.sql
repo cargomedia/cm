@@ -361,6 +361,7 @@ CREATE TABLE `cm_streamChannelArchive_media` (
   `duration` int(10) unsigned NOT NULL,
   `thumbnailCount` int(10) unsigned NOT NULL,
   `hash` char(32) NOT NULL,
+  `file` varchar(255) DEFAULT NULL,
   `streamChannelType` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   `data` varchar(255) NOT NULL DEFAULT '',
