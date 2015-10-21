@@ -23,7 +23,7 @@ class CM_MediaStreams_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function importArchive($streamChannelId, CM_File $archiveSource) {
         $streamChannelArchive = new CM_Model_StreamChannelArchive_Media($streamChannelId);
-        $archiveDestination = $streamChannelArchive->getVideo();
+        $archiveDestination = $streamChannelArchive->getFile();
         $archiveDestination->ensureParentDirectory();
         $archiveSource->copyToFile($archiveDestination);
     }

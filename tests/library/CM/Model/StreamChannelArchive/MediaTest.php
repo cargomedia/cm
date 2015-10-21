@@ -59,7 +59,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
 
     public function testGetVideo() {
         $archive = CMTest_TH::createStreamChannelVideoArchive();
-        $videoFile = $archive->getVideo();
+        $videoFile = $archive->getFile();
         $this->assertSame('streamChannels/' . $archive->getId() . '/' . $archive->getId() . '-' . $archive->getHash() .
             '-original.mp4', $videoFile->getPathRelative());
     }
@@ -204,7 +204,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
             $file->write('');
             $files[] = $file;
         }
-        $video = $archive->getVideo();
+        $video = $archive->getFile();
         $video->ensureParentDirectory();
         $video->write('');
         $files[] = $video;

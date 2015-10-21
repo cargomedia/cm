@@ -19,7 +19,7 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     /**
      * @return CM_File_UserContent
      */
-    public function getVideo() {
+    public function getFile() {
         $filename = $this->getId() . '-' . $this->getHash() . '-original.mp4';
         return new CM_File_UserContent('streamChannels', $filename, $this->getId());
     }
@@ -108,7 +108,7 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     protected function _onDeleteBefore() {
-        $this->getVideo()->delete();
+        $this->getFile()->delete();
 
         $thumbnailDir = new CM_File_UserContent('streamChannels', $this->getId() . '-' . $this->getHash() . '-thumbs/', $this->getId());
         $thumbnailDir->delete(true);
