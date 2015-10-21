@@ -45,7 +45,7 @@ class CM_Wowza_HttpApiClient {
      * @throws CM_Exception_Invalid
      */
     protected function _request($method, CM_Wowza_Server $server, $path, array $body = null) {
-        $url = 'http://' . $server->getPrivateHost() . $path;
+        $url = 'http://' . $server->getPrivateIp() . ':' . $server->getHttpPort() . $path;
         $options = ['body' => $body];
         $request = $this->_httpClient->createRequest($method, $url, $options);
         try {

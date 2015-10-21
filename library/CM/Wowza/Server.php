@@ -66,9 +66,9 @@ class CM_Wowza_Server {
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getPrivateHost() {
-        return $this->_privateIp . ':' . $this->_httpPort;
+    public function getHttpPort() {
+        return $this->_httpPort;
     }
 }
