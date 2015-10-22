@@ -34,7 +34,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
         $this->_registerClockworkCallbacks('10 seconds', array(
             'CM_Model_User::offlineDelayed' => function () {
                 CM_Model_User::offlineDelayed();
-            }
+            },
         ));
         $this->_registerClockworkCallbacks('1 minute', array(
             'CM_Model_User::offlineOld'                 => function () {
@@ -61,16 +61,22 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_Session::deleteExpired'                 => function () {
                 CM_Session::deleteExpired();
             },
-            'CM_Wowza_Service::synchronize'       => function () {
-                CM_Service_Manager::getInstance()->getWowza()->synchronize();
-            },
-            'CM_Wowza_Service::checkStreams'      => function () {
-                CM_Service_Manager::getInstance()->getWowza()->checkStreams();
-            },
             'CM_MessageStream_Service::synchronize'     => function () {
                 CM_Service_Manager::getInstance()->getStreamMessage()->synchronize();
-            }
+            },
         ));
+
+        if ($this->getServiceManager()->has('wowza')) {
+            $this->_registerClockworkCallbacks('1 minute', array(
+                'CM_Wowza_Service::synchronize'  => function () {
+                    $this->getServiceManager()->getWowza('wowza')->synchronize();
+                },
+                'CM_Wowza_Service::checkStreams' => function () {
+                    $this->getServiceManager()->getWowza('wowza')->checkStreams();
+                },
+            ));
+        }
+
         $this->_registerClockworkCallbacks('15 minutes', array(
             'CM_Mail::processQueue'                         => function () {
                 CM_Mail::processQueue(500);
@@ -87,7 +93,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                     $log = new $logClass();
                     $log->cleanUp();
                 }
-            }
+            },
         ));
         if ($this->getServiceManager()->has('maxmind')) {
             $this->_registerClockworkCallbacks('8 days', array(
@@ -107,7 +113,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                         $exception->setSeverity(CM_Exception::FATAL);
                         throw $exception;
                     }
-                }
+                },
             ));
         }
     }
@@ -129,7 +135,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param string    $dateTimeString
+     * @param string $dateTimeString
      * @param Closure[] $callbacks
      */
     protected function _registerClockworkCallbacks($dateTimeString, $callbacks) {
