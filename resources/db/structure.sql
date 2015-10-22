@@ -352,36 +352,35 @@ CREATE TABLE `cm_streamChannel` (
   KEY `type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_streamChannelArchive_video`;
+DROP TABLE IF EXISTS `cm_streamChannelArchive_media`;
 
 
-CREATE TABLE `cm_streamChannelArchive_video` (
+CREATE TABLE `cm_streamChannelArchive_media` (
   `id` int(10) unsigned NOT NULL,
   `userId` int(10) unsigned DEFAULT NULL,
-  `width` int(10) unsigned NOT NULL,
-  `height` int(10) unsigned NOT NULL,
   `duration` int(10) unsigned NOT NULL,
   `thumbnailCount` int(10) unsigned NOT NULL,
   `hash` char(32) NOT NULL,
+  `file` varchar(255) DEFAULT NULL,
   `streamChannelType` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
+  `data` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `userId` (`userId`),
   KEY `createStamp` (`createStamp`),
   KEY `streamChannelType` (`streamChannelType`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_streamChannel_video`;
+DROP TABLE IF EXISTS `cm_streamChannel_media`;
 
 
-CREATE TABLE `cm_streamChannel_video` (
+CREATE TABLE `cm_streamChannel_media` (
   `id` int(10) unsigned NOT NULL,
-  `width` int(10) unsigned NOT NULL,
-  `height` int(10) unsigned NOT NULL,
   `thumbnailCount` int(10) unsigned NOT NULL DEFAULT '0',
   `serverId` int(10) unsigned NOT NULL,
+  `data` varchar(255) not null default '',
   PRIMARY KEY (`id`),
-  CONSTRAINT `cm_streamChannel_video-cm_streamChannel` FOREIGN KEY (`id`) REFERENCES `cm_streamChannel` (`id`)
+  CONSTRAINT `cm_streamChannel_media-cm_streamChannel` FOREIGN KEY (`id`) REFERENCES `cm_streamChannel` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_stream_publish`;

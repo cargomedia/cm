@@ -28,6 +28,16 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
+     * @param mixed $object
+     * @param string $methodName
+     * @param array|null $arguments
+     * @return mixed
+     */
+    public function callProtectedMethod($object, $methodName, array $arguments = null) {
+        return CMTest_TH::callProtectedMethod($object, $methodName, $arguments);
+    }
+
+    /**
      * @return CM_Form_Abstract
      */
     public function getMockForm() {
@@ -38,9 +48,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param string|null $classname
-     * @param int|null    $type
-     * @param array|null  $configuration
-     * @param array|null  $methods
+     * @param int|null $type
+     * @param array|null $configuration
+     * @param array|null $methods
      * @throws CM_Exception_Invalid
      * @return CM_Site_Abstract|PHPUnit_Framework_MockObject_MockObject
      */
@@ -83,9 +93,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param string                        $url
-     * @param array|null                    $query
-     * @param array|null                    $headers
+     * @param string $url
+     * @param array|null $query
+     * @param array|null $headers
      * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
      * @return CM_Http_Request_Post|\Mocka\AbstractClassTrait
@@ -131,8 +141,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param CM_FormAction_Abstract        $action
-     * @param array|null                    $data
+     * @param CM_FormAction_Abstract $action
+     * @param array|null $data
      * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
      * @throws CM_Exception_Invalid
@@ -159,9 +169,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param CM_View_Abstract              $view
-     * @param string                        $methodName
-     * @param array|null                    $params
+     * @param CM_View_Abstract $view
+     * @param string $methodName
+     * @param array|null $params
      * @param CM_Frontend_ViewResponse|null $viewResponse
      * @param CM_Frontend_ViewResponse|null $componentResponse
      * @throws CM_Exception_Invalid
@@ -227,9 +237,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param CM_View_Abstract             $view
-     * @param string                       $methodName
-     * @param array|null                   $params
+     * @param CM_View_Abstract $view
+     * @param string $methodName
+     * @param array|null $params
      * @param CM_Frontend_Environment|null $environment
      * @return CM_Http_Response_View_Ajax
      */
@@ -244,8 +254,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param CM_FormAction_Abstract   $action
-     * @param array                    $data
+     * @param CM_FormAction_Abstract $action
+     * @param array $data
      * @param CM_Frontend_ViewResponse $scopeComponent
      * @return CM_Http_Response_View_Form
      */
@@ -256,8 +266,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param object|string $objectOrClass
-     * @param string        $methodName
-     * @param array|null    $arguments
+     * @param string $methodName
+     * @param array|null $arguments
      * @return mixed
      */
     public function forceInvokeMethod($objectOrClass, $methodName, array $arguments = null) {
@@ -273,7 +283,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param string     $pageClass
+     * @param string $pageClass
      * @param array|null $params
      * @return CM_Page_Abstract
      */
@@ -283,7 +293,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param CM_Component_Abstract $component
-     * @param CM_Model_User|null    $viewer
+     * @param CM_Model_User|null $viewer
      * @param CM_Site_Abstract|null $site
      * @return CM_Dom_NodeList
      */
@@ -295,8 +305,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param CM_FormField_Abstract   $formField
-     * @param array|null              $renderParams
+     * @param CM_FormField_Abstract $formField
+     * @param array|null $renderParams
      * @param CM_Frontend_Render|null $render
      * @return CM_Dom_NodeList
      */
@@ -310,8 +320,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param CM_Page_Abstract      $page
-     * @param CM_Model_User|null    $viewer
+     * @param CM_Page_Abstract $page
+     * @param CM_Model_User|null $viewer
      * @param CM_Site_Abstract|null $site
      * @return CM_Dom_NodeList
      */
@@ -330,7 +340,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param CM_Model_Abstract $model
-     * @param string|null       $message
+     * @param string|null $message
      */
     public static function assertModelInstantiable(CM_Model_Abstract $model, $message = null) {
         $message = null !== $message ? (string) $message : 'Model cannot be instantiated';
@@ -344,7 +354,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param CM_Model_Abstract $model
-     * @param string|null       $message
+     * @param string|null $message
      */
     public static function assertModelNotInstantiable(CM_Model_Abstract $model, $message = null) {
         $message = null !== $message ? (string) $message : 'Model can be instantiated';
@@ -358,7 +368,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param CM_Http_Response_View_Abstract $response
-     * @param array|null                     $data
+     * @param array|null $data
      */
     public static function assertViewResponseSuccess(CM_Http_Response_View_Abstract $response, array $data = null) {
         $responseContent = json_decode($response->getContent(), true);
@@ -370,9 +380,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param CM_Http_Response_View_Abstract $response
-     * @param string|null                    $type
-     * @param string|null                    $message
-     * @param boolean|null                   $isPublic
+     * @param string|null $type
+     * @param string|null $message
+     * @param boolean|null $isPublic
      */
     public static function assertViewResponseError(CM_Http_Response_View_Abstract $response, $type = null, $message = null, $isPublic = null) {
         $responseContent = json_decode($response->getContent(), true);
@@ -404,7 +414,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param CM_Component_Abstract $cmp
-     * @param CM_Model_User|null    $viewer
+     * @param CM_Model_User|null $viewer
      */
     public static function assertComponentAccessible(CM_Component_Abstract $cmp, CM_Model_User $viewer = null) {
         $environment = new CM_Frontend_Environment(null, $viewer);
@@ -420,8 +430,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param CM_Component_Abstract $cmp
-     * @param CM_Model_User|null    $viewer
-     * @param string|null           $expectedExceptionClass
+     * @param CM_Model_User|null $viewer
+     * @param string|null $expectedExceptionClass
      */
     public static function assertComponentNotAccessible(CM_Component_Abstract $cmp, CM_Model_User $viewer = null, $expectedExceptionClass = null) {
         $environment = new CM_Frontend_Environment(null, $viewer);
@@ -443,8 +453,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param CM_Component_Abstract $component
-     * @param CM_Model_User|null    $viewer
-     * @param string|null           $expectedExceptionClass
+     * @param CM_Model_User|null $viewer
+     * @param string|null $expectedExceptionClass
      */
     public function assertComponentNotRenderable(CM_Component_Abstract $component, CM_Model_User $viewer = null, $expectedExceptionClass = null) {
         if (null === $expectedExceptionClass) {
@@ -458,11 +468,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param mixed|CM_Comparable $needle
-     * @param Traversable|string  $haystack
-     * @param string              $message
-     * @param boolean             $ignoreCase
-     * @param boolean             $checkForObjectIdentity
-     * @param bool                $checkForNonObjectIdentity
+     * @param Traversable|string $haystack
+     * @param string $message
+     * @param boolean $ignoreCase
+     * @param boolean $checkForObjectIdentity
+     * @param bool $checkForNonObjectIdentity
      * @throws CM_Exception_Invalid
      */
     public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
@@ -485,11 +495,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param mixed|CM_Comparable $needle
-     * @param mixed|Traversable   $haystack
-     * @param string              $message
-     * @param boolean             $ignoreCase
-     * @param boolean             $checkForObjectIdentity
-     * @param bool                $checkForNonObjectIdentity
+     * @param mixed|Traversable $haystack
+     * @param string $message
+     * @param boolean $ignoreCase
+     * @param boolean $checkForObjectIdentity
+     * @param bool $checkForNonObjectIdentity
      * @throws CM_Exception_Invalid
      */
     public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
@@ -562,7 +572,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param CM_Http_Response_View_Form $response
-     * @param string|null                $msg
+     * @param string|null $msg
      */
     public static function assertFormResponseSuccess(CM_Http_Response_View_Form $response, $msg = null) {
         self::assertViewResponseSuccess($response);
@@ -576,8 +586,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param CM_Http_Response_View_Form $response
-     * @param string|null                $errorMsg
-     * @param string|null                $formFieldName
+     * @param string|null $errorMsg
+     * @param string|null $formFieldName
      */
     public static function assertFormResponseError(CM_Http_Response_View_Form $response, $errorMsg = null, $formFieldName = null) {
         self::assertViewResponseSuccess($response);
@@ -596,7 +606,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param CM_Dom_NodeList $html
-     * @param string          $css
+     * @param string $css
      */
     public static function assertHtmlExists(CM_Dom_NodeList $html, $css) {
         self::assertTrue($html->has($css), 'HTML does not contain `' . $css . '`.');
@@ -610,8 +620,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param CM_Page_Abstract   $page
-     * @param string|null        $expectedExceptionClass
+     * @param CM_Page_Abstract $page
+     * @param string|null $expectedExceptionClass
      * @param CM_Model_User|null $viewer
      */
     public function assertPageNotRenderable(CM_Page_Abstract $page, $expectedExceptionClass = null, CM_Model_User $viewer = null) {
@@ -628,9 +638,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     /**
      * @deprecated Usually checking DB rows is not desired, rather test the public interface
      *
-     * @param string            $table
+     * @param string $table
      * @param array|string|null $where WHERE conditions: ('attr' => 'value', 'attr2' => 'value')
-     * @param int|null          $rowCount
+     * @param int|null $rowCount
      */
     public static function assertRow($table, $where = null, $rowCount = null) {
         if (null === $rowCount) {
@@ -644,7 +654,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     /**
      * @deprecated Usually checking DB rows is not desired, rather test the public interface
      *
-     * @param string            $table
+     * @param string $table
      * @param array|string|null $where
      */
     public static function assertNotRow($table, $where = null) {
@@ -665,7 +675,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     /**
      * @param CM_Dom_NodeList $page
-     * @param bool            $warnings
+     * @param bool $warnings
      */
     public static function assertTidy(CM_Dom_NodeList $page, $warnings = true) {
         if (!extension_loaded('tidy')) {
