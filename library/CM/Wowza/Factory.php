@@ -15,7 +15,7 @@ class CM_Wowza_Factory {
                 $serverConfig['publicIp'],
                 $serverConfig['privateIp'],
                 $serverConfig['httpPort'],
-                $serverConfig['wowzaHost']
+                $serverConfig['wowzaPort']
             ));
         }
 
