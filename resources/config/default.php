@@ -233,25 +233,6 @@ return function (CM_Config_Node $config) {
         'arguments' => array(),
     );
 
-    $config->services['wowza'] = array(
-        'class'  => 'CM_Wowza_Factory',
-        'method' => array(
-            'name'      => 'createService',
-            'arguments' => array(
-
-                'servers' => array(
-                    [
-                        'publicHost'   => 'localhost',
-                        'publicIp'     => '127.0.0.1',
-                        'privateIp'    => '127.0.0.1',
-                        'httpPort'     => '8086',
-                        'wowzaPort'    => '1935',
-                    ],
-                ),
-            ),
-        ),
-    );
-
     $config->services['newrelic'] = array(
         'class'     => 'CMService_Newrelic',
         'arguments' => array(

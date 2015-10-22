@@ -62,10 +62,16 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 CM_Session::deleteExpired();
             },
             'CM_Wowza_Service::synchronize'       => function () {
-                CM_Service_Manager::getInstance()->getWowza()->synchronize();
+                $serviceManager = CM_Service_Manager::getInstance();
+                if ($serviceManager->has('wowza')) {
+                    $serviceManager->getWowza('wowza')->synchronize();
+                }
             },
             'CM_Wowza_Service::checkStreams'      => function () {
-                CM_Service_Manager::getInstance()->getWowza()->checkStreams();
+                $serviceManager = CM_Service_Manager::getInstance();
+                if ($serviceManager->has('wowza')) {
+                    $serviceManager->getWowza('wowza')->checkStreams();
+                }
             },
             'CM_MessageStream_Service::synchronize'     => function () {
                 CM_Service_Manager::getInstance()->getStreamMessage()->synchronize();

@@ -190,10 +190,12 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @param string $serviceName
      * @return CM_Wowza_Service
+     * @throws CM_Exception_Invalid
      */
-    public function getWowza() {
-        return $this->get('wowza', 'CM_Wowza_Service');
+    public function getWowza($serviceName) {
+        return $this->get($serviceName, 'CM_Wowza_Service');
     }
 
     /**
