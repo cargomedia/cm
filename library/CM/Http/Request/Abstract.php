@@ -44,7 +44,7 @@ abstract class CM_Http_Request_Abstract {
      * @param array|null         $server
      * @param CM_Model_User|null $viewer
      */
-    public function __construct($uri, array $headers = null, array $server = null, CM_Model_User $viewer = null) {
+    public function __construct($uri, array $headers = null, array $server = null) {
         if (null !== $headers) {
             $this->_headers = array_change_key_case($headers);
         }
@@ -55,13 +55,7 @@ abstract class CM_Http_Request_Abstract {
         $this->setUri($uri);
 
         if ($sessionId = $this->getCookie('sessionId')) {
-            if ($this->_session = CM_Session::findById($sessionId)) {
-                $this->_session->start();
-            }
-        }
-
-        if ($viewer) {
-            $this->_viewer = $viewer;
+            $this->setSession(CM_Session::findById($sessionId));
         }
 
         self::$_instance = $this;
@@ -306,6 +300,17 @@ abstract class CM_Http_Request_Abstract {
             $this->_session->start();
         }
         return $this->_session;
+    }
+
+    /**
+     * @param CM_Session|null $session
+     */
+    public function setSession(CM_Session $session = null) {
+        if (null !== $session) {
+            $session->start();
+        }
+        $this->_session = $session;
+        $this->resetViewer();
     }
 
     /**
