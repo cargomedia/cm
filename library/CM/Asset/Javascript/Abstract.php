@@ -40,6 +40,10 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
      * @return string
      */
     protected function _browserify(array $mainPaths, $rootPath, $debug = null) {
+        if(!count($mainPaths)) {
+            return '';
+        }
+
         $content = array_reduce(CM_Util::rglob('*.js', $rootPath), function ($carry, $item) {
             return $carry . (new CM_File($item))->read();
         }, '');
