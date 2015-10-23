@@ -26,7 +26,8 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
         if (null === $lifetime) {
             $lifetime = static::_getConfig()->lifetime;
         }
-        $this->_lifetime = (int) $lifetime;
+
+        $this->_lifetime = $lifetime ? (int) $lifetime : null;
     }
 
     /**

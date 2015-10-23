@@ -16,9 +16,8 @@ class CM_Asset_Javascript_VendorBeforeBody extends CM_Asset_Javascript_Abstract 
             }
 
             $sourcePath = DIR_ROOT . CM_Bootloader::getInstance()->getModulePath($moduleName) . 'client-vendor/before-body-source/';
-            foreach (glob($sourcePath . '*/main.js') as $path) {
-                $content .= $this->_browserify($path, $generateSourceMap) . ';' . PHP_EOL;
-            }
+            $sourceMainPaths = glob($sourcePath . '*/main.js');
+            $content .= $this->_browserify($sourceMainPaths, $sourcePath, $generateSourceMap) . ';' . PHP_EOL;
         }
         $this->_content = $content;
     }

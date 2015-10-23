@@ -34,24 +34,24 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
     }
 
     /**
-     * @param string       $mainPath
+     * @param string[]     $mainPaths
+     * @param string       $rootPath
      * @param boolean|null $debug
      * @return string
      */
-    protected function _browserify($mainPath, $debug = null) {
-        $directoryPath = dirname($mainPath);
-        $content = array_reduce(CM_Util::rglob('*.js', $directoryPath), function ($carry, $item) {
-            return $carry . $item;
+    protected function _browserify(array $mainPaths, $rootPath, $debug = null) {
+        $content = array_reduce(CM_Util::rglob('*.js', $rootPath), function ($carry, $item) {
+            return $carry . (new CM_File($item))->read();
         }, '');
-        $cacheKey = __METHOD__ . '_dir:' . $directoryPath . '_md5:' . md5($content) . '_debug:' . $debug;
+
+        $cacheKey = __METHOD__ . '_dir:' . $rootPath . '_md5:' . md5($content) . '_debug:' . $debug;
         $cache = CM_Cache_Persistent::getInstance();
-        return $cache->get($cacheKey, function () use ($mainPath, $directoryPath, $debug) {
-            $args = [];
+        return $cache->get($cacheKey, function () use ($mainPaths, $rootPath, $debug) {
+            $args = $mainPaths;
             if ($debug) {
                 $args[] = '--debug';
             }
-            $args[] = $mainPath;
-            return CM_Util::exec('browserify', $args, null, null, ['NODE_PATH' => $directoryPath]);
+            return CM_Util::exec('browserify', $args, null, null, ['NODE_PATH' => $rootPath]);
         });
     }
 }
