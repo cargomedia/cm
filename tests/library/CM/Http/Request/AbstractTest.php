@@ -32,6 +32,14 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertEquals($user, $mock->getViewer(true));
     }
 
+    public function testGetViewerDoesntCreateSession() {
+        $request = new CM_Http_Request_Get('/');
+        $this->assertFalse($request->hasSession());
+
+        $request->getViewer();
+        $this->assertFalse($request->hasSession());
+    }
+
     public function testGetCookie() {
         $uri = '/';
         $headers = array('Host'   => 'example.ch', 'Connection' => 'keep-alive',

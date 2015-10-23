@@ -335,14 +335,15 @@ abstract class CM_Http_Request_Abstract {
      * @throws CM_Exception_AuthRequired
      */
     public function getViewer($needed = false) {
-        if ($this->_viewer === false) {
-            $this->_viewer = $this->getSession()->getUser();
-        }
-        if (!$this->_viewer) {
-            if ($needed) {
-                throw new CM_Exception_AuthRequired();
+        if (false === $this->_viewer) {
+            $this->_viewer = null;
+            if ($this->hasSession()) {
+                $this->_viewer = $this->getSession()->getUser();
             }
-            return null;
+        }
+
+        if ($needed && null === $this->_viewer) {
+            throw new CM_Exception_AuthRequired();
         }
         return $this->_viewer;
     }
