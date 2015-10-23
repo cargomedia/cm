@@ -34,14 +34,16 @@ class CM_App implements CM_Service_ManagerAwareInterface {
     }
 
     public function fillCaches() {
+        $debug = CM_Bootloader::getInstance()->isDebug();
+
         /** @var CM_Asset_Javascript_Abstract[] $assetList */
         $assetList = array();
         $languageList = new CM_Paging_Language_Enabled();
         foreach (CM_Site_Abstract::getAll() as $site) {
             $assetList[] = new CM_Asset_Javascript_Internal($site);
             $assetList[] = new CM_Asset_Javascript_Library($site);
-            $assetList[] = new CM_Asset_Javascript_VendorAfterBody($site);
-            $assetList[] = new CM_Asset_Javascript_VendorBeforeBody($site);
+            $assetList[] = new CM_Asset_Javascript_VendorAfterBody($site, $debug);
+            $assetList[] = new CM_Asset_Javascript_VendorBeforeBody($site, $debug);
             foreach ($languageList as $language) {
                 $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, null, $language));
                 $assetList[] = new CM_Asset_Css_Vendor($render);
@@ -52,7 +54,7 @@ class CM_App implements CM_Service_ManagerAwareInterface {
             $assetList[] = new CM_Asset_Javascript_Translations($language);
         }
         foreach ($assetList as $asset) {
-            $asset->get(true);
+            $asset->get(!$debug);
         }
         CM_Bootloader::getInstance()->getModules();
     }
@@ -108,7 +110,7 @@ class CM_App implements CM_Service_ManagerAwareInterface {
 
     /**
      * @param Closure|null $callbackBefore fn($version)
-     * @param Closure|null $callbackAfter fn($version)
+     * @param Closure|null $callbackAfter  fn($version)
      * @return int Number of version bumps
      */
     public function runUpdateScripts(Closure $callbackBefore = null, Closure $callbackAfter = null) {

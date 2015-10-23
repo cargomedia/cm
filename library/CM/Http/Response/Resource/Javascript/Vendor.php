@@ -3,12 +3,14 @@
 class CM_Http_Response_Resource_Javascript_Vendor extends CM_Http_Response_Resource_Javascript_Abstract {
 
     protected function _process() {
+        $debug = CM_Bootloader::getInstance()->isDebug();
+
         switch ($this->getRequest()->getPath()) {
             case '/before-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_VendorBeforeBody($this->getSite()));
+                $this->_setAsset(new CM_Asset_Javascript_VendorBeforeBody($this->getSite(), $debug));
                 break;
             case '/after-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_VendorAfterBody($this->getSite()));
+                $this->_setAsset(new CM_Asset_Javascript_VendorAfterBody($this->getSite(), $debug));
                 break;
             default:
                 throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', CM_Exception::WARN);
