@@ -79,4 +79,23 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
             $this->assertContains('Site with type `9999` not configured', $ex->getMessage());
         }
     }
+
+    public function testEquals() {
+        $siteFoo = $this->mockClass('CM_Site_Abstract');
+        /** @var CM_Site_Abstract $siteFoo1 */
+        $siteFoo1 = $siteFoo->newInstance();
+        /** @var CM_Site_Abstract $siteFoo2 */
+        $siteFoo2 = $siteFoo->newInstance();
+
+        $siteBar = $this->mockClass('CM_Site_Abstract');
+        /** @var CM_Site_Abstract $siteBar1 */
+        $siteBar1 = $siteBar->newInstance();
+
+        $this->assertSame(true, $siteFoo2->equals($siteFoo1));
+        $this->assertSame(true, $siteFoo1->equals($siteFoo2));
+        $this->assertSame(false, $siteFoo1->equals(null));
+
+        $this->assertSame(false, $siteFoo1->equals($siteBar1));
+        $this->assertSame(false, $siteBar1->equals($siteFoo1));
+    }
 }
