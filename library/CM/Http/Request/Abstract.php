@@ -43,8 +43,10 @@ abstract class CM_Http_Request_Abstract {
      * @param array|null         $headers OPTIONAL
      * @param array|null         $server
      * @param CM_Model_User|null $viewer
+     * @throws CM_Exception
+     * @throws CM_Exception_Invalid
      */
-    public function __construct($uri, array $headers = null, array $server = null) {
+    public function __construct($uri, array $headers = null, array $server = null, CM_Model_User $viewer = null) {
         if (null !== $headers) {
             $this->_headers = array_change_key_case($headers);
         }
@@ -56,6 +58,10 @@ abstract class CM_Http_Request_Abstract {
 
         if ($sessionId = $this->getCookie('sessionId')) {
             $this->setSession(CM_Session::findById($sessionId));
+        }
+
+        if ($viewer) {
+            $this->_viewer = $viewer;
         }
 
         self::$_instance = $this;
