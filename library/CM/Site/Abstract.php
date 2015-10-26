@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed {
+abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed, CM_Comparable {
 
     /** @var string[] */
     protected $_themes = array();
@@ -179,6 +179,14 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         $urlRequest = $request->getHost();
         $urlSite = $this->getHost();
         return 0 === strpos(preg_replace('/^www\./', '', $urlRequest), preg_replace('/^www\./', '', $urlSite));
+    }
+
+    /**
+     * @param CM_Site_Abstract $other
+     * @return boolean
+     */
+    public function equals(CM_Comparable $other = null) {
+        return $other && (get_class($other) === get_class($this));
     }
 
     /**
