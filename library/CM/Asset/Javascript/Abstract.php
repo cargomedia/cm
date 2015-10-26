@@ -40,7 +40,7 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
      * @return string
      */
     protected function _browserify(array $mainPaths, $rootPath, $debug = null) {
-        if(!count($mainPaths)) {
+        if (!count($mainPaths)) {
             return '';
         }
 

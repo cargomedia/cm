@@ -8,17 +8,23 @@ class CM_Asset_Javascript_VendorAfterBody extends CM_Asset_Javascript_Abstract {
      */
     public function __construct(CM_Site_Abstract $site, $generateSourceMap = null) {
         $generateSourceMap = (bool) $generateSourceMap;
-        $content = '';
+        $jsContainer = new CM_Frontend_JavascriptContainer();
+
         foreach (array_reverse($site->getModules()) as $moduleName) {
-            $libraryPath = DIR_ROOT . CM_Bootloader::getInstance()->getModulePath($moduleName) . 'client-vendor/after-body/';
-            foreach (CM_Util::rglob('*.js', $libraryPath) as $path) {
-                $content .= (new CM_File($path))->read() . ';' . PHP_EOL;
+            $initPath = DIR_ROOT . CM_Bootloader::getInstance()->getModulePath($moduleName) . 'client-vendor/after-body/';
+            foreach (CM_Util::rglob('*.js', $initPath) as $path) {
+                $content = (new CM_File($path))->read();
+                $jsContainer->append($content);
             }
 
             $sourcePath = DIR_ROOT . CM_Bootloader::getInstance()->getModulePath($moduleName) . 'client-vendor/after-body-source/';
             $sourceMainPaths = glob($sourcePath . '*/main.js');
-            $content .= $this->_browserify($sourceMainPaths, $sourcePath, $generateSourceMap) . ';' . PHP_EOL;
+            if (count($sourceMainPaths)) {
+                $content = $this->_browserify($sourceMainPaths, $sourcePath, $generateSourceMap);
+                $jsContainer->append($content);
+            }
         }
-        $this->_content = $content;
+
+        $this->_content = $jsContainer->compile();
     }
 }
