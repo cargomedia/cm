@@ -4,35 +4,33 @@ class CM_Http_Response_Resource_Javascript_Vendor extends CM_Http_Response_Resou
 
     protected function _process() {
         $debug = CM_Bootloader::getInstance()->isDebug();
-        $path = $this->getRequest()->getPath();
-
         $asset = new CM_Asset_Javascript_Vendor($this->getSite());
-        $matches = [];
 
-        if($path == '/before-body.js') {
-            $asset->compileJsForAllModules('client-vendor/before-body/');
-            $asset->browserifyJsForAllModules('client-vendor/before-body-source/');
-        }
-        else if($path == '/after-body.js'){
-            $asset->compileJsForAllModules('client-vendor/after-body/');
-            $asset->browserifyJsForAllModules('client-vendor/after-body-source/');
-        }
-        else if($path == '/common-before-body.js'){
-            $asset->compileJsForAllModules('client-vendor/before-body/');
-        }
-        else if($path == '/common-after-body.js'){
-            $asset->compileJsForAllModules('client-vendor/after-body/');
-        }
-        else if(preg_match('/^\/([^-]+)-before-body.js$/', $path, $matches)){
-            $module = $matches[1];
-            $asset->browserifyJs($module, 'client-vendor/before-body-source/', $debug);
-        }
-        else if(preg_match('/^\/([^-]+)-after-body.js$/', $path, $matches)){
-            $module = $matches[1];
-            $asset->browserifyJs($module, 'client-vendor/after-body-source/', $debug);
-        }
-        else {
-            throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', CM_Exception::WARN);
+        switch ($this->getRequest()->getPath()) {
+
+            case '/before-body.js':
+                $asset->mergeJs('client-vendor/before-body/');
+                $asset->browserifyJs('client-vendor/before-body-source/');
+                break;
+            case '/after-body.js':
+                $asset->mergeJs('client-vendor/after-body/');
+                $asset->browserifyJs('client-vendor/after-body-source/');
+                break;
+
+            case '/merged-before-body.js':
+                $asset->mergeJs('client-vendor/before-body/');
+                break;
+            case '/merged-after-body.js':
+                $asset->mergeJs('client-vendor/after-body/');
+                break;
+            case '/source-before-body.js':
+                $asset->browserifyJs('client-vendor/before-body-source/', $debug);
+                break;
+            case '/source-after-body.js':
+                $asset->browserifyJs('client-vendor/after-body-source/', $debug);
+                break;
+            default:
+                throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', CM_Exception::WARN);
         }
 
         $this->_setAsset($asset);

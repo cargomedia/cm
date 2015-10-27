@@ -24,7 +24,7 @@ class CM_Asset_Javascript_Vendor extends CM_Asset_Javascript_Abstract {
     /**
      * @param {string} $path
      */
-    public function compileJsForAllModules($path) {
+    public function mergeJs($path) {
         foreach (array_reverse($this->_site->getModules()) as $moduleName) {
             $initPath = $this->_buildPath($moduleName, $path);
             foreach (CM_Util::rglob('*.js', $initPath) as $filePath) {
@@ -35,25 +35,22 @@ class CM_Asset_Javascript_Vendor extends CM_Asset_Javascript_Abstract {
     }
 
     /**
-     * @param {string} $path
+     * @param {string}  $path
+     * @param {bool}    $generateSourceMap
      */
-    public function browserifyJsForAllModules($path) {
-        foreach (array_reverse($this->_site->getModules()) as $moduleName) {
-            $this->browserifyJs($moduleName, $path, false);
-        }
-    }
-
-    /**
-     * @param {string} $path
-     */
-    public function browserifyJs($moduleName, $path, $generateSourceMap = null) {
+    public function browserifyJs($path, $generateSourceMap = null) {
         $generateSourceMap = (bool) $generateSourceMap;
-        $sourcePath = $this->_buildPath($moduleName, $path);
-        $sourceMainPaths = glob($sourcePath . '*/main.js');
-        if (count($sourceMainPaths)) {
-            $content = $this->_browserify($sourceMainPaths, $sourcePath, $generateSourceMap);
-            $this->_jsContainer->append($content);
+        $sourceMainPaths = [];
+        $sourcePaths = [];
+
+        foreach (array_reverse($this->_site->getModules()) as $moduleName) {
+            $sourcePath = $this->_buildPath($moduleName, $path);
+            $sourcePaths[] = $sourcePath;
+            $sourceMainPaths = array_merge($sourceMainPaths, glob($sourcePath . '*/main.js'));
         }
+
+        $content = $this->_browserify($sourceMainPaths, $sourcePaths, $generateSourceMap);
+        $this->_jsContainer->append($content);
     }
 
     /**
