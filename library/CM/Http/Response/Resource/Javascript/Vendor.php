@@ -8,23 +8,23 @@ class CM_Http_Response_Resource_Javascript_Vendor extends CM_Http_Response_Resou
 
         switch ($this->getRequest()->getPath()) {
             case '/before-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_VendorBeforeBody($site));
+                $this->_setAsset(new CM_Asset_Javascript_Vendor_BeforeBody($site));
                 break;
             case '/after-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_VendorAfterBody($site));
+                $this->_setAsset(new CM_Asset_Javascript_Vendor_AfterBody($site));
                 break;
 
             case '/dist-before-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_VendorBeforeBody($site, 'dist', $debug));
+                $this->_setAsset(new CM_Asset_Javascript_Vendor_BeforeBody($site, 'dist', $debug));
                 break;
             case '/dist-after-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_VendorAfterBody($site, 'dist', $debug));
+                $this->_setAsset(new CM_Asset_Javascript_Vendor_AfterBody($site, 'dist', $debug));
                 break;
             case '/source-before-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_VendorBeforeBody($site, 'source', $debug));
+                $this->_setAsset(new CM_Asset_Javascript_Vendor_BeforeBody($site, 'source', $debug));
                 break;
             case '/source-after-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_VendorAfterBody($site, 'source', $debug));
+                $this->_setAsset(new CM_Asset_Javascript_Vendor_AfterBody($site, 'source', $debug));
                 break;
             default:
                 throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', CM_Exception::WARN);

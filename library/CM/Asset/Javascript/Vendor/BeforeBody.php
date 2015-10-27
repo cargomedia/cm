@@ -1,6 +1,6 @@
 <?php
 
-class CM_Asset_Javascript_VendorBeforeBody extends CM_Asset_Javascript_Vendor {
+class CM_Asset_Javascript_Vendor_BeforeBody extends CM_Asset_Javascript_Vendor_Abstract {
 
     protected function _getDistPath() {
         return 'client-vendor/before-body/';

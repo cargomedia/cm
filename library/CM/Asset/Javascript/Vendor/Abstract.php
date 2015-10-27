@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Asset_Javascript_Vendor extends CM_Asset_Javascript_Abstract {
+abstract class CM_Asset_Javascript_Vendor_Abstract extends CM_Asset_Javascript_Abstract {
 
     /** @var CM_Site_Abstract */
     protected $_site;
@@ -28,8 +28,8 @@ abstract class CM_Asset_Javascript_Vendor extends CM_Asset_Javascript_Abstract {
     }
 
     /**
-     * @param string $type
-     * @param bool   $generateSourceMaps
+     * @param string|null $type
+     * @param bool        $generateSourceMaps
      */
     protected function _process($type, $generateSourceMaps) {
         if ('source' != $type) {

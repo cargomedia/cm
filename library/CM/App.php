@@ -42,8 +42,8 @@ class CM_App implements CM_Service_ManagerAwareInterface {
         foreach (CM_Site_Abstract::getAll() as $site) {
             $assetList[] = new CM_Asset_Javascript_Internal($site);
             $assetList[] = new CM_Asset_Javascript_Library($site);
-            $assetList[] = new CM_Asset_Javascript_VendorBeforeBody($site);
-            $assetList[] = new CM_Asset_Javascript_VendorAfterBody($site);
+            $assetList[] = new CM_Asset_Javascript_Vendor_BeforeBody($site);
+            $assetList[] = new CM_Asset_Javascript_Vendor_AfterBody($site);
             foreach ($languageList as $language) {
                 $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, null, $language));
                 $assetList[] = new CM_Asset_Css_Vendor($render);
