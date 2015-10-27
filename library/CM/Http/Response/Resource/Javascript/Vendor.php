@@ -7,11 +7,18 @@ class CM_Http_Response_Resource_Javascript_Vendor extends CM_Http_Response_Resou
 
         switch ($this->getRequest()->getPath()) {
             case '/before-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_VendorBeforeBody($this->getSite(), $debug));
+                $this->_setAsset(new CM_Asset_Javascript_Vendor($this->getSite(), 'client-vendor/before-body/'));
                 break;
             case '/after-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_VendorAfterBody($this->getSite(), $debug));
+                $this->_setAsset(new CM_Asset_Javascript_Vendor($this->getSite(), 'client-vendor/after-body/'));
                 break;
+            case '/before-body-source.js':
+                $this->_setAsset(new CM_Asset_Javascript_VendorSource($this->getSite(), 'client-vendor/before-body-source/', $debug));
+                break;
+            case '/after-body-source.js':
+                $this->_setAsset(new CM_Asset_Javascript_VendorSource($this->getSite(), 'client-vendor/after-body-source/', $debug));
+                break;
+
             default:
                 throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', CM_Exception::WARN);
         }
