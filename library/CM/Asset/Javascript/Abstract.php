@@ -46,7 +46,7 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
 
         $content = \Functional\reduce_left($rootPaths, function ($rootPath, $index, $collection, $carry) {
             return $carry . \Functional\reduce_left(CM_Util::rglob('*.js', $rootPath), function ($filePath, $index, $collection, $carry) {
-                return $carry . (new CM_File($filePath))->read();
+                return $carry . md5((new CM_File($filePath))->read());
             }, '');
         }, '');
 
