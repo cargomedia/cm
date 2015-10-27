@@ -40,18 +40,10 @@ class CM_App implements CM_Service_ManagerAwareInterface {
         $assetList = array();
         $languageList = new CM_Paging_Language_Enabled();
         foreach (CM_Site_Abstract::getAll() as $site) {
-            $vendorBeforeAsset = new CM_Asset_Javascript_Vendor($site);
-            $vendorBeforeAsset->mergeJs('client-vendor/before-body/');
-            $vendorBeforeAsset->browserifyJs('client-vendor/before-body-source/');
-
-            $vendorAfterAsset = new CM_Asset_Javascript_Vendor($site);
-            $vendorAfterAsset->mergeJs('client-vendor/after-body/');
-            $vendorAfterAsset->browserifyJs('client-vendor/after-body-source/');
-
             $assetList[] = new CM_Asset_Javascript_Internal($site);
             $assetList[] = new CM_Asset_Javascript_Library($site);
-            $assetList[] = $vendorBeforeAsset;
-            $assetList[] = $vendorAfterAsset;
+            $assetList[] = new CM_Asset_Javascript_VendorBeforeBody($site);
+            $assetList[] = new CM_Asset_Javascript_VendorAfterBody($site);
             foreach ($languageList as $language) {
                 $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, null, $language));
                 $assetList[] = new CM_Asset_Css_Vendor($render);

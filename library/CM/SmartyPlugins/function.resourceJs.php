@@ -13,7 +13,7 @@ function smarty_function_resourceJs(array $params, Smarty_Internal_Template $tem
     }
     $scripts = [];
     if ($debug && 'vendor' == $type) {
-        $scripts[] = $render->getUrlResource($type . '-js', 'merged-' . $file);
+        $scripts[] = $render->getUrlResource($type . '-js', 'dist-' . $file);
         $scripts[] = $render->getUrlResource($type . '-js', 'source-' . $file);
     }
     else {

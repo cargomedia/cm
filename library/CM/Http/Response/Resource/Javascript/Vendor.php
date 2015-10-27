@@ -4,36 +4,31 @@ class CM_Http_Response_Resource_Javascript_Vendor extends CM_Http_Response_Resou
 
     protected function _process() {
         $debug = CM_Bootloader::getInstance()->isDebug();
-        $asset = new CM_Asset_Javascript_Vendor($this->getSite());
+        $site = $this->getSite();
 
         switch ($this->getRequest()->getPath()) {
-
             case '/before-body.js':
-                $asset->mergeJs('client-vendor/before-body/');
-                $asset->browserifyJs('client-vendor/before-body-source/');
+                $this->_setAsset(new CM_Asset_Javascript_VendorBeforeBody($site));
                 break;
             case '/after-body.js':
-                $asset->mergeJs('client-vendor/after-body/');
-                $asset->browserifyJs('client-vendor/after-body-source/');
+                $this->_setAsset(new CM_Asset_Javascript_VendorAfterBody($site));
                 break;
 
-            case '/merged-before-body.js':
-                $asset->mergeJs('client-vendor/before-body/');
+            case '/dist-before-body.js':
+                $this->_setAsset(new CM_Asset_Javascript_VendorBeforeBody($site, 'dist', $debug));
                 break;
-            case '/merged-after-body.js':
-                $asset->mergeJs('client-vendor/after-body/');
+            case '/dist-after-body.js':
+                $this->_setAsset(new CM_Asset_Javascript_VendorAfterBody($site, 'dist', $debug));
                 break;
             case '/source-before-body.js':
-                $asset->browserifyJs('client-vendor/before-body-source/', $debug);
+                $this->_setAsset(new CM_Asset_Javascript_VendorBeforeBody($site, 'source', $debug));
                 break;
             case '/source-after-body.js':
-                $asset->browserifyJs('client-vendor/after-body-source/', $debug);
+                $this->_setAsset(new CM_Asset_Javascript_VendorAfterBody($site, 'source', $debug));
                 break;
             default:
                 throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', CM_Exception::WARN);
         }
-
-        $this->_setAsset($asset);
     }
 
     public static function match(CM_Http_Request_Abstract $request) {

@@ -57,7 +57,7 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
             if ($debug) {
                 $args[] = '--debug';
             }
-            return CM_Util::exec('NODE_PATH="' . implode(':', $rootPaths) . '" browserify', $args, null, null);
+            return CM_Util::exec('NODE_PATH="' . implode(':', $rootPaths) . '" browserify', $args);
         });
     }
 }
