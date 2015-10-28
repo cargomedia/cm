@@ -302,10 +302,11 @@ class CM_Util {
      * @param array|null  $args
      * @param string|null $input
      * @param string|null $inputPath
+     * @param array|null  $env
      * @throws CM_Exception
      * @return string Output
      */
-    public static function exec($command, array $args = null, $input = null, $inputPath = null) {
+    public static function exec($command, array $args = null, $input = null, $inputPath = null, array $env = null) {
         if (null === $args) {
             $args = array();
         }
@@ -318,18 +319,19 @@ class CM_Util {
         if ($inputPath) {
             $command .= ' <' . escapeshellarg($inputPath);
         }
-        return self::_exec($command, $input);
+        return self::_exec($command, $input, $env);
     }
 
     /**
-     * @param string $command
-     * @param string $stdin
+     * @param string     $command
+     * @param string     $stdin
+     * @param array|null $env
      * @return string
      * @throws CM_Exception
      */
-    private static function _exec($command, $stdin) {
+    private static function _exec($command, $stdin, array $env = null) {
         $descriptorSpec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w"));
-        $process = proc_open($command, $descriptorSpec, $pipes);
+        $process = proc_open($command, $descriptorSpec, $pipes, null, $env);
         if (!is_resource($process)) {
             throw new CM_Exception('Cannot open command file pointer to `' . $command . '`');
         }
