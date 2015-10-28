@@ -178,7 +178,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     public function match(CM_Http_Request_Abstract $request) {
         $urlRequest = $request->getHost();
         $urlSite = $this->getHost();
-        return 0 === strpos(preg_replace('/^www\./', '', $urlRequest), preg_replace('/^www\./', '', $urlSite));
+        return preg_replace('/^www\./', '', $urlRequest) === preg_replace('/^www\./', '', $urlSite);
     }
 
     /**
