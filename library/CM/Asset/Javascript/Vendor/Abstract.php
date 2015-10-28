@@ -32,11 +32,16 @@ abstract class CM_Asset_Javascript_Vendor_Abstract extends CM_Asset_Javascript_A
      * @param bool        $generateSourceMaps
      */
     protected function _process($type, $generateSourceMaps) {
-        if ('source' != $type) {
-            $this->_mergeJs($this->_getDistPath());
-        }
-        if ('dist' != $type) {
-            $this->_browserifyJs($this->_getSourcePath(), $generateSourceMaps);
+        switch ($type) {
+            case 'dist':
+                $this->_appendDistJs($this->_getDistPath());
+                break;
+            case 'source':
+                $this->_appendSourceJs($this->_getSourcePath(), $generateSourceMaps);
+                break;
+            default:
+                $this->_appendDistJs($this->_getDistPath());
+                $this->_appendSourceJs($this->_getSourcePath(), false);
         }
     }
 
@@ -53,7 +58,7 @@ abstract class CM_Asset_Javascript_Vendor_Abstract extends CM_Asset_Javascript_A
     /**
      * @param string $path
      */
-    protected function _mergeJs($path) {
+    protected function _appendDistJs($path) {
         foreach (array_reverse($this->_site->getModules()) as $moduleName) {
             $initPath = $this->_buildPath($moduleName, $path);
             foreach (CM_Util::rglob('*.js', $initPath) as $filePath) {
@@ -67,7 +72,7 @@ abstract class CM_Asset_Javascript_Vendor_Abstract extends CM_Asset_Javascript_A
      * @param string $path
      * @param bool   $generateSourceMap
      */
-    protected function _browserifyJs($path, $generateSourceMap = null) {
+    protected function _appendSourceJs($path, $generateSourceMap = null) {
         $generateSourceMap = (bool) $generateSourceMap;
         $sourceMainPaths = [];
         $sourcePaths = [];
