@@ -47,28 +47,31 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
     }
 
     public function testMatch() {
-        $siteClassMatchFoo = $this->getMockBuilder('CM_Site_Abstract')
+        $siteClassMatchCom = $this->getMockBuilder('CM_Site_Abstract')
             ->setMethods(array('getUrl'))
             ->setMockClassName('CM_Site_MockFoo')
             ->getMockForAbstractClass();
-        $siteClassMatchFoo->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.com'));
-        /** @var CM_Site_Abstract $siteClassMatchFoo */
+        $siteClassMatchCom->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.com'));
+        /** @var CM_Site_Abstract $siteClassMatchCom */
 
-        $siteClassMatchBar = $this->getMockBuilder('CM_Site_Abstract')
+        $siteClassMatchXxx = $this->getMockBuilder('CM_Site_Abstract')
             ->setMethods(array('getUrl'))
             ->setMockClassName('CM_Site_MockBar')
             ->getMockForAbstractClass();
-        $siteClassMatchBar->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.xxx'));
-        /** @var CM_Site_Abstract $siteClassMatchBar */
+        $siteClassMatchXxx->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.xxx'));
+        /** @var CM_Site_Abstract $siteClassMatchXxx */
 
         $requestCom = new CM_Http_Request_Get('/', array('host' => 'www.example.com'));
-        $this->assertTrue($siteClassMatchFoo->match($requestCom));
+        $this->assertTrue($siteClassMatchCom->match($requestCom));
 
         $requestXxx = new CM_Http_Request_Get('/', array('host' => 'www.example.xxx'));
-        $this->assertTrue($siteClassMatchBar->match($requestXxx));
+        $this->assertTrue($siteClassMatchXxx->match($requestXxx));
 
         $requestNot = new CM_Http_Request_Get('/', array('host' => 'www.example.foo'));
-        $this->assertFalse($siteClassMatchBar->match($requestNot));
+        $this->assertFalse($siteClassMatchXxx->match($requestNot));
+
+        $requestNotPartial = new CM_Http_Request_Get('/', array('host' => 'www.example.xxx.com'));
+        $this->assertFalse($siteClassMatchXxx->match($requestNotPartial));
     }
 
     public function testFactory() {
