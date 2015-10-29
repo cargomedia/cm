@@ -19,8 +19,19 @@ class CM_WeightedRandom {
      *
      * @param mixed[] $values  Array of elements to choose from
      * @param float[] $weights An array of weights. Weight must be a positive number.
+     * @throws CM_Exception
      */
     public function __construct(array $values, array $weights) {
+        $values = array_values($values);
+        $weights = array_values($weights);
+
+        if (count($values) !== count($weights)) {
+            throw new CM_Exception('Weights and values must have the same length');
+        }
+        if (0 === count($values)) {
+            throw new CM_Exception('Values cannot be empty');
+        }
+
         $this->_values = $values;
 
         for ($i = 0; $i < count($weights); $i++) {
