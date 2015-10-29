@@ -5,22 +5,27 @@
  */
 class CM_WeightedRandom {
 
+    /** @var array */
     private $_values = array();
+
+    /** @var array */
     private $_lookup = array();
-    private $_total_weight = 0;
+
+    /** @var float */
+    private $_weightTotal = 0;
 
     /**
      * Initalize the weighted random selector
      *
-     * @param array $values  Array of elements to choose from
-     * @param array $weights An array of weights. Weight must be a positive number.
+     * @param mixed[] $values  Array of elements to choose from
+     * @param float[] $weights An array of weights. Weight must be a positive number.
      */
-    public function __construct($values, $weights) {
+    public function __construct(array $values, array $weights) {
         $this->_values = $values;
 
         for ($i = 0; $i < count($weights); $i++) {
-            $this->_total_weight += $weights[$i];
-            $this->_lookup[$i] = $this->_total_weight;
+            $this->_weightTotal += $weights[$i];
+            $this->_lookup[$i] = $this->_weightTotal;
         }
     }
 
@@ -30,7 +35,7 @@ class CM_WeightedRandom {
      * @return mixed Selected element
      */
     public function lookup() {
-        $r = mt_rand() / mt_getrandmax() * $this->_total_weight;
+        $r = mt_rand() / mt_getrandmax() * $this->_weightTotal;
         return $this->_values[$this->_binarySearch($r, $this->_lookup)];
     }
 
