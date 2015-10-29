@@ -15,7 +15,7 @@ class CM_WeightedRandom {
      * @param array $values  Array of elements to choose from
      * @param array $weights An array of weights. Weight must be a positive number.
      */
-    function __construct($values, $weights) {
+    public function __construct($values, $weights) {
         $this->_values = $values;
 
         for ($i = 0; $i < count($weights); $i++) {
@@ -29,13 +29,12 @@ class CM_WeightedRandom {
      *
      * @return mixed Selected element
      */
-    function lookup() {
+    public function lookup() {
         $r = mt_rand() / mt_getrandmax() * $this->_total_weight;
-        return $this->_values[$this->binary_search($r, $this->_lookup)];
+        return $this->_values[$this->_binarySearch($r, $this->_lookup)];
     }
 
     /**
-     * binary_search()
      * Search a sorted array for a number. Returns the item's index if found. Otherwise
      * returns the position where it should be inserted, or count($haystack)-1 if the
      * $needle is higher than every element in the array.
@@ -44,7 +43,7 @@ class CM_WeightedRandom {
      * @param array $haystack
      * @return int
      */
-    private function binary_search($needle, $haystack) {
+    private function _binarySearch($needle, $haystack) {
         $high = count($haystack) - 1;
         $low = 0;
 
