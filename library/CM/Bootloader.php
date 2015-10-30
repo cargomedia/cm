@@ -9,7 +9,7 @@ class CM_Bootloader {
     /** @var bool */
     private $_debug;
 
-    /** @var CM_ExceptionHandling_Handler_Abstract */
+    /** @var CM_ExceptionHandling_Handler */
     private $_exceptionHandler;
 
     /** @var CM_EventHandler_EventHandler */
@@ -54,23 +54,27 @@ class CM_Bootloader {
     }
 
     /**
-     * @return CM_ExceptionHandling_Handler_Abstract
+     * @return CM_ExceptionHandling_Handler
      */
     public function getExceptionHandler() {
         if (!$this->_exceptionHandler) {
-            if ($this->isCli()) {
-                $this->_exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
-            } else {
-                $this->_exceptionHandler = new CM_ExceptionHandling_Handler_Http();
-            }
+            $serviceManager = CM_Service_Manager::getInstance();
+
+            $logFactory = new CM_Log_Factory();
+            $logFactory->setServiceManager($serviceManager);
+
+            $exceptionHandler = new CM_ExceptionHandling_Handler($logFactory);
+            $exceptionHandler->setServiceManager($serviceManager);
+
+            $this->_exceptionHandler = $exceptionHandler;
         }
         return $this->_exceptionHandler;
     }
 
     /**
-     * @param CM_ExceptionHandling_Handler_Abstract $exceptionHandler
+     * @param CM_ExceptionHandling_Handler $exceptionHandler
      */
-    public function setExceptionHandler(CM_ExceptionHandling_Handler_Abstract $exceptionHandler) {
+    public function setExceptionHandler(CM_ExceptionHandling_Handler $exceptionHandler) {
         $this->_exceptionHandler = $exceptionHandler;
     }
 
@@ -178,6 +182,10 @@ class CM_Bootloader {
         $serviceManager->register('filesystems', 'CM_Service_Filesystems');
         $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', [
             'adapter' => new CM_File_Filesystem_Adapter_Local($this->getDirTmp())
+        ]);
+        $serviceManager->register('logger-file-error', 'CM_Log_Handler_Factory', null, 'createFileHandler', [
+            'path'  => 'logs/error.log',
+            'level' => CM_Log_Logger::WARNING,
         ]);
         foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
             $serviceManager->registerWithArray($serviceKey, $serviceDefinition);
