@@ -2,6 +2,8 @@
 	"name": "{$render->getSite()->getName()}",
 	"display": "standalone",
 	"start_url": "/",
+	"background_color": "{lessVariable name='colorBgBody'}",
+	"theme_color": "{lessVariable name='colorBrand'}",
 	"icons": [
 		{
 			"src": "{resourceUrl path='img/meta/android-chrome-36x36.png' type='layout'}",
