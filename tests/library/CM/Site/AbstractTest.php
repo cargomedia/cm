@@ -74,6 +74,19 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertFalse($siteClassMatchXxx->match($requestNotPartial));
     }
 
+    public function testMatchCdn() {
+        $siteClass = $this->getMockBuilder('CM_Site_Abstract')
+            ->setMethods(array('getUrl'))
+            ->setMethods(array('getUrlCdn'))
+            ->getMockForAbstractClass();
+        $siteClass->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.com'));
+        $siteClass->expects($this->any())->method('getUrlCdn')->will($this->returnValue('http://cdn.example.com'));
+        /** @var CM_Site_Abstract $siteClass */
+
+        $this->assertTrue($siteClass->match(new CM_Http_Request_Get('/', array('host' => 'cdn.example.com'))));
+        $this->assertFalse($siteClass->match(new CM_Http_Request_Get('/', array('host' => 'www.google.com'))));
+    }
+
     public function testFactory() {
         try {
             CM_Site_Abstract::factory(9999);

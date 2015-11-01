@@ -122,14 +122,11 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     /**
      * @return string
-     * @throws CM_Exception_Invalid
+     * @throws CM_Exception
      */
     public function getHost() {
-        $siteHost = parse_url($this->getUrl(), PHP_URL_HOST);
-        if (false === $siteHost || null === $siteHost) {
-            throw new CM_Exception_Invalid('Cannot detect host from `' . $this->getUrl() . '`.');
-        }
-        return $siteHost;
+        $urlParser = new CM_Http_UrlParser($this->getUrl());
+        return $urlParser->getHost();
     }
 
     /**
@@ -176,9 +173,18 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return boolean
      */
     public function match(CM_Http_Request_Abstract $request) {
-        $urlRequest = $request->getHost();
-        $urlSite = $this->getHost();
-        return preg_replace('/^www\./', '', $urlRequest) === preg_replace('/^www\./', '', $urlSite);
+        $url = new CM_Http_UrlParser($this->getUrl());
+        $hostList = [
+            $url->getHost(),
+            preg_replace('/^www\./', '', $this->getHost()),
+        ];
+
+        if ($this->getUrlCdn()) {
+            $urlCdn = new CM_Http_UrlParser($this->getUrlCdn());
+            $hostList[] = $urlCdn->getHost();
+        }
+
+        return in_array($request->getHost(), $hostList, true);
     }
 
     /**
