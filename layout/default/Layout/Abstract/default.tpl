@@ -44,7 +44,6 @@
     <link rel="icon" type="image/png" href="{resourceUrl path='img/meta/favicon-16x16.png' type='layout'}" sizes="16x16">
 
     <link rel="manifest" href="{resourceUrl path='manifest.json' type='layout' sameOrigin=true}">
-    <link rel="shortcut icon" href="{resourceUrl path='img/meta/favicon.ico' type='layout'}">
 
     <link rel="alternate" href="{$renderDefault->getUrlPage($page, $page->getParams()->getParamsEncoded())|escape}" hreflang="x-default">
     {foreach $languageList as $language}
