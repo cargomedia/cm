@@ -16,14 +16,13 @@
     <meta name="msapplication-config" content="{resourceUrl path='browserconfig.xml' type='layout'}">
     <meta name="theme-color" content="{block name='themeColor'}{lessVariable name='colorBrand'}{/block}">
 
-    <link rel="apple-touch-icon" sizes="57x57" href="{resourceUrl path='img/meta/apple-touch-icon-57x57.png' type='layout'}">
-    <link rel="apple-touch-icon" sizes="60x60" href="{resourceUrl path='img/meta/apple-touch-icon-60x60.png' type='layout'}">
-    <link rel="apple-touch-icon" sizes="72x72" href="{resourceUrl path='img/meta/apple-touch-icon-72x72.png' type='layout'}">
+    {**
+     * See https://developer.apple.com/library/prerelease/ios/documentation/UserExperience/Conceptual/MobileHIG/IconMatrix.html
+     *}
     <link rel="apple-touch-icon" sizes="76x76" href="{resourceUrl path='img/meta/apple-touch-icon-76x76.png' type='layout'}">
-    <link rel="apple-touch-icon" sizes="114x114" href="{resourceUrl path='img/meta/apple-touch-icon-114x114.png' type='layout'}">
     <link rel="apple-touch-icon" sizes="120x120" href="{resourceUrl path='img/meta/apple-touch-icon-120x120.png' type='layout'}">
-    <link rel="apple-touch-icon" sizes="144x144" href="{resourceUrl path='img/meta/apple-touch-icon-144x144.png' type='layout'}">
     <link rel="apple-touch-icon" sizes="152x152" href="{resourceUrl path='img/meta/apple-touch-icon-152x152.png' type='layout'}">
+    <link rel="apple-touch-icon" sizes="167x167" href="{resourceUrl path='img/meta/apple-touch-icon-167x167.png' type='layout'}">
     <link rel="apple-touch-icon" sizes="180x180" href="{resourceUrl path='img/meta/apple-touch-icon-180x180.png' type='layout'}">
 
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/meta/apple-touch-startup-image-1242x2208.png' type='layout'}" media="(device-width: 414px) and (device-height: 736px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 3)">
