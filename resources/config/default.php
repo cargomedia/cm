@@ -3,6 +3,7 @@
 return function (CM_Config_Node $config) {
     $config->CM_App->setupScriptClasses = array();
     $config->CM_App->setupScriptClasses[] = 'CM_File_Filesystem_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_Class_TypeDumper';
     $config->CM_App->setupScriptClasses[] = 'CM_Db_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_MongoDb_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_Elasticsearch_SetupScript';
