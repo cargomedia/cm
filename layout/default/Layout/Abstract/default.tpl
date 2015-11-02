@@ -25,6 +25,10 @@
     <link rel="apple-touch-icon" sizes="167x167" href="{resourceUrl path='img/meta/apple-touch-icon-167x167.png' type='layout'}">
     <link rel="apple-touch-icon" sizes="180x180" href="{resourceUrl path='img/meta/apple-touch-icon-180x180.png' type='layout'}">
 
+    {**
+     * See https://developer.apple.com/library/prerelease/ios/documentation/UserExperience/Conceptual/MobileHIG/IconMatrix.html
+     * (Sometimes subtracting 40px from height or width)
+     *}
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/meta/apple-touch-startup-image-1242x2208.png' type='layout'}" media="(device-width: 414px) and (device-height: 736px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 3)">
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/meta/apple-touch-startup-image-750x1334.png' type='layout'}" media="(device-width: 375px) and (device-height: 667px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 2)">
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/meta/apple-touch-startup-image-1536x2008.png' type='layout'}" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 2)">
@@ -33,7 +37,6 @@
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/meta/apple-touch-startup-image-748x1024.png' type='layout'}" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 1)">
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/meta/apple-touch-startup-image-640x1096.png' type='layout'}" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/meta/apple-touch-startup-image-640x920.png' type='layout'}" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)">
-    <link rel="apple-touch-startup-image" href="{resourceUrl path='img/meta/apple-touch-startup-image-320x460.png' type='layout'}" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 1)">
 
     <link rel="icon" type="image/png" href="{resourceUrl path='img/meta/favicon-32x32.png' type='layout'}" sizes="32x32">
     <link rel="icon" type="image/png" href="{resourceUrl path='img/meta/android-chrome-192x192.png' type='layout'}" sizes="192x192">
