@@ -128,6 +128,8 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
             CM_Db_Db::delete('cm_streamChannel', array('id' => $id));
             throw $ex;
         }
+        $cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
+        CM_Cache_Shared::getInstance()->delete($cacheKey);
         return new static($id);
     }
 }
