@@ -46,6 +46,8 @@ class CM_Janus_HttpApiClient {
      */
     protected function _request($method, CM_Janus_Server $server, $path, array $body = null) {
         $url = 'http://' . $server->getHttpAddress() . $path;
+        $body = (array) $body;
+        $body['token'] = $server->getToken();
         $options = ['body' => $body];
         $request = $this->_httpClient->createRequest($method, $url, $options);
         try {
