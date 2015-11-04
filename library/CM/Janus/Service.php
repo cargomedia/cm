@@ -46,11 +46,16 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
 
     /**
      * @param CM_Model_Stream_Abstract $stream
+     * @throws CM_Exception_Invalid
+     * @throws CM_Janus_StopStreamError
      */
     protected function _stopStream(CM_Model_Stream_Abstract $stream) {
         /** @var $streamChannel CM_Model_StreamChannel_Media */
         $streamChannel = $stream->getStreamChannel();
         $server = $this->_configuration->getServer($streamChannel->getServerId());
-        $this->_httpApiClient->stopStream($server, $stream->getKey());
+        $result = $this->_httpApiClient->stopStream($server, $stream->getKey());
+        if (array_key_exists('error', $result)) {
+            throw new CM_Janus_StopStreamError($result['error']);
+        }
     }
 }

@@ -59,14 +59,25 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         $configuration = new CM_Janus_Configuration([$server]);
 
         $httpApiClient = $this->mockClass('CM_Janus_HttpApiClient')->newInstanceWithoutConstructor();
-        $stopStreamMethod = $httpApiClient->mockMethod('stopStream')->set(function (CM_Janus_Server $passedServer, $streamKey) use ($server) {
-            $this->assertSame($server, $passedServer);
-            $this->assertSame('foo', $streamKey);
-        });
+        $stopStreamMethod = $httpApiClient->mockMethod('stopStream')
+            ->at(0, function (CM_Janus_Server $passedServer, $streamKey) use ($server) {
+                $this->assertSame($server, $passedServer);
+                $this->assertSame('foo', $streamKey);
+                return ['success' => true];
+            })
+            ->at(1, function (CM_Janus_Server $passedServer, $streamKey) use ($server) {
+                return ['error' => 'Cannot stop stream'];
+            });
         /** @var CM_Janus_HttpApiClient $httpApiClient */
 
         $janus = new CM_Janus_Service($configuration, $httpApiClient);
         $this->callProtectedMethod($janus, '_stopStream', [$stream]);
         $this->assertSame(1, $stopStreamMethod->getCallCount());
+
+        $exception = $this->catchException(function() use ($janus, $stream) {
+            $this->callProtectedMethod($janus, '_stopStream', [$stream]);
+        });
+        $this->assertTrue($exception instanceof CM_Janus_StopStreamError);
+        $this->assertSame(2, $stopStreamMethod->getCallCount());
     }
 }
