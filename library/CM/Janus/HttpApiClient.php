@@ -19,7 +19,7 @@ class CM_Janus_HttpApiClient {
      * @throws CM_Exception_Invalid
      */
     public function stopStream(CM_Janus_Server $server, $clientKey) {
-        return $this->_request('POST', $server, '/stop', ['clientId' => (string) $clientKey]);
+        return $this->_request('POST', $server, '/stopStream', ['streamId' => (string) $clientKey]);
     }
 
     /**
@@ -45,7 +45,7 @@ class CM_Janus_HttpApiClient {
      * @throws CM_Exception_Invalid
      */
     protected function _request($method, CM_Janus_Server $server, $path, array $body = null) {
-        $url = 'http://' . $server->getHttpAddress() . $path;
+        $url = $server->getHttpAddress() . $path;
         $body = (array) $body;
         $body['token'] = $server->getToken();
         $options = ['body' => $body];
