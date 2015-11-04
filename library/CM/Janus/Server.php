@@ -24,7 +24,7 @@ class CM_Janus_Server {
         $this->_id = (int) $serverId;
         $this->_token = (string) $token;
         $this->_httpAddress = (string) $httpAddress;
-        $this->_webSocketAddress = (int) $webSocketAddress;
+        $this->_webSocketAddress = (string) $webSocketAddress;
     }
 
     /**
