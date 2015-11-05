@@ -34,7 +34,7 @@ class CM_Janus_Configuration {
      */
     public function findServerByToken($token) {
         foreach ($this->_servers as $server) {
-            if ($server->getToken() == $token) {
+            if ($server->getToken() === $token) {
                 return $server;
             }
         }
@@ -48,7 +48,7 @@ class CM_Janus_Configuration {
      */
     public function getServer($id) {
         foreach ($this->_servers as $server) {
-            if ($server->getId() == $id) {
+            if ($server->getId() === $id) {
                 return $server;
             }
         }

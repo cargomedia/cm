@@ -19,7 +19,7 @@ class CM_Janus_Factory {
 
         $httpClient = new GuzzleHttp\Client();
         $httpApiClient = new CM_Janus_HttpApiClient($httpClient);
-        $wowza = new CM_Janus_Service($configuration, $httpApiClient);
-        return $wowza;
+        $janus = new CM_Janus_Service($configuration, $httpApiClient);
+        return $janus;
     }
 }
