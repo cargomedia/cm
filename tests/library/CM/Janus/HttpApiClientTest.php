@@ -7,7 +7,8 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
         $sendRequestMethod = $httpClient->mockMethod('send')->set(function (\GuzzleHttp\Message\RequestInterface $request) {
             $this->assertSame('http://cm-janus.dev:8080/stopStream', $request->getUrl());
             $this->assertSame('POST', $request->getMethod());
-            $this->assertSame('streamId=foo&token=bar', $request->getBody()->getContents());
+            $this->assertSame('streamId=foo', $request->getBody()->getContents());
+            $this->assertSame($request->getHeader('Api-Key'), 'bar');
 
             $response = $this->mockClass('\GuzzleHttp\Message\Response')->newInstanceWithoutConstructor();
             $response->mockMethod('getBody')->set(null);
@@ -26,6 +27,7 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
         $sendRequestMethod = $httpClient->mockMethod('send')->set(function (\GuzzleHttp\Message\RequestInterface $request) {
             $this->assertSame('http://cm-janus.dev:8080/status', $request->getUrl());
             $this->assertSame('GET', $request->getMethod());
+            $this->assertSame($request->getHeader('Api-Key'), 'bar');
 
             $response = $this->mockClass('\GuzzleHttp\Message\Response')->newInstanceWithoutConstructor();
             $response->mockMethod('getBody')->set('{"foo":"bar"}');
