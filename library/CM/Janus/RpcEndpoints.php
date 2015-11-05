@@ -6,7 +6,7 @@ class CM_Janus_RpcEndpoints {
      * @param string $token
      * @param string $streamChannelKey
      * @param string $streamKey
-     * @param int $start
+     * @param int    $start
      * @param string $data
      * @return array
      * @throws CM_Exception_AuthFailed
@@ -21,6 +21,11 @@ class CM_Janus_RpcEndpoints {
 
         $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
         $server = $janus->getConfiguration()->findServerByToken($token);
+
+        if (!$server) {
+            throw new CM_Exception_Invalid('Server `' . $token . '` not found');
+        }
+
         $streamChannelType = $params->getInt('streamChannelType');
         $session = new CM_Session($params->getString('sessionId'));
         $user = $session->getUser(true);
@@ -99,7 +104,7 @@ class CM_Janus_RpcEndpoints {
 
     /**
      * @param CM_Janus_Service $janus
-     * @param string $token
+     * @param string           $token
      * @throws CM_Exception_AuthFailed
      */
     protected static function _authenticate(CM_Janus_Service $janus, $token) {
