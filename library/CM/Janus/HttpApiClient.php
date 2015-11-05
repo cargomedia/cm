@@ -14,7 +14,7 @@ class CM_Janus_HttpApiClient {
 
     /**
      * @param CM_Janus_Server $server
-     * @param string $clientKey
+     * @param string          $clientKey
      * @return string
      * @throws CM_Exception_Invalid
      */
@@ -37,18 +37,20 @@ class CM_Janus_HttpApiClient {
     }
 
     /**
-     * @param string $method
+     * @param string          $method
      * @param CM_Janus_Server $server
-     * @param string $path
-     * @param array|null $body
+     * @param string          $path
+     * @param array|null      $body
      * @return string
      * @throws CM_Exception_Invalid
      */
     protected function _request($method, CM_Janus_Server $server, $path, array $body = null) {
         $url = $server->getHttpAddress() . $path;
         $body = (array) $body;
-        $body['token'] = $server->getToken();
-        $options = ['body' => $body];
+        $options = [
+            'body'    => $body,
+            'headers' => ['Api-Key' => $server->getToken()],
+        ];
         $request = $this->_httpClient->createRequest($method, $url, $options);
         try {
             $response = $this->_httpClient->send($request);
