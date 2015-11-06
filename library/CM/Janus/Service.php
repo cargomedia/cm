@@ -9,8 +9,8 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
     protected $_httpApiClient;
 
     /**
-     * @param CM_Janus_Configuration $configuration
-     * @param CM_Janus_HttpApiClient $httpClient
+     * @param CM_Janus_Configuration                $configuration
+     * @param CM_Janus_HttpApiClient                $httpClient
      * @param CM_MediaStreams_StreamRepository|null $streamRepository
      */
     public function __construct(CM_Janus_Configuration $configuration, CM_Janus_HttpApiClient $httpClient, CM_MediaStreams_StreamRepository $streamRepository = null) {
@@ -20,7 +20,64 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
     }
 
     public function synchronize() {
-        throw new CM_Exception_NotImplemented();
+        $streamRepository = $this->getStreamRepository();
+
+        $startStampLimit = time() - 3;
+        $streamList = [];
+        $channelSubscriberList = [];
+        foreach ($this->_configuration->getServers() as $server) {
+            $serverStatus = $this->_httpApiClient->fetchStatus($server);
+            foreach ($serverStatus as $stream) {
+                $stream['server'] = $server;
+                $streamList[] = $stream;
+                $channelSubscriberList[$stream['streamChannelKey']][] = $stream['streamKey'];
+            }
+        }
+
+        foreach ($streamList as $stream) {
+            $clientKey = $stream['streamKey']; //naming conversions
+
+            /** @var CM_Model_StreamChannel_Abstract $streamChannel */
+            $streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($stream['streamChannelKey'], $this->getType());
+            if (!$streamChannel
+                || (true === $stream['isPublish'] && !$streamChannel->getStreamPublishs()->findKey($clientKey))
+                || (false === $stream['isPublish'] && !$streamChannel->getStreamSubscribes()->findKey($clientKey))
+            ) {
+                $this->_httpApiClient->stopStream($stream['server'], $clientKey);
+            }
+        }
+
+        $streamChannels = $streamRepository->getStreamChannels();
+        /** @var CM_Model_StreamChannel_Abstract $streamChannel */
+        foreach ($streamChannels as $streamChannel) {
+            if (!$streamChannel->hasStreams()) {
+                $streamChannel->delete();
+                continue;
+            }
+
+            /** @var CM_Model_Stream_Publish $streamPublish */
+            $streamPublish = $streamChannel->getStreamPublishs()->getItem(0);
+            if ($streamPublish) {
+                if ($streamPublish->getStart() > $startStampLimit) {
+                    continue;
+                }
+                if (!array_key_exists($streamChannel->getKey(), $channelSubscriberList)) {
+                    $streamRepository->removeStream($streamPublish);
+                }
+            } else {
+                //TODO Is it possible to have channel w/o publishers?
+            }
+
+            /** @var CM_Model_Stream_Subscribe $streamSubscribe */
+            foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
+                if ($streamSubscribe->getStart() > $startStampLimit) {
+                    continue;
+                }
+                if (!isset($channelSubscriberList[$streamChannel->getKey()][$streamSubscribe->getKey()])) {
+                    $streamRepository->removeStream($streamSubscribe);
+                }
+            }
+        }
     }
 
     /**
