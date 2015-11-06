@@ -32,7 +32,7 @@ class CM_Janus_Configuration {
      * @param string $token
      * @return CM_Janus_Server|null
      */
-    public function findServerByToken($token) {
+    public function findServerByKey($token) {
         foreach ($this->_servers as $server) {
             if ($server->getKey() === $token) {
                 return $server;

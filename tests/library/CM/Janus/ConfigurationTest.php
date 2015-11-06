@@ -10,9 +10,9 @@ class CM_Janus_ConfigurationTest extends CMTest_TestCase {
 
         $configuration = new CM_Janus_Configuration([$server1, $server2]);
 
-        $this->assertSame($server1, $configuration->findServerByToken('foo'));
-        $this->assertSame($server2, $configuration->findServerByToken('bar'));
-        $this->assertSame(null, $configuration->findServerByToken('zoo'));
+        $this->assertSame($server1, $configuration->findServerByKey('foo'));
+        $this->assertSame($server2, $configuration->findServerByKey('bar'));
+        $this->assertSame(null, $configuration->findServerByKey('zoo'));
     }
 
     public function testGetServer() {
