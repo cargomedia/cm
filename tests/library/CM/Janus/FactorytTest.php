@@ -5,7 +5,7 @@ class CM_Janus_FactoryTest extends CMTest_TestCase {
     public function testCreateService() {
         $serversConfig = [
             5 => [
-                'token'            => 'foo-bar',
+                'key'            => 'foo-bar',
                 'httpAddress'      => 'http://cm-janus.dev:8080',
                 'webSocketAddress' => 'ws://cm-janus.dev:8188',
             ],
