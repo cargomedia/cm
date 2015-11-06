@@ -20,7 +20,7 @@ class CM_Janus_RpcEndpoints {
         self::_authenticate($janus, $serverKey);
 
         $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
-        $server = $janus->getConfiguration()->findServerByserverKey($serverKey);
+        $server = $janus->getConfiguration()->findServerByKey($serverKey);
 
         if (!$server) {
             throw new CM_Exception_Invalid('Server `' . $serverKey . '` not found');
