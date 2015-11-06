@@ -11,7 +11,7 @@ class CM_Janus_Factory {
         foreach ($servers as $serverId => $serverConfig) {
             $configuration->addServer(new CM_Janus_Server(
                 $serverId,
-                $serverConfig['token'],
+                $serverConfig['key'],
                 $serverConfig['httpAddress'],
                 $serverConfig['webSocketAddress']
             ));
