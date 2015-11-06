@@ -4,9 +4,9 @@ class CM_Janus_ConfigurationTest extends CMTest_TestCase {
 
     public function testFindServerByToken() {
         $server1 = $this->mockClass('CM_Janus_Server')->newInstanceWithoutConstructor();
-        $server1->mockMethod('getToken')->set('foo');
+        $server1->mockMethod('getKey')->set('foo');
         $server2 = $this->mockClass('CM_Janus_Server')->newInstanceWithoutConstructor();
-        $server2->mockMethod('getToken')->set('bar');
+        $server2->mockMethod('getKey')->set('bar');
 
         $configuration = new CM_Janus_Configuration([$server1, $server2]);
 

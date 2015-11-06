@@ -15,7 +15,7 @@ class CM_Janus_FactoryTest extends CMTest_TestCase {
         $servers = $janus->getConfiguration()->getServers();
         $this->assertCount(1, $servers);
         $this->assertSame(5, $servers[0]->getId());
-        $this->assertSame('foo-bar', $servers[0]->getToken());
+        $this->assertSame('foo-bar', $servers[0]->getKey());
         $this->assertSame('http://cm-janus.dev:8080', $servers[0]->getHttpAddress());
         $this->assertSame('ws://cm-janus.dev:8188', $servers[0]->getWebSocketAddress());
     }
