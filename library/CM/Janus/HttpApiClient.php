@@ -29,11 +29,7 @@ class CM_Janus_HttpApiClient {
      */
     public function fetchStatus(CM_Janus_Server $server) {
         $encodedStatus = $this->_request('GET', $server, '/status');
-        $status = CM_Params::decode($encodedStatus, true);
-        if (false == $status) {
-            throw new CM_Exception_Invalid('Cannot decode server status');
-        }
-        return $status;
+        return CM_Params::jsonDecode($encodedStatus);
     }
 
     /**
