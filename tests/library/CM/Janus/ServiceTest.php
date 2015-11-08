@@ -110,4 +110,45 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         $this->assertNull(CM_Model_Stream_Subscribe::findByKeyAndChannel($streamSubscribe->getKey(), $streamChannel));
     }
 
+    public function testSynchronizeMissingInPhp() {
+        $streamChannel = CMTest_TH::createStreamChannel(null, CM_Janus_Service::getTypeStatic());
+        $streamChannelKey = $streamChannel->getKey();
+        $streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
+        $streamPublishKey = $streamPublish->getKey();
+        $streamSubscribe = CMTest_TH::createStreamSubscribe(null, $streamChannel);
+        $streamSubscribeKey = $streamSubscribe->getKey();
+
+        $server1 = $this->mockClass('CM_Janus_Server')->newInstance([1, 'key', 'http://mock', 'ws://mock']);
+        /** @var CM_Janus_Configuration|\Mocka\AbstractClassTrait $configuration */
+        $configuration = $this->mockObject('CM_Janus_Configuration');
+        $configuration->mockMethod('getServers')->set([$server1]);
+
+        $status = [
+            ['streamKey' => $streamPublishKey, 'streamChannelKey' => $streamChannelKey, 'isPublish' => true],
+            ['streamKey' => $streamSubscribeKey, 'streamChannelKey' => $streamChannelKey, 'isPublish' => false],
+        ];
+
+        $httpApiClient = $this->mockClass('CM_Janus_HttpApiClient')->newInstanceWithoutConstructor();
+        $httpApiClient->mockMethod('fetchStatus')->set(function (CM_Janus_Server $passedServer) use ($server1, $status) {
+            $this->assertSame($server1, $passedServer);
+            return $status;
+        });
+
+        $stopStreamMethod = $httpApiClient->mockMethod('stopStream')
+            ->at(0, function ($server, $streamKey) use ($streamPublishKey, $server1) {
+                $this->assertEquals($server1, $server);
+                $this->assertSame($streamPublishKey, $streamKey);
+            })
+            ->at(1, function ($server, $streamKey) use ($streamSubscribeKey, $server1) {
+                $this->assertEquals($server1, $server);
+                $this->assertSame($streamSubscribeKey, $streamKey);
+            });
+        /** @var CM_Janus_HttpApiClient $httpApiClient */
+
+        $janus = new CM_Janus_Service($configuration, $httpApiClient);
+        $janus->getStreamRepository()->removeStream($streamPublish);
+        $janus->getStreamRepository()->removeStream($streamSubscribe);
+        $janus->synchronize();
+        $this->assertSame(2, $stopStreamMethod->getCallCount());
+    }
 }
