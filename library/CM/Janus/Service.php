@@ -23,27 +23,23 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
         $streamRepository = $this->getStreamRepository();
 
         $startStampLimit = time() - 3;
-        $streamList = [];
         $channelSubscriberList = [];
-        foreach ($this->_configuration->getServers() as $server) {
-            $serverStatus = $this->_httpApiClient->fetchStatus($server);
-            foreach ($serverStatus as $stream) {
-                $stream['server'] = $server;
-                $streamList[] = $stream;
-                $channelSubscriberList[$stream['streamChannelKey']][] = $stream['streamKey'];
-            }
+
+        $streamList = $this->_fetchStatus();
+        foreach ($streamList as $stream) {
+            $channelSubscriberList[$stream->getStreamChannelKey()][] = $stream->getStreamKey();
         }
 
         foreach ($streamList as $stream) {
-            $clientKey = $stream['streamKey']; //naming conversions
+            $clientKey = $stream->getStreamKey();
 
             /** @var CM_Model_StreamChannel_Abstract $streamChannel */
-            $streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($stream['streamChannelKey'], $this->getType());
+            $streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($stream->getStreamChannelKey(), $this->getType());
             if (!$streamChannel
                 || (true === $stream['isPublish'] && !$streamChannel->getStreamPublishs()->findKey($clientKey))
                 || (false === $stream['isPublish'] && !$streamChannel->getStreamSubscribes()->findKey($clientKey))
             ) {
-                $this->_httpApiClient->stopStream($stream['server'], $clientKey);
+                $this->_httpApiClient->stopStream($stream->getServer(), $clientKey);
             }
         }
 
