@@ -9,8 +9,8 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
     protected $_httpApiClient;
 
     /**
-     * @param CM_Janus_Configuration                $configuration
-     * @param CM_Janus_HttpApiClient                $httpClient
+     * @param CM_Janus_Configuration $configuration
+     * @param CM_Janus_HttpApiClient $httpClient
      * @param CM_MediaStreams_StreamRepository|null $streamRepository
      */
     public function __construct(CM_Janus_Configuration $configuration, CM_Janus_HttpApiClient $httpClient, CM_MediaStreams_StreamRepository $streamRepository = null) {
@@ -21,28 +21,27 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
 
     public function synchronize() {
         $streamRepository = $this->getStreamRepository();
+        $streamList = $this->_fetchStatus();
+
+        foreach ($streamList as $stream) {
+            $streamChannel = $streamRepository->findStreamChannelByKey($stream->getStreamKey());
+            /** @var CM_Janus_Stream $stream */
+            $clientKey = $stream->getStreamKey();
+            if ($streamChannel) {
+                if ($streamChannel->getStreamPublishs()->findKey($clientKey)) {
+                    continue;
+                }
+                if ($streamChannel->getStreamSubscribes()->findKey($clientKey)) {
+                    continue;
+                }
+            }
+            $this->_httpApiClient->stopStream($stream->getServer(), $clientKey);
+        }
 
         $startStampLimit = time() - 3;
-        $channelSubscriberList = [];
-
-        $streamList = $this->_fetchStatus();
-        foreach ($streamList as $stream) {
-            $channelSubscriberList[$stream->getStreamChannelKey()][] = $stream->getStreamKey();
-        }
-
-        foreach ($streamList as $stream) {
-            $clientKey = $stream->getStreamKey();
-
-            /** @var CM_Model_StreamChannel_Abstract $streamChannel */
-            $streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($stream->getStreamChannelKey(), $this->getType());
-            if (!$streamChannel
-                || (true === $stream['isPublish'] && !$streamChannel->getStreamPublishs()->findKey($clientKey))
-                || (false === $stream['isPublish'] && !$streamChannel->getStreamSubscribes()->findKey($clientKey))
-            ) {
-                $this->_httpApiClient->stopStream($stream->getServer(), $clientKey);
-            }
-        }
-
+        $streamKeyList = \Functional\map($streamList, function (CM_Janus_Stream $stream) {
+            return $stream->getStreamKey();
+        });
         $streamChannels = $streamRepository->getStreamChannels();
         /** @var CM_Model_StreamChannel_Abstract $streamChannel */
         foreach ($streamChannels as $streamChannel) {
@@ -51,24 +50,19 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
                 continue;
             }
 
-            /** @var CM_Model_Stream_Publish $streamPublish */
-            $streamPublish = $streamChannel->getStreamPublishs()->getItem(0);
-            if ($streamPublish) {
-                if ($streamPublish->getStart() > $startStampLimit) {
-                    continue;
-                }
-                if (!array_key_exists($streamChannel->getKey(), $channelSubscriberList)) {
-                    $streamRepository->removeStream($streamPublish);
-                }
-            }
+            $streams = array_merge(
+                $streamChannel->getStreamPublishs()->getItems(),
+                $streamChannel->getStreamSubscribes()->getItems()
+            );
 
-            /** @var CM_Model_Stream_Subscribe $streamSubscribe */
-            foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
-                if ($streamSubscribe->getStart() > $startStampLimit) {
+            /** @var CM_Model_Stream_Abstract $stream */
+            foreach ($streams as $stream) {
+                $isJustCreated = $stream->getStart() > $startStampLimit;
+                if ($isJustCreated) {
                     continue;
                 }
-                if (!isset($channelSubscriberList[$streamChannel->getKey()][$streamSubscribe->getKey()])) {
-                    $streamRepository->removeStream($streamSubscribe);
+                if (!array_key_exists($stream->getKey(), $streamKeyList)) {
+                    $streamRepository->removeStream($stream);
                 }
             }
         }
