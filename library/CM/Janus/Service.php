@@ -60,8 +60,6 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
                 if (!array_key_exists($streamChannel->getKey(), $channelSubscriberList)) {
                     $streamRepository->removeStream($streamPublish);
                 }
-            } else {
-                //TODO Is it possible to have channel w/o publishers?
             }
 
             /** @var CM_Model_Stream_Subscribe $streamSubscribe */
