@@ -145,6 +145,10 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         $streamSubscribe = CMTest_TH::createStreamSubscribe(null, $streamChannel);
         $streamSubscribeKey = $streamSubscribe->getKey();
 
+        $streamChannel2 = CMTest_TH::createStreamChannel(null, CM_Janus_Service::getTypeStatic());
+        $streamChannelKey2 = $streamChannel2->getKey();
+        CMTest_TH::createStreamPublish(null, $streamChannel2); //to make channel non empty
+
         $server1 = $this->mockClass('CM_Janus_Server')->newInstance([1, 'key', 'http://mock', 'ws://mock']);
         /** @var CM_Janus_Configuration|\Mocka\AbstractClassTrait $configuration */
         $configuration = $this->mockObject('CM_Janus_Configuration');
@@ -153,6 +157,8 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         $status = [
             ['streamKey' => $streamPublishKey, 'streamChannelKey' => $streamChannelKey, 'isPublish' => true],
             ['streamKey' => $streamSubscribeKey, 'streamChannelKey' => $streamChannelKey, 'isPublish' => false],
+            ['streamKey' => 'absentStreamKey', 'streamChannelKey' => 'absentChannelKey', 'isPublish' => false],
+            ['streamKey' => 'absentStreamKey2', 'streamChannelKey' => $streamChannelKey2, 'isPublish' => true],
         ];
 
         $httpApiClient = $this->mockClass('CM_Janus_HttpApiClient')->newInstanceWithoutConstructor();
@@ -169,6 +175,14 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
             ->at(1, function ($server, $streamKey) use ($streamSubscribeKey, $server1) {
                 $this->assertEquals($server1, $server);
                 $this->assertSame($streamSubscribeKey, $streamKey);
+            })
+            ->at(2, function ($server, $streamKey) use ($server1) {
+                $this->assertEquals($server1, $server);
+                $this->assertSame('absentStreamKey', $streamKey);
+            })
+            ->at(3, function ($server, $streamKey) use ($server1) {
+                $this->assertEquals($server1, $server);
+                $this->assertSame('absentStreamKey2', $streamKey);
             });
         /** @var CM_Janus_HttpApiClient $httpApiClient */
 
@@ -176,6 +190,6 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         $janus->getStreamRepository()->removeStream($streamPublish);
         $janus->getStreamRepository()->removeStream($streamSubscribe);
         $janus->synchronize();
-        $this->assertSame(2, $stopStreamMethod->getCallCount());
+        $this->assertSame(4, $stopStreamMethod->getCallCount());
     }
 }
