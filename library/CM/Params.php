@@ -526,6 +526,16 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     }
 
     /**
+     * @param CM_ArrayConvertible $object
+     * @return string JSON
+     */
+    public static function encodeObjectId(CM_ArrayConvertible $object) {
+        $array = $object->toArrayIdOnly();
+        $value = array_merge($array, array('_class' => get_class($object)));
+        return self::jsonEncode($value);
+    }
+
+    /**
      * @param string       $value
      * @param boolean|null $json
      * @throws CM_Exception_Invalid
