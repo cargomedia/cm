@@ -77,6 +77,14 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             ));
         }
 
+        if ($this->getServiceManager()->has('janus')) {
+            $this->_registerClockworkCallbacks('1 minute', array(
+                'CM_Janus_Service::synchronize' => function () {
+                    $this->getServiceManager()->getJanus('janus')->synchronize();
+                },
+            ));
+        }
+
         $this->_registerClockworkCallbacks('15 minutes', array(
             'CM_Mail::processQueue'                         => function () {
                 CM_Mail::processQueue(500);
@@ -135,7 +143,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param string $dateTimeString
+     * @param string    $dateTimeString
      * @param Closure[] $callbacks
      */
     protected function _registerClockworkCallbacks($dateTimeString, $callbacks) {
