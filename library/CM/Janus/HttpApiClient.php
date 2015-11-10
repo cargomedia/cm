@@ -29,7 +29,13 @@ class CM_Janus_HttpApiClient {
      */
     public function fetchStatus(CM_Janus_Server $server) {
         $encodedStatus = $this->_request('GET', $server, '/status');
-        return CM_Params::jsonDecode($encodedStatus);
+        $decodedStatus = CM_Params::jsonDecode($encodedStatus);
+
+        return [
+            'streamKey'        => $decodedStatus['id'],
+            'streamChannelKey' => $decodedStatus['channelName'],
+            'isPublish'        => $decodedStatus['isPublish'],
+        ];
     }
 
     /**

@@ -30,7 +30,7 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
             $this->assertSame('bar', $request->getHeader('Server-Key'));
 
             $response = $this->mockClass('\GuzzleHttp\Message\Response')->newInstanceWithoutConstructor();
-            $response->mockMethod('getBody')->set('{"foo":"bar"}');
+            $response->mockMethod('getBody')->set('{"id":"streamKey","channelName":"channelKey", "isPublish":true}');
             return $response;
         });
         /** @var GuzzleHttp\Client $httpClient */
@@ -38,7 +38,7 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
         $server = new CM_Janus_Server(0, 'bar', 'http://cm-janus.dev:8080', 'ws://cm-janus.dev:8188');
         $api = new CM_Janus_HttpApiClient($httpClient);
         $result = $api->fetchStatus($server);
-        $this->assertSame(['foo' => 'bar'], $result);
+        $this->assertSame(['streamKey' => 'streamKey', 'streamChannelKey' => 'channelKey', 'isPublish' => true], $result);
         $this->assertSame(1, $sendRequestMethod->getCallCount());
     }
 }
