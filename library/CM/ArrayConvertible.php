@@ -10,6 +10,13 @@ interface CM_ArrayConvertible {
     public function toArray();
 
     /**
+     * Object representation as array
+     *
+     * @return array
+     */
+    public function toArrayIdOnly();
+
+    /**
      * Return object from array-representation
      *
      * @param array $array
