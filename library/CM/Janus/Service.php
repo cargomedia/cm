@@ -24,7 +24,7 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
         $streamList = $this->_fetchStatus();
 
         foreach ($streamList as $stream) {
-            $streamChannel = $streamRepository->findStreamChannelByKey($stream->getStreamKey());
+            $streamChannel = $streamRepository->findStreamChannelByKey($stream->getStreamChannelKey());
             /** @var CM_Janus_Stream $stream */
             $clientKey = $stream->getStreamKey();
             if ($streamChannel) {
@@ -39,9 +39,12 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
         }
 
         $startStampLimit = time() - 3;
-        $streamKeyList = \Functional\map($streamList, function (CM_Janus_Stream $stream) {
-            return $stream->getStreamKey();
-        });
+
+        $streamKeyMap = [];
+        foreach ($streamList as $stream) {
+            $streamKeyMap[$stream->getStreamKey()] = true; //need just to define key
+        }
+
         $streamChannels = $streamRepository->getStreamChannels();
         /** @var CM_Model_StreamChannel_Abstract $streamChannel */
         foreach ($streamChannels as $streamChannel) {
@@ -61,7 +64,7 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
                 if ($isJustCreated) {
                     continue;
                 }
-                if (!array_key_exists($stream->getKey(), $streamKeyList)) {
+                if (!array_key_exists($stream->getKey(), $streamKeyMap)) {
                     $streamRepository->removeStream($stream);
                 }
             }

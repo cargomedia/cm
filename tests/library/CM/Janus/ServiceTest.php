@@ -86,6 +86,10 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         $streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
         $streamSubscribe = CMTest_TH::createStreamSubscribe(null, $streamChannel);
 
+        $existingStreamChannel = CMTest_TH::createStreamChannel(null, CM_Janus_Service::getTypeStatic());
+        $existingStreamPublish = CMTest_TH::createStreamPublish(null, $existingStreamChannel);
+        $existingStreamSubscribe = CMTest_TH::createStreamSubscribe(null, $existingStreamChannel);
+
         $server1 = $this->mockClass('CM_Janus_Server')->newInstance([1, 'key', 'http://mock', 'ws://mock']);
         /** @var CM_Janus_Configuration|\Mocka\AbstractClassTrait $configuration */
         $configuration = $this->mockObject('CM_Janus_Configuration');
@@ -93,7 +97,18 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
 
         /** @var CM_Janus_HttpApiClient|\Mocka\AbstractClassTrait $httpApiClient */
         $httpApiClient = $this->mockClass('CM_Janus_HttpApiClient')->newInstanceWithoutConstructor();
-        $httpApiClient->mockMethod('fetchStatus')->set([]);
+        $httpApiClient->mockMethod('fetchStatus')->set([
+            [
+                'streamKey'        => $existingStreamPublish->getKey(),
+                'streamChannelKey' => $existingStreamChannel->getKey(),
+                'isPublish'        => true,
+            ],
+            [
+                'streamKey'        => $existingStreamSubscribe->getKey(),
+                'streamChannelKey' => $existingStreamChannel->getKey(),
+                'isPublish'        => false,
+            ],
+        ]);
 
         $janus = new CM_Janus_Service($configuration, $httpApiClient);
         $janus->synchronize();
@@ -102,12 +117,20 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         $this->assertEquals($streamPublish, CM_Model_Stream_Publish::findByKeyAndChannel($streamPublish->getKey(), $streamChannel));
         $this->assertEquals($streamSubscribe, CM_Model_Stream_Subscribe::findByKeyAndChannel($streamSubscribe->getKey(), $streamChannel));
 
+        $this->assertEquals($existingStreamChannel, CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($existingStreamChannel->getKey(), $janus->getType()));
+        $this->assertEquals($existingStreamPublish, CM_Model_Stream_Publish::findByKeyAndChannel($existingStreamPublish->getKey(), $existingStreamChannel));
+        $this->assertEquals($existingStreamSubscribe, CM_Model_Stream_Subscribe::findByKeyAndChannel($existingStreamSubscribe->getKey(), $existingStreamChannel));
+
         CMTest_TH::timeForward(5);
         $janus->synchronize();
 
         $this->assertNull(CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamChannel->getKey(), $janus->getType()));
         $this->assertNull(CM_Model_Stream_Publish::findByKeyAndChannel($streamPublish->getKey(), $streamChannel));
         $this->assertNull(CM_Model_Stream_Subscribe::findByKeyAndChannel($streamSubscribe->getKey(), $streamChannel));
+
+        $this->assertEquals($existingStreamChannel, CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($existingStreamChannel->getKey(), $janus->getType()));
+        $this->assertEquals($existingStreamPublish, CM_Model_Stream_Publish::findByKeyAndChannel($existingStreamPublish->getKey(), $existingStreamChannel));
+        $this->assertEquals($existingStreamSubscribe, CM_Model_Stream_Subscribe::findByKeyAndChannel($existingStreamSubscribe->getKey(), $existingStreamChannel));
     }
 
     public function testSynchronizeMissingInPhp() {
