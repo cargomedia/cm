@@ -37,9 +37,7 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
             }
             $this->_httpApiClient->stopStream($stream->getServer(), $clientKey);
         }
-
         $startStampLimit = time() - 3;
-
         $streamKeyMap = [];
         foreach ($streamList as $stream) {
             $streamKeyMap[$stream->getStreamKey()] = true; //need just to define key
