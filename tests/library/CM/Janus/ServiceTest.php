@@ -90,6 +90,8 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         $existingStreamPublish = CMTest_TH::createStreamPublish(null, $existingStreamChannel);
         $existingStreamSubscribe = CMTest_TH::createStreamSubscribe(null, $existingStreamChannel);
 
+        $emptyStreamChannel = CMTest_TH::createStreamChannel(null, CM_Janus_Service::getTypeStatic());
+
         $server1 = $this->mockClass('CM_Janus_Server')->newInstance([1, 'key', 'http://mock', 'ws://mock']);
         /** @var CM_Janus_Configuration|\Mocka\AbstractClassTrait $configuration */
         $configuration = $this->mockObject('CM_Janus_Configuration');
@@ -120,6 +122,8 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         $this->assertEquals($existingStreamChannel, CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($existingStreamChannel->getKey(), $janus->getType()));
         $this->assertEquals($existingStreamPublish, CM_Model_Stream_Publish::findByKeyAndChannel($existingStreamPublish->getKey(), $existingStreamChannel));
         $this->assertEquals($existingStreamSubscribe, CM_Model_Stream_Subscribe::findByKeyAndChannel($existingStreamSubscribe->getKey(), $existingStreamChannel));
+
+        $this->assertNull(CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($emptyStreamChannel->getKey(), $janus->getType()));
 
         CMTest_TH::timeForward(5);
         $janus->synchronize();
