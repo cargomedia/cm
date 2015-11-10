@@ -9,8 +9,8 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
     protected $_httpApiClient;
 
     /**
-     * @param CM_Janus_Configuration $configuration
-     * @param CM_Janus_HttpApiClient $httpClient
+     * @param CM_Janus_Configuration                $configuration
+     * @param CM_Janus_HttpApiClient                $httpClient
      * @param CM_MediaStreams_StreamRepository|null $streamRepository
      */
     public function __construct(CM_Janus_Configuration $configuration, CM_Janus_HttpApiClient $httpClient, CM_MediaStreams_StreamRepository $streamRepository = null) {
@@ -86,7 +86,7 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
         $status = [];
         foreach ($this->_configuration->getServers() as $server) {
             foreach ($this->_httpApiClient->fetchStatus($server) as $streamInfo) {
-                $status[] = new CM_Janus_Stream($streamInfo['streamKey'], $streamInfo['streamChannelKey'], $server);
+                $status[] = new CM_Janus_Stream($streamInfo['id'], $streamInfo['channelName'], $server);
             }
         }
         return $status;

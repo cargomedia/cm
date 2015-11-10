@@ -15,12 +15,12 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
             switch ($server->getId()) {
                 case 1:
                     return [
-                        ['streamKey' => 'stream-foo', 'streamChannelKey' => 'channel-foo', 'isPublish' => false],
+                        ['id' => 'stream-foo', 'channelName' => 'channel-foo', 'isPublish' => false],
                     ];
                 case 5:
                     return [
-                        ['streamKey' => 'stream-bar', 'streamChannelKey' => 'channel-bar', 'isPublish' => false],
-                        ['streamKey' => 'stream-zoo', 'streamChannelKey' => 'channel-zoo', 'isPublish' => false],
+                        ['id' => 'stream-bar', 'channelName' => 'channel-bar', 'isPublish' => false],
+                        ['id' => 'stream-zoo', 'channelName' => 'channel-zoo', 'isPublish' => false],
                     ];
             }
         });
@@ -101,14 +101,14 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         $httpApiClient = $this->mockClass('CM_Janus_HttpApiClient')->newInstanceWithoutConstructor();
         $httpApiClient->mockMethod('fetchStatus')->set([
             [
-                'streamKey'        => $existingStreamPublish->getKey(),
-                'streamChannelKey' => $existingStreamChannel->getKey(),
-                'isPublish'        => true,
+                'id'          => $existingStreamPublish->getKey(),
+                'channelName' => $existingStreamChannel->getKey(),
+                'isPublish'   => true,
             ],
             [
-                'streamKey'        => $existingStreamSubscribe->getKey(),
-                'streamChannelKey' => $existingStreamChannel->getKey(),
-                'isPublish'        => false,
+                'id'          => $existingStreamSubscribe->getKey(),
+                'channelName' => $existingStreamChannel->getKey(),
+                'isPublish'   => false,
             ],
         ]);
 
@@ -155,10 +155,10 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         $configuration->mockMethod('getServers')->set([$server1]);
 
         $status = [
-            ['streamKey' => $streamPublishKey, 'streamChannelKey' => $streamChannelKey, 'isPublish' => true],
-            ['streamKey' => $streamSubscribeKey, 'streamChannelKey' => $streamChannelKey, 'isPublish' => false],
-            ['streamKey' => 'absentStreamKey', 'streamChannelKey' => 'absentChannelKey', 'isPublish' => false],
-            ['streamKey' => 'absentStreamKey2', 'streamChannelKey' => $streamChannelKey2, 'isPublish' => true],
+            ['id' => $streamPublishKey, 'channelName' => $streamChannelKey, 'isPublish' => true],
+            ['id' => $streamSubscribeKey, 'channelName' => $streamChannelKey, 'isPublish' => false],
+            ['id' => 'absentStreamKey', 'channelName' => 'absentChannelKey', 'isPublish' => false],
+            ['id' => 'absentStreamKey2', 'channelName' => $streamChannelKey2, 'isPublish' => true],
         ];
 
         $httpApiClient = $this->mockClass('CM_Janus_HttpApiClient')->newInstanceWithoutConstructor();
