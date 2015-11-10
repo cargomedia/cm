@@ -103,7 +103,7 @@ class CM_Wowza_ServiceTest extends CMTest_TestCase {
 
     /**
      * @param CM_Model_StreamChannel_Media[] $streamChannels
-     * @return string
+     * @return array
      */
     private function _generateWowzaData(array $streamChannels) {
         $status = array();

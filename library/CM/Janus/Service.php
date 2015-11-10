@@ -9,8 +9,8 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
     protected $_httpApiClient;
 
     /**
-     * @param CM_Janus_Configuration $configuration
-     * @param CM_Janus_HttpApiClient $httpClient
+     * @param CM_Janus_Configuration                $configuration
+     * @param CM_Janus_HttpApiClient                $httpClient
      * @param CM_MediaStreams_StreamRepository|null $streamRepository
      */
     public function __construct(CM_Janus_Configuration $configuration, CM_Janus_HttpApiClient $httpClient, CM_MediaStreams_StreamRepository $streamRepository = null) {
@@ -20,7 +20,53 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
     }
 
     public function synchronize() {
-        throw new CM_Exception_NotImplemented();
+        $streamRepository = $this->getStreamRepository();
+        $streamList = $this->_fetchStatus();
+
+        foreach ($streamList as $stream) {
+            $streamChannel = $streamRepository->findStreamChannelByKey($stream->getStreamChannelKey());
+            /** @var CM_Janus_Stream $stream */
+            $clientKey = $stream->getStreamKey();
+            if ($streamChannel) {
+                if ($streamChannel->getStreamPublishs()->findKey($clientKey)) {
+                    continue;
+                }
+                if ($streamChannel->getStreamSubscribes()->findKey($clientKey)) {
+                    continue;
+                }
+            }
+            $this->_httpApiClient->stopStream($stream->getServer(), $clientKey);
+        }
+        $startStampLimit = time() - 3;
+        $streamKeyMap = [];
+        foreach ($streamList as $stream) {
+            $streamKeyMap[$stream->getStreamKey()] = true; //need just to define key
+        }
+
+        $streamChannels = $streamRepository->getStreamChannels();
+        /** @var CM_Model_StreamChannel_Abstract $streamChannel */
+        foreach ($streamChannels as $streamChannel) {
+            if (!$streamChannel->hasStreams()) {
+                $streamChannel->delete();
+                continue;
+            }
+
+            $streams = array_merge(
+                $streamChannel->getStreamPublishs()->getItems(),
+                $streamChannel->getStreamSubscribes()->getItems()
+            );
+
+            /** @var CM_Model_Stream_Abstract $stream */
+            foreach ($streams as $stream) {
+                $isJustCreated = $stream->getStart() > $startStampLimit;
+                if ($isJustCreated) {
+                    continue;
+                }
+                if (!array_key_exists($stream->getKey(), $streamKeyMap)) {
+                    $streamRepository->removeStream($stream);
+                }
+            }
+        }
     }
 
     /**
@@ -38,7 +84,7 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
         $status = [];
         foreach ($this->_configuration->getServers() as $server) {
             foreach ($this->_httpApiClient->fetchStatus($server) as $streamInfo) {
-                $status[] = new CM_Janus_Stream($streamInfo['streamKey'], $streamInfo['streamChannelKey'], $server);
+                $status[] = new CM_Janus_Stream($streamInfo['id'], $streamInfo['channelName'], $server);
             }
         }
         return $status;
