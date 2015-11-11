@@ -15,6 +15,9 @@
    */
   function promiseOnce(fn, namespace) {
     var uid = namespace || _getUid();
+    if(storage[uid]) {
+      throw new Error('`' + uid + '` namespace is already registered for another Promise.');
+    }
     return function() {
       return _getPromiseOnce.apply(this, [fn, uid].concat(slice.call(arguments)));
     };
@@ -45,7 +48,11 @@
    */
   function _getPromiseOnce(fn, uid) {
     if (!storage[uid]) {
-      storage[uid] = fn.apply(this, slice.call(arguments, 2));
+      var promise = fn.apply(this, slice.call(arguments, 2));
+      if(!(promise instanceof Promise)) {
+        throw new Error('promiseOnce getter function must return a Promise instance.');
+      }
+      storage[uid] = promise;
     }
     return storage[uid];
   }
