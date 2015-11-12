@@ -155,12 +155,12 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertEquals([$user1, $user2, $user3], $userOnlinePaging);
 
         CM_Model_User::offlineDelayed();
-        $userOnlinePaging = new CM_Paging_User_Online();
+        $userOnlinePaging->_change();
         $this->assertEquals([$user1, $user2, $user3], $userOnlinePaging);
 
         CMTest_TH::timeForward(1);
         CM_Model_User::offlineDelayed();
-        $userOnlinePaging = new CM_Paging_User_Online();
+        $userOnlinePaging->_change();
         $this->assertEquals([$user2, $user3], $userOnlinePaging);
     }
 }
