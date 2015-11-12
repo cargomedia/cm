@@ -464,6 +464,15 @@ CREATE TABLE `cm_tmp_location` (
   UNIQUE KEY `levelId` (`level`,`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_tmp_classType`;
+
+
+CREATE TABLE `cm_tmp_classType` (
+  `type` int(10) unsigned NOT NULL,
+  `className` varchar(255) NOT NULL,
+  PRIMARY KEY (`type`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `cm_tmp_location_coordinates`;
 
 

@@ -329,4 +329,11 @@ class CM_Model_LocationTest extends CMTest_TestCase {
     public function testFindByAttributesException() {
         CM_Model_Location::findByAttributes(CM_Model_Location::LEVEL_COUNTRY, ['notExistingField' => 'CH']);
     }
+
+    public function testArrayConvertible() {
+        $location = CMTest_TH::createLocation();
+
+        $this->assertEquals($location, CM_Model_Location::fromArray($location->toArray()));
+        $this->assertEquals($location, CM_Model_Location::fromArray($location->toArrayIdOnly()));
+    }
 }

@@ -62,8 +62,12 @@ abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract impleme
         return false;
     }
 
-    public function toArray() {
+    public function toArrayIdOnly() {
         return array('type' => static::getTypeStatic());
+    }
+
+    public function toArray() {
+        return $this->toArrayIdOnly();
     }
 
     /**

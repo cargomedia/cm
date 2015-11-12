@@ -5,22 +5,38 @@
  */
 class CM_WeightedRandom {
 
+    /** @var array */
     private $_values = array();
+
+    /** @var array */
     private $_lookup = array();
-    private $_total_weight = 0;
+
+    /** @var float */
+    private $_weightTotal = 0;
 
     /**
      * Initalize the weighted random selector
      *
-     * @param array $values  Array of elements to choose from
-     * @param array $weights An array of weights. Weight must be a positive number.
+     * @param mixed[] $values  Array of elements to choose from
+     * @param float[] $weights An array of weights. Weight must be a positive number.
+     * @throws CM_Exception
      */
-    function __construct($values, $weights) {
+    public function __construct(array $values, array $weights) {
+        $values = array_values($values);
+        $weights = array_values($weights);
+
+        if (count($values) !== count($weights)) {
+            throw new CM_Exception('Weights and values must have the same length');
+        }
+        if (0 === count($values)) {
+            throw new CM_Exception('Values cannot be empty');
+        }
+
         $this->_values = $values;
 
         for ($i = 0; $i < count($weights); $i++) {
-            $this->_total_weight += $weights[$i];
-            $this->_lookup[$i] = $this->_total_weight;
+            $this->_weightTotal += $weights[$i];
+            $this->_lookup[$i] = $this->_weightTotal;
         }
     }
 
@@ -29,13 +45,12 @@ class CM_WeightedRandom {
      *
      * @return mixed Selected element
      */
-    function lookup() {
-        $r = mt_rand() / mt_getrandmax() * $this->_total_weight;
-        return $this->_values[$this->binary_search($r, $this->_lookup)];
+    public function lookup() {
+        $r = mt_rand() / mt_getrandmax() * $this->_weightTotal;
+        return $this->_values[$this->_binarySearch($r, $this->_lookup)];
     }
 
     /**
-     * binary_search()
      * Search a sorted array for a number. Returns the item's index if found. Otherwise
      * returns the position where it should be inserted, or count($haystack)-1 if the
      * $needle is higher than every element in the array.
@@ -44,7 +59,7 @@ class CM_WeightedRandom {
      * @param array $haystack
      * @return int
      */
-    private function binary_search($needle, $haystack) {
+    private function _binarySearch($needle, $haystack) {
         $high = count($haystack) - 1;
         $low = 0;
 

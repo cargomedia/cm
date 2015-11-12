@@ -43,6 +43,8 @@ abstract class CM_Http_Request_Abstract {
      * @param array|null         $headers OPTIONAL
      * @param array|null         $server
      * @param CM_Model_User|null $viewer
+     * @throws CM_Exception
+     * @throws CM_Exception_Invalid
      */
     public function __construct($uri, array $headers = null, array $server = null, CM_Model_User $viewer = null) {
         if (null !== $headers) {
@@ -55,9 +57,7 @@ abstract class CM_Http_Request_Abstract {
         $this->setUri($uri);
 
         if ($sessionId = $this->getCookie('sessionId')) {
-            if ($this->_session = CM_Session::findById($sessionId)) {
-                $this->_session->start();
-            }
+            $this->setSession(CM_Session::findById($sessionId));
         }
 
         if ($viewer) {
@@ -309,6 +309,17 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @param CM_Session|null $session
+     */
+    public function setSession(CM_Session $session = null) {
+        if (null !== $session) {
+            $session->start();
+        }
+        $this->_session = $session;
+        $this->resetViewer();
+    }
+
+    /**
      * @return boolean
      */
     public function hasSession() {
@@ -330,14 +341,15 @@ abstract class CM_Http_Request_Abstract {
      * @throws CM_Exception_AuthRequired
      */
     public function getViewer($needed = false) {
-        if ($this->_viewer === false) {
-            $this->_viewer = $this->getSession()->getUser();
-        }
-        if (!$this->_viewer) {
-            if ($needed) {
-                throw new CM_Exception_AuthRequired();
+        if (false === $this->_viewer) {
+            $this->_viewer = null;
+            if ($this->hasSession()) {
+                $this->_viewer = $this->getSession()->getUser();
             }
-            return null;
+        }
+
+        if ($needed && null === $this->_viewer) {
+            throw new CM_Exception_AuthRequired();
         }
         return $this->_viewer;
     }

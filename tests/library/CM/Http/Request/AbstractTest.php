@@ -30,10 +30,14 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
 
         $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
         $this->assertEquals($user, $mock->getViewer(true));
+    }
 
-        $user2 = CMTest_TH::createUser();
-        $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers, null, $user2));
-        $this->assertEquals($user2, $mock->getViewer(true));
+    public function testGetViewerDoesntCreateSession() {
+        $request = new CM_Http_Request_Get('/');
+        $this->assertFalse($request->hasSession());
+
+        $request->getViewer();
+        $this->assertFalse($request->hasSession());
     }
 
     public function testGetCookie() {
@@ -238,6 +242,22 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
     public function testIsSupportedWithoutUserAgent() {
         $request = new CM_Http_Request_Get('/', []);
         $this->assertSame(true, $request->isSupported());
+    }
+
+    public function testSetSession() {
+        $user = CMTest_TH::createUser();
+        $session = new CM_Session();
+        $request = new CM_Http_Request_Get('/');
+
+        $session->setUser($user);
+        $request->setSession($session);
+        $this->assertEquals($session, $request->getSession());
+        $this->assertEquals($user, $request->getViewer());
+
+        $session->deleteUser();
+        $request->setSession($session);
+        $this->assertEquals($session, $request->getSession());
+        $this->assertSame(null, $request->getViewer());
     }
 
     /**

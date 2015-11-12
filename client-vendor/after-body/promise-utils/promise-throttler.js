@@ -79,6 +79,16 @@
     return storage[namespace];
   }
 
+  /**
+   * @param {String} namespace
+   */
+  function removeThrottler(namespace) {
+    if (storage[namespace]) {
+      delete storage[namespace];
+    }
+  }
+
   global.promiseThrottler = promiseThrottler;
+  global.removePromiseThrottler = removeThrottler;
 
 })(window);

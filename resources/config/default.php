@@ -6,6 +6,7 @@ return function (CM_Config_Node $config) {
     $config->CM_App->setupScriptClasses[] = 'CM_Db_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_MongoDb_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_Elasticsearch_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_Class_TypeDumper';
     $config->CM_App->setupScriptClasses[] = 'CM_Http_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Translations';
     $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Currency';
@@ -22,6 +23,9 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Cache_Shared->storage = 'CM_Cache_Storage_Memcache';
     $config->CM_Cache_Shared->lifetime = 3600;
+
+    $config->CM_Cache_Persistent->storage = 'CM_Cache_Storage_File';
+    $config->CM_Cache_Persistent->lifetime = null;
 
     $config->CM_Paging_Ip_Blocked->maxAge = (7 * 86400);
 

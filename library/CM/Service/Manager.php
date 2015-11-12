@@ -199,6 +199,15 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @param string $serviceName
+     * @return CM_Janus_Service
+     * @throws CM_Exception_Invalid
+     */
+    public function getJanus($serviceName) {
+        return $this->get($serviceName, 'CM_Janus_Service');
+    }
+
+    /**
      * @return CM_Memcache_Client
      */
     public function getMemcache() {

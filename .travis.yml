@@ -31,7 +31,7 @@ before_script:
   - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
   - npm install -g autoprefixer@4.0.0
   - npm install -g uglify-js@2.4.13
-
+  - npm install -g browserify@11.2.0
   - composer install
   - cp tests/travis/config.php resources/config/local.php
   - bin/cm app set-deploy-version

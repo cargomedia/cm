@@ -169,6 +169,8 @@ class CM_Elasticsearch_ClientTest extends CMTest_TestCase {
         $typeName = 'typeName';
         $cmClient->deleteIndex($indexName);
         $cmClient->createIndex($indexName, $typeName, [], [], false);
+        $cmClient->awaitReady();
+
         $this->assertSame(0, $cmClient->count($indexName, $typeName));
 
         $cmClient->bulkAddDocuments([new CM_Elasticsearch_Document('3', ['11' => '22'])], $indexName, $typeName);

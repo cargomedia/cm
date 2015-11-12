@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed {
+abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed, CM_Comparable {
 
     /** @var string[] */
     protected $_themes = array();
@@ -122,14 +122,11 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     /**
      * @return string
-     * @throws CM_Exception_Invalid
+     * @throws CM_Exception
      */
     public function getHost() {
-        $siteHost = parse_url($this->getUrl(), PHP_URL_HOST);
-        if (false === $siteHost || null === $siteHost) {
-            throw new CM_Exception_Invalid('Cannot detect host from `' . $this->getUrl() . '`.');
-        }
-        return $siteHost;
+        $urlParser = new CM_Http_UrlParser($this->getUrl());
+        return $urlParser->getHost();
     }
 
     /**
@@ -147,8 +144,12 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         }
     }
 
-    public function toArray() {
+    public function toArrayIdOnly() {
         return array('type' => $this->getType());
+    }
+
+    public function toArray() {
+        return $this->toArrayIdOnly();
     }
 
     /**
@@ -176,9 +177,26 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return boolean
      */
     public function match(CM_Http_Request_Abstract $request) {
-        $urlRequest = $request->getHost();
-        $urlSite = $this->getHost();
-        return 0 === strpos(preg_replace('/^www\./', '', $urlRequest), preg_replace('/^www\./', '', $urlSite));
+        $url = new CM_Http_UrlParser($this->getUrl());
+        $hostList = [
+            $url->getHost(),
+            preg_replace('/^www\./', '', $this->getHost()),
+        ];
+
+        if ($this->getUrlCdn()) {
+            $urlCdn = new CM_Http_UrlParser($this->getUrlCdn());
+            $hostList[] = $urlCdn->getHost();
+        }
+
+        return in_array($request->getHost(), $hostList, true);
+    }
+
+    /**
+     * @param CM_Site_Abstract $other
+     * @return boolean
+     */
+    public function equals(CM_Comparable $other = null) {
+        return $other && (get_class($other) === get_class($this));
     }
 
     /**

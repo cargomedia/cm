@@ -157,11 +157,11 @@ class CMTest_TH {
      */
     public static function createStreamChannelVideoArchive(CM_Model_StreamChannel_Media $streamChannel = null, CM_Model_User $user = null, $filename = null) {
         if (is_null($streamChannel)) {
-            $streamChannel = self::createStreamChannel();
-            self::createStreamPublish($user, $streamChannel);
+            $streamChannel = static::createStreamChannel();
+            static::createStreamPublish($user, $streamChannel);
         }
         if (!$streamChannel->hasStreamPublish()) {
-            self::createStreamPublish($user, $streamChannel);
+            static::createStreamPublish($user, $streamChannel);
         }
         if (null !== $filename) {
             $filename = (string) $filename;
