@@ -33,6 +33,7 @@ class CM_Janus_Configuration {
      * @return CM_Janus_Server|null
      */
     public function findServerByKey($key) {
+        $key = (string) $key;
         foreach ($this->_servers as $server) {
             if ($server->getKey() === $key) {
                 return $server;
@@ -47,6 +48,7 @@ class CM_Janus_Configuration {
      * @throws CM_Exception_Invalid
      */
     public function getServer($id) {
+        $id = (int) $id;
         foreach ($this->_servers as $server) {
             if ($server->getId() === $id) {
                 return $server;
