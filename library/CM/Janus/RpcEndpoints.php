@@ -103,8 +103,8 @@ class CM_Janus_RpcEndpoints {
         self::_authenticate($janus, $serverKey);
 
         $params = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
-        $session = new CM_Session($params->getString('sessionId'));
-        return null !== $session->getUser(false);
+        $session = CM_Session::findById($params->getString('sessionId'));
+        return $session && null !== $session->getUser(false);
     }
 
     /**
