@@ -3,8 +3,9 @@
 class CM_Log_Handler_AbstractTest extends CMTest_TestCase {
 
     public function testHandlerLevel() {
-        /** @var CM_Log_Handler_Abstract $mockLogHandler */
+        /** @var CM_Log_Handler_Abstract|\Mocka\ClassMock $mockLogHandler */
         $mockLogHandler = $this->mockClass('CM_Log_Handler_Abstract')->newInstanceWithoutConstructor();
+        /** @var \Mocka\FunctionMock */
         $mockHandleRecord = $mockLogHandler->mockMethod('_writeRecord');
         $mockHandleRecord->set(true);
 

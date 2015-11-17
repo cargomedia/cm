@@ -48,8 +48,13 @@ class CM_Log_Logger {
         foreach ($this->_handlerList as $handler) {
             try {
                 $handler->handleRecord($record);
+                $handlerFailed = false;
             } catch (Exception $e) {
                 $exceptionList[] = $e;
+                $handlerFailed = true;
+            }
+            if ($handler->isHandling($record) && !$handler->isBubbling() && !$handlerFailed) {
+                break;
             }
         }
         if (!empty($exceptionList)) {
@@ -81,18 +86,26 @@ class CM_Log_Logger {
 
     /**
      * @param CM_Log_Handler_HandlerInterface[] $handlerList
+     * @param null                              $prepend
      */
-    public function addHandlers(array $handlerList) {
+    public function addHandlers(array $handlerList, $prepend = null) {
+        $prepend = null === $prepend ? false : (bool) $prepend;
         foreach ($handlerList as $handler) {
-            $this->addHandler($handler);
+            $this->addHandler($handler, $prepend);
         }
     }
 
     /**
      * @param CM_Log_Handler_HandlerInterface $handler
+     * @param bool|null                       $prepend
      */
-    public function addHandler(CM_Log_Handler_HandlerInterface $handler) {
-        $this->_handlerList[] = $handler;
+    public function addHandler(CM_Log_Handler_HandlerInterface $handler, $prepend = null) {
+        $prepend = null === $prepend ? false : (bool) $prepend;
+        if ($prepend) {
+            array_unshift($this->_handlerList, $handler);
+        } else {
+            $this->_handlerList[] = $handler;
+        }
     }
 
     /**
