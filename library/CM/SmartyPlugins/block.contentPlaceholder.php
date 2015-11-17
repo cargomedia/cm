@@ -6,6 +6,11 @@ function smarty_block_contentPlaceholder($params, $content, Smarty_Internal_Temp
     if ($open) {
         return '';
     } else {
-        return CM_Frontend_TemplateHelper_ContentPlaceholder::create($content, $params['width'], $params['height'], (isset($params['stretch']) ? ' stretch' : false));
+        return CM_Frontend_TemplateHelper_ContentPlaceholder::create(
+            $content,
+            $params['width'],
+            $params['height'],
+            (isset($params['stretch']) ? ' stretch' : false),
+            (isset($params['color']) ? $params['color'] : null));
     }
 }

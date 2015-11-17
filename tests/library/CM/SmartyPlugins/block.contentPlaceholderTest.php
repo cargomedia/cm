@@ -23,6 +23,15 @@ class smarty_block_contentPlaceholderTest extends CMTest_TestCase {
         $this->assertEquals(600, $size['height']);
     }
 
+    public function testRenderColor() {
+        $params = ['height' => 1, 'width' => 1, 'color' => [127, 137, 147, 50]];
+        $colors = $this->_getImgColors($params);
+        $this->assertEquals(127, $colors['red']);
+        $this->assertEquals(137, $colors['green']);
+        $this->assertEquals(147, $colors['blue']);
+        $this->assertEquals(50, $colors['alpha']);
+    }
+
     /**
      * @param array $params
      * @return String
@@ -35,5 +44,20 @@ class smarty_block_contentPlaceholderTest extends CMTest_TestCase {
         $this->assertStringStartsWith('data:image/png;base64,', $imgSrc);
         $size = getimagesize($imgSrc);
         return ['width' => $size[0], 'height' => $size[1]];
+    }
+
+    /**
+     * @param array $params
+     * @return array
+     */
+    private function _getImgColors(array $params) {
+        $output = smarty_block_contentPlaceholder($params, '', $this->_template, false);
+        $matches = array();
+        preg_match('/class="contentPlaceholder-size" src="([^"]+)"/', $output, $matches);
+        $imgSrc = $matches[1];
+        $this->assertStringStartsWith('data:image/png;base64,', $imgSrc);
+        $img = imagecreatefrompng($imgSrc);
+        $rgb = imagecolorat($img, 0, 0);
+        return imagecolorsforindex($img, $rgb);
     }
 }
