@@ -6,11 +6,11 @@
     "html5printshiv"
   ],
   "feature-detects": [
-    "test/css/objectfit",
-    "test/forms/fileinput",
-    "test/dom/classlist",
-    "test/requestanimationframe",
-    "test/css/transforms3d",
-    "test/touchevents"
+    "css/objectfit",
+    "forms/fileinput",
+    "dom/classlist",
+    "requestanimationframe",
+    "css/transforms3d",
+    "touchevents"
   ]
 }
