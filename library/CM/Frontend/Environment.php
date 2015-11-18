@@ -175,9 +175,13 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_Model_Currency|null
+     * @return CM_Model_Currency
      */
     public function getCurrency() {
-        return $this->_currency;
+        $currency = $this->_currency;
+        if (null === $currency) {
+            $currency = CM_Model_Currency::getDefaultCurrency();
+        }
+        return $currency;
     }
 }
