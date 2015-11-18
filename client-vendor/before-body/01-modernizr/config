@@ -7,6 +7,7 @@
   ],
   "feature-detects": [
     "css/objectfit",
+    "event/deviceorientation-motion",
     "forms/fileinput",
     "fullscreen-api",
     "dom/classlist",
