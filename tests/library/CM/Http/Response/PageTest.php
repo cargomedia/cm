@@ -147,10 +147,11 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessTrackingViewer() {
-        $viewer = $this->getMock('CM_Model_User', array('getIdRaw', 'getVisible', 'getLanguage'));
+        $viewer = $this->getMock('CM_Model_User', array('getIdRaw', 'getVisible', 'getLanguage', 'getCurrency'));
         $viewer->expects($this->any())->method('getIdRaw')->will($this->returnValue(array('id' => '1')));
         $viewer->expects($this->any())->method('getVisible')->will($this->returnValue(false));
         $viewer->expects($this->any())->method('getLanguage')->will($this->returnValue(null));
+        $viewer->expects($this->any())->method('getCurrency')->will($this->returnValue(null));
         /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock5', null, $viewer);
         $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
