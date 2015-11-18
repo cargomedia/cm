@@ -8,6 +8,7 @@
   "feature-detects": [
     "css/objectfit",
     "forms/fileinput",
+    "fullscreen-api",
     "dom/classlist",
     "requestanimationframe",
     "css/transforms3d",
