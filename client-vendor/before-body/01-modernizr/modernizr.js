@@ -1,6 +1,6 @@
 /*!
  * modernizr v3.2.0
- * Build http://modernizr.com/download?-classlist-csstransforms3d-fileinput-objectfit-requestanimationframe-touchevents-addtest-printshiv-dontmin
+ * Build http://modernizr.com/download?-classlist-csstransforms3d-fileinput-objectfit-requestanimationframe-touchevents-webgl-addtest-printshiv-dontmin
  *
  * Copyright (c)
  *  Faruk Ates
@@ -1959,6 +1959,25 @@ This test will also return `true` for Firefox 4 Multitouch support.
       });
     }
     return bool;
+  });
+
+/*!
+{
+  "name": "WebGL",
+  "property": "webgl",
+  "caniuse": "webgl",
+  "tags": ["webgl", "graphics"],
+  "polyfills": ["jebgl", "cwebgl", "iewebgl"]
+}
+!*/
+
+  Modernizr.addTest('webgl', function() {
+    var canvas = createElement('canvas');
+    var supports = 'probablySupportsContext' in canvas ? 'probablySupportsContext' :  'supportsContext';
+    if (supports in canvas) {
+      return canvas[supports]('webgl') || canvas[supports]('experimental-webgl');
+    }
+    return 'WebGLRenderingContext' in window;
   });
 
 

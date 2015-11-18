@@ -11,6 +11,7 @@
     "dom/classlist",
     "requestanimationframe",
     "css/transforms3d",
-    "touchevents"
+    "touchevents",
+    "webgl"
   ]
 }
