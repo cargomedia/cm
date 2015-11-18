@@ -1,6 +1,6 @@
 /*!
  * modernizr v3.2.0
- * Build http://modernizr.com/download?-classlist-csstransforms3d-fileinput-fullscreen-objectfit-requestanimationframe-touchevents-webgl-addtest-printshiv-dontmin
+ * Build http://modernizr.com/download?-classlist-csstransforms3d-fileinput-fullscreen-objectfit-peerconnection-requestanimationframe-touchevents-webgl-addtest-printshiv-dontmin
  *
  * Copyright (c)
  *  Faruk Ates
@@ -1999,6 +1999,21 @@ This test will also return `true` for Firefox 4 Multitouch support.
     }
     return 'WebGLRenderingContext' in window;
   });
+
+/*!
+{
+  "name": "RTC Peer Connection",
+  "property": "peerconnection",
+  "tags": ["webrtc"],
+  "authors": ["Ankur Oberoi"],
+  "notes": [{
+    "name": "W3C Web RTC spec",
+    "href": "http://www.w3.org/TR/webrtc/"
+  }]
+}
+!*/
+
+  Modernizr.addTest('peerconnection', !!prefixed('RTCPeerConnection', window));
 
 
   // Run each test
