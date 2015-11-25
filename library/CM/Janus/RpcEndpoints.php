@@ -6,22 +6,24 @@ class CM_Janus_RpcEndpoints {
      * @param string $serverKey
      * @param string $streamChannelKey
      * @param string $streamKey
-     * @param int $start
+     * @param int    $start
      * @param string $sessionData
+     * @param string $channelData
      * @throws CM_Exception_AuthFailed
      * @throws CM_Exception_AuthRequired
      * @throws CM_Exception_Invalid
      * @throws CM_Exception_NotAllowed
-     * @throws Exception
      */
-    public static function rpc_publish($serverKey, $streamChannelKey, $streamKey, $start, $sessionData) {
+    public static function rpc_publish($serverKey, $streamChannelKey, $streamKey, $start, $sessionData, $channelData) {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
 
-        $params = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
-        $session = new CM_Session($params->getString('sessionId'));
+        $paramsSession = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
+        $session = new CM_Session($paramsSession->getString('sessionId'));
         $user = $session->getUser(true);
-        $streamChannelType = $params->getInt('streamChannelType');
+
+        $paramsChannel = CM_Params::factory(CM_Params::jsonDecode($channelData), true);
+        $streamChannelType = $paramsChannel->getInt('streamChannelType');
 
         $server = $janus->getConfiguration()->findServerByKey($serverKey);
         $streamRepository = $janus->getStreamRepository();
