@@ -6,6 +6,7 @@
     "html5printshiv"
   ],
   "feature-detects": [
+    "audio",
     "css/objectfit",
     "event/deviceorientation-motion",
     "forms/fileinput",

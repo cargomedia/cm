@@ -1,6 +1,6 @@
 /*!
  * modernizr v3.2.0
- * Build http://modernizr.com/download?-classlist-csstransforms3d-devicemotion_deviceorientation-fileinput-fullscreen-objectfit-peerconnection-requestanimationframe-touchevents-webgl-addtest-printshiv-dontmin
+ * Build http://modernizr.com/download?-audio-classlist-csstransforms3d-devicemotion_deviceorientation-fileinput-fullscreen-objectfit-peerconnection-requestanimationframe-touchevents-webgl-addtest-printshiv-dontmin
  *
  * Copyright (c)
  *  Faruk Ates
@@ -1011,6 +1011,79 @@
   ;
 
   /**
+   * createElement is a convenience wrapper around document.createElement. Since we
+   * use createElement all over the place, this allows for (slightly) smaller code
+   * as well as abstracting away issues with creating elements in contexts other than
+   * HTML documents (e.g. SVG documents).
+   *
+   * @access private
+   * @function createElement
+   * @returns {HTMLElement|SVGElement} An HTML or SVG element
+   */
+
+  function createElement() {
+    if (typeof document.createElement !== 'function') {
+      // This is the case in IE7, where the type of createElement is "object".
+      // For this reason, we cannot call apply() as Object is not a Function.
+      return document.createElement(arguments[0]);
+    } else if (isSVG) {
+      return document.createElementNS.call(document, 'http://www.w3.org/2000/svg', arguments[0]);
+    } else {
+      return document.createElement.apply(document, arguments);
+    }
+  }
+
+  ;
+/*!
+{
+  "name" : "HTML5 Audio Element",
+  "property": "audio",
+  "tags" : ["html5", "audio", "media"]
+}
+!*/
+/* DOC
+Detects the audio element
+*/
+
+  // This tests evaluates support of the audio element, as well as
+  // testing what types of content it supports.
+  //
+  // We're using the Boolean constructor here, so that we can extend the value
+  // e.g.  Modernizr.audio     // true
+  //       Modernizr.audio.ogg // 'probably'
+  //
+  // Codec values from : github.com/NielsLeenheer/html5test/blob/9106a8/index.html#L845
+  //                     thx to NielsLeenheer and zcorpan
+
+  // Note: in some older browsers, "no" was a return value instead of empty string.
+  //   It was live in FF3.5.0 and 3.5.1, but fixed in 3.5.2
+  //   It was also live in Safari 4.0.0 - 4.0.4, but fixed in 4.0.5
+  Modernizr.addTest('audio', function() {
+    /* jshint -W053 */
+    var elem = createElement('audio');
+    var bool = false;
+
+    try {
+      if (bool = !!elem.canPlayType) {
+        bool      = new Boolean(bool);
+        bool.ogg  = elem.canPlayType('audio/ogg; codecs="vorbis"').replace(/^no$/, '');
+        bool.mp3  = elem.canPlayType('audio/mpeg;')               .replace(/^no$/, '');
+        bool.opus  = elem.canPlayType('audio/ogg; codecs="opus"') .replace(/^no$/, '');
+
+        // Mimetypes accepted:
+        //   developer.mozilla.org/En/Media_formats_supported_by_the_audio_and_video_elements
+        //   bit.ly/iphoneoscodecs
+        bool.wav  = elem.canPlayType('audio/wav; codecs="1"')     .replace(/^no$/, '');
+        bool.m4a  = (elem.canPlayType('audio/x-m4a;')            ||
+                     elem.canPlayType('audio/aac;'))             .replace(/^no$/, '');
+      }
+    } catch (e) { }
+
+    return bool;
+  });
+
+
+  /**
    * If the browsers follow the spec, then they would expose vendor-specific style as:
    *   elem.style.WebkitBorderRadius
    * instead of something like the following, which would be technically incorrect:
@@ -1046,31 +1119,6 @@
 
   function contains(str, substr) {
     return !!~('' + str).indexOf(substr);
-  }
-
-  ;
-
-  /**
-   * createElement is a convenience wrapper around document.createElement. Since we
-   * use createElement all over the place, this allows for (slightly) smaller code
-   * as well as abstracting away issues with creating elements in contexts other than
-   * HTML documents (e.g. SVG documents).
-   *
-   * @access private
-   * @function createElement
-   * @returns {HTMLElement|SVGElement} An HTML or SVG element
-   */
-
-  function createElement() {
-    if (typeof document.createElement !== 'function') {
-      // This is the case in IE7, where the type of createElement is "object".
-      // For this reason, we cannot call apply() as Object is not a Function.
-      return document.createElement(arguments[0]);
-    } else if (isSVG) {
-      return document.createElementNS.call(document, 'http://www.w3.org/2000/svg', arguments[0]);
-    } else {
-      return document.createElement.apply(document, arguments);
-    }
   }
 
   ;
