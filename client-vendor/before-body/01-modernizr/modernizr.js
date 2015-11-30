@@ -1,6 +1,6 @@
 /*!
  * modernizr v3.2.0
- * Build http://modernizr.com/download?-audio-classlist-csstransforms3d-devicemotion_deviceorientation-fileinput-fullscreen-objectfit-peerconnection-requestanimationframe-touchevents-webgl-addtest-printshiv-dontmin
+ * Build http://modernizr.com/download?-audio-classlist-csstransforms3d-devicemotion_deviceorientation-fileinput-fullscreen-objectfit-peerconnection-requestanimationframe-touchevents-addtest-printshiv-setclasses-dontmin
  *
  * Copyright (c)
  *  Faruk Ates
@@ -41,10 +41,10 @@
     // Any settings that don't work as separate modules
     // can go in here as configuration.
     _config: {
-      'classPrefix' : '',
-      'enableClasses' : true,
-      'enableJSClass' : true,
-      'usePrefixes' : true
+      'classPrefix': '',
+      'enableClasses': true,
+      'enableJSClass': true,
+      'usePrefixes': true
     },
 
     // Queue of tests
@@ -65,11 +65,11 @@
     },
 
     addTest: function(name, fn, options) {
-      tests.push({name : name, fn : fn, options : options});
+      tests.push({name: name, fn: fn, options: options});
     },
 
     addAsyncTest: function(fn) {
-      tests.push({name : null, fn : fn});
+      tests.push({name: null, fn: fn});
     }
   };
 
@@ -1067,7 +1067,7 @@ Detects the audio element
       if (bool = !!elem.canPlayType) {
         bool      = new Boolean(bool);
         bool.ogg  = elem.canPlayType('audio/ogg; codecs="vorbis"').replace(/^no$/, '');
-        bool.mp3  = elem.canPlayType('audio/mpeg;')               .replace(/^no$/, '');
+        bool.mp3  = elem.canPlayType('audio/mpeg; codecs="mp3"')  .replace(/^no$/, '');
         bool.opus  = elem.canPlayType('audio/ogg; codecs="opus"') .replace(/^no$/, '');
 
         // Mimetypes accepted:
@@ -1130,7 +1130,7 @@ Detects the audio element
    */
 
   var modElem = {
-    elem : createElement('modernizr')
+    elem: createElement('modernizr')
   };
 
   // Clean up this element
@@ -1141,7 +1141,7 @@ Detects the audio element
   
 
   var mStyle = {
-    style : modElem.elem.style
+    style: modElem.elem.style
   };
 
   // kill ref for gc, must happen before mod.elem is removed, so we unshift on to
@@ -1281,7 +1281,7 @@ Detects the audio element
 
   // Accepts a list of property names and a single value
   // Returns `undefined` if native detection not available
-  function nativeTestProps (props, value) {
+  function nativeTestProps(props, value) {
     var i = props.length;
     // Start with the JS API: http://www.w3.org/TR/css3-conditional/#the-css-interface
     if ('CSS' in window && 'supports' in window.CSS) {
@@ -1462,6 +1462,12 @@ Detects the audio element
   /**
    * testDOMProps is a generic DOM property test; if a browser supports
    *   a certain property, it won't return undefined for it.
+   *
+   * @access private
+   * @function testDOMProps
+   * @param {array.<string>} props - An array of properties to test for
+   * @param {object} obj - An object or Element you want to use to test the parameters again
+   * @param {boolean|object} elem - An Element to bind the property lookup again. Use `false` to prevent the check
    */
   function testDOMProps(props, obj, elem) {
     var item;
@@ -1496,6 +1502,14 @@ Detects the audio element
    * We specify literally ALL possible (known and/or likely) properties on
    * the element including the non-vendor prefixed one, for forward-
    * compatibility.
+   *
+   * @access private
+   * @function testPropsAll
+   * @param {string} prop - A string of the property to test for
+   * @param {string|object} [prefixed] - An object to check the prefixed properties on. Use a string to skip
+   * @param {HTMLElement|SVGElement} [elem] - An element used to test the property and value against
+   * @param {string} [value] - A string of a css value
+   * @param {boolean} [skipValueTest] - An boolean representing if you want to test if value sticks when set
    */
   function testPropsAll(prop, prefixed, elem, value, skipValueTest) {
 
@@ -1533,7 +1547,7 @@ Detects the audio element
    * @access public
    * @function atRule
    * @param {string} prop - String name of the @-rule to test for
-   * @returns {string|false} The string representing the (possibly prefixed)
+   * @returns {string|boolean} The string representing the (possibly prefixed)
    * valid version of the @-rule, or `false` when it is unsupported.
    * @example
    * ```js
@@ -1599,7 +1613,8 @@ Detects the audio element
    * @access public
    * @function prefixed
    * @param {string} prop - String name of the property to test for
-   * @param {object} [obj]- An object to test for the prefixed properties on
+   * @param {object} [obj] - An object to test for the prefixed properties on
+   * @param {HTMLElement} [elem] - An element used to test specific properties against
    * @returns {string|false} The string representing the (possibly prefixed) valid
    * version of the property, or `false` when it is unsupported.
    * @example
@@ -1837,7 +1852,7 @@ Detects support for the `window.requestAnimationFrame` API, for offloading anima
    * ```
    */
 
-  function testAllProps (prop, value, skipValueTest) {
+  function testAllProps(prop, value, skipValueTest) {
     return testPropsAll(prop, undefined, undefined, value, skipValueTest);
   }
   ModernizrProto.testAllProps = testAllProps;
@@ -2058,25 +2073,6 @@ This test will also return `true` for Firefox 4 Multitouch support.
       });
     }
     return bool;
-  });
-
-/*!
-{
-  "name": "WebGL",
-  "property": "webgl",
-  "caniuse": "webgl",
-  "tags": ["webgl", "graphics"],
-  "polyfills": ["jebgl", "cwebgl", "iewebgl"]
-}
-!*/
-
-  Modernizr.addTest('webgl', function() {
-    var canvas = createElement('canvas');
-    var supports = 'probablySupportsContext' in canvas ? 'probablySupportsContext' :  'supportsContext';
-    if (supports in canvas) {
-      return canvas[supports]('webgl') || canvas[supports]('experimental-webgl');
-    }
-    return 'WebGLRenderingContext' in window;
   });
 
 /*!

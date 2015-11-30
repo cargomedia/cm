@@ -10,4 +10,15 @@
   Modernizr.addTest('webvr', function() {
     return ('getVRDevices' in navigator) || ('mozGetVRDevices' in navigator);
   });
+  /*
+   * test based on THREE.js method, see: http://threejs.org/examples/js/Detector.js
+   */
+  Modernizr.addTest('webgl', function() {
+    try {
+      var canvas = document.createElement('canvas');
+      return !!( window.WebGLRenderingContext && ( canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+    } catch (e) {
+      return false;
+    }
+  });
 })();

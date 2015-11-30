@@ -15,7 +15,6 @@
     "requestanimationframe",
     "css/transforms3d",
     "touchevents",
-    "webgl",
     "webrtc/peerconnection"
   ]
 }
