@@ -19,9 +19,11 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
     public function __construct($collection, $recordTtl = null, $level = null) {
         parent::__construct($level);
         $this->_collection = (string) $collection;
-        $this->_recordTtl = null === $recordTtl ? 3600 * 30 * 2 : (int) $recordTtl;
-
         $this->_mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        //TODO check index existance.
+        $this->_mongoDb->getIndexInfo($this->_collection);
+
+        $this->_recordTtl = null === $recordTtl ? 3600 * 30 * 2 : (int) $recordTtl;
     }
 
     /**
@@ -36,5 +38,30 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         $formattedRecord['expireAt'] = new MongoDate($expireAt->format(DateTime::ISO8601));
 
         $this->_mongoDb->insert($this->_collection, $formattedRecord);
+    }
+
+    /**
+     * @param CM_Log_Record $record
+     * @return array
+     */
+    protected function formatRecord(CM_Log_Record $record) {
+        $recordContext = $record->getContext();
+        $computerInfo = $recordContext->getComputerInfo();
+        $user = $recordContext->getUser();
+        $extra = $recordContext->getExtra();
+
+        $formattedContext = [];
+        if (null !== $computerInfo) {
+            $formattedContext['computerInfo'] = [
+                'fqdn' => $computerInfo->getFullyQualifiedDomainName(),
+                'phpVersion' => $computerInfo->getPhpVersion(),
+            ];
+        }
+        return [
+            'level'     => (int) $record->getLevel(),
+            'message'   => (string) $record->getMessage(),
+            'createdAt' => new MongoDate($record->getCreatedAt()->getTimestamp()),
+            'context'   => $formattedContext,
+        ];
     }
 }
