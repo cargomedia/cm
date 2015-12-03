@@ -194,7 +194,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
     public function testEncryptAndDecryptKey() {
         $data = 'foo ';
-        $encryptionKey = 'qwertyuiopasdfghjk';
+        $encryptionKey = '123450984#$%$#kj';
         $encryptMethod = new ReflectionMethod('CM_Model_StreamChannel_Abstract', '_encryptKey');
         $encryptMethod->setAccessible(true);
         $encryptedData = $encryptMethod->invoke(null, $data, $encryptionKey);
