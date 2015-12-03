@@ -29,5 +29,13 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $handler = new CM_Log_Handler_MongoDb($collection, 30, $level);
         $this->callProtectedMethod($handler, '_writeRecord', [$record]);
         $this->assertSame(1, $mongoClient->count($collection));
+
+        $savedRecord = $mongoClient->findOne($collection);
+
+        $this->assertSame($level, $savedRecord['level']);
+        $this->assertSame($message, $savedRecord['message']);
+
+        $this->assertInstanceOf('MongoDate', $savedRecord['createdAt']);
+        $this->assertInstanceOf('MongoDate', $savedRecord['expireAt']);
     }
 }
