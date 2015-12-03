@@ -171,7 +171,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
      * @return string Data
      */
     protected function _decryptKey($encryptionKey) {
-        return (new CM_Util_UrlEncryptor())->decrypt($this->getKey(), $encryptionKey);
+        return (new CM_Util_Encryption())->decryptUrl($this->getKey(), $encryptionKey);
     }
 
     /**
@@ -231,7 +231,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
      * @return string Channel-key
      */
     protected static function _encryptKey($data, $encryptionKey) {
-        return (new CM_Util_UrlEncryptor())->encrypt($data, $encryptionKey);
+        return (new CM_Util_Encryption())->encryptUrl($data, $encryptionKey);
     }
 
     protected static function _createStatic(array $data) {
