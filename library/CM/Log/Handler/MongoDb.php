@@ -30,12 +30,9 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
      * @param CM_Log_Record $record
      */
     protected function _writeRecord(CM_Log_Record $record) {
-        $expireAt = $record->getCreatedAt();
-        $expireAt->add(new DateInterval('PT' . $this->_recordTtl . 'S'));
 
         /** @var array $formattedRecord */
-        $formattedRecord = json_decode(json_encode($record), true);
-        $formattedRecord['expireAt'] = new MongoDate($expireAt->format(DateTime::ISO8601));
+        $formattedRecord = $this->_formatRecord($record);
 
         $this->_mongoDb->insert($this->_collection, $formattedRecord);
     }
@@ -44,24 +41,39 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
      * @param CM_Log_Record $record
      * @return array
      */
-    protected function formatRecord(CM_Log_Record $record) {
+    protected function _formatRecord(CM_Log_Record $record) {
         $recordContext = $record->getContext();
         $computerInfo = $recordContext->getComputerInfo();
         $user = $recordContext->getUser();
         $extra = $recordContext->getExtra();
 
+        $createdAt = $record->getCreatedAt();
+        $expireAt = clone $createdAt;
+        $expireAt->add(new DateInterval('PT' . $this->_recordTtl . 'S'));
+
         $formattedContext = [];
         if (null !== $computerInfo) {
             $formattedContext['computerInfo'] = [
-                'fqdn' => $computerInfo->getFullyQualifiedDomainName(),
+                'fqdn'       => $computerInfo->getFullyQualifiedDomainName(),
                 'phpVersion' => $computerInfo->getPhpVersion(),
             ];
         }
+        if (null !== $extra) {
+            $formattedContext['extra'] = $extra;
+        }
+        if (null !== $user) {
+            $formattedContext['user'] = [
+                'id' => $user->getId(),
+                'name' => $user->getDisplayName(),
+            ];
+        }
+
         return [
             'level'     => (int) $record->getLevel(),
             'message'   => (string) $record->getMessage(),
-            'createdAt' => new MongoDate($record->getCreatedAt()->getTimestamp()),
+            'createdAt' => new MongoDate($createdAt->getTimestamp()),
             'context'   => $formattedContext,
+            'expireAt'  => new MongoDate($expireAt->getTimestamp()),
         ];
     }
 }
