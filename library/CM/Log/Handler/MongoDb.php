@@ -20,9 +20,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         parent::__construct($level);
         $this->_collection = (string) $collection;
         $this->_mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        //TODO check index existance.
-        $this->_mongoDb->getIndexInfo($this->_collection);
-
+        $this->_validateCollection($this->_collection);
         $this->_recordTtl = null === $recordTtl ? 3600 * 30 * 2 : (int) $recordTtl;
     }
 
@@ -30,7 +28,6 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
      * @param CM_Log_Record $record
      */
     protected function _writeRecord(CM_Log_Record $record) {
-
         /** @var array $formattedRecord */
         $formattedRecord = $this->_formatRecord($record);
 
@@ -63,7 +60,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         }
         if (null !== $user) {
             $formattedContext['user'] = [
-                'id' => $user->getId(),
+                'id'   => $user->getId(),
                 'name' => $user->getDisplayName(),
             ];
         }
@@ -75,5 +72,21 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             'context'   => $formattedContext,
             'expireAt'  => new MongoDate($expireAt->getTimestamp()),
         ];
+    }
+
+    /**
+     * @param string $collection
+     * @throws CM_Exception_Invalid
+     */
+    protected function _validateCollection($collection) {
+        $indexInfo = $this->_mongoDb->getIndexInfo($collection);
+
+        $foundIndex = \Functional\some($indexInfo, function ($el) {
+            return isset($el['key']['expireAt']) && isset($el['expireAfterSeconds']) && $el['expireAfterSeconds'] == 0;
+        });
+
+        if (!$foundIndex) {
+            throw new CM_Exception_Invalid('MongoDb Collection `' . $collection . '` does not contain valid TTL index');
+        };
     }
 }
