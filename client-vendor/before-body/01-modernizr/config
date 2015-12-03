@@ -6,11 +6,16 @@
     "html5printshiv"
   ],
   "feature-detects": [
-    "test/css/objectfit",
-    "test/forms/fileinput",
-    "test/dom/classlist",
-    "test/requestanimationframe",
-    "test/css/transforms3d",
-    "test/touchevents"
+    "audio",
+    "video",
+    "css/objectfit",
+    "event/deviceorientation-motion",
+    "forms/fileinput",
+    "fullscreen-api",
+    "dom/classlist",
+    "requestanimationframe",
+    "css/transforms3d",
+    "touchevents",
+    "webrtc/peerconnection"
   ]
 }
