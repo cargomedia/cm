@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-VERSION="5e179e978af79444d3c877d5681ea91d15134a01"
+VERSION="1.0.4"
 
 git clone http://github.com/zenovich/runkit.git runkit
 cd runkit
