@@ -18,13 +18,13 @@ class CM_Util_EncryptionTest extends CMTest_TestCase {
         $this->assertSame('Invalid key size', $exception->getMessage());
     }
 
-    public function testEncryptDecryptUrl() {
+    public function testEncryptDecrypt() {
         $encryptionKey = '!@#12345AbCdE901';
         $plain = 'highlySecretData';
         $encryption = new CM_Util_Encryption();
-        $encrypted = $encryption->encryptUrl($plain, $encryptionKey);
+        $encrypted = $encryption->encrypt($plain, $encryptionKey);
         $this->assertNotSame(false, base64_decode($encrypted, true), 'Encrypted data is not valid base64 string');
-        $this->assertNotEquals($plain, $encryption->decryptUrl($encrypted, str_replace('1', '2', $encryptionKey)));
-        $this->assertSame($plain, $encryption->decryptUrl($encrypted, $encryptionKey));
+        $this->assertNotEquals($plain, $encryption->decrypt($encrypted, str_replace('1', '2', $encryptionKey)));
+        $this->assertSame($plain, $encryption->decrypt($encrypted, $encryptionKey));
     }
 }
