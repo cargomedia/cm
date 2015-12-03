@@ -48,7 +48,7 @@ class CM_Util_Encryption {
         $keySize = strlen($secretKey);
         $validKeySizes = mcrypt_module_get_supported_key_sizes(MCRYPT_RIJNDAEL_128);
         if (!in_array($keySize, $validKeySizes, true)) {
-            throw new CM_Exception_Invalid('Using wrong key for encryption/decryption');
+            throw new CM_Exception_Invalid('Invalid key size');
         }
     }
 }

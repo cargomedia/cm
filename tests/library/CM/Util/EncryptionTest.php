@@ -9,13 +9,13 @@ class CM_Util_EncryptionTest extends CMTest_TestCase {
             $encryption->encrypt('foo', 'BadKey');
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Using wrong key for encryption/decryption', $exception->getMessage());
+        $this->assertSame('Invalid key size', $exception->getMessage());
 
         $exception = $this->catchException(function () use ($encryption) {
             $encryption->decrypt('bar', 'BadKey');
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Using wrong key for encryption/decryption', $exception->getMessage());
+        $this->assertSame('Invalid key size', $exception->getMessage());
     }
 
     public function testEncryptDecryptUrl() {
