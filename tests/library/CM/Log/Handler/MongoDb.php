@@ -20,12 +20,13 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $level = CM_Log_Logger::DEBUG;
         $message = 'foo';
         $ttl = 30;
+        $user = CMTest_TH::createUser();
 
         $mongoClient = $this->getServiceManager()->getMongoDb();
         $this->assertSame(0, $mongoClient->count($collection));
 
         $mongoClient->createIndex($collection, ['expireAt' => 1], ['expireAfterSeconds' => 0]);
-        $record = new CM_Log_Record($level, $message, new CM_Log_Context(null, null, null, ['bar' => ['baz' => 'quux']]));
+        $record = new CM_Log_Record($level, $message, new CM_Log_Context($user, null, null, ['bar' => ['baz' => 'quux']]));
 
         $handler = new CM_Log_Handler_MongoDb($collection, $ttl, $level);
         $this->callProtectedMethod($handler, '_writeRecord', [$record]);
@@ -45,5 +46,10 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertInstanceOf('MongoDate', $expireAt);
 
         $this->assertSame($ttl, $expireAt->sec - $createdAt->sec);
+
+        $context = $savedRecord['context'];
+
+        $this->assertSame(['bar' => ['baz' => 'quux']], $context['extra']);
+        $this->assertSame(['id' => $user->getId(), 'name' => $user->getDisplayName()], $context['user']);
     }
 }
