@@ -9,7 +9,7 @@ class CM_Util_Encryption {
      */
     public function encrypt($data, $secretKey) {
         $this->_validateKey($secretKey);
-        return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $secretKey, $data, MCRYPT_MODE_ECB));
+        return strtr(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $secretKey, $data, MCRYPT_MODE_ECB)), '+=/', '-_.');
     }
 
     /**
@@ -19,7 +19,7 @@ class CM_Util_Encryption {
      */
     public function decrypt($data, $secretKey) {
         $this->_validateKey($secretKey);
-        return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $secretKey, base64_decode($data), MCRYPT_MODE_ECB), "\0");
+        return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $secretKey, base64_decode(strtr($data, '-_.', '+=/')), MCRYPT_MODE_ECB), "\0");
     }
 
     /**

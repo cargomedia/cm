@@ -23,8 +23,15 @@ class CM_Util_EncryptionTest extends CMTest_TestCase {
         $plain = 'highlySecretData';
         $encryption = new CM_Util_Encryption();
         $encrypted = $encryption->encrypt($plain, $encryptionKey);
-        $this->assertNotSame(false, base64_decode($encrypted, true), 'Encrypted data is not valid base64 string');
         $this->assertNotEquals($plain, $encryption->decrypt($encrypted, str_replace('1', '2', $encryptionKey)));
         $this->assertSame($plain, $encryption->decrypt($encrypted, $encryptionKey));
+    }
+
+    public function testUrlSafeEncryption() {
+        $encryptionKey = 'aaaabaaaaaaaaaab';
+        $plain = '{"user":2,"expiration":1449847146}';
+        $encryption = new CM_Util_Encryption();
+        $encrypted = $encryption->encrypt($plain, $encryptionKey);
+        $this->assertTrue(!preg_match('!/|\+|=!', $encrypted), 'Not url-safe');
     }
 }
