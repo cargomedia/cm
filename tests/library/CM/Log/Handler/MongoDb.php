@@ -19,6 +19,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $collection = 'cm_event_log';
         $level = CM_Log_Logger::DEBUG;
         $message = 'foo';
+        $ttl = 30;
 
         $mongoClient = $this->getServiceManager()->getMongoDb();
         $this->assertSame(0, $mongoClient->count($collection));
@@ -26,7 +27,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $mongoClient->createIndex($collection, ['expireAt' => 1], ['expireAfterSeconds' => 0]);
         $record = new CM_Log_Record($level, $message, new CM_Log_Context(null, null, null, ['bar' => ['baz' => 'quux']]));
 
-        $handler = new CM_Log_Handler_MongoDb($collection, 30, $level);
+        $handler = new CM_Log_Handler_MongoDb($collection, $ttl, $level);
         $this->callProtectedMethod($handler, '_writeRecord', [$record]);
         $this->assertSame(1, $mongoClient->count($collection));
 
@@ -35,7 +36,14 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertSame($level, $savedRecord['level']);
         $this->assertSame($message, $savedRecord['message']);
 
-        $this->assertInstanceOf('MongoDate', $savedRecord['createdAt']);
-        $this->assertInstanceOf('MongoDate', $savedRecord['expireAt']);
+        /** @var MongoDate $createdAt */
+        $createdAt = $savedRecord['createdAt'];
+        /** @var MongoDate $expireAt */
+        $expireAt = $savedRecord['expireAt'];
+
+        $this->assertInstanceOf('MongoDate', $createdAt);
+        $this->assertInstanceOf('MongoDate', $expireAt);
+
+        $this->assertSame($ttl, $expireAt->sec - $createdAt->sec);
     }
 }
