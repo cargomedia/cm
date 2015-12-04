@@ -15,13 +15,18 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
      * @param string   $collection
      * @param int|null $recordTtl Time To Live in seconds
      * @param int|null $level
+     * @throws CM_Exception_Invalid
      */
     public function __construct($collection, $recordTtl = null, $level = null) {
         parent::__construct($level);
         $this->_collection = (string) $collection;
         $this->_mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $this->_validateCollection($this->_collection);
         $this->_recordTtl = null === $recordTtl ? 3600 * 30 * 2 : (int) $recordTtl;
+
+        $this->_validateCollection($this->_collection);
+        if ($this->_recordTtl <= 0) {
+            throw new CM_Exception_Invalid('TTL should be positive value');
+        }
     }
 
     /**
