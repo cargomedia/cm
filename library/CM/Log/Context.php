@@ -85,12 +85,4 @@ class CM_Log_Context {
 
         return new CM_Log_Context($user, $httpRequest, $computerInfo, $extra);
     }
-
-    /**
-     * @param array $extra
-     * @return CM_Log_Context
-     */
-    public static function createExtraContext(array $extra) {
-        return new self(null, null, null, $extra);
-    }
 }
