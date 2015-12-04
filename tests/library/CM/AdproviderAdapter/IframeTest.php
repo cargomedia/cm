@@ -14,7 +14,7 @@ class CM_AdproviderAdapter_IframeTest extends CMTest_TestCase {
         ]);
 
         $this->assertSame(
-            '<iframe src="http://example.com" width="200" height="100" class="advertisement-hasContent" data-variables="{&quot;foo&quot;:&quot;bar&quot;}" frameborder="0" seamless="seamless" scrolling="no"></iframe>'
+            '<iframe src="http://example.com" width="200" height="100" class="advertisement-hasContent" data-variables="{&quot;foo&quot;:&quot;bar&quot;}" frameborder="0" scrolling="no"></iframe>'
             , $html);
     }
 
