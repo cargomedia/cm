@@ -117,5 +117,21 @@ class CM_UtilTest extends CMTest_TestCase {
         }
     }
 
+    public function testJsonEncode() {
+        $actual = CM_Util::jsonEncode(['foo' => 'bar']);
+        $this->assertSame('{"foo":"bar"}', $actual);
+    }
 
+    public function testJsonEncodePrettyPrint() {
+        $actual = CM_Util::jsonEncode(['foo' => 'bar'], true);
+        $this->assertSame('{' . "\n" . '    "foo": "bar"' . "\n" . '}', $actual);
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testJsonEncodeInvalid() {
+        $resource = fopen(sys_get_temp_dir(), 'r');
+        CM_Util::jsonEncode(['foo' => $resource]);
+    }
 }
