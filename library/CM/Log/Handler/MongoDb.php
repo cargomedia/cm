@@ -40,9 +40,11 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
      */
     protected function _formatRecord(CM_Log_Record $record) {
         $recordContext = $record->getContext();
+
         $computerInfo = $recordContext->getComputerInfo();
         $user = $recordContext->getUser();
         $extra = $recordContext->getExtra();
+        $request = $recordContext->getHttpRequest();
 
         $createdAt = $record->getCreatedAt();
         $expireAt = clone $createdAt;
@@ -64,13 +66,20 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
                 'name' => $user->getDisplayName(),
             ];
         }
+        if (null !== $request) {
+            $formattedContext['httpRequest'] = [
+                'uri' => $request->getUri(),
+                'server'  => $request->getServer(),
+                'headers' => $request->getHeaders(),
+            ];
+        }
 
         return [
             'level'     => (int) $record->getLevel(),
             'message'   => (string) $record->getMessage(),
             'createdAt' => new MongoDate($createdAt->getTimestamp()),
-            'context'   => $formattedContext,
             'expireAt'  => new MongoDate($expireAt->getTimestamp()),
+            'context'   => $formattedContext,
         ];
     }
 
