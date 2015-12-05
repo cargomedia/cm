@@ -4,8 +4,8 @@ class CM_AdproviderAdapter_Iframe extends CM_AdproviderAdapter_Abstract {
 
     public function getHtml($zoneName, $zoneData, array $variables) {
         $src = (string) $zoneData['src'];
-        $width = (int) $zoneData['width'];
-        $height = (int) $zoneData['height'];
+        $width = (string) $zoneData['width'];
+        $height = (string) $zoneData['height'];
 
         $params = [
             'src'            => $src,
