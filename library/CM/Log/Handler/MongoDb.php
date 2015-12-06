@@ -21,7 +21,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         parent::__construct($level);
         $this->_collection = (string) $collection;
         $this->_mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $this->_recordTtl = null !== $recordTtl ? (int) $recordTtl : 3600 * 30 * 2;
+        $this->_recordTtl = null !== $recordTtl ? (int) $recordTtl : 3600 * 24 * 60;
 
         $this->_validateCollection($this->_collection);
         if ($this->_recordTtl <= 0) {
