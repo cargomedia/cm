@@ -27,7 +27,7 @@ before_script:
   - yes '' | travis_retry pecl install imagick
   - travis_retry pecl install stats
   - travis_retry pecl install gearman-1.0.3
-  - if [ `php-config --vernum` -ge 50500 ]; then yes '' | travis_retry pecl install apcu-4.0.10; fi
+  - if [ `php-config --vernum` -ge 50500 ]; then yes '' | travis_retry pecl install apcu-4.0.4; fi
   - phpenv config-add tests/travis/php.ini
   - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
   - npm install -g autoprefixer@4.0.0
