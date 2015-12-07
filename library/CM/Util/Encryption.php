@@ -9,7 +9,8 @@ class CM_Util_Encryption {
      */
     public function encrypt($data, $secretKey) {
         $this->_validateKey($secretKey);
-        return strtr(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $secretKey, $data, MCRYPT_MODE_ECB)), '+=/', '-_.');
+        $encrypted = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $secretKey, $data, MCRYPT_MODE_ECB));
+        return strtr($encrypted, '+=/', '-_.'); // substitute URI reserved characters
     }
 
     /**
