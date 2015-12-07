@@ -198,7 +198,6 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
         $encryptMethod = new ReflectionMethod('CM_Model_StreamChannel_Abstract', '_encryptKey');
         $encryptMethod->setAccessible(true);
         $encryptedData = $encryptMethod->invoke(null, $data, $encryptionKey);
-        $this->assertNotSame(false, base64_decode($encryptedData, true), 'Encrypted data is not valid base64 string');
 
         $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Abstract')->setMethods(array('getKey'))->disableOriginalConstructor()->getMockForAbstractClass();
         $streamChannel->expects($this->any())->method('getKey')->will($this->returnValue($encryptedData));
