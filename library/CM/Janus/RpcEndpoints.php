@@ -89,7 +89,7 @@ class CM_Janus_RpcEndpoints {
         }
         $streamPublish = $streamChannel->getStreamPublishs()->findKey($streamKey);
         if ($streamPublish) {
-            $streamRepository->removeStream($streamSubscribe);
+            $streamRepository->removeStream($streamPublish);
         }
     }
 

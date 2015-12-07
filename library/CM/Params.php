@@ -567,15 +567,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @return string
      */
     public static function jsonEncode($value, $prettyPrint = null) {
-        $options = 0;
-        if ($prettyPrint) {
-            $options = $options | JSON_PRETTY_PRINT;
-        }
-        $value = json_encode($value, $options);
-        if (json_last_error() > 0) {
-            throw new CM_Exception_Invalid('Cannot json_encode value `' . CM_Util::var_line($value) . '`.');
-        }
-        return $value;
+        return CM_Util::jsonEncode($value, $prettyPrint);
     }
 
     /**
@@ -584,12 +576,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @throws CM_Exception_Invalid
      */
     public static function jsonDecode($value) {
-        $valueString = (string) $value;
-        $value = json_decode($valueString, true);
-        if (json_last_error() > 0) {
-            throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString . '`.');
-        }
-        return $value;
+        return CM_Util::jsonDecode($value);
     }
 
     /**
