@@ -244,4 +244,33 @@ return function (CM_Config_Node $config) {
             'appName' => 'CM Application',
         ),
     );
+
+    $config->services['logger-newrelic'] = [
+        'class'  => 'CM_Log_Handler_Factory',
+        'method' => [
+            'name' => 'createNewrelicHandler'
+        ]
+    ];
+
+    $config->services['logger-stream-stderr'] = [
+        'class'  => 'CM_Log_Handler_Factory',
+        'method' => [
+            'name'      => 'createStreamHandler',
+            'arguments' => [
+                'streamClass' => 'CM_OutputStream_Stream_StandardError',
+                'level'       => CM_Log_Logger::ERROR,
+                'format'      => '{levelname}: {message}'
+            ]
+        ]
+    ];
+
+    $config->services['logger'] = [
+        'class'  => 'CM_Log_Factory',
+        'method' => [
+            'name'      => 'createLogger',
+            'arguments' => [
+                'handlerList' => ['logger-stream-stderr', 'logger-newrelic'],
+            ],
+        ]
+    ];
 };

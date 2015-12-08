@@ -22,6 +22,7 @@ class CM_Log_Formatter_TextTest extends CMTest_TestCase {
     }
 
     public function testFormatContextWithHttpRequest() {
+        /** @var CM_Http_Request_Abstract|\Mocka\ClassMock $mockHttpRequest */
         $mockHttpRequest = $this->mockClass('CM_Http_Request_Abstract')->newInstance(['', [
             'referer'    => 'http://foo.com/foo',
             'user-agent' => 'Mozilla/5.0',
