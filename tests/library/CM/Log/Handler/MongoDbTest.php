@@ -42,7 +42,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $mongoClient->createIndex($collection, ['expireAt' => 1], ['expireAfterSeconds' => 0]);
         $record = new CM_Log_Record($level, $message, new CM_Log_Context($user, $httpRequest, $computerInfo, ['bar' => ['baz' => 'quux']]));
 
-        $handler = new CM_Log_Handler_MongoDb($collection, $ttl, $level);
+        $handler = new CM_Log_Handler_MongoDb($collection, $ttl, ['w' => 0], $level);
         $this->callProtectedMethod($handler, '_writeRecord', [$record]);
         $this->assertSame(1, $mongoClient->count($collection));
 

@@ -11,17 +11,24 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
     /** @var  CM_MongoDb_Client */
     protected $_mongoDb;
 
+    /** @var  array */
+    protected $_insertOptions;
+
     /**
      * @param string   $collection
      * @param int|null $recordTtl Time To Live in seconds
+     * @param array    $insertOptions
      * @param int|null $level
      * @throws CM_Exception_Invalid
      */
-    public function __construct($collection, $recordTtl = null, $level = null) {
+    public function __construct($collection, $recordTtl = null, array $insertOptions = null, $level = null) {
         parent::__construct($level);
         $this->_collection = (string) $collection;
         $this->_mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $this->_recordTtl = null !== $recordTtl ? (int) $recordTtl : 3600 * 24 * 60;
+        if (null === $insertOptions) {
+            $this->_insertOptions = ['w' => 0];
+        }
 
         $this->_validateCollection($this->_collection);
         if ($this->_recordTtl <= 0) {
@@ -36,7 +43,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         /** @var array $formattedRecord */
         $formattedRecord = $this->_formatRecord($record);
 
-        $this->_mongoDb->insert($this->_collection, $formattedRecord);
+        $this->_mongoDb->insert($this->_collection, $formattedRecord, $this->_insertOptions);
     }
 
     /**
