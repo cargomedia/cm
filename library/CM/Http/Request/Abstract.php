@@ -39,6 +39,11 @@ abstract class CM_Http_Request_Abstract {
     private static $_instance;
 
     /**
+     * @return string
+     */
+    abstract public function getMethodName();
+
+    /**
      * @param string             $uri
      * @param array|null         $headers OPTIONAL
      * @param array|null         $server

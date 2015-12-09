@@ -59,4 +59,8 @@ class CM_Http_Request_Post extends CM_Http_Request_Abstract {
         $this->_bodyEncoding = (int) $bodyEncoding;
         $this->_bodyQuery = null;
     }
+
+    public function getMethodName() {
+        return 'POST';
+    }
 }
