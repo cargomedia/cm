@@ -40,25 +40,6 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param CM_Log_Record $record
-     * @throws CM_Log_HandlingException
-     */
-    public function addRecord(CM_Log_Record $record) {
-        $exceptionList = [];
-        foreach ($this->_handlerList as $handler) {
-            try {
-                $handler->handleRecord($record);
-            } catch (Exception $e) {
-                $exceptionList[] = $e;
-            }
-        }
-        if (!empty($exceptionList)) {
-            $exceptionMessage = count($exceptionList) . ' handler(s) failed to process a record.';
-            throw new CM_Log_HandlingException($exceptionMessage, $exceptionList);
-        }
-    }
-
-    /**
      * @param string              $message
      * @param int                 $level
      * @param CM_Log_Context|null $context
@@ -67,7 +48,7 @@ class CM_Log_Logger {
         $message = (string) $message;
         $level = (int) $level;
         $context = $this->_mergeWithGlobalContext($context);
-        $this->addRecord(new CM_Log_Record($level, $message, $context));
+        $this->_addRecord(new CM_Log_Record($level, $message, $context));
     }
 
     /**
@@ -76,7 +57,7 @@ class CM_Log_Logger {
      */
     public function addException(Exception $exception, CM_Log_Context $context = null) {
         $context = $this->_mergeWithGlobalContext($context);
-        $this->addRecord(new CM_Log_Record_Exception($exception, $context));
+        $this->_addRecord(new CM_Log_Record_Exception($exception, $context));
     }
 
     /**
@@ -133,6 +114,25 @@ class CM_Log_Logger {
      */
     public function critical($message, CM_Log_Context $context = null) {
         $this->addMessage($message, self::CRITICAL, $context);
+    }
+
+    /**
+     * @param CM_Log_Record $record
+     * @throws CM_Log_HandlingException
+     */
+    protected function _addRecord(CM_Log_Record $record) {
+        $exceptionList = [];
+        foreach ($this->_handlerList as $handler) {
+            try {
+                $handler->handleRecord($record);
+            } catch (Exception $e) {
+                $exceptionList[] = $e;
+            }
+        }
+        if (!empty($exceptionList)) {
+            $exceptionMessage = count($exceptionList) . ' handler(s) failed to process a record.';
+            throw new CM_Log_HandlingException($exceptionMessage, $exceptionList);
+        }
     }
 
     /**
