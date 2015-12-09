@@ -13,7 +13,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
             $this->assertSame($expectedRecord, $record);
         });
 
-        $logger->addRecord($expectedRecord);
+        $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
         $this->assertSame(1, $mockHandleRecord->getCallCount());
     }
 
