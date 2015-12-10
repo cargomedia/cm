@@ -5,10 +5,15 @@ class CM_Http_ClientDevice {
     /** @var \Jenssegers\Agent\Agent */
     protected $_parser;
 
+    /** @var array */
+    protected $_headerList;
+
     /**
      * @param CM_Http_Request_Abstract $request
      */
     public function __construct(CM_Http_Request_Abstract $request) {
+        $this->_request = $request;
+
         $headerList = [];
         foreach ($request->getHeaders() as $key => $header) {
             if (substr($key, 0, 8) !== 'content-') {
@@ -16,12 +21,17 @@ class CM_Http_ClientDevice {
             }
         }
         $this->_parser = new Jenssegers\Agent\Agent($headerList);
+        $this->_headerList = $headerList;
     }
 
     /**
      * @return bool
      */
     public function isMobile() {
-        return $this->_parser->isMobile();
+        $cache = CM_Cache_Local::getInstance();
+
+        return $cache->get($cache->key(__CLASS__, 'isMobile', $this->_headerList), function () {
+            return $this->_parser->isMobile();
+        });
     }
 }
