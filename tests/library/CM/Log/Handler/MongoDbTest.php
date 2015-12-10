@@ -33,7 +33,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $message = 'foo';
         $ttl = 30;
         $user = CMTest_TH::createUser();
-        $httpRequest = CM_Http_Request_Abstract::factory('get', '/foo', ['bar' => 'baz'], ['foo' => 'quux']);
+        $httpRequest = CM_Http_Request_Abstract::factory('get', '/foo?bar=1&baz=quux', ['bar' => 'baz'], ['foo' => 'quux']);
         $computerInfo = new CM_Log_Context_ComputerInfo('www.example.com', 'v7.0.1');
 
         $mongoClient = $this->getServiceManager()->getMongoDb();
@@ -63,7 +63,9 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
 
         $context = $savedRecord['context'];
         $this->assertSame(['id' => $user->getId(), 'name' => $user->getDisplayName()], $context['user']);
-        $this->assertSame('/foo', $context['httpRequest']['uri']);
+        $this->assertSame('GET', $context['httpRequest']['method']);
+        $this->assertSame('/foo?bar=1&baz=quux', $context['httpRequest']['uri']);
+        $this->assertSame(['bar' => '1', 'baz' => 'quux'], $context['httpRequest']['query']);
         $this->assertSame(['bar' => 'baz'], $context['httpRequest']['headers']);
         $this->assertSame(['foo' => 'quux'], $context['httpRequest']['server']);
         $this->assertSame('www.example.com', $context['computerInfo']['fqdn']);

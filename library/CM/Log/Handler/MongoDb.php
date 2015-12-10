@@ -80,6 +80,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             $formattedContext['httpRequest'] = [
                 'method'  => $request->getMethodName(),
                 'uri'     => $request->getUri(),
+                'query'   => $request->getQuery(),
                 'server'  => $request->getServer(),
                 'headers' => $request->getHeaders(),
             ];
