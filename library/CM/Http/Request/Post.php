@@ -48,6 +48,10 @@ class CM_Http_Request_Post extends CM_Http_Request_Abstract {
         return array_merge($this->_query, $this->_bodyQuery);
     }
 
+    public function getMethodName() {
+        return 'POST';
+    }
+
     /**
      * @param int $bodyEncoding
      * @throws CM_Exception_Invalid
@@ -58,9 +62,5 @@ class CM_Http_Request_Post extends CM_Http_Request_Abstract {
         }
         $this->_bodyEncoding = (int) $bodyEncoding;
         $this->_bodyQuery = null;
-    }
-
-    public function getMethodName() {
-        return 'POST';
     }
 }
