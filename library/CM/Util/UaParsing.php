@@ -28,7 +28,7 @@ class CM_Util_UaParsing extends Jenssegers\Agent\Agent {
     }
 
     public function checkHttpHeadersForMobile() {
-        $cacheKey = self::CACHE_PREFIX . md5(serialize($this->httpHeaders)) . ':checkHttpHeadersForMobile:';
+        $cacheKey = self::CACHE_PREFIX . 'checkHttpHeadersForMobile:' . md5(serialize($this->httpHeaders));
         $cache = CM_Cache_Shared::getInstance();
         if (($isMatch = $cache->get($cacheKey)) === false) {
             $isMatch = parent::checkHttpHeadersForMobile();
@@ -38,7 +38,7 @@ class CM_Util_UaParsing extends Jenssegers\Agent\Agent {
     }
 
     protected function matchUAAgainstKey($key) {
-        $cacheKey = self::CACHE_PREFIX . md5($this->userAgent) . ':matchUAAgainstKey:' . $key;
+        $cacheKey = self::CACHE_PREFIX . 'matchUAAgainstKey:' . md5($this->userAgent) . ':' . $key;
         $cache = CM_Cache_Shared::getInstance();
         if (($isMatch = $cache->get($cacheKey)) === false) {
             $isMatch = parent::matchUAAgainstKey($key);
@@ -48,7 +48,7 @@ class CM_Util_UaParsing extends Jenssegers\Agent\Agent {
     }
 
     protected function matchDetectionRulesAgainstUA($userAgent = null) {
-        $cacheKey = self::CACHE_PREFIX . md5($this->userAgent) . ':matchDetectionRulesAgainstUA';
+        $cacheKey = self::CACHE_PREFIX . 'matchDetectionRulesAgainstUA:' . md5($this->userAgent);
         $cache = CM_Cache_Shared::getInstance();
         if (($isMatch = $cache->get($cacheKey)) === false) {
             $isMatch = parent::matchDetectionRulesAgainstUA();
