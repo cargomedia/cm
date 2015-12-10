@@ -10,7 +10,15 @@ class CM_Http_ClientDevice {
      */
     public function __construct(CM_Http_Request_Abstract $request) {
         $headerList = array_change_key_case($request->getHeaders(), CASE_UPPER);
-        $this->_parser = new Jenssegers\Agent\Agent($headerList);
+
+        $formattedHeaderList = [];
+        foreach ($headerList as $key => $header) {
+            if (substr($key, 0, 6) !== 'CONTENT') {
+                $key = 'HTTP_' . $key;
+            }
+            $formattedHeaderList[str_replace('-', '_', $key)] = $header;
+        }
+        $this->_parser = new Jenssegers\Agent\Agent($formattedHeaderList);
     }
 
     /**
