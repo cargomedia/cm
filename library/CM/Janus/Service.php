@@ -77,18 +77,6 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
     }
 
     /**
-     * @return CM_Janus_Server
-     * @throws CM_Exception_Invalid
-     */
-    public function getRandomServer() {
-        $servers = $this->_configuration->getServers();
-        if (empty($servers)) {
-            throw new CM_Exception_Invalid('No Janus servers configured');
-        }
-        return $servers[array_rand($servers)];
-    }
-
-    /**
      * @return CM_Janus_Stream[]
      * @throws CM_Exception_Invalid
      */

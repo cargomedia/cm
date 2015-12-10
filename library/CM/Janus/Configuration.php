@@ -56,4 +56,16 @@ class CM_Janus_Configuration {
         }
         throw new CM_Exception_Invalid('Cannot find server with id `' . $id . '`');
     }
+
+    /**
+     * @return CM_Janus_Server
+     * @throws CM_Exception_Invalid
+     */
+    public function getServerRandom() {
+        $servers = $this->_servers;
+        if (empty($servers)) {
+            throw new CM_Exception_Invalid('No servers configured');
+        }
+        return $servers[array_rand($servers)];
+    }
 }
