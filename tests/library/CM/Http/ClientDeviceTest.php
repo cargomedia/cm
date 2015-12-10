@@ -26,7 +26,7 @@ class CM_Http_ClientDeviceTest extends CMTest_TestCase {
         $mobileHeaders = [
             'content-type' => '',
             'content-length' => '',
-            'host' => 'fuckbook.dev.cargomedia.ch',
+            'host' => 'dev.cm',
             'connection' => 'keep-alive',
             'cache-control' => 'max-age=0',
             'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
