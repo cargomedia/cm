@@ -30,7 +30,7 @@ class CM_Http_ClientDevice {
     public function isMobile() {
         $cache = CM_Cache_Local::getInstance();
 
-        return $cache->get($cache->key(__CLASS__, 'isMobile', $this->_headerList), function () {
+        return $cache->get($cache->key(__METHOD__, $this->_headerList), function () {
             return $this->_parser->isMobile();
         });
     }
