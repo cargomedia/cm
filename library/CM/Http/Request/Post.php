@@ -33,6 +33,10 @@ class CM_Http_Request_Post extends CM_Http_Request_Abstract {
         return $this->_body;
     }
 
+    public function getMethodName() {
+        return 'POST';
+    }
+
     public function getQuery() {
         if ($this->_bodyQuery === null) {
             if ($this->_bodyEncoding == self::ENCODING_JSON) {
@@ -46,10 +50,6 @@ class CM_Http_Request_Post extends CM_Http_Request_Abstract {
             }
         }
         return array_merge($this->_query, $this->_bodyQuery);
-    }
-
-    public function getMethodName() {
-        return 'POST';
     }
 
     /**
