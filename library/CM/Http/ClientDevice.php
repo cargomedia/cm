@@ -9,16 +9,13 @@ class CM_Http_ClientDevice {
      * @param CM_Http_Request_Abstract $request
      */
     public function __construct(CM_Http_Request_Abstract $request) {
-        $headerList = array_change_key_case($request->getHeaders(), CASE_UPPER);
-
-        $formattedHeaderList = [];
-        foreach ($headerList as $key => $header) {
-            if (substr($key, 0, 6) !== 'CONTENT') {
-                $key = 'HTTP_' . $key;
+        $headerList = [];
+        foreach ($request->getHeaders() as $key => $header) {
+            if (substr($key, 0, 8) !== 'content-') {
+                $headerList['HTTP_' . str_replace('-', '_', strtoupper($key))] = $header;
             }
-            $formattedHeaderList[str_replace('-', '_', $key)] = $header;
         }
-        $this->_parser = new Jenssegers\Agent\Agent($formattedHeaderList);
+        $this->_parser = new Jenssegers\Agent\Agent($headerList);
     }
 
     /**
