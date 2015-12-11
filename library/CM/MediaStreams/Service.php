@@ -60,7 +60,7 @@ abstract class CM_MediaStreams_Service extends CM_Class_Abstract implements CM_T
     protected function _isPublishAllowed(CM_Model_Stream_Publish $streamPublish) {
         if ($streamPublish->getAllowedUntil() < time()) {
             $streamChannel = $streamPublish->getStreamChannel();
-            $canPublishUntil = $streamChannel->canPublish($streamPublish->getUser(), $streamPublish->getAllowedUntil());
+            $canPublishUntil = $streamChannel->canPublish($streamPublish, $streamPublish->getUser(), $streamPublish->getAllowedUntil());
             $streamPublish->setAllowedUntil($canPublishUntil);
             if ($streamPublish->getAllowedUntil() < time()) {
                 return false;

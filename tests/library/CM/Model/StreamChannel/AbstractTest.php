@@ -273,7 +273,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 class CM_Model_StreamChannel_Mock extends CM_Model_StreamChannel_Abstract {
 
-    public function canPublish(CM_Model_User $user, $allowedUntil) {
+    public function canPublish(CM_Model_Stream_Publish $streamPublish = null, CM_Model_User $user = null, $allowedUntil) {
         return $user->getId() != 1 ? $allowedUntil + 100 : $allowedUntil;
     }
 
