@@ -20,19 +20,32 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     /** @var CM_Model_Location|null */
     protected $_location;
 
-    /** @var CM_model_Currency|null */
+    /** @var CM_Model_Currency|null */
     protected $_currency;
 
+    /** @var CM_Http_ClientDevice|null */
+    protected $_clientDevice;
+
     /**
-     * @param CM_Site_Abstract|null  $site
-     * @param CM_Model_User|null     $viewer
-     * @param CM_Model_Language|null $language
-     * @param DateTimeZone|null      $timeZone
-     * @param bool|null              $debug
-     * @param CM_Model_Location|null $location
-     * @param CM_Model_Currency|null $currency
+     * @param CM_Site_Abstract|null     $site
+     * @param CM_Model_User|null        $viewer
+     * @param CM_Model_Language|null    $language
+     * @param DateTimeZone|null         $timeZone
+     * @param bool|null                 $debug
+     * @param CM_Model_Location|null    $location
+     * @param CM_Model_Currency|null    $currency
+     * @param CM_Http_ClientDevice|null $clientDevice
      */
-    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, DateTimeZone $timeZone = null, $debug = null, CM_Model_Location $location = null, CM_Model_Currency $currency = null) {
+    public function __construct(
+        CM_Site_Abstract $site = null,
+        CM_Model_User $viewer = null,
+        CM_Model_Language $language = null,
+        DateTimeZone $timeZone = null,
+        $debug = null,
+        CM_Model_Location $location = null,
+        CM_Model_Currency $currency = null,
+        CM_Http_ClientDevice $clientDevice = null
+    ) {
         $this->setSite($site);
         $this->setViewer($viewer);
         $this->setLanguage($language);
@@ -40,6 +53,7 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
         $this->setDebug($debug);
         $this->setLocation($location);
         $this->setCurrency($currency);
+        $this->setClientDevice($clientDevice);
     }
 
     /**
@@ -175,9 +189,27 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_Model_Currency|null
+     * @return CM_Model_Currency
      */
     public function getCurrency() {
-        return $this->_currency;
+        $currency = $this->_currency;
+        if (null === $currency) {
+            $currency = CM_Model_Currency::getDefaultCurrency();
+        }
+        return $currency;
+    }
+
+    /**
+     * @param CM_Http_ClientDevice|null $clientDevice
+     */
+    public function setClientDevice(CM_Http_ClientDevice $clientDevice = null) {
+        $this->_clientDevice = $clientDevice;
+    }
+
+    /**
+     * @return CM_Http_ClientDevice
+     */
+    public function getClientDevice() {
+        return $this->_clientDevice;
     }
 }

@@ -7,38 +7,33 @@ class CM_Janus_RpcEndpoints {
      * @param string $streamChannelKey
      * @param string $streamKey
      * @param int    $start
-     * @param string $data
-     * @return array
+     * @param string $sessionData
+     * @param string $channelData
      * @throws CM_Exception_AuthFailed
      * @throws CM_Exception_AuthRequired
      * @throws CM_Exception_Invalid
      * @throws CM_Exception_NotAllowed
-     * @throws Exception
      */
-    public static function rpc_publish($serverKey, $streamChannelKey, $streamKey, $start, $data) {
+    public static function rpc_publish($serverKey, $streamChannelKey, $streamKey, $start, $sessionData, $channelData) {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
 
-        $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
-        $server = $janus->getConfiguration()->findServerByKey($serverKey);
-
-        if (!$server) {
-            throw new CM_Exception_Invalid('Server `' . $serverKey . '` not found');
-        }
-
-        $streamChannelType = $params->getInt('streamChannelType');
-        $session = new CM_Session($params->getString('sessionId'));
+        $paramsSession = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
+        $session = new CM_Session($paramsSession->getString('sessionId'));
         $user = $session->getUser(true);
 
+        $paramsChannel = CM_Params::factory(CM_Params::jsonDecode($channelData), true);
+        $streamChannelType = $paramsChannel->getInt('streamChannelType');
+
+        $server = $janus->getConfiguration()->findServerByKey($serverKey);
         $streamRepository = $janus->getStreamRepository();
         $streamChannel = $streamRepository->createStreamChannel($streamChannelKey, $streamChannelType, $server->getId(), 0);
         try {
             $streamRepository->createStreamPublish($streamChannel, $user, $streamKey, $start);
-        } catch (CM_Exception_NotAllowed $ex) {
+        } catch (CM_Exception_NotAllowed $exception) {
             $streamChannel->delete();
-            throw $ex;
+            throw new CM_Exception_NotAllowed('Cannot publish: ' . $exception->getMessage());
         }
-        return ['streamChannelId' => $streamChannel->getId()];
     }
 
     /**
@@ -46,20 +41,18 @@ class CM_Janus_RpcEndpoints {
      * @param string $streamChannelKey
      * @param string $streamKey
      * @param string $start
-     * @param string $data
-     * @return bool
+     * @param string $sessionData
      * @throws CM_Exception_AuthFailed
      * @throws CM_Exception_AuthRequired
      * @throws CM_Exception_Invalid
      * @throws CM_Exception_Nonexistent
      * @throws CM_Exception_NotAllowed
      */
-    public static function rpc_subscribe($serverKey, $streamChannelKey, $streamKey, $start, $data) {
-
+    public static function rpc_subscribe($serverKey, $streamChannelKey, $streamKey, $start, $sessionData) {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
 
-        $params = CM_Params::factory(CM_Params::jsonDecode($data), true);
+        $params = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
         $session = new CM_Session($params->getString('sessionId'));
         $user = $session->getUser(true);
 
@@ -73,7 +66,6 @@ class CM_Janus_RpcEndpoints {
         } catch (CM_Exception_NotAllowed $exception) {
             throw new CM_Exception_NotAllowed('Cannot subscribe: ' . $exception->getMessage());
         }
-        return true;
     }
 
     /**
@@ -97,14 +89,29 @@ class CM_Janus_RpcEndpoints {
         }
         $streamPublish = $streamChannel->getStreamPublishs()->findKey($streamKey);
         if ($streamPublish) {
-            $streamRepository->removeStream($streamSubscribe);
+            $streamRepository->removeStream($streamPublish);
         }
-        return true;
+    }
+
+    /**
+     * @param string $serverKey
+     * @param string $sessionData
+     * @return bool
+     * @throws CM_Exception_AuthFailed
+     * @throws CM_Exception_Invalid
+     */
+    public static function rpc_isValidUser($serverKey, $sessionData) {
+        $janus = CM_Service_Manager::getInstance()->getJanus('janus');
+        self::_authenticate($janus, $serverKey);
+
+        $params = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
+        $session = CM_Session::findById($params->getString('sessionId'));
+        return $session && null !== $session->getUser(false);
     }
 
     /**
      * @param CM_Janus_Service $janus
-     * @param string           $serverKey
+     * @param string $serverKey
      * @throws CM_Exception_AuthFailed
      */
     protected static function _authenticate(CM_Janus_Service $janus, $serverKey) {

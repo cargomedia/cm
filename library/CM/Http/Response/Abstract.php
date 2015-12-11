@@ -115,8 +115,16 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      */
     public function getEnvironment() {
         $location = $this->getRequest()->getLocation();
-        $currency = (null !== $location) ? CM_Model_Currency::findByLocation($location) : null;
-        return new CM_Frontend_Environment($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), null, null, $location, $currency);
+        $viewer = $this->getRequest()->getViewer();
+        $currency = null;
+        if (null === $currency && null !== $viewer) {
+            $currency = $viewer->getCurrency();
+        }
+        if (null === $currency && null !== $location) {
+            $currency = CM_Model_Currency::findByLocation($location);
+        }
+        $clientDevice = new CM_Http_ClientDevice($this->getRequest());
+        return new CM_Frontend_Environment($this->getSite(), $viewer, $this->getRequest()->getLanguage(), null, null, $location, $currency, $clientDevice);
     }
 
     /**

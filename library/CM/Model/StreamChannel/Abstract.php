@@ -171,7 +171,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
      * @return string Data
      */
     protected function _decryptKey($encryptionKey) {
-        return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $encryptionKey, base64_decode($this->getKey()), MCRYPT_MODE_ECB), "\0");
+        return (new CM_Util_Encryption())->decrypt($this->getKey(), $encryptionKey);
     }
 
     /**
@@ -231,7 +231,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
      * @return string Channel-key
      */
     protected static function _encryptKey($data, $encryptionKey) {
-        return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $encryptionKey, $data, MCRYPT_MODE_ECB));
+        return (new CM_Util_Encryption())->encrypt($data, $encryptionKey);
     }
 
     protected static function _createStatic(array $data) {
