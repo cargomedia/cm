@@ -123,7 +123,8 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
         if (null === $currency && null !== $location) {
             $currency = CM_Model_Currency::findByLocation($location);
         }
-        return new CM_Frontend_Environment($this->getSite(), $viewer, $this->getRequest()->getLanguage(), null, null, $location, $currency);
+        $clientDevice = new CM_Http_ClientDevice($this->getRequest());
+        return new CM_Frontend_Environment($this->getSite(), $viewer, $this->getRequest()->getLanguage(), null, null, $location, $currency, $clientDevice);
     }
 
     /**
