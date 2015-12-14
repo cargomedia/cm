@@ -277,7 +277,7 @@ class CM_Model_StreamChannel_Mock extends CM_Model_StreamChannel_Abstract {
         return $user->getId() != 1 ? $allowedUntil + 100 : $allowedUntil;
     }
 
-    public function canSubscribe(CM_Model_User $user, $allowedUntil) {
+    public function canSubscribe(CM_Model_Stream_Subscribe $streamSubscribe = null, CM_Model_User $user = null, $allowedUntil) {
         return $user->getId() != 1 ? $allowedUntil + 100 : $allowedUntil;
     }
 
