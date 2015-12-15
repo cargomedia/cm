@@ -16,10 +16,10 @@ function smarty_function_load(array $params, Smarty_Internal_Template $template)
         $params = array_merge($template->getTemplateVars(), $params);
         return $render->fetchTemplate($tplPath, $params);
     } else {
-        $file = new CM_File($render->getLayoutPath($params['file'], $namespace, null, true, $needed));
-        if (null === $file) {
+        $tplPath = $render->getLayoutPath($params['file'], $namespace, null, true, $needed);
+        if (null === $tplPath) {
             return '';
         }
-        return $file->read();
+        return (new CM_File($tplPath))->read();
     }
 }
