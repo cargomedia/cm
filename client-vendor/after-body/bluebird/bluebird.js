@@ -24,8 +24,8 @@
  */
 /**
  * bluebird build version 2.9.33
- * Features enabled: core, settle, cancel, timers
- * Features disabled: race, call_get, generators, map, nodeify, promisify, props, reduce, some, using, filter, any, each
+ * Features enabled: core, race
+ * Features disabled: call_get, generators, map, nodeify, promisify, props, reduce, settle, some, cancel, using, filter, any, each, timers
 */
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Promise=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof _dereq_=="function"&&_dereq_;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof _dereq_=="function"&&_dereq_;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 "use strict";
@@ -179,7 +179,7 @@ Async.prototype._reset = function () {
 module.exports = new Async();
 module.exports.firstLineError = firstLineError;
 
-},{"./queue.js":19,"./schedule.js":20,"./util.js":25}],2:[function(_dereq_,module,exports){
+},{"./queue.js":18,"./schedule.js":20,"./util.js":23}],2:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, tryConvertToPromise) {
 var rejectThis = function(_, e) {
@@ -267,57 +267,7 @@ var bluebird = _dereq_("./promise.js")();
 bluebird.noConflict = noConflict;
 module.exports = bluebird;
 
-},{"./promise.js":16}],4:[function(_dereq_,module,exports){
-"use strict";
-module.exports = function(Promise) {
-var errors = _dereq_("./errors.js");
-var async = _dereq_("./async.js");
-var CancellationError = errors.CancellationError;
-
-Promise.prototype._cancel = function (reason) {
-    if (!this.isCancellable()) return this;
-    var parent;
-    var promiseToReject = this;
-    while ((parent = promiseToReject._cancellationParent) !== undefined &&
-        parent.isCancellable()) {
-        promiseToReject = parent;
-    }
-    this._unsetCancellable();
-    promiseToReject._target()._rejectCallback(reason, false, true);
-};
-
-Promise.prototype.cancel = function (reason) {
-    if (!this.isCancellable()) return this;
-    if (reason === undefined) reason = new CancellationError();
-    async.invokeLater(this._cancel, this, reason);
-    return this;
-};
-
-Promise.prototype.cancellable = function () {
-    if (this._cancellable()) return this;
-    async.enableTrampoline();
-    this._setCancellable();
-    this._cancellationParent = undefined;
-    return this;
-};
-
-Promise.prototype.uncancellable = function () {
-    var ret = this.then();
-    ret._unsetCancellable();
-    return ret;
-};
-
-Promise.prototype.fork = function (didFulfill, didReject, didProgress) {
-    var ret = this._then(didFulfill, didReject, didProgress,
-                         undefined, undefined);
-
-    ret._setCancellable();
-    ret._cancellationParent = undefined;
-    return ret;
-};
-};
-
-},{"./async.js":1,"./errors.js":10}],5:[function(_dereq_,module,exports){
+},{"./promise.js":15}],4:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
 var async = _dereq_("./async.js");
@@ -812,7 +762,7 @@ if (typeof console !== "undefined" && typeof console.warn !== "undefined") {
 return CapturedTrace;
 };
 
-},{"./async.js":1,"./util.js":25}],6:[function(_dereq_,module,exports){
+},{"./async.js":1,"./util.js":23}],5:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(NEXT_FILTER) {
 var util = _dereq_("./util.js");
@@ -880,7 +830,7 @@ CatchFilter.prototype.doFilter = function (e) {
 return CatchFilter;
 };
 
-},{"./errors.js":10,"./es5.js":11,"./util.js":25}],7:[function(_dereq_,module,exports){
+},{"./errors.js":9,"./es5.js":10,"./util.js":23}],6:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, CapturedTrace, isDebugging) {
 var contextStack = [];
@@ -920,7 +870,7 @@ Promise.prototype._popContext = Context.prototype._popContext;
 return createContext;
 };
 
-},{}],8:[function(_dereq_,module,exports){
+},{}],7:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, CapturedTrace) {
 var getDomain = Promise._getDomain;
@@ -1082,7 +1032,7 @@ return function() {
 };
 };
 
-},{"./async.js":1,"./errors.js":10,"./util.js":25}],9:[function(_dereq_,module,exports){
+},{"./async.js":1,"./errors.js":9,"./util.js":23}],8:[function(_dereq_,module,exports){
 "use strict";
 var util = _dereq_("./util.js");
 var isPrimitive = util.isPrimitive;
@@ -1145,7 +1095,7 @@ Promise.prototype.thenThrow = function (reason) {
 };
 };
 
-},{"./util.js":25}],10:[function(_dereq_,module,exports){
+},{"./util.js":23}],9:[function(_dereq_,module,exports){
 "use strict";
 var es5 = _dereq_("./es5.js");
 var Objectfreeze = es5.freeze;
@@ -1258,7 +1208,7 @@ module.exports = {
     Warning: Warning
 };
 
-},{"./es5.js":11,"./util.js":25}],11:[function(_dereq_,module,exports){
+},{"./es5.js":10,"./util.js":23}],10:[function(_dereq_,module,exports){
 var isES5 = (function(){
     "use strict";
     return this === undefined;
@@ -1340,7 +1290,7 @@ if (isES5) {
     };
 }
 
-},{}],12:[function(_dereq_,module,exports){
+},{}],11:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, NEXT_FILTER, tryConvertToPromise) {
 var util = _dereq_("./util.js");
@@ -1440,7 +1390,7 @@ Promise.prototype.tap = function (handler) {
 };
 };
 
-},{"./util.js":25}],13:[function(_dereq_,module,exports){
+},{"./util.js":23}],12:[function(_dereq_,module,exports){
 "use strict";
 module.exports =
 function(Promise, PromiseArray, tryConvertToPromise, INTERNAL) {
@@ -1549,7 +1499,7 @@ Promise.join = function () {
 
 };
 
-},{"./util.js":25}],14:[function(_dereq_,module,exports){
+},{"./util.js":23}],13:[function(_dereq_,module,exports){
 "use strict";
 module.exports =
 function(Promise, INTERNAL, tryConvertToPromise, apiRejection) {
@@ -1595,7 +1545,7 @@ Promise.prototype._resolveFromSyncValue = function (value) {
 };
 };
 
-},{"./util.js":25}],15:[function(_dereq_,module,exports){
+},{"./util.js":23}],14:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, PromiseArray) {
 var util = _dereq_("./util.js");
@@ -1673,7 +1623,7 @@ Promise.prototype._progressUnchecked = function (progressValue) {
 };
 };
 
-},{"./async.js":1,"./util.js":25}],16:[function(_dereq_,module,exports){
+},{"./async.js":1,"./util.js":23}],15:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
 var makeSelfResolutionError = function () {
@@ -2370,9 +2320,7 @@ _dereq_("./direct_resolve.js")(Promise);
 _dereq_("./synchronous_inspection.js")(Promise);
 _dereq_("./join.js")(Promise, PromiseArray, tryConvertToPromise, INTERNAL);
 Promise.Promise = Promise;
-_dereq_('./cancel.js')(Promise);
-_dereq_('./settle.js')(Promise, PromiseArray);
-_dereq_('./timers.js')(Promise, INTERNAL);
+_dereq_('./race.js')(Promise, INTERNAL, tryConvertToPromise, apiRejection);
                                                          
     util.toFastProperties(Promise);                                          
     util.toFastProperties(Promise.prototype);                                
@@ -2400,7 +2348,7 @@ _dereq_('./timers.js')(Promise, INTERNAL);
 
 };
 
-},{"./async.js":1,"./bind.js":2,"./cancel.js":4,"./captured_trace.js":5,"./catch_filter.js":6,"./context.js":7,"./debuggability.js":8,"./direct_resolve.js":9,"./errors.js":10,"./finally.js":12,"./join.js":13,"./method.js":14,"./progress.js":15,"./promise_array.js":17,"./promise_resolver.js":18,"./settle.js":21,"./synchronous_inspection.js":22,"./thenables.js":23,"./timers.js":24,"./util.js":25}],17:[function(_dereq_,module,exports){
+},{"./async.js":1,"./bind.js":2,"./captured_trace.js":4,"./catch_filter.js":5,"./context.js":6,"./debuggability.js":7,"./direct_resolve.js":8,"./errors.js":9,"./finally.js":11,"./join.js":12,"./method.js":13,"./progress.js":14,"./promise_array.js":16,"./promise_resolver.js":17,"./race.js":19,"./synchronous_inspection.js":21,"./thenables.js":22,"./util.js":23}],16:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, tryConvertToPromise,
     apiRejection) {
@@ -2544,7 +2492,7 @@ PromiseArray.prototype.getActualLength = function (len) {
 return PromiseArray;
 };
 
-},{"./util.js":25}],18:[function(_dereq_,module,exports){
+},{"./util.js":23}],17:[function(_dereq_,module,exports){
 "use strict";
 var util = _dereq_("./util.js");
 var maybeWrapAsError = util.maybeWrapAsError;
@@ -2669,7 +2617,7 @@ PromiseResolver.prototype.toJSON = function () {
 
 module.exports = PromiseResolver;
 
-},{"./errors.js":10,"./es5.js":11,"./util.js":25}],19:[function(_dereq_,module,exports){
+},{"./errors.js":9,"./es5.js":10,"./util.js":23}],18:[function(_dereq_,module,exports){
 "use strict";
 function arrayMove(src, srcIndex, dst, dstIndex, len) {
     for (var j = 0; j < len; ++j) {
@@ -2761,7 +2709,56 @@ Queue.prototype._resizeTo = function (capacity) {
 
 module.exports = Queue;
 
-},{}],20:[function(_dereq_,module,exports){
+},{}],19:[function(_dereq_,module,exports){
+"use strict";
+module.exports = function(
+    Promise, INTERNAL, tryConvertToPromise, apiRejection) {
+var isArray = _dereq_("./util.js").isArray;
+
+var raceLater = function (promise) {
+    return promise.then(function(array) {
+        return race(array, promise);
+    });
+};
+
+function race(promises, parent) {
+    var maybePromise = tryConvertToPromise(promises);
+
+    if (maybePromise instanceof Promise) {
+        return raceLater(maybePromise);
+    } else if (!isArray(promises)) {
+        return apiRejection("expecting an array, a promise or a thenable\u000a\u000a    See http://goo.gl/s8MMhc\u000a");
+    }
+
+    var ret = new Promise(INTERNAL);
+    if (parent !== undefined) {
+        ret._propagateFrom(parent, 4 | 1);
+    }
+    var fulfill = ret._fulfill;
+    var reject = ret._reject;
+    for (var i = 0, len = promises.length; i < len; ++i) {
+        var val = promises[i];
+
+        if (val === undefined && !(i in promises)) {
+            continue;
+        }
+
+        Promise.cast(val)._then(fulfill, reject, undefined, ret, null);
+    }
+    return ret;
+}
+
+Promise.race = function (promises) {
+    return race(promises, undefined);
+};
+
+Promise.prototype.race = function () {
+    return race(this, undefined);
+};
+
+};
+
+},{"./util.js":23}],20:[function(_dereq_,module,exports){
 "use strict";
 var schedule;
 var util = _dereq_("./util");
@@ -2798,49 +2795,7 @@ if (util.isNode && typeof MutationObserver === "undefined") {
 }
 module.exports = schedule;
 
-},{"./util":25}],21:[function(_dereq_,module,exports){
-"use strict";
-module.exports =
-    function(Promise, PromiseArray) {
-var PromiseInspection = Promise.PromiseInspection;
-var util = _dereq_("./util.js");
-
-function SettledPromiseArray(values) {
-    this.constructor$(values);
-}
-util.inherits(SettledPromiseArray, PromiseArray);
-
-SettledPromiseArray.prototype._promiseResolved = function (index, inspection) {
-    this._values[index] = inspection;
-    var totalResolved = ++this._totalResolved;
-    if (totalResolved >= this._length) {
-        this._resolve(this._values);
-    }
-};
-
-SettledPromiseArray.prototype._promiseFulfilled = function (value, index) {
-    var ret = new PromiseInspection();
-    ret._bitField = 268435456;
-    ret._settledValue = value;
-    this._promiseResolved(index, ret);
-};
-SettledPromiseArray.prototype._promiseRejected = function (reason, index) {
-    var ret = new PromiseInspection();
-    ret._bitField = 134217728;
-    ret._settledValue = reason;
-    this._promiseResolved(index, ret);
-};
-
-Promise.settle = function (promises) {
-    return new SettledPromiseArray(promises).promise();
-};
-
-Promise.prototype.settle = function () {
-    return new SettledPromiseArray(this).promise();
-};
-};
-
-},{"./util.js":25}],22:[function(_dereq_,module,exports){
+},{"./util":23}],21:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise) {
 function PromiseInspection(promise) {
@@ -2936,7 +2891,7 @@ Promise.prototype.reason = function() {
 Promise.PromiseInspection = PromiseInspection;
 };
 
-},{}],23:[function(_dereq_,module,exports){
+},{}],22:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL) {
 var util = _dereq_("./util.js");
@@ -3022,67 +2977,7 @@ function doThenable(x, then, context) {
 return tryConvertToPromise;
 };
 
-},{"./util.js":25}],24:[function(_dereq_,module,exports){
-"use strict";
-module.exports = function(Promise, INTERNAL) {
-var util = _dereq_("./util.js");
-var TimeoutError = Promise.TimeoutError;
-
-var afterTimeout = function (promise, message) {
-    if (!promise.isPending()) return;
-    if (typeof message !== "string") {
-        message = "operation timed out";
-    }
-    var err = new TimeoutError(message);
-    util.markAsOriginatingFromRejection(err);
-    promise._attachExtraTrace(err);
-    promise._cancel(err);
-};
-
-var afterValue = function(value) { return delay(+this).thenReturn(value); };
-var delay = Promise.delay = function (value, ms) {
-    if (ms === undefined) {
-        ms = value;
-        value = undefined;
-        var ret = new Promise(INTERNAL);
-        setTimeout(function() { ret._fulfill(); }, ms);
-        return ret;
-    }
-    ms = +ms;
-    return Promise.resolve(value)._then(afterValue, null, null, ms, undefined);
-};
-
-Promise.prototype.delay = function (ms) {
-    return delay(this, ms);
-};
-
-function successClear(value) {
-    var handle = this;
-    if (handle instanceof Number) handle = +handle;
-    clearTimeout(handle);
-    return value;
-}
-
-function failureClear(reason) {
-    var handle = this;
-    if (handle instanceof Number) handle = +handle;
-    clearTimeout(handle);
-    throw reason;
-}
-
-Promise.prototype.timeout = function (ms, message) {
-    ms = +ms;
-    var ret = this.then().cancellable();
-    ret._cancellationParent = this;
-    var handle = setTimeout(function timeoutTimeout() {
-        afterTimeout(ret, message);
-    }, ms);
-    return ret._then(successClear, failureClear, undefined, handle, undefined);
-};
-
-};
-
-},{"./util.js":25}],25:[function(_dereq_,module,exports){
+},{"./util.js":23}],23:[function(_dereq_,module,exports){
 "use strict";
 var es5 = _dereq_("./es5.js");
 var canEvaluate = typeof navigator == "undefined";
@@ -3405,5 +3300,5 @@ if (ret.isNode) ret.toFastProperties(process);
 try {throw new Error(); } catch (e) {ret.lastLineError = e;}
 module.exports = ret;
 
-},{"./es5.js":11}]},{},[3])(3)
+},{"./es5.js":10}]},{},[3])(3)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
