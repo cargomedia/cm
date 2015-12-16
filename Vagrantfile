@@ -19,6 +19,6 @@ Vagrant.configure('2') do |config|
 
   config.vm.provision 'shell', inline: [
     'cd /home/vagrant/cm',
-    'composer --no-interaction install --dev',
+    'composer --no-interaction install',
   ].join(' && ')
 end
