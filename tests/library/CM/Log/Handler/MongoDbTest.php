@@ -34,6 +34,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $ttl = 30;
         $user = CMTest_TH::createUser();
         $httpRequest = CM_Http_Request_Abstract::factory('post', '/foo?bar=1&baz=quux', ['bar' => 'baz'], ['foo' => 'quux'], '{"bar":"2", "quux":"baz"}');
+        $clientId = $httpRequest->getClientId();
         $computerInfo = new CM_Log_Context_ComputerInfo('www.example.com', 'v7.0.1');
 
         $mongoClient = $this->getServiceManager()->getMongoDb();
@@ -68,6 +69,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertSame(['bar' => '2', 'baz' => 'quux', 'quux' => 'baz'], $context['httpRequest']['query']);
         $this->assertSame(['bar' => 'baz'], $context['httpRequest']['headers']);
         $this->assertSame(['foo' => 'quux'], $context['httpRequest']['server']);
+        $this->assertSame($clientId, $context['httpRequest']['clientId']);
         $this->assertSame('www.example.com', $context['computerInfo']['fqdn']);
         $this->assertSame('v7.0.1', $context['computerInfo']['phpVersion']);
         $this->assertSame(['bar' => ['baz' => 'quux']], $context['extra']);
