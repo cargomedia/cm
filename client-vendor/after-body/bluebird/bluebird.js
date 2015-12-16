@@ -24,8 +24,8 @@
  */
 /**
  * bluebird build version 2.9.33
- * Features enabled: core, settle, cancel, timers
- * Features disabled: race, call_get, generators, map, nodeify, promisify, props, reduce, some, using, filter, any, each
+ * Features enabled: core, race, settle, cancel, timers
+ * Features disabled: call_get, generators, map, nodeify, promisify, props, reduce, some, using, filter, any, each
 */
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Promise=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof _dereq_=="function"&&_dereq_;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof _dereq_=="function"&&_dereq_;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 "use strict";
@@ -179,7 +179,7 @@ Async.prototype._reset = function () {
 module.exports = new Async();
 module.exports.firstLineError = firstLineError;
 
-},{"./queue.js":19,"./schedule.js":20,"./util.js":25}],2:[function(_dereq_,module,exports){
+},{"./queue.js":19,"./schedule.js":21,"./util.js":26}],2:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, tryConvertToPromise) {
 var rejectThis = function(_, e) {
@@ -812,7 +812,7 @@ if (typeof console !== "undefined" && typeof console.warn !== "undefined") {
 return CapturedTrace;
 };
 
-},{"./async.js":1,"./util.js":25}],6:[function(_dereq_,module,exports){
+},{"./async.js":1,"./util.js":26}],6:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(NEXT_FILTER) {
 var util = _dereq_("./util.js");
@@ -880,7 +880,7 @@ CatchFilter.prototype.doFilter = function (e) {
 return CatchFilter;
 };
 
-},{"./errors.js":10,"./es5.js":11,"./util.js":25}],7:[function(_dereq_,module,exports){
+},{"./errors.js":10,"./es5.js":11,"./util.js":26}],7:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, CapturedTrace, isDebugging) {
 var contextStack = [];
@@ -1082,7 +1082,7 @@ return function() {
 };
 };
 
-},{"./async.js":1,"./errors.js":10,"./util.js":25}],9:[function(_dereq_,module,exports){
+},{"./async.js":1,"./errors.js":10,"./util.js":26}],9:[function(_dereq_,module,exports){
 "use strict";
 var util = _dereq_("./util.js");
 var isPrimitive = util.isPrimitive;
@@ -1145,7 +1145,7 @@ Promise.prototype.thenThrow = function (reason) {
 };
 };
 
-},{"./util.js":25}],10:[function(_dereq_,module,exports){
+},{"./util.js":26}],10:[function(_dereq_,module,exports){
 "use strict";
 var es5 = _dereq_("./es5.js");
 var Objectfreeze = es5.freeze;
@@ -1258,7 +1258,7 @@ module.exports = {
     Warning: Warning
 };
 
-},{"./es5.js":11,"./util.js":25}],11:[function(_dereq_,module,exports){
+},{"./es5.js":11,"./util.js":26}],11:[function(_dereq_,module,exports){
 var isES5 = (function(){
     "use strict";
     return this === undefined;
@@ -1440,7 +1440,7 @@ Promise.prototype.tap = function (handler) {
 };
 };
 
-},{"./util.js":25}],13:[function(_dereq_,module,exports){
+},{"./util.js":26}],13:[function(_dereq_,module,exports){
 "use strict";
 module.exports =
 function(Promise, PromiseArray, tryConvertToPromise, INTERNAL) {
@@ -1549,7 +1549,7 @@ Promise.join = function () {
 
 };
 
-},{"./util.js":25}],14:[function(_dereq_,module,exports){
+},{"./util.js":26}],14:[function(_dereq_,module,exports){
 "use strict";
 module.exports =
 function(Promise, INTERNAL, tryConvertToPromise, apiRejection) {
@@ -1595,7 +1595,7 @@ Promise.prototype._resolveFromSyncValue = function (value) {
 };
 };
 
-},{"./util.js":25}],15:[function(_dereq_,module,exports){
+},{"./util.js":26}],15:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, PromiseArray) {
 var util = _dereq_("./util.js");
@@ -1673,7 +1673,7 @@ Promise.prototype._progressUnchecked = function (progressValue) {
 };
 };
 
-},{"./async.js":1,"./util.js":25}],16:[function(_dereq_,module,exports){
+},{"./async.js":1,"./util.js":26}],16:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
 var makeSelfResolutionError = function () {
@@ -2371,6 +2371,7 @@ _dereq_("./synchronous_inspection.js")(Promise);
 _dereq_("./join.js")(Promise, PromiseArray, tryConvertToPromise, INTERNAL);
 Promise.Promise = Promise;
 _dereq_('./cancel.js')(Promise);
+_dereq_('./race.js')(Promise, INTERNAL, tryConvertToPromise, apiRejection);
 _dereq_('./settle.js')(Promise, PromiseArray);
 _dereq_('./timers.js')(Promise, INTERNAL);
                                                          
@@ -2400,7 +2401,7 @@ _dereq_('./timers.js')(Promise, INTERNAL);
 
 };
 
-},{"./async.js":1,"./bind.js":2,"./cancel.js":4,"./captured_trace.js":5,"./catch_filter.js":6,"./context.js":7,"./debuggability.js":8,"./direct_resolve.js":9,"./errors.js":10,"./finally.js":12,"./join.js":13,"./method.js":14,"./progress.js":15,"./promise_array.js":17,"./promise_resolver.js":18,"./settle.js":21,"./synchronous_inspection.js":22,"./thenables.js":23,"./timers.js":24,"./util.js":25}],17:[function(_dereq_,module,exports){
+},{"./async.js":1,"./bind.js":2,"./cancel.js":4,"./captured_trace.js":5,"./catch_filter.js":6,"./context.js":7,"./debuggability.js":8,"./direct_resolve.js":9,"./errors.js":10,"./finally.js":12,"./join.js":13,"./method.js":14,"./progress.js":15,"./promise_array.js":17,"./promise_resolver.js":18,"./race.js":20,"./settle.js":22,"./synchronous_inspection.js":23,"./thenables.js":24,"./timers.js":25,"./util.js":26}],17:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, tryConvertToPromise,
     apiRejection) {
@@ -2544,7 +2545,7 @@ PromiseArray.prototype.getActualLength = function (len) {
 return PromiseArray;
 };
 
-},{"./util.js":25}],18:[function(_dereq_,module,exports){
+},{"./util.js":26}],18:[function(_dereq_,module,exports){
 "use strict";
 var util = _dereq_("./util.js");
 var maybeWrapAsError = util.maybeWrapAsError;
@@ -2669,7 +2670,7 @@ PromiseResolver.prototype.toJSON = function () {
 
 module.exports = PromiseResolver;
 
-},{"./errors.js":10,"./es5.js":11,"./util.js":25}],19:[function(_dereq_,module,exports){
+},{"./errors.js":10,"./es5.js":11,"./util.js":26}],19:[function(_dereq_,module,exports){
 "use strict";
 function arrayMove(src, srcIndex, dst, dstIndex, len) {
     for (var j = 0; j < len; ++j) {
@@ -2763,6 +2764,55 @@ module.exports = Queue;
 
 },{}],20:[function(_dereq_,module,exports){
 "use strict";
+module.exports = function(
+    Promise, INTERNAL, tryConvertToPromise, apiRejection) {
+var isArray = _dereq_("./util.js").isArray;
+
+var raceLater = function (promise) {
+    return promise.then(function(array) {
+        return race(array, promise);
+    });
+};
+
+function race(promises, parent) {
+    var maybePromise = tryConvertToPromise(promises);
+
+    if (maybePromise instanceof Promise) {
+        return raceLater(maybePromise);
+    } else if (!isArray(promises)) {
+        return apiRejection("expecting an array, a promise or a thenable\u000a\u000a    See http://goo.gl/s8MMhc\u000a");
+    }
+
+    var ret = new Promise(INTERNAL);
+    if (parent !== undefined) {
+        ret._propagateFrom(parent, 4 | 1);
+    }
+    var fulfill = ret._fulfill;
+    var reject = ret._reject;
+    for (var i = 0, len = promises.length; i < len; ++i) {
+        var val = promises[i];
+
+        if (val === undefined && !(i in promises)) {
+            continue;
+        }
+
+        Promise.cast(val)._then(fulfill, reject, undefined, ret, null);
+    }
+    return ret;
+}
+
+Promise.race = function (promises) {
+    return race(promises, undefined);
+};
+
+Promise.prototype.race = function () {
+    return race(this, undefined);
+};
+
+};
+
+},{"./util.js":26}],21:[function(_dereq_,module,exports){
+"use strict";
 var schedule;
 var util = _dereq_("./util");
 var noAsyncScheduler = function() {
@@ -2798,7 +2848,7 @@ if (util.isNode && typeof MutationObserver === "undefined") {
 }
 module.exports = schedule;
 
-},{"./util":25}],21:[function(_dereq_,module,exports){
+},{"./util":26}],22:[function(_dereq_,module,exports){
 "use strict";
 module.exports =
     function(Promise, PromiseArray) {
@@ -2840,7 +2890,7 @@ Promise.prototype.settle = function () {
 };
 };
 
-},{"./util.js":25}],22:[function(_dereq_,module,exports){
+},{"./util.js":26}],23:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise) {
 function PromiseInspection(promise) {
@@ -2936,7 +2986,7 @@ Promise.prototype.reason = function() {
 Promise.PromiseInspection = PromiseInspection;
 };
 
-},{}],23:[function(_dereq_,module,exports){
+},{}],24:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL) {
 var util = _dereq_("./util.js");
@@ -3022,7 +3072,7 @@ function doThenable(x, then, context) {
 return tryConvertToPromise;
 };
 
-},{"./util.js":25}],24:[function(_dereq_,module,exports){
+},{"./util.js":26}],25:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL) {
 var util = _dereq_("./util.js");
@@ -3082,7 +3132,7 @@ Promise.prototype.timeout = function (ms, message) {
 
 };
 
-},{"./util.js":25}],25:[function(_dereq_,module,exports){
+},{"./util.js":26}],26:[function(_dereq_,module,exports){
 "use strict";
 var es5 = _dereq_("./es5.js");
 var canEvaluate = typeof navigator == "undefined";
