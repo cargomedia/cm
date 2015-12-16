@@ -83,6 +83,10 @@ class CM_Janus_RpcEndpoints {
         $streamRepository = $janus->getStreamRepository();
         $streamChannel = $streamRepository->findStreamChannelByKey($streamChannelKey);
 
+        if (null === $streamChannel) {
+            return;
+        }
+
         $streamSubscribe = $streamChannel->getStreamSubscribes()->findKey($streamKey);
         if ($streamSubscribe) {
             $streamRepository->removeStream($streamSubscribe);
