@@ -77,6 +77,10 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
         $onclick .= ' cm.router.route(\'' . smarty_function_linkUrl($params, $template) . '\');';
     }
 
+    if (isset($params['href'])) {
+        $onclick .= ' cm.router.route(\'' . $params['href'] . '\');';
+    }
+
     if ($onclick) {
         $attrs .= ' onclick="' . CM_Util::htmlspecialchars($onclick) . '"';
     }
