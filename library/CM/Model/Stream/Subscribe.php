@@ -64,7 +64,7 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
             throw new CM_Exception_Invalid('Stream channel not valid', CM_Exception::WARN);
         }
 
-        $allowedUntil = $streamChannel->canSubscribe($user, time());
+        $allowedUntil = $streamChannel->canSubscribe(null, $user, time());
         if ($allowedUntil <= time()) {
             throw new CM_Exception_NotAllowed('Not allowed to subscribe');
         }
