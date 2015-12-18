@@ -81,6 +81,12 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
         $attrs .= ' onclick="' . CM_Util::htmlspecialchars($onclick) . '"';
     }
 
+    $link = false;
+    if (isset($params['href'])) {
+        $link = $params['href'];
+        $attrs .= ' href="' . CM_Util::htmlspecialchars($link) . '"';
+    }
+
     if (isset($params['data'])) {
         foreach ($params['data'] as $name => $value) {
             $attrs .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
@@ -88,7 +94,14 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
     }
 
     $html = '';
-    $html .= '<button class="' . $class . '" type="button" value="' . $label . '" ' . $attrs . '>';
+
+    if ($link) {
+        $html .= '<a';
+    } else {
+        $html .= '<button type="button" value="' . $label . '"';
+    }
+
+    $html .= ' class="' . $class . '" ' . $attrs . '>';
     if ($icon && $iconPosition == 'left') {
         $html .= $iconMarkup;
     }
@@ -99,6 +112,12 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
     if ($icon && $iconPosition == 'right') {
         $html .= $iconMarkup;
     }
-    $html .= '</button>';
+
+    if ($link) {
+        $html .= '</a>';
+    } else {
+        $html .= '</button>';
+    }
+
     return $html;
 }
