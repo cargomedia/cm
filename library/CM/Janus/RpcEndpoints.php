@@ -27,7 +27,10 @@ class CM_Janus_RpcEndpoints {
 
         $server = $janus->getConfiguration()->findServerByKey($serverKey);
         $streamRepository = $janus->getStreamRepository();
-        $streamChannel = $streamRepository->createStreamChannel($streamChannelKey, $streamChannelType, $server->getId(), 0);
+        $streamChannel = $streamRepository->findStreamChannelByKey($streamChannelKey);
+        if (!$streamChannel) {
+            $streamChannel = $streamRepository->createStreamChannel($streamChannelKey, $streamChannelType, $server->getId(), 0);
+        }
         try {
             $streamRepository->createStreamPublish($streamChannel, $user, $streamKey, $start);
         } catch (CM_Exception_NotAllowed $exception) {
