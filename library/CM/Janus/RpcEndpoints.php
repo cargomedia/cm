@@ -66,7 +66,7 @@ class CM_Janus_RpcEndpoints {
             $server = $janus->getConfiguration()->findServerByKey($serverKey);
             $streamChannel = $streamRepository->createStreamChannel($streamChannelKey, $streamChannelType, $server->getId(), 0);
         } elseif ($streamChannel->getType() !== $streamChannelType) {
-            throw new CM_Exception_Invalid('Passed stream channel type is does not match with existing');
+            throw new CM_Exception_Invalid('Passed stream channel type does not match existing');
         }
         try {
             $streamRepository->createStreamSubscribe($streamChannel, $user, $streamKey, $start);
