@@ -42,13 +42,14 @@ class CM_Janus_RpcEndpoints {
      * @param string $streamKey
      * @param string $start
      * @param string $sessionData
+     * @param string $channelData
      * @throws CM_Exception_AuthFailed
      * @throws CM_Exception_AuthRequired
      * @throws CM_Exception_Invalid
      * @throws CM_Exception_Nonexistent
      * @throws CM_Exception_NotAllowed
      */
-    public static function rpc_subscribe($serverKey, $streamChannelKey, $streamKey, $start, $sessionData) {
+    public static function rpc_subscribe($serverKey, $streamChannelKey, $streamKey, $start, $sessionData, $channelData) {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
 
@@ -56,10 +57,16 @@ class CM_Janus_RpcEndpoints {
         $session = new CM_Session($params->getString('sessionId'));
         $user = $session->getUser(true);
 
+        $paramsChannel = CM_Params::factory(CM_Params::jsonDecode($channelData), true);
+        $streamChannelType = $paramsChannel->getInt('streamChannelType');
+
         $streamRepository = $janus->getStreamRepository();
         $streamChannel = $streamRepository->findStreamChannelByKey($streamChannelKey);
         if (!$streamChannel) {
-            throw new CM_Exception_Nonexistent("Stream channel `{$streamChannelKey}` does not exists");
+            $server = $janus->getConfiguration()->findServerByKey($serverKey);
+            $streamChannel = $streamRepository->createStreamChannel($streamChannelKey, $streamChannelType, $server->getId(), 0);
+        } elseif ($streamChannel->getType() !== $streamChannelType) {
+            throw new CM_Exception_Invalid('Passed stream channel type is does not match with existing');
         }
         try {
             $streamRepository->createStreamSubscribe($streamChannel, $user, $streamKey, $start);
@@ -113,7 +120,7 @@ class CM_Janus_RpcEndpoints {
 
     /**
      * @param CM_Janus_Service $janus
-     * @param string $serverKey
+     * @param string           $serverKey
      * @throws CM_Exception_AuthFailed
      */
     protected static function _authenticate(CM_Janus_Service $janus, $serverKey) {
