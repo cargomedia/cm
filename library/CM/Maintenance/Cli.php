@@ -79,8 +79,11 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 
         if ($this->getServiceManager()->has('janus')) {
             $this->_registerClockworkCallbacks('1 minute', array(
-                'CM_Janus_Service::synchronize' => function () {
+                'CM_Janus_Service::synchronize'  => function () {
                     $this->getServiceManager()->getJanus('janus')->synchronize();
+                },
+                'CM_Janus_Service::checkStreams' => function () {
+                    $this->getServiceManager()->getJanus('janus')->checkStreams();
                 },
             ));
         }
