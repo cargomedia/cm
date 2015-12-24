@@ -27,7 +27,7 @@ class CM_Janus_RpcEndpoints {
 
         $streamRepository = $janus->getStreamRepository();
         $streamChannel = $streamRepository->findStreamChannelByKey($streamChannelKey);
-        if (null !== $streamChannel) {
+        if (null === $streamChannel) {
             $server = $janus->getConfiguration()->findServerByKey($serverKey);
             $streamChannel = $streamRepository->createStreamChannel($streamChannelKey, $streamChannelType, $server->getId(), 0);
         } elseif ($streamChannel->getType() !== $streamChannelType) {
@@ -67,7 +67,7 @@ class CM_Janus_RpcEndpoints {
 
         $streamRepository = $janus->getStreamRepository();
         $streamChannel = $streamRepository->findStreamChannelByKey($streamChannelKey);
-        if (null !== $streamChannel) {
+        if (null === $streamChannel) {
             $server = $janus->getConfiguration()->findServerByKey($serverKey);
             $streamChannel = $streamRepository->createStreamChannel($streamChannelKey, $streamChannelType, $server->getId(), 0);
         } elseif ($streamChannel->getType() !== $streamChannelType) {
