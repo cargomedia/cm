@@ -142,6 +142,13 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
         return true;
     }
 
+    public function toArray() {
+        $array = parent::toArray();
+        $array['key'] = $this->getKey();
+        $array['type'] = $this->getType();
+        return $array;
+    }
+    
     protected function _loadData() {
         $data = CM_Db_Db::select('cm_streamChannel', array('key', 'type', 'adapterType'), array('id' => $this->getId()))->fetch();
         if (false !== $data) {

@@ -62,7 +62,6 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
 
     public function toArray() {
         $array = parent::toArray();
-        $array['key'] = $this->getKey();
         if ($this->hasStreamPublish()) {
             $array['user'] = $this->getStreamPublish()->getUser();
         }
