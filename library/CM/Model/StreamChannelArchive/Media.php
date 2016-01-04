@@ -39,6 +39,13 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     /**
+     * @return string
+     */
+    public function getKey() {
+        return (string) $this->_get('key');
+    }
+
+    /**
      * @return int
      */
     public function getStreamChannelType() {
@@ -154,6 +161,7 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
             'streamChannelType' => $streamChannel->getType(),
             'createStamp'       => $createStamp,
             'data'              => CM_Params::jsonEncode(['thumbnailCount' => $thumbnailCount]),
+            'key'               => $streamChannel->getKey(),
         ));
         return new self($streamChannel->getId());
     }

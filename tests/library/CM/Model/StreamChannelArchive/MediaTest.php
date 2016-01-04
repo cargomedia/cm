@@ -23,6 +23,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         $this->assertSame($streamChannel->getThumbnailCount(), $archive->getThumbnailCount());
         $this->assertSame(md5($streamPublish->getKey()), $archive->getHash());
         $this->assertSame($streamChannel->getType(), $archive->getStreamChannelType());
+        $this->assertSame($streamChannel->getKey(), $archive->getKey());
 
         $streamChannel = CMTest_TH::createStreamChannel();
         try {
