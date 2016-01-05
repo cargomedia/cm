@@ -365,10 +365,12 @@ CREATE TABLE `cm_streamChannelArchive_media` (
   `streamChannelType` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   `data` varchar(255) NOT NULL DEFAULT '',
+  `key` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userId` (`userId`),
   KEY `createStamp` (`createStamp`),
-  KEY `streamChannelType` (`streamChannelType`)
+  KEY `streamChannelType` (`streamChannelType`),
+  KEY `key` (`key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_streamChannel_media`;
