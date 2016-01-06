@@ -13,7 +13,8 @@ class CM_Janus_Factory {
                 $serverId,
                 $serverConfig['key'],
                 $serverConfig['httpAddress'],
-                $serverConfig['webSocketAddress']
+                $serverConfig['webSocketAddress'],
+                $serverConfig['iceServerList']
             ));
         }
 

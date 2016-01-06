@@ -3,11 +3,18 @@
 class CM_Janus_FactoryTest extends CMTest_TestCase {
 
     public function testCreateService() {
+
+        $iceServerList = [
+            ['url' => 'turn:example.com:3478', 'username' => 'foo', 'credential' => 'bar'],
+            ['url' => 'turn:test.com:3478', 'username' => 'baz', 'credential' => 'quux'],
+        ];
+
         $serversConfig = [
             5 => [
-                'key'            => 'foo-bar',
+                'key'              => 'foo-bar',
                 'httpAddress'      => 'http://cm-janus.dev:8080',
                 'webSocketAddress' => 'ws://cm-janus.dev:8188',
+                'iceServerList'    => $iceServerList,
             ],
         ];
         $factory = new CM_Janus_Factory();
@@ -18,5 +25,6 @@ class CM_Janus_FactoryTest extends CMTest_TestCase {
         $this->assertSame('foo-bar', $servers[0]->getKey());
         $this->assertSame('http://cm-janus.dev:8080', $servers[0]->getHttpAddress());
         $this->assertSame('ws://cm-janus.dev:8188', $servers[0]->getWebSocketAddress());
+        $this->assertSame($iceServerList, $servers[0]->getIceServerList());
     }
 }
