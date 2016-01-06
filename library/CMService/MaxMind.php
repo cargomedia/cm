@@ -2,7 +2,7 @@
 
 class CMService_MaxMind extends CM_Class_Abstract {
 
-    const COUNTRY_URL = 'https://raw.githubusercontent.com/lukes/ISO-3166-Countries-with-Regional-Codes/master/all/all.csv';
+    const COUNTRY_URL = 'https://raw.githubusercontent.com/lukes/ISO-3166-Countries-with-Regional-Codes/56efb650f927eda08c18c2a077226104d0e41744/all/all.csv';
     const REGION_URL = 'http://www.maxmind.com/download/geoip/misc/region_codes.csv';
     const GEO_LITE_CITY_URL = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity-latest.zip';
     const GEO_IP_URL = 'https://download.maxmind.com/app/geoip_download';
