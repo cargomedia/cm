@@ -46,6 +46,15 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     /**
+     * @return string|null
+     */
+    public function getMediaId() {
+        $mediaId = $this->_get('mediaId');
+        $mediaId = (null !== $mediaId) ? (string) $mediaId : null;
+        return $mediaId;
+    }
+
+    /**
      * @return int
      */
     public function getStreamChannelType() {
@@ -146,15 +155,20 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     protected static function _createStatic(array $data) {
         /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = $data['streamChannel'];
-        $streamPublish = $streamChannel->getStreamPublish();
-        $createStamp = $streamPublish->getStart();
+        $createStamp = $streamChannel->getCreateStamp();
+        $userId = null;
+        if ($streamChannel->hasStreamPublish()) {
+            $streamPublish = $streamChannel->getStreamPublish();
+            $createStamp = $streamPublish->getStart();
+            $userId = $streamPublish->getUserId();
+        }
         $thumbnailCount = $streamChannel->getThumbnailCount();
         $file = isset($data['file']) ? $data['file'] : null;
         $end = time();
         $duration = $end - $createStamp;
-        CM_Db_Db::insert('cm_streamChannelArchive_media', array(
+        CM_Db_Db::insert('cm_streamChannelArchive_media', [
             'id'                => $streamChannel->getId(),
-            'userId'            => $streamPublish->getUserId(),
+            'userId'            => $userId,
             'duration'          => $duration,
             'hash'              => $streamChannel->getHash(),
             'file'              => $file,
@@ -162,7 +176,8 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
             'createStamp'       => $createStamp,
             'data'              => CM_Params::jsonEncode(['thumbnailCount' => $thumbnailCount]),
             'key'               => $streamChannel->getKey(),
-        ));
+            'mediaId'           => $streamChannel->getMediaId()
+        ]);
         return new self($streamChannel->getId());
     }
 

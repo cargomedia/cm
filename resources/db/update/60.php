@@ -8,3 +8,7 @@ if (!CM_Db_Db::existsColumn('cm_streamChannel_media', 'mediaId')) {
     CM_Db_Db::exec("ALTER TABLE cm_streamChannel_media ADD mediaId VARCHAR(255) DEFAULT NULL, ADD UNIQUE KEY (mediaId)");
 }
 
+if (!CM_Db_Db::existsColumn('cm_streamChannelArchive_media', 'mediaId')) {
+    CM_Db_Db::exec("ALTER TABLE cm_streamChannelArchive_media ADD mediaId VARCHAR(255) DEFAULT NULL, ADD UNIQUE KEY (mediaId)");
+}
+
