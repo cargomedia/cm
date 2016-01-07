@@ -2,18 +2,34 @@
 
 class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
 
+    public function tearDown() {
+        CMTest_TH::clearEnv();
+    }
+
     public function testCreate() {
-        /** @var CM_Model_StreamChannel_Media $channel */
-        $channel = CM_Model_StreamChannel_Media::createStatic(array(
+        /** @var CM_Model_StreamChannel_Media $channel1 */
+        $channel1 = CM_Model_StreamChannel_Media::createStatic(array(
             'key'            => 'foo',
             'serverId'       => 1,
             'thumbnailCount' => 2,
             'adapterType'    => 1,
         ));
-        $this->assertInstanceOf('CM_Model_StreamChannel_Media', $channel);
-        $this->assertSame('foo', $channel->getKey());
-        $this->assertSame(1, $channel->getAdapterType());
-        $this->assertSame(2, $channel->getThumbnailCount());
+        $this->assertInstanceOf('CM_Model_StreamChannel_Media', $channel1);
+        $this->assertSame('foo', $channel1->getKey());
+        $this->assertSame(1, $channel1->getAdapterType());
+        $this->assertSame(2, $channel1->getThumbnailCount());
+        $this->assertSame(null, $channel1->getMediaId());
+
+        /** @var CM_Model_StreamChannel_Media $channel */
+        $channel2 = CM_Model_StreamChannel_Media::createStatic(array(
+            'key'            => 'bar',
+            'serverId'       => 1,
+            'thumbnailCount' => 2,
+            'adapterType'    => 1,
+            'mediaId' => 'foobar',
+        ));
+
+        $this->assertSame('foobar', $channel2->getMediaId());
     }
 
     public function testCreateWithoutServerId() {

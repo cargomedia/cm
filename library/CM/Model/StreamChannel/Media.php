@@ -36,6 +36,15 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
     }
 
     /**
+     * @return string|null
+     */
+    public function getMediaId() {
+        $mediaId = $this->_get('mediaId');
+        $mediaId = (null !== $mediaId) ? (string) $mediaId : null;
+        return $mediaId;
+    }
+
+    /**
      * @return CM_Model_Stream_Publish
      * @throws CM_Exception_Invalid
      */
@@ -119,12 +128,21 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
         $serverId = $data['serverId'];
         $thumbnailCount = (int) $data['thumbnailCount'];
         $adapterType = (int) $data['adapterType'];
-        $id = CM_Db_Db::insert('cm_streamChannel', array('key' => $key, 'type' => static::getTypeStatic(), 'adapterType' => $adapterType));
+        $mediaId = isset($data['mediaId']) ? (string) $data['mediaId'] : null;
+        $id = CM_Db_Db::insert('cm_streamChannel', [
+            'key'         => $key,
+            'type'        => static::getTypeStatic(),
+            'adapterType' => $adapterType,
+        ]);
         try {
-            CM_Db_Db::insert('cm_streamChannel_media', array('id'   => $id, 'serverId' => $serverId,
-                                                             'data' => CM_Params::encode(['thumbnailCount' => $thumbnailCount], true)));
+            CM_Db_Db::insert('cm_streamChannel_media', [
+                'id'       => $id,
+                'serverId' => $serverId,
+                'data'     => CM_Params::encode(['thumbnailCount' => $thumbnailCount], true),
+                'mediaId'  => $mediaId,
+            ]);
         } catch (CM_Exception $ex) {
-            CM_Db_Db::delete('cm_streamChannel', array('id' => $id));
+            CM_Db_Db::delete('cm_streamChannel', ['id' => $id]);
             throw $ex;
         }
         $cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
