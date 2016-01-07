@@ -345,6 +345,7 @@ DROP TABLE IF EXISTS `cm_streamChannel`;
 CREATE TABLE `cm_streamChannel` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(64) NOT NULL,
+  `createStamp` int(10) unsigned NOT NULL,
   `type` int(10) unsigned NOT NULL,
   `adapterType` int(11) NOT NULL,
   PRIMARY KEY (`id`),
