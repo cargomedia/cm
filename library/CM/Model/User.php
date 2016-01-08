@@ -3,7 +3,7 @@
 class CM_Model_User extends CM_Model_Abstract {
 
     const ONLINE_EXPIRATION = 1800;
-    const OFFLINE_DELAY = 10;
+    const OFFLINE_DELAY = 5;
     const ACTIVITY_EXPIRATION = 60;
 
     /**
@@ -79,26 +79,6 @@ class CM_Model_User extends CM_Model_Abstract {
             CM_Db_Db::delete('cm_user_online', array('userId' => $this->getId()));
             $this->_set(array('online' => null, 'visible' => null));
         }
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getOfflineStamp() {
-        $offlineStamp = $this->_get('offlineStamp');
-        if (null !== $offlineStamp) {
-            $offlineStamp = (int) $offlineStamp;
-        }
-        return $offlineStamp;
-    }
-
-    /**
-     * @param int|null $offlineStamp
-     */
-    public function setOfflineStamp($offlineStamp) {
-        $offlineStamp = null !== $offlineStamp ? (int) $offlineStamp : $offlineStamp;
-        CM_Db_Db::update('cm_user_online', ['offlineStamp' => $offlineStamp], ['userId' => $this->getId()]);
-        $this->_set('offlineStamp', $offlineStamp);
     }
 
     /**
@@ -260,7 +240,7 @@ class CM_Model_User extends CM_Model_Abstract {
 
     protected function _loadData() {
         return CM_Db_Db::exec('
-			SELECT `main`.*, `online`.`userId` AS `online`, `online`.`visible`, `online`.`offlineStamp`
+			SELECT `main`.*, `online`.`userId` AS `online`, `online`.`visible`
 			FROM `cm_user` AS `main`
 			LEFT JOIN `cm_user_online` AS `online` USING (`userId`)
 			WHERE `main`.`userId`=?',
@@ -286,18 +266,6 @@ class CM_Model_User extends CM_Model_Abstract {
     public static function factory($id) {
         $className = self::_getClassName();
         return new $className($id);
-    }
-
-    public static function offlineDelayed() {
-        $result = CM_Db_Db::exec('SELECT `userId` FROM `cm_user_online` WHERE `offlineStamp` < ?', [time() - self::OFFLINE_DELAY]);
-        while ($userId = $result->fetchColumn()) {
-            try {
-                $user = CM_Model_User::factory($userId);
-                $user->setOnline(false);
-            } catch (CM_Exception_Nonexistent $e) {
-                CM_Db_Db::delete('cm_user_online', array('userId' => $userId));
-            }
-        }
     }
 
     public static function offlineOld() {
