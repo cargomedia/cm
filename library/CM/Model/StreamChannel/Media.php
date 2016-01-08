@@ -131,7 +131,7 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
         $serverId = $data['serverId'];
         $thumbnailCount = (int) $data['thumbnailCount'];
         $adapterType = (int) $data['adapterType'];
-        $mediaId = isset($data['mediaId']) ? (string) $data['mediaId'] : null;
+        $mediaId = !empty($data['mediaId']) ? (string) $data['mediaId'] : null;
         $id = CM_Db_Db::insert('cm_streamChannel', [
             'key'         => $key,
             'type'        => static::getTypeStatic(),
