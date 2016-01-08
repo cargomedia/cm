@@ -195,4 +195,16 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
             $streamChannelArchive->delete();
         }
     }
+
+    /**
+     * @param string $mediaId
+     * @return CM_Model_StreamChannelArchive_Media|null
+     */
+    public static function findByMediaId($mediaId) {
+        $streamChannelId = CM_Db_Db::select('cm_streamChannelArchive_media', 'id', ['mediaId' => (string) $mediaId])->fetchColumn();
+        if (!$streamChannelId) {
+            return null;
+        }
+        return new self($streamChannelId);
+    }
 }

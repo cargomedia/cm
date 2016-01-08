@@ -190,6 +190,15 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Model_StreamChannelArchive_Media', CM_Model_StreamChannelArchive_Media::findById($streamChannel->getId()));
     }
 
+    public function testFindByMediaId() {
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
+        $streamChannel = $streamChannel = CMTest_TH::createStreamChannel(null, null, 'foo');
+        $this->assertNull(CM_Model_StreamChannelArchive_Media::findByMediaId($streamChannel->getMediaId()));
+
+        $streamChannelArchive = CM_Model_StreamChannelArchive_Media::createStatic(['streamChannel' => $streamChannel]);
+        $this->assertEquals($streamChannelArchive, CM_Model_StreamChannelArchive_Media::findByMediaId($streamChannel->getMediaId()));
+    }
+
     /**
      * @param CM_Model_StreamChannelArchive_Media $archive
      * @return CM_File[]
