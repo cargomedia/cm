@@ -159,4 +159,18 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
         CM_Cache_Shared::getInstance()->delete($cacheKey);
         return new static($id);
     }
+
+    /**
+     * @param string $mediaId
+     * @return CM_Model_StreamChannel_Media|null
+     */
+    public static function findByMediaId($mediaId) {
+        $row = CM_Db_Db::exec("SELECT t1.id, t2.type FROM cm_streamChannel_media t1 JOIN cm_streamChannel t2 USING(id) WHERE t1.mediaId = ?", [(string) $mediaId])->fetch();
+        if (!$row) {
+            return null;
+        }
+        $streamChannelId = $row['id'];
+        $streamChannelType = $row['type'];
+        return CM_Model_StreamChannel_Media::factory($streamChannelId, $streamChannelType);
+    }
 }

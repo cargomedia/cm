@@ -221,6 +221,13 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         $this->assertEquals($streamChannelArchive, CM_Model_StreamChannelArchive_Media::findByMediaId($streamChannel->getMediaId()));
     }
 
+    public function testSetThumbnailCount() {
+        $streamChannelArchive = CMTest_TH::createStreamChannelVideoArchive();
+        $this->assertSame(0, $streamChannelArchive->getThumbnailCount());
+        $streamChannelArchive->setThumbnailCount(5);
+        $this->assertSame(5, $streamChannelArchive->getThumbnailCount());
+    }
+
     /**
      * @param CM_Model_StreamChannelArchive_Media $archive
      * @return CM_File[]

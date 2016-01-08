@@ -82,6 +82,17 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     /**
+     * @param int $thumbnailCount
+     */
+    public function setThumbnailCount($thumbnailCount) {
+        $thumbnailCount = (int) $thumbnailCount;
+        $params = $this->_getDataColumn();
+        $params->set('thumbnailCount', $thumbnailCount);
+        CM_Db_Db::update('cm_streamChannelArchive_media', ['data' => CM_Params::jsonEncode($params->getParamsEncoded())], ['id' => $this->getId()]);
+        $this->_change();
+    }
+
+    /**
      * @param int $index
      * @return CM_File_UserContent
      */
@@ -215,10 +226,10 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
      * @return CM_Model_StreamChannelArchive_Media|null
      */
     public static function findByMediaId($mediaId) {
-        $streamChannelId = CM_Db_Db::select('cm_streamChannelArchive_media', 'id', ['mediaId' => (string) $mediaId])->fetchColumn();
-        if (!$streamChannelId) {
+        $streamChannelArchiveId = CM_Db_Db::select('cm_streamChannelArchive_media', 'id', ['mediaId' => (string) $mediaId])->fetchColumn();
+        if (!$streamChannelArchiveId) {
             return null;
         }
-        return new self($streamChannelId);
+        return new self($streamChannelArchiveId);
     }
 }

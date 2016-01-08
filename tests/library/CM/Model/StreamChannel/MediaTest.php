@@ -153,5 +153,12 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
             'streamChannels/' . $streamChannel->getId() . '/' . $streamChannel->getId() . '-' . $streamChannel->getHash() . '-thumbs/3.png',
             $thumbnail->getPathRelative());
     }
+
+    public function testFindByMediaId() {
+        $this->assertNull(CM_Model_StreamChannelArchive_Media::findByMediaId('foo'));
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
+        $streamChannel = $streamChannel = CMTest_TH::createStreamChannel(null, null, 'foo');
+        $this->assertEquals($streamChannel, CM_Model_StreamChannel_Media::findByMediaId($streamChannel->getMediaId()));
+    }
 }
 
