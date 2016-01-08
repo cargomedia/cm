@@ -116,6 +116,13 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
         }
     }
 
+    protected function _onDeleteBefore() {
+        parent::_onDeleteBefore();
+        if (!CM_Model_StreamChannelArchive_Media::findById($this->getId())) {
+            CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $this));
+        }
+    }
+
     protected function _onDelete() {
         CM_Db_Db::delete('cm_streamChannel_media', array('id' => $this->getId()));
         parent::_onDelete();

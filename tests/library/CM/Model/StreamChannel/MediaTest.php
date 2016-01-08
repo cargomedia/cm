@@ -83,14 +83,14 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
     }
 
     public function testOnDelete() {
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $streamChannel->delete();
-        try {
-            new CM_Model_StreamChannel_Media($streamChannel->getId());
-        } catch (CM_Exception_Nonexistent $ex) {
-            $this->assertTrue(true);
-        }
-        $this->assertNotRow('cm_streamChannel_media', array('id' => $streamChannel->getId()));
+        $exception = $this->catchException(function () use ($streamChannel) {
+            CMTest_TH::reinstantiateModel($streamChannel);
+        });
+        $this->assertInstanceOf('CM_Exception_Nonexistent', $exception);
+        $this->assertInstanceOf('CM_Model_StreamChannelArchive_Media', CM_Model_StreamChannelArchive_Media::findById($streamChannel->getId()));
     }
 
     public function testOnUnpublish() {
@@ -102,6 +102,8 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Model_StreamChannelArchive_Media', CM_Model_StreamChannelArchive_Media::findById($streamChannel->getId()));
 
         $streamChannel->onUnpublish($streamPublish);
+        $streamPublish->delete();
+        $streamChannel->delete();
     }
 
     public function testOnUnpublishDelete() {
