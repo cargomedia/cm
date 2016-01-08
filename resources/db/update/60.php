@@ -1,14 +1,18 @@
 <?php
 
-if (!CM_Db_Db::existsColumn('cm_streamChannel', 'createStamp')) {
-    CM_Db_Db::exec("ALTER TABLE cm_streamChannel ADD createStamp INT UNSIGNED NOT NULL AFTER `key`");
+if (!CM_Db_Db::existsTable('cm_jobdistribution_delayedqueue')) {
+    CM_Db_Db::exec('
+        CREATE TABLE `cm_jobdistribution_delayedqueue` (
+          `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+          `className` varchar(255) NOT NULL,
+          `params` text NOT NULL,
+          `executeAt` int(10) unsigned NOT NULL,
+          PRIMARY KEY (`id`),
+          KEY `executeAt` (`executeAt`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+    ');
 }
 
-if (!CM_Db_Db::existsColumn('cm_streamChannel_media', 'mediaId')) {
-    CM_Db_Db::exec("ALTER TABLE cm_streamChannel_media ADD mediaId VARCHAR(255) DEFAULT NULL, ADD UNIQUE KEY (mediaId)");
+if (CM_Db_Db::existsColumn('cm_user_online', 'offlineStamp')) {
+    CM_Db_Db::exec('ALTER TABLE `cm_user_online` DROP `offlineStamp`');
 }
-
-if (!CM_Db_Db::existsColumn('cm_streamChannelArchive_media', 'mediaId')) {
-    CM_Db_Db::exec("ALTER TABLE cm_streamChannelArchive_media ADD mediaId VARCHAR(255) DEFAULT NULL, ADD UNIQUE KEY (mediaId)");
-}
-
