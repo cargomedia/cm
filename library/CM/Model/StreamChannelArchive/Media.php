@@ -133,7 +133,9 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     protected function _onDeleteBefore() {
-        $this->getFile()->delete();
+        if ($this->hasFile()) {
+            $this->getFile()->delete();
+        }
 
         $thumbnailDir = new CM_File_UserContent('streamChannels', $this->getId() . '-' . $this->getHash() . '-thumbs/', $this->getId());
         $thumbnailDir->delete(true);
