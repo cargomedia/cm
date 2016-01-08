@@ -17,17 +17,29 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     /**
-     * @param CM_File_UserContent $file
+     * @return bool
      */
-    public function setFile(CM_File_UserContent $file) {
-        CM_Db_Db::update('cm_streamChannelArchive_media', ['file' => $file->getPath()], ['id' => $this->getId()]);
+    public function hasFile() {
+        return $this->_has('file') && null !== $this->_get('file');
+    }
+
+    /**
+     * @param CM_File_UserContent|null $file
+     */
+    public function setFile(CM_File_UserContent $file = null) {
+        $path = null !== $file ? $file->getPath() : null;
+        CM_Db_Db::update('cm_streamChannelArchive_media', ['file' => $path], ['id' => $this->getId()]);
         $this->_change();
     }
 
     /**
      * @return CM_File_UserContent
+     * @throws CM_Exception_Invalid
      */
     public function getFile() {
+        if (null === $this->_get('file')) {
+            throw new CM_Exception_Invalid('File does not exist');
+        }
         return new CM_File_UserContent('streamChannels', $this->_get('file'), $this->getId());
     }
 
@@ -122,7 +134,9 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     protected function _onDeleteBefore() {
-        $this->getFile()->delete();
+        if ($this->hasFile()) {
+            $this->getFile()->delete();
+        }
 
         $thumbnailDir = new CM_File_UserContent('streamChannels', $this->getId() . '-' . $this->getHash() . '-thumbs/', $this->getId());
         $thumbnailDir->delete(true);
