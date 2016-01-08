@@ -26,10 +26,18 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
             'serverId'       => 1,
             'thumbnailCount' => 2,
             'adapterType'    => 1,
-            'mediaId' => 'foobar',
+            'mediaId'        => 'foobar',
         ));
-
         $this->assertSame('foobar', $channel2->getMediaId());
+
+        $channel3 = CM_Model_StreamChannel_Media::createStatic(array(
+            'key'            => 'foobar',
+            'serverId'       => 1,
+            'thumbnailCount' => 2,
+            'adapterType'    => 1,
+            'mediaId'        => null,
+        ));
+        $this->assertSame(null, $channel3->getMediaId());
     }
 
     public function testCreateWithoutServerId() {

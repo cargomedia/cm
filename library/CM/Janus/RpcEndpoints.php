@@ -24,12 +24,13 @@ class CM_Janus_RpcEndpoints {
 
         $paramsChannel = CM_Params::factory(CM_Params::jsonDecode($channelData), true);
         $streamChannelType = $paramsChannel->getInt('streamChannelType');
+        $mediaId = $paramsChannel->getString('mediaId');
 
         $streamRepository = $janus->getStreamRepository();
         $streamChannel = $streamRepository->findStreamChannelByKey($streamChannelKey);
         if (null === $streamChannel) {
             $server = $janus->getConfiguration()->findServerByKey($serverKey);
-            $streamChannel = $streamRepository->createStreamChannel($streamChannelKey, $streamChannelType, $server->getId(), 0);
+            $streamChannel = $streamRepository->createStreamChannel($streamChannelKey, $streamChannelType, $server->getId(), 0, $mediaId);
         } elseif ($streamChannel->getType() !== $streamChannelType) {
             throw new CM_Exception_Invalid('Passed stream channel type does not match existing');
         }
@@ -64,12 +65,13 @@ class CM_Janus_RpcEndpoints {
 
         $paramsChannel = CM_Params::factory(CM_Params::jsonDecode($channelData), true);
         $streamChannelType = $paramsChannel->getInt('streamChannelType');
+        $mediaId = $paramsChannel->getString('mediaId');
 
         $streamRepository = $janus->getStreamRepository();
         $streamChannel = $streamRepository->findStreamChannelByKey($streamChannelKey);
         if (null === $streamChannel) {
             $server = $janus->getConfiguration()->findServerByKey($serverKey);
-            $streamChannel = $streamRepository->createStreamChannel($streamChannelKey, $streamChannelType, $server->getId(), 0);
+            $streamChannel = $streamRepository->createStreamChannel($streamChannelKey, $streamChannelType, $server->getId(), 0, $mediaId);
         } elseif ($streamChannel->getType() !== $streamChannelType) {
             throw new CM_Exception_Invalid('Passed stream channel type does not match existing');
         }
