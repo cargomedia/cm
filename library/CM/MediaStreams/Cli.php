@@ -18,15 +18,15 @@ class CM_MediaStreams_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param string  $mediaId
+     * @param string  $streamChannelMediaId
      * @param CM_File $archiveSource
      * @throws CM_Exception_Invalid
      */
-    public function importArchive($mediaId, CM_File $archiveSource) {
-        $mediaId = (string) $mediaId;
-        $streamChannelArchive = CM_Model_StreamChannelArchive_Media::findByMediaId($mediaId);
+    public function importArchive($streamChannelMediaId, CM_File $archiveSource) {
+        $streamChannelMediaId = (string) $streamChannelMediaId;
+        $streamChannelArchive = CM_Model_StreamChannelArchive_Media::findByMediaId($streamChannelMediaId);
         if (!$streamChannelArchive) {
-            throw new CM_Exception_Invalid('Archive not found', null, ['mediaId' => $mediaId]);
+            throw new CM_Exception_Invalid('Archive not found', null, ['streamChannelMediaId' => $streamChannelMediaId]);
         }
         $filename = $streamChannelArchive->getId() . '-' . $streamChannelArchive->getHash() . '-original' . $archiveSource->getExtension();
         $archiveDestination = new CM_File_UserContent('streamChannels', $filename, $streamChannelArchive->getId());
