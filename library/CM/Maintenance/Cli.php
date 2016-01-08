@@ -31,6 +31,12 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     protected function _registerCallbacks() {
+        $this->_registerClockworkCallbacks('1 second', [
+            'CM_Jobdistribution_DelayedQueue::queueOutstanding' => function () {
+                $delayedQueue = new CM_Jobdistribution_DelayedQueue($this->getServiceManager());
+                $delayedQueue->queueOutstanding();
+            },
+        ]);
         $this->_registerClockworkCallbacks('10 seconds', array(
             'CM_Model_User::offlineDelayed' => function () {
                 CM_Model_User::offlineDelayed();
