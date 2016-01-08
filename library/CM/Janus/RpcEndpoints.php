@@ -9,12 +9,13 @@ class CM_Janus_RpcEndpoints {
      * @param int    $start
      * @param string $sessionData
      * @param string $channelData
+     * @param string $mediaId
      * @throws CM_Exception_AuthFailed
      * @throws CM_Exception_AuthRequired
      * @throws CM_Exception_Invalid
      * @throws CM_Exception_NotAllowed
      */
-    public static function rpc_publish($serverKey, $streamChannelKey, $streamKey, $start, $sessionData, $channelData) {
+    public static function rpc_publish($serverKey, $streamChannelKey, $streamKey, $start, $sessionData, $channelData, $mediaId) {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
 
@@ -24,7 +25,6 @@ class CM_Janus_RpcEndpoints {
 
         $paramsChannel = CM_Params::factory(CM_Params::jsonDecode($channelData), true);
         $streamChannelType = $paramsChannel->getInt('streamChannelType');
-        $mediaId = $paramsChannel->getString('mediaId');
 
         $streamRepository = $janus->getStreamRepository();
         $streamChannel = $streamRepository->findStreamChannelByKey($streamChannelKey);
@@ -49,13 +49,14 @@ class CM_Janus_RpcEndpoints {
      * @param string $start
      * @param string $sessionData
      * @param string $channelData
+     * @param string $mediaId
      * @throws CM_Exception_AuthFailed
      * @throws CM_Exception_AuthRequired
      * @throws CM_Exception_Invalid
      * @throws CM_Exception_Nonexistent
      * @throws CM_Exception_NotAllowed
      */
-    public static function rpc_subscribe($serverKey, $streamChannelKey, $streamKey, $start, $sessionData, $channelData) {
+    public static function rpc_subscribe($serverKey, $streamChannelKey, $streamKey, $start, $sessionData, $channelData, $mediaId) {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
 
@@ -65,7 +66,6 @@ class CM_Janus_RpcEndpoints {
 
         $paramsChannel = CM_Params::factory(CM_Params::jsonDecode($channelData), true);
         $streamChannelType = $paramsChannel->getInt('streamChannelType');
-        $mediaId = $paramsChannel->getString('mediaId');
 
         $streamRepository = $janus->getStreamRepository();
         $streamChannel = $streamRepository->findStreamChannelByKey($streamChannelKey);
