@@ -17,18 +17,29 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     /**
-     * @param CM_File_UserContent $file
+     * @return bool
      */
-    public function setFile(CM_File_UserContent $file) {
-        CM_Db_Db::update('cm_streamChannelArchive_media', ['file' => $file->getPath()], ['id' => $this->getId()]);
+    public function hasFile() {
+        return $this->_has('file') && $this->_get('file') !== null;
+    }
+
+    /**
+     * @param CM_File_UserContent|null $file
+     */
+    public function setFile(CM_File_UserContent $file = null) {
+        $path = null !== $file ? $file->getPath() : null;
+        CM_Db_Db::update('cm_streamChannelArchive_media', ['file' => $path], ['id' => $this->getId()]);
         $this->_change();
     }
 
     /**
-     * @return CM_File_UserContent
+     * @return CM_File_UserContent|null
      */
     public function getFile() {
-        return new CM_File_UserContent('streamChannels', $this->_get('file'), $this->getId());
+        if ($this->hasFile()) {
+            return new CM_File_UserContent('streamChannels', $this->_get('file'), $this->getId());
+        }
+        return null;
     }
 
     /**

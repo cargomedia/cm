@@ -66,6 +66,20 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         $this->assertSame('streamChannels/' . $archive->getId() . '/' . $filename, $videoFile->getPathRelative());
     }
 
+    public function testGetNullFile() {
+        $archive = CMTest_TH::createStreamChannelVideoArchive();
+        $this->assertFalse($archive->hasFile());
+        $this->assertNull($archive->getFile());
+
+        $archive = CMTest_TH::createStreamChannelVideoArchive(null, null, 'archive.mp4');
+        $this->assertTrue($archive->hasFile());
+        $this->assertNotNull($archive->getFile());
+
+        $archive->setFile(null);
+        $this->assertFalse($archive->hasFile());
+        $this->assertNull($archive->getFile());
+    }
+
     public function testGetThumbnails() {
         $archive = CMTest_TH::createStreamChannelVideoArchive();
         $this->assertSame(array(), $archive->getThumbnails()->getItems());
@@ -207,9 +221,11 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
             $files[] = $file;
         }
         $video = $archive->getFile();
-        $video->ensureParentDirectory();
-        $video->write('');
-        $files[] = $video;
+        if (null !== $video) {
+            $video->ensureParentDirectory();
+            $video->write('');
+            $files[] = $video;
+        }
         return $files;
     }
 }
