@@ -69,15 +69,23 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
     public function testGetNullFile() {
         $archive = CMTest_TH::createStreamChannelVideoArchive();
         $this->assertFalse($archive->hasFile());
-        $this->assertNull($archive->getFile());
+        $exception = $this->catchException(function () use ($archive) {
+            $archive->getFile();
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('File does not exist', $exception->getMessage());
 
         $archive = CMTest_TH::createStreamChannelVideoArchive(null, null, 'archive.mp4');
         $this->assertTrue($archive->hasFile());
-        $this->assertNotNull($archive->getFile());
+        $this->assertNotEmpty($archive->getFile());
 
         $archive->setFile(null);
         $this->assertFalse($archive->hasFile());
-        $this->assertNull($archive->getFile());
+        $exception = $this->catchException(function () use ($archive) {
+            $archive->getFile();
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('File does not exist', $exception->getMessage());
     }
 
     public function testGetThumbnails() {
@@ -220,8 +228,8 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
             $file->write('');
             $files[] = $file;
         }
-        $video = $archive->getFile();
-        if (null !== $video) {
+        if ($archive->hasFile()) {
+            $video = $archive->getFile();
             $video->ensureParentDirectory();
             $video->write('');
             $files[] = $video;

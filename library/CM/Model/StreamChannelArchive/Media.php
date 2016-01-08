@@ -20,7 +20,7 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
      * @return bool
      */
     public function hasFile() {
-        return $this->_has('file') && $this->_get('file') !== null;
+        return $this->_has('file') && null !== $this->_get('file');
     }
 
     /**
@@ -33,13 +33,14 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     /**
-     * @return CM_File_UserContent|null
+     * @return CM_File_UserContent
+     * @throws CM_Exception_Invalid
      */
     public function getFile() {
-        if ($this->hasFile()) {
-            return new CM_File_UserContent('streamChannels', $this->_get('file'), $this->getId());
+        if (null === $this->_get('file')) {
+            throw new CM_Exception_Invalid('File does not exist');
         }
-        return null;
+        return new CM_File_UserContent('streamChannels', $this->_get('file'), $this->getId());
     }
 
     /**
