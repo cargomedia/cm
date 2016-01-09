@@ -18,6 +18,7 @@ class CM_Janus_RpcEndpoints {
     public static function rpc_publish($serverKey, $streamChannelKey, $streamKey, $start, $sessionData, $channelData, $mediaId) {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
+        $server = $janus->getConfiguration()->findServerByKey($serverKey);
 
         $paramsSession = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
         $session = new CM_Session($paramsSession->getString('sessionId'));
@@ -38,6 +39,8 @@ class CM_Janus_RpcEndpoints {
             throw new CM_Exception_Invalid('Passed stream channel type does not match existing');
         } elseif ($streamChannel->getMediaId() !== $mediaId) {
             throw new CM_Exception_Invalid('Passed stream channel mediaId does not match existing');
+        } elseif ($streamChannel->getServerId() !== $server->getId()) {
+            throw new CM_Exception_Invalid('Passed server does not match existing');
         }
         try {
             $streamRepository->createStreamPublish($streamChannel, $user, $streamKey, $start);
@@ -64,6 +67,7 @@ class CM_Janus_RpcEndpoints {
     public static function rpc_subscribe($serverKey, $streamChannelKey, $streamKey, $start, $sessionData, $channelData, $mediaId) {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
+        $server = $janus->getConfiguration()->findServerByKey($serverKey);
 
         $params = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
         $session = new CM_Session($params->getString('sessionId'));
@@ -84,6 +88,8 @@ class CM_Janus_RpcEndpoints {
             throw new CM_Exception_Invalid('Passed stream channel type does not match existing');
         } elseif ($streamChannel->getMediaId() !== $mediaId) {
             throw new CM_Exception_Invalid('Passed stream channel mediaId does not match existing');
+        } elseif ($streamChannel->getServerId() !== $server->getId()) {
+            throw new CM_Exception_Invalid('Passed server does not match existing');
         }
         try {
             $streamRepository->createStreamSubscribe($streamChannel, $user, $streamKey, $start);
@@ -103,11 +109,15 @@ class CM_Janus_RpcEndpoints {
     public static function rpc_removeStream($serverKey, $streamChannelKey, $streamKey) {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
+        $server = $janus->getConfiguration()->findServerByKey($serverKey);
 
         $streamRepository = $janus->getStreamRepository();
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = $streamRepository->findStreamChannelByKey($streamChannelKey);
         if (null === $streamChannel) {
             return;
+        } elseif ($streamChannel->getServerId() !== $server->getId()) {
+            throw new CM_Exception_Invalid('Passed server does not match existing');
         }
         $streamSubscribe = $streamChannel->getStreamSubscribes()->findKey($streamKey);
         if ($streamSubscribe) {
