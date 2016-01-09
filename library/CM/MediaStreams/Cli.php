@@ -40,7 +40,7 @@ class CM_MediaStreams_Cli extends CM_Cli_Runnable_Abstract {
         if (!$streamChannelArchive) {
             throw new CM_Exception_Invalid('Archive not found', null, ['streamChannelMediaId' => $streamChannelMediaId]);
         }
-        $filename = $streamChannelArchive->getId() . '-' . $streamChannelArchive->getHash() . '-original' . $archiveSource->getExtension();
+        $filename = $streamChannelArchive->getId() . '-' . $streamChannelArchive->getHash() . '-original.' . $archiveSource->getExtension();
         $archiveDestination = new CM_File_UserContent('streamChannels', $filename, $streamChannelArchive->getId());
         $archiveDestination->ensureParentDirectory();
         $archiveSource->copyToFile($archiveDestination);
