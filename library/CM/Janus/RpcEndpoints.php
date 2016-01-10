@@ -136,22 +136,6 @@ class CM_Janus_RpcEndpoints {
     }
 
     /**
-     * @param string $serverKey
-     * @param string $sessionData
-     * @return bool
-     * @throws CM_Exception_AuthFailed
-     * @throws CM_Exception_Invalid
-     */
-    public static function rpc_isValidUser($serverKey, $sessionData) {
-        $janus = CM_Service_Manager::getInstance()->getJanus('janus');
-        self::_authenticate($janus, $serverKey);
-
-        $params = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
-        $session = CM_Session::findById($params->getString('sessionId'));
-        return $session && null !== $session->getUser(false);
-    }
-
-    /**
      * @param CM_Janus_Service $janus
      * @param string $serverKey
      * @throws CM_Exception_AuthFailed
