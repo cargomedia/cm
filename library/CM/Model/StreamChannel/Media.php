@@ -32,7 +32,19 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
      * @return string
      */
     public function getHash() {
-        return md5($this->getStreamPublish()->getKey());
+        if ($this->hasStreamPublish()) {
+            return md5($this->getStreamPublish()->getKey());
+        }
+        return md5($this->getKey());
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMediaId() {
+        $mediaId = $this->_get('mediaId');
+        $mediaId = (null !== $mediaId) ? (string) $mediaId : null;
+        return $mediaId;
     }
 
     /**
@@ -104,6 +116,13 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
         }
     }
 
+    protected function _onDeleteBefore() {
+        parent::_onDeleteBefore();
+        if (!CM_Model_StreamChannelArchive_Media::findById($this->getId())) {
+            CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $this));
+        }
+    }
+
     protected function _onDelete() {
         CM_Db_Db::delete('cm_streamChannel_media', array('id' => $this->getId()));
         parent::_onDelete();
@@ -119,16 +138,39 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
         $serverId = $data['serverId'];
         $thumbnailCount = (int) $data['thumbnailCount'];
         $adapterType = (int) $data['adapterType'];
-        $id = CM_Db_Db::insert('cm_streamChannel', array('key' => $key, 'type' => static::getTypeStatic(), 'adapterType' => $adapterType));
+        $mediaId = !empty($data['mediaId']) ? (string) $data['mediaId'] : null;
+        $id = CM_Db_Db::insert('cm_streamChannel', [
+            'key'         => $key,
+            'type'        => static::getTypeStatic(),
+            'adapterType' => $adapterType,
+        ]);
         try {
-            CM_Db_Db::insert('cm_streamChannel_media', array('id'   => $id, 'serverId' => $serverId,
-                                                             'data' => CM_Params::encode(['thumbnailCount' => $thumbnailCount], true)));
+            CM_Db_Db::insert('cm_streamChannel_media', [
+                'id'       => $id,
+                'serverId' => $serverId,
+                'data'     => CM_Params::encode(['thumbnailCount' => $thumbnailCount], true),
+                'mediaId'  => $mediaId,
+            ]);
         } catch (CM_Exception $ex) {
-            CM_Db_Db::delete('cm_streamChannel', array('id' => $id));
+            CM_Db_Db::delete('cm_streamChannel', ['id' => $id]);
             throw $ex;
         }
         $cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
         CM_Cache_Shared::getInstance()->delete($cacheKey);
         return new static($id);
+    }
+
+    /**
+     * @param string $mediaId
+     * @return CM_Model_StreamChannel_Media|null
+     */
+    public static function findByMediaId($mediaId) {
+        $row = CM_Db_Db::exec("SELECT t1.id, t2.type FROM cm_streamChannel_media t1 JOIN cm_streamChannel t2 USING(id) WHERE t1.mediaId = ?", [(string) $mediaId])->fetch();
+        if (!$row) {
+            return null;
+        }
+        $streamChannelId = $row['id'];
+        $streamChannelType = $row['type'];
+        return CM_Model_StreamChannel_Media::factory($streamChannelId, $streamChannelType);
     }
 }

@@ -357,6 +357,7 @@ DROP TABLE IF EXISTS `cm_streamChannel`;
 CREATE TABLE `cm_streamChannel` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(64) NOT NULL,
+  `createStamp` int(10) unsigned NOT NULL,
   `type` int(10) unsigned NOT NULL,
   `adapterType` int(11) NOT NULL,
   PRIMARY KEY (`id`),
@@ -378,7 +379,9 @@ CREATE TABLE `cm_streamChannelArchive_media` (
   `createStamp` int(10) unsigned NOT NULL,
   `data` varchar(255) NOT NULL DEFAULT '',
   `key` varchar(64) DEFAULT NULL,
+  `mediaId` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `mediaId` (`mediaId`),
   KEY `userId` (`userId`),
   KEY `createStamp` (`createStamp`),
   KEY `streamChannelType` (`streamChannelType`),
@@ -393,7 +396,9 @@ CREATE TABLE `cm_streamChannel_media` (
   `thumbnailCount` int(10) unsigned NOT NULL DEFAULT '0',
   `serverId` int(10) unsigned NOT NULL,
   `data` varchar(255) NOT NULL DEFAULT '',
+  `mediaId` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `mediaId` (`mediaId`),
   CONSTRAINT `cm_streamChannel_media-cm_streamChannel` FOREIGN KEY (`id`) REFERENCES `cm_streamChannel` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

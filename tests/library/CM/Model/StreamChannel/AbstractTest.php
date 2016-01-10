@@ -22,20 +22,6 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
         }
     }
 
-    public function testGetKey() {
-        /** @var CM_Model_StreamChannel_Mock $streamChannel */
-        $streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key'         => 'foo',
-                                                                         'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic()));
-        $this->assertEquals('foo', $streamChannel->getKey());
-    }
-
-    public function testGetAdapterType() {
-        /** @var CM_Model_StreamChannel_Mock $streamChannel */
-        $streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key'         => 'foobar',
-                                                                         'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic()));
-        $this->assertEquals(CM_MessageStream_Adapter_SocketRedis::getTypeStatic(), $streamChannel->getAdapterType());
-    }
-
     public function testFactory() {
         $streamChannel1 = CM_Model_StreamChannel_Media::createStatic(array('key'         => 'dsljkfk34asdd', 'serverId' => 1,
                                                                            'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic(),
@@ -177,9 +163,13 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
     }
 
     public function testCreate() {
+        /** @var CM_Model_StreamChannel_Abstract $streamChannel */
         $streamChannel = CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getTypeStatic(), array('key'         => 'foo1',
                                                                                                                             'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic()));
         $this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
+        $this->assertSame('foo1', $streamChannel->getKey());
+        $this->assertEquals(CM_MessageStream_Adapter_SocketRedis::getTypeStatic(), $streamChannel->getAdapterType());
+        $this->assertSame(time(), $streamChannel->getCreateStamp());
 
         try {
             CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getTypeStatic(), array('key'         => 'foo1',

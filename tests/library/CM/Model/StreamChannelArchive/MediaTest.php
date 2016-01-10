@@ -7,6 +7,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
     }
 
     public function testCreate() {
+        // with streamPublish
         /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         $user = CMTest_TH::createUser();
@@ -24,14 +25,15 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         $this->assertSame(md5($streamPublish->getKey()), $archive->getHash());
         $this->assertSame($streamChannel->getType(), $archive->getStreamChannelType());
         $this->assertSame($streamChannel->getKey(), $archive->getKey());
+        $this->assertSame($streamChannel->getMediaId(), $archive->getMediaId());
+        $this->assertSame($streamChannel->getHash(), $archive->getHash());
 
-        $streamChannel = CMTest_TH::createStreamChannel();
-        try {
-            CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel));
-            $this->fail('StreamChannelArchive_Media created without StreamPublish.');
-        } catch (CM_Exception_Invalid $ex) {
-            $this->assertTrue(true);
-        }
+        // without streamPublish
+        $streamChannel = CMTest_TH::createStreamChannel(null, null, 'foo');
+        $archive = CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel));
+        $this->assertSame($streamChannel->getMediaId(), $archive->getMediaId());
+        $this->assertSame($streamChannel->getCreateStamp(), $archive->getCreated());
+        $this->assertSame($streamChannel->getHash(), $archive->getHash());
     }
 
     public function testNoUser() {
@@ -208,6 +210,22 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         CMTest_TH::createStreamPublish(null, $streamChannel);
         CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel));
         $this->assertInstanceOf('CM_Model_StreamChannelArchive_Media', CM_Model_StreamChannelArchive_Media::findById($streamChannel->getId()));
+    }
+
+    public function testFindByMediaId() {
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
+        $streamChannel = $streamChannel = CMTest_TH::createStreamChannel(null, null, 'foo');
+        $this->assertNull(CM_Model_StreamChannelArchive_Media::findByMediaId($streamChannel->getMediaId()));
+
+        $streamChannelArchive = CM_Model_StreamChannelArchive_Media::createStatic(['streamChannel' => $streamChannel]);
+        $this->assertEquals($streamChannelArchive, CM_Model_StreamChannelArchive_Media::findByMediaId($streamChannel->getMediaId()));
+    }
+
+    public function testSetThumbnailCount() {
+        $streamChannelArchive = CMTest_TH::createStreamChannelVideoArchive();
+        $this->assertSame(0, $streamChannelArchive->getThumbnailCount());
+        $streamChannelArchive->setThumbnailCount(5);
+        $this->assertSame(5, $streamChannelArchive->getThumbnailCount());
     }
 
     /**
