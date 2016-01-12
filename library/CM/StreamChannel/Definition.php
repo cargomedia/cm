@@ -1,6 +1,6 @@
 <?php
 
-class CM_StreamChannel_Definition {
+class CM_StreamChannel_Definition implements CM_ArrayConvertible {
 
     /** @var string */
     private $_key;
@@ -74,4 +74,19 @@ class CM_StreamChannel_Definition {
         return $channel;
     }
 
+    public function toArray() {
+        return [
+            'key'         => $this->getKey(),
+            'type'        => $this->getType(),
+            'adapterType' => $this->getAdapterType(),
+        ];
+    }
+
+    public function toArrayIdOnly() {
+        return $this->toArray();
+    }
+
+    public static function fromArray(array $array) {
+        return new self($array['key'], $array['type'], $array['adapterType']);
+    }
 }
