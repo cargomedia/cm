@@ -15,11 +15,12 @@ class CM_Janus_HttpApiClient {
     /**
      * @param CM_Janus_Server $server
      * @param string          $clientKey
-     * @return string
+     * @return array
      * @throws CM_Exception_Invalid
      */
     public function stopStream(CM_Janus_Server $server, $clientKey) {
-        return $this->_request('POST', $server, '/stopStream', ['streamId' => (string) $clientKey]);
+        $res = $this->_request('POST', $server, '/stopStream', ['streamId' => (string) $clientKey]);
+        return CM_Params::jsonDecode($res);
     }
 
     /**
@@ -53,6 +54,10 @@ class CM_Janus_HttpApiClient {
         } catch (GuzzleHttp\Exception\TransferException $e) {
             throw new CM_Exception_Invalid('Fetching contents from `' . $url . '` failed: `' . $e->getMessage());
         }
-        return $response->getBody();
+        $body = $response->getBody();
+        if (null === $body) {
+            throw new CM_Exception_Invalid('Empty response body');
+        }
+        return $body->getContents();
     }
 }
