@@ -115,7 +115,7 @@ class CM_Janus_RpcEndpoints {
 
         $server = $janus->getConfiguration()->findServerByKey($serverKey);
         $channelKey = (string) $channelKey;
-        $streamKey = (string) $serverKey;
+        $streamKey = (string) $streamKey;
 
         $streamRepository = $janus->getStreamRepository();
         /** @var CM_Model_StreamChannel_Media $streamChannel */
