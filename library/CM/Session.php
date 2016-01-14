@@ -23,7 +23,7 @@ class CM_Session implements CM_Comparable {
     private $_isPersistent = false;
 
     /**
-     * @param string|null              $id
+     * @param string|null                   $id
      * @param CM_Http_Request_Abstract|null $request
      * @throws CM_Exception_Nonexistent
      */
@@ -71,6 +71,11 @@ class CM_Session implements CM_Comparable {
             $this->delete('userId');
             $this->regenerateId();
         }
+    }
+
+    public function logoutUser() {
+        $this->deleteUser();
+        $this->setLifetime(null);
     }
 
     /**
