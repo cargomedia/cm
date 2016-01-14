@@ -19,6 +19,7 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
         $this->assertSame(1, $channel1->getAdapterType());
         $this->assertSame(2, $channel1->getThumbnailCount());
         $this->assertSame(null, $channel1->getMediaId());
+        $this->assertSame(time(), $channel1->getCreateStamp());
 
         /** @var CM_Model_StreamChannel_Media $channel */
         $channel2 = CM_Model_StreamChannel_Media::createStatic(array(
