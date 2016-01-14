@@ -43,7 +43,7 @@ class CM_Http_ClientDevice {
         $property = (string) $property;
         $cache = CM_Cache_Local::getInstance();
 
-        return $cache->get($cache->key(__METHOD__, $this->_headerList), function () use ($property) {
+        return $cache->get($cache->key(__METHOD__, $this->_headerList, $property), function () use ($property) {
             return $this->_parser->version($property);
         });
     }
