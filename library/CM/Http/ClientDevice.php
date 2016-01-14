@@ -34,4 +34,17 @@ class CM_Http_ClientDevice {
             return $this->_parser->isMobile();
         });
     }
+
+    /**
+     * @param string $property
+     * @return string|false
+     */
+    public function getVersion($property) {
+        $property = (string) $property;
+        $cache = CM_Cache_Local::getInstance();
+
+        return $cache->get($cache->key(__METHOD__, $this->_headerList), function () use ($property) {
+            return $this->_parser->version($property);
+        });
+    }
 }
