@@ -46,6 +46,20 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
         CM_Model_StreamChannel_Media::factory($messageStreamChannel->getId());
     }
 
+    public function testCreateDuplicate() {
+        $channel1 = CM_Model_StreamChannel_Message::createStatic([
+            'key'         => 'foo',
+            'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic(),
+        ]);
+        $channel2 = CM_Model_StreamChannel_Message::createStatic([
+            'key'         => 'foo',
+            'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic(),
+        ]);
+        $this->assertInstanceOf('CM_Model_StreamChannel_Message', $channel1);
+        $this->assertInstanceOf('CM_Model_StreamChannel_Message', $channel2);
+        $this->assertSame($channel1->getId(), $channel2->getId());
+    }
+
     public function testFindByKeyAndAdapter() {
         $adapterType = 1;
         /** @var CM_Model_StreamChannel_Media $streamChannelOriginal */
