@@ -55,6 +55,29 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
         }
     }
 
+    public function testCreateDuplicate() {
+        /** @var CM_Model_StreamChannel_Media $channel1 */
+        $channel1 = CM_Model_StreamChannel_Media::createStatic(array(
+            'key'            => 'foo',
+            'serverId'       => 1,
+            'thumbnailCount' => 2,
+            'adapterType'    => 1,
+        ));
+
+        /** @var CM_Model_StreamChannel_Media $channel2 */
+        $channel2 = CM_Model_StreamChannel_Media::createStatic(array(
+            'key'            => 'foo',
+            'serverId'       => 1,
+            'thumbnailCount' => 2,
+            'adapterType'    => 1,
+        ));
+
+        $this->assertInstanceOf('CM_Model_StreamChannel_Media', $channel1);
+        $this->assertInstanceOf('CM_Model_StreamChannel_Media', $channel2);
+        $this->assertSame($channel1->getId(), $channel2->getId());
+        $this->assertSame($channel1->getCreateStamp(), $channel2->getCreateStamp());
+    }
+
     public function testGetStreamPublish() {
         /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();

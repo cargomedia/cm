@@ -263,7 +263,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
             'createStamp' => time(),
             'type'        => static::getTypeStatic(),
             'adapterType' => $adapterType,
-        ));
+        ), null, ['id' => ['literal' => 'LAST_INSERT_ID(id)']]);
         $cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
         CM_Cache_Shared::getInstance()->delete($cacheKey);
         return new static($id);
