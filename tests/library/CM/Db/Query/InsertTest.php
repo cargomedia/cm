@@ -83,5 +83,17 @@ class CM_Db_Query_InsertTest extends CMTest_TestCase {
         // Statement
         $query = new CM_Db_Query_Insert(self::$_client, 't`est', array('foo' => 'foo2', 'bar' => 'bar2'), null, null, 'INSERT IGNORE');
         $this->assertSame('INSERT IGNORE INTO `t``est` (`foo`,`bar`) VALUES (?,?)', $query->getSqlTemplate());
+
+        $query = new CM_Db_Query_Insert(self::$_client, 't`est', ['foo' => 'foo2', 'bar' => 'bar2'], null, [
+            'id' => ['literal' => 'LAST_INSERT_ID(id)']
+        ]);
+        $this->assertSame('INSERT INTO `t``est` (`foo`,`bar`) VALUES (?,?) ON DUPLICATE KEY UPDATE `id` = LAST_INSERT_ID(id)', $query->getSqlTemplate());
+    }
+
+    public function testIsValidLiteral() {
+        $query = $this->mockClass('CM_Db_Query_Insert')->newInstanceWithoutConstructor();
+        $this->assertFalse($this->callProtectedMethod($query, '_isValidLiteral', ['COUNT']));
+        $this->assertTrue($this->callProtectedMethod($query, '_isValidLiteral', ['LAST_INSERT_ID()']));
+        $this->assertTrue($this->callProtectedMethod($query, '_isValidLiteral', ['LAST_INSERT_ID(id)']));
     }
 }
