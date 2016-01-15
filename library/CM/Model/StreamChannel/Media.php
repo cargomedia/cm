@@ -144,18 +144,15 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
             'createStamp' => time(),
             'type'        => static::getTypeStatic(),
             'adapterType' => $adapterType,
-        ]);
-        try {
-            CM_Db_Db::insert('cm_streamChannel_media', [
-                'id'       => $id,
-                'serverId' => $serverId,
-                'data'     => CM_Params::encode(['thumbnailCount' => $thumbnailCount], true),
-                'mediaId'  => $mediaId,
-            ]);
-        } catch (CM_Exception $ex) {
-            CM_Db_Db::delete('cm_streamChannel', ['id' => $id]);
-            throw $ex;
-        }
+        ], null, ['id' => ['literal' => 'LAST_INSERT_ID(id)']]);
+
+        CM_Db_Db::insert('cm_streamChannel_media', [
+            'id'       => $id,
+            'serverId' => $serverId,
+            'data'     => CM_Params::encode(['thumbnailCount' => $thumbnailCount], true),
+            'mediaId'  => $mediaId,
+        ], null, ['id' => ['literal' => 'LAST_INSERT_ID(id)']]);
+
         $cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
         CM_Cache_Shared::getInstance()->delete($cacheKey);
         return new static($id);
