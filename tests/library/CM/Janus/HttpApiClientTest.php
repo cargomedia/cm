@@ -11,7 +11,7 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
             $this->assertSame('bar', $request->getHeader('Server-Key'));
 
             $body = $this->mockClass('\GuzzleHttp\Post\PostBody')->newInstanceWithoutConstructor();
-            $body->mockMethod('getContents')->set('');
+            $body->mockMethod('getContents')->set('{"success":"Stream stopped"}');
 
             $response = $this->mockClass('\GuzzleHttp\Message\Response')->newInstanceWithoutConstructor();
             $response->mockMethod('getBody')->set($body);
@@ -33,7 +33,7 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
             $this->assertSame('bar', $request->getHeader('Server-Key'));
 
             $body = $this->mockClass('\GuzzleHttp\Post\PostBody')->newInstanceWithoutConstructor();
-            $body->mockMethod('getContents')->set('{"foo":"bar"}');
+            $body->mockMethod('getContents')->set('[{"id":"foo", "channelName":"bar"},{"id":"baz", "channelName":"quux"}]');
 
             $response = $this->mockClass('\GuzzleHttp\Message\Response')->newInstanceWithoutConstructor();
             $response->mockMethod('getBody')->set($body);
@@ -44,7 +44,7 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
         $server = new CM_Janus_Server(0, 'bar', 'http://cm-janus.dev:8080', 'ws://cm-janus.dev:8188');
         $api = new CM_Janus_HttpApiClient($httpClient);
         $result = $api->fetchStatus($server);
-        $this->assertSame(['foo' => 'bar'], $result);
+        $this->assertSame([['id' => 'foo', 'channelName' => 'bar'], ['id' => 'baz', 'channelName' => 'quux']], $result);
         $this->assertSame(1, $sendRequestMethod->getCallCount());
     }
 
