@@ -78,6 +78,6 @@ class CM_Db_Query_Insert extends CM_Db_Query_Abstract {
      * @return bool
      */
     private function _isValidLiteral($literal) {
-        return (1 === preg_match('/LAST_INSERT_ID\((?:id)?\)/', $literal));
+        return (1 === preg_match('/^LAST_INSERT_ID\((?:id)?\)$/', $literal));
     }
 }
