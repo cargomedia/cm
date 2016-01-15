@@ -62,6 +62,8 @@ class CM_Db_Query_Insert extends CM_Db_Query_Abstract {
                     $literal = (string) $values['literal'];
                     if ($this->_isValidLiteral($literal)) {
                         $valuesList[] = $this->_getClient()->quoteIdentifier($fields) . ' = ' . $values['literal'];
+                    } else {
+                        throw new CM_Exception('Unescaped Value is not whitelisted');
                     }
                 } else {
                     $valuesList[] = $this->_getClient()->quoteIdentifier($fields) . ' = ?';

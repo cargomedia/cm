@@ -88,6 +88,14 @@ class CM_Db_Query_InsertTest extends CMTest_TestCase {
             'id' => ['literal' => 'LAST_INSERT_ID(id)']
         ]);
         $this->assertSame('INSERT INTO `t``est` (`foo`,`bar`) VALUES (?,?) ON DUPLICATE KEY UPDATE `id` = LAST_INSERT_ID(id)', $query->getSqlTemplate());
+
+        $exception = $this->catchException(function () use ($query) {
+            new CM_Db_Query_Insert(self::$_client, 't`est', ['foo' => 'foo2', 'bar' => 'bar2'], null, [
+                'id' => ['literal' => 'COUNT(*)']
+            ]);
+        });
+        $this->assertInstanceOf('CM_Exception', $exception);
+        $this->assertSame('Unescaped Value is not whitelisted', $exception->getMessage());
     }
 
     public function testIsValidLiteral() {
