@@ -143,18 +143,23 @@ class CM_Janus_RpcEndpoints {
         /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = $streamRepository->findStreamChannelByKey($channelKey);
         if (null === $streamChannel) {
-            return;
-        } elseif ($streamChannel->getServerId() !== $server->getId()) {
+            return false;
+        }
+
+        if ($streamChannel->getServerId() !== $server->getId()) {
             throw new CM_Exception_Invalid("Request server `{$server->getId()}` does not match existing `{$streamChannel->getServerId()}`");
         }
         $streamSubscribe = $streamChannel->getStreamSubscribes()->findKey($streamKey);
         if ($streamSubscribe) {
             $streamRepository->removeStream($streamSubscribe);
+            return true;
         }
         $streamPublish = $streamChannel->getStreamPublishs()->findKey($streamKey);
         if ($streamPublish) {
             $streamRepository->removeStream($streamPublish);
+            return true;
         }
+        return false;
     }
 
     /**
