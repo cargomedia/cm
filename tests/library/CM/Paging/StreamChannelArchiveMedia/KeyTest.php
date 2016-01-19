@@ -1,6 +1,6 @@
 <?php
 
-class CM_Paging_StreamChannelArchive_KeyTest extends CMTest_TestCase {
+class CM_Paging_StreamChannelArchiveMedia_KeyTest extends CMTest_TestCase {
 
     public function testPaging() {
         $key = 'foo';
