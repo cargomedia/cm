@@ -13,6 +13,6 @@ class CM_Paging_StreamChannelArchiveMedia_KeyTest extends CMTest_TestCase {
         $streamChannelArchive1 = CMTest_TH::createStreamChannelVideoArchive($streamChannel1);
         CMTest_TH::timeForward(1);
         $streamChannelArchive2 = CMTest_TH::createStreamChannelVideoArchive($streamChannel2);
-        $this->assertEquals([$streamChannelArchive2, $streamChannelArchive1], new CM_Paging_StreamChannelArchiveMedia_Key($key));
+        $this->assertEquals([$streamChannelArchive1, $streamChannelArchive2], new CM_Paging_StreamChannelArchiveMedia_Key($key));
     }
 }
