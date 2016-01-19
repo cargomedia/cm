@@ -143,13 +143,6 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
     }
 
     public function testGetHash() {
-        // with streamPublish
-        /** @var CM_Model_StreamChannel_Media $streamChannel */
-        $streamChannel = CMTest_TH::createStreamChannel();
-        $streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
-        $this->assertSame(md5($streamPublish->getKey()), $streamChannel->getHash());
-
-        // without streamPublish
         $streamChannel = CMTest_TH::createStreamChannel();
         $this->assertSame(md5($streamChannel->getKey()), $streamChannel->getHash());
     }

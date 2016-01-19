@@ -32,9 +32,6 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
      * @return string
      */
     public function getHash() {
-        if ($this->hasStreamPublish()) {
-            return md5($this->getStreamPublish()->getKey());
-        }
         return md5($this->getKey());
     }
 
