@@ -9,9 +9,6 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
     }
 
     public function onUnpublish(CM_Model_Stream_Publish $streamPublish) {
-        if (!CM_Model_StreamChannelArchive_Media::findById($this->getId())) {
-            CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $this));
-        }
     }
 
     public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
