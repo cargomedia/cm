@@ -139,19 +139,25 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
         $thumbnailCount = (int) $data['thumbnailCount'];
         $adapterType = (int) $data['adapterType'];
         $mediaId = !empty($data['mediaId']) ? (string) $data['mediaId'] : null;
-        $id = CM_Db_Db::insert('cm_streamChannel', [
-            'key'         => $key,
-            'createStamp' => time(),
-            'type'        => static::getTypeStatic(),
-            'adapterType' => $adapterType,
-        ], null, ['id' => ['literal' => 'LAST_INSERT_ID(id)']]);
 
-        CM_Db_Db::insert('cm_streamChannel_media', [
-            'id'       => $id,
-            'serverId' => $serverId,
-            'data'     => CM_Params::encode(['thumbnailCount' => $thumbnailCount], true),
-            'mediaId'  => $mediaId,
-        ], null, ['id' => ['literal' => 'LAST_INSERT_ID(id)']]);
+        CM_Db_Db::exec("INSERT INTO cm_streamChannel(`key`, `createStamp`, `type`, `adapterType`)
+	        SELECT ?, ?, ?, ?  FROM DUAL
+	          WHERE NOT EXISTS
+		        (SELECT 1 FROM cm_streamChannelArchive_media
+                  WHERE mediaId = ?)
+          ON DUPLICATE KEY UPDATE `id` = LAST_INSERT_ID(id)",
+            [$key, time(), static::getTypeStatic(), $adapterType, $mediaId]);
+
+        $id = CM_Db_Db::exec("SELECT LAST_INSERT_ID()")->fetchColumn();
+
+        if ('0' !== $id) {
+            CM_Db_Db::insert('cm_streamChannel_media', [
+                'id'       => $id,
+                'serverId' => $serverId,
+                'data'     => CM_Params::encode(['thumbnailCount' => $thumbnailCount], true),
+                'mediaId'  => $mediaId,
+            ], null, ['id' => ['literal' => 'LAST_INSERT_ID(id)']]);
+        }
 
         $cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
         CM_Cache_Shared::getInstance()->delete($cacheKey);
