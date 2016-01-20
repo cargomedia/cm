@@ -150,14 +150,17 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
 
         $id = CM_Db_Db::exec("SELECT LAST_INSERT_ID()")->fetchColumn();
 
-        if ('0' !== $id) {
-            CM_Db_Db::insert('cm_streamChannel_media', [
-                'id'       => $id,
-                'serverId' => $serverId,
-                'data'     => CM_Params::encode(['thumbnailCount' => $thumbnailCount], true),
-                'mediaId'  => $mediaId,
-            ], null, ['id' => ['literal' => 'LAST_INSERT_ID(id)']]);
+        if ('0' === $id) {
+            throw new CM_Exception_Invalid('Channel archive with given mediaId already exists');
         }
+
+        $id = (int) $id;
+        CM_Db_Db::insert('cm_streamChannel_media', [
+            'id'       => $id,
+            'serverId' => $serverId,
+            'data'     => CM_Params::encode(['thumbnailCount' => $thumbnailCount], true),
+            'mediaId'  => $mediaId,
+        ], null, ['id' => ['literal' => 'LAST_INSERT_ID(id)']]);
 
         $cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
         CM_Cache_Shared::getInstance()->delete($cacheKey);
