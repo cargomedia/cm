@@ -34,6 +34,7 @@ class CM_MediaStreams_StreamRepository {
      * @param int|null    $thumbnailCount
      * @param string|null $mediaId
      * @return CM_Model_StreamChannel_Abstract
+     * @throws CM_Exception_Invalid
      */
     public function createStreamChannel($streamName, $streamChannelType, $serverId, $thumbnailCount = null, $mediaId = null) {
         if (null !== $thumbnailCount) {
@@ -41,7 +42,11 @@ class CM_MediaStreams_StreamRepository {
         }
         if (null !== $mediaId) {
             $mediaId = (string) $mediaId;
+            if (null !== CM_Model_StreamChannelArchive_Media::findByMediaId($mediaId)) {
+                throw new CM_Exception_Invalid('Channel archive with mediaId `'.$mediaId.'` already exists');
+            }
         }
+
         return CM_Model_StreamChannel_Abstract::createType($streamChannelType, [
             'key'            => $streamName,
             'adapterType'    => $this->_adapterType,
