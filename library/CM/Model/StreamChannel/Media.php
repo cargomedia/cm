@@ -140,21 +140,21 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
         $adapterType = (int) $data['adapterType'];
         $mediaId = !empty($data['mediaId']) ? (string) $data['mediaId'] : null;
 
-        CM_Db_Db::exec("INSERT INTO cm_streamChannel(`key`, `createStamp`, `type`, `adapterType`)
+        $affectedRows = CM_Db_Db::exec("INSERT INTO cm_streamChannel(`key`, `createStamp`, `type`, `adapterType`)
 	        SELECT ?, ?, ?, ?  FROM DUAL
 	          WHERE NOT EXISTS
 		        (SELECT 1 FROM cm_streamChannelArchive_media
                   WHERE mediaId = ?)
-          ON DUPLICATE KEY UPDATE `id` = LAST_INSERT_ID(id)",
-            [$key, time(), static::getTypeStatic(), $adapterType, $mediaId]);
+          ON DUPLICATE KEY UPDATE `id` = LAST_INSERT_ID(id), `createStamp` = \"createStamp\"+1 ",
+            [$key, time(), static::getTypeStatic(), $adapterType, $mediaId])->getAffectedRows();
 
-        $id = CM_Db_Db::exec("SELECT LAST_INSERT_ID()")->fetchColumn();
-
-        if ('0' === $id) {
+        if (0 === $affectedRows) {
             throw new CM_Exception_Invalid('Channel archive with given mediaId already exists');
         }
 
+        $id = CM_Db_Db::exec("SELECT LAST_INSERT_ID()")->fetchColumn();
         $id = (int) $id;
+
         CM_Db_Db::insert('cm_streamChannel_media', [
             'id'       => $id,
             'serverId' => $serverId,
