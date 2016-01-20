@@ -36,6 +36,22 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         $this->assertSame($streamChannel->getHash(), $archive->getHash());
     }
 
+    public function testCreateDuplicated() {
+        $channel = CM_Model_StreamChannel_Media::createStatic(array(
+            'key'            => 'foo',
+            'serverId'       => 1,
+            'thumbnailCount' => 2,
+            'adapterType'    => 1,
+            'mediaId'        => 'foo',
+        ));
+        $archive1 = CM_Model_StreamChannelArchive_Media::createStatic(['streamChannel' => $channel]);
+        $archive2 = CM_Model_StreamChannelArchive_Media::createStatic(['streamChannel' => $channel]);
+        $this->assertInstanceOf('CM_Model_StreamChannelArchive_Media', $archive2);
+
+        $this->assertSame($archive1->getId(), $archive2->getId());
+        $this->assertSame($archive1->getCreated(), $archive2->getCreated());
+    }
+
     public function testNoUser() {
         /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
