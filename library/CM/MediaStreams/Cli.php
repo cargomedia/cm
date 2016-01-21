@@ -5,9 +5,10 @@ class CM_MediaStreams_Cli extends CM_Cli_Runnable_Abstract {
     /**
      * @param string  $streamChannelMediaId
      * @param CM_File $thumbnailSource
+     * @param int     $createStamp
      * @throws CM_Exception_Invalid
      */
-    public function importVideoThumbnail($streamChannelMediaId, CM_File $thumbnailSource) {
+    public function importVideoThumbnail($streamChannelMediaId, CM_File $thumbnailSource, $createStamp) {
         $streamChannelMediaId = (string) $streamChannelMediaId;
         if ($streamChannel = CM_Model_StreamChannel_Media::findByMediaId($streamChannelMediaId)) {
             $thumbnailCount = $streamChannel->getThumbnailCount();
