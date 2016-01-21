@@ -31,9 +31,6 @@ class CM_StreamChannel_Thumbnail extends CM_Model_Abstract {
         return md5($this->getChannelId() . '-' . $this->getId());
     }
 
-    /**
-     * @return CM_Model_Schema_Definition|null
-     */
     protected function _getSchema() {
         return new CM_Model_Schema_Definition([
             'channelId'   => 'int',
@@ -41,9 +38,6 @@ class CM_StreamChannel_Thumbnail extends CM_Model_Abstract {
         ]);
     }
 
-    /**
-     * @return CM_Cacheable[]
-     */
     protected function _getContainingCacheables() {
         return [new CM_StreamChannel_ThumbnailList_Channel($this->getChannelId())];
     }
