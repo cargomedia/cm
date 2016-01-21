@@ -22,9 +22,6 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
      * @throws CM_Exception
      */
     public function __construct(Aws\S3\S3Client $client, $bucket, $acl = null, $pathPrefix = null) {
-        if (!in_array('s3', stream_get_wrappers(), true)) {
-            throw new CM_Exception('Stream wrapper not enabled');
-        }
         parent::__construct($pathPrefix);
         if (null === $acl) {
             $acl = 'private';
@@ -36,6 +33,9 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
 
     public function getStreamRead($path) {
         $streamUrl = $this->_getStreamUrl($path);
+        if (!in_array('s3', stream_get_wrappers(), true)) {
+            throw new CM_Exception('Stream wrapper not enabled');
+        }
         $stream = @fopen($streamUrl, 'r');
         if (false === $stream) {
             throw new CM_Exception('Cannot open read stream for `' . $streamUrl . '`.');
@@ -45,6 +45,9 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
 
     public function getStreamWrite($path) {
         $streamUrl = $this->_getStreamUrl($path);
+        if (!in_array('s3', stream_get_wrappers(), true)) {
+            throw new CM_Exception('Stream wrapper not enabled');
+        }
         $stream = @fopen($streamUrl, 'w');
         if (false === $stream) {
             throw new CM_Exception('Cannot open write stream for `' . $streamUrl . '`.');
