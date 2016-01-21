@@ -19,8 +19,12 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
      * @param string          $bucket
      * @param string|null     $acl
      * @param string|null     $pathPrefix
+     * @throws CM_Exception
      */
     public function __construct(Aws\S3\S3Client $client, $bucket, $acl = null, $pathPrefix = null) {
+        if (!in_array('s3', stream_get_wrappers(), true)) {
+            throw new CM_Exception('Stream wrapper not enabled');
+        }
         parent::__construct($pathPrefix);
         if (null === $acl) {
             $acl = 'private';
