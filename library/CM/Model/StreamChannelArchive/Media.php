@@ -74,39 +74,10 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     /**
-     * @return int
-     */
-    public function getThumbnailCount() {
-        $params = $this->_getDataColumn();
-        return $params->getInt('thumbnailCount', 0);
-    }
-
-    /**
-     * @param int $thumbnailCount
-     */
-    public function setThumbnailCount($thumbnailCount) {
-        $thumbnailCount = (int) $thumbnailCount;
-        $params = $this->_getDataColumn();
-        $params->set('thumbnailCount', $thumbnailCount);
-        CM_Db_Db::update('cm_streamChannelArchive_media', ['data' => CM_Params::jsonEncode($params->getParamsEncoded())], ['id' => $this->getId()]);
-        $this->_change();
-    }
-
-    /**
-     * @param int $index
-     * @return CM_File_UserContent
-     */
-    public function getThumbnail($index) {
-        $index = (int) $index;
-        $filename = $this->getId() . '-' . $this->getHash() . '-thumbs' . DIRECTORY_SEPARATOR . $index . '.png';
-        return new CM_File_UserContent('streamChannels', $filename, $this->getId());
-    }
-
-    /**
-     * @return CM_Paging_FileUserContent_StreamChannelArchiveMediaThumbnails
+     * @return CM_StreamChannel_ThumbnailList_Channel
      */
     public function getThumbnails() {
-        return new CM_Paging_FileUserContent_StreamChannelArchiveMediaThumbnails($this);
+        return new CM_StreamChannel_ThumbnailList_Channel($this->getId());
     }
 
     /**
@@ -136,17 +107,6 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     /**
-     * @return CM_Params
-     */
-    protected function _getDataColumn() {
-        if (!$this->_has('data')) {
-            return CM_Params::factory();
-        } else {
-            return CM_Params::factory(CM_Params::jsonDecode($this->_get('data')));
-        }
-    }
-
-    /**
      * @return array
      */
     protected function _loadData() {
@@ -158,8 +118,12 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
             $this->getFile()->delete();
         }
 
-        $thumbnailDir = new CM_File_UserContent('streamChannels', $this->getId() . '-' . $this->getHash() . '-thumbs/', $this->getId());
+        $thumbnailDir = new CM_File_UserContent('streamChannels', $this->getId() . '-thumbs', $this->getId());
         $thumbnailDir->delete(true);
+        /** @var CM_StreamChannel_Thumbnail $thumbnail */
+        foreach ($this->getThumbnails() as $thumbnail) {
+            $thumbnail->delete();
+        }
     }
 
     protected function _onDelete() {
@@ -187,7 +151,6 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
             $createStamp = $streamPublish->getStart();
             $userId = $streamPublish->getUserId();
         }
-        $thumbnailCount = $streamChannel->getThumbnailCount();
         $file = isset($data['file']) ? $data['file'] : null;
         $end = time();
         $duration = $end - $createStamp;
@@ -199,7 +162,6 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
             'file'              => $file,
             'streamChannelType' => $streamChannel->getType(),
             'createStamp'       => $createStamp,
-            'data'              => CM_Params::jsonEncode(['thumbnailCount' => $thumbnailCount]),
             'key'               => $streamChannel->getKey(),
             'mediaId'           => $streamChannel->getMediaId(),
         ]);

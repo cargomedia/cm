@@ -5,28 +5,23 @@ class CM_MediaStreams_Cli extends CM_Cli_Runnable_Abstract {
     /**
      * @param string  $streamChannelMediaId
      * @param CM_File $thumbnailSource
+     * @param int     $createStamp
      * @throws CM_Exception_Invalid
      */
-    public function importVideoThumbnail($streamChannelMediaId, CM_File $thumbnailSource) {
+    public function importVideoThumbnail($streamChannelMediaId, CM_File $thumbnailSource, $createStamp) {
         $streamChannelMediaId = (string) $streamChannelMediaId;
+        $createStamp = (int) $createStamp;
         if ($streamChannel = CM_Model_StreamChannel_Media::findByMediaId($streamChannelMediaId)) {
-            $thumbnailCount = $streamChannel->getThumbnailCount();
-            $thumbnailDestination = $streamChannel->getThumbnail($thumbnailCount + 1);
+            $channelId = $streamChannel->getId();
         } elseif ($streamChannelArchive = CM_Model_StreamChannelArchive_Media::findByMediaId($streamChannelMediaId)) {
-            $thumbnailCount = $streamChannelArchive->getThumbnailCount();
-            $thumbnailDestination = $streamChannelArchive->getThumbnail($thumbnailCount + 1);
+            $channelId = $streamChannelArchive->getId();
         } else {
             throw new CM_Exception_Invalid('No streamchannel or archive found', null, ['streamChannelMediaId' => $streamChannelMediaId]);
         }
-        if (0 == $thumbnailCount) {
-            $thumbnailDestination->ensureParentDirectory();
-        }
+        $thumbnail = CM_StreamChannel_Thumbnail::create($channelId, $createStamp);
+        $thumbnailDestination = $thumbnail->getFile();
+        $thumbnailDestination->ensureParentDirectory();
         $thumbnailSource->copyToFile($thumbnailDestination);
-        if ($streamChannel) {
-            $streamChannel->setThumbnailCount($thumbnailCount + 1);
-        } elseif (!empty($streamChannelArchive)) {
-            $streamChannelArchive->setThumbnailCount($thumbnailCount + 1);
-        }
     }
 
     /**

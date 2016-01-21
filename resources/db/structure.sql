@@ -372,12 +372,10 @@ CREATE TABLE `cm_streamChannelArchive_media` (
   `id` int(10) unsigned NOT NULL,
   `userId` int(10) unsigned DEFAULT NULL,
   `duration` int(10) unsigned NOT NULL,
-  `thumbnailCount` int(10) unsigned NOT NULL,
   `hash` char(32) NOT NULL,
   `file` varchar(255) DEFAULT NULL,
   `streamChannelType` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
-  `data` varchar(255) NOT NULL DEFAULT '',
   `key` varchar(64) DEFAULT NULL,
   `mediaId` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -393,9 +391,7 @@ DROP TABLE IF EXISTS `cm_streamChannel_media`;
 
 CREATE TABLE `cm_streamChannel_media` (
   `id` int(10) unsigned NOT NULL,
-  `thumbnailCount` int(10) unsigned NOT NULL DEFAULT '0',
   `serverId` int(10) unsigned NOT NULL,
-  `data` varchar(255) NOT NULL DEFAULT '',
   `mediaId` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `mediaId` (`mediaId`),
@@ -433,6 +429,17 @@ CREATE TABLE `cm_stream_subscribe` (
   KEY `userId` (`userId`),
   CONSTRAINT `cm_stream_subscribe-cm_streamChannel` FOREIGN KEY (`channelId`) REFERENCES `cm_streamChannel` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_streamchannel_thumbnail`;
+
+
+CREATE TABLE `cm_streamchannel_thumbnail` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `channelId` int(10) unsigned NOT NULL,
+  `createStamp` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `channelId-createStamp` (`channelId`,`createStamp`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_string`;
 
