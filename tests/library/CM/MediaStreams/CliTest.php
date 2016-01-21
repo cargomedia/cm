@@ -18,6 +18,7 @@ class CM_MediaStreams_CliTest extends CMTest_TestCase {
         $this->assertSame(1234, $thumbnail->getCreateStamp());
         $this->assertSame('foo1', $thumbnail->getFile()->read());
 
+        // archive exists
         $archive = CM_Model_StreamChannelArchive_Media::createStatic(['streamChannel' => $streamChannel]);
         $streamChannel->delete();
         $cli->importVideoThumbnail('foobar', $testFile2, 1235);
