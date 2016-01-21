@@ -31,14 +31,10 @@ class CM_MediaStreams_StreamRepository {
      * @param string      $streamName
      * @param int         $streamChannelType
      * @param int         $serverId
-     * @param int|null    $thumbnailCount
      * @param string|null $mediaId
      * @return CM_Model_StreamChannel_Abstract
      */
-    public function createStreamChannel($streamName, $streamChannelType, $serverId, $thumbnailCount = null, $mediaId = null) {
-        if (null !== $thumbnailCount) {
-            $thumbnailCount = (int) $thumbnailCount;
-        }
+    public function createStreamChannel($streamName, $streamChannelType, $serverId, $mediaId = null) {
         if (null !== $mediaId) {
             $mediaId = (string) $mediaId;
         }
@@ -46,7 +42,6 @@ class CM_MediaStreams_StreamRepository {
             'key'            => $streamName,
             'adapterType'    => $this->_adapterType,
             'serverId'       => (int) $serverId,
-            'thumbnailCount' => $thumbnailCount,
             'mediaId'        => $mediaId,
         ]);
     }
