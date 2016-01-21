@@ -21,7 +21,7 @@ class CM_StreamChannel_Thumbnail extends CM_Model_Abstract {
      */
     public function getFile() {
         return new CM_File_UserContent('streamChannels', $this->getChannelId() . '-thumbs' . DIRECTORY_SEPARATOR . $this->getCreateStamp() . '-' .
-            $this->getHash() . '-' . $this->getId(), $this->getChannelId());
+            $this->getHash() . '-' . $this->getId() . '.png', $this->getChannelId());
     }
 
     /**

@@ -20,7 +20,7 @@ class CM_StreamChannel_ThumbnailTest extends CMTest_TestCase {
     public function testGetFile() {
         $thumbnail = CM_StreamChannel_Thumbnail::create(1, 123);
         $expected = new CM_File_UserContent('streamChannels', 1 . '-thumbs' . DIRECTORY_SEPARATOR . $thumbnail->getCreateStamp() . '-' .
-            $thumbnail->getHash() . '-' . $thumbnail->getId(), 1);
+            $thumbnail->getHash() . '-' . $thumbnail->getId() . '.png', 1);
         $this->assertEquals($expected, $thumbnail->getFile());
     }
 
