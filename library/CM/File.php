@@ -196,6 +196,8 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
             $streamSource = $adapterSource->getStreamRead($this->getPath());
             $streamDestination = $adapterDestination->getStreamWrite($file->getPath());
             stream_copy_to_stream($streamSource, $streamDestination);
+            @fclose($streamDestination);
+            @fclose($streamSource);
         } else {
             $file->write($this->read());
         }
