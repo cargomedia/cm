@@ -6,6 +6,7 @@ class CM_MediaStreams_Cli extends CM_Cli_Runnable_Abstract {
      * @param string  $streamChannelMediaId
      * @param CM_File $thumbnailSource
      * @param int     $createStamp
+     * @throws CM_Exception
      * @throws CM_Exception_Invalid
      */
     public function importVideoThumbnail($streamChannelMediaId, CM_File $thumbnailSource, $createStamp) {
@@ -20,8 +21,13 @@ class CM_MediaStreams_Cli extends CM_Cli_Runnable_Abstract {
         }
         $thumbnail = CM_StreamChannel_Thumbnail::create($channelId, $createStamp);
         $thumbnailDestination = $thumbnail->getFile();
-        $thumbnailDestination->ensureParentDirectory();
-        $thumbnailSource->copyToFile($thumbnailDestination);
+        try {
+            $thumbnailDestination->ensureParentDirectory();
+            $thumbnailSource->copyToFile($thumbnailDestination);
+        } catch (CM_Exception $ex) {
+            $thumbnail->delete();
+            throw $ex;
+        }
     }
 
     /**

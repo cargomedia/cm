@@ -28,4 +28,17 @@ class CM_MediaStreams_CliTest extends CMTest_TestCase {
         $this->assertSame(1235, $thumbnail->getCreateStamp());
         $this->assertSame('foo2', $thumbnail->getFile()->read());
     }
+
+    public function testImportInvalidFile() {
+        $file = new CM_File('fileDoesNotExist');
+
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
+        $streamChannel = CMTest_TH::createStreamChannel(null, null, 'foobar');
+        $cli = new CM_MediaStreams_Cli();
+        $exception = $this->catchException(function () use ($cli, $file) {
+            $cli->importVideoThumbnail('foobar', $file, 1);
+        });
+        $this->assertInstanceOf('CM_Exception', $exception);
+        $this->assertCount(0, $streamChannel->getThumbnails());
+    }
 }
