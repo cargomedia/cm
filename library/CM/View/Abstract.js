@@ -487,7 +487,7 @@ var CM_View_Abstract = Backbone.View.extend({
       flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
       silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
       error: function() {
-        throw new Error('Can\'t play ' + audioPath);
+        console.error('Can\'t play ' + audioPath);
       },
       success: function(mediaElement, domObject) {
         if (params.loop) {
