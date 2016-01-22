@@ -26,7 +26,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
         $streamChannel1 = CM_Model_StreamChannel_Media::createStatic(array('key'         => 'dsljkfk34asdd', 'serverId' => 1,
                                                                            'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic(),
                                                                            'width'       => 100,
-                                                                           'height'      => 100, 'thumbnailCount' => 0));
+                                                                           'height'      => 100,));
         $streamChannel2 = CM_Model_StreamChannel_Abstract::factory($streamChannel1->getId());
         $this->assertEquals($streamChannel1, $streamChannel2);
 

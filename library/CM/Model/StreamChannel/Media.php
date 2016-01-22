@@ -18,17 +18,6 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
     }
 
     /**
-     * @param int $thumbnailCount
-     */
-    public function setThumbnailCount($thumbnailCount) {
-        $thumbnailCount = (int) $thumbnailCount;
-        $params = $this->_getDataColumn();
-        $params->set('thumbnailCount', $thumbnailCount);
-        CM_Db_Db::update('cm_streamChannel_media', ['data' => CM_Params::jsonEncode($params->getParamsEncoded())], ['id' => $this->getId()]);
-        $this->_change();
-    }
-
-    /**
      * @return string
      */
     public function getHash() {
@@ -78,39 +67,10 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
     }
 
     /**
-     * @return int
-     */
-    public function getThumbnailCount() {
-        $params = $this->_getDataColumn();
-        return $params->getInt('thumbnailCount', 0);
-    }
-
-    /**
-     * @param int $index
-     * @return CM_File_UserContent
-     */
-    public function getThumbnail($index) {
-        $index = (int) $index;
-        $filename = $this->getId() . '-' . $this->getHash() . '-thumbs' . DIRECTORY_SEPARATOR . $index . '.png';
-        return new CM_File_UserContent('streamChannels', $filename, $this->getId());
-    }
-
-    /**
-     * @return CM_Paging_FileUserContent_StreamChannelMediaThumbnails
+     * @return CM_StreamChannel_ThumbnailList_Channel
      */
     public function getThumbnails() {
-        return new CM_Paging_FileUserContent_StreamChannelMediaThumbnails($this);
-    }
-
-    /**
-     * @return CM_Params
-     */
-    protected function _getDataColumn() {
-        if (!$this->_has('data')) {
-            return CM_Params::factory();
-        } else {
-            return CM_Params::factory(CM_Params::jsonDecode($this->_get('data')));
-        }
+        return new CM_StreamChannel_ThumbnailList_Channel($this->getId());
     }
 
     protected function _onDeleteBefore() {
@@ -133,7 +93,6 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
     protected static function _createStatic(array $data) {
         $key = (string) $data['key'];
         $serverId = $data['serverId'];
-        $thumbnailCount = (int) $data['thumbnailCount'];
         $adapterType = (int) $data['adapterType'];
         $mediaId = !empty($data['mediaId']) ? (string) $data['mediaId'] : null;
         $id = CM_Db_Db::insert('cm_streamChannel', [
@@ -146,7 +105,6 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
         CM_Db_Db::insert('cm_streamChannel_media', [
             'id'       => $id,
             'serverId' => $serverId,
-            'data'     => CM_Params::encode(['thumbnailCount' => $thumbnailCount], true),
             'mediaId'  => $mediaId,
         ], null, ['id' => ['literal' => 'LAST_INSERT_ID(id)']]);
 

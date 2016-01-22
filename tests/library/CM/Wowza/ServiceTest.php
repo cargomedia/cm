@@ -126,7 +126,6 @@ class CM_Wowza_ServiceTest extends CMTest_TestCase {
                 'clientId'       => $streamPublish->getKey(),
                 'data'           => json_encode(array('sessionId' => $session->getId(), 'streamChannelType' => $streamChannel->getType())),
                 'subscribers'    => $subscribes,
-                'thumbnailCount' => 2,
                 'wowzaIp'        => ip2long('192.168.0.1'));
         }
         return $status;
