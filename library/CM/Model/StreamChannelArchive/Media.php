@@ -164,7 +164,7 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
             'createStamp'       => $createStamp,
             'key'               => $streamChannel->getKey(),
             'mediaId'           => $streamChannel->getMediaId(),
-        ]);
+        ], null, ['id' => ['literal' => 'LAST_INSERT_ID(id)']]);
         return new self($streamChannel->getId());
     }
 
