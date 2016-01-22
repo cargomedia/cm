@@ -89,10 +89,6 @@ class CM_Asset_Css extends CM_Asset_Abstract {
 
         $cacheKey = CM_CacheConst::App_Resource . '_md5:' . md5($content);
         $cacheKey .= '_compress:' . (int) $compress;
-        $cacheKey .= '_siteId:' . $render->getSite()->getId();
-        if ($render->getLanguage()) {
-            $cacheKey .= '_languageId:' . $render->getLanguage()->getId();
-        }
         $cache = new CM_Cache_Storage_File();
         if (false === ($contentTransformed = $cache->get($cacheKey))) {
             $contentTransformed = $content;
