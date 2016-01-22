@@ -60,13 +60,16 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
         /** @var CM_Model_StreamChannel_Abstract $streamChannel */
         $streamChannel = $data['streamChannel'];
 
-        if (!$streamChannel->isValid()) {
-            throw new CM_Exception_Invalid('Stream channel not valid', CM_Exception::WARN);
-        }
-
-        $allowedUntil = $streamChannel->canSubscribe($user, time());
-        if ($allowedUntil <= time()) {
-            throw new CM_Exception_NotAllowed('Not allowed to subscribe');
+        $allowedUntil = null;
+        if ($streamChannel instanceof CM_StreamChannel_DisallowInterface) {
+            /** @var CM_StreamChannel_DisallowInterface $streamChannel */
+            if (!$streamChannel->isValid()) {
+                throw new CM_Exception_Invalid('Stream channel not valid', CM_Exception::WARN);
+            }
+            $allowedUntil = $streamChannel->canSubscribe($user, time());
+            if ($allowedUntil <= time()) {
+                throw new CM_Exception_NotAllowed('Not allowed to subscribe');
+            }
         }
 
         $id = CM_Db_Db::insert('cm_stream_subscribe', array(

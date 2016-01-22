@@ -54,13 +54,16 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
         $streamChannel = $data['streamChannel'];
         $start = (int) $data['start'];
 
-        if (!$streamChannel->isValid()) {
-            throw new CM_Exception_Invalid('Stream channel not valid', CM_Exception::WARN);
-        }
-
-        $allowedUntil = $streamChannel->canPublish($user, time());
-        if ($allowedUntil <= time()) {
-            throw new CM_Exception_NotAllowed('Not allowed to publish');
+        $allowedUntil = null;
+        if ($streamChannel instanceof CM_StreamChannel_DisallowInterface) {
+            /** @var CM_StreamChannel_DisallowInterface $streamChannel */
+            if (!$streamChannel->isValid()) {
+                throw new CM_Exception_Invalid('Stream channel not valid', CM_Exception::WARN);
+            }
+            $allowedUntil = $streamChannel->canPublish($user, time());
+            if ($allowedUntil <= time()) {
+                throw new CM_Exception_NotAllowed('Not allowed to publish');
+            }
         }
 
         $key = (string) $data['key'];
