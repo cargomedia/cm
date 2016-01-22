@@ -482,13 +482,12 @@ var CM_View_Abstract = Backbone.View.extend({
     $element.attr('src', cm.getUrlResource('layout', 'audio/' + mp3Path));
     $element.attr('autoplay', params.autoplay);
 
-    var error = false;
-    var mediaElement = new MediaElement($element.get(0), {
+    return new MediaElement($element.get(0), {
       startVolume: 1,
       flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
       silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
-      error: function() {
-        error = true;
+      error: function(err) {
+        throw err;
       },
       success: function(mediaElement, domObject) {
         if (params.loop) {
@@ -498,12 +497,6 @@ var CM_View_Abstract = Backbone.View.extend({
         }
       }
     });
-    if (error) {
-      mediaElement.play = new Function();
-      mediaElement.pause = new Function();
-    }
-
-    return mediaElement;
   },
 
   /**
