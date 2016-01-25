@@ -14,10 +14,12 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
     }
 
     public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
-        $user = $streamSubscribe->getUser();
-        if ($user && !$this->isSubscriber($user, $streamSubscribe)) {
-            $offlineJob = new CM_User_OfflineJob();
-            $offlineJob->queueDelayed(CM_Model_User::OFFLINE_DELAY, ['user' => $user]);
+        if ($this->hasUser()) {
+            $user = $streamSubscribe->getUser();
+            if ($user && !$this->isSubscriber($user, $streamSubscribe)) {
+                $offlineJob = new CM_User_OfflineJob();
+                $offlineJob->queueDelayed(CM_Model_User::OFFLINE_DELAY, ['user' => $user]);
+            }
         }
     }
 
@@ -55,13 +57,6 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
         } catch (CM_Exception_Nonexistent $e) {
             return false;
         }
-    }
-
-    /**
-     * @return bool
-     */
-    public function isValid() {
-        return $this->hasUser();
     }
 
     /**

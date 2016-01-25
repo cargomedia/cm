@@ -24,10 +24,7 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
     }
 
     protected function _onDeleteBefore() {
-        $streamChannel = $this->getStreamChannel();
-        if ($streamChannel->isValid()) {
-            $streamChannel->onUnsubscribe($this);
-        }
+        $this->getStreamChannel()->onUnsubscribe($this);
     }
 
     protected function _onDelete() {

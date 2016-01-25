@@ -24,10 +24,7 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
     }
 
     protected function _onDeleteBefore() {
-        $streamChannel = $this->getStreamChannel();
-        if ($streamChannel->isValid()) {
-            $streamChannel->onUnpublish($this);
-        }
+        $this->getStreamChannel()->onUnpublish($this);
     }
 
     protected function _onDelete() {
