@@ -487,11 +487,13 @@ var CM_View_Abstract = Backbone.View.extend({
     });
     $element.attr('autoplay', params.autoplay);
 
-    return new MediaElement($element.get(0), {
+    var error = false;
+    var player = new MediaElement($element.get(0), {
       startVolume: 1,
       flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
       silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
       error: function() {
+        error = true;
         console.error('Can\'t play ' + audioSrc);
       },
       success: function(mediaElement, domObject) {
@@ -502,6 +504,13 @@ var CM_View_Abstract = Backbone.View.extend({
         }
       }
     });
+
+    if (error) {
+      player.play = _.noop;
+      player.stop = _.noop;
+      player.pause = _.noop;
+    }
+    return player;
   },
 
   /**
