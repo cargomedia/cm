@@ -470,7 +470,7 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
-   * @param {String} audioPath
+   * @param {String|String[]} audioPath
    * @param {Object} [params]
    * @return {MediaElement}
    */
@@ -479,7 +479,13 @@ var CM_View_Abstract = Backbone.View.extend({
 
     var $element = $('<audio />');
     $element.wrap('<div />');	// MediaElement needs a parent to show error msgs
-    $element.attr('src', cm.getUrlResource('layout', 'audio/' + audioPath));
+    if (_.isArray(audioPath)) {
+      _.each(audioPath, function(srcPath) {
+        $element.append($('<source>').attr('src', cm.getUrlResource('layout', 'audio/' + srcPath)));
+      });
+    } else {
+      $element.attr('src', cm.getUrlResource('layout', 'audio/' + audioPath));
+    }
     $element.attr('autoplay', params.autoplay);
 
     return new MediaElement($element.get(0), {
