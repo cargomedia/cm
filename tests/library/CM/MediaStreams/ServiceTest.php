@@ -6,7 +6,7 @@ class CM_MediaStreams_ServiceTest extends CMTest_TestCase {
         $streamPublish = $this->mockClass('CM_Model_Stream_Publish')->newInstanceWithoutConstructor();
         $streamSubscribe = $this->mockClass('CM_Model_Stream_Subscribe')->newInstanceWithoutConstructor();
 
-        $streamChannel = $this->mockClass('CM_Model_StreamChannel_Media')->newInstanceWithoutConstructor();
+        $streamChannel = $this->mockClass('CM_Model_StreamChannel_Media', ['CM_StreamChannel_DisallowInterface'])->newInstanceWithoutConstructor();
         $streamChannel->mockMethod('isValid')->set(false);
         $streamChannel->mockMethod('hasStreamPublish')->set(true);
         $streamChannel->mockMethod('getStreamPublish')->set($streamPublish);
@@ -35,7 +35,7 @@ class CM_MediaStreams_ServiceTest extends CMTest_TestCase {
         $streamPublish = $this->mockClass('CM_Model_Stream_Publish')->newInstanceWithoutConstructor();
         $streamSubscribe = $this->mockClass('CM_Model_Stream_Subscribe')->newInstanceWithoutConstructor();
 
-        $streamChannel = $this->mockClass('CM_Model_StreamChannel_Media')->newInstanceWithoutConstructor();
+        $streamChannel = $this->mockClass('CM_Model_StreamChannel_Media', ['CM_StreamChannel_DisallowInterface'])->newInstanceWithoutConstructor();
         $streamChannel->mockMethod('isValid')->set(true);
         $streamChannel->mockMethod('hasStreamPublish')->set(true);
         $streamChannel->mockMethod('getStreamPublish')->set($streamPublish);
@@ -67,5 +67,30 @@ class CM_MediaStreams_ServiceTest extends CMTest_TestCase {
 
         $service->checkStreams();
         $this->assertSame(3, $stopStreamMethod->getCallCount());
+    }
+
+    public function testCheckStreamsNoConnectionsDisallowed() {
+        $streamPublish = $this->mockClass('CM_Model_Stream_Publish')->newInstanceWithoutConstructor();
+        $streamSubscribe = $this->mockClass('CM_Model_Stream_Subscribe')->newInstanceWithoutConstructor();
+
+        $streamChannel = $this->mockClass('CM_Model_StreamChannel_Media')->newInstanceWithoutConstructor();
+        $isValidMethod = $streamChannel->mockMethod('isValid');
+        $streamChannel->mockMethod('hasStreamPublish')->set(true);
+        $streamChannel->mockMethod('getStreamPublish')->set($streamPublish);
+        $streamChannel->mockMethod('getStreamSubscribes')->set([$streamSubscribe]);
+
+        $streamRepository = $this->mockClass('CM_MediaStreams_StreamRepository')->newInstanceWithoutConstructor();
+        $streamRepository->mockMethod('getStreamChannels')->set([$streamChannel]);
+        /** @var CM_MediaStreams_StreamRepository $streamRepository */
+
+        $service = $this->mockObject('CM_MediaStreams_Service', [$streamRepository]);
+        $_isPublishAllowedMethod = $service->mockMethod('_isPublishAllowed');
+        $_isSubscribeAllowedMethod = $service->mockMethod('_isSubscribeAllowed');
+        /** @var CM_MediaStreams_Service $service */
+
+        $service->checkStreams();
+        $this->assertSame(0, $isValidMethod->getCallCount());
+        $this->assertSame(0, $_isPublishAllowedMethod->getCallCount());
+        $this->assertSame(0, $_isSubscribeAllowedMethod->getCallCount());
     }
 }
