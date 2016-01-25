@@ -470,16 +470,19 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
-   * @param {String[]} audioSrcList
+   * @param {String|String[]} audioSrc
    * @param {Object} [params]
    * @return {MediaElement}
    */
-  createAudioPlayer: function(audioSrcList, params) {
+  createAudioPlayer: function(audioSrc, params) {
     params = _.extend({loop: false, autoplay: false}, params);
 
     var $element = $('<audio />');
     $element.wrap('<div />');	// MediaElement needs a parent to show error msgs
-    _.each(audioSrcList, function(audioSrc) {
+    if (!_.isArray(audioSrc)) {
+      audioSrc = [audioSrc];
+    }
+    _.each(audioSrc, function(audioSrc) {
       $element.append($('<source>').attr('src', cm.getUrlResource('layout', 'audio/' + audioSrc)));
     });
     $element.attr('autoplay', params.autoplay);
@@ -489,7 +492,7 @@ var CM_View_Abstract = Backbone.View.extend({
       flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
       silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
       error: function() {
-        console.error('Can\'t play ' + audioSrcList);
+        console.error('Can\'t play ' + audioSrc);
       },
       success: function(mediaElement, domObject) {
         if (params.loop) {
