@@ -146,11 +146,6 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
         $streamChannel = $data['streamChannel'];
         $createStamp = $streamChannel->getCreateStamp();
         $userId = null;
-        if ($streamChannel->hasStreamPublish()) {
-            $streamPublish = $streamChannel->getStreamPublish();
-            $createStamp = $streamPublish->getStart();
-            $userId = $streamPublish->getUserId();
-        }
         $file = isset($data['file']) ? $data['file'] : null;
         $end = time();
         $duration = $end - $createStamp;
