@@ -370,7 +370,6 @@ DROP TABLE IF EXISTS `cm_streamChannelArchive_media`;
 
 CREATE TABLE `cm_streamChannelArchive_media` (
   `id` int(10) unsigned NOT NULL,
-  `userId` int(10) unsigned DEFAULT NULL,
   `duration` int(10) unsigned NOT NULL,
   `hash` char(32) NOT NULL,
   `file` varchar(255) DEFAULT NULL,
@@ -380,7 +379,6 @@ CREATE TABLE `cm_streamChannelArchive_media` (
   `mediaId` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `mediaId` (`mediaId`),
-  KEY `userId` (`userId`),
   KEY `createStamp` (`createStamp`),
   KEY `streamChannelType` (`streamChannelType`),
   KEY `key` (`key`)
@@ -405,7 +403,7 @@ CREATE TABLE `cm_stream_publish` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `userId` int(10) unsigned DEFAULT NULL,
   `start` int(10) unsigned NOT NULL,
-  `allowedUntil` int(10) unsigned NOT NULL,
+  `allowedUntil` int(10) unsigned DEFAULT NULL,
   `key` varchar(36) NOT NULL,
   `channelId` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
@@ -421,7 +419,7 @@ CREATE TABLE `cm_stream_subscribe` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `userId` int(10) unsigned DEFAULT NULL,
   `start` int(10) unsigned NOT NULL,
-  `allowedUntil` int(10) unsigned NOT NULL,
+  `allowedUntil` int(10) unsigned DEFAULT NULL,
   `key` varchar(36) NOT NULL,
   `channelId` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
