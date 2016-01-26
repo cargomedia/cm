@@ -7,6 +7,7 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
     }
 
     public function testCreate() {
+        // without mediaId
         /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
         CMTest_TH::timeForward(10);
@@ -20,10 +21,14 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         $this->assertSame($streamChannel->getType(), $archive->getStreamChannelType());
         $this->assertSame($streamChannel->getKey(), $archive->getKey());
         $this->assertSame($streamChannel->getMediaId(), $archive->getMediaId());
+        $this->assertSame(null, $archive->getMediaId());
         $this->assertSame($streamChannel->getHash(), $archive->getHash());
+
+        // with mediaId
+        $streamChannel = CMTest_TH::createStreamChannel(null, null, 'foo');
+        $archive = CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel));
         $this->assertSame($streamChannel->getMediaId(), $archive->getMediaId());
-        $this->assertSame($streamChannel->getCreateStamp(), $archive->getCreated());
-        $this->assertSame($streamChannel->getHash(), $archive->getHash());
+        $this->assertSame('foo', $archive->getMediaId());
     }
 
     public function testCreateDuplicated() {
