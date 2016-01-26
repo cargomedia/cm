@@ -59,7 +59,12 @@ class CM_Janus_RpcEndpoints {
             $streamRepository->createStreamPublish($streamChannel, $user, $streamKey, $streamStart);
         } catch (CM_Exception_NotAllowed $exception) {
             $streamChannel->delete();
-            throw new CM_Exception_NotAllowed('Cannot publish: ' . $exception->getMessage());
+            throw new CM_Exception_NotAllowed('Cannot publish: ' . $exception->getMessage(), $exception->getSeverity());
+        } catch (CM_Exception_Invalid $exception) {
+            if (!$streamChannel->hasStreams()) {
+                $streamChannel->delete();
+            }
+            throw new CM_Exception_Invalid('Cannot publish: ' . $exception->getMessage(), $exception->getSeverity());
         }
     }
 
@@ -119,7 +124,12 @@ class CM_Janus_RpcEndpoints {
         try {
             $streamRepository->createStreamSubscribe($streamChannel, $user, $streamKey, $streamStart);
         } catch (CM_Exception_NotAllowed $exception) {
-            throw new CM_Exception_NotAllowed('Cannot subscribe: ' . $exception->getMessage());
+            throw new CM_Exception_NotAllowed('Cannot subscribe: ' . $exception->getMessage(), $exception->getSeverity());
+        } catch (CM_Exception_Invalid $exception) {
+            if (!$streamChannel->hasStreams()) {
+                $streamChannel->delete();
+            }
+            throw new CM_Exception_Invalid('Cannot subscribe: ' . $exception->getMessage(), $exception->getSeverity());
         }
     }
 

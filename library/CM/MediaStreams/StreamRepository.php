@@ -43,7 +43,7 @@ class CM_MediaStreams_StreamRepository {
         if (null !== $mediaId) {
             $mediaId = (string) $mediaId;
             if (null !== CM_Model_StreamChannelArchive_Media::findByMediaId($mediaId)) {
-                throw new CM_Exception_Invalid('Channel archive with mediaId `'.$mediaId.'` already exists');
+                throw new CM_Exception_Invalid('Channel archive with mediaId `' . $mediaId . '` already exists');
             }
         }
 
@@ -62,6 +62,8 @@ class CM_MediaStreams_StreamRepository {
      * @param string                          $clientKey
      * @param int                             $start
      * @return CM_Model_Stream_Publish
+     * @throws CM_Exception_NotAllowed
+     * @throws CM_Exception_Invalid
      */
     public function createStreamPublish(CM_Model_StreamChannel_Abstract $streamChannel, CM_Model_User $user, $clientKey, $start) {
         return CM_Model_Stream_Publish::createStatic([
@@ -78,6 +80,8 @@ class CM_MediaStreams_StreamRepository {
      * @param string                          $clientKey
      * @param int                             $start
      * @return CM_Model_Stream_Subscribe
+     * @throws CM_Exception_NotAllowed
+     * @throws CM_Exception_Invalid
      */
     public function createStreamSubscribe(CM_Model_StreamChannel_Abstract $streamChannel, CM_Model_User $user, $clientKey, $start) {
         return CM_Model_Stream_Subscribe::createStatic([

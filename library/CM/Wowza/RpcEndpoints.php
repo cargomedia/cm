@@ -27,9 +27,14 @@ class CM_Wowza_RpcEndpoints {
         $streamChannel = $streamRepository->createStreamChannel($streamName, $streamChannelType, $server->getId(), 0);
         try {
             $streamRepository->createStreamPublish($streamChannel, $user, $clientKey, $start);
-        } catch (CM_Exception $ex) {
+        } catch (CM_Exception_NotAllowed $exception) {
             $streamChannel->delete();
-            throw new CM_Exception_NotAllowed('Cannot publish: ' . $ex->getMessage());
+            throw new CM_Exception_NotAllowed('Cannot publish: ' . $exception->getMessage(), $exception->getSeverity());
+        } catch (CM_Exception_Invalid $exception) {
+            if (!$streamChannel->hasStreams()) {
+                $streamChannel->delete();
+            }
+            throw new CM_Exception_Invalid('Cannot publish: ' . $exception->getMessage(), $exception->getSeverity());
         }
         return $streamChannel->getId();
     }
