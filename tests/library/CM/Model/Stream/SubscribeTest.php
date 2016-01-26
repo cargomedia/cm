@@ -47,8 +47,6 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
         $this->assertEquals(0, $streamChannel->getStreamSubscribes()->getCount());
         $subscriber = CM_Model_Stream_Subscribe::createStatic(array('user'          => $user, 'start' => 123123,
                                                                     'streamChannel' => $streamChannel, 'key' => '123123_2'));
-        $this->assertRow('cm_stream_subscribe', array('id'        => $subscriber->getId(), 'userId' => $user->getId(), 'start' => 123123,
-                                                      'channelId' => $streamChannel->getId(), 'key' => '123123_2'));
         $this->assertEquals($user, $subscriber->getUser());
         $this->assertSame(123123, $subscriber->getStart());
         $this->assertEquals($streamChannel, $subscriber->getStreamChannel());
