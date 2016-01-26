@@ -56,7 +56,9 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
 
         $response = CMTest_TH::createResponsePage('/mock5', array('host' => $site->getHost()));
         $response->process();
-        $this->assertEmpty($response->getHeaders());
+        $this->assertFalse(Functional\some($response->getHeaders(), function($header) {
+            return preg_match('/^Location:/', $header);
+        }));
 
         $response = CMTest_TH::createResponsePage('/mock5', array('host' => 'incorrect-host.org'));
         $response->process();

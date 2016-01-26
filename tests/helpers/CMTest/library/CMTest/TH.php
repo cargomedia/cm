@@ -147,7 +147,6 @@ class CMTest_TH {
             $data['width'] = 480;
             $data['height'] = 720;
             $data['serverId'] = 1;
-            $data['thumbnailCount'] = 0;
             $data['adapterType'] = $adapterType;
             $data['mediaId'] = $mediaId;
         }

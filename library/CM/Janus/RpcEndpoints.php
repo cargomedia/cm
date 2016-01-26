@@ -36,7 +36,7 @@ class CM_Janus_RpcEndpoints {
         /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = $streamRepository->findStreamChannelByKey($channelKey);
         if (null === $streamChannel) {
-            $streamChannel = $streamRepository->createStreamChannel($channelKey, $channelType, $server->getId(), 0, $channelMediaId);
+            $streamChannel = $streamRepository->createStreamChannel($channelKey, $channelType, $server->getId(), $channelMediaId);
         } else {
             $channelServerData = [
                 'type'     => $streamChannel->getType(),
@@ -102,7 +102,7 @@ class CM_Janus_RpcEndpoints {
         /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = $streamRepository->findStreamChannelByKey($channelKey);
         if (null === $streamChannel) {
-            $streamChannel = $streamRepository->createStreamChannel($channelKey, $channelType, $server->getId(), 0, $channelMediaId);
+            $streamChannel = $streamRepository->createStreamChannel($channelKey, $channelType, $server->getId(), $channelMediaId);
         } else {
             $channelServerData = [
                 'type'     => $streamChannel->getType(),
