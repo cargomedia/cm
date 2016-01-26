@@ -5,7 +5,7 @@ class CM_Wowza_RpcEndpoints {
     /**
      * @param string $streamName
      * @param string $clientKey
-     * @param int $start
+     * @param int    $start
      * @param string $data
      * @return int
      * @throws CM_Exception_AuthRequired
@@ -31,9 +31,7 @@ class CM_Wowza_RpcEndpoints {
             $streamChannel->delete();
             throw new CM_Exception_NotAllowed('Cannot publish: ' . $exception->getMessage(), $exception->getSeverity());
         } catch (CM_Exception_Invalid $exception) {
-            if (!$streamChannel->hasStreams()) {
-                $streamChannel->delete();
-            }
+            $streamChannel->delete();
             throw new CM_Exception_Invalid('Cannot publish: ' . $exception->getMessage(), $exception->getSeverity());
         }
         return $streamChannel->getId();
@@ -115,7 +113,7 @@ class CM_Wowza_RpcEndpoints {
     }
 
     /**
-     * @param CM_Wowza_Service $wowza
+     * @param CM_Wowza_Service         $wowza
      * @param CM_Http_Request_Abstract $request
      * @throws CM_Exception_AuthFailed
      */
