@@ -58,10 +58,14 @@ class CM_Janus_RpcEndpoints {
         try {
             $streamRepository->createStreamPublish($streamChannel, $user, $streamKey, $streamStart);
         } catch (CM_Exception_NotAllowed $exception) {
-            $streamChannel->delete();
+            if (!$streamChannel->hasStreams()) {
+                $streamChannel->delete();
+            }
             throw new CM_Exception_NotAllowed('Cannot publish: ' . $exception->getMessage(), $exception->getSeverity());
         } catch (CM_Exception_Invalid $exception) {
-            $streamChannel->delete();
+            if (!$streamChannel->hasStreams()) {
+                $streamChannel->delete();
+            }
             throw new CM_Exception_Invalid('Cannot publish: ' . $exception->getMessage(), $exception->getSeverity());
         }
     }
