@@ -2,7 +2,8 @@
 
 class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implements
     CM_File_Filesystem_Adapter_SizeCalculatorInterface,
-    CM_File_Filesystem_Adapter_ChecksumCalculatorInterface {
+    CM_File_Filesystem_Adapter_ChecksumCalculatorInterface,
+    CM_File_Filesystem_Adapter_StreamInterface {
 
     /** @var Aws\S3\S3Client */
     private $_client;
@@ -18,6 +19,7 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
      * @param string          $bucket
      * @param string|null     $acl
      * @param string|null     $pathPrefix
+     * @throws CM_Exception
      */
     public function __construct(Aws\S3\S3Client $client, $bucket, $acl = null, $pathPrefix = null) {
         parent::__construct($pathPrefix);
@@ -27,6 +29,30 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         $this->_client = $client;
         $this->_bucket = (string) $bucket;
         $this->_acl = $acl;
+    }
+
+    public function getStreamRead($path) {
+        $streamUrl = $this->_getStreamUrl($path);
+        if (!in_array('s3', stream_get_wrappers(), true)) {
+            throw new CM_Exception('Stream wrapper not enabled');
+        }
+        $stream = @fopen($streamUrl, 'r');
+        if (false === $stream) {
+            throw new CM_Exception('Cannot open read stream for `' . $streamUrl . '`.');
+        }
+        return $stream;
+    }
+
+    public function getStreamWrite($path) {
+        $streamUrl = $this->_getStreamUrl($path);
+        if (!in_array('s3', stream_get_wrappers(), true)) {
+            throw new CM_Exception('Stream wrapper not enabled');
+        }
+        $stream = @fopen($streamUrl, 'w');
+        if (false === $stream) {
+            throw new CM_Exception('Cannot open write stream for `' . $streamUrl . '`.');
+        }
+        return $stream;
     }
 
     public function read($path) {
@@ -244,5 +270,13 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         $options['Key'] = $this->_getAbsolutePath($path);
 
         return $options;
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    protected function _getStreamUrl($path) {
+        return 's3://' . $this->_bucket . '/' . $this->_getAbsolutePath($path);
     }
 }

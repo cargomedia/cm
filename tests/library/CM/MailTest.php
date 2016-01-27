@@ -77,7 +77,7 @@ class CM_MailTest extends CMTest_TestCase {
     public function testSend() {
         CM_Config::get()->CM_Mail->send = true;
 
-        /** @var PHPMailer|\Mocka\AbstractClassTrait $_mockPHPMailer*/
+        /** @var PHPMailer|\Mocka\AbstractClassTrait $_mockPHPMailer */
         $phpMailer = $this->mockObject('PHPMailer');
 
         $setFromMethod = $phpMailer->mockMethod('SetFrom')->set(function ($address, $name) {
@@ -149,6 +149,25 @@ class CM_MailTest extends CMTest_TestCase {
         $this->assertSame(2, CM_Mail::getQueueSize());
         $mail->processQueue(100);
         $this->assertSame(0, CM_Mail::getQueueSize());
+    }
+
+    public function testGetRender() {
+        $site = $this->getMockSite();
+        $mail = new CM_Mail(null, null, $site);
+        $this->assertEquals($site, $mail->getRender()->getSite());
+    }
+
+    public function testGetRenderRecipient() {
+        $site = $this->getMockSite();
+        $recipient = CMTest_TH::createUser();
+        $recipient->setSite($site);
+        $mail = new CM_Mail($recipient);
+        $this->assertEquals($site, $mail->getRender()->getSite());
+    }
+
+    public function testGetRenderDefault() {
+        $mail = new CM_Mail();
+        $this->assertEquals(CM_Site_Abstract::factory(), $mail->getRender()->getSite());
     }
 
     public function testGetSite() {

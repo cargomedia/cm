@@ -20,7 +20,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     private $_environment;
 
     /** @var Smarty|null */
-    private static $_smarty;
+    private $_smarty;
 
     /**
      * @param CM_Frontend_Environment|null $environment
@@ -454,25 +454,25 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return Smarty
      */
     private function _getSmarty() {
-        if (!isset(self::$_smarty)) {
-            self::$_smarty = new Smarty();
-            self::$_smarty->setTemplateDir(DIR_ROOT);
-            self::$_smarty->setCompileDir(CM_Bootloader::getInstance()->getDirTmp() . 'smarty/');
-            self::$_smarty->_file_perms = 0666;
-            self::$_smarty->_dir_perms = 0777;
-            self::$_smarty->compile_check = CM_Bootloader::getInstance()->isDebug();
-            self::$_smarty->caching = false;
-            self::$_smarty->error_reporting = error_reporting();
+        if (null === $this->_smarty) {
+            $this->_smarty = new Smarty();
+            $this->_smarty->setTemplateDir(DIR_ROOT);
+            $this->_smarty->setCompileDir(CM_Bootloader::getInstance()->getDirTmp() . 'smarty/');
+            $this->_smarty->_file_perms = 0666;
+            $this->_smarty->_dir_perms = 0777;
+            $this->_smarty->compile_check = CM_Bootloader::getInstance()->isDebug();
+            $this->_smarty->caching = false;
+            $this->_smarty->error_reporting = error_reporting();
         }
 
         $pluginDirs = array(SMARTY_PLUGINS_DIR);
         foreach ($this->getSite()->getModules() as $moduleName) {
             $pluginDirs[] = CM_Util::getModulePath($moduleName) . 'library/' . $moduleName . '/SmartyPlugins';
         }
-        self::$_smarty->setPluginsDir($pluginDirs);
-        self::$_smarty->loadFilter('pre', 'translate');
+        $this->_smarty->setPluginsDir($pluginDirs);
+        $this->_smarty->loadFilter('pre', 'translate');
 
-        return self::$_smarty;
+        return $this->_smarty;
     }
 
     /**

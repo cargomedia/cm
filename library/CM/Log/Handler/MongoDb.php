@@ -84,6 +84,10 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
                 'server'  => $request->getServer(),
                 'headers' => $request->getHeaders(),
             ];
+
+            if ($request->hasClientId()) {
+                $formattedContext['httpRequest']['clientId'] = $request->getClientId();
+            }
         }
 
         return [

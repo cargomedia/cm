@@ -22,25 +22,11 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
         }
     }
 
-    public function testGetKey() {
-        /** @var CM_Model_StreamChannel_Mock $streamChannel */
-        $streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key'         => 'foo',
-                                                                         'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic()));
-        $this->assertEquals('foo', $streamChannel->getKey());
-    }
-
-    public function testGetAdapterType() {
-        /** @var CM_Model_StreamChannel_Mock $streamChannel */
-        $streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key'         => 'foobar',
-                                                                         'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic()));
-        $this->assertEquals(CM_MessageStream_Adapter_SocketRedis::getTypeStatic(), $streamChannel->getAdapterType());
-    }
-
     public function testFactory() {
         $streamChannel1 = CM_Model_StreamChannel_Media::createStatic(array('key'         => 'dsljkfk34asdd', 'serverId' => 1,
                                                                            'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic(),
                                                                            'width'       => 100,
-                                                                           'height'      => 100, 'thumbnailCount' => 0));
+                                                                           'height'      => 100,));
         $streamChannel2 = CM_Model_StreamChannel_Abstract::factory($streamChannel1->getId());
         $this->assertEquals($streamChannel1, $streamChannel2);
 
@@ -177,19 +163,28 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
     }
 
     public function testCreate() {
+        /** @var CM_Model_StreamChannel_Abstract $streamChannel */
         $streamChannel = CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getTypeStatic(), array('key'         => 'foo1',
                                                                                                                             'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic()));
         $this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
+        $this->assertSame('foo1', $streamChannel->getKey());
+        $this->assertEquals(CM_MessageStream_Adapter_SocketRedis::getTypeStatic(), $streamChannel->getAdapterType());
+        $this->assertSame(time(), $streamChannel->getCreateStamp());
 
-        try {
-            CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getTypeStatic(), array('key'         => 'foo1',
-                                                                                                               'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic()));
-            $this->fail();
-        } catch (CM_Db_Exception $e) {
-            $this->assertContains('Duplicate entry', $e->getMessage());
-        }
-
-        CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getTypeStatic(), array('key' => 'foo1', 'adapterType' => 2));
+        /** @var CM_Model_StreamChannel_Abstract $channel1 */
+        $channel1 = CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getTypeStatic(), [
+            'key'         => 'foo',
+            'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic(),
+        ]);
+        /** @var CM_Model_StreamChannel_Abstract $channel2 */
+        $channel2 = CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getTypeStatic(), [
+            'key'         => 'foo',
+            'adapterType' => CM_MessageStream_Adapter_SocketRedis::getTypeStatic(),
+        ]);
+        $this->assertInstanceOf('CM_Model_StreamChannel_Message', $channel1);
+        $this->assertInstanceOf('CM_Model_StreamChannel_Message', $channel2);
+        $this->assertSame($channel1->getId(), $channel2->getId());
+        $this->assertSame($channel1->getCreateStamp(), $channel2->getCreateStamp());
     }
 
     public function testEncryptAndDecryptKey() {

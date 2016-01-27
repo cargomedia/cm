@@ -125,11 +125,12 @@ class CMTest_TH {
     }
 
     /**
-     * @param int|null $type
-     * @param int|null $adapterType
+     * @param int|null    $type
+     * @param int|null    $adapterType
+     * @param string|null $mediaId
      * @return CM_Model_StreamChannel_Abstract
      */
-    public static function createStreamChannel($type = null, $adapterType = null) {
+    public static function createStreamChannel($type = null, $adapterType = null, $mediaId = null) {
         if (null === $type) {
             $type = CM_Model_StreamChannel_Media::getTypeStatic();
         }
@@ -140,11 +141,12 @@ class CMTest_TH {
 
         $data = array('key' => rand(1, 10000) . '_' . rand(1, 100));
         if (CM_Model_StreamChannel_Media::getTypeStatic() == $type) {
+            $mediaId = (null !== $mediaId) ? (string) $mediaId : null;
             $data['width'] = 480;
             $data['height'] = 720;
             $data['serverId'] = 1;
-            $data['thumbnailCount'] = 0;
             $data['adapterType'] = $adapterType;
+            $data['mediaId'] = $mediaId;
         }
         return CM_Model_StreamChannel_Abstract::createType($type, $data);
     }

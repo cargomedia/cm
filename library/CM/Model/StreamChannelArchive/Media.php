@@ -17,17 +17,29 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     /**
-     * @param CM_File_UserContent $file
+     * @return bool
      */
-    public function setFile(CM_File_UserContent $file) {
-        CM_Db_Db::update('cm_streamChannelArchive_media', ['file' => $file->getPath()], ['id' => $this->getId()]);
+    public function hasFile() {
+        return $this->_has('file') && null !== $this->_get('file');
+    }
+
+    /**
+     * @param CM_File_UserContent|null $file
+     */
+    public function setFile(CM_File_UserContent $file = null) {
+        $filename = null !== $file ? $file->getFileName() : null;
+        CM_Db_Db::update('cm_streamChannelArchive_media', ['file' => $filename], ['id' => $this->getId()]);
         $this->_change();
     }
 
     /**
      * @return CM_File_UserContent
+     * @throws CM_Exception_Invalid
      */
     public function getFile() {
+        if (null === $this->_get('file')) {
+            throw new CM_Exception_Invalid('File does not exist');
+        }
         return new CM_File_UserContent('streamChannels', $this->_get('file'), $this->getId());
     }
 
@@ -39,6 +51,22 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     /**
+     * @return string
+     */
+    public function getKey() {
+        return (string) $this->_get('key');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMediaId() {
+        $mediaId = $this->_get('mediaId');
+        $mediaId = (null !== $mediaId) ? (string) $mediaId : null;
+        return $mediaId;
+    }
+
+    /**
      * @return int
      */
     public function getStreamChannelType() {
@@ -46,65 +74,10 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     /**
-     * @return int
-     */
-    public function getThumbnailCount() {
-        $params = $this->_getDataColumn();
-        return $params->getInt('thumbnailCount', 0);
-    }
-
-    /**
-     * @param int $index
-     * @return CM_File_UserContent
-     */
-    public function getThumbnail($index) {
-        $index = (int) $index;
-        $filename = $this->getId() . '-' . $this->getHash() . '-thumbs' . DIRECTORY_SEPARATOR . $index . '.png';
-        return new CM_File_UserContent('streamChannels', $filename, $this->getId());
-    }
-
-    /**
-     * @return CM_Paging_FileUserContent_StreamChannelArchiveMediaThumbnails
+     * @return CM_StreamChannel_ThumbnailList_Channel
      */
     public function getThumbnails() {
-        return new CM_Paging_FileUserContent_StreamChannelArchiveMediaThumbnails($this);
-    }
-
-    /**
-     * @return CM_Model_User|null
-     */
-    public function getUser() {
-        $userId = $this->getUserId();
-        if (null === $userId) {
-            return null;
-        }
-        try {
-            return CM_Model_User::factory($userId);
-        } catch (CM_Exception_Nonexistent $ex) {
-            return null;
-        }
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getUserId() {
-        $userId = $this->_get('userId');
-        if (null === $userId) {
-            return null;
-        }
-        return (int) $userId;
-    }
-
-    /**
-     * @return CM_Params
-     */
-    protected function _getDataColumn() {
-        if (!$this->_has('data')) {
-            return CM_Params::factory();
-        } else {
-            return CM_Params::factory(CM_Params::jsonDecode($this->_get('data')));
-        }
+        return new CM_StreamChannel_ThumbnailList_Channel($this->getId());
     }
 
     /**
@@ -115,10 +88,16 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     protected function _onDeleteBefore() {
-        $this->getFile()->delete();
+        if ($this->hasFile()) {
+            $this->getFile()->delete();
+        }
 
-        $thumbnailDir = new CM_File_UserContent('streamChannels', $this->getId() . '-' . $this->getHash() . '-thumbs/', $this->getId());
+        $thumbnailDir = new CM_File_UserContent('streamChannels', $this->getId() . '-thumbs', $this->getId());
         $thumbnailDir->delete(true);
+        /** @var CM_StreamChannel_Thumbnail $thumbnail */
+        foreach ($this->getThumbnails() as $thumbnail) {
+            $thumbnail->delete();
+        }
     }
 
     protected function _onDelete() {
@@ -139,22 +118,20 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     protected static function _createStatic(array $data) {
         /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = $data['streamChannel'];
-        $streamPublish = $streamChannel->getStreamPublish();
-        $createStamp = $streamPublish->getStart();
-        $thumbnailCount = $streamChannel->getThumbnailCount();
+        $createStamp = $streamChannel->getCreateStamp();
         $file = isset($data['file']) ? $data['file'] : null;
         $end = time();
         $duration = $end - $createStamp;
-        CM_Db_Db::insert('cm_streamChannelArchive_media', array(
+        CM_Db_Db::insert('cm_streamChannelArchive_media', [
             'id'                => $streamChannel->getId(),
-            'userId'            => $streamPublish->getUserId(),
             'duration'          => $duration,
             'hash'              => $streamChannel->getHash(),
             'file'              => $file,
             'streamChannelType' => $streamChannel->getType(),
             'createStamp'       => $createStamp,
-            'data'              => CM_Params::jsonEncode(['thumbnailCount' => $thumbnailCount]),
-        ));
+            'key'               => $streamChannel->getKey(),
+            'mediaId'           => $streamChannel->getMediaId(),
+        ], null, ['id' => ['literal' => 'LAST_INSERT_ID(id)']]);
         return new self($streamChannel->getId());
     }
 
@@ -171,5 +148,17 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
         foreach ($streamChannelArchives as $streamChannelArchive) {
             $streamChannelArchive->delete();
         }
+    }
+
+    /**
+     * @param string $mediaId
+     * @return CM_Model_StreamChannelArchive_Media|null
+     */
+    public static function findByMediaId($mediaId) {
+        $streamChannelArchiveId = CM_Db_Db::select('cm_streamChannelArchive_media', 'id', ['mediaId' => (string) $mediaId])->fetchColumn();
+        if (!$streamChannelArchiveId) {
+            return null;
+        }
+        return new self($streamChannelArchiveId);
     }
 }

@@ -135,7 +135,7 @@ class CM_SessionTest extends CMTest_TestCase {
         }
     }
 
-    public function testLogin() {
+    public function testSetUser() {
         $user = CM_Model_User::createStatic();
         $session = new CM_Session();
 
@@ -144,7 +144,7 @@ class CM_SessionTest extends CMTest_TestCase {
         $this->assertTrue($session->getUser(true)->getOnline());
     }
 
-    public function testLogout() {
+    public function testDeleteUser() {
         $session = new CM_Session();
         $session->setUser(CM_Model_User::createStatic());
         $user = $session->getUser(true);
@@ -153,6 +153,18 @@ class CM_SessionTest extends CMTest_TestCase {
         $this->assertNull($session->getUser());
         $user->_change();
         $this->assertFalse($user->getOnline());
+    }
+
+    public function testLogoutUser() {
+        $session = new CM_Session();
+        $session->setUser(CM_Model_User::createStatic());
+        $session->setLifetime(123);
+        $this->assertNotNull($session->getUser());
+        $this->assertTrue($session->hasLifetime());
+
+        $session->logoutUser();
+        $this->assertNull($session->getUser());
+        $this->assertFalse($session->hasLifetime());
     }
 
     public function testGetViewer() {
@@ -207,20 +219,6 @@ class CM_SessionTest extends CMTest_TestCase {
 
         $session = new CM_Session($sessionId);
         $this->assertEquals('bar', $session->get('foo'));
-    }
-
-    public function testStartResetOfflineStamp() {
-        $user = CMTest_TH::createUser();
-        $offlineStamp = time();
-        $user->setOfflineStamp($offlineStamp);
-        $session = new CM_Session();
-        $session->setUser($user);
-        $this->assertSame($offlineStamp, $user->getOfflineStamp());
-
-        $session->start();
-        CMTest_TH::reinstantiateModel($user);
-        $this->assertSame(null, $user->getOfflineStamp());
-
     }
 
     public function testExpiration() {

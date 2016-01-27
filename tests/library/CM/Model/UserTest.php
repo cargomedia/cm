@@ -13,7 +13,6 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertEquals(CM_Site_Abstract::factory(), $user->getSite());
         $this->assertSame(null, $user->getLanguage());
         $this->assertSame(null, $user->getCurrency());
-        $this->assertSame(null, $user->getOfflineStamp());
     }
 
     public function testCreateAllData() {
@@ -41,15 +40,6 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertTrue($user->getOnline());
         $user->setOnline(false);
         $this->assertFalse($user->getOnline());
-    }
-
-    public function testGetSetOfflineStamp() {
-        $user = CMTest_TH::createUser();
-        $this->assertNull($user->getOfflineStamp());
-        $user->setOfflineStamp(time());
-        $this->assertSame(time(), $user->getOfflineStamp());
-        $user->setOfflineStamp(null);
-        $this->assertNull($user->getOfflineStamp());
     }
 
     public function testGetPreferences() {
@@ -135,32 +125,5 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $activityStamp2 = time();
         $user->updateLatestActivityThrottled();
         $this->assertSameTime($activityStamp2, $user->getLatestActivity());
-    }
-
-    public function testOfflineDelayed() {
-        $user1 = CMTest_TH::createUser();
-        $user2 = CMTest_TH::createUser();
-        $user3 = CMTest_TH::createUser();
-        $user1->setOnline();
-        $user2->setOnline();
-        $user3->setOnline();
-
-        $user1->setOfflineStamp(time());
-        $user2->setOfflineStamp(time());
-        CMTest_TH::timeForward(CM_Model_User::OFFLINE_DELAY);
-        $user3->setOfflineStamp(time());
-        $user2->setOnline();
-
-        $userOnlinePaging = new CM_Paging_User_Online();
-        $this->assertEquals([$user1, $user2, $user3], $userOnlinePaging);
-
-        CM_Model_User::offlineDelayed();
-        $userOnlinePaging->_change();
-        $this->assertEquals([$user1, $user2, $user3], $userOnlinePaging);
-
-        CMTest_TH::timeForward(1);
-        CM_Model_User::offlineDelayed();
-        $userOnlinePaging->_change();
-        $this->assertEquals([$user2, $user3], $userOnlinePaging);
     }
 }

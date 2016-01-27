@@ -371,4 +371,16 @@ class CM_ParamsTest extends CMTest_TestCase {
         });
         $this->assertSame('[Cannot dump params: `foo`]', $params->getDebugInfo());
     }
+
+    public function testGetStreamChannel() {
+        $streamChannel = CMTest_TH::createStreamChannel();
+        $params = new CM_Params(['channel' => $streamChannel]);
+        $this->assertEquals($streamChannel, $params->getStreamChannel('channel'));
+    }
+
+    public function testGetStreamChannelDefinition() {
+        $definition = new CM_StreamChannel_Definition('foo', 12);
+        $params = new CM_Params(['def' => $definition]);
+        $this->assertEquals($definition, $params->getStreamChannelDefinition('def'));
+    }
 }

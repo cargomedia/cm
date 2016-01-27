@@ -4,32 +4,59 @@ class CM_Janus_RpcEndpoints {
 
     /**
      * @param string $serverKey
-     * @param string $streamChannelKey
-     * @param string $streamKey
-     * @param int    $start
      * @param string $sessionData
+     * @param string $channelKey
+     * @param string $channelMediaId
      * @param string $channelData
+     * @param string $streamKey
+     * @param int $streamStart
      * @throws CM_Exception_AuthFailed
      * @throws CM_Exception_AuthRequired
      * @throws CM_Exception_Invalid
      * @throws CM_Exception_NotAllowed
      */
-    public static function rpc_publish($serverKey, $streamChannelKey, $streamKey, $start, $sessionData, $channelData) {
+    public static function rpc_publish($serverKey, $sessionData, $channelKey, $channelMediaId, $channelData, $streamKey, $streamStart) {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
 
-        $paramsSession = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
-        $session = new CM_Session($paramsSession->getString('sessionId'));
+        $server = $janus->getConfiguration()->findServerByKey($serverKey);
+        $sessionParams = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
+        $session = new CM_Session($sessionParams->getString('sessionId'));
         $user = $session->getUser(true);
 
-        $paramsChannel = CM_Params::factory(CM_Params::jsonDecode($channelData), true);
-        $streamChannelType = $paramsChannel->getInt('streamChannelType');
+        $channelKey = (string) $channelKey;
+        $channelMediaId = (string) $channelMediaId;
+        $channelParams = CM_Params::factory(CM_Params::jsonDecode($channelData), true);
+        $channelType = $channelParams->getInt('streamChannelType');
 
-        $server = $janus->getConfiguration()->findServerByKey($serverKey);
+        $streamKey = (string) $streamKey;
+        $streamStart = (int) $streamStart;
+
         $streamRepository = $janus->getStreamRepository();
-        $streamChannel = $streamRepository->createStreamChannel($streamChannelKey, $streamChannelType, $server->getId(), 0);
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
+        $streamChannel = $streamRepository->findStreamChannelByKey($channelKey);
+        if (null === $streamChannel) {
+            $streamChannel = $streamRepository->createStreamChannel($channelKey, $channelType, $server->getId(), $channelMediaId);
+        } else {
+            $channelServerData = [
+                'type'     => $streamChannel->getType(),
+                'mediaId'  => $streamChannel->getMediaId(),
+                'serverId' => $streamChannel->getServerId(),
+            ];
+            $channelRequestData = [
+                'type'     => $channelType,
+                'mediaId'  => $channelMediaId,
+                'serverId' => $server->getId(),
+            ];
+            if ($channelServerData !== $channelRequestData) {
+                throw new CM_Exception_Invalid('Channel request data differs from server data', null, [
+                    'channelRequestData' => $channelRequestData,
+                    'channelServerData'  => $channelServerData,
+                ]);
+            }
+        }
         try {
-            $streamRepository->createStreamPublish($streamChannel, $user, $streamKey, $start);
+            $streamRepository->createStreamPublish($streamChannel, $user, $streamKey, $streamStart);
         } catch (CM_Exception_NotAllowed $exception) {
             $streamChannel->delete();
             throw new CM_Exception_NotAllowed('Cannot publish: ' . $exception->getMessage());
@@ -38,31 +65,59 @@ class CM_Janus_RpcEndpoints {
 
     /**
      * @param string $serverKey
-     * @param string $streamChannelKey
-     * @param string $streamKey
-     * @param string $start
      * @param string $sessionData
+     * @param string $channelKey
+     * @param string $channelMediaId
+     * @param string $channelData
+     * @param string $streamKey
+     * @param int $streamStart
      * @throws CM_Exception_AuthFailed
      * @throws CM_Exception_AuthRequired
      * @throws CM_Exception_Invalid
-     * @throws CM_Exception_Nonexistent
      * @throws CM_Exception_NotAllowed
      */
-    public static function rpc_subscribe($serverKey, $streamChannelKey, $streamKey, $start, $sessionData) {
+    public static function rpc_subscribe($serverKey, $sessionData, $channelKey, $channelMediaId, $channelData, $streamKey, $streamStart) {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
 
-        $params = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
-        $session = new CM_Session($params->getString('sessionId'));
+        $server = $janus->getConfiguration()->findServerByKey($serverKey);
+        $sessionParams = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
+        $session = new CM_Session($sessionParams->getString('sessionId'));
         $user = $session->getUser(true);
 
+        $channelKey = (string) $channelKey;
+        $channelMediaId = (string) $channelMediaId;
+        $channelParams = CM_Params::factory(CM_Params::jsonDecode($channelData), true);
+        $channelType = $channelParams->getInt('streamChannelType');
+
+        $streamKey = (string) $streamKey;
+        $streamStart = (int) $streamStart;
+
         $streamRepository = $janus->getStreamRepository();
-        $streamChannel = $streamRepository->findStreamChannelByKey($streamChannelKey);
-        if (!$streamChannel) {
-            throw new CM_Exception_Nonexistent("Stream channel `{$streamChannelKey}` does not exists");
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
+        $streamChannel = $streamRepository->findStreamChannelByKey($channelKey);
+        if (null === $streamChannel) {
+            $streamChannel = $streamRepository->createStreamChannel($channelKey, $channelType, $server->getId(), $channelMediaId);
+        } else {
+            $channelServerData = [
+                'type'     => $streamChannel->getType(),
+                'mediaId'  => $streamChannel->getMediaId(),
+                'serverId' => $streamChannel->getServerId(),
+            ];
+            $channelRequestData = [
+                'type'     => $channelType,
+                'mediaId'  => $channelMediaId,
+                'serverId' => $server->getId(),
+            ];
+            if ($channelServerData !== $channelRequestData) {
+                throw new CM_Exception_Invalid('Channel request data differs from server data', null, [
+                    'channelRequestData' => $channelRequestData,
+                    'channelServerData'  => $channelServerData,
+                ]);
+            }
         }
         try {
-            $streamRepository->createStreamSubscribe($streamChannel, $user, $streamKey, $start);
+            $streamRepository->createStreamSubscribe($streamChannel, $user, $streamKey, $streamStart);
         } catch (CM_Exception_NotAllowed $exception) {
             throw new CM_Exception_NotAllowed('Cannot subscribe: ' . $exception->getMessage());
         }
@@ -70,43 +125,41 @@ class CM_Janus_RpcEndpoints {
 
     /**
      * @param string $serverKey
-     * @param string $streamChannelKey
+     * @param string $channelKey
      * @param string $streamKey
      * @return bool
      * @throws CM_Exception_AuthFailed
      * @throws CM_Exception_Invalid
      */
-    public static function rpc_removeStream($serverKey, $streamChannelKey, $streamKey) {
+    public static function rpc_removeStream($serverKey, $channelKey, $streamKey) {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
 
-        $streamRepository = $janus->getStreamRepository();
-        $streamChannel = $streamRepository->findStreamChannelByKey($streamChannelKey);
+        $server = $janus->getConfiguration()->findServerByKey($serverKey);
+        $channelKey = (string) $channelKey;
+        $streamKey = (string) $streamKey;
 
+        $streamRepository = $janus->getStreamRepository();
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
+        $streamChannel = $streamRepository->findStreamChannelByKey($channelKey);
+        if (null === $streamChannel) {
+            return false;
+        }
+
+        if ($streamChannel->getServerId() !== $server->getId()) {
+            throw new CM_Exception_Invalid("Request server `{$server->getId()}` does not match existing `{$streamChannel->getServerId()}`");
+        }
         $streamSubscribe = $streamChannel->getStreamSubscribes()->findKey($streamKey);
         if ($streamSubscribe) {
             $streamRepository->removeStream($streamSubscribe);
+            return true;
         }
         $streamPublish = $streamChannel->getStreamPublishs()->findKey($streamKey);
         if ($streamPublish) {
             $streamRepository->removeStream($streamPublish);
+            return true;
         }
-    }
-
-    /**
-     * @param string $serverKey
-     * @param string $sessionData
-     * @return bool
-     * @throws CM_Exception_AuthFailed
-     * @throws CM_Exception_Invalid
-     */
-    public static function rpc_isValidUser($serverKey, $sessionData) {
-        $janus = CM_Service_Manager::getInstance()->getJanus('janus');
-        self::_authenticate($janus, $serverKey);
-
-        $params = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
-        $session = CM_Session::findById($params->getString('sessionId'));
-        return $session && null !== $session->getUser(false);
+        return false;
     }
 
     /**

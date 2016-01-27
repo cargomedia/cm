@@ -24,7 +24,7 @@ class CM_Wowza_RpcEndpoints {
         $user = $session->getUser(true);
 
         $streamRepository = $wowza->getStreamRepository();
-        $streamChannel = $streamRepository->createStreamChannel($streamName, $streamChannelType, $server->getId(), 0);
+        $streamChannel = $streamRepository->createStreamChannel($streamName, $streamChannelType, $server->getId());
         try {
             $streamRepository->createStreamPublish($streamChannel, $user, $clientKey, $start);
         } catch (CM_Exception $ex) {

@@ -41,6 +41,13 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
     abstract public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe);
 
     /**
+     * @return int
+     */
+    public function getCreateStamp() {
+        return (int) $this->_get('createStamp');
+    }
+
+    /**
      * @return string
      */
     public function getKey() {
@@ -142,8 +149,22 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
         return true;
     }
 
+    /**
+     * @return CM_StreamChannel_Definition
+     */
+    public function getDefinition() {
+        return new CM_StreamChannel_Definition($this->getKey(), $this->getType(), $this->getAdapterType());
+    }
+
+    public function toArray() {
+        $array = parent::toArray();
+        $array['key'] = $this->getKey();
+        $array['type'] = $this->getType();
+        return $array;
+    }
+
     protected function _loadData() {
-        $data = CM_Db_Db::select('cm_streamChannel', array('key', 'type', 'adapterType'), array('id' => $this->getId()))->fetch();
+        $data = CM_Db_Db::select('cm_streamChannel', array('key', 'type', 'createStamp', 'adapterType'), array('id' => $this->getId()))->fetch();
         if (false !== $data) {
             $type = (int) $data['type'];
             if ($this->getType() !== $type) {
@@ -237,7 +258,12 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
     protected static function _createStatic(array $data) {
         $key = (string) $data ['key'];
         $adapterType = (int) $data['adapterType'];
-        $id = CM_Db_Db::insert('cm_streamChannel', array('key' => $key, 'type' => static::getTypeStatic(), 'adapterType' => $adapterType));
+        $id = CM_Db_Db::insert('cm_streamChannel', array(
+            'key'         => $key,
+            'createStamp' => time(),
+            'type'        => static::getTypeStatic(),
+            'adapterType' => $adapterType,
+        ), null, ['id' => ['literal' => 'LAST_INSERT_ID(id)']]);
         $cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
         CM_Cache_Shared::getInstance()->delete($cacheKey);
         return new static($id);

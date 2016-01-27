@@ -14,17 +14,25 @@ class CM_Janus_Server {
     /** @var string */
     protected $_key;
 
+    /** @var  array */
+    protected $_iceServerList;
+
     /**
-     * @param int $serverId
-     * @param string $key
-     * @param string $httpAddress
-     * @param string $webSocketAddress
+     * @param int        $serverId
+     * @param string     $key
+     * @param string     $httpAddress
+     * @param string     $webSocketAddress
+     * @param array|null $iceServerList
      */
-    public function __construct($serverId, $key, $httpAddress, $webSocketAddress) {
+    public function __construct($serverId, $key, $httpAddress, $webSocketAddress, array $iceServerList = null) {
+        if (null === $iceServerList) {
+            $iceServerList = [];
+        }
         $this->_id = (int) $serverId;
         $this->_key = (string) $key;
         $this->_httpAddress = (string) $httpAddress;
         $this->_webSocketAddress = (string) $webSocketAddress;
+        $this->_iceServerList = $iceServerList;
     }
 
     /**
@@ -53,5 +61,12 @@ class CM_Janus_Server {
      */
     public function getWebSocketAddress() {
         return $this->_webSocketAddress;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIceServerList() {
+        return $this->_iceServerList;
     }
 }

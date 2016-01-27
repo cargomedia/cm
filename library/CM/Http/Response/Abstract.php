@@ -162,6 +162,11 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
         $this->addHeaderRaw('HTTP/1.0 404 Not Found');
     }
 
+    public function setHeaderDisableCache() {
+        # Via http://stackoverflow.com/questions/49547/making-sure-a-web-page-is-not-cached-across-all-browsers/5493543#5493543
+        $this->setHeader('Cache-Control', 'no-store, must-revalidate');
+    }
+
     /**
      * @param string $key
      * @param string $value
@@ -260,7 +265,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
             $exceptionsToCatch = $config->exceptionsToCatch;
             $catchPublicExceptions = !empty($config->catchPublicExceptions);
             $errorOptions = \Functional\first($exceptionsToCatch, function ($options, $exceptionClass) use ($ex) {
-                return is_a($ex, $exceptionClass) ;
+                return is_a($ex, $exceptionClass);
             });
             $catchException = null !== $errorOptions;
             if ($catchException) {
