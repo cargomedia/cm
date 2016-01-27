@@ -7,17 +7,17 @@ interface CM_StreamChannel_DisallowInterface {
      * @param int                $allowedUntil
      * @return int
      */
-    function canPublish(CM_Model_User $user = null, $allowedUntil);
+    public function canPublish(CM_Model_User $user = null, $allowedUntil);
 
     /**
      * @param CM_Model_User|null $user
      * @param int                $allowedUntil
      * @return int
      */
-    function canSubscribe(CM_Model_User $user = null, $allowedUntil);
+    public function canSubscribe(CM_Model_User $user = null, $allowedUntil);
 
     /**
      * @return boolean
      */
-    function isValid();
+    public function isValid();
 }
