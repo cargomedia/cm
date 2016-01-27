@@ -9,9 +9,9 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
     public function testCreate() {
         /** @var CM_Model_StreamChannel_Media $channel1 */
         $channel1 = CM_Model_StreamChannel_Media::createStatic(array(
-            'key'            => 'foo',
-            'serverId'       => 1,
-            'adapterType'    => 1,
+            'key'         => 'foo',
+            'serverId'    => 1,
+            'adapterType' => 1,
         ));
         $this->assertInstanceOf('CM_Model_StreamChannel_Media', $channel1);
         $this->assertSame('foo', $channel1->getKey());
@@ -21,18 +21,18 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
 
         /** @var CM_Model_StreamChannel_Media $channel */
         $channel2 = CM_Model_StreamChannel_Media::createStatic(array(
-            'key'            => 'bar',
-            'serverId'       => 1,
-            'adapterType'    => 1,
-            'mediaId'        => 'foobar',
+            'key'         => 'bar',
+            'serverId'    => 1,
+            'adapterType' => 1,
+            'mediaId'     => 'foobar',
         ));
         $this->assertSame('foobar', $channel2->getMediaId());
 
         $channel3 = CM_Model_StreamChannel_Media::createStatic(array(
-            'key'            => 'foobar',
-            'serverId'       => 1,
-            'adapterType'    => 1,
-            'mediaId'        => null,
+            'key'         => 'foobar',
+            'serverId'    => 1,
+            'adapterType' => 1,
+            'mediaId'     => null,
         ));
         $this->assertSame(null, $channel3->getMediaId());
     }
@@ -40,9 +40,9 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
     public function testCreateWithoutServerId() {
         try {
             CM_Model_StreamChannel_Media::createStatic(array(
-                'key'            => 'bar',
-                'serverId'       => null,
-                'adapterType'    => 1,
+                'key'         => 'bar',
+                'serverId'    => null,
+                'adapterType' => 1,
             ));
             $this->fail('Can create streamChannel without serverId');
         } catch (CM_Exception $ex) {
@@ -53,16 +53,16 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
     public function testCreateDuplicate() {
         /** @var CM_Model_StreamChannel_Media $channel1 */
         $channel1 = CM_Model_StreamChannel_Media::createStatic(array(
-            'key'            => 'foo',
-            'serverId'       => 1,
-            'adapterType'    => 1,
+            'key'         => 'foo',
+            'serverId'    => 1,
+            'adapterType' => 1,
         ));
 
         /** @var CM_Model_StreamChannel_Media $channel2 */
         $channel2 = CM_Model_StreamChannel_Media::createStatic(array(
-            'key'            => 'foo',
-            'serverId'       => 1,
-            'adapterType'    => 1,
+            'key'         => 'foo',
+            'serverId'    => 1,
+            'adapterType' => 1,
         ));
 
         $this->assertInstanceOf('CM_Model_StreamChannel_Media', $channel1);
@@ -101,31 +101,6 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
         });
         $this->assertInstanceOf('CM_Exception_Nonexistent', $exception);
         $this->assertInstanceOf('CM_Model_StreamChannelArchive_Media', CM_Model_StreamChannelArchive_Media::findById($streamChannel->getId()));
-    }
-
-    public function testOnUnpublish() {
-        $streamChannel = CMTest_TH::createStreamChannel();
-        $streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
-        $this->assertNull(CM_Model_StreamChannelArchive_Media::findById($streamChannel->getId()));
-
-        $streamChannel->onUnpublish($streamPublish);
-        $this->assertInstanceOf('CM_Model_StreamChannelArchive_Media', CM_Model_StreamChannelArchive_Media::findById($streamChannel->getId()));
-
-        $streamChannel->onUnpublish($streamPublish);
-        $streamPublish->delete();
-        $streamChannel->delete();
-    }
-
-    public function testOnUnpublishDelete() {
-        $streamChannel = CMTest_TH::createStreamChannel();
-        $streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
-        try {
-            $streamChannel->onUnpublish($streamPublish);
-            new CM_Model_StreamChannelArchive_Media($streamChannel->getId());
-            $streamPublish->delete();
-        } catch (CM_Exception_Nonexistent $ex) {
-            $this->fail('Could not delete CM_Model_Stream_Publish.');
-        }
     }
 
     public function testGetHash() {

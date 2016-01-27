@@ -7,32 +7,28 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
     }
 
     public function testCreate() {
-        // with streamPublish
+        // without mediaId
         /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
-        $user = CMTest_TH::createUser();
-        $streamPublish = CMTest_TH::createStreamPublish($user, $streamChannel);
         CMTest_TH::timeForward(10);
         /** @var CM_Model_StreamChannelArchive_Media $archive */
         $archive = CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel));
         $this->assertInstanceOf('CM_Model_StreamChannelArchive_Media', $archive);
         $this->assertSame($streamChannel->getId(), $archive->getId());
-        $this->assertSame($user->getId(), $archive->getUserId());
-        $this->assertEquals($user, $archive->getUser());
-        $this->assertSame($streamPublish->getStart(), $archive->getCreated());
+        $this->assertSame($streamChannel->getCreateStamp(), $archive->getCreated());
         $this->assertEquals(10, $archive->getDuration(), '', 1);
         $this->assertSame(md5($streamChannel->getKey()), $archive->getHash());
         $this->assertSame($streamChannel->getType(), $archive->getStreamChannelType());
         $this->assertSame($streamChannel->getKey(), $archive->getKey());
         $this->assertSame($streamChannel->getMediaId(), $archive->getMediaId());
+        $this->assertSame(null, $archive->getMediaId());
         $this->assertSame($streamChannel->getHash(), $archive->getHash());
 
-        // without streamPublish
+        // with mediaId
         $streamChannel = CMTest_TH::createStreamChannel(null, null, 'foo');
         $archive = CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel));
         $this->assertSame($streamChannel->getMediaId(), $archive->getMediaId());
-        $this->assertSame($streamChannel->getCreateStamp(), $archive->getCreated());
-        $this->assertSame($streamChannel->getHash(), $archive->getHash());
+        $this->assertSame('foo', $archive->getMediaId());
     }
 
     public function testCreateDuplicated() {
@@ -49,30 +45,6 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
 
         $this->assertSame($archive1->getId(), $archive2->getId());
         $this->assertSame($archive1->getCreated(), $archive2->getCreated());
-    }
-
-    public function testNoUser() {
-        /** @var CM_Model_StreamChannel_Media $streamChannel */
-        $streamChannel = CMTest_TH::createStreamChannel();
-        $user = CMTest_TH::createUser();
-        $streamPublish = CMTest_TH::createStreamPublish($user, $streamChannel);
-        $streamPublish->unsetUser();
-
-        /** @var CM_Model_StreamChannelArchive_Media $archive */
-        $archive = CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel));
-
-        $this->assertNull($archive->getUser());
-        $this->assertNull($archive->getUserId());
-    }
-
-    public function testGetUser() {
-        $user = CMTest_TH::createUser();
-        $streamChannel = CMTest_TH::createStreamChannel();
-        CMTest_TH::createStreamPublish($user, $streamChannel);
-        $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel);
-        $this->assertEquals($user, $archive->getUser());
-        $user->delete();
-        $this->assertNull($archive->getUser());
     }
 
     public function testGetVideo() {
