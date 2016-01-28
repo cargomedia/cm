@@ -24,8 +24,8 @@
  */
 /**
  * bluebird build version 3.1.5
- * Features enabled: core, race, settle, timers
- * Features disabled: call_get, generators, map, nodeify, promisify, props, reduce, some, using, filter, any, each
+ * Features enabled: core, race, props, settle, timers
+ * Features disabled: call_get, generators, map, nodeify, promisify, reduce, some, using, filter, any, each
 */
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Promise=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof _dereq_=="function"&&_dereq_;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof _dereq_=="function"&&_dereq_;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 "use strict";
@@ -182,7 +182,7 @@ Async.prototype._reset = function () {
 module.exports = Async;
 module.exports.firstLineError = firstLineError;
 
-},{"./queue":17,"./schedule":19,"./util":24}],2:[function(_dereq_,module,exports){
+},{"./queue":18,"./schedule":20,"./util":25}],2:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, tryConvertToPromise, debug) {
 var calledBind = false;
@@ -391,7 +391,7 @@ Promise.prototype._resultCancelled = function() {
 
 };
 
-},{"./util":24}],5:[function(_dereq_,module,exports){
+},{"./util":25}],5:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(NEXT_FILTER) {
 var util = _dereq_("./util");
@@ -435,7 +435,7 @@ function catchFilter(instances, cb, promise) {
 return catchFilter;
 };
 
-},{"./es5":10,"./util":24}],6:[function(_dereq_,module,exports){
+},{"./es5":10,"./util":25}],6:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise) {
 var longStackTraces = false;
@@ -1332,7 +1332,7 @@ return {
 };
 };
 
-},{"./errors":9,"./util":24}],8:[function(_dereq_,module,exports){
+},{"./errors":9,"./util":25}],8:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise) {
 function returner() {
@@ -1493,7 +1493,7 @@ module.exports = {
     Warning: Warning
 };
 
-},{"./es5":10,"./util":24}],10:[function(_dereq_,module,exports){
+},{"./es5":10,"./util":25}],10:[function(_dereq_,module,exports){
 var isES5 = (function(){
     "use strict";
     return this === undefined;
@@ -1684,7 +1684,7 @@ Promise.prototype.tap = function (handler) {
 return PassThroughHandlerContext;
 };
 
-},{"./util":24}],12:[function(_dereq_,module,exports){
+},{"./util":25}],12:[function(_dereq_,module,exports){
 "use strict";
 module.exports =
 function(Promise, PromiseArray, tryConvertToPromise, INTERNAL) {
@@ -1835,7 +1835,7 @@ Promise.join = function () {
 
 };
 
-},{"./util":24}],13:[function(_dereq_,module,exports){
+},{"./util":25}],13:[function(_dereq_,module,exports){
 "use strict";
 module.exports =
 function(Promise, INTERNAL, tryConvertToPromise, apiRejection, debug) {
@@ -1892,7 +1892,7 @@ Promise.prototype._resolveFromSyncValue = function (value) {
 };
 };
 
-},{"./util":24}],14:[function(_dereq_,module,exports){
+},{"./util":25}],14:[function(_dereq_,module,exports){
 "use strict";
 var util = _dereq_("./util");
 var maybeWrapAsError = util.maybeWrapAsError;
@@ -1945,7 +1945,7 @@ function nodebackForPromise(promise, multiArgs) {
 
 module.exports = nodebackForPromise;
 
-},{"./errors":9,"./es5":10,"./util":24}],15:[function(_dereq_,module,exports){
+},{"./errors":9,"./es5":10,"./util":25}],15:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
 var makeSelfResolutionError = function () {
@@ -2664,6 +2664,7 @@ _dereq_("./synchronous_inspection")(Promise);
 _dereq_("./join")(
     Promise, PromiseArray, tryConvertToPromise, INTERNAL, debug);
 Promise.Promise = Promise;
+_dereq_('./props.js')(Promise, PromiseArray, tryConvertToPromise, apiRejection);
 _dereq_('./race.js')(Promise, INTERNAL, tryConvertToPromise, apiRejection);
 _dereq_('./settle.js')(Promise, PromiseArray, debug);
 _dereq_('./timers.js')(Promise, INTERNAL, debug);
@@ -2692,7 +2693,7 @@ _dereq_('./timers.js')(Promise, INTERNAL, debug);
 
 };
 
-},{"./async":1,"./bind":2,"./cancel":4,"./catch_filter":5,"./context":6,"./debuggability":7,"./direct_resolve":8,"./errors":9,"./es5":10,"./finally":11,"./join":12,"./method":13,"./nodeback":14,"./promise_array":16,"./race.js":18,"./settle.js":20,"./synchronous_inspection":21,"./thenables":22,"./timers.js":23,"./util":24}],16:[function(_dereq_,module,exports){
+},{"./async":1,"./bind":2,"./cancel":4,"./catch_filter":5,"./context":6,"./debuggability":7,"./direct_resolve":8,"./errors":9,"./es5":10,"./finally":11,"./join":12,"./method":13,"./nodeback":14,"./promise_array":16,"./props.js":17,"./race.js":19,"./settle.js":21,"./synchronous_inspection":22,"./thenables":23,"./timers.js":24,"./util":25}],16:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, tryConvertToPromise,
     apiRejection, Proxyable) {
@@ -2878,7 +2879,127 @@ PromiseArray.prototype.getActualLength = function (len) {
 return PromiseArray;
 };
 
-},{"./util":24}],17:[function(_dereq_,module,exports){
+},{"./util":25}],17:[function(_dereq_,module,exports){
+"use strict";
+module.exports = function(
+    Promise, PromiseArray, tryConvertToPromise, apiRejection) {
+var util = _dereq_("./util");
+var isObject = util.isObject;
+var es5 = _dereq_("./es5");
+var Es6Map;
+if (typeof Map === "function") Es6Map = Map;
+
+var mapToEntries = (function() {
+    var index = 0;
+    var size = 0;
+
+    function extractEntry(value, key) {
+        this[index] = value;
+        this[index + size] = key;
+        index++;
+    }
+
+    return function mapToEntries(map) {
+        size = map.size;
+        index = 0;
+        var ret = new Array(map.size * 2);
+        map.forEach(extractEntry, ret);
+        return ret;
+    };
+})();
+
+var entriesToMap = function(entries) {
+    var ret = new Es6Map();
+    var length = entries.length / 2 | 0;
+    for (var i = 0; i < length; ++i) {
+        var key = entries[length + i];
+        var value = entries[i];
+        ret.set(key, value);
+    }
+    return ret;
+};
+
+function PropertiesPromiseArray(obj) {
+    var isMap = false;
+    var entries;
+    if (Es6Map !== undefined && obj instanceof Es6Map) {
+        entries = mapToEntries(obj);
+        isMap = true;
+    } else {
+        var keys = es5.keys(obj);
+        var len = keys.length;
+        entries = new Array(len * 2);
+        for (var i = 0; i < len; ++i) {
+            var key = keys[i];
+            entries[i] = obj[key];
+            entries[i + len] = key;
+        }
+    }
+    this.constructor$(entries);
+    this._isMap = isMap;
+    this._init$(undefined, -3);
+}
+util.inherits(PropertiesPromiseArray, PromiseArray);
+
+PropertiesPromiseArray.prototype._init = function () {};
+
+PropertiesPromiseArray.prototype._promiseFulfilled = function (value, index) {
+    this._values[index] = value;
+    var totalResolved = ++this._totalResolved;
+    if (totalResolved >= this._length) {
+        var val;
+        if (this._isMap) {
+            val = entriesToMap(this._values);
+        } else {
+            val = {};
+            var keyOffset = this.length();
+            for (var i = 0, len = this.length(); i < len; ++i) {
+                val[this._values[i + keyOffset]] = this._values[i];
+            }
+        }
+        this._resolve(val);
+        return true;
+    }
+    return false;
+};
+
+PropertiesPromiseArray.prototype.shouldCopyValues = function () {
+    return false;
+};
+
+PropertiesPromiseArray.prototype.getActualLength = function (len) {
+    return len >> 1;
+};
+
+function props(promises) {
+    var ret;
+    var castValue = tryConvertToPromise(promises);
+
+    if (!isObject(castValue)) {
+        return apiRejection("cannot await properties of a non-object\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
+    } else if (castValue instanceof Promise) {
+        ret = castValue._then(
+            Promise.props, undefined, undefined, undefined, undefined);
+    } else {
+        ret = new PropertiesPromiseArray(castValue).promise();
+    }
+
+    if (castValue instanceof Promise) {
+        ret._propagateFrom(castValue, 2);
+    }
+    return ret;
+}
+
+Promise.prototype.props = function () {
+    return props(this);
+};
+
+Promise.props = function (promises) {
+    return props(promises);
+};
+};
+
+},{"./es5":10,"./util":25}],18:[function(_dereq_,module,exports){
 "use strict";
 function arrayMove(src, srcIndex, dst, dstIndex, len) {
     for (var j = 0; j < len; ++j) {
@@ -2970,7 +3091,7 @@ Queue.prototype._resizeTo = function (capacity) {
 
 module.exports = Queue;
 
-},{}],18:[function(_dereq_,module,exports){
+},{}],19:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(
     Promise, INTERNAL, tryConvertToPromise, apiRejection) {
@@ -3021,7 +3142,7 @@ Promise.prototype.race = function () {
 
 };
 
-},{"./util":24}],19:[function(_dereq_,module,exports){
+},{"./util":25}],20:[function(_dereq_,module,exports){
 "use strict";
 var util = _dereq_("./util");
 var schedule;
@@ -3077,7 +3198,7 @@ if (util.isNode && typeof MutationObserver === "undefined") {
 }
 module.exports = schedule;
 
-},{"./util":24}],20:[function(_dereq_,module,exports){
+},{"./util":25}],21:[function(_dereq_,module,exports){
 "use strict";
 module.exports =
     function(Promise, PromiseArray, debug) {
@@ -3122,7 +3243,7 @@ Promise.prototype.settle = function () {
 };
 };
 
-},{"./util":24}],21:[function(_dereq_,module,exports){
+},{"./util":25}],22:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise) {
 function PromiseInspection(promise) {
@@ -3220,7 +3341,7 @@ Promise.prototype._reason = function() {
 Promise.PromiseInspection = PromiseInspection;
 };
 
-},{}],22:[function(_dereq_,module,exports){
+},{}],23:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL) {
 var util = _dereq_("./util");
@@ -3304,7 +3425,7 @@ function doThenable(x, then, context) {
 return tryConvertToPromise;
 };
 
-},{"./util":24}],23:[function(_dereq_,module,exports){
+},{"./util":25}],24:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, debug) {
 var util = _dereq_("./util");
@@ -3382,7 +3503,7 @@ Promise.prototype.timeout = function (ms, message) {
 
 };
 
-},{"./util":24}],24:[function(_dereq_,module,exports){
+},{"./util":25}],25:[function(_dereq_,module,exports){
 "use strict";
 var es5 = _dereq_("./es5");
 var canEvaluate = typeof navigator == "undefined";

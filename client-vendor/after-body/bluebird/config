@@ -1,1 +1,1 @@
-node tools/build.js --features "core settle timers race"
+node tools/build.js --features "core settle timers race props"
