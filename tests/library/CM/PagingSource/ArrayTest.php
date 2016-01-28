@@ -3,10 +3,17 @@
 class CM_PagingSource_ArrayTest extends CMTest_TestCase {
 
     public function testClearCache() {
-        $pagingMock = $this->getMock('CM_PagingSource_Array', array('clearCache'), array(range(1, 10)));
-        $pagingMock->expects($this->once())->method('clearCache');
-        $pagingSource = new CM_PagingSource_Array($pagingMock);
+        $dataSource = $this->mockClass('CM_PagingSource_Array')->newInstanceWithoutConstructor();
+        $dataSource->mockMethod('getItems')->set([1, 2, 3]);
+        $clearCache = $dataSource->mockMethod('clearCache');
+
+        $pagingSource = new CM_PagingSource_Array($dataSource);
+        $this->assertEquals([1, 2, 3], $pagingSource->getItems());
+
+        $dataSource->mockMethod('getItems')->set([1, 2, 3, 4]);
         $pagingSource->clearCache();
+        $this->assertSame(1, $clearCache->getCallCount());
+        $this->assertEquals([1, 2, 3, 4], $pagingSource->getItems());
     }
 
     /**
