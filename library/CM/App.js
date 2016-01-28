@@ -13,6 +13,10 @@ var CM_App = CM_Class_Abstract.extend({
   options: {},
 
   ready: function() {
+    Promise.config({
+      cancellation: true,
+      warnings: cm.options.debug
+    });
     this.error.ready();
     this.dom.ready();
     this.window.ready();
@@ -50,8 +54,8 @@ var CM_App = CM_Class_Abstract.extend({
       return view;
     }
     return _.find(this.views, function(view) {
-      return view.hasClass(className);
-    }) || null;
+        return view.hasClass(className);
+      }) || null;
   },
 
   /**
@@ -796,7 +800,7 @@ var CM_App = CM_Class_Abstract.extend({
     var self = this;
     var jqXHR;
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject, onCancel) {
       jqXHR = $.ajax(url, {
         data: JSON.stringify(data),
         type: 'POST',
@@ -830,13 +834,12 @@ var CM_App = CM_Class_Abstract.extend({
           }
           reject(new CM_Exception(msg));
         });
-    }).cancellable()
-      .catch(Promise.CancellationError, function(error) {
+      onCancel(function() {
         if (jqXHR) {
           jqXHR.abort();
         }
-        throw error;
       });
+    });
   },
 
   /**
