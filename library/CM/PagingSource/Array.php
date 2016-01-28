@@ -48,6 +48,7 @@ class CM_PagingSource_Array extends CM_PagingSource_Abstract {
     }
 
     public function clearCache() {
+        unset($this->_data);
         if ($this->_source) {
             $this->_source->clearCache();
         } else {
