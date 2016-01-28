@@ -240,9 +240,7 @@ var CM_App = CM_Class_Abstract.extend({
       $(window).on('unhandledrejection', function(e) {
         e.preventDefault();
         var error = e.originalEvent.detail.reason;
-        if (!(error instanceof Promise.CancellationError)) {
-          cm.error._globalHandler(error);
-        }
+        cm.error._globalHandler(error);
       });
     },
 
@@ -800,7 +798,7 @@ var CM_App = CM_Class_Abstract.extend({
     var self = this;
     var jqXHR;
 
-    return new Promise(function(resolve, reject, onCancel) {
+    var ajaxPromise = new Promise(function(resolve, reject, onCancel) {
       jqXHR = $.ajax(url, {
         data: JSON.stringify(data),
         type: 'POST',
@@ -822,7 +820,7 @@ var CM_App = CM_Class_Abstract.extend({
         .fail(function(xhr, textStatus) {
           if (xhr.status === 0) {
             if (window.navigator.onLine) {
-              reject(Promise.CancellationError());
+              ajaxPromise.cancel();
             } else {
               reject(new CM_Exception_RequestFailed(cm.language.get('No Internet connection')));
             }
@@ -840,6 +838,7 @@ var CM_App = CM_Class_Abstract.extend({
         }
       });
     });
+    return ajaxPromise;
   },
 
   /**

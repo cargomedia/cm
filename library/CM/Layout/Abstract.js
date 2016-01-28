@@ -37,11 +37,9 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
       })
       .catch(function(error) {
         layout._clearSpinnerTimeout();
-        if (!(error instanceof Promise.CancellationError)) {
-          layout._errorPagePlaceholder(error);
-          layout._onPageError();
-          throw error;
-        }
+        layout._errorPagePlaceholder(error);
+        layout._onPageError();
+        throw error;
       });
   }, {cancelLeading: true}),
 
