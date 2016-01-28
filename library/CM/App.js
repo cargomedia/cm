@@ -240,7 +240,9 @@ var CM_App = CM_Class_Abstract.extend({
       $(window).on('unhandledrejection', function(e) {
         e.preventDefault();
         var error = e.originalEvent.detail.reason;
-        cm.error._globalHandler(error);
+        if (!(error instanceof Promise.CancellationError)) {
+          cm.error._globalHandler(error);
+        }
       });
     },
 
