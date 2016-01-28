@@ -136,13 +136,6 @@ class CM_Model_User extends CM_Model_Abstract {
     }
 
     /**
-     * @return CM_Paging_StreamChannelArchiveMedia_User
-     */
-    public function getStreamChannelArchiveMediaList() {
-        return new CM_Paging_StreamChannelArchiveMedia_User($this);
-    }
-
-    /**
      * @return boolean
      */
     public function getVisible() {

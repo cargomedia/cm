@@ -81,32 +81,6 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
     }
 
     /**
-     * @return CM_Model_User|null
-     */
-    public function getUser() {
-        $userId = $this->getUserId();
-        if (null === $userId) {
-            return null;
-        }
-        try {
-            return CM_Model_User::factory($userId);
-        } catch (CM_Exception_Nonexistent $ex) {
-            return null;
-        }
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getUserId() {
-        $userId = $this->_get('userId');
-        if (null === $userId) {
-            return null;
-        }
-        return (int) $userId;
-    }
-
-    /**
      * @return array
      */
     protected function _loadData() {
@@ -145,18 +119,11 @@ class CM_Model_StreamChannelArchive_Media extends CM_Model_StreamChannelArchive_
         /** @var CM_Model_StreamChannel_Media $streamChannel */
         $streamChannel = $data['streamChannel'];
         $createStamp = $streamChannel->getCreateStamp();
-        $userId = null;
-        if ($streamChannel->hasStreamPublish()) {
-            $streamPublish = $streamChannel->getStreamPublish();
-            $createStamp = $streamPublish->getStart();
-            $userId = $streamPublish->getUserId();
-        }
         $file = isset($data['file']) ? $data['file'] : null;
         $end = time();
         $duration = $end - $createStamp;
         CM_Db_Db::insert('cm_streamChannelArchive_media', [
             'id'                => $streamChannel->getId(),
-            'userId'            => $userId,
             'duration'          => $duration,
             'hash'              => $streamChannel->getHash(),
             'file'              => $file,

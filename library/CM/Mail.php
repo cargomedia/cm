@@ -183,6 +183,15 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
+     * @return CM_Frontend_Render
+     */
+    public function getRender() {
+        $environment = $this->_recipient ? $this->_recipient->getEnvironment() : new CM_Frontend_Environment();
+        $environment->setSite($this->_site);
+        return new CM_Frontend_Render($environment);
+    }
+
+    /**
      * @return boolean
      */
     public function getRenderLayout() {
@@ -290,12 +299,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @return array array($subject, $html, $text)
      */
     public function render() {
-        if (null !== $this->_recipient) {
-            $environment = $this->_recipient->getEnvironment();
-        } else {
-            $environment = new CM_Frontend_Environment($this->_site);
-        }
-        $render = new CM_Frontend_Render($environment);
+        $render = $this->getRender();
         $renderAdapter = new CM_RenderAdapter_Mail($render, $this);
         return $renderAdapter->fetch();
     }

@@ -370,7 +370,6 @@ DROP TABLE IF EXISTS `cm_streamChannelArchive_media`;
 
 CREATE TABLE `cm_streamChannelArchive_media` (
   `id` int(10) unsigned NOT NULL,
-  `userId` int(10) unsigned DEFAULT NULL,
   `duration` int(10) unsigned NOT NULL,
   `hash` char(32) NOT NULL,
   `file` varchar(255) DEFAULT NULL,
@@ -380,7 +379,6 @@ CREATE TABLE `cm_streamChannelArchive_media` (
   `mediaId` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `mediaId` (`mediaId`),
-  KEY `userId` (`userId`),
   KEY `createStamp` (`createStamp`),
   KEY `streamChannelType` (`streamChannelType`),
   KEY `key` (`key`)
