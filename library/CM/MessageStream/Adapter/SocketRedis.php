@@ -142,7 +142,6 @@ class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abst
                 $channel = $data['channel'];
                 $clientKey = $data['clientKey'];
                 $start = time();
-                $allowedUntil = null;
                 $data = CM_Params::factory((array) $data['data'], true);
                 $user = null;
                 if ($data->has('sessionId')) {
@@ -150,7 +149,7 @@ class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abst
                         $user = $session->getUser(false);
                     }
                 }
-                $this->_subscribe($channel, $clientKey, $start, $allowedUntil, $user);
+                $this->_subscribe($channel, $clientKey, $start, $user);
                 break;
             case 'unsubscribe':
                 $channel = $data['channel'];
@@ -170,11 +169,10 @@ class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abst
      * @param string             $channel
      * @param string             $clientKey
      * @param int                $start
-     * @param int                $allowedUntil
      * @param CM_Model_User|null $user
      * @throws CM_Exception_Invalid
      */
-    protected function _subscribe($channel, $clientKey, $start, $allowedUntil, CM_Model_User $user = null) {
+    protected function _subscribe($channel, $clientKey, $start, CM_Model_User $user = null) {
         $channelData = CM_Model_StreamChannel_Message::extractStatusChannelData($channel);
         $channelKey = $channelData['key'];
         $channelType = $channelData['type'];

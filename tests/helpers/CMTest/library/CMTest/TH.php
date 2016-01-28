@@ -187,7 +187,8 @@ class CMTest_TH {
         }
         return CM_Model_Stream_Publish::createStatic(array(
             'streamChannel' => $streamChannel,
-            'user'          => $user, 'start' => time(),
+            'user'          => $user,
+            'start'         => time(),
             'key'           => rand(1, 10000) . '_' . rand(1, 100),
         ));
     }

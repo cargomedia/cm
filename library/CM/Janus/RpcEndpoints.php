@@ -9,7 +9,7 @@ class CM_Janus_RpcEndpoints {
      * @param string $channelMediaId
      * @param string $channelData
      * @param string $streamKey
-     * @param int $streamStart
+     * @param int    $streamStart
      * @throws CM_Exception_AuthFailed
      * @throws CM_Exception_AuthRequired
      * @throws CM_Exception_Invalid
@@ -58,8 +58,15 @@ class CM_Janus_RpcEndpoints {
         try {
             $streamRepository->createStreamPublish($streamChannel, $user, $streamKey, $streamStart);
         } catch (CM_Exception_NotAllowed $exception) {
-            $streamChannel->delete();
-            throw new CM_Exception_NotAllowed('Cannot publish: ' . $exception->getMessage());
+            if (!$streamChannel->hasStreams()) {
+                $streamChannel->delete();
+            }
+            throw new CM_Exception_NotAllowed('Cannot publish: ' . $exception->getMessage(), $exception->getSeverity());
+        } catch (CM_Exception_Invalid $exception) {
+            if (!$streamChannel->hasStreams()) {
+                $streamChannel->delete();
+            }
+            throw new CM_Exception_Invalid('Cannot publish: ' . $exception->getMessage(), $exception->getSeverity());
         }
     }
 
@@ -70,7 +77,7 @@ class CM_Janus_RpcEndpoints {
      * @param string $channelMediaId
      * @param string $channelData
      * @param string $streamKey
-     * @param int $streamStart
+     * @param int    $streamStart
      * @throws CM_Exception_AuthFailed
      * @throws CM_Exception_AuthRequired
      * @throws CM_Exception_Invalid
@@ -119,7 +126,15 @@ class CM_Janus_RpcEndpoints {
         try {
             $streamRepository->createStreamSubscribe($streamChannel, $user, $streamKey, $streamStart);
         } catch (CM_Exception_NotAllowed $exception) {
-            throw new CM_Exception_NotAllowed('Cannot subscribe: ' . $exception->getMessage());
+            if (!$streamChannel->hasStreams()) {
+                $streamChannel->delete();
+            }
+            throw new CM_Exception_NotAllowed('Cannot subscribe: ' . $exception->getMessage(), $exception->getSeverity());
+        } catch (CM_Exception_Invalid $exception) {
+            if (!$streamChannel->hasStreams()) {
+                $streamChannel->delete();
+            }
+            throw new CM_Exception_Invalid('Cannot subscribe: ' . $exception->getMessage(), $exception->getSeverity());
         }
     }
 
@@ -164,7 +179,7 @@ class CM_Janus_RpcEndpoints {
 
     /**
      * @param CM_Janus_Service $janus
-     * @param string $serverKey
+     * @param string           $serverKey
      * @throws CM_Exception_AuthFailed
      */
     protected static function _authenticate(CM_Janus_Service $janus, $serverKey) {

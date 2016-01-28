@@ -23,20 +23,22 @@ abstract class CM_MediaStreams_Service extends CM_Class_Abstract implements CM_T
     public function checkStreams() {
         $streamRepository = $this->getStreamRepository();
 
-        /** @var CM_Model_StreamChannel_Media $streamChannel */
         foreach ($streamRepository->getStreamChannels() as $streamChannel) {
-            $streamChannelIsValid = $streamChannel->isValid();
-            if ($streamChannel->hasStreamPublish()) {
-                /** @var CM_Model_Stream_Publish $streamPublish */
-                $streamPublish = $streamChannel->getStreamPublish();
-                if (!$streamChannelIsValid || !$this->_isPublishAllowed($streamPublish)) {
-                    $this->_stopStream($streamPublish);
+            if ($streamChannel instanceof CM_StreamChannel_DisallowInterface) {
+                /** @var CM_Model_StreamChannel_Media|CM_StreamChannel_DisallowInterface $streamChannel */
+                $streamChannelIsValid = $streamChannel->isValid();
+                if ($streamChannel->hasStreamPublish()) {
+                    /** @var CM_Model_Stream_Publish $streamPublish */
+                    $streamPublish = $streamChannel->getStreamPublish();
+                    if (!$streamChannelIsValid || !$this->_isPublishAllowed($streamPublish)) {
+                        $this->_stopStream($streamPublish);
+                    }
                 }
-            }
-            /** @var CM_Model_Stream_Subscribe $streamSubscribe */
-            foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
-                if (!$streamChannelIsValid || !$this->_isSubscribeAllowed($streamSubscribe)) {
-                    $this->_stopStream($streamSubscribe);
+                /** @var CM_Model_Stream_Subscribe $streamSubscribe */
+                foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
+                    if (!$streamChannelIsValid || !$this->_isSubscribeAllowed($streamSubscribe)) {
+                        $this->_stopStream($streamSubscribe);
+                    }
                 }
             }
         }
@@ -56,10 +58,15 @@ abstract class CM_MediaStreams_Service extends CM_Class_Abstract implements CM_T
     /**
      * @param CM_Model_Stream_Publish $streamPublish
      * @return bool
+     * @throws CM_Exception_Invalid
      */
     protected function _isPublishAllowed(CM_Model_Stream_Publish $streamPublish) {
+        /** @var CM_Model_StreamChannel_Media|CM_StreamChannel_DisallowInterface $streamChannel */
+        $streamChannel = $streamPublish->getStreamChannel();
+        if (!$streamChannel instanceof CM_StreamChannel_DisallowInterface) {
+            throw new CM_Exception_Invalid('Streamchannel does not disallow client-connections', ['streamChannel' => $streamChannel]);
+        }
         if ($streamPublish->getAllowedUntil() < time()) {
-            $streamChannel = $streamPublish->getStreamChannel();
             $canPublishUntil = $streamChannel->canPublish($streamPublish->getUser(), $streamPublish->getAllowedUntil());
             $streamPublish->setAllowedUntil($canPublishUntil);
             if ($streamPublish->getAllowedUntil() < time()) {
@@ -72,10 +79,15 @@ abstract class CM_MediaStreams_Service extends CM_Class_Abstract implements CM_T
     /**
      * @param CM_Model_Stream_Subscribe $streamSubscribe
      * @return bool
+     * @throws CM_Exception_Invalid
      */
     protected function _isSubscribeAllowed(CM_Model_Stream_Subscribe $streamSubscribe) {
+        /** @var CM_Model_StreamChannel_Media|CM_StreamChannel_DisallowInterface $streamChannel */
+        $streamChannel = $streamSubscribe->getStreamChannel();
+        if (!$streamChannel instanceof CM_StreamChannel_DisallowInterface) {
+            throw new CM_Exception_Invalid('Streamchannel does not disallow client-connections', ['streamChannel' => $streamChannel]);
+        }
         if ($streamSubscribe->getAllowedUntil() < time()) {
-            $streamChannel = $streamSubscribe->getStreamChannel();
             $canSubscribeUntil = $streamChannel->canSubscribe($streamSubscribe->getUser(), $streamSubscribe->getAllowedUntil());
             $streamSubscribe->setAllowedUntil($canSubscribeUntil);
             if ($streamSubscribe->getAllowedUntil() < time()) {
