@@ -1,1 +1,1 @@
-node tools/build.js --features "core settle cancel timers race"
+node tools/build.js --features "core settle timers race"
