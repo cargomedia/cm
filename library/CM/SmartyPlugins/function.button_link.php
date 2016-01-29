@@ -68,35 +68,24 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
         }
     }
 
-    $onclick = false;
-    if (isset($params['onclick'])) {
-        $onclick = $params['onclick'];
-        unset($params['onclick']);
-    }
-    if (isset($params['page'])) {
-        $onclick .= ' cm.router.route(\'' . smarty_function_linkUrl($params, $template) . '\');';
-    }
-
-    if ($onclick) {
-        $attrs .= ' onclick="' . CM_Util::htmlspecialchars($onclick) . '"';
-    }
-
-    $link = false;
-    if (isset($params['href'])) {
-        $link = $params['href'];
-        $attrs .= ' href="' . CM_Util::htmlspecialchars($link) . '"';
-    }
-
     if (isset($params['data'])) {
         foreach ($params['data'] as $name => $value) {
             $attrs .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
         }
+        unset($params['data']);
+    }
+
+    $href = false;
+    if (isset($params['href'])) {
+        $href = $params['href'];
+    } elseif (isset($params['page'])) {
+        $href = smarty_function_linkUrl($params, $template);
     }
 
     $html = '';
 
-    if ($link) {
-        $html .= '<a';
+    if ($href) {
+        $html .= '<a href="' . CM_Util::htmlspecialchars($href) . '"';
     } else {
         $html .= '<button type="button" value="' . $label . '"';
     }
@@ -113,7 +102,7 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
         $html .= $iconMarkup;
     }
 
-    if ($link) {
+    if ($href) {
         $html .= '</a>';
     } else {
         $html .= '</button>';
