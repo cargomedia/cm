@@ -54,7 +54,6 @@ class CMTest_TH {
 
     public static function timeForward($sec) {
         self::$timeDelta += $sec;
-        self::clearCache();
     }
 
     public static function timeDaysForward($days) {
@@ -63,7 +62,6 @@ class CMTest_TH {
 
     public static function timeReset() {
         self::$timeDelta = 0;
-        self::clearCache();
     }
 
     public static function timeDelta() {
