@@ -13,10 +13,7 @@ var CM_App = CM_Class_Abstract.extend({
   options: {},
 
   ready: function() {
-    Promise.config({
-      cancellation: true,
-      warnings: cm.options.debug
-    });
+    this.promise.ready();
     this.error.ready();
     this.dom.ready();
     this.window.ready();
@@ -231,6 +228,20 @@ var CM_App = CM_Class_Abstract.extend({
     }
     path += '/' + this.getSiteId();
     return this.getUrl(path, null, true);
+  },
+
+  promise: {
+    ready: function() {
+      var promiseConfig = {cancellation: true};
+      if (cm.options.debug) {
+        promiseConfig['warnings'] = {
+          wForgottenReturn: false
+        };
+      } else {
+        promiseConfig['warnings'] = false;
+      }
+      Promise.config(promiseConfig);
+    }
   },
 
   error: {
