@@ -837,13 +837,13 @@ var CM_App = CM_Class_Abstract.extend({
             } else {
               reject(new CM_Exception_RequestFailed(cm.language.get('No Internet connection')));
             }
+          } else {
+            var msg = cm.language.get('An unexpected connection problem occurred.');
+            if (cm.options.debug) {
+              msg = xhr.responseText || textStatus;
+            }
+            reject(new CM_Exception(msg));
           }
-
-          var msg = cm.language.get('An unexpected connection problem occurred.');
-          if (cm.options.debug) {
-            msg = xhr.responseText || textStatus;
-          }
-          reject(new CM_Exception(msg));
         });
       onCancel(function() {
         if (jqXHR) {
