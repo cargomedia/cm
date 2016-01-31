@@ -49,9 +49,7 @@
       if (options.queue && promise && promise.isPending()) {
         var args = arguments;
         var self = this;
-        promise = promise.then(function() {
-          return fn.apply(self, args);
-        }).catch(function() {
+        promise = promise.finally(function() {
           return fn.apply(self, args);
         });
       }
