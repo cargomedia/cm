@@ -12,9 +12,6 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $mockHandleRecord->set(function (CM_Log_Record $record) use ($expectedRecord) {
             $this->assertSame($expectedRecord, $record);
         });
-
-        $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
-        $this->assertSame(1, $mockHandleRecord->getCallCount());
     }
 
     public function testHandlerBubbling() {
