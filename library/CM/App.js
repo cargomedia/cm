@@ -266,6 +266,15 @@ var CM_App = CM_Class_Abstract.extend({
 
     /**
      * @param {Error} error
+     */
+    log: function(error) {
+      _.defer(function() {
+        throw error;
+      });
+    },
+
+    /**
+     * @param {Error} error
      * @throws Error
      */
     _globalHandler: function(error) {
