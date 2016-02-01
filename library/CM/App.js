@@ -13,6 +13,7 @@ var CM_App = CM_Class_Abstract.extend({
   options: {},
 
   ready: function() {
+    this.promise.ready();
     this.error.ready();
     this.dom.ready();
     this.window.ready();
@@ -50,8 +51,8 @@ var CM_App = CM_Class_Abstract.extend({
       return view;
     }
     return _.find(this.views, function(view) {
-      return view.hasClass(className);
-    }) || null;
+        return view.hasClass(className);
+      }) || null;
   },
 
   /**
@@ -227,6 +228,20 @@ var CM_App = CM_Class_Abstract.extend({
     }
     path += '/' + this.getSiteId();
     return this.getUrl(path, null, true);
+  },
+
+  promise: {
+    ready: function() {
+      var promiseConfig = {cancellation: true};
+      if (cm.options.debug) {
+        promiseConfig['warnings'] = {
+          wForgottenReturn: false
+        };
+      } else {
+        promiseConfig['warnings'] = false;
+      }
+      Promise.config(promiseConfig);
+    }
   },
 
   error: {
@@ -796,7 +811,7 @@ var CM_App = CM_Class_Abstract.extend({
     var self = this;
     var jqXHR;
 
-    return new Promise(function(resolve, reject) {
+    var ajaxPromise = new Promise(function(resolve, reject, onCancel) {
       jqXHR = $.ajax(url, {
         data: JSON.stringify(data),
         type: 'POST',
@@ -818,25 +833,25 @@ var CM_App = CM_Class_Abstract.extend({
         .fail(function(xhr, textStatus) {
           if (xhr.status === 0) {
             if (window.navigator.onLine) {
-              reject(Promise.CancellationError());
+              ajaxPromise.cancel();
             } else {
               reject(new CM_Exception_RequestFailed(cm.language.get('No Internet connection')));
             }
+          } else {
+            var msg = cm.language.get('An unexpected connection problem occurred.');
+            if (cm.options.debug) {
+              msg = xhr.responseText || textStatus;
+            }
+            reject(new CM_Exception(msg));
           }
-
-          var msg = cm.language.get('An unexpected connection problem occurred.');
-          if (cm.options.debug) {
-            msg = xhr.responseText || textStatus;
-          }
-          reject(new CM_Exception(msg));
         });
-    }).cancellable()
-      .catch(Promise.CancellationError, function(error) {
+      onCancel(function() {
         if (jqXHR) {
           jqXHR.abort();
         }
-        throw error;
       });
+    });
+    return ajaxPromise;
   },
 
   /**

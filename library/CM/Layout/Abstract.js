@@ -16,8 +16,10 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     layout._chargeSpinnerTimeout();
 
     return this.ajaxModal('loadPage', {path: path})
-      .then(function(response) {
+      .finally(function() {
         layout._clearSpinnerTimeout();
+      })
+      .then(function(response) {
         if (response.redirectExternal) {
           cm.router.route(response.redirectExternal);
           return;
@@ -36,7 +38,6 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
         return view;
       })
       .catch(function(error) {
-        layout._clearSpinnerTimeout();
         if (!(error instanceof Promise.CancellationError)) {
           layout._errorPagePlaceholder(error);
           layout._onPageError();
