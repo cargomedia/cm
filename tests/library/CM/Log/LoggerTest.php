@@ -17,6 +17,93 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $this->assertSame(1, $mockHandleRecord->getCallCount());
     }
 
+    public function testHandlerBubbling() {
+        $mockLogHandlerFoo = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
+        $mockLogHandlerBar = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
+        $mockHandleRecordFoo = $mockLogHandlerFoo->mockMethod('handleRecord');
+        $mockHandleRecordBar = $mockLogHandlerBar->mockMethod('handleRecord');
+
+        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandlerFoo, $mockLogHandlerBar]);
+
+        $mockLogHandlerFoo->mockMethod('isBubbling')->set(true);
+        $mockLogHandlerBar->mockMethod('isBubbling')->set(true);
+        $mockLogHandlerFoo->mockMethod('isHandling')->set(true);
+        $mockLogHandlerBar->mockMethod('isHandling')->set(true);
+        $expectedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
+        $logger->addRecord($expectedRecord);
+        $this->assertSame(1, $mockHandleRecordFoo->getCallCount());
+        $this->assertSame(1, $mockHandleRecordBar->getCallCount());
+    }
+
+    public function testHandlerNotBubbling() {
+        $mockLogHandlerFoo = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
+        $mockLogHandlerBar = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
+        $mockHandleRecordFoo = $mockLogHandlerFoo->mockMethod('handleRecord');
+        $mockHandleRecordBar = $mockLogHandlerBar->mockMethod('handleRecord');
+
+        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandlerFoo, $mockLogHandlerBar]);
+
+        $mockLogHandlerFoo->mockMethod('isBubbling')->set(false);
+        $mockLogHandlerBar->mockMethod('isBubbling')->set(false);
+        $mockLogHandlerFoo->mockMethod('isHandling')->set(true);
+        $mockLogHandlerBar->mockMethod('isHandling')->set(true);
+        $expectedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
+        $logger->addRecord($expectedRecord);
+        $this->assertSame(1, $mockHandleRecordFoo->getCallCount());
+        $this->assertSame(0, $mockHandleRecordBar->getCallCount());
+    }
+
+    public function testHandlerNotBubblingWithNotHandledLevel() {
+        $mockLogHandlerFoo = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
+        $mockLogHandlerBar = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
+        $mockHandleRecordFoo = $mockLogHandlerFoo->mockMethod('handleRecord');
+        $mockHandleRecordBar = $mockLogHandlerBar->mockMethod('handleRecord');
+
+        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandlerFoo, $mockLogHandlerBar]);
+
+        $mockLogHandlerFoo->mockMethod('isBubbling')->set(false);
+        $mockLogHandlerBar->mockMethod('isBubbling')->set(false);
+        $mockLogHandlerFoo->mockMethod('isHandling')->set(false);
+        $mockLogHandlerBar->mockMethod('isHandling')->set(false);
+        $expectedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
+        $logger->addRecord($expectedRecord);
+        $this->assertSame(1, $mockHandleRecordFoo->getCallCount());
+        $this->assertSame(1, $mockHandleRecordBar->getCallCount());
+    }
+
+    public function testHandlerBubblingForcedOnError() {
+        $mockLogHandlerFoo = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
+        $mockLogHandlerBar = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
+        $mockLogHandlerFooBar = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
+        $mockHandleRecordFoo = $mockLogHandlerFoo->mockMethod('handleRecord');
+        $mockHandleRecordBar = $mockLogHandlerBar->mockMethod('handleRecord');
+        $mockHandleRecordFooBar = $mockLogHandlerFooBar->mockMethod('handleRecord');
+
+        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerFooBar]);
+
+        $mockLogHandlerFoo->mockMethod('isBubbling')->set(false);
+        $mockLogHandlerBar->mockMethod('isBubbling')->set(false);
+        $mockLogHandlerFooBar->mockMethod('isBubbling')->set(false);
+        $mockLogHandlerFoo->mockMethod('isHandling')->set(true);
+        $mockLogHandlerBar->mockMethod('isHandling')->set(true);
+        $mockLogHandlerFooBar->mockMethod('isHandling')->set(true);
+
+        $mockHandleRecordFoo->set(function () {
+            throw new Exception('handler failed.');
+        });
+
+        $expectedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
+        try {
+            $logger->addRecord($expectedRecord);
+            $this->fail('CM_Log_HandlingException not thrown.');
+        } catch (CM_Log_HandlingException $e) {
+            $this->assertSame('1 handler(s) failed to process a record.', $e->getMessage());
+        }
+        $this->assertSame(1, $mockHandleRecordFoo->getCallCount());
+        $this->assertSame(1, $mockHandleRecordBar->getCallCount());
+        $this->assertSame(0, $mockHandleRecordFooBar->getCallCount());
+    }
+
     public function testLoggingWithContext() {
         $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
         $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
@@ -121,15 +208,13 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
 
         try {
             $logger->info('test');
+            $this->fail('CM_Log_HandlingException not thrown.');
         } catch (CM_Log_HandlingException $e) {
             $exceptionList = $e->getExceptionList();
             $this->assertSame('2 handler(s) failed to process a record.', $e->getMessage());
             $this->assertSame('exception from foo', $exceptionList[0]->getMessage());
             $this->assertSame('exception from bar', $exceptionList[1]->getMessage());
-            return;
         }
-
-        $this->fail('CM_Log_HandlingException exception not caught.');
     }
 
     public function testLogException() {

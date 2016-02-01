@@ -243,6 +243,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Log_Logger
+     */
+    public function getLogger() {
+        return $this->get('logger', 'CM_Log_Logger');
+    }
+
+    /**
      * @param string $serviceName
      * @throws CM_Exception_Invalid
      * @return mixed
