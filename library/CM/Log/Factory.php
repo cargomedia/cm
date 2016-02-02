@@ -17,16 +17,18 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
     }
 
     /**
+     * @param boolean|null $isCli
      * @return CM_Log_Logger
      */
-    public function createBackupLogger() {
-        if (CM_Bootloader::getInstance()->isCli()) {
+    public function createBackupLogger($isCli = null) {
+        if (true === $isCli) {
             $formatter = new CM_Log_Formatter_Text('{levelname}: {message}');
             $stream = new CM_OutputStream_Stream_StandardError();
         } else {
             $formatter = new CM_Log_Formatter_Html();
             $stream = new CM_OutputStream_Stream_Output();
         }
+
         $handlers = [new CM_Log_Handler_Stream($stream, $formatter, CM_Log_Logger::WARNING, false)];
         if ($this->getServiceManager()->has('logger-file-error')) {
             $handlers[] = $this->getServiceManager()->get('logger-file-error', 'CM_Log_Handler_Stream');
