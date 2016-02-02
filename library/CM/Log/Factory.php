@@ -4,6 +4,9 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
 
+    /** @var boolean|null */
+    private $_isCli = null;
+
     /**
      * @param string[] $handlerList
      * @return CM_Log_Logger
@@ -17,11 +20,10 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * @param boolean|null $isCli
      * @return CM_Log_Logger
      */
-    public function createBackupLogger($isCli = null) {
-        if (true === $isCli) {
+    public function createBackupLogger() {
+        if (true === $this->_isCli) {
             $formatter = new CM_Log_Formatter_Text('{levelname}: {message}');
             $stream = new CM_OutputStream_Stream_StandardError();
         } else {
@@ -34,6 +36,13 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
             $handlers[] = $this->getServiceManager()->get('logger-handler-file-error', 'CM_Log_Handler_Stream');
         }
         return $this->_getLogger($handlers);
+    }
+
+    /**
+     * @param boolean $isCli
+     */
+    public function setIsCli($isCli) {
+        $this->_isCli = (bool) $isCli;
     }
 
     /**

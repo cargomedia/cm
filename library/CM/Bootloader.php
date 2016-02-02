@@ -62,6 +62,9 @@ class CM_Bootloader {
 
             $logFactory = new CM_Log_Factory();
             $logFactory->setServiceManager($serviceManager);
+            if ($this->isCli()) {
+                $logFactory->setIsCli(true);
+            }
 
             $exceptionHandler = new CM_ExceptionHandling_Handler($logFactory);
             $exceptionHandler->setServiceManager($serviceManager);

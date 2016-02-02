@@ -103,6 +103,6 @@ class CM_ExceptionHandling_Handler implements CM_Service_ManagerAwareInterface {
      * @return CM_Log_Logger
      */
     protected function _getBackupLogger() {
-        return $this->_loggerFactory->createBackupLogger(CM_Bootloader::getInstance()->isCli());
+        return $this->_loggerFactory->createBackupLogger();
     }
 }
