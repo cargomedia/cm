@@ -5,18 +5,17 @@ abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterfac
     /** @var int */
     protected $_levelMin;
 
-    /** @var  bool */
+    /** @var bool */
     protected $_bubble;
 
     /**
      * @param int|null  $levelMin
-     * @param bool|null $bubble
+     * @param bool|null $stopPropagation
      */
-    public function __construct($levelMin = null, $bubble = null) {
+    public function __construct($levelMin = null, $stopPropagation = null) {
         $levelMin = null === $levelMin ? CM_Log_Logger::DEBUG : (int) $levelMin;
-        $bubble = null === $bubble ? true : (bool) $bubble;
+        $this->_bubble = null === $stopPropagation ? true : !(bool) $stopPropagation;
 
-        $this->_bubble = $bubble;
         $this->setLevelMin($levelMin);
     }
 
