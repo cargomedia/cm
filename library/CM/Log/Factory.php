@@ -30,8 +30,8 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
         }
 
         $handlers = [new CM_Log_Handler_Stream($stream, $formatter, CM_Log_Logger::WARNING, false)];
-        if ($this->getServiceManager()->has('logger-file-error')) {
-            $handlers[] = $this->getServiceManager()->get('logger-file-error', 'CM_Log_Handler_Stream');
+        if ($this->getServiceManager()->has('logger-handler-file-error')) {
+            $handlers[] = $this->getServiceManager()->get('logger-handler-file-error', 'CM_Log_Handler_Stream');
         }
         return $this->_getLogger($handlers);
     }
