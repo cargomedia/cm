@@ -47,9 +47,9 @@ class CM_Log_Logger {
     public function addRecord(CM_Log_Record $record) {
         $exceptionList = [];
         foreach ($this->_handlerList as $handler) {
+            $handlerFailed = false;
             try {
                 $handler->handleRecord($record);
-                $handlerFailed = false;
             } catch (Exception $e) {
                 $exceptionList[] = $e;
                 $handlerFailed = true;
