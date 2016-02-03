@@ -95,7 +95,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $expectedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
         try {
             $logger->addRecord($expectedRecord);
-            $this->fail('CM_Log_HandlingException not thrown.');
+            $this->fail('CM_Log_HandlingException was not thrown.');
         } catch (CM_Log_HandlingException $e) {
             $this->assertSame('1 handler(s) failed to process a record.', $e->getMessage());
         }
@@ -193,7 +193,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $this->assertSame(5, $mockHandleRecord->getCallCount());
     }
 
-    public function testHandlingException() {
+    public function testProcessingHandlerException() {
         $mockLogHandlerFoo = $this->mockClass('CM_Log_Handler_Abstract')->newInstance();
         $mockLogHandlerFoo->mockMethod('handleRecord')->set(function () {
             throw new Exception('exception from foo');
@@ -204,7 +204,13 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
             throw new Exception('exception from bar');
         });
 
-        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandlerFoo, $mockLogHandlerBar]);
+        $mockLogHandlerBaz = $this->mockClass('CM_Log_Handler_Abstract')->newInstance();
+        $mockHandlerBaz = $mockLogHandlerBaz->mockMethod('handleRecord')->set(function (CM_Log_Record $record) {
+            $this->assertSame('test', $record->getMessage());
+            $this->assertSame(CM_Log_Logger::INFO, $record->getLevel());
+        });
+
+        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerBaz]);
 
         try {
             $logger->info('test');
@@ -214,6 +220,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
             $this->assertSame('2 handler(s) failed to process a record.', $e->getMessage());
             $this->assertSame('exception from foo', $exceptionList[0]->getMessage());
             $this->assertSame('exception from bar', $exceptionList[1]->getMessage());
+            $this->assertSame(1, $mockHandlerBaz->getCallCount());
         }
     }
 
