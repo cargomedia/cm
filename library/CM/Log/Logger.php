@@ -90,26 +90,18 @@ class CM_Log_Logger {
 
     /**
      * @param CM_Log_Handler_HandlerInterface[] $handlerList
-     * @param bool|null                         $prepend
      */
-    public function addHandlers(array $handlerList, $prepend = null) {
-        $prepend = null === $prepend ? false : (bool) $prepend;
+    public function addHandlers(array $handlerList) {
         foreach ($handlerList as $handler) {
-            $this->addHandler($handler, $prepend);
+            $this->addHandler($handler);
         }
     }
 
     /**
      * @param CM_Log_Handler_HandlerInterface $handler
-     * @param bool|null                       $prepend
      */
-    public function addHandler(CM_Log_Handler_HandlerInterface $handler, $prepend = null) {
-        $prepend = null === $prepend ? false : (bool) $prepend;
-        if ($prepend) {
-            array_unshift($this->_handlerList, $handler);
-        } else {
-            $this->_handlerList[] = $handler;
-        }
+    public function addHandler(CM_Log_Handler_HandlerInterface $handler) {
+        $this->_handlerList[] = $handler;
     }
 
     /**
