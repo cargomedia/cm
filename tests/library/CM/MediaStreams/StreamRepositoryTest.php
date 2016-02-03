@@ -25,4 +25,23 @@ class CM_MediaStreams_StreamRepositoryTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertSame('Channel archive with mediaId `' . $mediaId . '` already exists', $exception->getMessage());
     }
+
+    public function testRemoveStreamChannel() {
+        $streamSubscribe = $this->mockObject();
+        $streamSubscribe->mockMethod('delete');
+        $streamPublish = $this->mockObject();
+        $streamPublish->mockMethod('delete');
+
+        $streamChannel = $this->mockClass('CM_Model_StreamChannel_Abstract')->newInstanceWithoutConstructor();
+        $streamChannel->mockMethod('delete');
+        $streamChannel->mockMethod('getStreamSubscribes')->set([$streamSubscribe]);
+        $streamChannel->mockMethod('getStreamPublishs')->set([$streamPublish]);
+
+        $streamRepository = new CM_MediaStreams_StreamRepository(1);
+        $streamRepository->removeStreamChannel($streamChannel);
+
+        $this->assertSame(1, $streamSubscribe->mockMethod('delete')->getCallCount());
+        $this->assertSame(1, $streamPublish->mockMethod('delete')->getCallCount());
+        $this->assertSame(1, $streamChannel->mockMethod('delete')->getCallCount());
+    }
 }
