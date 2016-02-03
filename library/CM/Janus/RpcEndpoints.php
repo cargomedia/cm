@@ -178,6 +178,27 @@ class CM_Janus_RpcEndpoints {
     }
 
     /**
+     * @param string $serverKey
+     * @return bool
+     * @throws CM_Exception_AuthFailed
+     */
+    public static function rpc_removeAllStreams($serverKey) {
+        $janus = CM_Service_Manager::getInstance()->getJanus('janus');
+        self::_authenticate($janus, $serverKey);
+
+        $server = $janus->getConfiguration()->findServerByKey($serverKey);
+
+        $streamRepository = $janus->getStreamRepository();
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
+        foreach ($streamRepository->getStreamChannels() as $streamChannel) {
+            if ($streamChannel->getServerId() === $server->getId()) {
+                $streamRepository->removeStreamChannel($streamChannel);
+            }
+        }
+        return true;
+    }
+
+    /**
      * @param CM_Janus_Service $janus
      * @param string           $serverKey
      * @throws CM_Exception_AuthFailed
