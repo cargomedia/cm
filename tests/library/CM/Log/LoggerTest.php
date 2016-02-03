@@ -217,7 +217,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         }
     }
 
-    public function testLogException() {
+    public function testHandleException() {
         $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
         $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
 

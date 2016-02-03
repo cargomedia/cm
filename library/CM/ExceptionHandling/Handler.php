@@ -69,7 +69,7 @@ class CM_ExceptionHandling_Handler implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * Implemented for retro compatibility
+     * @deprecated Left for temp backward compatibility with sk
      * @param Exception $exception
      */
     public function logException(Exception $exception) {

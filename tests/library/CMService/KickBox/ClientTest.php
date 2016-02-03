@@ -54,17 +54,17 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
     }
 
     public function testHandleExceptionNoCredits() {
-        $kickBoxMock = $this->getMock('CMService_KickBox_Client', array('_getResponse', '_logException'), array('', true, false, 0));
+        $kickBoxMock = $this->getMock('CMService_KickBox_Client', array('_getResponse', '_handleException'), array('', true, false, 0));
         $exception = new Exception('No credits');
         $kickBoxMock->expects($this->once())->method('_getResponse')->will($this->throwException($exception));
-        $kickBoxMock->expects($this->once())->method('_logException')->with($exception);
+        $kickBoxMock->expects($this->once())->method('_handleException')->with($exception);
         /** @var CMService_KickBox_Client $kickBoxMock */
         $kickBoxMock->isValid('test@example.com');
     }
 
     public function testHandleInvalidResponseCodeNoCredits() {
         $responseMock = new \Kickbox\HttpClient\Response(array('result' => 'unknown'), 403, array('header' => 'value'));
-        $kickBoxMock = $this->getMock('CMService_KickBox_Client', array('_getResponse', '_logException'), array('', true, false, 0));
+        $kickBoxMock = $this->getMock('CMService_KickBox_Client', array('_getResponse', '_handleException'), array('', true, false, 0));
         $kickBoxMock->expects($this->once())->method('_getResponse')->will($this->returnValue($responseMock));
         $exception = new CM_Exception('Invalid KickBox email validation response', null, [
             'email'   => 'test@example.com',
@@ -72,15 +72,15 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
             'headers' => array('header' => 'value'),
             'body'    => array('result' => 'unknown'),
         ]);
-        $kickBoxMock->expects($this->once())->method('_logException')->with($exception);
+        $kickBoxMock->expects($this->once())->method('_handleException')->with($exception);
         /** @var CMService_KickBox_Client $kickBoxMock */
         $kickBoxMock->isValid('test@example.com');
     }
 
-    public function testLogExceptionTimeout() {
+    public function testHandleExceptionTimeout() {
         $kickBoxMock = $this->mockObject('CMService_KickBox_Client', array('', true, false, 0));
         $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler')->newInstanceWithoutConstructor();
-        $printException = $exceptionHandlerMock->mockMethod('logException');
+        $printException = $exceptionHandlerMock->mockMethod('handleException');
         $exceptionHandler = CM_Bootloader::getInstance()->getExceptionHandler();
         /** @var CM_ExceptionHandling_Handler $exceptionHandlerMock */
         CM_Bootloader::getInstance()->setExceptionHandler($exceptionHandlerMock);
@@ -108,14 +108,14 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
         CM_Bootloader::getInstance()->setExceptionHandler($exceptionHandler);
     }
 
-    public function testLogExceptionOther() {
+    public function testHandleExceptionOther() {
         $kickBoxMock = $this->mockObject('CMService_KickBox_Client', array('', true, false, 0));
         $exceptionMessage = '[curl] 6: Couldn\'t resolve host \'api.kickbox.io\' [url] https://api.kickbox.io/v1/verify?email=testLogExceptionOther%40example.com';
         $kickBoxMock->mockMethod('_getResponse')->set(function () use ($exceptionMessage) {
             throw new RuntimeException($exceptionMessage);
         });
         $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler')->newInstanceWithoutConstructor();
-        $printException = $exceptionHandlerMock->mockMethod('logException')->set(function (Exception $exception) {
+        $printException = $exceptionHandlerMock->mockMethod('handleException')->set(function (Exception $exception) {
             $this->assertTrue('RuntimeException' === get_class($exception));
         });
         $exceptionHandler = CM_Bootloader::getInstance()->getExceptionHandler();
