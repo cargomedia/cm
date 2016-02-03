@@ -10,9 +10,9 @@ class CM_Log_HandlingException extends CM_Exception {
      * @param Exception[] $exceptionList
      */
     public function __construct($message = null, array $exceptionList) {
-        $message = (string) $message;
+        $message = null !== $message ? (string) $message : null;
         $this->_exceptionList = $exceptionList;
-        parent::__construct((string) $message, CM_Exception::ERROR);
+        parent::__construct($message, CM_Exception::ERROR);
     }
 
     /**
