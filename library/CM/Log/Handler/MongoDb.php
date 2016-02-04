@@ -18,11 +18,11 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
      * @param string   $collection
      * @param int|null $recordTtl Time To Live in seconds
      * @param array    $insertOptions
-     * @param int|null $levelMin
+     * @param int|null $level
      * @throws CM_Exception_Invalid
      */
-    public function __construct($collection, $recordTtl = null, array $insertOptions = null, $levelMin = null) {
-        parent::__construct($levelMin);
+    public function __construct($collection, $recordTtl = null, array $insertOptions = null, $level = null) {
+        parent::__construct($level);
         $this->_collection = (string) $collection;
         $this->_mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $this->_recordTtl = null !== $recordTtl ? (int) $recordTtl : 3600 * 24 * 60;
