@@ -249,10 +249,9 @@ return function (CM_Config_Node $config) {
     $config->services['logger-handler-stream-stderr'] = [
         'class'  => 'CM_Log_Handler_Factory',
         'method' => [
-            'name'      => 'createStreamHandler',
+            'name'      => 'createStderrHandler',
             'arguments' => [
-                'streamClass' => 'CM_OutputStream_Stream_StandardError',
-                'level'       => CM_Log_Logger::ERROR,
+                'level' => CM_Log_Logger::ERROR,
             ],
         ],
     ];
