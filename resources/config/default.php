@@ -245,18 +245,6 @@ return function (CM_Config_Node $config) {
         ),
     );
 
-    //handler for backup logger
-    $config->services['logger-handler-file-error'] = [
-        'class'  => 'CM_Log_Handler_Factory',
-        'method' => [
-            'name'      => 'createFileHandler',
-            'arguments' => [
-                'path'  => 'logs/error.log',
-                'level' => CM_Log_Logger::WARNING,
-            ],
-        ],
-    ];
-
     //fallback handler (last in the queue)
     $config->services['logger-handler-stream-stderr'] = [
         'class'  => 'CM_Log_Handler_Factory',
