@@ -2,13 +2,6 @@
 
 class CM_Log_Formatter_Html extends CM_Log_Formatter_Text {
 
-    public function _getDefaults() {
-        return [
-            'formatMessage' => '<h1>{message}</h1><span>{fqdn} - PHP {phpVersion}</span>',
-            'formatDate'    => 'c',
-        ];
-    }
-
     public function renderContext(CM_Log_Record $record) {
         $contextText = parent::renderContext($record);
         if (null !== $contextText) {
@@ -29,13 +22,20 @@ class CM_Log_Formatter_Html extends CM_Log_Formatter_Text {
         return $exceptionText;
     }
 
+    protected function _getDefaults() {
+        return [
+            'formatMessage' => '<h1>{message}</h1><span>{fqdn} - PHP {phpVersion}</span>',
+            'formatDate'    => 'c',
+        ];
+    }
+
     /**
      * @param string $text
      * @param array  $data
      * @return string
      */
     protected function _format($text, array $data) {
-        $data = \Functional\map($data, function($value){
+        $data = \Functional\map($data, function ($value) {
             return CM_Util::htmlspecialchars($value);
         });
         return parent::_format($text, $data);

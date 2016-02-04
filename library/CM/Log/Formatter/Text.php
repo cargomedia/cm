@@ -2,13 +2,6 @@
 
 class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
 
-    public function _getDefaults() {
-        return [
-            'formatMessage' => '[{datetime} - {fqdn} - php {phpVersion} - {levelname}] {message}',
-            'formatDate'    => 'c',
-        ];
-    }
-
     public function renderMessage(CM_Log_Record $record) {
         return $this->_format($this->_formatMessage, $this->_getRecordInfo($record));
     }
@@ -80,5 +73,12 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
             $dataText[] = sprintf($format, $key, $value);
         }
         return implode(PHP_EOL, $dataText);
+    }
+
+    protected function _getDefaults() {
+        return [
+            'formatMessage' => '[{datetime} - {fqdn} - php {phpVersion} - {levelname}] {message}',
+            'formatDate'    => 'c',
+        ];
     }
 }
