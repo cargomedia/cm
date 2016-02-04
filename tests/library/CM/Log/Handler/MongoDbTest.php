@@ -6,9 +6,14 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         CMTest_TH::clearEnv();
     }
 
+    public function testConstructor() {
+        $handler = new CM_Log_Handler_MongoDb('foo');
+        $this->assertInstanceOf('CM_Log_Handler_MongoDb', $handler);
+    }
+
     public function testFailWithWrongCollection() {
         $exception = $this->catchException(function () {
-            new CM_Log_Handler_MongoDb('badCollection');
+            new CM_Log_Handler_MongoDb('badCollection', 1000);
         });
 
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);

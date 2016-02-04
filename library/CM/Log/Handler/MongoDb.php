@@ -6,7 +6,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
     protected $_collection;
 
     /** @var int|null */
-    protected $_recordTtl;
+    protected $_recordTtl = null;
 
     /** @var  CM_MongoDb_Client */
     protected $_mongoDb;
@@ -25,13 +25,15 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         parent::__construct($level);
         $this->_collection = (string) $collection;
         $this->_mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $this->_recordTtl = null !== $recordTtl ? (int) $recordTtl : null;
-        $this->_insertOptions = null !== $insertOptions ? $insertOptions : ['w' => 0];
+        if (null !== $recordTtl) {
+            $this->_recordTtl = (int) $recordTtl;
+            if ($this->_recordTtl <= 0) {
+                throw new CM_Exception_Invalid('TTL should be positive value');
+            }
+        };
 
+        $this->_insertOptions = null !== $insertOptions ? $insertOptions : ['w' => 0];
         $this->_validateCollection($this->_collection);
-        if ($this->_recordTtl <= 0) {
-            throw new CM_Exception_Invalid('TTL should be positive value');
-        }
     }
 
     /**
@@ -109,14 +111,15 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
      * @throws CM_Exception_Invalid
      */
     protected function _validateCollection($collection) {
-        $indexInfo = $this->_mongoDb->getIndexInfo($collection);
+        if (null !== $this->_recordTtl) {
+            $indexInfo = $this->_mongoDb->getIndexInfo($collection);
+            $foundIndex = \Functional\some($indexInfo, function ($el) {
+                return isset($el['key']['expireAt']) && isset($el['expireAfterSeconds']) && $el['expireAfterSeconds'] == 0;
+            });
 
-        $foundIndex = \Functional\some($indexInfo, function ($el) {
-            return isset($el['key']['expireAt']) && isset($el['expireAfterSeconds']) && $el['expireAfterSeconds'] == 0;
-        });
-
-        if (!$foundIndex) {
-            throw new CM_Exception_Invalid('MongoDb Collection `' . $collection . '` does not contain valid TTL index');
-        };
+            if (!$foundIndex) {
+                throw new CM_Exception_Invalid('MongoDb Collection `' . $collection . '` does not contain valid TTL index');
+            };
+        }
     }
 }
