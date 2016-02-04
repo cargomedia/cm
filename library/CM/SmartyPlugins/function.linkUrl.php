@@ -8,11 +8,11 @@ function smarty_function_linkUrl(array $params, Smarty_Internal_Template $templa
         trigger_error('Param `page` missing.');
     }
 
-    $strip = false;
-    if (!empty($params['strip']) && ($params['strip'] === true)) {
-        $strip = true;
+    $short = false;
+    if (!empty($params['short']) && ($params['short'] === true)) {
+        $short = true;
     }
-    unset($params['strip']);
+    unset($params['short']);
 
     if (!empty($params['params'])) {
         $params = array_merge($params, $params['params']);
@@ -24,8 +24,8 @@ function smarty_function_linkUrl(array $params, Smarty_Internal_Template $templa
 
     $url = $render->getUrlPage($page, $params);
 
-    if ($strip) {
-        $pattern = '/http.?:\/\/(www.)?/';
+    if ($short) {
+        $pattern = '#^https?://(www\.)?#';
         $url = preg_replace($pattern, '', $url);
     }
 
