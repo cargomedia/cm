@@ -5,7 +5,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
     /** @var  string */
     protected $_collection;
 
-    /** @var int */
+    /** @var int|null */
     protected $_recordTtl;
 
     /** @var  CM_MongoDb_Client */
@@ -25,7 +25,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         parent::__construct($level);
         $this->_collection = (string) $collection;
         $this->_mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $this->_recordTtl = null !== $recordTtl ? (int) $recordTtl : 3600 * 24 * 60;
+        $this->_recordTtl = null !== $recordTtl ? (int) $recordTtl : null;
         $this->_insertOptions = null !== $insertOptions ? $insertOptions : ['w' => 0];
 
         $this->_validateCollection($this->_collection);
@@ -57,8 +57,6 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         $request = $recordContext->getHttpRequest();
 
         $createdAt = $record->getCreatedAt();
-        $expireAt = clone $createdAt;
-        $expireAt->add(new DateInterval('PT' . $this->_recordTtl . 'S'));
 
         $formattedContext = [];
         if (null !== $computerInfo) {
@@ -90,13 +88,20 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             }
         }
 
-        return [
+        $formattedRecord = [
             'level'     => (int) $record->getLevel(),
             'message'   => (string) $record->getMessage(),
             'createdAt' => new MongoDate($createdAt->getTimestamp()),
-            'expireAt'  => new MongoDate($expireAt->getTimestamp()),
             'context'   => $formattedContext,
         ];
+
+        if (null !== $this->_recordTtl) {
+            $expireAt = clone $createdAt;
+            $expireAt->add(new DateInterval('PT' . $this->_recordTtl . 'S'));
+            $formattedRecord['expireAt'] = new MongoDate($expireAt->getTimestamp());
+        }
+
+        return $formattedRecord;
     }
 
     /**
