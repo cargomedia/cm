@@ -16,7 +16,7 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
         $handlers = \Functional\map($handlerList, function ($handlerService) {
             return $this->getServiceManager()->get($handlerService);
         });
-        return $this->_getLogger($handlers);
+        return $this->_createLogger($handlers);
     }
 
     /**
@@ -34,7 +34,7 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
         if ($this->getServiceManager()->has('logger-handler-file-error')) {
             $handlers[] = $this->getServiceManager()->get('logger-handler-file-error', 'CM_Log_Handler_Stream');
         }
-        return $this->_getLogger($handlers);
+        return $this->_createLogger($handlers);
     }
 
     /**
@@ -48,7 +48,7 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
      * @param CM_Log_Handler_HandlerInterface[] $handlers
      * @return CM_Log_Logger
      */
-    protected function _getLogger($handlers) {
+    protected function _createLogger($handlers) {
         $computerInfo = new CM_Log_Context_ComputerInfo(CM_Util::getFqdn(), phpversion());
         $globalContext = new CM_Log_Context(null, null, $computerInfo);
         return new CM_Log_Logger($globalContext, $handlers);
