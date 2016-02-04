@@ -245,15 +245,39 @@ return function (CM_Config_Node $config) {
         ),
     );
 
-    $config->services['logger-handler-stream-stderr'] = [
-        'class' => 'CM_Log_Handler_Factory',
+    //handler for backup logger
+    $config->services['logger-handler-file-error'] = [
+        'class'  => 'CM_Log_Handler_Factory',
         'method' => [
-            'name' => 'createStreamHandler',
+            'name'      => 'createFileHandler',
+            'arguments' => [
+                'path'  => 'logs/error.log',
+                'level' => CM_Log_Logger::WARNING,
+            ],
+        ],
+    ];
+
+    //fallback handler (last in the queue)
+    $config->services['logger-handler-stream-stderr'] = [
+        'class'  => 'CM_Log_Handler_Factory',
+        'method' => [
+            'name'      => 'createStreamHandler',
             'arguments' => [
                 'streamClass' => 'CM_OutputStream_Stream_StandardError',
-                'level' => CM_Log_Logger::ERROR
-            ]
-        ]
+                'level'       => CM_Log_Logger::ERROR,
+            ],
+        ],
+    ];
+
+    //general handler
+    $config->services['logger-handler-mongodb'] = [
+        'class'     => 'CM_Log_Handler_MongoDb',
+        'arguments' => [
+            'collection'    => 'cm_log',
+            'recordTtl'     => null,
+            'insertOptions' => null,
+            'level'         => CM_Log_Logger::INFO,
+        ],
     ];
 
     $config->services['logger'] = [
@@ -261,8 +285,8 @@ return function (CM_Config_Node $config) {
         'method' => [
             'name'      => 'createLogger',
             'arguments' => [
-                'handlerList' => ['logger-handler-stream-stderr'],
+                'handlerList' => ['logger-handler-mongodb', 'logger-handler-stream-stderr'],
             ],
-        ]
+        ],
     ];
 };

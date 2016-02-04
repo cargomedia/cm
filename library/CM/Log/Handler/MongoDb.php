@@ -42,7 +42,6 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
     protected function _writeRecord(CM_Log_Record $record) {
         /** @var array $formattedRecord */
         $formattedRecord = $this->_formatRecord($record);
-
         $this->_mongoDb->insert($this->_collection, $formattedRecord, $this->_insertOptions);
     }
 
@@ -101,6 +100,10 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             $expireAt = clone $createdAt;
             $expireAt->add(new DateInterval('PT' . $this->_recordTtl . 'S'));
             $formattedRecord['expireAt'] = new MongoDate($expireAt->getTimestamp());
+        }
+
+        if ($record instanceof CM_Log_Record_Exception) {
+            $formattedRecord['exception'] = $record->getException();
         }
 
         return $formattedRecord;
