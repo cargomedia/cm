@@ -3,7 +3,7 @@
 class CM_Log_Handler_Stream extends CM_Log_Handler_Abstract {
 
     /** @var  CM_Log_Formatter_Interface */
-    private $_formatter;
+    protected $_formatter;
 
     /** @var CM_OutputStream_Interface */
     protected $_stream;

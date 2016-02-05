@@ -245,13 +245,24 @@ return function (CM_Config_Node $config) {
         ),
     );
 
-    //fallback handler (last in the queue)
+    //cli handler
     $config->services['logger-handler-stream-stderr'] = [
         'class'  => 'CM_Log_Handler_Factory',
         'method' => [
             'name'      => 'createStderrHandler',
             'arguments' => [
-                'level' => CM_Log_Logger::ERROR,
+                'level' => CM_Log_Logger::WARNING,
+            ],
+        ],
+    ];
+
+    //http handler
+    $config->services['logger-handler-http'] = [
+        'class'  => 'CM_Log_Handler_Factory',
+        'method' => [
+            'name'      => 'createHttpHandler',
+            'arguments' => [
+                'level' => CM_Log_Logger::WARNING,
             ],
         ],
     ];
@@ -272,7 +283,7 @@ return function (CM_Config_Node $config) {
         'method' => [
             'name'      => 'createLogger',
             'arguments' => [
-                'handlerList' => ['logger-handler-mongodb', 'logger-handler-stream-stderr'],
+                'handlerList' => ['logger-handler-http', 'logger-handler-mongodb', 'logger-handler-stream-stderr'],
             ],
         ],
     ];
