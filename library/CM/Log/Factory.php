@@ -4,9 +4,6 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
 
-    /** @var boolean|null */
-    private $_isCli = null;
-
     /**
      * @param string[] $handlerList
      * @return CM_Log_Logger
@@ -30,13 +27,6 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
         $handlers[] = (new CM_Log_Handler_Factory())->createStderrHandler('{levelname}: {message}');
 
         return $this->_createLogger($handlers);
-    }
-
-    /**
-     * @param boolean $isCli
-     */
-    public function setIsCli($isCli) {
-        $this->_isCli = (bool) $isCli;
     }
 
     /**
