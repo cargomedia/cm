@@ -81,11 +81,12 @@ class CM_Log_Logger {
     /**
      * @param Exception           $exception
      * @param CM_Log_Context|null $context
+     * @param int|null            $type
      * @return CM_Log_Logger
      */
-    public function addException(Exception $exception, CM_Log_Context $context = null) {
+    public function addException(Exception $exception, CM_Log_Context $context = null, $type = null) {
         $context = $this->_mergeWithGlobalContext($context);
-        return $this->addRecord(new CM_Log_Record_Exception($exception, $context));
+        return $this->addRecord(new CM_Log_Record_Exception($exception, $context, $type));
     }
 
     /**
