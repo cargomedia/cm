@@ -81,7 +81,7 @@ class CM_ExceptionHandling_Handler implements CM_Service_ManagerAwareInterface {
      */
     public function handleException(Exception $exception) {
         try {
-            $this->getServiceManager()->getLogger()->addException($exception);
+            $this->getServiceManager()->getLogger()->addException($exception, null, CM_Paging_Log_Error::getTypeStatic());
         } catch (CM_Log_HandlingException $loggerException) {
             $backupLogger = $this->_getBackupLogger();
             $backupLogger
