@@ -245,29 +245,6 @@ return function (CM_Config_Node $config) {
         ),
     );
 
-    //cli handler
-    $config->services['logger-handler-stream-stderr'] = [
-        'class'  => 'CM_Log_Handler_Factory',
-        'method' => [
-            'name'      => 'createStderrHandler',
-            'arguments' => [
-                'level' => CM_Log_Logger::WARNING,
-            ],
-        ],
-    ];
-
-    //http handler
-    $config->services['logger-handler-http'] = [
-        'class'  => 'CM_Log_Handler_Factory',
-        'method' => [
-            'name'      => 'createHttpHandler',
-            'arguments' => [
-                'level' => CM_Log_Logger::WARNING,
-            ],
-        ],
-    ];
-
-    //general handler
     $config->services['logger-handler-mongodb'] = [
         'class'     => 'CM_Log_Handler_MongoDb',
         'arguments' => [
@@ -283,7 +260,7 @@ return function (CM_Config_Node $config) {
         'method' => [
             'name'      => 'createLogger',
             'arguments' => [
-                'handlerList' => ['logger-handler-http', 'logger-handler-mongodb', 'logger-handler-stream-stderr'],
+                'handlerList' => ['logger-handler-mongodb'],
             ],
         ],
     ];

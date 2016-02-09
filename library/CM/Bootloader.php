@@ -63,9 +63,12 @@ class CM_Bootloader {
             $logFactory = new CM_Log_Factory();
             $logFactory->setServiceManager($serviceManager);
 
-            $exceptionHandler = new CM_ExceptionHandling_Handler_Abstract($logFactory);
+            if ($this->isCli()) {
+                $exceptionHandler = new CM_ExceptionHandling_Handler_Cli($logFactory);
+            } else {
+                $exceptionHandler = new CM_ExceptionHandling_Handler_Http($logFactory);
+            }
             $exceptionHandler->setServiceManager($serviceManager);
-
             $this->_exceptionHandler = $exceptionHandler;
         }
         return $this->_exceptionHandler;
@@ -185,8 +188,8 @@ class CM_Bootloader {
 
         //handler for backup logger
         $serviceManager->register('logger-handler-file-error', 'CM_Log_Handler_Factory', null, 'createFileHandler', [
-            'path'  => 'logs/error.log',
-            'level' => CM_Log_Logger::WARNING,
+            'path'            => 'logs/error.log',
+            'level'           => CM_Log_Logger::WARNING,
             'stopPropagation' => true,
         ]);
 

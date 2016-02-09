@@ -1,11 +1,14 @@
 <?php
 
-class CM_ExceptionHandling_Handler_Abstract implements CM_Service_ManagerAwareInterface {
+abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
 
     /** @var CM_Log_Factory */
     private $_loggerFactory;
+
+    /** @var  int|null */
+    private $_printSeverityMin;
 
     private $_errorCodes = array(
         E_ERROR             => 'E_ERROR',
@@ -69,17 +72,9 @@ class CM_ExceptionHandling_Handler_Abstract implements CM_Service_ManagerAwareIn
     }
 
     /**
-     * @deprecated Left for temp backward compatibility with sk
      * @param Exception $exception
      */
     public function logException(Exception $exception) {
-        $this->handleException($exception);
-    }
-
-    /**
-     * @param Exception $exception
-     */
-    public function handleException(Exception $exception) {
         try {
             $this->getServiceManager()->getLogger()->addException($exception, null, CM_Paging_Log_Error::getTypeStatic());
         } catch (CM_Log_HandlingException $loggerException) {
@@ -98,6 +93,42 @@ class CM_ExceptionHandling_Handler_Abstract implements CM_Service_ManagerAwareIn
                 ->error('Logger exception:')->addException($loggerException);
         }
     }
+
+    /**
+     * @param Exception $exception
+     */
+    public function handleException(Exception $exception) {
+        $printException = true;
+        if ($exception instanceof CM_Exception) {
+            $printException = $exception->getSeverity() >= $this->_getPrintSeverityMin();
+        }
+
+        if ($printException) {
+            $this->_printException($exception);
+        }
+
+        $this->logException($exception);
+    }
+
+    /**
+     * @param int $severity
+     */
+    public function setPrintSeverityMin($severity) {
+        $this->_printSeverityMin = (int) $severity;
+    }
+
+    /**
+     * @param Exception $exception
+     */
+    abstract protected function _printException(Exception $exception);
+
+    /**
+     * @return int|null
+     */
+    private function _getPrintSeverityMin() {
+        return $this->_printSeverityMin;
+    }
+
 
     /**
      * @return CM_Log_Logger

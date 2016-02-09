@@ -11,11 +11,11 @@ class CM_ProcessTest extends CMTest_TestCase {
     public function testFork() {
         $process = CM_Process::getInstance();
         $forkHandler1 = $process->fork(function () {
-            });
+        });
         $forkHandler2 = $process->fork(function () {
-            });
+        });
         $forkHandler3 = $process->fork(function () {
-            });
+        });
         $this->assertSame(1, $forkHandler2->getIdentifier() - $forkHandler1->getIdentifier());
         $this->assertSame(1, $forkHandler3->getIdentifier() - $forkHandler2->getIdentifier());
     }
@@ -95,9 +95,17 @@ class CM_ProcessTest extends CMTest_TestCase {
         $bootloader = CM_Bootloader::getInstance();
         $exceptionHandlerBackup = $bootloader->getExceptionHandler();
 
-        /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\ClassMock $exceptionHandler */
-        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
-        $exceptionHandler->mockMethod('handleException');
+        /** @var CM_Log_Factory|\Mocka\ClassMock $loggerFactory */
+        $loggerFactory = $this->mockClass('CM_Log_Factory')->newInstance();
+        $loggerFactory->setServiceManager(CM_Service_Manager::getInstance());
+        $loggerFactory->mockMethod('');
+
+        /**
+         * Increase print-severity to make sure "child 3"'s exception output doesn't disturb phpunit
+         */
+        $exceptionHandler = new CM_ExceptionHandling_Handler_Cli($loggerFactory);
+        $exceptionHandler->setPrintSeverityMin(CM_Exception::FATAL);
+        $exceptionHandler->setServiceManager(CM_Service_Manager::getInstance());
 
         $bootloader->setExceptionHandler($exceptionHandler);
 
@@ -114,7 +122,6 @@ class CM_ProcessTest extends CMTest_TestCase {
             usleep(150 * 1000);
             throw new CM_Exception('Child 3 finished');
         });
-
         $process->fork(function (CM_Process_WorkloadResult $result) {
             usleep(200 * 1000);
             $result->setException(new CM_Exception('Child 4 finished'));
