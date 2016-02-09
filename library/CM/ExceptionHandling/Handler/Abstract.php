@@ -108,6 +108,10 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
         }
 
         $this->logException($exception);
+
+        if ($printException) {
+            exit;
+        }
     }
 
     /**
@@ -128,7 +132,6 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
     private function _getPrintSeverityMin() {
         return $this->_printSeverityMin;
     }
-
 
     /**
      * @return CM_Log_Logger
