@@ -19,24 +19,24 @@ class CM_Log_Logger {
         self::CRITICAL => 'CRITICAL',
     );
 
-    /** @var CM_Log_Handler_HandlerInterface[] */
-    private $_handlerList;
+    /** @var array */
+    private $_handlerStructList;
 
     /** @var CM_Log_Context */
     private $_contextGlobal;
 
     /**
-     * @param CM_Log_Context                         $contextGlobal
-     * @param CM_Log_Handler_HandlerInterface[]|null $handlerList
+     * @param CM_Log_Context $contextGlobal
+     * @param array|null     $handlerStructList
      */
-    public function __construct(CM_Log_Context $contextGlobal, array $handlerList = null) {
-        if (null === $handlerList) {
-            $handlerList = [];
+    public function __construct(CM_Log_Context $contextGlobal, array $handlerStructList = null) {
+        if (null === $handlerStructList) {
+            $handlerStructList = [];
         }
-        $this->_handlerList = [];
+        $this->_handlerStructList = [];
         $this->_contextGlobal = $contextGlobal;
 
-        $this->addHandlers($handlerList);
+        $this->addHandlers($handlerStructList);
     }
 
     /**
@@ -46,15 +46,18 @@ class CM_Log_Logger {
      */
     public function addRecord(CM_Log_Record $record) {
         $exceptionList = [];
-        foreach ($this->_handlerList as $handler) {
+        foreach ($this->_handlerStructList as $handlerStruct) {
             $handlerFailed = false;
+            /** @var CM_Log_Handler_HandlerInterface $handler */
+            $handler = $handlerStruct['handler'];
+            $propagate = (bool) $handlerStruct['propagate'];
             try {
                 $handler->handleRecord($record);
             } catch (Exception $e) {
                 $exceptionList[] = $e;
                 $handlerFailed = true;
             }
-            if ($handler->isHandling($record) && !$handler->isBubbling() && !$handlerFailed) {
+            if ($handler->isHandling($record) && !$propagate && !$handlerFailed) {
                 break;
             }
         }
@@ -90,19 +93,26 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param CM_Log_Handler_HandlerInterface[] $handlerList
+     * @param array $handlerStructList
      */
-    public function addHandlers(array $handlerList) {
-        foreach ($handlerList as $handler) {
-            $this->addHandler($handler);
+    public function addHandlers(array $handlerStructList) {
+        foreach ($handlerStructList as $handlerStruct) {
+            $this->addHandler($handlerStruct);
         }
     }
 
     /**
-     * @param CM_Log_Handler_HandlerInterface $handler
+     * @param array $handlerStruct
+     * @throws CM_Exception_Invalid
      */
-    public function addHandler(CM_Log_Handler_HandlerInterface $handler) {
-        $this->_handlerList[] = $handler;
+    public function addHandler(array $handlerStruct) {
+        if (!isset($handlerStruct['handler'])
+            || !$handlerStruct['handler'] instanceof CM_Log_Handler_HandlerInterface
+            || !isset($handlerStruct['propagate'])
+        ) {
+            throw new CM_Exception_Invalid('Malformed handlerStruct parameter');
+        }
+        $this->_handlerStructList[] = $handlerStruct;
     }
 
     /**

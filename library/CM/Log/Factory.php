@@ -5,37 +5,45 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
     use CM_Service_ManagerAwareTrait;
 
     /**
-     * @param string[] $handlerList
+     * @param array $handlerConfigList
      * @return CM_Log_Logger
      * @throws CM_Exception_Invalid
      */
-    public function createLogger(array $handlerList) {
-        $handlers = \Functional\map($handlerList, function ($handlerService) {
-            return $this->getServiceManager()->get($handlerService);
+    public function createLogger(array $handlerConfigList) {
+        $handlerStructList = \Functional\map($handlerConfigList, function (array $handlerConfig) {
+            return [
+                'handler'   => $this->getServiceManager()->get($handlerConfig['name']),
+                'propagate' => (bool) $handlerConfig['propagate'],
+            ];
         });
-        return $this->_createLogger($handlers);
+        return $this->_createLogger($handlerStructList);
     }
 
     /**
      * @return CM_Log_Logger
      */
     public function createBackupLogger() {
-        $handlers = [];
+        $handlerStructList = [];
         if ($this->getServiceManager()->has('logger-handler-file-error')) {
-            $handlers[] = $this->getServiceManager()->get('logger-handler-file-error', 'CM_Log_Handler_Stream');
+            $handlerStructList[] = [
+                'handler'   => $this->getServiceManager()->get('logger-handler-file-error', 'CM_Log_Handler_Stream'),
+                'propagate' => true,
+            ];
         }
-        $handlers[] = (new CM_Log_Handler_Factory())->createStderrHandler('{levelname}: {message}');
-
-        return $this->_createLogger($handlers);
+        $handlerStructList[] = [
+            'handler' => (new CM_Log_Handler_Factory())->createStderrHandler('{levelname}: {message}'),
+            'propagate' => false,
+        ];
+        return $this->_createLogger($handlerStructList);
     }
 
     /**
-     * @param CM_Log_Handler_HandlerInterface[] $handlers
+     * @param array $handlerStructList
      * @return CM_Log_Logger
      */
-    protected function _createLogger($handlers) {
+    protected function _createLogger($handlerStructList) {
         $computerInfo = new CM_Log_Context_ComputerInfo(CM_Util::getFqdn(), phpversion());
         $globalContext = new CM_Log_Context(null, null, $computerInfo);
-        return new CM_Log_Logger($globalContext, $handlers);
+        return new CM_Log_Logger($globalContext, $handlerStructList);
     }
 }

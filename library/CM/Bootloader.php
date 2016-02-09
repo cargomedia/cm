@@ -190,7 +190,6 @@ class CM_Bootloader {
         $serviceManager->register('logger-handler-file-error', 'CM_Log_Handler_Factory', null, 'createFileHandler', [
             'path'            => 'logs/error.log',
             'level'           => CM_Log_Logger::WARNING,
-            'stopPropagation' => true,
         ]);
 
         foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
