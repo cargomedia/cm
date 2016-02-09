@@ -470,24 +470,6 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
-   * @param {String|String[]} audioSrc
-   * @param {Object} [params]
-   * @return {MediaElement}
-   */
-  createAudioPlayer: function(audioSrc, params) {
-    var $element = $('<audio />');
-    $element.wrap('<div />');	// MediaElement needs a parent to show error msgs
-    if (!_.isArray(audioSrc)) {
-      audioSrc = [audioSrc];
-    }
-    _.each(audioSrc, function(audioSrc) {
-      $element.append($('<source>').attr('src', cm.getUrlResource('layout', 'audio/' + audioSrc)));
-    });
-
-    return cm.dom.setupAudio($element[0], params);
-  },
-
-  /**
    * @param {jQuery} $element
    * @param {String} url
    * @param {Object} [flashvars]
