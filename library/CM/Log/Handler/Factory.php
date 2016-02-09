@@ -21,17 +21,6 @@ class CM_Log_Handler_Factory implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * @param int|null  $level
-     * @param bool|null $stopPropagation
-     * @return CM_Log_Handler_Stream
-     */
-    public function createHttpHandler($level = null, $stopPropagation = null) {
-        $stream = new CM_OutputStream_Stream_Output();
-        $formatter = new CM_Log_Formatter_Html();
-        return new CM_Log_Handler_Stream_Http($stream, $formatter, $level, $stopPropagation);
-    }
-
-    /**
      * @param string      $path
      * @param string|null $formatMessage
      * @param string|null $formatDate
