@@ -1,6 +1,6 @@
 <?php
 
-class CM_ExceptionHandling_Handler implements CM_Service_ManagerAwareInterface {
+class CM_ExceptionHandling_Handler_Abstract implements CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
 

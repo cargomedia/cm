@@ -9,7 +9,7 @@ class CM_Bootloader {
     /** @var bool */
     private $_debug;
 
-    /** @var CM_ExceptionHandling_Handler */
+    /** @var CM_ExceptionHandling_Handler_Abstract */
     private $_exceptionHandler;
 
     /** @var CM_EventHandler_EventHandler */
@@ -54,7 +54,7 @@ class CM_Bootloader {
     }
 
     /**
-     * @return CM_ExceptionHandling_Handler
+     * @return CM_ExceptionHandling_Handler_Abstract
      */
     public function getExceptionHandler() {
         if (!$this->_exceptionHandler) {
@@ -63,7 +63,7 @@ class CM_Bootloader {
             $logFactory = new CM_Log_Factory();
             $logFactory->setServiceManager($serviceManager);
 
-            $exceptionHandler = new CM_ExceptionHandling_Handler($logFactory);
+            $exceptionHandler = new CM_ExceptionHandling_Handler_Abstract($logFactory);
             $exceptionHandler->setServiceManager($serviceManager);
 
             $this->_exceptionHandler = $exceptionHandler;
@@ -72,9 +72,9 @@ class CM_Bootloader {
     }
 
     /**
-     * @param CM_ExceptionHandling_Handler $exceptionHandler
+     * @param CM_ExceptionHandling_Handler_Abstract $exceptionHandler
      */
-    public function setExceptionHandler(CM_ExceptionHandling_Handler $exceptionHandler) {
+    public function setExceptionHandler(CM_ExceptionHandling_Handler_Abstract $exceptionHandler) {
         $this->_exceptionHandler = $exceptionHandler;
     }
 

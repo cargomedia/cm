@@ -1,6 +1,6 @@
 <?php
 
-class CM_ExceptionHandling_HandlerTest extends CMTest_TestCase {
+class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
 
     public function testHandleException() {
         $expectedException = new Exception('foo');
@@ -21,7 +21,7 @@ class CM_ExceptionHandling_HandlerTest extends CMTest_TestCase {
         $serviceManager = $this->mockClass('CM_Service_Manager')->newInstance();
         $serviceManager->mockMethod('getLogger')->set($logger);
 
-        $exceptionHandler = new CM_ExceptionHandling_Handler($loggerFactory);
+        $exceptionHandler = new CM_ExceptionHandling_Handler_Abstract($loggerFactory);
         $exceptionHandler->setServiceManager($serviceManager);
         $exceptionHandler->handleException($expectedException);
 
@@ -74,8 +74,8 @@ class CM_ExceptionHandling_HandlerTest extends CMTest_TestCase {
         $serviceManager = $this->mockClass('CM_Service_Manager')->newInstance();
         $serviceManager->mockMethod('getLogger')->set($logger);
 
-        /** @var CM_ExceptionHandling_Handler|\Mocka\ClassMock $exceptionHandlerMock */
-        $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler')->newInstance([$loggerFactory]);
+        /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\ClassMock $exceptionHandlerMock */
+        $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstance([$loggerFactory]);
         $exceptionHandlerMock->mockMethod('_getBackupLogger')->set($backupLogger);
 
         $exceptionHandlerMock->setServiceManager($serviceManager);
@@ -137,8 +137,8 @@ class CM_ExceptionHandling_HandlerTest extends CMTest_TestCase {
         $serviceManager = $this->mockClass('CM_Service_Manager')->newInstance();
         $serviceManager->mockMethod('getLogger')->set($logger);
 
-        /** @var CM_ExceptionHandling_Handler|\Mocka\ClassMock $exceptionHandlerMock */
-        $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler')->newInstance([$loggerFactory]);
+        /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\ClassMock $exceptionHandlerMock */
+        $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstance([$loggerFactory]);
         $exceptionHandlerMock->mockMethod('_getBackupLogger')->set($backupLogger);
         $exceptionHandlerMock->setServiceManager($serviceManager);
 

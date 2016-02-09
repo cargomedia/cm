@@ -95,8 +95,8 @@ class CM_ProcessTest extends CMTest_TestCase {
         $bootloader = CM_Bootloader::getInstance();
         $exceptionHandlerBackup = $bootloader->getExceptionHandler();
 
-        /** @var CM_ExceptionHandling_Handler|\Mocka\ClassMock $exceptionHandler */
-        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler')->newInstanceWithoutConstructor();
+        /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\ClassMock $exceptionHandler */
+        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
         $exceptionHandler->mockMethod('handleException');
 
         $bootloader->setExceptionHandler($exceptionHandler);
@@ -207,8 +207,8 @@ class CM_ProcessTest extends CMTest_TestCase {
         $bootloader = CM_Bootloader::getInstance();
         $exceptionHandlerBackup = $bootloader->getExceptionHandler();
 
-        /** @var CM_ExceptionHandling_Handler|\Mocka\ClassMock $exceptionHandler */
-        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler')->newInstanceWithoutConstructor();
+        /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\ClassMock $exceptionHandler */
+        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
         $exceptionHandler->mockMethod('handleException');
 
         $bootloader->setExceptionHandler($exceptionHandler);
