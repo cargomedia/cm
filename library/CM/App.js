@@ -371,24 +371,27 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('textarea.autosize, .autosize textarea').trigger('autosize.destroy');
     },
     /**
-     * @param {jQuery} $element
-     * @param {Function} [success] fn(MediaElement, Element)
-     * @param {Boolean} [preferPlugins]
+     * @param {HTMLVideoElement} element
+     * @param {Object} [options]
+     * @returns {MediaElementPlayer}
      */
-    setupVideo: function($element, success, preferPlugins) {
-      var mode = 'auto';
-      if (preferPlugins) {
-        mode = 'auto_plugin';
-      }
+    setupVideo: function(element, options) {
+      options = _.extend({
+        preferPlugins: false,
+        success: null
+      }, options || {});
 
-      $element.mediaelementplayer({
+      return new mejs.MediaElementPlayer(element, {
         flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
         silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
         videoWidth: '100%',
         videoHeight: '100%',
         defaultVideoWidth: '100%',
         defaultVideoHeight: '100%',
-        mode: mode,
+        mode: (options.preferPlugins ? 'auto_plugin' : 'auto'),
+        error: function() {
+          throw new Error('Cannot initialize MediaElement video player.');
+        },
         success: function(mediaElement, domObject) {
           var mediaElementMuted = cm.storage.get('mediaElement-muted');
           var mediaElementVolume = cm.storage.get('mediaElement-volume');
@@ -398,15 +401,69 @@ var CM_App = CM_Class_Abstract.extend({
           if (null !== mediaElementVolume) {
             mediaElement.setVolume(mediaElementVolume);
           }
-          mediaElement.addEventListener("volumechange", function() {
+          mediaElement.addEventListener('volumechange', function() {
             cm.storage.set('mediaElement-volume', mediaElement.volume);
             cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
           });
-          if (success) {
-            success(mediaElement, domObject);
+          if (options.success) {
+            options.success(mediaElement, domObject);
           }
         }
       });
+    },
+
+    /**
+     * @param {HTMLAudioElement} element
+     * @param {Object} [options]
+     * @returns {MediaElement}
+     */
+    setupAudio: function(element, options) {
+      options = _.extend({
+        loop: false
+      }, options || {});
+
+      var error = false;
+      var player = new mejs.MediaElement(element, {
+        flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
+        silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
+        startVolume: 1,
+        error: function() {
+          cm.error.log(new Error('Cannot initialize MediaElement audio player.'));
+          error = true;
+        },
+        success: function(mediaElement, domObject) {
+          if (options.loop) {
+            mediaElement.addEventListener('ended', function() {
+              mediaElement.load();
+            });
+          }
+        }
+      });
+
+      if (error) {
+        player.play = _.noop;
+        player.stop = _.noop;
+        player.pause = _.noop;
+      }
+      return player;
+    },
+
+    /**
+     * @param {String|String[]} pathList
+     * @param {Object} [options]
+     * @return {MediaElement}
+     */
+    createAudio: function(pathList, options) {
+      if (!_.isArray(pathList)) {
+        pathList = [pathList];
+      }
+
+      var $element = $('<audio />');
+      $element.wrap('<div />');	// MediaElement needs a parent to show error msgs
+      _.each(pathList, function(path) {
+        $element.append($('<source>').attr('src', cm.getUrlResource('layout', 'audio/' + path)));
+      });
+      return cm.dom.setupAudio($element[0], options);
     }
   },
 
