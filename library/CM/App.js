@@ -407,6 +407,42 @@ var CM_App = CM_Class_Abstract.extend({
           }
         }
       });
+    },
+
+    /**
+     * @param {HTMLAudioElement} element
+     * @param {Object} [options]
+     * @returns {MediaElement}
+     */
+    setupAudio: function(element, options) {
+      options = _.extend({
+        loop: false
+      }, options || {});
+
+      var error = false;
+      var player = new MediaElement(element, {
+        flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
+        silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
+        startVolume: 1,
+        error: function() {
+          error = true;
+        },
+        success: function(mediaElement, domObject) {
+          if (options.loop) {
+            mediaElement.addEventListener('ended', function() {
+              mediaElement.load();
+            });
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Cannot create MediaElement audio player for element ', element);
+        player.play = _.noop;
+        player.stop = _.noop;
+        player.pause = _.noop;
+      }
+      return player;
     }
   },
 
