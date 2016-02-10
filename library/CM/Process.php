@@ -120,11 +120,12 @@ class CM_Process {
                 ]);
                 echo $message . PHP_EOL;
                 if ($timeoutReached) {
-                    $logError = new CM_Paging_Log_Error();
-                    $logError->add($message, [
+                    $logRecord = new CM_Log_Record(CM_Log_Logger::ERROR, $message, new CM_Log_Context(null, null, null, [
                         'pid'  => $this->getProcessId(),
                         'argv' => join(' ', $this->getArgv()),
-                    ]);
+                    ]), CM_Paging_Log_Error::getTypeStatic());
+
+                    CM_Service_Manager::getInstance()->getLogger()->addRecord($logRecord);
                 }
                 $timeOutput = $timeNow;
             }

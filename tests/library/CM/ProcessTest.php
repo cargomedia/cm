@@ -280,11 +280,11 @@ class CM_ProcessTest extends CMTest_TestCase {
 
         $this->assertCount(2, $pidListBefore);
         $this->assertCount(0, $this->_getChildrenPidList());
-        $this->assertSameTime(0.5, microtime(true) - $timeStart, 0.15);
+        $this->assertSameTime(0.5, microtime(true) - $timeStart, 0.25);
 
         $logError = new CM_Paging_Log_Error();
         $this->assertSame(1, $logError->getCount());
-        $this->assertContains('killing with signal `9`', $logError->getItem(0)['msg']);
+        $this->assertContains('killing with signal `9`', $logError->getItem(0)['message']);
     }
 
     /**
