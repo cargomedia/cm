@@ -34,6 +34,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
      */
     public function __construct(CM_Log_Factory $loggerFactory) {
         $this->_loggerFactory = $loggerFactory;
+        $this->setServiceManager($loggerFactory->getServiceManager());
     }
 
     public function handleErrorFatal() {

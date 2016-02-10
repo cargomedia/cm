@@ -105,7 +105,6 @@ class CM_ProcessTest extends CMTest_TestCase {
          */
         $exceptionHandler = new CM_ExceptionHandling_Handler_Cli($loggerFactory);
         $exceptionHandler->setPrintSeverityMin(CM_Exception::FATAL);
-        $exceptionHandler->setServiceManager(CM_Service_Manager::getInstance());
 
         $bootloader->setExceptionHandler($exceptionHandler);
 

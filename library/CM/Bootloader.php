@@ -68,7 +68,6 @@ class CM_Bootloader {
             } else {
                 $exceptionHandler = new CM_ExceptionHandling_Handler_Http($logFactory);
             }
-            $exceptionHandler->setServiceManager($serviceManager);
             $this->_exceptionHandler = $exceptionHandler;
         }
         return $this->_exceptionHandler;

@@ -5,9 +5,6 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
     public function testHandleException() {
         $expectedException = new Exception('foo');
 
-        /** @var CM_Log_Factory|\Mocka\ClassMock $loggerFactory */
-        $loggerFactory = $this->mockClass('CM_Log_Factory')->newInstance();
-
         /** @var CM_Log_Logger|\Mocka\ClassMock $logger */
         $logger = $this->mockClass('CM_Log_Logger')->newInstance([new CM_Log_Context()]);
         $methodAddException = $logger->mockMethod('addException');
@@ -21,9 +18,12 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $serviceManager = $this->mockClass('CM_Service_Manager')->newInstance();
         $serviceManager->mockMethod('getLogger')->set($logger);
 
+        /** @var CM_Log_Factory|\Mocka\ClassMock $loggerFactory */
+        $loggerFactory = $this->mockClass('CM_Log_Factory')->newInstance();
+        $loggerFactory->setServiceManager($serviceManager);
+
         /** @var CM_ExceptionHandling_Handler_Abstract $exceptionHandler */
         $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstance([$loggerFactory]);
-        $exceptionHandler->setServiceManager($serviceManager);
         $exceptionHandler->handleException($expectedException);
         $this->assertSame(1, $methodAddException->getCallCount());
     }
@@ -74,11 +74,12 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $serviceManager = $this->mockClass('CM_Service_Manager')->newInstance();
         $serviceManager->mockMethod('getLogger')->set($logger);
 
+        $loggerFactory->setServiceManager($serviceManager);
+
         /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\ClassMock $exceptionHandlerMock */
         $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstance([$loggerFactory]);
         $exceptionHandlerMock->mockMethod('_getBackupLogger')->set($backupLogger);
 
-        $exceptionHandlerMock->setServiceManager($serviceManager);
         $exceptionHandlerMock->handleException($expectedException);
 
         $this->assertSame(1, $methodAddException->getCallCount());
@@ -131,16 +132,17 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
                 throw new Exception('handler exception message.');
             });
         /** @var CM_Log_Logger|\Mocka\ClassMock $logger */
-        $logger = $this->mockClass('CM_Log_Logger')->newInstance([new CM_Log_Context(), ['handler' => $handler, 'propagate' => false]]);
+        $logger = $this->mockClass('CM_Log_Logger')->newInstance([new CM_Log_Context(), [['handler' => $handler, 'propagate' => false]]]);
 
         /** @var CM_Service_Manager|\Mocka\ClassMock $serviceManager */
         $serviceManager = $this->mockClass('CM_Service_Manager')->newInstance();
         $serviceManager->mockMethod('getLogger')->set($logger);
 
+        $loggerFactory->setServiceManager($serviceManager);
+
         /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\ClassMock $exceptionHandlerMock */
         $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstance([$loggerFactory]);
         $exceptionHandlerMock->mockMethod('_getBackupLogger')->set($backupLogger);
-        $exceptionHandlerMock->setServiceManager($serviceManager);
 
         $exceptionHandlerMock->handleException($expectedException);
 
