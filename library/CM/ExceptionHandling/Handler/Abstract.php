@@ -108,10 +108,6 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
         }
 
         $this->logException($exception);
-
-        if ($printException) {
-            exit;
-        }
     }
 
     /**

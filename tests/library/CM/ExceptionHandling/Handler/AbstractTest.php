@@ -25,7 +25,6 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstance([$loggerFactory]);
         $exceptionHandler->setServiceManager($serviceManager);
         $exceptionHandler->handleException($expectedException);
-
         $this->assertSame(1, $methodAddException->getCallCount());
     }
 
@@ -132,7 +131,7 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
                 throw new Exception('handler exception message.');
             });
         /** @var CM_Log_Logger|\Mocka\ClassMock $logger */
-        $logger = $this->mockClass('CM_Log_Logger')->newInstance([new CM_Log_Context(), [$handler]]);
+        $logger = $this->mockClass('CM_Log_Logger')->newInstance([new CM_Log_Context(), ['handler' => $handler, 'propagate' => false]]);
 
         /** @var CM_Service_Manager|\Mocka\ClassMock $serviceManager */
         $serviceManager = $this->mockClass('CM_Service_Manager')->newInstance();

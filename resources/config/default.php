@@ -260,10 +260,10 @@ return function (CM_Config_Node $config) {
         'method' => [
             'name'      => 'createLogger',
             'arguments' => [
-                'handlerList' => [
+                'handlerConfigList' => [[
                     'name'     => 'logger-handler-mongodb',
                     'propagate' => true,
-                ],
+                ]],
             ],
         ],
     ];
