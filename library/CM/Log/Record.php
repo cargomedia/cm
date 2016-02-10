@@ -14,13 +14,17 @@ class CM_Log_Record {
     /** @var CM_Log_Context */
     private $_context;
 
+    /** @var int|null */
+    private $_type;
+
     /**
      * @param int            $level
      * @param string         $message
      * @param CM_Log_Context $context
+     * @param int|null       $type
      * @throws CM_Exception_Invalid
      */
-    public function __construct($level, $message, CM_Log_Context $context) {
+    public function __construct($level, $message, CM_Log_Context $context, $type = null) {
         $level = (int) $level;
         $message = (string) $message;
 
@@ -31,6 +35,7 @@ class CM_Log_Record {
         $this->_message = $message;
         $this->_context = $context;
         $this->_createdAt = new DateTime();
+        $this->_type = null !== $type ? (int) $type : null;
     }
 
     /**
@@ -59,5 +64,12 @@ class CM_Log_Record {
      */
     public function getCreatedAt() {
         return $this->_createdAt;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getType() {
+        return $this->_type;
     }
 }

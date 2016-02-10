@@ -23,16 +23,11 @@ class CM_ExceptionHandling_SerializableException {
     /** @var array */
     public $metaInfo = array();
 
-    /** @var int|null */
-    public $type;
-
     /**
      * @param Exception $exception
-     * @param null      $type
      */
-    public function __construct(Exception $exception, $type = null) {
+    public function __construct(Exception $exception) {
         $this->_extract($exception);
-        $this->type = null !== $type ? (int) $type : null;
     }
 
     /**

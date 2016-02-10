@@ -41,12 +41,13 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $httpRequest = CM_Http_Request_Abstract::factory('post', '/foo?bar=1&baz=quux', ['bar' => 'baz'], ['foo' => 'quux'], '{"bar":"2", "quux":"baz"}');
         $clientId = $httpRequest->getClientId();
         $computerInfo = new CM_Log_Context_ComputerInfo('www.example.com', 'v7.0.1');
+        $type = CM_Paging_Log_Warn::getTypeStatic();
 
         $mongoClient = $this->getServiceManager()->getMongoDb();
         $this->assertSame(0, $mongoClient->count($collection));
 
         $mongoClient->createIndex($collection, ['expireAt' => 1], ['expireAfterSeconds' => 0]);
-        $record = new CM_Log_Record($level, $message, new CM_Log_Context($user, $httpRequest, $computerInfo, ['bar' => ['baz' => 'quux']]));
+        $record = new CM_Log_Record($level, $message, new CM_Log_Context($user, $httpRequest, $computerInfo, ['bar' => ['baz' => 'quux']]), $type);
 
         $handler = new CM_Log_Handler_MongoDb($collection, $ttl, ['w' => 0], $level);
         $this->callProtectedMethod($handler, '_writeRecord', [$record]);
@@ -56,6 +57,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
 
         $this->assertSame($level, $savedRecord['level']);
         $this->assertSame($message, $savedRecord['message']);
+        $this->assertSame($type, $savedRecord['type']);
 
         /** @var MongoDate $createdAt */
         $createdAt = $savedRecord['createdAt'];
