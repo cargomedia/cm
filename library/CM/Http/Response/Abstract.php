@@ -271,7 +271,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
             if ($catchException && isset($errorOptions['log'])) {
                 /** @type CM_Paging_Log_Abstract $logClass */
                 $logClass = $errorOptions['log'];
-                $this->getServiceManager()->getLogger()->addException($ex, null, $logClass::getTypeStatic());
+                CM_Bootloader::getInstance()->getExceptionHandler()->logException($ex, $logClass::getTypeStatic());
             }
             if (!$catchException && ($catchPublicExceptions && $ex->isPublic())) {
                 $errorOptions = [];
