@@ -40,35 +40,6 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param CM_Log_Record $record
-     * @return CM_Log_Logger
-     * @throws CM_Log_HandlingException
-     */
-    public function addRecord(CM_Log_Record $record) {
-        $exceptionList = [];
-        foreach ($this->_handlerStructList as $handlerStruct) {
-            $handlerFailed = false;
-            /** @var CM_Log_Handler_HandlerInterface $handler */
-            $handler = $handlerStruct['handler'];
-            $propagate = (bool) $handlerStruct['propagate'];
-            try {
-                $handler->handleRecord($record);
-            } catch (Exception $e) {
-                $exceptionList[] = $e;
-                $handlerFailed = true;
-            }
-            if ($handler->isHandling($record) && !$propagate && !$handlerFailed) {
-                break;
-            }
-        }
-        if (!empty($exceptionList)) {
-            $exceptionMessage = count($exceptionList) . ' handler(s) failed to process a record.';
-            throw new CM_Log_HandlingException($exceptionMessage, $exceptionList);
-        }
-        return $this;
-    }
-
-    /**
      * @param string              $message
      * @param int                 $level
      * @param CM_Log_Context|null $context
@@ -81,7 +52,7 @@ class CM_Log_Logger {
         $level = (int) $level;
         $type = null !== $type ? (int) $type : null;
         $context = $this->_mergeWithGlobalContext($context);
-        return $this->addRecord(new CM_Log_Record($level, $message, $context, $type));
+        return $this->_addRecord(new CM_Log_Record($level, $message, $context, $type));
     }
 
     /**
@@ -92,7 +63,7 @@ class CM_Log_Logger {
      */
     public function addException(Exception $exception, CM_Log_Context $context = null, $type = null) {
         $context = $this->_mergeWithGlobalContext($context);
-        return $this->addRecord(new CM_Log_Record_Exception($exception, $context, $type));
+        return $this->_addRecord(new CM_Log_Record_Exception($exception, $context, $type));
     }
 
     /**
@@ -166,6 +137,35 @@ class CM_Log_Logger {
      */
     public function critical($message, CM_Log_Context $context = null, $type = null) {
         return $this->addMessage($message, self::CRITICAL, $context, $type);
+    }
+
+    /**
+     * @param CM_Log_Record $record
+     * @return CM_Log_Logger
+     * @throws CM_Log_HandlingException
+     */
+    protected function _addRecord(CM_Log_Record $record) {
+        $exceptionList = [];
+        foreach ($this->_handlerStructList as $handlerStruct) {
+            $handlerFailed = false;
+            /** @var CM_Log_Handler_HandlerInterface $handler */
+            $handler = $handlerStruct['handler'];
+            $propagate = (bool) $handlerStruct['propagate'];
+            try {
+                $handler->handleRecord($record);
+            } catch (Exception $e) {
+                $exceptionList[] = $e;
+                $handlerFailed = true;
+            }
+            if ($handler->isHandling($record) && !$propagate && !$handlerFailed) {
+                break;
+            }
+        }
+        if (!empty($exceptionList)) {
+            $exceptionMessage = count($exceptionList) . ' handler(s) failed to process a record.';
+            throw new CM_Log_HandlingException($exceptionMessage, $exceptionList);
+        }
+        return $this;
     }
 
     /**

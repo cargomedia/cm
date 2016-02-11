@@ -33,7 +33,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
             $this->assertSame($expectedRecord, $record);
         });
 
-        $logger->addRecord($expectedRecord);
+        $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
         $this->assertSame(1, $mockHandleRecord->getCallCount());
     }
 
@@ -50,7 +50,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $mockLogHandlerFoo->mockMethod('isHandling')->set(true);
         $mockLogHandlerBar->mockMethod('isHandling')->set(true);
         $expectedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
-        $logger->addRecord($expectedRecord);
+        $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
         $this->assertSame(1, $mockHandleRecordFoo->getCallCount());
         $this->assertSame(1, $mockHandleRecordBar->getCallCount());
     }
@@ -69,7 +69,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $mockLogHandlerFoo->mockMethod('isHandling')->set(true);
         $mockLogHandlerBar->mockMethod('isHandling')->set(true);
         $expectedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
-        $logger->addRecord($expectedRecord);
+        $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
         $this->assertSame(1, $mockHandleRecordFoo->getCallCount());
         $this->assertSame(0, $mockHandleRecordBar->getCallCount());
     }
@@ -87,7 +87,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $mockLogHandlerFoo->mockMethod('isHandling')->set(false);
         $mockLogHandlerBar->mockMethod('isHandling')->set(false);
         $expectedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
-        $logger->addRecord($expectedRecord);
+        $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
         $this->assertSame(1, $mockHandleRecordFoo->getCallCount());
         $this->assertSame(1, $mockHandleRecordBar->getCallCount());
     }
@@ -115,7 +115,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
 
         $expectedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
         try {
-            $logger->addRecord($expectedRecord);
+            $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
             $this->fail('CM_Log_HandlingException was not thrown.');
         } catch (CM_Log_HandlingException $e) {
             $this->assertSame('1 handler(s) failed to process a record.', $e->getMessage());
