@@ -13,6 +13,10 @@ class CM_Log_Record_Exception extends CM_Log_Record {
     public function __construct(Exception $exception, CM_Log_Context $context, $type = null) {
         $this->_exception = new CM_ExceptionHandling_SerializableException($exception);
         $message = $this->_exception->getClass() . ': ' . $this->_exception->getMessage();
+        if (null === $type) {
+            $type = $this->_exceptionSeverityToType($exception);
+        }
+
         parent::__construct($this->_exceptionSeverityToLevel($exception), $message, $context, $type);
     }
 
@@ -35,5 +39,19 @@ class CM_Log_Record_Exception extends CM_Log_Record {
             CM_Exception::FATAL => CM_Log_Logger::CRITICAL,
         ];
         return isset($map[$severity]) ? $map[$severity] : CM_Log_Logger::ERROR;
+    }
+
+    /**
+     * @param Exception $exception
+     * @return int
+     */
+    protected function _exceptionSeverityToType(Exception $exception) {
+        $severity = $exception instanceof CM_Exception ? $exception->getSeverity() : null;
+        $map = [
+            CM_Exception::WARN  => CM_Paging_Log_Warn::getTypeStatic(),
+            CM_Exception::ERROR => CM_Paging_Log_Error::getTypeStatic(),
+            CM_Exception::FATAL => CM_Paging_Log_Fatal::getTypeStatic(),
+        ];
+        return isset($map[$severity]) ? $map[$severity] : CM_Paging_Log_Fatal::getTypeStatic();
     }
 }
