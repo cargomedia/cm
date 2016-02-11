@@ -101,7 +101,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         $this->_autoCommit = true;
     }
 
-    final public function delete() {
+    public function delete() {
         $containingCacheables = $this->_getContainingCacheables();
         $this->_onDeleteBefore();
         foreach ($this->_assets as $asset) {
