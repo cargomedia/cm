@@ -74,15 +74,15 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
 
     /**
      * @param Exception $exception
-     * @param int|null  $type
+     * @param int|null  $logLevel
      */
-    public function logException(Exception $exception, $type = null) {
+    public function logException(Exception $exception, $logLevel = null) {
         try {
-            $this->getServiceManager()->getLogger()->addException($exception, null, $type);
+            $this->getServiceManager()->getLogger()->addException($exception, null, $logLevel);
         } catch (CM_Log_HandlingException $loggerException) {
             $backupLogger = $this->_getBackupLogger();
             $backupLogger
-                ->error('Origin exception:')->addException($exception, null, $type)
+                ->error('Origin exception:')->addException($exception, null, $logLevel)
                 ->error('Handlers exception:')
                 ->error($loggerException->getMessage());
 
@@ -91,7 +91,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
             }
         } catch (Exception $loggerException) {
             $this->_getBackupLogger()
-                ->error('Origin exception:')->addException($exception, null, $type)
+                ->error('Origin exception:')->addException($exception, null, $logLevel)
                 ->error('Logger exception:')->addException($loggerException);
         }
     }

@@ -282,7 +282,7 @@ class CM_ProcessTest extends CMTest_TestCase {
         $this->assertCount(0, $this->_getChildrenPidList());
         $this->assertSameTime(0.65, microtime(true) - $timeStart, 0.15);
 
-        $logError = new CM_Paging_Log_Error();
+        $logError = new CM_Paging_Log(CM_Log_Logger::ERROR);
         $this->assertSame(1, $logError->getCount());
         $this->assertContains('killing with signal `9`', $logError->getItem(0)['message']);
     }

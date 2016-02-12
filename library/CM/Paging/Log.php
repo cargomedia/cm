@@ -1,15 +1,22 @@
 <?php
 
-abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_Typed {
+class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
 
     const COLLECTION_NAME = 'cm_log';
 
+    /** @var int */
+    protected $_level;
+
     /**
+     * @param int     $level
      * @param boolean $aggregate
      * @param int     $ageMax
      */
-    public function __construct($aggregate = false, $ageMax = null) {
-        $criteria = ['type' => $this->getType()];
+    public function __construct($level, $aggregate = false, $ageMax = null) {
+        $level = (int) $level;
+
+        $this->_level = $level;
+        $criteria = ['level' => $this->_level];
         if ($ageMax) {
             $criteria['createdAt'] = ['$gt' => new MongoDate(time() - (int) $ageMax)];
         }
@@ -36,7 +43,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
 
     public function flush() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $mongoDb->remove(self::COLLECTION_NAME, ['type' => $this->getType()]);
+        $mongoDb->remove(self::COLLECTION_NAME, ['level' => $this->_level]);
         $this->_change();
     }
 
@@ -52,7 +59,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
         $deleteOlderThan = time() - $age;
 
         $criteria = [
-            'type'      => $this->getType(),
+            'level'     => $this->_level,
             'createdAt' => ['$lt' => new MongoDate($deleteOlderThan)]
         ];
 
@@ -62,13 +69,12 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
     }
 
     /**
-     * @param int       $type
+     * @param int       $level
      * @param bool|null $aggregate
      * @param int|null  $ageMax
-     * @return CM_Paging_Log_Abstract
+     * @return CM_Paging_Log
      */
-    final public static function factory($type, $aggregate = null, $ageMax = null) {
-        $className = self::_getClassName($type);
-        return new $className($aggregate, $ageMax);
+    final public static function factory($level, $aggregate = null, $ageMax = null) {
+        return new self($level, $aggregate, $ageMax);
     }
 }

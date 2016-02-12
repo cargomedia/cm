@@ -116,7 +116,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
 
     public function testProcessTrackingVirtualPageViewWithError() {
         CM_Config::get()->CM_Http_Response_Page->exceptionsToCatch = [
-            'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => null],
+            'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'logLevel' => null],
         ];
         $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
         $response = CMTest_TH::createResponsePage('/mock10');
@@ -172,7 +172,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
 
     public function testProcessExceptionCatching() {
         CM_Config::get()->CM_Http_Response_Page->exceptionsToCatch = [
-            'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => null],
+            'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'logLevel' => null],
         ];
         $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
         $request = CMTest_TH::createResponsePage('/example')->getRequest();

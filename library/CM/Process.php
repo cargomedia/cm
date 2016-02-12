@@ -124,7 +124,7 @@ class CM_Process {
                         'pid'  => $this->getProcessId(),
                         'argv' => join(' ', $this->getArgv()),
                     ]);
-                    CM_Service_Manager::getInstance()->getLogger()->error($message, $logContext, CM_Paging_Log_Error::getTypeStatic());
+                    CM_Service_Manager::getInstance()->getLogger()->error($message, $logContext);
                 }
                 $timeOutput = $timeNow;
             }

@@ -15,7 +15,7 @@ class CM_Http_Response_JsError extends CM_Http_Response_Abstract {
         $suppressLogging = $request->isBotCrawler() || !$request->isSupported();
         if (!$suppressLogging) {
             $exception = new CM_Exception_Javascript($message, $url, $counter, $fileUrl, $fileLine);
-            CM_Bootloader::getInstance()->getExceptionHandler()->logException($exception, CM_Paging_Log_JsError::getTypeStatic());
+            CM_Bootloader::getInstance()->getExceptionHandler()->logException($exception, CM_Log_Logger::WARNING);
         }
 
         $this->setHeader('Content-Type', 'text/javascript');
