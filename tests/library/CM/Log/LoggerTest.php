@@ -262,7 +262,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
             $this->assertSame($exception->getLine(), $recordException->getLine());
             $this->assertSame($exception->getFile(), $recordException->getFile());
             $this->assertSame('Exception: foo', $record->getMessage());
-            $this->assertSame(CM_Log_Logger::ERROR, $record->getLevel());
+            $this->assertSame(CM_Log_Logger::CRITICAL, $record->getLevel());
         });
         $logger->addException($exception);
         $this->assertSame(1, $mockHandleRecord->getCallCount());
