@@ -31,7 +31,7 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
             ];
         }
         $handlerStructList[] = [
-            'handler' => (new CM_Log_Handler_Factory())->createStderrHandler('{levelname}: {message}'),
+            'handler'   => (new CM_Log_Handler_Factory())->createStderrHandler('{levelname}: {message}'),
             'propagate' => false,
         ];
         return $this->_createLogger($handlerStructList);
@@ -43,7 +43,18 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
      */
     protected function _createLogger($handlerStructList) {
         $computerInfo = new CM_Log_Context_ComputerInfo(CM_Util::getFqdn(), phpversion());
-        $globalContext = new CM_Log_Context(null, null, $computerInfo);
+        $request = $this->_getGlobalRequest();
+        $globalContext = new CM_Log_Context(null, $request, $computerInfo);
         return new CM_Log_Logger($globalContext, $handlerStructList);
+    }
+
+    /**
+     * @return CM_Http_Request_Abstract|null
+     */
+    protected function _getGlobalRequest() {
+        if (CM_Http_Request_Abstract::hasInstance()) {
+            return CM_Http_Request_Abstract::getInstance();
+        }
+        return null;
     }
 }
