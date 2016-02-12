@@ -1,6 +1,6 @@
 <?php
 
-class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
+class CM_Paging_Log extends CM_Paging_Abstract {
 
     const COLLECTION_NAME = 'cm_log';
 
@@ -11,10 +11,13 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
      * @param int     $level
      * @param boolean $aggregate
      * @param int     $ageMax
+     * @throws CM_Exception_Invalid
      */
     public function __construct($level, $aggregate = false, $ageMax = null) {
         $level = (int) $level;
-
+        if (!CM_Log_Logger::hasLevel($level)) {
+            throw new CM_Exception_Invalid('Log level `' . $level . '` does not exist.');
+        }
         $this->_level = $level;
         $criteria = ['level' => $this->_level];
         if ($ageMax) {

@@ -6,6 +6,15 @@ class CM_Paging_LogTest extends CMTest_TestCase {
         CMTest_TH::clearEnv();
     }
 
+    public function testConstructorValidation() {
+        $exception = $this->catchException(function () {
+            new CM_Paging_Log(1);
+        });
+
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Log level `1` does not exist.', $exception->getMessage());
+    }
+
     public function testAddGet() {
         $handler = new CM_Log_Handler_MongoDb(CM_Paging_Log::COLLECTION_NAME);
         $user = CMTest_TH::createUser();
