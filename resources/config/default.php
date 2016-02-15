@@ -245,6 +245,13 @@ return function (CM_Config_Node $config) {
         ),
     );
 
+    $config->services['logger-handler-newrelic'] = [
+        'class'     => 'CMService_NewRelic_Log_Handler',
+        'arguments' => [
+            'level' => CM_Log_Logger::WARNING,
+        ],
+    ];
+
     $config->services['logger-handler-mongodb'] = [
         'class'     => 'CM_Log_Handler_MongoDb',
         'arguments' => [
@@ -276,6 +283,6 @@ return function (CM_Config_Node $config) {
                     ['logger-handler-file-error']
                 ],
             ],
-        ],
+        ]
     ];
 };
