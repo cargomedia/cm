@@ -244,4 +244,11 @@ return function (CM_Config_Node $config) {
             'appName' => 'CM Application',
         ),
     );
+
+    $config->services['logger-handler-newrelic'] = [
+        'class'     => 'CMService_NewRelic_Log_Handler',
+        'arguments' => [
+            'level' => CM_Log_Logger::WARNING,
+        ],
+    ];
 };
