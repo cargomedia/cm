@@ -45,7 +45,7 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
     }
 
     public function renderException( CM_Log_Record_Exception $record) {
-        $exception = $record->getException();
+        $exception = $record->getSerializableException();
 
         $traceData = [];
         $traceCount = 0;

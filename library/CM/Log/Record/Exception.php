@@ -2,8 +2,11 @@
 
 class CM_Log_Record_Exception extends CM_Log_Record {
 
-    /** @var CM_ExceptionHandling_SerializableException */
+    /** @var Exception */
     private $_exception;
+
+    /** @var CM_ExceptionHandling_SerializableException */
+    private $_serializableException;
 
     /**
      * @param Exception      $exception
@@ -11,8 +14,10 @@ class CM_Log_Record_Exception extends CM_Log_Record {
      * @param CM_Log_Context $context
      */
     public function __construct(Exception $exception, CM_Log_Context $context, $logLevel = null) {
-        $this->_exception = new CM_ExceptionHandling_SerializableException($exception);
-        $message = $this->_exception->getClass() . ': ' . $this->_exception->getMessage();
+        $this->_exception = $exception;
+        $this->_exceptionSerializable = new CM_ExceptionHandling_SerializableException($exception);
+
+        $message = $this->_exceptionSerializable->getClass() . ': ' . $this->_exceptionSerializable->getMessage();
         if (null === $logLevel) {
             $logLevel = $this->_exceptionSeverityToLevel($exception);
         }
@@ -21,10 +26,17 @@ class CM_Log_Record_Exception extends CM_Log_Record {
     }
 
     /**
-     * @return CM_ExceptionHandling_SerializableException
+     * @return Exception
      */
     public function getException() {
         return $this->_exception;
+    }
+
+    /**
+     * @return CM_ExceptionHandling_SerializableException
+     */
+    public function getSerializableException() {
+        return $this->_serializableException;
     }
 
     /**

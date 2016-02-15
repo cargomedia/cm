@@ -103,7 +103,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         }
 
         if ($record instanceof CM_Log_Record_Exception) {
-            $formattedRecord['exception'] = $record->getException();
+            $formattedRecord['exception'] = $record->getSerializableException();
         }
 
         return $formattedRecord;

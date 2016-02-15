@@ -257,7 +257,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
 
         $exception = new Exception('foo');
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
-            $recordException = $record->getException();
+            $recordException = $record->getSerializableException();
             $this->assertSame($exception->getMessage(), $recordException->getMessage());
             $this->assertSame($exception->getLine(), $recordException->getLine());
             $this->assertSame($exception->getFile(), $recordException->getFile());
@@ -270,7 +270,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $exception = new CM_Exception('bar');
         $exception->setSeverity(CM_Exception::WARN);
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
-            $recordException = $record->getException();
+            $recordException = $record->getSerializableException();
             $this->assertSame($exception->getMessage(), $recordException->getMessage());
             $this->assertSame($exception->getLine(), $recordException->getLine());
             $this->assertSame($exception->getFile(), $recordException->getFile());
@@ -283,7 +283,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $exception = new CM_Exception('foobar');
         $exception->setSeverity(CM_Exception::ERROR);
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
-            $recordException = $record->getException();
+            $recordException = $record->getSerializableException();
             $this->assertSame($exception->getMessage(), $recordException->getMessage());
             $this->assertSame($exception->getLine(), $recordException->getLine());
             $this->assertSame($exception->getFile(), $recordException->getFile());
@@ -296,7 +296,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $exception = new CM_Exception('test');
         $exception->setSeverity(CM_Exception::FATAL);
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
-            $recordException = $record->getException();
+            $recordException = $record->getSerializableException();
             $this->assertSame($exception->getMessage(), $recordException->getMessage());
             $this->assertSame($exception->getLine(), $recordException->getLine());
             $this->assertSame($exception->getFile(), $recordException->getFile());
