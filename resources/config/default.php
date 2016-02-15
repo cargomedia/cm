@@ -255,14 +255,26 @@ return function (CM_Config_Node $config) {
         ],
     ];
 
+    $config->services['logger-handler-file-error'] = [
+        'class'  => 'CM_Log_Handler_Factory',
+        'method' => [
+            'name'      => 'createFileHandler',
+            'arguments' => [
+                'path'  => 'logs/error.log',
+                'level' => CM_Log_Logger::WARNING,
+            ],
+        ],
+    ];
+
     $config->services['logger'] = [
         'class'  => 'CM_Log_Factory',
         'method' => [
             'name'      => 'createLogger',
             'arguments' => [
-                'handlerConfigList' => [[
-                    'name'     => 'logger-handler-mongodb',
-                ]],
+                'handlersLayerList' => [
+                    ['logger-handler-mongodb'],
+                    ['logger-handler-file-error']
+                ],
             ],
         ],
     ];
