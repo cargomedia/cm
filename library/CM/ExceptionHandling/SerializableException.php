@@ -23,6 +23,9 @@ class CM_ExceptionHandling_SerializableException {
     /** @var array */
     public $metaInfo = array();
 
+    /** @var Exception */
+    protected $_exception;
+
     /**
      * @param Exception $exception
      */
@@ -66,6 +69,13 @@ class CM_ExceptionHandling_SerializableException {
     }
 
     /**
+     * @return Exception
+     */
+    public function getOriginalException() {
+        return $this->_exception;
+    }
+
+    /**
      * @return array|null
      */
     public function getTrace() {
@@ -83,6 +93,7 @@ class CM_ExceptionHandling_SerializableException {
      * @param Exception $exception
      */
     private function _extract(Exception $exception) {
+        $this->_exception = $exception;
         $this->class = get_class($exception);
         $this->message = $exception->getMessage();
         $this->line = $exception->getLine();
