@@ -13,7 +13,6 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
         $handlerStructList = \Functional\map($handlerConfigList, function (array $handlerConfig) {
             return [
                 'handler'   => $this->getServiceManager()->get($handlerConfig['name']),
-                'propagate' => (bool) $handlerConfig['propagate'],
             ];
         });
         return $this->_createLogger($handlerStructList);
@@ -27,12 +26,10 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
         if ($this->getServiceManager()->has('logger-handler-file-error')) {
             $handlerStructList[] = [
                 'handler'   => $this->getServiceManager()->get('logger-handler-file-error', 'CM_Log_Handler_Stream'),
-                'propagate' => true,
             ];
         }
         $handlerStructList[] = [
             'handler'   => (new CM_Log_Handler_Factory())->createStderrHandler('{levelname}: {message}'),
-            'propagate' => false,
         ];
         return $this->_createLogger($handlerStructList);
     }

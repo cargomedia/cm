@@ -80,7 +80,6 @@ class CM_Log_Logger {
     public function addHandler(array $handlerStruct) {
         if (!isset($handlerStruct['handler'])
             || !$handlerStruct['handler'] instanceof CM_Log_Handler_HandlerInterface
-            || !isset($handlerStruct['propagate'])
         ) {
             throw new CM_Exception_Invalid('Malformed handlerStruct parameter');
         }
@@ -143,14 +142,13 @@ class CM_Log_Logger {
             $handlerFailed = false;
             /** @var CM_Log_Handler_HandlerInterface $handler */
             $handler = $handlerStruct['handler'];
-            $propagate = (bool) $handlerStruct['propagate'];
             try {
                 $handler->handleRecord($record);
             } catch (Exception $e) {
                 $exceptionList[] = $e;
                 $handlerFailed = true;
             }
-            if ($handler->isHandling($record) && !$propagate && !$handlerFailed) {
+            if ($handler->isHandling($record) && !$handlerFailed) {
                 break;
             }
         }

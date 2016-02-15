@@ -262,7 +262,6 @@ return function (CM_Config_Node $config) {
             'arguments' => [
                 'handlerConfigList' => [[
                     'name'     => 'logger-handler-mongodb',
-                    'propagate' => true,
                 ]],
             ],
         ],
