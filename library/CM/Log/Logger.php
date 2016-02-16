@@ -20,23 +20,24 @@ class CM_Log_Logger {
     );
 
     /** @var array */
-    private $_handlerStructList;
+    private $_handlersLayerList;
 
     /** @var CM_Log_Context */
     private $_contextGlobal;
 
     /**
      * @param CM_Log_Context $contextGlobal
-     * @param array|null     $handlerStructList
+     * @param array          $handlersLayerList
+     * @throws CM_Exception_Invalid
      */
-    public function __construct(CM_Log_Context $contextGlobal, array $handlerStructList = null) {
-        if (null === $handlerStructList) {
-            $handlerStructList = [];
+    public function __construct(CM_Log_Context $contextGlobal, array $handlersLayerList) {
+        if (empty($handlersLayerList)) {
+            throw new CM_Exception_Invalid('Logger should have at least 1 handler');
         }
-        $this->_handlerStructList = [];
         $this->_contextGlobal = $contextGlobal;
-
-        $this->addHandlers($handlerStructList);
+        foreach ($handlersLayerList as $handlersLayer) {
+            $this->_addHandlersLayer($handlersLayer);
+        }
     }
 
     /**
@@ -44,7 +45,6 @@ class CM_Log_Logger {
      * @param int                 $level
      * @param CM_Log_Context|null $context
      * @return CM_Log_Logger
-     * @throws CM_Log_HandlingException
      */
     public function addMessage($message, $level, CM_Log_Context $context = null) {
         $message = (string) $message;
@@ -62,28 +62,6 @@ class CM_Log_Logger {
     public function addException(Exception $exception, CM_Log_Context $context = null, $logLevel = null) {
         $context = $this->_mergeWithGlobalContext($context);
         return $this->_addRecord(new CM_Log_Record_Exception($exception, $context, $logLevel));
-    }
-
-    /**
-     * @param array $handlerStructList
-     */
-    public function addHandlers(array $handlerStructList) {
-        foreach ($handlerStructList as $handlerStruct) {
-            $this->addHandler($handlerStruct);
-        }
-    }
-
-    /**
-     * @param array $handlerStruct
-     * @throws CM_Exception_Invalid
-     */
-    public function addHandler(array $handlerStruct) {
-        if (!isset($handlerStruct['handler'])
-            || !$handlerStruct['handler'] instanceof CM_Log_Handler_HandlerInterface
-        ) {
-            throw new CM_Exception_Invalid('Malformed handlerStruct parameter');
-        }
-        $this->_handlerStructList[] = $handlerStruct;
     }
 
     /**
@@ -132,31 +110,111 @@ class CM_Log_Logger {
     }
 
     /**
+     * @param array $handlersLayer
+     * @throws CM_Exception_Invalid
+     */
+    protected function _addHandlersLayer(array $handlersLayer) {
+        $currentLayerIdx = sizeof($this->_handlersLayerList);
+        foreach ($handlersLayer as $handler) {
+            if (!$handler instanceof CM_Log_Handler_HandlerInterface) {
+                throw new CM_Exception_Invalid('Not logger handler instance');
+            }
+            $this->_handlersLayerList[$currentLayerIdx][] = $handler;
+        }
+    }
+
+    /**
      * @param CM_Log_Record $record
      * @return CM_Log_Logger
-     * @throws CM_Log_HandlingException
      */
     protected function _addRecord(CM_Log_Record $record) {
+        $this->_addRecordToLayer($record, 0);
+        return $this;
+    }
+
+    /**
+     * @param CM_Log_Record $record
+     * @param int           $layerIdx
+     * @throws CM_Exception_Invalid
+     */
+    protected function _addRecordToLayer(CM_Log_Record $record, $layerIdx) {
+        $layerIdx = (int) $layerIdx;
+
+        $layersListSize = sizeof($this->_handlersLayerList);
+        if ($layerIdx >= $layersListSize) {
+            throw new CM_Exception_Invalid('Wrong offset for handlers layer');
+        }
+        $handlerList = $this->_handlersLayerList[$layerIdx];
         $exceptionList = [];
-        foreach ($this->_handlerStructList as $handlerStruct) {
-            $handlerFailed = false;
+        $failedHandlerIds = [];
+
+        $layerSize = sizeof($handlerList);
+        for ($i = 0, $n = $layerSize; $i < $n; $i++) {
             /** @var CM_Log_Handler_HandlerInterface $handler */
-            $handler = $handlerStruct['handler'];
+            $handler = $handlerList[$i];
             try {
                 $handler->handleRecord($record);
             } catch (Exception $e) {
                 $exceptionList[] = $e;
-                $handlerFailed = true;
-            }
-            if ($handler->isHandling($record) && !$handlerFailed) {
-                break;
+                $failedHandlerIds[] = $i;
             }
         }
+
         if (!empty($exceptionList)) {
-            $exceptionMessage = count($exceptionList) . ' handler(s) failed to process a record.';
-            throw new CM_Log_HandlingException($exceptionMessage, $exceptionList);
+            if ($layerSize === sizeof($exceptionList)) { //all handlers failed so use next layer
+                $nextLayerIdx = $layerIdx + 1;
+                if ($nextLayerIdx >= $layersListSize) {
+                    return; //no chances, can't throw here because exceptions will be not logged
+                } else {
+                    //use next layer
+                    $this->_addRecordToLayer($record, $nextLayerIdx);
+                    $this->_logHandlersExceptions($exceptionList, $record->getContext(), $nextLayerIdx);
+                }
+            } else {
+                //use only working handlers for writing exceptions
+                $this->_logHandlersExceptions($exceptionList, $record->getContext(), $layerIdx, $failedHandlerIds);
+            }
         }
-        return $this;
+    }
+
+    /**
+     * @param Exception[]    $exceptionList
+     * @param CM_Log_Context $context
+     * @param int            $layerIdx
+     * @param array|null     $skipHandlerIds
+     * @throws CM_Exception_Invalid
+     */
+    protected function _logHandlersExceptions(array $exceptionList, CM_Log_Context $context, $layerIdx, array $skipHandlerIds = null) {
+        $layerIdx = (int) $layerIdx;
+        if (null === $skipHandlerIds) {
+            $skipHandlerIds = [];
+        }
+
+        $layersListSize = sizeof($this->_handlersLayerList);
+        if ($layerIdx >= $layersListSize) {
+            throw new CM_Exception_Invalid('Wrong offset for log layer');
+        }
+        $handlerList = $this->_handlersLayerList[$layerIdx];
+        $layerSize = sizeof($handlerList);
+        try {
+            for ($i = 0, $n = $layerSize; $i < $n; $i++) {
+                if (!in_array($i, $skipHandlerIds)) {
+                    /** @var CM_Log_Handler_HandlerInterface $handler */
+                    $handler = $handlerList[$i];
+                    foreach ($exceptionList as $exception) {
+                        $handler->handleRecord(new CM_Log_Record_Exception($exception, $context));
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            $nextLayerIdx = $layerIdx + 1;
+            if ($nextLayerIdx >= $layersListSize) {
+                return;
+            } else {
+                //send down only original handlers exceptions, not collect them
+                $this->_logHandlersExceptions($exceptionList, $context, $nextLayerIdx);
+            }
+        }
     }
 
     /**

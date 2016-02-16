@@ -77,23 +77,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
      * @param int|null  $logLevel
      */
     public function logException(Exception $exception, $logLevel = null) {
-        try {
-            $this->getServiceManager()->getLogger()->addException($exception, null, $logLevel);
-        } catch (CM_Log_HandlingException $loggerException) {
-            $backupLogger = $this->_getBackupLogger();
-            $backupLogger
-                ->error('Origin exception:')->addException($exception, null, $logLevel)
-                ->error('Handlers exception:')
-                ->error($loggerException->getMessage());
-
-            foreach ($loggerException->getExceptionList() as $handlerException) {
-                $backupLogger->addException($handlerException);
-            }
-        } catch (Exception $loggerException) {
-            $this->_getBackupLogger()
-                ->error('Origin exception:')->addException($exception, null, $logLevel)
-                ->error('Logger exception:')->addException($loggerException);
-        }
+        $this->getServiceManager()->getLogger()->addException($exception, null, $logLevel);
     }
 
     /**
@@ -129,12 +113,5 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
      */
     private function _getPrintSeverityMin() {
         return $this->_printSeverityMin;
-    }
-
-    /**
-     * @return CM_Log_Logger
-     */
-    protected function _getBackupLogger() {
-        return $this->_loggerFactory->createBackupLogger();
     }
 }

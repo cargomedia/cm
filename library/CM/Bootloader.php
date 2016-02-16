@@ -184,13 +184,6 @@ class CM_Bootloader {
         $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', [
             'adapter' => new CM_File_Filesystem_Adapter_Local($this->getDirTmp())
         ]);
-
-        //handler for backup logger
-        $serviceManager->register('logger-handler-file-error', 'CM_Log_Handler_Factory', null, 'createFileHandler', [
-            'path'            => 'logs/error.log',
-            'level'           => CM_Log_Logger::WARNING,
-        ]);
-
         foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
             $serviceManager->registerWithArray($serviceKey, $serviceDefinition);
         }

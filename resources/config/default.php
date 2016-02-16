@@ -278,8 +278,8 @@ return function (CM_Config_Node $config) {
         'method' => [
             'name'      => 'createLogger',
             'arguments' => [
-                'handlersLayerList' => [
-                    ['logger-handler-mongodb'],
+                'handlersLayerConfigList' => [
+                    ['logger-handler-mongodb', 'logger-handler-newrelic'],
                     ['logger-handler-file-error']
                 ],
             ],
