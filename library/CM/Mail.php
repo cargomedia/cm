@@ -468,6 +468,6 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             'to'      => $this->getTo(),
             'cc'      => $this->getCc(),
             'bcc'     => $this->getBcc(),
-        ]), CM_Paging_Log_Mail::getTypeStatic());
+        ]));
     }
 }
