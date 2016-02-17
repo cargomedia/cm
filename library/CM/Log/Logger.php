@@ -32,7 +32,7 @@ class CM_Log_Logger {
      */
     public function __construct(CM_Log_Context $contextGlobal, array $handlersLayerList) {
         if (empty($handlersLayerList)) {
-            throw new CM_Exception_Invalid('Logger should have at least 1 handler');
+            throw new CM_Exception_Invalid('Logger should have at least 1 handler layer');
         }
         $this->_contextGlobal = $contextGlobal;
         foreach ($handlersLayerList as $handlersLayer) {
@@ -115,6 +115,9 @@ class CM_Log_Logger {
      */
     protected function _addHandlersLayer(array $handlersLayer) {
         $currentLayerIdx = sizeof($this->_handlersLayerList);
+        if (empty($handlersLayer)) {
+            throw new CM_Exception_Invalid('Empty handlers layer');
+        }
         foreach ($handlersLayer as $handler) {
             if (!$handler instanceof CM_Log_Handler_HandlerInterface) {
                 throw new CM_Exception_Invalid('Not logger handler instance');
@@ -189,24 +192,29 @@ class CM_Log_Logger {
         if (null === $skipHandlerIds) {
             $skipHandlerIds = [];
         }
-
         $layersListSize = sizeof($this->_handlersLayerList);
         if ($layerIdx >= $layersListSize) {
             throw new CM_Exception_Invalid('Wrong offset for log layer');
         }
         $handlerList = $this->_handlersLayerList[$layerIdx];
         $layerSize = sizeof($handlerList);
-        try {
-            for ($i = 0, $n = $layerSize; $i < $n; $i++) {
-                if (!in_array($i, $skipHandlerIds)) {
-                    /** @var CM_Log_Handler_HandlerInterface $handler */
-                    $handler = $handlerList[$i];
+        $exceptionsCount = 0;
+
+        for ($i = 0, $n = $layerSize; $i < $n; $i++) {
+            if (!in_array($i, $skipHandlerIds)) {
+                /** @var CM_Log_Handler_HandlerInterface $handler */
+                $handler = $handlerList[$i];
+                try {
                     foreach ($exceptionList as $exception) {
                         $handler->handleRecord(new CM_Log_Record_Exception($exception, $context));
                     }
+                } catch (Exception $e) {
+                    $exceptionsCount += 1;
                 }
             }
-        } catch (Exception $e) {
+        }
+
+        if ($exceptionsCount === $layerSize) { //all handlers failed
             $nextLayerIdx = $layerIdx + 1;
             if ($nextLayerIdx >= $layersListSize) {
                 return;
