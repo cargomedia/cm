@@ -79,10 +79,16 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             $formattedContext['httpRequest'] = [
                 'method'  => $request->getMethodName(),
                 'uri'     => $request->getUri(),
-                'query'   => $request->getQuery(),
+                'query'   => [],
                 'server'  => $request->getServer(),
                 'headers' => $request->getHeaders(),
             ];
+
+            try {
+                $formattedContext['httpRequest']['query'] = $request->getQuery();
+            } catch (CM_Exception_Invalid $e) {
+                //CM_Http_Request_Post can throw.
+            }
 
             if ($request->hasClientId()) {
                 $formattedContext['httpRequest']['clientId'] = $request->getClientId();
