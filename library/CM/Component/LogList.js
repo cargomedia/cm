@@ -7,13 +7,13 @@ var CM_Component_LogList = CM_Component_Abstract.extend({
   /** @type String */
   _class: 'CM_Component_LogList',
 
-  type: null,
+  level: null,
 
   events: {
     'click .flushLog': 'flushLog'
   },
 
   flushLog: function() {
-    this.ajaxModal('flushLog', {'type': this.type});
+    this.ajaxModal('flushLog', {level: this.level});
   }
 });

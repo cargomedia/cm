@@ -9,7 +9,7 @@ class CM_Component_LogList extends CM_Component_Abstract {
     }
 
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
-        $type = $this->_params->getInt('type');
+        $level = $this->_params->getInt('level');
         $aggregate = $this->_params->has('aggregate') ? $this->_params->getInt('aggregate') : null;
         $urlPage = $this->_params->has('urlPage') ? $this->_params->getString('urlPage') : null;
         $urlParams = $this->_params->has('urlParams') ? $this->_params->getArray('urlParams') : null;
@@ -19,11 +19,11 @@ class CM_Component_LogList extends CM_Component_Abstract {
             $deployStamp = CM_App::getInstance()->getDeployVersion();
             $aggregationPeriod = time() - $deployStamp;
         }
-        $logList = CM_Paging_Log_Abstract::factory($type, (bool) $aggregationPeriod, $aggregationPeriod);
+        $logList = CM_Paging_Log::factory($level, (bool) $aggregationPeriod, $aggregationPeriod);
         $logList->setPage($this->_params->getPage(), $this->_params->getInt('count', 50));
 
         $viewResponse->setData([
-            'type'                  => $type,
+            'level'                 => $level,
             'logList'               => $logList,
             'aggregate'             => $aggregate,
             'aggregationPeriod'     => $aggregationPeriod,
@@ -31,15 +31,15 @@ class CM_Component_LogList extends CM_Component_Abstract {
             'urlPage'               => $urlPage,
             'urlParams'             => $urlParams
         ]);
-        $viewResponse->getJs()->setProperty('type', $type);
+        $viewResponse->getJs()->setProperty('level', $level);
     }
 
     public function ajax_flushLog(CM_Params $params, CM_Frontend_JavascriptContainer $handler, CM_Http_Response_View_Ajax $response) {
         if (!$this->_getAllowedFlush($response->getRender()->getEnvironment())) {
             throw new CM_Exception_NotAllowed();
         }
-        $type = $params->getInt('type');
-        $logList = CM_Paging_Log_Abstract::factory($type);
+        $level = $params->getInt('level');
+        $logList = CM_Paging_Log::factory($level);
         $logList->flush();
 
         $response->reloadComponent();
