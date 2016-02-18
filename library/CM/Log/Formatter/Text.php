@@ -24,9 +24,9 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
             $server = $httpRequest->getServer();
             $httpRequestText = '{type} {path} {proto}, host: {host}, ip: {ip}, referer: {referer}, user-agent: {agent}';
             $data['httpRequest'] = $this->_format($httpRequestText, [
-                'type'    => $server['REQUEST_METHOD'],
+                'type'    => isset($server['REQUEST_METHOD']) ? $server['REQUEST_METHOD'] : '',
                 'path'    => $httpRequest->getPath(),
-                'proto'   => $server['SERVER_PROTOCOL'],
+                'proto'   => isset($server['SERVER_PROTOCOL']) ? $server['SERVER_PROTOCOL'] : '',
                 'host'    => $httpRequest->getHost(),
                 'ip'      => $httpRequest->getIp(),
                 'referer' => $httpRequest->getHeader('referer'),
@@ -44,7 +44,7 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
         return empty($data) ? null : $this->_formatArrayToLines(' - %s: %s', $data);
     }
 
-    public function renderException( CM_Log_Record_Exception $record) {
+    public function renderException(CM_Log_Record_Exception $record) {
         $exception = $record->getSerializableException();
 
         $traceData = [];
