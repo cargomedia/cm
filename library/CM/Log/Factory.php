@@ -5,11 +5,12 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
     use CM_Service_ManagerAwareTrait;
 
     /**
-     * @param array $handlersLayerConfigList
+     * @param array        $handlersLayerConfigList
+     * @param boolean|null $addStderrHandler
      * @return CM_Log_Logger
      * @throws CM_Exception_Invalid
      */
-    public function createLogger(array $handlersLayerConfigList) {
+    public function createLogger(array $handlersLayerConfigList, $addStderrHandler = null) {
         $handlersLayerList = [];
         foreach ($handlersLayerConfigList as $handlersLayerConfig) {
             $currentLayer = [];
@@ -18,8 +19,10 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
             }
             $handlersLayerList[] = $currentLayer;
         }
-        $handlersLayerList[sizeof($handlersLayerList) - 1][] = (new CM_Log_Handler_Factory())->createStderrHandler('{levelname}: {message}');
-        //append stderr to the end of last layer
+        if (true === $addStderrHandler) {
+            $handlersLayerList[sizeof($handlersLayerList) - 1][] = (new CM_Log_Handler_Factory())->createStderrHandler('{levelname}: {message}');
+            //append stderr to the end of last layer
+        }
 
         return $this->_createLogger($handlersLayerList);
     }

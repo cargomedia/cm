@@ -282,6 +282,7 @@ return function (CM_Config_Node $config) {
                     ['logger-handler-mongodb', 'logger-handler-newrelic'],
                     ['logger-handler-file-error']
                 ],
+                'addStderrHandler'        => true,
             ],
         ]
     ];
