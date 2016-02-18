@@ -1,0 +1,21 @@
+{
+  "cm_log": [
+    {
+      "key": {
+        "_id": 1
+      },
+      "options": {
+        "name": "_id_"
+      }
+    },
+    {
+      "key": {
+        "level": 1,
+        "createdAt": 1
+      },
+      "options": {
+        "name": "level_1_createdAt_1"
+      }
+    }
+  ]
+}
