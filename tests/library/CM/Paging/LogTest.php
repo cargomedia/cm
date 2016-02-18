@@ -10,9 +10,14 @@ class CM_Paging_LogTest extends CMTest_TestCase {
         $exception = $this->catchException(function () {
             new CM_Paging_Log(1);
         });
-
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertSame('Log level `1` does not exist.', $exception->getMessage());
+
+        $exception = $this->catchException(function () {
+            new CM_Paging_Log(CM_Log_Logger::INFO, null, null, 1);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Type is not a children of CM_Paging_Log.', $exception->getMessage());
     }
 
     public function testAddGet() {

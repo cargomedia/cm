@@ -10,6 +10,7 @@ class CM_Component_LogList extends CM_Component_Abstract {
 
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $level = $this->_params->getInt('level');
+        $type = $this->_params->has('type') ? $this->_params->getInt('type') : null;
         $aggregate = $this->_params->has('aggregate') ? $this->_params->getInt('aggregate') : null;
         $urlPage = $this->_params->has('urlPage') ? $this->_params->getString('urlPage') : null;
         $urlParams = $this->_params->has('urlParams') ? $this->_params->getArray('urlParams') : null;
@@ -24,6 +25,7 @@ class CM_Component_LogList extends CM_Component_Abstract {
 
         $viewResponse->setData([
             'level'                 => $level,
+            'type'                  => $type,
             'logList'               => $logList,
             'aggregate'             => $aggregate,
             'aggregationPeriod'     => $aggregationPeriod,
@@ -32,6 +34,7 @@ class CM_Component_LogList extends CM_Component_Abstract {
             'urlParams'             => $urlParams
         ]);
         $viewResponse->getJs()->setProperty('level', $level);
+        $viewResponse->getJs()->setProperty('type', $type);
     }
 
     public function ajax_flushLog(CM_Params $params, CM_Frontend_JavascriptContainer $handler, CM_Http_Response_View_Ajax $response) {
@@ -39,7 +42,8 @@ class CM_Component_LogList extends CM_Component_Abstract {
             throw new CM_Exception_NotAllowed();
         }
         $level = $params->getInt('level');
-        $logList = CM_Paging_Log::factory($level);
+        $type = $params->has('type') ? $params->getInt('type') : null;
+        $logList = CM_Paging_Log::factory($level, null, null, $type);
         $logList->flush();
 
         $response->reloadComponent();

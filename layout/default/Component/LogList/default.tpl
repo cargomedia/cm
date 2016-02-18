@@ -2,14 +2,14 @@
 
 <ul class="aggregationPeriodList menu-pills">
   <li class="aggregationPeriod {if null === $aggregate}active{/if}">
-    <a href="{linkUrl page=$urlPage level=$level}">No aggregation</a>
+    <a href="{linkUrl page=$urlPage level=$level type=$type}">No aggregation</a>
   </li>
   <li class="aggregationPeriod {if 0 === $aggregate}active{/if}">
-    <a href="{linkUrl page=$urlPage level=$level aggregate=0}">Last Release</a>
+    <a href="{linkUrl page=$urlPage level=$level type=$type aggregate=0}">Last Release</a>
   </li>
   {foreach $aggregationPeriodList as $aggregationPeriodItem}
     <li class="aggregationPeriod {if $aggregationPeriodItem === $aggregate}active{/if}">
-      <a href="{linkUrl page=$urlPage level=$level aggregate=$aggregationPeriodItem}">{date_period period=$aggregationPeriodItem}</a>
+      <a href="{linkUrl page=$urlPage level=$level type=$type aggregate=$aggregationPeriodItem}">{date_period period=$aggregationPeriodItem}</a>
     </li>
   {/foreach}
 </ul>
