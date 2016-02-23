@@ -56,7 +56,7 @@
             {/foreach}
           </div>
         {elseif (!empty($exception.traceString))}
-            <div><span class="label">Trace as string:</span> {$exception.traceString}</div>
+          <div><span class="label">Trace as string:</span> {$exception.traceString}</div>
         {/if}
 
       {/if}
@@ -66,7 +66,9 @@
         <div class="toggleNext">Meta Info</div>
         <div class="toggleNext-content">
           {if (!empty($context.extra))}
-            <div><span class="label">Extra:</span> {$context.extra|@print_r}</div>
+            <div><span class="label">Extra:</span>
+              <pre>{$context.extra|@print_r}</pre>
+            </div>
           {/if}
           {if (isset($context.user))}
             <div><span class="label">User: id-{$context.id}</span> <span class="label">name:</span> {$context.name}</div>
