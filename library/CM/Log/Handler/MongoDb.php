@@ -90,9 +90,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
                 //CM_Http_Request_Post can throw.
             }
 
-            if ($request->hasClientId()) {
-                $formattedContext['httpRequest']['clientId'] = $request->getClientId();
-            }
+            $formattedContext['httpRequest']['clientId'] = $request->getClientId();
         }
 
         $formattedRecord = [
