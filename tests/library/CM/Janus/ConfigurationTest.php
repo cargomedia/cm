@@ -15,6 +15,21 @@ class CM_Janus_ConfigurationTest extends CMTest_TestCase {
         $this->assertSame(null, $configuration->findServerByKey('zoo'));
     }
 
+    public function testFindServerByPlugin() {
+        $server1 = $this->mockClass('CM_Janus_Server')->newInstanceWithoutConstructor();
+        $server1->mockMethod('getPluginList')->set(['audio', 'audioHD']);
+        $server2 = $this->mockClass('CM_Janus_Server')->newInstanceWithoutConstructor();
+        $server2->mockMethod('getPluginList')->set(['video', 'videoHD']);
+
+        $configuration = new CM_Janus_Configuration([$server1, $server2]);
+
+        $this->assertSame($server1, $configuration->findServerByPlugin('audio'));
+        $this->assertSame($server1, $configuration->findServerByPlugin('audioHD'));
+        $this->assertSame($server2, $configuration->findServerByPlugin('videoHD'));
+        $this->assertSame(null, $configuration->findServerByKey('bar'));
+    }
+
+
     public function testGetServer() {
         $server = $this->mockClass('CM_Janus_Server')->newInstanceWithoutConstructor();
         $server->mockMethod('getId')->set(1);
