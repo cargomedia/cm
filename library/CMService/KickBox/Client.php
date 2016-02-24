@@ -87,7 +87,7 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
                 ]);
             }
         } catch (Exception $exception) {
-            $this->_handleException($exception);
+            $this->_logException($exception);
             return null;
         }
         return $response->body;
@@ -96,10 +96,10 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
     /**
      * @param Exception $exception
      */
-    protected function _handleException(Exception $exception) {
+    protected function _logException(Exception $exception) {
         if ('RuntimeException' === get_class($exception) && false !== strpos($exception->getMessage(), ' timed out ')) {
             $exception = new CM_Exception($exception->getMessage(), CM_Exception::WARN);
         }
-        CM_Bootloader::getInstance()->getExceptionHandler()->handleException($exception);
+        CM_Bootloader::getInstance()->getExceptionHandler()->logException($exception);
     }
 }
