@@ -34,7 +34,7 @@
           {date_timeago time=$log.createdAt->toDateTime()->getTimestamp()}
         {/if}
       </div>
-      <div class="message">{if isset($log.level)}{$log.level}{/if} - {$log.message|escape}</div>
+      <div class="message">{if isset($log.level)}{$levelMap[$log.level]}{/if} - {$log.message|escape}</div>
 
       {if !empty($log.exception)}
         {$exception = $log.exception}

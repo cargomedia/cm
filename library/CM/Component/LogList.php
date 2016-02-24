@@ -31,7 +31,8 @@ class CM_Component_LogList extends CM_Component_Abstract {
             'aggregationPeriod'     => $aggregationPeriod,
             'aggregationPeriodList' => array(3600, 86400, 7 * 86400, 31 * 86400),
             'urlPage'               => $urlPage,
-            'urlParams'             => $urlParams
+            'urlParams'             => $urlParams,
+            'levelMap'              => array_flip(CM_Log_Logger::getLevels())
         ]);
         $viewResponse->getJs()->setProperty('level', $level);
         $viewResponse->getJs()->setProperty('type', $type);
