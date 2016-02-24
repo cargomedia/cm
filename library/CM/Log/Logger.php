@@ -180,7 +180,6 @@ class CM_Log_Logger {
     /**
      * @param Exception[]    $exceptionList
      * @param CM_Log_Context $context
-     * @throws CM_Exception_Invalid
      */
     protected function _logHandlersExceptions(array $exceptionList, CM_Log_Context $context) {
         foreach ($exceptionList as $exception) {
