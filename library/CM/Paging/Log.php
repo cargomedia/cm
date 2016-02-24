@@ -19,6 +19,10 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
      */
     public function __construct($level, $aggregate = null, $ageMax = null, $type = null) {
         $level = (int) $level;
+        if (null !== $ageMax) {
+            $ageMax = (int) $ageMax;
+        }
+
         if (!CM_Log_Logger::hasLevel($level)) {
             throw new CM_Exception_Invalid('Log level `' . $level . '` does not exist.');
         }
@@ -42,7 +46,7 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         $criteria = array_merge($criteria, self::addTypeCriteria($this->_type));
 
         if ($ageMax) {
-            $criteria['createdAt'] = ['$gt' => new MongoDate(time() - (int) $ageMax)];
+            $criteria['createdAt'] = ['$gt' => new MongoDate(time() - $ageMax)];
         }
 
         if (true === $aggregate) {
@@ -110,16 +114,4 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         }
         return ['context.extra.type' => $typeCriteria];
     }
-
-    /**
-     * @param int       $level
-     * @param bool|null $aggregate
-     * @param int|null  $ageMax
-     * @param int|null  $type
-     * @return CM_Paging_Log
-     */
-    final public static function factory($level, $aggregate = null, $ageMax = null, $type = null) {
-        return new self($level, $aggregate, $ageMax, $type);
-    }
-    //TODO delete for the sake of constructor
 }

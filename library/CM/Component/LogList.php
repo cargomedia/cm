@@ -20,7 +20,7 @@ class CM_Component_LogList extends CM_Component_Abstract {
             $deployStamp = CM_App::getInstance()->getDeployVersion();
             $aggregationPeriod = time() - $deployStamp;
         }
-        $logList = CM_Paging_Log::factory($level, (bool) $aggregationPeriod, $aggregationPeriod, $type);
+        $logList = new CM_Paging_Log($level, (bool) $aggregationPeriod, $aggregationPeriod, $type);
         $logList->setPage($this->_params->getPage(), $this->_params->getInt('count', 50));
 
         $viewResponse->setData([
@@ -44,7 +44,7 @@ class CM_Component_LogList extends CM_Component_Abstract {
         }
         $level = $params->getInt('level');
         $type = $params->has('type') ? $params->getInt('type') : null;
-        $logList = CM_Paging_Log::factory($level, null, null, $type);
+        $logList = new CM_Paging_Log($level, null, null, $type);
         $logList->flush();
 
         $response->reloadComponent();
