@@ -82,7 +82,7 @@
               <pre>{$context.httpRequest.server|@print_r}</pre>
             </div>
             <div><span class="label">Headers:</span>
-              <pre>{$context.httpRequest.headers|@print_r:true}</pre>
+              <pre>{$context.httpRequest.headers|@print_r}</pre>
             </div>
             {if (isset($context.httpRequest.clientId))}
               <div><span class="label">ClientId:</span> {$context.httpRequest.clientId}</div>
