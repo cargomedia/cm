@@ -204,8 +204,12 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
                     'Bytes copied' => $sizeDestination,
                 ]);
             }
-            @fclose($streamDestination);
-            @fclose($streamSource);
+            if (!@fclose($streamDestination)) {
+                throw new CM_Exception('Could not close stream for `' . $file->getPath() . '`');
+            }
+            if (!@fclose($streamSource)) {
+                throw new CM_Exception('Could not close stream for `' . $this->getPath() . '`');
+            }
         } else {
             $file->write($this->read());
         }
