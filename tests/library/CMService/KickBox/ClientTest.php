@@ -77,10 +77,16 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
         $kickBoxMock->isValid('test@example.com');
     }
 
-    public function testHandleExceptionTimeout() {
+    public function testLogExceptionTimeout() {
         $kickBoxMock = $this->mockObject('CMService_KickBox_Client', array('', true, false, 0));
-        $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
-        $printException = $exceptionHandlerMock->mockMethod('handleException');
+
+        /** @var CM_Log_Factory|\Mocka\ClassMock $loggerFactory */
+        $loggerFactory = $this->mockClass('CM_Log_Factory')->newInstance();
+        $loggerFactory->setServiceManager($this->getServiceManager());
+
+        $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler_Cli')->newInstance([$loggerFactory]);
+        $printException = $exceptionHandlerMock->mockMethod('logException');
+
         $exceptionHandler = CM_Bootloader::getInstance()->getExceptionHandler();
         /** @var CM_ExceptionHandling_Handler_Abstract $exceptionHandlerMock */
         CM_Bootloader::getInstance()->setExceptionHandler($exceptionHandlerMock);
@@ -108,14 +114,19 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
         CM_Bootloader::getInstance()->setExceptionHandler($exceptionHandler);
     }
 
-    public function testHandleExceptionOther() {
+    public function testLogExceptionOther() {
         $kickBoxMock = $this->mockObject('CMService_KickBox_Client', array('', true, false, 0));
         $exceptionMessage = '[curl] 6: Couldn\'t resolve host \'api.kickbox.io\' [url] https://api.kickbox.io/v1/verify?email=testLogExceptionOther%40example.com';
         $kickBoxMock->mockMethod('_getResponse')->set(function () use ($exceptionMessage) {
             throw new RuntimeException($exceptionMessage);
         });
-        $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
-        $printException = $exceptionHandlerMock->mockMethod('handleException')->set(function (Exception $exception) {
+
+        /** @var CM_Log_Factory|\Mocka\ClassMock $loggerFactory */
+        $loggerFactory = $this->mockClass('CM_Log_Factory')->newInstance();
+        $loggerFactory->setServiceManager($this->getServiceManager());
+
+        $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler_Cli')->newInstance([$loggerFactory]);
+        $printException = $exceptionHandlerMock->mockMethod('logException')->set(function (Exception $exception) {
             $this->assertTrue('RuntimeException' === get_class($exception));
         });
         $exceptionHandler = CM_Bootloader::getInstance()->getExceptionHandler();
