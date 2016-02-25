@@ -268,7 +268,7 @@ return function (CM_Config_Node $config) {
             'name'      => 'createFileHandler',
             'arguments' => [
                 'path'  => 'logs/error.log',
-                'level' => CM_Log_Logger::WARNING,
+                'level' => CM_Log_Logger::INFO,
             ],
         ],
     ];
