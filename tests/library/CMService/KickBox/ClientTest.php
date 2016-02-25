@@ -80,11 +80,7 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
     public function testLogExceptionTimeout() {
         $kickBoxMock = $this->mockObject('CMService_KickBox_Client', array('', true, false, 0));
 
-        /** @var CM_Log_Factory|\Mocka\ClassMock $loggerFactory */
-        $loggerFactory = $this->mockClass('CM_Log_Factory')->newInstance();
-        $loggerFactory->setServiceManager($this->getServiceManager());
-
-        $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler_Cli')->newInstance([$loggerFactory]);
+        $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler_Cli')->newInstance();
         $printException = $exceptionHandlerMock->mockMethod('logException');
 
         $exceptionHandler = CM_Bootloader::getInstance()->getExceptionHandler();
@@ -121,11 +117,7 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
             throw new RuntimeException($exceptionMessage);
         });
 
-        /** @var CM_Log_Factory|\Mocka\ClassMock $loggerFactory */
-        $loggerFactory = $this->mockClass('CM_Log_Factory')->newInstance();
-        $loggerFactory->setServiceManager($this->getServiceManager());
-
-        $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler_Cli')->newInstance([$loggerFactory]);
+        $exceptionHandlerMock = $this->mockClass('CM_ExceptionHandling_Handler_Cli')->newInstance();
         $printException = $exceptionHandlerMock->mockMethod('logException')->set(function (Exception $exception) {
             $this->assertTrue('RuntimeException' === get_class($exception));
         });

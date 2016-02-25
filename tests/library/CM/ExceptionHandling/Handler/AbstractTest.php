@@ -19,12 +19,9 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $serviceManager = $this->mockClass('CM_Service_Manager')->newInstance();
         $serviceManager->mockMethod('getLogger')->set($logger);
 
-        /** @var CM_Log_Factory|\Mocka\ClassMock $loggerFactory */
-        $loggerFactory = $this->mockClass('CM_Log_Factory')->newInstance();
-        $loggerFactory->setServiceManager($serviceManager);
-
         /** @var CM_ExceptionHandling_Handler_Abstract $exceptionHandler */
-        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstance([$loggerFactory]);
+        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstance();
+        $exceptionHandler->setServiceManager($serviceManager);
         $exceptionHandler->handleException($expectedException);
         $this->assertSame(1, $methodAddException->getCallCount());
     }
@@ -64,7 +61,9 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
 
         /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\AbstractClassTrait $exceptionHandler */
         $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
-        $exceptionHandler->mockMethod('logException')->set(function () {
+
+        $logExceptionMock = $exceptionHandler->mockMethod('logException');
+        $logExceptionMock->set(function () {
         });
 
         $printExceptionMock = $exceptionHandler->mockMethod('_printException');
@@ -78,11 +77,11 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
 
         $exceptionHandler->setPrintSeverityMin(CM_Exception::FATAL);
 
-        /** @var CM_ExceptionHandling_Handler_Abstract $exceptionHandler */
         $exceptionHandler->handleException($errorException);
         $exceptionHandler->handleException($nativeException);
         $exceptionHandler->handleException($fatalException);
 
         $this->assertSame(2, $printExceptionMock->getCallCount());
+        $this->assertSame(3, $logExceptionMock->getCallCount());
     }
 }

@@ -4,9 +4,6 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
 
     use CM_Service_ManagerAwareTrait;
 
-    /** @var CM_Log_Factory */
-    private $_loggerFactory;
-
     /** @var  int|null */
     private $_printSeverityMin;
 
@@ -28,14 +25,6 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
         E_USER_DEPRECATED   => 'E_USER_DEPRECATED',
         E_ALL               => 'E_ALL',
     );
-
-    /**
-     * @param CM_Log_Factory $loggerFactory
-     */
-    public function __construct(CM_Log_Factory $loggerFactory) {
-        $this->_loggerFactory = $loggerFactory;
-        $this->setServiceManager($loggerFactory->getServiceManager());
-    }
 
     public function handleErrorFatal() {
         if ($error = error_get_last()) {

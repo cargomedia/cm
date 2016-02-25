@@ -95,16 +95,12 @@ class CM_ProcessTest extends CMTest_TestCase {
         $bootloader = CM_Bootloader::getInstance();
         $exceptionHandlerBackup = $bootloader->getExceptionHandler();
 
-        /** @var CM_Log_Factory|\Mocka\ClassMock $loggerFactory */
-        $loggerFactory = $this->mockClass('CM_Log_Factory')->newInstance();
-        $loggerFactory->setServiceManager(CM_Service_Manager::getInstance());
-        $loggerFactory->mockMethod('');
-
         /**
          * Increase print-severity to make sure "child 3"'s exception output doesn't disturb phpunit
          */
-        $exceptionHandler = new CM_ExceptionHandling_Handler_Cli($loggerFactory);
+        $exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
         $exceptionHandler->setPrintSeverityMin(CM_Exception::FATAL);
+        $exceptionHandler->setServiceManager($this->getServiceManager());
 
         $bootloader->setExceptionHandler($exceptionHandler);
 
