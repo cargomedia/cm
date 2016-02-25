@@ -182,6 +182,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
 
     /**
      * @param CM_File $file
+     * @throws CM_Exception
      */
     public function copyToFile(CM_File $file) {
         $filesystemSource = $this->_filesystem;
@@ -195,7 +196,14 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
         ) {
             $streamSource = $adapterSource->getStreamRead($this->getPath());
             $streamDestination = $adapterDestination->getStreamWrite($file->getPath());
-            stream_copy_to_stream($streamSource, $streamDestination);
+            $sizeDestination = stream_copy_to_stream($streamSource, $streamDestination);
+            $sizeSource = $this->getSize();
+            if ($sizeSource !== $sizeDestination) {
+                throw new CM_Exception('Copy of `' . $this->getPath() . '` to `' . $file->getPath() . '` failed', null, [
+                    'Source size'  => $sizeSource,
+                    'Bytes copied' => $sizeDestination,
+                ]);
+            }
             @fclose($streamDestination);
             @fclose($streamSource);
         } else {
