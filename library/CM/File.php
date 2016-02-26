@@ -405,20 +405,21 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
         /** @var CM_File_Filesystem_Adapter_StreamInterface $adapterSource */
         /** @var CM_File_Filesystem_Adapter_StreamInterface $adapterDestination */
         $streamSource = $adapterSource->getStreamRead($this->getPath());
-        $streamDestination = $adapterDestination->getStreamWrite($file->getPath());
-        $sizeDestination = stream_copy_to_stream($streamSource, $streamDestination);
+        $adapterDestination->writeStream($file->getPath(), $streamSource);
+        $sizeDestination = $file->getSize();
         $sizeSource = $this->getSize();
         if ($sizeSource !== $sizeDestination) {
             throw new CM_Exception('Copy of `' . $this->getPath() . '` to `' . $file->getPath() . '` failed', null, [
-                'Source size'  => $sizeSource,
-                'Bytes copied' => $sizeDestination,
+                'Original size'       => $sizeSource,
+                'Bytes copied'        => $sizeDestination,
+                'Source adapter'      => get_class($adapterSource),
+                'Destination adapter' => get_class($adapterDestination),
             ]);
         }
-        if (!@fclose($streamDestination)) {
-            throw new CM_Exception('Could not close stream for `' . $file->getPath() . '`');
-        }
-        if (!@fclose($streamSource)) {
-            throw new CM_Exception('Could not close stream for `' . $this->getPath() . '`');
+        if (is_resource($streamSource) && !@fclose($streamSource)) {
+            throw new CM_Exception('Could not close stream for `' . $this->getPath() . '`', null, [
+                'Source adapter' => get_class($adapterSource),
+            ]);
         }
     }
 }
