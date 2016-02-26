@@ -410,12 +410,16 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
         $sizeSource = $this->getSize();
         if ($sizeSource !== $sizeDestination) {
             throw new CM_Exception('Copy of `' . $this->getPath() . '` to `' . $file->getPath() . '` failed', null, [
-                'Source size'  => $sizeSource,
-                'Bytes copied' => $sizeDestination,
+                'Original size'       => $sizeSource,
+                'Bytes copied'        => $sizeDestination,
+                'Source adapter'      => get_class($adapterSource),
+                'Destination adapter' => get_class($adapterDestination),
             ]);
         }
-        if (!@fclose($streamSource)) {
-            throw new CM_Exception('Could not close stream for `' . $this->getPath() . '`');
+        if (is_resource($streamSource) && !@fclose($streamSource)) {
+            throw new CM_Exception('Could not close stream for `' . $this->getPath() . '`', null, [
+                'Source adapter' => get_class($adapterSource),
+            ]);
         }
     }
 }

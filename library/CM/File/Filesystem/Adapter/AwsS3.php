@@ -81,10 +81,22 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
     }
 
     public function writeStream($path, $stream) {
-        $streamDestination = $this->getStreamWrite($path);
-        stream_copy_to_stream($stream, $streamDestination);
-        if (!@fclose($streamDestination)) {
-            throw new CM_Exception('Could not close stream for `' . $path . '`');
+        /** @var \Aws\S3\Model\MultipartUpload\UploadBuilder $uploader */
+        $uploadBuilder = \Aws\S3\Model\MultipartUpload\UploadBuilder::newInstance();
+        $uploadBuilder->setClient($this->_client);
+        $uploadBuilder->setSource($stream);
+        $uploadBuilder->setBucket($this->_bucket);
+        $uploadBuilder->setKey($this->_getAbsolutePath($path));
+        /** @var \Aws\Common\Model\MultipartUpload\TransferInterface $uploader */
+        $uploader = $uploadBuilder->build();
+
+        try {
+            $uploader->upload();
+        } catch (\Aws\Common\Exception\MultipartUploadException $exception) {
+            $uploader->abort();
+            throw new CM_Exception('AWS S3 Upload to `' . $path . '` failed', null, [
+                'originalExceptionMessage' => $exception->getMessage(),
+            ]);
         }
     }
 
