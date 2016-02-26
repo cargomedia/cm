@@ -80,6 +80,14 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         }
     }
 
+    public function writeStream($path, $stream) {
+        $streamDestination = $this->getStreamWrite($path);
+        stream_copy_to_stream($stream, $streamDestination);
+        if (!@fclose($streamDestination)) {
+            throw new CM_Exception('Could not close stream for `' . $path . '`');
+        }
+    }
+
     public function exists($path) {
         try {
             return $this->_client->doesObjectExist($this->_bucket, $this->_getAbsolutePath($path));
