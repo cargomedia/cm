@@ -48,11 +48,11 @@ class CM_Janus_Configuration {
      */
     public function findServerByPlugin($plugin) {
         $plugin = (string) $plugin;
-        $pluginServerList = Functional\filter($this->_servers, function (CM_Janus_Server $server) use ($plugin) {
+        $pluginServerList = array_values(Functional\filter($this->_servers, function (CM_Janus_Server $server) use ($plugin) {
             return in_array($plugin, $server->getPluginList());
-        });
+        }));
         if (!empty($pluginServerList)) {
-            return $pluginServerList[array_rand($pluginServerList)];
+            return $pluginServerList[mt_rand(0, count($pluginServerList) - 1)];
         }
         return null;
     }
