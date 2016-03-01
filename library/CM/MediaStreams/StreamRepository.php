@@ -44,10 +44,10 @@ class CM_MediaStreams_StreamRepository {
         }
 
         return CM_Model_StreamChannel_Abstract::createType($streamChannelType, [
-            'key'            => $streamName,
-            'adapterType'    => $this->_adapterType,
-            'serverId'       => (int) $serverId,
-            'mediaId'        => $mediaId,
+            'key'         => $streamName,
+            'adapterType' => $this->_adapterType,
+            'serverId'    => (int) $serverId,
+            'mediaId'     => $mediaId,
         ]);
     }
 
@@ -102,10 +102,11 @@ class CM_MediaStreams_StreamRepository {
      * @param CM_Model_StreamChannel_Abstract $streamChannel
      */
     public function removeStreamChannel(CM_Model_StreamChannel_Abstract $streamChannel) {
-        /** @var CM_Model_Stream_Abstract[] $streams */
-        $streams = array_merge($streamChannel->getStreamSubscribes(), $streamChannel->getStreamPublishs());
-        foreach ($streams as $stream) {
-            $stream->delete();
+        foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
+            $streamSubscribe->delete();
+        }
+        foreach ($streamChannel->getStreamPublishs() as $streamPublish) {
+            $streamPublish->delete();
         }
         $streamChannel->delete();
     }
