@@ -9,7 +9,6 @@ class CM_Janus_Factory {
      */
     public function createService(array $servers) {
         $configuration = new CM_Janus_Configuration();
-        $allPluginList = [];
 
         foreach ($servers as $serverId => $serverConfig) {
             $iceServerList = isset($serverConfig['iceServerList']) ? $serverConfig['iceServerList'] : null;
@@ -18,11 +17,6 @@ class CM_Janus_Factory {
                 throw new CM_Exception_Invalid('Server pluginList is empty');
             }
             $serverPluginList = $serverConfig['pluginList'];
-            $pluginsIntersection = array_intersect($allPluginList, $serverPluginList);
-            if (!empty($pluginsIntersection)) {
-                throw new CM_Exception_Invalid('Each janus server plugin should point to exactly one server');
-            }
-
             $configuration->addServer(new CM_Janus_Server(
                 $serverId,
                 $serverConfig['key'],
@@ -31,7 +25,6 @@ class CM_Janus_Factory {
                 $serverPluginList,
                 $iceServerList
             ));
-            $allPluginList = array_merge($allPluginList, $serverPluginList);
         }
 
         $httpClient = new GuzzleHttp\Client();

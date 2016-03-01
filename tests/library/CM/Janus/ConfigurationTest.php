@@ -17,7 +17,7 @@ class CM_Janus_ConfigurationTest extends CMTest_TestCase {
 
     public function testFindServerByPlugin() {
         $server1 = $this->mockClass('CM_Janus_Server')->newInstanceWithoutConstructor();
-        $server1->mockMethod('getPluginList')->set(['audio', 'audioHD']);
+        $server1->mockMethod('getPluginList')->set(['audio', 'audioHD', 'video']);
         $server2 = $this->mockClass('CM_Janus_Server')->newInstanceWithoutConstructor();
         $server2->mockMethod('getPluginList')->set(['video', 'videoHD']);
 
@@ -26,6 +26,12 @@ class CM_Janus_ConfigurationTest extends CMTest_TestCase {
         $this->assertSame($server1, $configuration->findServerByPlugin('audio'));
         $this->assertSame($server1, $configuration->findServerByPlugin('audioHD'));
         $this->assertSame($server2, $configuration->findServerByPlugin('videoHD'));
+        mt_srand(2);
+        srand(2);
+        $this->assertSame($server2, $configuration->findServerByPlugin('video'));
+        mt_srand(5);
+        srand(5);
+        $this->assertSame($server1, $configuration->findServerByPlugin('video'));
         $this->assertSame(null, $configuration->findServerByKey('bar'));
     }
 

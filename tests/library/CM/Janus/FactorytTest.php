@@ -29,30 +29,7 @@ class CM_Janus_FactoryTest extends CMTest_TestCase {
             $factory->createService($serversConfig);
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Server pluginList is empty' , $exception->getMessage());
-
-        $serversConfig = [
-            1 => [
-                'key'              => 'foo-bar',
-                'httpAddress'      => 'http://cm-janus.dev:8080',
-                'webSocketAddress' => 'ws://cm-janus.dev:8188',
-                'pluginList'       => ['audio', 'audioHD'],
-                'iceServerList'    => $iceServerList,
-            ],
-            6 => [
-                'key'              => 'foo-bar-baz',
-                'httpAddress'      => 'http://cm-janus.dev:8081',
-                'webSocketAddress' => 'ws://cm-janus.dev:8189',
-                'pluginList'       => ['audio', 'video'],
-                'iceServerList'    => $iceServerList,
-            ],
-        ];
-
-        $exception = $this->catchException(function () use ($factory, $serversConfig) {
-            $factory->createService($serversConfig);
-        });
-        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Each janus server plugin should point to exactly one server' , $exception->getMessage());
+        $this->assertSame('Server pluginList is empty', $exception->getMessage());
     }
 
     public function testCreateServiceSuccess() {
@@ -73,7 +50,7 @@ class CM_Janus_FactoryTest extends CMTest_TestCase {
                 'key'              => 'foo-bar-baz',
                 'httpAddress'      => 'http://cm-janus.dev:8081',
                 'webSocketAddress' => 'ws://cm-janus.dev:8189',
-                'pluginList'       => ['video'],
+                'pluginList'       => ['video', 'audio', 'videoHD'],
                 'iceServerList'    => $iceServerList,
             ],
         ];
@@ -86,11 +63,13 @@ class CM_Janus_FactoryTest extends CMTest_TestCase {
         $this->assertSame('http://cm-janus.dev:8080', $servers[0]->getHttpAddress());
         $this->assertSame('ws://cm-janus.dev:8188', $servers[0]->getWebSocketAddress());
         $this->assertSame($iceServerList, $servers[0]->getIceServerList());
+        $this->assertSame($serversConfig[5]['pluginList'], $servers[0]->getPluginList());
 
         $this->assertSame(6, $servers[1]->getId());
         $this->assertSame('foo-bar-baz', $servers[1]->getKey());
         $this->assertSame('http://cm-janus.dev:8081', $servers[1]->getHttpAddress());
         $this->assertSame('ws://cm-janus.dev:8189', $servers[1]->getWebSocketAddress());
         $this->assertSame($iceServerList, $servers[1]->getIceServerList());
+        $this->assertSame($serversConfig[6]['pluginList'], $servers[1]->getPluginList());
     }
 }
