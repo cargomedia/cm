@@ -32,10 +32,16 @@ class CM_MediaStreams_StreamRepositoryTest extends CMTest_TestCase {
         $streamPublish = $this->mockObject();
         $streamPublish->mockMethod('delete');
 
+        $pagingSubscribes = $this->mockClass('CM_Paging_StreamSubscribe_StreamChannel')->newInstanceWithoutConstructor();
+        $pagingSubscribes->mockMethod('getItems')->set([$streamSubscribe]);
+        $pagingPublishs = $this->mockClass('CM_Paging_StreamPublish_StreamChannel')->newInstanceWithoutConstructor();
+        $pagingPublishs->mockMethod('getItems')->set([$streamPublish]);
+
+        /** @var CM_Model_StreamChannel_Abstract|\Mocka\AbstractClassTrait $streamChannel */
         $streamChannel = $this->mockClass('CM_Model_StreamChannel_Abstract')->newInstanceWithoutConstructor();
         $streamChannel->mockMethod('delete');
-        $streamChannel->mockMethod('getStreamSubscribes')->set([$streamSubscribe]);
-        $streamChannel->mockMethod('getStreamPublishs')->set([$streamPublish]);
+        $streamChannel->mockMethod('getStreamSubscribes')->set($pagingSubscribes);
+        $streamChannel->mockMethod('getStreamPublishs')->set($pagingPublishs);
 
         $streamRepository = new CM_MediaStreams_StreamRepository(1);
         $streamRepository->removeStreamChannel($streamChannel);
