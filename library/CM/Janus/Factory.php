@@ -16,13 +16,12 @@ class CM_Janus_Factory {
             if (empty($serverConfig['pluginList'])) {
                 throw new CM_Exception_Invalid('Server pluginList is empty');
             }
-            $serverPluginList = $serverConfig['pluginList'];
             $configuration->addServer(new CM_Janus_Server(
                 $serverId,
                 $serverConfig['key'],
                 $serverConfig['httpAddress'],
                 $serverConfig['webSocketAddress'],
-                $serverPluginList,
+                $serverConfig['pluginList'],
                 $iceServerList
             ));
         }
