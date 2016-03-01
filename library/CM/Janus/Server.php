@@ -36,8 +36,8 @@ class CM_Janus_Server {
         $this->_key = (string) $key;
         $this->_httpAddress = (string) $httpAddress;
         $this->_webSocketAddress = (string) $webSocketAddress;
-        $this->_pluginList = array_map(function ($el) {
-            return (string) $el;
+        $this->_pluginList = array_map(function ($plugin) {
+            return (string) $plugin;
         }, $pluginList);
         $this->_iceServerList = $iceServerList;
     }
