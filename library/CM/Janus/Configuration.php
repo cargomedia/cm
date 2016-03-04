@@ -43,6 +43,21 @@ class CM_Janus_Configuration {
     }
 
     /**
+     * @param string $plugin
+     * @return CM_Janus_Server|null
+     */
+    public function findServerByPlugin($plugin) {
+        $plugin = (string) $plugin;
+        $pluginServerList = array_values(Functional\filter($this->_servers, function (CM_Janus_Server $server) use ($plugin) {
+            return in_array($plugin, $server->getPluginList());
+        }));
+        if (!empty($pluginServerList)) {
+            return $pluginServerList[mt_rand(0, count($pluginServerList) - 1)];
+        }
+        return null;
+    }
+
+    /**
      * @param int $id
      * @return CM_Janus_Server
      * @throws CM_Exception_Invalid
