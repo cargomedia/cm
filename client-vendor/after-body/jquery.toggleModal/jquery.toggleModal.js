@@ -36,7 +36,7 @@
    * @param {Boolean} state
    */
   ToggleModal.prototype.setState = function(state) {
-    if (state === this.getState()) {
+    if (!this.getEnabled() || state === this.getState()) {
       return;
     }
     this._executeCallback(state);
@@ -48,6 +48,19 @@
     this.setState(!this.getState());
   };
 
+  /**
+   * @returns {Boolean}
+   */
+  ToggleModal.prototype.getEnabled = function() {
+    return this.enabled;
+  };
+
+  /**
+   * @param {Boolean} state
+   */
+  ToggleModal.prototype.setEnabled = function(state) {
+    this.enabled = Boolean(state);
+  };
 
   /**
    * @param {Boolean} state
@@ -77,6 +90,12 @@
       }
 
       switch (action) {
+        case 'enable':
+          toggleModal.setEnabled(true);
+          break;
+        case 'disable':
+          toggleModal.setEnabled(false);
+          break;
         case 'show':
         case 'open':
           toggleModal.setState(true);
