@@ -18,6 +18,8 @@
     this.callback = callback;
     /** @type {Boolean} */
     this.state = false;
+    /** @type {Boolean} */
+    this.enabled = true;
     /** @type {ModalClose} */
     this.modalClose = new ModalClose(this.$element[0], function() {
       this.setState(false);
