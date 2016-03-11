@@ -186,6 +186,13 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $response->process();
     }
 
+    public function testGetUserAgent() {
+        $request = new CM_Http_Request_Get('/foo');
+        $this->assertSame('', $request->getUserAgent());
+        $request = new CM_Http_Request_Get('/foo', ['user-agent' => 'Mozilla/5.0']);
+        $this->assertSame('Mozilla/5.0', $request->getUserAgent());
+    }
+
     public function testIsBotCrawler() {
         $useragents = array(
             'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'   => true,
