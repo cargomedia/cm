@@ -56,6 +56,14 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         clearstatcache(false, $pathAbsolute);
     }
 
+    public function writeStream($path, $stream) {
+        $streamDestination = $this->getStreamWrite($path);
+        stream_copy_to_stream($stream, $streamDestination);
+        if (!@fclose($streamDestination)) {
+            throw new CM_Exception('Could not close stream for `' . $path . '`');
+        }
+    }
+
     public function exists($path) {
         $pathAbsolute = $this->_getAbsolutePath($path);
         return file_exists($pathAbsolute);

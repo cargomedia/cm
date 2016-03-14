@@ -30,7 +30,7 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
                 'host'    => $httpRequest->getHost(),
                 'ip'      => $httpRequest->getIp(),
                 'referer' => $httpRequest->getHeader('referer'),
-                'agent'   => $httpRequest->getHeader('user-agent'),
+                'agent'   => $httpRequest->getUserAgent(),
             ]);
         }
         if (!empty($extra)) {

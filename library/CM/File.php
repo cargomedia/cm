@@ -193,11 +193,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
         } elseif ($adapterSource instanceof CM_File_Filesystem_Adapter_StreamInterface &&
             $adapterDestination instanceof CM_File_Filesystem_Adapter_StreamInterface
         ) {
-            $streamSource = $adapterSource->getStreamRead($this->getPath());
-            $streamDestination = $adapterDestination->getStreamWrite($file->getPath());
-            stream_copy_to_stream($streamSource, $streamDestination);
-            @fclose($streamDestination);
-            @fclose($streamSource);
+            $this->_copyToFileStreaming($file, $adapterSource, $adapterDestination);
         } else {
             $file->write($this->read());
         }
@@ -397,5 +393,33 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
         $samePath = $this->getPath() === $other->getPath();
         $sameFilesystemAdapter = $this->_filesystem->equals($other->_filesystem);
         return ($samePath && $sameFilesystemAdapter);
+    }
+
+    /**
+     * @param CM_File                    $file
+     * @param CM_File_Filesystem_Adapter $adapterSource
+     * @param CM_File_Filesystem_Adapter $adapterDestination
+     * @throws CM_Exception
+     */
+    protected function _copyToFileStreaming(CM_File $file, CM_File_Filesystem_Adapter $adapterSource, CM_File_Filesystem_Adapter $adapterDestination) {
+        /** @var CM_File_Filesystem_Adapter_StreamInterface $adapterSource */
+        /** @var CM_File_Filesystem_Adapter_StreamInterface $adapterDestination */
+        $streamSource = $adapterSource->getStreamRead($this->getPath());
+        $adapterDestination->writeStream($file->getPath(), $streamSource);
+        $sizeDestination = $file->getSize();
+        $sizeSource = $this->getSize();
+        if ($sizeSource !== $sizeDestination) {
+            throw new CM_Exception('Copy of `' . $this->getPath() . '` to `' . $file->getPath() . '` failed', null, [
+                'Original size'       => $sizeSource,
+                'Bytes copied'        => $sizeDestination,
+                'Source adapter'      => get_class($adapterSource),
+                'Destination adapter' => get_class($adapterDestination),
+            ]);
+        }
+        if (is_resource($streamSource) && !@fclose($streamSource)) {
+            throw new CM_Exception('Could not close stream for `' . $this->getPath() . '`', null, [
+                'Source adapter' => get_class($adapterSource),
+            ]);
+        }
     }
 }

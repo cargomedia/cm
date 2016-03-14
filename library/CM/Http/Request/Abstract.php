@@ -432,13 +432,20 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @return string
+     */
+    public function getUserAgent() {
+        if (!$this->hasHeader('user-agent')) {
+            return '';
+        }
+        return $this->getHeader('user-agent');
+    }
+
+    /**
      * @return bool
      */
     public function isBotCrawler() {
-        if (!$this->hasHeader('user-agent')) {
-            return false;
-        }
-        $useragent = $this->getHeader('user-agent');
+        $useragent = $this->getUserAgent();
         $useragentMatches = array(
             'Googlebot',
             'bingbot',
@@ -460,10 +467,7 @@ abstract class CM_Http_Request_Abstract {
      * @return bool
      */
     public function isSupported() {
-        if (!$this->hasHeader('user-agent')) {
-            return true;
-        }
-        $userAgent = $this->getHeader('user-agent');
+        $userAgent = $this->getUserAgent();
         if (preg_match('#Opera Mini#', $userAgent)) {
             return false;
         }

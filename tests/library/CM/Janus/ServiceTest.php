@@ -92,7 +92,7 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
 
         $emptyStreamChannel = CMTest_TH::createStreamChannel(null, CM_Janus_Service::getTypeStatic());
 
-        $server1 = $this->mockClass('CM_Janus_Server')->newInstance([1, 'key', 'http://mock', 'ws://mock']);
+        $server1 = $this->mockClass('CM_Janus_Server')->newInstance([1, 'key', 'http://mock', 'ws://mock', []]);
         /** @var CM_Janus_Configuration|\Mocka\AbstractClassTrait $configuration */
         $configuration = $this->mockObject('CM_Janus_Configuration');
         $configuration->mockMethod('getServers')->set([$server1]);
@@ -149,7 +149,7 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         $streamChannelKey2 = $streamChannel2->getKey();
         CMTest_TH::createStreamPublish(null, $streamChannel2); //to make channel non empty
 
-        $server1 = $this->mockClass('CM_Janus_Server')->newInstance([1, 'key', 'http://mock', 'ws://mock']);
+        $server1 = $this->mockClass('CM_Janus_Server')->newInstance([1, 'key', 'http://mock', 'ws://mock', []]);
         /** @var CM_Janus_Configuration|\Mocka\AbstractClassTrait $configuration */
         $configuration = $this->mockObject('CM_Janus_Configuration');
         $configuration->mockMethod('getServers')->set([$server1]);
