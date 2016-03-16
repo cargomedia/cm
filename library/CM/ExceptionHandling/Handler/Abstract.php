@@ -63,14 +63,6 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
 
     /**
      * @param Exception $exception
-     * @param int|null  $logLevel
-     */
-    public function logException(Exception $exception, $logLevel = null) {
-        $this->getServiceManager()->getLogger()->addException($exception, null, $logLevel);
-    }
-
-    /**
-     * @param Exception $exception
      */
     public function handleException(Exception $exception) {
         $printException = true;
@@ -82,7 +74,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
             $this->_printException($exception);
         }
 
-        $this->logException($exception);
+        $this->_logException($exception);
     }
 
     /**
@@ -102,5 +94,13 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
      */
     private function _getPrintSeverityMin() {
         return $this->_printSeverityMin;
+    }
+
+    /**
+     * @param Exception $exception
+     * @param int|null  $logLevel
+     */
+    protected function _logException(Exception $exception, $logLevel = null) {
+        $this->getServiceManager()->getLogger()->addException($exception, null, $logLevel);
     }
 }

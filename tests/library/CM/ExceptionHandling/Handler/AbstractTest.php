@@ -32,7 +32,7 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $fatalException = new CM_Exception(null, CM_Exception::FATAL);
 
         $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
-        $exceptionHandler->mockMethod('logException')->set(function () {
+        $exceptionHandler->mockMethod('_logException')->set(function () {
         });
 
         $printExceptionMock = $exceptionHandler->mockMethod('_printException')
@@ -62,7 +62,7 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\AbstractClassTrait $exceptionHandler */
         $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
 
-        $logExceptionMock = $exceptionHandler->mockMethod('logException');
+        $logExceptionMock = $exceptionHandler->mockMethod('_logException');
         $logExceptionMock->set(function () {
         });
 
