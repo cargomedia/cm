@@ -63,7 +63,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 
         foreach ($paramsList as $params) {
             $workload = CM_Params::encode($params, true);
-            $task = $gearmanClient->addTask($this->_getJobName(), $workload);
+            $task = $gearmanClient->addTaskHigh($this->_getJobName(), $workload);
             if (false === $task) {
                 throw new CM_Exception('Cannot add task `' . $this->_getJobName() . '`.');
             }
