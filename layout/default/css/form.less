@@ -45,11 +45,10 @@ textarea.textinput {
   box-sizing: border-box;
   width: auto;
   height: @sizeButton;
-  line-height: @sizeButton - 2px;
   min-width: @sizeButton;
   max-width: 100%;
   margin: 1px;
-  padding: 0 15px;
+  padding: 0 1em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -72,11 +71,15 @@ textarea.textinput {
   }
 
   &.hasIcon.hasLabel .icon {
-    margin-right: 5px;
+    margin-right: .4em;
   }
 
   &.hasIconRight.hasLabel .icon {
-    margin-left: 5px;
+    margin-left: .4em;
+  }
+
+  a& {
+    line-height: @sizeButton - 2*@buttonBorderWidth;
   }
 }
 
@@ -131,17 +134,12 @@ textarea.textinput {
 }
 
 .button-large {
-  height: 1.2*@sizeButton;
-  min-width: 1.2*@sizeButton;
-  font-size: 1.5rem;
-  padding: 0 25px;
+  height: 1.4*@sizeButton;
+  min-width: 1.4*@sizeButton;
+  font-size: 1.6em;
 
-  &.hasIcon.hasLabel .icon {
-    margin-right: 10px;
-  }
-
-  &.hasIconRight.hasLabel .icon {
-    margin-left: 10px;
+  a& {
+    line-height: 1.4*@sizeButton - 2*@buttonBorderWidth;
   }
 }
 
