@@ -44,7 +44,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $mockLogHandler = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::ERROR]);
         $mockWriteRecord = $mockLogHandler->mockMethod('_writeRecord');
 
-        $logger = new CM_Log_Logger(new CM_Log_Context(), [[$mockLogHandler]]);
+        $logger = $this->_getLoggerMock(new CM_Log_Context(), [[$mockLogHandler]]);
 
         $expectedRecord = new CM_Log_Record(CM_Log_Logger::ERROR, 'foo', new CM_Log_Context());
         $debugRecord = new CM_Log_Record(CM_Log_Logger::DEBUG, 'bar', new CM_Log_Context());
@@ -72,7 +72,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $mockHandleRecordBar = $mockLogHandlerBar->mockMethod('handleRecord')->set($handleRecord);
         $mockHandleRecordBaz = $mockLogHandlerBaz->mockMethod('handleRecord')->set($handleRecord);
 
-        $logger = new CM_Log_Logger(new CM_Log_Context(), [[$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerBaz]]);
+        $logger = $this->_getLoggerMock(new CM_Log_Context(), [[$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerBaz]]);
 
         $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
         $this->assertSame(1, $mockHandleRecordFoo->getCallCount());
@@ -113,7 +113,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
             ->at(0, $handleRecordOK)
             ->at(1, $handleLoggerException);
 
-        $logger = new CM_Log_Logger(new CM_Log_Context(), [[$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerBaz]]);
+        $logger = $this->_getLoggerMock(new CM_Log_Context(), [[$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerBaz]]);
 
         $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
         $this->assertSame(2, $mockHandleRecordFoo->getCallCount());
@@ -198,7 +198,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
                 $this->assertSame($expectedRecord->getMessage(), $record->getMessage());
             });
 
-        $logger = new CM_Log_Logger(new CM_Log_Context(), [
+        $logger = $this->_getLoggerMock(new CM_Log_Context(), [
             [$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerFooBar],
             [$mockLogHandlerBaz, $mockLogHandlerBaz2],
             [$mockLogHandlerQuux]
@@ -219,7 +219,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
 
         // without any context
-        $logger = new CM_Log_Logger(new CM_Log_Context(), [[$mockLogHandler]]);
+        $logger = $this->_getLoggerMock(new CM_Log_Context(), [[$mockLogHandler]]);
         $mockHandleRecord->set(function (CM_Log_Record $record) {
             $context = $record->getContext();
             $this->assertNull($context->getComputerInfo());
@@ -233,7 +233,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         // with a global context
         $computerInfo = new CM_Log_Context_ComputerInfo('foo.dev', '42.0');
         $contextGlobal = new CM_Log_Context(null, null, $computerInfo);
-        $logger = new CM_Log_Logger($contextGlobal, [[$mockLogHandler]]);
+        $logger = $this->_getLoggerMock($contextGlobal, [[$mockLogHandler]]);
 
         $mockHandleRecord->set(function (CM_Log_Record $record) use ($computerInfo) {
             $context = $record->getContext();
@@ -248,7 +248,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         // with a global context + log context
         $computerInfo = new CM_Log_Context_ComputerInfo('foo.dev', '42.0');
         $contextGlobal = new CM_Log_Context(null, null, $computerInfo);
-        $logger = new CM_Log_Logger($contextGlobal, [[$mockLogHandler]]);
+        $logger = $this->_getLoggerMock($contextGlobal, [[$mockLogHandler]]);
 
         $mockHandleRecord->set(function (CM_Log_Record $record) use ($computerInfo) {
             $context = $record->getContext();
@@ -265,7 +265,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
         $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
 
-        $logger = new CM_Log_Logger(new CM_Log_Context(), [[$mockLogHandler]]);
+        $logger = $this->_getLoggerMock(new CM_Log_Context(), [[$mockLogHandler]]);
 
         $mockHandleRecord->set(function (CM_Log_Record $record) {
             $this->assertSame('message sent using debug method', $record->getMessage());
@@ -307,7 +307,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
         $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
 
-        $logger = new CM_Log_Logger(new CM_Log_Context(), [[$mockLogHandler]]);
+        $logger = $this->_getLoggerMock(new CM_Log_Context(), [[$mockLogHandler]]);
 
         $exception = new Exception('foo');
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
@@ -374,5 +374,24 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
      */
     public function testStaticGetLevelNameException() {
         CM_Log_Logger::getLevelName(666);
+    }
+
+    /**
+     * @param CM_Log_Context $context
+     * @param array          $handlersLayerList
+     * @return CM_Log_Logger|\Mocka\AbstractClassTrait
+     */
+    protected function _getLoggerMock(CM_Log_Context $context, array $handlersLayerList) {
+        $loggerMock = $this->mockClass('CM_Log_Logger')->newInstance([$context, $handlersLayerList]);
+        $logExceptionsMock = $loggerMock->mockMethod('_logHandlersExceptions');
+        $logExceptionsMock->set(function (CM_Log_Record $record, array $exceptionList, CM_Log_Context $context) use ($loggerMock) {
+            if ($exception = \Functional\first($exceptionList, function (CM_Log_HandlingException $e) {
+                return $e->getOriginalException() instanceof PHPUnit_Framework_Exception;
+            })) {
+                throw $exception;
+            }
+            $loggerMock->callOriginalMethod('_logHandlersExceptions', func_get_args());
+        });
+        return $loggerMock;
     }
 }
