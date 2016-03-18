@@ -270,6 +270,9 @@ class CM_Process {
                         $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', CM_Exception::WARN);
                         CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
                         usleep(self::RESPAWN_TIMEOUT * 1000000);
+                        if (!$this->_hasForks()) {
+                            $this->bind('exit', [$this, 'killChildren']);
+                        }
                         $this->_fork($forkHandler->getWorkload(), $forkHandler->getIdentifier());
                     }
                 }
