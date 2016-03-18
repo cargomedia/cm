@@ -52,11 +52,12 @@ textarea.textinput {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  border-radius: @borderRadiusInput;
+  border-radius: @borderRadiusButton;
   vertical-align: top;
   letter-spacing: 1px;
   cursor: pointer;
   transition: background-color 200ms;
+  font-size: @fontSizeButton;
 
   &:focus {
     .input_focus;
@@ -78,7 +79,7 @@ textarea.textinput {
     margin-left: .4em;
   }
 
-  a& {
+  a&, div& {
     line-height: @sizeButton - 2*@buttonBorderWidth;
   }
 }
@@ -134,12 +135,13 @@ textarea.textinput {
 }
 
 .button-large {
-  height: 1.4*@sizeButton;
-  min-width: 1.4*@sizeButton;
-  font-size: 1.6em;
+  height: @sizeButtonLargeFactor*@sizeButton;
+  min-width: @sizeButtonLargeFactor*@sizeButton;
+  font-size: @sizeButtonLargeFactor*@fontSizeButton;
+  border-radius: @sizeButtonLargeFactor*@borderRadiusButton;
 
   a& {
-    line-height: 1.4*@sizeButton - 2*@buttonBorderWidth;
+    line-height: @sizeButtonLargeFactor*@sizeButton - 2*@buttonBorderWidth;
   }
 }
 
