@@ -214,7 +214,7 @@ class CM_Process {
         if ($pid) {
             // parent
             fclose($sockets[0]);
-            $forkHandler = new CM_Process_ForkHandler($pid, $workload, $sockets[1], $identifier);
+            $forkHandler = $this->_getForkHandler($pid, $workload, $sockets[1], $identifier);
             $this->_forkHandlerList[$identifier] = $forkHandler;
             return $forkHandler;
         } else {
@@ -223,7 +223,7 @@ class CM_Process {
                 fclose($sockets[1]);
                 $this->_reset();
                 CM_Service_Manager::getInstance()->resetServiceInstances();
-                $forkHandler = new CM_Process_ForkHandler($this->getProcessId(), $workload, $sockets[0]);
+                $forkHandler = $this->_getForkHandler($this->getProcessId(), $workload, $sockets[0]);
                 $forkHandler->runAndSendWorkload();
                 $forkHandler->closeIpcStream();
             } catch (Exception $e) {
@@ -231,6 +231,17 @@ class CM_Process {
             }
             exit;
         }
+    }
+
+    /**
+     * @param int      $pid
+     * @param Closure  $workload
+     * @param resource $ipcStream
+     * @param int|null $identifier
+     * @return CM_Process_ForkHandler
+     */
+    protected function _getForkHandler($pid, Closure $workload, $ipcStream, $identifier = null) {
+        return new CM_Process_ForkHandler($pid, $workload, $ipcStream, $identifier);
     }
 
     protected function _reset() {
