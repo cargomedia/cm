@@ -61,9 +61,6 @@ class CM_Process {
      * @throws CM_Exception
      */
     public function fork(Closure $workload) {
-        if (!$this->_hasForks()) {
-            $this->bind('exit', [$this, 'killChildren']);
-        }
         $identifier = ++$this->_forkHandlerCounter;
         return $this->_fork($workload, $identifier);
     }
@@ -203,6 +200,9 @@ class CM_Process {
      * @return CM_Process_ForkHandler
      */
     private function _fork(Closure $workload, $identifier) {
+        if (!$this->_hasForks()) {
+            $this->bind('exit', [$this, 'killChildren']);
+        }
         $sockets = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
         if (false === $sockets) {
             throw new CM_Exception('Cannot open stream socket pair');
@@ -270,9 +270,6 @@ class CM_Process {
                         $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', CM_Exception::WARN);
                         CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
                         usleep(self::RESPAWN_TIMEOUT * 1000000);
-                        if (!$this->_hasForks()) {
-                            $this->bind('exit', [$this, 'killChildren']);
-                        }
                         $this->_fork($forkHandler->getWorkload(), $forkHandler->getIdentifier());
                     }
                 }
