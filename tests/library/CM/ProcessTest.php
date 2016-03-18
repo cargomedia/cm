@@ -11,13 +11,46 @@ class CM_ProcessTest extends CMTest_TestCase {
     public function testFork() {
         $process = CM_Process::getInstance();
         $forkHandler1 = $process->fork(function () {
-            });
+        });
         $forkHandler2 = $process->fork(function () {
-            });
+        });
         $forkHandler3 = $process->fork(function () {
-            });
+        });
         $this->assertSame(1, $forkHandler2->getIdentifier() - $forkHandler1->getIdentifier());
         $this->assertSame(1, $forkHandler3->getIdentifier() - $forkHandler2->getIdentifier());
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testBindOnFork() {
+        /** @var CM_Process|\Mocka\AbstractClassTrait $process */
+        $process = $this->mockObject('CM_Process');
+
+        $bindMock = $process->mockMethod('bind');
+        $bindMock->set(function ($event, callable $callback) {
+            $this->assertSame('exit', $event);
+            $this->assertSame('killChildren', $callback[1]);
+        });
+        /** @var CM_Process_ForkHandler|\Mocka\FunctionMock $forkHandlerMock */
+        $forkHandlerMock = $process->mockMethod('_getForkHandler');
+        $forkHandlerMock->set(function () {
+            $mockForkHandler = $this->mockClass('CM_Process_ForkHandler')->newInstanceWithoutConstructor();
+            $mockForkHandler->mockMethod('runAndSendWorkload');
+            $mockForkHandler->mockMethod('closeIpcStream');
+            return $mockForkHandler;
+        });
+
+        $this->assertSame(0, $bindMock->getCallCount());
+        $process->mockMethod('_hasForks')->set(true);
+        $process->fork(function () {
+        });
+        $this->assertSame(0, $bindMock->getCallCount());
+        $process->mockMethod('_hasForks')->set(false);
+        $process->fork(function () {
+        });
+        $this->assertSame(1, $bindMock->getCallCount());
     }
 
     /**
