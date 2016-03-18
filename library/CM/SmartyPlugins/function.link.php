@@ -50,6 +50,13 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
         $href = (string) $params['href'];
     }
     unset($params['href']);
+
+    $target = null;
+    if (isset($params['target'])) {
+        $target = (string) $params['target'];
+    }
+    unset($params['target']);
+
     if (isset($params['page'])) {
         $href = smarty_function_linkUrl($params, $template);
     }
@@ -85,6 +92,7 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
         'class'   => $class,
         'title'   => $title,
         'onclick' => $onclick,
+        'target'  => $target,
     ];
 
     foreach ($data as $name => $value) {

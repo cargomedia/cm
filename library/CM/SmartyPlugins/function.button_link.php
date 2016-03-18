@@ -35,6 +35,12 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
     }
     unset($params['title']);
 
+    $target = null;
+    if (isset($params['target'])) {
+        $target = (string) $params['target'];
+    }
+    unset($params['target']);
+
     if (isset($params['id'])) {
         $attrs .= ' id="' . $params['id'] . '"';
     }
@@ -86,6 +92,10 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 
     if ($href) {
         $html .= '<a href="' . CM_Util::htmlspecialchars($href) . '"';
+
+        if ($target) {
+            $html .= ' target="' . CM_Util::htmlspecialchars($target) . '"';
+        }
     } else {
         $html .= '<button type="button" value="' . $label . '"';
     }
