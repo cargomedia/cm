@@ -31,6 +31,7 @@ class CM_ProcessTest extends CMTest_TestCase {
         $bindMock = $process->mockMethod('bind');
         $bindMock->set(function ($event, callable $callback) {
             $this->assertSame('exit', $event);
+            $this->assertSame('killChildren', $callback[1]);
         });
         /** @var CM_Process_ForkHandler|\Mocka\FunctionMock $forkHandlerMock */
         $forkHandlerMock = $process->mockMethod('_getForkHandler');
