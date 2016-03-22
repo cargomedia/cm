@@ -376,6 +376,65 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         CM_Log_Logger::getLevelName(666);
     }
 
+    public function testLoopIsNotEndless() {
+        $expectedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
+
+        $mockLogHandlerFoo = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::ERROR]);
+        $mockLogHandlerBar = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::WARNING]);
+        $mockLogHandlerFooBar = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::INFO]);
+
+        $mockLogHandlerBaz = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::ERROR]);
+        $mockLogHandlerBaz2 = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::ERROR]);
+
+        $mockLogHandlerQuux = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::ERROR]);
+        $mockLogHandlerQuux2 = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::ERROR]);
+
+        $mockHandleRecordFoo = $mockLogHandlerFoo->mockMethod('handleRecord')
+            ->set(function () {
+                throw new CM_Exception_Invalid('Foo Error');
+            });
+        $mockHandleRecordBar = $mockLogHandlerBar->mockMethod('handleRecord')
+            ->set(function () {
+                throw new CM_Exception_Invalid('Bar Error');
+            });
+        $mockHandleRecordFooBar = $mockLogHandlerFooBar->mockMethod('handleRecord')
+            ->set(function () {
+                throw new CM_Exception_Invalid('FooBar Error');
+            });
+        $mockHandleRecordBaz = $mockLogHandlerBaz->mockMethod('handleRecord')
+            ->set(function () {
+                throw new CM_Exception_Invalid('Baz Error');
+            });
+        $mockHandleRecordBaz2 = $mockLogHandlerBaz2->mockMethod('handleRecord')
+            ->set(function () {
+                throw new CM_Exception_Invalid('Baz2 Error');
+            });
+        $mockHandleRecordQuux = $mockLogHandlerQuux->mockMethod('handleRecord')
+            ->set(function () {
+                throw new CM_Exception_Invalid('Quux Error');
+            });
+        $mockHandleRecordQuux2 = $mockLogHandlerQuux2->mockMethod('handleRecord')
+            ->set(function () {
+                throw new CM_Exception_Invalid('Quux2 Error');
+            });
+
+        $logger = $this->_getLoggerMock(new CM_Log_Context(), [
+            [$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerFooBar],
+            [$mockLogHandlerBaz, $mockLogHandlerBaz2],
+            [$mockLogHandlerQuux, $mockLogHandlerQuux2],
+        ]);
+
+        $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
+
+        $this->assertSame(8, $mockHandleRecordFoo->getCallCount());
+        $this->assertSame(8, $mockHandleRecordBar->getCallCount());
+        $this->assertSame(8, $mockHandleRecordFooBar->getCallCount());
+        $this->assertSame(8, $mockHandleRecordBaz->getCallCount());
+        $this->assertSame(8, $mockHandleRecordBaz2->getCallCount());
+        $this->assertSame(8, $mockHandleRecordQuux->getCallCount());
+        $this->assertSame(8, $mockHandleRecordQuux2->getCallCount());
+    }
+
     /**
      * @param CM_Log_Context $context
      * @param array          $handlersLayerList
