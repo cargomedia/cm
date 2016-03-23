@@ -3,9 +3,9 @@
 class CM_MediaStreams_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
-     * @param string  $streamChannelMediaId
+     * @param string $streamChannelMediaId
      * @param CM_File $thumbnailSource
-     * @param int     $createStamp
+     * @param int $createStamp
      * @throws CM_Exception
      * @throws CM_Exception_Invalid
      */
@@ -31,7 +31,7 @@ class CM_MediaStreams_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param string  $streamChannelMediaId
+     * @param string $streamChannelMediaId
      * @param CM_File $archiveSource
      * @throws CM_Exception_Invalid
      */
@@ -39,7 +39,14 @@ class CM_MediaStreams_Cli extends CM_Cli_Runnable_Abstract {
         $streamChannelMediaId = (string) $streamChannelMediaId;
         $streamChannelArchive = CM_Model_StreamChannelArchive_Media::findByMediaId($streamChannelMediaId);
         if (!$streamChannelArchive) {
-            throw new CM_Exception_Invalid('Archive not found', null, ['streamChannelMediaId' => $streamChannelMediaId]);
+            $streamChannel = CM_Model_StreamChannel_Media::findByMediaId($streamChannelMediaId);
+            if ($streamChannel) {
+                throw new CM_Exception_Invalid('Archive not created yet', null, ['streamChannelMediaId' => $streamChannelMediaId]);
+            }
+            $exception = new CM_Exception_Invalid('Archive not found, stream channel not found, skipping', CM_Exception::WARN, ['streamChannelMediaId' => $streamChannelMediaId]);
+            CM_Bootloader::getInstance()->getExceptionHandler()->logException($exception);
+            $this->_getStreamError()->writeln($exception->getMessage());
+            return;
         }
         $filename = $streamChannelArchive->getId() . '-' . $streamChannelArchive->getHash() . '-original.' . $archiveSource->getExtension();
         $archiveDestination = new CM_File_UserContent('streamChannels', $filename, $streamChannelArchive->getId());
