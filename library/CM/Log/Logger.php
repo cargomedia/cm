@@ -55,11 +55,11 @@ class CM_Log_Logger {
 
     /**
      * @param Exception           $exception
-     * @param CM_Log_Context|null $context
      * @param int|null            $logLevel
+     * @param CM_Log_Context|null $context
      * @return CM_Log_Logger
      */
-    public function addException(Exception $exception, CM_Log_Context $context = null, $logLevel = null) {
+    public function addException(Exception $exception, $logLevel = null, CM_Log_Context $context = null) {
         $context = $this->_mergeWithGlobalContext($context);
         return $this->_addRecord(new CM_Log_Record_Exception($exception, $context, $logLevel));
     }

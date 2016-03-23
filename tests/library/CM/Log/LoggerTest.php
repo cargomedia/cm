@@ -359,6 +359,19 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         });
         $logger->addException($exception);
         $this->assertSame(4, $mockHandleRecord->getCallCount());
+
+        $exception = new CM_Exception('explicit log level');
+        $exception->setSeverity(CM_Exception::FATAL);
+        $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
+            $recordException = $record->getSerializableException();
+            $this->assertSame($exception->getMessage(), $recordException->getMessage());
+            $this->assertSame($exception->getLine(), $recordException->getLine());
+            $this->assertSame($exception->getFile(), $recordException->getFile());
+            $this->assertSame('CM_Exception: explicit log level', $record->getMessage());
+            $this->assertSame(CM_Log_Logger::INFO, $record->getLevel());
+        });
+        $logger->addException($exception, CM_Log_Logger::INFO);
+        $this->assertSame(5, $mockHandleRecord->getCallCount());
     }
 
     public function testStaticLogLevelMethods() {
