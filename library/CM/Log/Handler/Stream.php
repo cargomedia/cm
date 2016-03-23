@@ -11,12 +11,12 @@ class CM_Log_Handler_Stream extends CM_Log_Handler_Abstract {
     /**
      * @param CM_OutputStream_Interface  $stream
      * @param CM_Log_Formatter_Interface $formatter
-     * @param int|null                   $level
+     * @param int|null                   $minLevel
      */
-    public function __construct(CM_OutputStream_Interface $stream, CM_Log_Formatter_Interface $formatter, $level = null) {
+    public function __construct(CM_OutputStream_Interface $stream, CM_Log_Formatter_Interface $formatter, $minLevel = null) {
         $this->_stream = $stream;
         $this->_formatter = $formatter;
-        parent::__construct($level);
+        parent::__construct($minLevel);
     }
 
     /**

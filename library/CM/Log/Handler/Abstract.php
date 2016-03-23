@@ -3,36 +3,36 @@
 abstract class CM_Log_Handler_Abstract implements CM_Log_Handler_HandlerInterface {
 
     /** @var int */
-    protected $_level;
+    protected $_minLevel;
 
     /**
-     * @param int|null  $level
+     * @param int|null $minLevel
      */
-    public function __construct($level = null) {
-        $level = null === $level ? CM_Log_Logger::DEBUG : (int) $level;
-        $this->setLevel($level);
+    public function __construct($minLevel = null) {
+        $minLevel = null === $minLevel ? CM_Log_Logger::DEBUG : (int) $minLevel;
+        $this->setMinLevel($minLevel);
     }
 
     /**
      * @return int
      */
-    public function getLevel() {
-        return $this->_level;
+    public function getMinLevel() {
+        return $this->_minLevel;
     }
 
     /**
      * @param int $level
      * @throws CM_Exception_Invalid
      */
-    public function setLevel($level) {
+    public function setMinLevel($level) {
         $level = (int) $level;
         if (CM_Log_Logger::hasLevel($level)) {
-            $this->_level = $level;
+            $this->_minLevel = $level;
         }
     }
 
     public function isHandling(CM_Log_Record $record) {
-        return $record->getLevel() >= $this->getLevel();
+        return $record->getLevel() >= $this->getMinLevel();
     }
 
     public function handleRecord(CM_Log_Record $record) {

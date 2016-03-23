@@ -248,7 +248,7 @@ return function (CM_Config_Node $config) {
     $config->services['logger-handler-newrelic'] = [
         'class'     => 'CMService_NewRelic_Log_Handler',
         'arguments' => [
-            'level' => CM_Log_Logger::WARNING,
+            'minLevel' => CM_Log_Logger::WARNING,
         ],
     ];
 
@@ -258,7 +258,7 @@ return function (CM_Config_Node $config) {
             'collection'    => 'cm_log',
             'recordTtl'     => null,
             'insertOptions' => null,
-            'level'         => CM_Log_Logger::INFO,
+            'minLevel'         => CM_Log_Logger::INFO,
         ],
     ];
 
@@ -268,7 +268,7 @@ return function (CM_Config_Node $config) {
             'name'      => 'createFileHandler',
             'arguments' => [
                 'path'  => 'logs/error.log',
-                'level' => CM_Log_Logger::INFO,
+                'minLevel' => CM_Log_Logger::INFO,
             ],
         ],
     ];
