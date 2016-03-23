@@ -44,15 +44,15 @@ return function (CM_Config_Node $config) {
     $config->CM_Model_Currency->default = ['code' => '840', 'abbreviation' => 'USD'];
 
     $config->CM_Http_Response_Page->exceptionsToCatch = array(
-        'CM_Exception_Nonexistent'  => ['errorPage' => 'CM_Page_Error_NotFound', 'logLevel' => CM_Log_Logger::WARNING],
-        'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'logLevel' => CM_Log_Logger::WARNING],
-        'CM_Exception_AuthRequired' => ['errorPage' => 'CM_Page_Error_AuthRequired', 'logLevel' => null],
-        'CM_Exception_NotAllowed'   => ['errorPage' => 'CM_Page_Error_NotAllowed', 'logLevel' => null],
+        'CM_Exception_Nonexistent'  => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => true, 'level' => CM_Log_Logger::WARNING],
+        'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => true, 'level' => CM_Log_Logger::WARNING],
+        'CM_Exception_AuthRequired' => ['errorPage' => 'CM_Page_Error_AuthRequired', 'log' => false],
+        'CM_Exception_NotAllowed'   => ['errorPage' => 'CM_Page_Error_NotAllowed', 'log' => false],
     );
 
     $config->CM_Http_Response_View_Abstract->exceptionsToCatch = array(
-        'CM_Exception_Nonexistent'  => ['logLevel' => CM_Log_Logger::WARNING],
-        'CM_Exception_InvalidParam' => ['logLevel' => CM_Log_Logger::WARNING],
+        'CM_Exception_Nonexistent'  => ['log' => true, 'level' => CM_Log_Logger::WARNING],
+        'CM_Exception_InvalidParam' => ['log' => true, 'level' => CM_Log_Logger::WARNING],
         'CM_Exception_AuthRequired' => [],
         'CM_Exception_NotAllowed'   => [],
         'CM_Exception_Blocked'      => [],
@@ -61,9 +61,9 @@ return function (CM_Config_Node $config) {
     $config->CM_Http_Response_View_Abstract->catchPublicExceptions = true;
 
     $config->CM_Http_Response_RPC->exceptionsToCatch = array(
-        'CM_Exception_InvalidParam' => ['logLevel' => CM_Log_Logger::WARNING],
-        'CM_Exception_AuthRequired' => ['logLevel' => CM_Log_Logger::WARNING],
-        'CM_Exception_NotAllowed'   => ['logLevel' => CM_Log_Logger::WARNING],
+        'CM_Exception_InvalidParam' => ['log' => true, 'level' => CM_Log_Logger::WARNING],
+        'CM_Exception_AuthRequired' => ['log' => true, 'level' => CM_Log_Logger::WARNING],
+        'CM_Exception_NotAllowed'   => ['log' => true, 'level' => CM_Log_Logger::WARNING],
     );
     $config->CM_Http_Response_RPC->catchPublicExceptions = true;
 

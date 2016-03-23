@@ -53,7 +53,7 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
         // test logging and errorCallback-execution
         CM_Config::get()->$className = new stdClass();
         CM_Config::get()->$className->exceptionsToCatch = [
-            'CM_Exception_Nonexistent'  => ['logLevel' => CM_Log_Logger::WARNING, 'foo' => 'bar'],
+            'CM_Exception_Nonexistent'  => ['log' => true, 'level' => CM_Log_Logger::WARNING, 'foo' => 'bar'],
             'CM_Exception_InvalidParam' => [],
         ];
         $exceptionCodeExecutionCounter = 0;

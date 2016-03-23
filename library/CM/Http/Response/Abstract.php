@@ -268,8 +268,9 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
                 return is_a($ex, $exceptionClass);
             });
             $catchException = null !== $errorOptions;
-            if ($catchException && isset($errorOptions['logLevel'])) {
-                $this->getServiceManager()->getLogger()->addException($ex, $errorOptions['logLevel']);
+            if ($catchException && isset($errorOptions['log']) && true === $errorOptions['log']) {
+                $logLevel = isset($errorOptions['level']) ? $errorOptions['level'] : null;
+                $this->getServiceManager()->getLogger()->addException($ex, $logLevel);
             }
             if (!$catchException && ($catchPublicExceptions && $ex->isPublic())) {
                 $errorOptions = [];
