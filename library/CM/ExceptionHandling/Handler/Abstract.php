@@ -98,9 +98,8 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
 
     /**
      * @param Exception $exception
-     * @param int|null  $logLevel
      */
-    protected function _logException(Exception $exception, $logLevel = null) {
-        $this->getServiceManager()->getLogger()->addException($exception, null, $logLevel);
+    protected function _logException(Exception $exception) {
+        $this->getServiceManager()->getLogger()->addException($exception);
     }
 }
