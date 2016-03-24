@@ -258,7 +258,7 @@ return function (CM_Config_Node $config) {
             'collection'    => 'cm_log',
             'recordTtl'     => null,
             'insertOptions' => null,
-            'minLevel'         => CM_Log_Logger::INFO,
+            'minLevel'      => CM_Log_Logger::DEBUG,
         ],
     ];
 
@@ -267,8 +267,8 @@ return function (CM_Config_Node $config) {
         'method' => [
             'name'      => 'createFileHandler',
             'arguments' => [
-                'path'  => 'logs/error.log',
-                'minLevel' => CM_Log_Logger::INFO,
+                'path'     => 'logs/error.log',
+                'minLevel' => CM_Log_Logger::DEBUG,
             ],
         ],
     ];
