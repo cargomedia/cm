@@ -87,7 +87,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      * @throws CM_Exception_AuthRequired
      */
     public function getViewer($needed = false) {
-        return $this->_request->getViewer($needed);
+        return $this->getRequest()->getViewer($needed);
     }
 
     /**
