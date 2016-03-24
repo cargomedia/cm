@@ -20,7 +20,7 @@ class CM_Log_Record_ExceptionTest extends CMTest_TestCase {
         $exception3 = new Exception('Native error');
         $recordException = new CM_Log_Record_Exception($exception3, new CM_Log_Context());
         $this->assertInstanceOf('CM_Log_Record_Exception', $recordException);
-        $this->assertSame(CM_Log_Logger::CRITICAL, $recordException->getLevel());
+        $this->assertSame(CM_Log_Logger::ERROR, $recordException->getLevel());
 
         $exception = $this->catchException(function () use ($exception3) {
             new CM_Log_Record_Exception($exception3, new CM_Log_Context(), 11);
