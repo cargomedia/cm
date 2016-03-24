@@ -70,7 +70,7 @@
             </div>
           {/if}
           {if (isset($context.user))}
-            <div><span class="label">User: id-{$context.id}</span> <span class="label">name:</span> {$context.name}</div>
+            <div><span class="label">User ID:</span> {$context.user.id} <span class="label">name:</span> {$context.user.name}</div>
           {/if}
           {if (isset($context.httpRequest))}
             <div><span class="label">Request:</span> {$context.httpRequest.method} {$context.httpRequest.uri}</div>
