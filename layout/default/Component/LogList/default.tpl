@@ -40,7 +40,6 @@
         {$exception = $log.exception}
         <div class="label">Exception Info</div>
         <div><span class="label">Class:</span> {$exception.class}</div>
-        <div><span class="label">Message:</span> {$exception.message}</div>
         <div><span class="label">Line:</span> {$exception.line}</div>
         <div><span class="label">File:</span> {$exception.file}</div>
         {if (!empty($exception.metaInfo))}
