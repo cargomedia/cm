@@ -47,6 +47,7 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
     public function testRunWithCatching() {
         /** @var CM_Http_Response_Abstract|\Mocka\AbstractClassTrait $response */
         $response = $this->mockClass('CM_Http_Response_Abstract')->newInstanceWithoutConstructor();
+        $response->mockMethod('getRequest')->set(new CM_Http_Request_Get('/foo/bar/'));
         $response->setServiceManager($this->getServiceManager());
         $className = get_class($response);
 
