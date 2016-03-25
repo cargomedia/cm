@@ -108,11 +108,10 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
      * @return array
      */
     public static function addTypeCriteria($type = null) {
-        if (null === $type) {
-            $typeCriteria = ['$exists' => false];
-        } else {
-            $typeCriteria = (int) $type;
+        $criteria = [];
+        if (null !== $type) {
+            $criteria['context.extra.type'] = (int) $type;
         }
-        return ['context.extra.type' => $typeCriteria];
+        return $criteria;
     }
 }
