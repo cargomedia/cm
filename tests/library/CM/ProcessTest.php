@@ -24,6 +24,39 @@ class CM_ProcessTest extends CMTest_TestCase {
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
+    public function testBindOnFork() {
+        /** @var CM_Process|\Mocka\AbstractClassTrait $process */
+        $process = $this->mockObject('CM_Process');
+
+        $bindMock = $process->mockMethod('bind');
+        $bindMock->set(function ($event, callable $callback) {
+            $this->assertSame('exit', $event);
+            $this->assertSame('killChildren', $callback[1]);
+        });
+        /** @var CM_Process_ForkHandler|\Mocka\FunctionMock $forkHandlerMock */
+        $forkHandlerMock = $process->mockMethod('_getForkHandler');
+        $forkHandlerMock->set(function () {
+            $mockForkHandler = $this->mockClass('CM_Process_ForkHandler')->newInstanceWithoutConstructor();
+            $mockForkHandler->mockMethod('runAndSendWorkload');
+            $mockForkHandler->mockMethod('closeIpcStream');
+            return $mockForkHandler;
+        });
+
+        $this->assertSame(0, $bindMock->getCallCount());
+        $process->mockMethod('_hasForks')->set(true);
+        $process->fork(function () {
+        });
+        $this->assertSame(0, $bindMock->getCallCount());
+        $process->mockMethod('_hasForks')->set(false);
+        $process->fork(function () {
+        });
+        $this->assertSame(1, $bindMock->getCallCount());
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function testForkAndWaitForChildren() {
         $file = CM_File::createTmp();
 
