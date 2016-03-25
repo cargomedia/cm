@@ -18,11 +18,11 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
      * @throws CM_Exception_Invalid
      */
     public function __construct(array $levelList, $aggregate = null, $ageMax = null, $type = null) {
-
-        if (empty ($levelList)) {
+        if (empty($levelList)) {
             throw new CM_Exception_Invalid('Log level list is empty.');
         }
         foreach ($levelList as $level) {
+            $level = (int) $level;
             if (!CM_Log_Logger::hasLevel($level)) {
                 throw new CM_Exception_Invalid('Log level `' . $level . '` does not exist.');
             }
