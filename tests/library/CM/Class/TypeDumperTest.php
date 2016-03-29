@@ -35,26 +35,25 @@ class CM_Class_TypeDumperTest extends CMTest_TestCase {
     }
 
     public function testLoadTwice() {
+        $dumper = new CM_Class_TypeDumper($this->getServiceManager());
+
         CM_Config::get()->Foo = new stdClass();
         CM_Config::get()->Foo->types = [
             1111 => 'Foo1',
             2222 => 'Foo2',
+            3333 => 'Foo3',
         ];
-
-        $dumper = new CM_Class_TypeDumper($this->getServiceManager());
         $dumper->load(new CM_OutputStream_Null());
-        $dumper->load(new CM_OutputStream_Null());
-    }
 
-    public function testUnload() {
-        $dumper = new CM_Class_TypeDumper($this->getServiceManager());
+        CM_Config::get()->Foo->types = [
+            1111 => 'Foo1',
+            2222 => 'Foo2',
+        ];
         $dumper->load(new CM_OutputStream_Null());
 
         $dbClient = $this->getServiceManager()->getDatabases()->getMaster();
-        $queryCount = new CM_Db_Query_Count($dbClient, 'cm_tmp_classType');
-        $this->assertNotSame('0', $queryCount->execute()->fetchColumn());
-
-        $dumper->unload(new CM_OutputStream_Null());
-        $this->assertSame('0', $queryCount->execute()->fetchColumn());
+        $this->assertSame('1', (new CM_Db_Query_Count($dbClient, 'cm_tmp_classType', ['type' => 1111]))->execute()->fetchColumn());
+        $this->assertSame('1', (new CM_Db_Query_Count($dbClient, 'cm_tmp_classType', ['type' => 2222]))->execute()->fetchColumn());
+        $this->assertSame('0', (new CM_Db_Query_Count($dbClient, 'cm_tmp_classType', ['type' => 3333]))->execute()->fetchColumn());
     }
 }
