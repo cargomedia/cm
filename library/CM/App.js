@@ -1371,5 +1371,9 @@ var CM_App = CM_Class_Abstract.extend({
       });
       return params;
     }
-  }
+  },
+
+  userAgent: (function(ua) {
+    return window.UserAgentParser.parse(ua);
+  })(navigator.userAgent || '')
 });
