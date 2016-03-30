@@ -309,7 +309,9 @@ var CM_App = CM_Class_Abstract.extend({
         return;
       }
       var messages = _.toArray(arguments);
-      messages.unshift('[CM]');
+      var time = (Date.now() - performance.timing.navigationStart) / 1000;
+      var timeFormatted = time.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false});
+      messages.unshift('[CM ' + timeFormatted + ']');
       if (window.console && window.console.log) {
         var log = window.console.log;
         if (typeof log == "object" && Function.prototype.bind) {
