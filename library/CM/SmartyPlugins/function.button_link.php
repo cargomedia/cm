@@ -97,7 +97,7 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
             $html .= ' target="' . CM_Util::htmlspecialchars($target) . '"';
         }
     } else {
-        $html .= '<button type="button" value="' . $label . '"';
+        $html .= '<button type="button" value="' . CM_Util::htmlspecialchars($label) . '"';
     }
 
     $html .= ' class="' . $class . '" ' . $attrs . '>';
