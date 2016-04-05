@@ -218,7 +218,12 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
         if (!$result) {
             return null;
         }
-        return self::factory($result['id'], $result['type']);
+        try {
+            $streamChannel = self::factory($result['id'], $result['type']);
+        } catch (CM_Exception_Nonexistent $ex) {
+            return null;
+        }
+        return $streamChannel;
     }
 
     /**

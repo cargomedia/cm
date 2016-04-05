@@ -50,12 +50,19 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
         $adapterType = 1;
         /** @var CM_Model_StreamChannel_Media $streamChannelOriginal */
         $streamChannelOriginal = CMTest_TH::createStreamChannel(null, $adapterType);
+        $streamChannelId = $streamChannelOriginal->getId();
         $streamChannelKey = $streamChannelOriginal->getKey();
         $streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamChannelKey, $adapterType);
         $this->assertInstanceOf('CM_Model_StreamChannel_Media', $streamChannel);
         $this->assertEquals($streamChannelOriginal->getId(), $streamChannel->getId());
 
         $streamChannelOriginal->delete();
+        $this->assertNull(CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamChannelKey, $adapterType));
+
+        // invalid cache-entry
+        $cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $streamChannelKey . '_adapterType:' . $adapterType;
+        $cache = CM_Cache_Shared::getInstance();
+        $cache->set($cacheKey, ['id' => $streamChannelId, 'type' => $adapterType]);
         $this->assertNull(CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamChannelKey, $adapterType));
     }
 
