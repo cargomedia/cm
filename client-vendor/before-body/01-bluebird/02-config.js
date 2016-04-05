@@ -1,0 +1,3 @@
+Promise.config({
+  cancellation: true
+});

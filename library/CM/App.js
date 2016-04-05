@@ -232,7 +232,7 @@ var CM_App = CM_Class_Abstract.extend({
 
   promise: {
     ready: function() {
-      var promiseConfig = {cancellation: true};
+      var promiseConfig = {};
       if (cm.options.debug) {
         promiseConfig['warnings'] = {
           wForgottenReturn: false
