@@ -221,6 +221,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
         try {
             $streamChannel = self::factory($result['id'], $result['type']);
         } catch (CM_Exception_Nonexistent $ex) {
+            $cache->delete($cacheKey);
             return null;
         }
         return $streamChannel;

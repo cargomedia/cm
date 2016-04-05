@@ -64,6 +64,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
         $cache = CM_Cache_Shared::getInstance();
         $cache->set($cacheKey, ['id' => $streamChannelId, 'type' => $adapterType]);
         $this->assertNull(CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamChannelKey, $adapterType));
+        $this->assertSame(false, $cache->get($cacheKey));
     }
 
     /**
