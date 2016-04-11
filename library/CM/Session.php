@@ -169,6 +169,7 @@ class CM_Session implements CM_Comparable {
         $this->regenerateId();
         if ($request = $this->getRequest()) {
             CM_Splittest_Fixture::setUserForRequestClient($request, $user);
+            $user->getUseragents()->addFromRequest($request);
         }
     }
 
