@@ -58,6 +58,18 @@ class CM_App implements CM_Service_ManagerAwareInterface {
     }
 
     /**
+     * @throws CM_Exception_Invalid
+     * @return string
+     */
+    public function getName() {
+        $config = CM_Bootloader::getInstance()->getConfig()->get();
+        if (!isset($config->installationName)) {
+            throw new CM_Exception_Invalid('The `installationName` config property is required.');
+        }
+        return $config->installationName;
+    }
+
+    /**
      * @param string|null $namespace
      * @return int
      */
