@@ -1,6 +1,9 @@
 <?php
 
 return function (CM_Config_Node $config) {
+
+    $config->installationName = 'CM';
+
     $config->CM_App->setupScriptClasses = array();
     $config->CM_App->setupScriptClasses[] = 'CM_File_Filesystem_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_Db_SetupScript';
