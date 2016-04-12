@@ -230,6 +230,28 @@ var CM_App = CM_Class_Abstract.extend({
     return this.getUrl(path, null, true);
   },
 
+  /**
+   * @returns {String}
+   */
+  getClientId: function() {
+    return $.cookie('clientId');
+  },
+
+  /**
+   * @returns {Object}
+   */
+  getContext: function() {
+    var context = {};
+    context[cm.options.name] = {
+      client: cm.getClientId(),
+      browserWindow: cm.window.getId()
+    };
+    if (cm.viewer) {
+      context[cm.options.name].user = cm.viewer.id;
+    }
+    return context;
+  },
+
   promise: {
     ready: function() {
       var promiseConfig = {};
