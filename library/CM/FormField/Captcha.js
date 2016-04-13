@@ -1,3 +1,5 @@
+var CM_FormField_Abstract = require('CM/FormField/Abstract');
+
 /**
  * @class CM_FormField_Captcha
  * @extends CM_FormField_Abstract
@@ -48,3 +50,6 @@ var CM_FormField_Captcha = CM_FormField_Abstract.extend({
     this.$("input[name*=value]").val(captcha.value);
   }
 });
+
+
+module.exports = CM_FormField_Captcha;

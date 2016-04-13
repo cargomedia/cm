@@ -1,3 +1,5 @@
+var CM_Class_Abstract = require('CM/Class/Abstract');
+
 /**
  * @class CM_MessageStream_Adapter_Abstract
  * @extends CM_Class_Abstract
@@ -36,3 +38,6 @@ var CM_MessageStream_Adapter_Abstract = CM_Class_Abstract.extend({
     throw 'Not implemented';
   }
 });
+
+
+module.exports = CM_MessageStream_Adapter_Abstract;

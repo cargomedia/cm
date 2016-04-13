@@ -1,3 +1,5 @@
+var CM_FormField_Abstract = require('CM/FormField/Abstract');
+
 /**
  * @class CM_FormField_Date
  * @extends CM_FormField_Abstract
@@ -39,3 +41,6 @@ var CM_FormField_Date = CM_FormField_Abstract.extend({
     this.$('select.year').val(date.year);
   }
 });
+
+
+module.exports = CM_FormField_Date;

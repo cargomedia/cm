@@ -1,3 +1,5 @@
+var CM_FormField_SuggestOne = require('CM/FormField/SuggestOne');
+
 /**
  * @class CM_FormField_Location
  * @extends CM_FormField_SuggestOne
@@ -83,3 +85,6 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
     return this.ajax('getSuggestionByCoordinates', {lat: lat, lon: lon, levelMin: this.getOption('levelMin'), levelMax: this.getOption('levelMax')});
   }
 });
+
+
+module.exports = CM_FormField_Location;

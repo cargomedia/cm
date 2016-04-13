@@ -1,3 +1,5 @@
+var CM_FormField_Abstract = require('CM/FormField/Abstract');
+
 /**
  * @class CM_FormField_Text
  * @extends CM_FormField_Abstract
@@ -51,3 +53,6 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
     this.getInput().on('input propertychange keyup', _.bind(this.triggerChange, this));
   }
 });
+
+
+module.exports = CM_FormField_Text;

@@ -1,3 +1,5 @@
+var CM_FormField_Text = require('CM/FormField/Text');
+
 /**
  * @class CM_FormField_Password
  * @extends CM_FormField_Text
@@ -63,3 +65,6 @@ var CM_FormField_Password = CM_FormField_Text.extend({
     this.getInput().attr('type', state ? 'text' : 'password').focus();
   }
 });
+
+
+module.exports = CM_FormField_Password;

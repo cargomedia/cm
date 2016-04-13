@@ -1,3 +1,5 @@
+var CM_View_Abstract = require('CM/View/Abstract');
+
 /**
  * @class CM_Component_Abstract
  * @extends CM_View_Abstract
@@ -103,3 +105,6 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
       });
   }
 });
+
+
+module.exports = CM_Component_Abstract;

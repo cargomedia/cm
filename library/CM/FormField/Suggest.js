@@ -1,3 +1,5 @@
+var CM_FormField_Abstract = require('CM/FormField/Abstract');
+
 /**
  * @class CM_FormField_Suggest
  * @extends CM_FormField_Abstract
@@ -142,3 +144,6 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
     return output;
   }
 });
+
+
+module.exports = CM_FormField_Suggest;

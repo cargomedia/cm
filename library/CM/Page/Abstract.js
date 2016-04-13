@@ -1,3 +1,5 @@
+var CM_Component_Abstract = require('CM/Component/Abstract');
+
 /**
  * @class CM_Page_Abstract
  * @extends CM_Component_Abstract
@@ -91,3 +93,6 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
   }
 
 });
+
+
+module.exports = CM_Page_Abstract;

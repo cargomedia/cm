@@ -1,3 +1,5 @@
+var CM_Form_Abstract = require('CM/Form/Abstract');
+
 /**
  * @class CM_Form_Example
  * @extends CM_Form_Abstract
@@ -7,6 +9,7 @@ var CM_Form_Example = CM_Form_Abstract.extend({
 
   ready: function() {
     var form = this;
+    var CM_FormField_Text = require('CM_FormField_Text');
     this.getFields().forEach(function(field) {
       field.on('ready', function() {
         field.on('change', form.logData.bind(form));
@@ -48,3 +51,6 @@ var CM_Form_Example = CM_Form_Abstract.extend({
     return table;
   }
 });
+
+
+module.exports = CM_Form_Example;

@@ -47,17 +47,13 @@ class CM_Util {
     }
 
     /**
-     * @param string           $pattern
-     * @param CM_Site_Abstract $site
+     * @param string $pattern
+     * @param string $moduleName
      * @return string[]
      */
-    public static function rglobLibraries($pattern, CM_Site_Abstract $site) {
-        $paths = array();
-        foreach ($site->getModules() as $moduleName) {
-            $libraryPath = CM_Util::getModulePath($moduleName) . 'library/' . $moduleName . '/';
-            $paths = array_merge($paths, CM_Util::rglob($pattern, $libraryPath));
-        }
-        return $paths;
+    public static function rglobLibrariesByModule($pattern, $moduleName) {
+        $libraryPath = CM_Util::getModulePath($moduleName, false, true) . '/library/' . $moduleName . '/';
+        return CM_Util::rglob($pattern, $libraryPath);
     }
 
     /**
@@ -265,12 +261,16 @@ class CM_Util {
     /**
      * @param string    $name
      * @param bool|null $relative
+     * @param bool|null $canonical
      * @return string
      */
-    public static function getModulePath($name, $relative = null) {
+    public static function getModulePath($name, $relative = null, $canonical = null) {
         $path = CM_Bootloader::getInstance()->getModulePath($name);
         if (!$relative) {
             $path = DIR_ROOT . $path;
+        }
+        if ($canonical) {
+            $path = realpath($path);
         }
         return $path;
     }

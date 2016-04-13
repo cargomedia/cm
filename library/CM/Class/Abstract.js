@@ -18,3 +18,5 @@ CM_Class_Abstract.prototype = {
  * @param {Object} prototype
  */
 CM_Class_Abstract.extend = Backbone.Model.extend;
+
+module.exports = CM_Class_Abstract;

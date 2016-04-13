@@ -1,3 +1,5 @@
+var CM_Page_Abstract = require('CM/Page/Abstract');
+
 /**
  * @class CM_Page_Example
  * @extends CM_Page_Abstract
@@ -15,3 +17,6 @@ var CM_Page_Example = CM_Page_Abstract.extend({
     }
   }
 });
+
+
+module.exports = CM_Page_Example;
