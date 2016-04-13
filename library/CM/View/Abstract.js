@@ -636,3 +636,5 @@ var CM_View_Abstract = Backbone.View.extend({
     return view;
   }
 });
+
+module.exports = CM_View_Abstract;
