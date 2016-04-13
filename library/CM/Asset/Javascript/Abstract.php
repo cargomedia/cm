@@ -37,9 +37,10 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
      * @param string[]     $mainPaths
      * @param string[]     $rootPaths
      * @param boolean|null $debug
+     * @param boolean|null $require
      * @return string
      */
-    protected function _browserify(array $mainPaths, array $rootPaths, $debug = null) {
+    protected function _browserify(array $mainPaths, array $rootPaths, $debug = null, $require = null) {
         if (!count($mainPaths)) {
             return '';
         }
@@ -52,7 +53,19 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
 
         $cacheKey = __METHOD__ . '_md5:' . md5($content) . '_debug:' . $debug;
         $cache = CM_Cache_Persistent::getInstance();
-        return $cache->get($cacheKey, function () use ($mainPaths, $rootPaths, $debug) {
+        return $cache->get($cacheKey, function () use ($mainPaths, $rootPaths, $debug, $require) {
+            if ($require) {
+                $mainClassPaths = \Functional\map($mainPaths, function ($path) use ($rootPaths) {
+                    foreach ($rootPaths as $rootPath) {
+                        $path = preg_replace('#^' . $rootPath . '#', '', $path);
+                    }
+                    $path = preg_replace('#\.js$#', '', $path);
+                    return $path . ':' . preg_replace('#/#', '_', $path);
+                });
+
+                $mainPaths = \Functional\zip(array_fill(0, count($mainClassPaths), '-r'), $mainClassPaths);
+                $mainPaths = \Functional\flatten($mainPaths);
+            }
             $args = $mainPaths;
             if ($debug) {
                 $args[] = '--debug';
