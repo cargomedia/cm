@@ -1,3 +1,5 @@
+var CM_Form_Abstract = require('CM/Form/Abstract');
+
 /**
  * @class CM_Form_ExampleIcon
  * @extends CM_Form_Abstract
@@ -46,3 +48,6 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
     }, ''));
   }
 });
+
+
+module.exports = CM_Form_ExampleIcon;

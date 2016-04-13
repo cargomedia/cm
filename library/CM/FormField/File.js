@@ -1,3 +1,5 @@
+var CM_FormField_Abstract = require('CM/FormField/Abstract');
+
 /**
  * @class CM_FormField_File
  * @extends CM_FormField_Abstract
@@ -124,3 +126,6 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
     this.$('.previews').empty();
   }
 });
+
+
+module.exports = CM_FormField_File;

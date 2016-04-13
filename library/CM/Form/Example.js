@@ -1,3 +1,5 @@
+var CM_Form_Abstract = require('CM/Form/Abstract');
+
 /**
  * @class CM_Form_Example
  * @extends CM_Form_Abstract
@@ -48,3 +50,6 @@ var CM_Form_Example = CM_Form_Abstract.extend({
     return table;
   }
 });
+
+
+module.exports = CM_Form_Example;

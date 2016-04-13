@@ -1,3 +1,5 @@
+var CM_FormField_Abstract = require('CM/FormField/Abstract');
+
 /**
  * @class CM_FormField_Integer
  * @extends CM_FormField_Abstract
@@ -88,3 +90,6 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
     }
   }
 });
+
+
+module.exports = CM_FormField_Integer;

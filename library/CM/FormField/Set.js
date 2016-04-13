@@ -1,3 +1,5 @@
+var CM_FormField_Abstract = require('CM/FormField/Abstract');
+
 /**
  * @class CM_FormField_Set
  * @extends CM_FormField_Abstract
@@ -43,3 +45,6 @@ var CM_FormField_Set = CM_FormField_Abstract.extend({
     return $input;
   }
 });
+
+
+module.exports = CM_FormField_Set;

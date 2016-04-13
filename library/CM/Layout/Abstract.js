@@ -1,3 +1,5 @@
+var CM_View_Abstract = require('CM/View/Abstract');
+
 /**
  * @class CM_Layout_Abstract
  * @extends CM_View_Abstract
@@ -181,3 +183,6 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   }
 
 });
+
+
+module.exports = CM_Layout_Abstract;

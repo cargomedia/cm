@@ -1,3 +1,5 @@
+var CM_MessageStream_Adapter_Abstract = require('CM/MessageStream/Adapter/Abstract');
+
 /**
  * @class CM_MessageStream_Adapter_SocketRedis
  * @extends CM_MessageStream_Adapter_Abstract
@@ -23,3 +25,6 @@ var CM_MessageStream_Adapter_SocketRedis = CM_MessageStream_Adapter_Abstract.ext
     this._socketRedis.publish(channel, event, data);
   }
 });
+
+
+module.exports = CM_MessageStream_Adapter_SocketRedis;

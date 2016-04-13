@@ -1,3 +1,5 @@
+var CM_View_Abstract = require('CM/View/Abstract');
+
 /**
  * @class CM_Form_Abstract
  * @extends CM_View_Abstract
@@ -323,3 +325,6 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     return null;
   }
 });
+
+
+module.exports = CM_Form_Abstract;

@@ -1,3 +1,5 @@
+var CM_Component_Abstract = require('CM/Component/Abstract');
+
 /**
  * @class CM_Component_LogList
  * @extends CM_Component_Abstract
@@ -17,3 +19,6 @@ var CM_Component_LogList = CM_Component_Abstract.extend({
     this.ajaxModal('flushLog', {'type': this.type});
   }
 });
+
+
+module.exports = CM_Component_LogList;

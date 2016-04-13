@@ -1,3 +1,5 @@
+var CM_FormField_Abstract = require('CM/FormField/Abstract');
+
 /**
  * @class CM_FormField_TreeSelect
  * @extends CM_FormField_Abstract
@@ -84,3 +86,6 @@ var CM_FormField_TreeSelect = CM_FormField_Abstract.extend({
     return this.$('.node[data-id="' + this.getValue() + '"]');
   }
 });
+
+
+module.exports = CM_FormField_TreeSelect;

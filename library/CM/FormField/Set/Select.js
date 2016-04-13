@@ -1,3 +1,5 @@
+var CM_FormField_Set = require('CM/FormField/Set');
+
 /**
  * @class CM_FormField_Set_Select
  * @extends CM_FormField_Set
@@ -47,3 +49,6 @@ var CM_FormField_Set_Select = CM_FormField_Set.extend({
     return this.getInput().is('[type=radio]');
   }
 });
+
+
+module.exports = CM_FormField_Set_Select;

@@ -1,3 +1,5 @@
+var CM_Component_Abstract = require('CM/Component/Abstract');
+
 /**
  * @class CM_Component_Example
  * @extends CM_Component_Abstract
@@ -138,3 +140,6 @@ var CM_Component_Example = CM_Component_Abstract.extend({
     });
   }
 });
+
+
+module.exports = CM_Component_Example;

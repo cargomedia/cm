@@ -1,3 +1,5 @@
+var CM_View_Abstract = require('CM/View/Abstract');
+
 /**
  * @class CM_FormField_Abstract
  * @extends CM_View_Abstract
@@ -168,3 +170,6 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
     return 0 === String(value).trim().length;
   }
 });
+
+
+module.exports = CM_FormField_Abstract;

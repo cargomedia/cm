@@ -1,3 +1,5 @@
+var CM_Class_Abstract = require('CM/Class/Abstract');
+
 /**
  * @class CM_App
  * @extends CM_Class_Abstract
@@ -1048,7 +1050,8 @@ var CM_App = CM_Class_Abstract.extend({
      */
     _getAdapter: function() {
       if (!this._adapter) {
-        this._adapter = new window[cm.options.stream.adapter](cm.options.stream.options);
+        var Adapter = require(cm.options.stream.adapter);
+        this._adapter = new Adapter(cm.options.stream.options);
       }
       return this._adapter;
     },
@@ -1400,4 +1403,9 @@ var CM_App = CM_Class_Abstract.extend({
   userAgent: (function(ua) {
     return window.UserAgentParser.parse(ua);
   })(navigator.userAgent || '')
+}, {
+  require: require
 });
+
+
+module.exports = CM_App;
