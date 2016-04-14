@@ -44,7 +44,7 @@ class CM_MediaStreams_Cli extends CM_Cli_Runnable_Abstract {
                 throw new CM_Exception_Invalid('Archive not created, please try again later', null, ['streamChannelMediaId' => $streamChannelMediaId]);
             }
             $exception = new CM_Exception_Invalid('Archive not found, stream channel not found, skipping', CM_Exception::WARN, ['streamChannelMediaId' => $streamChannelMediaId]);
-            $this->getServiceManager()->getLogger()->addException($exception);
+            $this->getServiceManager()->getLogger()->addException($exception, CM_Log_Logger::WARNING);
             return;
         }
         $filename = $streamChannelArchive->getId() . '-' . $streamChannelArchive->getHash() . '-original.' . $archiveSource->getExtension();

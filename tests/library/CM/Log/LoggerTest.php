@@ -327,11 +327,10 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
             $this->assertSame('Exception: foo', $record->getMessage());
             $this->assertSame(CM_Log_Logger::ERROR, $record->getLevel());
         });
-        $logger->addException($exception);
+        $logger->addException($exception, CM_Log_Logger::ERROR);
         $this->assertSame(1, $mockHandleRecord->getCallCount());
 
         $exception = new CM_Exception('bar');
-        $exception->setSeverity(CM_Exception::WARN);
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
             $recordException = $record->getSerializableException();
             $this->assertSame($exception->getMessage(), $recordException->getMessage());
@@ -340,11 +339,10 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
             $this->assertSame('CM_Exception: bar', $record->getMessage());
             $this->assertSame(CM_Log_Logger::WARNING, $record->getLevel());
         });
-        $logger->addException($exception);
+        $logger->addException($exception, CM_Log_Logger::WARNING);
         $this->assertSame(2, $mockHandleRecord->getCallCount());
 
         $exception = new CM_Exception('foobar');
-        $exception->setSeverity(CM_Exception::ERROR);
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
             $recordException = $record->getSerializableException();
             $this->assertSame($exception->getMessage(), $recordException->getMessage());
@@ -353,11 +351,10 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
             $this->assertSame('CM_Exception: foobar', $record->getMessage());
             $this->assertSame(CM_Log_Logger::ERROR, $record->getLevel());
         });
-        $logger->addException($exception);
+        $logger->addException($exception, CM_Log_Logger::ERROR);
         $this->assertSame(3, $mockHandleRecord->getCallCount());
 
         $exception = new CM_Exception('test');
-        $exception->setSeverity(CM_Exception::FATAL);
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
             $recordException = $record->getSerializableException();
             $this->assertSame($exception->getMessage(), $recordException->getMessage());
@@ -366,21 +363,8 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
             $this->assertSame('CM_Exception: test', $record->getMessage());
             $this->assertSame(CM_Log_Logger::CRITICAL, $record->getLevel());
         });
-        $logger->addException($exception);
+        $logger->addException($exception, CM_Log_Logger::CRITICAL);
         $this->assertSame(4, $mockHandleRecord->getCallCount());
-
-        $exception = new CM_Exception('explicit log level');
-        $exception->setSeverity(CM_Exception::FATAL);
-        $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
-            $recordException = $record->getSerializableException();
-            $this->assertSame($exception->getMessage(), $recordException->getMessage());
-            $this->assertSame($exception->getLine(), $recordException->getLine());
-            $this->assertSame($exception->getFile(), $recordException->getFile());
-            $this->assertSame('CM_Exception: explicit log level', $record->getMessage());
-            $this->assertSame(CM_Log_Logger::INFO, $record->getLevel());
-        });
-        $logger->addException($exception, CM_Log_Logger::INFO);
-        $this->assertSame(5, $mockHandleRecord->getCallCount());
     }
 
     public function testStaticLogLevelMethods() {

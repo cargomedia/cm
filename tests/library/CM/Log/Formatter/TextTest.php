@@ -51,7 +51,7 @@ class CM_Log_Formatter_TextTest extends CMTest_TestCase {
 
     public function testFormattingWithException() {
         $exception = new Exception('foo');
-        $record = new CM_Log_Record_Exception($exception, new CM_Log_Context());
+        $record = new CM_Log_Record_Exception(CM_Log_Logger::ERROR, new CM_Log_Context(), $exception);
         $formatter = new CM_Log_Formatter_Text();
         $messageLines = explode(PHP_EOL, $formatter->renderException($record));
 

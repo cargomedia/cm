@@ -44,7 +44,8 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
         try {
             return new $className();
         } catch (Exception $e) {
-            $this->getServiceManager()->getLogger()->addException($e);
+            $logLevel = CM_Log_Record_Exception::exceptionSeverityToLevel($e);
+            $this->getServiceManager()->getLogger()->addException($e, $logLevel);
             return null;
         }
     }

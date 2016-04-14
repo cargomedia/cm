@@ -117,7 +117,7 @@ class CM_Paging_LogTest extends CMTest_TestCase {
         $exception = new CM_Exception_Invalid('Bad news', CM_Exception::WARN, ['baz' => 'bar']);
         $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', new CM_Log_Context(null, null, new CM_Log_Context_App(['bar' => 'quux'])));
         $record2 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'baz', new CM_Log_Context());
-        $record3 = new CM_Log_Record_Exception($exception, new CM_Log_Context());
+        $record3 = new CM_Log_Record_Exception(CM_Log_Logger::WARNING, new CM_Log_Context(), $exception);
 
         //they will not be found
         $handler->handleRecord($record1);
@@ -128,7 +128,7 @@ class CM_Paging_LogTest extends CMTest_TestCase {
 
         //recreate records to correctly set up CM_Log_Record::createdAt
         $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', new CM_Log_Context(null, null, new CM_Log_Context_App(['bar' => 'quux'])));
-        $record3 = new CM_Log_Record_Exception($exception, new CM_Log_Context());
+        $record3 = new CM_Log_Record_Exception(CM_Log_Logger::WARNING, new CM_Log_Context(), $exception);
 
         $handler->handleRecord($record1);
         $handler->handleRecord($record3);
@@ -138,7 +138,7 @@ class CM_Paging_LogTest extends CMTest_TestCase {
         //recreate records to correctly set up CM_Log_Record::createdAt
         $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', new CM_Log_Context(null, null, new CM_Log_Context_App(['bar' => 'quux'])));
         $record2 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'baz', new CM_Log_Context());
-        $record3 = new CM_Log_Record_Exception($exception, new CM_Log_Context(), CM_Log_Logger::DEBUG);
+        $record3 = new CM_Log_Record_Exception(CM_Log_Logger::DEBUG, new CM_Log_Context(), $exception);
 
         $handler->handleRecord($record2);
         $handler->handleRecord($record2);

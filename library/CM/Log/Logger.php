@@ -66,16 +66,16 @@ class CM_Log_Logger {
 
     /**
      * @param Exception               $exception
-     * @param int|null                $level
+     * @param int                     $level
      * @param CM_Log_Context_App|null $appContext
      * @return CM_Log_Logger
      */
-    public function addException(Exception $exception, $level = null, CM_Log_Context_App $appContext = null) {
+    public function addException(Exception $exception, $level, CM_Log_Context_App $appContext = null) {
         $context = clone $this->_contextGlobal;
         if ($appContext) {
             $context->getAppContext()->merge($appContext);
         }
-        return $this->_addRecord(new CM_Log_Record_Exception($exception, $context, $level));
+        return $this->_addRecord(new CM_Log_Record_Exception($level, $context, $exception));
     }
 
     /**
@@ -196,7 +196,7 @@ class CM_Log_Logger {
             return;
         }
         foreach ($exceptionList as $exception) {
-            $this->_addRecordToLayer(new CM_Log_Record_Exception($exception, $context), 0);
+            $this->_addRecordToLayer(new CM_Log_Record_Exception(CM_Log_Logger::ERROR, $context, $exception), 0);
         }
     }
 
