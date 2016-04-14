@@ -87,7 +87,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      * @throws CM_Exception_AuthRequired
      */
     public function getViewer($needed = false) {
-        return $this->_request->getViewer($needed);
+        return $this->getRequest()->getViewer($needed);
     }
 
     /**
@@ -268,8 +268,9 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
                 return is_a($ex, $exceptionClass);
             });
             $catchException = null !== $errorOptions;
-            if ($catchException && isset($errorOptions['logLevel'])) {
-                $this->getServiceManager()->getLogger()->addException($ex, null, $errorOptions['logLevel']);
+            if ($catchException && isset($errorOptions['log']) && true === $errorOptions['log']) {
+                $logLevel = isset($errorOptions['level']) ? $errorOptions['level'] : null;
+                $this->getServiceManager()->getLogger()->addException($ex, $logLevel, new CM_Log_Context($this->getViewer(), $this->getRequest()));
             }
             if (!$catchException && ($catchPublicExceptions && $ex->isPublic())) {
                 $errorOptions = [];

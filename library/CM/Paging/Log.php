@@ -4,27 +4,32 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
 
     const COLLECTION_NAME = 'cm_log';
 
-    /** @var int */
-    protected $_level;
+    /** @var array */
+    protected $_levelList;
 
     /** @var int|null */
     protected $_type;
 
     /**
-     * @param int          $level
+     * @param array        $levelList
      * @param boolean|null $aggregate
      * @param int          $ageMax
      * @param int|null     $type
      * @throws CM_Exception_Invalid
      */
-    public function __construct($level, $aggregate = null, $ageMax = null, $type = null) {
-        $level = (int) $level;
-        if (null !== $ageMax) {
-            $ageMax = (int) $ageMax;
+    public function __construct(array $levelList, $aggregate = null, $ageMax = null, $type = null) {
+        if (empty($levelList)) {
+            throw new CM_Exception_Invalid('Log level list is empty.');
+        }
+        foreach ($levelList as $level) {
+            $level = (int) $level;
+            if (!CM_Log_Logger::hasLevel($level)) {
+                throw new CM_Exception_Invalid('Log level `' . $level . '` does not exist.');
+            }
         }
 
-        if (!CM_Log_Logger::hasLevel($level)) {
-            throw new CM_Exception_Invalid('Log level `' . $level . '` does not exist.');
+        if (null !== $ageMax) {
+            $ageMax = (int) $ageMax;
         }
 
         if (null !== $type) {
@@ -37,13 +42,13 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
                 throw new CM_Exception_Invalid('Type is not a children of CM_Paging_Log.');
             }
         }
-        $this->_level = $level;
+        $this->_levelList = $levelList;
         $this->_type = $type;
 
         $criteria = [
-            'level' => $this->_level,
+            'level' => ['$in' => $this->_levelList],
         ];
-        $criteria = array_merge($criteria, self::addTypeCriteria($this->_type));
+        $criteria = array_merge($criteria, self::_addTypeCriteria($this->_type));
 
         if ($ageMax) {
             $criteria['createdAt'] = ['$gt' => new MongoDate(time() - $ageMax)];
@@ -74,8 +79,8 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
     public function flush() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
 
-        $criteria = ['level' => $this->_level];
-        $criteria = array_merge($criteria, self::addTypeCriteria($this->_type));
+        $criteria = ['level' => ['$in' => $this->_levelList]];
+        $criteria = array_merge($criteria, self::_addTypeCriteria($this->_type, true));
 
         $mongoDb->remove(self::COLLECTION_NAME, $criteria);
         $this->_change();
@@ -93,10 +98,10 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         $deleteOlderThan = time() - $age;
 
         $criteria = [
-            'level'     => $this->_level,
+            'level'     => ['$in' => $this->_levelList],
             'createdAt' => ['$lt' => new MongoDate($deleteOlderThan)],
         ];
-        $criteria = array_merge($criteria, self::addTypeCriteria($this->_type));
+        $criteria = array_merge($criteria, self::_addTypeCriteria($this->_type, true));
 
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $mongoDb->remove(self::COLLECTION_NAME, $criteria);
@@ -104,15 +109,17 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
     }
 
     /**
-     * @param int|null $type
+     * @param int|null  $type
+     * @param bool|null $excludeTyped
      * @return array
      */
-    public static function addTypeCriteria($type = null) {
-        if (null === $type) {
-            $typeCriteria = ['$exists' => false];
-        } else {
-            $typeCriteria = (int) $type;
+    protected static function _addTypeCriteria($type = null, $excludeTyped = null) {
+        $criteria = [];
+        if (null !== $type) {
+            $criteria['context.extra.type'] = (int) $type;
+        } elseif (true === $excludeTyped) {
+            $criteria['context.extra.type'] = ['$exists' => false];
         }
-        return ['context.extra.type' => $typeCriteria];
+        return $criteria;
     }
 }

@@ -47,13 +47,14 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
     public function testRunWithCatching() {
         /** @var CM_Http_Response_Abstract|\Mocka\AbstractClassTrait $response */
         $response = $this->mockClass('CM_Http_Response_Abstract')->newInstanceWithoutConstructor();
+        $response->mockMethod('getRequest')->set(new CM_Http_Request_Get('/foo/bar/'));
         $response->setServiceManager($this->getServiceManager());
         $className = get_class($response);
 
         // test logging and errorCallback-execution
         CM_Config::get()->$className = new stdClass();
         CM_Config::get()->$className->exceptionsToCatch = [
-            'CM_Exception_Nonexistent'  => ['logLevel' => CM_Log_Logger::WARNING, 'foo' => 'bar'],
+            'CM_Exception_Nonexistent'  => ['log' => true, 'level' => CM_Log_Logger::WARNING, 'foo' => 'bar'],
             'CM_Exception_InvalidParam' => [],
         ];
         $exceptionCodeExecutionCounter = 0;
@@ -62,18 +63,18 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
             $exceptionCodeExecutionCounter++;
         };
         $this->assertSame(0, $exceptionCodeExecutionCounter);
-        $this->assertCount(0, new CM_Paging_Log(CM_Log_Logger::WARNING));
+        $this->assertCount(0, new CM_Paging_Log([CM_Log_Logger::WARNING]));
         CMTest_TH::callProtectedMethod($response, '_runWithCatching', [
             function () {
             }, $errorCode]);
         $this->assertSame(0, $exceptionCodeExecutionCounter);
-        $this->assertCount(0, new CM_Paging_Log(CM_Log_Logger::WARNING));
+        $this->assertCount(0, new CM_Paging_Log([CM_Log_Logger::WARNING]));
         CMTest_TH::callProtectedMethod($response, '_runWithCatching', [
             function () {
                 throw new CM_Exception_Nonexistent();
             }, $errorCode]);
         $this->assertSame(1, $exceptionCodeExecutionCounter);
-        $this->assertCount(1, new CM_Paging_Log(CM_Log_Logger::WARNING));
+        $this->assertCount(1, new CM_Paging_Log([CM_Log_Logger::WARNING]));
         $errorCode = function (CM_Exception_InvalidParam $ex, $errorOptions) use (&$exceptionCodeExecutionCounter) {
             $exceptionCodeExecutionCounter++;
         };
@@ -82,7 +83,7 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
                 throw new CM_Exception_InvalidParam();
             }, $errorCode]);
         $this->assertSame(2, $exceptionCodeExecutionCounter);
-        $this->assertCount(1, new CM_Paging_Log(CM_Log_Logger::WARNING));
+        $this->assertCount(1, new CM_Paging_Log([CM_Log_Logger::WARNING]));
 
         // test public/non-public exceptions not marked for catching
 

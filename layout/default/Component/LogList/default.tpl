@@ -27,20 +27,21 @@
   </li>
   {foreach $logList as $log}
     <li class="log">
+      {$recordTimestamp=$log.createdAt->toDateTime()->getTimestamp()}
       <div class="counter">
         {if $aggregationPeriod}
           {$log.count}
         {else}
-          {date_timeago time=$log.createdAt->toDateTime()->getTimestamp()}
+          {date_timeago time=$recordTimestamp}
         {/if}
       </div>
       <div class="message">{if isset($log.level)}{$levelMap[$log.level]}{/if} - {$log.message|escape}</div>
+      <div class="message">{$recordTimestamp}</div>
 
       {if !empty($log.exception)}
         {$exception = $log.exception}
         <div class="label">Exception Info</div>
         <div><span class="label">Class:</span> {$exception.class}</div>
-        <div><span class="label">Message:</span> {$exception.message}</div>
         <div><span class="label">Line:</span> {$exception.line}</div>
         <div><span class="label">File:</span> {$exception.file}</div>
         {if (!empty($exception.metaInfo))}
@@ -71,7 +72,7 @@
             </div>
           {/if}
           {if (isset($context.user))}
-            <div><span class="label">User: id-{$context.id}</span> <span class="label">name:</span> {$context.name}</div>
+            <div><span class="label">User ID:</span> {$context.user.id} <span class="label">name:</span> {$context.user.name}</div>
           {/if}
           {if (isset($context.httpRequest))}
             <div><span class="label">Request:</span> {$context.httpRequest.method} {$context.httpRequest.uri}</div>

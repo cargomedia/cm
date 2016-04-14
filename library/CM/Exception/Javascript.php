@@ -16,7 +16,7 @@ class CM_Exception_Javascript extends CM_Exception {
         $fileUrl = (string) $fileUrl;
         $fileLine = (string) $fileLine;
 
-        parent::__construct($message, CM_Exception_Invalid::ERROR, [
+        parent::__construct($message, CM_Exception_Invalid::WARN, [
             'url'      => $url,
             'counter'  => $counter,
             'fileUrl'  => $fileUrl,

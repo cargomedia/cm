@@ -78,5 +78,6 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertSame('www.example.com', $context['computerInfo']['fqdn']);
         $this->assertSame('v7.0.1', $context['computerInfo']['phpVersion']);
         $this->assertSame(['bar' => ['baz' => 'quux']], $context['extra']);
+        $this->assertSame('{"bar":"2", "quux":"baz"}', $context['httpRequest']['body']);
     }
 }

@@ -18,11 +18,11 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
      * @param string   $collection
      * @param int|null $recordTtl Time To Live in seconds
      * @param array    $insertOptions
-     * @param int|null $level
+     * @param int|null $minLevel
      * @throws CM_Exception_Invalid
      */
-    public function __construct($collection, $recordTtl = null, array $insertOptions = null, $level = null) {
-        parent::__construct($level);
+    public function __construct($collection, $recordTtl = null, array $insertOptions = null, $minLevel = null) {
+        parent::__construct($minLevel);
         $this->_collection = (string) $collection;
         $this->_mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         if (null !== $recordTtl) {
@@ -88,6 +88,10 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
                 $formattedContext['httpRequest']['query'] = $request->getQuery();
             } catch (CM_Exception_Invalid $e) {
                 //CM_Http_Request_Post can throw.
+            }
+
+            if ($request instanceof CM_Http_Request_Post) {
+                $formattedContext['httpRequest']['body'] = $request->getBody();
             }
 
             $formattedContext['httpRequest']['clientId'] = $request->getClientId();

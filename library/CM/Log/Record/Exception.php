@@ -50,6 +50,6 @@ class CM_Log_Record_Exception extends CM_Log_Record {
             CM_Exception::ERROR => CM_Log_Logger::ERROR,
             CM_Exception::FATAL => CM_Log_Logger::CRITICAL,
         ];
-        return isset($map[$severity]) ? $map[$severity] : CM_Log_Logger::CRITICAL;
+        return isset($map[$severity]) ? $map[$severity] : CM_Log_Logger::ERROR;
     }
 }
