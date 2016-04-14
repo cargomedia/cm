@@ -11,13 +11,13 @@ class CM_Log_Logger {
     /**
      * @var array $levels Logging levels
      */
-    protected static $_levels = array(
+    protected static $_levels = [
         self::DEBUG    => 'DEBUG',
         self::INFO     => 'INFO',
         self::WARNING  => 'WARNING',
         self::ERROR    => 'ERROR',
         self::CRITICAL => 'CRITICAL',
-    );
+    ];
 
     /** @var array */
     private $_handlersLayerList;
@@ -48,71 +48,80 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param string              $message
-     * @param int                 $level
-     * @param CM_Log_Context|null $context
+     * @param string                  $message
+     * @param int                     $level
+     * @param CM_Log_Context_App|null $appContext
      * @return CM_Log_Logger
      */
-    public function addMessage($message, $level, CM_Log_Context $context = null) {
+    public function addMessage($message, $level, CM_Log_Context_App $appContext = null) {
         $message = (string) $message;
         $level = (int) $level;
-        $context = $this->_mergeWithGlobalContext($context);
+
+        $context = clone $this->_contextGlobal;
+        if ($appContext) {
+            $context->getAppContext()->merge($appContext);
+        }
         return $this->_addRecord(new CM_Log_Record($level, $message, $context));
     }
 
     /**
-     * @param Exception           $exception
-     * @param int|null            $logLevel
-     * @param CM_Log_Context|null $context
+     * @param Exception               $exception
+     * @param int|null                $level
+     * @param CM_Log_Context_App|null $appContext
      * @return CM_Log_Logger
      */
-    public function addException(Exception $exception, $logLevel = null, CM_Log_Context $context = null) {
-        $context = $this->_mergeWithGlobalContext($context);
-        return $this->_addRecord(new CM_Log_Record_Exception($exception, $context, $logLevel));
+    public function addException(Exception $exception, $level = null, CM_Log_Context_App $appContext = null) {
+        $level = (int) $level;
+
+        $context = clone $this->_contextGlobal;
+        if ($appContext) {
+            $context->getAppContext()->merge($appContext);
+        }
+        return $this->_addRecord(new CM_Log_Record_Exception($exception, $context, $level));
     }
 
     /**
-     * @param string              $message
-     * @param CM_Log_Context|null $context
+     * @param string                  $message
+     * @param CM_Log_Context_App|null $context
      * @return CM_Log_Logger
      */
-    public function debug($message, CM_Log_Context $context = null) {
+    public function debug($message, CM_Log_Context_App $context = null) {
         return $this->addMessage($message, self::DEBUG, $context);
     }
 
     /**
-     * @param string              $message
-     * @param CM_Log_Context|null $context
+     * @param string                  $message
+     * @param CM_Log_Context_App|null $context
      * @return CM_Log_Logger
      */
-    public function info($message, CM_Log_Context $context = null) {
+    public function info($message, CM_Log_Context_App $context = null) {
         return $this->addMessage($message, self::INFO, $context);
     }
 
     /**
-     * @param string              $message
-     * @param CM_Log_Context|null $context
+     * @param string                  $message
+     * @param CM_Log_Context_App|null $context
      * @return CM_Log_Logger
      */
-    public function warning($message, CM_Log_Context $context = null) {
+    public function warning($message, CM_Log_Context_App $context = null) {
         return $this->addMessage($message, self::WARNING, $context);
     }
 
     /**
-     * @param string              $message
-     * @param CM_Log_Context|null $context
+     * @param string                  $message
+     * @param CM_Log_Context_App|null $context
      * @return CM_Log_Logger
      */
-    public function error($message, CM_Log_Context $context = null) {
+    public function error($message, CM_Log_Context_App $context = null) {
         return $this->addMessage($message, self::ERROR, $context);
     }
 
     /**
-     * @param string              $message
-     * @param CM_Log_Context|null $context
+     * @param string                  $message
+     * @param CM_Log_Context_App|null $context
      * @return CM_Log_Logger
      */
-    public function critical($message, CM_Log_Context $context = null) {
+    public function critical($message, CM_Log_Context_App $context = null) {
         return $this->addMessage($message, self::CRITICAL, $context);
     }
 
@@ -191,17 +200,6 @@ class CM_Log_Logger {
         foreach ($exceptionList as $exception) {
             $this->_addRecordToLayer(new CM_Log_Record_Exception($exception, $context), 0);
         }
-    }
-
-    /**
-     * @param CM_Log_Context|null $context
-     * @return CM_Log_Context
-     */
-    protected function _mergeWithGlobalContext(CM_Log_Context $context = null) {
-        if (null === $context) {
-            $context = new CM_Log_Context();
-        }
-        return $this->_contextGlobal->merge($context);
     }
 
     /**

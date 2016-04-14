@@ -44,6 +44,9 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     abstract protected function _process();
 
     public function process() {
+        $this->getServiceManager()->getLogger()->getContext()->getAppContext()->setUserWithClosure(function() {
+            return $this->getViewer();
+        });
         $this->_process();
 
         if ($this->getRequest()->hasSession()) {
@@ -270,7 +273,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
             $catchException = null !== $errorOptions;
             if ($catchException && isset($errorOptions['log']) && true === $errorOptions['log']) {
                 $logLevel = isset($errorOptions['level']) ? $errorOptions['level'] : null;
-                $this->getServiceManager()->getLogger()->addException($ex, $logLevel, new CM_Log_Context($this->getViewer(), $this->getRequest()));
+                $this->getServiceManager()->getLogger()->addException($ex, $logLevel, new CM_Log_Context_App(null, $this->getViewer()));
             }
             if (!$catchException && ($catchPublicExceptions && $ex->isPublic())) {
                 $errorOptions = [];

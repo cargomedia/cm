@@ -241,7 +241,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
 
         // with a global context
         $computerInfo = new CM_Log_Context_ComputerInfo('foo.dev', '42.0');
-        $contextGlobal = new CM_Log_Context(null, null, $computerInfo);
+        $contextGlobal = new CM_Log_Context(null, $computerInfo);
         $logger = $this->_getLoggerMock($contextGlobal, [[$mockLogHandler]]);
 
         $mockHandleRecord->set(function (CM_Log_Record $record) use ($computerInfo) {
@@ -256,7 +256,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
 
         // with a global context + log context
         $computerInfo = new CM_Log_Context_ComputerInfo('foo.dev', '42.0');
-        $contextGlobal = new CM_Log_Context(null, null, $computerInfo);
+        $contextGlobal = new CM_Log_Context(null, $computerInfo);
         $logger = $this->_getLoggerMock($contextGlobal, [[$mockLogHandler]]);
 
         $mockHandleRecord->set(function (CM_Log_Record $record) use ($computerInfo) {
@@ -266,7 +266,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
             $this->assertNull($context->getHttpRequest());
             $this->assertSame(['foo' => 10], $context->getExtra());
         });
-        $logger->addMessage('foo', CM_Log_Logger::INFO, new CM_Log_Context(null, null, null, ['foo' => 10]));
+        $logger->addMessage('foo', CM_Log_Logger::INFO, new CM_Log_Context_App(['foo' => 10]));
         $this->assertSame(3, $mockHandleRecord->getCallCount());
     }
 
