@@ -71,9 +71,9 @@ class CM_Log_Context {
     }
 
     public function __clone() {
-        if ($computerInfo = $this->getComputerInfo()) {
-            $this->_computerInfo = clone $computerInfo;
+        if (null !== $this->_computerInfo) {
+            $this->_computerInfo = clone $this->_computerInfo;
         }
-        $this->_appContext = clone $this->getAppContext();
+        $this->_appContext = clone $this->_appContext;
     }
 }

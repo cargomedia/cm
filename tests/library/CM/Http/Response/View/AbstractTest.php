@@ -199,6 +199,9 @@ EOL;
         $serviceManager = new CM_Service_Manager();
         $serviceManager->registerInstance('googleanalytics', new CMService_GoogleAnalytics_Client($code));
         $serviceManager->registerInstance('trackings', new CM_Service_Trackings(['googleanalytics']));
+        $serviceManager->registerInstance('logger', $this->getServiceManager()->getLogger());
+        $serviceManager->registerInstance('newrelic', $this->getServiceManager()->getNewrelic());
+
         return $serviceManager;
     }
 }

@@ -91,7 +91,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     public function testProcessTrackingCanNotTrackPageView() {
         $response = CMTest_TH::createResponsePage('/mock8');
         $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
-        $response->process();
+        $this->callProtectedMethod($response, '_process');
         $html = $response->getContent();
 
         $this->assertNotContains('ga("send", "pageview"', $html);
@@ -102,7 +102,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     public function testProcessTrackingVirtualPageView() {
         $response = CMTest_TH::createResponsePage('/mock9');
         $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
-        $response->process();
+        $this->callProtectedMethod($response, '_process');
         $html = $response->getContent();
 
         $this->assertContains('ga("create", "ga123"', $html);
@@ -121,7 +121,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
         $response = CMTest_TH::createResponsePage('/mock10');
         $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
-        $response->process();
+        $this->callProtectedMethod($response, '_process');
         $html = $response->getContent();
 
         $this->assertContains('ga("create", "ga123"', $html);
@@ -136,7 +136,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     public function testProcessTrackingGuest() {
         $response = CMTest_TH::createResponsePage('/mock5');
         $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
-        $response->process();
+        $this->callProtectedMethod($response, '_process');
         $html = $response->getContent();
 
         $this->assertContains('ga("create", "ga123"', $html);
@@ -157,7 +157,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock5', null, $viewer);
         $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
-        $response->process();
+        $this->callProtectedMethod($response, '_process');
         $html = $response->getContent();
 
         $this->assertContains('ga("create", "ga123"', $html);
@@ -187,7 +187,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         });
 
         $this->assertSame('/example', $response->getRequest()->getPath());
-        $response->process();
+        $this->callProtectedMethod($response, '_process');
         $this->assertSame('/error/not-found', $response->getRequest()->getPath());
     }
 

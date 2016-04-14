@@ -44,8 +44,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     abstract protected function _process();
 
     public function process() {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $serviceManager->getLogger()->getContext()->getAppContext()->setUserWithClosure(function() {
+        $this->getServiceManager()->getLogger()->getContext()->getAppContext()->setUserWithClosure(function() {
             return $this->getViewer();
         });
         $this->_process();
@@ -68,7 +67,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
         }
 
         $name = $this->_getStringRepresentation();
-        $serviceManager->getNewrelic()->setNameTransaction($name);
+        $this->getServiceManager()->getNewrelic()->setNameTransaction($name);
     }
 
     /**
