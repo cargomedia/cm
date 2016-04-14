@@ -230,9 +230,31 @@ var CM_App = CM_Class_Abstract.extend({
     return this.getUrl(path, null, true);
   },
 
+  /**
+   * @returns {String}
+   */
+  getClientId: function() {
+    return $.cookie('clientId');
+  },
+
+  /**
+   * @returns {Object}
+   */
+  getContext: function() {
+    var context = {};
+    context[cm.options.name] = {
+      client: cm.getClientId(),
+      browserWindow: cm.window.getId()
+    };
+    if (cm.viewer) {
+      context[cm.options.name].user = cm.viewer.id;
+    }
+    return context;
+  },
+
   promise: {
     ready: function() {
-      var promiseConfig = {cancellation: true};
+      var promiseConfig = {};
       if (cm.options.debug) {
         promiseConfig['warnings'] = {
           wForgottenReturn: false
@@ -309,7 +331,9 @@ var CM_App = CM_Class_Abstract.extend({
         return;
       }
       var messages = _.toArray(arguments);
-      messages.unshift('[CM]');
+      var time = (Date.now() - performance.timing.navigationStart) / 1000;
+      var timeFormatted = time.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false});
+      messages.unshift('[CM ' + timeFormatted + ']');
       if (window.console && window.console.log) {
         var log = window.console.log;
         if (typeof log == "object" && Function.prototype.bind) {
@@ -1371,5 +1395,9 @@ var CM_App = CM_Class_Abstract.extend({
       });
       return params;
     }
-  }
+  },
+
+  userAgent: (function(ua) {
+    return window.UserAgentParser.parse(ua);
+  })(navigator.userAgent || '')
 });

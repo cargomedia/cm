@@ -4,10 +4,13 @@
 {button_link icon="like"}
 {button_link icon="trophy" label="With Icon"}
 {button_link label="As a link" href="/"}
+{button_link icon="gift" label="Link with icon" href="/"}
 <hr />
 <h3>Large</h3>
 {button_link class="button-large" label="Button"}
 {button_link icon="gift" class="button-large" label="With Icon"}
+{button_link class="button-large" label="As a link" href="/"}
+{button_link icon="gift" class="button-large" label="Link with icon" href="/"}
 <hr />
 <h3>Themes</h3>
 {button_link theme='default' label="Default"}

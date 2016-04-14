@@ -25,9 +25,7 @@ class smarty_function_button_linkTest extends CMTest_TestCase {
             'class'  => 'button-large',
         );
 
-        $this->_assertContains('value="Some text <br /> with html tags"', array_merge($params, array('isHtmlLabel' => true)));
         $this->_assertContains('<span class="label">Some text <br /> with html tags</span>', array_merge($params, array('isHtmlLabel' => true)));
-        $this->_assertContains('value="Some text &lt;br /&gt; with html tags"', array_merge($params, array('isHtmlLabel' => false)));
         $this->_assertContains('<span class="label">Some text &lt;br /&gt; with html tags</span>', array_merge($params, array('isHtmlLabel' => false)));
     }
 

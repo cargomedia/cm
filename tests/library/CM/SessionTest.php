@@ -144,6 +144,16 @@ class CM_SessionTest extends CMTest_TestCase {
         $this->assertTrue($session->getUser(true)->getOnline());
     }
 
+    public function testSetUserWithRequest() {
+        $user = CM_Model_User::createStatic();
+        $request = new CM_Http_Request_Get('/', ['user-agent' => 'Chrome']);
+        $session = new CM_Session(null, $request);
+
+        $session->setUser($user);
+        $userAgentList = $user->getUseragents();
+        $this->assertSame([['useragent' => 'Chrome', 'createStamp' => time()]], $userAgentList->getItems());
+    }
+
     public function testDeleteUser() {
         $session = new CM_Session();
         $session->setUser(CM_Model_User::createStatic());
