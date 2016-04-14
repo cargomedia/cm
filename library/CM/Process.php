@@ -8,7 +8,7 @@ class CM_Process {
     private $_eventHandler;
 
     /** @var CM_Process_ForkHandler[] */
-    private $_forkHandlerList = array();
+    private $_forkHandlerList = [];
 
     /** @var int */
     private $_forkHandlerCounter = 0;
@@ -52,7 +52,7 @@ class CM_Process {
             return;
         }
         $arguments = func_get_args();
-        call_user_func_array(array($this->_eventHandler, 'trigger'), $arguments);
+        call_user_func_array([$this->_eventHandler, 'trigger'], $arguments);
     }
 
     /**
@@ -117,7 +117,7 @@ class CM_Process {
                 ]);
                 echo $message . PHP_EOL;
                 if ($timeoutReached) {
-                    $logContext = new CM_Log_Context(null, null, null, [
+                    $logContext = new CM_Log_Context_App([
                         'pid'  => $this->getProcessId(),
                         'argv' => join(' ', $this->getArgv()),
                     ]);
@@ -246,7 +246,7 @@ class CM_Process {
 
     protected function _reset() {
         $this->_eventHandler = null;
-        $this->_forkHandlerList = array();
+        $this->_forkHandlerList = [];
         pcntl_signal(SIGTERM, SIG_DFL);
         pcntl_signal(SIGINT, SIG_DFL);
     }
@@ -261,7 +261,7 @@ class CM_Process {
      */
     private function _wait($keepAlive = null, $nohang = null) {
         $keepAlive = (bool) $keepAlive;
-        $workloadResultList = array();
+        $workloadResultList = [];
         $waitOption = $nohang ? WNOHANG : 0;
         if (!empty($this->_forkHandlerList)) {
             do {
