@@ -40,6 +40,13 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Log_Logger', $logger);
     }
 
+    public function testGetContext() {
+        /** @var CM_Log_Context $context */
+        $context = $this->mockClass('CM_Log_Context')->newInstanceWithoutConstructor();
+        $logger = new CM_Log_Logger($context, []);
+        $this->assertSame($context, $logger->getContext());
+    }
+
     public function testAddRecord() {
         $mockLogHandler = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::ERROR]);
         $mockWriteRecord = $mockLogHandler->mockMethod('_writeRecord');

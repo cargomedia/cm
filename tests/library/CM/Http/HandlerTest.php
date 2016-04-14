@@ -12,5 +12,6 @@ class CM_Http_HandlerTest extends CMTest_TestCase {
         } catch (CM_Exception $e) {
             $this->assertSame(CM_Exception::WARN, $e->getSeverity());
         }
+        $this->assertSame($request, $this->getServiceManager()->getLogger()->getContext()->getHttpRequest());
     }
 }

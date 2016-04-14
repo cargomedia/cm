@@ -48,6 +48,13 @@ class CM_Log_Context {
     }
 
     /**
+     * @param CM_Http_Request_Abstract|null $httpRequest
+     */
+    public function setHttpRequest($httpRequest) {
+        $this->_httpRequest = $httpRequest;
+    }
+
+    /**
      * @return CM_Http_Request_Abstract|null
      */
     public function getHttpRequest() {

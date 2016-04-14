@@ -41,6 +41,13 @@ class CM_Log_Logger {
     }
 
     /**
+     * @return CM_Log_Context
+     */
+    public function getContext() {
+        return $this->_contextGlobal;
+    }
+
+    /**
      * @param string              $message
      * @param int                 $level
      * @param CM_Log_Context|null $context
