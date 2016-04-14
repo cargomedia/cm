@@ -71,8 +71,6 @@ class CM_Log_Logger {
      * @return CM_Log_Logger
      */
     public function addException(Exception $exception, $level = null, CM_Log_Context_App $appContext = null) {
-        $level = (int) $level;
-
         $context = clone $this->_contextGlobal;
         if ($appContext) {
             $context->getAppContext()->merge($appContext);
