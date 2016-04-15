@@ -130,11 +130,6 @@ EOD;
      */
     protected function _flushTrackingQueue(CM_Model_User $user) {
         while ($trackingData = $this->_popTrackingData($user)) {
-            if (!is_array($trackingData) || !array_key_exists('eventType', $trackingData) || !array_key_exists('data', $trackingData)) {
-                $exception = new CM_Exception_Invalid('Invalid tracking data', CM_Exception::WARN, ['trackingData' => $trackingData]);
-                CM_Bootloader::getInstance()->getExceptionHandler()->logException($exception);
-                continue;
-            }
             $this->addEvent($trackingData['eventType'], $trackingData['data']);
         }
     }
