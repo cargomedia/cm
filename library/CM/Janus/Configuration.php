@@ -1,6 +1,6 @@
 <?php
 
-class CM_Janus_Configuration extends CM_Class_Abstract {
+class CM_Janus_Configuration extends CM_Class_Abstract implements CM_Typed {
 
     /** @var CM_Janus_Server[] */
     protected $_servers;
@@ -90,7 +90,7 @@ class CM_Janus_Configuration extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function findServerByChannelDefinition(CM_StreamChannel_Definition $channelDefinition) {
-        $streamChannelClass = self::_getClassName($channelDefinition->getType());
+        $streamChannelClass = CM_Model_StreamChannel_Media::_getClassName($channelDefinition->getType());
 
         if (!in_array('CM_Janus_StreamChannelInterface', class_implements($streamChannelClass))) {
             throw new CM_Exception_Invalid('`' . $streamChannelClass . '` does not implement CM_Janus_StreamChannelInterface');
