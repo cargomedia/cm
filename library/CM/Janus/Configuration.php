@@ -86,7 +86,7 @@ class CM_Janus_Configuration extends CM_Class_Abstract implements CM_Typed {
 
     /**
      * @param CM_StreamChannel_Definition $channelDefinition
-     * @return CM_Janus_Server|null
+     * @return CM_Janus_Server
      * @throws CM_Exception_Invalid
      */
     public function findServerByChannelDefinition(CM_StreamChannel_Definition $channelDefinition) {
@@ -96,6 +96,11 @@ class CM_Janus_Configuration extends CM_Class_Abstract implements CM_Typed {
             throw new CM_Exception_Invalid('`' . $streamChannelClass . '` does not implement CM_Janus_StreamChannelInterface');
         }
         /** @type CM_Janus_StreamChannelInterface $streamChannelClass */
-        return $this->findServerByPlugin($streamChannelClass::getJanusPluginName());
+        $janusServer = $this->findServerByPlugin($streamChannelClass::getJanusPluginName());
+        
+        if (null === $janusServer)  {
+            throw new CM_Exception_Invalid('Janus server for definition of type `' . $channelDefinition->getType() . '` is not found');
+        }
+        return $janusServer;
     }
 }
