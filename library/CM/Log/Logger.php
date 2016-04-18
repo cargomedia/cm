@@ -164,18 +164,22 @@ class CM_Log_Logger {
         $exceptionList = [];
 
         $numberOfHandlers = sizeof($handlerList);
+        $handlersRecorded = 0;
         for ($i = 0, $n = $numberOfHandlers; $i < $n; $i++) {
             /** @var CM_Log_Handler_HandlerInterface $handler */
             $handler = $handlerList[$i];
             try {
-                $handler->handleRecord($record);
-            } catch (Exception $e) {
+                if (true === $handler->handleRecord($record)) {
+                    $handlersRecorded += 1;
+                }
+            }
+            catch (Exception $e) {
                 $exceptionList[] = new CM_Log_HandlingException($e);
             }
         }
 
         if (!empty($exceptionList)) {
-            if (sizeof($exceptionList) === $numberOfHandlers) { //all handlers failed so use next layer
+            if (0 === $handlersRecorded) { //all handlers failed or didn't handle so use next layer
                 $nextLayerIdx = $layerIdx + 1;
                 if (array_key_exists($nextLayerIdx, $this->_handlersLayerList)) {
                     $this->_addRecordToLayer($record, $nextLayerIdx);

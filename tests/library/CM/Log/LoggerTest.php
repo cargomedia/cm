@@ -131,7 +131,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
     }
 
     public function testPassingMessageDown() {
-        $expectedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
+        $expectedRecord = new CM_Log_Record(CM_Log_Logger::CRITICAL, 'foo', new CM_Log_Context());
         $mockLogHandlerFoo = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::ERROR]);
         $mockLogHandlerBar = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::WARNING]);
         $mockLogHandlerFooBar = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::INFO]);
@@ -152,6 +152,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
                 if (null !== $messageToThrow) {
                     throw new Exception($messageToThrow);
                 }
+                return true;
             };
         };
 
