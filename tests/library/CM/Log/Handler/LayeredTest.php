@@ -17,7 +17,12 @@ class CM_Log_Handler_LayeredTest extends CMTest_TestCase {
         $mockHandleRecordBar = $mockLogHandlerBar->mockMethod('handleRecord')->set($handleRecord);
         $mockHandleRecordBaz = $mockLogHandlerBaz->mockMethod('handleRecord')->set($handleRecord);
 
-        $logger = $this->_getLoggerMock(new CM_Log_Context(), [[$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerBaz]]);
+        $logger = $this->_getLoggerMock(
+            new CM_Log_Context(),
+            new CM_Log_Handler_Layered([
+                new CM_Log_Handler_Layered_Layer([$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerBaz])
+            ])
+        );
 
         $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
         $this->assertSame(1, $mockHandleRecordFoo->getCallCount());
@@ -58,7 +63,12 @@ class CM_Log_Handler_LayeredTest extends CMTest_TestCase {
             ->at(0, $handleRecordOK)
             ->at(1, $handleLoggerException);
 
-        $logger = $this->_getLoggerMock(new CM_Log_Context(), [[$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerBaz]]);
+        $logger = $this->_getLoggerMock(
+            new CM_Log_Context(),
+            new CM_Log_Handler_Layered([
+                new CM_Log_Handler_Layered_Layer([$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerBaz])
+            ])
+        );
 
         $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
         $this->assertSame(2, $mockHandleRecordFoo->getCallCount());
@@ -67,7 +77,7 @@ class CM_Log_Handler_LayeredTest extends CMTest_TestCase {
     }
 
     public function testPassingMessageDown() {
-        $expectedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
+        $expectedRecord = new CM_Log_Record(CM_Log_Logger::CRITICAL, 'foo', new CM_Log_Context());
         $mockLogHandlerFoo = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::ERROR]);
         $mockLogHandlerBar = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::WARNING]);
         $mockLogHandlerFooBar = $this->mockClass('CM_Log_Handler_Abstract')->newInstance([CM_Log_Logger::INFO]);
@@ -88,6 +98,7 @@ class CM_Log_Handler_LayeredTest extends CMTest_TestCase {
                 if (null !== $messageToThrow) {
                     throw new Exception($messageToThrow);
                 }
+                return true;
             };
         };
 
@@ -143,11 +154,14 @@ class CM_Log_Handler_LayeredTest extends CMTest_TestCase {
                 $this->assertSame($expectedRecord->getMessage(), $record->getMessage());
             });
 
-        $logger = $this->_getLoggerMock(new CM_Log_Context(), [
-            [$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerFooBar],
-            [$mockLogHandlerBaz, $mockLogHandlerBaz2],
-            [$mockLogHandlerQuux],
-        ]);
+        $logger = $this->_getLoggerMock(
+            new CM_Log_Context(),
+            new CM_Log_Handler_Layered([
+                new CM_Log_Handler_Layered_Layer([$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerFooBar]),
+                new CM_Log_Handler_Layered_Layer([$mockLogHandlerBaz, $mockLogHandlerBaz2]),
+                new CM_Log_Handler_Layered_Layer([$mockLogHandlerQuux]),
+            ])
+        );
 
         $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
         $this->assertSame(6, $mockHandleRecordFoo->getCallCount());
@@ -163,7 +177,12 @@ class CM_Log_Handler_LayeredTest extends CMTest_TestCase {
         $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
         $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
 
-        $logger = $this->_getLoggerMock(new CM_Log_Context(), [[$mockLogHandler]]);
+        $logger = $this->_getLoggerMock(
+            new CM_Log_Context(),
+            new CM_Log_Handler_Layered([
+                new CM_Log_Handler_Layered_Layer([$mockLogHandler])
+            ])
+        );
 
         $exception = new Exception('foo');
         $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
@@ -256,11 +275,14 @@ class CM_Log_Handler_LayeredTest extends CMTest_TestCase {
                 throw new CM_Exception_Invalid('Quux2 Error');
             });
 
-        $logger = $this->_getLoggerMock(new CM_Log_Context(), [
-            [$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerFooBar],
-            [$mockLogHandlerBaz, $mockLogHandlerBaz2],
-            [$mockLogHandlerQuux, $mockLogHandlerQuux2],
-        ]);
+        $logger = $this->_getLoggerMock(
+            new CM_Log_Context(),
+            new CM_Log_Handler_Layered([
+                new CM_Log_Handler_Layered_Layer([$mockLogHandlerFoo, $mockLogHandlerBar, $mockLogHandlerFooBar]),
+                new CM_Log_Handler_Layered_Layer([$mockLogHandlerBaz, $mockLogHandlerBaz2]),
+                new CM_Log_Handler_Layered_Layer([$mockLogHandlerQuux, $mockLogHandlerQuux2]),
+            ])
+        );
 
         $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
 
@@ -274,12 +296,13 @@ class CM_Log_Handler_LayeredTest extends CMTest_TestCase {
     }
 
     /**
-     * @param CM_Log_Context $context
-     * @param array          $handlersLayerList
+     * @param CM_Log_Context         $context
+     * @param CM_Log_Handler_Layered $layered
      * @return CM_Log_Logger|\Mocka\AbstractClassTrait
+     * @throws \Mocka\Exception
      */
-    protected function _getLoggerMock(CM_Log_Context $context, array $handlersLayerList) {
-        $loggerMock = $this->mockClass('CM_Log_Logger')->newInstance([$context, $handlersLayerList]);
+    protected function _getLoggerMock(CM_Log_Context $context, CM_Log_Handler_Layered $layered) {
+        $loggerMock = $this->mockClass('CM_Log_Logger')->newInstance([$context, $layered]);
         $logExceptionsMock = $loggerMock->mockMethod('_logHandlersExceptions');
         $logExceptionsMock->set(function (CM_Log_Record $record, array $exceptionList, CM_Log_Context $context) use ($loggerMock) {
             if ($exception = \Functional\first($exceptionList, function (CM_Log_HandlingException $e) {

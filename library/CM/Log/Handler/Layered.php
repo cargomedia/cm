@@ -66,17 +66,19 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
         $layer = $this->_getLayer($layerIdx);
 
         $exceptionList = [];
-
+        $handlersRecorded = 0;
         foreach ($layer->getHandlers() as $handler) {
             try {
-                $handler->handleRecord($record);
+                if (true === $handler->handleRecord($record)) {
+                    $handlersRecorded += 1;
+                }
             } catch (Exception $e) {
                 $exceptionList[] = new CM_Log_HandlingException($e);
             }
         }
 
         if (!empty($exceptionList)) {
-            if (sizeof($exceptionList) === $layer->getHandlersCount()) { //all handlers failed so use next layer
+            if (0 === $handlersRecorded) { //all handlers failed or didn't handle so use next layer
                 $nextLayerIdx = $layerIdx + 1;
                 if ($this->_hasLayer($nextLayerIdx)) {
                     $this->_addRecordToLayer($record, $nextLayerIdx);
