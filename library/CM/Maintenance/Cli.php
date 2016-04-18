@@ -100,7 +100,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 CM_Action_Abstract::deleteTransgressionsOlder(3 * 31 * 86400);
             },
             'CM_Paging_Log::cleanup'                        => function () {
-                $allLevelsList = CM_Log_Logger::getLevels();
+                $allLevelsList = array_values(CM_Log_Logger::getLevels());
                 foreach (CM_Paging_Log::getClassChildren() as $pagingLogClass) {
                     /** @type CM_Paging_Log $log */
                     $log = new $pagingLogClass($allLevelsList);
