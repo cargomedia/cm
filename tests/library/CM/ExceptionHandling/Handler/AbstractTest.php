@@ -7,7 +7,12 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $handlerMock = $this->mockClass('CM_Log_Handler_Abstract')->newInstanceWithoutConstructor();
 
         /** @var CM_Log_Logger|\Mocka\ClassMock $logger */
-        $logger = $this->mockClass('CM_Log_Logger')->newInstance([new CM_Log_Context(), [[$handlerMock]]]);
+        $logger = $this->mockClass('CM_Log_Logger')->newInstance([
+            new CM_Log_Context(),
+            new CM_Log_Handler_Layered([
+                new CM_Log_Handler_Layered_Layer([$handlerMock])
+            ])
+        ]);
         $methodAddException = $logger->mockMethod('addException');
         $methodAddException->set(
             function (Exception $exception) use ($expectedException) {

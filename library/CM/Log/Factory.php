@@ -20,6 +20,7 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
      */
     public function createLayeredLogger(array $handlersLayerConfigList) {
         $handlerFactory = new CM_Log_Handler_Factory();
+        $handlerFactory->setServiceManager($this->getServiceManager());
         $handler = $handlerFactory->createLayeredHandler($handlersLayerConfigList);
         return $this->_createLogger($handler);
     }
