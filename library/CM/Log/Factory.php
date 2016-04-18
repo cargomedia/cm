@@ -5,35 +5,32 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
     use CM_Service_ManagerAwareTrait;
 
     /**
-     * @param array        $handlersLayerConfigList
-     * @param boolean|null $addStderrHandler
+     * @param $handlerName
      * @return CM_Log_Logger
      * @throws CM_Exception_Invalid
      */
-    public function createLogger(array $handlersLayerConfigList, $addStderrHandler = null) {
-        $handlersLayerList = [];
-        foreach ($handlersLayerConfigList as $handlersLayerConfig) {
-            $currentLayer = [];
-            foreach ($handlersLayerConfig as $handlerName) {
-                $currentLayer[] = $this->getServiceManager()->get($handlerName);
-            }
-            $handlersLayerList[] = $currentLayer;
-        }
-        if (true === $addStderrHandler) {
-            $handlersLayerList[sizeof($handlersLayerList) - 1][] = (new CM_Log_Handler_Factory())->createStderrHandler('{levelname}: {message}');
-            //append stderr to the end of last layer
-        }
-
-        return $this->_createLogger($handlersLayerList);
+    public function createLogger($handlerName) {
+        $handler = $this->getServiceManager()->get($handlerName, 'CM_Log_Handler_HandlerInterface');
+        return $this->_createLogger($handler);
     }
 
     /**
-     * @param array $handlersLayerList
+     * @param array[] $handlersLayerConfigList
      * @return CM_Log_Logger
      */
-    protected function _createLogger($handlersLayerList) {
+    public function createLayeredLogger(array $handlersLayerConfigList) {
+        $handlerFactory = new CM_Log_Handler_Factory();
+        $handler = $handlerFactory->createLayeredHandler($handlersLayerConfigList);
+        return $this->_createLogger($handler);
+    }
+
+    /**
+     * @param CM_Log_Handler_HandlerInterface $handler
+     * @return CM_Log_Logger
+     */
+    protected function _createLogger(CM_Log_Handler_HandlerInterface $handler) {
         $computerInfo = new CM_Log_Context_ComputerInfo(CM_Util::getFqdn(), phpversion());
         $globalContext = new CM_Log_Context(null, $computerInfo);
-        return new CM_Log_Logger($globalContext, $handlersLayerList);
+        return new CM_Log_Logger($globalContext, $handler);
     }
 }

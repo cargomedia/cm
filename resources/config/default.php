@@ -279,7 +279,7 @@ return function (CM_Config_Node $config) {
     $config->services['logger'] = [
         'class'  => 'CM_Log_Factory',
         'method' => [
-            'name'      => 'createLogger',
+            'name'      => 'createLayeredLogger',
             'arguments' => [
                 'handlersLayerConfigList' => [
                     ['logger-handler-mongodb', 'logger-handler-newrelic'],

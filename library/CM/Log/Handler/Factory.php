@@ -39,6 +39,23 @@ class CM_Log_Handler_Factory implements CM_Service_ManagerAwareInterface {
     }
 
     /**
+     * @param array[] $layersConfig
+     * @return CM_Log_Handler_Layered
+     * @throws CM_Exception_Invalid
+     */
+    public function createLayeredHandler($layersConfig) {
+        $layeredHandler = new CM_Log_Handler_Layered();
+        foreach ($layersConfig as $layerConfig) {
+            $layer = new CM_Log_Handler_Layered_Layer();
+            foreach ($layerConfig as $handlerServiceName) {
+                $layer->addHandler($this->getServiceManager()->get($handlerServiceName, 'CM_Log_Handler_HandlerInterface'));
+            }
+            $layeredHandler->addLayer($layer);
+        }
+        return $layeredHandler;
+    }
+
+    /**
      * @param CM_OutputStream_Interface $stream
      * @param CM_Log_Formatter_Abstract $formatter
      * @param int|null                  $minLevel

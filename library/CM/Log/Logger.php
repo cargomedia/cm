@@ -19,32 +19,60 @@ class CM_Log_Logger {
         self::CRITICAL => 'CRITICAL',
     ];
 
-    /** @var array */
-    private $_handlersLayerList;
+    /** @var  CM_Log_Handler_HandlerInterface */
+    private $_handler;
 
     /** @var CM_Log_Context */
-    private $_contextGlobal;
+    private $_context;
 
     /**
-     * @param CM_Log_Context $contextGlobal
-     * @param array          $handlersLayerList
+     * @param CM_Log_Context|null                  $context
+     * @param CM_Log_Handler_HandlerInterface|null $handler
      * @throws CM_Exception_Invalid
      */
-    public function __construct(CM_Log_Context $contextGlobal, array $handlersLayerList) {
-        if (empty($handlersLayerList)) {
-            throw new CM_Exception_Invalid('Logger should have at least 1 handler layer');
+    public function __construct(CM_Log_Context $context = null, CM_Log_Handler_HandlerInterface $handler = null) {
+        if (null !== $context) {
+            $this->setContext($context);
         }
-        $this->_contextGlobal = $contextGlobal;
-        foreach ($handlersLayerList as $handlersLayer) {
-            $this->_addHandlersLayer($handlersLayer);
+        if (null !== $handler) {
+            $this->setHandler($handler);
         }
     }
 
     /**
+     * @param CM_Log_Handler_HandlerInterface $handler
+     */
+    public function setHandler($handler) {
+        $this->_handler = $handler;
+    }
+
+    /**
+     * @return CM_Log_Handler_HandlerInterface
+     * @throws CM_Exception
+     */
+    public function getHandler() {
+        if (null === $this->_handler) {
+            throw new CM_Exception('Handler not set');
+        }
+        return $this->_handler;
+    }
+
+    /**
+     * @param CM_Log_Context $context
+     */
+    public function setContext($context) {
+        $this->_context = $context;
+    }
+
+    /**
      * @return CM_Log_Context
+     * @throws CM_Exception
      */
     public function getContext() {
-        return $this->_contextGlobal;
+        if (null === $this->_context) {
+            throw new CM_Exception('Context not set');
+        }
+        return $this->_context;
     }
 
     /**
@@ -57,7 +85,7 @@ class CM_Log_Logger {
         $message = (string) $message;
         $level = (int) $level;
 
-        $context = clone $this->_contextGlobal;
+        $context = clone $this->_context;
         if ($appContext) {
             $context->getAppContext()->merge($appContext);
         }
@@ -71,7 +99,7 @@ class CM_Log_Logger {
      * @return CM_Log_Logger
      */
     public function addException(Exception $exception, $level, CM_Log_Context_App $appContext = null) {
-        $context = clone $this->_contextGlobal;
+        $context = clone $this->_context;
         if ($appContext) {
             $context->getAppContext()->merge($appContext);
         }
@@ -124,80 +152,12 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param array $handlersLayer
-     * @throws CM_Exception_Invalid
-     */
-    protected function _addHandlersLayer(array $handlersLayer) {
-        $currentLayerIdx = sizeof($this->_handlersLayerList);
-        if (empty($handlersLayer)) {
-            throw new CM_Exception_Invalid('Empty handlers layer');
-        }
-        foreach ($handlersLayer as $handler) {
-            if (!$handler instanceof CM_Log_Handler_HandlerInterface) {
-                throw new CM_Exception_Invalid('Not logger handler instance');
-            }
-            $this->_handlersLayerList[$currentLayerIdx][] = $handler;
-        }
-    }
-
-    /**
      * @param CM_Log_Record $record
      * @return CM_Log_Logger
      */
     protected function _addRecord(CM_Log_Record $record) {
-        $this->_addRecordToLayer($record, 0);
+        $this->getHandler()->handleRecord($record);
         return $this;
-    }
-
-    /**
-     * @param CM_Log_Record $record
-     * @param int           $layerIdx
-     * @throws CM_Exception_Invalid
-     */
-    protected function _addRecordToLayer(CM_Log_Record $record, $layerIdx) {
-        $layerIdx = (int) $layerIdx;
-
-        if (!array_key_exists($layerIdx, $this->_handlersLayerList)) {
-            throw new CM_Exception_Invalid('Wrong offset for handlers layer');
-        }
-        $handlerList = $this->_handlersLayerList[$layerIdx];
-        $exceptionList = [];
-
-        $numberOfHandlers = sizeof($handlerList);
-        for ($i = 0, $n = $numberOfHandlers; $i < $n; $i++) {
-            /** @var CM_Log_Handler_HandlerInterface $handler */
-            $handler = $handlerList[$i];
-            try {
-                $handler->handleRecord($record);
-            } catch (Exception $e) {
-                $exceptionList[] = new CM_Log_HandlingException($e);
-            }
-        }
-
-        if (!empty($exceptionList)) {
-            if (sizeof($exceptionList) === $numberOfHandlers) { //all handlers failed so use next layer
-                $nextLayerIdx = $layerIdx + 1;
-                if (array_key_exists($nextLayerIdx, $this->_handlersLayerList)) {
-                    $this->_addRecordToLayer($record, $nextLayerIdx);
-                }
-            }
-            $this->_logHandlersExceptions($record, $exceptionList, $record->getContext());
-        }
-    }
-
-    /**
-     * @param CM_Log_Record  $record
-     * @param Exception[]    $exceptionList
-     * @param CM_Log_Context $context
-     * @throws CM_Exception_Invalid
-     */
-    protected function _logHandlersExceptions(CM_Log_Record $record, array $exceptionList, CM_Log_Context $context) {
-        if ($record instanceof CM_Log_Record_Exception && $record->getException() instanceof CM_Log_HandlingException) {
-            return;
-        }
-        foreach ($exceptionList as $exception) {
-            $this->_addRecordToLayer(new CM_Log_Record_Exception(CM_Log_Logger::ERROR, $context, $exception), 0);
-        }
     }
 
     /**

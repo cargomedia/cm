@@ -50,6 +50,13 @@ class CM_Log_Context {
     }
 
     /**
+     * @param CM_Log_Context_App $appContext
+     */
+    public function setAppContext($appContext) {
+        $this->_appContext = $appContext;
+    }
+
+    /**
      * @return CM_Log_Context_App
      */
     public function getAppContext() {
