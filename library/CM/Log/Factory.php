@@ -5,17 +5,17 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
     use CM_Service_ManagerAwareTrait;
 
     /**
-     * @param $handlerName
+     * @param string $handlerName
      * @return CM_Log_Logger
      * @throws CM_Exception_Invalid
      */
     public function createLogger($handlerName) {
-        $handler = $this->getServiceManager()->get($handlerName, 'CM_Log_Handler_HandlerInterface');
+        $handler = $this->getServiceManager()->get((string) $handlerName, 'CM_Log_Handler_HandlerInterface');
         return $this->_createLogger($handler);
     }
 
     /**
-     * @param array[] $handlersLayerConfigList
+     * @param string[] $handlersLayerConfigList
      * @return CM_Log_Logger
      */
     public function createLayeredLogger(array $handlersLayerConfigList) {
