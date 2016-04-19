@@ -10,7 +10,7 @@ trait CM_Service_Tracking_QueueTrait {
      * @return CM_Queue
      */
     protected function _getTrackingQueue(CM_Model_User $user) {
-        return new CM_Queue(__METHOD__ . ':' . $user->getId());
+        return new CM_Queue(get_called_class() . '::_getTrackingQueue:' . $user->getId());
     }
 
     /**
