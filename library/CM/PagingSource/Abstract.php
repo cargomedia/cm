@@ -2,16 +2,24 @@
 
 abstract class CM_PagingSource_Abstract {
 
+    /** @var int */
     private $_cacheLifetime;
     private $_cacheLocalLifetime;
+    /** @var CM_Cache_Abstract|null */
+    private $_cache;
 
     /**
      * Enable cache
      * Cost: 2 memcache requests
      *
-     * @param int $lifetime
+     * @param int               $lifetime
+     * @param CM_Cache_Abstract $cache
      */
-    public function enableCache($lifetime = 600) {
+    public function enableCache($lifetime = 600, CM_Cache_Abstract $cache = null) {
+        if (!$cache) {
+            $cache = CM_Cache_Shared::getInstance();
+        }
+        $this->_cache = $cache;
         $this->_cacheLifetime = (int) $lifetime;
     }
 
@@ -22,7 +30,7 @@ abstract class CM_PagingSource_Abstract {
      * @param int $lifetime
      */
     public function enableCacheLocal($lifetime = 60) {
-        $this->_cacheLocalLifetime = (int) $lifetime;
+        $this->enableCache($lifetime, CM_Cache_Local::getInstance());
     }
 
     /**
@@ -30,11 +38,8 @@ abstract class CM_PagingSource_Abstract {
      */
     public function clearCache() {
         $tag = CM_Cache_Shared::getInstance()->key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
-        if ($this->_cacheLocalLifetime) {
-            CM_Cache_Local::getInstance()->deleteTag($tag);
-        }
-        if ($this->_cacheLifetime) {
-            CM_Cache_Shared::getInstance()->deleteTag($tag);
+        if ($this->_cache) {
+            $this->_cache->deleteTag($tag);
         }
     }
 
@@ -45,27 +50,27 @@ abstract class CM_PagingSource_Abstract {
         return 0;
     }
 
+    /**
+     * @param string $key
+     * @param mixed $value
+     */
     protected function _cacheSet($key, $value) {
-        $tag = CM_Cache_Shared::getInstance()->key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
-        $key = CM_Cache_Shared::getInstance()->key(CM_CacheConst::PagingSource, $key);
-        if ($this->_cacheLocalLifetime) {
-            CM_Cache_Local::getInstance()->setTagged($tag, $key, $value, $this->_cacheLocalLifetime);
-        }
-        if ($this->_cacheLifetime) {
-            CM_Cache_Shared::getInstance()->setTagged($tag, $key, $value, $this->_cacheLifetime);
+        if ($this->_cache) {
+            $tag = $this->_cache->key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
+            $key = $this->_cache->key(CM_CacheConst::PagingSource, $key);
+            $this->_cache->setTagged($tag, $key, $value, $this->_cacheLifetime);
         }
     }
 
+    /**
+     * @param string $key
+     * @return boolean|mixed
+     */
     protected function _cacheGet($key) {
-        $tag = CM_Cache_Shared::getInstance()->key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
-        $key = CM_Cache_Shared::getInstance()->key(CM_CacheConst::PagingSource, $key);
-        if ($this->_cacheLocalLifetime) {
-            if (($result = CM_Cache_Local::getInstance()->getTagged($tag, $key)) !== false) {
-                return $result;
-            }
-        }
-        if ($this->_cacheLifetime) {
-            if (($result = CM_Cache_Shared::getInstance()->getTagged($tag, $key)) !== false) {
+        if ($this->_cache) {
+            $tag = $this->_cache->key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
+            $key = $this->_cache->key(CM_CacheConst::PagingSource, $key);
+            if (($result = $this->_cache->getTagged($tag, $key)) !== false) {
                 return $result;
             }
         }
