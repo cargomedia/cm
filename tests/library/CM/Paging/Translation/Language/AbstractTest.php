@@ -1,10 +1,13 @@
 <?php
 
-class CM_Paging_Translation_LanguageTest extends CMTest_TestCase {
+class CM_Paging_Translation_Language_AbstractTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
     }
+
+    // TODO: consider the paging that is to be cached, add a test for set()
+
 
     public function testRemove() {
         $languagePagingFoo = CM_Model_Language::create('Foo', 'foo', true)->getTranslations();
