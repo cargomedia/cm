@@ -3,7 +3,7 @@
   {foreach $optionList as $itemValue => $itemLabel}
     <li class="set-item {$name}-value-{$itemValue} {if $showColumns}column4{/if}">
       {if $translate}
-        {$label = {translate "{$translatePrefix}{$itemLabel}"|escape}}
+        {$label = {{translate "{$translatePrefix}{$itemLabel}"}|escape}}
       {else}
         {$label = $itemLabel|escape}
       {/if}
