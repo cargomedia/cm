@@ -4,7 +4,6 @@ abstract class CM_PagingSource_Abstract {
 
     /** @var int */
     private $_cacheLifetime;
-    private $_cacheLocalLifetime;
     /** @var CM_Cache_Abstract|null */
     private $_cache;
 
