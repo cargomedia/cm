@@ -48,8 +48,10 @@ class CM_App implements CM_Service_ManagerAwareInterface {
             $assetList[] = new CM_Asset_Css_Library($render);
         }
         $languageList = new CM_Paging_Language_Enabled();
+        /** @var CM_Model_Language $language */
         foreach ($languageList as $language) {
             $assetList[] = new CM_Asset_Javascript_Translations($language);
+            $language->getTranslations()->getItemsRaw();
         }
         foreach ($assetList as $asset) {
             $asset->get(!$debug);
