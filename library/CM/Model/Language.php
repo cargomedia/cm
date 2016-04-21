@@ -73,10 +73,11 @@ class CM_Model_Language extends CM_Model_Abstract {
     }
 
     /**
+     * @param boolean|null $javascriptOnly
      * @return CM_Paging_Translation_Language_All
      */
-    public function getTranslations() {
-        return new CM_Paging_Translation_Language_All($this);
+    public function getTranslations($javascriptOnly = null) {
+        return new CM_Paging_Translation_Language_All($this, $javascriptOnly);
     }
 
     /**

@@ -6,23 +6,6 @@ class CM_Paging_Translation_Language_AbstractTest extends CMTest_TestCase {
         CMTest_TH::clearEnv();
     }
 
-    // TODO: consider the paging that is to be cached, add a test for set()
-
-
-    public function testRemove() {
-        $languagePagingFoo = CM_Model_Language::create('Foo', 'foo', true)->getTranslations();
-        $languagePagingBar = CM_Model_Language::create('Bar', 'bar', true)->getTranslations();
-
-        $languagePagingFoo->set('phrase', 'foo');
-        $languagePagingBar->set('phrase', 'bar');
-        $this->assertSame('foo', $languagePagingFoo->get('phrase', null, true));
-        $this->assertSame('bar', $languagePagingBar->get('phrase', null, true));
-
-        $languagePagingFoo->remove('phrase');
-        $this->assertNull($languagePagingFoo->get('phrase', null, true));
-        $this->assertSame('bar', $languagePagingBar->get('phrase', null, true));
-    }
-
     public function testTrailingWhitespaceInLanguageKeyName() {
         CM_Db_Db::insert('cm_model_languagekey', ['name'], [['foo '],['foo']]);
 
