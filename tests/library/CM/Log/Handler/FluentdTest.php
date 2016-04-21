@@ -57,5 +57,6 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $this->assertSame('CM_Exception_Invalid', $formattedRecord['exception']['type']);
         $this->assertSame('Bad', $formattedRecord['exception']['message']);
         $this->assertArrayHasKey('stack', $formattedRecord['exception']);
+        $this->assertInternalType('string', $formattedRecord['exception']['stack']);
     }
 }

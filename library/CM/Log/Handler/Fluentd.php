@@ -87,7 +87,7 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
             $formattedRecord['exception'] = [
                 'type'    => $exception->getClass(),
                 'message' => $exception->getMessage(),
-                'stack'   => $exception->getTrace(),
+                'stack'   => $exception->getTraceAsString(),
             ];
         }
 

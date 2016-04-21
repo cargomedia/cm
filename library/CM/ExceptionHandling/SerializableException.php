@@ -107,8 +107,8 @@ class CM_ExceptionHandling_SerializableException {
             $this->trace = $trace;
         } catch (Exception $e) {
             $this->trace = null;
-            $this->traceString = $e->getTraceAsString();
         }
+        $this->traceString = $exception->getTraceAsString();
     }
 
     /**
