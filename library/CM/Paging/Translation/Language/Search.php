@@ -1,7 +1,7 @@
 <?php
 
 class CM_Paging_Translation_Language_Search extends CM_Paging_Translation_Language_Abstract {
-    
+
     /**
      * @param CM_Model_Language $language
      * @param string|null       $searchPhrase

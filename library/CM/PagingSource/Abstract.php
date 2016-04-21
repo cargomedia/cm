@@ -11,8 +11,8 @@ abstract class CM_PagingSource_Abstract {
      * Enable cache
      * Cost: 2 memcache requests
      *
-     * @param int               $lifetime
-     * @param CM_Cache_Abstract $cache
+     * @param int                    $lifetime
+     * @param CM_Cache_Abstract|null $cache
      */
     public function enableCache($lifetime = 600, CM_Cache_Abstract $cache = null) {
         if (!$cache) {
@@ -51,7 +51,7 @@ abstract class CM_PagingSource_Abstract {
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      */
     protected function _cacheSet($key, $value) {
         if ($this->_cache) {
