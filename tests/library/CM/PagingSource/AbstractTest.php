@@ -15,6 +15,9 @@ class CM_PagingSource_AbstractTest extends CMTest_TestCase {
 
     public function tearDown() {
         CM_Db_Db::exec('DROP TABLE `test`');
+        $paging = new CM_PagingSource_Sql('`num`', 'test');
+        $paging->enableCache();
+        $paging->clearCache();
     }
 
     public function testCacheLocal() {
