@@ -21,6 +21,11 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         CM_App::getInstance()->fillCaches();
     }
 
+    public function fillLanguageCache() {
+        $this->_getStreamOutput()->writeln('Warming up language cache…');
+        CM_App::getInstance()->fillLanguageCache();
+    }
+
     public function deploy() {
         $this->setup();
         $this->setDeployVersion();
