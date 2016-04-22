@@ -91,7 +91,7 @@ class CM_Asset_Css extends CM_Asset_Abstract {
         $cache = new CM_Cache_Storage_File();
         if (false === ($contentTransformed = $cache->get($cacheKey))) {
             $contentTransformed = $content;
-            $contentTransformed = $this->_compileLess($contentTransformed, $compress, $cache);
+            $contentTransformed = $this->_compileLess($contentTransformed, $compress);
             $contentTransformed = $this->_compileAutoprefixer($contentTransformed);
             $contentTransformed = trim($contentTransformed);
             $cache->set($cacheKey, $contentTransformed);
@@ -100,12 +100,11 @@ class CM_Asset_Css extends CM_Asset_Abstract {
     }
 
     /**
-     * @param string                    $content
-     * @param bool                      $compress
-     * @param CM_Cache_Storage_Abstract $cache
+     * @param string $content
+     * @param bool   $compress
      * @return string
      */
-    private function _compileLess($content, $compress, CM_Cache_Storage_Abstract $cache) {
+    private function _compileLess($content, $compress) {
         $render = $this->_render;
 
         $lessCompiler = new lessc();
@@ -114,7 +113,7 @@ class CM_Asset_Css extends CM_Asset_Abstract {
             list($type, $delimiter, $values) = $arg;
             return array('function', 'url', array('string', $delimiter, array($render->getUrlResource('layout', 'img/' . $values[0]))));
         });
-        $lessCompiler->registerFunction('image-inline', function ($arg) use ($render, $cache) {
+        $lessCompiler->registerFunction('image-inline', function ($arg) use ($render) {
             /** @var CM_Frontend_Render $render */
             list($type, $delimiter, $values) = $arg;
             if (2 == sizeof($values) && is_array($values[0]) && is_array($values[1])) {
@@ -123,6 +122,7 @@ class CM_Asset_Css extends CM_Asset_Abstract {
                 $size = (int) $values[1][1];
             } else {
                 $path = $values[0];
+                $size = null;
             }
 
             $imagePath = $render->getLayoutPath('resource/img/' . $path, null, null, true, true);
@@ -130,16 +130,16 @@ class CM_Asset_Css extends CM_Asset_Abstract {
             if (!empty($size)) {
                 $cacheKey .= '_size:' . $size;
             }
-            if (false === ($imageBase64 = $cache->get($cacheKey))) {
+            $imageBase64 = CM_Cache_Persistent::getInstance()->get($cacheKey, function () use ($imagePath, $size) {
                 $file = new CM_File($imagePath);
                 $img = new CM_Image_Image($file->read());
                 if (!empty($size)) {
                     $img->resize($size, $size);
                 }
                 $img->setFormat(CM_Image_Image::FORMAT_GIF);
-                $imageBase64 = base64_encode($img->getBlob());
-                $cache->set($cacheKey, $imageBase64);
-            }
+                return base64_encode($img->getBlob());
+            });
+
             $url = 'data:image/gif;base64,' . $imageBase64;
             return array('function', 'url', array('string', $delimiter, array($url)));
         });
