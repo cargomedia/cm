@@ -7,9 +7,8 @@ class CM_Paging_Translation_Language_Search extends CM_Paging_Translation_Langua
      * @param string|null       $searchPhrase
      * @param string|null       $section
      * @param bool|null         $translated
-     * @param bool|null         $javascriptOnly
      */
-    public function __construct(CM_Model_Language $language, $searchPhrase = null, $section = null, $translated = null, $javascriptOnly = null) {
+    public function __construct(CM_Model_Language $language, $searchPhrase = null, $section = null, $translated = null) {
         $this->_language = $language;
         $where = array();
         $parameters = array();
@@ -27,9 +26,6 @@ class CM_Paging_Translation_Language_Search extends CM_Paging_Translation_Langua
         }
         if ($translated === false) {
             $where[] = 'v.value IS NULL';
-        }
-        if ($javascriptOnly) {
-            $where[] = 'k.javascript = 1';
         }
 
         $orderBy = 'k.name ASC';
