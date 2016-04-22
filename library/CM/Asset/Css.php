@@ -85,7 +85,6 @@ class CM_Asset_Css extends CM_Asset_Abstract {
     private function _compile($content, $compress = null) {
         $content = (string) $content;
         $compress = (bool) $compress;
-        $render = $this->_render;
 
         $cacheKey = CM_CacheConst::App_Resource . '_md5:' . md5($content);
         $cacheKey .= '_compress:' . (int) $compress;
@@ -113,6 +112,26 @@ class CM_Asset_Css extends CM_Asset_Abstract {
             /** @var CM_Frontend_Render $render */
             list($type, $delimiter, $values) = $arg;
             return array('function', 'url', array('string', $delimiter, array($render->getUrlResource('layout', 'img/' . $values[0]))));
+        });
+        $lessCompiler->registerFunction('image-inline', function ($arg) use ($render) {
+            /** @var CM_Frontend_Render $render */
+            list($type, $delimiter, $values) = $arg;
+            if (2 == sizeof($values) && is_array($values[0]) && is_array($values[1])) {
+                $delimiter = (string) $values[0][1];
+                $path = (string) $values[0][2][0];
+                $size = (int) $values[1][1];
+            } else {
+                $path = $values[0];
+            }
+
+            $file = new CM_File($render->getLayoutPath('resource/img/' . $path, null, null, true, true));
+            $img = new CM_Image_Image($file->read());
+            if (isset($size) && $size > 0) {
+                $img->resize($size, $size);
+            }
+            $img->setFormat(CM_Image_Image::FORMAT_GIF);
+            $url = 'data:image/gif;base64,' . base64_encode($img->getBlob());
+            return array('function', 'url', array('string', $delimiter, array($url)));
         });
         $lessCompiler->registerFunction('urlFont', function ($arg) use ($render) {
             /** @var CM_Frontend_Render $render */

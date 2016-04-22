@@ -40,6 +40,35 @@ EOD;
         $this->assertEquals(trim($expected), $css->get());
     }
 
+    public function testImageInline() {
+        $render = new CM_Frontend_Render();
+        $css = new CM_Asset_Css($render, "body { background: image-inline('select2/select2.png') no-repeat 60px 40px; }");
+
+        $encodedImage = 'R0lGODlhPAAoAPEAAEZGRoiIiAAAAAAAACH5BAEAAAIALAAAAAA8ACgAAAJ5lI+py+0Po5y02otxQDt7F3Rh95XcGJrqma4u6q5oG3/t+JJ1MuugvzvAI' .
+            'sMgj/aYGY+SXgaAgC4vAGlVOqVcr1kqt2vZgivb6nhiFnzP7Lb7DY/L5/RMsS7A4fB5HVL+l4cXCAT3FxiHhJjYU8i4ccfXt1hHSRdYAAA7';
+
+        $expected = <<<EOD
+body {
+  background: url('data:image/gif;base64,$encodedImage') no-repeat 60px 40px;
+}
+EOD;
+        $this->assertEquals(trim($expected), $css->get());
+    }
+
+    public function testImageInlineResize() {
+        $render = new CM_Frontend_Render();
+        $css = new CM_Asset_Css($render, "body { background: image-inline('select2/select2.png', 20) no-repeat 20px 20px; }");
+
+        $encodedImage = 'R0lGODlhFAANAPEAAEZGRoiIiAAAAAAAACH5BAEAAAIALAAAAAAUAA0AAAIalI+pyxINwzMTrkqtTgBs7n3iGJGOSWHjVAAAOw==';
+
+        $expected = <<<EOD
+body {
+  background: url('data:image/gif;base64,$encodedImage') no-repeat 20px 20px;
+}
+EOD;
+        $this->assertEquals(trim($expected), $css->get());
+    }
+
     public function testBackgroundImage() {
         $render = new CM_Frontend_Render();
         $css = new CM_Asset_Css($render, "body { background-image: image('icon/mailbox_read.png'); }");
