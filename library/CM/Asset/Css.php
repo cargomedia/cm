@@ -128,7 +128,7 @@ class CM_Asset_Css extends CM_Asset_Abstract {
             $imagePath = $render->getLayoutPath('resource/img/' . $path, null, null, true, true);
             $cache = CM_Cache_Persistent::getInstance();
 
-            $imageBase64 = $cache->get($cache->key(__METHOD__, md5($imagePath), '_size:' . $size), function () use ($imagePath, $size) {
+            $imageBase64 = $cache->get($cache->key(__METHOD__, md5($imagePath), 'size:' . $size), function () use ($imagePath, $size) {
                 $file = new CM_File($imagePath);
                 $img = new CM_Image_Image($file->read());
                 if ($size > 0) {
