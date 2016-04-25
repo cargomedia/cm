@@ -42,31 +42,31 @@ EOD;
 
     public function testImageInline() {
         $render = new CM_Frontend_Render();
-        $css = new CM_Asset_Css($render, "body { background: image-inline('select2/select2.png') no-repeat 60px 40px; }");
+        $css = new CM_Asset_Css($render, "body { background: image-inline('logo.png') no-repeat 200px 95px; }");
 
-        $encodedImage = 'R0lGODlhPAAoAPEAAEZGRoiIiAAAAAAAACH5BAEAAAIALAAAAAA8ACgAAAJ5lI+py+0Po5y02otxQDt7F3Rh95XcGJrqma4u6q5oG3/t+JJ1MuugvzvAI' .
-            'sMgj/aYGY+SXgaAgC4vAGlVOqVcr1kqt2vZgivb6nhiFnzP7Lb7DY/L5/RMsS7A4fB5HVL+l4cXCAT3FxiHhJjYU8i4ccfXt1hHSRdYAAA7';
-
-        $expected = <<<EOD
-body {
-  background: url('data:image/gif;base64,$encodedImage') no-repeat 60px 40px;
-}
+        $encodedImageBeginning = preg_quote('R0lGODlhyABfAPEAADw8Oz+0/wAAAAAAACH5BAEAAAIALAAAAADIAF8AAAL+lI+py+0Po5y02ouz3rz7D4biSJbmiabqyrbuC8fyTNf2jef', '/');
+        $encodedImageEnding = preg_quote('mW6WCddrhkk7dyWqiqbFLZIp7gwohcZpM9OKhd6q7LbrvuvgtvvPLOS68tBQAAOw==', '/');
+        $expectedRegex = <<<EOD
+/^body {
+  background: url\('data\:image\/gif;base64,$encodedImageBeginning.+?$encodedImageEnding'\) no-repeat 200px 95px;
+}$/
 EOD;
-        $this->assertEquals(trim($expected), $css->get());
+        $this->assertRegExp($expectedRegex, $css->get());
     }
 
     public function testImageInlineResize() {
         $render = new CM_Frontend_Render();
-        $css = new CM_Asset_Css($render, "body { background: image-inline('select2/select2.png', 20) no-repeat 20px 20px; }");
+        $css = new CM_Asset_Css($render, "body { background: image-inline('logo.png', 100) no-repeat 100px 47px; }");
 
-        $encodedImage = 'R0lGODlhFAANAPEAAEZGRoiIiAAAAAAAACH5BAEAAAIALAAAAAAUAA0AAAIalI+pyxINwzMTrkqtTgBs7n3iGJGOSWHjVAAAOw==';
+        $encodedImageBeginning = preg_quote('R0lGODlhZAAvAPEAADw8Oz+0/wAAAAAAACH5BAEAAAIALAAAAABkAC8AAAL+lI+py+0Po5y02ouz3rz', '/');
+        $encodedImageEnding = preg_quote('hxz7GQMJEuI8fSVFnoSWUuOxdjD3Sctm8107iMx8bnugkILCpErXrbOoK6rUqVQ9FQAAOw==', '/');
 
-        $expected = <<<EOD
-body {
-  background: url('data:image/gif;base64,$encodedImage') no-repeat 20px 20px;
-}
+        $expectedRegex = <<<EOD
+/^body {
+  background: url\('data\:image\/gif;base64,$encodedImageBeginning.+?$encodedImageEnding'\) no-repeat 100px 47px;
+}$/
 EOD;
-        $this->assertEquals(trim($expected), $css->get());
+        $this->assertRegExp($expectedRegex, $css->get());
     }
 
     public function testBackgroundImage() {
