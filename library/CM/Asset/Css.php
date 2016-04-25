@@ -122,18 +122,16 @@ class CM_Asset_Css extends CM_Asset_Abstract {
                 $size = (int) $values[1][1];
             } else {
                 $path = $values[0];
-                $size = null;
+                $size = 0;
             }
 
             $imagePath = $render->getLayoutPath('resource/img/' . $path, null, null, true, true);
-            $cacheKey = CM_CacheConst::App_Resource . '_md5:' . md5($imagePath);
-            if (!empty($size)) {
-                $cacheKey .= '_size:' . $size;
-            }
-            $imageBase64 = CM_Cache_Persistent::getInstance()->get($cacheKey, function () use ($imagePath, $size) {
+            $cache = CM_Cache_Persistent::getInstance();
+
+            $imageBase64 = $cache->get($cache->key(__METHOD__, md5($imagePath), '_size:' . $size), function () use ($imagePath, $size) {
                 $file = new CM_File($imagePath);
                 $img = new CM_Image_Image($file->read());
-                if (!empty($size)) {
+                if ($size > 0) {
                     $img->resize($size, $size);
                 }
                 $img->setFormat(CM_Image_Image::FORMAT_GIF);
