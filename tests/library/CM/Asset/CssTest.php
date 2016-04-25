@@ -60,7 +60,6 @@ EOD;
 
         $encodedImageBeginning = preg_quote('R0lGODlhZAAvAPEAADw8Oz+0/wAAAAAAACH5BAEAAAIALAAAAABkAC8AAAL+lI+py+0Po5y02ouz3rz7D4ZKEIxlQorqRbZHm', '/');
         $encodedImageEnding = preg_quote('GQMJEuI8fSVFnoSWUuOxdjD3Sctm8107iMx8bnugkILCpErXrbOoK6rUqVQ9FQAAOw==', '/');
-
         $expectedRegex = <<<EOD
 /^body {
   background: url\('data\:image\/gif;base64,$encodedImageBeginning.+?$encodedImageEnding'\) no-repeat 100px 47px;
