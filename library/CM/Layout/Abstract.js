@@ -13,12 +13,11 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   /** @type PromiseThrottled|Null */
   _loadPageThrottled: promiseThrottler(function(path) {
     var layout = this;
-    layout._createPagePlaceholder();
     layout._chargeSpinnerTimeout();
 
     return this.ajaxModal('loadPage', {path: path})
       .finally(function() {
-        clearTimeout(this._timeoutLoading);
+        layout._clearSpinnerTimeout();
       })
       .then(function(response) {
         if (response.redirectExternal) {
@@ -159,10 +158,14 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   },
 
   _chargeSpinnerTimeout: function() {
-    clearTimeout(this._timeoutLoading);
+    this._clearSpinnerTimeout();
     this._timeoutLoading = this.setTimeout(function() {
       this._getPagePlaceholder().html('<div class="spinner spinner-expanded" />');
     }, 750);
+  },
+
+  _clearSpinnerTimeout: function() {
+    clearTimeout(this._timeoutLoading);
   },
 
   /**
