@@ -38,32 +38,32 @@
       <div class="message">{if isset($log.level)}{$levelMap[$log.level]}{/if} - {$log.message|escape}</div>
       <div class="message">{$recordTimestamp}</div>
 
-      {if !empty($log.exception)}
-        {$exception = $log.exception}
-        <div class="label">Exception Info</div>
-        <div><span class="label">Class:</span> {$exception.class}</div>
-        <div><span class="label">Line:</span> {$exception.line}</div>
-        <div><span class="label">File:</span> {$exception.file}</div>
-        {if (!empty($exception.metaInfo))}
-          <div><span class="label">MetaInfo:</span>
-            <pre>{$exception.metaInfo|@print_r}</pre>
-          </div>
-        {/if}
-
-        {if (!empty($exception.trace))}
-          <div><span class="label">Trace:</span>
-            {foreach from=$exception.trace item=traceRow name=traceLoop}
-              <div>{$smarty.foreach.traceLoop.index}. {$traceRow.code} at {$traceRow.file} line {$traceRow.line}</div>
-            {/foreach}
-          </div>
-        {elseif (!empty($exception.traceString))}
-          <div><span class="label">Trace as string:</span> {$exception.traceString}</div>
-        {/if}
-
-      {/if}
-
       {if !empty($log.context)}
         {$context = $log.context}
+
+        {if !empty($context.exception)}
+          {$exception = $context.exception}
+          <div class="label">Exception Info</div>
+          <div><span class="label">Message:</span> {$exception.message|escape}</div>
+          <div><span class="label">Class:</span> {$exception.class}</div>
+          <div><span class="label">Line:</span> {$exception.line}</div>
+          <div><span class="label">File:</span> {$exception.file}</div>
+          {if (!empty($exception.metaInfo))}
+            <div><span class="label">MetaInfo:</span>
+              <pre>{$exception.metaInfo|@print_r}</pre>
+            </div>
+          {/if}
+          {if (!empty($exception.trace))}
+            <div><span class="label">Trace:</span>
+              {foreach from=$exception.trace item=traceRow name=traceLoop}
+                <div>{$smarty.foreach.traceLoop.index}. {$traceRow.code} at {$traceRow.file} line {$traceRow.line}</div>
+              {/foreach}
+            </div>
+          {elseif (!empty($exception.traceString))}
+            <div><span class="label">Trace as string:</span> {$exception.traceString}</div>
+          {/if}
+        {/if}
+
         <div class="toggleNext">Meta Info</div>
         <div class="toggleNext-content">
           {if (!empty($context.extra))}
