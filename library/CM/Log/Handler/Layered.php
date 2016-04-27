@@ -101,9 +101,10 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
         if ($appContext->hasException() && $appContext->getException() instanceof CM_Log_HandlingException) {
             return;
         }
+        $loggerExceptionContext = clone $context;
         foreach ($exceptionList as $exception) {
-            $appContext->setException($exception);
-            $newRecord = new CM_Log_Record(CM_Log_Logger::ERROR, 'Logger Exception', $context);
+            $loggerExceptionContext->getAppContext()->setException($exception);
+            $newRecord = new CM_Log_Record(CM_Log_Logger::ERROR, 'Logger Exception', $loggerExceptionContext);
             $this->_addRecordToLayer($newRecord, 0);
         }
     }
