@@ -11,9 +11,6 @@ class CM_Log_Context_App {
     /** @var Exception|null */
     private $_exception;
 
-    /** @var CM_ExceptionHandling_SerializableException|null */
-    private $_serializableException;
-
     /**
      * @param array              $extra
      * @param CM_Model_User|null $user
@@ -26,7 +23,6 @@ class CM_Log_Context_App {
         }
         if (null !== $exception) {
             $this->_exception = $exception;
-            $this->_serializableException = new CM_ExceptionHandling_SerializableException($exception);
         }
     }
 
@@ -51,7 +47,6 @@ class CM_Log_Context_App {
      */
     public function setException(Exception $exception) {
         $this->_exception = $exception;
-        $this->_serializableException = new CM_ExceptionHandling_SerializableException($exception);
     }
 
     /**
@@ -102,7 +97,7 @@ class CM_Log_Context_App {
         if (!$this->hasException()) {
             throw new CM_Exception_Invalid('Exception is not set');
         }
-        return $this->_serializableException;
+        return new CM_ExceptionHandling_SerializableException($this->getException());
     }
 
     /**
@@ -114,7 +109,6 @@ class CM_Log_Context_App {
         }
         if ($appContext->hasException()) {
             $this->_exception = $appContext->_exception;
-            $this->_serializableException = $appContext->_serializableException;
         }
         $this->_extra = array_merge($this->getExtra(), $appContext->getExtra());
     }
