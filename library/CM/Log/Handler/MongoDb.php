@@ -97,6 +97,10 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             $formattedContext['httpRequest']['clientId'] = $request->getClientId();
         }
 
+        if ($recordContext->getAppContext()->hasException()) {
+            $formattedContext['exception'] = $recordContext->getAppContext()->getSerializableException();
+        }
+
         $formattedRecord = [
             'level'     => (int) $record->getLevel(),
             'message'   => (string) $record->getMessage(),
@@ -108,10 +112,6 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             $expireAt = clone $createdAt;
             $expireAt->add(new DateInterval('PT' . $this->_recordTtl . 'S'));
             $formattedRecord['expireAt'] = new MongoDate($expireAt->getTimestamp());
-        }
-
-        if ($record instanceof CM_Log_Record_Exception) {
-            $formattedRecord['exception'] = $record->getSerializableException();
         }
 
         return $formattedRecord;

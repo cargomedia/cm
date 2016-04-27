@@ -93,20 +93,6 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param Exception               $exception
-     * @param int                     $level
-     * @param CM_Log_Context_App|null $appContext
-     * @return CM_Log_Logger
-     */
-    public function addException(Exception $exception, $level, CM_Log_Context_App $appContext = null) {
-        $context = clone $this->_context;
-        if ($appContext) {
-            $context->getAppContext()->merge($appContext);
-        }
-        return $this->_addRecord(new CM_Log_Record_Exception($level, $context, $exception));
-    }
-
-    /**
      * @param string                  $message
      * @param CM_Log_Context_App|null $context
      * @return CM_Log_Logger
