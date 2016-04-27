@@ -27,16 +27,18 @@
   </li>
   {foreach $logList as $log}
     <li class="log">
-      {$recordTimestamp=$log.createdAt->toDateTime()->getTimestamp()}
       <div class="counter">
         {if $aggregationPeriod}
           {$log.count}
         {else}
+          {$recordTimestamp=$log.createdAt->toDateTime()->getTimestamp()}
           {date_timeago time=$recordTimestamp}
         {/if}
       </div>
       <div class="message">{if isset($log.level)}{$levelMap[$log.level]}{/if} - {$log.message|escape}</div>
-      <div class="message">{$recordTimestamp}</div>
+      {if !$aggregationPeriod}
+        <div><span class="label">Timestamp:</span> {$recordTimestamp}</div>
+      {/if}
 
       {if !empty($log.context)}
         {$context = $log.context}
@@ -63,7 +65,6 @@
             <div><span class="label">Trace as string:</span> {$exception.traceString}</div>
           {/if}
         {/if}
-
         <div class="toggleNext">Meta Info</div>
         <div class="toggleNext-content">
           {if (!empty($context.extra))}
@@ -90,7 +91,7 @@
             {/if}
           {/if}
           {if (isset($context.computerInfo))}
-            <div>FQDN: {$context.computerInfo.fqdn} Version: {$context.computerInfo.phpVersion}</div>
+            <div>FQDN: {$context.computerInfo.fqdn} PHP Version: {$context.computerInfo.phpVersion}</div>
           {/if}
         </div>
       {/if}
