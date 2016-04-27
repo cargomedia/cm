@@ -13,10 +13,12 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
                 new CM_Log_Handler_Layered_Layer([$handlerMock])
             ])
         ]);
-        $methodAddException = $logger->mockMethod('addException');
-        $methodAddException->set(
-            function (Exception $exception) use ($expectedException) {
-                $this->assertEquals($expectedException, $exception);
+        $methodAddMessage = $logger->mockMethod('addMessage');
+        $methodAddMessage->set(
+            function ($message, $level, CM_Log_Context_App $appContext) use ($expectedException) {
+                $this->assertSame('Application error', $message);
+                $this->assertSame(CM_Log_Logger::ERROR, $level);
+                $this->assertEquals($expectedException, $appContext->getException());
             }
         );
 
@@ -28,7 +30,7 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstance();
         $exceptionHandler->setServiceManager($serviceManager);
         $exceptionHandler->handleException($expectedException);
-        $this->assertSame(1, $methodAddException->getCallCount());
+        $this->assertSame(1, $methodAddMessage->getCallCount());
     }
 
     public function testPrintException() {
