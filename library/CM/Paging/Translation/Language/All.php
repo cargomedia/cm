@@ -58,4 +58,9 @@ class CM_Paging_Translation_Language_All extends CM_Paging_Translation_Language_
         (new self($this->_language, !$this->_javascriptOnly))->_change();
     }
 
+    public function _change() {
+        parent::_change();
+        $this->getItemsRaw(); // eagerly refill the cache
+    }
+
 }

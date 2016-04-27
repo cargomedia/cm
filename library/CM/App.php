@@ -47,8 +47,12 @@ class CM_App implements CM_Service_ManagerAwareInterface {
             $assetList[] = new CM_Asset_Css_Vendor($render);
             $assetList[] = new CM_Asset_Css_Library($render);
         }
-        $this->fillLanguageCache();
         $languageList = new CM_Paging_Language_Enabled();
+        /** @var CM_Model_Language $language */
+        foreach ($languageList as $language) {
+            $language->getTranslations()->getItemsRaw();
+            $language->getTranslations(true)->getItemsRaw();
+        }
         /** @var CM_Model_Language $language */
         foreach ($languageList as $language) {
             $assetList[] = new CM_Asset_Javascript_Translations($language);
@@ -57,15 +61,6 @@ class CM_App implements CM_Service_ManagerAwareInterface {
             $asset->get(!$debug);
         }
         CM_Bootloader::getInstance()->getModules();
-    }
-    
-    public function fillLanguageCache() {
-        $languageList = new CM_Paging_Language_Enabled();
-        /** @var CM_Model_Language $language */
-        foreach ($languageList as $language) {
-            $language->getTranslations()->getItemsRaw();
-            $language->getTranslations(true)->getItemsRaw();
-        }
     }
 
     /**
