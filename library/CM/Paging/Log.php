@@ -58,16 +58,16 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
             $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, null, null, [
                 ['$match' => $criteria],
                 ['$group' => [
-                    '_id'   => ['level' => '$level', 'message' => '$message', 'exception' => '$exception'],
+                    '_id'   => ['level' => '$level', 'message' => '$message', 'exception' => '$context.exception'],
                     'count' => ['$sum' => 1]]
                 ],
                 ['$sort' => ['count' => -1]],
                 ['$project' => [
-                    'level'     => '$_id.level',
-                    'message'   => '$_id.message',
-                    'exception' => '$_id.exception',
-                    'count'     => '$count',
-                    '_id'       => false]
+                    'level'             => '$_id.level',
+                    'message'           => '$_id.message',
+                    'context.exception' => '$_id.exception',
+                    'count'             => '$count',
+                    '_id'               => false]
                 ]
             ]);
         } else {

@@ -135,28 +135,40 @@ class CM_Paging_LogTest extends CMTest_TestCase {
         $handler->handleRecord($record3);
 
         CMTest_TH::timeDaysForward(1);
+        $exception2 = new CM_Exception_Invalid('Some info', CM_Exception::FATAL, ['foo' => 'bar']);
         //recreate records to correctly set up CM_Log_Record::createdAt
         $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', new CM_Log_Context(null, null, new CM_Log_Context_App(['bar' => 'quux'])));
         $record2 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'baz', new CM_Log_Context());
         $record3 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'Error bar', new CM_Log_Context(null, null, new CM_Log_Context_App(null, null, $exception)));
+        $record4 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'Error bar', new CM_Log_Context(null, null, new CM_Log_Context_App(null, null, $exception2)));
 
         $handler->handleRecord($record2);
         $handler->handleRecord($record2);
+        $handler->handleRecord($record2);
         $handler->handleRecord($record3);
+        $handler->handleRecord($record3);
+        $handler->handleRecord($record4);
+        $handler->handleRecord($record1);
         $handler->handleRecord($record1);
         $handler->handleRecord($record1);
 
         $paging = new CM_Paging_Log([CM_Log_Logger::DEBUG], true, 2 * 86400);
-        $this->assertSame(3, $paging->getCount());
+        $this->assertSame(4, $paging->getCount());
         $foundRecord1 = $paging->getItem(0);
         $foundRecord2 = $paging->getItem(1);
         $foundRecord3 = $paging->getItem(2);
-        $this->assertSame(3, $foundRecord1['count']);
-        $this->assertSame(2, $foundRecord2['count']);
-        $this->assertSame(1, $foundRecord3['count']);
+        $foundRecord4 = $paging->getItem(3);
+
+        $this->assertSame(4, $foundRecord1['count']);
+        $this->assertSame(3, $foundRecord2['count']);
+        $this->assertSame(2, $foundRecord3['count']);
+        $this->assertSame(1, $foundRecord4['count']);
 
         $this->assertSame('foo', $foundRecord1['message']);
         $this->assertSame('baz', $foundRecord2['message']);
         $this->assertSame('Error bar', $foundRecord3['message']);
+        $this->assertSame('Bad news', $foundRecord3['context']['exception']['message']);
+        $this->assertSame('Error bar', $foundRecord4['message']);
+        $this->assertSame('Some info', $foundRecord4['context']['exception']['message']);
     }
 }
