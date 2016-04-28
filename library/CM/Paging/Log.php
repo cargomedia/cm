@@ -4,27 +4,42 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
 
     const COLLECTION_NAME = 'cm_log';
 
-    /** @var array */
-    protected $_levelList;
+    /** @var array|null */
+    protected $_filterLevelList;
+
+    /** @var int|boolean|null */
+    protected $_filterType;
 
     /** @var int|null */
-    protected $_type;
+    protected $_ageMax;
 
     /**
-     * @param array        $levelList
-     * @param boolean|null $aggregate
-     * @param int          $ageMax
-     * @param int|null     $type
+     * @param array            $filterLevelList
+     * @param int|boolean|null $filterType
+     * @param boolean|null     $aggregate
+     * @param int|null         $ageMax
      * @throws CM_Exception_Invalid
      */
-    public function __construct(array $levelList, $aggregate = null, $ageMax = null, $type = null) {
-        if (empty($levelList)) {
-            throw new CM_Exception_Invalid('Log level list is empty.');
+    public function __construct(array $filterLevelList = null, $filterType = null, $aggregate = null, $ageMax = null) {
+        if (null !== $filterLevelList) {
+            foreach ($filterLevelList as $level) {
+                $level = (int) $level;
+                if (!CM_Log_Logger::hasLevel($level)) {
+                    throw new CM_Exception_Invalid('Log level `' . $level . '` does not exist.');
+                }
+            }
         }
-        foreach ($levelList as $level) {
-            $level = (int) $level;
-            if (!CM_Log_Logger::hasLevel($level)) {
-                throw new CM_Exception_Invalid('Log level `' . $level . '` does not exist.');
+
+        if (null !== $filterType) {
+            if (false !== $filterType) {
+                $filterType = (int) $filterType;
+                $childrenTypeList = \Functional\map(CM_Paging_Log::getClassChildren(), function ($className) {
+                    /** @type CM_Class_Abstract $className */
+                    return $className::getTypeStatic();
+                });
+                if (!in_array($filterType, $childrenTypeList)) {
+                    throw new CM_Exception_Invalid('Type is not a children of CM_Paging_Log.');
+                }
             }
         }
 
@@ -32,27 +47,11 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
             $ageMax = (int) $ageMax;
         }
 
-        if (null !== $type) {
-            $type = (int) $type;
-            $childrenTypeList = \Functional\map(CM_Paging_Log::getClassChildren(), function ($className) {
-                /** @type CM_Class_Abstract $className */
-                return $className::getTypeStatic();
-            });
-            if (!in_array($type, $childrenTypeList)) {
-                throw new CM_Exception_Invalid('Type is not a children of CM_Paging_Log.');
-            }
-        }
-        $this->_levelList = $levelList;
-        $this->_type = $type;
+        $this->_filterLevelList = $filterLevelList;
+        $this->_filterType = $filterType;
+        $this->_ageMax = $ageMax;
 
-        $criteria = [
-            'level' => ['$in' => $this->_levelList],
-        ];
-        $criteria = array_merge($criteria, self::_addTypeCriteria($this->_type));
-
-        if ($ageMax) {
-            $criteria['createdAt'] = ['$gt' => new MongoDate(time() - $ageMax)];
-        }
+        $criteria = $this->_getCriteria();
 
         if (true === $aggregate) {
             $aggregate = [
@@ -102,10 +101,7 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
 
     public function flush() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-
-        $criteria = ['level' => ['$in' => $this->_levelList]];
-        $criteria = array_merge($criteria, self::_addTypeCriteria($this->_type, true));
-
+        $criteria = $this->_getCriteria();
         $mongoDb->remove(self::COLLECTION_NAME, $criteria);
         $this->_change();
     }
@@ -121,11 +117,8 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         $age = (int) $age;
         $deleteOlderThan = time() - $age;
 
-        $criteria = [
-            'level'     => ['$in' => $this->_levelList],
-            'createdAt' => ['$lt' => new MongoDate($deleteOlderThan)],
-        ];
-        $criteria = array_merge($criteria, self::_addTypeCriteria($this->_type, true));
+        $criteria = $this->_getCriteria();
+        $criteria['createdAt'] = ['$lt' => new MongoDate($deleteOlderThan)];
 
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $mongoDb->remove(self::COLLECTION_NAME, $criteria);
@@ -133,17 +126,25 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
     }
 
     /**
-     * @param int|null  $type
-     * @param bool|null $excludeTyped
      * @return array
      */
-    protected static function _addTypeCriteria($type = null, $excludeTyped = null) {
-        $criteria = [];
-        if (null !== $type) {
-            $criteria['context.extra.type'] = (int) $type;
-        } elseif (true === $excludeTyped) {
+    protected function _getCriteria() {
+        $criteria = ['message' => ['$exists' => true]];
+
+        if (false === $this->_filterType) {
             $criteria['context.extra.type'] = ['$exists' => false];
+        } elseif (null !== $this->_filterType) {
+            $criteria['context.extra.type'] = (int) $this->_filterType;
         }
+
+        if (null !== $this->_filterLevelList) {
+            $criteria['level'] = ['$in' => $this->_filterLevelList];
+        }
+
+        if (null !== $this->_ageMax) {
+            $criteria['createdAt'] = ['$gt' => new MongoDate(time() - $this->_ageMax)];
+        }
+
         return $criteria;
     }
 }
