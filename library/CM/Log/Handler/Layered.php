@@ -91,8 +91,8 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
     }
 
     /**
-     * @param CM_Log_Record $record
-     * @param Exception[]   $exceptionList
+     * @param CM_Log_Record              $record
+     * @param CM_Log_HandlingException[] $exceptionList
      * @throws CM_Exception_Invalid
      */
     protected function _logHandlersExceptions(CM_Log_Record $record, array $exceptionList) {
@@ -103,7 +103,7 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
         }
         $loggerExceptionContext = clone $context;
         foreach ($exceptionList as $exception) {
-            $loggerExceptionContext->getAppContext()->setException($exception);
+            $loggerExceptionContext->getAppContext()->setException($exception->getOriginalException());
             $newRecord = new CM_Log_Record(CM_Log_Logger::ERROR, 'Logger Exception', $loggerExceptionContext);
             $this->_addRecordToLayer($newRecord, 0);
         }
