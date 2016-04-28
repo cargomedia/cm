@@ -75,7 +75,8 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
                     $handlersRecorded += 1;
                 }
             } catch (Exception $e) {
-                $exceptionList[] = new CM_Log_HandlingException($e);
+                $handlerClassName = get_class($handler);
+                $exceptionList[] = new CM_Log_HandlingException("Logger handler `{$handlerClassName}` failed", $e);
             }
         }
 
@@ -91,8 +92,8 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
     }
 
     /**
-     * @param CM_Log_Record $record
-     * @param Exception[]   $exceptionList
+     * @param CM_Log_Record              $record
+     * @param CM_Log_HandlingException[] $exceptionList
      * @throws CM_Exception_Invalid
      */
     protected function _logHandlersExceptions(CM_Log_Record $record, array $exceptionList) {
@@ -101,11 +102,11 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
         if ($appContext->hasException() && $appContext->getException() instanceof CM_Log_HandlingException) {
             return;
         }
-        $loggerExceptionContext = clone $context;
-        foreach ($exceptionList as $exception) {
-            $loggerExceptionContext->getAppContext()->setException($exception);
-            $newRecord = new CM_Log_Record(CM_Log_Logger::ERROR, 'Logger Exception', $loggerExceptionContext);
-            $this->_addRecordToLayer($newRecord, 0);
-        }
+        \Functional\each($exceptionList, function (CM_Log_HandlingException $exception) use ($context) {
+            $newContext = clone $context;
+            $newContext->getAppContext()->setException($exception->getOriginalException());
+            $newRecord = new CM_Log_Record(CM_Log_Logger::ERROR, $exception->getMessage(), $newContext);
+            $this->handleRecord($newRecord);
+        });
     }
 }
