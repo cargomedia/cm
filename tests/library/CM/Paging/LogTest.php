@@ -167,8 +167,8 @@ class CM_Paging_LogTest extends CMTest_TestCase {
         $this->assertSame('foo', $foundRecord1['message']);
         $this->assertSame('baz', $foundRecord2['message']);
         $this->assertSame('Error bar', $foundRecord3['message']);
-        $this->assertSame('Bad news', $foundRecord3['context']['exception']['message']);
+        $this->assertSame('Bad news', $foundRecord3['exception']['message']);
         $this->assertSame('Error bar', $foundRecord4['message']);
-        $this->assertSame('Some info', $foundRecord4['context']['exception']['message']);
+        $this->assertSame('Some info', $foundRecord4['exception']['message']);
     }
 }

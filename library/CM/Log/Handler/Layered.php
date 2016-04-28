@@ -59,23 +59,28 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
     }
 
     /**
-     * @param CM_Log_Record $record
-     * @param int           $layerIdx
+     * @param CM_Log_Record                          $record
+     * @param int                                    $layerIdx
+     * @param CM_Log_Handler_HandlerInterface[]|null $excludeHandlers
      * @throws CM_Exception_Invalid
      */
-    protected function _addRecordToLayer(CM_Log_Record $record, $layerIdx) {
+    protected function _addRecordToLayer(CM_Log_Record $record, $layerIdx, array $excludeHandlers = null) {
         $layer = $this->_getLayer($layerIdx);
 
-        $exceptionList = [];
+        /** @var CM_Log_Handler_HandlerInterface[] $handlers */
+        $handlers = array_diff($layer->getHandlers(), (array) $excludeHandlers);
         $handlersRecorded = 0;
-        foreach ($layer->getHandlers() as $handler) {
+        $failingHandlers = [];
+        $exceptionList = [];
+        foreach ($handlers as $handler) {
             try {
                 $handler->handleRecord($record);
                 if ($handler->isHandling($record)) {
                     $handlersRecorded += 1;
                 }
             } catch (Exception $e) {
-                $exceptionList[] = new CM_Log_HandlingException($e);
+                $failingHandlers[] = $handler;
+                $exceptionList[] = $e;
             }
         }
 
@@ -86,26 +91,23 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
                     $this->_addRecordToLayer($record, $nextLayerIdx);
                 }
             }
-            $this->_logHandlersExceptions($record, $exceptionList);
+            foreach ($exceptionList as $exception) {
+                $this->_addExceptionToLayer($exception, $record->getContext(), $layerIdx, $failingHandlers);
+            }
         }
     }
 
     /**
-     * @param CM_Log_Record              $record
-     * @param CM_Log_HandlingException[] $exceptionList
-     * @throws CM_Exception_Invalid
+     * @param CM_Exception                           $exception
+     * @param CM_Log_Context                         $context
+     * @param int                                    $layerIdx
+     * @param CM_Log_Handler_HandlerInterface[]|null $excludeHandlers
+     * @internal param CM_Log_Record $record
      */
-    protected function _logHandlersExceptions(CM_Log_Record $record, array $exceptionList) {
-        $context = $record->getContext();
-        $appContext = $context->getAppContext();
-        if ($appContext->hasException() && $appContext->getException() instanceof CM_Log_HandlingException) {
-            return;
-        }
-        $loggerExceptionContext = clone $context;
-        foreach ($exceptionList as $exception) {
-            $loggerExceptionContext->getAppContext()->setException($exception->getOriginalException());
-            $newRecord = new CM_Log_Record(CM_Log_Logger::ERROR, 'Logger Exception', $loggerExceptionContext);
-            $this->_addRecordToLayer($newRecord, 0);
-        }
+    protected function _addExceptionToLayer(CM_Exception $exception, CM_Log_Context $context, $layerIdx, array $excludeHandlers = null) {
+        $newContext = clone $context;
+        $newContext->getAppContext()->setException($exception);
+        $newRecord = new CM_Log_Record(CM_Log_Logger::ERROR, $exception->getMessage(), $newContext);
+        $this->_addRecordToLayer($newRecord, $layerIdx, $excludeHandlers);
     }
 }
