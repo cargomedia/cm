@@ -67,20 +67,22 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
     protected function _addRecordToLayer(CM_Log_Record $record, $layerIdx, array $excludeHandlers = null) {
         $layer = $this->_getLayer($layerIdx);
 
+        $handlers = $layer->getHandlers();
+        if (null !== $excludeHandlers) {
+            $handlers = array_diff($handlers, $excludeHandlers);
+        }
         $handlersRecorded = 0;
         $failingHandlers = [];
         $exceptionList = [];
-        foreach ($layer->getHandlers() as $handler) {
-            if (!in_array($handler, (array) $excludeHandlers)) {
-                try {
-                    $handler->handleRecord($record);
-                    if ($handler->isHandling($record)) {
-                        $handlersRecorded += 1;
-                    }
-                } catch (Exception $e) {
-                    $failingHandlers[] = $handler;
-                    $exceptionList[] = $e;
+        foreach ($handlers as $handler) {
+            try {
+                $handler->handleRecord($record);
+                if ($handler->isHandling($record)) {
+                    $handlersRecorded += 1;
                 }
+            } catch (Exception $e) {
+                $failingHandlers[] = $handler;
+                $exceptionList[] = $e;
             }
         }
         if (!empty($exceptionList)) {
@@ -88,11 +90,9 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
                 $nextLayerIdx = $layerIdx + 1;
                 if ($this->_hasLayer($nextLayerIdx)) {
                     $this->_addRecordToLayer($record, $nextLayerIdx);
-                    $this->_addExceptionListToLayer($exceptionList, $record->getContext(), $nextLayerIdx, $failingHandlers);
                 }
-            } else {
-                $this->_addExceptionListToLayer($exceptionList, $record->getContext(), $layerIdx, $failingHandlers);
             }
+            $this->_addExceptionListToLayer($exceptionList, $record->getContext(), $layerIdx, $failingHandlers);
         }
     }
 
