@@ -24,8 +24,8 @@
  */
 /**
  * bluebird build version 3.1.5
- * Features enabled: core, race, props, timers, each
- * Features disabled: call_get, generators, map, nodeify, promisify, reduce, settle, some, using, filter, any
+ * Features enabled: core, race, props, reduce, timers, each
+ * Features disabled: call_get, generators, map, nodeify, promisify, settle, some, using, filter, any
 */
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Promise=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof _dereq_=="function"&&_dereq_;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof _dereq_=="function"&&_dereq_;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 "use strict";
@@ -182,7 +182,7 @@ Async.prototype._reset = function () {
 module.exports = Async;
 module.exports.firstLineError = firstLineError;
 
-},{"./queue":19,"./schedule":21,"./util":25}],2:[function(_dereq_,module,exports){
+},{"./queue":19,"./schedule":22,"./util":26}],2:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, tryConvertToPromise, debug) {
 var calledBind = false;
@@ -391,7 +391,7 @@ Promise.prototype._resultCancelled = function() {
 
 };
 
-},{"./util":25}],5:[function(_dereq_,module,exports){
+},{"./util":26}],5:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(NEXT_FILTER) {
 var util = _dereq_("./util");
@@ -435,7 +435,7 @@ function catchFilter(instances, cb, promise) {
 return catchFilter;
 };
 
-},{"./es5":11,"./util":25}],6:[function(_dereq_,module,exports){
+},{"./es5":11,"./util":26}],6:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise) {
 var longStackTraces = false;
@@ -1332,7 +1332,7 @@ return {
 };
 };
 
-},{"./errors":10,"./util":25}],8:[function(_dereq_,module,exports){
+},{"./errors":10,"./util":26}],8:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise) {
 function returner() {
@@ -1524,7 +1524,7 @@ module.exports = {
     Warning: Warning
 };
 
-},{"./es5":11,"./util":25}],11:[function(_dereq_,module,exports){
+},{"./es5":11,"./util":26}],11:[function(_dereq_,module,exports){
 var isES5 = (function(){
     "use strict";
     return this === undefined;
@@ -1715,7 +1715,7 @@ Promise.prototype.tap = function (handler) {
 return PassThroughHandlerContext;
 };
 
-},{"./util":25}],13:[function(_dereq_,module,exports){
+},{"./util":26}],13:[function(_dereq_,module,exports){
 "use strict";
 module.exports =
 function(Promise, PromiseArray, tryConvertToPromise, INTERNAL) {
@@ -1866,7 +1866,7 @@ Promise.join = function () {
 
 };
 
-},{"./util":25}],14:[function(_dereq_,module,exports){
+},{"./util":26}],14:[function(_dereq_,module,exports){
 "use strict";
 module.exports =
 function(Promise, INTERNAL, tryConvertToPromise, apiRejection, debug) {
@@ -1923,7 +1923,7 @@ Promise.prototype._resolveFromSyncValue = function (value) {
 };
 };
 
-},{"./util":25}],15:[function(_dereq_,module,exports){
+},{"./util":26}],15:[function(_dereq_,module,exports){
 "use strict";
 var util = _dereq_("./util");
 var maybeWrapAsError = util.maybeWrapAsError;
@@ -1976,7 +1976,7 @@ function nodebackForPromise(promise, multiArgs) {
 
 module.exports = nodebackForPromise;
 
-},{"./errors":10,"./es5":11,"./util":25}],16:[function(_dereq_,module,exports){
+},{"./errors":10,"./es5":11,"./util":26}],16:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
 var makeSelfResolutionError = function () {
@@ -2698,6 +2698,7 @@ Promise.Promise = Promise;
 _dereq_('./timers.js')(Promise, INTERNAL, debug);
 _dereq_('./props.js')(Promise, PromiseArray, tryConvertToPromise, apiRejection);
 _dereq_('./race.js')(Promise, INTERNAL, tryConvertToPromise, apiRejection);
+_dereq_('./reduce.js')(Promise, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug);
 _dereq_('./each.js')(Promise, INTERNAL);
                                                          
     util.toFastProperties(Promise);                                          
@@ -2724,7 +2725,7 @@ _dereq_('./each.js')(Promise, INTERNAL);
 
 };
 
-},{"./async":1,"./bind":2,"./cancel":4,"./catch_filter":5,"./context":6,"./debuggability":7,"./direct_resolve":8,"./each.js":9,"./errors":10,"./es5":11,"./finally":12,"./join":13,"./method":14,"./nodeback":15,"./promise_array":17,"./props.js":18,"./race.js":20,"./synchronous_inspection":22,"./thenables":23,"./timers.js":24,"./util":25}],17:[function(_dereq_,module,exports){
+},{"./async":1,"./bind":2,"./cancel":4,"./catch_filter":5,"./context":6,"./debuggability":7,"./direct_resolve":8,"./each.js":9,"./errors":10,"./es5":11,"./finally":12,"./join":13,"./method":14,"./nodeback":15,"./promise_array":17,"./props.js":18,"./race.js":20,"./reduce.js":21,"./synchronous_inspection":23,"./thenables":24,"./timers.js":25,"./util":26}],17:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, tryConvertToPromise,
     apiRejection, Proxyable) {
@@ -2910,7 +2911,7 @@ PromiseArray.prototype.getActualLength = function (len) {
 return PromiseArray;
 };
 
-},{"./util":25}],18:[function(_dereq_,module,exports){
+},{"./util":26}],18:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(
     Promise, PromiseArray, tryConvertToPromise, apiRejection) {
@@ -3030,7 +3031,7 @@ Promise.props = function (promises) {
 };
 };
 
-},{"./es5":11,"./util":25}],19:[function(_dereq_,module,exports){
+},{"./es5":11,"./util":26}],19:[function(_dereq_,module,exports){
 "use strict";
 function arrayMove(src, srcIndex, dst, dstIndex, len) {
     for (var j = 0; j < len; ++j) {
@@ -3173,7 +3174,171 @@ Promise.prototype.race = function () {
 
 };
 
-},{"./util":25}],21:[function(_dereq_,module,exports){
+},{"./util":26}],21:[function(_dereq_,module,exports){
+"use strict";
+module.exports = function(Promise,
+                          PromiseArray,
+                          apiRejection,
+                          tryConvertToPromise,
+                          INTERNAL,
+                          debug) {
+var getDomain = Promise._getDomain;
+var util = _dereq_("./util");
+var tryCatch = util.tryCatch;
+
+function ReductionPromiseArray(promises, fn, initialValue, _each) {
+    this.constructor$(promises);
+    var domain = getDomain();
+    this._fn = domain === null ? fn : domain.bind(fn);
+    if (initialValue !== undefined) {
+        initialValue = Promise.resolve(initialValue);
+        initialValue._attachCancellationCallback(this);
+    }
+    this._initialValue = initialValue;
+    this._currentCancellable = null;
+    this._eachValues = _each === INTERNAL ? [] : undefined;
+    this._promise._captureStackTrace();
+    this._init$(undefined, -5);
+}
+util.inherits(ReductionPromiseArray, PromiseArray);
+
+ReductionPromiseArray.prototype._gotAccum = function(accum) {
+    if (this._eachValues !== undefined && accum !== INTERNAL) {
+        this._eachValues.push(accum);
+    }
+};
+
+ReductionPromiseArray.prototype._eachComplete = function(value) {
+    this._eachValues.push(value);
+    return this._eachValues;
+};
+
+ReductionPromiseArray.prototype._init = function() {};
+
+ReductionPromiseArray.prototype._resolveEmptyArray = function() {
+    this._resolve(this._eachValues !== undefined ? this._eachValues
+                                                 : this._initialValue);
+};
+
+ReductionPromiseArray.prototype.shouldCopyValues = function () {
+    return false;
+};
+
+ReductionPromiseArray.prototype._resolve = function(value) {
+    this._promise._resolveCallback(value);
+    this._values = null;
+};
+
+ReductionPromiseArray.prototype._resultCancelled = function(sender) {
+    if (sender === this._initialValue) return this._cancel();
+    if (this._isResolved()) return;
+    this._resultCancelled$();
+    if (this._currentCancellable instanceof Promise) {
+        this._currentCancellable.cancel();
+    }
+    if (this._initialValue instanceof Promise) {
+        this._initialValue.cancel();
+    }
+};
+
+ReductionPromiseArray.prototype._iterate = function (values) {
+    this._values = values;
+    var value;
+    var i;
+    var length = values.length;
+    if (this._initialValue !== undefined) {
+        value = this._initialValue;
+        i = 0;
+    } else {
+        value = Promise.resolve(values[0]);
+        i = 1;
+    }
+
+    this._currentCancellable = value;
+
+    if (!value.isRejected()) {
+        for (; i < length; ++i) {
+            var ctx = {
+                accum: null,
+                value: values[i],
+                index: i,
+                length: length,
+                array: this
+            };
+            value = value._then(gotAccum, undefined, undefined, ctx, undefined);
+        }
+    }
+
+    if (this._eachValues !== undefined) {
+        value = value
+            ._then(this._eachComplete, undefined, undefined, this, undefined);
+    }
+    value._then(completed, completed, undefined, value, this);
+};
+
+Promise.prototype.reduce = function (fn, initialValue) {
+    return reduce(this, fn, initialValue, null);
+};
+
+Promise.reduce = function (promises, fn, initialValue, _each) {
+    return reduce(promises, fn, initialValue, _each);
+};
+
+function completed(valueOrReason, array) {
+    if (this.isFulfilled()) {
+        array._resolve(valueOrReason);
+    } else {
+        array._reject(valueOrReason);
+    }
+}
+
+function reduce(promises, fn, initialValue, _each) {
+    if (typeof fn !== "function") {
+        return apiRejection("expecting a function but got " + util.classString(fn));
+    }
+    var array = new ReductionPromiseArray(promises, fn, initialValue, _each);
+    return array.promise();
+}
+
+function gotAccum(accum) {
+    this.accum = accum;
+    this.array._gotAccum(accum);
+    var value = tryConvertToPromise(this.value, this.array._promise);
+    if (value instanceof Promise) {
+        this.array._currentCancellable = value;
+        return value._then(gotValue, undefined, undefined, this, undefined);
+    } else {
+        return gotValue.call(this, value);
+    }
+}
+
+function gotValue(value) {
+    var array = this.array;
+    var promise = array._promise;
+    var fn = tryCatch(array._fn);
+    promise._pushContext();
+    var ret;
+    if (array._eachValues !== undefined) {
+        ret = fn.call(promise._boundValue(), value, this.index, this.length);
+    } else {
+        ret = fn.call(promise._boundValue(),
+                              this.accum, value, this.index, this.length);
+    }
+    if (ret instanceof Promise) {
+        array._currentCancellable = ret;
+    }
+    var promiseCreated = promise._popContext();
+    debug.checkForgottenReturns(
+        ret,
+        promiseCreated,
+        array._eachValues !== undefined ? "Promise.each" : "Promise.reduce",
+        promise
+    );
+    return ret;
+}
+};
+
+},{"./util":26}],22:[function(_dereq_,module,exports){
 "use strict";
 var util = _dereq_("./util");
 var schedule;
@@ -3229,7 +3394,7 @@ if (util.isNode && typeof MutationObserver === "undefined") {
 }
 module.exports = schedule;
 
-},{"./util":25}],22:[function(_dereq_,module,exports){
+},{"./util":26}],23:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise) {
 function PromiseInspection(promise) {
@@ -3327,7 +3492,7 @@ Promise.prototype._reason = function() {
 Promise.PromiseInspection = PromiseInspection;
 };
 
-},{}],23:[function(_dereq_,module,exports){
+},{}],24:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL) {
 var util = _dereq_("./util");
@@ -3411,7 +3576,7 @@ function doThenable(x, then, context) {
 return tryConvertToPromise;
 };
 
-},{"./util":25}],24:[function(_dereq_,module,exports){
+},{"./util":26}],25:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, debug) {
 var util = _dereq_("./util");
@@ -3489,7 +3654,7 @@ Promise.prototype.timeout = function (ms, message) {
 
 };
 
-},{"./util":25}],25:[function(_dereq_,module,exports){
+},{"./util":26}],26:[function(_dereq_,module,exports){
 "use strict";
 var es5 = _dereq_("./es5");
 var canEvaluate = typeof navigator == "undefined";
