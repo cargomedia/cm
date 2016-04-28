@@ -24,8 +24,8 @@
  */
 /**
  * bluebird build version 3.1.5
- * Features enabled: core, race, props, timers
- * Features disabled: call_get, generators, map, nodeify, promisify, reduce, settle, some, using, filter, any, each
+ * Features enabled: core, race, props, timers, each
+ * Features disabled: call_get, generators, map, nodeify, promisify, reduce, settle, some, using, filter, any
 */
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Promise=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof _dereq_=="function"&&_dereq_;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof _dereq_=="function"&&_dereq_;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 "use strict";
@@ -182,7 +182,7 @@ Async.prototype._reset = function () {
 module.exports = Async;
 module.exports.firstLineError = firstLineError;
 
-},{"./queue":18,"./schedule":20,"./util":24}],2:[function(_dereq_,module,exports){
+},{"./queue":19,"./schedule":21,"./util":25}],2:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, tryConvertToPromise, debug) {
 var calledBind = false;
@@ -264,7 +264,7 @@ var bluebird = _dereq_("./promise")();
 bluebird.noConflict = noConflict;
 module.exports = bluebird;
 
-},{"./promise":15}],4:[function(_dereq_,module,exports){
+},{"./promise":16}],4:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, PromiseArray, apiRejection, debug) {
 var util = _dereq_("./util");
@@ -391,7 +391,7 @@ Promise.prototype._resultCancelled = function() {
 
 };
 
-},{"./util":24}],5:[function(_dereq_,module,exports){
+},{"./util":25}],5:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(NEXT_FILTER) {
 var util = _dereq_("./util");
@@ -435,7 +435,7 @@ function catchFilter(instances, cb, promise) {
 return catchFilter;
 };
 
-},{"./es5":10,"./util":24}],6:[function(_dereq_,module,exports){
+},{"./es5":11,"./util":25}],6:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise) {
 var longStackTraces = false;
@@ -1332,7 +1332,7 @@ return {
 };
 };
 
-},{"./errors":9,"./util":24}],8:[function(_dereq_,module,exports){
+},{"./errors":10,"./util":25}],8:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise) {
 function returner() {
@@ -1381,6 +1381,37 @@ Promise.prototype.catchReturn = function (value) {
 };
 
 },{}],9:[function(_dereq_,module,exports){
+"use strict";
+module.exports = function(Promise, INTERNAL) {
+var PromiseReduce = Promise.reduce;
+var PromiseAll = Promise.all;
+
+function promiseAllThis() {
+    return PromiseAll(this);
+}
+
+function PromiseMapSeries(promises, fn) {
+    return PromiseReduce(promises, fn, INTERNAL, INTERNAL);
+}
+
+Promise.prototype.each = function (fn) {
+    return this.mapSeries(fn)
+            ._then(promiseAllThis, undefined, undefined, this, undefined);
+};
+
+Promise.prototype.mapSeries = function (fn) {
+    return PromiseReduce(this, fn, INTERNAL, INTERNAL);
+};
+
+Promise.each = function (promises, fn) {
+    return PromiseMapSeries(promises, fn)
+            ._then(promiseAllThis, undefined, undefined, promises, undefined);
+};
+
+Promise.mapSeries = PromiseMapSeries;
+};
+
+},{}],10:[function(_dereq_,module,exports){
 "use strict";
 var es5 = _dereq_("./es5");
 var Objectfreeze = es5.freeze;
@@ -1493,7 +1524,7 @@ module.exports = {
     Warning: Warning
 };
 
-},{"./es5":10,"./util":24}],10:[function(_dereq_,module,exports){
+},{"./es5":11,"./util":25}],11:[function(_dereq_,module,exports){
 var isES5 = (function(){
     "use strict";
     return this === undefined;
@@ -1575,7 +1606,7 @@ if (isES5) {
     };
 }
 
-},{}],11:[function(_dereq_,module,exports){
+},{}],12:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, tryConvertToPromise) {
 var util = _dereq_("./util");
@@ -1684,7 +1715,7 @@ Promise.prototype.tap = function (handler) {
 return PassThroughHandlerContext;
 };
 
-},{"./util":24}],12:[function(_dereq_,module,exports){
+},{"./util":25}],13:[function(_dereq_,module,exports){
 "use strict";
 module.exports =
 function(Promise, PromiseArray, tryConvertToPromise, INTERNAL) {
@@ -1835,7 +1866,7 @@ Promise.join = function () {
 
 };
 
-},{"./util":24}],13:[function(_dereq_,module,exports){
+},{"./util":25}],14:[function(_dereq_,module,exports){
 "use strict";
 module.exports =
 function(Promise, INTERNAL, tryConvertToPromise, apiRejection, debug) {
@@ -1892,7 +1923,7 @@ Promise.prototype._resolveFromSyncValue = function (value) {
 };
 };
 
-},{"./util":24}],14:[function(_dereq_,module,exports){
+},{"./util":25}],15:[function(_dereq_,module,exports){
 "use strict";
 var util = _dereq_("./util");
 var maybeWrapAsError = util.maybeWrapAsError;
@@ -1945,7 +1976,7 @@ function nodebackForPromise(promise, multiArgs) {
 
 module.exports = nodebackForPromise;
 
-},{"./errors":9,"./es5":10,"./util":24}],15:[function(_dereq_,module,exports){
+},{"./errors":10,"./es5":11,"./util":25}],16:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
 var makeSelfResolutionError = function () {
@@ -2664,9 +2695,10 @@ _dereq_("./synchronous_inspection")(Promise);
 _dereq_("./join")(
     Promise, PromiseArray, tryConvertToPromise, INTERNAL, debug);
 Promise.Promise = Promise;
+_dereq_('./timers.js')(Promise, INTERNAL, debug);
 _dereq_('./props.js')(Promise, PromiseArray, tryConvertToPromise, apiRejection);
 _dereq_('./race.js')(Promise, INTERNAL, tryConvertToPromise, apiRejection);
-_dereq_('./timers.js')(Promise, INTERNAL, debug);
+_dereq_('./each.js')(Promise, INTERNAL);
                                                          
     util.toFastProperties(Promise);                                          
     util.toFastProperties(Promise.prototype);                                
@@ -2692,7 +2724,7 @@ _dereq_('./timers.js')(Promise, INTERNAL, debug);
 
 };
 
-},{"./async":1,"./bind":2,"./cancel":4,"./catch_filter":5,"./context":6,"./debuggability":7,"./direct_resolve":8,"./errors":9,"./es5":10,"./finally":11,"./join":12,"./method":13,"./nodeback":14,"./promise_array":16,"./props.js":17,"./race.js":19,"./synchronous_inspection":21,"./thenables":22,"./timers.js":23,"./util":24}],16:[function(_dereq_,module,exports){
+},{"./async":1,"./bind":2,"./cancel":4,"./catch_filter":5,"./context":6,"./debuggability":7,"./direct_resolve":8,"./each.js":9,"./errors":10,"./es5":11,"./finally":12,"./join":13,"./method":14,"./nodeback":15,"./promise_array":17,"./props.js":18,"./race.js":20,"./synchronous_inspection":22,"./thenables":23,"./timers.js":24,"./util":25}],17:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, tryConvertToPromise,
     apiRejection, Proxyable) {
@@ -2878,7 +2910,7 @@ PromiseArray.prototype.getActualLength = function (len) {
 return PromiseArray;
 };
 
-},{"./util":24}],17:[function(_dereq_,module,exports){
+},{"./util":25}],18:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(
     Promise, PromiseArray, tryConvertToPromise, apiRejection) {
@@ -2998,7 +3030,7 @@ Promise.props = function (promises) {
 };
 };
 
-},{"./es5":10,"./util":24}],18:[function(_dereq_,module,exports){
+},{"./es5":11,"./util":25}],19:[function(_dereq_,module,exports){
 "use strict";
 function arrayMove(src, srcIndex, dst, dstIndex, len) {
     for (var j = 0; j < len; ++j) {
@@ -3090,7 +3122,7 @@ Queue.prototype._resizeTo = function (capacity) {
 
 module.exports = Queue;
 
-},{}],19:[function(_dereq_,module,exports){
+},{}],20:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(
     Promise, INTERNAL, tryConvertToPromise, apiRejection) {
@@ -3141,7 +3173,7 @@ Promise.prototype.race = function () {
 
 };
 
-},{"./util":24}],20:[function(_dereq_,module,exports){
+},{"./util":25}],21:[function(_dereq_,module,exports){
 "use strict";
 var util = _dereq_("./util");
 var schedule;
@@ -3197,7 +3229,7 @@ if (util.isNode && typeof MutationObserver === "undefined") {
 }
 module.exports = schedule;
 
-},{"./util":24}],21:[function(_dereq_,module,exports){
+},{"./util":25}],22:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise) {
 function PromiseInspection(promise) {
@@ -3295,7 +3327,7 @@ Promise.prototype._reason = function() {
 Promise.PromiseInspection = PromiseInspection;
 };
 
-},{}],22:[function(_dereq_,module,exports){
+},{}],23:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL) {
 var util = _dereq_("./util");
@@ -3379,7 +3411,7 @@ function doThenable(x, then, context) {
 return tryConvertToPromise;
 };
 
-},{"./util":24}],23:[function(_dereq_,module,exports){
+},{"./util":25}],24:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, debug) {
 var util = _dereq_("./util");
@@ -3457,7 +3489,7 @@ Promise.prototype.timeout = function (ms, message) {
 
 };
 
-},{"./util":24}],24:[function(_dereq_,module,exports){
+},{"./util":25}],25:[function(_dereq_,module,exports){
 "use strict";
 var es5 = _dereq_("./es5");
 var canEvaluate = typeof navigator == "undefined";
@@ -3803,5 +3835,5 @@ if (ret.isNode) ret.toFastProperties(process);
 try {throw new Error(); } catch (e) {ret.lastLineError = e;}
 module.exports = ret;
 
-},{"./es5":10}]},{},[3])(3)
+},{"./es5":11}]},{},[3])(3)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
