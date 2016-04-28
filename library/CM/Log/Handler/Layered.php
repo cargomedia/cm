@@ -61,28 +61,26 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
     /**
      * @param CM_Log_Record                          $record
      * @param int                                    $layerIdx
-     * @param CM_Log_Handler_HandlerInterface[]|null $excludeHandlers
+     * @param CM_Log_Handler_HandlerInterface[]|null $excludedHandlers
      * @throws CM_Exception_Invalid
      */
-    protected function _addRecordToLayer(CM_Log_Record $record, $layerIdx, array $excludeHandlers = null) {
+    protected function _addRecordToLayer(CM_Log_Record $record, $layerIdx, array $excludedHandlers = null) {
         $layer = $this->_getLayer($layerIdx);
 
-        $handlers = $layer->getHandlers();
-        if (null !== $excludeHandlers) {
-            $handlers = array_diff($handlers, $excludeHandlers);
-        }
         $handlersRecorded = 0;
         $failingHandlers = [];
         $exceptionList = [];
-        foreach ($handlers as $handler) {
-            try {
-                $handler->handleRecord($record);
-                if ($handler->isHandling($record)) {
-                    $handlersRecorded += 1;
+        foreach ($layer->getHandlers() as $handler) {
+            if (!in_array($handler, (array) $excludedHandlers)) {
+                try {
+                    $handler->handleRecord($record);
+                    if ($handler->isHandling($record)) {
+                        $handlersRecorded += 1;
+                    }
+                } catch (Exception $e) {
+                    $failingHandlers[] = $handler;
+                    $exceptionList[] = $e;
                 }
-            } catch (Exception $e) {
-                $failingHandlers[] = $handler;
-                $exceptionList[] = $e;
             }
         }
         if (!empty($exceptionList)) {
