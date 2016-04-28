@@ -55,39 +55,48 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         }
 
         if (true === $aggregate) {
-            $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, null, null, [
+            $aggregate = [
                 ['$match' => $criteria],
                 ['$group' => [
-                    '_id'       => ['level' => '$level', 'message' => '$message', 'exception' => '$context.exception'],
+                    '_id'       => [
+                        'level'             => '$level',
+                        'message'           => '$message',
+                        'exception_message' => '$context.exception.message',
+                        'exception_class'   => '$context.exception.class',
+                        'exception_line'    => '$context.exception.line',
+                        'exception_file'    => '$context.exception.file',
+                        //stack trace can be different only by 1 line
+                    ],
                     'count'     => ['$sum' => 1],
-                    'createdAt' => ['$max' => '$createdAt']],
+                    'createdAt' => ['$max' => '$createdAt'],
+                    'exception' => ['$last' => '$context.exception']],
                 ],
                 ['$sort' => ['count' => -1]],
                 ['$project' => [
                     'level'     => '$_id.level',
                     'message'   => '$_id.message',
-                    'exception' => '$_id.exception',
+                    'exception' => '$exception',
                     'count'     => '$count',
                     'createdAt' => '$createdAt',
                     '_id'       => false],
                 ],
-            ]);
+            ];
         } else {
             $aggregate = [
                 ['$match' => $criteria],
                 ['$sort' => ['_id' => -1]],
                 ['$project' => [
-                    'level'             => '$level',
-                    'message'           => '$message',
-                    'exception'         => '$context.exception',
-                    'context'           => '$context',
-                    'count'             => '$count',
-                    'createdAt'         => '$createdAt',
-                    '_id'               => false,
+                    'level'     => '$level',
+                    'message'   => '$message',
+                    'exception' => '$context.exception',
+                    'context'   => '$context',
+                    'count'     => '$count',
+                    'createdAt' => '$createdAt',
+                    '_id'       => false,
                 ]],
             ];
-            $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, null, null, $aggregate);
         }
+        $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, null, null, $aggregate);
         parent::__construct($source);
     }
 
