@@ -27,71 +27,40 @@
   </li>
   {foreach $logList as $log}
     <li class="log">
+      {$recordTimestamp=$log.createdAt->toDateTime()->getTimestamp()}
       <div class="counter">
         {if $aggregationPeriod}
           {$log.count}
         {else}
-          {$recordTimestamp=$log.createdAt->toDateTime()->getTimestamp()}
           {date_timeago time=$recordTimestamp}
         {/if}
       </div>
-      <div class="message">{if isset($log.level)}{$levelMap[$log.level]}{/if} - {$log.message|escape}</div>
-      {if !$aggregationPeriod}
-        <div><span class="label">Timestamp:</span> {$recordTimestamp}</div>
-      {/if}
+      <div class="message">{if isset($log.level)}<span class="level level-{$log.level}">{$levelMap[$log.level]}</span>{/if} {$log.message|escape}</div>
 
-      {if !empty($log.context)}
-        {$context = $log.context}
-
-        {if !empty($context.exception)}
-          {$exception = $context.exception}
-          <div class="label">Exception Info</div>
-          <div><span class="label">Message:</span> {$exception.message|escape}</div>
-          <div><span class="label">Class:</span> {$exception.class}</div>
-          <div><span class="label">Line:</span> {$exception.line}</div>
-          <div><span class="label">File:</span> {$exception.file}</div>
+      {if !empty($log.exception)}
+        <div class="exception">
+          {$exception = $log.exception}
+          <div>{$exception.class}: {$exception.message|escape} in {$exception.file} on line {$exception.line}</div>
+          {if (!empty($exception.trace))}
+            {foreach from=$exception.trace item=traceRow name=traceLoop}
+              <div>{$smarty.foreach.traceLoop.index}. {$traceRow.code} at {$traceRow.file} line {$traceRow.line}</div>
+            {/foreach}
+          {elseif (!empty($exception.traceString))}
+            <div>{$exception.traceString}</div>
+          {/if}
           {if (!empty($exception.metaInfo))}
-            <div><span class="label">MetaInfo:</span>
+            <div><span class="label">Exception meta info:</span>
               <pre>{$exception.metaInfo|@print_r}</pre>
             </div>
           {/if}
-          {if (!empty($exception.trace))}
-            <div><span class="label">Trace:</span>
-              {foreach from=$exception.trace item=traceRow name=traceLoop}
-                <div>{$smarty.foreach.traceLoop.index}. {$traceRow.code} at {$traceRow.file} line {$traceRow.line}</div>
-              {/foreach}
-            </div>
-          {elseif (!empty($exception.traceString))}
-            <div><span class="label">Trace as string:</span> {$exception.traceString}</div>
-          {/if}
-        {/if}
-        <div class="toggleNext">Meta Info</div>
+        </div>
+      {/if}
+
+      {if !empty($log.context)}
+        <div class="toggleNext">Context</div>
         <div class="toggleNext-content">
-          {if (!empty($context.extra))}
-            <div><span class="label">Extra:</span>
-              <pre>{$context.extra|@print_r}</pre>
-            </div>
-          {/if}
-          {if (isset($context.user))}
-            <div><span class="label">User ID:</span> {$context.user.id} <span class="label">name:</span> {$context.user.name}</div>
-          {/if}
-          {if (isset($context.httpRequest))}
-            <div><span class="label">Request:</span> {$context.httpRequest.method} {$context.httpRequest.uri}</div>
-            <div><span class="label">Query:</span>
-              <pre>{$context.httpRequest.query|@print_r}</pre>
-            </div>
-            <div><span class="label">Server:</span>
-              <pre>{$context.httpRequest.server|@print_r}</pre>
-            </div>
-            <div><span class="label">Headers:</span>
-              <pre>{$context.httpRequest.headers|@print_r}</pre>
-            </div>
-            {if (isset($context.httpRequest.clientId))}
-              <div><span class="label">ClientId:</span> {$context.httpRequest.clientId}</div>
-            {/if}
-          {/if}
-          {if (isset($context.computerInfo))}
-            <div>FQDN: {$context.computerInfo.fqdn} PHP Version: {$context.computerInfo.phpVersion}</div>
+          {if (!empty($log.context))}
+            <pre>{print_r($log.context, true)}</pre>
           {/if}
         </div>
       {/if}

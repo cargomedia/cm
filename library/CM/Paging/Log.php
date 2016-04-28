@@ -58,20 +58,35 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
             $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, null, null, [
                 ['$match' => $criteria],
                 ['$group' => [
-                    '_id'   => ['level' => '$level', 'message' => '$message', 'exception' => '$context.exception'],
-                    'count' => ['$sum' => 1]]
+                    '_id'       => ['level' => '$level', 'message' => '$message', 'exception' => '$context.exception'],
+                    'count'     => ['$sum' => 1],
+                    'createdAt' => ['$max' => '$createdAt']],
                 ],
                 ['$sort' => ['count' => -1]],
                 ['$project' => [
-                    'level'             => '$_id.level',
-                    'message'           => '$_id.message',
-                    'context.exception' => '$_id.exception',
-                    'count'             => '$count',
-                    '_id'               => false]
-                ]
+                    'level'     => '$_id.level',
+                    'message'   => '$_id.message',
+                    'exception' => '$_id.exception',
+                    'count'     => '$count',
+                    'createdAt' => '$createdAt',
+                    '_id'       => false],
+                ],
             ]);
         } else {
-            $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, $criteria, null, null, ['_id' => -1]);
+            $aggregate = [
+                ['$match' => $criteria],
+                ['$sort' => ['_id' => -1]],
+                ['$project' => [
+                    'level'             => '$level',
+                    'message'           => '$message',
+                    'exception'         => '$context.exception',
+                    'context'           => '$context',
+                    'count'             => '$count',
+                    'createdAt'         => '$createdAt',
+                    '_id'               => false,
+                ]],
+            ];
+            $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, null, null, $aggregate);
         }
         parent::__construct($source);
     }
