@@ -88,9 +88,11 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
                 $nextLayerIdx = $layerIdx + 1;
                 if ($this->_hasLayer($nextLayerIdx)) {
                     $this->_addRecordToLayer($record, $nextLayerIdx);
+                    $this->_addExceptionListToLayer($exceptionList, $record->getContext(), $nextLayerIdx, $failingHandlers);
                 }
+            } else {
+                $this->_addExceptionListToLayer($exceptionList, $record->getContext(), $layerIdx, $failingHandlers);
             }
-            $this->_addExceptionListToLayer($exceptionList, $record->getContext(), $layerIdx, $failingHandlers);
         }
     }
 
