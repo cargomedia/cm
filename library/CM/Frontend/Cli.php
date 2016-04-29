@@ -1,6 +1,6 @@
 <?php
 
-class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
+class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
 
     public function iconRefresh() {
         /** @var CM_File[] $svgFileList */
@@ -47,6 +47,6 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public static function getPackageName() {
-        return 'css';
+        return 'frontend';
     }
 }
