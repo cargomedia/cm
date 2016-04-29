@@ -13,14 +13,11 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   /** @type PromiseThrottled|Null */
   _loadPageThrottled: promiseThrottler(function(path) {
     var layout = this;
-    console.log('preparing a new request');
     layout._createPagePlaceholder();
     layout._chargeSpinnerTimeout();
 
-    console.log('starting a new request');
     return this.ajaxModal('loadPage', {path: path})
       .finally(function() {
-        console.log('finally cancels the request');
         clearTimeout(layout._timeoutLoading);
       })
       .then(function(response) {
