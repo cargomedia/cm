@@ -42,11 +42,15 @@
     var promise;
 
     return function() {
-      var cancelLeading = options.cancelLeading && promise && promise.isPending() && promise.isCancellable();
+      if (!promise || !promise.isPending()) {
+        promise = fn.apply(this, arguments);
+        return promise;
+      }
+      var cancelLeading = options.cancelLeading;
       if (cancelLeading) {
         promise.cancel();
       }
-      var addToQueue = options.queue && promise && promise.isPending();
+      var addToQueue = options.queue;
       if (cancelLeading || addToQueue) {
         var args = arguments;
         var self = this;
@@ -57,9 +61,6 @@
           });
         });
         return promise;
-      }
-      if (!promise || !promise.isPending()) {
-        promise = fn.apply(this, arguments);
       }
       return promise;
     };
