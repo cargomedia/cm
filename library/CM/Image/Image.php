@@ -5,6 +5,7 @@ class CM_Image_Image {
     const FORMAT_JPEG = 1;
     const FORMAT_GIF = 2;
     const FORMAT_PNG = 3;
+    const FORMAT_SVG = 4;
 
     /** @var Imagick|null */
     private $_imagick;
@@ -13,13 +14,16 @@ class CM_Image_Image {
     private $_animated;
 
     /**
-     * @param string $imageBlob
+     * @param string       $imageBlob
+     * @param Imagick|null $imagick
      * @throws CM_Exception
      */
-    public function __construct($imageBlob) {
+    public function __construct($imageBlob, Imagick $imagick = null) {
         $imageBlob = (string) $imageBlob;
-        try {
+        if (null === $imagick) {
             $imagick = new Imagick();
+        }
+        try {
             $imagick->readImageBlob($imageBlob);
             if ($imagick->getIteratorIndex() > 0) {
                 $this->_animated = true;
@@ -130,6 +134,8 @@ class CM_Image_Image {
                 return self::FORMAT_GIF;
             case'PNG':
                 return self::FORMAT_PNG;
+            case'SVG':
+                return self::FORMAT_SVG;
             default:
                 throw new CM_Exception_Invalid('Unsupported format `' . $imagickFormat . '`.');
         }
@@ -366,5 +372,23 @@ class CM_Image_Image {
             default:
                 throw new CM_Exception_Invalid('Invalid format `' . $format . '`.');
         }
+    }
+
+    /**
+     * @param string    $imageBlob
+     * @param float     $resolutionX
+     * @param float     $resolutionY
+     * @param bool|null $skipXmlHeader
+     * @return CM_Image_Image
+     */
+    public static function createFromSVG($imageBlob, $resolutionX, $resolutionY, $skipXmlHeader = null) {
+        $imageBlob = (string) $imageBlob;
+        if (true !== (bool) $skipXmlHeader) {
+            $imageBlob = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' . $imageBlob;
+        }
+
+        $imagick = new Imagick();
+        $imagick->setResolution((float) $resolutionX, (float) $resolutionY);
+        return new self($imageBlob, $imagick);
     }
 }
