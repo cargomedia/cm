@@ -252,6 +252,45 @@ var CM_App = CM_Class_Abstract.extend({
     return context;
   },
 
+  factory: {
+
+    /**
+     * @param {String|Object} data
+     * @return {Object}
+     */
+    create: function(data) {
+      if (_.isString(data)) {
+        data = JSON.parse(data);
+      }
+      return this._create(data);
+    },
+
+    _create: function(data) {
+      if (this._isCmObject(data)) {
+        return this._toCmObject(data);
+      }
+      if ($.isPlainObject(data)) {
+        _.each(data, function(value, key) {
+          data[key] = this._create(value);
+        }.bind(this));
+      }
+      return data;
+    },
+
+    _isCmObject: function(data) {
+      return data && data['__javascript_encodable__'] && data['_class'];
+    },
+
+    _toCmObject: function(data) {
+      var constructor = data['_class'];
+      if (cm.model.types[constructor]) {
+        return new window[constructor](data['data']);
+      } else {
+        throw new Error('Unexpected encoded class');
+      }
+    }
+  },
+
   promise: {
     ready: function() {
       var promiseConfig = {};
@@ -1061,6 +1100,7 @@ var CM_App = CM_Class_Abstract.extend({
       this._channelDispatchers[channel] = _.clone(Backbone.Events);
       this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(event, data) {
         if (handler._channelDispatchers[channel]) {
+          data = cm.factory.create(data);
           handler._channelDispatchers[channel].trigger(event, data);
           cm.debug.log('Stream channel (' + channel + '): event `' + event + '`: ', data);
         }

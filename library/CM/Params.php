@@ -529,7 +529,11 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
         if ($value instanceof CM_ArrayConvertible) {
             $array = $value->toArray();
             $array = array_map('self::encode', $array);
-            $value = array_merge($array, array('_class' => get_class($value)));
+            if ($value instanceof CM_JavascriptEncodable) {
+                $value = array('_class' => get_class($value), '__javascript_encodable__' => true, 'data' => $array);
+            } else {
+                $value = array_merge($array, array('_class' => get_class($value)));
+            }
         }
         if ($json) {
             if (is_object($value)) {
