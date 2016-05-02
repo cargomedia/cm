@@ -1,0 +1,150 @@
+<?php
+
+class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
+
+    const COLLECTION_NAME = 'cm_log';
+
+    /** @var array|null */
+    protected $_filterLevelList;
+
+    /** @var int|boolean|null */
+    protected $_filterType;
+
+    /** @var int|null */
+    protected $_ageMax;
+
+    /**
+     * @param array            $filterLevelList
+     * @param int|boolean|null $filterType
+     * @param boolean|null     $aggregate
+     * @param int|null         $ageMax
+     * @throws CM_Exception_Invalid
+     */
+    public function __construct(array $filterLevelList = null, $filterType = null, $aggregate = null, $ageMax = null) {
+        if (null !== $filterLevelList) {
+            foreach ($filterLevelList as $level) {
+                $level = (int) $level;
+                if (!CM_Log_Logger::hasLevel($level)) {
+                    throw new CM_Exception_Invalid('Log level `' . $level . '` does not exist.');
+                }
+            }
+        }
+
+        if (null !== $filterType) {
+            if (false !== $filterType) {
+                $filterType = (int) $filterType;
+                $childrenTypeList = \Functional\map(CM_Paging_Log::getClassChildren(), function ($className) {
+                    /** @type CM_Class_Abstract $className */
+                    return $className::getTypeStatic();
+                });
+                if (!in_array($filterType, $childrenTypeList)) {
+                    throw new CM_Exception_Invalid('Type is not a children of CM_Paging_Log.');
+                }
+            }
+        }
+
+        if (null !== $ageMax) {
+            $ageMax = (int) $ageMax;
+        }
+
+        $this->_filterLevelList = $filterLevelList;
+        $this->_filterType = $filterType;
+        $this->_ageMax = $ageMax;
+
+        $criteria = $this->_getCriteria();
+
+        if (true === $aggregate) {
+            $aggregate = [
+                ['$match' => $criteria],
+                ['$group' => [
+                    '_id'       => [
+                        'level'             => '$level',
+                        'message'           => '$message',
+                        'exception_message' => '$context.exception.message',
+                        'exception_class'   => '$context.exception.class',
+                        'exception_line'    => '$context.exception.line',
+                        'exception_file'    => '$context.exception.file',
+                        //stack trace can be different only by 1 line
+                    ],
+                    'count'     => ['$sum' => 1],
+                    'createdAt' => ['$max' => '$createdAt'],
+                    'exception' => ['$last' => '$context.exception']],
+                ],
+                ['$sort' => ['count' => -1]],
+                ['$project' => [
+                    'level'     => '$_id.level',
+                    'message'   => '$_id.message',
+                    'exception' => '$exception',
+                    'count'     => '$count',
+                    'createdAt' => '$createdAt',
+                    '_id'       => false],
+                ],
+            ];
+        } else {
+            $aggregate = [
+                ['$match' => $criteria],
+                ['$sort' => ['_id' => -1]],
+                ['$project' => [
+                    'level'     => '$level',
+                    'message'   => '$message',
+                    'exception' => '$context.exception',
+                    'context'   => '$context',
+                    'count'     => '$count',
+                    'createdAt' => '$createdAt',
+                    '_id'       => false,
+                ]],
+            ];
+        }
+        $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, null, null, $aggregate);
+        parent::__construct($source);
+    }
+
+    public function flush() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $criteria = $this->_getCriteria();
+        $mongoDb->remove(self::COLLECTION_NAME, $criteria);
+        $this->_change();
+    }
+
+    public function cleanUp() {
+        $this->_deleteOlderThan(7 * 86400);
+    }
+
+    /**
+     * @param int $age
+     */
+    protected function _deleteOlderThan($age) {
+        $age = (int) $age;
+        $deleteOlderThan = time() - $age;
+
+        $criteria = $this->_getCriteria();
+        $criteria['createdAt'] = ['$lt' => new MongoDate($deleteOlderThan)];
+
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $mongoDb->remove(self::COLLECTION_NAME, $criteria);
+        $this->_change();
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getCriteria() {
+        $criteria = ['message' => ['$exists' => true]];
+
+        if (false === $this->_filterType) {
+            $criteria['context.extra.type'] = ['$exists' => false];
+        } elseif (null !== $this->_filterType) {
+            $criteria['context.extra.type'] = (int) $this->_filterType;
+        }
+
+        if (null !== $this->_filterLevelList) {
+            $criteria['level'] = ['$in' => $this->_filterLevelList];
+        }
+
+        if (null !== $this->_ageMax) {
+            $criteria['createdAt'] = ['$gt' => new MongoDate(time() - $this->_ageMax)];
+        }
+
+        return $criteria;
+    }
+}

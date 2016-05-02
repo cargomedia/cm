@@ -5,8 +5,8 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
     /** @var  string */
     protected $_collection;
 
-    /** @var int */
-    protected $_recordTtl;
+    /** @var int|null */
+    protected $_recordTtl = null;
 
     /** @var  CM_MongoDb_Client */
     protected $_mongoDb;
@@ -18,20 +18,22 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
      * @param string   $collection
      * @param int|null $recordTtl Time To Live in seconds
      * @param array    $insertOptions
-     * @param int|null $level
+     * @param int|null $minLevel
      * @throws CM_Exception_Invalid
      */
-    public function __construct($collection, $recordTtl = null, array $insertOptions = null, $level = null) {
-        parent::__construct($level);
+    public function __construct($collection, $recordTtl = null, array $insertOptions = null, $minLevel = null) {
+        parent::__construct($minLevel);
         $this->_collection = (string) $collection;
         $this->_mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $this->_recordTtl = null !== $recordTtl ? (int) $recordTtl : 3600 * 24 * 60;
-        $this->_insertOptions = null !== $insertOptions ? $insertOptions : ['w' => 0];
+        if (null !== $recordTtl) {
+            $this->_recordTtl = (int) $recordTtl;
+            if ($this->_recordTtl <= 0) {
+                throw new CM_Exception_Invalid('TTL should be positive value');
+            }
+        };
 
+        $this->_insertOptions = null !== $insertOptions ? $insertOptions : ['w' => 0];
         $this->_validateCollection($this->_collection);
-        if ($this->_recordTtl <= 0) {
-            throw new CM_Exception_Invalid('TTL should be positive value');
-        }
     }
 
     /**
@@ -40,7 +42,6 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
     protected function _writeRecord(CM_Log_Record $record) {
         /** @var array $formattedRecord */
         $formattedRecord = $this->_formatRecord($record);
-
         $this->_mongoDb->insert($this->_collection, $formattedRecord, $this->_insertOptions);
     }
 
@@ -57,8 +58,6 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         $request = $recordContext->getHttpRequest();
 
         $createdAt = $record->getCreatedAt();
-        $expireAt = clone $createdAt;
-        $expireAt->add(new DateInterval('PT' . $this->_recordTtl . 'S'));
 
         $formattedContext = [];
         if (null !== $computerInfo) {
@@ -80,21 +79,42 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             $formattedContext['httpRequest'] = [
                 'method'  => $request->getMethodName(),
                 'uri'     => $request->getUri(),
-                'query'   => $request->getQuery(),
+                'query'   => [],
                 'server'  => $request->getServer(),
                 'headers' => $request->getHeaders(),
             ];
 
+            try {
+                $formattedContext['httpRequest']['query'] = $request->getQuery();
+            } catch (CM_Exception_Invalid $e) {
+                //CM_Http_Request_Post can throw.
+            }
+
+            if ($request instanceof CM_Http_Request_Post) {
+                $formattedContext['httpRequest']['body'] = $request->getBody();
+            }
+
             $formattedContext['httpRequest']['clientId'] = $request->getClientId();
         }
 
-        return [
+        if ($recordContext->getAppContext()->hasException()) {
+            $formattedContext['exception'] = $recordContext->getAppContext()->getSerializableException();
+        }
+
+        $formattedRecord = [
             'level'     => (int) $record->getLevel(),
             'message'   => (string) $record->getMessage(),
             'createdAt' => new MongoDate($createdAt->getTimestamp()),
-            'expireAt'  => new MongoDate($expireAt->getTimestamp()),
             'context'   => $formattedContext,
         ];
+
+        if (null !== $this->_recordTtl) {
+            $expireAt = clone $createdAt;
+            $expireAt->add(new DateInterval('PT' . $this->_recordTtl . 'S'));
+            $formattedRecord['expireAt'] = new MongoDate($expireAt->getTimestamp());
+        }
+
+        return $formattedRecord;
     }
 
     /**
@@ -102,14 +122,15 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
      * @throws CM_Exception_Invalid
      */
     protected function _validateCollection($collection) {
-        $indexInfo = $this->_mongoDb->getIndexInfo($collection);
+        if (null !== $this->_recordTtl) {
+            $indexInfo = $this->_mongoDb->getIndexInfo($collection);
+            $foundIndex = \Functional\some($indexInfo, function ($el) {
+                return isset($el['key']['expireAt']) && isset($el['expireAfterSeconds']) && $el['expireAfterSeconds'] == 0;
+            });
 
-        $foundIndex = \Functional\some($indexInfo, function ($el) {
-            return isset($el['key']['expireAt']) && isset($el['expireAfterSeconds']) && $el['expireAfterSeconds'] == 0;
-        });
-
-        if (!$foundIndex) {
-            throw new CM_Exception_Invalid('MongoDb Collection `' . $collection . '` does not contain valid TTL index');
-        };
+            if (!$foundIndex) {
+                throw new CM_Exception_Invalid('MongoDb Collection `' . $collection . '` does not contain valid TTL index');
+            };
+        }
     }
 }

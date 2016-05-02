@@ -2,192 +2,98 @@
 
 class CM_Log_LoggerTest extends CMTest_TestCase {
 
+    public function testConstructor() {
+        /** @var CM_Log_Context $context */
+        $context = $this->mockClass('CM_Log_Context')->newInstanceWithoutConstructor();
+
+        /** @var CM_Log_Handler_HandlerInterface $handler */
+        $handler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstanceWithoutConstructor();
+
+        $loggerClass = $this->mockClass('CM_Log_Logger');
+        $setHandler = $loggerClass->mockMethod('setHandler');
+        $setContext = $loggerClass->mockMethod('setContext');
+
+        $loggerClass->newInstance([$context, $handler]);
+        $this->assertSame($handler, $setHandler->getCall(0)->getArgument(0));
+        $this->assertSame($context, $setContext->getCall(0)->getArgument(0));
+    }
+
+    public function testSetGetContext() {
+        /** @var CM_Log_Context $context */
+        $context = $this->mockClass('CM_Log_Context')->newInstanceWithoutConstructor();
+
+        $logger = new CM_Log_Logger();
+        $logger->setContext($context);
+        $this->assertSame($context, $logger->getContext());
+    }
+
+    public function testSetGetHandler() {
+        /** @var CM_Log_Handler_HandlerInterface $handler */
+        $handler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstanceWithoutConstructor();
+
+        $logger = new CM_Log_Logger();
+        $logger->setHandler($handler);
+        $this->assertSame($handler, $logger->getHandler());
+    }
+
     public function testAddRecord() {
-        $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
-        $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
+        $handler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstanceWithoutConstructor();
+        $addRecord = $handler->mockMethod('handleRecord');
+        /** @var CM_Log_Handler_HandlerInterface $handler */
 
-        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandler]);
+        /** @var CM_Log_Record $record */
+        $record = $this->mockClass('CM_Log_Record')->newInstanceWithoutConstructor();
 
-        $expectedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context());
-        $mockHandleRecord->set(function (CM_Log_Record $record) use ($expectedRecord) {
-            $this->assertSame($expectedRecord, $record);
-        });
-
-        $this->callProtectedMethod($logger, '_addRecord', [$expectedRecord]);
-        $this->assertSame(1, $mockHandleRecord->getCallCount());
+        $logger = new CM_Log_Logger();
+        $logger->setHandler($handler);
+        $this->callProtectedMethod($logger, '_addRecord', [$record]);
+        $this->assertSame([$record], $addRecord->getCall(0)->getArguments());
     }
 
-    public function testLoggingWithContext() {
-        $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
-        $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
+    public function testAddMessage() {
+        $appContextClass = $this->mockClass('CM_Log_Context_App');
+        $merge = $appContextClass->mockMethod('merge');
+        $loggerContextApp = $appContextClass->newInstance();
+        /** @var CM_Log_Context_App $loggerContextApp */
 
-        // without any context
-        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandler]);
-        $mockHandleRecord->set(function (CM_Log_Record $record) {
-            $context = $record->getContext();
-            $this->assertNull($context->getComputerInfo());
-            $this->assertNull($context->getUser());
-            $this->assertNull($context->getHttpRequest());
-            $this->assertSame([], $context->getExtra());
-        });
-        $logger->addMessage('foo', CM_Log_Logger::INFO);
-        $this->assertSame(1, $mockHandleRecord->getCallCount());
+        $loggerContext = new CM_Log_Context();
+        $loggerContext->setAppContext($loggerContextApp);
 
-        // with a global context
-        $computerInfo = new CM_Log_Context_ComputerInfo('foo.dev', '42.0');
-        $contextGlobal = new CM_Log_Context(null, null, $computerInfo);
-        $logger = new CM_Log_Logger($contextGlobal, [$mockLogHandler], []);
+        $logger = $this->mockObject('CM_Log_Logger');
+        $addRecord = $logger->mockMethod('_addRecord');
+        /** @var CM_Log_Logger $logger */
+        $logger->setContext($loggerContext);
 
-        $mockHandleRecord->set(function (CM_Log_Record $record) use ($computerInfo) {
-            $context = $record->getContext();
-            $this->assertEquals($computerInfo, $context->getComputerInfo());
-            $this->assertNull($context->getUser());
-            $this->assertNull($context->getHttpRequest());
-            $this->assertSame([], $context->getExtra());
-        });
-        $logger->addMessage('foo', CM_Log_Logger::INFO);
-        $this->assertSame(2, $mockHandleRecord->getCallCount());
+        $message = 'message';
+        $level = CM_Log_Logger::DEBUG;
+        $appContext = new CM_Log_Context_App();
 
-        // with a global context + log context
-        $computerInfo = new CM_Log_Context_ComputerInfo('foo.dev', '42.0');
-        $contextGlobal = new CM_Log_Context(null, null, $computerInfo);
-        $logger = new CM_Log_Logger($contextGlobal, [$mockLogHandler], []);
+        $logger->addMessage($message, $level, $appContext);
 
-        $mockHandleRecord->set(function (CM_Log_Record $record) use ($computerInfo) {
-            $context = $record->getContext();
-            $this->assertEquals($computerInfo, $context->getComputerInfo());
-            $this->assertNull($context->getUser());
-            $this->assertNull($context->getHttpRequest());
-            $this->assertSame(['foo' => 10], $context->getExtra());
-        });
-        $logger->addMessage('foo', CM_Log_Logger::INFO, new CM_Log_Context(null, null, null, ['foo' => 10]));
-        $this->assertSame(3, $mockHandleRecord->getCallCount());
+        $this->assertSame([$appContext], $merge->getCall(0)->getArguments());
+        /** @var CM_Log_Record $record */
+        $record = $addRecord->getCall(0)->getArgument(0);
+        $this->assertSame($message, $record->getMessage());
+        $this->assertSame($level, $record->getLevel());
+
+        $this->assertInstanceOf($appContextClass->getClassName(), $record->getContext()->getAppContext());
     }
 
-    public function testLogHelpers() {
-        $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
-        $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
+    public function testLevelHelpers() {
+        $levels = CM_Log_Logger::getLevels();
 
-        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandler]);
+        $logger = $this->mockObject('CM_Log_Logger');
+        $addMessage = $logger->mockMethod('addMessage');
+        /** @var CM_Log_Logger $logger */
 
-        $mockHandleRecord->set(function (CM_Log_Record $record) {
-            $this->assertSame('message sent using debug method', $record->getMessage());
-            $this->assertSame(CM_Log_Logger::DEBUG, $record->getLevel());
-        });
-        $logger->debug('message sent using debug method');
-        $this->assertSame(1, $mockHandleRecord->getCallCount());
+        $message = 'message';
+        $context = new CM_Log_Context_App();
 
-        $mockHandleRecord->set(function (CM_Log_Record $record) {
-            $this->assertSame('message sent using info method', $record->getMessage());
-            $this->assertSame(CM_Log_Logger::INFO, $record->getLevel());
-        });
-        $logger->info('message sent using info method');
-        $this->assertSame(2, $mockHandleRecord->getCallCount());
-
-        $mockHandleRecord->set(function (CM_Log_Record $record) {
-            $this->assertSame('message sent using warning method', $record->getMessage());
-            $this->assertSame(CM_Log_Logger::WARNING, $record->getLevel());
-        });
-        $logger->warning('message sent using warning method');
-        $this->assertSame(3, $mockHandleRecord->getCallCount());
-
-        $mockHandleRecord->set(function (CM_Log_Record $record) {
-            $this->assertSame('message sent using error method', $record->getMessage());
-            $this->assertSame(CM_Log_Logger::ERROR, $record->getLevel());
-        });
-        $logger->error('message sent using error method');
-        $this->assertSame(4, $mockHandleRecord->getCallCount());
-
-        $mockHandleRecord->set(function (CM_Log_Record $record) {
-            $this->assertSame('message sent using critical method', $record->getMessage());
-            $this->assertSame(CM_Log_Logger::CRITICAL, $record->getLevel());
-        });
-        $logger->critical('message sent using critical method');
-        $this->assertSame(5, $mockHandleRecord->getCallCount());
-    }
-
-    public function testHandlingException() {
-        $mockLogHandlerFoo = $this->mockClass('CM_Log_Handler_Abstract')->newInstance();
-        $mockLogHandlerFoo->mockMethod('handleRecord')->set(function () {
-            throw new Exception('exception from foo');
-        });
-
-        $mockLogHandlerBar = $this->mockClass('CM_Log_Handler_Abstract')->newInstance();
-        $mockLogHandlerBar->mockMethod('handleRecord')->set(function () {
-            throw new Exception('exception from bar');
-        });
-
-        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandlerFoo, $mockLogHandlerBar]);
-
-        try {
-            $logger->info('test');
-        } catch (CM_Log_HandlingException $e) {
-            $exceptionList = $e->getExceptionList();
-            $this->assertSame('2 handler(s) failed to process a record.', $e->getMessage());
-            $this->assertSame('exception from foo', $exceptionList[0]->getMessage());
-            $this->assertSame('exception from bar', $exceptionList[1]->getMessage());
-            return;
+        foreach ($levels as $label => $code) {
+            $methodName = strtolower($label);
+            $logger->$methodName($message, $context);
+            $this->assertSame([$message, $code, $context], $addMessage->getLastCall()->getArguments());
         }
-
-        $this->fail('CM_Log_HandlingException exception not caught.');
-    }
-
-    public function testLogException() {
-        $mockLogHandler = $this->mockInterface('CM_Log_Handler_HandlerInterface')->newInstance();
-        $mockHandleRecord = $mockLogHandler->mockMethod('handleRecord');
-
-        $logger = new CM_Log_Logger(new CM_Log_Context(), [$mockLogHandler]);
-
-        $exception = new Exception('foo');
-        $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
-            $recordException = $record->getException();
-            $this->assertSame($exception->getMessage(), $recordException->getMessage());
-            $this->assertSame($exception->getLine(), $recordException->getLine());
-            $this->assertSame($exception->getFile(), $recordException->getFile());
-            $this->assertSame('Exception: foo', $record->getMessage());
-            $this->assertSame(CM_Log_Logger::ERROR, $record->getLevel());
-        });
-        $logger->addException($exception);
-        $this->assertSame(1, $mockHandleRecord->getCallCount());
-
-        $exception = new CM_Exception('bar');
-        $exception->setSeverity(CM_Exception::WARN);
-        $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
-            $recordException = $record->getException();
-            $this->assertSame($exception->getMessage(), $recordException->getMessage());
-            $this->assertSame($exception->getLine(), $recordException->getLine());
-            $this->assertSame($exception->getFile(), $recordException->getFile());
-            $this->assertSame('CM_Exception: bar', $record->getMessage());
-            $this->assertSame(CM_Log_Logger::WARNING, $record->getLevel());
-        });
-        $logger->addException($exception);
-        $this->assertSame(2, $mockHandleRecord->getCallCount());
-
-        $exception = new CM_Exception('foobar');
-        $exception->setSeverity(CM_Exception::ERROR);
-        $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
-            $recordException = $record->getException();
-            $this->assertSame($exception->getMessage(), $recordException->getMessage());
-            $this->assertSame($exception->getLine(), $recordException->getLine());
-            $this->assertSame($exception->getFile(), $recordException->getFile());
-            $this->assertSame('CM_Exception: foobar', $record->getMessage());
-            $this->assertSame(CM_Log_Logger::ERROR, $record->getLevel());
-        });
-        $logger->addException($exception);
-        $this->assertSame(3, $mockHandleRecord->getCallCount());
-
-        $exception = new CM_Exception('test');
-        $exception->setSeverity(CM_Exception::FATAL);
-        $mockHandleRecord->set(function (CM_Log_Record_Exception $record) use ($exception) {
-            $recordException = $record->getException();
-            $this->assertSame($exception->getMessage(), $recordException->getMessage());
-            $this->assertSame($exception->getLine(), $recordException->getLine());
-            $this->assertSame($exception->getFile(), $recordException->getFile());
-            $this->assertSame('CM_Exception: test', $record->getMessage());
-            $this->assertSame(CM_Log_Logger::CRITICAL, $record->getLevel());
-        });
-        $logger->addException($exception);
-        $this->assertSame(4, $mockHandleRecord->getCallCount());
     }
 
     public function testStaticLogLevelMethods() {
@@ -195,13 +101,5 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         $this->assertNotEmpty(CM_Log_Logger::getLevels());
         $this->assertTrue(CM_Log_Logger::hasLevel(CM_Log_Logger::INFO));
         $this->assertFalse(CM_Log_Logger::hasLevel(666));
-    }
-
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage is not defined, use one of
-     */
-    public function testStaticGetLevelNameException() {
-        CM_Log_Logger::getLevelName(666);
     }
 }
