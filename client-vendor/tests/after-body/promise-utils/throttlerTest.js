@@ -53,7 +53,7 @@ define(["after-body/promise-utils/promise-throttler"], function() {
       assert.ok(false);
     });
     throttler('bar').finally(function() {
-      assert.deepEqual(check, ['call:foo', 'finally:foo', 'call:foo', 'resolve:bar', 'finally:bar']);
+      assert.deepEqual(check, ['call:foo', 'finally:foo', 'call:bar', 'resolve:bar', 'finally:bar']);
       done();
     });
   });
