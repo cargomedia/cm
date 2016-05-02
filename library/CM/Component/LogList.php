@@ -9,28 +9,35 @@ class CM_Component_LogList extends CM_Component_Abstract {
     }
 
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
-        $type = $this->_params->getInt('type');
+        $level = $this->_params->has('level') ? $this->_params->getInt('level') : null;
+        $levelList = $level ? [$level] : null;
+        $type = $this->_params->has('type') ? $this->_params->getInt('type') : null;
         $aggregate = $this->_params->has('aggregate') ? $this->_params->getInt('aggregate') : null;
         $urlPage = $this->_params->has('urlPage') ? $this->_params->getString('urlPage') : null;
         $urlParams = $this->_params->has('urlParams') ? $this->_params->getArray('urlParams') : null;
+
 
         $aggregationPeriod = $aggregate;
         if (0 === $aggregationPeriod) {
             $deployStamp = CM_App::getInstance()->getDeployVersion();
             $aggregationPeriod = time() - $deployStamp;
         }
-        $logList = CM_Paging_Log_Abstract::factory($type, (bool) $aggregationPeriod, $aggregationPeriod);
+
+        $logList = new CM_Paging_Log($levelList, $type, (bool) $aggregationPeriod, $aggregationPeriod);
         $logList->setPage($this->_params->getPage(), $this->_params->getInt('count', 50));
 
         $viewResponse->setData([
+            'level'                 => $level,
             'type'                  => $type,
             'logList'               => $logList,
             'aggregate'             => $aggregate,
             'aggregationPeriod'     => $aggregationPeriod,
             'aggregationPeriodList' => array(3600, 86400, 7 * 86400, 31 * 86400),
             'urlPage'               => $urlPage,
-            'urlParams'             => $urlParams
+            'urlParams'             => $urlParams,
+            'levelMap'              => array_flip(CM_Log_Logger::getLevels())
         ]);
+        $viewResponse->getJs()->setProperty('level', $level);
         $viewResponse->getJs()->setProperty('type', $type);
     }
 
@@ -38,8 +45,10 @@ class CM_Component_LogList extends CM_Component_Abstract {
         if (!$this->_getAllowedFlush($response->getRender()->getEnvironment())) {
             throw new CM_Exception_NotAllowed();
         }
-        $type = $params->getInt('type');
-        $logList = CM_Paging_Log_Abstract::factory($type);
+        $level = $params->has('level') ? $params->getInt('level') : null;
+        $levelList = $level ? [$level] : null;
+        $type = $params->has('type') ? $params->getInt('type') : null;
+        $logList = new CM_Paging_Log($levelList, $type);
         $logList->flush();
 
         $response->reloadComponent();

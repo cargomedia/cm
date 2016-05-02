@@ -1,1 +1,1 @@
-node tools/build.js --features "core timers race props"
+node tools/build.js --features "core timers race props each reduce"

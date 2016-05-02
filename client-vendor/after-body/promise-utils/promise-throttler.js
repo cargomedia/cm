@@ -42,19 +42,25 @@
     var promise;
 
     return function() {
-      if (options.cancelLeading && promise && promise.isPending() && promise.isCancellable()) {
-        promise.cancel();
-        promise = null;
-      }
-      if (options.queue && promise && promise.isPending()) {
-        var args = arguments;
-        var self = this;
-        promise = promise.finally(function() {
-          return fn.apply(self, args);
-        });
-      }
       if (!promise || !promise.isPending()) {
         promise = fn.apply(this, arguments);
+        return promise;
+      }
+      var cancelLeading = options.cancelLeading;
+      if (cancelLeading) {
+        promise.cancel();
+      }
+      var addToQueue = options.queue;
+      if (cancelLeading || addToQueue) {
+        var args = arguments;
+        var self = this;
+        var leadingPromise = promise;
+        promise = new Promise(function(resolve) {
+          leadingPromise.finally(function() {
+            resolve(fn.apply(self, args));
+          });
+        });
+        return promise;
       }
       return promise;
     };

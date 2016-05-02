@@ -2,23 +2,22 @@
 
 class CM_Log_HandlingException extends CM_Exception {
 
-    /** @var  Exception[] */
-    private $_exceptionList;
+    /** @var Exception */
+    private $_originalException;
 
     /**
-     * @param string|null $message
-     * @param Exception[] $exceptionList
+     * @param string $message
+     * @param Exception   $originalException
      */
-    public function __construct($message = null, array $exceptionList) {
-        $message = (string) $message;
-        $this->_exceptionList = $exceptionList;
-        parent::__construct((string) $message, CM_Exception::ERROR);
+    public function __construct($message, Exception $originalException) {
+        $this->_originalException = $originalException;
+        parent::__construct($message, CM_Exception::ERROR);
     }
 
     /**
-     * @return Exception[]
+     * @return Exception
      */
-    public function getExceptionList() {
-        return $this->_exceptionList;
+    public function getOriginalException() {
+        return $this->_originalException;
     }
 }

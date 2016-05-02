@@ -44,6 +44,9 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     abstract protected function _process();
 
     public function process() {
+        $this->getServiceManager()->getLogger()->getContext()->getAppContext()->setUserWithClosure(function () {
+            return $this->getViewer();
+        });
         $this->_process();
 
         if ($this->getRequest()->hasSession()) {
@@ -64,7 +67,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
         }
 
         $name = $this->_getStringRepresentation();
-        CM_Service_Manager::getInstance()->getNewrelic()->setNameTransaction($name);
+        $this->getServiceManager()->getNewrelic()->setNameTransaction($name);
     }
 
     /**
@@ -87,7 +90,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      * @throws CM_Exception_AuthRequired
      */
     public function getViewer($needed = false) {
-        return $this->_request->getViewer($needed);
+        return $this->getRequest()->getViewer($needed);
     }
 
     /**
@@ -252,8 +255,8 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     }
 
     /**
-     * @param callable $regularCode
-     * @param callable $errorCode
+     * @param Closure $regularCode
+     * @param Closure $errorCode
      * @return mixed
      * @throws CM_Exception
      */
@@ -268,13 +271,12 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
                 return is_a($ex, $exceptionClass);
             });
             $catchException = null !== $errorOptions;
-            if ($catchException) {
-                if (isset($errorOptions['log'])) {
-                    $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
-                    /** @var CM_Paging_Log_Abstract $log */
-                    $log = new $errorOptions['log']();
-                    $log->add($formatter->formatException($ex), $ex->getMetaInfo());
+            if ($catchException && isset($errorOptions['log']) && true === $errorOptions['log']) {
+                $logLevel = isset($errorOptions['level']) ? $errorOptions['level'] : null;
+                if (null === $logLevel) {
+                    $logLevel = CM_Log_Logger::exceptionSeverityToLevel($ex);
                 }
+                $this->getServiceManager()->getLogger()->addMessage('HTML response error', $logLevel, new CM_Log_Context_App(null, $this->getViewer(), $ex));
             }
             if (!$catchException && ($catchPublicExceptions && $ex->isPublic())) {
                 $errorOptions = [];

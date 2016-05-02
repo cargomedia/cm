@@ -312,7 +312,15 @@ var CM_App = CM_Class_Abstract.extend({
     ready: function() {
       $(window).on('unhandledrejection', function(e) {
         e.preventDefault();
-        var error = e.originalEvent.detail.reason;
+        var event = e.originalEvent;
+        var error = null;
+        if (event.detail && event.detail.reason) {
+          error = event.detail.reason;
+        } else if (event.reason) {
+          error = event.reason;
+        } else {
+          error = new Error('Unhandled promise rejection without reason.');
+        }
         if (!(error instanceof Promise.CancellationError)) {
           cm.error._globalHandler(error);
         }

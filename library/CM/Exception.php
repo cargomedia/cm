@@ -76,24 +76,6 @@ class CM_Exception extends Exception {
     }
 
     /**
-     * @return CM_Paging_Log_Error|CM_Paging_Log_Fatal|CM_Paging_Log_Warn
-     */
-    public function getLog() {
-        switch ($this->getSeverity()) {
-            case self::WARN:
-                return new CM_Paging_Log_Warn();
-                break;
-            case self::ERROR:
-                return new CM_Paging_Log_Error();
-                break;
-            case self::FATAL:
-            default:
-                return new CM_Paging_Log_Fatal();
-                break;
-        }
-    }
-
-    /**
      * @param CM_I18n_Phrase $messagePublic
      */
     private function _setMessagePublic(CM_I18n_Phrase $messagePublic) {

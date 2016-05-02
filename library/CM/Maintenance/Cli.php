@@ -99,12 +99,14 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_Action_Abstract::deleteTransgressionsOlder' => function () {
                 CM_Action_Abstract::deleteTransgressionsOlder(3 * 31 * 86400);
             },
-            'CM_Paging_Log_Abstract::cleanup'               => function () {
-                foreach (CM_Paging_Log_Abstract::getClassChildren() as $logClass) {
-                    /** @var CM_Paging_Log_Abstract $log */
-                    $log = new $logClass();
+            'CM_Paging_Log::cleanup'                        => function () {
+                $allLevelsList = array_values(CM_Log_Logger::getLevels());
+                foreach (CM_Paging_Log::getClassChildren() as $pagingLogClass) {
+                    /** @type CM_Paging_Log $log */
+                    $log = new $pagingLogClass($allLevelsList);
                     $log->cleanUp();
                 }
+                (new CM_Paging_Log($allLevelsList, false))->cleanUp(); //deletes all untyped records
             },
         ));
         if ($this->getServiceManager()->has('maxmind')) {
