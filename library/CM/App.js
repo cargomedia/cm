@@ -267,6 +267,7 @@ var CM_App = CM_Class_Abstract.extend({
 
     _create: function(data) {
       if (this._isCmObject(data)) {
+        data['data'] = this._create(data['data']);
         return this._toCmObject(data);
       }
       if ($.isPlainObject(data)) {
