@@ -37,7 +37,9 @@ before_script:
   - cp tests/travis/config.php resources/config/local.php
   - bin/cm app set-deploy-version
 
-script: bin/phpunit
+script:
+  - bin/phpunit
+  - bin/qunit
 
 sudo: false
 

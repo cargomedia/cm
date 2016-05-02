@@ -1,3 +1,5 @@
+QUnit.config.autostart = false;
+
 define('bootstrap', function(require) {
 
   var Bootstrapper = function() {
@@ -69,29 +71,18 @@ define('bootstrap', function(require) {
     run: function() {
       var suitePaths = this._suitePaths;
       require(suitePaths, function() {
-        var index = 0;
+        var suitesLoaded = 0;
         var suites = Array.prototype.slice.call(arguments);
-
-        var runTest = function(suite) {
-          if (!suite) {
-            return;
-          }
-
-          var count = 0;
-          var total = suite.modules.length;
-
-          QUnit.moduleDone(function() {
-            if (++count == total) {
-              runTest(suites[++index]);
-            }
-          });
+        suites.forEach(function(suite) {
           requirejs.config(suite.config);
           require(suite.dependencies || [], function() {
-            require(suite.modules);
+            require(suite.modules, function() {
+              if (++suitesLoaded == suites.length) {
+                QUnit.start();
+              }
+            });
           });
-        };
-
-        runTest(suites[index]);
+        });
       });
     }
   };

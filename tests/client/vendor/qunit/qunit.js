@@ -2281,7 +2281,6 @@
   var urlParams = getUrlParams();
 
   QUnit.urlParams = urlParams;
-  console.log(QUnit.urlParams);
 
   // Match module/test by inclusion in an array
   QUnit.config.moduleId = [].concat(urlParams.moduleId || []);
