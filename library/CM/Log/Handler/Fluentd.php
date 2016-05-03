@@ -52,8 +52,8 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
                 'phpVersion' => $computerInfo->getPhpVersion(),
             ];
         }
-        $request = $context->getHttpRequest();
 
+        $request = $context->getHttpRequest();
         if (null !== $request) {
             $serverArray = $request->getServer();
             $formattedRequest = [
@@ -72,14 +72,14 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
             $formattedRecord['request'] = $formattedRequest;
         }
 
-        $extraAttributes = [];
+        $appAttributes = $context->getExtra();
         if ($user = $context->getUser()) {
-            $extraAttributes['user'] = $user->getId();
+            $appAttributes['user'] = $user->getId();
         }
         if (null !== $request) {
-            $extraAttributes['clientId'] = $request->getClientId();
+            $appAttributes['clientId'] = $request->getClientId();
         }
-        $formattedRecord[$this->_appName] = array_merge($extraAttributes, $context->getExtra());
+        $formattedRecord[$this->_appName] = $appAttributes;
 
         if ($context->getAppContext()->hasException()) {
             $exception = $context->getAppContext()->getSerializableException();
