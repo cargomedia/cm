@@ -27,8 +27,9 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         );
         $clientId = $httpRequest->getClientId();
         $computerInfo = new CM_Log_Context_ComputerInfo('www.example.com', 'v7.0.1');
+        $exception = new CM_Exception_Invalid('Bad');
 
-        $appContext = new CM_Log_Context_App(['bar' => 'baz', 'baz' => 'quux'], $user);
+        $appContext = new CM_Log_Context_App(['bar' => 'baz', 'baz' => 'quux'], $user, $exception);
         $record = new CM_Log_Record($level, $message, new CM_Log_Context($httpRequest, $computerInfo, $appContext));
 
         $handler = new CM_Log_Handler_Fluentd('localhost', 25555, 'tag', 'appName');
@@ -49,14 +50,10 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $this->assertSame('baz', $formattedRecord['appName']['bar']);
         $this->assertSame('quux', $formattedRecord['appName']['baz']);
 
-        $exception = new CM_Exception_Invalid('Bad');
-        $recordWithException = new CM_Log_Record_Exception($level, new CM_Log_Context($httpRequest, $computerInfo, $appContext), $exception);
-        $formattedRecord = $this->callProtectedMethod($handler, '_formatRecord', [$recordWithException]);
-
-        $this->assertSame($recordWithException->getMessage(), $formattedRecord['message']);
         $this->assertSame('CM_Exception_Invalid', $formattedRecord['exception']['type']);
         $this->assertSame('Bad', $formattedRecord['exception']['message']);
         $this->assertArrayHasKey('stack', $formattedRecord['exception']);
         $this->assertInternalType('string', $formattedRecord['exception']['stack']);
+        $this->assertRegExp('/CM_Log_Handler_FluentdTest->testFormatting\(\)/', $formattedRecord['exception']['stack']);
     }
 }

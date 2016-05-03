@@ -29,7 +29,6 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
      * @param CM_Log_Record $record
      */
     protected function _writeRecord(CM_Log_Record $record) {
-        /** @var array $formattedRecord */
         $formattedRecord = $this->_formatRecord($record);
         $this->_fluentLogger->post($this->_tag, $formattedRecord);
     }
@@ -82,8 +81,8 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
         }
         $formattedRecord[$this->_appName] = array_merge($extraAttributes, $context->getExtra());
 
-        if ($record instanceof CM_Log_Record_Exception) {
-            $exception = $record->getSerializableException();
+        if ($context->getAppContext()->hasException()) {
+            $exception = $context->getAppContext()->getSerializableException();
             $formattedRecord['exception'] = [
                 'type'    => $exception->getClass(),
                 'message' => $exception->getMessage(),
