@@ -71,18 +71,25 @@ define('bootstrap', function(require) {
     run: function() {
       var suitePaths = this._suitePaths;
       require(suitePaths, function() {
-        var suitesLoaded = 0;
+        var index = 0;
         var suites = Array.prototype.slice.call(arguments);
-        suites.forEach(function(suite) {
-          requirejs.config(suite.config);
+        var loadCurrentSuite = function() {
+          if (index < suites.length) {
+            loadSuite(suites[index]);
+          } else {
+            QUnit.start();
+          }
+        };
+        var loadSuite = function(suite) {
+          requirejs.config(suite.config || {});
           require(suite.dependencies || [], function() {
-            require(suite.modules, function() {
-              if (++suitesLoaded == suites.length) {
-                QUnit.start();
-              }
+            require(suite.modules || [], function() {
+              index++;
+              loadCurrentSuite();
             });
           });
-        });
+        };
+        loadCurrentSuite();
       });
     }
   };

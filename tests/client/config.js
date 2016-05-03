@@ -1,5 +1,6 @@
 module.exports = {
   suites: [
-    'client-vendor/tests/suite.js'
+    'tests/client/suites/after-body.js',
+    'tests/client/suites/after-body-source.js'
   ]
 };
