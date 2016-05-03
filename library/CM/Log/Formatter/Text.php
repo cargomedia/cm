@@ -40,25 +40,11 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
             }
             $data['extra'] = implode(', ', $extraText);
         }
-
-        return empty($data) ? null : $this->_formatArrayToLines(' - %s: %s', $data);
-    }
-
-    public function renderException(CM_Log_Record_Exception $record) {
-        $exception = $record->getSerializableException();
-
-        $traceData = [];
-        $traceCount = 0;
-        foreach ($exception->getTrace() as $trace) {
-            $traceData[] = sprintf('     %02d. %s %s:%s', $traceCount++, $trace['code'], $trace['file'], $trace['line']);
+        if ($record->getContext()->getAppContext()->hasException()) {
+            $data['exception'] = $this->_renderException($record->getContext()->getAppContext()->getSerializableException());
         }
-        $traceText = implode(PHP_EOL, $traceData);
-
-        return ' - exception:' . PHP_EOL . $this->_formatArrayToLines('   - %s: %s', [
-            'message'    => $exception->getMessage(),
-            'type'       => $exception->getClass(),
-            'stacktrace' => PHP_EOL . $traceText,
-        ]);
+        $output = empty($data) ? null : $this->_formatArrayToLines(' - %s: %s', $data);
+        return $output;
     }
 
     /**
@@ -73,6 +59,25 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
             $dataText[] = sprintf($format, $key, $value);
         }
         return implode(PHP_EOL, $dataText);
+    }
+
+    /**
+     * @param CM_ExceptionHandling_SerializableException $exception
+     * @return string
+     */
+    protected function _renderException(CM_ExceptionHandling_SerializableException $exception) {
+        $traceData = [];
+        $traceCount = 0;
+        foreach ($exception->getTrace() as $trace) {
+            $traceData[] = sprintf('     %02d. %s %s:%s', $traceCount++, $trace['code'], $trace['file'], $trace['line']);
+        }
+        $traceText = implode(PHP_EOL, $traceData);
+
+        return PHP_EOL . $this->_formatArrayToLines('   - %s: %s', [
+            'message'    => $exception->getMessage(),
+            'type'       => $exception->getClass(),
+            'stacktrace' => PHP_EOL . $traceText,
+        ]);
     }
 
     protected function _getDefaults() {

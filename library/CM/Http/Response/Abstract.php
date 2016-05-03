@@ -274,10 +274,9 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
             if ($catchException && isset($errorOptions['log']) && true === $errorOptions['log']) {
                 $logLevel = isset($errorOptions['level']) ? $errorOptions['level'] : null;
                 if (null === $logLevel) {
-                    $logLevel = CM_Log_Record_Exception::exceptionSeverityToLevel($ex);
+                    $logLevel = CM_Log_Logger::exceptionSeverityToLevel($ex);
                 }
-
-                $this->getServiceManager()->getLogger()->addException($ex, $logLevel, new CM_Log_Context_App(null, $this->getViewer()));
+                $this->getServiceManager()->getLogger()->addMessage('HTML response error', $logLevel, new CM_Log_Context_App(null, $this->getViewer(), $ex));
             }
             if (!$catchException && ($catchPublicExceptions && $ex->isPublic())) {
                 $errorOptions = [];

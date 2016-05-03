@@ -93,20 +93,6 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param Exception               $exception
-     * @param int                     $level
-     * @param CM_Log_Context_App|null $appContext
-     * @return CM_Log_Logger
-     */
-    public function addException(Exception $exception, $level, CM_Log_Context_App $appContext = null) {
-        $context = clone $this->_context;
-        if ($appContext) {
-            $context->getAppContext()->merge($appContext);
-        }
-        return $this->_addRecord(new CM_Log_Record_Exception($level, $context, $exception));
-    }
-
-    /**
      * @param string                  $message
      * @param CM_Log_Context_App|null $context
      * @return CM_Log_Logger
@@ -191,5 +177,19 @@ class CM_Log_Logger {
     public static function hasLevel($level) {
         $level = (int) $level;
         return isset(self::$_levels[$level]);
+    }
+
+    /**
+     * @param Exception $exception
+     * @return int
+     */
+    public static function exceptionSeverityToLevel(Exception $exception) {
+        $severity = $exception instanceof CM_Exception ? $exception->getSeverity() : null;
+        $map = [
+            CM_Exception::WARN  => CM_Log_Logger::WARNING,
+            CM_Exception::ERROR => CM_Log_Logger::ERROR,
+            CM_Exception::FATAL => CM_Log_Logger::CRITICAL,
+        ];
+        return isset($map[$severity]) ? $map[$severity] : CM_Log_Logger::ERROR;
     }
 }

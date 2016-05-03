@@ -36,6 +36,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
             $this->_set('variables', $variablesEncoded);
 
             $this->_increaseUpdateCount();
+            $this->_changeContainingCacheables();
             if ($this->_getUpdateCount() > self::MAX_UPDATE_COUNT) {
                 $message = [
                     'Variables for languageKey `' . $this->getName() . '` have been updated over ' . self::MAX_UPDATE_COUNT . ' times since release.',
@@ -97,6 +98,13 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
 
     protected function _onDeleteBefore() {
         CM_Db_Db::delete('cm_languageValue', array('languageKeyId' => $this->getId()));
+    }
+
+    protected function _getContainingCacheables() {
+        $languages = new CM_Paging_Language_All();
+        return array_flatten(\Functional\map($languages, function (CM_Model_Language $language) {
+            return [$language->getTranslations(false), $language->getTranslations(true)];
+        }));
     }
 
     protected function _changeContainingCacheables() {

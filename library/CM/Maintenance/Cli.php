@@ -106,7 +106,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                     $log = new $pagingLogClass($allLevelsList);
                     $log->cleanUp();
                 }
-                (new CM_Paging_Log($allLevelsList))->cleanUp(); //deletes all untyped records
+                (new CM_Paging_Log($allLevelsList, false))->cleanUp(); //deletes all untyped records
             },
         ));
         if ($this->getServiceManager()->has('maxmind')) {

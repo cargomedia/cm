@@ -40,6 +40,34 @@ EOD;
         $this->assertEquals(trim($expected), $css->get());
     }
 
+    public function testImageInline() {
+        $render = new CM_Frontend_Render();
+        $css = new CM_Asset_Css($render, "body { background: image-inline('logo.png') no-repeat 200px 95px; }");
+
+        $encodedImageBeginning = preg_quote('R0lGODlhyABfAPEAADw8Oz+0/wAAAAAAACH5BAEAAAIALAAAAADIAF8AAAL+lI+py+0Po5y02ouz3rz7D4biSJbmiabqyrbuC', '/');
+        $encodedImageEnding = preg_quote('mW6WCddrhkk7dyWqiqbFLZIp7gwohcZpM9OKhd6q7LbrvuvgtvvPLOS68tBQAAOw==', '/');
+        $expectedRegex = <<<EOD
+/^body {
+  background: url\('data\:image\/gif;base64,$encodedImageBeginning.+?$encodedImageEnding'\) no-repeat 200px 95px;
+}$/
+EOD;
+        $this->assertRegExp($expectedRegex, $css->get());
+    }
+
+    public function testImageInlineResize() {
+        $render = new CM_Frontend_Render();
+        $css = new CM_Asset_Css($render, "body { background: image-inline('logo.png', 100) no-repeat 100px 47px; }");
+
+        $encodedImageBeginning = preg_quote('R0lGODlhZAAvAPEAADw8Oz+0/wAAAAAAACH5BAEAAAIALAAAAABkAC8AAAL+lI+py+0Po5y02ouz3rz7D4ZKEIxlQorqRbZHm', '/');
+        $encodedImageEnding = preg_quote('GQMJEuI8fSVFnoSWUuOxdjD3Sctm8107iMx8bnugkILCpErXrbOoK6rUqVQ9FQAAOw==', '/');
+        $expectedRegex = <<<EOD
+/^body {
+  background: url\('data\:image\/gif;base64,$encodedImageBeginning.+?$encodedImageEnding'\) no-repeat 100px 47px;
+}$/
+EOD;
+        $this->assertRegExp($expectedRegex, $css->get());
+    }
+
     public function testBackgroundImage() {
         $render = new CM_Frontend_Render();
         $css = new CM_Asset_Css($render, "body { background-image: image('icon/mailbox_read.png'); }");

@@ -33,6 +33,7 @@ class CM_Log_Handler_Factory implements CM_Service_ManagerAwareInterface {
 
         $filesystem = $this->getServiceManager()->getFilesystems()->getData();
         $file = new CM_File($path, $filesystem);
+        $file->ensureParentDirectory();
         $stream = new CM_OutputStream_File($file);
         $formatter = new CM_Log_Formatter_Text($formatMessage, $formatDate);
         return $this->_createStreamHandler($stream, $formatter, $minLevel);

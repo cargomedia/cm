@@ -50,12 +50,10 @@ class CM_Log_Formatter_TextTest extends CMTest_TestCase {
     }
 
     public function testFormattingWithException() {
-        $exception = new Exception('foo');
-        $record = new CM_Log_Record_Exception(CM_Log_Logger::ERROR, new CM_Log_Context(), $exception);
+        $exception = new CM_ExceptionHandling_SerializableException(new Exception('foo'));
         $formatter = new CM_Log_Formatter_Text();
-        $messageLines = explode(PHP_EOL, $formatter->renderException($record));
-
-        $this->assertSame(' - exception:', $messageLines[0]);
+        $messageLines = explode(PHP_EOL, $this->callProtectedMethod($formatter, '_renderException', [$exception]));
+        $this->assertSame('', $messageLines[0]);
         $this->assertSame('   - message: foo', $messageLines[1]);
         $this->assertSame('   - type: Exception', $messageLines[2]);
         $this->assertSame('   - stacktrace: ', $messageLines[3]);
