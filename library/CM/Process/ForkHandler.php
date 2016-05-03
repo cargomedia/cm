@@ -87,7 +87,7 @@ class CM_Process_ForkHandler {
      * @return CM_Process_WorkloadResult
      */
     public function receiveWorkloadResult() {
-        $ipcData = fgets($this->_ipcStream);
+        $ipcData = stream_get_contents($this->_ipcStream);
         if (false === $ipcData) {
             return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception('Received no data from IPC stream.'));
         }
