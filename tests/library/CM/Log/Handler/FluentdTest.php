@@ -67,7 +67,9 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
             }
         );
         $handler = $this->mockClass('CM_Log_Handler_Fluentd')->newInstance(['localhost', 24555, 'tag', 'CM']);
-        $handler->mockMethod('_getFluentd')->set($fluentdApiMock);
+        $handler->mockMethod('_getFluentd')->set(function () use ($fluentdApiMock) {
+            return $fluentdApiMock;
+        });
 
         $record = new CM_Log_Record(CM_Log_Logger::CRITICAL, 'foo', new CM_Log_Context());
         $this->callProtectedMethod($handler, '_writeRecord', [$record]);
