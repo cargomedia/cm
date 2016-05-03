@@ -7,7 +7,8 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
     }
 
     public function testConstructor() {
-        $handler = new CM_Log_Handler_Fluentd('localhost', 12223, 'tag', 'appName');
+        $fluentd = $this->mockClass('\Fluent\Logger\FluentLogger')->newInstanceWithoutConstructor();
+        $handler = new CM_Log_Handler_Fluentd($fluentd, 'tag', 'appName');
         $this->assertInstanceOf('CM_Log_Handler_Fluentd', $handler);
     }
 
@@ -32,7 +33,9 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $appContext = new CM_Log_Context_App(['bar' => 'baz', 'baz' => 'quux'], $user, $exception);
         $record = new CM_Log_Record($level, $message, new CM_Log_Context($httpRequest, $computerInfo, $appContext));
 
-        $handler = new CM_Log_Handler_Fluentd('localhost', 25555, 'tag', 'appName');
+        /** @var \Fluent\Logger\FluentLogger $fluentd */
+        $fluentd = $this->mockClass('\Fluent\Logger\FluentLogger')->newInstanceWithoutConstructor();
+        $handler = new CM_Log_Handler_Fluentd($fluentd, 'tag', 'appName');
         $formattedRecord = $this->callProtectedMethod($handler, '_formatRecord', [$record]);
 
         $this->assertSame($message, $formattedRecord['message']);
@@ -58,18 +61,17 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
     }
 
     public function testWriteRecord() {
-        $fluentdApiMock = $this->mockClass('\Fluent\Logger\FluentLogger')->newInstanceWithoutConstructor();
-        $postMock = $fluentdApiMock->mockMethod('post')->set(
+        $fluentd = $this->mockClass('\Fluent\Logger\FluentLogger')->newInstanceWithoutConstructor();
+        $postMock = $fluentd->mockMethod('post')->set(
             function ($tag, array $data) {
                 $this->assertSame('tag', $tag);
                 $this->assertSame('critical', $data['level']);
                 $this->assertSame('foo', $data['message']);
             }
         );
-        $handler = $this->mockClass('CM_Log_Handler_Fluentd')->newInstance(['localhost', 24555, 'tag', 'CM']);
-        $handler->mockMethod('_getFluentd')->set(function () use ($fluentdApiMock) {
-            return $fluentdApiMock;
-        });
+        /** @var \Fluent\Logger\FluentLogger $fluentd */
+
+        $handler = new CM_Log_Handler_Fluentd($fluentd, 'tag', 'CM');
 
         $record = new CM_Log_Record(CM_Log_Logger::CRITICAL, 'foo', new CM_Log_Context());
         $this->callProtectedMethod($handler, '_writeRecord', [$record]);

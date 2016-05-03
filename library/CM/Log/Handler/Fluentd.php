@@ -1,9 +1,11 @@
 <?php
 
+use Fluent\Logger\FluentLogger;
+
 class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
 
     /** @var \Fluent\Logger\FluentLogger */
-    protected $_fluentLogger;
+    protected $_fluentdLogger;
 
     /** @var string */
     protected $_tag;
@@ -12,15 +14,14 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
     protected $_appName;
 
     /**
-     * @param string   $server
-     * @param int      $port
-     * @param string   $tag
-     * @param string   $appName
-     * @param int|null $minLevel
+     * @param FluentLogger $fluentdLogger
+     * @param string       $tag
+     * @param string       $appName
+     * @param int|null     $minLevel
      */
-    public function __construct($server, $port, $tag, $appName, $minLevel = null) {
+    public function __construct(FluentLogger $fluentdLogger, $tag, $appName, $minLevel = null) {
         parent::__construct($minLevel);
-        $this->_fluentLogger = new Fluent\Logger\FluentLogger((string) $server, (int) $port);
+        $this->_fluentdLogger = $fluentdLogger;
         $this->_tag = (string) $tag;
         $this->_appName = (string) $appName;
     }
@@ -29,7 +30,7 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
      * @return \Fluent\Logger\FluentLogger
      */
     protected function _getFluentd() {
-        return $this->_fluentLogger;
+        return $this->_fluentdLogger;
     }
 
     /**
