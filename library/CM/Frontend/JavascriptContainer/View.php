@@ -11,7 +11,7 @@ class CM_Frontend_JavascriptContainer_View extends CM_Frontend_JavascriptContain
     }
 
     public function setObjectProperty($name, $value) {
-        $this->append("this.{$name} = cm.factory.create(" . CM_Params::encode($value, true) . ');');
+        $this->append("this.{$name} = cm.factory.create(" . CM_Util::jsonEncode(CM_Params::encodeJavascript($value)) . ');');
     }
 
     /**

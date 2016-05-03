@@ -529,17 +529,34 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
         if ($value instanceof CM_ArrayConvertible) {
             $array = $value->toArray();
             $array = array_map('self::encode', $array);
-            if ($value instanceof CM_JavascriptEncodable) {
-                $value = array('_class' => get_class($value), '__javascript_encodable__' => true, 'data' => $array);
-            } else {
-                $value = array_merge($array, array('_class' => get_class($value)));
-            }
+            $value = array_merge($array, array('_class' => get_class($value)));
         }
         if ($json) {
             if (is_object($value)) {
                 $value = 'null';
             } else {
                 $value = self::jsonEncode($value);
+            }
+        }
+        return $value;
+    }
+
+    /**
+     * @param mixed $value
+     * @throws CM_Exception_Invalid
+     * @return string
+     */
+    public static function encodeJavascript($value) {
+        if (is_array($value)) {
+            $value = array_map('self::encodeJavascript', $value);
+        }
+        if ($value instanceof CM_ArrayConvertible) {
+            $array = $value->toArray();
+            $array = array_map('self::encodeJavascript', $array);
+            if ($value instanceof CM_JavascriptEncodable) {
+                $value = array('_class' => get_class($value), '__javascript_encodable__' => true, 'data' => $array);
+            } else {
+                $value = array_merge($array, array('_class' => get_class($value)));
             }
         }
         return $value;
