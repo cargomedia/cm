@@ -270,7 +270,7 @@ var CM_App = CM_Class_Abstract.extend({
         data['data'] = this._create(data['data']);
         return this._toCmObject(data);
       }
-      if ($.isPlainObject(data)) {
+      if ($.isPlainObject(data) || _.isArray(data)) {
         _.each(data, function(value, key) {
           data[key] = this._create(value);
         }.bind(this));
