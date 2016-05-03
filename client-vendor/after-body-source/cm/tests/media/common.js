@@ -133,9 +133,10 @@ define(["cm/tests/media/common"], function() {
           el.addEventListener('seeked', function() {
             seeked++;
           });
-          return media._getPromisePlaying();
+          return media
+            ._getPromisePlaying()
+            .timeout(1500);
         })
-        .timeout(1100)
         .catch(function(reason) {
           error = reason;
         })
@@ -171,9 +172,8 @@ define(["cm/tests/media/common"], function() {
               reject(new Error('media seek in loop:false mode.'));
             });
             el.addEventListener('ended', resolve);
-          })
+          }).timeout(1500)
         })
-        .timeout(1100)
         .catch(function(reason) {
           error = reason;
         })
