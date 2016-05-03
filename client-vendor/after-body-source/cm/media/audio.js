@@ -6,13 +6,9 @@ var Media = require('../media');
  */
 var Audio = Media.extend({
 
-  /**
-   * @param {HTMLAudioElement} audio
-   */
-  constructor: function(audio) {
+  constructor: function(audio, options) {
     audio = audio || document.createElement('audio');
-    Media.call(this, audio);
-    this.getElement().autoplay = true;
+    Media.call(this, audio, options);
   }
 });
 

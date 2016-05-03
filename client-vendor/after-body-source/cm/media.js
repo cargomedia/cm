@@ -8,14 +8,23 @@ var Media = Event.extend({
 
   /**
    * @param {HTMLMediaElement} element
+   * @param {Object} [options]
+   * @param {Boolean} [options.loop=false]
+   * @param {Boolean} [options.autoplay=false]
+   * @param {String} [options.crossOrigin='anonymous']
    */
-  constructor: function(element) {
+  constructor: function(element, options) {
     this._element = element;
+    this._options = _.defaults(options || {}, {
+      loop: false,
+      autoplay: false,
+      crossOrigin: 'anonymous'
+    });
+
     this._$element = $(element);
     this._isPlaying = false;
 
-    this.getElement().crossOrigin = 'anonymous';
-
+    this.setOptions();
     this._setPromiseLoaded();
     this._bindElementEvents();
   },
@@ -25,6 +34,18 @@ var Media = Event.extend({
    */
   getElement: function() {
     return this._element;
+  },
+
+  /**
+   * @param {Object} [options]
+   */
+  setOptions: function(options) {
+    var element = this.getElement();
+    _.chain(this._options)
+      .extend(options || {})
+      .each(function(value, name) {
+        element[name] = value;
+      });
   },
 
   /**

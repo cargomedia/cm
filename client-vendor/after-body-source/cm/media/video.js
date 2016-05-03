@@ -6,13 +6,9 @@ var Media = require('../media');
  */
 var Video = Media.extend({
 
-  /**
-   * @param {HTMLVideoElement} video
-   */
-  constructor: function Video(video) {
+  constructor: function Video(video, options) {
     video = video || document.createElement('video');
-    Media.call(this, video);
-    this.getElement().loop = true;
+    Media.call(this, video, options);
   }
 });
 
