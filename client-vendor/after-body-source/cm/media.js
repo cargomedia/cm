@@ -22,6 +22,7 @@ var Media = Event.extend({
     });
 
     this._$element = $(element);
+    this._sources = [];
     this._isPlaying = false;
 
     this.setOptions();
@@ -91,8 +92,24 @@ var Media = Event.extend({
    */
   attachStream: function(stream) {
     this._setPromiseLoaded();
-    attachMediaStream(this.getElement(), stream);
+    var element = this.getElement();
+    if ('srcObject' in element) {
+      element.srcObject = stream;
+    } else if ('mozSrcObject' in element) {
+      element.mozSrcObject = stream;
+    } else if ('src' in element) {
+      element.src = URL.createObjectURL(stream);
+    } else {
+      throw Error('Failed to attach a stream to the media.');
+    }
     this.trigger('media:attachStream', stream);
+  },
+
+  /**
+   * @param {String[]} srcList
+   */
+  setSources: function(srcList) {
+    _.each(srcList, this.setSource, this);
   },
 
   /**
@@ -100,7 +117,10 @@ var Media = Event.extend({
    */
   setSource: function(src) {
     this._setPromiseLoaded();
-    this.getElement().src = src;
+    var source = document.createElement('source');
+    source.src = src;
+    this.getElement().appendChild(source);
+    this._sources.push(source);
     this.trigger('media:setSource', src);
   },
 
@@ -108,7 +128,7 @@ var Media = Event.extend({
    * @returns {Boolean}
    */
   hasSource: function() {
-    return !!this.getElement().src || !!this.getElement().srcObject;
+    return this._sources.length > 0 || !!this.getElement().src || !!this.getElement().srcObject || !!this.getElement().mozSrcObject;
   },
 
   /**
@@ -116,6 +136,14 @@ var Media = Event.extend({
    */
   isPlaying: function() {
     return this._isPlaying;
+  },
+
+  /**
+   * @returns {Number|null}
+   */
+  getDuration: function() {
+    var element = this.getElement();
+    return !_.isNaN(element.duration) ? Math.round(element.duration * 1000) : null;
   },
 
   /**
@@ -186,12 +214,18 @@ var Media = Event.extend({
     }
 
     var emptied = this._getPromiseEmptied();
+    var sources = this._sources;
     var element = this.getElement();
     return this
       .stop()
       .then(function() {
+        _.each(sources, function(source) {
+          element.removeChild(source);
+        });
+        sources.splice(0, sources.length);
         element.removeAttribute('src');
         element.removeAttribute('srcObject');
+        element.removeAttribute('mozSrcObject');
         element.load();
         return emptied;
       });
