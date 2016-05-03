@@ -26,11 +26,18 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
     }
 
     /**
+     * @return \Fluent\Logger\FluentLogger
+     */
+    protected function _getFluentd() {
+        return $this->_fluentLogger;
+    }
+
+    /**
      * @param CM_Log_Record $record
      */
     protected function _writeRecord(CM_Log_Record $record) {
         $formattedRecord = $this->_formatRecord($record);
-        $this->_fluentLogger->post($this->_tag, $formattedRecord);
+        $this->_getFluentd()->post($this->_tag, $formattedRecord);
     }
 
     /**

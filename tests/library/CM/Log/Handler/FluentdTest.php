@@ -56,4 +56,21 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $this->assertInternalType('string', $formattedRecord['exception']['stack']);
         $this->assertRegExp('/CM_Log_Handler_FluentdTest->testFormatting\(\)/', $formattedRecord['exception']['stack']);
     }
+
+    public function testWriteRecord() {
+        $fluentdApiMock = $this->mockClass('\Fluent\Logger\FluentLogger')->newInstanceWithoutConstructor();
+        $postMock = $fluentdApiMock->mockMethod('post')->set(
+            function ($tag, array $data) {
+                $this->assertSame('tag', $tag);
+                $this->assertSame('critical', $data['level']);
+                $this->assertSame('foo', $data['message']);
+            }
+        );
+        $handler = $this->mockClass('CM_Log_Handler_Fluentd')->newInstance(['localhost', 24555, 'tag', 'CM']);
+        $handler->mockMethod('_getFluentd')->set($fluentdApiMock);
+
+        $record = new CM_Log_Record(CM_Log_Logger::CRITICAL, 'foo', new CM_Log_Context());
+        $this->callProtectedMethod($handler, '_writeRecord', [$record]);
+        $this->assertSame(1, $postMock->getCallCount());
+    }
 }
