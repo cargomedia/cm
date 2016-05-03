@@ -6,6 +6,9 @@ var CM_App = CM_Class_Abstract.extend({
   /** @type Object **/
   views: {},
 
+  /** @type Object **/
+  lib: {},
+
   /** @type {Object|Null} **/
   viewer: null,
 
@@ -481,21 +484,19 @@ var CM_App = CM_Class_Abstract.extend({
     },
 
     /**
-     * @param {String|String[]} pathList
+     * @param {String|String[]} sourceList
      * @param {Object} [options]
-     * @return {MediaElement}
+     * @param {Boolean} [options.loop=false]
+     * @param {Boolean} [options.autoplay=false]
+     * @param {String} [options.crossOrigin='anonymous']
+     * @return {Audio}
      */
-    createAudio: function(pathList, options) {
-      if (!_.isArray(pathList)) {
-        pathList = [pathList];
-      }
-
-      var $element = $('<audio />');
-      $element.wrap('<div />');	// MediaElement needs a parent to show error msgs
-      _.each(pathList, function(path) {
-        $element.append($('<source>').attr('src', cm.getUrlResource('layout', 'audio/' + path)));
-      });
-      return cm.dom.setupAudio($element[0], options);
+    createAudio: function(sourceList, options) {
+      sourceList = _.isString(sourceList) ? [sourceList] : sourceList;
+      var audio = new cm.lib.Media.Audio(options);
+      audio.setOptions(options);
+      audio.setSources(sourceList);
+      return audio;
     }
   },
 
