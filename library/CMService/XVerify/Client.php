@@ -88,7 +88,7 @@ class CMService_XVerify_Client implements CM_Service_EmailVerification_ClientInt
                 ]);
             }
         } catch (Exception $exception) {
-            $this->_logException($exception);
+            $this->_handleException($exception);
             return null;
         }
         return $body['email'];
@@ -97,7 +97,8 @@ class CMService_XVerify_Client implements CM_Service_EmailVerification_ClientInt
     /**
      * @param Exception $exception
      */
-    protected function _logException(Exception $exception) {
-        CM_Bootloader::getInstance()->getExceptionHandler()->logException($exception);
+    protected function _handleException(Exception $exception) {
+        $logLevel = CM_Log_Logger::exceptionSeverityToLevel($exception);
+        CM_Service_Manager::getInstance()->getLogger()->addMessage('XVerify client error', $logLevel, new CM_Log_Context_App(null, null, $exception));
     }
 }
