@@ -3,73 +3,56 @@ QUnit.config.autostart = false;
 define('bootstrap', function(require) {
 
   var Bootstrapper = function() {
-    this._suitePaths = [];
-    this._libraries = [];
-    this._baseUrl = '';
   };
 
   Bootstrapper.prototype = {
 
     /**
-     * @param {...String[]} suites
-     */
-    addSuitePaths: function(suites) {
-      this._suitePaths = this._suitePaths.concat(suites);
-    },
-
-    /**
-     * @param {...{name: String, path: String, init: [Function]}} libraries
-     */
-    addLibraries: function(libraries) {
-      this._libraries = this._libraries.concat(Array.prototype.slice.call(arguments));
-    },
-
-    /**
      * @param {String} url
      */
     setBaseUrl: function(url) {
-      this._baseUrl = url;
+      requirejs.config({
+        baseUrl: url
+      });
     },
 
     /**
+     * @param {{name: String, path: String, init: [Function]}[]} dependencies
      * @param {Function} callback
      * @param {*} scope
      */
-    loadLibraries: function(callback, scope) {
-      var libraries = this._libraries;
-      var baseUrl = this._baseUrl;
+    load: function(dependencies, callback, scope) {
       var paths = {};
-
-
-      libraries.forEach(function(library) {
-        paths[library.name] = library.path;
+      dependencies.forEach(function(dependency) {
+        paths[dependency.name] = dependency.path;
       });
-
       requirejs.config({
-        baseUrl: baseUrl,
         paths: paths
       });
 
-      var initializedLibs = [];
-      libraries.forEach(function(library, index) {
-        require([library.name], function(lib) {
-          initializedLibs.push(lib);
-          if (library.init) {
-            library.init(lib);
+      var dependenciesLoaded = [];
+      dependencies.forEach(function(dependency, index) {
+        require([dependency.name], function(lib) {
+          dependenciesLoaded.push(lib);
+          if (dependency.init) {
+            dependency.init(lib);
           }
-          if (index == libraries.length - 1) {
-            callback.apply(scope || this, initializedLibs);
+          if (index == dependencies.length - 1) {
+            callback.apply(scope || this, dependenciesLoaded);
           }
         });
       });
 
-      if (0 == libraries.length) {
-        callback.apply(scope || this, initializedLibs);
+      if (0 == dependencies.length) {
+        callback.apply(scope || this, dependenciesLoaded);
       }
     },
 
-    run: function() {
-      var suitePaths = this._suitePaths;
+    /**
+     * @param {String[]} suitePaths
+     */
+    run: function(suitePaths) {
+      var self = this;
       require(suitePaths, function() {
         var index = 0;
         var suites = Array.prototype.slice.call(arguments);
@@ -82,7 +65,7 @@ define('bootstrap', function(require) {
         };
         var loadSuite = function(suite) {
           requirejs.config(suite.config || {});
-          require(suite.dependencies || [], function() {
+          self.load(suite.dependencies || [], function() {
             require(suite.modules || [], function() {
               index++;
               loadCurrentSuite();
@@ -94,32 +77,5 @@ define('bootstrap', function(require) {
     }
   };
 
-  var bootstrapper = new Bootstrapper();
-
-  bootstrapper.addLibraries(
-    {
-      name: 'jquery',
-      path: 'client-vendor/after-body/10-jquery/jquery'
-    },
-    {
-      name: 'underscore',
-      path: 'client-vendor/after-body/20-underscore/underscore'
-    },
-    {
-      name: 'backbone',
-      path: 'client-vendor/after-body/30-backbone/backbone'
-    },
-    {
-      name: 'bluebird',
-      path: 'client-vendor/before-body/01-bluebird/01-bluebird',
-      init: function(Promise) {
-        window.Promise = Promise;
-        Promise.config({
-          cancellation: true
-        });
-      }
-    }
-  );
-
-  return bootstrapper;
+  return new Bootstrapper();
 });
