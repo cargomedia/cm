@@ -35,7 +35,9 @@
           {date_timeago time=$recordTimestamp}
         {/if}
       </div>
-      <div class="message">{if isset($log.level)}<span class="level level-{$log.level}">{$levelMap[$log.level]}</span>{/if} {$log.message|escape}</div>
+      <div class="message">
+        {if isset($log.level)}<span class="level level-{$log.level}">{$levelMap[$log.level]}</span>{/if} {$log.message|escape}
+      </div>
 
       {if !empty($log.exception)}
         <div class="exception">
@@ -50,7 +52,7 @@
           {/if}
           {if (!empty($exception.metaInfo))}
             <div><span class="label">Exception meta info:</span>
-              <pre>{$exception.metaInfo|@print_r}</pre>
+              <pre>{print_r($exception.metaInfo, true)}</pre>
             </div>
           {/if}
         </div>
