@@ -15,7 +15,7 @@ class CM_Component_LogList extends CM_Component_Abstract {
         }
         $levelList = $level ? [$level] : null;
         $type = $this->_params->has('type') ? $this->_params->getInt('type') : null;
-        if (null !== $type && !CM_Paging_Log::hasType($type)) {
+        if (null !== $type && !CM_Paging_Log::isValidType($type)) {
             throw new CM_Exception_InvalidParam('Invalid `type` param');
         }
         $aggregate = $this->_params->has('aggregate') ? $this->_params->getInt('aggregate') : null;

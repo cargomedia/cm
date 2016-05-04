@@ -30,7 +30,7 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
             }
         }
 
-        if (null !== $filterType && false !== $filterType && !self::hasType((int) $filterType)) {
+        if (null !== $filterType && false !== $filterType && !self::isValidType((int) $filterType)) {
             throw new CM_Exception_Invalid('Type is not a children of CM_Paging_Log.');
         }
 
@@ -140,15 +140,15 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
     }
 
     /**
-     * @param int $filterType
+     * @param int $type
      * @return bool
      */
-    public static function hasType($filterType) {
-        $filterType = (int) $filterType;
+    public static function isValidType($type) {
+        $type = (int) $type;
         $childrenTypeList = \Functional\map(CM_Paging_Log::getClassChildren(), function ($className) {
             /** @type CM_Class_Abstract $className */
             return $className::getTypeStatic();
         });
-        return in_array($filterType, $childrenTypeList);
+        return in_array($type, $childrenTypeList);
     }
 }
