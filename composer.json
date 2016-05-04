@@ -38,7 +38,7 @@
       "CMTest_": "tests/helpers/CMTest/library/"
     }
   },
-  "bin": ["bin/cm"],
+  "bin": ["bin/cm", "bin/qunit"],
   "extra": {
     "cm-modules": {
       "CM": {

@@ -3,6 +3,6 @@ module.exports = {
     baseUrl: 'client-vendor'
   },
   modules: [
-    "tests/after-body/promise-utils/throttlerTest"
+    "tests/after-body/promise-utils/promise-throttlerTest"
   ]
 };
