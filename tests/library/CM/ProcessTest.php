@@ -133,6 +133,8 @@ class CM_ProcessTest extends CMTest_TestCase {
          */
         $exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
         $exceptionHandler->setPrintSeverityMin(CM_Exception::FATAL);
+        $exceptionHandler->setServiceManager($this->getServiceManager());
+
         $bootloader->setExceptionHandler($exceptionHandler);
 
         $process = CM_Process::getInstance();
@@ -144,7 +146,7 @@ class CM_ProcessTest extends CMTest_TestCase {
             usleep(50 * 1000);
             return array('msg' => 'Child 2 finished');
         });
-        $process->fork(function (CM_Process_WorkloadResult $result) {
+        $process->fork(function () {
             usleep(150 * 1000);
             throw new CM_Exception('Child 3 finished');
         });
@@ -167,14 +169,10 @@ class CM_ProcessTest extends CMTest_TestCase {
         $this->assertSame(null, $workloadResultList[3]->getResult());
         $this->assertSame('Child 3 finished', $workloadResultList[3]->getException()->getMessage());
         $this->assertFalse($workloadResultList[3]->isSuccess());
-        $errorLog = new CM_Paging_Log_Error();
-        $this->assertSame(1, $errorLog->getCount());
 
-        $this->assertContains('Child 3 finished', $errorLog->getItem(0)['msg']);
         $this->assertSame(null, $workloadResultList[4]->getResult());
         $this->assertSame('Child 4 finished', $workloadResultList[4]->getException()->getMessage());
         $this->assertFalse($workloadResultList[4]->isSuccess());
-        $this->assertSame(1, $errorLog->getCount());
 
         $bootloader->setExceptionHandler($exceptionHandlerBackup);
     }
@@ -241,6 +239,15 @@ class CM_ProcessTest extends CMTest_TestCase {
      * @preserveGlobalState disabled
      */
     public function testKillChildrenOnExit() {
+        $bootloader = CM_Bootloader::getInstance();
+        $exceptionHandlerBackup = $bootloader->getExceptionHandler();
+
+        /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\ClassMock $exceptionHandler */
+        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
+        $exceptionHandler->mockMethod('handleException');
+
+        $bootloader->setExceptionHandler($exceptionHandler);
+
         $loopEcho = function () {
             usleep(50000);
         };
@@ -267,6 +274,8 @@ class CM_ProcessTest extends CMTest_TestCase {
         $process->fork($loopEcho);
         $process->trigger('exit');
         $this->assertSame(2, $killChildrenMethod->getCallCount());
+
+        $bootloader->setExceptionHandler($exceptionHandlerBackup);
     }
 
     /**
@@ -300,11 +309,11 @@ class CM_ProcessTest extends CMTest_TestCase {
 
         $this->assertCount(2, $pidListBefore);
         $this->assertCount(0, $this->_getChildrenPidList());
-        $this->assertSameTime(0.5, microtime(true) - $timeStart, 0.15);
+        $this->assertSameTime(0.65, microtime(true) - $timeStart, 0.15);
 
-        $logError = new CM_Paging_Log_Error();
+        $logError = new CM_Paging_Log([CM_Log_Logger::ERROR]);
         $this->assertSame(1, $logError->getCount());
-        $this->assertContains('killing with signal `9`', $logError->getItem(0)['msg']);
+        $this->assertContains('killing with signal `9`', $logError->getItem(0)['message']);
     }
 
     /**

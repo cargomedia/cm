@@ -34,18 +34,12 @@ abstract class CM_Log_Formatter_Abstract implements CM_Log_Formatter_Interface {
         if (null !== $contextText) {
             $renderedText[] = $contextText;
         }
-
-        if ($record instanceof CM_Log_Record_Exception) {
-            $renderedText[] = $this->renderException($record);
-        }
         return implode(PHP_EOL, $renderedText);
     }
 
     abstract public function renderMessage(CM_Log_Record $record);
 
     abstract public function renderContext(CM_Log_Record $record);
-
-    abstract public function renderException(CM_Log_Record_Exception $record);
 
     /**
      * @return array
