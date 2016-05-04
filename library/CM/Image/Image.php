@@ -375,20 +375,26 @@ class CM_Image_Image {
     }
 
     /**
-     * @param string    $imageBlob
-     * @param float     $resolutionX
-     * @param float     $resolutionY
-     * @param bool|null $skipXmlHeader
+     * @param string      $imageBlob
+     * @param float       $resolutionX
+     * @param float       $resolutionY
+     * @param string|null $backgroundColor
+     * @param bool|null   $skipXmlHeader
      * @return CM_Image_Image
      */
-    public static function createFromSVG($imageBlob, $resolutionX, $resolutionY, $skipXmlHeader = null) {
+    public static function createFromSVG($imageBlob, $resolutionX, $resolutionY, $backgroundColor = null, $skipXmlHeader = null) {
         $imageBlob = (string) $imageBlob;
         if (true !== (bool) $skipXmlHeader) {
             $imageBlob = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' . $imageBlob;
         }
-
         $imagick = new Imagick();
         $imagick->setResolution((float) $resolutionX, (float) $resolutionY);
+        if (null !== $backgroundColor) {
+            $backgroundColor = (string) $backgroundColor;
+        } else {
+            $backgroundColor = new ImagickPixel('transparent');
+        }
+        $imagick->setBackgroundColor($backgroundColor);
         return new self($imageBlob, $imagick);
     }
 }
