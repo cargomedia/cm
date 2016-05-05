@@ -185,6 +185,7 @@ define(["cm/tests/media/common"], function() {
 
   return {
     test: function(Media, source) {
+      QUnit.config.testTimeout = 5000;
       _.each(tests, function(fn, name) {
         QUnit.test(name, function(assert) {
           fn(assert, Media, source);
