@@ -216,7 +216,7 @@ class CM_ParamsTest extends CMTest_TestCase {
     public function testEncodeJavascript() {
         $javascriptEncodable = $this->mockInterface('CM_JavascriptEncodable')->newInstance();
         $data = ['foo' => 'bar', 'bar' => 1];
-        $javascriptEncodable->mockMethod('toArray')->set($data);
+        $javascriptEncodable->mockMethod('toJavascript')->set($data);
         $expectedEncoded = array(
             '_class'                   => get_class($javascriptEncodable),
             '__javascript_encodable__' => true,
