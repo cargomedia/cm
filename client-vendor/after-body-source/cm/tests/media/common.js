@@ -94,7 +94,10 @@ define(["cm/tests/media/common"], function() {
           assert.equal(media.isPlaying(), false);
           assert.equal(media.getPromiseLoaded().isFulfilled(), false);
         })
-        .finally(done);
+        .finally(function() {
+          media.release();
+          done();
+        });
 
       media.setSource(source);
 
@@ -144,6 +147,7 @@ define(["cm/tests/media/common"], function() {
           assert.equal(seeking, 1);
           assert.equal(seeked, 1);
           assert.equal(error, null);
+          media.release();
           done();
         });
     },
@@ -178,6 +182,7 @@ define(["cm/tests/media/common"], function() {
         })
         .finally(function() {
           assert.equal(error, null);
+          media.release();
           done();
         });
     }
