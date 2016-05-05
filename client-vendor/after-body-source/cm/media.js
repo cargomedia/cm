@@ -154,7 +154,6 @@ var Media = Event.extend({
     return this._promiseLoaded;
   },
 
-
   /**
    * @returns {Promise}
    * @private
@@ -162,7 +161,6 @@ var Media = Event.extend({
   _play: function() {
     var self = this;
     var element = this.getElement();
-
 
     if (!this.hasSource()) {
       return Promise.reject(new Error('Failed to play, no media source found.'));
@@ -173,10 +171,7 @@ var Media = Event.extend({
     }
 
     var playing = self._getPromisePlaying();
-
-    // "canplay" is triggered by firefox only after calling play on the media
-    element.play();
-
+    element.play();  // "canplay" is triggered by firefox only after calling play on the media
     return this
       .getPromiseLoaded()
       .then(function() {
