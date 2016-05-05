@@ -7,7 +7,7 @@ var CM_App = CM_Class_Abstract.extend({
   views: {},
 
   /** @type Object **/
-  lib: {},
+  lib: (cm.lib || {}),
 
   /** @type {Object|Null} **/
   viewer: null,
@@ -445,42 +445,6 @@ var CM_App = CM_Class_Abstract.extend({
           }
         }
       });
-    },
-
-    /**
-     * @param {HTMLAudioElement} element
-     * @param {Object} [options]
-     * @returns {MediaElement}
-     */
-    setupAudio: function(element, options) {
-      options = _.extend({
-        loop: false
-      }, options || {});
-
-      var error = false;
-      var player = new mejs.MediaElement(element, {
-        flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
-        silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
-        startVolume: 1,
-        error: function() {
-          cm.error.log(new Error('Cannot initialize MediaElement audio player.'));
-          error = true;
-        },
-        success: function(mediaElement, domObject) {
-          if (options.loop) {
-            mediaElement.addEventListener('ended', function() {
-              mediaElement.load();
-            });
-          }
-        }
-      });
-
-      if (error) {
-        player.play = _.noop;
-        player.stop = _.noop;
-        player.pause = _.noop;
-      }
-      return player;
     },
 
     /**
