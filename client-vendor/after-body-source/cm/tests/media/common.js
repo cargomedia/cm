@@ -135,7 +135,7 @@ define(["cm/tests/media/common"], function() {
           });
           return media
             ._getPromisePlaying()
-            .timeout(1500);
+            .timeout(2000);
         })
         .catch(function(reason) {
           error = reason;
@@ -147,7 +147,6 @@ define(["cm/tests/media/common"], function() {
           done();
         });
     },
-
 
     'options loop:false': function(assert, Media, source) {
       var done = assert.async();
@@ -172,7 +171,7 @@ define(["cm/tests/media/common"], function() {
               reject(new Error('media seek in loop:false mode.'));
             });
             el.addEventListener('ended', resolve);
-          }).timeout(1500)
+          }).timeout(2000)
         })
         .catch(function(reason) {
           error = reason;
