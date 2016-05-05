@@ -12,6 +12,14 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     }
 
     /**
+     * @return string $name
+     */
+    public function setName($name) {
+        $this->_set('name', $name);
+        $this->_changeContainingCacheables();
+    }
+
+    /**
      * @return string[]
      */
     public function getVariables() {
