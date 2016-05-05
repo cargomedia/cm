@@ -22,7 +22,6 @@ var Media = Event.extend({
       crossOrigin: 'anonymous'
     });
 
-    this._$element = $(element);
     this._sources = [];
     this._isPlaying = false;
 
@@ -287,27 +286,27 @@ var Media = Event.extend({
   _bindElementEvents: function() {
     var self = this;
 
-    this._$element.on('playing', function() {
+    this._element.addEventListener('playing', function() {
       self._isPlaying = true;
       self.trigger('playing');
     });
 
-    this._$element.on('pause', function() {
+    this._element.addEventListener('pause', function() {
       self._isPlaying = false;
       self.trigger('stop');
     });
 
-    this._$element.on('emptied', function() {
+    this._element.addEventListener('emptied', function() {
       self._isPlaying = false;
       self._setPromiseLoaded();
       self.trigger('emptied');
     });
 
-    this._$element.on('canplay', function() {
+    this._element.addEventListener('canplay', function() {
       self.trigger('canplay');
     });
 
-    this._$element.on('error', function() {
+    this._element.addEventListener('error', function() {
       var errorCode = this.error ? this.error.code : null;
       var error = null;
 
