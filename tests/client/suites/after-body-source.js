@@ -3,7 +3,8 @@ module.exports = {
     baseUrl: 'client-vendor/after-body-source'
   },
   modules: [
+    'cm/tests/media/videoTest',
     'cm/tests/media/audioTest',
-    'cm/tests/media/videoTest'
+    'cm/tests/media/audio/engineTest'
   ]
 };
