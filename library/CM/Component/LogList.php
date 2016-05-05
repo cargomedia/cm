@@ -10,12 +10,17 @@ class CM_Component_LogList extends CM_Component_Abstract {
 
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $level = $this->_params->has('level') ? $this->_params->getInt('level') : null;
+        if (null !== $level && !CM_Log_Logger::hasLevel($level)) {
+            throw new CM_Exception_InvalidParam('Invalid `level` param');
+        }
         $levelList = $level ? [$level] : null;
         $type = $this->_params->has('type') ? $this->_params->getInt('type') : null;
+        if (null !== $type && !CM_Paging_Log::isValidType($type)) {
+            throw new CM_Exception_InvalidParam('Invalid `type` param');
+        }
         $aggregate = $this->_params->has('aggregate') ? $this->_params->getInt('aggregate') : null;
         $urlPage = $this->_params->has('urlPage') ? $this->_params->getString('urlPage') : null;
         $urlParams = $this->_params->has('urlParams') ? $this->_params->getArray('urlParams') : null;
-
 
         $aggregationPeriod = $aggregate;
         if (0 === $aggregationPeriod) {

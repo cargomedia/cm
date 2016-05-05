@@ -87,17 +87,20 @@ class CM_Process_ForkHandler {
      * @return CM_Process_WorkloadResult
      */
     public function receiveWorkloadResult() {
-        $ipcData = fgets($this->_ipcStream);
+        $ipcData = stream_get_contents($this->_ipcStream);
         if (false === $ipcData) {
+                return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception('Failed to receive IPC data.'));
+        }
+        if ('' === $ipcData) {
             return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception('Received no data from IPC stream.'));
         }
         try {
             $workloadResult = unserialize($ipcData);
         } catch (ErrorException $e) {
-            return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception('Received unserializable IPC data.'));
+            return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception("Received unserializable IPC data: `{$ipcData}"));
         }
         if (!$workloadResult instanceof CM_Process_WorkloadResult) {
-            return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception('Received unexpected IPC data.'));
+            return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception("Received unexpected IPC data: `{$ipcData}`"));
         }
         return $workloadResult;
     }
