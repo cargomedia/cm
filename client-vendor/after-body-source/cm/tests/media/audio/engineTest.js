@@ -24,7 +24,5 @@ require(["cm/media/audio/engine"], function(AudioEngine) {
       })
       .timeout(1200)
       .finally(done);
-
   });
-
 });

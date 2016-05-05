@@ -28,6 +28,7 @@ var Media = Event.extend({
     this.setOptions();
     this._setPromiseLoaded();
     this._bindElementEvents();
+    this._shimElementPlay();
   },
 
   /**
@@ -344,6 +345,25 @@ var Media = Event.extend({
         this.trigger.apply(this, ['media'].concat(args));
       }
     });
+  },
+
+  /**
+   * Shim the "media.play()" to catch additional errors as warning only
+   *
+   * "media.play()" return a promise on Chrome, but not on FF
+   * It's described as "void play();" in the W3C specs:
+   * http://w3c.github.io/html/semantics-embedded-content.html#media-elements
+   *
+   * @private
+   */
+  _shimElementPlay: function() {
+    var element = this.getElement();
+    var originPlay = element.play;
+    element.play = function() {
+      (originPlay.call(this) || Promise.resolve()).catch(function(e) {
+        console.warn(e);
+      });
+    };
   }
 });
 
