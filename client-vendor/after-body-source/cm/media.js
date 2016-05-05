@@ -1,4 +1,5 @@
 var Event = require('./event');
+var Observer = require('./observer');
 
 /**
  * @class Media
@@ -270,22 +271,13 @@ var Media = Event.extend({
    */
   _getPromiseForEvent: function(eventName) {
     var self = this;
-    return new Promise(function(resolve, reject) {
-      var successCallback = function() {
-        unbind();
-        resolve(self);
-      };
-      var errorCallback = function(error) {
-        unbind();
-        reject(error);
-      };
-      var unbind = function() {
-        self.off(eventName, successCallback);
-        self.off('error', errorCallback);
-      };
-
-      self.once(eventName, successCallback);
-      self.once('error', errorCallback);
+    var observer = new Observer();
+    var promise = new Promise(function(resolve, reject) {
+      observer.listenTo(self, eventName, resolve);
+      observer.listenTo(self, 'error', reject);
+    });
+    return promise.finally(function() {
+      observer.stopListening();
     });
   },
 
