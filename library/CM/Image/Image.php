@@ -14,17 +14,29 @@ class CM_Image_Image {
     private $_animated;
 
     /**
-     * @param string       $imageBlob
+     * @param string|null  $imageBlob
      * @param Imagick|null $imagick
      * @throws CM_Exception
      */
-    public function __construct($imageBlob, Imagick $imagick = null) {
-        $imageBlob = (string) $imageBlob;
-        if (null === $imagick) {
+    public function __construct($imageBlob = null, Imagick $imagick = null) {
+        if ($imageBlob !== null) {
+            $imageBlob = (string) $imageBlob;
             $imagick = new Imagick();
+            try {
+                $imagick->readImageBlob($imageBlob);
+            } catch (ImagickException $e) {
+                throw new CM_Exception_Invalid('Cannot load Imagick instance ' . $e->getMessage());
+            }
+        } elseif (null === $imagick) {
+            throw new CM_Exception_Invalid('Either `$imageBlog` or `$imagick` should be defined in order to create an instance');
+        } else {
+            try {
+                $imagick->valid(); //seems to be the only method to check if it contains an image
+            } catch (ImagickException $e) {
+                throw new CM_Exception_Invalid('`$imagick` does not contain any image ' . $e->getMessage());
+            }
         }
         try {
-            $imagick->readImageBlob($imageBlob);
             if ($imagick->getIteratorIndex() > 0) {
                 $this->_animated = true;
                 $imagick = $imagick->coalesceImages();
@@ -32,7 +44,7 @@ class CM_Image_Image {
                 $this->_animated = false;
             }
         } catch (ImagickException $e) {
-            throw new CM_Exception('Cannot load Imagick instance ' . $e->getMessage());
+            throw new CM_Exception('Cannot process image ' . $e->getMessage());
         }
         $this->_imagick = $imagick;
     }
@@ -139,6 +151,15 @@ class CM_Image_Image {
             default:
                 throw new CM_Exception_Invalid('Unsupported format `' . $imagickFormat . '`.');
         }
+    }
+
+    /**
+     * @param CM_Image_Image $image
+     * @param int            $x
+     * @param int            $y
+     */
+    public function compositeImage(CM_Image_Image $image, $x, $y) {
+        $this->_imagick->compositeImage($image->_imagick, Imagick::COMPOSITE_DEFAULT, (int) $x, (int) $y);
     }
 
     /**
@@ -381,6 +402,7 @@ class CM_Image_Image {
      * @param string|null $backgroundColor
      * @param bool|null   $skipXmlHeader
      * @return CM_Image_Image
+     * @throws CM_Exception_Invalid
      */
     public static function createFromSVG($imageBlob, $resolutionX, $resolutionY, $backgroundColor = null, $skipXmlHeader = null) {
         $imageBlob = (string) $imageBlob;
@@ -395,6 +417,11 @@ class CM_Image_Image {
             $backgroundColor = new ImagickPixel('transparent');
         }
         $imagick->setBackgroundColor($backgroundColor);
-        return new self($imageBlob, $imagick);
+        try {
+            $imagick->readImageBlob($imageBlob);
+        } catch (ImagickException $e) {
+            throw new CM_Exception_Invalid('Cannot load Imagick instance ' . $e->getMessage());
+        }
+        return new self(null, $imagick);
     }
 }
