@@ -28,12 +28,12 @@ class CM_Image_Image {
                 throw new CM_Exception_Invalid('Cannot load Imagick instance ' . $e->getMessage());
             }
         } elseif (null === $imagick) {
-            throw new CM_Exception_Invalid('Either `$imageBlog` or `$imagick` should be defined in order to create an instance');
+            throw new CM_Exception_Invalid('Either $imageBlog or $imagick should be defined');
         } else {
             try {
                 $imagick->valid(); //seems to be the only method to check if it contains an image
             } catch (ImagickException $e) {
-                throw new CM_Exception_Invalid('`$imagick` does not contain any image ' . $e->getMessage());
+                throw new CM_Exception_Invalid('$imagick does not contain any image ' . $e->getMessage());
             }
         }
         try {

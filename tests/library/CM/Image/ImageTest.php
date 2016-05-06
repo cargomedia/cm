@@ -11,20 +11,39 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         new CM_Image_Image($imageFile->read());
     }
 
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot load Imagick instance
-     */
     public function testConstructEmptyData() {
-        new CM_Image_Image('');
+        $exception = $this->catchException(function () {
+            new CM_Image_Image();
+        });
+        $this->assertInstanceOf('CM_Exception', $exception);
+        $this->assertSame('Either $imageBlog or $imagick should be defined', $exception->getMessage());
+
+        $exception = $this->catchException(function () {
+            new CM_Image_Image('');
+        });
+        $this->assertInstanceOf('CM_Exception', $exception);
+        $this->assertRegExp('/^Cannot load Imagick instance /', $exception->getMessage());
     }
 
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot load Imagick instance
-     */
-    public function testConstructInvalidData() {
-        new CM_Image_Image('foobar');
+    public function testConstructor() {
+        $exception = $this->catchException(function () {
+            new CM_Image_Image('foobar');
+        });
+        $this->assertInstanceOf('CM_Exception', $exception);
+        $this->assertRegExp('/^Cannot load Imagick instance /', $exception->getMessage());
+
+        $exception = $this->catchException(function () {
+            new CM_Image_Image(null, new Imagick());
+        });
+        $this->assertInstanceOf('CM_Exception', $exception);
+        $this->assertRegExp('/^\$imagick does not contain any image /', $exception->getMessage());
+
+        $imagick = new Imagick();
+        $imagick->newPseudoImage(100, 100, 'canvas:black');
+        $image = new CM_Image_Image(null, $imagick);
+        $this->assertInstanceOf('CM_Image_Image', $image);
+        $this->assertSame(100, $image->getHeight());
+        $this->assertSame(100, $image->getWidth());
     }
 
     public function testCrop() {
@@ -262,7 +281,7 @@ class CM_Image_ImageTest extends CMTest_TestCase {
                 $this->assertSame(150, $height);
             });
         $cropMethod = $image->mockMethod('crop')
-            ->set(function($width, $height, $offsetX = null, $offsetY = null) {
+            ->set(function ($width, $height, $offsetX = null, $offsetY = null) {
                 $this->assertSame(150, $width);
                 $this->assertSame(150, $height);
                 $this->assertSame(null, $offsetX);
@@ -285,7 +304,7 @@ class CM_Image_ImageTest extends CMTest_TestCase {
                 $this->assertSame(150, $height);
             });
         $cropMethod = $image->mockMethod('crop')
-            ->set(function($width, $height, $offsetX = null, $offsetY = null) {
+            ->set(function ($width, $height, $offsetX = null, $offsetY = null) {
                 $this->assertSame(150, $width);
                 $this->assertSame(150, $height);
                 $this->assertSame(null, $offsetX);
@@ -308,13 +327,12 @@ class CM_Image_ImageTest extends CMTest_TestCase {
                 $this->assertSame(150, $height);
             });
         $cropMethod = $image->mockMethod('crop')
-            ->set(function($width, $height, $offsetX = null, $offsetY = null) {
+            ->set(function ($width, $height, $offsetX = null, $offsetY = null) {
             });
         /** @var CM_Image_Image $image */
         $image->resize(500, 400, true);
         $this->assertSame(1, $resizeSpecificMethod->getCallCount());
         $this->assertSame(0, $cropMethod->getCallCount());
-
     }
 
     public function testResizeSquareNoBlowup() {
@@ -366,7 +384,7 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
         $image = new CM_Image_Image($imageFileOriginal->read());
 
-        $image->resizeSpecific(50, 50, 20, 20);
+        $image->resizeSpecific(50, 50);
         $this->assertSame(50, $image->getWidth());
         $this->assertSame(50, $image->getHeight());
     }
@@ -395,24 +413,24 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     }
 
     public function testCalculateDimensions() {
-        $dimensions = CM_Image_Image::calculateDimensions( 2000, 1600, 500, 600, false );
+        $dimensions = CM_Image_Image::calculateDimensions(2000, 1600, 500, 600, false);
 
-        $this->assertEquals( 500, $dimensions['width']);
-        $this->assertEquals( 400, $dimensions['height']);
+        $this->assertEquals(500, $dimensions['width']);
+        $this->assertEquals(400, $dimensions['height']);
     }
 
     public function testCalculateDimensionsSquare() {
-        $dimensions = CM_Image_Image::calculateDimensions( 2000, 1600, 500, 500, true );
+        $dimensions = CM_Image_Image::calculateDimensions(2000, 1600, 500, 500, true);
 
-        $this->assertEquals( 500, $dimensions['width']);
-        $this->assertEquals( 500, $dimensions['height']);
+        $this->assertEquals(500, $dimensions['width']);
+        $this->assertEquals(500, $dimensions['height']);
     }
 
     public function testCalculateDimensionsLower() {
-        $dimensions = CM_Image_Image::calculateDimensions( 100, 200, 1000, 500, false );
+        $dimensions = CM_Image_Image::calculateDimensions(100, 200, 1000, 500, false);
 
-        $this->assertEquals( 100, $dimensions['width']);
-        $this->assertEquals( 200, $dimensions['height']);
+        $this->assertEquals(100, $dimensions['width']);
+        $this->assertEquals(200, $dimensions['height']);
     }
 
     /**
@@ -424,4 +442,4 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $reflectionProperty->setAccessible(true);
         return $reflectionProperty->getValue($image);
     }
- }
+}
