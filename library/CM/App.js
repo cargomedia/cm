@@ -6,6 +6,9 @@ var CM_App = CM_Class_Abstract.extend({
   /** @type Object **/
   views: {},
 
+  /** @type Object **/
+  lib: (cm.lib || {}),
+
   /** @type {Object|Null} **/
   viewer: null,
 
@@ -445,57 +448,19 @@ var CM_App = CM_Class_Abstract.extend({
     },
 
     /**
-     * @param {HTMLAudioElement} element
+     * @param {String|String[]} sourceList
      * @param {Object} [options]
-     * @returns {MediaElement}
+     * @param {Boolean} [options.loop=false]
+     * @param {Boolean} [options.autoplay=false]
+     * @param {String} [options.crossOrigin='anonymous']
+     * @return {Audio}
      */
-    setupAudio: function(element, options) {
-      options = _.extend({
-        loop: false
-      }, options || {});
-
-      var error = false;
-      var player = new mejs.MediaElement(element, {
-        flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
-        silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
-        startVolume: 1,
-        error: function() {
-          cm.error.log(new Error('Cannot initialize MediaElement audio player.'));
-          error = true;
-        },
-        success: function(mediaElement, domObject) {
-          if (options.loop) {
-            mediaElement.addEventListener('ended', function() {
-              mediaElement.load();
-            });
-          }
-        }
-      });
-
-      if (error) {
-        player.play = _.noop;
-        player.stop = _.noop;
-        player.pause = _.noop;
-      }
-      return player;
-    },
-
-    /**
-     * @param {String|String[]} pathList
-     * @param {Object} [options]
-     * @return {MediaElement}
-     */
-    createAudio: function(pathList, options) {
-      if (!_.isArray(pathList)) {
-        pathList = [pathList];
-      }
-
-      var $element = $('<audio />');
-      $element.wrap('<div />');	// MediaElement needs a parent to show error msgs
-      _.each(pathList, function(path) {
-        $element.append($('<source>').attr('src', cm.getUrlResource('layout', 'audio/' + path)));
-      });
-      return cm.dom.setupAudio($element[0], options);
+    createAudio: function(sourceList, options) {
+      sourceList = _.isString(sourceList) ? [sourceList] : sourceList;
+      var audio = new cm.lib.Media.Audio(options);
+      audio.setOptions(options);
+      audio.setSources(sourceList);
+      return audio;
     }
   },
 
