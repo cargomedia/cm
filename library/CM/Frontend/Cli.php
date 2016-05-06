@@ -96,8 +96,8 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
                     $backgroundImage->compositeImage($iconImage, ($backgroundWidth - $iconSize) / 2, ($backgroundHeight - $iconSize) / 2);
                     $backgroundImage->setFormat(CM_Image_Image::FORMAT_PNG);
 
-                    CM_File::create($themeDir . DIRECTORY_SEPARATOR . $outputFilename, $backgroundImage->getBlob());
-                    $this->_getStreamOutput()->writeln('Generated ' . $themeDir . DIRECTORY_SEPARATOR . $outputFilename);
+                    CM_File::create($themeDir . $outputFilename, $backgroundImage->getBlob());
+                    $this->_getStreamOutput()->writeln('Generated ' . $themeDir . $outputFilename);
                 }
             }
         }
