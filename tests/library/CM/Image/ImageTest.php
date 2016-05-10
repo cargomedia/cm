@@ -36,6 +36,15 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $this->assertSame(100, $image->getWidth());
     }
 
+    public function testCreateFromSvg() {
+        $svgFile = new CM_File(DIR_TEST_DATA . 'img/favicon.svg');
+        $svgImage = CM_Image_Image::createFromSVG($svgFile->read(), 200, 200, '#0000FF');
+        $this->assertInstanceOf('CM_Image_Image', $svgImage);
+        $this->assertTrue($svgImage->getHeight() > 200);
+        $this->assertTrue($svgImage->getWidth() > 200);
+        $this->assertSame('srgb(0,0,255)', $this->_getImagickObject($svgImage)->getImagePixelColor(1, 1)->getColorAsString());
+    }
+
     public function testCrop() {
         $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
         $imageOriginal = new CM_Image_Image($imageFile->read());
@@ -137,6 +146,9 @@ class CM_Image_ImageTest extends CMTest_TestCase {
             $image = new CM_Image_Image($imageFile->read());
             $this->assertSame($format, $image->getFormat());
         }
+
+        $svgImage = CM_Image_Image::createFromSVG((new CM_File(DIR_TEST_DATA . 'img/favicon.svg'))->read(), 100, 100);
+        $this->assertSame(CM_Image_Image::FORMAT_SVG, $svgImage->getFormat());
     }
 
     /**
