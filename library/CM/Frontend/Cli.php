@@ -81,7 +81,7 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
                     }
                     $background = new \Imagick();
                     $background->newPseudoImage($backgroundWidth, $backgroundHeight, 'canvas:' . $backgroundColor);
-                    $backgroundImage = new CM_Image_Image(null, $background);
+                    $backgroundImage = new CM_Image_Image($background);
 
                     $svgResolution = max($backgroundWidth, $backgroundHeight) * 1.5; //make image wittingly little bigger
 

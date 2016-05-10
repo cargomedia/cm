@@ -14,22 +14,20 @@ class CM_Image_Image {
     private $_animated;
 
     /**
-     * @param string|null  $imageBlob
-     * @param Imagick|null $imagick
+     * @param string|Imagick $imageContainer
      * @throws CM_Exception
      */
-    public function __construct($imageBlob = null, Imagick $imagick = null) {
-        if ($imageBlob !== null) {
-            $imageBlob = (string) $imageBlob;
+    public function __construct($imageContainer) {
+        if (!is_a($imageContainer, 'Imagick')) {
+            $imageContainer = (string) $imageContainer;
             $imagick = new Imagick();
             try {
-                $imagick->readImageBlob($imageBlob);
+                $imagick->readImageBlob($imageContainer);
             } catch (ImagickException $e) {
-                throw new CM_Exception_Invalid('Cannot load Imagick instance ' . $e->getMessage());
+                throw new CM_Exception_Invalid('Cannot load image blob ' . $e->getMessage());
             }
-        } elseif (null === $imagick) {
-            throw new CM_Exception_Invalid('Either $imageBlog or $imagick should be defined');
         } else {
+            $imagick = $imageContainer;
             try {
                 $imagick->valid(); //seems to be the only method to check if it contains an image
             } catch (ImagickException $e) {
@@ -400,13 +398,12 @@ class CM_Image_Image {
      * @param float       $resolutionX
      * @param float       $resolutionY
      * @param string|null $backgroundColor
-     * @param bool|null   $skipXmlHeader
      * @return CM_Image_Image
      * @throws CM_Exception_Invalid
      */
-    public static function createFromSVG($imageBlob, $resolutionX, $resolutionY, $backgroundColor = null, $skipXmlHeader = null) {
+    public static function createFromSVG($imageBlob, $resolutionX, $resolutionY, $backgroundColor = null) {
         $imageBlob = (string) $imageBlob;
-        if (true !== (bool) $skipXmlHeader) {
+        if ('<?xml' !== substr($imageBlob, 0, 5)) {
             $imageBlob = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' . $imageBlob;
         }
         $imagick = new Imagick();
@@ -422,6 +419,6 @@ class CM_Image_Image {
         } catch (ImagickException $e) {
             throw new CM_Exception_Invalid('Cannot load Imagick instance ' . $e->getMessage());
         }
-        return new self(null, $imagick);
+        return new self($imagick);
     }
 }

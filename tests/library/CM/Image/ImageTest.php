@@ -2,45 +2,35 @@
 
 class CM_Image_ImageTest extends CMTest_TestCase {
 
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot load Imagick instance
-     */
-    public function testConstructCorruptHeader() {
-        $imageFile = new CM_File(DIR_TEST_DATA . 'img/corrupt-header.jpg');
-        new CM_Image_Image($imageFile->read());
-    }
-
-    public function testConstructEmptyData() {
-        $exception = $this->catchException(function () {
-            new CM_Image_Image();
-        });
-        $this->assertInstanceOf('CM_Exception', $exception);
-        $this->assertSame('Either $imageBlog or $imagick should be defined', $exception->getMessage());
-
+    public function testConstructor() {
         $exception = $this->catchException(function () {
             new CM_Image_Image('');
         });
         $this->assertInstanceOf('CM_Exception', $exception);
-        $this->assertRegExp('/^Cannot load Imagick instance /', $exception->getMessage());
-    }
+        $this->assertRegExp('/^Cannot load image blob /', $exception->getMessage());
 
-    public function testConstructor() {
+        $exception = $this->catchException(function () {
+            $imageFile = new CM_File(DIR_TEST_DATA . 'img/corrupt-header.jpg');
+            new CM_Image_Image($imageFile->read());
+        });
+        $this->assertInstanceOf('CM_Exception', $exception);
+        $this->assertRegExp('/^Cannot load image blob /', $exception->getMessage());
+
         $exception = $this->catchException(function () {
             new CM_Image_Image('foobar');
         });
         $this->assertInstanceOf('CM_Exception', $exception);
-        $this->assertRegExp('/^Cannot load Imagick instance /', $exception->getMessage());
+        $this->assertRegExp('/^Cannot load image blob /', $exception->getMessage());
 
         $exception = $this->catchException(function () {
-            new CM_Image_Image(null, new Imagick());
+            new CM_Image_Image(new Imagick());
         });
         $this->assertInstanceOf('CM_Exception', $exception);
         $this->assertRegExp('/^\$imagick does not contain any image /', $exception->getMessage());
 
         $imagick = new Imagick();
         $imagick->newPseudoImage(100, 100, 'canvas:black');
-        $image = new CM_Image_Image(null, $imagick);
+        $image = new CM_Image_Image($imagick);
         $this->assertInstanceOf('CM_Image_Image', $image);
         $this->assertSame(100, $image->getHeight());
         $this->assertSame(100, $image->getWidth());
