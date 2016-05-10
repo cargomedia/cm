@@ -162,4 +162,22 @@ class CM_Http_Response_AbstractTest extends CMTest_TestCase {
 
         $this->assertSame(1, $exceptionCodeExecutionCounter);
     }
+
+    public function testGetEnvironmentTimezone() {
+        /** @var CM_Http_Response_Abstract|\Mocka\AbstractClassTrait $response */
+        $response = $this->mockClass('CM_Http_Response_Abstract')->newInstanceWithoutConstructor();
+
+        $response->mockMethod('getRequest')->set(new CM_Http_Request_Get('/foo/bar/', ['cookie' => 'timezoneOffset=-150; clientId=7']));
+        $response->setServiceManager($this->getServiceManager());
+        $environment = $response->getEnvironment();
+        $this->assertInstanceOf('CM_Frontend_Environment', $environment);
+        $this->assertInstanceOf('DateTimeZone', $environment->getTimeZone());
+        $this->assertSame('+02:30', $environment->getTimeZone()->getName());
+
+        $response->mockMethod('getRequest')->set(new CM_Http_Request_Get('/foo/bar/', ['cookie' => 'timezoneOffset=60']));
+        $environment = $response->getEnvironment();
+        $this->assertInstanceOf('CM_Frontend_Environment', $environment);
+        $this->assertInstanceOf('DateTimeZone', $environment->getTimeZone());
+        $this->assertSame('-01:00', $environment->getTimeZone()->getName());
+    }
 }
