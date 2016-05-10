@@ -266,29 +266,24 @@ var CM_App = CM_Class_Abstract.extend({
     },
 
     _create: function(data) {
-      if (this._isCmObject(data)) {
-        data['data'] = this._create(data['data']);
-        return this._toCmObject(data);
-      }
       if ($.isPlainObject(data) || _.isArray(data)) {
         _.each(data, function(value, key) {
           data[key] = this._create(value);
         }.bind(this));
       }
+      if (this._isCmObject(data)) {
+        return this._toCmObject(data);
+      }
       return data;
     },
 
     _isCmObject: function(data) {
-      return data && data['__javascript_encodable__'] && data['_class'];
+      var className = data && data['_class'];
+      return className && cm.model.types[className] && window[className];
     },
 
     _toCmObject: function(data) {
-      var constructor = data['_class'];
-      if (cm.model.types[constructor]) {
-        return new window[constructor](data['data']);
-      } else {
-        throw new Error('Unexpected encoded class');
-      }
+      return new window[data['_class']](data);
     }
   },
 

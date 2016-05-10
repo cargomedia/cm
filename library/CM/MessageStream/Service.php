@@ -66,6 +66,6 @@ class CM_MessageStream_Service {
         if (!$this->getEnabled()) {
             return;
         }
-        $this->getAdapter()->publish($channel, $event, CM_Params::encodeJavascript($data));
+        $this->getAdapter()->publish($channel, $event, CM_Params::encode($data));
     }
 }

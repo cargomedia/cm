@@ -542,29 +542,6 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     }
 
     /**
-     * @param mixed $value
-     * @throws CM_Exception_Invalid
-     * @return string
-     */
-    public static function encodeJavascript($value) {
-        if (is_array($value)) {
-            $value = array_map('self::encodeJavascript', $value);
-        }
-        if ($value instanceof CM_ArrayConvertible) {
-            if ($value instanceof CM_JavascriptEncodable) {
-                $array = $value->toJavascript();
-                $array = array_map('self::encodeJavascript', $array);
-                $value = array('_class' => get_class($value), '__javascript_encodable__' => true, 'data' => $array);
-            } else {
-                $array = $value->toArray();
-                $array = array_map('self::encodeJavascript', $array);
-                $value = array_merge($array, array('_class' => get_class($value)));
-            }
-        }
-        return $value;
-    }
-
-    /**
      * @param CM_ArrayConvertible $object
      * @return string JSON
      */

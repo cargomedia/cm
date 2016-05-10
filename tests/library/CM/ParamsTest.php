@@ -213,18 +213,6 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame(1, $toArrayMethod->getCallCount());
     }
 
-    public function testEncodeJavascript() {
-        $javascriptEncodable = $this->mockInterface('CM_JavascriptEncodable')->newInstance();
-        $data = ['foo' => 'bar', 'bar' => 1];
-        $javascriptEncodable->mockMethod('toJavascript')->set($data);
-        $expectedEncoded = array(
-            '_class'                   => get_class($javascriptEncodable),
-            '__javascript_encodable__' => true,
-            'data'                     => $data
-        );
-        $this->assertEquals($expectedEncoded, CM_Params::encodeJavascript($javascriptEncodable));
-    }
-
     public function testEncodeObjectId() {
         /** @var CM_ArrayConvertible|\Mocka\ClassMock $arrayConvertible */
         $arrayConvertible = $this->mockInterface('CM_ArrayConvertible')->newInstance();
