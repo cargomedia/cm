@@ -435,6 +435,24 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $this->assertEquals(200, $dimensions['height']);
     }
 
+    public function testCompositeImage() {
+        $backgroundColor = '#0000FF';
+        $background = new \Imagick();
+        $background->newPseudoImage(100, 100, 'canvas:' . $backgroundColor);
+        $backgroundImage = new CM_Image_Image($background);
+
+        $foregroundColor = '#FF0000';
+        $foreground = new \Imagick();
+        $foreground->newPseudoImage(30, 30, 'canvas:' . $foregroundColor);
+        $foregroundImage = new CM_Image_Image($foreground);
+
+        $backgroundImage->compositeImage($foregroundImage, 10, 10);
+
+        $backgroundImagick = $this->_getImagickObject($backgroundImage);
+        $this->assertSame('srgb(0,0,255)', $backgroundImagick->getImagePixelColor(9, 9)->getColorAsString());
+        $this->assertSame('srgb(255,0,0)', $backgroundImagick->getImagePixelColor(10, 10)->getColorAsString());
+    }
+
     /**
      * @param CM_Image_Image $image
      * @return Imagick
