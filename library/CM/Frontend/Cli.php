@@ -82,7 +82,6 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
             'tile-medium-270x270-transparent.png' => ['width' => 270, 'height' => 270, 'transparent' => true, 'iconSize' => 0.5],
             'tile-large-558x558-transparent.png'  => ['width' => 558, 'height' => 558, 'transparent' => true, 'iconSize' => 0.5],
             'tile-wide-558x270-transparent.png'   => ['width' => 558, 'height' => 270, 'transparent' => true, 'iconSize' => 0.5],
-
         ];
         $this->_getStreamOutput()->writeln('Generating favicons');
 
@@ -94,13 +93,11 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
                 foreach ($configImageList as $outputFilename => $config) {
                     $backgroundWidth = (int) $config['width'];
                     $backgroundHeight = (int) $config['height'];
-
                     if (array_key_exists('transparent', $config) && false === $config['transparent']) {
                         $assetCss = new CM_Asset_Css($render);
                         $assetCss->addVariables();
                         $assetCss->add('foo:@' . self::FAVICON_BACKGROUND_LESS_VARIABLE);
                         $css = $assetCss->get(true);
-
                         if (!preg_match('/^foo:(.+);$/', $css, $matches)) {
                             throw new CM_Exception_Invalid('Cannot detect variable `' . self::FAVICON_BACKGROUND_LESS_VARIABLE . '` from CSS `' .
                                 $css . '`.');
@@ -109,12 +106,11 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
                     } else {
                         $backgroundColor = 'transparent';
                     }
-                    $background = new \Imagick();
+                    $background = new Imagick();
                     $background->newPseudoImage($backgroundWidth, $backgroundHeight, 'canvas:' . $backgroundColor);
                     $backgroundImage = new CM_Image_Image($background);
 
                     $svgResolution = max($backgroundWidth, $backgroundHeight) * 1.5; //make image wittingly little bigger
-
                     $iconImage = CM_Image_Image::createFromSVG((new CM_File($svgPath))->read(), $svgResolution, $svgResolution);
                     $sizeRatio = array_key_exists('iconSize', $config) ? (float) $config['iconSize'] : 1;
                     if ($sizeRatio > 1 || $sizeRatio < 0) {
