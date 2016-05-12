@@ -42,7 +42,10 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Image_Image', $svgImage);
         $this->assertTrue($svgImage->getHeight() > 200);
         $this->assertTrue($svgImage->getWidth() > 200);
-        $this->assertSame('srgb(0,0,255)', $this->_getImagickObject($svgImage)->getImagePixelColor(1, 1)->getColorAsString());
+
+        $imagick = $this->_getImagickObject($svgImage);
+        $imagick->transformImageColorspace(Imagick::COLORSPACE_SRGB);
+        $this->assertSame('srgb(0,0,255)', $imagick->getImagePixelColor(1, 1)->getColorAsString());
     }
 
     public function testCrop() {
@@ -438,11 +441,13 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     public function testCompositeImage() {
         $backgroundColor = '#0000FF';
         $background = new \Imagick();
+        $background->setColorspace(Imagick::COLORSPACE_SRGB);
         $background->newPseudoImage(100, 100, 'canvas:' . $backgroundColor);
         $backgroundImage = new CM_Image_Image($background);
 
         $foregroundColor = '#FF0000';
         $foreground = new \Imagick();
+        $foreground->setColorspace(Imagick::COLORSPACE_SRGB);
         $foreground->newPseudoImage(30, 30, 'canvas:' . $foregroundColor);
         $foregroundImage = new CM_Image_Image($foreground);
 
