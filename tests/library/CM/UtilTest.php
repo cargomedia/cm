@@ -134,4 +134,10 @@ class CM_UtilTest extends CMTest_TestCase {
         $resource = fopen(sys_get_temp_dir(), 'r');
         CM_Util::jsonEncode(['foo' => $resource]);
     }
+
+    public function testDistance() {
+        $this->assertSame(2.0, CM_Util::distance(1, 1, 3, 1));
+        $this->assertSame(0.0, CM_Util::distance(2, 2, 2, 2));
+        $this->assertEquals(2.82, CM_Util::distance(1, 1, -1, -1), '', 0.01);
+    }
 }

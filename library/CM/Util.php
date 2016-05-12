@@ -557,4 +557,19 @@ class CM_Util {
         }
         return $value;
     }
+
+    /**
+     * @param float $x1
+     * @param float $y1
+     * @param float $x2
+     * @param float $y2
+     * @return float
+     */
+    public static function distance($x1, $y1, $x2, $y2) {
+        $x1 = (float) $x1;
+        $y1 = (float) $y1;
+        $x2 = (float) $x2;
+        $y2 = (float) $y2;
+        return sqrt(pow($x1 - $x2, 2) + pow($y1 - $y2, 2));
+    }
 }
