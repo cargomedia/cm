@@ -117,8 +117,9 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      * @throws CM_Exception_AuthRequired
      */
     public function getEnvironment() {
-        $location = $this->getRequest()->getLocation();
-        $viewer = $this->getRequest()->getViewer();
+        $request = $this->getRequest();
+        $location = $request->getLocation();
+        $viewer = $request->getViewer();
         $currency = null;
         if (null === $currency && null !== $viewer) {
             $currency = $viewer->getCurrency();
@@ -126,9 +127,8 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
         if (null === $currency && null !== $location) {
             $currency = CM_Model_Currency::findByLocation($location);
         }
-        $clientDevice = new CM_Http_ClientDevice($this->getRequest());
-        $timeZone = $this->getRequest()->getTimeZone();
-        return new CM_Frontend_Environment($this->getSite(), $viewer, $this->getRequest()->getLanguage(), $timeZone, null, $location, $currency, $clientDevice);
+        $clientDevice = new CM_Http_ClientDevice($request);
+        return new CM_Frontend_Environment($this->getSite(), $viewer, $request->getLanguage(), $request->getTimeZone(), null, $location, $currency, $clientDevice);
     }
 
     /**
