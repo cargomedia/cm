@@ -119,6 +119,27 @@ class CM_Model_Location extends CM_Model_Abstract {
     }
 
     /**
+     * @return DateTimeZone
+     */
+    public function getTimeZone() {
+        $coordinates = $this->getCoordinates();
+        $timezoneNameList = DateTimeZone::listIdentifiers();
+        $distanceList = Functional\map($timezoneNameList, function ($timezoneName) use ($coordinates) {
+            $timezoneLocation = (new DateTimeZone($timezoneName))->getLocation();
+            return [
+                'timezoneName' => $timezoneName,
+                'distance'     => CM_Util::distance($timezoneLocation['latitude'], $timezoneLocation['longitude'], $coordinates['latitude'], $coordinates['longitude'])
+            ];
+        });
+
+        $closestDistance = Functional\reduce_left($distanceList, function (array $current, $index, $collection, array $minimal) {
+            return $current['distance'] < $minimal['distance'] ? $current : $minimal;
+        }, $distanceList[0]);
+
+        return new DateTimeZone($closestDistance['timezoneName']);
+    }
+
+    /**
      * @param int|null $level
      * @throws CM_Exception_Invalid
      * @return CM_Model_Location_Abstract|null
