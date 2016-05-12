@@ -43,8 +43,10 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $this->assertTrue($svgImage->getHeight() > 200);
         $this->assertTrue($svgImage->getWidth() > 200);
 
-        $imagick = $this->_getImagickObject($svgImage);
-        $this->assertSame('rgb(0,0,255)', $imagick->getImagePixelColor(1, 1)->getColorAsString());
+        $imageColor = $this->_getImagickObject($svgImage)->getImagePixelColor(1, 1)->getColor();
+        $this->assertSame(0, $imageColor['r']);
+        $this->assertSame(0, $imageColor['g']);
+        $this->assertSame(255, $imageColor['b']);
     }
 
     public function testCrop() {
@@ -451,8 +453,15 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $backgroundImage->compositeImage($foregroundImage, 10, 10);
 
         $backgroundImagick = $this->_getImagickObject($backgroundImage);
-        $this->assertSame('rgb(0,0,255)', $backgroundImagick->getImagePixelColor(9, 9)->getColorAsString());
-        $this->assertSame('rgb(255,0,0)', $backgroundImagick->getImagePixelColor(10, 10)->getColorAsString());
+        $colorBackground = $backgroundImagick->getImagePixelColor(9, 9)->getColor();
+        $this->assertSame(0, $colorBackground['r']);
+        $this->assertSame(0, $colorBackground['g']);
+        $this->assertSame(255, $colorBackground['b']);
+
+        $colorForeground = $backgroundImagick->getImagePixelColor(10, 10)->getColor();
+        $this->assertSame(255, $colorForeground['r']);
+        $this->assertSame(0, $colorForeground['g']);
+        $this->assertSame(0, $colorForeground['b']);
     }
 
     /**
