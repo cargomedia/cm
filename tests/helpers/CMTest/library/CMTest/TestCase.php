@@ -558,18 +558,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         if ($actual instanceof CM_Paging_Abstract) {
             $actual = $actual->getItems();
         }
-        if (is_array($expected) && is_array($actual)) {
-            self::assertSame(array_keys($expected), array_keys($actual), $message);
-            foreach ($expected as $expectedKey => $expectedValue) {
-                self::assertEquals($expectedValue, $actual[$expectedKey], $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
-            }
-            return;
-        }
-        if ($expected instanceof CM_Comparable) {
-            self::assertTrue($expected->equals($actual), 'Comparables differ');
-        } else {
-            parent::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
-        }
+        parent::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
     }
 
     public static function assertNotEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false) {
