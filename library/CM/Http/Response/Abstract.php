@@ -127,15 +127,8 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
             $currency = CM_Model_Currency::findByLocation($location);
         }
         $clientDevice = new CM_Http_ClientDevice($this->getRequest());
-        $timezone = null;
-        if ($timezoneOffset = $this->getRequest()->getCookie('timezoneOffset')) {
-            //timezoneOffset is minutes behind UTC
-            $timezoneOffset = (int) $timezoneOffset * -1;
-            $offsetHours = intval($timezoneOffset / 60);
-            $offsetMinutes = intval($timezoneOffset % 60);
-            $timezone = DateTime::createFromFormat('O', sprintf("%+03d%02d", $offsetHours , $offsetMinutes))->getTimezone();
-        }
-        return new CM_Frontend_Environment($this->getSite(), $viewer, $this->getRequest()->getLanguage(), $timezone, null, $location, $currency, $clientDevice);
+        $timeZone = $this->getRequest()->getTimeZone();
+        return new CM_Frontend_Environment($this->getSite(), $viewer, $this->getRequest()->getLanguage(), $timeZone, null, $location, $currency, $clientDevice);
     }
 
     /**
