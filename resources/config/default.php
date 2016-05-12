@@ -251,7 +251,7 @@ return function (CM_Config_Node $config) {
     $config->services['logger-handler-newrelic'] = [
         'class'     => 'CMService_NewRelic_Log_Handler',
         'arguments' => [
-            'minLevel' => CM_Log_Logger::WARNING,
+            'minLevel' => CM_Log_Logger::ERROR,
         ],
     ];
 
