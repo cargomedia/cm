@@ -51,17 +51,14 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
 
     public function generateFavicon() {
         $faviconConfigList = $this->_getFaviconConfigList();
-        $faviconConfigDefault = ['iconSize' => 1, 'transparent' => false];
         $this->_getStreamOutput()->writeln('Generating favicons');
 
         foreach (CM_Site_Abstract::getAll() as $site) {
             $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-            $themeDir = $render->getThemeDir(true);
-            $svgFile = new CM_File($themeDir . self::FAVICON_SVG_FILENAME);
+            $themeDir = new CM_File($render->getThemeDir(true));
+            $svgFile = $themeDir->joinPath('resource', 'img', self::FAVICON_SVG_FILENAME);
             if ($svgFile->exists()) {
                 foreach ($faviconConfigList as $outputFilename => $config) {
-                    $config = array_merge($faviconConfigDefault, $config);
-
                     $backgroundWidth = (int) $config['width'];
                     $backgroundHeight = (int) $config['height'];
                     $backgroundColor = false === $config['transparent'] ?
@@ -78,8 +75,10 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
                     $backgroundImage->compositeImage($iconImage, ($backgroundWidth - $iconSize) / 2, ($backgroundHeight - $iconSize) / 2);
                     $backgroundImage->setFormat(CM_Image_Image::FORMAT_PNG);
 
-                    CM_File::create($themeDir . $outputFilename, $backgroundImage->getBlob());
-                    $this->_getStreamOutput()->writeln('Generated ' . $themeDir . $outputFilename);
+                    $targetFile = $themeDir->joinPath('resource', 'img', 'meta', $outputFilename);
+                    $targetFile->ensureParentDirectory();
+                    $targetFile->write($backgroundImage->getBlob());
+                    $this->_getStreamOutput()->writeln('Generated ' . $targetFile->getPath());
                 }
             }
         }
@@ -89,6 +88,8 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
      * @return array
      */
     private function _getFaviconConfigList() {
+        $faviconConfigDefault = ['iconSize' => 1, 'transparent' => false];
+
         $configImageList = [
             // Favicon & Apple Touch Icons
             'square-16.png'                       => ['width' => 16, 'height' => 16],
@@ -124,6 +125,8 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
         ];
 
         foreach ($configImageList as &$config) {
+            $config = array_merge($faviconConfigDefault, $config);
+
             if (array_key_exists('iconSize', $config)) {
                 $iconSize = (float) $config['iconSize'];
                 if ($iconSize > 1 || $iconSize < 0) {
