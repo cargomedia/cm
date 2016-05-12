@@ -421,4 +421,18 @@ class CM_Image_Image {
         }
         return new self($imagick);
     }
+
+    /**
+     * @param string      $imageBlob
+     * @param int         $width
+     * @param int         $height
+     * @param string|null $backgroundColor
+     * @return CM_Image_Image
+     */
+    public static function createFromSVGWithSize($imageBlob, $width, $height, $backgroundColor = null) {
+        $image = self::createFromSVG($imageBlob, 72, 72);
+        $scale = max([$width / $image->getWidth(), $height / $image->getHeight()]);
+        $image = self::createFromSVG($imageBlob, 72 * $scale, 72 * $scale, $backgroundColor);
+        return $image;
+    }
 }

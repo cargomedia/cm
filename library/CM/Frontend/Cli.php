@@ -73,9 +73,7 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
                     $backgroundImage = new CM_Image_Image($background);
 
                     $iconSize = (int) (min($backgroundWidth, $backgroundHeight) * (float) $config['iconSize']);
-                    $svgResolution = $iconSize * 1.3; //make image wittingly little bigger
-                    $iconImage = CM_Image_Image::createFromSVG($svgFile->read(), $svgResolution, $svgResolution);
-                    $iconImage->resizeSpecific($iconSize, $iconSize);
+                    $iconImage = CM_Image_Image::createFromSVGWithSize($svgFile->read(), $iconSize, $iconSize);
 
                     $backgroundImage->compositeImage($iconImage, ($backgroundWidth - $iconSize) / 2, ($backgroundHeight - $iconSize) / 2);
                     $backgroundImage->setFormat(CM_Image_Image::FORMAT_PNG);
