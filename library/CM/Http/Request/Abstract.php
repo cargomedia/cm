@@ -435,11 +435,11 @@ abstract class CM_Http_Request_Abstract {
      * @return DateTimeZone|null
      */
     public function getTimeZone() {
-        if ($timezoneOffset = $this->getCookie('timeZoneOffset')) {
+        if ($timeZoneOffset = $this->getCookie('timezoneOffset')) {
             //timezoneOffset is minutes behind UTC
-            $timezoneOffset = (int) $timezoneOffset * -1;
-            $offsetHours = intval($timezoneOffset / 60);
-            $offsetMinutes = intval($timezoneOffset % 60);
+            $timeZoneOffset = (int) $timeZoneOffset * -1;
+            $offsetHours = intval($timeZoneOffset / 60);
+            $offsetMinutes = intval($timeZoneOffset % 60);
             return DateTime::createFromFormat('O', sprintf("%+03d%02d", $offsetHours, $offsetMinutes))->getTimezone();
         }
         return null;
