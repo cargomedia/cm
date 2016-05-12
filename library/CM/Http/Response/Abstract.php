@@ -130,7 +130,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
         $clientDevice = new CM_Http_ClientDevice($request);
         
         $timeZone = $request->getTimeZone();
-        if (null === $timeZone && null !== $timeZone) {
+        if (null === $timeZone && null !== $location) {
             $timeZone = $location->getTimeZone();
         }
         
