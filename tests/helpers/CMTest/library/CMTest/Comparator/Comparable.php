@@ -13,8 +13,8 @@ class CMTest_Comparator_Comparable extends Comparator\Comparator {
     }
 
     public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = false, $ignoreCase = false) {
-        /** @var CM_Model_Abstract $expected */
-        /** @var CM_Model_Abstract $actual */
+        /** @var CM_Comparable $expected */
+        /** @var CM_Comparable $actual */
         if (!$expected->equals($actual)) {
             $message = "Failed asserting that {$this->exporter->export($actual)} matches expected {$this->exporter->export($expected)}.";
             throw new Comparator\ComparisonFailure($expected, $actual, '', '', false, $message);
