@@ -30,17 +30,8 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
             }
         }
 
-        if (null !== $filterType) {
-            if (false !== $filterType) {
-                $filterType = (int) $filterType;
-                $childrenTypeList = \Functional\map(CM_Paging_Log::getClassChildren(), function ($className) {
-                    /** @type CM_Class_Abstract $className */
-                    return $className::getTypeStatic();
-                });
-                if (!in_array($filterType, $childrenTypeList)) {
-                    throw new CM_Exception_Invalid('Type is not a children of CM_Paging_Log.');
-                }
-            }
+        if (null !== $filterType && false !== $filterType && !self::isValidType((int) $filterType)) {
+            throw new CM_Exception_Invalid('Type is not a children of CM_Paging_Log.');
         }
 
         if (null !== $ageMax) {
@@ -146,5 +137,18 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         }
 
         return $criteria;
+    }
+
+    /**
+     * @param int $type
+     * @return bool
+     */
+    public static function isValidType($type) {
+        $type = (int) $type;
+        $childrenTypeList = \Functional\map(CM_Paging_Log::getClassChildren(), function ($className) {
+            /** @type CM_Class_Abstract $className */
+            return $className::getTypeStatic();
+        });
+        return in_array($type, $childrenTypeList);
     }
 }
