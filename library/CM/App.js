@@ -903,7 +903,6 @@ var CM_App = CM_Class_Abstract.extend({
    */
   ajax: function(type, data) {
     var url = this.getUrlAjax(type);
-    var self = this;
     var jqXHR;
 
     var ajaxPromise = new Promise(function(resolve, reject, onCancel) {
