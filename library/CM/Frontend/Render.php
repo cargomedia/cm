@@ -451,6 +451,24 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
+     * @param $variableName
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    public function getLessVariable($variableName) {
+        $variableName = (string) $variableName;
+
+        $assetCss = new CM_Asset_Css($this);
+        $assetCss->addVariables();
+        $assetCss->add('foo:@' . $variableName);
+        $css = $assetCss->get(true);
+        if (!preg_match('/^foo:(.+);$/', $css, $matches)) {
+            throw new CM_Exception_Invalid('Cannot detect variable `' . $variableName . '` from CSS `' . $css . '`.');
+        }
+        return (string) $matches[1];
+    }
+
+    /**
      * @return Smarty
      */
     private function _getSmarty() {
