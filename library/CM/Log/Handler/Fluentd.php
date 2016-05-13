@@ -80,7 +80,7 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
             $formattedRecord['request'] = $formattedRequest;
         }
 
-        $appAttributes = $context->getExtra();
+        $appAttributes = $context->getExtra()->toArray();
         if ($user = $context->getUser()) {
             $appAttributes['user'] = $user->getId();
         }
@@ -89,12 +89,12 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
         }
         $formattedRecord[$this->_appName] = $appAttributes;
 
-        if ($context->getAppContext()->hasException()) {
-            $exception = $context->getAppContext()->getSerializableException();
+        if ($exception = $context->getException()) {
+            $serializableException = new CM_ExceptionHandling_SerializableException($exception);
             $formattedRecord['exception'] = [
-                'type'    => $exception->getClass(),
-                'message' => $exception->getMessage(),
-                'stack'   => $exception->getTraceAsString(),
+                'type'    => $serializableException->getClass(),
+                'message' => $serializableException->getMessage(),
+                'stack'   => $serializableException->getTraceAsString(),
             ];
         }
 

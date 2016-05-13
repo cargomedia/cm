@@ -30,8 +30,11 @@ class CM_Log_Handler_StreamTest extends CMTest_TestCase {
             $this->assertRegExp('/^\[[0-9T\:\-\+]+ - none - php none - INFO\] foo\n - extra: foo: bar\n - exception:(?:\s+) - message: foo.*$/s', $message);
         });
 
-        $appContext = new CM_Log_Context_App(['foo' => 'bar'], null,  new Exception('foo'));
-        $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context(null, null, $appContext));
+
+        $context = new CM_Log_Context();
+        $context->getExtra()->set(['foo' => 'bar']);
+        $context->setException(new Exception('foo'));
+        $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', $context);
         $formatter = new CM_Log_Formatter_Text();
         $handler = new CM_Log_Handler_Stream($mockStreamInterface, $formatter);
         $this->forceInvokeMethod($handler, '_writeRecord', [$record]);

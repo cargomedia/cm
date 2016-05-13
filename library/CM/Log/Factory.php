@@ -31,7 +31,8 @@ class CM_Log_Factory implements CM_Service_ManagerAwareInterface {
      */
     protected function _createLogger(CM_Log_Handler_HandlerInterface $handler) {
         $computerInfo = new CM_Log_Context_ComputerInfo(CM_Util::getFqdn(), phpversion());
-        $globalContext = new CM_Log_Context(null, $computerInfo);
+        $globalContext = new CM_Log_Context();
+        $globalContext->setComputerInfo($computerInfo);
         return new CM_Log_Logger($globalContext, $handler);
     }
 }
