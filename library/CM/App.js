@@ -494,6 +494,7 @@ var CM_App = CM_Class_Abstract.extend({
         wordSeparator: " ",
         numbers: []
       };
+      $.cookie('timezoneOffset', (new Date()).getTimezoneOffset() * 60);
     },
     /**
      * @return {Number} Unix-timestamp
