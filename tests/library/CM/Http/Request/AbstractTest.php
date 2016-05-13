@@ -273,12 +273,12 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertInstanceOf('DateTimeZone', $timeZone);
         $this->assertSame('+02:30', $timeZone->getName());
 
-        $request =new CM_Http_Request_Post('/foo/bar/', ['cookie' => 'timezoneOffset=3600']);
+        $request = new CM_Http_Request_Post('/foo/bar/', ['cookie' => 'timezoneOffset=3600']);
         $timeZone = $this->callProtectedMethod($request, 'getTimeZone');
         $this->assertInstanceOf('DateTimeZone', $timeZone);
         $this->assertSame('-01:00', $timeZone->getName());
 
-        $request =new CM_Http_Request_Get('/foo/baz/');
+        $request = new CM_Http_Request_Get('/foo/baz/');
         $timeZone = $this->callProtectedMethod($request, 'getTimeZone');
         $this->assertNull($timeZone);
     }

@@ -128,12 +128,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
             $currency = CM_Model_Currency::findByLocation($location);
         }
         $clientDevice = new CM_Http_ClientDevice($request);
-
-        $timeZone = $request->getTimeZone();
-        if (null === $timeZone && null !== $location) {
-            $timeZone = $location->getTimeZone();
-        }
-        return new CM_Frontend_Environment($this->getSite(), $viewer, $request->getLanguage(), $timeZone, null, $location, $currency, $clientDevice);
+        return new CM_Frontend_Environment($this->getSite(), $viewer, $request->getLanguage(), $request->getTimeZone(), null, $location, $currency, $clientDevice);
     }
 
     /**
