@@ -128,7 +128,7 @@ class CM_Model_Location extends CM_Model_Abstract {
             $timezoneLocation = (new DateTimeZone($timezoneName))->getLocation();
             return [
                 'timezoneName' => $timezoneName,
-                'distance'     => CM_Util::distance($timezoneLocation['latitude'], $timezoneLocation['longitude'], $coordinates['latitude'], $coordinates['longitude'])
+                'distance'     => CM_Util::distance($timezoneLocation['latitude'], $timezoneLocation['longitude'], $coordinates['lat'], $coordinates['lon'])
             ];
         });
 

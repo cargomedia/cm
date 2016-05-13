@@ -335,20 +335,20 @@ class CM_Model_LocationTest extends CMTest_TestCase {
         /** @var CM_Model_Location|\Mocka\AbstractClassTrait $locationMock */
         $locationMock = $this->mockClass('CM_Model_Location')->newInstanceWithoutConstructor();
 
-        $locationMock->mockMethod('getCoordinates')->set(['latitude' => 51.58742, 'longitude' => -0.28425]);
+        $locationMock->mockMethod('getCoordinates')->set(['lat' => 51.58742, 'lon' => -0.28425]);
         $timeZone = $locationMock->getTimeZone();
         $this->assertInstanceOf('DateTimeZone', $timeZone);
         $this->assertSame('Europe/London', $timeZone->getName());
 
-        $locationMock->mockMethod('getCoordinates')->set(['latitude' => 49.82072, 'longitude' => 1.44115]);
+        $locationMock->mockMethod('getCoordinates')->set(['lat' => 49.82072, 'lon' => 1.44115]);
         $timeZone = $locationMock->getTimeZone();
         $this->assertSame('Europe/Paris', $timeZone->getName());
 
-        $locationMock->mockMethod('getCoordinates')->set(['latitude' => 40.58026, 'longitude' => -74.84595]);
+        $locationMock->mockMethod('getCoordinates')->set(['lat' => 40.58026, 'lon' => -74.84595]);
         $timeZone = $locationMock->getTimeZone();
         $this->assertSame('America/New_York', $timeZone->getName());
         
-        $locationMock->mockMethod('getCoordinates')->set(['latitude' => 35.80933, 'longitude' => -118.55927]);
+        $locationMock->mockMethod('getCoordinates')->set(['lat' => 35.80933, 'lon' => -118.55927]);
         $timeZone = $locationMock->getTimeZone();
         $this->assertSame('America/Los_Angeles', $timeZone->getName());
     }
