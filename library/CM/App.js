@@ -262,9 +262,6 @@ var CM_App = CM_Class_Abstract.extend({
      * @return {Object}
      */
     create: function(data) {
-      if (_.isString(data)) {
-        data = JSON.parse(data);
-      }
       return this._create(data);
     },
 
