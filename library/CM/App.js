@@ -921,7 +921,7 @@ var CM_App = CM_Class_Abstract.extend({
           if (response.error) {
             reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
           } else {
-            resolve(response.success);
+            resolve(cm.factory.create(response.success));
           }
         })
         .fail(function(xhr, textStatus) {
