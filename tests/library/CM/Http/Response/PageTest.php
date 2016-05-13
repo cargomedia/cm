@@ -56,7 +56,9 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
 
         $response = CMTest_TH::createResponsePage('/mock5', array('host' => $site->getHost()));
         $response->process();
-        $this->assertEmpty($response->getHeaders());
+        $this->assertFalse(Functional\some($response->getHeaders(), function($header) {
+            return preg_match('/^Location:/', $header);
+        }));
 
         $response = CMTest_TH::createResponsePage('/mock5', array('host' => 'incorrect-host.org'));
         $response->process();
@@ -89,7 +91,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     public function testProcessTrackingCanNotTrackPageView() {
         $response = CMTest_TH::createResponsePage('/mock8');
         $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
-        $response->process();
+        $this->callProtectedMethod($response, '_process');
         $html = $response->getContent();
 
         $this->assertNotContains('ga("send", "pageview"', $html);
@@ -100,7 +102,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     public function testProcessTrackingVirtualPageView() {
         $response = CMTest_TH::createResponsePage('/mock9');
         $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
-        $response->process();
+        $this->callProtectedMethod($response, '_process');
         $html = $response->getContent();
 
         $this->assertContains('ga("create", "ga123"', $html);
@@ -114,12 +116,12 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
 
     public function testProcessTrackingVirtualPageViewWithError() {
         CM_Config::get()->CM_Http_Response_Page->exceptionsToCatch = [
-            'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => null],
+            'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => false],
         ];
         $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
         $response = CMTest_TH::createResponsePage('/mock10');
         $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
-        $response->process();
+        $this->callProtectedMethod($response, '_process');
         $html = $response->getContent();
 
         $this->assertContains('ga("create", "ga123"', $html);
@@ -134,7 +136,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     public function testProcessTrackingGuest() {
         $response = CMTest_TH::createResponsePage('/mock5');
         $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
-        $response->process();
+        $this->callProtectedMethod($response, '_process');
         $html = $response->getContent();
 
         $this->assertContains('ga("create", "ga123"', $html);
@@ -147,14 +149,15 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessTrackingViewer() {
-        $viewer = $this->getMock('CM_Model_User', array('getIdRaw', 'getVisible', 'getLanguage'));
+        $viewer = $this->getMock('CM_Model_User', array('getIdRaw', 'getVisible', 'getLanguage', 'getCurrency'));
         $viewer->expects($this->any())->method('getIdRaw')->will($this->returnValue(array('id' => '1')));
         $viewer->expects($this->any())->method('getVisible')->will($this->returnValue(false));
         $viewer->expects($this->any())->method('getLanguage')->will($this->returnValue(null));
+        $viewer->expects($this->any())->method('getCurrency')->will($this->returnValue(null));
         /** @var CM_Model_User $viewer */
         $response = CMTest_TH::createResponsePage('/mock5', null, $viewer);
         $response->setServiceManager($this->_getServiceManager('ga123', 'km123'));
-        $response->process();
+        $this->callProtectedMethod($response, '_process');
         $html = $response->getContent();
 
         $this->assertContains('ga("create", "ga123"', $html);
@@ -169,7 +172,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
 
     public function testProcessExceptionCatching() {
         CM_Config::get()->CM_Http_Response_Page->exceptionsToCatch = [
-            'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => null],
+            'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => false],
         ];
         $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
         $request = CMTest_TH::createResponsePage('/example')->getRequest();
@@ -184,7 +187,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         });
 
         $this->assertSame('/example', $response->getRequest()->getPath());
-        $response->process();
+        $this->callProtectedMethod($response, '_process');
         $this->assertSame('/error/not-found', $response->getRequest()->getPath());
     }
 

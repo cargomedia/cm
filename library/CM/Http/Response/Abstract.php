@@ -44,6 +44,9 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     abstract protected function _process();
 
     public function process() {
+        $this->getServiceManager()->getLogger()->getContext()->getAppContext()->setUserWithClosure(function () {
+            return $this->getViewer();
+        });
         $this->_process();
 
         if ($this->getRequest()->hasSession()) {
@@ -64,7 +67,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
         }
 
         $name = $this->_getStringRepresentation();
-        CM_Service_Manager::getInstance()->getNewrelic()->setNameTransaction($name);
+        $this->getServiceManager()->getNewrelic()->setNameTransaction($name);
     }
 
     /**
@@ -87,7 +90,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      * @throws CM_Exception_AuthRequired
      */
     public function getViewer($needed = false) {
-        return $this->_request->getViewer($needed);
+        return $this->getRequest()->getViewer($needed);
     }
 
     /**
@@ -115,8 +118,16 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      */
     public function getEnvironment() {
         $location = $this->getRequest()->getLocation();
-        $currency = (null !== $location) ? CM_Model_Currency::findByLocation($location) : null;
-        return new CM_Frontend_Environment($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), null, null, $location, $currency);
+        $viewer = $this->getRequest()->getViewer();
+        $currency = null;
+        if (null === $currency && null !== $viewer) {
+            $currency = $viewer->getCurrency();
+        }
+        if (null === $currency && null !== $location) {
+            $currency = CM_Model_Currency::findByLocation($location);
+        }
+        $clientDevice = new CM_Http_ClientDevice($this->getRequest());
+        return new CM_Frontend_Environment($this->getSite(), $viewer, $this->getRequest()->getLanguage(), null, null, $location, $currency, $clientDevice);
     }
 
     /**
@@ -152,6 +163,11 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      */
     public function setHeaderNotfound() {
         $this->addHeaderRaw('HTTP/1.0 404 Not Found');
+    }
+
+    public function setHeaderDisableCache() {
+        # Via http://stackoverflow.com/questions/49547/making-sure-a-web-page-is-not-cached-across-all-browsers/5493543#5493543
+        $this->setHeader('Cache-Control', 'no-store, must-revalidate');
     }
 
     /**
@@ -239,8 +255,8 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     }
 
     /**
-     * @param callable $regularCode
-     * @param callable $errorCode
+     * @param Closure $regularCode
+     * @param Closure $errorCode
      * @return mixed
      * @throws CM_Exception
      */
@@ -252,16 +268,15 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
             $exceptionsToCatch = $config->exceptionsToCatch;
             $catchPublicExceptions = !empty($config->catchPublicExceptions);
             $errorOptions = \Functional\first($exceptionsToCatch, function ($options, $exceptionClass) use ($ex) {
-                return is_a($ex, $exceptionClass) ;
+                return is_a($ex, $exceptionClass);
             });
             $catchException = null !== $errorOptions;
-            if ($catchException) {
-                if (isset($errorOptions['log'])) {
-                    $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
-                    /** @var CM_Paging_Log_Abstract $log */
-                    $log = new $errorOptions['log']();
-                    $log->add($formatter->formatException($ex), $ex->getMetaInfo());
+            if ($catchException && isset($errorOptions['log']) && true === $errorOptions['log']) {
+                $logLevel = isset($errorOptions['level']) ? $errorOptions['level'] : null;
+                if (null === $logLevel) {
+                    $logLevel = CM_Log_Logger::exceptionSeverityToLevel($ex);
                 }
+                $this->getServiceManager()->getLogger()->addMessage('HTML response error', $logLevel, new CM_Log_Context_App(null, $this->getViewer(), $ex));
             }
             if (!$catchException && ($catchPublicExceptions && $ex->isPublic())) {
                 $errorOptions = [];

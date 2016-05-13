@@ -58,6 +58,13 @@ class CM_Db_Query_Insert extends CM_Db_Query_Abstract {
             foreach ($onDuplicateKeyValues as $fields => $values) {
                 if ($values === null) {
                     $valuesList[] = $this->_getClient()->quoteIdentifier($fields) . ' = NULL';
+                } elseif (!empty($values['literal'])) {
+                    $literal = (string) $values['literal'];
+                    if ($this->_isValidLiteral($literal)) {
+                        $valuesList[] = $this->_getClient()->quoteIdentifier($fields) . ' = ' . $values['literal'];
+                    } else {
+                        throw new CM_Exception('Unescaped Value is not whitelisted');
+                    }
                 } else {
                     $valuesList[] = $this->_getClient()->quoteIdentifier($fields) . ' = ?';
                     $this->_addParameters($values);
@@ -66,5 +73,13 @@ class CM_Db_Query_Insert extends CM_Db_Query_Abstract {
 
             $this->_addSql('ON DUPLICATE KEY UPDATE ' . implode(',', $valuesList));
         }
+    }
+
+    /**
+     * @param string $literal
+     * @return bool
+     */
+    private function _isValidLiteral($literal) {
+        return (1 === preg_match('/^LAST_INSERT_ID\((?:id)?\)$/', $literal));
     }
 }

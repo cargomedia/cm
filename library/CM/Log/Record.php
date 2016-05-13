@@ -31,6 +31,7 @@ class CM_Log_Record {
         $this->_message = $message;
         $this->_context = $context;
         $this->_createdAt = new DateTime();
+        $this->_createdAt->setTimestamp(time());
     }
 
     /**

@@ -5,7 +5,7 @@ class CM_Wowza_RpcEndpoints {
     /**
      * @param string $streamName
      * @param string $clientKey
-     * @param int $start
+     * @param int    $start
      * @param string $data
      * @return int
      * @throws CM_Exception_AuthRequired
@@ -24,12 +24,15 @@ class CM_Wowza_RpcEndpoints {
         $user = $session->getUser(true);
 
         $streamRepository = $wowza->getStreamRepository();
-        $streamChannel = $streamRepository->createStreamChannel($streamName, $streamChannelType, $server->getId(), 0);
+        $streamChannel = $streamRepository->createStreamChannel($streamName, $streamChannelType, $server->getId());
         try {
             $streamRepository->createStreamPublish($streamChannel, $user, $clientKey, $start);
-        } catch (CM_Exception $ex) {
+        } catch (CM_Exception_NotAllowed $exception) {
             $streamChannel->delete();
-            throw new CM_Exception_NotAllowed('Cannot publish: ' . $ex->getMessage());
+            throw new CM_Exception_NotAllowed('Cannot publish: ' . $exception->getMessage(), $exception->getSeverity());
+        } catch (CM_Exception_Invalid $exception) {
+            $streamChannel->delete();
+            throw new CM_Exception_Invalid('Cannot publish: ' . $exception->getMessage(), $exception->getSeverity());
         }
         return $streamChannel->getId();
     }
@@ -110,7 +113,7 @@ class CM_Wowza_RpcEndpoints {
     }
 
     /**
-     * @param CM_Wowza_Service $wowza
+     * @param CM_Wowza_Service         $wowza
      * @param CM_Http_Request_Abstract $request
      * @throws CM_Exception_AuthFailed
      */

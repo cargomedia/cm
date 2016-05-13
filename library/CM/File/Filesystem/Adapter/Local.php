@@ -3,7 +3,8 @@
 class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implements
     CM_File_Filesystem_Adapter_ChecksumCalculatorInterface,
     CM_File_Filesystem_Adapter_SizeCalculatorInterface,
-    CM_File_Filesystem_Adapter_AppendInterface {
+    CM_File_Filesystem_Adapter_AppendInterface,
+    CM_File_Filesystem_Adapter_StreamInterface {
 
     /** @var int */
     private $_mode;
@@ -18,6 +19,24 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
             $mode = 0777;
         }
         $this->_mode = (int) $mode;
+    }
+
+    public function getStreamRead($path) {
+        $pathAbsolute = $this->_getAbsolutePath($path);
+        $stream = @fopen($pathAbsolute, 'r');
+        if (false === $stream) {
+            throw new CM_Exception('Cannot open read stream for `' . $pathAbsolute . '`.');
+        }
+        return $stream;
+    }
+
+    public function getStreamWrite($path) {
+        $pathAbsolute = $this->_getAbsolutePath($path);
+        $stream = @fopen($pathAbsolute, 'w');
+        if (false === $stream) {
+            throw new CM_Exception('Cannot open write stream for `' . $pathAbsolute . '`.');
+        }
+        return $stream;
     }
 
     public function read($path) {
@@ -35,6 +54,14 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
             throw new CM_Exception('Cannot write ' . strlen($content) . ' bytes to `' . $pathAbsolute . '`');
         }
         clearstatcache(false, $pathAbsolute);
+    }
+
+    public function writeStream($path, $stream) {
+        $streamDestination = $this->getStreamWrite($path);
+        stream_copy_to_stream($stream, $streamDestination);
+        if (!@fclose($streamDestination)) {
+            throw new CM_Exception('Could not close stream for `' . $path . '`');
+        }
     }
 
     public function exists($path) {

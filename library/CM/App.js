@@ -6,6 +6,9 @@ var CM_App = CM_Class_Abstract.extend({
   /** @type Object **/
   views: {},
 
+  /** @type Object **/
+  lib: (cm.lib || {}),
+
   /** @type {Object|Null} **/
   viewer: null,
 
@@ -13,6 +16,7 @@ var CM_App = CM_Class_Abstract.extend({
   options: {},
 
   ready: function() {
+    this.promise.ready();
     this.error.ready();
     this.dom.ready();
     this.window.ready();
@@ -50,8 +54,8 @@ var CM_App = CM_Class_Abstract.extend({
       return view;
     }
     return _.find(this.views, function(view) {
-      return view.hasClass(className);
-    }) || null;
+        return view.hasClass(className);
+      }) || null;
   },
 
   /**
@@ -229,13 +233,57 @@ var CM_App = CM_Class_Abstract.extend({
     return this.getUrl(path, null, true);
   },
 
+  /**
+   * @returns {String}
+   */
+  getClientId: function() {
+    return $.cookie('clientId');
+  },
+
+  /**
+   * @returns {Object}
+   */
+  getContext: function() {
+    var context = {};
+    context[cm.options.name] = {
+      client: cm.getClientId(),
+      browserWindow: cm.window.getId()
+    };
+    if (cm.viewer) {
+      context[cm.options.name].user = cm.viewer.id;
+    }
+    return context;
+  },
+
+  promise: {
+    ready: function() {
+      var promiseConfig = {};
+      if (cm.options.debug) {
+        promiseConfig['warnings'] = {
+          wForgottenReturn: false
+        };
+      } else {
+        promiseConfig['warnings'] = false;
+      }
+      Promise.config(promiseConfig);
+    }
+  },
+
   error: {
     _callbacks: {_all: []},
 
     ready: function() {
       $(window).on('unhandledrejection', function(e) {
         e.preventDefault();
-        var error = e.originalEvent.detail.reason;
+        var event = e.originalEvent;
+        var error = null;
+        if (event.detail && event.detail.reason) {
+          error = event.detail.reason;
+        } else if (event.reason) {
+          error = event.reason;
+        } else {
+          error = new Error('Unhandled promise rejection without reason.');
+        }
         if (!(error instanceof Promise.CancellationError)) {
           cm.error._globalHandler(error);
         }
@@ -247,6 +295,15 @@ var CM_App = CM_Class_Abstract.extend({
      */
     setGlobalHandler: function(fn) {
       cm.error._globalHandler = fn;
+    },
+
+    /**
+     * @param {Error} error
+     */
+    log: function(error) {
+      _.defer(function() {
+        throw error;
+      });
     },
 
     /**
@@ -285,7 +342,9 @@ var CM_App = CM_Class_Abstract.extend({
         return;
       }
       var messages = _.toArray(arguments);
-      messages.unshift('[CM]');
+      var time = (Date.now() - performance.timing.navigationStart) / 1000;
+      var timeFormatted = time.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false});
+      messages.unshift('[CM ' + timeFormatted + ']');
       if (window.console && window.console.log) {
         var log = window.console.log;
         if (typeof log == "object" && Function.prototype.bind) {
@@ -347,24 +406,27 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('textarea.autosize, .autosize textarea').trigger('autosize.destroy');
     },
     /**
-     * @param {jQuery} $element
-     * @param {Function} [success] fn(MediaElement, Element)
-     * @param {Boolean} [preferPlugins]
+     * @param {HTMLVideoElement} element
+     * @param {Object} [options]
+     * @returns {MediaElementPlayer}
      */
-    setupVideo: function($element, success, preferPlugins) {
-      var mode = 'auto';
-      if (preferPlugins) {
-        mode = 'auto_plugin';
-      }
+    setupVideo: function(element, options) {
+      options = _.extend({
+        preferPlugins: false,
+        success: null
+      }, options || {});
 
-      $element.mediaelementplayer({
+      return new mejs.MediaElementPlayer(element, {
         flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
         silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
         videoWidth: '100%',
         videoHeight: '100%',
         defaultVideoWidth: '100%',
         defaultVideoHeight: '100%',
-        mode: mode,
+        mode: (options.preferPlugins ? 'auto_plugin' : 'auto'),
+        error: function() {
+          throw new Error('Cannot initialize MediaElement video player.');
+        },
         success: function(mediaElement, domObject) {
           var mediaElementMuted = cm.storage.get('mediaElement-muted');
           var mediaElementVolume = cm.storage.get('mediaElement-volume');
@@ -374,15 +436,31 @@ var CM_App = CM_Class_Abstract.extend({
           if (null !== mediaElementVolume) {
             mediaElement.setVolume(mediaElementVolume);
           }
-          mediaElement.addEventListener("volumechange", function() {
+          mediaElement.addEventListener('volumechange', function() {
             cm.storage.set('mediaElement-volume', mediaElement.volume);
             cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
           });
-          if (success) {
-            success(mediaElement, domObject);
+          if (options.success) {
+            options.success(mediaElement, domObject);
           }
         }
       });
+    },
+
+    /**
+     * @param {String|String[]} sourceList
+     * @param {Object} [options]
+     * @param {Boolean} [options.loop=false]
+     * @param {Boolean} [options.autoplay=false]
+     * @param {String} [options.crossOrigin='anonymous']
+     * @return {Audio}
+     */
+    createAudio: function(sourceList, options) {
+      sourceList = _.isString(sourceList) ? [sourceList] : sourceList;
+      var audio = new cm.lib.Media.Audio(options);
+      audio.setOptions(options);
+      audio.setSources(sourceList);
+      return audio;
     }
   },
 
@@ -796,7 +874,7 @@ var CM_App = CM_Class_Abstract.extend({
     var self = this;
     var jqXHR;
 
-    return new Promise(function(resolve, reject) {
+    var ajaxPromise = new Promise(function(resolve, reject, onCancel) {
       jqXHR = $.ajax(url, {
         data: JSON.stringify(data),
         type: 'POST',
@@ -818,25 +896,25 @@ var CM_App = CM_Class_Abstract.extend({
         .fail(function(xhr, textStatus) {
           if (xhr.status === 0) {
             if (window.navigator.onLine) {
-              reject(Promise.CancellationError());
+              ajaxPromise.cancel();
             } else {
               reject(new CM_Exception_RequestFailed(cm.language.get('No Internet connection')));
             }
+          } else {
+            var msg = cm.language.get('An unexpected connection problem occurred.');
+            if (cm.options.debug) {
+              msg = xhr.responseText || textStatus;
+            }
+            reject(new CM_Exception(msg));
           }
-
-          var msg = cm.language.get('An unexpected connection problem occurred.');
-          if (cm.options.debug) {
-            msg = xhr.responseText || textStatus;
-          }
-          reject(new CM_Exception(msg));
         });
-    }).cancellable()
-      .catch(Promise.CancellationError, function(error) {
+      onCancel(function() {
         if (jqXHR) {
           jqXHR.abort();
         }
-        throw error;
       });
+    });
+    return ajaxPromise;
   },
 
   /**
@@ -1290,5 +1368,9 @@ var CM_App = CM_Class_Abstract.extend({
       });
       return params;
     }
-  }
+  },
+
+  userAgent: (function(ua) {
+    return window.UserAgentParser.parse(ua);
+  })(navigator.userAgent || '')
 });

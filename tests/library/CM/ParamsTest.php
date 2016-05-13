@@ -213,6 +213,24 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame(1, $toArrayMethod->getCallCount());
     }
 
+    public function testEncodeObjectId() {
+        /** @var CM_ArrayConvertible|\Mocka\ClassMock $arrayConvertible */
+        $arrayConvertible = $this->mockInterface('CM_ArrayConvertible')->newInstance();
+        $arrayConvertible->mockMethod('toArrayIdOnly')->set([
+            'id' => 3
+        ]);
+        $arrayConvertible->mockMethod('toArray')->set([
+            'id'  => 3,
+            'foo' => 'bar',
+        ]);
+
+        $expectedEncoded = json_encode([
+            'id'     => 3,
+            '_class' => get_class($arrayConvertible),
+        ]);
+        $this->assertEquals($expectedEncoded, CM_Params::encodeObjectId($arrayConvertible));
+    }
+
     public function testGetDateTime() {
         $dateTimeList = array(
             new DateTime('2012-12-12 13:00:00 +0300'),
@@ -231,7 +249,9 @@ class CM_ParamsTest extends CMTest_TestCase {
 
     public function testGetLocation() {
         $location = CMTest_TH::createLocation();
-        $params = new CM_Params(['location' => $location, 'locationParameters' => ['id' => $location->getId(), 'level' => $location->getLevel()], 'insufficientParameters' => 1]);
+        $params = new CM_Params(['location'               => $location,
+                                 'locationParameters'     => ['id' => $location->getId(), 'level' => $location->getLevel()],
+                                 'insufficientParameters' => 1]);
         $this->assertEquals($location, $params->getLocation('location'));
         $this->assertEquals($location, $params->getLocation('locationParameters'));
         try {
@@ -338,24 +358,6 @@ class CM_ParamsTest extends CMTest_TestCase {
         $params->getParams('foo');
     }
 
-    public function testJsonEncode() {
-        $actual = CM_Params::jsonEncode(['foo' => 'bar']);
-        $this->assertSame('{"foo":"bar"}', $actual);
-    }
-
-    public function testJsonEncodePrettyPrint() {
-        $actual = CM_Params::jsonEncode(['foo' => 'bar'], true);
-        $this->assertSame('{' . "\n" . '    "foo": "bar"' . "\n" . '}', $actual);
-    }
-
-    /**
-     * @expectedException Exception
-     */
-    public function testJsonEncodeInvalid() {
-        $resource = fopen(sys_get_temp_dir(), 'r');
-        CM_Params::jsonEncode(['foo' => $resource]);
-    }
-
     public function testDebugInfo() {
         $params = new CM_Params(['foo' => 12, 'bar' => [1, 2]]);
         $this->assertSame("['foo' => 12, 'bar' => [0 => 1, 1 => 2]]", $params->getDebugInfo());
@@ -364,9 +366,21 @@ class CM_ParamsTest extends CMTest_TestCase {
     public function testDebugInfoWithException() {
         /** @var CM_Params|\Mocka\AbstractClassTrait $params */
         $params = $this->mockObject('CM_Params');
-        $params->mockMethod('getParamsDecoded')->set(function() {
+        $params->mockMethod('getParamsDecoded')->set(function () {
             throw new Exception('foo');
         });
         $this->assertSame('[Cannot dump params: `foo`]', $params->getDebugInfo());
+    }
+
+    public function testGetStreamChannel() {
+        $streamChannel = CMTest_TH::createStreamChannel();
+        $params = new CM_Params(['channel' => $streamChannel]);
+        $this->assertEquals($streamChannel, $params->getStreamChannel('channel'));
+    }
+
+    public function testGetStreamChannelDefinition() {
+        $definition = new CM_StreamChannel_Definition('foo', 12);
+        $params = new CM_Params(['def' => $definition]);
+        $this->assertEquals($definition, $params->getStreamChannelDefinition('def'));
     }
 }

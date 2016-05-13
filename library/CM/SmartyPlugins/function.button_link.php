@@ -35,6 +35,12 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
     }
     unset($params['title']);
 
+    $target = null;
+    if (isset($params['target'])) {
+        $target = (string) $params['target'];
+    }
+    unset($params['target']);
+
     if (isset($params['id'])) {
         $attrs .= ' id="' . $params['id'] . '"';
     }
@@ -68,27 +74,33 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
         }
     }
 
-    $onclick = false;
-    if (isset($params['onclick'])) {
-        $onclick = $params['onclick'];
-        unset($params['onclick']);
-    }
-    if (isset($params['page'])) {
-        $onclick .= ' cm.router.route(\'' . smarty_function_linkUrl($params, $template) . '\');';
-    }
-
-    if ($onclick) {
-        $attrs .= ' onclick="' . CM_Util::htmlspecialchars($onclick) . '"';
-    }
-
     if (isset($params['data'])) {
         foreach ($params['data'] as $name => $value) {
             $attrs .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
         }
+        unset($params['data']);
+    }
+
+    $href = false;
+    if (isset($params['href'])) {
+        $href = $params['href'];
+    } elseif (isset($params['page'])) {
+        $href = smarty_function_linkUrl($params, $template);
     }
 
     $html = '';
-    $html .= '<button class="' . $class . '" type="button" value="' . $label . '" ' . $attrs . '>';
+
+    if ($href) {
+        $html .= '<a href="' . CM_Util::htmlspecialchars($href) . '"';
+
+        if ($target) {
+            $html .= ' target="' . CM_Util::htmlspecialchars($target) . '"';
+        }
+    } else {
+        $html .= '<button type="button"';
+    }
+
+    $html .= ' class="' . $class . '" ' . $attrs . '>';
     if ($icon && $iconPosition == 'left') {
         $html .= $iconMarkup;
     }
@@ -99,6 +111,12 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
     if ($icon && $iconPosition == 'right') {
         $html .= $iconMarkup;
     }
-    $html .= '</button>';
+
+    if ($href) {
+        $html .= '</a>';
+    } else {
+        $html .= '</button>';
+    }
+
     return $html;
 }

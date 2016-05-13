@@ -59,10 +59,12 @@ class CM_Bootloader {
     public function getExceptionHandler() {
         if (!$this->_exceptionHandler) {
             if ($this->isCli()) {
-                $this->_exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
+                $exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
             } else {
-                $this->_exceptionHandler = new CM_ExceptionHandling_Handler_Http();
+                $exceptionHandler = new CM_ExceptionHandling_Handler_Http();
             }
+            $exceptionHandler->setServiceManager(CM_Service_Manager::getInstance());
+            $this->_exceptionHandler = $exceptionHandler;
         }
         return $this->_exceptionHandler;
     }
@@ -173,7 +175,6 @@ class CM_Bootloader {
 
     protected function _registerServices() {
         $serviceManager = CM_Service_Manager::getInstance();
-
         $serviceManager->register('debug', 'CM_Debug', ['enabled' => $this->isDebug()]);
         $serviceManager->register('filesystems', 'CM_Service_Filesystems');
         $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', [

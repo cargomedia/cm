@@ -183,6 +183,15 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
+     * @return CM_Frontend_Render
+     */
+    public function getRender() {
+        $environment = $this->_recipient ? $this->_recipient->getEnvironment() : new CM_Frontend_Environment();
+        $environment->setSite($this->_site);
+        return new CM_Frontend_Render($environment);
+    }
+
+    /**
      * @return boolean
      */
     public function getRenderLayout() {
@@ -290,12 +299,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @return array array($subject, $html, $text)
      */
     public function render() {
-        if (null !== $this->_recipient) {
-            $environment = $this->_recipient->getEnvironment();
-        } else {
-            $environment = new CM_Frontend_Environment($this->_site);
-        }
-        $render = new CM_Frontend_Render($environment);
+        $render = $this->getRender();
         $renderAdapter = new CM_RenderAdapter_Mail($render, $this);
         return $renderAdapter->fetch();
     }
@@ -457,7 +461,14 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     private function _log($subject, $text) {
         $msg = '* ' . $subject . ' *' . PHP_EOL . PHP_EOL;
         $msg .= $text . PHP_EOL;
-        $log = new CM_Paging_Log_Mail();
-        $log->addMail($this, $msg);
+        $logger = CM_Service_Manager::getInstance()->getLogger();
+        $logger->info($msg, new CM_Log_Context_App([
+            'type'    => CM_Paging_Log_Mail::getTypeStatic(),
+            'sender'  => $this->getSender(),
+            'replyTo' => $this->getReplyTo(),
+            'to'      => $this->getTo(),
+            'cc'      => $this->getCc(),
+            'bcc'     => $this->getBcc(),
+        ]));
     }
 }

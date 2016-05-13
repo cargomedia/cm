@@ -41,6 +41,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 
         $serviceManager = CM_Service_Manager::getInstance();
         $options = array();
+        $options['name'] = CM_App::getInstance()->getName();
         $options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
         $options['renderStamp'] = floor(microtime(true) * 1000);
         $options['site'] = CM_Params::encode($this->getRender()->getSite());

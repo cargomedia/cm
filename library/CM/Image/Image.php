@@ -5,6 +5,7 @@ class CM_Image_Image {
     const FORMAT_JPEG = 1;
     const FORMAT_GIF = 2;
     const FORMAT_PNG = 3;
+    const FORMAT_SVG = 4;
 
     /** @var Imagick|null */
     private $_imagick;
@@ -13,14 +14,27 @@ class CM_Image_Image {
     private $_animated;
 
     /**
-     * @param string $imageBlob
+     * @param string|Imagick $imageContainer
      * @throws CM_Exception
      */
-    public function __construct($imageBlob) {
-        $imageBlob = (string) $imageBlob;
-        try {
+    public function __construct($imageContainer) {
+        if (!is_a($imageContainer, 'Imagick')) {
+            $imageContainer = (string) $imageContainer;
             $imagick = new Imagick();
-            $imagick->readImageBlob($imageBlob);
+            try {
+                $imagick->readImageBlob($imageContainer);
+            } catch (ImagickException $e) {
+                throw new CM_Exception_Invalid('Cannot load image blob ' . $e->getMessage());
+            }
+        } else {
+            $imagick = $imageContainer;
+            try {
+                $imagick->valid(); //seems to be the only method to check if it contains an image
+            } catch (ImagickException $e) {
+                throw new CM_Exception_Invalid('$imagick does not contain any image ' . $e->getMessage());
+            }
+        }
+        try {
             if ($imagick->getIteratorIndex() > 0) {
                 $this->_animated = true;
                 $imagick = $imagick->coalesceImages();
@@ -28,7 +42,7 @@ class CM_Image_Image {
                 $this->_animated = false;
             }
         } catch (ImagickException $e) {
-            throw new CM_Exception('Cannot load Imagick instance ' . $e->getMessage());
+            throw new CM_Exception('Cannot process image ' . $e->getMessage());
         }
         $this->_imagick = $imagick;
     }
@@ -130,9 +144,20 @@ class CM_Image_Image {
                 return self::FORMAT_GIF;
             case'PNG':
                 return self::FORMAT_PNG;
+            case'SVG':
+                return self::FORMAT_SVG;
             default:
                 throw new CM_Exception_Invalid('Unsupported format `' . $imagickFormat . '`.');
         }
+    }
+
+    /**
+     * @param CM_Image_Image $image
+     * @param int            $x
+     * @param int            $y
+     */
+    public function compositeImage(CM_Image_Image $image, $x, $y) {
+        $this->_imagick->compositeImage($image->_imagick, Imagick::COMPOSITE_DEFAULT, (int) $x, (int) $y);
     }
 
     /**
@@ -366,5 +391,48 @@ class CM_Image_Image {
             default:
                 throw new CM_Exception_Invalid('Invalid format `' . $format . '`.');
         }
+    }
+
+    /**
+     * @param string      $imageBlob
+     * @param float       $resolutionX
+     * @param float       $resolutionY
+     * @param string|null $backgroundColor
+     * @return CM_Image_Image
+     * @throws CM_Exception_Invalid
+     */
+    public static function createFromSVG($imageBlob, $resolutionX, $resolutionY, $backgroundColor = null) {
+        $imageBlob = (string) $imageBlob;
+        if ('<?xml' !== substr($imageBlob, 0, 5)) {
+            $imageBlob = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' . $imageBlob;
+        }
+        $imagick = new Imagick();
+        $imagick->setResolution((float) $resolutionX, (float) $resolutionY);
+        if (null !== $backgroundColor) {
+            $backgroundColor = (string) $backgroundColor;
+        } else {
+            $backgroundColor = new ImagickPixel('transparent');
+        }
+        $imagick->setBackgroundColor($backgroundColor);
+        try {
+            $imagick->readImageBlob($imageBlob);
+        } catch (ImagickException $e) {
+            throw new CM_Exception_Invalid('Cannot load Imagick instance ' . $e->getMessage());
+        }
+        return new self($imagick);
+    }
+
+    /**
+     * @param string      $imageBlob
+     * @param int         $width
+     * @param int         $height
+     * @param string|null $backgroundColor
+     * @return CM_Image_Image
+     */
+    public static function createFromSVGWithSize($imageBlob, $width, $height, $backgroundColor = null) {
+        $image = self::createFromSVG($imageBlob, 72, 72);
+        $scale = max([$width / $image->getWidth(), $height / $image->getHeight()]);
+        $image = self::createFromSVG($imageBlob, 72 * $scale, 72 * $scale, $backgroundColor);
+        return $image;
     }
 }

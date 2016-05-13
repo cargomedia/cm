@@ -199,6 +199,15 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @param string $serviceName
+     * @return CM_Janus_Service
+     * @throws CM_Exception_Invalid
+     */
+    public function getJanus($serviceName) {
+        return $this->get($serviceName, 'CM_Janus_Service');
+    }
+
+    /**
      * @return CM_Memcache_Client
      */
     public function getMemcache() {
@@ -231,6 +240,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public function getNewrelic() {
         return $this->get('newrelic', 'CMService_Newrelic');
+    }
+
+    /**
+     * @return CM_Log_Logger
+     */
+    public function getLogger() {
+        return $this->get('logger', 'CM_Log_Logger');
     }
 
     /**

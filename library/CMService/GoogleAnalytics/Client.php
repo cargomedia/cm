@@ -2,14 +2,13 @@
 
 class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInterface {
 
+    use CM_Service_Tracking_QueueTrait;
+
     /** @var string */
     protected $_code;
 
     /** @var array */
-    protected $_eventList = array(), $_transactionList = array(), $_pageViewList = array(), $_fieldList = array();
-
-    /** @var int */
-    protected $_ttl;
+    protected $_eventList = [], $_transactionList = [], $_pageViewList = [], $_fieldList = [];
 
     /**
      * @param string   $code
@@ -17,10 +16,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
      */
     public function __construct($code, $ttl = null) {
         $this->_code = (string) $code;
-        if (null === $ttl) {
-            $ttl = 86400;
-        }
-        $this->_ttl = (int) $ttl;
+        $this->_setTrackingQueueTtl($ttl);
     }
 
     /**
@@ -63,13 +59,13 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
         $label = isset($label) ? (string) $label : null;
         $value = isset($value) ? (int) $value : null;
         $nonInteraction = (bool) $nonInteraction;
-        $this->_eventList[] = array(
+        $this->_eventList[] = [
             'category'       => $category,
             'action'         => $action,
             'label'          => $label,
             'value'          => $value,
             'nonInteraction' => $nonInteraction,
-        );
+        ];
     }
 
     /**
@@ -204,10 +200,9 @@ EOF;
      * @param CM_Model_User $user
      */
     protected function _flushTrackingQueue(CM_Model_User $user) {
-        $trackingQueue = $this->_getTrackingQueue($user);
-        while ($tracking = $trackingQueue->pop()) {
-            $data = $tracking['data'];
-            switch ($tracking['hitType']) {
+        while ($trackingData = $this->_popTrackingData($user)) {
+            $data = $trackingData['data'];
+            switch ($trackingData['hitType']) {
                 case 'event':
                     $eventCategory = $data['category'];
                     $eventAction = $data['action'];
@@ -233,21 +228,15 @@ EOF;
 
     /**
      * @param CM_Model_User $user
-     * @return CM_Queue
-     */
-    protected function _getTrackingQueue(CM_Model_User $user) {
-        return new CM_Queue(__METHOD__ . ':' . $user->getId());
-    }
-
-    /**
-     * @param CM_Model_User $user
      * @param string        $hitType
      * @param array|null    $data
+     * @throws CM_Exception_Invalid
      */
     protected function _pushHit(CM_Model_User $user, $hitType, array $data = null) {
-        $trackingQueue = $this->_getTrackingQueue($user);
-        $trackingQueue->push(['hitType' => $hitType, 'data' => $data]);
-        $trackingQueue->setTtl($this->_ttl);
+        if (!in_array($hitType, ['event', 'pageview'])) {
+            throw new CM_Exception_Invalid('Invalid hit type `' . $hitType . '`');
+        }
+        $this->_pushTrackingData($user, ['hitType' => $hitType, 'data' => $data]);
     }
 
     /**

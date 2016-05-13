@@ -63,7 +63,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 
         foreach ($paramsList as $params) {
             $workload = CM_Params::encode($params, true);
-            $task = $gearmanClient->addTask($this->_getJobName(), $workload);
+            $task = $gearmanClient->addTaskHigh($this->_getJobName(), $workload);
             if (false === $task) {
                 throw new CM_Exception('Cannot add task `' . $this->_getJobName() . '`.');
             }
@@ -92,6 +92,18 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
         $workload = CM_Params::encode($params, true);
         $gearmanClient = $this->_getGearmanClient();
         $gearmanClient->doBackground($this->_getJobName(), $workload);
+    }
+
+    /**
+     * @param int        $seconds
+     * @param array|null $params
+     */
+    public function queueDelayed($seconds, array $params = null) {
+        if (null === $params) {
+            $params = array();
+        }
+        $executeAt = time() + $seconds;
+        $this->_getDelayedQueue()->addJob($this, $params, $executeAt);
     }
 
     /**
@@ -163,5 +175,12 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
         if (is_object($value) && false === $value instanceof CM_ArrayConvertible) {
             throw new CM_Exception_InvalidParam('Object of class `' . get_class($value) . '` is not an instance of CM_ArrayConvertible');
         }
+    }
+
+    /**
+     * @return CM_Jobdistribution_DelayedQueue
+     */
+    protected function _getDelayedQueue() {
+        return new CM_Jobdistribution_DelayedQueue(CM_Service_Manager::getInstance());
     }
 }

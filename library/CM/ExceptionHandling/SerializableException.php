@@ -17,7 +17,7 @@ class CM_ExceptionHandling_SerializableException {
     /** @var array|null */
     public $trace;
 
-    /** @var array */
+    /** @var string */
     public $traceString;
 
     /** @var array */
@@ -73,7 +73,7 @@ class CM_ExceptionHandling_SerializableException {
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getTraceAsString() {
         return $this->traceString;
@@ -107,8 +107,8 @@ class CM_ExceptionHandling_SerializableException {
             $this->trace = $trace;
         } catch (Exception $e) {
             $this->trace = null;
-            $this->traceString = $e->getTraceAsString();
         }
+        $this->traceString = $exception->getTraceAsString();
     }
 
     /**

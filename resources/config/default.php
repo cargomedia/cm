@@ -1,11 +1,15 @@
 <?php
 
 return function (CM_Config_Node $config) {
+
+    $config->installationName = 'CM';
+
     $config->CM_App->setupScriptClasses = array();
     $config->CM_App->setupScriptClasses[] = 'CM_File_Filesystem_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_Db_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_MongoDb_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_Elasticsearch_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_Class_TypeDumper';
     $config->CM_App->setupScriptClasses[] = 'CM_Http_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Translations';
     $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Currency';
@@ -43,15 +47,15 @@ return function (CM_Config_Node $config) {
     $config->CM_Model_Currency->default = ['code' => '840', 'abbreviation' => 'USD'];
 
     $config->CM_Http_Response_Page->exceptionsToCatch = array(
-        'CM_Exception_Nonexistent'  => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => 'CM_Paging_Log_NotFound'],
-        'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => 'CM_Paging_Log_NotFound'],
-        'CM_Exception_AuthRequired' => ['errorPage' => 'CM_Page_Error_AuthRequired', 'log' => null],
-        'CM_Exception_NotAllowed'   => ['errorPage' => 'CM_Page_Error_NotAllowed', 'log' => null],
+        'CM_Exception_Nonexistent'  => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => true, 'level' => CM_Log_Logger::INFO],
+        'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => true, 'level' => CM_Log_Logger::INFO],
+        'CM_Exception_AuthRequired' => ['errorPage' => 'CM_Page_Error_AuthRequired', 'log' => false],
+        'CM_Exception_NotAllowed'   => ['errorPage' => 'CM_Page_Error_NotAllowed', 'log' => false],
     );
 
     $config->CM_Http_Response_View_Abstract->exceptionsToCatch = array(
-        'CM_Exception_Nonexistent'  => ['log' => 'CM_Paging_Log_NotFound'],
-        'CM_Exception_InvalidParam' => ['log' => 'CM_Paging_Log_NotFound'],
+        'CM_Exception_Nonexistent'  => ['log' => true, 'level' => CM_Log_Logger::INFO],
+        'CM_Exception_InvalidParam' => ['log' => true, 'level' => CM_Log_Logger::INFO],
         'CM_Exception_AuthRequired' => [],
         'CM_Exception_NotAllowed'   => [],
         'CM_Exception_Blocked'      => [],
@@ -60,9 +64,9 @@ return function (CM_Config_Node $config) {
     $config->CM_Http_Response_View_Abstract->catchPublicExceptions = true;
 
     $config->CM_Http_Response_RPC->exceptionsToCatch = array(
-        'CM_Exception_InvalidParam' => [],
-        'CM_Exception_AuthRequired' => [],
-        'CM_Exception_NotAllowed'   => [],
+        'CM_Exception_InvalidParam' => ['log' => true, 'level' => CM_Log_Logger::WARNING],
+        'CM_Exception_AuthRequired' => ['log' => true, 'level' => CM_Log_Logger::WARNING],
+        'CM_Exception_NotAllowed'   => ['log' => true, 'level' => CM_Log_Logger::WARNING],
     );
     $config->CM_Http_Response_RPC->catchPublicExceptions = true;
 
@@ -243,4 +247,45 @@ return function (CM_Config_Node $config) {
             'appName' => 'CM Application',
         ),
     );
+
+    $config->services['logger-handler-newrelic'] = [
+        'class'     => 'CMService_NewRelic_Log_Handler',
+        'arguments' => [
+            'minLevel' => CM_Log_Logger::ERROR,
+        ],
+    ];
+
+    $config->services['logger-handler-mongodb'] = [
+        'class'     => 'CM_Log_Handler_MongoDb',
+        'arguments' => [
+            'collection'    => 'cm_log',
+            'recordTtl'     => null,
+            'insertOptions' => null,
+            'minLevel'      => CM_Log_Logger::DEBUG,
+        ],
+    ];
+
+    $config->services['logger-handler-file-error'] = [
+        'class'  => 'CM_Log_Handler_Factory',
+        'method' => [
+            'name'      => 'createFileHandler',
+            'arguments' => [
+                'path'     => 'logs/error.log',
+                'minLevel' => CM_Log_Logger::DEBUG,
+            ],
+        ],
+    ];
+
+    $config->services['logger'] = [
+        'class'  => 'CM_Log_Factory',
+        'method' => [
+            'name'      => 'createLayeredLogger',
+            'arguments' => [
+                'handlersLayerConfigList' => [
+                    ['logger-handler-mongodb', 'logger-handler-newrelic'],
+                    ['logger-handler-file-error']
+                ],
+            ],
+        ]
+    ];
 };

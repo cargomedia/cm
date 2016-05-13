@@ -1,8 +1,10 @@
 <?php
 
-abstract class CM_ExceptionHandling_Handler_Abstract {
+abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_ManagerAwareInterface {
 
-    /** @var int|null */
+    use CM_Service_ManagerAwareTrait;
+
+    /** @var  int|null */
     private $_printSeverityMin;
 
     private $_errorCodes = array(
@@ -68,45 +70,11 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
             $printException = $exception->getSeverity() >= $this->_getPrintSeverityMin();
         }
 
-        try {
-            $this->logException($exception);
-        } catch (Exception $e) {
-            $printException = true;
-        }
-
         if ($printException) {
             $this->_printException($exception);
         }
 
-        if (!$exception instanceof CM_Exception || $exception->getSeverity() >= CM_Exception::ERROR) {
-            CM_Service_Manager::getInstance()->getNewrelic()->setNoticeError($exception);
-        }
-    }
-
-    /**
-     * @param Exception $exception
-     */
-    public function logException(Exception $exception) {
-        $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
-        try {
-            if ($exception instanceof CM_Exception) {
-                $log = $exception->getLog();
-                $metaInfo = $exception->getMetaInfo();
-            } else {
-                $log = new CM_Paging_Log_Error();
-                $metaInfo = null;
-            }
-            $log->add($formatter->formatException($exception), $metaInfo);
-        } catch (Exception $loggerException) {
-            $logEntry = '[' . date('d.m.Y - H:i:s', time()) . ']' . PHP_EOL;
-            $logEntry .= '### Cannot log error: ' . PHP_EOL;
-            $logEntry .= $formatter->formatException($loggerException);
-            $logEntry .= '### Original Exception: ' . PHP_EOL;
-            $logEntry .= $formatter->formatException($exception) . PHP_EOL;
-            $logFile = $this->_getLogFile();
-            $logFile->ensureParentDirectory();
-            $logFile->append($logEntry);
-        }
+        $this->_logException($exception);
     }
 
     /**
@@ -122,17 +90,17 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
     abstract protected function _printException(Exception $exception);
 
     /**
-     * @return CM_File
-     */
-    protected function _getLogFile() {
-        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getData();
-        return new CM_File('logs/error.log', $filesystem);
-    }
-
-    /**
      * @return int|null
      */
     private function _getPrintSeverityMin() {
         return $this->_printSeverityMin;
+    }
+
+    /**
+     * @param Exception $exception
+     */
+    protected function _logException(Exception $exception) {
+        $logLevel = CM_Log_Logger::exceptionSeverityToLevel($exception);
+        $this->getServiceManager()->getLogger()->addMessage('Application error', $logLevel, new CM_Log_Context_App(null, null, $exception));
     }
 }

@@ -8,7 +8,7 @@ class CM_Process {
     private $_eventHandler;
 
     /** @var CM_Process_ForkHandler[] */
-    private $_forkHandlerList = array();
+    private $_forkHandlerList = [];
 
     /** @var int */
     private $_forkHandlerCounter = 0;
@@ -52,7 +52,7 @@ class CM_Process {
             return;
         }
         $arguments = func_get_args();
-        call_user_func_array(array($this->_eventHandler, 'trigger'), $arguments);
+        call_user_func_array([$this->_eventHandler, 'trigger'], $arguments);
     }
 
     /**
@@ -61,9 +61,6 @@ class CM_Process {
      * @throws CM_Exception
      */
     public function fork(Closure $workload) {
-        if (!$this->_hasForks()) {
-            $this->bind('exit', [$this, 'killChildren']);
-        }
         $identifier = ++$this->_forkHandlerCounter;
         return $this->_fork($workload, $identifier);
     }
@@ -120,11 +117,11 @@ class CM_Process {
                 ]);
                 echo $message . PHP_EOL;
                 if ($timeoutReached) {
-                    $logError = new CM_Paging_Log_Error();
-                    $logError->add($message, [
+                    $logContext = new CM_Log_Context_App([
                         'pid'  => $this->getProcessId(),
                         'argv' => join(' ', $this->getArgv()),
                     ]);
+                    CM_Service_Manager::getInstance()->getLogger()->error($message, $logContext);
                 }
                 $timeOutput = $timeNow;
             }
@@ -203,6 +200,9 @@ class CM_Process {
      * @return CM_Process_ForkHandler
      */
     private function _fork(Closure $workload, $identifier) {
+        if (!$this->_hasForks()) {
+            $this->bind('exit', [$this, 'killChildren']);
+        }
         $sockets = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
         if (false === $sockets) {
             throw new CM_Exception('Cannot open stream socket pair');
@@ -214,7 +214,7 @@ class CM_Process {
         if ($pid) {
             // parent
             fclose($sockets[0]);
-            $forkHandler = new CM_Process_ForkHandler($pid, $workload, $sockets[1], $identifier);
+            $forkHandler = $this->_getForkHandler($pid, $workload, $sockets[1], $identifier);
             $this->_forkHandlerList[$identifier] = $forkHandler;
             return $forkHandler;
         } else {
@@ -223,7 +223,7 @@ class CM_Process {
                 fclose($sockets[1]);
                 $this->_reset();
                 CM_Service_Manager::getInstance()->resetServiceInstances();
-                $forkHandler = new CM_Process_ForkHandler($this->getProcessId(), $workload, $sockets[0]);
+                $forkHandler = $this->_getForkHandler($this->getProcessId(), $workload, $sockets[0]);
                 $forkHandler->runAndSendWorkload();
                 $forkHandler->closeIpcStream();
             } catch (Exception $e) {
@@ -233,9 +233,20 @@ class CM_Process {
         }
     }
 
+    /**
+     * @param int      $pid
+     * @param Closure  $workload
+     * @param resource $ipcStream
+     * @param int|null $identifier
+     * @return CM_Process_ForkHandler
+     */
+    protected function _getForkHandler($pid, Closure $workload, $ipcStream, $identifier = null) {
+        return new CM_Process_ForkHandler($pid, $workload, $ipcStream, $identifier);
+    }
+
     protected function _reset() {
         $this->_eventHandler = null;
-        $this->_forkHandlerList = array();
+        $this->_forkHandlerList = [];
         pcntl_signal(SIGTERM, SIG_DFL);
         pcntl_signal(SIGINT, SIG_DFL);
     }
@@ -250,7 +261,7 @@ class CM_Process {
      */
     private function _wait($keepAlive = null, $nohang = null) {
         $keepAlive = (bool) $keepAlive;
-        $workloadResultList = array();
+        $workloadResultList = [];
         $waitOption = $nohang ? WNOHANG : 0;
         if (!empty($this->_forkHandlerList)) {
             do {

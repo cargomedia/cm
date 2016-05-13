@@ -31,11 +31,12 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     protected function _registerCallbacks() {
-        $this->_registerClockworkCallbacks('10 seconds', array(
-            'CM_Model_User::offlineDelayed' => function () {
-                CM_Model_User::offlineDelayed();
+        $this->_registerClockworkCallbacks('1 second', [
+            'CM_Jobdistribution_DelayedQueue::queueOutstanding' => function () {
+                $delayedQueue = new CM_Jobdistribution_DelayedQueue($this->getServiceManager());
+                $delayedQueue->queueOutstanding();
             },
-        ));
+        ]);
         $this->_registerClockworkCallbacks('1 minute', array(
             'CM_Model_User::offlineOld'                 => function () {
                 CM_Model_User::offlineOld();
@@ -77,6 +78,17 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             ));
         }
 
+        if ($this->getServiceManager()->has('janus')) {
+            $this->_registerClockworkCallbacks('1 minute', array(
+                'CM_Janus_Service::synchronize'  => function () {
+                    $this->getServiceManager()->getJanus('janus')->synchronize();
+                },
+                'CM_Janus_Service::checkStreams' => function () {
+                    $this->getServiceManager()->getJanus('janus')->checkStreams();
+                },
+            ));
+        }
+
         $this->_registerClockworkCallbacks('15 minutes', array(
             'CM_Mail::processQueue'                         => function () {
                 CM_Mail::processQueue(500);
@@ -87,12 +99,14 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_Action_Abstract::deleteTransgressionsOlder' => function () {
                 CM_Action_Abstract::deleteTransgressionsOlder(3 * 31 * 86400);
             },
-            'CM_Paging_Log_Abstract::cleanup'               => function () {
-                foreach (CM_Paging_Log_Abstract::getClassChildren() as $logClass) {
-                    /** @var CM_Paging_Log_Abstract $log */
-                    $log = new $logClass();
+            'CM_Paging_Log::cleanup'                        => function () {
+                $allLevelsList = array_values(CM_Log_Logger::getLevels());
+                foreach (CM_Paging_Log::getClassChildren() as $pagingLogClass) {
+                    /** @type CM_Paging_Log $log */
+                    $log = new $pagingLogClass($allLevelsList);
                     $log->cleanUp();
                 }
+                (new CM_Paging_Log($allLevelsList, false))->cleanUp(); //deletes all untyped records
             },
         ));
         if ($this->getServiceManager()->has('maxmind')) {
@@ -135,7 +149,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param string $dateTimeString
+     * @param string    $dateTimeString
      * @param Closure[] $callbacks
      */
     protected function _registerClockworkCallbacks($dateTimeString, $callbacks) {

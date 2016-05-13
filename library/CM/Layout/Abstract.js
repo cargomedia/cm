@@ -13,11 +13,14 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   /** @type PromiseThrottled|Null */
   _loadPageThrottled: promiseThrottler(function(path) {
     var layout = this;
+    layout._createPagePlaceholder();
     layout._chargeSpinnerTimeout();
 
     return this.ajaxModal('loadPage', {path: path})
+      .finally(function() {
+        clearTimeout(layout._timeoutLoading);
+      })
       .then(function(response) {
-        layout._clearSpinnerTimeout();
         if (response.redirectExternal) {
           cm.router.route(response.redirectExternal);
           return;
@@ -36,7 +39,6 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
         return view;
       })
       .catch(function(error) {
-        layout._clearSpinnerTimeout();
         if (!(error instanceof Promise.CancellationError)) {
           layout._errorPagePlaceholder(error);
           layout._onPageError();
@@ -157,14 +159,10 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   },
 
   _chargeSpinnerTimeout: function() {
-    this._clearSpinnerTimeout();
+    clearTimeout(this._timeoutLoading);
     this._timeoutLoading = this.setTimeout(function() {
       this._getPagePlaceholder().html('<div class="spinner spinner-expanded" />');
     }, 750);
-  },
-
-  _clearSpinnerTimeout: function() {
-    clearTimeout(this._timeoutLoading);
   },
 
   /**

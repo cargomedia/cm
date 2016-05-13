@@ -390,6 +390,22 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
 
     /**
      * @param string $key
+     * @return CM_Model_StreamChannel_Abstract
+     */
+    public function getStreamChannel($key) {
+        return $this->getObject($key, 'CM_Model_StreamChannel_Abstract');
+    }
+
+    /**
+     * @param string $key
+     * @return CM_StreamChannel_Definition
+     */
+    public function getStreamChannelDefinition($key) {
+        return $this->getObject($key, 'CM_StreamChannel_Definition');
+    }
+
+    /**
+     * @param string $key
      * @return CM_Model_StreamChannel_Media
      */
     public function getStreamChannelMedia($key) {
@@ -526,6 +542,16 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     }
 
     /**
+     * @param CM_ArrayConvertible $object
+     * @return string JSON
+     */
+    public static function encodeObjectId(CM_ArrayConvertible $object) {
+        $array = $object->toArrayIdOnly();
+        $value = array_merge($array, array('_class' => get_class($object)));
+        return self::jsonEncode($value);
+    }
+
+    /**
      * @param string       $value
      * @param boolean|null $json
      * @throws CM_Exception_Invalid
@@ -557,15 +583,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @return string
      */
     public static function jsonEncode($value, $prettyPrint = null) {
-        $options = 0;
-        if ($prettyPrint) {
-            $options = $options | JSON_PRETTY_PRINT;
-        }
-        $value = json_encode($value, $options);
-        if (json_last_error() > 0) {
-            throw new CM_Exception_Invalid('Cannot json_encode value `' . CM_Util::var_line($value) . '`.');
-        }
-        return $value;
+        return CM_Util::jsonEncode($value, $prettyPrint);
     }
 
     /**
@@ -574,12 +592,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @throws CM_Exception_Invalid
      */
     public static function jsonDecode($value) {
-        $valueString = (string) $value;
-        $value = json_decode($valueString, true);
-        if (json_last_error() > 0) {
-            throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString . '`.');
-        }
-        return $value;
+        return CM_Util::jsonDecode($value);
     }
 
     /**

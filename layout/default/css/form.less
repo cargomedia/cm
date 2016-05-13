@@ -40,23 +40,24 @@ textarea.textinput {
 .placeholder(@colorInputPlaceholder);
 
 .button {
+  display: inline-block;
   position: relative;
   box-sizing: border-box;
   width: auto;
   height: @sizeButton;
-  line-height: @sizeButton - 2px;
   min-width: @sizeButton;
   max-width: 100%;
   margin: 1px;
-  padding: 0 15px;
+  padding: 0 1em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  border-radius: @borderRadiusInput;
+  border-radius: @borderRadiusButton;
   vertical-align: top;
   letter-spacing: 1px;
   cursor: pointer;
   transition: background-color 200ms;
+  font-size: @fontSizeButton;
 
   &:focus {
     .input_focus;
@@ -71,11 +72,15 @@ textarea.textinput {
   }
 
   &.hasIcon.hasLabel .icon {
-    margin-right: 5px;
+    margin-right: .4em;
   }
 
   &.hasIconRight.hasLabel .icon {
-    margin-left: 5px;
+    margin-left: .4em;
+  }
+
+  a&, div& {
+    line-height: @sizeButton - 2*@buttonBorderWidth;
   }
 }
 
@@ -130,17 +135,13 @@ textarea.textinput {
 }
 
 .button-large {
-  height: 1.2*@sizeButton;
-  min-width: 1.2*@sizeButton;
-  font-size: 1.5rem;
-  padding: 0 25px;
+  height: @sizeButtonLargeFactor*@sizeButton;
+  min-width: @sizeButtonLargeFactor*@sizeButton;
+  font-size: @sizeButtonLargeFactor*@fontSizeButton;
+  border-radius: @sizeButtonLargeFactor*@borderRadiusButton;
 
-  &.hasIcon.hasLabel .icon {
-    margin-right: 10px;
-  }
-
-  &.hasIconRight.hasLabel .icon {
-    margin-left: 10px;
+  a& {
+    line-height: @sizeButtonLargeFactor*@sizeButton - 2*@buttonBorderWidth;
   }
 }
 

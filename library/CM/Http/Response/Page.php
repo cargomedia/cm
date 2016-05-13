@@ -67,6 +67,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     }
 
     protected function _process() {
+        $this->setHeaderDisableCache();
         $this->_site->preprocessPageResponse($this);
         $this->_processContentOrRedirect();
         if ($redirectUrl = $this->getRedirectUrl()) {

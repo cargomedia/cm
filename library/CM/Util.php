@@ -525,4 +525,36 @@ class CM_Util {
         }
         return null;
     }
+
+    /**
+     * @param mixed     $value
+     * @param bool|null $prettyPrint
+     * @throws CM_Exception_Invalid
+     * @return string
+     */
+    public static function jsonEncode($value, $prettyPrint = null) {
+        $options = 0;
+        if ($prettyPrint) {
+            $options = $options | JSON_PRETTY_PRINT;
+        }
+        $value = json_encode($value, $options);
+        if (json_last_error() > 0) {
+            throw new CM_Exception_Invalid('Cannot json_encode value `' . self::var_line($value) . '`.');
+        }
+        return $value;
+    }
+
+    /**
+     * @param string $value
+     * @return mixed
+     * @throws CM_Exception_Invalid
+     */
+    public static function jsonDecode($value) {
+        $valueString = (string) $value;
+        $value = json_decode($valueString, true);
+        if (json_last_error() > 0) {
+            throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString . '`.');
+        }
+        return $value;
+    }
 }
