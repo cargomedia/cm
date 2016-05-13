@@ -53,9 +53,24 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
         $faviconConfigList = $this->_getFaviconConfigList();
         $this->_getStreamOutput()->writeln('Generating favicons');
 
-        foreach (CM_Site_Abstract::getAll() as $site) {
+        $themeDirStructList = Functional\map(CM_Site_Abstract::getAll(), function (CM_Site_Abstract $site) {
             $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-            $themeDir = new CM_File($render->getThemeDir(true));
+            return [
+                'render'   => $render,
+                'themeDir' => new CM_File($render->getThemeDir(true)),
+            ];
+        });
+        $themeDirStructList = Functional\unique($themeDirStructList, function (array $themeDirStruct) {
+            /** @var CM_File $themeDir */
+            $themeDir = $themeDirStruct['themeDir'];
+            return $themeDir->getPath();
+        });//filter site aliases
+
+        foreach ($themeDirStructList as $themeDirStruct) {
+            /** @var CM_Frontend_Render $render */
+            $render = $themeDirStruct['render'];
+            /** @var CM_File $themeDir */
+            $themeDir = $themeDirStruct['themeDir'];
             $svgFile = $themeDir->joinPath('resource', 'img', self::FAVICON_SVG_FILENAME);
             if ($svgFile->exists()) {
                 foreach ($faviconConfigList as $outputFilename => $config) {
