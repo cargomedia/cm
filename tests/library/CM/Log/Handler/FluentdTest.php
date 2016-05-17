@@ -31,7 +31,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $exception = new CM_Exception_Invalid('Bad');
 
         $context = new CM_Log_Context();
-        $context->getExtra()->set(['bar' => 'baz', 'baz' => 'quux']);
+        $context->setExtra(['bar' => 'baz', 'baz' => 'quux']);
         $context->setUser($user);
         $context->setException($exception);
         $context->setComputerInfo($computerInfo);

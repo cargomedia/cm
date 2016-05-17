@@ -14,11 +14,11 @@ class CM_Log_Context {
     /** @var Exception|null */
     private $_exception;
 
-    /** @var CM_Log_Context_Extra */
+    /** @var array */
     private $_extra;
 
     public function __construct() {
-        $this->_extra = new CM_Log_Context_Extra();
+        $this->_extra = [];
     }
 
     /**
@@ -95,14 +95,14 @@ class CM_Log_Context {
     }
 
     /**
-     * @param CM_Log_Context_Extra $extra
+     * @param array $extra
      */
-    public function setExtra(CM_Log_Context_Extra $extra) {
+    public function setExtra(array $extra) {
         $this->_extra = $extra;
     }
 
     /**
-     * @return CM_Log_Context_Extra
+     * @return array
      */
     public function getExtra() {
         return $this->_extra;
@@ -111,9 +111,6 @@ class CM_Log_Context {
     public function __clone() {
         if (null !== $this->_computerInfo) {
             $this->_computerInfo = clone $this->_computerInfo;
-        }
-        if (null !== $this->_extra) {
-            $this->_extra = clone $this->_extra;
         }
     }
 
@@ -136,6 +133,8 @@ class CM_Log_Context {
         if ($exception = $context->getException()) {
             $this->setException($exception);
         }
-        $this->getExtra()->merge($context->getExtra());
+
+        $extra = array_merge($this->getExtra(), $context->getExtra());
+        $this->setExtra($extra);
     }
 }

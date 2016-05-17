@@ -10,7 +10,7 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
         $context = $record->getContext();
         $user = $context->getUser();
         $httpRequest = $context->getHttpRequest();
-        $extra = $context->getExtra()->toArray();
+        $extra = $context->getExtra();
 
         $data = [];
 

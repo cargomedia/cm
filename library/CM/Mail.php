@@ -463,7 +463,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         $msg .= $text . PHP_EOL;
         $logger = CM_Service_Manager::getInstance()->getLogger();
         $context = new CM_Log_Context();
-        $context->getExtra()->set([
+        $context->setExtra([
             'type'    => CM_Paging_Log_Mail::getTypeStatic(),
             'sender'  => $this->getSender(),
             'replyTo' => $this->getReplyTo(),

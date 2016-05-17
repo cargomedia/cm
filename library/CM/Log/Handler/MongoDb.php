@@ -54,7 +54,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
 
         $computerInfo = $recordContext->getComputerInfo();
         $user = $recordContext->getUser();
-        $extra = $recordContext->getExtra()->toArray();
+        $extra = $recordContext->getExtra();
         $request = $recordContext->getHttpRequest();
 
         $createdAt = $record->getCreatedAt();

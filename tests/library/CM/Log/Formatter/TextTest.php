@@ -48,7 +48,7 @@ class CM_Log_Formatter_TextTest extends CMTest_TestCase {
     public function testFormattingWithExtra() {
         $extra = ['foo', 'bar', 'foo' => 'bar'];
         $context = new CM_Log_Context();
-        $context->getExtra()->set($extra);
+        $context->setExtra($extra);
         $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', $context);
         $formatter = new CM_Log_Formatter_Text();
         $this->assertSame(' - extra: 0: foo, 1: bar, foo: bar', $formatter->renderContext($record));

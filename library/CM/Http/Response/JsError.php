@@ -16,7 +16,7 @@ class CM_Http_Response_JsError extends CM_Http_Response_Abstract {
         if (!$suppressLogging) {
             $exception = new CM_Exception_Javascript($message, $url, $counter, $fileUrl, $fileLine);
             $context = new CM_Log_Context();
-            $context->getExtra()->set(['type' => CM_Paging_Log_Javascript::getTypeStatic()]);
+            $context->setExtra(['type' => CM_Paging_Log_Javascript::getTypeStatic()]);
             $context->setException($exception);
             $this->getServiceManager()->getLogger()->warning('Javascript error', $context);
         }

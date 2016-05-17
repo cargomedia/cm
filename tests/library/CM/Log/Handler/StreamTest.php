@@ -32,7 +32,7 @@ class CM_Log_Handler_StreamTest extends CMTest_TestCase {
 
 
         $context = new CM_Log_Context();
-        $context->getExtra()->set(['foo' => 'bar']);
+        $context->setExtra(['foo' => 'bar']);
         $context->setException(new Exception('foo'));
         $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', $context);
         $formatter = new CM_Log_Formatter_Text();

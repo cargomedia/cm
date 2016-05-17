@@ -80,7 +80,7 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
             $formattedRecord['request'] = $formattedRequest;
         }
 
-        $appAttributes = $context->getExtra()->toArray();
+        $appAttributes = $context->getExtra();
         if ($user = $context->getUser()) {
             $appAttributes['user'] = $user->getId();
         }

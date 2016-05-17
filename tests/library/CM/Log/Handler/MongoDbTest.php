@@ -47,7 +47,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
 
         $mongoClient->createIndex($collection, ['expireAt' => 1], ['expireAfterSeconds' => 0]);
         $recordContext = new CM_Log_Context();
-        $recordContext->getExtra()->set(['bar' => ['baz' => 'quux']]);
+        $recordContext->setExtra(['bar' => ['baz' => 'quux']]);
         $recordContext->setUser($user);
         $recordContext->setHttpRequest($httpRequest);
         $recordContext->setComputerInfo($computerInfo);
