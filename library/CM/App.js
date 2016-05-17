@@ -259,7 +259,7 @@ var CM_App = CM_Class_Abstract.extend({
 
     /**
      * @param {String|Object} data
-     * @return {Object}
+     * @return {Object|CM_Model_Abstract}
      */
     create: function(data) {
       return this._create(data);
