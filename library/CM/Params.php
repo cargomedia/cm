@@ -195,6 +195,14 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     }
 
     /**
+     * @param string $key
+     * @return DateInterval
+     */
+    public function getDateInterval($key) {
+        return $this->getObject($key, 'DateInterval');
+    }
+
+    /**
      * @param string   $key
      * @param int|null $default
      * @return int
