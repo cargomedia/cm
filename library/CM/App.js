@@ -258,13 +258,17 @@ var CM_App = CM_Class_Abstract.extend({
   factory: {
 
     /**
-     * @param {String|Object} data
-     * @return {Object|CM_Model_Abstract}
+     * @param {*} data
+     * @return {*|CM_Model_Abstract}
      */
     create: function(data) {
       return this._create(data);
     },
 
+    /**
+     * @param {*} data
+     * @return {*|CM_Model_Abstract}
+     */
     _create: function(data) {
       if ($.isPlainObject(data) || _.isArray(data)) {
         _.each(data, function(value, key) {
@@ -277,11 +281,19 @@ var CM_App = CM_Class_Abstract.extend({
       return data;
     },
 
+    /**
+     * @param {*} data
+     * @returns {boolean}
+     */
     _isCmObject: function(data) {
       var className = data && data['_class'];
       return className && cm.model.types[className] && window[className];
     },
 
+    /**
+     * @param {Object} data
+     * @returns {CM_Model_Abstract}
+     */
     _toCmObject: function(data) {
       return new window[data['_class']](data);
     }
