@@ -113,24 +113,16 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
             'square-96.png'                       => ['width' => 96, 'height' => 96],
             'square-120.png'                      => ['width' => 120, 'height' => 120],
             'square-144.png'                      => ['width' => 144, 'height' => 144],
+            'square-144-transparent.png'          => ['width' => 144, 'height' => 144, 'transparent' => true],
             'square-152.png'                      => ['width' => 152, 'height' => 152],
             'square-167.png'                      => ['width' => 167, 'height' => 167],
             'square-180.png'                      => ['width' => 180, 'height' => 180],
 
             // Android Chrome
-            'square-144-transparent.png'          => ['width' => 144, 'height' => 144, 'transparent' => true],
-            'square-192-transparent.png'          => ['width' => 192, 'height' => 192, 'transparent' => true],
-            'square-256-transparent.png'          => ['width' => 256, 'height' => 256, 'transparent' => true],
-            'square-384-transparent.png'          => ['width' => 384, 'height' => 384, 'transparent' => true],
-            'square-512-transparent.png'          => ['width' => 512, 'height' => 512, 'transparent' => true],
-
-            // Splashscreens
-            'splashscreen-1242x2208.png'          => ['width' => 1242, 'height' => 2208, 'iconSize' => 0.2],
-            'splashscreen-750x1334.png'           => ['width' => 750, 'height' => 1334, 'iconSize' => 0.2],
-            'splashscreen-1536x2008.png'          => ['width' => 1536, 'height' => 2008, 'iconSize' => 0.2],
-            'splashscreen-748x1024.png'           => ['width' => 748, 'height' => 1024, 'iconSize' => 0.2],
-            'splashscreen-640x1096.png'           => ['width' => 640, 'height' => 1096, 'iconSize' => 0.3],
-            'splashscreen-640x920.png'            => ['width' => 640, 'height' => 920, 'iconSize' => 0.3],
+            'square-192.png'                      => ['width' => 192, 'height' => 192],
+            'square-256.png'                      => ['width' => 256, 'height' => 256],
+            'square-384.png'                      => ['width' => 384, 'height' => 384],
+            'square-512.png'                      => ['width' => 512, 'height' => 512],
 
             // MS Tiles
             'tile-small-128x128-transparent.png'  => ['width' => 128, 'height' => 128, 'transparent' => true, 'iconSize' => 0.5],

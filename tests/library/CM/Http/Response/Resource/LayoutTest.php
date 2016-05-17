@@ -27,7 +27,7 @@ class CM_Http_Response_Resource_LayoutTest extends CMTest_TestCase {
         /** @var CM_Http_Response_Resource_Layout $response */
         $response = $this->getResponseResourceLayout($filePath);
         $this->assertContains('Content-Type: application/xml', $response->getHeaders());
-        $this->assertTrue((boolean) preg_match('!src="http://cdn\.default\.dev/layout/.+?/img/meta/mstile-70x70\.png"!', $response->getContent()));
+        $this->assertTrue((boolean) preg_match('!src="http://cdn\.default\.dev/layout/.+?/img/meta/tile-small-128x128-transparent\.png"!', $response->getContent()));
         $response->getRender()->getLayoutFile('resource/' . $filePath);
     }
 
