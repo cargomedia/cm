@@ -267,6 +267,22 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertSame(null, $request->getViewer());
     }
 
+    public function testGetTimeZoneFromCookie() {
+        $request = new CM_Http_Request_Get('/foo/bar/', ['cookie' => 'timezoneOffset=-9000; clientId=7']);
+        $timeZone = $this->callProtectedMethod($request, 'getTimeZone');
+        $this->assertInstanceOf('DateTimeZone', $timeZone);
+        $this->assertSame('+02:30', $timeZone->getName());
+
+        $request =new CM_Http_Request_Post('/foo/bar/', ['cookie' => 'timezoneOffset=3600']);
+        $timeZone = $this->callProtectedMethod($request, 'getTimeZone');
+        $this->assertInstanceOf('DateTimeZone', $timeZone);
+        $this->assertSame('-01:00', $timeZone->getName());
+
+        $request =new CM_Http_Request_Get('/foo/baz/');
+        $timeZone = $this->callProtectedMethod($request, 'getTimeZone');
+        $this->assertNull($timeZone);
+    }
+
     /**
      * @param string             $uri
      * @param array|null         $additionalHeaders

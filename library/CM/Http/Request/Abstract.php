@@ -432,6 +432,13 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @return DateTimeZone|null
+     */
+    public function getTimeZone() {
+        return $this->_getTimeZoneFromCookie();
+    }
+
+    /**
      * @return string
      */
     public function getUserAgent() {
@@ -504,6 +511,20 @@ abstract class CM_Http_Request_Abstract {
                     return $language;
                 }
             }
+        }
+        return null;
+    }
+
+    /**
+     * @return DateTimeZone|null
+     */
+    private function _getTimeZoneFromCookie() {
+        if ($timeZoneOffset = $this->getCookie('timezoneOffset')) {
+            //timezoneOffset is seconds behind UTC
+            $timeZoneOffset = (int) $timeZoneOffset * -1;
+            $offsetHours = floor($timeZoneOffset / 3600);
+            $offsetMinutes = floor($timeZoneOffset % 3600 / 60);
+            return DateTime::createFromFormat('O', sprintf("%+03d%02d", $offsetHours, $offsetMinutes))->getTimezone();
         }
         return null;
     }
