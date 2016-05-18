@@ -347,10 +347,24 @@ class CM_Model_LocationTest extends CMTest_TestCase {
         $locationMock->mockMethod('getCoordinates')->set(['lat' => 40.58026, 'lon' => -74.84595]);
         $timeZone = $locationMock->getTimeZone();
         $this->assertSame('America/New_York', $timeZone->getName());
-        
+
         $locationMock->mockMethod('getCoordinates')->set(['lat' => 35.80933, 'lon' => -118.55927]);
         $timeZone = $locationMock->getTimeZone();
         $this->assertSame('America/Los_Angeles', $timeZone->getName());
+    }
+
+    public function testGetGeoPoint() {
+        /** @var CM_Model_Location|\Mocka\AbstractClassTrait $locationMock */
+        $locationMock = $this->mockClass('CM_Model_Location')->newInstanceWithoutConstructor();
+        $locationMock->mockMethod('getCoordinates')->set(['lat' => 51.58742, 'lon' => -0.28425]);
+
+        $point = $locationMock->getGeoPoint();
+        $this->assertInstanceOf('CM_Geo_Point', $point);
+        $this->assertEquals(51.58742, $point->getLatitude());
+        $this->assertEquals(-0.28425, $point->getLongitude());
+
+        $locationMock->mockMethod('getCoordinates')->set(null);
+        $this->assertNull($locationMock->getGeoPoint());
     }
 
     public function testArrayConvertible() {
