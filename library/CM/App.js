@@ -267,7 +267,7 @@ var CM_App = CM_Class_Abstract.extend({
 
     /**
      * @param {*} data
-     * @return {*|CM_Model_Abstract}
+     * @returns {*|CM_Model_Abstract}
      */
     _create: function(data) {
       if ($.isPlainObject(data) || _.isArray(data)) {
@@ -283,7 +283,7 @@ var CM_App = CM_Class_Abstract.extend({
 
     /**
      * @param {*} data
-     * @returns {boolean}
+     * @returns {Boolean}
      */
     _isCmObject: function(data) {
       var className = data && data['_class'];
