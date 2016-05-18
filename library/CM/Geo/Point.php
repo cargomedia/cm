@@ -74,7 +74,7 @@ class CM_Geo_Point implements CM_Comparable {
      * @param CM_Geo_Point $pointTo
      * @return float
      */
-    public function distance(CM_Geo_Point $pointTo) {
+    public function getDistance(CM_Geo_Point $pointTo) {
         $pi180 = M_PI / 180;
         $currentRadianLatitude = $this->getLatitude() * $pi180;
         $currentRadianLongitude = $this->getLongitude() * $pi180;

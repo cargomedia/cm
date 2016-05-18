@@ -48,9 +48,9 @@ class CM_Geo_PointTest extends CMTest_TestCase {
         $point->setLongitude(300);
     }
 
-    public function testDistance() {
+    public function testGetDistance() {
         $berlinPoint = new CM_Geo_Point(52.523403, 13.411400);
         $newYorkPoint = new CM_Geo_Point(40.71278, -74.00594);
-        $this->assertEquals(6380800, $berlinPoint->distance($newYorkPoint), null, 10000);
+        $this->assertEquals(6380800, $berlinPoint->getDistance($newYorkPoint), null, 10000);
     }
 }

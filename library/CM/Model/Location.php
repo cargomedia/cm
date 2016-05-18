@@ -113,7 +113,7 @@ class CM_Model_Location extends CM_Model_Abstract {
         if (!$pointCurrent || !$pointAgainst) {
             return null;
         }
-        return (int) round($pointCurrent->distance($pointAgainst));
+        return (int) round($pointCurrent->getDistance($pointAgainst));
     }
 
     /**
@@ -130,7 +130,7 @@ class CM_Model_Location extends CM_Model_Abstract {
             $pointTimeZone = new CM_Geo_Point($timezoneLocation['latitude'], $timezoneLocation['longitude']);
             return [
                 'timezoneName' => $timezoneName,
-                'distance'     => $pointCurrent->distance($pointTimeZone),
+                'distance'     => $pointCurrent->getDistance($pointTimeZone),
             ];
         });
         $closestDistance = Functional\reduce_left($distanceList, function (array $current, $index, $collection, array $minimal) {
