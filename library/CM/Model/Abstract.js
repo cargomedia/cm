@@ -9,7 +9,12 @@ var CM_Model_Abstract = Backbone.Model.extend({
   idAttribute: '_compoundId',
 
   initialize: function() {
-    this.set('_compoundId', this.get('_id').id + '-' + this.get('_type'));
+    var _id = this.get('_id');
+    if (!$.isPlainObject(_id)) {
+      throw new Error('`_id` field must be a hash object');
+    }
+    var idParts = _.values(_id).concat(this.get('_type'));
+    this.set('_compoundId', idParts.join('-'));
   },
 
   toJSON: function() {
