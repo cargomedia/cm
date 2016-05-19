@@ -4,6 +4,8 @@
  */
 var CM_Model_Abstract = Backbone.Model.extend({
 
+  _class: 'CM_Model_Abstract',
+
   idAttribute: '_compoundId',
 
   initialize: function() {
@@ -11,7 +13,7 @@ var CM_Model_Abstract = Backbone.Model.extend({
   },
 
   toJSON: function() {
-    var json = {_id: this.get('_id'), _type: this.get('_type')};
+    var json = {_id: this.get('_id'), _type: this.get('_type'), _class: this._class};
     if (this.has('id')) {
       json['id'] = this.get('id');
     }
