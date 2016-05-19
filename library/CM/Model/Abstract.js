@@ -13,10 +13,6 @@ var CM_Model_Abstract = Backbone.Model.extend({
   },
 
   toJSON: function() {
-    var json = {_id: this.get('_id'), _type: this.get('_type'), _class: this._class};
-    if (this.has('id')) {
-      json['id'] = this.get('id');
-    }
-    return json;
+    return {_id: this.get('_id'), _type: this.get('_type'), _class: this._class};
   }
 });
