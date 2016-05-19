@@ -358,12 +358,6 @@ var CM_App = CM_Class_Abstract.extend({
   dom: {
     _swfId: 0,
     ready: function() {
-      if (window.addEventListener) {
-        window.addEventListener('load', function() {
-          new FastClick(document.body);
-        }, false);
-      }
-
       window.viewportUnitsBuggyfill.init();
     },
     /**
