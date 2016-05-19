@@ -17,6 +17,9 @@ var CM_Model_Abstract = Backbone.Model.extend({
     this.set('_compoundId', idParts.join('-'));
   },
 
+  /**
+   * @returns {Object}
+   */
   toJSON: function() {
     return {_id: this.get('_id'), _type: this.get('_type'), _class: this._class};
   }
