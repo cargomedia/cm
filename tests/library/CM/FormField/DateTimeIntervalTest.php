@@ -12,9 +12,9 @@ class CM_FormField_DateTimeIntervalTest extends CMTest_TestCase {
         $this->assertEquals([$expectedStart, $expectedEnd], $value);
 
         $environment = new CM_Frontend_Environment();
-        $value = $formField->validate($environment, ['year' => 2016, 'month' => 05, 'day' => 20, 'start' => '23', 'end' => '1']);
+        $value = $formField->validate($environment, ['year' => 2016, 'month' => 05, 'day' => 20, 'start' => '23', 'end' => '23']);
         $expectedStart = new DateTime('2016-05-20 23:00:00');
-        $expectedEnd = new DateTime('2016-05-21 01:00:00');
+        $expectedEnd = new DateTime('2016-05-21 23:00:00');
         $this->assertEquals([$expectedStart, $expectedEnd], $value);
     }
 }

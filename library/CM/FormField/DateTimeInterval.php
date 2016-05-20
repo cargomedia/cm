@@ -26,7 +26,7 @@ class CM_FormField_DateTimeInterval extends CM_FormField_Abstract {
         $from->add($this->_processTime($start));
         $until = clone $base;
         $until->add($this->_processTime($end));
-        if ($until < $from) {
+        if ($until <= $from) {
             $until->add(new DateInterval('P1D'));
         }
         return [$from, $until];
