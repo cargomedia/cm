@@ -255,6 +255,50 @@ var CM_App = CM_Class_Abstract.extend({
     return context;
   },
 
+  factory: {
+
+    /**
+     * @param {*} data
+     * @returns {*|CM_Model_Abstract}
+     */
+    create: function(data) {
+      return this._create(data);
+    },
+
+    /**
+     * @param {*} data
+     * @returns {*|CM_Model_Abstract}
+     */
+    _create: function(data) {
+      if ($.isPlainObject(data) || _.isArray(data)) {
+        _.each(data, function(value, key) {
+          data[key] = this._create(value);
+        }.bind(this));
+      }
+      if (this._isCmObject(data)) {
+        return this._toCmObject(data);
+      }
+      return data;
+    },
+
+    /**
+     * @param {*} data
+     * @returns {Boolean}
+     */
+    _isCmObject: function(data) {
+      var className = data && data['_class'];
+      return className && cm.model.types[className] && window[className] && !data.cid;
+    },
+
+    /**
+     * @param {Object} data
+     * @returns {CM_Model_Abstract}
+     */
+    _toCmObject: function(data) {
+      return new window[data['_class']](data);
+    }
+  },
+
   promise: {
     ready: function() {
       var promiseConfig = {};
@@ -866,7 +910,6 @@ var CM_App = CM_Class_Abstract.extend({
    */
   ajax: function(type, data) {
     var url = this.getUrlAjax(type);
-    var self = this;
     var jqXHR;
 
     var ajaxPromise = new Promise(function(resolve, reject, onCancel) {
@@ -885,7 +928,7 @@ var CM_App = CM_Class_Abstract.extend({
           if (response.error) {
             reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
           } else {
-            resolve(response.success);
+            resolve(cm.factory.create(response.success));
           }
         })
         .fail(function(xhr, textStatus) {
@@ -1029,6 +1072,7 @@ var CM_App = CM_Class_Abstract.extend({
       this._channelDispatchers[channel] = _.clone(Backbone.Events);
       this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(event, data) {
         if (handler._channelDispatchers[channel]) {
+          data = cm.factory.create(data);
           handler._channelDispatchers[channel].trigger(event, data);
           cm.debug.log('Stream channel (' + channel + '): event `' + event + '`: ', data);
         }
