@@ -61,7 +61,7 @@ class CM_FormField_DateTimeInterval extends CM_FormField_Abstract {
     }
 
     public function isEmpty($userInput) {
-        return empty($userInput['day']) || empty($userInput['month']) || empty($userInput['year']);
+        return empty($userInput['day']) || empty($userInput['month']) || empty($userInput['year']) || empty($userInput['start']) || empty($userInput['end']);
     }
 
     /**
