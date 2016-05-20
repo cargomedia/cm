@@ -435,7 +435,11 @@ abstract class CM_Http_Request_Abstract {
      * @return DateTimeZone|null
      */
     public function getTimeZone() {
-        return $this->_getTimeZoneFromCookie();
+        $timeZone = $this->_getTimeZoneFromCookie();
+        if (null === $timeZone && $location = $this->getLocation()) {
+            $timeZone = $location->getTimeZone();
+        }
+        return $timeZone;
     }
 
     /**
