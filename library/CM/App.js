@@ -182,7 +182,7 @@ var CM_App = CM_Class_Abstract.extend({
     if (!options['sameOrigin'] && cm.options.urlCdn) {
       url = cm.options.urlCdn + url;
     } else {
-      url = cm.options.url + url;
+      url = cm.options.urlBase + url;
     }
 
     if (type && path) {
@@ -230,7 +230,7 @@ var CM_App = CM_Class_Abstract.extend({
       path += '/' + cm.options.language.abbreviation;
     }
     path += '/' + this.getSiteId();
-    return this.getUrl(path, null, true);
+    return cm.options.urlBase + path;
   },
 
   /**
@@ -1262,15 +1262,15 @@ var CM_App = CM_Class_Abstract.extend({
           return;
         }
         router.hrefInitialIgnore = null;
-        router._handleLocationChange(router._getFragment());
+        router._handleLocationChange(location.href);
       });
 
-      var urlBase = cm.getUrl();
+      var urlSite = cm.getUrl();
       $(document).on('click', 'a[href]:not([data-router-disabled=true])', function(event) {
         var metaPressed = (event.ctrlKey || event.metaKey);
-        var partOfUrlBase = 0 === this.href.indexOf(urlBase);
-        if (!metaPressed && partOfUrlBase) {
-          var fragment = this.href.substr(urlBase.length);
+        var partOfUrlSite = 0 === this.href.indexOf(urlSite);
+        if (!metaPressed && partOfUrlSite) {
+          var fragment = this.href.substr(urlSite.length);
           var forceReload = $(this).data('force-reload');
           router.route(fragment, forceReload);
           event.preventDefault();
@@ -1291,14 +1291,12 @@ var CM_App = CM_Class_Abstract.extend({
     route: function(url, forceReload, replaceState) {
       forceReload = this._shouldReload || forceReload || false;
       replaceState = replaceState || false;
-      var urlBase = cm.getUrl();
-      var fragment = url;
+      var urlSite = cm.getUrl();
       if ('/' == url.charAt(0)) {
-        url = urlBase + fragment;
-      } else {
-        fragment = url.substr(urlBase.length);
+        url = urlSite + url;
       }
-      if (forceReload || 0 !== url.indexOf(urlBase)) {
+      var fragment = this._getFragmentByUrl(url);
+      if (forceReload || 0 !== url.indexOf(urlSite)) {
         window.location.assign(url);
         return Promise.resolve();
       }
@@ -1309,7 +1307,7 @@ var CM_App = CM_Class_Abstract.extend({
           this.pushState(fragment);
         }
       }
-      return this._handleLocationChange(fragment);
+      return this._handleLocationChange(url);
     },
 
     /**
@@ -1332,33 +1330,48 @@ var CM_App = CM_Class_Abstract.extend({
      * @returns string
      */
     _getFragment: function() {
-      var location = window.location;
-      return location.pathname + location.search + location.hash;
+      return this._getFragmentByLocation(window.location);
     },
 
     /**
-     * @param {String} fragment
+     * @param {String} url
      * @returns Location
      */
-    _getLocationByFragment: function(fragment) {
+    _getLocationByUrl: function(url) {
       var location = document.createElement('a');
-      if (fragment) {
-        location.href = fragment;
+      if (url) {
+        location.href = url;
       }
       return location;
     },
 
     /**
-     * @param {String} fragment
+     * @param {Location} location
+     * @returns string
+     */
+    _getFragmentByLocation: function(location) {
+      return location.pathname + location.search + location.hash;
+    },
+
+    /**
+     * @param {String} url
+     * @returns string
+     */
+    _getFragmentByUrl: function(url) {
+      return this._getFragmentByLocation(this._getLocationByUrl(url));
+    },
+
+    /**
+     * @param {String} url
      * @returns {Promise}
      */
-    _handleLocationChange: function(fragment) {
+    _handleLocationChange: function(url) {
       var paramsStateNext = null;
       var pageCurrent = cm.getLayout().findPage();
 
       if (pageCurrent && pageCurrent.hasStateParams()) {
-        var locationCurrent = this._getLocationByFragment(pageCurrent.getFragment());
-        var locationNext = this._getLocationByFragment(fragment);
+        var locationCurrent = this._getLocationByUrl(pageCurrent.getUrl());
+        var locationNext = this._getLocationByUrl(url);
 
         if (locationCurrent.pathname === locationNext.pathname) {
           var paramsCurrent = cm.request.parseQueryParams(locationCurrent.search);
@@ -1376,11 +1389,13 @@ var CM_App = CM_Class_Abstract.extend({
       }
 
       if (paramsStateNext) {
-        if (false !== cm.getLayout().getPage().routeToState(paramsStateNext, fragment)) {
+        if (false !== cm.getLayout().getPage().routeToState(paramsStateNext, url)) {
           return Promise.resolve();
         }
       }
-      return cm.getLayout().loadPage(fragment);
+
+      var pageFragment = url.substr(cm.getUrl().length);
+      return cm.getLayout().loadPage(pageFragment);
     }
   },
 

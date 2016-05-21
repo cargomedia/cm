@@ -170,7 +170,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
    * @param {String} responseUrl
    */
   _updateHistory: function(requestPath, responseUrl) {
-    var responseFragment = responseUrl.substr(cm.getUrl().length);
+    var responseFragment = cm.router._getFragmentByUrl(responseUrl);
     if (requestPath === responseFragment + window.location.hash) {
       responseFragment = requestPath;
     }

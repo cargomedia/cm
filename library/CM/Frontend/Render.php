@@ -239,7 +239,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         if (!$options['sameOrigin'] && $this->getSite()->getUrlCdn()) {
             $url = $this->getSite()->getUrlCdn();
         } else {
-            $url = $this->getSite()->getUrl();
+            $url = $this->getSite()->getUrlBase();
         }
 
         if (!is_null($type) && !is_null($path)) {
@@ -272,7 +272,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             throw new CM_Exception_Invalid('Needs user');
         }
         $params = array('user' => $mail->getRecipient()->getId(), 'mailType' => $mail->getType());
-        return CM_Util::link($this->getSite()->getUrl() . '/emailtracking/' . $this->getSite()->getId(), $params);
+        return CM_Util::link($this->getSite()->getUrlBase() . '/emailtracking/' . $this->getSite()->getId(), $params);
     }
 
     /**
@@ -283,7 +283,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         if ($this->getSite()->getUrlCdn()) {
             $url = $this->getSite()->getUrlCdn();
         } else {
-            $url = $this->getSite()->getUrl();
+            $url = $this->getSite()->getUrlBase();
         }
 
         $url .= '/static';
