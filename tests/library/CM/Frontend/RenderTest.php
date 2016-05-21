@@ -229,4 +229,32 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $expected = $viewer->getId() . ' bar normal-text';
         $this->assertSame($expected, $render->parseTemplateContent($content, ['foo' => 'bar']));
     }
+
+    public function testGetFormatterDate() {
+        $time = new DateTime('2016-05-21 00:00:00', new DateTimeZone('UTC'));
+
+        $timeZone = new DateTimeZone('Europe/Zurich');
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment(null, null, null, $timeZone));
+        $formatter = $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
+        $this->assertSame('5/21/16 2:00 AM', $formatter->format($time));
+    }
+
+    public function testGetFormatterDateNumericalTimeZone() {
+        $time = new DateTime('2016-05-21 00:00:00', new DateTimeZone('UTC'));
+
+        $timeZone = DateTime::createFromFormat('O', '+02:00')->getTimezone();
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment(null, null, null, $timeZone));
+        $formatter = $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
+        $this->assertSame('5/21/16 2:00 AM', $formatter->format($time));
+    }
+
+    public function testGetFormatterDateNumericalOverrideTimeZone() {
+        $time = new DateTime('2016-05-21 00:00:00', new DateTimeZone('UTC'));
+
+        $timeZone = DateTime::createFromFormat('O', '+02:00')->getTimezone();
+        $timeZoneOverride = DateTime::createFromFormat('O', '+03:00')->getTimezone();
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment(null, null, null, $timeZone));
+        $formatter = $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::SHORT, null, $timeZoneOverride);
+        $this->assertSame('5/21/16 3:00 AM', $formatter->format($time));
+    }
 }
