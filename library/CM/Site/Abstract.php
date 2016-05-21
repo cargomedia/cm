@@ -232,14 +232,18 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     /**
      * @param CM_Http_Request_Abstract $request
+     * @param array|null               $matchData
      * @return CM_Site_Abstract
-     * @throws CM_Exception_Invalid
+     * @throws CM_Class_Exception_TypeNotConfiguredException
      */
-    public static function findByRequest(CM_Http_Request_Abstract $request) {
+    public static function findByRequest(CM_Http_Request_Abstract $request, array $matchData = null) {
+        if (null === $matchData) {
+            $matchData = [];
+        }
         foreach (array_reverse(static::getClassChildren()) as $className) {
             /** @var CM_Site_Abstract $site */
             $site = new $className();
-            if ($site->match($request)) {
+            if ($site->match($request, $matchData)) {
                 return $site;
             }
         }
