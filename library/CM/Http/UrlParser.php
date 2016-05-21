@@ -23,4 +23,16 @@ class CM_Http_UrlParser {
         }
         return $host;
     }
+
+    /**
+     * @return string
+     * @throws CM_Exception
+     */
+    public function getScheme() {
+        $scheme = parse_url($this->_url, PHP_URL_SCHEME);
+        if (false === $scheme || null === $scheme) {
+            throw new CM_Exception('Cannot detect scheme from `' . $this->_url . '`.');
+        }
+        return $scheme;
+    }
 }
