@@ -114,20 +114,27 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
-     * @param string      $template Template file name
-     * @param string|null $module
-     * @param string|null $theme
-     * @param bool|null   $absolute
-     * @param bool|null   $needed
+     * @param string                $template Template file name
+     * @param string|null           $module
+     * @param string|null           $theme
+     * @param bool|null             $absolute
+     * @param bool|null             $needed
+     * @param CM_Site_Abstract|null $site
+     * @return string
      * @throws CM_Exception_Invalid
-     * @return string Layout path based on theme
      */
-    public function getLayoutPath($template, $module = null, $theme = null, $absolute = null, $needed = true) {
-        $moduleList = $this->getSite()->getModules();
+    public function getLayoutPath($template, $module = null, $theme = null, $absolute = null, $needed = null, CM_Site_Abstract $site = null) {
+        if (null === $needed) {
+            $needed = true;
+        }
+        if (null === $site) {
+            $site = $this->getSite();
+        }
+        $moduleList = $site->getModules();
         if ($module !== null) {
             $moduleList = array((string) $module);
         }
-        $themeList = $this->getSite()->getThemes();
+        $themeList = $site->getThemes();
         if ($theme !== null) {
             $themeList = array((string) $theme);
         }
@@ -146,19 +153,20 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
 
         if ($needed) {
             throw new CM_Exception_Invalid('Cannot find `' . $template . '` in modules `' . implode('`, `', $moduleList) . '` and themes `' .
-                implode('`, `', $this->getSite()->getThemes()) . '`');
+                implode('`, `', $site->getThemes()) . '`');
         }
         return null;
     }
 
     /**
-     * @param string      $path
-     * @param string|null $namespace
+     * @param string                $path
+     * @param string|null           $namespace
+     * @param CM_Site_Abstract|null $site
      * @return CM_File
      * @throws CM_Exception_Invalid
      */
-    public function getLayoutFile($path, $namespace = null) {
-        return new CM_File($this->getLayoutPath($path, $namespace, null, true));
+    public function getLayoutFile($path, $namespace = null, CM_Site_Abstract $site = null) {
+        return new CM_File($this->getLayoutPath($path, $namespace, null, true, null, $site));
     }
 
     /**
@@ -225,9 +233,9 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
-     * @param string|null      $type
-     * @param string|null      $path
-     * @param array|null       $options
+     * @param string|null           $type
+     * @param string|null           $path
+     * @param array|null            $options
      * @param CM_Site_Abstract|null $site
      * @return string
      */
@@ -280,7 +288,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
-     * @param string|null $path
+     * @param string|null           $path
      * @param CM_Site_Abstract|null $site
      * @return string
      */

@@ -273,4 +273,12 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $formatter = $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::SHORT, null, $timeZoneOverride);
         $this->assertSame('5/21/16 3:00 AM', $formatter->format($time));
     }
+
+    public function testGetLayoutPath() {
+        $render = new CM_Frontend_Render();
+        $this->assertSame(
+            'layout/default/resource/img/favicon.svg',
+            $render->getLayoutPath('resource/img/favicon.svg')
+        );
+    }
 }
