@@ -64,48 +64,54 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      * @return array
      */
     public function loadPage(CM_Params $params, CM_Http_Response_View_Ajax $response) {
-        $request = new CM_Http_Request_Get($params->getString('path'), $this->getRequest()->getHeaders(), $this->getRequest()->getServer(), $this->getRequest()->getViewer());
+        $request = $this->_createGetRequestWithUrl($params->getString('path'));
 
         $count = 0;
         $paths = array($request->getPath());
         do {
             $url = $this->getRender()->getUrl(CM_Util::link($request->getPath(), $request->getQuery()));
+            if (!$this->_isPageOnSameSite($url)) {
+                return array('redirectExternal' => $url);
+            }
             if ($count++ > 10) {
                 throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $paths) . ').');
             }
-            $responsePage = new CM_Http_Response_Page_Embed($request, $response->getSite(), $this->getServiceManager());
-            $responsePage->process();
-            $request = $responsePage->getRequest();
+            $responseEmbed = new CM_Http_Response_Page_Embed($request, $response->getSite(), $this->getServiceManager());
+            $responseEmbed->process();
+            $request = $responseEmbed->getRequest();
 
             $paths[] = $request->getPath();
 
-            if ($redirectUrl = $responsePage->getRedirectUrl()) {
-                $redirectExternal = (0 !== mb_stripos($redirectUrl, $this->getRender()->getUrl()));
-                if ($redirectExternal) {
+            if ($redirectUrl = $responseEmbed->getRedirectUrl()) {
+                if (!$this->_isPageOnSameSite($redirectUrl)) {
                     return array('redirectExternal' => $redirectUrl);
+                } else {
+                    // Process redirect URL with page response constructor
+                    $responsePage = CM_Http_Response_Page::factory($request, $this->getServiceManager());
+                    $request = $responsePage->getRequest();
                 }
             }
         } while ($redirectUrl);
 
-        foreach ($responsePage->getCookies() as $name => $cookieParameters) {
+        foreach ($responseEmbed->getCookies() as $name => $cookieParameters) {
             $response->setCookie($name, $cookieParameters['value'], $cookieParameters['expire'], $cookieParameters['path']);
         }
-        $page = $responsePage->getPage();
+        $page = $responseEmbed->getPage();
 
         $this->_setStringRepresentation(get_class($page));
 
-        $frontend = $responsePage->getRender()->getGlobalResponse();
-        $html = $responsePage->getContent();
+        $frontend = $responseEmbed->getRender()->getGlobalResponse();
+        $html = $responseEmbed->getContent();
         $js = $frontend->getJs();
         $autoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
         $frontend->clear();
 
-        $title = $responsePage->getTitle();
+        $title = $responseEmbed->getTitle();
         $layoutClass = get_class($page->getLayout($this->getRender()->getEnvironment()));
-        $menuList = array_merge($this->getSite()->getMenus(), $responsePage->getRender()->getMenuList());
+        $menuList = array_merge($this->getSite()->getMenus(), $responseEmbed->getRender()->getMenuList());
         $menuEntryHashList = $this->_getMenuEntryHashList($menuList, get_class($page), $page->getParams());
-        $jsTracking = $responsePage->getRender()->getServiceManager()->getTrackings()->getJs();
+        $jsTracking = $responseEmbed->getRender()->getServiceManager()->getTrackings()->getJs();
 
         return array(
             'autoId'            => $autoId,
@@ -242,4 +248,28 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         }
         return $menuEntryHashList;
     }
+
+    /**
+     * @param string $url
+     * @return CM_Http_Request_Get
+     */
+    private function _createGetRequestWithUrl($url) {
+        $request = $this->getRequest();
+        return new CM_Http_Request_Get($url, $request->getHeaders(), $request->getServer(), $request->getViewer());
+    }
+
+    /**
+     * @param string $url
+     * @return bool
+     */
+    private function _isPageOnSameSite($url) {
+        $isSameBaseUrl = (0 === mb_stripos($url, $this->getRender()->getUrl()));
+        if (!$isSameBaseUrl) {
+            return false;
+        }
+        $request = $this->_createGetRequestWithUrl($url);
+        $response = CM_Http_Response_Page::factory($request, $this->getServiceManager());
+        return $response->getSite()->equals($this->getSite());
+    }
+
 }
