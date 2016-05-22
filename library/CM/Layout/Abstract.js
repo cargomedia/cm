@@ -22,7 +22,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
       })
       .then(function(response) {
         if (response.redirectExternal) {
-          cm.router.route(response.redirectExternal);
+          window.location.replace(response.redirectExternal);
           return;
         }
         var view = layout._injectView(response);
