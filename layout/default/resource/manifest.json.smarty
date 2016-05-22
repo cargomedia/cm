@@ -1,7 +1,7 @@
 {
 	"name": "{$render->getSite()->getName()}",
 	"display": "standalone",
-	"start_url": "/",
+	"start_url": "{$render->getSite()->getUrl()}",
 	"background_color": "{lessVariable name='colorBrand'}",
 	"theme_color": "{lessVariable name='colorBrand'}",
 	"icons": [
