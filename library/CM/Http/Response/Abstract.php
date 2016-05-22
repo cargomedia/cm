@@ -301,7 +301,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
                 return $responseClass;
             }
         }
-        return self::_getDefaultResponseClass();
+        return CM_Http_Response_Page::getPageResponseClass();
     }
 
     /**
@@ -320,12 +320,5 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      */
     public static function match(CM_Http_Request_Abstract $request) {
         return false;
-    }
-
-    /**
-     * @return string
-     */
-    private static function _getDefaultResponseClass() {
-        return (string) self::_getConfig()->defaultResponse;
     }
 }
