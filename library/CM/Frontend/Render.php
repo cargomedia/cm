@@ -225,21 +225,25 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
-     * @param string|null $type
-     * @param string|null $path
-     * @param array|null  $options
+     * @param string|null      $type
+     * @param string|null      $path
+     * @param array|null       $options
+     * @param CM_Site_Abstract|null $site
      * @return string
      */
-    public function getUrlResource($type = null, $path = null, array $options = null) {
+    public function getUrlResource($type = null, $path = null, array $options = null, CM_Site_Abstract $site = null) {
         $options = array_merge([
             'sameOrigin' => false,
             'root'       => false,
         ], (array) $options);
+        if (null === $site) {
+            $site = $this->getSite();
+        }
 
         if (!$options['sameOrigin'] && $this->getSite()->getUrlCdn()) {
-            $url = $this->getSite()->getUrlCdn();
+            $url = $site->getUrlCdn();
         } else {
-            $url = $this->getSite()->getUrlBase();
+            $url = $site->getUrlBase();
         }
 
         if (!is_null($type) && !is_null($path)) {
@@ -248,7 +252,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             if ($this->getLanguage()) {
                 $pathParts[] = $this->getLanguage()->getAbbreviation();
             }
-            $pathParts[] = $this->getSite()->getId();
+            $pathParts[] = $site->getId();
             $pathParts[] = CM_App::getInstance()->getDeployVersion();
             $pathParts = array_merge($pathParts, explode('/', $path));
 
@@ -277,13 +281,17 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
 
     /**
      * @param string|null $path
+     * @param CM_Site_Abstract|null $site
      * @return string
      */
-    public function getUrlStatic($path = null) {
+    public function getUrlStatic($path = null, CM_Site_Abstract $site = null) {
+        if (null === $site) {
+            $site = $this->getSite();
+        }
         if ($this->getSite()->getUrlCdn()) {
-            $url = $this->getSite()->getUrlCdn();
+            $url = $site->getUrlCdn();
         } else {
-            $url = $this->getSite()->getUrlBase();
+            $url = $site->getUrlBase();
         }
 
         $url .= '/static';

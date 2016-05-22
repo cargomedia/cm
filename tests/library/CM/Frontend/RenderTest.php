@@ -145,6 +145,15 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         );
     }
 
+    public function testGetUrlResourceDifferentSite() {
+        $render = new CM_Frontend_Render();
+        $site = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
+        $siteType = $site->getType();
+        $deployVersion = CM_App::getInstance()->getDeployVersion();
+        $this->assertSame('http://cdn.other.com/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg',
+            $render->getUrlResource('layout', 'foo/bar.jpg', null, $site));
+    }
+
     public function testGetUrlStatic() {
         $render = new CM_Frontend_Render();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
@@ -161,6 +170,13 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('http://www.default.dev/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
+    }
+
+    public function testGetUrlStaticDifferentSite() {
+        $render = new CM_Frontend_Render();
+        $site = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
+        $deployVersion = CM_App::getInstance()->getDeployVersion();
+        $this->assertSame('http://cdn.other.com/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg', $site));
     }
 
     public function testGetLanguage() {
