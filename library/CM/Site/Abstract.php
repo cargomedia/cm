@@ -92,7 +92,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return string Theme
      */
     public function getTheme() {
-        return $this->_themes[0];
+        return $this->getThemes()[0];
     }
 
     /**
