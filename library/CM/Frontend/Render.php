@@ -348,13 +348,21 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
-     * @param int         $dateType
-     * @param int         $timeType
-     * @param string|null $pattern
+     * @param int               $dateType
+     * @param int               $timeType
+     * @param string|null       $pattern
+     * @param DateTimeZone|null $timeZone
      * @return IntlDateFormatter
      */
-    public function getFormatterDate($dateType, $timeType, $pattern = null) {
-        return new IntlDateFormatter($this->getLocale(), $dateType, $timeType, $this->getEnvironment()->getTimeZone()->getName(), null, $pattern);
+    public function getFormatterDate($dateType, $timeType, $pattern = null, DateTimeZone $timeZone = null) {
+        if (null === $timeZone) {
+            $timeZone = $this->getEnvironment()->getTimeZone();
+        }
+        $timeZoneName = $timeZone->getName();
+        if (in_array(substr($timeZoneName, 0, 1), ['+', '-'])) {
+            $timeZoneName = 'GMT' . $timeZoneName;
+        }
+        return new IntlDateFormatter($this->getLocale(), $dateType, $timeType, $timeZoneName, null, $pattern);
     }
 
     /**
