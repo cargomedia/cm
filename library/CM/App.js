@@ -1394,8 +1394,14 @@ var CM_App = CM_Class_Abstract.extend({
         }
       }
 
-      var pageFragment = url.substr(cm.getUrl().length);
-      return cm.getLayout().loadPage(pageFragment);
+      var urlSite = cm.getUrl();
+      if (0 === url.indexOf(urlSite)) {
+        var pageFragment = url.substr(urlSite.length);
+        cm.getLayout().loadPage(pageFragment);
+      } else {
+        window.location.assign(url);
+        return Promise.resolve();
+      }
     }
   },
 
