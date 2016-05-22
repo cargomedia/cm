@@ -130,6 +130,15 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
+     * @return string
+     * @throws CM_Exception
+     */
+    public function getUrlBase() {
+        $urlParser = new CM_Http_UrlParser($this->getUrl());
+        return $urlParser->getScheme() . '://' . $urlParser->getHost();
+    }
+
+    /**
      * @param CM_Http_Response_Page $response
      */
     public function preprocessPageResponse(CM_Http_Response_Page $response) {
@@ -174,12 +183,13 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     /**
      * @param CM_Http_Request_Abstract $request
-     * @return boolean
+     * @param array                    $data
+     * @return bool
+     * @throws CM_Exception
      */
-    public function match(CM_Http_Request_Abstract $request) {
-        $url = new CM_Http_UrlParser($this->getUrl());
+    public function match(CM_Http_Request_Abstract $request, array $data) {
         $hostList = [
-            $url->getHost(),
+            $this->getHost(),
             preg_replace('/^www\./', '', $this->getHost()),
         ];
 
@@ -222,14 +232,18 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     /**
      * @param CM_Http_Request_Abstract $request
+     * @param array|null               $matchData
      * @return CM_Site_Abstract
-     * @throws CM_Exception_Invalid
+     * @throws CM_Class_Exception_TypeNotConfiguredException
      */
-    public static function findByRequest(CM_Http_Request_Abstract $request) {
+    public static function findByRequest(CM_Http_Request_Abstract $request, array $matchData = null) {
+        if (null === $matchData) {
+            $matchData = [];
+        }
         foreach (array_reverse(static::getClassChildren()) as $className) {
             /** @var CM_Site_Abstract $site */
             $site = new $className();
-            if ($site->match($request)) {
+            if ($site->match($request, $matchData)) {
                 return $site;
             }
         }
