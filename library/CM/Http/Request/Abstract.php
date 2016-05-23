@@ -525,9 +525,12 @@ abstract class CM_Http_Request_Abstract {
     private function _getTimeZoneFromCookie() {
         if ($timeZoneOffset = $this->getCookie('timezoneOffset')) {
             //timezoneOffset is seconds behind UTC
-            $timeZoneOffset = (int) $timeZoneOffset * -1;
-            $offsetHours = floor($timeZoneOffset / 3600);
-            $offsetMinutes = floor($timeZoneOffset % 3600 / 60);
+            $timeZoneAbs = abs($timeZoneOffset);
+            $offsetHours = floor($timeZoneAbs / 3600);
+            $offsetMinutes = floor($timeZoneAbs % 3600 / 60);
+            if ($timeZoneOffset > 0) {
+                $offsetHours *= -1;
+            }
             $dateTime = DateTime::createFromFormat('O', sprintf("%+03d%02d", $offsetHours, $offsetMinutes));
             if (false !== $dateTime) {
                 return $dateTime->getTimezone();
