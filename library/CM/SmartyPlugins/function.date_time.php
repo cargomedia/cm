@@ -10,7 +10,8 @@ function smarty_function_date_time(array $params, Smarty_Internal_Template $temp
     } else {
         $timeStamp = (int) $params['time'];
     }
+    $timeZone = isset($params['timeZone']) ? $params['timeZone'] : null;
 
-    $formatter = $render->getFormatterDate(IntlDateFormatter::NONE, IntlDateFormatter::NONE, 'H:mm');
+    $formatter = $render->getFormatterDate(IntlDateFormatter::NONE, IntlDateFormatter::NONE, 'H:mm', $timeZone);
     return $formatter->format($timeStamp);
 }

@@ -3,7 +3,7 @@
 class CM_Layout_AbstractTest extends CMTest_TestCase {
 
     public function testTrackingDisabled() {
-        $site = $this->getMockSite('CM_Site_Abstract');
+        $site = $this->getMockSite('CM_Site_Abstract', null, ['url' => 'http://www.my-website.net']);
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
         $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
         $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());

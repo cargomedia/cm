@@ -14,7 +14,7 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
   _state: null,
 
   /** @type String|Null */
-  _fragment: null,
+  _url: null,
 
   _ready: function() {
     CM_Component_Abstract.prototype._ready.call(this);
@@ -23,15 +23,15 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
       var location = window.location;
       var params = cm.request.parseQueryParams(location.search);
       var state = _.pick(params, _.intersection(_.keys(params), this.getStateParams()));
-      this.routeToState(state, location.pathname + location.search);
+      this.routeToState(state, location.href);
     }
   },
 
   /**
    * @returns {String|Null}
    */
-  getFragment: function() {
-    return this._fragment;
+  getUrl: function() {
+    return this._url;
   },
 
   /**
@@ -73,11 +73,11 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
 
   /**
    * @param {Object} state
-   * @param {String} fragment
+   * @param {String} url
    * @returns {Boolean}
    */
-  routeToState: function(state, fragment) {
-    this._fragment = fragment;
+  routeToState: function(state, url) {
+    this._url = url;
     this.setState(state);
     return this._changeState(state);
   },
