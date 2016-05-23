@@ -528,7 +528,10 @@ abstract class CM_Http_Request_Abstract {
             $timeZoneOffset = (int) $timeZoneOffset * -1;
             $offsetHours = floor($timeZoneOffset / 3600);
             $offsetMinutes = floor($timeZoneOffset % 3600 / 60);
-            return DateTime::createFromFormat('O', sprintf("%+03d%02d", $offsetHours, $offsetMinutes))->getTimezone();
+            $dateTime = DateTime::createFromFormat('O', sprintf("%+03d%02d", $offsetHours, $offsetMinutes));
+            if (false !== $dateTime) {
+                return $dateTime->getTimezone();
+            }
         }
         return null;
     }
