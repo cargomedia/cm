@@ -6,7 +6,7 @@ var CM_FormField_DateTimeInterval = CM_FormField_Abstract.extend({
   _class: 'CM_FormField_DateTimeInterval',
 
   ready: function() {
-    this.bindJquery(this.$('select,input'), 'change', function() {
+    this.bindJquery(this.getInput(), 'change', function() {
       this.trigger('change');
     });
   },
@@ -16,7 +16,7 @@ var CM_FormField_DateTimeInterval = CM_FormField_Abstract.extend({
   },
 
   getInput: function() {
-    return this.$('select');
+    return this.$('select, input');
   },
 
   /**
