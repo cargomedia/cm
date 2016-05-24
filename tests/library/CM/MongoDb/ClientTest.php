@@ -307,4 +307,73 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
             $this->assertSame(['result' => ['ok' => 0, 'errmsg' => 'foo']], $ex->getMetaInfo());
         }
     }
+
+    function testRejectAggregationStage() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+
+        $pipeline = [
+            ['$match' => ['foo', 'bar']],
+            ['$project' => ['foo', 'baz']],
+            ['$sort' => '1'],
+            ['$sample' => ['bar']],
+        ];
+        $pipelineAfter = CMTest_TH::callProtectedMethod($mongoDb, '_rejectAggregationStage', [$pipeline, '$project']);
+        $this->assertSame(
+            [
+                ['$match' => ['foo', 'bar']],
+                ['$sort' => '1'],
+                ['$sample' => ['bar']],
+            ],
+            $pipelineAfter
+        ); //project removed
+
+        $pipeline = [
+            ['$match' => ['foo', 'bar']],
+            ['$project' => ['foo', 'baz']],
+            ['$sort' => '1'],
+            ['$sample' => ['bar']],
+        ];
+        $pipelineAfter = CMTest_TH::callProtectedMethod($mongoDb, '_rejectAggregationStage', [$pipeline, '$sort']);
+        $this->assertSame(
+            [
+                ['$match' => ['foo', 'bar']],
+                ['$project' => ['foo', 'baz']],
+                ['$sample' => ['bar']],
+            ],
+            $pipelineAfter
+        ); //sort removed
+
+        $pipeline = [
+            ['$match' => ['foo', 'bar']],
+            ['$project' => ['foo', 'baz']],
+            ['$sort' => '1'],
+            ['$sample' => ['bar']],
+        ];
+        $pipelineAfter = CMTest_TH::callProtectedMethod($mongoDb, '_rejectAggregationStage', [$pipeline, '$match']);
+        $this->assertSame($pipeline, $pipelineAfter); // wrong stage
+
+        $pipeline = [
+            ['$match' => ['foo', 'bar']],
+            ['$project' => ['foo', 'baz']],
+            ['$sort' => '1'],
+            ['$limit' => ['bar']],
+        ];
+        $pipelineAfter = CMTest_TH::callProtectedMethod($mongoDb, '_rejectAggregationStage', [$pipeline, '$sort']);
+        $this->assertSame($pipeline, $pipelineAfter); // limit after sort
+
+        $pipeline = [
+            ['$match' => ['foo', 'bar']],
+            ['$project' => ['foo', 'baz']],
+            ['$sort' => '1'],
+            ['$group' => ['bar']],
+            ['$project' => ['foo', 'baz']],
+        ];
+        $pipelineAfter = CMTest_TH::callProtectedMethod($mongoDb, '_rejectAggregationStage', [$pipeline, '$project']);
+        $this->assertSame([
+            ['$match' => ['foo', 'bar']],
+            ['$project' => ['foo', 'baz']],
+            ['$sort' => '1'],
+            ['$group' => ['bar']],
+        ], $pipelineAfter); // only last project is removed
+    }
 }
