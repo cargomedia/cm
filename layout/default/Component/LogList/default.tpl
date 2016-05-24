@@ -39,6 +39,7 @@
         {if isset($log.level)}<span class="level level-{$log.level}">{$levelMap[$log.level]}</span>{/if} {$log.message|escape}
       </div>
 
+      {$exception = null}
       {if !empty($log.exception)}
         {$exception = $log.exception} {* aggregated *}
       {elseif !empty($log.context.exception)}
