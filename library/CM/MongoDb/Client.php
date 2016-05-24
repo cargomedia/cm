@@ -227,7 +227,6 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
             array_push($pipeline, ['$group' => ['_id' => null, 'count' => ['$sum' => 1]]]);
             array_push($pipeline, ['$project' => ['_id' => 0, 'count' => 1]]);
             $pipeline = $this->_rejectAggregationStage($pipeline, '$sort');
-
             $result = $this->_getCollection($collection)->aggregate($pipeline);
             if (!empty($result['result'])) {
                 return $result['result'][0]['count'];
@@ -397,14 +396,11 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
         }
 
         $containsAnyKey = function (array $keyList, array $pipeline) {
-            foreach ($pipeline as $stage) {
-                foreach ($keyList as $key) {
-                    if (array_key_exists((string) $key, $stage)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
+            return Functional\some($pipeline, function (array $stage) use ($keyList) {
+                return Functional\some($keyList, function ($key) use ($stage) {
+                    return array_key_exists((string) $key, $stage);
+                });
+            });
         };
 
         return array_values(Functional\reject($pipeline, function (array $stage, $index, array $originalPipeline) use ($containsAnyKey, $rejectedKey, $followingKeyList) {
