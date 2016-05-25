@@ -13,7 +13,6 @@ class CM_Http_Handler implements CM_Service_ManagerAwareInterface {
 
     /**
      * @param CM_Http_Request_Abstract $request
-     * @throws CM_Exception
      * @return CM_Http_Response_Abstract
      */
     public function processRequest(CM_Http_Request_Abstract $request) {
@@ -25,7 +24,7 @@ class CM_Http_Handler implements CM_Service_ManagerAwareInterface {
             CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
             exit(1);
         }
-
+        $response->process();
         try {
             $response->process();
         } catch (Exception $e) {
