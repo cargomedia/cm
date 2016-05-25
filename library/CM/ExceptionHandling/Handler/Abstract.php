@@ -39,7 +39,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
                 $message = $this->_errorCodes[$code] . ': ' . $message;
             }
             $exception = new ErrorException($message, 0, $code, $file, $line);
-            $this->handleException($exception);
+            $this->handleException($exception, CM_Exception::FATAL);
         }
     }
 
@@ -63,18 +63,18 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
 
     /**
      * @param Exception $exception
+     * @param int|null  $severity
      */
-    public function handleException(Exception $exception) {
+    public function handleException(Exception $exception, $severity = null) {
         $printException = true;
         if ($exception instanceof CM_Exception) {
             $printException = $exception->getSeverity() >= $this->_getPrintSeverityMin();
         }
-
         if ($printException) {
             $this->_printException($exception);
         }
 
-        $this->_logException($exception);
+        $this->_logException($exception, $severity);
     }
 
     /**
@@ -98,9 +98,15 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
 
     /**
      * @param Exception $exception
+     * @param int|null  $severity
+     * @throws CM_Exception_Invalid
      */
-    protected function _logException(Exception $exception) {
-        $logLevel = CM_Log_Logger::exceptionSeverityToLevel($exception);
+    protected function _logException(Exception $exception, $severity = null) {
+        if (null === $severity) {
+            $logLevel = CM_Log_Logger::exceptionToLevel($exception);
+        } else {
+            $logLevel = CM_Log_Logger::severityToLevel((int) $severity);
+        }
         $this->getServiceManager()->getLogger()->addMessage('Application error', $logLevel, new CM_Log_Context_App(null, null, $exception));
     }
 }

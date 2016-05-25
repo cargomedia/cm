@@ -168,7 +168,7 @@ class CM_Bootloader {
     protected function _exceptionHandler() {
         $errorHandler = $this->getExceptionHandler();
         set_exception_handler(function (Exception $exception) use ($errorHandler) {
-            $errorHandler->handleException($exception);
+            $errorHandler->handleException($exception, CM_Exception::FATAL);
             exit(1);
         });
     }

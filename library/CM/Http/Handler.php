@@ -22,9 +22,17 @@ class CM_Http_Handler implements CM_Service_ManagerAwareInterface {
             $response = CM_Http_Response_Abstract::factory($request, $this->getServiceManager());
         } catch (CM_Exception $e) {
             $e->setSeverity(CM_Exception::WARN);
-            throw $e;
+            CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
+            exit(1);
         }
-        $response->process();
+
+        try {
+            $response->process();
+        } catch (Exception $e) {
+            CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
+            exit(1);
+        }
+
         return $response;
     }
 }
