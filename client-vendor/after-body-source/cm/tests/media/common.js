@@ -137,7 +137,7 @@ define(["cm/tests/media/common"], function() {
             seeked++;
           });
           return media
-            ._getPromisePlaying()
+            .getPromisePlaying()
             .timeout(2000);
         })
         .catch(function(reason) {
