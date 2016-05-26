@@ -39,14 +39,8 @@
         {if isset($log.level)}<span class="level level-{$log.level}">{$levelMap[$log.level]}</span>{/if} {$log.message|escape}
       </div>
 
-      {$exception = null}
       {if !empty($log.exception)}
-        {$exception = $log.exception} {* aggregated *}
-      {elseif !empty($log.context.exception)}
-        {$exception = $log.context.exception} {* plain *}
-      {/if}
-
-      {if !empty($exception)}
+        {$exception = $log.exception}
         <div class="exception">
           <div>{$exception.class}: {$exception.message|escape} in {$exception.file} on line {$exception.line}</div>
           {if (!empty($exception.trace))}

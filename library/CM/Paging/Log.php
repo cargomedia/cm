@@ -128,6 +128,13 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         return $criteria;
     }
 
+    protected function _processItem($itemRaw) {
+        if (isset($itemRaw['context']['exception'])) {
+            $itemRaw['exception'] = $itemRaw['context']['exception'];
+        }
+        return $itemRaw;
+    }
+
     /**
      * @param int $type
      * @return bool
