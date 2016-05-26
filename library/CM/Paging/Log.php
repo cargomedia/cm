@@ -71,22 +71,11 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
                     '_id'       => false],
                 ],
             ];
+            $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, null, null, $aggregate);
         } else {
-            $aggregate = [
-                ['$match' => $criteria],
-                ['$sort' => ['_id' => -1]],
-                ['$project' => [
-                    'level'     => '$level',
-                    'message'   => '$message',
-                    'exception' => '$context.exception',
-                    'context'   => '$context',
-                    'count'     => '$count',
-                    'createdAt' => '$createdAt',
-                    '_id'       => false,
-                ]],
-            ];
+            $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, $criteria, ['_id' => false], null, ['_id' => -1]);
         }
-        $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, null, null, $aggregate);
+
         parent::__construct($source);
     }
 
@@ -137,6 +126,13 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         }
 
         return $criteria;
+    }
+
+    protected function _processItem($itemRaw) {
+        if (isset($itemRaw['context']['exception'])) {
+            $itemRaw['exception'] = $itemRaw['context']['exception'];
+        }
+        return $itemRaw;
     }
 
     /**
