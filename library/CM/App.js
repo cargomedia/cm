@@ -174,8 +174,7 @@ var CM_App = CM_Class_Abstract.extend({
    */
   getUrlResource: function(type, path, options) {
     options = _.defaults(options || {}, {
-      'sameOrigin': false,
-      'root': false
+      'sameOrigin': false
     });
 
     var url = '';
@@ -195,11 +194,7 @@ var CM_App = CM_Class_Abstract.extend({
       urlParts.push(cm.options.deployVersion);
       urlParts = urlParts.concat(path.split('/'));
 
-      if (options['root']) {
-        url += '/resource-' + urlParts.join('--');
-      } else {
-        url += '/' + urlParts.join('/');
-      }
+      url += '/' + urlParts.join('/');
     }
 
     return url;

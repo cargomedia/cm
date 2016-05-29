@@ -242,7 +242,6 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     public function getUrlResource($type = null, $path = null, array $options = null, CM_Site_Abstract $site = null) {
         $options = array_merge([
             'sameOrigin' => false,
-            'root'       => false,
         ], (array) $options);
         if (null === $site) {
             $site = $this->getSite();
@@ -264,11 +263,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             $pathParts[] = CM_App::getInstance()->getDeployVersion();
             $pathParts = array_merge($pathParts, explode('/', $path));
 
-            if ($options['root']) {
-                $url .= '/resource-' . implode('--', $pathParts);
-            } else {
-                $url .= '/' . implode('/', $pathParts);
-            }
+            $url .= '/' . implode('/', $pathParts);
         }
 
         return $url;
