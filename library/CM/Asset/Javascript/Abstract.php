@@ -2,11 +2,28 @@
 
 class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
 
-    protected $_content;
+    /** @var CM_Frontend_JavascriptContainer */
+    protected $_js;
 
-    public function get($compress = null) {
-        $content = (string) $this->_content;
-        if ($compress) {
+    /** @var CM_Site_Abstract */
+    protected $_site;
+
+    /** @var bool */
+    protected $_debug;
+
+    /**
+     * @param CM_Site_Abstract $site
+     * @param bool|null        $debug
+     */
+    public function __construct(CM_Site_Abstract $site, $debug = null) {
+        $this->_site = $site;
+        $this->_debug = (bool) $debug;
+        $this->_js = new CM_Frontend_JavascriptContainer();
+    }
+
+    public function get() {
+        $content = $this->_js->compile();
+        if (!$this->_isDebug()) {
             $content = $this->_minify($content);
         }
         return $content;
@@ -34,12 +51,12 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
     }
 
     /**
-     * @param string[]     $mainPaths
-     * @param string[]     $rootPaths
-     * @param boolean|null $debug
+     * @param string[] $mainPaths
+     * @param string[] $rootPaths
      * @return string
      */
-    protected function _browserify(array $mainPaths, array $rootPaths, $debug = null) {
+    protected function _browserify(array $mainPaths, array $rootPaths) {
+        $debug = $this->_isDebug();
         if (!count($mainPaths)) {
             return '';
         }
@@ -59,5 +76,51 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
             }
             return CM_Util::exec('NODE_PATH="' . implode(':', $rootPaths) . '" browserify', $args);
         });
+    }
+
+    /**
+     * @param string $path
+     */
+    protected function _appendPathGlob($path) {
+        foreach (array_reverse($this->_site->getModules()) as $moduleName) {
+            $initPath = $this->_getPathInModule($moduleName, $path);
+            foreach (CM_Util::rglob('*.js', $initPath) as $filePath) {
+                $content = (new CM_File($filePath))->read();
+                $this->_js->append($content);
+            }
+        }
+    }
+
+    /**
+     * @param string $path
+     */
+    protected function _appendPathBrowserify($path) {
+        $sourceMainPaths = [];
+        $sourcePaths = [];
+
+        foreach (array_reverse($this->_site->getModules()) as $moduleName) {
+            $sourcePath = $this->_getPathInModule($moduleName, $path);
+            $sourcePaths[] = $sourcePath;
+            $sourceMainPaths = array_merge($sourceMainPaths, glob($sourcePath . '*/main.js'));
+        }
+
+        $content = $this->_browserify($sourceMainPaths, $sourcePaths);
+        $this->_js->append($content);
+    }
+
+    /**
+     * @param string $moduleName
+     * @param string $path
+     * @return string
+     */
+    protected function _getPathInModule($moduleName, $path) {
+        return DIR_ROOT . CM_Bootloader::getInstance()->getModulePath($moduleName) . $path;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _isDebug() {
+        return $this->_debug;
     }
 }
