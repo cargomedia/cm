@@ -206,6 +206,13 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   /**
+   * @returns {string}
+   */
+  getUrlServiceWorker: function() {
+    return cm.options.urlServiceWorker;
+  },
+
+  /**
    * @param {String} path
    * @return {String}
    */
