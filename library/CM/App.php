@@ -42,7 +42,7 @@ class CM_App implements CM_Service_ManagerAwareInterface {
         $languageList = new CM_Paging_Language_Enabled();
 
         foreach ($siteList as $site) {
-            $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, $debug));
+            $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
             $assetList[] = new CM_Asset_Javascript_Internal($site, $debug);
             $assetList[] = new CM_Asset_Javascript_Library($site, $debug);
             $assetList[] = new CM_Asset_Javascript_Vendor_BeforeBody($site, $debug);
