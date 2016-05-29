@@ -1,4 +1,4 @@
- <?php
+<?php
 
 class CM_Http_Response_Resource_Javascript_ServiceWorker extends CM_Http_Response_Resource_Javascript_Abstract {
 
