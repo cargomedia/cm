@@ -9,6 +9,14 @@ class CM_Asset_Javascript_ServiceWorker extends CM_Asset_Javascript_Abstract {
     public function __construct(CM_Site_Abstract $site, $debug = null) {
         parent::__construct($site, $debug);
 
+        $this->_appendConfig();
         $this->_appendPathBrowserify('client-vendor/serviceworker/');
+    }
+
+    protected function _appendConfig() {
+        $config = [
+            'site' => $this->_site,
+        ];
+        $this->_js->append('var config = ' . CM_Params::encode($config, true) . ';');
     }
 }
