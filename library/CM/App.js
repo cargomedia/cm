@@ -155,7 +155,7 @@ var CM_App = CM_Class_Abstract.extend({
     if (cm.options.urlCdn) {
       url = cm.options.urlCdn + url;
     } else {
-      url = cm.options.url + url;
+      url = cm.options.urlBase + url;
     }
 
     url += '/static';
