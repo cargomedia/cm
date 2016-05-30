@@ -9,20 +9,23 @@ interface CM_Service_Tracking_ClientInterface {
     public function getHtml(CM_Frontend_Environment $environment);
 
     /**
+     * @param CM_Frontend_Environment $environment
      * @return string
      */
-    public function getJs();
+    public function getJs(CM_Frontend_Environment $environment);
 
     /**
-     * @param CM_Action_Abstract $action
+     * @param CM_Frontend_Environment $environment
+     * @param CM_Action_Abstract      $action
      */
-    public function trackAction(CM_Action_Abstract $action);
+    public function trackAction(CM_Frontend_Environment $environment, CM_Action_Abstract $action);
 
     /**
-     * @param int    $requestClientId
-     * @param string $affiliateName
+     * @param CM_Frontend_Environment $environment
+     * @param int                     $requestClientId
+     * @param string                  $affiliateName
      */
-    public function trackAffiliate($requestClientId, $affiliateName);
+    public function trackAffiliate(CM_Frontend_Environment $environment, $requestClientId, $affiliateName);
 
     /**
      * @param CM_Frontend_Environment $environment
@@ -31,8 +34,9 @@ interface CM_Service_Tracking_ClientInterface {
     public function trackPageView(CM_Frontend_Environment $environment, $path);
 
     /**
+     * @param CM_Frontend_Environment     $environment
      * @param CM_Splittest_Fixture        $fixture
      * @param CM_Model_SplittestVariation $variation
      */
-    public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation);
+    public function trackSplittest(CM_Frontend_Environment $environment, CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation);
 }
