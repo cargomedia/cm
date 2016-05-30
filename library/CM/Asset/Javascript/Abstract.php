@@ -53,10 +53,10 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
     /**
      * @param string[] $mainPaths
      * @param string[] $rootPaths
+     * @param bool     $generateSourceMaps
      * @return string
      */
-    protected function _browserify(array $mainPaths, array $rootPaths) {
-        $debug = $this->_isDebug();
+    protected function _browserify(array $mainPaths, array $rootPaths, $generateSourceMaps) {
         if (!count($mainPaths)) {
             return '';
         }
@@ -67,11 +67,11 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
             }, '');
         }, '');
 
-        $cacheKey = __METHOD__ . '_md5:' . md5($content) . '_debug:' . $debug;
+        $cacheKey = __METHOD__ . '_md5:' . md5($content) . '_generateSourceMaps:' . $generateSourceMaps;
         $cache = CM_Cache_Persistent::getInstance();
-        return $cache->get($cacheKey, function () use ($mainPaths, $rootPaths, $debug) {
+        return $cache->get($cacheKey, function () use ($mainPaths, $rootPaths, $generateSourceMaps) {
             $args = $mainPaths;
-            if ($debug) {
+            if ($generateSourceMaps) {
                 $args[] = '--debug';
             }
             return CM_Util::exec('NODE_PATH="' . implode(':', $rootPaths) . '" browserify', $args);
@@ -81,7 +81,7 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
     /**
      * @param string $path
      */
-    protected function _appendPathGlob($path) {
+    protected function _appendDirectoryGlob($path) {
         foreach (array_reverse($this->_site->getModules()) as $moduleName) {
             $initPath = $this->_getPathInModule($moduleName, $path);
             foreach (CM_Util::rglob('*.js', $initPath) as $filePath) {
@@ -93,10 +93,16 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
 
     /**
      * @param string $path
+     * @param bool   $generateSourceMaps
+     * @throws CM_Exception
      */
-    protected function _appendPathBrowserify($path) {
+    protected function _appendDirectoryBrowserify($path, $generateSourceMaps) {
         $sourceMainPaths = [];
         $sourcePaths = [];
+
+        if ($generateSourceMaps && !$this->_js->isEmpty()) {
+            throw new CM_Exception('Cannot generate source maps when output container already contains code.');
+        }
 
         foreach (array_reverse($this->_site->getModules()) as $moduleName) {
             $sourcePath = $this->_getPathInModule($moduleName, $path);
@@ -104,7 +110,7 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
             $sourceMainPaths = array_merge($sourceMainPaths, glob($sourcePath . '*/main.js'));
         }
 
-        $content = $this->_browserify($sourceMainPaths, $sourcePaths);
+        $content = $this->_browserify($sourceMainPaths, $sourcePaths, $generateSourceMaps);
         $this->_js->append($content);
     }
 

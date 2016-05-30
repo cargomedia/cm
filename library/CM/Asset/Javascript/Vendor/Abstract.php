@@ -20,14 +20,14 @@ abstract class CM_Asset_Javascript_Vendor_Abstract extends CM_Asset_Javascript_A
     protected function _process($type) {
         switch ($type) {
             case 'dist':
-                $this->_appendPathGlob($this->_getDistPath());
+                $this->_appendDirectoryGlob($this->_getDistPath());
                 break;
             case 'source':
-                $this->_appendPathBrowserify($this->_getSourcePath());
+                $this->_appendDirectoryBrowserify($this->_getSourcePath(), true);
                 break;
             default:
-                $this->_appendPathGlob($this->_getDistPath());
-                $this->_appendPathBrowserify($this->_getSourcePath());
+                $this->_appendDirectoryGlob($this->_getDistPath());
+                $this->_appendDirectoryBrowserify($this->_getSourcePath(), false);
         }
     }
 

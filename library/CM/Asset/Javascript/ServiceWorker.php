@@ -10,7 +10,7 @@ class CM_Asset_Javascript_ServiceWorker extends CM_Asset_Javascript_Abstract {
         parent::__construct($site, $debug);
 
         $this->_appendConfig();
-        $this->_appendPathBrowserify('client-vendor/serviceworker/');
+        $this->_appendDirectoryBrowserify('client-vendor/serviceworker/', false);
     }
 
     protected function _appendConfig() {
