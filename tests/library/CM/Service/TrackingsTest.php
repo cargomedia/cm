@@ -72,11 +72,9 @@ class CM_Service_TrackingsTest extends CMTest_TestCase {
         $exception = $this->catchException(function () use ($serviceTrackings) {
             $serviceTrackings->getTrackingServiceList('Foo');
         });
-        
+
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertSame('`Foo` is not a child of CM_Site_Abstract', $exception->getMessage());
     }
 }
-
-
 
