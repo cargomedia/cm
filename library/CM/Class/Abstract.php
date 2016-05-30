@@ -22,6 +22,13 @@ abstract class CM_Class_Abstract {
     }
 
     /**
+     * @return string[] List of class names
+     */
+    public static function getClassHierarchyStatic() {
+        return self::_getClassHierarchy();
+    }
+    
+    /**
      * @param int $type
      * @return string
      * @throws CM_Class_Exception_TypeNotConfiguredException
