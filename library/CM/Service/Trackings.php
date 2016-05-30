@@ -21,7 +21,7 @@ class CM_Service_Trackings extends CM_Service_ManagerAware implements CM_Service
 
     public function getHtml(CM_Frontend_Environment $environment) {
         $html = '';
-        foreach ($this->getTrackingServiceList($environment->getSite()->getName()) as $trackingService) {
+        foreach ($this->getTrackingServiceList(get_class($environment->getSite())) as $trackingService) {
             $html .= $trackingService->getHtml($environment);
         }
         return $html;
@@ -29,32 +29,32 @@ class CM_Service_Trackings extends CM_Service_ManagerAware implements CM_Service
 
     public function getJs(CM_Frontend_Environment $environment) {
         $js = '';
-        foreach ($this->getTrackingServiceList($environment->getSite()->getName()) as $trackingService) {
+        foreach ($this->getTrackingServiceList(get_class($environment->getSite())) as $trackingService) {
             $js .= $trackingService->getJs($environment);
         }
         return $js;
     }
 
     public function trackAction(CM_Frontend_Environment $environment, CM_Action_Abstract $action) {
-        foreach ($this->getTrackingServiceList($environment->getSite()->getName()) as $trackingService) {
+        foreach ($this->getTrackingServiceList(get_class($environment->getSite())) as $trackingService) {
             $trackingService->trackAction($environment, $action);
         }
     }
 
     public function trackAffiliate(CM_Frontend_Environment $environment, $requestClientId, $affiliateName) {
-        foreach ($this->getTrackingServiceList($environment->getSite()->getName()) as $trackingService) {
+        foreach ($this->getTrackingServiceList(get_class($environment->getSite())) as $trackingService) {
             $trackingService->trackAffiliate($environment, $requestClientId, $affiliateName);
         }
     }
 
     public function trackPageView(CM_Frontend_Environment $environment, $path) {
-        foreach ($this->getTrackingServiceList($environment->getSite()->getName()) as $trackingService) {
+        foreach ($this->getTrackingServiceList(get_class($environment->getSite())) as $trackingService) {
             $trackingService->trackPageView($environment, $path);
         }
     }
 
     public function trackSplittest(CM_Frontend_Environment $environment, CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
-        foreach ($this->getTrackingServiceList($environment->getSite()->getName()) as $trackingService) {
+        foreach ($this->getTrackingServiceList(get_class($environment->getSite())) as $trackingService) {
             $trackingService->trackSplittest($environment, $fixture, $variation);
         }
     }
