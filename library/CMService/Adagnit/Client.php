@@ -52,10 +52,7 @@ class CMService_Adagnit_Client implements CM_Service_Tracking_ClientInterface {
         $this->_pageViewList = [$path];
     }
 
-    /**
-     * @return string
-     */
-    public function getJs() {
+    public function getJs(CM_Frontend_Environment $environment) {
         $js = '';
         foreach ($this->_pageViewList as $pageView) {
             $url = CM_Params::jsonEncode($pageView);
@@ -74,7 +71,7 @@ class CMService_Adagnit_Client implements CM_Service_Tracking_ClientInterface {
     }
 
     public function getHtml(CM_Frontend_Environment $environment) {
-        $js = $this->getJs();
+        $js = $this->getJs($environment);
         $html = <<<EOD
 <script type="text/javascript" src="https://via.adagnit.io/static/view/js/ada.js"></script>
 <script type="text/javascript">{$js}</script>
@@ -82,10 +79,10 @@ EOD;
         return $html;
     }
 
-    public function trackAction(CM_Action_Abstract $action) {
+    public function trackAction(CM_Frontend_Environment $environment, CM_Action_Abstract $action) {
     }
 
-    public function trackAffiliate($requestClientId, $affiliateName) {
+    public function trackAffiliate(CM_Frontend_Environment $environment, $requestClientId, $affiliateName) {
     }
 
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
@@ -122,7 +119,7 @@ EOD;
         }
     }
 
-    public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
+    public function trackSplittest(CM_Frontend_Environment $environment, CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
     }
 
     /**

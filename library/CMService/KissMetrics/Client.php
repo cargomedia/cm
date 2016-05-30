@@ -32,15 +32,12 @@ function _kms(u) {
 _kms('//i.kissmetrics.com/i.js');
 _kms('//doug1izaerwt3.cloudfront.net/' + _kmk + '.1.js');
 EOF;
-        $html .= $this->getJs();
+        $html .= $this->getJs($environment);
         $html .= '</script>';
         return $html;
     }
 
-    /**
-     * @return string
-     */
-    public function getJs() {
+    public function getJs(CM_Frontend_Environment $environment) {
         $js = '';
         $identityList = $this->_getIdentityList();
         foreach ($identityList as $identity) {
@@ -81,10 +78,7 @@ EOF;
         $this->_addIdentity($userId);
     }
 
-    /**
-     * @param CM_Action_Abstract $action
-     */
-    public function trackAction(CM_Action_Abstract $action) {
+    public function trackAction(CM_Frontend_Environment $environment, CM_Action_Abstract $action) {
         if (0 === count($this->_getIdentityList()) && $actor = $action->getActor()) {
             $this->setUserId($actor->getId());
         }
@@ -97,7 +91,7 @@ EOF;
         ));
     }
 
-    public function trackAffiliate($requestClientId, $affiliateName) {
+    public function trackAffiliate(CM_Frontend_Environment $environment, $requestClientId, $affiliateName) {
         $this->setRequestClientId($requestClientId);
         $trackEventJob = new CMService_KissMetrics_TrackPropertyListJob();
         $trackEventJob->queue([
@@ -154,7 +148,7 @@ EOF;
         $kissMetrics->submit();
     }
 
-    public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
+    public function trackSplittest(CM_Frontend_Environment $environment, CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
         $nameSplittest = $variation->getSplittest()->getName();
         $nameVariation = $variation->getName();
         switch ($fixture->getFixtureType()) {
