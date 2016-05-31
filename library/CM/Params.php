@@ -203,6 +203,14 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     }
 
     /**
+     * @param string $key
+     * @return DateTimeZone
+     */
+    public function getDateTimeZone($key) {
+        return $this->getObject($key, 'DateTimeZone');
+    }
+
+    /**
      * @param string   $key
      * @param int|null $default
      * @return int
