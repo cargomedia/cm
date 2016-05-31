@@ -172,6 +172,15 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     }
 
     /**
+     * @param int $maxAge
+     */
+    public function setHeaderExpires($maxAge) {
+        $maxAge = (int) $maxAge;
+        $this->setHeader('Cache-Control', 'max-age=' . $maxAge);
+        $this->setHeader('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + $maxAge));
+    }
+
+    /**
      * @param string $key
      * @param string $value
      */
