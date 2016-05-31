@@ -9,6 +9,7 @@ class CM_Service_Trackings extends CM_Service_ManagerAware implements CM_Service
      * @param array $siteToTrackingsMap
      */
     public function __construct(array $siteToTrackingsMap) {
+        $this->_validateConfig($siteToTrackingsMap);
         $this->_siteToTrackingsMap = $siteToTrackingsMap;
     }
 
@@ -66,7 +67,7 @@ class CM_Service_Trackings extends CM_Service_ManagerAware implements CM_Service
      */
     public function getTrackingServiceList($siteClassName = null) {
         $siteClassName = null !== $siteClassName ? (string) $siteClassName : 'CM_Site_Abstract';
-        if (!is_a($siteClassName, 'CM_Site_Abstract', true)) {
+        if (!$this->_isSiteClass($siteClassName)) {
             throw new CM_Exception_Invalid('`' . $siteClassName . '` is not a child of CM_Site_Abstract');
         }
         $trackingServiceList = $this->_getTrackingServiceNameList($siteClassName);
@@ -97,5 +98,28 @@ class CM_Service_Trackings extends CM_Service_ManagerAware implements CM_Service
             }
         }
         return array_unique(array_values($trackingServiceList));
+    }
+
+    /**
+     * @param array $siteToTrackingsMap
+     * @throws CM_Exception_Invalid
+     */
+    private function _validateConfig(array $siteToTrackingsMap) {
+        foreach ($siteToTrackingsMap as $siteClassName => $trackingList) {
+            if (!$this->_isSiteClass($siteClassName)) {
+                throw new CM_Exception_Invalid('`' . $siteClassName . '` is not a child of CM_Site_Abstract');
+            }
+            if (!is_array($trackingList)) {
+                throw new CM_Exception_Invalid('Invalid tracking service list for site `' . $siteClassName . '`');
+            }
+        }
+    }
+
+    /**
+     * @param string $siteClassName
+     * @return bool
+     */
+    private function _isSiteClass($siteClassName) {
+        return is_a((string) $siteClassName, 'CM_Site_Abstract', true);
     }
 }

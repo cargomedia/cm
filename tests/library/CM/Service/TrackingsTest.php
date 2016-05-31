@@ -11,6 +11,24 @@ class CM_Service_TrackingsTest extends CMTest_TestCase {
         ];
         $serviceTrackings = new CM_Service_Trackings($siteToTrackingsMap);
         $this->assertSame($siteToTrackingsMap, $serviceTrackings->getSiteToTrackingsMap());
+
+        $exception = $this->catchException(function () {
+            new CM_Service_Trackings([
+                'CM_Class_Abstract' => [
+                    'bar',
+                ]
+            ]);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('`CM_Class_Abstract` is not a child of CM_Site_Abstract', $exception->getMessage());
+
+        $exception = $this->catchException(function () {
+            new CM_Service_Trackings([
+                'CM_Site_Abstract' => 'baz'
+            ]);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Invalid tracking service list for site `CM_Site_Abstract`', $exception->getMessage());
     }
 
     public function testGetTrackingServiceNameList() {
@@ -29,7 +47,8 @@ class CM_Service_TrackingsTest extends CMTest_TestCase {
         ]);
         $siteGrandMockClass = $siteGrandMockClass->newInstanceWithoutConstructor();
 
-        $serviceTracking = new CM_Service_Trackings([
+        $serviceTrackingClass = $this->mockClass('CM_Service_Trackings');
+        $serviceTrackingClass->mockMethod('getSiteToTrackingsMap')->set([
             'CM_Site_Abstract'  => [
                 'foo',
                 'b' => 'bar',
@@ -43,7 +62,7 @@ class CM_Service_TrackingsTest extends CMTest_TestCase {
                 'foo',
             ]
         ]);
-
+        $serviceTracking = $serviceTrackingClass->newInstanceWithoutConstructor();
         $serviceNamesList = $this->callProtectedMethod($serviceTracking, '_getTrackingServiceNameList', [get_class($siteMock)]);
         $this->assertSame([
             'foo',
@@ -68,7 +87,8 @@ class CM_Service_TrackingsTest extends CMTest_TestCase {
     }
 
     public function testGetTrackingServiceList() {
-        $serviceTrackings = new CM_Service_Trackings(['foo' => 'bar']);
+        /** @var CM_Service_Trackings|\Mocka\AbstractClassTrait $serviceTrackings */
+        $serviceTrackings = $this->mockClass('CM_Service_Trackings')->newInstanceWithoutConstructor();
         $exception = $this->catchException(function () use ($serviceTrackings) {
             $serviceTrackings->getTrackingServiceList('Foo');
         });
