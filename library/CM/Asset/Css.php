@@ -44,8 +44,9 @@ class CM_Asset_Css extends CM_Asset_Abstract {
         $this->_children[] = new self($this->_render, $content, ['prefix' => $prefix]);
     }
 
-    public function get($compress = null) {
+    public function get() {
         $content = $this->_getContent();
+        $compress = !$this->_render->getEnvironment()->isDebug();
         return $this->_compile($content, $compress);
     }
 
@@ -78,11 +79,11 @@ class CM_Asset_Css extends CM_Asset_Abstract {
     }
 
     /**
-     * @param string       $content
-     * @param boolean|null $compress
+     * @param string  $content
+     * @param boolean $compress
      * @return string
      */
-    private function _compile($content, $compress = null) {
+    private function _compile($content, $compress) {
         $content = (string) $content;
         $compress = (bool) $compress;
 

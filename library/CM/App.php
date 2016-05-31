@@ -34,31 +34,35 @@ class CM_App implements CM_Service_ManagerAwareInterface {
     }
 
     public function fillCaches() {
-        $debug = CM_Bootloader::getInstance()->isDebug();
-
         /** @var CM_Asset_Javascript_Abstract[] $assetList */
         $assetList = array();
-        foreach (CM_Site_Abstract::getAll() as $site) {
-            $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-            $assetList[] = new CM_Asset_Javascript_Internal($site);
-            $assetList[] = new CM_Asset_Javascript_Library($site);
-            $assetList[] = new CM_Asset_Javascript_Vendor_BeforeBody($site);
-            $assetList[] = new CM_Asset_Javascript_Vendor_AfterBody($site);
-            $assetList[] = new CM_Asset_Css_Vendor($render);
-            $assetList[] = new CM_Asset_Css_Library($render);
-        }
+
+        $debug = CM_Bootloader::getInstance()->isDebug();
+        $siteList = CM_Site_Abstract::getAll();
         $languageList = new CM_Paging_Language_Enabled();
+
+        foreach ($siteList as $site) {
+            $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
+            $assetList[] = new CM_Asset_Javascript_Internal($site, $debug);
+            $assetList[] = new CM_Asset_Javascript_Library($site, $debug);
+            $assetList[] = new CM_Asset_Javascript_Vendor_BeforeBody($site, $debug);
+            $assetList[] = new CM_Asset_Javascript_Vendor_AfterBody($site, $debug);
+            $assetList[] = new CM_Asset_Css_Vendor($render, $debug);
+            $assetList[] = new CM_Asset_Css_Library($render, $debug);
+            /** @var CM_Model_Language $language */
+            foreach ($languageList as $language) {
+                $assetList[] = new CM_Asset_Javascript_Translations($site, $debug, $language);
+            }
+        }
+
         /** @var CM_Model_Language $language */
         foreach ($languageList as $language) {
             $language->getTranslations()->getItemsRaw();
             $language->getTranslations(true)->getItemsRaw();
         }
-        /** @var CM_Model_Language $language */
-        foreach ($languageList as $language) {
-            $assetList[] = new CM_Asset_Javascript_Translations($language);
-        }
+
         foreach ($assetList as $asset) {
-            $asset->get(!$debug);
+            $asset->get();
         }
         CM_Bootloader::getInstance()->getModules();
     }
