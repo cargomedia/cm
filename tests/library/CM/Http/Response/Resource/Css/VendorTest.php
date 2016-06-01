@@ -8,5 +8,6 @@ class CM_Http_Response_Resource_Css_VendorTest extends CMTest_TestCase {
         $response = new CM_Http_Response_Resource_Css_Vendor($request, $this->getServiceManager());
         $response->process();
         $this->assertContains('body{', $response->getContent());
+        $this->assertNotContains('#mocha', $response->getContent());
     }
 }
