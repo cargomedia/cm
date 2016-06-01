@@ -120,17 +120,6 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
             $render->getUrlResource('layout', 'foo.jpg', ['sameOrigin' => true])
         );
     }
-
-    public function testGetUrlResourceSameRoot() {
-        $render = new CM_Frontend_Render();
-        $siteType = CM_Site_Abstract::factory()->getType();
-        $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame(
-            'http://cdn.default.dev/resource-layout--' . $siteType . '--' . $deployVersion . '--foo.jpg',
-            $render->getUrlResource('layout', 'foo.jpg', ['root' => true])
-        );
-    }
-
     public function testGetUrlResourceWithoutCdn() {
         $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getType', 'getUrlCdn'))->getMockForAbstractClass();
         $site->expects($this->any())->method('getType')->will($this->returnValue(12));
