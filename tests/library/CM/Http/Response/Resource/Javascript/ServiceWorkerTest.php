@@ -11,6 +11,8 @@ class CM_Http_Response_Resource_Javascript_ServiceWorkerTest extends CMTest_Test
         $response = $this->processRequest($request);
 
         $this->assertContains('Content-Type: application/x-javascript', $response->getHeaders());
+        $this->assertContains('Cache-Control: max-age=31536000', $response->getHeaders());
+        $this->assertContains('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 31536000), $response->getHeaders());
         $this->assertContains('self.addEventListener("install"', $response->getContent());
     }
 

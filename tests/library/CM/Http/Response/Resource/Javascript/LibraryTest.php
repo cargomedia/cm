@@ -24,6 +24,9 @@ class CM_Http_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
         $request = new CM_Http_Request_Get($render->getUrlResource('library-js', 'library.js'));
         $response = new CM_Http_Response_Resource_Javascript_Library($request, $this->getServiceManager());
         $response->process();
+
+        $this->assertContains('Cache-Control: max-age=31536000', $response->getHeaders());
+        $this->assertContains('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 31536000), $response->getHeaders());
         $this->assertContains('function()', $response->getContent());
     }
 
@@ -32,6 +35,9 @@ class CM_Http_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
         $request = new CM_Http_Request_Get($render->getUrlResource('library-js', 'translations/123.js'));
         $response = new CM_Http_Response_Resource_Javascript_Library($request, $this->getServiceManager());
         $response->process();
+
+        $this->assertContains('Cache-Control: max-age=31536000', $response->getHeaders());
+        $this->assertContains('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 31536000), $response->getHeaders());
         $this->assertContains('cm.language.setAll', $response->getContent());
     }
 }
