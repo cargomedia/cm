@@ -162,12 +162,15 @@ return function (CM_Config_Node $config) {
         ),
     );
 
-    $config->services['trackings'] = array(
+    $config->services['trackings'] = [
         'class'     => 'CM_Service_Trackings',
-        'arguments' => array(
-            'trackingServiceNameList' => array(),
-        ),
-    );
+        'arguments' => [
+            'siteToTrackingsMap' => [
+                'CM_Site_Abstract' => [
+                ],
+            ],
+        ],
+    ];
 
     $config->services['tracking-adagnit'] = [
         'class'     => 'CMService_Adagnit_Client',

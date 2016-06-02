@@ -108,10 +108,11 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $frontend->clear();
 
         $title = $responseEmbed->getTitle();
-        $layoutClass = get_class($page->getLayout($this->getRender()->getEnvironment()));
+        $environment = $this->getRender()->getEnvironment();
+        $layoutClass = get_class($page->getLayout($environment));
         $menuList = array_merge($this->getSite()->getMenus(), $responseEmbed->getRender()->getMenuList());
         $menuEntryHashList = $this->_getMenuEntryHashList($menuList, get_class($page), $page->getParams());
-        $jsTracking = $responseEmbed->getRender()->getServiceManager()->getTrackings()->getJs();
+        $jsTracking = $responseEmbed->getRender()->getServiceManager()->getTrackings()->getJs($environment);
 
         return array(
             'autoId'            => $autoId,

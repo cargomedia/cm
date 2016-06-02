@@ -56,7 +56,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
 
         $response = CMTest_TH::createResponsePage('/mock5', array('host' => $site->getHost()));
         $response->process();
-        $this->assertFalse(Functional\some($response->getHeaders(), function($header) {
+        $this->assertFalse(Functional\some($response->getHeaders(), function ($header) {
             return preg_match('/^Location:/', $header);
         }));
 
@@ -200,7 +200,12 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $serviceManager = new CM_Service_Manager();
         $serviceManager->registerInstance('googleanalytics', new CMService_GoogleAnalytics_Client($codeGoogleAnalytics));
         $serviceManager->registerInstance('kissmetrics', new CMService_KissMetrics_Client($codeKissMetrics));
-        $serviceManager->registerInstance('trackings', new CM_Service_Trackings(['googleanalytics', 'kissmetrics']));
+        $serviceManager->registerInstance('trackings', new CM_Service_Trackings([
+            'CM_Site_Abstract' => [
+                'googleanalytics',
+                'kissmetrics',
+            ]
+        ]));
         return $serviceManager;
     }
 }

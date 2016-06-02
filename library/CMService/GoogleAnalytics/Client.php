@@ -104,10 +104,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
         $this->_setField('userId', $userId);
     }
 
-    /**
-     * @return string
-     */
-    public function getJs() {
+    public function getJs(CM_Frontend_Environment $environment) {
         $js = '';
         foreach ($this->_fieldList as $fieldName => $fieldValue) {
             $js .= 'ga("set", ' . CM_Params::jsonEncode($fieldName) . ', ' . CM_Params::jsonEncode($fieldValue) . ');';
@@ -173,16 +170,16 @@ EOF;
         }
 
         $html .= 'ga("create", ' . CM_Params::jsonEncode($this->_getCode()) . ', ' . CM_Params::jsonEncode(array_filter($fieldList)) . ');';
-        $html .= $this->getJs();
+        $html .= $this->getJs($environment);
         $html .= '</script>';
 
         return $html;
     }
 
-    public function trackAction(CM_Action_Abstract $action) {
+    public function trackAction(CM_Frontend_Environment $environment, CM_Action_Abstract $action) {
     }
 
-    public function trackAffiliate($requestClientId, $affiliateName) {
+    public function trackAffiliate(CM_Frontend_Environment $environment, $requestClientId, $affiliateName) {
     }
 
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
@@ -193,7 +190,7 @@ EOF;
         }
     }
 
-    public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
+    public function trackSplittest(CM_Frontend_Environment $environment, CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
     }
 
     /**

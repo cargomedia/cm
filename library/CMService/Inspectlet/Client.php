@@ -29,15 +29,12 @@ EOF;
         if ($user = $environment->getViewer()) {
             $this->_setUser($user);
         }
-        $html .= $this->getJs();
+        $html .= $this->getJs($environment);
         $html .= '</script>';
         return $html;
     }
 
-    /**
-     * @return string
-     */
-    public function getJs() {
+    public function getJs(CM_Frontend_Environment $environment) {
         $js = '';
         if (isset($this->_identity)) {
             $js .= "__insp.push(['identify', '{$this->_identity}']);";
@@ -45,10 +42,10 @@ EOF;
         return $js;
     }
 
-    public function trackAction(CM_Action_Abstract $action) {
+    public function trackAction(CM_Frontend_Environment $environment, CM_Action_Abstract $action) {
     }
 
-    public function trackAffiliate($requestClientId, $affiliateName) {
+    public function trackAffiliate(CM_Frontend_Environment $environment, $requestClientId, $affiliateName) {
     }
 
     public function trackPageView(CM_Frontend_Environment $environment, $path) {
@@ -57,7 +54,7 @@ EOF;
         }
     }
 
-    public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
+    public function trackSplittest(CM_Frontend_Environment $environment, CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
     }
 
     /**
