@@ -8,7 +8,7 @@
     return !navigator.userAgent.match(/(iPad|iPhone|iPod)/i);
   });
   Modernizr.addTest('webvr', function() {
-    return ('getVRDevices' in navigator) || ('mozGetVRDevices' in navigator);
+    return 'getVRDisplays' in navigator;
   });
   /*
    * test based on THREE.js method, see: http://threejs.org/examples/js/Detector.js
