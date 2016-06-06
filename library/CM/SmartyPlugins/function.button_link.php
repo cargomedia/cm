@@ -41,6 +41,12 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
     }
     unset($params['target']);
 
+    $disabled = null;
+    if (isset($params['disabled'])) {
+        $disabled = (bool) $params['disabled'];
+    }
+    unset($params['disabled']);
+
     if (isset($params['id'])) {
         $attrs .= ' id="' . $params['id'] . '"';
     }
@@ -98,6 +104,10 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
         }
     } else {
         $html .= '<button type="button"';
+
+        if ($disabled) {
+            $html .= ' disabled';
+        }
     }
 
     $html .= ' class="' . $class . '" ' . $attrs . '>';
