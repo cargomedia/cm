@@ -3,6 +3,7 @@
 {button_link label="Button with html <em>tags</em>" isHtmlLabel=true}
 {button_link icon="like"}
 {button_link icon="trophy" label="With Icon"}
+{button_link disabled=true icon="forbidden" label="Disabled"}
 {button_link label="As a link" href="/"}
 {button_link icon="gift" label="Link with icon" href="/"}
 <hr />
