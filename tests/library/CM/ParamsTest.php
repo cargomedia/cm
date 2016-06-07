@@ -213,6 +213,19 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame(1, $toArrayMethod->getCallCount());
     }
 
+    public function testEncodeJsonSerializable() {
+        $jsonSerializable = $this->mockInterface('JsonSerializable')->newInstance();
+        $toArrayMethod = $jsonSerializable->mockMethod('jsonSerialize')->set([
+            'foo' => 1
+        ]);
+        $expectedEncoded = array(
+            'foo' => 1,
+            '_class' => get_class($jsonSerializable),
+        );
+        $this->assertEquals($expectedEncoded, CM_Params::encode($jsonSerializable));
+        $this->assertSame(1, $toArrayMethod->getCallCount());
+    }
+
     public function testEncodeObjectId() {
         /** @var CM_ArrayConvertible|\Mocka\ClassMock $arrayConvertible */
         $arrayConvertible = $this->mockInterface('CM_ArrayConvertible')->newInstance();

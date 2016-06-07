@@ -1,7 +1,7 @@
 <?php
 
 abstract class CM_Model_Abstract extends CM_Class_Abstract
-    implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable, CM_Typed, CM_Debug_DebugInfoInterface {
+    implements CM_Comparable, CM_ArrayConvertible, JsonSerializable, CM_Cacheable, Serializable, CM_Typed, CM_Debug_DebugInfoInterface {
 
     /** @var array|null */
     protected $_id;
@@ -699,6 +699,10 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             $array['id'] = $this->getId();
         }
         return $array;
+    }
+
+    public function jsonSerialize() {
+        return $this->toArray();
     }
 
     public static function fromArray(array $data) {

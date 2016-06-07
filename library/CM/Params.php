@@ -543,15 +543,24 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
             $value = array_map('self::encode', $value);
         }
         if ($value instanceof CM_ArrayConvertible) {
-            $array = $value->toArray();
-            $array = array_map('self::encode', $array);
-            $value = array_merge($array, array('_class' => get_class($value)));
+            $class = get_class($value);
+            $value = $value->toArray();
+            $value = array_map('self::encode', $value);
+            $value = array_merge($value, array('_class' => $class));
+        }
+        if ($value instanceof JsonSerializable) {
+            $class = get_class($value);
+            $value = $value->jsonSerialize();
+            if (is_array($value)) {
+                $value = array_map('self::encode', $value);
+                $value = array_merge($value, array('_class' => $class));
+            }
         }
         if ($json) {
             if (is_object($value)) {
                 $value = 'null';
             } else {
-                $value = self::jsonEncode($value);
+                $value = CM_Util::jsonEncode($value);
             }
         }
         return $value;
@@ -564,7 +573,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     public static function encodeObjectId(CM_ArrayConvertible $object) {
         $array = $object->toArrayIdOnly();
         $value = array_merge($array, array('_class' => get_class($object)));
-        return self::jsonEncode($value);
+        return CM_Util::jsonEncode($value);
     }
 
     /**
@@ -575,7 +584,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      */
     public static function decode($value, $json = null) {
         if ($json) {
-            $value = self::jsonDecode($value);
+            $value = CM_Util::jsonDecode($value);
         }
         if (is_array($value) && isset($value['_class'])) {
             // CM_ArrayConvertible
