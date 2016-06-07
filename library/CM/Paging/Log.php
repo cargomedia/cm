@@ -82,7 +82,7 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
     public function flush() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $criteria = $this->_getCriteria();
-        $mongoDb->remove(self::COLLECTION_NAME, $criteria);
+        $mongoDb->remove(self::COLLECTION_NAME, $criteria, ['socketTimeoutMS' => 50000]);
         $this->_change();
     }
 
@@ -101,7 +101,7 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         $criteria['createdAt'] = ['$lt' => new MongoDate($deleteOlderThan)];
 
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $mongoDb->remove(self::COLLECTION_NAME, $criteria);
+        $mongoDb->remove(self::COLLECTION_NAME, $criteria, ['socketTimeoutMS' => 50000]);
         $this->_change();
     }
 
