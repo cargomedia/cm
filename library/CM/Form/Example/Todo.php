@@ -3,6 +3,7 @@
 class CM_Form_Example_Todo extends CM_Form_Abstract {
 
     protected function _initialize() {
+        $this->registerField(new CM_FormField_Hidden(['name' => 'todoId']));
         $this->registerField(new CM_FormField_Text(['name' => 'title']));
         $this->registerField(new CM_FormField_Text(['name' => 'description']));
         $this->registerField(new CM_FormField_Set_Select([

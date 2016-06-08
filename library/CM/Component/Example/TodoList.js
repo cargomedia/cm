@@ -20,15 +20,23 @@ var CM_Component_Example_TodoList = CM_Component_Abstract.extend({
 
   events: {
     'click .delete': function(event) {
-      var $icon = $(event.currentTarget);
-      var todo = this._todoList.get($icon.closest('li').data('id'));
+      var $el = $(event.currentTarget);
+      var todo = this._todoList.get($el.closest('li').data('id'));
       return this.ajax('delete', {todo: todo});
     },
 
     'click .changeState': function(event) {
-      var $icon = $(event.currentTarget);
-      var todo = this._todoList.get($icon.closest('li').data('id'));
+      var $el = $(event.currentTarget);
+      var todo = this._todoList.get($el.closest('li').data('id'));
       return this.ajax('changeState', {todo: todo, state: todo.getStateNext()});
+    },
+
+    'click h4': function(event) {
+      var $el = $(event.currentTarget);
+      var todo = this._todoList.get($el.closest('li').data('id'));
+      this._form.fill(todo);
+      this._form.show();
+      this._$buttonAdd.hide();
     },
 
     'click .add': function() {

@@ -23,5 +23,15 @@ var CM_Form_Example_Todo = CM_Form_Abstract.extend({
         field.setValue('');
       }
     });
+  },
+
+  /**
+   * @param {CM_Model_Example_Toto} todo
+   */
+  fill: function(todo) {
+    _.each(this.getFields(), function(field) {
+      var value = field.getName() !== 'todoId' ? todo.get(field.getName()) : todo.get('id');
+      field.setValue(value);
+    });
   }
 });
