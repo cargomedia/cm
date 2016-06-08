@@ -289,7 +289,7 @@ var CM_App = CM_Class_Abstract.extend({
      */
     _isCmObject: function(data) {
       var className = data && data['_class'];
-      return className && cm.model.types[className] && window[className] && !data.cid;
+      return className && window[className] && !data.cid;
     },
 
     /**
