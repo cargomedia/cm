@@ -1,1 +1,3 @@
-<h3>Model Binding</h3><p>todolist component</p>
+<h3>Model Binding</h3>
+
+{component name="CM_Component_Example_TodoList"}
