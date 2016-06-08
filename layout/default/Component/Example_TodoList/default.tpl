@@ -1,7 +1,10 @@
 <div class="todo-list"></div>
 
-<div class="todo-list-edit">
+{button_link label="Add" class="add"}
+
+<div class="todo-form">
   {form name="CM_Form_Example_Todo"}
+    <span class="icon icon-close cancel"></span>
   {formField name='title' label='Title'}
   {formField name='description' label='Description'}
   {formField name='state' label='State'}
