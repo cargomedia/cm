@@ -146,6 +146,17 @@ CREATE TABLE `cm_model_currency_country` (
   UNIQUE KEY `countryId` (`countryId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_model_example_todo`;
+
+
+CREATE TABLE `cm_model_example_todo` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(64) NOT NULL,
+  `description` varchar(140) NOT NULL,
+  `state` int(2) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `cm_model_language`;
 
 

@@ -1,0 +1,66 @@
+& {
+  max-width: 50%;
+  margin: 0 auto;
+
+  .icon {
+    cursor: pointer;
+  }
+
+  .todo-form form {
+    position: relative;
+    padding: 10px;
+    border: 1px solid grey;
+    margin-top: 10px;
+    border-radius: @borderRadiusButton;
+    display: none;
+
+    .icon {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+    }
+  }
+
+  .add {
+    float: right;
+    margin-top: 10px;
+  }
+
+  &:after {
+    clear: both;
+    content: "";
+    display: block;
+  }
+
+  li {
+    padding: 5px 10px;
+    border: 1px solid #D6D6D6;
+    position: relative;
+
+    h4 {
+      cursor: pointer;
+    }
+
+    .icons {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+
+      .icon-tag {
+        &.pending {
+          color: rgba(157, 87, 234, 1)
+        }
+        &.progress {
+          color: rgba(88, 131, 234, 1);
+        }
+        &.cancelled {
+          color: rgba(234, 176, 59, 1);
+        }
+        &.done {
+          color: rgba(161, 234, 92, 1);
+        }
+
+      }
+    }
+  }
+}
