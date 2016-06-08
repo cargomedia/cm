@@ -12,6 +12,20 @@ var CM_Component_Example_TodoList = CM_Component_Abstract.extend({
 
   _class: 'CM_Component_Example_TodoList',
 
+  events: {
+    'click .delete': function(event) {
+      var $icon = $(event.currentTarget);
+      var todo = this._todoList.get($icon.closest('li').data('id'));
+      return this.ajax('delete', {todo: todo});
+    },
+
+    'click .changeState': function(event) {
+      var $icon = $(event.currentTarget);
+      var todo = this._todoList.get($icon.closest('li').data('id'));
+      return this.ajax('changeState', {todo: todo, state: todo.getStateNext()});
+    }
+  },
+
   ready: function() {
     this.$target = this.$('.todo-list');
 

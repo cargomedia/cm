@@ -11,13 +11,17 @@
 
 {literal}
   <script type="text/template" class="tpl-todo-list">
-    <dl>
+    <ul>
       [[ todoList.each(function(todo) { ]]
-      <dt>[[- todo.get('title') ]] ([[- todo.get('state') ]])</dt>
-      <dd>
+      <li data-id="[[- todo.id ]]">
+        <h4>[[- todo.get('title') ]]</h4>
+        <div class="icons">
+          <span class="icon icon-trash delete"></span>
+          <span class="icon icon-tag changeState [[- todo.getStateName() ]]"></span>
+        </div>
         [[- todo.get('description') ]]
-      </dd>
+      </li>
       [[ }) ]]
-    </dl>
+    </ul>
   </script>
 {/literal}

@@ -11,4 +11,16 @@ class CM_Component_Example_TodoList extends CM_Component_Abstract {
             throw new CM_Exception_NotAllowed();
         }
     }
+
+    public function ajax_delete(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
+        $todo = $params->get('todo');
+        $todo->delete();
+    }
+
+    public function ajax_changeState(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
+        $todo = $params->get('todo');
+        $state = $params->getInt('state');
+        $todo->setState($state);
+        $todo->commit();
+    }
 }
