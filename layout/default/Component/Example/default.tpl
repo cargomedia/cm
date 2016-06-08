@@ -7,6 +7,7 @@
     <li data-tab="variables"><a href="{linkUrl page='CM_Page_Example' tab='variables'}" class="clickFeedback">Variables</a></li>
     <li data-tab="icons"><a href="{linkUrl page='CM_Page_Example' tab='icons'}" class="clickFeedback">Icons</a></li>
     <li data-tab="styleguide"><a href="{linkUrl page='CM_Page_Example' tab='styleguide'}" class="clickFeedback">Styleguide</a></li>
+    <li data-tab="binding"><a href="{linkUrl page='CM_Page_Example' tab='binding'}" class="clickFeedback">Model Binding</a></li>
   {/block}
 </ul>
 
@@ -34,6 +35,9 @@
     </div>
     <div>
       {viewTemplate name='tabs/styleguide'}
+    </div>
+    <div>
+      {viewTemplate name='tabs/binding'}
     </div>
   {/block}
 </div>
