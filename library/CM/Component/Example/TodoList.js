@@ -14,6 +14,9 @@ var CM_Component_Example_TodoList = CM_Component_Abstract.extend({
 
   ready: function() {
     this.$target = this.$('.todo-list');
+
+    this.listenTo(this._todoList, 'add', this.render);
+    this.listenTo(this._todoList, 'remove', this.render);
     this.listenTo(this._todoList, 'change', this.render);
 
     this.render();
