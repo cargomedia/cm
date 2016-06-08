@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_Example_Todo extends CM_Model_Abstract {
+class CM_Model_Example_Todo extends CM_Model_Bound {
 
     /**
      * @return string
@@ -50,6 +50,10 @@ class CM_Model_Example_Todo extends CM_Model_Abstract {
         $array['description'] = $this->getDescription();
         $array['state'] = $this->getState();
         return $array;
+    }
+
+    protected function _loadData() {
+        return CM_Db_Db::exec('SELECT * FROM `cm_model_example_todo` WHERE `id`=?', array($this->getId()))->fetch();
     }
 
     public static function getCacheClass() {

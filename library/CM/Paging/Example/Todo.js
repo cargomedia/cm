@@ -1,8 +1,8 @@
 /**
  * @class CM_Paging_Example_Todo
- * @extends CM_Paging_Abstract
+ * @extends CM_Paging_Bound
  */
-var CM_Paging_Example_Todo = CM_Paging_Abstract.extend({
+var CM_Paging_Example_Todo = CM_Paging_Bound.extend({
 
   /** @type {String} */
   _class: 'CM_Paging_Example_Todo',
