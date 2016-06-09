@@ -65,17 +65,26 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase {
         $this->assertFalse($entity->isOwner($stranger));
     }
 
-    public function testToArray() {
+    public function testArrayConvertible() {
         $user = CMTest_TH::createUser();
         $id = CM_Model_Entity_Mock::createStatic(array('userId' => $user->getId(), 'foo' => 'boo'));
         $mock = $this->getMockBuilder('CM_Model_Entity_Mock')->setConstructorArgs(array($id->getId()))->setMethods(array('getType'))->getMock();
         $mock->expects($this->any())->method('getType')->will($this->returnValue(null));
         /** @var $mock CM_Model_Entity_Abstract */
-        $data = $mock->toArray();
-        $this->assertArrayHasKey('path', $data);
-        $this->assertNull($data['path']);
+        $data = $mock->toArrayIdOnly();
         $this->assertArrayHasKey('_type', $data);
         $this->assertNull($data['_type']);
+    }
+
+    public function testJsonSerializable() {
+        $user = CMTest_TH::createUser();
+        $id = CM_Model_Entity_Mock::createStatic(array('userId' => $user->getId(), 'foo' => 'boo'));
+        $mock = $this->getMockBuilder('CM_Model_Entity_Mock')->setConstructorArgs(array($id->getId()))->setMethods(array('getType'))->getMock();
+        $mock->expects($this->any())->method('getType')->will($this->returnValue(null));
+        /** @var $mock CM_Model_Entity_Abstract */
+        $data = $mock->jsonSerialize();
+        $this->assertArrayHasKey('path', $data);
+        $this->assertNull($data['path']);
     }
 }
 

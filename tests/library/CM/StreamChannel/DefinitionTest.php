@@ -62,10 +62,10 @@ class CM_StreamChannel_DefinitionTest extends CMTest_TestCase {
         $this->assertSame(null, $definition->findStreamChannel());
     }
 
-    public function testToFromArray() {
+    public function testArrayConvertible() {
         $definition = new CM_StreamChannel_Definition('foo', 12);
 
-        $array = $definition->toArray();
+        $array = $definition->toArrayIdOnly();
         $this->assertEquals(CM_StreamChannel_Definition::fromArray($array), $definition);
     }
 }

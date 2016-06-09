@@ -13,15 +13,20 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         parent::_initialize();
     }
 
+    /**
+     * @param CM_Model_Location  $location
+     * @param CM_Frontend_Render $render
+     * @return array list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img, 'class' => string])
+     */
     public function getSuggestion($location, CM_Frontend_Render $render) {
         $names = array();
         for ($level = $location->getLevel(); $level >= CM_Model_Location::LEVEL_COUNTRY; $level--) {
             $names[] = $location->getName($level);
         }
         return array(
-            'id'    => $location->toArray(),
-            'name'  => implode(', ', array_filter($names)),
-            'img'   => $render->getUrlResource('layout',
+            'id'   => $location->toArrayIdOnly(),
+            'name' => implode(', ', array_filter($names)),
+            'img'  => $render->getUrlResource('layout',
                 'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),
         );
     }

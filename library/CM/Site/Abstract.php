@@ -157,10 +157,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         return array('type' => $this->getType());
     }
 
-    public function toArray() {
-        return $this->toArrayIdOnly();
-    }
-
     /**
      * @param string $theme
      * @return CM_Site_Abstract

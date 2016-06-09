@@ -693,16 +693,10 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         return array('_type' => $this->getType(), '_id' => $this->getIdRaw());
     }
 
-    public function toArray() {
-        $array = $this->toArrayIdOnly();
-        if ($this->hasId()) {
-            $array['id'] = $this->getId();
-        }
-        return $array;
-    }
-
     public function jsonSerialize() {
-        return $this->toArray();
+        return [
+            'id' => $this->getId(),
+        ];
     }
 
     public static function fromArray(array $data) {

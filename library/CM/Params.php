@@ -536,34 +536,37 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @param mixed        $value
      * @param boolean|null $json
      * @throws CM_Exception_Invalid
-     * @return string
+     * @return array|string
      */
     public static function encode($value, $json = null) {
         if (is_array($value)) {
-            $value = array_map('self::encode', $value);
-        }
-        if ($value instanceof CM_ArrayConvertible) {
+            $result = array_map('self::encode', $value);
+        } elseif ($value instanceof CM_ArrayConvertible || $value instanceof JsonSerializable) {
             $class = get_class($value);
-            $value = $value->toArray();
-            $value = array_map('self::encode', $value);
-            $value = array_merge($value, array('_class' => $class));
-        }
-        if ($value instanceof JsonSerializable) {
-            $class = get_class($value);
-            $value = $value->jsonSerialize();
-            if (is_array($value)) {
-                $value = array_map('self::encode', $value);
-                $value = array_merge($value, array('_class' => $class));
+            $result = [];
+            if ($value instanceof CM_ArrayConvertible) {
+                $array = $value->toArrayIdOnly();
+                $array = array_merge($array, array('_class' => $class));
+                $result = array_merge($result, $array);
             }
+            if ($value instanceof JsonSerializable) {
+                $array = $value->jsonSerialize();
+                if (is_array($array)) {
+                    $result = array_merge($result, array_map('self::encode', $array));
+                }
+            }
+        } else {
+            $result = $value;
         }
+
         if ($json) {
-            if (is_object($value)) {
-                $value = 'null';
+            if (is_object($result)) {
+                $result = 'null';
             } else {
-                $value = CM_Util::jsonEncode($value);
+                $result = CM_Util::jsonEncode($result);
             }
         }
-        return $value;
+        return $result;
     }
 
     /**

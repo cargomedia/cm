@@ -328,8 +328,8 @@ class CM_Model_User extends CM_Model_Abstract {
         CM_Db_Db::delete('cm_user', array('userId' => $this->getId()));
     }
 
-    public function toArray() {
-        $array = parent::toArray();
+    public function jsonSerialize() {
+        $array = parent::jsonSerialize();
         $array['displayName'] = $this->getDisplayName();
         $array['visible'] = $this->getVisible();
         return $array;
