@@ -7,7 +7,7 @@ interface CM_ArrayConvertible {
      *
      * @return array
      */
-    public function toArrayIdOnly();
+    public function toArray();
 
     /**
      * Return object from array-representation

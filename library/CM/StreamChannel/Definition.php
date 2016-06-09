@@ -82,7 +82,7 @@ class CM_StreamChannel_Definition implements CM_ArrayConvertible, JsonSerializab
         ];
     }
 
-    public function toArrayIdOnly() {
+    public function toArray() {
         return $this->jsonSerialize();
     }
 

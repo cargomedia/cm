@@ -294,7 +294,7 @@ class CM_Model_Location extends CM_Model_Abstract {
         return null;
     }
 
-    public function toArrayIdOnly() {
+    public function toArray() {
         return array('level' => $this->getLevel(), 'id' => $this->getId());
     }
 

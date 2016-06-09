@@ -24,7 +24,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
             $names[] = $location->getName($level);
         }
         return array(
-            'id'   => $location->toArrayIdOnly(),
+            'id'   => $location->toArray(),
             'name' => implode(', ', array_filter($names)),
             'img'  => $render->getUrlResource('layout',
                 'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),

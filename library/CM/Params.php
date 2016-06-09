@@ -545,7 +545,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
             $class = get_class($value);
             $result = [];
             if ($value instanceof CM_ArrayConvertible) {
-                $array = $value->toArrayIdOnly();
+                $array = $value->toArray();
                 $array = array_merge($array, array('_class' => $class));
                 $result = array_merge($result, $array);
             }
@@ -574,7 +574,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @return string JSON
      */
     public static function encodeObjectId(CM_ArrayConvertible $object) {
-        $array = $object->toArrayIdOnly();
+        $array = $object->toArray();
         $value = array_merge($array, array('_class' => get_class($object)));
         return CM_Util::jsonEncode($value);
     }

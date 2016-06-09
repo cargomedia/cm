@@ -202,7 +202,7 @@ class CM_ParamsTest extends CMTest_TestCase {
 
     public function testEncodeArrayConvertible() {
         $object = $this->mockInterface('CM_ArrayConvertible')->newInstance();
-        $toArrayMethod = $object->mockMethod('toArrayIdOnly')->set([
+        $toArrayMethod = $object->mockMethod('toArray')->set([
             'myId' => 1
         ]);
         $expectedEncoded = array(
@@ -216,7 +216,7 @@ class CM_ParamsTest extends CMTest_TestCase {
     public function testEncodeObjectId() {
         /** @var CM_ArrayConvertible|\Mocka\AbstractClassTrait $object */
         $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable'])->newInstance();
-        $toArrayMethod = $object->mockMethod('toArrayIdOnly')->set([
+        $toArrayMethod = $object->mockMethod('toArray')->set([
             'myId' => 1
         ]);
         $jsonSerializeMethod = $object->mockMethod('jsonSerialize')->set([
@@ -237,7 +237,7 @@ class CM_ParamsTest extends CMTest_TestCase {
             'foo' => 1
         ]);
         $expectedEncoded = array(
-            'foo'    => 1,
+            'foo' => 1,
         );
         $this->assertEquals($expectedEncoded, CM_Params::encode($object));
         $this->assertSame(1, $toArrayMethod->getCallCount());
@@ -245,7 +245,7 @@ class CM_ParamsTest extends CMTest_TestCase {
 
     public function testEncodeArrayConvertibleAndJsonSerializable() {
         $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable'])->newInstance();
-        $toArrayMethod = $object->mockMethod('toArrayIdOnly')->set([
+        $toArrayMethod = $object->mockMethod('toArray')->set([
             'foo' => 1
         ]);
         $jsonSerializeMethod = $object->mockMethod('jsonSerialize')->set([

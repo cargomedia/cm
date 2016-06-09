@@ -370,6 +370,6 @@ class CM_Model_LocationTest extends CMTest_TestCase {
     public function testArrayConvertible() {
         $location = CMTest_TH::createLocation();
 
-        $this->assertEquals($location, CM_Model_Location::fromArray($location->toArrayIdOnly()));
+        $this->assertEquals($location, CM_Model_Location::fromArray($location->toArray()));
     }
 }

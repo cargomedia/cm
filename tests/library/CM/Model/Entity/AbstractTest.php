@@ -71,7 +71,7 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase {
         $mock = $this->getMockBuilder('CM_Model_Entity_Mock')->setConstructorArgs(array($id->getId()))->setMethods(array('getType'))->getMock();
         $mock->expects($this->any())->method('getType')->will($this->returnValue(null));
         /** @var $mock CM_Model_Entity_Abstract */
-        $data = $mock->toArrayIdOnly();
+        $data = $mock->toArray();
         $this->assertArrayHasKey('_type', $data);
         $this->assertNull($data['_type']);
     }
