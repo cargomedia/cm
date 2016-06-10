@@ -38,6 +38,13 @@ class CM_Http_Response_View_Form extends CM_Http_Response_View_Abstract {
         return (bool) count($this->errors);
     }
 
+    /**
+     * @return string[]
+     */
+    public function getErrors() {
+        return $this->errors;
+    }
+
     protected function _processView(array $output) {
         $success = array();
         $form = $this->_getView();
