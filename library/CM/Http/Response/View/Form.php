@@ -39,7 +39,7 @@ class CM_Http_Response_View_Form extends CM_Http_Response_View_Abstract {
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getErrors() {
         return $this->errors;
