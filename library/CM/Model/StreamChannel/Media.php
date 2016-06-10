@@ -55,8 +55,8 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
         return (int) $this->_get('serverId');
     }
 
-    public function toArray() {
-        $array = parent::toArray();
+    public function jsonSerialize() {
+        $array = parent::jsonSerialize();
         if ($this->hasStreamPublish()) {
             $array['user'] = $this->getStreamPublish()->getUser();
         }
