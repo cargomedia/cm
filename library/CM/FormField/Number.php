@@ -1,6 +1,6 @@
 <?php
 
-class CM_FormField_Integer extends CM_FormField_Text {
+class CM_FormField_Number extends CM_FormField_Text {
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (!is_numeric($userInput)) {
