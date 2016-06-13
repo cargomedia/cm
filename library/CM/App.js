@@ -289,7 +289,12 @@ var CM_App = CM_Class_Abstract.extend({
      */
     _isCmObject: function(data) {
       var className = data && data['_class'];
-      return className && cm.model.types[className] && window[className] && !data.cid;
+      var isClass = className && cm.model.types[className] && window[className];
+      if (isClass) {
+        var isBackbone = data instanceof Backbone.Model || data instanceof Backbone.Collection;
+        return !isBackbone;
+      }
+      return false;
     },
 
     /**
