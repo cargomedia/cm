@@ -1,8 +1,8 @@
 /**
  * @class CM_FormField_Distance
- * @extends CM_FormField_Integer
+ * @extends CM_FormField_Hidden
  */
-var CM_FormField_Distance = CM_FormField_Integer.extend({
+var CM_FormField_Distance = CM_FormField_Hidden.extend({
 
   _class: 'CM_FormField_Distance',
 

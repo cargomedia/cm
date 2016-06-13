@@ -1,6 +1,6 @@
 <?php
 
-class CM_FormField_Distance extends CM_FormField_Integer {
+class CM_FormField_Distance extends CM_FormField_Hidden {
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         parent::validate($environment, $userInput);
