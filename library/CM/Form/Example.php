@@ -10,7 +10,7 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_Float(['name' => 'float']));
         $this->registerField(new CM_FormField_Money(['name' => 'money']));
         $this->registerField(new CM_FormField_Url(['name' => 'url']));
-        $this->registerField(new CM_FormField_Number(['name' => 'int', 'min' => -10, 'max' => 20]));
+        $this->registerField(new CM_FormField_Integer(['name' => 'int', 'min' => -10, 'max' => 20]));
         $this->registerField(new CM_FormField_Distance(['name' => 'locationSlider']));
         $this->registerField(new CM_FormField_Location(['name' => 'location', 'fieldNameDistance' => 'locationSlider']));
         $this->registerField(new CM_FormField_File(['name' => 'file', 'cardinality' => 2]));

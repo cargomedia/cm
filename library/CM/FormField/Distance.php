@@ -1,6 +1,8 @@
 <?php
 
-class CM_FormField_Distance extends CM_FormField_Hidden {
+class CM_FormField_Distance extends CM_FormField_Integer {
+
+    const DISPLAY_DEFAULT = self::DISPLAY_SLIDER;
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         parent::validate($environment, $userInput);
