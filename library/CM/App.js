@@ -392,7 +392,7 @@ var CM_App = CM_Class_Abstract.extend({
       var messages = _.toArray(arguments);
       var time = (Date.now() - performance.timing.navigationStart) / 1000;
       var timeFormatted = time.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false});
-      messages.unshift('[CM ' + timeFormatted + ']');
+      messages.unshift('[CM ' + timeFormatted + (performance.timing.isPolyfilled ? '!' : '') + ']');
       if (window.console && window.console.log) {
         var log = window.console.log;
         if (typeof log == "object" && Function.prototype.bind) {
