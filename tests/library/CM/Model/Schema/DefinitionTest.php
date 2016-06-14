@@ -571,6 +571,32 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
         }
     }
 
+    public function testEncodeArrayConvertible() {
+        $class = $this->mockInterface('CM_ArrayConvertible');
+        $arrayConvertible = $class->newInstanceWithoutConstructor();
+        $toArray = ['key' => 'value'];
+        $arrayConvertible->mockMethod('toArray')->set($toArray);
+        $schema = new CM_Model_Schema_Definition([
+            'arrayConvertible' => ['type' => 'CM_ArrayConvertible']
+        ]);
+        $value = $schema->encodeField('arrayConvertible', $arrayConvertible);
+        $this->assertSame('{"key":"value","_class":"' . get_class($arrayConvertible) . '"}', $value);
+    }
+
+    public function testDecodeArrayConvertible() {
+        $class = $this->mockInterface('CM_ArrayConvertible');
+        $arrayConvertible = $class->newInstanceWithoutConstructor();
+        $fromArray = $class->mockStaticMethod('fromArray')->set($arrayConvertible);
+        $schema = new CM_Model_Schema_Definition([
+            'arrayConvertible' => ['type' => 'CM_ArrayConvertible']
+        ]);
+        $jsonData = CM_Params::jsonEncode(['_class' => $class->getClassName(), 'key' => 'value']);
+        $value = $schema->decodeField('arrayConvertible', $jsonData);
+        
+        $this->assertSame(['key' => 'value'], $fromArray->getLastCall()->getArgument(0));
+        $this->assertSame($arrayConvertible, $value);
+    }
+
     /**
      * @expectedException CM_Model_Exception_Validation
      * @expectedExceptionMessage Value `bar` is not an instance of `CM_Model_Mock_Validation2`
