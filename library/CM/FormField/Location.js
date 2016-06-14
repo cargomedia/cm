@@ -24,7 +24,7 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
   },
 
   /**
-   * @returns {CM_FormField_Integer|Null}
+   * @returns {CM_FormField_Distance|Null}
    */
   getDistanceField: function() {
     if (!this.getOption("distanceName")) {
