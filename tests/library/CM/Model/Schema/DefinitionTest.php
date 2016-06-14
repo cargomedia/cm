@@ -608,7 +608,7 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 
     /**
      * @expectedException CM_Model_Exception_Validation
-     * @expectedExceptionMessage Field `foo` is not a valid model
+     * @expectedExceptionMessage Value `bar` is not an instance of `CM_Class_Abstract`
      */
     public function testEncodeInvalidClass() {
         $schema = new CM_Model_Schema_Definition(array('foo' => array('type' => 'CM_Class_Abstract')));
