@@ -5,7 +5,7 @@
     "bin-dir": "bin/"
   },
   "require": {
-    "composer/composer": "1.0.0-alpha10",
+    "composer/composer": "~1.1.0",
     "smarty/smarty": "3.1.16",
     "leafo/lessphp": "~0.5.0",
     "easybook/geshi": "1.0.8.11",

@@ -10,8 +10,8 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
 
     public function __construct(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
         $this->_request = clone $request;
-        $this->_site = CM_Site_Abstract::findByRequest($this->_request);
         $this->_request->popPathLanguage();
+        $this->_site = CM_Site_Abstract::findByRequest($this->_request);
 
         $this->setServiceManager($serviceManager);
     }
@@ -154,4 +154,22 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             return false;
         });
     }
+
+    /**
+     * @return string
+     */
+    public static function getPageResponseClass() {
+        return self::_getClassName();
+    }
+
+    /**
+     * @param CM_Http_Request_Abstract $request
+     * @param CM_Service_Manager       $serviceManager
+     * @return CM_Http_Response_Page
+     */
+    public static function factory(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
+        $className = self::getPageResponseClass();
+        return new $className($request, $serviceManager);
+    }
+
 }

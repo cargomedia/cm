@@ -81,6 +81,7 @@ textarea.textinput {
 
   a&, div& {
     line-height: @sizeButton - 2*@buttonBorderWidth;
+    text-align: center;
   }
 }
 
@@ -114,6 +115,7 @@ textarea.textinput {
 .button-transparent {
   background: none;
   border: 1px solid transparent;
+  color: @colorFgButton;
 }
 
 .button-highlight {
@@ -142,13 +144,6 @@ textarea.textinput {
 
   a& {
     line-height: @sizeButtonLargeFactor*@sizeButton - 2*@buttonBorderWidth;
-  }
-}
-
-label {
-  //Fix for fastclick
-  > * {
-    pointer-events: none;
   }
 }
 

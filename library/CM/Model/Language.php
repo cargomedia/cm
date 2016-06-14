@@ -134,8 +134,8 @@ class CM_Model_Language extends CM_Model_Abstract {
         $this->getTranslations()->set($phrase, $value, $variables);
     }
 
-    public function toArray() {
-        $array = parent::toArray();
+    public function jsonSerialize() {
+        $array = parent::jsonSerialize();
         $array['abbreviation'] = $this->getAbbreviation();
         return $array;
     }

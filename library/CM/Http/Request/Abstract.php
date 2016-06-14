@@ -432,6 +432,17 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @return DateTimeZone|null
+     */
+    public function getTimeZone() {
+        $timeZone = $this->_getTimeZoneFromCookie();
+        if (null === $timeZone && $location = $this->getLocation()) {
+            $timeZone = $location->getTimeZone();
+        }
+        return $timeZone;
+    }
+
+    /**
      * @return string
      */
     public function getUserAgent() {
@@ -503,6 +514,30 @@ abstract class CM_Http_Request_Abstract {
                 if ($language = $languagePaging->findByAbbreviation($locale[0])) {
                     return $language;
                 }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return DateTimeZone|null
+     */
+    private function _getTimeZoneFromCookie() {
+        if ($timeZoneOffset = $this->getCookie('timezoneOffset')) {
+            //timezoneOffset is seconds behind UTC
+            $timeZoneOffset = (int) $timeZoneOffset;
+            if ($timeZoneOffset < -50400 || $timeZoneOffset > 43200) { //UTC+14 UTC-12
+                return null;
+            }
+            $timeZoneAbs = abs($timeZoneOffset);
+            $offsetHours = floor($timeZoneAbs / 3600);
+            $offsetMinutes = floor($timeZoneAbs % 3600 / 60);
+            if ($timeZoneOffset > 0) {
+                $offsetHours *= -1;
+            }
+            $dateTime = DateTime::createFromFormat('O', sprintf("%+03d%02d", $offsetHours, $offsetMinutes));
+            if (false !== $dateTime) {
+                return $dateTime->getTimezone();
             }
         }
         return null;

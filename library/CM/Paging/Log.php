@@ -71,29 +71,18 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
                     '_id'       => false],
                 ],
             ];
+            $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, null, null, $aggregate);
         } else {
-            $aggregate = [
-                ['$match' => $criteria],
-                ['$sort' => ['_id' => -1]],
-                ['$project' => [
-                    'level'     => '$level',
-                    'message'   => '$message',
-                    'exception' => '$context.exception',
-                    'context'   => '$context',
-                    'count'     => '$count',
-                    'createdAt' => '$createdAt',
-                    '_id'       => false,
-                ]],
-            ];
+            $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, $criteria, null, null, ['_id' => -1]);
         }
-        $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, null, null, $aggregate);
+
         parent::__construct($source);
     }
 
     public function flush() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $criteria = $this->_getCriteria();
-        $mongoDb->remove(self::COLLECTION_NAME, $criteria);
+        $mongoDb->remove(self::COLLECTION_NAME, $criteria, ['socketTimeoutMS' => 50000]);
         $this->_change();
     }
 
@@ -112,7 +101,7 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         $criteria['createdAt'] = ['$lt' => new MongoDate($deleteOlderThan)];
 
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $mongoDb->remove(self::COLLECTION_NAME, $criteria);
+        $mongoDb->remove(self::COLLECTION_NAME, $criteria, ['socketTimeoutMS' => 50000]);
         $this->_change();
     }
 
@@ -137,6 +126,13 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         }
 
         return $criteria;
+    }
+
+    protected function _processItem($itemRaw) {
+        if (isset($itemRaw['context']['exception'])) {
+            $itemRaw['exception'] = $itemRaw['context']['exception'];
+        }
+        return $itemRaw;
     }
 
     /**

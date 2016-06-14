@@ -17,6 +17,7 @@
 {formField name='image' label="Upload Photos"}
 {formField name='color' label="Color"}
 {formField name='date' label="Date"}
+{formField name='dateTimeInterval' label = "DateTimeInterval" placeholderStart='Starting Time' placeholderEnd='End'}
 {formField name='birthdate' label="Birth Date between 18 and 30"}
 {formField name='geopoint' label="Geo Point"}
 {formField name='set' label="Set"}

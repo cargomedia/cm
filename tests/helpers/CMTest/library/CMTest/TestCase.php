@@ -72,10 +72,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         }
         $methods = (array) $methods;
         $defaultConfiguration = array(
-            'url'          => null,
+            'url'          => 'http://www.example.com',
             'urlCdn'       => null,
-            'name'         => null,
-            'emailAddress' => null,
+            'name'         => 'Example site',
+            'emailAddress' => 'hello@example.com',
         );
         $configuration = array_merge($defaultConfiguration, (array) $configuration);
 

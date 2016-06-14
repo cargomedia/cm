@@ -69,4 +69,23 @@ class CM_Geo_Point implements CM_Comparable {
             && $this->getLatitude() === $other->getLatitude()
             && $this->getLongitude() === $other->getLongitude());
     }
+
+    /**
+     * @param CM_Geo_Point $pointTo
+     * @return float
+     */
+    public function calculateDistanceTo(CM_Geo_Point $pointTo) {
+        $pi180 = M_PI / 180;
+        $currentRadianLatitude = $this->getLatitude() * $pi180;
+        $currentRadianLongitude = $this->getLongitude() * $pi180;
+        $againstRadianLatitude = $pointTo->getLatitude() * $pi180;
+        $againstRadianLongitude = $pointTo->getLongitude() * $pi180;
+
+        $arcCosine = acos(
+            sin($currentRadianLatitude) * sin($againstRadianLatitude) +
+            cos($currentRadianLatitude) * cos($againstRadianLatitude) * cos($currentRadianLongitude - $againstRadianLongitude)
+        );
+
+        return CM_Model_Location::EARTH_RADIUS * $arcCosine;
+    }
 }

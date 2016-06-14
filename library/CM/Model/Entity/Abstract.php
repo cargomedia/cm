@@ -56,8 +56,8 @@ abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract {
         return new $className($id);
     }
 
-    public function toArray() {
-        $array = parent::toArray();
+    public function jsonSerialize() {
+        $array = parent::jsonSerialize();
         $array['path'] = $this->getPath();
         return $array;
     }

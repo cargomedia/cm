@@ -8,5 +8,5 @@ function smarty_block_less($params, $content, Smarty_Internal_Template $template
     $assetCss->addVariables();
     $assetCss->add($content);
 
-    return $assetCss->get(true);
+    return $assetCss->get();
 }

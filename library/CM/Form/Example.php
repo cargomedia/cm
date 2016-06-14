@@ -17,6 +17,7 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_FileImage(['name' => 'image', 'cardinality' => 2]));
         $this->registerField(new CM_FormField_Color(['name' => 'color']));
         $this->registerField(new CM_FormField_Date(['name' => 'date']));
+        $this->registerField(new CM_FormField_DateTimeInterval(['name' => 'dateTimeInterval', 'yearFirst' => date('Y'), 'yearLast' => (int) date('Y') + 1]));
         $this->registerField(new CM_FormField_Birthdate(['name' => 'birthdate', 'minAge' => 18, 'maxAge' => 30]));
         $this->registerField(new CM_FormField_GeoPoint(['name' => 'geopoint']));
         $this->registerField(new CM_FormField_Set(['name' => 'set', 'values' => array(1 => 'Eins', 2 => 'Zwei'), 'labelsInValues' => true]));

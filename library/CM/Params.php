@@ -195,6 +195,22 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     }
 
     /**
+     * @param string $key
+     * @return DateInterval
+     */
+    public function getDateInterval($key) {
+        return $this->getObject($key, 'DateInterval');
+    }
+
+    /**
+     * @param string $key
+     * @return DateTimeZone
+     */
+    public function getDateTimeZone($key) {
+        return $this->getObject($key, 'DateTimeZone');
+    }
+
+    /**
      * @param string   $key
      * @param int|null $default
      * @return int
@@ -520,25 +536,37 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @param mixed        $value
      * @param boolean|null $json
      * @throws CM_Exception_Invalid
-     * @return string
+     * @return array|string
      */
     public static function encode($value, $json = null) {
         if (is_array($value)) {
-            $value = array_map('self::encode', $value);
+            $result = array_map('self::encode', $value);
+        } elseif ($value instanceof CM_ArrayConvertible || $value instanceof JsonSerializable) {
+            $class = get_class($value);
+            $result = [];
+            if ($value instanceof CM_ArrayConvertible) {
+                $array = $value->toArray();
+                $array = array_merge($array, array('_class' => $class));
+                $result = array_merge($result, $array);
+            }
+            if ($value instanceof JsonSerializable) {
+                $array = $value->jsonSerialize();
+                if (is_array($array)) {
+                    $result = array_merge($result, array_map('self::encode', $array));
+                }
+            }
+        } else {
+            $result = $value;
         }
-        if ($value instanceof CM_ArrayConvertible) {
-            $array = $value->toArray();
-            $array = array_map('self::encode', $array);
-            $value = array_merge($array, array('_class' => get_class($value)));
-        }
+
         if ($json) {
-            if (is_object($value)) {
-                $value = 'null';
+            if (is_object($result)) {
+                $result = 'null';
             } else {
-                $value = self::jsonEncode($value);
+                $result = CM_Util::jsonEncode($result);
             }
         }
-        return $value;
+        return $result;
     }
 
     /**
@@ -546,9 +574,9 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @return string JSON
      */
     public static function encodeObjectId(CM_ArrayConvertible $object) {
-        $array = $object->toArrayIdOnly();
+        $array = $object->toArray();
         $value = array_merge($array, array('_class' => get_class($object)));
-        return self::jsonEncode($value);
+        return CM_Util::jsonEncode($value);
     }
 
     /**
@@ -559,7 +587,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      */
     public static function decode($value, $json = null) {
         if ($json) {
-            $value = self::jsonDecode($value);
+            $value = CM_Util::jsonDecode($value);
         }
         if (is_array($value) && isset($value['_class'])) {
             // CM_ArrayConvertible

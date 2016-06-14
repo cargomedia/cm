@@ -192,12 +192,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         $this->_prepare();
     }
 
-    public function toArrayIdOnly() {
-        return array('actor' => $this->getActor(), 'verb' => $this->getVerb(), 'type' => $this->getType());
-    }
-
     public function toArray() {
-        return $this->toArrayIdOnly();
+        return array('actor' => $this->getActor(), 'verb' => $this->getVerb(), 'type' => $this->getType());
     }
 
     /**

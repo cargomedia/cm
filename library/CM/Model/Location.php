@@ -93,29 +93,50 @@ class CM_Model_Location extends CM_Model_Abstract {
     }
 
     /**
+     * @return CM_Geo_Point|null
+     */
+    public function getGeoPoint() {
+        $coordinates = $this->getCoordinates();
+        if (null === $coordinates) {
+            return null;
+        }
+        return new CM_Geo_Point($coordinates['lat'], $coordinates['lon']);
+    }
+
+    /**
      * @param CM_Model_Location $location
      * @return int|null
      */
     public function getDistance(CM_Model_Location $location) {
-        $currentCoordinates = $this->getCoordinates();
-        $againstCoordinates = $location->getCoordinates();
-
-        if (!$currentCoordinates || !$againstCoordinates) {
+        $pointCurrent = $this->getGeoPoint();
+        $pointAgainst = $location->getGeoPoint();
+        if (!$pointCurrent || !$pointAgainst) {
             return null;
         }
+        return (int) round($pointCurrent->calculateDistanceTo($pointAgainst));
+    }
 
-        $pi180 = M_PI / 180;
-        $currentCoordinates['lat'] *= $pi180;
-        $currentCoordinates['lon'] *= $pi180;
-        $againstCoordinates['lat'] *= $pi180;
-        $againstCoordinates['lon'] *= $pi180;
-
-        $arcCosine = acos(
-            sin($currentCoordinates['lat']) * sin($againstCoordinates['lat'])
-            + cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon'])
-        );
-
-        return (int) round(self::EARTH_RADIUS * $arcCosine);
+    /**
+     * @return DateTimeZone|null
+     */
+    public function getTimeZone() {
+        $pointCurrent = $this->getGeoPoint();
+        if (null === $pointCurrent) {
+            return null;
+        }
+        $timezoneNameList = DateTimeZone::listIdentifiers();
+        $distanceList = Functional\map($timezoneNameList, function ($timezoneName) use ($pointCurrent) {
+            $timezoneLocation = (new DateTimeZone($timezoneName))->getLocation();
+            $pointTimeZone = new CM_Geo_Point($timezoneLocation['latitude'], $timezoneLocation['longitude']);
+            return [
+                'timezoneName' => $timezoneName,
+                'distance'     => $pointCurrent->calculateDistanceTo($pointTimeZone),
+            ];
+        });
+        $closestDistance = Functional\reduce_left($distanceList, function (array $current, $index, $collection, array $minimal) {
+            return $current['distance'] < $minimal['distance'] ? $current : $minimal;
+        }, $distanceList[0]);
+        return new DateTimeZone($closestDistance['timezoneName']);
     }
 
     /**
@@ -273,12 +294,8 @@ class CM_Model_Location extends CM_Model_Abstract {
         return null;
     }
 
-    public function toArrayIdOnly() {
-        return array('level' => $this->getLevel(), 'id' => $this->getId());
-    }
-
     public function toArray() {
-        return $this->toArrayIdOnly();
+        return array('level' => $this->getLevel(), 'id' => $this->getId());
     }
 
     public static function fromArray(array $data) {

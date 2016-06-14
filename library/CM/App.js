@@ -155,7 +155,7 @@ var CM_App = CM_Class_Abstract.extend({
     if (cm.options.urlCdn) {
       url = cm.options.urlCdn + url;
     } else {
-      url = cm.options.url + url;
+      url = cm.options.urlBase + url;
     }
 
     url += '/static';
@@ -174,15 +174,14 @@ var CM_App = CM_Class_Abstract.extend({
    */
   getUrlResource: function(type, path, options) {
     options = _.defaults(options || {}, {
-      'sameOrigin': false,
-      'root': false
+      'sameOrigin': false
     });
 
     var url = '';
     if (!options['sameOrigin'] && cm.options.urlCdn) {
       url = cm.options.urlCdn + url;
     } else {
-      url = cm.options.url + url;
+      url = cm.options.urlBase + url;
     }
 
     if (type && path) {
@@ -195,14 +194,17 @@ var CM_App = CM_Class_Abstract.extend({
       urlParts.push(cm.options.deployVersion);
       urlParts = urlParts.concat(path.split('/'));
 
-      if (options['root']) {
-        url += '/resource-' + urlParts.join('--');
-      } else {
-        url += '/' + urlParts.join('/');
-      }
+      url += '/' + urlParts.join('/');
     }
 
     return url;
+  },
+
+  /**
+   * @returns {string}
+   */
+  getUrlServiceWorker: function() {
+    return cm.options.urlServiceWorker;
   },
 
   /**
@@ -230,7 +232,7 @@ var CM_App = CM_Class_Abstract.extend({
       path += '/' + cm.options.language.abbreviation;
     }
     path += '/' + this.getSiteId();
-    return this.getUrl(path, null, true);
+    return cm.options.urlBase + path;
   },
 
   /**
@@ -253,6 +255,52 @@ var CM_App = CM_Class_Abstract.extend({
       context[cm.options.name].user = cm.viewer.id;
     }
     return context;
+  },
+
+  factory: {
+
+    /**
+     * @param {*} data
+     * @returns {*|CM_Model_Abstract}
+     */
+    create: function(data) {
+      return this._create(data);
+    },
+
+    /**
+     * @param {*} data
+     * @returns {*|CM_Model_Abstract}
+     */
+    _create: function(data) {
+      if ($.isPlainObject(data) || _.isArray(data)) {
+        _.each(data, function(value, key) {
+          data[key] = this._create(value);
+        }.bind(this));
+      }
+      if (this._isCmObject(data)) {
+        return this._toCmObject(data);
+      }
+      return data;
+    },
+
+    /**
+     * @param {*} data
+     * @returns {Boolean}
+     */
+    _isCmObject: function(data) {
+      var className = data && data['_class'];
+      var isClass = className && cm.model.types[className] && window[className];
+      var isBackbone = data instanceof Backbone.Model || data instanceof Backbone.Collection;
+      return isClass && !isBackbone;
+    },
+
+    /**
+     * @param {Object} data
+     * @returns {CM_Model_Abstract}
+     */
+    _toCmObject: function(data) {
+      return new window[data['_class']](data);
+    }
   },
 
   promise: {
@@ -358,12 +406,6 @@ var CM_App = CM_Class_Abstract.extend({
   dom: {
     _swfId: 0,
     ready: function() {
-      if (window.addEventListener) {
-        window.addEventListener('load', function() {
-          new FastClick(document.body);
-        }, false);
-      }
-
       window.viewportUnitsBuggyfill.init();
     },
     /**
@@ -872,7 +914,6 @@ var CM_App = CM_Class_Abstract.extend({
    */
   ajax: function(type, data) {
     var url = this.getUrlAjax(type);
-    var self = this;
     var jqXHR;
 
     var ajaxPromise = new Promise(function(resolve, reject, onCancel) {
@@ -891,7 +932,7 @@ var CM_App = CM_Class_Abstract.extend({
           if (response.error) {
             reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
           } else {
-            resolve(response.success);
+            resolve(cm.factory.create(response.success));
           }
         })
         .fail(function(xhr, textStatus) {
@@ -1035,6 +1076,7 @@ var CM_App = CM_Class_Abstract.extend({
       this._channelDispatchers[channel] = _.clone(Backbone.Events);
       this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(event, data) {
         if (handler._channelDispatchers[channel]) {
+          data = cm.factory.create(data);
           handler._channelDispatchers[channel].trigger(event, data);
           cm.debug.log('Stream channel (' + channel + '): event `' + event + '`: ', data);
         }
@@ -1224,15 +1266,15 @@ var CM_App = CM_Class_Abstract.extend({
           return;
         }
         router.hrefInitialIgnore = null;
-        router._handleLocationChange(router._getFragment());
+        router._handleLocationChange(location.href);
       });
 
-      var urlBase = cm.getUrl();
+      var urlSite = cm.getUrl();
       $(document).on('click', 'a[href]:not([data-router-disabled=true])', function(event) {
         var metaPressed = (event.ctrlKey || event.metaKey);
-        var partOfUrlBase = 0 === this.href.indexOf(urlBase);
-        if (!metaPressed && partOfUrlBase) {
-          var fragment = this.href.substr(urlBase.length);
+        var partOfUrlSite = 0 === this.href.indexOf(urlSite);
+        if (!metaPressed && partOfUrlSite) {
+          var fragment = this.href.substr(urlSite.length);
           var forceReload = $(this).data('force-reload');
           router.route(fragment, forceReload);
           event.preventDefault();
@@ -1253,14 +1295,12 @@ var CM_App = CM_Class_Abstract.extend({
     route: function(url, forceReload, replaceState) {
       forceReload = this._shouldReload || forceReload || false;
       replaceState = replaceState || false;
-      var urlBase = cm.getUrl();
-      var fragment = url;
+      var urlSite = cm.getUrl();
       if ('/' == url.charAt(0)) {
-        url = urlBase + fragment;
-      } else {
-        fragment = url.substr(urlBase.length);
+        url = urlSite + url;
       }
-      if (forceReload || 0 !== url.indexOf(urlBase)) {
+      var fragment = this._getFragmentByUrl(url);
+      if (forceReload || 0 !== url.indexOf(urlSite)) {
         window.location.assign(url);
         return Promise.resolve();
       }
@@ -1271,7 +1311,7 @@ var CM_App = CM_Class_Abstract.extend({
           this.pushState(fragment);
         }
       }
-      return this._handleLocationChange(fragment);
+      return this._handleLocationChange(url);
     },
 
     /**
@@ -1294,33 +1334,48 @@ var CM_App = CM_Class_Abstract.extend({
      * @returns string
      */
     _getFragment: function() {
-      var location = window.location;
-      return location.pathname + location.search + location.hash;
+      return this._getFragmentByLocation(window.location);
     },
 
     /**
-     * @param {String} fragment
+     * @param {String} url
      * @returns Location
      */
-    _getLocationByFragment: function(fragment) {
+    _getLocationByUrl: function(url) {
       var location = document.createElement('a');
-      if (fragment) {
-        location.href = fragment;
+      if (url) {
+        location.href = url;
       }
       return location;
     },
 
     /**
-     * @param {String} fragment
+     * @param {Location} location
+     * @returns string
+     */
+    _getFragmentByLocation: function(location) {
+      return location.pathname + location.search + location.hash;
+    },
+
+    /**
+     * @param {String} url
+     * @returns string
+     */
+    _getFragmentByUrl: function(url) {
+      return this._getFragmentByLocation(this._getLocationByUrl(url));
+    },
+
+    /**
+     * @param {String} url
      * @returns {Promise}
      */
-    _handleLocationChange: function(fragment) {
+    _handleLocationChange: function(url) {
       var paramsStateNext = null;
       var pageCurrent = cm.getLayout().findPage();
 
       if (pageCurrent && pageCurrent.hasStateParams()) {
-        var locationCurrent = this._getLocationByFragment(pageCurrent.getFragment());
-        var locationNext = this._getLocationByFragment(fragment);
+        var locationCurrent = this._getLocationByUrl(pageCurrent.getUrl());
+        var locationNext = this._getLocationByUrl(url);
 
         if (locationCurrent.pathname === locationNext.pathname) {
           var paramsCurrent = cm.request.parseQueryParams(locationCurrent.search);
@@ -1338,11 +1393,19 @@ var CM_App = CM_Class_Abstract.extend({
       }
 
       if (paramsStateNext) {
-        if (false !== cm.getLayout().getPage().routeToState(paramsStateNext, fragment)) {
+        if (false !== cm.getLayout().getPage().routeToState(paramsStateNext, url)) {
           return Promise.resolve();
         }
       }
-      return cm.getLayout().loadPage(fragment);
+
+      var urlSite = cm.getUrl();
+      if (0 === url.indexOf(urlSite)) {
+        var pageFragment = url.substr(urlSite.length);
+        cm.getLayout().loadPage(pageFragment);
+      } else {
+        window.location.assign(url);
+        return Promise.resolve();
+      }
     }
   },
 
