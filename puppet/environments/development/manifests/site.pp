@@ -5,8 +5,8 @@ node default {
   }
 
   class { 'cm::services':
-    ssl_key  => template('cm_ssl/*.dev.cargomedia.ch.key'),
-    ssl_cert => template('cm_ssl/*.dev.cargomedia.ch.pem'),
+    ssl_key  => template('cm_ssl/wildcard.dev.cargomedia.ch.key'),
+    ssl_cert => template('cm_ssl/wildcard.dev.cargomedia.ch.pem'),
   }
 
   environment::variable {'PHP_IDE_CONFIG':
