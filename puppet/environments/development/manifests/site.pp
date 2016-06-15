@@ -1,6 +1,4 @@
-node default {}
-
-node 'cm.dev.cargomedia.ch' {
+node default {
 
   class {'cm::application':
     development => true,
