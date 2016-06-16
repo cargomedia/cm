@@ -8,7 +8,9 @@ abstract class CM_Http_Response_Resource_Abstract extends CM_Http_Response_Abstr
     }
 
     protected function _setContent($content) {
-        $this->setHeader('Access-Control-Allow-Origin', $this->getSite()->getUrl());
+        $this->setHeader('Access-Control-Allow-Origin', $this->getSite()->getUrlBase());
+        $this->setHeaderExpires(86400 * 365);
+
         parent::_setContent($content);
     }
 }

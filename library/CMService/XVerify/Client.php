@@ -99,6 +99,8 @@ class CMService_XVerify_Client implements CM_Service_EmailVerification_ClientInt
      */
     protected function _handleException(Exception $exception) {
         $logLevel = CM_Log_Logger::exceptionSeverityToLevel($exception);
-        CM_Service_Manager::getInstance()->getLogger()->addMessage('XVerify client error', $logLevel, new CM_Log_Context_App(null, null, $exception));
+        $context = new CM_Log_Context();
+        $context->setException($exception);
+        CM_Service_Manager::getInstance()->getLogger()->addMessage('XVerify client error', $logLevel, $context);
     }
 }

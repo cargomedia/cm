@@ -22,6 +22,13 @@ class CM_Frontend_JavascriptContainer {
     }
 
     /**
+     * @return bool
+     */
+    public function isEmpty() {
+        return empty($this->_operations);
+    }
+
+    /**
      * @param string|null $scope
      * @return string
      */

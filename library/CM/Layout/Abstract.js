@@ -22,7 +22,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
       })
       .then(function(response) {
         if (response.redirectExternal) {
-          cm.router.route(response.redirectExternal);
+          window.location.replace(response.redirectExternal);
           return;
         }
         var view = layout._injectView(response);
@@ -170,7 +170,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
    * @param {String} responseUrl
    */
   _updateHistory: function(requestPath, responseUrl) {
-    var responseFragment = responseUrl.substr(cm.getUrl().length);
+    var responseFragment = cm.router._getFragmentByUrl(responseUrl);
     if (requestPath === responseFragment + window.location.hash) {
       responseFragment = requestPath;
     }

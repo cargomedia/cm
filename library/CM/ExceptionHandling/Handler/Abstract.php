@@ -101,6 +101,8 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
      */
     protected function _logException(Exception $exception) {
         $logLevel = CM_Log_Logger::exceptionSeverityToLevel($exception);
-        $this->getServiceManager()->getLogger()->addMessage('Application error', $logLevel, new CM_Log_Context_App(null, null, $exception));
+        $context = new CM_Log_Context();
+        $context->setException($exception);
+        $this->getServiceManager()->getLogger()->addMessage('Application error', $logLevel, $context);
     }
 }

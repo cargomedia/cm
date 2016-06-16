@@ -10,13 +10,15 @@
 {formField name='float' label="Float" placeholder="Float"}
 {formField name='money' label="Money" placeholder="Money"}
 {formField name='url' label="Url" placeholder="Url"}
-{formField name='int' label="Integer"}
+{formField name='int' label="Integer" placeholder="Integer"}
+{formField name='slider' label="Slider"}
 {formField name='location' label="Location"}
 {formField name='locationSlider' label="Radius"}
 {formField name='file' label="Upload Files"}
 {formField name='image' label="Upload Photos"}
 {formField name='color' label="Color"}
 {formField name='date' label="Date"}
+{formField name='dateTimeInterval' label = "DateTimeInterval" placeholderStart='Starting Time' placeholderEnd='End'}
 {formField name='birthdate' label="Birth Date between 18 and 30"}
 {formField name='geopoint' label="Geo Point"}
 {formField name='set' label="Set"}

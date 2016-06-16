@@ -220,18 +220,22 @@ class CMTest_TH {
     }
 
     /**
-     * @param string             $uri
-     * @param array|null         $headers
-     * @param CM_Model_User|null $viewer
+     * @param string                $uri
+     * @param array|null            $headers
+     * @param CM_Model_User|null    $viewer
+     * @param CM_Site_Abstract|null $site
      * @return CM_Http_Response_Page
+     * @throws CM_Class_Exception_TypeNotConfiguredException
      */
-    public static function createResponsePageEmbed($uri, array $headers = null, CM_Model_User $viewer = null) {
-        if (!$headers) {
+    public static function createResponsePageEmbed($uri, array $headers = null, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
+        if (null === $site) {
             $site = CM_Site_Abstract::factory();
+        }
+        if (!$headers) {
             $headers = array('host' => $site->getHost());
         }
         $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
-        return new CM_Http_Response_Page_Embed($request, self::getServiceManager());
+        return new CM_Http_Response_Page_Embed($request, $site, self::getServiceManager());
     }
 
     /**

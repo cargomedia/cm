@@ -8,28 +8,28 @@ class CM_Log_Context {
     /** @var CM_Http_Request_Abstract|null */
     private $_httpRequest;
 
-    /** @var CM_Log_Context_App */
-    private $_appContext;
+    /** @var Closure|null */
+    protected $_getUserClosure;
 
-    /**
-     * @param CM_Http_Request_Abstract|null    $httpRequest
-     * @param CM_Log_Context_ComputerInfo|null $computerInfo
-     * @param CM_Log_Context_App|null          $appContext
-     */
-    public function __construct(CM_Http_Request_Abstract $httpRequest = null,
-                                CM_Log_Context_ComputerInfo $computerInfo = null,
-                                CM_Log_Context_App $appContext = null) {
+    /** @var Exception|null */
+    private $_exception;
 
-        $this->_httpRequest = $httpRequest;
-        $this->_computerInfo = $computerInfo;
-        if (null === $appContext) {
-            $appContext = new CM_Log_Context_App();
-        }
-        $this->_appContext = $appContext;
+    /** @var array */
+    private $_extra;
+
+    public function __construct() {
+        $this->_extra = [];
     }
 
     /**
-     * @return CM_Log_Context_ComputerInfo|null
+     * @param CM_Log_Context_ComputerInfo $computerInfo
+     */
+    public function setComputerInfo(CM_Log_Context_ComputerInfo $computerInfo) {
+        $this->_computerInfo = $computerInfo;
+    }
+
+    /**
+     * @return CM_Log_Context_ComputerInfo
      */
     public function getComputerInfo() {
         return $this->_computerInfo;
@@ -50,37 +50,91 @@ class CM_Log_Context {
     }
 
     /**
-     * @param CM_Log_Context_App $appContext
+     * @param Closure $getUser
      */
-    public function setAppContext($appContext) {
-        $this->_appContext = $appContext;
+    public function setUserWithClosure(Closure $getUser) {
+        $this->_getUserClosure = $getUser;
     }
 
     /**
-     * @return CM_Log_Context_App
+     * @param CM_Model_User|null $user
      */
-    public function getAppContext() {
-        return $this->_appContext;
+    public function setUser(CM_Model_User $user = null) {
+        $this->setUserWithClosure(function () use ($user) {
+            return $user;
+        });
     }
 
     /**
      * @return CM_Model_User|null
+     * @throws CM_Exception_Invalid
      */
     public function getUser() {
-        return $this->getAppContext()->getUser();
+        if (null === $this->_getUserClosure) {
+            return null;
+        }
+        $user = call_user_func($this->_getUserClosure);
+        if ($user === null || $user instanceof CM_Model_User) {
+            return $user;
+        }
+        throw new CM_Exception_Invalid('User need to be CM_Model_User or null');
+    }
+
+    /**
+     * @return Exception|null
+     */
+    public function getException() {
+        return $this->_exception;
+    }
+
+    /**
+     * @param Exception|null $exception
+     */
+    public function setException($exception) {
+        $this->_exception = $exception;
+    }
+
+    /**
+     * @param array $extra
+     */
+    public function setExtra(array $extra) {
+        $this->_extra = $extra;
     }
 
     /**
      * @return array
      */
     public function getExtra() {
-        return $this->getAppContext()->getExtra();
+        return $this->_extra;
     }
 
     public function __clone() {
         if (null !== $this->_computerInfo) {
             $this->_computerInfo = clone $this->_computerInfo;
         }
-        $this->_appContext = clone $this->_appContext;
+    }
+
+    /**
+     * @param CM_Log_Context $context
+     */
+    public function merge(CM_Log_Context $context) {
+        if ($computerInfo = $context->getComputerInfo()) {
+            $this->setComputerInfo($computerInfo);
+        }
+
+        if ($httpRequest = $context->getHttpRequest()) {
+            $this->setHttpRequest($httpRequest);
+        }
+
+        if ($getUserClosure = $context->_getUserClosure) {
+            $this->setUserWithClosure($getUserClosure);
+        }
+
+        if ($exception = $context->getException()) {
+            $this->setException($exception);
+        }
+
+        $extra = array_merge($this->getExtra(), $context->getExtra());
+        $this->setExtra($extra);
     }
 }

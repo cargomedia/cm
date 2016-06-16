@@ -53,9 +53,22 @@ class CM_Log_ContextFormatter_Cargomedia {
             if ($ip = $request->getIp()) {
                 $formattedRequest['ip'] = (string) $ip;
             }
-            $hash['request'] = $formattedRequest;
+            if ($request->hasHeader('host')) {
+                $formattedRequest['hostname'] = $request->getHost();
+            }
+            $formattedRecord['httpRequest'] = $formattedRequest;
         }
-        return array_merge($hash, $this->getAppContext($context));
+        $hash = array_merge($hash, $this->getAppContext($context));
+
+        if ($exception = $context->getException()) {
+            $serializableException = new CM_ExceptionHandling_SerializableException($exception);
+            $formattedRecord['exception'] = [
+                'type'    => $serializableException->getClass(),
+                'message' => $serializableException->getMessage(),
+                'stack'   => $serializableException->getTraceAsString(),
+            ];
+        }
+        return $hash;
     }
 
     /**
@@ -64,9 +77,8 @@ class CM_Log_ContextFormatter_Cargomedia {
      * @throws CM_Exception_Invalid
      */
     public function getAppContext(CM_Log_Context $context) {
-        $appContext = $context->getAppContext();
-        $appAttributes = $appContext->getExtra();
-        if ($user = $appContext->getUser()) {
+        $appAttributes = $context->getExtra();
+        if ($user = $context->getUser()) {
             $appAttributes['user'] = $user->getId();
         }
         $request = $context->getHttpRequest();

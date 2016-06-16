@@ -10,13 +10,15 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_Float(['name' => 'float']));
         $this->registerField(new CM_FormField_Money(['name' => 'money']));
         $this->registerField(new CM_FormField_Url(['name' => 'url']));
-        $this->registerField(new CM_FormField_Integer(['name' => 'int', 'min' => -10, 'max' => 20, 'step' => 2]));
+        $this->registerField(new CM_FormField_Integer(['name' => 'int']));
+        $this->registerField(new CM_FormField_Slider(['name' => 'slider', 'min' => 0, 'max' => 2.5, 'step' => 0.1]));
         $this->registerField(new CM_FormField_Distance(['name' => 'locationSlider']));
         $this->registerField(new CM_FormField_Location(['name' => 'location', 'fieldNameDistance' => 'locationSlider']));
         $this->registerField(new CM_FormField_File(['name' => 'file', 'cardinality' => 2]));
         $this->registerField(new CM_FormField_FileImage(['name' => 'image', 'cardinality' => 2]));
         $this->registerField(new CM_FormField_Color(['name' => 'color']));
         $this->registerField(new CM_FormField_Date(['name' => 'date']));
+        $this->registerField(new CM_FormField_DateTimeInterval(['name' => 'dateTimeInterval', 'yearFirst' => date('Y'), 'yearLast' => (int) date('Y') + 1]));
         $this->registerField(new CM_FormField_Birthdate(['name' => 'birthdate', 'minAge' => 18, 'maxAge' => 30]));
         $this->registerField(new CM_FormField_GeoPoint(['name' => 'geopoint']));
         $this->registerField(new CM_FormField_Set(['name' => 'set', 'values' => array(1 => 'Eins', 2 => 'Zwei'), 'labelsInValues' => true]));

@@ -40,8 +40,9 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
             }
             $data['extra'] = implode(', ', $extraText);
         }
-        if ($record->getContext()->getAppContext()->hasException()) {
-            $data['exception'] = $this->_renderException($record->getContext()->getAppContext()->getSerializableException());
+        if ($exception = $record->getContext()->getException()) {
+            $serializableException = new CM_ExceptionHandling_SerializableException($exception);
+            $data['exception'] = $this->_renderException($serializableException);
         }
         $output = empty($data) ? null : $this->_formatArrayToLines(' - %s: %s', $data);
         return $output;

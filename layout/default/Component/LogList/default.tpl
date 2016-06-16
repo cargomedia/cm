@@ -40,8 +40,8 @@
       </div>
 
       {if !empty($log.exception)}
+        {$exception = $log.exception}
         <div class="exception">
-          {$exception = $log.exception}
           <div>{$exception.class}: {$exception.message|escape} in {$exception.file} on line {$exception.line}</div>
           {if (!empty($exception.trace))}
             {foreach from=$exception.trace item=traceRow name=traceLoop}

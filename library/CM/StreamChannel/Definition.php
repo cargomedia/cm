@@ -1,6 +1,6 @@
 <?php
 
-class CM_StreamChannel_Definition implements CM_ArrayConvertible {
+class CM_StreamChannel_Definition implements CM_ArrayConvertible, JsonSerializable {
 
     /** @var string */
     private $_key;
@@ -74,7 +74,7 @@ class CM_StreamChannel_Definition implements CM_ArrayConvertible {
         return $channel;
     }
 
-    public function toArray() {
+    public function jsonSerialize() {
         return [
             'key'         => $this->getKey(),
             'type'        => $this->getType(),
@@ -82,8 +82,8 @@ class CM_StreamChannel_Definition implements CM_ArrayConvertible {
         ];
     }
 
-    public function toArrayIdOnly() {
-        return $this->toArray();
+    public function toArray() {
+        return $this->jsonSerialize();
     }
 
     public static function fromArray(array $array) {

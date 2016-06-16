@@ -15,7 +15,7 @@ Vagrant.configure('2') do |config|
   config.vm.provision :puppet do |puppet|
     puppet.environment_path = 'puppet/environments'
     puppet.environment = 'development'
-    puppet.module_path = 'puppet/modules'
+    puppet.module_path = ['puppet/modules', 'puppet/environments/development/modules']
   end
 
   config.vm.provision 'shell', inline: [

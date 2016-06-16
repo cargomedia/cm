@@ -17,7 +17,9 @@ class CM_Log_Formatter_TextTest extends CMTest_TestCase {
     public function testFormatMessageComputerInfo() {
         $formatter = new CM_Log_Formatter_Text();
         $computerInfo = new CM_Log_Context_ComputerInfo('foo.com', '5.4');
-        $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context(null, $computerInfo));
+        $context = new CM_Log_Context();
+        $context->setComputerInfo($computerInfo);
+        $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', $context);
         $this->assertRegExp('/^\[[0-9T\:\-\+]+ - foo.com - php 5.4 - INFO\] foo$/', $formatter->renderMessage($record));
     }
 
@@ -34,7 +36,9 @@ class CM_Log_Formatter_TextTest extends CMTest_TestCase {
         $mockHttpRequest->mockMethod('getHost')->set('foo.com');
         $mockHttpRequest->mockMethod('getIp')->set('10.10.0.1');
 
-        $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context($mockHttpRequest));
+        $context = new CM_Log_Context();
+        $context->setHttpRequest($mockHttpRequest);
+        $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', $context);
         $formatter = new CM_Log_Formatter_Text();
         $this->assertSame(
             ' - httpRequest: GET /foo/bar HTTP/1.1, host: foo.com, ip: 10.10.0.1, referer: http://foo.com/foo, user-agent: Mozilla/5.0',
@@ -43,8 +47,9 @@ class CM_Log_Formatter_TextTest extends CMTest_TestCase {
 
     public function testFormattingWithExtra() {
         $extra = ['foo', 'bar', 'foo' => 'bar'];
-        $appContext = new CM_Log_Context_App($extra);
-        $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context(null, null, $appContext));
+        $context = new CM_Log_Context();
+        $context->setExtra($extra);
+        $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', $context);
         $formatter = new CM_Log_Formatter_Text();
         $this->assertSame(' - extra: 0: foo, 1: bar, foo: bar', $formatter->renderContext($record));
     }

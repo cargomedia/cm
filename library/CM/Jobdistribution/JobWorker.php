@@ -24,6 +24,7 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
         while (true) {
             $workFailed = false;
             try {
+                CM_Cache_Storage_Runtime::getInstance()->flush();
                 $workFailed = !$this->_getGearmanWorker()->work();
             } catch (Exception $ex) {
                 $this->_handleException($ex);

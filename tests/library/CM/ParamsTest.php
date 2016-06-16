@@ -13,6 +13,15 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertFalse($params->has('6'));
     }
 
+    /**
+     * @expectedException CM_Exception_InvalidParam
+     * @expectedExceptionMessage Class for decoding does not exist
+     */
+    public function testGetWithInvalidEncodedData() {
+        $params = new CM_Params(['foo' => ['_class' => 'Some_Nonexistent_Class', '_id' => 123]]);
+        $params->get('foo');
+    }
+
     public function testGetString() {
         $text = "Foo Bar, Bar Foo";
         $notText = new stdClass();
@@ -187,48 +196,78 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testDecodeArrayConvertible() {
-        $arrayConvertibleClass = $this->mockInterface('CM_ArrayConvertible');
-        $fromArrayMethod = $arrayConvertibleClass->mockStaticMethod('fromArray')->set(function ($encoded) {
+        $object = $this->mockInterface('CM_ArrayConvertible');
+        $fromArrayMethod = $object->mockStaticMethod('fromArray')->set(function ($encoded) {
             $this->assertSame(['foo' => 1], $encoded);
             return $encoded['foo'];
         });
         $encodedArrayConvertible = [
             'foo'    => 1,
-            '_class' => get_class($arrayConvertibleClass->newInstance()),
+            '_class' => get_class($object->newInstance()),
         ];
         $this->assertEquals(1, CM_Params::decode($encodedArrayConvertible));
         $this->assertSame(1, $fromArrayMethod->getCallCount());
     }
 
     public function testEncodeArrayConvertible() {
-        $arrayConvertible = $this->mockInterface('CM_ArrayConvertible')->newInstance();
-        $toArrayMethod = $arrayConvertible->mockMethod('toArray')->set([
-            'foo' => 1
+        $object = $this->mockInterface('CM_ArrayConvertible')->newInstance();
+        $toArrayMethod = $object->mockMethod('toArray')->set([
+            'myId' => 1
         ]);
         $expectedEncoded = array(
-            'foo'    => 1,
-            '_class' => get_class($arrayConvertible),
+            'myId'   => 1,
+            '_class' => get_class($object),
         );
-        $this->assertEquals($expectedEncoded, CM_Params::encode($arrayConvertible));
+        $this->assertEquals($expectedEncoded, CM_Params::encode($object));
         $this->assertSame(1, $toArrayMethod->getCallCount());
     }
 
     public function testEncodeObjectId() {
-        /** @var CM_ArrayConvertible|\Mocka\ClassMock $arrayConvertible */
-        $arrayConvertible = $this->mockInterface('CM_ArrayConvertible')->newInstance();
-        $arrayConvertible->mockMethod('toArrayIdOnly')->set([
-            'id' => 3
+        /** @var CM_ArrayConvertible|\Mocka\AbstractClassTrait $object */
+        $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable'])->newInstance();
+        $toArrayMethod = $object->mockMethod('toArray')->set([
+            'myId' => 1
         ]);
-        $arrayConvertible->mockMethod('toArray')->set([
-            'id'  => 3,
-            'foo' => 'bar',
+        $jsonSerializeMethod = $object->mockMethod('jsonSerialize')->set([
+            'myData' => 1
         ]);
+        $expectedEncoded = array(
+            'myId'   => 1,
+            '_class' => get_class($object),
+        );
+        $this->assertEquals(json_encode($expectedEncoded), CM_Params::encodeObjectId($object));
+        $this->assertSame(1, $toArrayMethod->getCallCount());
+        $this->assertSame(0, $jsonSerializeMethod->getCallCount());
+    }
 
-        $expectedEncoded = json_encode([
-            'id'     => 3,
-            '_class' => get_class($arrayConvertible),
+    public function testEncodeJsonSerializable() {
+        $object = $this->mockInterface('JsonSerializable')->newInstance();
+        $toArrayMethod = $object->mockMethod('jsonSerialize')->set([
+            'foo' => 1
         ]);
-        $this->assertEquals($expectedEncoded, CM_Params::encodeObjectId($arrayConvertible));
+        $expectedEncoded = array(
+            'foo' => 1,
+        );
+        $this->assertEquals($expectedEncoded, CM_Params::encode($object));
+        $this->assertSame(1, $toArrayMethod->getCallCount());
+    }
+
+    public function testEncodeArrayConvertibleAndJsonSerializable() {
+        $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable'])->newInstance();
+        $toArrayMethod = $object->mockMethod('toArray')->set([
+            'foo' => 1
+        ]);
+        $jsonSerializeMethod = $object->mockMethod('jsonSerialize')->set([
+            'bar' => 1
+        ]);
+        $expectedEncoded = array(
+            'foo'    => 1,
+            'bar'    => 1,
+            '_class' => get_class($object),
+        );
+        $this->assertEquals($expectedEncoded, CM_Params::encode($object));
+        $this->assertSame(1, $toArrayMethod->getCallCount());
+        $this->assertSame(1, $jsonSerializeMethod->getCallCount());
     }
 
     public function testGetDateTime() {

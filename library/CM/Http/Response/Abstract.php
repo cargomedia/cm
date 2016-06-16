@@ -44,7 +44,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     abstract protected function _process();
 
     public function process() {
-        $this->getServiceManager()->getLogger()->getContext()->getAppContext()->setUserWithClosure(function () {
+        $this->getServiceManager()->getLogger()->getContext()->setUserWithClosure(function () {
             return $this->getViewer();
         });
         $this->_process();
@@ -117,8 +117,9 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      * @throws CM_Exception_AuthRequired
      */
     public function getEnvironment() {
-        $location = $this->getRequest()->getLocation();
-        $viewer = $this->getRequest()->getViewer();
+        $request = $this->getRequest();
+        $location = $request->getLocation();
+        $viewer = $request->getViewer();
         $currency = null;
         if (null === $currency && null !== $viewer) {
             $currency = $viewer->getCurrency();
@@ -126,8 +127,8 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
         if (null === $currency && null !== $location) {
             $currency = CM_Model_Currency::findByLocation($location);
         }
-        $clientDevice = new CM_Http_ClientDevice($this->getRequest());
-        return new CM_Frontend_Environment($this->getSite(), $viewer, $this->getRequest()->getLanguage(), null, null, $location, $currency, $clientDevice);
+        $clientDevice = new CM_Http_ClientDevice($request);
+        return new CM_Frontend_Environment($this->getSite(), $viewer, $request->getLanguage(), $request->getTimeZone(), null, $location, $currency, $clientDevice);
     }
 
     /**
@@ -168,6 +169,15 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     public function setHeaderDisableCache() {
         # Via http://stackoverflow.com/questions/49547/making-sure-a-web-page-is-not-cached-across-all-browsers/5493543#5493543
         $this->setHeader('Cache-Control', 'no-store, must-revalidate');
+    }
+
+    /**
+     * @param int $maxAge
+     */
+    public function setHeaderExpires($maxAge) {
+        $maxAge = (int) $maxAge;
+        $this->setHeader('Cache-Control', 'max-age=' . $maxAge);
+        $this->setHeader('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + $maxAge));
     }
 
     /**
@@ -276,7 +286,10 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
                 if (null === $logLevel) {
                     $logLevel = CM_Log_Logger::exceptionSeverityToLevel($ex);
                 }
-                $this->getServiceManager()->getLogger()->addMessage('HTML response error', $logLevel, new CM_Log_Context_App(null, $this->getViewer(), $ex));
+                $context = new CM_Log_Context();
+                $context->setUser($this->getViewer());
+                $context->setException($ex);
+                $this->getServiceManager()->getLogger()->addMessage('HTML response error', $logLevel, $context);
             }
             if (!$catchException && ($catchPublicExceptions && $ex->isPublic())) {
                 $errorOptions = [];
@@ -300,7 +313,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
                 return $responseClass;
             }
         }
-        return 'CM_Http_Response_Page';
+        return CM_Http_Response_Page::getPageResponseClass();
     }
 
     /**

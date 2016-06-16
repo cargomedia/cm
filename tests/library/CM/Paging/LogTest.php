@@ -23,8 +23,10 @@ class CM_Paging_LogTest extends CMTest_TestCase {
     public function testAddGet() {
         $handler = new CM_Log_Handler_MongoDb(CM_Paging_Log::COLLECTION_NAME);
         $user = CMTest_TH::createUser();
-        $appContext = new CM_Log_Context_App(['bar' => 'quux'], $user);
-        $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', new CM_Log_Context(null, null, $appContext));
+        $context = new CM_Log_Context();
+        $context->setExtra(['bar' => 'quux']);
+        $context->setUser($user);
+        $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', $context);
         $record2 = new CM_Log_Record(CM_Log_Logger::INFO, 'baz', new CM_Log_Context());
 
         $handler->handleRecord($record1);
@@ -59,11 +61,15 @@ class CM_Paging_LogTest extends CMTest_TestCase {
 
     public function testCleanUp() {
         $handler = new CM_Log_Handler_MongoDb(CM_Paging_Log::COLLECTION_NAME);
-        $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', new CM_Log_Context(null, null, new CM_Log_Context_App(['bar' => 'quux'])));
+        $context1 = new CM_Log_Context();
+        $context1->setExtra(['bar' => 'quux']);
+        $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', $context1);
         $record2 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'baz', new CM_Log_Context());
         $record3 = new CM_Log_Record(CM_Log_Logger::CRITICAL, 'bar', new CM_Log_Context());
         $record4 = new CM_Log_Record(CM_Log_Logger::INFO, 'bazBar', new CM_Log_Context());
-        $typedRecord = new CM_Log_Record(CM_Log_Logger::DEBUG, 'quux', new CM_Log_Context(null, null, new CM_Log_Context_App(['type' => 1])));
+        $contextTyped = new CM_Log_Context();
+        $contextTyped->setExtra(['type' => 1]);
+        $typedRecord = new CM_Log_Record(CM_Log_Logger::DEBUG, 'quux', $contextTyped);
 
         $paging = new CM_Paging_Log([CM_Log_Logger::DEBUG, CM_Log_Logger::INFO]);
 
@@ -86,10 +92,14 @@ class CM_Paging_LogTest extends CMTest_TestCase {
 
     public function testFlush() {
         $handler = new CM_Log_Handler_MongoDb(CM_Paging_Log::COLLECTION_NAME);
-        $record1 = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', new CM_Log_Context(null, null, new CM_Log_Context_App(['bar' => 'quux'])));
+        $context1 = new CM_Log_Context();
+        $context1->setExtra(['bar' => 'quux']);
+        $record1 = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', $context1);
         $record2 = new CM_Log_Record(CM_Log_Logger::INFO, 'baz', new CM_Log_Context());
         $record3 = new CM_Log_Record(CM_Log_Logger::CRITICAL, 'quux', new CM_Log_Context());
-        $typedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'baz', new CM_Log_Context(null, null, new CM_Log_Context_App(['type' => 1])));
+        $contextTyped = new CM_Log_Context();
+        $contextTyped->setExtra(['type' => 1]);
+        $typedRecord = new CM_Log_Record(CM_Log_Logger::INFO, 'baz', $contextTyped);
 
         $paging = new CM_Paging_Log([CM_Log_Logger::INFO, CM_Log_Logger::CRITICAL]);
 
@@ -108,10 +118,18 @@ class CM_Paging_LogTest extends CMTest_TestCase {
 
     public function testAggregate() {
         $handler = new CM_Log_Handler_MongoDb(CM_Paging_Log::COLLECTION_NAME);
+
+        $context1 = new CM_Log_Context();
+        $context1->setExtra(['bar' => 'quux']);
+        $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', $context1);
+
+        $context2 = new CM_Log_Context();
+        $record2 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'baz', $context2);
+
         $exception = new CM_Exception_Invalid('Bad news', CM_Exception::WARN, ['baz' => 'bar']);
-        $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', new CM_Log_Context(null, null, new CM_Log_Context_App(['bar' => 'quux'])));
-        $record2 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'baz', new CM_Log_Context());
-        $record3 = new CM_Log_Record(CM_Log_Logger::WARNING, 'bar', new CM_Log_Context(null, null, new CM_Log_Context_App(null, null, $exception)));
+        $context3 = new CM_Log_Context();
+        $context3->setException($exception);
+        $record3 = new CM_Log_Record(CM_Log_Logger::WARNING, 'bar', $context3);
 
         //they will not be found
         $handler->handleRecord($record1);
@@ -121,8 +139,12 @@ class CM_Paging_LogTest extends CMTest_TestCase {
         CMTest_TH::timeDaysForward(2);
 
         //recreate records to correctly set up CM_Log_Record::createdAt
-        $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', new CM_Log_Context(null, null, new CM_Log_Context_App(['bar' => 'quux'])));
-        $record3 = new CM_Log_Record(CM_Log_Logger::WARNING, 'bar', new CM_Log_Context(null, null, new CM_Log_Context_App(null, null, $exception)));
+        $context1 = new CM_Log_Context();
+        $context1->setExtra(['bar' => 'quux']);
+        $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', $context1);
+        $context3 = new CM_Log_Context();
+        $context3->setException($exception);
+        $record3 = new CM_Log_Record(CM_Log_Logger::WARNING, 'bar', $context3);
 
         $handler->handleRecord($record1);
         $handler->handleRecord($record3);
@@ -131,10 +153,20 @@ class CM_Paging_LogTest extends CMTest_TestCase {
         CMTest_TH::timeDaysForward(1);
         $exception2 = new CM_Exception_Invalid('Some info', CM_Exception::FATAL, ['foo' => 'bar']);
         //recreate records to correctly set up CM_Log_Record::createdAt
-        $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', new CM_Log_Context(null, null, new CM_Log_Context_App(['bar' => 'quux'])));
-        $record2 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'baz', new CM_Log_Context());
-        $record3 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'Error bar', new CM_Log_Context(null, null, new CM_Log_Context_App(null, null, $exception)));
-        $record4 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'Error bar', new CM_Log_Context(null, null, new CM_Log_Context_App(null, null, $exception2)));
+        $context1 = new CM_Log_Context();
+        $context1->setExtra(['bar' => 'quux']);
+        $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', $context1);
+
+        $context2 = new CM_Log_Context();
+        $record2 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'baz', $context2);
+
+        $context3 = new CM_Log_Context();
+        $context3->setException($exception);
+        $record3 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'Error bar', $context3);
+
+        $context4 = new CM_Log_Context();
+        $context4->setException($exception2);
+        $record4 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'Error bar', $context4);
 
         $handler->handleRecord($record2);
         $handler->handleRecord($record2);

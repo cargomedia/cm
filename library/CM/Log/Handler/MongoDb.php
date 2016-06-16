@@ -66,7 +66,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
                 'phpVersion' => $computerInfo->getPhpVersion(),
             ];
         }
-        if (null !== $extra) {
+        if ($extra) {
             $formattedContext['extra'] = $extra;
         }
         if (null !== $user) {
@@ -97,8 +97,9 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             $formattedContext['httpRequest']['clientId'] = $request->getClientId();
         }
 
-        if ($recordContext->getAppContext()->hasException()) {
-            $formattedContext['exception'] = $recordContext->getAppContext()->getSerializableException();
+        if ($exception = $recordContext->getException()) {
+            $serializableException = new CM_ExceptionHandling_SerializableException($exception);
+            $formattedContext['exception'] = $serializableException;
         }
 
         $formattedRecord = [

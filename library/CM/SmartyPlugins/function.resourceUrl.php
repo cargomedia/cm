@@ -6,14 +6,18 @@ function smarty_function_resourceUrl(array $params, Smarty_Internal_Template $te
 
     $path = (string) $params['path'];
     unset($params['path']);
+
     $type = (string) $params['type'];
     unset($params['type']);
 
+    $site = isset($params['site']) ? $params['site'] : null;
+    unset($params['site']);
+
     switch ($type) {
         case 'layout':
-            return $render->getUrlResource($type, $path, $params);
+            return $render->getUrlResource($type, $path, $params, $site);
         case 'static':
-            return $render->getUrlStatic($path);
+            return $render->getUrlStatic($path, $site);
         default:
             throw new CM_Exception_Invalid('Invalid type `' . $type . '` provided');
     }

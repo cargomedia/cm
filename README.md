@@ -238,7 +238,6 @@ Commands:
  app setup [--reload]
  cache clear
  console interactive
- css icon-refresh
  db db-to-file <namespace>
  db file-to-db
  db run-update <version> [--namespace=<value>]
@@ -248,6 +247,8 @@ Commands:
  generator create-module <module-name> [--single-module-structure] [--module-path=<value>]
  generator create-site <class-name> <name> <domain>
  generator create-view <class-name>
+ frontend icon-refresh
+ frontend generate-favicon
  job-distribution start-worker
  location outdated [--verbose]
  location upgrade [--without-ip-blocks] [--verbose]

@@ -62,16 +62,16 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         /** @var CM_Site_Abstract $siteClassMatchXxx */
 
         $requestCom = new CM_Http_Request_Get('/', array('host' => 'www.example.com'));
-        $this->assertTrue($siteClassMatchCom->match($requestCom));
+        $this->assertTrue($siteClassMatchCom->match($requestCom, []));
 
         $requestXxx = new CM_Http_Request_Get('/', array('host' => 'www.example.xxx'));
-        $this->assertTrue($siteClassMatchXxx->match($requestXxx));
+        $this->assertTrue($siteClassMatchXxx->match($requestXxx, []));
 
         $requestNot = new CM_Http_Request_Get('/', array('host' => 'www.example.foo'));
-        $this->assertFalse($siteClassMatchXxx->match($requestNot));
+        $this->assertFalse($siteClassMatchXxx->match($requestNot, []));
 
         $requestNotPartial = new CM_Http_Request_Get('/', array('host' => 'www.example.xxx.com'));
-        $this->assertFalse($siteClassMatchXxx->match($requestNotPartial));
+        $this->assertFalse($siteClassMatchXxx->match($requestNotPartial, []));
     }
 
     public function testMatchCdn() {
@@ -83,8 +83,8 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $siteClass->expects($this->any())->method('getUrlCdn')->will($this->returnValue('http://cdn.example.com'));
         /** @var CM_Site_Abstract $siteClass */
 
-        $this->assertTrue($siteClass->match(new CM_Http_Request_Get('/', array('host' => 'cdn.example.com'))));
-        $this->assertFalse($siteClass->match(new CM_Http_Request_Get('/', array('host' => 'www.google.com'))));
+        $this->assertTrue($siteClass->match(new CM_Http_Request_Get('/', array('host' => 'cdn.example.com')), []));
+        $this->assertFalse($siteClass->match(new CM_Http_Request_Get('/', array('host' => 'www.google.com')), []));
     }
 
     public function testFactory() {
