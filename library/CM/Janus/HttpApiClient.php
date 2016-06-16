@@ -42,9 +42,16 @@ class CM_Janus_HttpApiClient {
      * @throws CM_Exception_Invalid
      */
     protected function _request($method, CM_Janus_Server $server, $path, array $body = null) {
+        $appName = CM_App::getInstance()->getName();
+        $contextFormatter = new CM_Log_ContextFormatter_Cargomedia($appName);
+        $context = CM_Service_Manager::getInstance()->getLogger()->getContext();
+        $appContext = $contextFormatter->getAppContext($context);
+        
         $url = $server->getHttpAddress() . $path;
         $body = (array) $body;
+        
         $options = [
+            'query'   => ['context' => CM_Util::jsonEncode($appContext)],
             'body'    => $body,
             'headers' => ['Server-Key' => $server->getKey()],
         ];

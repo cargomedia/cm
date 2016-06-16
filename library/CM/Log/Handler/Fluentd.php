@@ -46,58 +46,7 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
      * @return array
      */
     protected function _formatRecord(CM_Log_Record $record) {
-        $context = $record->getContext();
-        $levelsMapping = array_flip(CM_Log_Logger::getLevels());
-
-        $formattedRecord = [
-            'message'   => (string) $record->getMessage(),
-            'level'     => strtolower($levelsMapping[$record->getLevel()]),
-            'timestamp' => $record->getCreatedAt()->format(DateTime::ISO8601),
-        ];
-        if ($computerInfo = $context->getComputerInfo()) {
-            $formattedRecord['computerInfo'] = [
-                'fqdn'       => $computerInfo->getFullyQualifiedDomainName(),
-                'phpVersion' => $computerInfo->getPhpVersion(),
-            ];
-        }
-
-        $request = $context->getHttpRequest();
-        if (null !== $request) {
-            $serverArray = $request->getServer();
-            $formattedRequest = [
-                'uri'    => $request->getUri(),
-                'method' => $request->getMethodName(),
-            ];
-            if (array_key_exists('http_referrer', $serverArray)) {
-                $formattedRequest['referrer'] = (string) $serverArray['http_referrer'];
-            }
-            if (array_key_exists('http_user_agent', $serverArray)) {
-                $formattedRequest['user_agent'] = (string) $serverArray['http_user_agent'];
-            }
-            if ($ip = $request->getIp()) {
-                $formattedRequest['ip'] = (string) $ip;
-            }
-            $formattedRecord['request'] = $formattedRequest;
-        }
-
-        $appAttributes = $context->getExtra();
-        if ($user = $context->getUser()) {
-            $appAttributes['user'] = $user->getId();
-        }
-        if (null !== $request) {
-            $appAttributes['clientId'] = $request->getClientId();
-        }
-        $formattedRecord[$this->_appName] = $appAttributes;
-
-        if ($context->getAppContext()->hasException()) {
-            $exception = $context->getAppContext()->getSerializableException();
-            $formattedRecord['exception'] = [
-                'type'    => $exception->getClass(),
-                'message' => $exception->getMessage(),
-                'stack'   => $exception->getTraceAsString(),
-            ];
-        }
-
-        return $formattedRecord;
+        $contextFormatter = new CM_Log_ContextFormatter_Cargomedia($this->_appName);
+        return $contextFormatter->getRecordContext($record);
     }
 }
