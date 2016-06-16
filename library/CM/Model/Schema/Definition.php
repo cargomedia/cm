@@ -14,7 +14,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      * @return mixed
      * @throws CM_Exception_Invalid
      * @throws CM_Model_Exception_Validation
@@ -48,19 +48,30 @@ class CM_Model_Schema_Definition {
                             $value = $value->getTimestamp();
                             break;
                         default:
-                            if (!(class_exists($type) && is_subclass_of($type, 'CM_Model_Abstract'))) {
-                                throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a valid model');
+                            if (!class_exists($type)) {
+                                throw new CM_Model_Exception_Validation('Field type `' . $type . '` is not a valid class');
                             }
-                            if (!$value instanceof $type) {
+                            $className = $type;
+                            if (!$value instanceof $className) {
                                 throw new CM_Model_Exception_Validation(
-                                    'Value `' . CM_Util::var_line($value) . '` is not an instance of `' . $type . '`');
+                                    'Value `' . CM_Util::var_line($value) . '` is not an instance of `' . $className . '`');
                             }
-                            /** @var CM_Model_Abstract $value */
-                            $id = $value->getIdRaw();
-                            if (count($id) == 1) {
-                                $value = $value->getId();
+
+                            if (is_a($className, 'CM_Model_Abstract', true)) {
+                                /** @var CM_Model_Abstract $value */
+                                $id = $value->getIdRaw();
+                                if (count($id) == 1) {
+                                    $value = $value->getId();
+                                } else {
+                                    $value = CM_Util::jsonEncode($id);
+                                }
+                            } elseif (is_subclass_of($className, 'CM_ArrayConvertible', true)) {
+                                /** @var CM_ArrayConvertible $value */
+                                $value = $value->toArray();
+                                $value = CM_Util::jsonEncode($value);
                             } else {
-                                $value = CM_Params::jsonEncode($id);
+                                throw new CM_Model_Exception_Validation(
+                                    'Class `' . $className . '` is neither CM_Model_Abstract nor CM_ArrayConvertible');
                             }
                     }
                 }
@@ -71,7 +82,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      * @return mixed
      * @throws CM_Exception_Invalid
      * @throws CM_Model_Exception_Validation
@@ -104,15 +115,34 @@ class CM_Model_Schema_Definition {
                             $value = DateTime::createFromFormat('U', $value);
                             break;
                         default:
-                            if ($this->_isJson($value)) {
-                                $value = CM_Params::jsonDecode($value);
+                            if (!class_exists($type)) {
+                                throw new CM_Model_Exception_Validation('Field type `' . $type . '` is not a valid class/interface');
                             }
-                            $id = $value;
+                            $className = $type;
+                            if (is_a($className, 'CM_Model_Abstract', true)) {
+                                /** @var CM_Model_Abstract $type */
+                                if ($this->_isJson($value)) {
+                                    $value = CM_Util::jsonDecode($value);
+                                }
+                                $id = $value;
 
-                            if (!is_array($id)) {
-                                $id = array('id' => $id);
+                                if (!is_array($id)) {
+                                    $id = ['id' => $id];
+                                }
+                                $value = CM_Model_Abstract::factoryGeneric($type::getTypeStatic(), $id);
+                            } elseif (is_subclass_of($className, 'CM_ArrayConvertible', true)) {
+                                /** @var CM_ArrayConvertible $className */
+                                $value = CM_Util::jsonDecode($value);
+                                $value = $className::fromArray($value);
+                            } else {
+                                throw new CM_Model_Exception_Validation(
+                                    'Class `' . $className . '` is neither CM_Model_Abstract nor CM_ArrayConvertible');
                             }
-                            $value = CM_Model_Abstract::factoryGeneric($type::getTypeStatic(), $id);
+
+                            if (!$value instanceof $className) {
+                                throw new CM_Model_Exception_Validation(
+                                    'Value `' . CM_Util::var_line($value) . '` is not an instance of `' . $className . '`');
+                            }
                     }
                 }
             }
@@ -147,7 +177,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      * @return mixed
      * @throws CM_Exception_Invalid
      * @throws CM_Model_Exception_Validation
