@@ -20,11 +20,14 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $httpRequest = CM_Http_Request_Abstract::factory(
             'post',
             '/foo?bar=1&baz=quux',
-            ['bar' => 'baz'],
+            [
+                'bar'  => 'baz',
+                'host' => 'foo.bar:8080',
+            ],
             [
                 'http_referrer'   => 'http://bar/baz',
                 'http_user_agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)',
-                'foo'             => 'quux'
+                'foo'             => 'quux',
             ]
         );
         $clientId = $httpRequest->getClientId();
@@ -54,6 +57,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $this->assertSame('POST', $formattedRecord['httpRequest']['method']);
         $this->assertSame('http://bar/baz', $formattedRecord['httpRequest']['referrer']);
         $this->assertSame('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)', $formattedRecord['httpRequest']['user_agent']);
+        $this->assertSame('foo.bar', $formattedRecord['httpRequest']['hostname']);
         $this->assertSame($user->getId(), $formattedRecord['appName']['user']);
         $this->assertSame($clientId, $formattedRecord['appName']['clientId']);
         $this->assertSame('baz', $formattedRecord['appName']['bar']);
