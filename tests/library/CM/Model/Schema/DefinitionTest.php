@@ -326,6 +326,11 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
                 'schema'      => array('type' => 'string'),
                 'returnValue' => '',
             ),
+            array(
+                'value'       => 123,
+                'schema'      => array('type' => 'string'),
+                'returnValue' => '123',
+            ),
 
             // type float
             array(
@@ -478,6 +483,11 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
                 'value'       => '',
                 'schema'      => array('type' => 'string'),
                 'returnValue' => '',
+            ),
+            array(
+                'value'       => 123,
+                'schema'      => array('type' => 'string'),
+                'returnValue' => '123',
             ),
 
             // type float

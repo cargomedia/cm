@@ -14,7 +14,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      * @return mixed
      * @throws CM_Exception_Invalid
      * @throws CM_Model_Exception_Validation
@@ -36,6 +36,7 @@ class CM_Model_Schema_Definition {
                             $value = (float) $value;
                             break;
                         case 'string':
+                            $value = (string) $value;
                             break;
                         case 'boolean':
                         case 'bool':
@@ -71,7 +72,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      * @return mixed
      * @throws CM_Exception_Invalid
      * @throws CM_Model_Exception_Validation
@@ -93,6 +94,7 @@ class CM_Model_Schema_Definition {
                             $value = (float) $value;
                             break;
                         case 'string':
+                            $value = (string) $value;
                             break;
                         case 'boolean':
                         case 'bool':
@@ -147,7 +149,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      * @return mixed
      * @throws CM_Exception_Invalid
      * @throws CM_Model_Exception_Validation
