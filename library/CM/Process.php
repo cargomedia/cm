@@ -117,7 +117,8 @@ class CM_Process {
                 ]);
                 echo $message . PHP_EOL;
                 if ($timeoutReached) {
-                    $logContext = new CM_Log_Context_App([
+                    $logContext = new CM_Log_Context();
+                    $logContext->setExtra([
                         'pid'  => $this->getProcessId(),
                         'argv' => join(' ', $this->getArgv()),
                     ]);

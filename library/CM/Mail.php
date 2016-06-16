@@ -9,25 +9,25 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     private $_site;
 
     /** @var array */
-    private $_to = array();
+    private $_to = [];
 
     /** @var array */
-    private $_replyTo = array();
+    private $_replyTo = [];
 
     /** @var array */
-    private $_cc = array();
+    private $_cc = [];
 
     /** @var array */
-    private $_bcc = array();
+    private $_bcc = [];
 
     /** @var array */
-    private $_sender = array();
+    private $_sender = [];
 
     /** @var string|null */
     private $_subject = null;
 
     /** @var array */
-    private $_customHeaders = array();
+    private $_customHeaders = [];
 
     /** @var string|null */
     private $_textBody = null;
@@ -42,7 +42,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     private $_renderLayout = false;
 
     /** @var array */
-    protected $_tplParams = array();
+    protected $_tplParams = [];
 
     /**
      * @param CM_Model_User|string|null $recipient
@@ -90,7 +90,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     public function addBcc($address, $name = null) {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
-        $this->_bcc[] = array('address' => $address, 'name' => $name);
+        $this->_bcc[] = ['address' => $address, 'name' => $name];
     }
 
     /**
@@ -107,7 +107,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     public function addCc($address, $name = null) {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
-        $this->_cc[] = array('address' => $address, 'name' => $name);
+        $this->_cc[] = ['address' => $address, 'name' => $name];
     }
 
     /**
@@ -124,7 +124,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     public function addReplyTo($address, $name = null) {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
-        $this->_replyTo[] = array('address' => $address, 'name' => $name);
+        $this->_replyTo[] = ['address' => $address, 'name' => $name];
     }
 
     /**
@@ -141,7 +141,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     public function addTo($address, $name = null) {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
-        $this->_to[] = array('address' => $address, 'name' => $name);
+        $this->_to[] = ['address' => $address, 'name' => $name];
     }
 
     /**
@@ -219,7 +219,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     public function setSender($address, $name = null) {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
-        $this->_sender = array('address' => $address, 'name' => $name);
+        $this->_sender = ['address' => $address, 'name' => $name];
     }
 
     /**
@@ -368,7 +368,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             $sender = unserialize($row['sender']);
             $mail->setSender($sender['address'], $sender['name']);
             $mail->_send($row['subject'], $row['text'], $row['html']);
-            CM_Db_Db::delete('cm_mail', array('id' => $row['id']));
+            CM_Db_Db::delete('cm_mail', ['id' => $row['id']]);
         }
     }
 
@@ -444,7 +444,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     private function _queue($subject, $text, $html) {
-        CM_Db_Db::insert('cm_mail', array(
+        CM_Db_Db::insert('cm_mail', [
             'subject'       => $subject,
             'text'          => $text,
             'html'          => $html,
@@ -455,20 +455,22 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             'cc'            => serialize($this->getCc()),
             'bcc'           => serialize($this->getBcc()),
             'customHeaders' => serialize($this->_getCustomHeaders()),
-        ));
+        ]);
     }
 
     private function _log($subject, $text) {
         $msg = '* ' . $subject . ' *' . PHP_EOL . PHP_EOL;
         $msg .= $text . PHP_EOL;
         $logger = CM_Service_Manager::getInstance()->getLogger();
-        $logger->info($msg, new CM_Log_Context_App([
+        $context = new CM_Log_Context();
+        $context->setExtra([
             'type'    => CM_Paging_Log_Mail::getTypeStatic(),
             'sender'  => $this->getSender(),
             'replyTo' => $this->getReplyTo(),
             'to'      => $this->getTo(),
             'cc'      => $this->getCc(),
             'bcc'     => $this->getBcc(),
-        ]));
+        ]);
+        $logger->info($msg, $context);
     }
 }

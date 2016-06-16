@@ -106,7 +106,7 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
     protected function _addExceptionListToLayer(array $exceptionList, CM_Log_Context $context, $layerIdx, array $excludeHandlers = null) {
         foreach ($exceptionList as $exception) {
             $newContext = clone $context;
-            $newContext->getAppContext()->setException($exception);
+            $newContext->setException($exception);
             $newRecord = new CM_Log_Record(CM_Log_Logger::ERROR, $exception->getMessage(), $newContext);
             $this->_addRecordToLayer($newRecord, $layerIdx, $excludeHandlers);
         }

@@ -31,8 +31,13 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $computerInfo = new CM_Log_Context_ComputerInfo('www.example.com', 'v7.0.1');
         $exception = new CM_Exception_Invalid('Bad');
 
-        $appContext = new CM_Log_Context_App(['bar' => 'baz', 'baz' => 'quux'], $user, $exception);
-        $record = new CM_Log_Record($level, $message, new CM_Log_Context($httpRequest, $computerInfo, $appContext));
+        $context = new CM_Log_Context();
+        $context->setExtra(['bar' => 'baz', 'baz' => 'quux']);
+        $context->setUser($user);
+        $context->setException($exception);
+        $context->setComputerInfo($computerInfo);
+        $context->setHttpRequest($httpRequest);
+        $record = new CM_Log_Record($level, $message, $context);
 
         /** @var \Fluent\Logger\FluentLogger $fluentd */
         $fluentd = $this->mockClass('\Fluent\Logger\FluentLogger')->newInstanceWithoutConstructor();

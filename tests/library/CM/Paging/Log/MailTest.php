@@ -12,17 +12,25 @@ class CM_Paging_Log_MailTest extends CMTest_TestCase {
         $this->assertSame(0, (new CM_Paging_Log_Mail([CM_Log_Logger::INFO]))->getCount());
         $this->assertSame(0, (new CM_Paging_Log([CM_Log_Logger::INFO]))->getCount());
 
-        $logger->info('mail foo', new CM_Log_Context_App([
+        $context1 = new CM_Log_Context();
+        $context1->setExtra([
             'type' => CM_Paging_Log_Mail::getTypeStatic(),
             'foo'  => 'foo',
-        ]));
-        $logger->info('mail bar', new CM_Log_Context_App([
+        ]);
+        $logger->info('mail foo', $context1);
+
+        $context2 = new CM_Log_Context();
+        $context2->setExtra([
             'type' => CM_Paging_Log_Mail::getTypeStatic(),
             'bar'  => 'bar',
-        ]));
-        $logger->info('not mail', new CM_Log_Context_App([
+        ]);
+        $logger->info('mail bar', $context2);
+
+        $context3 = new CM_Log_Context();
+        $context3->setExtra([
             'baz' => 'baz',
-        ]));
+        ]);
+        $logger->info('not mail', $context3);
         $this->assertSame(2, (new CM_Paging_Log_Mail([CM_Log_Logger::INFO]))->getCount());
         $this->assertSame(3, (new CM_Paging_Log([CM_Log_Logger::INFO]))->getCount());
 

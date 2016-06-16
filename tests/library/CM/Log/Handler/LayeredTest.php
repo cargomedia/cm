@@ -42,9 +42,7 @@ class CM_Log_Handler_LayeredTest extends CMTest_TestCase {
         };
 
         $assertHandleLoggerException = function (CM_Log_Record $record) {
-            $appContext = $record->getContext()->getAppContext();
-            $this->assertTrue($appContext->hasException());
-            $originalException = $appContext->getException();
+            $originalException = $record->getContext()->getException();
             $this->assertInstanceOf('Exception', $originalException);
             $this->assertSame('Handler error', $originalException->getMessage());
         };
@@ -88,9 +86,7 @@ class CM_Log_Handler_LayeredTest extends CMTest_TestCase {
 
         $assertHandlerException = function ($messageToAssert, $messageToThrow = null) {
             return function (CM_Log_Record $record) use ($messageToAssert, $messageToThrow) {
-                $appContext = $record->getContext()->getAppContext();
-                $this->assertTrue($appContext->hasException());
-                $exception = $appContext->getException();
+                $exception = $record->getContext()->getException();
                 $this->assertInstanceOf('Exception', $exception);
                 $this->assertSame($messageToAssert, $exception->getMessage());
 
@@ -171,9 +167,7 @@ class CM_Log_Handler_LayeredTest extends CMTest_TestCase {
 
         $assertHandlerException = function ($messageToAssert, $messageToThrow = null) {
             return function (CM_Log_Record $record) use ($messageToAssert, $messageToThrow) {
-                $appContext = $record->getContext()->getAppContext();
-                $this->assertTrue($appContext->hasException());
-                $exception = $appContext->getException();
+                $exception = $record->getContext()->getException();
                 $this->assertInstanceOf('Exception', $exception);
                 $this->assertSame($messageToAssert, $exception->getMessage());
 
@@ -229,30 +223,31 @@ class CM_Log_Handler_LayeredTest extends CMTest_TestCase {
 
         $exception = new Exception('foo');
         $mockHandleRecord->set(function (CM_Log_Record $record) use ($exception) {
-            $appContext = $record->getContext()->getAppContext();
-            $this->assertTrue($appContext->hasException());
-            $recordException = $appContext->getSerializableException();
+            $this->assertTrue(!!$record->getContext()->getException());
+            $recordException = $record->getContext()->getException();
             $this->assertSame('foo', $recordException->getMessage());
             $this->assertSame($exception->getLine(), $recordException->getLine());
             $this->assertSame($exception->getFile(), $recordException->getFile());
             $this->assertSame('Error happened', $record->getMessage());
             $this->assertSame(CM_Log_Logger::ERROR, $record->getLevel());
         });
-        $logger->error('Error happened', new CM_Log_Context_App(null, null, $exception));
+        $context = new CM_Log_Context();
+        $context->setException($exception);
+        $logger->error('Error happened', $context);
         $this->assertSame(1, $mockHandleRecord->getCallCount());
 
         $exception = new CM_Exception('bar');
         $mockHandleRecord->set(function (CM_Log_Record $record) use ($exception) {
-            $appContext = $record->getContext()->getAppContext();
-            $this->assertTrue($appContext->hasException());
-            $recordException = $appContext->getSerializableException();
+            $recordException = $record->getContext()->getException();
             $this->assertSame('bar', $recordException->getMessage());
             $this->assertSame($exception->getLine(), $recordException->getLine());
             $this->assertSame($exception->getFile(), $recordException->getFile());
             $this->assertSame('Warning alert', $record->getMessage());
             $this->assertSame(CM_Log_Logger::WARNING, $record->getLevel());
         });
-        $logger->warning('Warning alert', new CM_Log_Context_App(null, null, $exception));
+        $context= new CM_Log_Context();
+        $context->setException($exception);
+        $logger->warning('Warning alert', $context);
         $this->assertSame(2, $mockHandleRecord->getCallCount());
     }
 
