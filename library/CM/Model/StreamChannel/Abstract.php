@@ -131,8 +131,8 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
         return new CM_StreamChannel_Definition($this->getKey(), $this->getType(), $this->getAdapterType());
     }
 
-    public function toArray() {
-        $array = parent::toArray();
+    public function jsonSerialize() {
+        $array = parent::jsonSerialize();
         $array['key'] = $this->getKey();
         $array['type'] = $this->getType();
         return $array;

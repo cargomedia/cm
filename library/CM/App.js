@@ -155,7 +155,7 @@ var CM_App = CM_Class_Abstract.extend({
     if (cm.options.urlCdn) {
       url = cm.options.urlCdn + url;
     } else {
-      url = cm.options.url + url;
+      url = cm.options.urlBase + url;
     }
 
     url += '/static';
@@ -174,8 +174,7 @@ var CM_App = CM_Class_Abstract.extend({
    */
   getUrlResource: function(type, path, options) {
     options = _.defaults(options || {}, {
-      'sameOrigin': false,
-      'root': false
+      'sameOrigin': false
     });
 
     var url = '';
@@ -195,14 +194,17 @@ var CM_App = CM_Class_Abstract.extend({
       urlParts.push(cm.options.deployVersion);
       urlParts = urlParts.concat(path.split('/'));
 
-      if (options['root']) {
-        url += '/resource-' + urlParts.join('--');
-      } else {
-        url += '/' + urlParts.join('/');
-      }
+      url += '/' + urlParts.join('/');
     }
 
     return url;
+  },
+
+  /**
+   * @returns {string}
+   */
+  getUrlServiceWorker: function() {
+    return cm.options.urlServiceWorker;
   },
 
   /**
@@ -287,7 +289,9 @@ var CM_App = CM_Class_Abstract.extend({
      */
     _isCmObject: function(data) {
       var className = data && data['_class'];
-      return className && cm.model.types[className] && window[className] && !data.cid;
+      var isClass = className && cm.model.types[className] && window[className];
+      var isBackbone = data instanceof Backbone.Model || data instanceof Backbone.Collection;
+      return isClass && !isBackbone;
     },
 
     /**
@@ -388,7 +392,7 @@ var CM_App = CM_Class_Abstract.extend({
       var messages = _.toArray(arguments);
       var time = (Date.now() - performance.timing.navigationStart) / 1000;
       var timeFormatted = time.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false});
-      messages.unshift('[CM ' + timeFormatted + ']');
+      messages.unshift('[CM ' + timeFormatted + (performance.timing.isPolyfilled ? '!' : '') + ']');
       if (window.console && window.console.log) {
         var log = window.console.log;
         if (typeof log == "object" && Function.prototype.bind) {

@@ -5,7 +5,10 @@ class CM_Http_Response_Resource_LayoutTest extends CMTest_TestCase {
     public function testProcess() {
         $filePath = 'img/logo.png';
         $response = $this->getResponseResourceLayout($filePath);
+
         $this->assertContains('Content-Type: image/png', $response->getHeaders());
+        $this->assertContains('Cache-Control: max-age=31536000', $response->getHeaders());
+        $this->assertContains('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 31536000), $response->getHeaders());
     }
 
     public function testFiletypeForbidden() {
@@ -26,7 +29,10 @@ class CM_Http_Response_Resource_LayoutTest extends CMTest_TestCase {
         $filePath = 'browserconfig.xml';
         /** @var CM_Http_Response_Resource_Layout $response */
         $response = $this->getResponseResourceLayout($filePath);
+
         $this->assertContains('Content-Type: application/xml', $response->getHeaders());
+        $this->assertContains('Cache-Control: max-age=31536000', $response->getHeaders());
+        $this->assertContains('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 31536000), $response->getHeaders());
         $this->assertTrue((boolean) preg_match('!src="http://cdn\.default\.dev/layout/.+?/img/meta/tile-small-128x128-transparent\.png"!', $response->getContent()));
         $response->getRender()->getLayoutFile('resource/' . $filePath);
     }

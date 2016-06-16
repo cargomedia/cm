@@ -46,8 +46,12 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertSame(0, $mongoClient->count($collection));
 
         $mongoClient->createIndex($collection, ['expireAt' => 1], ['expireAfterSeconds' => 0]);
-        $appContext = new CM_Log_Context_App(['bar' => ['baz' => 'quux']], $user);
-        $record = new CM_Log_Record($level, $message, new CM_Log_Context($httpRequest, $computerInfo, $appContext));
+        $recordContext = new CM_Log_Context();
+        $recordContext->setExtra(['bar' => ['baz' => 'quux']]);
+        $recordContext->setUser($user);
+        $recordContext->setHttpRequest($httpRequest);
+        $recordContext->setComputerInfo($computerInfo);
+        $record = new CM_Log_Record($level, $message, $recordContext);
 
         $handler = new CM_Log_Handler_MongoDb($collection, $ttl, ['w' => 0], $level);
         $this->callProtectedMethod($handler, '_writeRecord', [$record]);

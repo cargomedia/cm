@@ -108,6 +108,8 @@ class CMService_KickBox_Client implements CM_Service_EmailVerification_ClientInt
      */
     protected function _logException(Exception $exception) {
         $logLevel = CM_Log_Logger::exceptionToLevel($exception);
-        CM_Service_Manager::getInstance()->getLogger()->addMessage('KickBox client error', $logLevel, new CM_Log_Context_App(null, null, $exception));
+        $context = new CM_Log_Context();
+        $context->setException($exception);
+        CM_Service_Manager::getInstance()->getLogger()->addMessage('KickBox client error', $logLevel, $context);
     }
 }

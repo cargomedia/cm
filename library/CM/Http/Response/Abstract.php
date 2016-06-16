@@ -44,7 +44,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     abstract protected function _process();
 
     public function process() {
-        $this->getServiceManager()->getLogger()->getContext()->getAppContext()->setUserWithClosure(function () {
+        $this->getServiceManager()->getLogger()->getContext()->setUserWithClosure(function () {
             return $this->getViewer();
         });
         $this->_process();
@@ -172,6 +172,15 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     }
 
     /**
+     * @param int $maxAge
+     */
+    public function setHeaderExpires($maxAge) {
+        $maxAge = (int) $maxAge;
+        $this->setHeader('Cache-Control', 'max-age=' . $maxAge);
+        $this->setHeader('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + $maxAge));
+    }
+
+    /**
      * @param string $key
      * @param string $value
      */
@@ -277,7 +286,10 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
                 if (null === $logLevel) {
                     $logLevel = CM_Log_Logger::exceptionToLevel($ex);
                 }
-                $this->getServiceManager()->getLogger()->addMessage('HTML response error', $logLevel, new CM_Log_Context_App(null, $this->getViewer(), $ex));
+                $context = new CM_Log_Context();
+                $context->setUser($this->getViewer());
+                $context->setException($ex);
+                $this->getServiceManager()->getLogger()->addMessage('HTML response error', $logLevel, $context);
             }
             if (!$catchException && ($catchPublicExceptions && $ex->isPublic())) {
                 $errorOptions = [];

@@ -7,6 +7,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
     }
 
     public function testConstructor() {
+        /** @var \Fluent\Logger\FluentLogger|\Mocka\AbstractClassTrait $fluentd */
         $fluentd = $this->mockClass('\Fluent\Logger\FluentLogger')->newInstanceWithoutConstructor();
         $handler = new CM_Log_Handler_Fluentd($fluentd, 'tag', 'appName');
         $this->assertInstanceOf('CM_Log_Handler_Fluentd', $handler);
@@ -19,19 +20,27 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $httpRequest = CM_Http_Request_Abstract::factory(
             'post',
             '/foo?bar=1&baz=quux',
-            ['bar' => 'baz'],
+            [
+                'bar'  => 'baz',
+                'host' => 'foo.bar:8080',
+            ],
             [
                 'http_referrer'   => 'http://bar/baz',
                 'http_user_agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)',
-                'foo'             => 'quux'
+                'foo'             => 'quux',
             ]
         );
         $clientId = $httpRequest->getClientId();
         $computerInfo = new CM_Log_Context_ComputerInfo('www.example.com', 'v7.0.1');
         $exception = new CM_Exception_Invalid('Bad');
 
-        $appContext = new CM_Log_Context_App(['bar' => 'baz', 'baz' => 'quux'], $user, $exception);
-        $record = new CM_Log_Record($level, $message, new CM_Log_Context($httpRequest, $computerInfo, $appContext));
+        $context = new CM_Log_Context();
+        $context->setExtra(['bar' => 'baz', 'baz' => 'quux']);
+        $context->setUser($user);
+        $context->setException($exception);
+        $context->setComputerInfo($computerInfo);
+        $context->setHttpRequest($httpRequest);
+        $record = new CM_Log_Record($level, $message, $context);
 
         /** @var \Fluent\Logger\FluentLogger $fluentd */
         $fluentd = $this->mockClass('\Fluent\Logger\FluentLogger')->newInstanceWithoutConstructor();
@@ -43,11 +52,12 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $this->assertArrayHasKey('timestamp', $formattedRecord);
         $this->assertSame('www.example.com', $formattedRecord['computerInfo']['fqdn']);
         $this->assertSame('v7.0.1', $formattedRecord['computerInfo']['phpVersion']);
-        $this->assertSame('/foo?bar=1&baz=quux', $formattedRecord['request']['uri']);
+        $this->assertSame('/foo?bar=1&baz=quux', $formattedRecord['httpRequest']['uri']);
 
-        $this->assertSame('POST', $formattedRecord['request']['method']);
-        $this->assertSame('http://bar/baz', $formattedRecord['request']['referrer']);
-        $this->assertSame('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)', $formattedRecord['request']['user_agent']);
+        $this->assertSame('POST', $formattedRecord['httpRequest']['method']);
+        $this->assertSame('http://bar/baz', $formattedRecord['httpRequest']['referrer']);
+        $this->assertSame('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)', $formattedRecord['httpRequest']['user_agent']);
+        $this->assertSame('foo.bar', $formattedRecord['httpRequest']['hostname']);
         $this->assertSame($user->getId(), $formattedRecord['appName']['user']);
         $this->assertSame($clientId, $formattedRecord['appName']['clientId']);
         $this->assertSame('baz', $formattedRecord['appName']['bar']);

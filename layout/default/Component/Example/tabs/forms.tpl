@@ -10,7 +10,8 @@
 {formField name='float' label="Float" placeholder="Float"}
 {formField name='money' label="Money" placeholder="Money"}
 {formField name='url' label="Url" placeholder="Url"}
-{formField name='int' label="Integer"}
+{formField name='int' label="Integer" placeholder="Integer"}
+{formField name='slider' label="Slider"}
 {formField name='location' label="Location"}
 {formField name='locationSlider' label="Radius"}
 {formField name='file' label="Upload Files"}

@@ -7,6 +7,10 @@ class CM_Http_Response_Resource_Css_VendorTest extends CMTest_TestCase {
         $request = new CM_Http_Request_Get($render->getUrlResource('vendor-css', 'all.css'));
         $response = new CM_Http_Response_Resource_Css_Vendor($request, $this->getServiceManager());
         $response->process();
+
+        $this->assertContains('Cache-Control: max-age=31536000', $response->getHeaders());
+        $this->assertContains('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 31536000), $response->getHeaders());
         $this->assertContains('body{', $response->getContent());
+        $this->assertNotContains('#mocha', $response->getContent());
     }
 }

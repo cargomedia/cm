@@ -51,13 +51,10 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
     }
 
     public function testAddMessage() {
-        $appContextClass = $this->mockClass('CM_Log_Context_App');
-        $merge = $appContextClass->mockMethod('merge');
-        $loggerContextApp = $appContextClass->newInstance();
-        /** @var CM_Log_Context_App $loggerContextApp */
-
-        $loggerContext = new CM_Log_Context();
-        $loggerContext->setAppContext($loggerContextApp);
+        $loggerContextClass = $this->mockClass('CM_Log_Context');
+        $merge = $loggerContextClass->mockMethod('merge');
+        $loggerContext = $loggerContextClass->newInstanceWithoutConstructor();
+        /** @var CM_Log_Context $loggerContext */
 
         $logger = $this->mockObject('CM_Log_Logger');
         $addRecord = $logger->mockMethod('_addRecord');
@@ -66,17 +63,16 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
 
         $message = 'message';
         $level = CM_Log_Logger::DEBUG;
-        $appContext = new CM_Log_Context_App();
+        $context = new CM_Log_Context();
 
-        $logger->addMessage($message, $level, $appContext);
+        $logger->addMessage($message, $level, $context);
 
-        $this->assertSame([$appContext], $merge->getCall(0)->getArguments());
+        $this->assertSame([$context], $merge->getCall(0)->getArguments());
         /** @var CM_Log_Record $record */
         $record = $addRecord->getCall(0)->getArgument(0);
         $this->assertSame($message, $record->getMessage());
         $this->assertSame($level, $record->getLevel());
-
-        $this->assertInstanceOf($appContextClass->getClassName(), $record->getContext()->getAppContext());
+        $this->assertInstanceOf($loggerContextClass->getClassName(), $record->getContext());
     }
 
     public function testLevelHelpers() {
@@ -87,7 +83,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         /** @var CM_Log_Logger $logger */
 
         $message = 'message';
-        $context = new CM_Log_Context_App();
+        $context = new CM_Log_Context();
 
         foreach ($levels as $label => $code) {
             $methodName = strtolower($label);

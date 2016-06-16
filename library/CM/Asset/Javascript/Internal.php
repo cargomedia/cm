@@ -4,10 +4,13 @@ class CM_Asset_Javascript_Internal extends CM_Asset_Javascript_Abstract {
 
     /**
      * @param CM_Site_Abstract $site
+     * @param bool|null        $debug
      */
-    public function __construct(CM_Site_Abstract $site) {
-        $this->_content = 'var cm = new ' . $this->_getAppClassName($site) . '();' . PHP_EOL;
-        $this->_content .= (new CM_File(DIR_ROOT . 'resources/config/js/internal.js'))->read();
+    public function __construct(CM_Site_Abstract $site, $debug = null) {
+        parent::__construct($site, $debug);
+
+        $this->_js->append('var cm = new ' . $this->_getAppClassName($site) . '();');
+        $this->_js->append((new CM_File(DIR_ROOT . 'resources/config/js/internal.js'))->read());
     }
 
     /**

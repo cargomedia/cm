@@ -156,6 +156,27 @@ var Media = Event.extend({
 
   /**
    * @returns {Promise}
+   */
+  getPromisePlaying: function() {
+    return this._getPromiseForEvent('playing');
+  },
+
+  /**
+   * @returns {Promise}
+   */
+  getPromiseStopped: function() {
+    return this._getPromiseForEvent('stop');
+  },
+
+  /**
+   * @returns {Promise}
+   */
+  getPromiseEmptied: function() {
+    return this._getPromiseForEvent('emptied');
+  },
+
+  /**
+   * @returns {Promise}
    * @private
    */
   _play: function() {
@@ -170,7 +191,7 @@ var Media = Event.extend({
       return Promise.resolve(this);
     }
 
-    var playing = self._getPromisePlaying();
+    var playing = self.getPromisePlaying();
     element.play();  // "canplay" is triggered by firefox only after calling play on the media
     return this
       .getPromiseLoaded()
@@ -191,7 +212,7 @@ var Media = Event.extend({
       return Promise.resolve();
     }
 
-    var stopped = this._getPromiseStopped();
+    var stopped = this.getPromiseStopped();
     var element = this.getElement();
     element.pause();
     if (element.seekable.length > 0) {
@@ -209,7 +230,7 @@ var Media = Event.extend({
       return Promise.resolve();
     }
 
-    var emptied = this._getPromiseEmptied();
+    var emptied = this.getPromiseEmptied();
     var sources = this._sources;
     var element = this.getElement();
     return this
@@ -225,30 +246,6 @@ var Media = Event.extend({
         element.load();
         return emptied;
       });
-  },
-
-  /**
-   * @returns {Promise}
-   * @private
-   */
-  _getPromisePlaying: function() {
-    return this._getPromiseForEvent('playing');
-  },
-
-  /**
-   * @returns {Promise}
-   * @private
-   */
-  _getPromiseStopped: function() {
-    return this._getPromiseForEvent('stop');
-  },
-
-  /**
-   * @returns {Promise}
-   * @private
-   */
-  _getPromiseEmptied: function() {
-    return this._getPromiseForEvent('emptied');
   },
 
   /**

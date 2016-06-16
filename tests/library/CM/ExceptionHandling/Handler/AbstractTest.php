@@ -15,10 +15,10 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         ]);
         $methodAddMessage = $logger->mockMethod('addMessage');
         $methodAddMessage->set(
-            function ($message, $level, CM_Log_Context_App $appContext) use ($expectedException) {
+            function ($message, $level, CM_Log_Context $context) use ($expectedException) {
                 $this->assertSame('Application error', $message);
                 $this->assertSame(CM_Log_Logger::ERROR, $level);
-                $this->assertEquals($expectedException, $appContext->getException());
+                $this->assertEquals($expectedException, $context->getException());
             }
         );
 

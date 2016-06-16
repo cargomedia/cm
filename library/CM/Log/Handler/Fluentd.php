@@ -77,7 +77,10 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
             if ($ip = $request->getIp()) {
                 $formattedRequest['ip'] = (string) $ip;
             }
-            $formattedRecord['request'] = $formattedRequest;
+            if ($request->hasHeader('host')) {
+                $formattedRequest['hostname'] = $request->getHost();
+            }
+            $formattedRecord['httpRequest'] = $formattedRequest;
         }
 
         $appAttributes = $context->getExtra();
@@ -89,12 +92,12 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
         }
         $formattedRecord[$this->_appName] = $appAttributes;
 
-        if ($context->getAppContext()->hasException()) {
-            $exception = $context->getAppContext()->getSerializableException();
+        if ($exception = $context->getException()) {
+            $serializableException = new CM_ExceptionHandling_SerializableException($exception);
             $formattedRecord['exception'] = [
-                'type'    => $exception->getClass(),
-                'message' => $exception->getMessage(),
-                'stack'   => $exception->getTraceAsString(),
+                'type'    => $serializableException->getClass(),
+                'message' => $serializableException->getMessage(),
+                'stack'   => $serializableException->getTraceAsString(),
             ];
         }
 
