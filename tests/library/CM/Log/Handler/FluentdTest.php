@@ -21,13 +21,13 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
             'post',
             '/foo?bar=1&baz=quux',
             [
-                'bar' => 'baz',
-                'host' => 'foo.bar:8080'
+                'bar'  => 'baz',
+                'host' => 'foo.bar:8080',
             ],
             [
                 'http_referrer'   => 'http://bar/baz',
                 'http_user_agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)',
-                'foo'             => 'quux'
+                'foo'             => 'quux',
             ]
         );
         $clientId = $httpRequest->getClientId();
