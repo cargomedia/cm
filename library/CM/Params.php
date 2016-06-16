@@ -582,18 +582,24 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     /**
      * @param string       $value
      * @param boolean|null $json
-     * @throws CM_Exception_Invalid
      * @return mixed|false
+     * @throws CM_Exception_InvalidParam
      */
     public static function decode($value, $json = null) {
         if ($json) {
             $value = CM_Util::jsonDecode($value);
         }
         if (is_array($value) && isset($value['_class'])) {
-            // CM_ArrayConvertible
             $className = (string) $value['_class'];
             unset($value['_class']);
-            $value = call_user_func(array($className, 'fromArray'), $value);
+            if (!class_exists($className)) {
+                throw new CM_Exception_InvalidParam('Class for decoding does not exist', null, ['class' => $className]);
+            }
+            if (!is_subclass_of($className, 'CM_ArrayConvertible')) {
+                throw new CM_Exception_InvalidParam('Class for decoding is not CM_ArrayConvertible', null, ['class' => $className]);
+            }
+            /** @var CM_ArrayConvertible $className */
+            $value = $className::fromArray($value);
             if (!$value) {
                 return false;
             }

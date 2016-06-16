@@ -77,7 +77,7 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
             if ($ip = $request->getIp()) {
                 $formattedRequest['ip'] = (string) $ip;
             }
-            $formattedRecord['request'] = $formattedRequest;
+            $formattedRecord['httpRequest'] = $formattedRequest;
         }
 
         $appAttributes = $context->getExtra();

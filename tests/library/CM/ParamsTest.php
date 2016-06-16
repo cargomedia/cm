@@ -13,6 +13,15 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertFalse($params->has('6'));
     }
 
+    /**
+     * @expectedException CM_Exception_InvalidParam
+     * @expectedExceptionMessage Class for decoding does not exist
+     */
+    public function testGetWithInvalidEncodedData() {
+        $params = new CM_Params(['foo' => ['_class' => 'Some_Nonexistent_Class', '_id' => 123]]);
+        $params->get('foo');
+    }
+
     public function testGetString() {
         $text = "Foo Bar, Bar Foo";
         $notText = new stdClass();
