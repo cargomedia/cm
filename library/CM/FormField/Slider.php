@@ -10,8 +10,10 @@ class CM_FormField_Slider extends CM_FormField_Abstract {
         if (!is_numeric($userInput)) {
             throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid number'));
         }
+
+        $possibleValues = range($this->_options['min'], $this->_options['max'], $this->_options['step']);
         $value = (float) $userInput;
-        if ($value < $this->_options['min'] || $value > $this->_options['max']) {
+        if (!in_array($value, $possibleValues, true)) {
             throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Value not in range.'));
         }
         return $value;
