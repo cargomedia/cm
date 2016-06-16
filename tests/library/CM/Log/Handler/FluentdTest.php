@@ -7,6 +7,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
     }
 
     public function testConstructor() {
+        /** @var \Fluent\Logger\FluentLogger|\Mocka\AbstractClassTrait $fluentd */
         $fluentd = $this->mockClass('\Fluent\Logger\FluentLogger')->newInstanceWithoutConstructor();
         $handler = new CM_Log_Handler_Fluentd($fluentd, 'tag', 'appName');
         $this->assertInstanceOf('CM_Log_Handler_Fluentd', $handler);
@@ -43,11 +44,11 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $this->assertArrayHasKey('timestamp', $formattedRecord);
         $this->assertSame('www.example.com', $formattedRecord['computerInfo']['fqdn']);
         $this->assertSame('v7.0.1', $formattedRecord['computerInfo']['phpVersion']);
-        $this->assertSame('/foo?bar=1&baz=quux', $formattedRecord['request']['uri']);
+        $this->assertSame('/foo?bar=1&baz=quux', $formattedRecord['httpRequest']['uri']);
 
-        $this->assertSame('POST', $formattedRecord['request']['method']);
-        $this->assertSame('http://bar/baz', $formattedRecord['request']['referrer']);
-        $this->assertSame('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)', $formattedRecord['request']['user_agent']);
+        $this->assertSame('POST', $formattedRecord['httpRequest']['method']);
+        $this->assertSame('http://bar/baz', $formattedRecord['httpRequest']['referrer']);
+        $this->assertSame('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)', $formattedRecord['httpRequest']['user_agent']);
         $this->assertSame($user->getId(), $formattedRecord['appName']['user']);
         $this->assertSame($clientId, $formattedRecord['appName']['clientId']);
         $this->assertSame('baz', $formattedRecord['appName']['bar']);
