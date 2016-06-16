@@ -573,24 +573,26 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 
     public function testEncodeArrayConvertible() {
         $class = $this->mockInterface('CM_ArrayConvertible');
+        $className = $class->getClassName();
         $arrayConvertible = $class->newInstanceWithoutConstructor();
         $toArray = ['key' => 'value'];
         $arrayConvertible->mockMethod('toArray')->set($toArray);
         $schema = new CM_Model_Schema_Definition([
-            'arrayConvertible' => ['type' => 'CM_ArrayConvertible']
+            'arrayConvertible' => ['type' => $className]
         ]);
         $value = $schema->encodeField('arrayConvertible', $arrayConvertible);
-        $this->assertSame('{"key":"value","_class":"' . get_class($arrayConvertible) . '"}', $value);
+        $this->assertSame('{"key":"value"}', $value);
     }
 
     public function testDecodeArrayConvertible() {
         $class = $this->mockInterface('CM_ArrayConvertible');
+        $className = $class->getClassName();
         $arrayConvertible = $class->newInstanceWithoutConstructor();
         $fromArray = $class->mockStaticMethod('fromArray')->set($arrayConvertible);
         $schema = new CM_Model_Schema_Definition([
-            'arrayConvertible' => ['type' => 'CM_ArrayConvertible']
+            'arrayConvertible' => ['type' => $className]
         ]);
-        $jsonData = CM_Params::jsonEncode(['_class' => $class->getClassName(), 'key' => 'value']);
+        $jsonData = '{"key":"value"}';
         $value = $schema->decodeField('arrayConvertible', $jsonData);
         
         $this->assertSame(['key' => 'value'], $fromArray->getLastCall()->getArgument(0));

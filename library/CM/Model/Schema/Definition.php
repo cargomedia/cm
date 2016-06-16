@@ -48,8 +48,8 @@ class CM_Model_Schema_Definition {
                             $value = $value->getTimestamp();
                             break;
                         default:
-                            if (!class_exists($type) && !interface_exists($type)) {
-                                throw new CM_Model_Exception_Validation('Field type `' . $type . '` is not a valid class/interface');
+                            if (!class_exists($type)) {
+                                throw new CM_Model_Exception_Validation('Field type `' . $type . '` is not a valid class');
                             }
                             $className = $type;
                             if (!$value instanceof $className) {
@@ -63,11 +63,12 @@ class CM_Model_Schema_Definition {
                                 if (count($id) == 1) {
                                     $value = $value->getId();
                                 } else {
-                                    $value = CM_Params::jsonEncode($id);
+                                    $value = CM_Util::jsonEncode($id);
                                 }
-                            } elseif (is_a($className, 'CM_ArrayConvertible', true)) {
+                            } elseif (is_subclass_of($className, 'CM_ArrayConvertible', true)) {
                                 /** @var CM_ArrayConvertible $value */
-                                $value = CM_Params::encode($value, true);
+                                $value = $value->toArray();
+                                $value = CM_Util::jsonEncode($value);
                             } else {
                                 throw new CM_Model_Exception_Validation(
                                     'Class `' . $className . '` is neither CM_Model_Abstract nor CM_ArrayConvertible');
@@ -114,15 +115,14 @@ class CM_Model_Schema_Definition {
                             $value = DateTime::createFromFormat('U', $value);
                             break;
                         default:
-                            if (!class_exists($type) && !interface_exists($type)) {
+                            if (!class_exists($type)) {
                                 throw new CM_Model_Exception_Validation('Field type `' . $type . '` is not a valid class/interface');
                             }
                             $className = $type;
-
                             if (is_a($className, 'CM_Model_Abstract', true)) {
                                 /** @var CM_Model_Abstract $type */
                                 if ($this->_isJson($value)) {
-                                    $value = CM_Params::jsonDecode($value);
+                                    $value = CM_Util::jsonDecode($value);
                                 }
                                 $id = $value;
 
@@ -130,8 +130,10 @@ class CM_Model_Schema_Definition {
                                     $id = ['id' => $id];
                                 }
                                 $value = CM_Model_Abstract::factoryGeneric($type::getTypeStatic(), $id);
-                            } elseif (is_a($className, 'CM_ArrayConvertible', true)) {
-                                $value = CM_Params::decode($value, true);
+                            } elseif (is_subclass_of($className, 'CM_ArrayConvertible', true)) {
+                                /** @var CM_ArrayConvertible $className */
+                                $value = CM_Util::jsonDecode($value);
+                                $value = $className::fromArray($value);
                             } else {
                                 throw new CM_Model_Exception_Validation(
                                     'Class `' . $className . '` is neither CM_Model_Abstract nor CM_ArrayConvertible');
