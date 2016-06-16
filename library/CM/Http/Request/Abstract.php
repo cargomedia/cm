@@ -479,6 +479,9 @@ abstract class CM_Http_Request_Abstract {
      */
     public function isSupported() {
         $userAgent = $this->getUserAgent();
+        if (preg_match('#UCWEB|UCBrowser#', $userAgent)) {
+            return false;
+        }
         if (preg_match('#Opera Mini#', $userAgent)) {
             return false;
         }
