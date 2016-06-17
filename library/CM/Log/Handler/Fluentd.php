@@ -6,24 +6,24 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
 
     /** @var \Fluent\Logger\FluentLogger */
     protected $_fluentdLogger;
+    
+    /** @var CM_Log_ContextFormatter_Interface */
+    protected $_contextFormatter;
 
     /** @var string */
     protected $_tag;
 
-    /** @var string */
-    protected $_appName;
-
     /**
-     * @param FluentLogger $fluentdLogger
-     * @param string       $tag
-     * @param string       $appName
-     * @param int|null     $minLevel
+     * @param FluentLogger                      $fluentdLogger
+     * @param CM_Log_ContextFormatter_Interface $contextFormatter
+     * @param string                            $tag
+     * @param int|null                          $minLevel
      */
-    public function __construct(FluentLogger $fluentdLogger, $tag, $appName, $minLevel = null) {
+    public function __construct(FluentLogger $fluentdLogger, CM_Log_ContextFormatter_Interface $contextFormatter, $tag, $minLevel = null) {
         parent::__construct($minLevel);
         $this->_fluentdLogger = $fluentdLogger;
+        $this->_contextFormatter = $contextFormatter;
         $this->_tag = (string) $tag;
-        $this->_appName = (string) $appName;
     }
 
     /**
@@ -46,7 +46,6 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
      * @return array
      */
     protected function _formatRecord(CM_Log_Record $record) {
-        $contextFormatter = new CM_Log_ContextFormatter_Cargomedia($this->_appName);
-        return $contextFormatter->getRecordContext($record);
+        return $this->_contextFormatter->getRecordContext($record);
     }
 }
