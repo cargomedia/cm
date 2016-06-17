@@ -67,7 +67,8 @@ class CM_Log_Handler_Factory implements CM_Service_ManagerAwareInterface {
     public function createFluentdLogger($hostname, $port, $tag, $minLevel = null) {
         $fluentd = new \Fluent\Logger\FluentLogger($hostname, $port);
         $appName = CM_App::getInstance()->getName();
-        return new CM_Log_Handler_Fluentd($fluentd, $tag, $appName, $minLevel);
+        $contextFormatter = new CM_Log_ContextFormatter_Cargomedia($appName);
+        return new CM_Log_Handler_Fluentd($fluentd, $contextFormatter, $tag, $minLevel);
     }
 
     /**

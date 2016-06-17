@@ -4,12 +4,17 @@ class CM_Janus_HttpApiClient {
 
     /** @var \GuzzleHttp\Client */
     protected $_httpClient;
+    
+    /** @var CM_Log_ContextFormatter_Interface */
+    protected $_contextFormatter;
 
     /**
-     * @param \GuzzleHttp\Client $httpClient
+     * @param \GuzzleHttp\Client                $httpClient
+     * @param CM_Log_ContextFormatter_Interface $contextFormatter
      */
-    public function __construct(GuzzleHttp\Client $httpClient) {
+    public function __construct(GuzzleHttp\Client $httpClient, CM_Log_ContextFormatter_Interface $contextFormatter) {
         $this->_httpClient = $httpClient;
+        $this->_contextFormatter = $contextFormatter;
     }
 
     /**
@@ -42,9 +47,14 @@ class CM_Janus_HttpApiClient {
      * @throws CM_Exception_Invalid
      */
     protected function _request($method, CM_Janus_Server $server, $path, array $body = null) {
+        $context = CM_Service_Manager::getInstance()->getLogger()->getContext();
+        $appContext = $this->_contextFormatter->formatAppContext($context);
+        
         $url = $server->getHttpAddress() . $path;
         $body = (array) $body;
+        
         $options = [
+            'query'   => ['context' => CM_Util::jsonEncode($appContext)],
             'body'    => $body,
             'headers' => ['Server-Key' => $server->getKey()],
         ];
