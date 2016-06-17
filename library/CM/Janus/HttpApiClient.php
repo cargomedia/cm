@@ -9,7 +9,8 @@ class CM_Janus_HttpApiClient {
     protected $_contextFormatter;
 
     /**
-     * @param \GuzzleHttp\Client $httpClient
+     * @param \GuzzleHttp\Client                $httpClient
+     * @param CM_Log_ContextFormatter_Interface $contextFormatter
      */
     public function __construct(GuzzleHttp\Client $httpClient, CM_Log_ContextFormatter_Interface $contextFormatter) {
         $this->_httpClient = $httpClient;

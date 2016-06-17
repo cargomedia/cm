@@ -9,7 +9,7 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
      * @param string $appName
      */
     public function __construct($appName) {
-        $this->_appName = $appName;
+        $this->_appName = (string) $appName;
     }
 
     public function getRecordContext(CM_Log_Record $record) {
@@ -39,11 +39,11 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
                 'uri'    => $request->getUri(),
                 'method' => $request->getMethodName(),
             ];
-            if (array_key_exists('http_referrer', $serverArray)) {
-                $formattedRequest['referrer'] = (string) $serverArray['http_referrer'];
+            if (array_key_exists('http_referer', $serverArray)) {
+                $formattedRequest['referer'] = (string) $serverArray['http_referer'];
             }
             if (array_key_exists('http_user_agent', $serverArray)) {
-                $formattedRequest['user_agent'] = (string) $serverArray['http_user_agent'];
+                $formattedRequest['useragent'] = (string) $serverArray['http_user_agent'];
             }
             if ($ip = $request->getIp()) {
                 $formattedRequest['ip'] = (string) $ip;
