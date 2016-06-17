@@ -19,7 +19,10 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
         });
         /** @var GuzzleHttp\Client $httpClient */
 
-        $server = new CM_Janus_Server(0, 'bar', 'http://cm-janus.dev:8080', 'ws://cm-janus.dev:8188', []);
+        $location = $this->mockClass('CM_Geo_Point')->newInstanceWithoutConstructor();
+        /** @var CM_Geo_Point $location */
+        
+        $server = new CM_Janus_Server(0, 'bar', 'http://cm-janus.dev:8080', 'ws://cm-janus.dev:8188', [], $location);
         $api = new CM_Janus_HttpApiClient($httpClient);
         $api->stopStream($server, 'foo');
         $this->assertSame(1, $sendRequestMethod->getCallCount());
@@ -41,7 +44,10 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
         });
         /** @var GuzzleHttp\Client $httpClient */
 
-        $server = new CM_Janus_Server(0, 'bar', 'http://cm-janus.dev:8080', 'ws://cm-janus.dev:8188', []);
+        $location = $this->mockClass('CM_Geo_Point')->newInstanceWithoutConstructor();
+        /** @var CM_Geo_Point $location */
+        
+        $server = new CM_Janus_Server(0, 'bar', 'http://cm-janus.dev:8080', 'ws://cm-janus.dev:8188', [], $location);
         $api = new CM_Janus_HttpApiClient($httpClient);
         $result = $api->fetchStatus($server);
         $this->assertSame([['id' => 'foo', 'channelName' => 'bar'], ['id' => 'baz', 'channelName' => 'quux']], $result);
@@ -56,7 +62,10 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
             throw new GuzzleHttp\Exception\TransferException();
         });
 
-        $server = new CM_Janus_Server(0, 'bar', 'http://cm-janus.dev:8080', 'ws://cm-janus.dev:8188', []);
+        $location = $this->mockClass('CM_Geo_Point')->newInstanceWithoutConstructor();
+        /** @var CM_Geo_Point $location */
+
+        $server = new CM_Janus_Server(0, 'bar', 'http://cm-janus.dev:8080', 'ws://cm-janus.dev:8188', [], $location);
         $api = new CM_Janus_HttpApiClient($httpClient);
         $exception = $this->catchException(function () use ($api, $server) {
             $api->fetchStatus($server);

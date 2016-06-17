@@ -3,12 +3,12 @@
 class CM_Janus_ServiceTest extends CMTest_TestCase {
 
     public function testFetchStatus() {
-        $configuration = new CM_Janus_Configuration();
+        $serverList = new CM_Janus_ServerList();
         foreach ([1, 5] as $serverId) {
             $server = $this->mockClass('CM_Janus_Server')->newInstanceWithoutConstructor();
             $server->mockMethod('getId')->set($serverId);
             /** @var CM_Janus_Server $server */
-            $configuration->addServer($server);
+            $serverList->addServer($server);
         }
         $httpApiClient = $this->mockClass('CM_Janus_HttpApiClient')->newInstanceWithoutConstructor();
         $httpApiClient->mockMethod('fetchStatus')->set(function (CM_Janus_Server $server) {
@@ -26,21 +26,21 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         });
         /** @var CM_Janus_HttpApiClient $httpApiClient */
 
-        $janus = new CM_Janus_Service($configuration, $httpApiClient);
+        $janus = new CM_Janus_Service($serverList, $httpApiClient);
         /** @var CM_Janus_Stream[] $streams */
         $streams = $this->callProtectedMethod($janus, '_fetchStatus');
         $this->assertContainsOnlyInstancesOf('CM_Janus_Stream', $streams);
         $this->assertCount(3, $streams);
 
-        $this->assertSame($configuration->getServer(1), $streams[0]->getServer());
+        $this->assertSame($serverList->getById(1), $streams[0]->getServer());
         $this->assertSame('stream-foo', $streams[0]->getStreamKey());
         $this->assertSame('channel-foo', $streams[0]->getStreamChannelKey());
 
-        $this->assertSame($configuration->getServer(5), $streams[1]->getServer());
+        $this->assertSame($serverList->getById(5), $streams[1]->getServer());
         $this->assertSame('stream-bar', $streams[1]->getStreamKey());
         $this->assertSame('channel-bar', $streams[1]->getStreamChannelKey());
 
-        $this->assertSame($configuration->getServer(5), $streams[2]->getServer());
+        $this->assertSame($serverList->getById(5), $streams[2]->getServer());
         $this->assertSame('stream-zoo', $streams[2]->getStreamKey());
         $this->assertSame('channel-zoo', $streams[2]->getStreamChannelKey());
     }
@@ -56,7 +56,7 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         $server = $this->mockClass('CM_Janus_Server')->newInstanceWithoutConstructor();
         $server->mockMethod('getId')->set(1);
 
-        $configuration = new CM_Janus_Configuration([$server]);
+        $serverList = new CM_Janus_ServerList([$server]);
 
         $httpApiClient = $this->mockClass('CM_Janus_HttpApiClient')->newInstanceWithoutConstructor();
         $stopStreamMethod = $httpApiClient->mockMethod('stopStream')
@@ -70,7 +70,7 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
             });
         /** @var CM_Janus_HttpApiClient $httpApiClient */
 
-        $janus = new CM_Janus_Service($configuration, $httpApiClient);
+        $janus = new CM_Janus_Service($serverList, $httpApiClient);
         $this->callProtectedMethod($janus, '_stopStream', [$stream]);
         $this->assertSame(1, $stopStreamMethod->getCallCount());
 
@@ -92,10 +92,11 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
 
         $emptyStreamChannel = CMTest_TH::createStreamChannel(null, CM_Janus_Service::getTypeStatic());
 
-        $server1 = $this->mockClass('CM_Janus_Server')->newInstance([1, 'key', 'http://mock', 'ws://mock', []]);
-        /** @var CM_Janus_Configuration|\Mocka\AbstractClassTrait $configuration */
-        $configuration = $this->mockObject('CM_Janus_Configuration');
-        $configuration->mockMethod('getServers')->set([$server1]);
+        $location = $this->mockClass('CM_Geo_Point')->newInstanceWithoutConstructor();
+        $server1 = $this->mockClass('CM_Janus_Server')->newInstance([1, 'key', 'http://mock', 'ws://mock', [], $location]);
+        /** @var CM_Janus_ServerList|\Mocka\AbstractClassTrait $serverList */
+        $serverList = $this->mockObject('CM_Janus_ServerList');
+        $serverList->mockMethod('getAll')->set([$server1]);
 
         /** @var CM_Janus_HttpApiClient|\Mocka\AbstractClassTrait $httpApiClient */
         $httpApiClient = $this->mockClass('CM_Janus_HttpApiClient')->newInstanceWithoutConstructor();
@@ -112,7 +113,7 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
             ],
         ]);
 
-        $janus = new CM_Janus_Service($configuration, $httpApiClient);
+        $janus = new CM_Janus_Service($serverList, $httpApiClient);
         $janus->synchronize();
 
         $this->assertEquals($streamChannel, CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamChannel->getKey(), $janus->getType()));
@@ -149,10 +150,11 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
         $streamChannelKey2 = $streamChannel2->getKey();
         CMTest_TH::createStreamPublish(null, $streamChannel2); //to make channel non empty
 
-        $server1 = $this->mockClass('CM_Janus_Server')->newInstance([1, 'key', 'http://mock', 'ws://mock', []]);
-        /** @var CM_Janus_Configuration|\Mocka\AbstractClassTrait $configuration */
-        $configuration = $this->mockObject('CM_Janus_Configuration');
-        $configuration->mockMethod('getServers')->set([$server1]);
+        $location = $this->mockClass('CM_Geo_Point')->newInstanceWithoutConstructor();
+        $server1 = $this->mockClass('CM_Janus_Server')->newInstance([1, 'key', 'http://mock', 'ws://mock', [], $location]);
+        /** @var CM_Janus_ServerList|\Mocka\AbstractClassTrait $serverList */
+        $serverList = $this->mockObject('CM_Janus_ServerList');
+        $serverList->mockMethod('getAll')->set([$server1]);
 
         $status = [
             ['id' => $streamPublishKey, 'channelName' => $streamChannelKey, 'isPublish' => true],
@@ -186,7 +188,7 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
             });
         /** @var CM_Janus_HttpApiClient $httpApiClient */
 
-        $janus = new CM_Janus_Service($configuration, $httpApiClient);
+        $janus = new CM_Janus_Service($serverList, $httpApiClient);
         $janus->getStreamRepository()->removeStream($streamPublish);
         $janus->getStreamRepository()->removeStream($streamSubscribe);
         $janus->synchronize();
