@@ -108,4 +108,22 @@ class CM_Janus_ServerList extends CM_Class_Abstract implements CM_Typed {
         }
         return null;
     }
+
+    /**
+     * @param CM_Geo_Point $location
+     * @return CM_Janus_ServerList
+     */
+    public function filterByClosestDistanceTo(CM_Geo_Point $location) {
+        $servers = $this->_servers;
+        if (!empty($servers)) {
+            $groupedServers = \Functional\group($servers, function (CM_Janus_Server $server) use ($location) {
+                return $server->getLocation()->calculateDistanceTo($location);
+            });
+            $distances = array_keys($groupedServers);
+            $minimumDistance = min($distances);
+
+            $servers = array_values($groupedServers[$minimumDistance]);
+        }
+        return new CM_Janus_ServerList($servers);
+    }
 }
