@@ -22,8 +22,6 @@ class CM_Janus_ServerList extends CM_Class_Abstract implements CM_Typed {
         $this->_servers[] = $server;
     }
 
-
-
     /**
      * @param string $plugin
      * @return CM_Janus_ServerList
@@ -109,22 +107,5 @@ class CM_Janus_ServerList extends CM_Class_Abstract implements CM_Typed {
             }
         }
         return null;
-    }
-
-    /**
-     * @param string $plugin
-     * @return CM_Janus_Server|null
-     */
-    public function findByPlugin($plugin) {
-        return $this->filterByPlugin($plugin)->findRandom();
-    }
-
-    /**
-     * @param CM_StreamChannel_Definition $channelDefinition
-     * @return CM_Janus_Server
-     * @throws CM_Exception_Invalid
-     */
-    public function getByChannelDefinition(CM_StreamChannel_Definition $channelDefinition) {
-        return $this->filterByChannelDefinition($channelDefinition)->getRandom();
     }
 }
