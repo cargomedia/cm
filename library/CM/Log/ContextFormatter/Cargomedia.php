@@ -16,18 +16,19 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
         $levelsMapping = array_flip(CM_Log_Logger::getLevels());
         $context = $record->getContext();
 
-        $hash = [
+        $result = [
             'message'   => (string) $record->getMessage(),
             'level'     => strtolower($levelsMapping[$record->getLevel()]),
             'timestamp' => $record->getCreatedAt()->format(DateTime::ISO8601),
         ];
-        return array_merge($hash, $this->getContext($context));
+        $result = array_merge($result, $this->getContext($context));
+        return $result;
     }
 
     public function getContext(CM_Log_Context $context) {
-        $hash = [];
+        $result = [];
         if ($computerInfo = $context->getComputerInfo()) {
-            $hash['computerInfo'] = [
+            $result['computerInfo'] = [
                 'fqdn'       => $computerInfo->getFullyQualifiedDomainName(),
                 'phpVersion' => $computerInfo->getPhpVersion(),
             ];
@@ -51,22 +52,23 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
             if ($request->hasHeader('host')) {
                 $formattedRequest['hostname'] = $request->getHost();
             }
-            $hash['httpRequest'] = $formattedRequest;
+            $result['httpRequest'] = $formattedRequest;
         }
-        $hash = array_merge($hash, $this->getAppContext($context));
+        $result = array_merge($result, $this->getAppContext($context));
 
         if ($exception = $context->getException()) {
             $serializableException = new CM_ExceptionHandling_SerializableException($exception);
-            $hash['exception'] = [
+            $result['exception'] = [
                 'type'    => $serializableException->getClass(),
                 'message' => $serializableException->getMessage(),
                 'stack'   => $serializableException->getTraceAsString(),
             ];
         }
-        return $hash;
+        return $result;
     }
 
     public function getAppContext(CM_Log_Context $context) {
+        $result = [];
         $appAttributes = $context->getExtra();
         if ($user = $context->getUser()) {
             $appAttributes['user'] = $user->getId();
@@ -75,6 +77,7 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
         if (null !== $request) {
             $appAttributes['clientId'] = $request->getClientId();
         }
-        return [$this->_appName => $appAttributes];
+        $result[$this->_appName] = $appAttributes;
+        return $result;
     }
 }
