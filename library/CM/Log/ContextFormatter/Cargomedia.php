@@ -51,13 +51,13 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
             if ($request->hasHeader('host')) {
                 $formattedRequest['hostname'] = $request->getHost();
             }
-            $formattedRecord['httpRequest'] = $formattedRequest;
+            $hash['httpRequest'] = $formattedRequest;
         }
         $hash = array_merge($hash, $this->getAppContext($context));
 
         if ($exception = $context->getException()) {
             $serializableException = new CM_ExceptionHandling_SerializableException($exception);
-            $formattedRecord['exception'] = [
+            $hash['exception'] = [
                 'type'    => $serializableException->getClass(),
                 'message' => $serializableException->getMessage(),
                 'stack'   => $serializableException->getTraceAsString(),
