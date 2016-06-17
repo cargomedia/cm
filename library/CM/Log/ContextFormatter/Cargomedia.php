@@ -12,7 +12,7 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
         $this->_appName = (string) $appName;
     }
 
-    public function getRecordContext(CM_Log_Record $record) {
+    public function formatRecordContext(CM_Log_Record $record) {
         $levelsMapping = array_flip(CM_Log_Logger::getLevels());
         $context = $record->getContext();
 
@@ -21,11 +21,11 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
             'level'     => strtolower($levelsMapping[$record->getLevel()]),
             'timestamp' => $record->getCreatedAt()->format(DateTime::ISO8601),
         ];
-        $result = array_merge($result, $this->getContext($context));
+        $result = array_merge($result, $this->formatContext($context));
         return $result;
     }
 
-    public function getContext(CM_Log_Context $context) {
+    public function formatContext(CM_Log_Context $context) {
         $result = [];
         if ($computerInfo = $context->getComputerInfo()) {
             $result['computerInfo'] = [
@@ -54,7 +54,7 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
             }
             $result['httpRequest'] = $formattedRequest;
         }
-        $result = array_merge($result, $this->getAppContext($context));
+        $result = array_merge($result, $this->formatAppContext($context));
 
         if ($exception = $context->getException()) {
             $serializableException = new CM_ExceptionHandling_SerializableException($exception);
@@ -67,7 +67,7 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
         return $result;
     }
 
-    public function getAppContext(CM_Log_Context $context) {
+    public function formatAppContext(CM_Log_Context $context) {
         $result = [];
         $appAttributes = $context->getExtra();
         if ($user = $context->getUser()) {

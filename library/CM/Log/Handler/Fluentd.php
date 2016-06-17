@@ -46,6 +46,6 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
      * @return array
      */
     protected function _formatRecord(CM_Log_Record $record) {
-        return $this->_contextFormatter->getRecordContext($record);
+        return $this->_contextFormatter->formatRecordContext($record);
     }
 }

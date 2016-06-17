@@ -22,7 +22,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         /** @var \Fluent\Logger\FluentLogger $fluentd */
 
         $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
-        $getRecordContext = $contextFormatter->mockMethod('getRecordContext')->set('formatted-record');
+        $getRecordContext = $contextFormatter->mockMethod('formatRecordContext')->set('formatted-record');
         /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
         
         $handler = new CM_Log_Handler_Fluentd($fluentd, $contextFormatter, 'tag');
@@ -46,7 +46,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         /** @var \Fluent\Logger\FluentLogger $fluentd */
 
         $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
-        $contextFormatter->mockMethod('getRecordContext')->set(['key' => 'value']);
+        $contextFormatter->mockMethod('formatRecordContext')->set(['key' => 'value']);
         /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
         
         $handler = new CM_Log_Handler_Fluentd($fluentd, $contextFormatter, 'tag');

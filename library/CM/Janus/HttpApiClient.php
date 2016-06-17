@@ -48,7 +48,7 @@ class CM_Janus_HttpApiClient {
      */
     protected function _request($method, CM_Janus_Server $server, $path, array $body = null) {
         $context = CM_Service_Manager::getInstance()->getLogger()->getContext();
-        $appContext = $this->_contextFormatter->getAppContext($context);
+        $appContext = $this->_contextFormatter->formatAppContext($context);
         
         $url = $server->getHttpAddress() . $path;
         $body = (array) $body;

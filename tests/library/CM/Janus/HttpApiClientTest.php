@@ -4,7 +4,7 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
 
     public function testStopStream() {
         $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
-        $contextFormatter->mockMethod('getAppContext')->set(['key' => 'value']);
+        $contextFormatter->mockMethod('formatAppContext')->set(['key' => 'value']);
         /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
         
         $httpClient = $this->mockObject('GuzzleHttp\Client');
@@ -31,7 +31,7 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
 
     public function testFetchStatus() {
         $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
-        $contextFormatter->mockMethod('getAppContext')->set(['key' => 'value']);
+        $contextFormatter->mockMethod('formatAppContext')->set(['key' => 'value']);
         /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
 
         $httpClient = $this->mockObject('GuzzleHttp\Client');
