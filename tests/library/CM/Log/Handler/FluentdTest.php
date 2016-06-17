@@ -40,13 +40,13 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $postMock = $fluentd->mockMethod('post')->set(
             function ($tag, array $data) {
                 $this->assertSame('tag', $tag);
-                $this->assertSame('critical', $data['level']);
-                $this->assertSame('foo', $data['message']);
+                $this->assertSame('value', $data['key']);
             }
         );
         /** @var \Fluent\Logger\FluentLogger $fluentd */
 
         $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
+        $contextFormatter->mockMethod('getRecordContext')->set(['key' => 'value']);
         /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
         
         $handler = new CM_Log_Handler_Fluentd($fluentd, $contextFormatter, 'tag');
