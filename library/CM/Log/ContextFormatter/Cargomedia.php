@@ -1,6 +1,9 @@
 <?php
 
-class CM_Log_ContextFormatter_Cargomedia {
+class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Interface {
+    
+    /** @var string */
+    protected $_appName;
 
     /**
      * @param string $appName
@@ -9,10 +12,6 @@ class CM_Log_ContextFormatter_Cargomedia {
         $this->_appName = $appName;
     }
 
-    /**
-     * @param CM_Log_Record $record
-     * @return array
-     */
     public function getRecordContext(CM_Log_Record $record) {
         $levelsMapping = array_flip(CM_Log_Logger::getLevels());
         $context = $record->getContext();
@@ -25,10 +24,6 @@ class CM_Log_ContextFormatter_Cargomedia {
         return array_merge($hash, $this->getContext($context));
     }
 
-    /**
-     * @param CM_Log_Context $context
-     * @return array
-     */
     public function getContext(CM_Log_Context $context) {
         $hash = [];
         if ($computerInfo = $context->getComputerInfo()) {
@@ -71,11 +66,6 @@ class CM_Log_ContextFormatter_Cargomedia {
         return $hash;
     }
 
-    /**
-     * @param CM_Log_Context $context
-     * @return array
-     * @throws CM_Exception_Invalid
-     */
     public function getAppContext(CM_Log_Context $context) {
         $appAttributes = $context->getExtra();
         if ($user = $context->getUser()) {
