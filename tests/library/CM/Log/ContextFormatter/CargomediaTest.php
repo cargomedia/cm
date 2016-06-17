@@ -1,6 +1,5 @@
 <?php
 
-
 class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
 
     public function testGetRecordContext() {
