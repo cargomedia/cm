@@ -15,7 +15,7 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
                 'host' => 'foo.bar:8080',
             ],
             [
-                'http_referrer'   => 'http://bar/baz',
+                'http_referer'   => 'http://bar/baz',
                 'http_user_agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)',
                 'foo'             => 'quux',
             ]
@@ -33,7 +33,7 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
         $record = new CM_Log_Record($level, $message, $context);
 
         $contextFormatter = new CM_Log_ContextFormatter_Cargomedia('appName');
-        $formattedRecord = $contextFormatter->getRecordContext($record);
+        $formattedRecord = $contextFormatter->formatRecordContext($record);
         
         $this->assertSame($message, $formattedRecord['message']);
         $this->assertSame('debug', $formattedRecord['level']);
@@ -43,8 +43,8 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
         $this->assertSame('/foo?bar=1&baz=quux', $formattedRecord['httpRequest']['uri']);
 
         $this->assertSame('POST', $formattedRecord['httpRequest']['method']);
-        $this->assertSame('http://bar/baz', $formattedRecord['httpRequest']['referrer']);
-        $this->assertSame('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)', $formattedRecord['httpRequest']['user_agent']);
+        $this->assertSame('http://bar/baz', $formattedRecord['httpRequest']['referer']);
+        $this->assertSame('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)', $formattedRecord['httpRequest']['useragent']);
         $this->assertSame('foo.bar', $formattedRecord['httpRequest']['hostname']);
         $this->assertSame($user->getId(), $formattedRecord['appName']['user']);
         $this->assertSame($clientId, $formattedRecord['appName']['clientId']);
