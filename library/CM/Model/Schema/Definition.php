@@ -36,6 +36,7 @@ class CM_Model_Schema_Definition {
                             $value = (float) $value;
                             break;
                         case 'string':
+                            $value = (string) $value;
                             break;
                         case 'boolean':
                         case 'bool':
@@ -104,6 +105,7 @@ class CM_Model_Schema_Definition {
                             $value = (float) $value;
                             break;
                         case 'string':
+                            $value = (string) $value;
                             break;
                         case 'boolean':
                         case 'bool':
