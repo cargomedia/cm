@@ -27,7 +27,7 @@ class CM_Janus_Factory {
         }
 
         $httpClient = new GuzzleHttp\Client();
-    $appName = CM_App::getInstance()->getName();
+        $appName = CM_App::getInstance()->getName();
         $contextFormatter = new CM_Log_ContextFormatter_Cargomedia($appName);
         $httpApiClient = new CM_Janus_HttpApiClient($httpClient, $contextFormatter);
 
