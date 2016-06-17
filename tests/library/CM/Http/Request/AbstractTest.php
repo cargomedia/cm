@@ -296,10 +296,6 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertNull($timeZone);
     }
 
-    public function testFactoryFromGlobals() {
-        var_dump($_SERVER);
-    }
-
     /**
      * @param string             $uri
      * @param array|null         $additionalHeaders
