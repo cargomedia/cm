@@ -16,6 +16,11 @@ var CM_Form_Example = CM_Form_Abstract.extend({
         }
       });
     });
+
+    this.on('success', function(response) {
+      cm.window.hint('Form successfully submitted. See browser console for response.');
+      console.debug('Response:', response);
+    });
   },
 
   logData: promiseThrottler(function() {
