@@ -2,6 +2,15 @@
 
 class CM_Http_Response_View_AjaxTest extends CMTest_TestCase {
 
+    public function testProcess() {
+        $view = new CM_Component_Example();
+        $request = $this->createRequestAjax($view, 'test', ['x' => 'foo']);
+        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $this->getServiceManager());
+        $response->process();
+
+        $this->assertJson($response->getContent());
+    }
+
     /**
      * @expectedException CM_Exception_Invalid
      * @expectedExceptionMessage Illegal method: `_ad_!!!##`

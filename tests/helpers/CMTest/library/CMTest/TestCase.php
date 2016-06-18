@@ -160,6 +160,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             throw new CM_Exception_Invalid('Action\'s form and ViewResponse\'s view must match');
         }
         if (null === $scopeComponent) {
+            /** @var CM_Component_Abstract $component */
             $component = $this->mockClass('CM_Component_Abstract')->newInstance();
             $scopeComponent = new CM_Frontend_ViewResponse($component);
         }
@@ -167,11 +168,13 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             'data'       => (array) $data,
             'actionName' => $actionName,
         );
-        $siteId = 'null';
-        if (null !== $site) {
-            $siteId = $site->getId();
+        if (null === $site) {
+            $site = CM_Site_Abstract::factory();
         }
-        return $this->createRequest('/form/' . $siteId, $query, null, $scopeView, $scopeComponent);
+        $headers = [
+            'host' => $site->getHost(),
+        ];
+        return $this->createRequest('/form', $query, $headers, $scopeView, $scopeComponent);
     }
 
     /**
@@ -211,11 +214,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             'method' => (string) $methodName,
             'params' => (array) $params,
         );
-        $siteId = 'null';
-        if (null !== $site) {
-            $siteId = $site->getId();
+
+        if (null === $site) {
+            $site = CM_Site_Abstract::factory();
         }
-        return $this->createRequest('/ajax/' . $siteId, $query, null, $viewResponse, $componentResponse);
+        $headers = [
+            'host' => $site->getHost(),
+        ];
+        return $this->createRequest('/ajax', $query, $headers, $viewResponse, $componentResponse);
     }
 
     /**

@@ -231,8 +231,7 @@ var CM_App = CM_Class_Abstract.extend({
     if (cm.options.urlLanguage) {
       path += '/' + cm.options.urlLanguage.abbreviation;
     }
-    path += '/' + this.getSiteId();
-    return cm.options.urlBase + path;
+    return this.getUrl(path);
   },
 
   /**
