@@ -30,15 +30,13 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
 
     /**
      * @param CM_Http_Request_Abstract $request
+     * @param CM_Site_Abstract         $site
      * @param CM_Service_Manager       $serviceManager
      */
-    public function __construct(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
-        $this->_request = clone $request;
-        $responseType = $this->_request->popPathPart();
-        $language = $this->_request->popPathLanguage();
-        $this->_site = $this->_request->popPathSite();
-
+    public function __construct(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
         $this->setServiceManager($serviceManager);
+        $this->_request = $request;
+        $this->_site = $site;
     }
 
     abstract protected function _process();
@@ -304,33 +302,18 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
 
     /**
      * @param CM_Http_Request_Abstract $request
-     * @return CM_Http_Response_Abstract|string
-     */
-    public static function getResponseClassName(CM_Http_Request_Abstract $request) {
-        /** @var $responseClass CM_Http_Response_Abstract */
-        foreach (array_reverse(self::getClassChildren()) as $responseClass) {
-            if ($responseClass::match($request)) {
-                return $responseClass;
-            }
-        }
-        return CM_Http_Response_Page::getPageResponseClass();
-    }
-
-    /**
-     * @param CM_Http_Request_Abstract $request
      * @param CM_Service_Manager       $serviceManager
-     * @return CM_Http_Response_Abstract
+     * @return CM_Http_Response_Abstract|null
      */
-    public static function factory(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
-        $className = self::getResponseClassName($request);
-        return new $className($request, $serviceManager);
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
+        return null;
     }
 
     /**
-     * @param CM_Http_Request_Abstract $request
      * @return bool
      */
-    public static function match(CM_Http_Request_Abstract $request) {
+    public static function catchAll() {
         return false;
     }
+
 }

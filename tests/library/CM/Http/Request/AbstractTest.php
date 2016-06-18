@@ -76,18 +76,6 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertEquals($request->getLanguage(), $defaultLanguage);
     }
 
-    public function testGetLanguageByUrl() {
-        $request = $this->_prepareRequest('/de/home');
-        CM_Http_Response_Abstract::factory($request, $this->getServiceManager());
-        $this->assertNull($request->getLanguage());
-
-        CMTest_TH::createLanguage('en'); // default language
-        $urlLanguage = CMTest_TH::createLanguage('de');
-        $request = $this->_prepareRequest('/de/home');
-        $response = CM_Http_Response_Abstract::factory($request, $this->getServiceManager());
-        $this->assertEquals($response->getRequest()->getLanguage(), $urlLanguage);
-    }
-
     public function testGetLanguageByBrowser() {
         $defaultLanguage = CMTest_TH::createLanguage('en');
         $browserLanguage = CMTest_TH::createLanguage('de');
@@ -180,8 +168,9 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
     public function testGetClientIdSetCookie() {
         $request = new CM_Http_Request_Post('/foo/null/');
         $clientId = $request->getClientId();
+        $site = $this->getMockSite();
         /** @var CM_Http_Response_Abstract $response */
-        $response = $this->getMock('CM_Http_Response_Abstract', array('_process', 'setCookie'), array($request, $this->getServiceManager()));
+        $response = $this->getMock('CM_Http_Response_Abstract', array('_process', 'setCookie'), array($request, $site, $this->getServiceManager()));
         $response->expects($this->once())->method('setCookie')->with('clientId', (string) $clientId);
         $response->process();
     }
@@ -277,7 +266,7 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $timeZone = $request->getTimeZone();
         $this->assertInstanceOf('DateTimeZone', $timeZone);
         $this->assertSame('+02:30', $timeZone->getName());
-        
+
         $request = new CM_Http_Request_Post('/foo/bar/', ['cookie' => 'timezoneOffset=3600']);
         $timeZone = $request->getTimeZone();
         $this->assertInstanceOf('DateTimeZone', $timeZone);

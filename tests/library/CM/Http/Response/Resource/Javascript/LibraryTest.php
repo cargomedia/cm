@@ -22,7 +22,7 @@ class CM_Http_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
     public function testProcessLibrary() {
         $render = new CM_Frontend_Render(new CM_Frontend_Environment());
         $request = new CM_Http_Request_Get($render->getUrlResource('library-js', 'library.js'));
-        $response = new CM_Http_Response_Resource_Javascript_Library($request, $this->getServiceManager());
+        $response = CM_Http_Response_Resource_Javascript_Library::createFromRequest($request, $this->getServiceManager());
         $response->process();
 
         $this->assertContains('Cache-Control: max-age=31536000', $response->getHeaders());
@@ -33,7 +33,7 @@ class CM_Http_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
     public function testProcessTranslations() {
         $render = new CM_Frontend_Render(new CM_Frontend_Environment());
         $request = new CM_Http_Request_Get($render->getUrlResource('library-js', 'translations/123.js'));
-        $response = new CM_Http_Response_Resource_Javascript_Library($request, $this->getServiceManager());
+        $response = CM_Http_Response_Resource_Javascript_Library::createFromRequest($request, $this->getServiceManager());
         $response->process();
 
         $this->assertContains('Cache-Control: max-age=31536000', $response->getHeaders());

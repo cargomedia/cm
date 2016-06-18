@@ -8,14 +8,6 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     /** @var string|null */
     private $_redirectUrl;
 
-    public function __construct(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
-        $this->_request = clone $request;
-        $this->_request->popPathLanguage();
-        $this->_site = CM_Site_Abstract::findByRequest($this->_request);
-
-        $this->setServiceManager($serviceManager);
-    }
-
     /**
      * @throws CM_Exception_Invalid
      * @return CM_Page_Abstract
@@ -155,21 +147,16 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
         });
     }
 
-    /**
-     * @return string
-     */
-    public static function getPageResponseClass() {
-        return self::_getClassName();
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
+        $request = clone $request;
+        $site = $request->popPathSiteByMatch();
+        $request->popPathLanguage();
+
+        return new self($request, $site, $serviceManager);
     }
 
-    /**
-     * @param CM_Http_Request_Abstract $request
-     * @param CM_Service_Manager       $serviceManager
-     * @return CM_Http_Response_Page
-     */
-    public static function factory(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
-        $className = self::getPageResponseClass();
-        return new $className($request, $serviceManager);
+    public static function catchAll() {
+        return true;
     }
 
 }

@@ -216,7 +216,7 @@ class CMTest_TH {
             $headers = array('host' => $site->getHost());
         }
         $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
-        return new CM_Http_Response_Page($request, self::getServiceManager());
+        return CM_Http_Response_Page::createFromRequest($request, self::getServiceManager());
     }
 
     /**
@@ -235,7 +235,7 @@ class CMTest_TH {
             $headers = array('host' => $site->getHost());
         }
         $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
-        return new CM_Http_Response_Page_Embed($request, $site, self::getServiceManager());
+        return CM_Http_Response_Page_Embed::createEmbedResponseFromRequest($request, $site, self::getServiceManager());
     }
 
     /**

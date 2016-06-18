@@ -14,7 +14,7 @@ class CM_Http_Response_EmailTrackingTest extends CMTest_TestCase {
         $headers = array('host' => $site->getHost());
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
         $request = new CM_Http_Request_Get($render->getUrlEmailTracking($mail), $headers);
-        $response = new CM_Http_Response_EmailTracking($request, $this->getServiceManager());
+        $response = CM_Http_Response_EmailTracking::createFromRequest($request, $this->getServiceManager());
 
         $response->process();
 
@@ -30,7 +30,7 @@ class CM_Http_Response_EmailTrackingTest extends CMTest_TestCase {
         $headers = array('host' => $site->getHost());
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
         $request = new CM_Http_Request_Get($render->getUrlEmailTracking($mail), $headers);
-        $response = new CM_Http_Response_EmailTracking($request, $this->getServiceManager());
+        $response = CM_Http_Response_EmailTracking::createFromRequest($request, $this->getServiceManager());
 
         $user->delete();
         try {
@@ -45,7 +45,7 @@ class CM_Http_Response_EmailTrackingTest extends CMTest_TestCase {
         $site = CM_Site_Abstract::factory();
         $headers = array('host' => $site->getHost());
         $request = new CM_Http_Request_Get('/emailtracking/' . $site->getId(), $headers);
-        $response = new CM_Http_Response_EmailTracking($request, $this->getServiceManager());
+        $response = CM_Http_Response_EmailTracking::createFromRequest($request, $this->getServiceManager());
 
         try {
             $response->process();

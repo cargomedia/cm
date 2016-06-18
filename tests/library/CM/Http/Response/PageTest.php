@@ -56,7 +56,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
 
         $response = CMTest_TH::createResponsePage('/mock5', array('host' => $site->getHost()));
         $response->process();
-        $this->assertFalse(Functional\some($response->getHeaders(), function($header) {
+        $this->assertFalse(Functional\some($response->getHeaders(), function ($header) {
             return preg_match('/^Location:/', $header);
         }));
 
@@ -175,10 +175,11 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
             'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => false],
         ];
         $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
-        $request = CMTest_TH::createResponsePage('/example')->getRequest();
+        $site = $this->getMockSite();
+        $request = new CM_Http_Request_Get('/example', ['host' => $site->getHost()]);
 
         /** @var CM_Http_Response_Page|\Mocka\AbstractClassTrait $response */
-        $response = $this->mockObject('CM_Http_Response_Page', [$request, CMTest_TH::getServiceManager()]);
+        $response = $this->mockObject('CM_Http_Response_Page', [$request, $site, $this->getServiceManager()]);
         $response->mockMethod('_renderPage')->set(function (CM_Page_Abstract $page) {
             if ($page instanceof CM_Page_Example) {
                 throw new CM_Exception_InvalidParam();

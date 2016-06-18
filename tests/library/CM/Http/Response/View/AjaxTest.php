@@ -11,7 +11,7 @@ class CM_Http_Response_View_AjaxTest extends CMTest_TestCase {
         $view = $this->getMockForAbstractClass('CM_View_Abstract');
 
         $request = $this->createRequestAjax($view, '_ad_!!!##', ['params' => 'foo']);
-        $response = new CM_Http_Response_View_Ajax($request, $this->getServiceManager());
+        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $this->getServiceManager());
         $response->process();
     }
 
@@ -24,7 +24,7 @@ class CM_Http_Response_View_AjaxTest extends CMTest_TestCase {
         $view = $this->getMockForAbstractClass('CM_View_Abstract');
 
         $request = $this->createRequestAjax($view, 'someReallyBadMethod', ['params' => 'foo']);
-        $response = new CM_Http_Response_View_Ajax($request, $this->getServiceManager());
+        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $this->getServiceManager());
         $response->process();
     }
 }

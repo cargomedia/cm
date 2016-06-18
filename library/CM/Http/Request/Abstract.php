@@ -219,6 +219,24 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @return CM_Site_Abstract
+     */
+    public function popPathSiteByMatch() {
+        $site = CM_Site_Abstract::findByRequest($this);
+        if (null === $site) {
+            $site = CM_Site_Abstract::factory();
+        }
+        $siteUrl = $site->getUrlParser();
+        $path = new Stringy\Stringy($this->getPath());
+        if ($path->startsWith($siteUrl->getPath())) {
+            $path = $path->removeLeft($siteUrl->getPath());
+            $path = $path->ensureLeft('/');
+            $this->setPath((string) $path);
+        }
+        return $site;
+    }
+
+    /**
      * @return array
      */
     public function getQuery() {

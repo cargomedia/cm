@@ -24,7 +24,14 @@ class CM_Http_Response_RPC extends CM_Http_Response_Abstract {
         $this->_setContent(json_encode($output));
     }
 
-    public static function match(CM_Http_Request_Abstract $request) {
-        return $request->getPathPart(0) === 'rpc';
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
+        $request = clone $request;
+        if ($request->popPathPart(0) === 'rpc') {
+            $request->popPathLanguage();
+            $site = $request->popPathSite();
+            return new self($request, $site, $serviceManager);
+        }
+        return null;
     }
+
 }

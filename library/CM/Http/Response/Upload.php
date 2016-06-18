@@ -22,11 +22,6 @@ class CM_Http_Response_Upload extends CM_Http_Response_Abstract {
         UPLOAD_ERR_EXTENSION  => 'File upload stopped by extension.',
     );
 
-    public function __construct(CM_Http_Request_Post $request, CM_Service_Manager $serviceManager) {
-        parent::__construct($request, $serviceManager);
-        $this->_request->setBodyEncoding(CM_Http_Request_Post::ENCODING_NONE);
-    }
-
     protected function _process() {
         $return = array();
 
@@ -63,7 +58,15 @@ class CM_Http_Response_Upload extends CM_Http_Response_Abstract {
         $this->_setContent(json_encode($return, JSON_HEX_TAG)); // JSON decoding in IE-iframe needs JSON_HEX_TAG
     }
 
-    public static function match(CM_Http_Request_Abstract $request) {
-        return $request->getPathPart(0) === 'upload';
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
+        $request = clone $request;
+        if ($request->popPathPart(0) === 'upload' && $request instanceof CM_Http_Request_Post) {
+            $request->popPathLanguage();
+            $site = $request->popPathSite();
+            $request->setBodyEncoding(CM_Http_Request_Post::ENCODING_NONE);
+            return new self($request, $site, $serviceManager);
+        }
+        return null;
     }
+
 }

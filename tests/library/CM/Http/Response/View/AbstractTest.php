@@ -87,7 +87,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     public function testLoadPageTracking() {
         $page = new CM_Page_View_Ajax_Test_Mock();
         $request = $this->createRequestAjax($page, 'loadPage', ['path' => $page::getPath()]);
-        $response = new CM_Http_Response_View_Ajax($request, $this->_getServiceManagerWithGA('ga123'));
+        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $this->_getServiceManagerWithGA('ga123'));
         $response->process();
 
         $this->assertViewResponseSuccess($response);
@@ -99,7 +99,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     public function testLoadPageTrackingRedirect() {
         $page = new CM_Page_View_Ajax_Test_MockRedirectSelf();
         $request = $this->createRequestAjax($page, 'loadPage', ['path' => $page::getPath() . '?count=3']);
-        $response = new CM_Http_Response_View_Ajax($request, $this->_getServiceManagerWithGA('ga123'));
+        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $this->_getServiceManagerWithGA('ga123'));
         $response->process();
 
         $this->assertViewResponseSuccess($response);
@@ -117,7 +117,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
         $page = new CM_Page_View_Ajax_Test_Mock();
         $request = $this->createRequestAjax($page, 'loadPage', ['path' => '/iwhdfkjlsh']);
-        $response = new CM_Http_Response_View_Ajax($request, $this->_getServiceManagerWithGA('ga123'));
+        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $this->_getServiceManagerWithGA('ga123'));
         $response->process();
 
         $this->assertViewResponseSuccess($response);

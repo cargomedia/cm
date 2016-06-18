@@ -31,7 +31,15 @@ class CM_Http_Response_Resource_Layout extends CM_Http_Response_Resource_Abstrac
         return ['smarty'];
     }
 
-    public static function match(CM_Http_Request_Abstract $request) {
-        return $request->getPathPart(0) === 'layout';
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
+        $request = clone $request;
+        if ($request->popPathPart(0) === 'layout') {
+            $request->popPathLanguage();
+            $site = $request->popPathSite();
+            $deployVersion = $request->popPathPart(0);
+            return new self($request, $site, $serviceManager);
+        }
+        return null;
     }
+
 }

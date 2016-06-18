@@ -11,8 +11,9 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
             'method' => 'CM_Http_Response_RPCTest.add',
             'params' => [2, 3],
         ]);
-        $request = new CM_Http_Request_Post('/rpc/' . CM_Site_Abstract::factory()->getType(), null, null, $body);
-        $response = new CM_Http_Response_RPC($request, $this->getServiceManager());
+        $site = $this->getMockSite();
+        $request = new CM_Http_Request_Post('/rpc/' . $site->getType(), null, null, $body);
+        $response = CM_Http_Response_RPC::createFromRequest($request, $this->getServiceManager());
         $response->process();
 
         $responseData = CM_Params::jsonDecode($response->getContent());
@@ -26,14 +27,15 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
     public function testProcessExceptionCatching() {
         CM_Config::get()->CM_Http_Response_RPC->catchPublicExceptions = true;
         CM_Config::get()->CM_Http_Response_RPC->exceptionsToCatch = ['CM_Exception_Nonexistent' => []];
-        $request = $this->mockObject('CM_Http_Request_Abstract', ['/rpc/' . CM_Site_Abstract::factory()->getType() . '/foo']);
+        $site = $this->getMockSite();
+        /** @var CM_Http_Request_Abstract|\Mocka\AbstractClassTrait $request */
+        $request = $this->mockObject('CM_Http_Request_Abstract', ['/rpc/' . $site->getType() . '/foo']);
         $request->mockMethod('getQuery')->set(function () {
             throw new CM_Exception_Invalid('foo', null, null, [
                 'messagePublic' => new CM_I18n_Phrase('bar'),
             ]);
         });
-        /** @var CM_Http_Request_Abstract|\Mocka\AbstractClassTrait $request */
-        $response = new CM_Http_Response_RPC($request, $this->getServiceManager());
+        $response = CM_Http_Response_RPC::createFromRequest($request, $this->getServiceManager());
 
         $response->process();
         $responseData = CM_Params::jsonDecode($response->getContent());
@@ -49,7 +51,7 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
         $request->mockMethod('getQuery')->set(function () {
             throw new CM_Exception_Nonexistent('foo');
         });
-        $response = new CM_Http_Response_RPC($request, CMTest_TH::getServiceManager());
+        $response = new CM_Http_Response_RPC($request, $site, CMTest_TH::getServiceManager());
 
         $response->process();
         $responseData = CM_Params::jsonDecode($response->getContent());
@@ -65,8 +67,9 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
 
     public function testProcessingWithoutMethod() {
         $body = CM_Params::jsonEncode(['method' => null]);
-        $request = new CM_Http_Request_Post('/rpc/' . CM_Site_Abstract::factory()->getType(), null, null, $body);
-        $response = new CM_Http_Response_RPC($request, $this->getServiceManager());
+        $site = $this->getMockSite();
+        $request = new CM_Http_Request_Post('/rpc/' . $site->getType(), null, null, $body);
+        $response = CM_Http_Response_RPC::createFromRequest($request, $this->getServiceManager());
         $response->process();
 
         $responseData = CM_Params::jsonDecode($response->getContent());
@@ -81,8 +84,9 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
 
     public function testProcessingInvalidMethod() {
         $body = CM_Params::jsonEncode(['method' => 'foo']);
-        $request = new CM_Http_Request_Post('/rpc/' . CM_Site_Abstract::factory()->getType(), null, null, $body);
-        $response = new CM_Http_Response_RPC($request, $this->getServiceManager());
+        $site = $this->getMockSite();
+        $request = new CM_Http_Request_Post('/rpc/' . $site->getType(), null, null, $body);
+        $response = CM_Http_Response_RPC::createFromRequest($request, $this->getServiceManager());
         $response->process();
 
         $responseData = CM_Params::jsonDecode($response->getContent());

@@ -76,7 +76,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
             if ($count++ > 10) {
                 throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $paths) . ').');
             }
-            $responseEmbed = new CM_Http_Response_Page_Embed($request, $response->getSite(), $this->getServiceManager());
+            $responseEmbed = CM_Http_Response_Page_Embed::createEmbedResponseFromRequest($request, $response->getSite(), $this->getServiceManager());
             $responseEmbed->process();
             $request = $responseEmbed->getRequest();
 
@@ -86,8 +86,8 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
                 if (!$this->_isPageOnSameSite($redirectUrl)) {
                     return array('redirectExternal' => $redirectUrl);
                 } else {
-                    // Process redirect URL with page response constructor
-                    $responsePage = CM_Http_Response_Page::factory($request, $this->getServiceManager());
+                    // Process redirect URL with page response
+                    $responsePage = CM_Http_Response_Page::createFromRequest($request, $this->getServiceManager());
                     $request = $responsePage->getRequest();
                 }
             }
@@ -268,7 +268,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
             return false;
         }
         $request = $this->_createGetRequestWithUrl($url);
-        $response = CM_Http_Response_Page::factory($request, $this->getServiceManager());
+        $response = CM_Http_Response_Page::createFromRequest($request, $this->getServiceManager());
         return $response->getSite()->equals($this->getSite());
     }
 

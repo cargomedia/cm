@@ -44,7 +44,14 @@ class CM_Http_Response_View_Ajax extends CM_Http_Response_View_Abstract {
         return $output;
     }
 
-    public static function match(CM_Http_Request_Abstract $request) {
-        return $request->getPathPart(0) === 'ajax';
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
+        $request = clone $request;
+        if ($request->popPathPart(0) === 'ajax') {
+            $request->popPathLanguage();
+            $site = $request->popPathSite();
+            return new self($request, $site, $serviceManager);
+        }
+        return null;
     }
+
 }
