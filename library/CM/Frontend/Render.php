@@ -222,7 +222,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         /** @var CM_Page_Abstract $pageClassName */
         $path = $pageClassName::getPath($params);
 
-        $languageRewrite = $this->_languageRewrite || $language;
+        $languageRewrite = $this->getLanguageRewrite()|| $language;
         if (!$language) {
             $language = $this->getLanguage();
         }
@@ -357,6 +357,13 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         }
 
         return $language;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getLanguageRewrite() {
+        return $this->_languageRewrite;
     }
 
     /**
