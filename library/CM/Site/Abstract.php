@@ -191,11 +191,10 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     /**
      * @param CM_Http_Request_Abstract $request
-     * @param array                    $data
      * @return bool
      * @throws CM_Exception
      */
-    public function match(CM_Http_Request_Abstract $request, array $data) {
+    public function match(CM_Http_Request_Abstract $request) {
         $matchList = [
             $this->getHost() . $this->getPath(),
             preg_replace('/^www\./', '', $this->getHost()) . $this->getPath(),
@@ -249,7 +248,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         foreach (array_reverse(static::getClassChildren()) as $className) {
             /** @var CM_Site_Abstract $site */
             $site = new $className();
-            if ($site->match($request, [])) {
+            if ($site->match($request)) {
                 return $site;
             }
         }
