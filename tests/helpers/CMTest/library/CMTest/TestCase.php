@@ -230,7 +230,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      */
     public function getResponse(CM_Http_Request_Abstract $request) {
         $responseFactory = new CM_Http_Response_Factory(self::getServiceManager());
-        $response = $responseFactory->get($request);
+        $response = $responseFactory->getResponse($request);
         return $this->mockClass(get_class($response))
             ->newInstance([$response->getRequest(), $response->getSite(), $response->getServiceManager()]);
     }
@@ -348,8 +348,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             $site = CM_Site_Abstract::factory();
         }
         $host = parse_url($site->getUrl(), PHP_URL_HOST);
-        $request = new CM_Http_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), array('host' => $host), null, $viewer);
-        $response = CM_Http_Response_Page::createFromRequest($request, $this->getServiceManager());
+        $request = new CM_Http_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), ['host' => $host], null, $viewer);
+        $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
         $page->prepareResponse($response->getRender()->getEnvironment(), $response);
         $renderAdapter = new CM_RenderAdapter_Page($response->getRender(), $page);
         $html = $renderAdapter->fetch();

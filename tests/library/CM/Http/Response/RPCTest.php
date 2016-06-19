@@ -13,7 +13,7 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
         ]);
         $site = $this->getMockSite();
         $request = new CM_Http_Request_Post('/rpc', ['host' => $site->getHost()], null, $body);
-        $response = CM_Http_Response_RPC::createFromRequest($request, $this->getServiceManager());
+        $response = CM_Http_Response_RPC::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
 
         $responseData = CM_Params::jsonDecode($response->getContent());
@@ -35,7 +35,7 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
                 'messagePublic' => new CM_I18n_Phrase('bar'),
             ]);
         });
-        $response = CM_Http_Response_RPC::createFromRequest($request, $this->getServiceManager());
+        $response = CM_Http_Response_RPC::createFromRequest($request, $site, $this->getServiceManager());
 
         $response->process();
         $responseData = CM_Params::jsonDecode($response->getContent());
@@ -69,7 +69,7 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
         $body = CM_Params::jsonEncode(['method' => null]);
         $site = $this->getMockSite();
         $request = new CM_Http_Request_Post('/rpc', ['host' => $site->getHost()], null, $body);
-        $response = CM_Http_Response_RPC::createFromRequest($request, $this->getServiceManager());
+        $response = CM_Http_Response_RPC::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
 
         $responseData = CM_Params::jsonDecode($response->getContent());
@@ -86,7 +86,7 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
         $body = CM_Params::jsonEncode(['method' => 'foo']);
         $site = $this->getMockSite();
         $request = new CM_Http_Request_Post('/rpc', ['host' => $site->getHost()], null, $body);
-        $response = CM_Http_Response_RPC::createFromRequest($request, $this->getServiceManager());
+        $response = CM_Http_Response_RPC::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
 
         $responseData = CM_Params::jsonDecode($response->getContent());

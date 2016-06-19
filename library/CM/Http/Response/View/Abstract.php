@@ -65,6 +65,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      */
     public function loadPage(CM_Params $params, CM_Http_Response_View_Ajax $response) {
         $request = $this->_createGetRequestWithUrl($params->getString('path'));
+        $responseFactory = new CM_Http_Response_Factory($this->getServiceManager());
 
         $count = 0;
         $paths = array($request->getPath());
@@ -86,9 +87,8 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
                 if (!$this->_isPageOnSameSite($redirectUrl)) {
                     return array('redirectExternal' => $redirectUrl);
                 } else {
-                    // Process redirect URL with page response
-                    $responsePage = CM_Http_Response_Page::createFromRequest($request, $this->getServiceManager());
-                    $request = $responsePage->getRequest();
+                    // Process redirect URL with response matching
+                    $request = $responseFactory->getResponse($request)->getRequest();
                 }
             }
         } while ($redirectUrl);
@@ -268,7 +268,8 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
             return false;
         }
         $request = $this->_createGetRequestWithUrl($url);
-        $response = CM_Http_Response_Page::createFromRequest($request, $this->getServiceManager());
+        $responseFactory = new CM_Http_Response_Factory($this->getServiceManager());
+        $response = $responseFactory->getResponse($request);
         return $response->getSite()->equals($this->getSite());
     }
 

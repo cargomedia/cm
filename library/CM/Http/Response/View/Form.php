@@ -76,10 +76,9 @@ class CM_Http_Response_View_Form extends CM_Http_Response_View_Abstract {
         return $output;
     }
 
-    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
-        $request = clone $request;
-        $site = $request->popPathSiteByMatch();
-        if ($request->popPathPart(0) === 'form') {
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
+        if ($request->getPathPart(0) === 'form') {
+            $request = clone $request;
             $request->popPathLanguage();
             return new self($request, $site, $serviceManager);
         }

@@ -20,9 +20,9 @@ class CM_Http_Response_UploadTest extends CMTest_TestCase {
         $fileTmp = CM_File::create($this->_dir . 'test1', $content);
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
-        $site = $this->getMockSite();
+        $site = CM_Site_Abstract::factory();
         $request = new CM_Http_Request_Post('/upload/' . $site->getType());
-        $upload = CM_Http_Response_Upload::createFromRequest($request, $this->getServiceManager());
+        $upload = CM_Http_Response_Upload::createFromRequest($request, $site, $this->getServiceManager());
         $upload->process();
         $data = json_decode($upload->getContent(), true);
 
@@ -41,8 +41,9 @@ class CM_Http_Response_UploadTest extends CMTest_TestCase {
         $fileTmp = CM_File::create($this->_dir . 'test1', $content);
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
+        $site = CM_Site_Abstract::factory();
         $request = new CM_Http_Request_Post('/upload/null?field=CM_FormField_FileImage');
-        $upload = CM_Http_Response_Upload::createFromRequest($request, $this->getServiceManager());
+        $upload = CM_Http_Response_Upload::createFromRequest($request, $site, $this->getServiceManager());
         $upload->process();
         $data = json_decode($upload->getContent(), true);
 
@@ -58,8 +59,9 @@ class CM_Http_Response_UploadTest extends CMTest_TestCase {
         $fileTmp = CM_File::create($this->_dir . 'test1', $content);
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
+        $site = CM_Site_Abstract::factory();
         $request = new CM_Http_Request_Post('/upload/null?field=CM_FormField_FileImage');
-        $upload = CM_Http_Response_Upload::createFromRequest($request, $this->getServiceManager());
+        $upload = CM_Http_Response_Upload::createFromRequest($request, $site, $this->getServiceManager());
         $upload->process();
         $data = json_decode($upload->getContent(), true);
 
@@ -73,8 +75,9 @@ class CM_Http_Response_UploadTest extends CMTest_TestCase {
         $fileTmp = CM_File::create($this->_dir . 'test1', $content);
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
+        $site = CM_Site_Abstract::factory();
         $request = new CM_Http_Request_Post('/upload/null?field=CM_FormField_File');
-        $upload = CM_Http_Response_Upload::createFromRequest($request, $this->getServiceManager());
+        $upload = CM_Http_Response_Upload::createFromRequest($request, $site, $this->getServiceManager());
         $upload->process();
         $data = json_decode($upload->getContent(), true);
 
@@ -88,8 +91,9 @@ class CM_Http_Response_UploadTest extends CMTest_TestCase {
         $fileTmp = CM_File::create($this->_dir . 'test1', $content);
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
+        $site = CM_Site_Abstract::factory();
         $request = new CM_Http_Request_Post('/upload/null?field=CM_FormField_FileImage');
-        $upload = CM_Http_Response_Upload::createFromRequest($request, $this->getServiceManager());
+        $upload = CM_Http_Response_Upload::createFromRequest($request, $site, $this->getServiceManager());
         $upload->process();
         $data = json_decode($upload->getContent(), true);
 
@@ -103,8 +107,9 @@ class CM_Http_Response_UploadTest extends CMTest_TestCase {
         $fileTmp = CM_File::create($this->_dir . 'test1', $content);
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
+        $site = CM_Site_Abstract::factory();
         $request = new CM_Http_Request_Post('/upload/null?field=CM_FormField_File');
-        $upload = CM_Http_Response_Upload::createFromRequest($request, $this->getServiceManager());
+        $upload = CM_Http_Response_Upload::createFromRequest($request, $site, $this->getServiceManager());
         $upload->process();
         $data = json_decode($upload->getContent(), true);
 
@@ -118,8 +123,9 @@ class CM_Http_Response_UploadTest extends CMTest_TestCase {
         $fileTmp = CM_File::create($this->_dir . 'test1', $content);
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
+        $site = CM_Site_Abstract::factory();
         $request = new CM_Http_Request_Post('/upload/null?field=nonexistent');
-        $upload = CM_Http_Response_Upload::createFromRequest($request, $this->getServiceManager());
+        $upload = CM_Http_Response_Upload::createFromRequest($request, $site, $this->getServiceManager());
 
         try {
             $upload->process();

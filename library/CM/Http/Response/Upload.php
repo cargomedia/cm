@@ -58,9 +58,10 @@ class CM_Http_Response_Upload extends CM_Http_Response_Abstract {
         $this->_setContent(json_encode($return, JSON_HEX_TAG)); // JSON decoding in IE-iframe needs JSON_HEX_TAG
     }
 
-    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
-        $request = clone $request;
-        if ($request->popPathPart(0) === 'upload' && $request instanceof CM_Http_Request_Post) {
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
+        if ($request->getPathPart(0) === 'upload' && $request instanceof CM_Http_Request_Post) {
+            $request = clone $request;
+            $request->popPathPart(0);
             $request->popPathLanguage();
             $site = $request->popPathSite();
             $request->setBodyEncoding(CM_Http_Request_Post::ENCODING_NONE);

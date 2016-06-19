@@ -32,10 +32,12 @@ class CM_Http_Response_Factory implements CM_Service_ManagerAwareInterface {
      * @param CM_Http_Request_Abstract $request
      * @return CM_Http_Response_Abstract|null
      */
-    public function find(CM_Http_Request_Abstract $request) {
+    public function findResponse(CM_Http_Request_Abstract $request) {
+        $request = clone $request;
+        $site = $request->popPathSiteByMatch();
         /** @var $responseClass CM_Http_Response_Abstract */
         foreach ($this->_responseClassList as $responseClass) {
-            if ($response = $responseClass::createFromRequest($request, $this->getServiceManager())) {
+            if ($response = $responseClass::createFromRequest($request, $site, $this->getServiceManager())) {
                 return $response;
             }
         }
@@ -47,8 +49,8 @@ class CM_Http_Response_Factory implements CM_Service_ManagerAwareInterface {
      * @return CM_Http_Response_Abstract
      * @throws CM_Exception
      */
-    public function get(CM_Http_Request_Abstract $request) {
-        $response = $this->find($request);
+    public function getResponse(CM_Http_Request_Abstract $request) {
+        $response = $this->findResponse($request);
         if (null === $response) {
             throw new CM_Exception('No suitable response found for request.', null, ['request' => $request]);
         }

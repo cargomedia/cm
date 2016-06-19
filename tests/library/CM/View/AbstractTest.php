@@ -40,10 +40,6 @@ class CM_View_AbstractTest extends CMTest_TestCase {
     public function testAjax_loadComponentBadClass() {
         /** @var CM_View_Abstract $view */
         $view = $this->getMockForAbstractClass('CM_View_Abstract');
-        $request = $this->createRequestAjax($view, 'someMethod', ['foo' => 'bar']);
-        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $this->getServiceManager());
-        $componentHandler = new CM_Frontend_JavascriptContainer_View();
-
-        $view->ajax_loadComponent(new CM_Params(['className' => 'absentClassName']), $componentHandler, $response);
+        $this->getResponseAjax($view, 'loadComponent', ['className' => 'absentClassName']);
     }
 }

@@ -302,10 +302,11 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
 
     /**
      * @param CM_Http_Request_Abstract $request
+     * @param CM_Site_Abstract         $site
      * @param CM_Service_Manager       $serviceManager
      * @return CM_Http_Response_Abstract|null
      */
-    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
         return null;
     }
 

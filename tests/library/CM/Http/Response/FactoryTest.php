@@ -6,7 +6,7 @@ class CM_Http_Response_FactoryTest extends CMTest_TestCase {
         CMTest_TH::clearEnv();
     }
 
-    public function testGet() {
+    public function testGetResponse() {
         $responses = array();
         $responses['/captcha'] = 'CM_Http_Response_Captcha';
         $responses['/emailtracking'] = 'CM_Http_Response_EmailTracking';
@@ -26,7 +26,7 @@ class CM_Http_Response_FactoryTest extends CMTest_TestCase {
 
         foreach ($responses as $path => $expectedResponse) {
             $request = new CM_Http_Request_Post($path . '/null/timestamp', null, null, '[]');
-            $this->assertInstanceOf($expectedResponse, $factory->get($request));
+            $this->assertInstanceOf($expectedResponse, $factory->getResponse($request));
         }
     }
 

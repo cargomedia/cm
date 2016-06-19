@@ -10,6 +10,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $viewer = CMTest_TH::createUser();
         $environment = new CM_Frontend_Environment(null, $viewer);
         $component = new CM_Page_View_Ajax_Test_Mock();
+        $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
         $response = $this->getResponseAjax($component, 'loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath()], $environment);
 
         $this->assertViewResponseSuccess($response);
@@ -85,9 +86,10 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageTracking() {
+        $site = CM_Site_Abstract::factory();
         $page = new CM_Page_View_Ajax_Test_Mock();
         $request = $this->createRequestAjax($page, 'loadPage', ['path' => $page::getPath()]);
-        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $this->_getServiceManagerWithGA('ga123'));
+        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $site, $this->_getServiceManagerWithGA('ga123'));
         $response->process();
 
         $this->assertViewResponseSuccess($response);
@@ -97,9 +99,10 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageTrackingRedirect() {
+        $site = CM_Site_Abstract::factory();
         $page = new CM_Page_View_Ajax_Test_MockRedirectSelf();
         $request = $this->createRequestAjax($page, 'loadPage', ['path' => $page::getPath() . '?count=3']);
-        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $this->_getServiceManagerWithGA('ga123'));
+        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $site, $this->_getServiceManagerWithGA('ga123'));
         $response->process();
 
         $this->assertViewResponseSuccess($response);
@@ -115,9 +118,10 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
             'errorPage' => 'CM_Page_View_Ajax_Test_Mock',
         ];
 
+        $site = CM_Site_Abstract::factory();
         $page = new CM_Page_View_Ajax_Test_Mock();
         $request = $this->createRequestAjax($page, 'loadPage', ['path' => '/iwhdfkjlsh']);
-        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $this->_getServiceManagerWithGA('ga123'));
+        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $site, $this->_getServiceManagerWithGA('ga123'));
         $response->process();
 
         $this->assertViewResponseSuccess($response);

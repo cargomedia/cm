@@ -31,9 +31,10 @@ class CM_Http_Response_Resource_Javascript_Vendor extends CM_Http_Response_Resou
         }
     }
 
-    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
-        $request = clone $request;
-        if ($request->popPathPart(0) === 'vendor-js') {
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
+        if ($request->getPathPart(0) === 'vendor-js') {
+            $request = clone $request;
+            $request->popPathPart(0);
             $request->popPathLanguage();
             $site = $request->popPathSite();
             $deployVersion = $request->popPathPart(0);

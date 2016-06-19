@@ -11,10 +11,9 @@ class CM_Http_Response_EmailTrackingTest extends CMTest_TestCase {
         $mail = new CM_Mail_Welcome($user);
 
         $site = CM_Site_Abstract::factory();
-        $headers = array('host' => $site->getHost());
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-        $request = new CM_Http_Request_Get($render->getUrlEmailTracking($mail), $headers);
-        $response = CM_Http_Response_EmailTracking::createFromRequest($request, $this->getServiceManager());
+        $request = new CM_Http_Request_Get($render->getUrlEmailTracking($mail), ['host' => $site->getHost()]);
+        $response = CM_Http_Response_EmailTracking::createFromRequest($request, $site, $this->getServiceManager());
 
         $response->process();
 
@@ -27,10 +26,9 @@ class CM_Http_Response_EmailTrackingTest extends CMTest_TestCase {
         $mail = new CM_Mail_Welcome($user);
 
         $site = CM_Site_Abstract::factory();
-        $headers = array('host' => $site->getHost());
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-        $request = new CM_Http_Request_Get($render->getUrlEmailTracking($mail), $headers);
-        $response = CM_Http_Response_EmailTracking::createFromRequest($request, $this->getServiceManager());
+        $request = new CM_Http_Request_Get($render->getUrlEmailTracking($mail), ['host' => $site->getHost()]);
+        $response = CM_Http_Response_EmailTracking::createFromRequest($request, $site, $this->getServiceManager());
 
         $user->delete();
         try {
@@ -43,9 +41,8 @@ class CM_Http_Response_EmailTrackingTest extends CMTest_TestCase {
 
     public function testProcessMissingParameter() {
         $site = CM_Site_Abstract::factory();
-        $headers = array('host' => $site->getHost());
-        $request = new CM_Http_Request_Get('/emailtracking/' . $site->getId(), $headers);
-        $response = CM_Http_Response_EmailTracking::createFromRequest($request, $this->getServiceManager());
+        $request = new CM_Http_Request_Get('/emailtracking/' . $site->getId(), ['host' => $site->getHost()]);
+        $response = CM_Http_Response_EmailTracking::createFromRequest($request, $site, $this->getServiceManager());
 
         try {
             $response->process();

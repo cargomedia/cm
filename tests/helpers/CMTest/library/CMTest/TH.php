@@ -214,7 +214,6 @@ class CMTest_TH {
         $site = CM_Site_Abstract::factory();
         $headers = array('host' => $site->getHost());
         $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
-
         return CM_Http_Response_Page::createFromRequest($request, $site, self::getServiceManager());
     }
 
