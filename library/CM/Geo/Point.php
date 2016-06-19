@@ -1,6 +1,6 @@
 <?php
 
-class CM_Geo_Point implements CM_Comparable {
+class CM_Geo_Point implements CM_Comparable, CM_ArrayConvertible {
 
     /** @var float */
     private $_latitude;
@@ -87,5 +87,20 @@ class CM_Geo_Point implements CM_Comparable {
         );
 
         return CM_Model_Location::EARTH_RADIUS * $arcCosine;
+    }
+
+    public function toArray() {
+        return [
+            'latitude'  => $this->_latitude,
+            'longitude' => $this->_longitude,
+        ];
+    }
+
+    /**
+     * @param array $data
+     * @return CM_Geo_Point
+     */
+    public static function fromArray(array $data) {
+        return new self($data['latitude'], $data['longitude']);
     }
 }
