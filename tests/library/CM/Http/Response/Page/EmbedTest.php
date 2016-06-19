@@ -4,24 +4,29 @@ class CM_Http_Response_Page_EmbedTest extends CMTest_TestCase {
 
     public function testProcessHostRedirect() {
         $site = CM_Site_Abstract::factory();
-
-        $response = CMTest_TH::createResponsePageEmbed('/mock7', array('host' => $site->getHost()));
+        $request = new CM_Http_Request_Get('/mock7', ['host' => $site->getHost()]);
+        $response = CM_Http_Response_Page_Embed::createEmbedResponseFromRequest($request, $site, $this->getServiceManager());
         $response->process();
         $this->assertNull($response->getRedirectUrl());
 
-        $response = CMTest_TH::createResponsePageEmbed('/mock7', array('host' => 'incorrect-host.org'));
+        $request = new CM_Http_Request_Get('/mock7', ['host' => 'incorrect-host.org']);
+        $response = CM_Http_Response_Page_Embed::createEmbedResponseFromRequest($request, $site, $this->getServiceManager());
         $response->process();
         $this->assertSame($site->getUrl() . '/mock7', $response->getRedirectUrl());
     }
 
     public function testProcessLanguageRedirect() {
         CMTest_TH::createLanguage('en');
-
-        $response = CMTest_TH::createResponsePageEmbed('/en/mock7');
+        $site = CM_Site_Abstract::factory();
+        $request = new CM_Http_Request_Get('/en/mock7', ['host' => $site->getHost()]);
+        $response = CM_Http_Response_Page_Embed::createEmbedResponseFromRequest($request, $site, $this->getServiceManager());
         $response->process();
         $this->assertNull($response->getRedirectUrl());
 
-        $response = CMTest_TH::createResponsePageEmbed('/en/mock7', null, CMTest_TH::createUser());
+        $site = CM_Site_Abstract::factory();
+        $viewer = CMTest_TH::createUser();
+        $request = new CM_Http_Request_Get('/en/mock7', ['host' => $site->getHost()], null, $viewer);
+        $response = CM_Http_Response_Page_Embed::createEmbedResponseFromRequest($request, $site, $this->getServiceManager());
         $response->process();
         $this->assertSame($response->getSite()->getUrl() . '/mock7', $response->getRedirectUrl());
     }

@@ -206,36 +206,16 @@ class CMTest_TH {
 
     /**
      * @param string             $uri
-     * @param array|null         $headers
      * @param CM_Model_User|null $viewer
-     * @return CM_Http_Response_Page
-     */
-    public static function createResponsePage($uri, array $headers = null, CM_Model_User $viewer = null) {
-        if (!$headers) {
-            $site = CM_Site_Abstract::factory();
-            $headers = array('host' => $site->getHost());
-        }
-        $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
-        return CM_Http_Response_Page::createFromRequest($request, self::getServiceManager());
-    }
-
-    /**
-     * @param string                $uri
-     * @param array|null            $headers
-     * @param CM_Model_User|null    $viewer
-     * @param CM_Site_Abstract|null $site
      * @return CM_Http_Response_Page
      * @throws CM_Class_Exception_TypeNotConfiguredException
      */
-    public static function createResponsePageEmbed($uri, array $headers = null, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
-        if (null === $site) {
-            $site = CM_Site_Abstract::factory();
-        }
-        if (!$headers) {
-            $headers = array('host' => $site->getHost());
-        }
+    public static function createResponsePage($uri, CM_Model_User $viewer = null) {
+        $site = CM_Site_Abstract::factory();
+        $headers = array('host' => $site->getHost());
         $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
-        return CM_Http_Response_Page_Embed::createEmbedResponseFromRequest($request, $site, self::getServiceManager());
+
+        return CM_Http_Response_Page::createFromRequest($request, $site, self::getServiceManager());
     }
 
     /**
