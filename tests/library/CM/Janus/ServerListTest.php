@@ -29,6 +29,27 @@ class CM_Janus_ServerListTest extends CMTest_TestCase {
         $this->assertSame([], $serverList->filterByPlugin('bar')->getAll());
     }
 
+    public function testFilterByChannelDefinition() {
+        $channel = $this->mockClass('CM_Model_StreamChannel_Media', ['CM_Janus_StreamChannelInterface']);
+        $channel->mockStaticMethod('getJanusPluginName')->set('plugin-name');
+
+        $type = -1;
+        CM_Config::get()->CM_Model_Abstract->types[$type] = $channel->getClassName(); 
+        
+        $channelDefinition = $this->mockClass('CM_StreamChannel_Definition')->newInstanceWithoutConstructor();
+        $channelDefinition->mockMethod('getType')->set($type);
+        /** @var CM_StreamChannel_Definition $channelDefinition */
+
+        $serverList = $this->mockObject('CM_Janus_ServerList');
+        $filterByPlugin = $serverList->mockMethod('filterByPlugin')->set('return-value');
+        /** @var CM_Janus_ServerList $serverList */
+
+        $returnValue = $serverList->filterByChannelDefinition($channelDefinition);
+        $this->assertSame(1, $filterByPlugin->getCallCount());
+        $this->assertSame(['plugin-name'], $filterByPlugin->getLastCall()->getArguments());
+        $this->assertSame($filterByPlugin->getLastCall()->getReturnValue(), $returnValue);
+    }
+
     public function testGetById() {
         $server = $this->mockClass('CM_Janus_Server')->newInstanceWithoutConstructor();
         $server->mockMethod('getId')->set(1);
