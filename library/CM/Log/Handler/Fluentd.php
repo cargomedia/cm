@@ -6,24 +6,24 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
 
     /** @var \Fluent\Logger\FluentLogger */
     protected $_fluentdLogger;
+    
+    /** @var CM_Log_ContextFormatter_Interface */
+    protected $_contextFormatter;
 
     /** @var string */
     protected $_tag;
 
-    /** @var string */
-    protected $_appName;
-
     /**
-     * @param FluentLogger $fluentdLogger
-     * @param string       $tag
-     * @param string       $appName
-     * @param int|null     $minLevel
+     * @param FluentLogger                      $fluentdLogger
+     * @param CM_Log_ContextFormatter_Interface $contextFormatter
+     * @param string                            $tag
+     * @param int|null                          $minLevel
      */
-    public function __construct(FluentLogger $fluentdLogger, $tag, $appName, $minLevel = null) {
+    public function __construct(FluentLogger $fluentdLogger, CM_Log_ContextFormatter_Interface $contextFormatter, $tag, $minLevel = null) {
         parent::__construct($minLevel);
         $this->_fluentdLogger = $fluentdLogger;
+        $this->_contextFormatter = $contextFormatter;
         $this->_tag = (string) $tag;
-        $this->_appName = (string) $appName;
     }
 
     /**
@@ -46,61 +46,6 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
      * @return array
      */
     protected function _formatRecord(CM_Log_Record $record) {
-        $context = $record->getContext();
-        $levelsMapping = array_flip(CM_Log_Logger::getLevels());
-
-        $formattedRecord = [
-            'message'   => (string) $record->getMessage(),
-            'level'     => strtolower($levelsMapping[$record->getLevel()]),
-            'timestamp' => $record->getCreatedAt()->format(DateTime::ISO8601),
-        ];
-        if ($computerInfo = $context->getComputerInfo()) {
-            $formattedRecord['computerInfo'] = [
-                'fqdn'       => $computerInfo->getFullyQualifiedDomainName(),
-                'phpVersion' => $computerInfo->getPhpVersion(),
-            ];
-        }
-
-        $request = $context->getHttpRequest();
-        if (null !== $request) {
-            $serverArray = $request->getServer();
-            $formattedRequest = [
-                'uri'    => $request->getUri(),
-                'method' => $request->getMethodName(),
-            ];
-            if (array_key_exists('http_referrer', $serverArray)) {
-                $formattedRequest['referrer'] = (string) $serverArray['http_referrer'];
-            }
-            if (array_key_exists('http_user_agent', $serverArray)) {
-                $formattedRequest['user_agent'] = (string) $serverArray['http_user_agent'];
-            }
-            if ($ip = $request->getIp()) {
-                $formattedRequest['ip'] = (string) $ip;
-            }
-            if ($request->hasHeader('host')) {
-                $formattedRequest['hostname'] = $request->getHost();
-            }
-            $formattedRecord['httpRequest'] = $formattedRequest;
-        }
-
-        $appAttributes = $context->getExtra();
-        if ($user = $context->getUser()) {
-            $appAttributes['user'] = $user->getId();
-        }
-        if (null !== $request) {
-            $appAttributes['clientId'] = $request->getClientId();
-        }
-        $formattedRecord[$this->_appName] = $appAttributes;
-
-        if ($exception = $context->getException()) {
-            $serializableException = new CM_ExceptionHandling_SerializableException($exception);
-            $formattedRecord['exception'] = [
-                'type'    => $serializableException->getClass(),
-                'message' => $serializableException->getMessage(),
-                'stack'   => $serializableException->getTraceAsString(),
-            ];
-        }
-
-        return $formattedRecord;
+        return $this->_contextFormatter->formatRecordContext($record);
     }
 }
