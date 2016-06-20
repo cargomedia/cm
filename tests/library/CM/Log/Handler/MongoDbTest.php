@@ -89,14 +89,20 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
     public function testSanitizeRecord() {
         $handler = new CM_Log_Handler_MongoDb('foo');
         $record = [
-            'foo' => ['bar' => pack("H*", 'c32e')],
+            'foo'  => [
+                'baz' => 'quux',
+                'bar' => pack("H*", 'c32e')
+            ],
+            'foo2' => 2,
         ];
         $sanitizedRecord = $this->callProtectedMethod($handler, '_sanitizeRecord', [$record]);
 
         $this->assertSame([
             'foo'     => [
+                'baz' => 'quux',
                 'bar' => 'SANITIZED: ?.',
             ],
+            'foo2'    => 2,
             'context' => [
                 'extra' => [
                     'sanitized' => true,
