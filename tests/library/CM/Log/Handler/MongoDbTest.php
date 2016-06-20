@@ -85,4 +85,24 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertSame(['bar' => ['baz' => 'quux']], $context['extra']);
         $this->assertSame('{"bar":"2", "quux":"baz"}', $context['httpRequest']['body']);
     }
+
+    public function testSanitizeRecord() {
+        $handler = new CM_Log_Handler_MongoDb('foo');
+        $record = [
+            'foo' => ['bar' => pack("H*", 'c32e')],
+        ];
+        $sanitizedRecord = $this->callProtectedMethod($handler, '_sanitizeRecord', [$record]);
+
+        $this->assertSame([
+            'foo'     => [
+                'bar' => 'SANITIZED: ?.',
+            ],
+            'context' => [
+                'extra' => [
+                    'sanitized' => true,
+                    'bar-UTF'   => 'c32e',
+                ]
+            ],
+        ], $sanitizedRecord);
+    }
 }

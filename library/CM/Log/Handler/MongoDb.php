@@ -115,6 +115,32 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             $formattedRecord['expireAt'] = new MongoDate($expireAt->getTimestamp());
         }
 
+        $formattedRecord = $this->_sanitizeRecord($formattedRecord); //TODO remove after investigation
+
+        return $formattedRecord;
+    }
+
+    /**
+     * @param array $formattedRecord
+     * @return array
+     */
+    protected function _sanitizeRecord(array $formattedRecord) {
+        $nonUtfBytesList = [];
+
+        array_walk_recursive($formattedRecord, function (&$value, $key) use (&$nonUtfBytesList) {
+            if (is_string($value) && !mb_check_encoding($value)) {
+                $nonUtfBytesList[$key] = unpack('H*', $value)[1];
+                $value = 'SANITIZED: '. mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+            }
+        });
+
+        if (!empty($nonUtfBytesList)) {
+            $formattedRecord['context']['extra']['sanitized'] = true;
+        }
+        foreach ($nonUtfBytesList as $key => $nonUtfByte) {
+            $formattedRecord['context']['extra'][$key . '-UTF'] = $nonUtfByte;
+        }
+
         return $formattedRecord;
     }
 
