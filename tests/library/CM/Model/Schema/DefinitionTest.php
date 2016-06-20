@@ -257,6 +257,18 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
                 'expected' => true,
             ),
 
+            array(
+                'value'    => '{"foo":"bar"}',
+                'schema'   => array('type' => $this->mockInterface('CM_ArrayConvertible')->getClassName()),
+                'expected' => true,
+            ),
+
+            array(
+                'value'    => 'invalid-json',
+                'schema'   => array('type' => $this->mockInterface('CM_ArrayConvertible')->getClassName()),
+                'expected' => 'CM_Model_Exception_Validation',
+            ),
+
             // type invalid
             array(
                 'value'    => -12,

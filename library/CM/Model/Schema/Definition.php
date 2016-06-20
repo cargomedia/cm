@@ -232,9 +232,15 @@ class CM_Model_Schema_Definition {
                             }
                             break;
                         default:
-                            if (class_exists($type) && is_subclass_of($type, 'CM_Model_Abstract')) {
+                            if (is_subclass_of($type, 'CM_Model_Abstract')) {
                                 if (!$this->_isModel($value)) {
                                     throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a valid model');
+                                }
+                                break;
+                            }
+                            if (is_subclass_of($type, 'CM_ArrayConvertible')) {
+                                if (!$this->_isJson($value)) {
+                                    throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a valid json');
                                 }
                                 break;
                             }
