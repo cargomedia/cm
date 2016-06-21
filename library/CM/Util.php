@@ -537,7 +537,7 @@ class CM_Util {
         if ($prettyPrint) {
             $options = $options | JSON_PRETTY_PRINT;
         }
-        $value = @json_encode($value, $options);
+        $value = json_encode($value, $options);
         if (json_last_error() > 0) {
             throw new CM_Exception_Invalid('Cannot json_encode value `' . self::var_line($value) . '`.');
         }
