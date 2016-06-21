@@ -127,9 +127,6 @@ class CM_UtilTest extends CMTest_TestCase {
         $this->assertSame('{' . "\n" . '    "foo": "bar"' . "\n" . '}', $actual);
     }
 
-    /**
-     * @expectedException Exception
-     */
     public function testJsonEncodeInvalid() {
         $resource = fopen(sys_get_temp_dir(), 'r');
         CM_Util::jsonEncode(['foo' => $resource]);
