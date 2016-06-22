@@ -99,7 +99,15 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
 
         if ($exception = $recordContext->getException()) {
             $serializableException = new CM_ExceptionHandling_SerializableException($exception);
-            $formattedContext['exception'] = $serializableException;
+            $formattedContext['exception'] = [
+                'class'       => $serializableException->getClass(),
+                'message'     => $serializableException->getMessage(),
+                'line'        => $serializableException->getLine(),
+                'file'        => $serializableException->getFile(),
+                'trace'       => $serializableException->getTrace(),
+                'traceString' => $serializableException->getTraceAsString(),
+                'meta'        => $serializableException->getMeta(),
+            ];
         }
 
         $formattedRecord = [
@@ -116,7 +124,6 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         }
 
         $formattedRecord = $this->_sanitizeRecord($formattedRecord); //TODO remove after investigation
-
         return $formattedRecord;
     }
 
@@ -130,7 +137,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         array_walk_recursive($formattedRecord, function (&$value, $key) use (&$nonUtfBytesList) {
             if (is_string($value) && !mb_check_encoding($value)) {
                 $nonUtfBytesList[$key] = unpack('H*', $value)[1];
-                $value = 'SANITIZED: '. mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                $value = 'SANITIZED: ' . mb_convert_encoding($value, 'UTF-8', 'UTF-8');
             }
         });
 
