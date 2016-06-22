@@ -76,6 +76,13 @@ class CM_Janus_Server {
     }
 
     /**
+     * @return string
+     */
+    public function getWebSocketAddressSubscribeOnly() {
+        return CM_Util::link($this->getWebSocketAddress(), ['subscribeOnly' => 1]);
+    }
+
+    /**
      * @return string[]
      */
     public function getPluginList() {

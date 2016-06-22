@@ -239,6 +239,13 @@ class CMTest_TH {
     }
 
     /**
+     * @return CM_Geo_Point
+     */
+    public static function createGeoPoint() {
+        return new CM_Geo_Point(rand(-90, 90), rand(-180, 180));
+    }
+
+    /**
      * @param int|null $level
      * @return CM_Model_Location
      */
