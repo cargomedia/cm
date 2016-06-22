@@ -537,9 +537,10 @@ class CM_Util {
         if ($prettyPrint) {
             $options = $options | JSON_PRETTY_PRINT;
         }
+        $result = '';
         $errorMessage = null;
         try {
-            $value = json_encode($value, $options);
+            $result = json_encode($value, $options);
         } catch (ErrorException $e) {
             $errorMessage = $e->getMessage();
         }
@@ -552,7 +553,7 @@ class CM_Util {
                 'jsonError' => $errorMessage,
             ]);
         }
-        return $value;
+        return $result;
     }
 
     /**
@@ -562,9 +563,10 @@ class CM_Util {
      */
     public static function jsonDecode($value) {
         $valueString = (string) $value;
+        $result = '';
         $errorMessage = null;
         try {
-            $value = json_decode($valueString, true);
+            $result = json_decode($valueString, true);
         } catch (ErrorException $e) {
             $errorMessage = $e->getMessage();
         }
@@ -577,6 +579,6 @@ class CM_Util {
                 'jsonError' => $errorMessage,
             ]);
         }
-        return $value;
+        return $result;
     }
 }
