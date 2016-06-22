@@ -544,7 +544,7 @@ class CM_Util {
             $encodingFailed = true;
         }
         if ($encodingFailed || json_last_error() > 0) {
-            throw new CM_Exception_Invalid('Cannot json_encode value.');
+            throw new CM_Exception_Invalid('Cannot json_encode value.', null, ['value' => $value]);
         }
         return $value;
     }
@@ -556,9 +556,14 @@ class CM_Util {
      */
     public static function jsonDecode($value) {
         $valueString = (string) $value;
-        $value = json_decode($valueString, true);
-        if (json_last_error() > 0) {
-            throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString . '`.');
+        $decodingFailed = false;
+        try {
+            $value = json_decode($valueString, true);
+        } catch (ErrorException $e) {
+            $decodingFailed = true;
+        }
+        if ($decodingFailed || json_last_error() > 0) {
+            throw new CM_Exception_Invalid('Cannot json_decode value.', null, ['value' => $valueString]);
         }
         return $value;
     }

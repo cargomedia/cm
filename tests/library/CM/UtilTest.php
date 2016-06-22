@@ -128,10 +128,17 @@ class CM_UtilTest extends CMTest_TestCase {
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException CM_Exception_Invalid
      */
     public function testJsonEncodeInvalid() {
         $resource = fopen(sys_get_temp_dir(), 'r');
         CM_Util::jsonEncode(['foo' => $resource]);
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     */
+    public function testJsonDecodeInvalid() {
+        CM_Util::jsonDecode('{[foo:bar)}');
     }
 }
