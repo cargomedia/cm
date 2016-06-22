@@ -71,7 +71,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
 
     /**
      * @param Exception $exception
-     * @param           $severity
+     * @param int|null  $severity
      */
     public function handleExceptionWithSeverity(Exception $exception, $severity) {
         $printException = true;
