@@ -529,17 +529,22 @@ class CM_Util {
     /**
      * @param mixed     $value
      * @param bool|null $prettyPrint
-     * @throws CM_Exception_Invalid
      * @return string
+     * @throws CM_Exception_Invalid
      */
     public static function jsonEncode($value, $prettyPrint = null) {
         $options = 0;
         if ($prettyPrint) {
             $options = $options | JSON_PRETTY_PRINT;
         }
-        $value = json_encode($value, $options);
-        if (json_last_error() > 0) {
-            throw new CM_Exception_Invalid('Cannot json_encode value `' . self::var_line($value) . '`.');
+        $encodingFailed = false;
+        try {
+            $value = json_encode($value, $options);
+        } catch (ErrorException $e) {
+            $encodingFailed = true;
+        }
+        if ($encodingFailed || json_last_error() > 0) {
+            throw new CM_Exception_Invalid('Cannot json_encode value.');
         }
         return $value;
     }
