@@ -154,6 +154,17 @@ class CM_Bootloader {
         return new DateTimeZone(CM_Config::get()->timeZone);
     }
 
+    /**
+     * @param Closure $code
+     */
+    public function execute(Closure $code) {
+        try {
+            $code();
+        } catch (Exception $e) {
+            self::getExceptionHandler()->handleException($e);
+        }
+    }
+
     protected function _constants() {
         define('DIR_VENDOR', DIR_ROOT . 'vendor/');
         define('DIR_PUBLIC', DIR_ROOT . 'public/');
@@ -168,7 +179,7 @@ class CM_Bootloader {
     protected function _exceptionHandler() {
         $errorHandler = $this->getExceptionHandler();
         set_exception_handler(function (Exception $exception) use ($errorHandler) {
-            $errorHandler->handleException($exception, CM_Exception::FATAL);
+            $errorHandler->handleExceptionWithSeverity($exception, CM_Exception::FATAL);
             exit(1);
         });
     }
