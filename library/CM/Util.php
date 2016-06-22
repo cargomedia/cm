@@ -537,14 +537,20 @@ class CM_Util {
         if ($prettyPrint) {
             $options = $options | JSON_PRETTY_PRINT;
         }
-        $encodingFailed = false;
+        $errorMessage = null;
         try {
             $value = json_encode($value, $options);
         } catch (ErrorException $e) {
-            $encodingFailed = true;
+            $errorMessage = $e->getMessage();
         }
-        if ($encodingFailed || json_last_error() > 0) {
-            throw new CM_Exception_Invalid('Cannot json_encode value.', null, ['value' => $value]);
+        if (null === $errorMessage && $jsonError = json_last_error()) {
+            $errorMessage = 'json error code: `' . $jsonError . '`';
+        }
+        if (null !== $errorMessage) {
+            throw new CM_Exception_Invalid('Cannot json_encode value.', null, [
+                'value'     => $value,
+                'jsonError' => $errorMessage,
+            ]);
         }
         return $value;
     }
@@ -556,14 +562,20 @@ class CM_Util {
      */
     public static function jsonDecode($value) {
         $valueString = (string) $value;
-        $decodingFailed = false;
+        $errorMessage = null;
         try {
             $value = json_decode($valueString, true);
         } catch (ErrorException $e) {
-            $decodingFailed = true;
+            $errorMessage = $e->getMessage();
         }
-        if ($decodingFailed || json_last_error() > 0) {
-            throw new CM_Exception_Invalid('Cannot json_decode value.', null, ['value' => $valueString]);
+        if (null === $errorMessage && $jsonError = json_last_error()) {
+            $errorMessage = 'json error code: `' . $jsonError . '`';
+        }
+        if (null !== $errorMessage) {
+            throw new CM_Exception_Invalid('Cannot json_decode value.', null, [
+                'value'     => $valueString,
+                'jsonError' => $errorMessage,
+            ]);
         }
         return $value;
     }
