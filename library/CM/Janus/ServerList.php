@@ -125,4 +125,14 @@ class CM_Janus_ServerList extends CM_Class_Abstract implements CM_Typed {
         }
         return new CM_Janus_ServerList($servers);
     }
+
+    /**
+     * @param int $identifier
+     * @return CM_Janus_Server
+     */
+    public function getForIdentifier($identifier) {
+        $serverCount = count($this->_servers);
+        $key = $identifier % $serverCount;
+        return $this->_servers[$key];
+    }
 }

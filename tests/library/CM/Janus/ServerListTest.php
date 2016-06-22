@@ -93,4 +93,23 @@ class CM_Janus_ServerListTest extends CMTest_TestCase {
         $this->assertSame([$server2, $server3], $serverList->filterByClosestDistanceTo($location1)->getAll());
         $this->assertSame([$server1], $serverList->filterByClosestDistanceTo($location2)->getAll());
     }
+
+    public function testGetForIdentifier() {
+        $serverList = new CM_Janus_ServerList();
+        $serverClass = $this->mockClass('CM_Janus_Server');
+        for ($i = 0; $i < 100; $i++) {
+            /** @var CM_Janus_Server $server */
+            $server = $serverClass->newInstanceWithoutConstructor();
+            $serverList->addServer($server);
+        }
+
+        $id = rand(0, 1000);
+        $server1 = $serverList->getForIdentifier($id);
+        for ($i = 0; $i < 10; $i++) {
+            $this->assertSame($server1, $serverList->getForIdentifier($id));
+        }
+        $id++;
+        $server2 = $serverList->getForIdentifier($id);
+        $this->assertNotSame($server1, $server2);
+    }
 }
