@@ -10,7 +10,7 @@ class CM_Http_Response_EmailTracking extends CM_Http_Response_Abstract {
 
             $action = new CM_Action_Email(CM_Action_Abstract::VIEW, $user, $mailType);
             $action->prepare();
-            $action->notify($user, $mailType);
+            $action->notify($user);
         } catch (CM_Exception $e) {
             if (in_array(get_class($e), [
                 'CM_Exception_Nonexistent',
@@ -30,7 +30,6 @@ class CM_Http_Response_EmailTracking extends CM_Http_Response_Abstract {
             $request = clone $request;
             $request->popPathPart(0);
             $request->popPathLanguage();
-            $site = $request->popPathSite();
             return new self($request, $site, $serviceManager);
         }
         return null;

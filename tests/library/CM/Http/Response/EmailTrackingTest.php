@@ -41,7 +41,7 @@ class CM_Http_Response_EmailTrackingTest extends CMTest_TestCase {
 
     public function testProcessMissingParameter() {
         $site = CM_Site_Abstract::factory();
-        $request = new CM_Http_Request_Get('/emailtracking/' . $site->getId(), ['host' => $site->getHost()]);
+        $request = new CM_Http_Request_Get('/emailtracking', ['host' => $site->getHost()]);
         $response = CM_Http_Response_EmailTracking::createFromRequest($request, $site, $this->getServiceManager());
 
         try {

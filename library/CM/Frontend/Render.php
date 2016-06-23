@@ -299,7 +299,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             throw new CM_Exception_Invalid('Needs user');
         }
         $params = array('user' => $mail->getRecipient()->getId(), 'mailType' => $mail->getType());
-        return CM_Util::link($this->getSite()->getUrlBase() . '/emailtracking/' . $this->getSite()->getId(), $params);
+        return CM_Util::link($this->getSite()->getUrl() . '/emailtracking', $params);
     }
 
     /**
