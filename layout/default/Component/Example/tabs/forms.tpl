@@ -28,4 +28,6 @@
 {formField name='setSelect2' label="Set Select" placeholder=true}
 {formField name='setSelect3' label="Set Select with Prefix" labelPrefix="FooBar" placeholder=true}
 {formField name='treeselect' label="Tree select"}
+{formField name='vector2' label="Vector 2D"}
+{formField name='vector3' label="Vector 3D"}
 {/form}
