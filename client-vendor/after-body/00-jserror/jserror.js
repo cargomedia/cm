@@ -70,6 +70,6 @@
 		}
 	};
 
-	jserror.install('/jserror/null', 10, false, false);
+	jserror.install('/jserror', 10, false, false);
 
 }).call(this);
