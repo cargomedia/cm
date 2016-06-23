@@ -445,6 +445,22 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     }
 
     /**
+     * @param string $key
+     * @return CM_Geometry_Vector2
+     */
+    public function getGeometryVector2($key) {
+        return $this->getObject($key, 'CM_Geometry_Vector2');
+    }
+
+    /**
+     * @param string $key
+     * @return CM_Geometry_Vector3
+     */
+    public function getGeometryVector3($key) {
+        return $this->getObject($key, 'CM_Geometry_Vector3');
+    }
+
+    /**
      * @return mixed
      */
     public function shift() {
