@@ -15,7 +15,6 @@ class CM_Http_Response_Captcha extends CM_Http_Response_Abstract {
             $request = clone $request;
             $request->popPathPart(0);
             $request->popPathLanguage();
-            $site = $request->popPathSite();
             return new self($request, $site, $serviceManager);
         }
         return null;

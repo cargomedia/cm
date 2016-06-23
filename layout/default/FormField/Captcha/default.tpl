@@ -1,6 +1,6 @@
 <div class="captcha">
   <div class="captcha-image">
-    <img src="{$render->getUrl("/captcha/{$render->getSite()->getId()}?id={$imageId}")}" />
+    <img src="{$render->getUrl("/captcha?id={$imageId}")}" />
     {link icon="refresh" class="refreshCaptcha refresh-link" title="{translate 'Refresh'}"}
   </div>
   <div class="captcha-input">
