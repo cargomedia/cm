@@ -2,11 +2,15 @@
 
 class CMService_NewRelic_Log_Handler extends CM_Log_Handler_Abstract {
 
+    /** @var CMService_Newrelic */
+    protected $_newRelicService;
+
+    public function __construct($minLevel) {
+        parent::__construct($minLevel);
+        $this->_newRelicService = CM_Service_Manager::getInstance()->getNewrelic();
+    }
+
     public function isHandling(CM_Log_Record $record) {
-        $newRelic = CM_Service_Manager::getInstance()->getNewrelic();
-        if (true !== $newRelic->isEnabled()) {
-            return false;
-        }
         if (!$record->getContext()->getException()) {
             return false;
         }
@@ -14,7 +18,6 @@ class CMService_NewRelic_Log_Handler extends CM_Log_Handler_Abstract {
     }
 
     protected function _writeRecord(CM_Log_Record $record) {
-        $newRelic = CM_Service_Manager::getInstance()->getNewrelic();
-        $newRelic->setNoticeError($record->getContext()->getException());
+        $this->_newRelicService->setNoticeError($record->getContext()->getException());
     }
 }
