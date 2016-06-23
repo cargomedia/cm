@@ -529,19 +529,31 @@ class CM_Util {
     /**
      * @param mixed     $value
      * @param bool|null $prettyPrint
-     * @throws CM_Exception_Invalid
      * @return string
+     * @throws CM_Exception_Invalid
      */
     public static function jsonEncode($value, $prettyPrint = null) {
         $options = 0;
         if ($prettyPrint) {
             $options = $options | JSON_PRETTY_PRINT;
         }
-        $value = json_encode($value, $options);
-        if (json_last_error() > 0) {
-            throw new CM_Exception_Invalid('Cannot json_encode value `' . self::var_line($value) . '`.');
+        $result = '';
+        $errorMessage = null;
+        try {
+            $result = json_encode($value, $options);
+        } catch (ErrorException $e) {
+            $errorMessage = $e->getMessage();
         }
-        return $value;
+        if (null === $errorMessage && $jsonError = json_last_error()) {
+            $errorMessage = 'json error code: `' . $jsonError . '`';
+        }
+        if (null !== $errorMessage) {
+            throw new CM_Exception_Invalid('Cannot json_encode value.', null, [
+                'value'     => $value,
+                'jsonError' => $errorMessage,
+            ]);
+        }
+        return $result;
     }
 
     /**
@@ -551,10 +563,22 @@ class CM_Util {
      */
     public static function jsonDecode($value) {
         $valueString = (string) $value;
-        $value = json_decode($valueString, true);
-        if (json_last_error() > 0) {
-            throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString . '`.');
+        $result = '';
+        $errorMessage = null;
+        try {
+            $result = json_decode($valueString, true);
+        } catch (ErrorException $e) {
+            $errorMessage = $e->getMessage();
         }
-        return $value;
+        if (null === $errorMessage && $jsonError = json_last_error()) {
+            $errorMessage = 'json error code: `' . $jsonError . '`';
+        }
+        if (null !== $errorMessage) {
+            throw new CM_Exception_Invalid('Cannot json_decode value.', null, [
+                'value'     => $valueString,
+                'jsonError' => $errorMessage,
+            ]);
+        }
+        return $result;
     }
 }
