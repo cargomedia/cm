@@ -29,27 +29,6 @@ class CM_Janus_ServerListTest extends CMTest_TestCase {
         $this->assertSame([], $serverList->filterByPlugin('bar')->getAll());
     }
 
-    public function testFilterByChannelDefinition() {
-        $channel = $this->mockClass('CM_Model_StreamChannel_Media', ['CM_Janus_StreamChannelInterface']);
-        $channel->mockStaticMethod('getJanusPluginName')->set('plugin-name');
-
-        $type = -1;
-        CM_Config::get()->CM_Model_Abstract->types[$type] = $channel->getClassName(); 
-        
-        $channelDefinition = $this->mockClass('CM_StreamChannel_Definition')->newInstanceWithoutConstructor();
-        $channelDefinition->mockMethod('getType')->set($type);
-        /** @var CM_StreamChannel_Definition $channelDefinition */
-
-        $serverList = $this->mockObject('CM_Janus_ServerList');
-        $filterByPlugin = $serverList->mockMethod('filterByPlugin')->set('return-value');
-        /** @var CM_Janus_ServerList $serverList */
-
-        $returnValue = $serverList->filterByChannelDefinition($channelDefinition);
-        $this->assertSame(1, $filterByPlugin->getCallCount());
-        $this->assertSame(['plugin-name'], $filterByPlugin->getLastCall()->getArguments());
-        $this->assertSame($filterByPlugin->getLastCall()->getReturnValue(), $returnValue);
-    }
-
     public function testGetById() {
         $server = $this->mockClass('CM_Janus_Server')->newInstanceWithoutConstructor();
         $server->mockMethod('getId')->set(1);
@@ -70,7 +49,7 @@ class CM_Janus_ServerListTest extends CMTest_TestCase {
         $serverLocation1 = new CM_Geo_Point(51, 0);
         $serverLocation2 = new CM_Geo_Point(55, 20);
         $serverLocation3 = new CM_Geo_Point(85, 25);
-        
+
         $serverClass = $this->mockClass('CM_Janus_Server');
         $server1 = $serverClass->newInstanceWithoutConstructor();
         $server1->mockMethod('getLocation')->set($serverLocation1);
@@ -79,10 +58,10 @@ class CM_Janus_ServerListTest extends CMTest_TestCase {
         $server2->mockMethod('getLocation')->set($serverLocation2);
         $server3 = $serverClass->newInstanceWithoutConstructor();
         $server3->mockMethod('getLocation')->set($serverLocation2);
-        
+
         $server4 = $serverClass->newInstanceWithoutConstructor();
         $server4->mockMethod('getLocation')->set($serverLocation3);
-        
+
         $serverList = new CM_Janus_ServerList([
             $server1,
             $server2,

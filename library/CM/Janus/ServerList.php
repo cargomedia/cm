@@ -35,22 +35,6 @@ class CM_Janus_ServerList extends CM_Class_Abstract implements CM_Typed {
     }
 
     /**
-     * @param CM_StreamChannel_Definition $channelDefinition
-     * @return CM_Janus_ServerList
-     * @throws CM_Class_Exception_TypeNotConfiguredException
-     * @throws CM_Exception_Invalid
-     */
-    public function filterByChannelDefinition(CM_StreamChannel_Definition $channelDefinition) {
-        $streamChannelClassName = CM_Model_StreamChannel_Media::_getClassName($channelDefinition->getType());
-
-        if (!is_subclass_of($streamChannelClassName, 'CM_Janus_StreamChannelInterface')) {
-            throw new CM_Exception_Invalid('`' . $streamChannelClassName . '` does not implement CM_Janus_StreamChannelInterface');
-        }
-        /** @var CM_Janus_StreamChannelInterface $streamChannelClassName */
-        return $this->filterByPlugin($streamChannelClassName::getJanusPluginName());
-    }
-
-    /**
      * @return CM_Janus_Server[]
      */
     public function getAll() {
