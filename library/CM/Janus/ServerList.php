@@ -35,10 +35,42 @@ class CM_Janus_ServerList extends CM_Class_Abstract implements CM_Typed {
     }
 
     /**
+     * @param CM_Geo_Point $location
+     * @return CM_Janus_ServerList
+     */
+    public function filterByClosestDistanceTo(CM_Geo_Point $location) {
+        $servers = $this->_servers;
+        if (!empty($servers)) {
+            $groupedServers = \Functional\group($servers, function (CM_Janus_Server $server) use ($location) {
+                return $server->getLocation()->calculateDistanceTo($location);
+            });
+            $distances = array_keys($groupedServers);
+            $minimumDistance = min($distances);
+
+            $servers = array_values($groupedServers[$minimumDistance]);
+        }
+        return new CM_Janus_ServerList($servers);
+    }
+
+    /**
      * @return CM_Janus_Server[]
      */
     public function getAll() {
         return $this->_servers;
+    }
+
+    /**
+     * @param string $key
+     * @return CM_Janus_Server|null
+     */
+    public function findByKey($key) {
+        $key = (string) $key;
+        foreach ($this->_servers as $server) {
+            if ($server->getKey() === $key) {
+                return $server;
+            }
+        }
+        return null;
     }
 
     /**
@@ -76,38 +108,6 @@ class CM_Janus_ServerList extends CM_Class_Abstract implements CM_Typed {
             }
         }
         throw new CM_Exception_Invalid('Cannot find server with id `' . $id . '`');
-    }
-
-    /**
-     * @param string $key
-     * @return CM_Janus_Server|null
-     */
-    public function findByKey($key) {
-        $key = (string) $key;
-        foreach ($this->_servers as $server) {
-            if ($server->getKey() === $key) {
-                return $server;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @param CM_Geo_Point $location
-     * @return CM_Janus_ServerList
-     */
-    public function filterByClosestDistanceTo(CM_Geo_Point $location) {
-        $servers = $this->_servers;
-        if (!empty($servers)) {
-            $groupedServers = \Functional\group($servers, function (CM_Janus_Server $server) use ($location) {
-                return $server->getLocation()->calculateDistanceTo($location);
-            });
-            $distances = array_keys($groupedServers);
-            $minimumDistance = min($distances);
-
-            $servers = array_values($groupedServers[$minimumDistance]);
-        }
-        return new CM_Janus_ServerList($servers);
     }
 
     /**
