@@ -1,6 +1,6 @@
 <?php
 
-class CM_Http_Response_Factory implements CM_Service_ManagerAwareInterface {
+class CM_Http_ResponseFactory implements CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
 

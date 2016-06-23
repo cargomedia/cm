@@ -65,7 +65,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      */
     public function loadPage(CM_Params $params, CM_Http_Response_View_Ajax $response) {
         $request = $this->_createGetRequestWithUrl($params->getString('path'));
-        $responseFactory = new CM_Http_Response_Factory($this->getServiceManager());
+        $responseFactory = new CM_Http_ResponseFactory($this->getServiceManager());
 
         $count = 0;
         $paths = array($request->getPath());
@@ -268,7 +268,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
             return false;
         }
         $request = $this->_createGetRequestWithUrl($url);
-        $responseFactory = new CM_Http_Response_Factory($this->getServiceManager());
+        $responseFactory = new CM_Http_ResponseFactory($this->getServiceManager());
         $response = $responseFactory->getResponse($request);
         return $response->getSite()->equals($this->getSite());
     }

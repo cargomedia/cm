@@ -1,6 +1,6 @@
 <?php
 
-class CM_Http_Response_FactoryTest extends CMTest_TestCase {
+class CM_Http_ResponseFactoryTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
@@ -22,7 +22,7 @@ class CM_Http_Response_FactoryTest extends CMTest_TestCase {
         $responses['/homepage'] = 'CM_Http_Response_Page';
 
         $responseClassList = array_values($responses);
-        $factory = new CM_Http_Response_Factory($this->getServiceManager(), $responseClassList);
+        $factory = new CM_Http_ResponseFactory($this->getServiceManager(), $responseClassList);
 
         foreach ($responses as $path => $expectedResponse) {
             $request = new CM_Http_Request_Post($path . '/null/timestamp', null, null, '[]');

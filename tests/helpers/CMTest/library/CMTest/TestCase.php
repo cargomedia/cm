@@ -229,7 +229,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @return CM_Http_Response_Abstract|\Mocka\AbstractClassTrait
      */
     public function getResponse(CM_Http_Request_Abstract $request) {
-        $responseFactory = new CM_Http_Response_Factory(self::getServiceManager());
+        $responseFactory = new CM_Http_ResponseFactory(self::getServiceManager());
         $response = $responseFactory->getResponse($request);
         return $this->mockClass(get_class($response))
             ->newInstance([$response->getRequest(), $response->getSite(), $response->getServiceManager()]);
