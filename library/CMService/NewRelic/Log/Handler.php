@@ -3,6 +3,10 @@
 class CMService_NewRelic_Log_Handler extends CM_Log_Handler_Abstract {
 
     public function isHandling(CM_Log_Record $record) {
+        $newRelic = CM_Service_Manager::getInstance()->getNewrelic();
+        if (true !== $newRelic->isEnabled()) {
+            return false;
+        }
         if (!$record->getContext()->getException()) {
             return false;
         }

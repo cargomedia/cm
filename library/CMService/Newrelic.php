@@ -93,6 +93,18 @@ class CMService_Newrelic extends CM_Class_Abstract {
     }
 
     /**
+     * @return bool
+     */
+    public function isEnabled() {
+        try {
+            $isEnabled = $this->_getEnabled();
+        } catch (CM_Exception_Invalid $e) {
+            $isEnabled = false;
+        }
+        return $isEnabled;
+    }
+
+    /**
      * @throws CM_Exception_Invalid
      * @return bool
      */
