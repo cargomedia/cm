@@ -28,7 +28,10 @@ class CM_Geometry_Vector2 implements CM_Geometry_Vector {
     }
 
     public function toArray() {
-        return [$this->getX(), $this->getY()];
+        return [
+            'x' => $this->getX(),
+            'y' => $this->getY(),
+        ];
     }
 
     /**
@@ -49,10 +52,6 @@ class CM_Geometry_Vector2 implements CM_Geometry_Vector {
     }
 
     public static function fromArray(array $array) {
-        $size = sizeof($array);
-        if (self::getSize() !== $size) {
-            throw new CM_Exception_Invalid('Invalid source array size');
-        }
-        return new self($array[0], $array[1]);
+        return new self($array['x'], $array['y']);
     }
 }

@@ -24,7 +24,7 @@ class CM_Geometry_Vector3 extends CM_Geometry_Vector2 {
     }
 
     public function toArray() {
-        return [$this->getX(), $this->getY(), $this->getZ()];
+        return array_merge(parent::toArray(), ['z' => $this->getZ()]);
     }
 
     public static function getSize() {
@@ -32,10 +32,6 @@ class CM_Geometry_Vector3 extends CM_Geometry_Vector2 {
     }
 
     public static function fromArray(array $array) {
-        $size = sizeof($array);
-        if (self::getSize() !== $size) {
-            throw new CM_Exception_Invalid('Invalid source array size');
-        }
-        return new self($array[0], $array[1], $array[2]);
+        return new self($array['x'], $array['y'], $array['z']);
     }
 }
