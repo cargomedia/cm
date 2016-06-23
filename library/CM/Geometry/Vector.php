@@ -1,6 +1,6 @@
 <?php
 
-interface CM_Type_Vector extends CM_ArrayConvertible {
+interface CM_Geometry_Vector extends CM_ArrayConvertible {
 
     /**
      * @return float

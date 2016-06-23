@@ -1,6 +1,6 @@
 <?php
 
-class CM_Type_Vector3 extends CM_Type_Vector2 {
+class CM_Geometry_Vector3 extends CM_Geometry_Vector2 {
 
     /** @var float */
     protected $_z;

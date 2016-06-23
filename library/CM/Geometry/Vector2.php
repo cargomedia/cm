@@ -1,6 +1,6 @@
 <?php
 
-class CM_Type_Vector2 implements CM_Type_Vector {
+class CM_Geometry_Vector2 implements CM_Geometry_Vector {
 
     /** @var float */
     protected $_x;
