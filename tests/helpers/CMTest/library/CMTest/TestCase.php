@@ -283,6 +283,25 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
+     * @param string|CM_Http_Request_Get $pathOrRequest
+     * @return CM_Http_Response_Page|\Mocka\AbstractClassTrait
+     * @throws CM_Exception
+     */
+    public function getResponsePage($pathOrRequest) {
+        if ($pathOrRequest instanceof CM_Http_Request_Get) {
+            $request = $pathOrRequest;
+        } else {
+            $site = $this->getMockSite();
+            $request = new CM_Http_Request_Get($pathOrRequest, ['host' => $site->getHost()]);
+        }
+        $response = $this->getResponse($request);
+        if (!$response instanceof CM_Http_Response_Page) {
+            throw new CM_Exception('Unexpected response of type `' . get_class($response) . '`');
+        }
+        return $response;
+    }
+
+    /**
      * @param object|string $objectOrClass
      * @param string        $methodName
      * @param array|null    $arguments
