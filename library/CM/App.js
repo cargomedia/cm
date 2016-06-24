@@ -1077,8 +1077,8 @@ var CM_App = CM_Class_Abstract.extend({
       this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(event, data) {
         if (handler._channelDispatchers[channel]) {
           data = cm.factory.create(data);
-          handler._channelDispatchers[channel].trigger(event, data);
           cm.debug.log('Stream channel (' + channel + '): event `' + event + '`: ', data);
+          handler._channelDispatchers[channel].trigger(event, data);
         }
       });
       cm.debug.log('Stream channel (' + channel + '): subscribe');
