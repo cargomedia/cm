@@ -162,7 +162,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
      * @param CM_Comparable|null $model
      * @return boolean
      */
-    final public function equals(CM_Comparable $model = null) {
+    public function equals(CM_Comparable $model = null) {
         if (empty($model)) {
             return false;
         }
