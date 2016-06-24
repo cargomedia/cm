@@ -33,8 +33,8 @@ class CM_Janus_ConnectionDescription implements JsonSerializable, CM_ArrayConver
 
     public function jsonSerialize() {
         return [
-            'channel' => $this->getChannelDefinition()->jsonSerialize(),
-            'server'  => $this->getServer()->jsonSerialize(),
+            'channel' => $this->getChannelDefinition(),
+            'server'  => $this->getServer(),
         ];
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-class CM_Janus_Server implements JsonSerializable {
+class CM_Janus_Server implements CM_ArrayConvertible, JsonSerializable {
 
     /** @var int */
     protected $_id;
@@ -110,5 +110,13 @@ class CM_Janus_Server implements JsonSerializable {
             'webSocketAddressSubscribeOnly' => $this->getWebSocketAddressSubscribeOnly(),
             'iceServerList'                 => $this->getIceServerList(),
         ];
+    }
+
+    public function toArray() {
+        return $this->jsonSerialize();
+    }
+
+    public static function fromArray(array $array) {
+        throw new CM_Exception_NotImplemented();
     }
 }

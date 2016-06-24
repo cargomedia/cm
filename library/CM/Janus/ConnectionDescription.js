@@ -7,25 +7,24 @@ var CM_Janus_ConnectionDescription = Backbone.Model.extend({
   _class: 'CM_Janus_ConnectionDescription',
 
   /**
-   * @returns {{key: <String>, type: <Number>}}
+   * @returns {CM_StreamChannel_Definition}
    */
   getChannel: function() {
     return this.get('channel');
   },
-  
+
   /**
-   * @returns {{webSocketAddress: <String>, iceServers: <Array>}}
+   * @returns {CM_Janus_Server}
    */
   getServer: function() {
-    var server = this.get('server');
-    server.webSocketAddress += '?' + jQuery.param({
-      context: JSON.stringify(cm.getContext())
-    });
-    return server;
+    return this.get('server');
   },
-  
+
   toJSON: function() {
-    return _.extend(this.getServer(), this.getChannel());
+    return {
+      channel: this.getChannel().toJSON(),
+      server: this.getServer().toJSON()
+    };
   },
 
   /**
