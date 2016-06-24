@@ -29,6 +29,16 @@ var CM_Janus_ConnectionDescription = Backbone.Model.extend({
 
   /**
    * @param {*} description
+   */
+  update: function(description) {
+    if (description instanceof CM_Janus_ConnectionDescription && !this.equals(description)) {
+      this.getServer().set(description.getServer().toJSON());
+      this.getChannel().set(description.getChannel().toJSON());
+    }
+  },
+
+  /**
+   * @param {*} description
    * @returns {Boolean}
    */
   equals: function(description) {
