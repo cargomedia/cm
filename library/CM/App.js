@@ -289,7 +289,7 @@ var CM_App = CM_Class_Abstract.extend({
      */
     _isCmObject: function(data) {
       var className = data && data['_class'];
-      var isClass = className && cm.model.types[className] && window[className];
+      var isClass = className && window[className];
       var isBackbone = data instanceof Backbone.Model || data instanceof Backbone.Collection;
       return isClass && !isBackbone;
     },
@@ -1077,8 +1077,8 @@ var CM_App = CM_Class_Abstract.extend({
       this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(event, data) {
         if (handler._channelDispatchers[channel]) {
           data = cm.factory.create(data);
-          handler._channelDispatchers[channel].trigger(event, data);
           cm.debug.log('Stream channel (' + channel + '): event `' + event + '`: ', data);
+          handler._channelDispatchers[channel].trigger(event, data);
         }
       });
       cm.debug.log('Stream channel (' + channel + '): subscribe');
