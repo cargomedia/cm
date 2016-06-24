@@ -27,10 +27,6 @@ class CM_Geometry_Vector3 extends CM_Geometry_Vector2 {
         return array_merge(parent::toArray(), ['z' => $this->getZ()]);
     }
 
-    public static function getSize() {
-        return 3;
-    }
-
     public static function fromArray(array $array) {
         return new self($array['x'], $array['y'], $array['z']);
     }

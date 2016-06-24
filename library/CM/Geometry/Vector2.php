@@ -44,13 +44,6 @@ class CM_Geometry_Vector2 implements CM_Geometry_Vector {
         }
     }
 
-    /**
-     * @return int
-     */
-    public static function getSize() {
-        return 2;
-    }
-
     public static function fromArray(array $array) {
         return new self($array['x'], $array['y']);
     }

@@ -11,9 +11,4 @@ interface CM_Geometry_Vector extends CM_ArrayConvertible {
      * @return float
      */
     public function getY();
-
-    /**
-     * @return int
-     */
-    public static function getSize();
 }
