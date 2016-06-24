@@ -1,6 +1,6 @@
 <?php
 
-class CM_Janus_ConnectionDescription implements JsonSerializable {
+class CM_Janus_ConnectionDescription implements JsonSerializable, CM_ArrayConvertible {
 
     /** @var CM_StreamChannel_Definition */
     protected $_channelDefinition;
@@ -32,9 +32,18 @@ class CM_Janus_ConnectionDescription implements JsonSerializable {
     }
 
     public function jsonSerialize() {
-        $data = $this->getChannelDefinition()->jsonSerialize();
-        $data['server'] = $this->getServer()->jsonSerialize();
-        return $data;
+        return [
+            'channel' => $this->getChannelDefinition()->jsonSerialize(),
+            'server'  => $this->getServer()->jsonSerialize(),
+        ];
+    }
+
+    public function toArray() {
+        return $this->jsonSerialize();
+    }
+
+    public static function fromArray(array $array) {
+        throw new CM_Exception_NotImplemented();
     }
 
 }

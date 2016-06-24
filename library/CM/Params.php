@@ -422,6 +422,14 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
 
     /**
      * @param string $key
+     * @return CM_Janus_ConnectionDescription
+     */
+    public function getConnectionDescription($key) {
+        return $this->getObject($key, 'CM_Janus_ConnectionDescription');
+    }
+
+    /**
+     * @param string $key
      * @return CM_Model_StreamChannel_Media
      */
     public function getStreamChannelMedia($key) {
