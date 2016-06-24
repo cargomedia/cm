@@ -108,6 +108,7 @@ class CM_Janus_Server implements JsonSerializable {
             'id'                            => $this->_id,
             'webSocketAddress'              => $this->getWebSocketAddress(),
             'webSocketAddressSubscribeOnly' => $this->getWebSocketAddressSubscribeOnly(),
+            'iceServerList'                 => $this->getIceServerList(),
         ];
     }
 }
