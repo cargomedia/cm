@@ -174,7 +174,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $headers = [
             'host' => $site->getHost(),
         ];
-        return $this->createRequest('/form', $query, $headers, $scopeView, $scopeComponent);
+        return $this->createRequest($site->getUrl() . '/form', $query, $headers, $scopeView, $scopeComponent);
     }
 
     /**
@@ -221,7 +221,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $headers = [
             'host' => $site->getHost(),
         ];
-        return $this->createRequest('/ajax', $query, $headers, $viewResponse, $componentResponse);
+        return $this->createRequest($site->getUrl() . '/ajax', $query, $headers, $viewResponse, $componentResponse);
     }
 
     /**
@@ -242,16 +242,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     public function getResponseResourceLayout($path) {
         $request = $this->createRequest('/layout/null/' . time() . '/' . $path);
         return $this->processRequest($request);
-    }
-
-    /**
-     * @param CM_Http_Request_Abstract $request
-     * @return CM_Http_Response_Abstract|\Mocka\AbstractClassTrait
-     */
-    public function processRequest(CM_Http_Request_Abstract $request) {
-        $response = $this->getResponse($request);
-        $response->process();
-        return $response;
     }
 
     /**
@@ -298,6 +288,16 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         if (!$response instanceof CM_Http_Response_Page) {
             throw new CM_Exception('Unexpected response of type `' . get_class($response) . '`');
         }
+        return $response;
+    }
+
+    /**
+     * @param CM_Http_Request_Abstract $request
+     * @return CM_Http_Response_Abstract|\Mocka\AbstractClassTrait
+     */
+    public function processRequest(CM_Http_Request_Abstract $request) {
+        $response = $this->getResponse($request);
+        $response->process();
         return $response;
     }
 

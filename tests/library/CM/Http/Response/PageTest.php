@@ -66,7 +66,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         }
     }
 
-    public function testProcessHostRedirect() {
+    public function testProcessHostNoRedirect() {
         $site = CM_Site_Abstract::factory();
         $request = new CM_Http_Request_Get('/mock5', ['host' => $site->getHost()]);
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
@@ -77,25 +77,43 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         }));
     }
 
-    public function testProcessUnknownHostRedirect() {
+    public function testProcessHostUnknownRedirect() {
         $site = CM_Site_Abstract::factory();
-        $request = new CM_Http_Request_Get('/mock5', ['host' => 'unknown-host.org']);
+        $request = new CM_Http_Request_Get('/mock5?foo=bar', ['host' => 'unknown-host.org']);
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
-
         $response->process();
-        $this->assertContains('Location: ' . $site->getUrl() . '/mock5', $response->getHeaders());
+
+        $this->assertContains('Location: ' . $site->getUrl() . '/mock5?foo=bar', $response->getHeaders());
     }
 
-    public function testProcessHostRedirect_parameter() {
-        $location = CMTest_TH::createLocation();
-        $locationEncoded = CM_Params::encode($location, true);
-        $query = http_build_query(['location' => $locationEncoded]);
-        $site = CM_Site_Abstract::factory();
-        $request = new CM_Http_Request_Get('/mock5?' . $query, ['host' => 'unknown-host.org']);
-        $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
-
+    public function testProcessHostWithoutWww() {
+        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-site.com']);
+        $request = new CM_Http_Request_Get('/mock5?foo=bar', ['host' => 'my-site.com']);
+        $response = $this->getResponse($request);
         $response->process();
-        $this->assertContains('Location: ' . $site->getUrl() . '/mock5?' . $query, $response->getHeaders());
+
+        $this->assertContains('Location: ' . $site->getUrl() . '/mock5?foo=bar', $response->getHeaders());
+    }
+
+    public function testProcessSiteMatchingByPath() {
+        $site1 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
+        $site2 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/bar']);
+        $site3 = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
+
+        $expectedList = [
+            '/foo/mock5?foo=bar' => $site1,
+            '/bar/mock5?foo=bar' => $site2,
+            '/mock5?foo=bar' => $site3,
+        ];
+
+        foreach($expectedList as $path => $site) {
+            $request = new CM_Http_Request_Get($path, ['host' => 'my-site.com']);
+            $response = $this->getResponsePage($request);
+            $response->process();
+
+            $this->assertInstanceOf('CM_Http_Response_Page', $response);
+            $this->assertEquals($site, $response->getSite());
+        }
     }
 
     public function testProcessTrackingDisabled() {

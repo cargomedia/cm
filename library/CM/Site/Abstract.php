@@ -195,19 +195,38 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @throws CM_Exception
      */
     public function match(CM_Http_Request_Abstract $request) {
+        return $this->isUrlMatch($request->getHost(), $request->getPath());
+    }
+
+    /**
+     * @param string $host
+     * @param string $path
+     * @return bool
+     * @throws CM_Exception
+     */
+    public function isUrlMatch($host, $path) {
         $matchList = [
-            $this->getHost() . $this->getPath(),
-            preg_replace('/^www\./', '', $this->getHost()) . $this->getPath(),
+            [
+                'host' => $this->getHost(),
+                'path' => $this->getPath(),
+            ],
+            [
+                'host' => preg_replace('/^www\./', '', $this->getHost()),
+                'path' => $this->getPath(),
+            ],
         ];
 
         if ($this->getUrlCdn()) {
             $urlCdn = new CM_Http_UrlParser($this->getUrlCdn());
-            $matchList[] = $urlCdn->getHost() . $urlCdn->getPath();
+            $matchList[] = [
+                'host' => $urlCdn->getHost(),
+                'path' => $urlCdn->getPath(),
+            ];
         }
 
-        $requestUrl = new Stringy\Stringy($request->getHost() . $request->getPath());
-        return Functional\some($matchList, function ($match) use ($requestUrl) {
-            return $requestUrl->startsWith($match);
+        return Functional\some($matchList, function ($match) use ($host, $path) {
+            $path = new Stringy\Stringy($path);
+            return ($host === $match['host'] && $path->startsWith($match['path']));
         });
     }
 
@@ -216,7 +235,13 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return boolean
      */
     public function equals(CM_Comparable $other = null) {
-        return $other && (get_class($other) === get_class($this));
+        if (null === $other) {
+            return false;
+        }
+        if (get_class($other) !== get_class($this)) {
+            return false;
+        }
+        return $this->getUrl() === $other->getUrl();
     }
 
     /**
@@ -245,9 +270,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return CM_Site_Abstract|null
      */
     public static function findByRequest(CM_Http_Request_Abstract $request) {
-        foreach (array_reverse(static::getClassChildren()) as $className) {
-            /** @var CM_Site_Abstract $site */
-            $site = new $className();
+        foreach (self::getAll() as $site) {
             if ($site->match($request)) {
                 return $site;
             }

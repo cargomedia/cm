@@ -114,4 +114,18 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertSame(false, $siteFoo1->equals($siteBar1));
         $this->assertSame(false, $siteBar1->equals($siteFoo1));
     }
+
+    public function testEqualsDifferentUrl() {
+        $siteClass = $this->mockClass('CM_Site_Abstract');
+
+        /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $site1 */
+        $site1 = $siteClass->newInstance();
+        $site1->mockMethod('getUrl')->set('http://my-site1.com');
+
+        /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $site2 */
+        $site2 = $siteClass->newInstance();
+        $site2->mockMethod('getUrl')->set('http://my-site2.com');
+
+        $this->assertSame(false, $site1->equals($site2));
+    }
 }

@@ -34,17 +34,4 @@ class CM_Http_Response_Page_Embed extends CM_Http_Response_Page {
         return null;
     }
 
-    /**
-     * @param CM_Http_Request_Abstract $request
-     * @param CM_Site_Abstract         $site
-     * @param CM_Service_Manager       $serviceManager
-     * @return CM_Http_Response_Page_Embed
-     */
-    public static function createEmbedResponseFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
-        $request = clone $request;
-        $request->popPathLanguage();
-
-        return new self($request, $site, $serviceManager);
-    }
-
 }
