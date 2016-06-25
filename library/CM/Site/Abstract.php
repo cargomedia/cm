@@ -265,19 +265,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         return $this->getType();
     }
 
-    /**
-     * @param CM_Http_Request_Abstract $request
-     * @return CM_Site_Abstract|null
-     */
-    public static function findByRequest(CM_Http_Request_Abstract $request) {
-        foreach (self::getAll() as $site) {
-            if ($site->match($request)) {
-                return $site;
-            }
-        }
-        return null;
-    }
-
     public static function fromArray(array $array) {
         $type = (int) $array['type'];
         return self::factory($type);

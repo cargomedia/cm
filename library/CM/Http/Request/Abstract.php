@@ -222,10 +222,12 @@ abstract class CM_Http_Request_Abstract {
      * @return CM_Site_Abstract
      */
     public function popPathSiteByMatch() {
-        $site = CM_Site_Abstract::findByRequest($this);
+        $siteFactory = new CM_Site_SiteFactory();
+        $site = $siteFactory->findSite($this);
         if (null === $site) {
             $site = CM_Site_Abstract::factory();
         }
+        
         $siteUrl = $site->getUrlParser();
         $path = new Stringy\Stringy($this->getPath());
         if ($path->startsWith($siteUrl->getPath())) {

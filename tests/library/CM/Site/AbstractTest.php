@@ -46,45 +46,30 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertEquals('http://www.cdn.com', $site->getUrlCdn());
     }
 
-    public function testMatch() {
-        $siteClassMatchCom = $this->getMockBuilder('CM_Site_Abstract')
-            ->setMethods(array('getUrl'))
-            ->setMockClassName('CM_Site_MockFoo')
-            ->getMockForAbstractClass();
-        $siteClassMatchCom->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.com'));
-        /** @var CM_Site_Abstract $siteClassMatchCom */
+    public function testIsUrlMatch() {
+        $site = $this->getMockSite(null, null, [
+            'url' => 'http://www.my-site.com',
+            'urlCdn' => 'http://cdn.my-site.com',
+        ]);
 
-        $siteClassMatchXxx = $this->getMockBuilder('CM_Site_Abstract')
-            ->setMethods(array('getUrl'))
-            ->setMockClassName('CM_Site_MockBar')
-            ->getMockForAbstractClass();
-        $siteClassMatchXxx->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.xxx'));
-        /** @var CM_Site_Abstract $siteClassMatchXxx */
-
-        $requestCom = new CM_Http_Request_Get('/', array('host' => 'www.example.com'));
-        $this->assertTrue($siteClassMatchCom->match($requestCom));
-
-        $requestXxx = new CM_Http_Request_Get('/', array('host' => 'www.example.xxx'));
-        $this->assertTrue($siteClassMatchXxx->match($requestXxx));
-
-        $requestNot = new CM_Http_Request_Get('/', array('host' => 'www.example.foo'));
-        $this->assertFalse($siteClassMatchXxx->match($requestNot));
-
-        $requestNotPartial = new CM_Http_Request_Get('/', array('host' => 'www.example.xxx.com'));
-        $this->assertFalse($siteClassMatchXxx->match($requestNotPartial));
+        $this->assertSame(true, $site->isUrlMatch('my-site.com', '/'));
+        $this->assertSame(true, $site->isUrlMatch('my-site.com', '/foo'));
+        $this->assertSame(true, $site->isUrlMatch('www.my-site.com', '/foo'));
+        $this->assertSame(true, $site->isUrlMatch('cdn.my-site.com', '/foo'));
+        $this->assertSame(false, $site->isUrlMatch('something.my-site.com', '/foo'));
+        $this->assertSame(false, $site->isUrlMatch('something.com', '/foo'));
     }
 
-    public function testMatchCdn() {
-        $siteClass = $this->getMockBuilder('CM_Site_Abstract')
-            ->setMethods(array('getUrl'))
-            ->setMethods(array('getUrlCdn'))
-            ->getMockForAbstractClass();
-        $siteClass->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.com'));
-        $siteClass->expects($this->any())->method('getUrlCdn')->will($this->returnValue('http://cdn.example.com'));
-        /** @var CM_Site_Abstract $siteClass */
+    public function testIsUrlMatchWithPath() {
+        $site = $this->getMockSite(null, null, [
+            'url' => 'http://www.my-site.com/foo',
+        ]);
 
-        $this->assertTrue($siteClass->match(new CM_Http_Request_Get('/', array('host' => 'cdn.example.com'))));
-        $this->assertFalse($siteClass->match(new CM_Http_Request_Get('/', array('host' => 'www.google.com'))));
+        $this->assertSame(false, $site->isUrlMatch('my-site.com', '/'));
+        $this->assertSame(true, $site->isUrlMatch('my-site.com', '/foo'));
+        $this->assertSame(true, $site->isUrlMatch('my-site.com', '/foo/bar'));
+        $this->assertSame(true, $site->isUrlMatch('www.my-site.com', '/foo'));
+        $this->assertSame(false, $site->isUrlMatch('something.my-site.com', '/foo'));
     }
 
     public function testFactory() {
