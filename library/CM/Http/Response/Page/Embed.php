@@ -30,6 +30,10 @@ class CM_Http_Response_Page_Embed extends CM_Http_Response_Page {
         $this->_processContentOrRedirect();
     }
 
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
+        return null;
+    }
+
     /**
      * @param CM_Http_Request_Abstract $request
      * @param CM_Site_Abstract         $site
