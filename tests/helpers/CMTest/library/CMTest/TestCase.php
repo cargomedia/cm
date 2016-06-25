@@ -283,7 +283,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @param string             $path
      * @param CM_Model_User|null $viewer
      * @param CM_Site_Abstract   $site
-     * @return CM_Http_Response_Page|\Mocka\AbstractClassTrait
+     * @return CM_Http_Response_Page
      * @throws CM_Exception
      * @throws CM_Exception_Invalid
      */
