@@ -236,12 +236,13 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param string $path
+     * @param CM_Http_Request_Abstract $request
      * @return CM_Http_Response_Abstract|\Mocka\AbstractClassTrait
      */
-    public function getResponseResourceLayout($path) {
-        $request = $this->createRequest('/layout/null/' . time() . '/' . $path);
-        return $this->processRequest($request);
+    public function processRequest(CM_Http_Request_Abstract $request) {
+        $response = $this->getResponse($request);
+        $response->process();
+        return $response;
     }
 
     /**
@@ -273,31 +274,22 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param string|CM_Http_Request_Get $pathOrRequest
+     * @param string             $path
+     * @param CM_Model_User|null $viewer
+     * @param CM_Site_Abstract   $site
      * @return CM_Http_Response_Page|\Mocka\AbstractClassTrait
      * @throws CM_Exception
+     * @throws CM_Exception_Invalid
      */
-    public function getResponsePage($pathOrRequest) {
-        if ($pathOrRequest instanceof CM_Http_Request_Get) {
-            $request = $pathOrRequest;
-        } else {
+    public function getResponsePage($path, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
+        if (null === $site) {
             $site = $this->getMockSite();
-            $request = new CM_Http_Request_Get($pathOrRequest, ['host' => $site->getHost()]);
         }
+        $request = new CM_Http_Request_Get($path, ['host' => $site->getHost()], null, $viewer);
         $response = $this->getResponse($request);
         if (!$response instanceof CM_Http_Response_Page) {
             throw new CM_Exception('Unexpected response of type `' . get_class($response) . '`');
         }
-        return $response;
-    }
-
-    /**
-     * @param CM_Http_Request_Abstract $request
-     * @return CM_Http_Response_Abstract|\Mocka\AbstractClassTrait
-     */
-    public function processRequest(CM_Http_Request_Abstract $request) {
-        $response = $this->getResponse($request);
-        $response->process();
         return $response;
     }
 

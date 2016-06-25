@@ -105,10 +105,12 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
             '/bar/mock5?foo=bar' => $site2,
             '/mock5?foo=bar' => $site3,
         ];
+        
+        $responseFactory = new CM_Http_ResponseFactory($this->getServiceManager());
 
         foreach($expectedList as $path => $site) {
             $request = new CM_Http_Request_Get($path, ['host' => 'my-site.com']);
-            $response = $this->getResponsePage($request);
+            $response = $responseFactory->getResponse($request);
             $response->process();
 
             $this->assertInstanceOf('CM_Http_Response_Page', $response);
