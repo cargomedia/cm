@@ -89,7 +89,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     public function testProcessHostWithoutWww() {
         $site = $this->getMockSite(null, null, ['url' => 'http://www.my-site.com']);
         $request = new CM_Http_Request_Get('/mock5?foo=bar', ['host' => 'my-site.com']);
-        $response = $this->getResponse($request);
+        $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
 
         $this->assertContains('Location: ' . $site->getUrl() . '/mock5?foo=bar', $response->getHeaders());
@@ -105,7 +105,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
             '/bar/mock5?foo=bar' => $site2,
             '/mock5?foo=bar' => $site3,
         ];
-        
+
         $responseFactory = new CM_Http_ResponseFactory($this->getServiceManager());
 
         foreach($expectedList as $path => $site) {

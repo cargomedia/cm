@@ -253,13 +253,16 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @return CM_Http_Response_View_Ajax
      */
     public function getResponseAjax(CM_View_Abstract $view, $methodName, array $params = null, CM_Frontend_Environment $environment = null) {
-        $request = $this->createRequestAjax($view, $methodName, $params);
+        $site = CM_Site_Abstract::factory();
+        $request = $this->createRequestAjax($view, $methodName, $params, null, null, $site);
         if ($environment) {
             $request->mockMethod('getViewer')->set(function () use ($environment) {
                 return $environment->getViewer();
             });
         }
-        return $this->processRequest($request);
+        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $site, $this->getServiceManager());
+        $response->process();
+        return $response;
     }
 
     /**
@@ -269,8 +272,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @return CM_Http_Response_View_Form
      */
     public function getResponseFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+        $site = CM_Site_Abstract::factory();
         $request = $this->createRequestFormAction($action, $data, $scopeComponent);
-        return $this->processRequest($request);
+        $response = CM_Http_Response_View_Form::createFromRequest($request, $site, $this->getServiceManager());
+        $response->process();
+        return $response;
     }
 
     /**
@@ -283,13 +289,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      */
     public function getResponsePage($path, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
         if (null === $site) {
-            $site = $this->getMockSite();
+            $site = CM_Site_Abstract::factory();
         }
         $request = new CM_Http_Request_Get($path, ['host' => $site->getHost()], null, $viewer);
-        $response = $this->getResponse($request);
-        if (!$response instanceof CM_Http_Response_Page) {
-            throw new CM_Exception('Unexpected response of type `' . get_class($response) . '`');
-        }
+        $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
         return $response;
     }
 
