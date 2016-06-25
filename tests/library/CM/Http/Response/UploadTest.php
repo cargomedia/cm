@@ -13,6 +13,13 @@ class CM_Http_Response_UploadTest extends CMTest_TestCase {
         CMTest_TH::clearEnv();
     }
 
+    public function testRequestMatching() {
+        $site = $this->getMockSite();
+        $factory = new CM_Http_ResponseFactory($this->getServiceManager());
+        $request = new CM_Http_Request_Post('/upload', ['host' => $site->getHost()]);
+        $this->assertInstanceOf('CM_Http_Response_Upload', $factory->getResponse($request));
+    }
+
     public function testUpload() {
         $filename = 'test.jpg';
         $content = file_get_contents(DIR_TEST_DATA . 'img/' . $filename);
