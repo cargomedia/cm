@@ -104,12 +104,14 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageRedirectLanguage() {
-        $site = CM_Site_Abstract::factory();
+        $site = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
         CMTest_TH::createLanguage('en');
         $viewer = CMTest_TH::createUser();
-        $environment = new CM_Frontend_Environment(null, $viewer);
-        $component = new CM_Page_View_Ajax_Test_Mock();
-        $response = $this->getResponseAjax($component, 'loadPage', ['path' => '/en' . CM_Page_View_Ajax_Test_Mock::getPath()], $environment);
+        $view = new CM_Page_View_Ajax_Test_Mock();
+        $request = $this->createRequestAjax($view, 'loadPage', ['path' => '/en' . CM_Page_View_Ajax_Test_Mock::getPath()], null, null, $site);
+        $request->mockMethod('getViewer')->set($viewer);
+        /** @var CM_Http_Response_View_Abstract $response */
+        $response = $this->processRequest($request);
 
         $this->assertViewResponseSuccess($response);
         $responseDecoded = CM_Params::jsonDecode($response->getContent());
