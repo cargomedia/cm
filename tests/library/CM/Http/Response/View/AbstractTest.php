@@ -7,11 +7,12 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPage() {
-        $viewer = CMTest_TH::createUser();
-        $environment = new CM_Frontend_Environment(null, $viewer);
-        $component = new CM_Page_View_Ajax_Test_Mock();
+        $site = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
+        $page = new CM_Page_View_Ajax_Test_Mock();
         $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
-        $response = $this->getResponseAjax($component, 'loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath()], $environment);
+        $request = $this->createRequestAjax($page, 'loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath()], null, null, $site);
+        /** @var CM_Http_Response_View_Abstract $response */
+        $response = $this->processRequest($request);
 
         $this->assertViewResponseSuccess($response);
         $responseContent = CM_Params::decode($response->getContent(), true);
@@ -22,6 +23,19 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertSame('', $responseContent['success']['data']['title']);
         $this->assertSame($response->getRender()->getUrlPage('CM_Page_View_Ajax_Test_Mock'), $responseContent['success']['data']['url']);
         $this->assertSame('CM_Layout_Mock1', $responseContent['success']['data']['layoutClass']);
+    }
+
+    public function testLoadPageSiteWithPath() {
+        $site = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
+        $page = new CM_Page_View_Ajax_Test_Mock();
+        $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
+        $request = $this->createRequestAjax($page, 'loadPage', ['path' => '/foo' . CM_Page_View_Ajax_Test_Mock::getPath()], null, null, $site);
+        /** @var CM_Http_Response_View_Abstract $response */
+        $response = $this->processRequest($request);
+
+        $this->assertViewResponseSuccess($response);
+        $responseContent = CM_Params::decode($response->getContent(), true);
+        $this->assertSame($response->getRender()->getUrlPage('CM_Page_View_Ajax_Test_Mock'), $responseContent['success']['data']['url']);
     }
 
     public function testProcessExceptionCatching() {

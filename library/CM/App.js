@@ -1398,9 +1398,10 @@ var CM_App = CM_Class_Abstract.extend({
       }
 
       var urlSite = cm.getUrl();
+      var urlBase = cm.options.urlBase;
       if (0 === url.indexOf(urlSite)) {
-        var pageFragment = url.substr(urlSite.length);
-        cm.getLayout().loadPage(pageFragment);
+        var path = url.substr(urlBase.length);
+        cm.getLayout().loadPage(path);
       } else {
         window.location.assign(url);
         return Promise.resolve();
