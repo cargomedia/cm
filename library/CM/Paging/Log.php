@@ -73,7 +73,7 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
             ];
             $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, null, null, $aggregate);
         } else {
-            $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, $criteria, null, null, ['_id' => -1]);
+            $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, $criteria, null, null, ['createdAt' => -1]);
         }
 
         parent::__construct($source);
