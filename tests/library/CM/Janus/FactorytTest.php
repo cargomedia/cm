@@ -14,6 +14,10 @@ class CM_Janus_FactoryTest extends CMTest_TestCase {
                 'httpAddress'      => 'http://cm-janus.dev:8080',
                 'webSocketAddress' => 'ws://cm-janus.dev:8188',
                 'pluginList'       => ['audio', 'audioHD'],
+                'coordinates'      => [
+                    'latitude'  => 51.51,
+                    'longitude' => -0.13,
+                ],
                 'iceServerList'    => $iceServerList,
             ],
             6 => [
@@ -21,6 +25,10 @@ class CM_Janus_FactoryTest extends CMTest_TestCase {
                 'httpAddress'      => 'http://cm-janus.dev:8081',
                 'webSocketAddress' => 'ws://cm-janus.dev:8189',
                 'pluginList'       => [],
+                'coordinates'      => [
+                    'latitude'  => 53.43,
+                    'longitude' => 14.53,
+                ],
                 'iceServerList'    => $iceServerList,
             ],
         ];
@@ -44,6 +52,10 @@ class CM_Janus_FactoryTest extends CMTest_TestCase {
                 'httpAddress'      => 'http://cm-janus.dev:8080',
                 'webSocketAddress' => 'ws://cm-janus.dev:8188',
                 'pluginList'       => ['audio', 'audioHD'],
+                'coordinates'      => [
+                    'latitude'  => 51.51,
+                    'longitude' => -0.13,
+                ],
                 'iceServerList'    => $iceServerList,
             ],
             6 => [
@@ -51,25 +63,33 @@ class CM_Janus_FactoryTest extends CMTest_TestCase {
                 'httpAddress'      => 'http://cm-janus.dev:8081',
                 'webSocketAddress' => 'ws://cm-janus.dev:8189',
                 'pluginList'       => ['video', 'audio', 'videoHD'],
+                'coordinates'      => [
+                    'latitude'  => 53.43,
+                    'longitude' => 14.53,
+                ],
                 'iceServerList'    => $iceServerList,
             ],
         ];
         $factory = new CM_Janus_Factory();
         $janus = $factory->createService($serversConfig);
-        $servers = $janus->getConfiguration()->getServers();
+        $servers = $janus->getServerList()->getAll();
         $this->assertCount(2, $servers);
         $this->assertSame(5, $servers[0]->getId());
         $this->assertSame('foo-bar', $servers[0]->getKey());
         $this->assertSame('http://cm-janus.dev:8080', $servers[0]->getHttpAddress());
         $this->assertSame('ws://cm-janus.dev:8188', $servers[0]->getWebSocketAddress());
-        $this->assertSame($iceServerList, $servers[0]->getIceServerList());
         $this->assertSame($serversConfig[5]['pluginList'], $servers[0]->getPluginList());
+        $this->assertSame(51.51, $servers[0]->getLocation()->getLatitude());
+        $this->assertSame(-0.13, $servers[0]->getLocation()->getLongitude());
+        $this->assertSame($iceServerList, $servers[0]->getIceServerList());
 
         $this->assertSame(6, $servers[1]->getId());
         $this->assertSame('foo-bar-baz', $servers[1]->getKey());
         $this->assertSame('http://cm-janus.dev:8081', $servers[1]->getHttpAddress());
         $this->assertSame('ws://cm-janus.dev:8189', $servers[1]->getWebSocketAddress());
-        $this->assertSame($iceServerList, $servers[1]->getIceServerList());
         $this->assertSame($serversConfig[6]['pluginList'], $servers[1]->getPluginList());
+        $this->assertSame(53.43, $servers[1]->getLocation()->getLatitude());
+        $this->assertSame(14.53, $servers[1]->getLocation()->getLongitude());
+        $this->assertSame($iceServerList, $servers[1]->getIceServerList());
     }
 }

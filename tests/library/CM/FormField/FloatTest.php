@@ -2,17 +2,29 @@
 
 class CM_FormField_FloatTest extends CMTest_TestCase {
 
-    /**
-     * @expectedException CM_Exception_FormFieldValidation
-     */
     public function testValidate() {
         $environment = new CM_Frontend_Environment();
         $field = new CM_FormField_Float(['name' => 'foo']);
-        $response = $this->getMockForAbstractClass('CM_Http_Response_Abstract', array(), '', false);
-        /** @var CM_Http_Response_Abstract $response */
 
-        $validationResult = $field->validate($environment, 1.3);
-        $this->assertSame(1.3, $validationResult);
-        $field->validate($environment, 'foo');
+        $this->assertSame(1.3, $field->validate($environment, 1.3));
+        
+        $this->assertInstanceOf('CM_Exception_FormFieldValidation', $this->catchException(function() use ($field, $environment) {
+            $field->validate($environment, 'foo');
+        }));
+    }
+
+    public function testValidateMinMaxOptions() {
+        $environment = new CM_Frontend_Environment();
+        $field = new CM_FormField_Float(['name' => 'foo', 'min' => 1.3, 'max' => 2.5]);
+
+        $this->assertSame(1.3, $field->validate($environment, 1.3));
+
+        $this->assertInstanceOf('CM_Exception_FormFieldValidation', $this->catchException(function() use ($field, $environment) {
+            $field->validate($environment, 1.2);
+        }));
+
+        $this->assertInstanceOf('CM_Exception_FormFieldValidation', $this->catchException(function() use ($field, $environment) {
+            $field->validate($environment, 2.6);
+        }));
     }
 }

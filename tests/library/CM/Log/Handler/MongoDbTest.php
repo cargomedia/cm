@@ -11,15 +11,6 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Log_Handler_MongoDb', $handler);
     }
 
-    public function testFailWithWrongCollection() {
-        $exception = $this->catchException(function () {
-            new CM_Log_Handler_MongoDb('badCollection', 1000);
-        });
-
-        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('MongoDb Collection `badCollection` does not contain valid TTL index', $exception->getMessage());
-    }
-
     public function testFailWithWrongTtl() {
         $collection = 'cm_event_log';
         $mongoClient = $this->getServiceManager()->getMongoDb();
@@ -84,5 +75,31 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertSame('v7.0.1', $context['computerInfo']['phpVersion']);
         $this->assertSame(['bar' => ['baz' => 'quux']], $context['extra']);
         $this->assertSame('{"bar":"2", "quux":"baz"}', $context['httpRequest']['body']);
+    }
+
+    public function testSanitizeRecord() {
+        $handler = new CM_Log_Handler_MongoDb('foo');
+        $record = [
+            'foo'  => [
+                'baz' => 'quux',
+                'bar' => pack("H*", 'c32e')
+            ],
+            'foo2' => 2,
+        ];
+        $sanitizedRecord = $this->callProtectedMethod($handler, '_sanitizeRecord', [$record]);
+
+        $this->assertSame([
+            'foo'     => [
+                'baz' => 'quux',
+                'bar' => 'SANITIZED: ?.',
+            ],
+            'foo2'    => 2,
+            'context' => [
+                'extra' => [
+                    'sanitized' => true,
+                    'bar-UTF'   => 'c32e',
+                ]
+            ],
+        ], $sanitizedRecord);
     }
 }

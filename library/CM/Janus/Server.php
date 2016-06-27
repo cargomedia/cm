@@ -17,18 +17,22 @@ class CM_Janus_Server {
     /** @var string[] */
     protected $_pluginList;
 
+    /** @var CM_Geo_Point */
+    protected $_location;
+
     /** @var  array */
     protected $_iceServerList;
 
     /**
-     * @param int        $serverId
-     * @param string     $key
-     * @param string     $httpAddress
-     * @param string     $webSocketAddress
-     * @param string[]   $pluginList
-     * @param array|null $iceServerList
+     * @param int          $serverId
+     * @param string       $key
+     * @param string       $httpAddress
+     * @param string       $webSocketAddress
+     * @param string[]     $pluginList
+     * @param CM_Geo_Point $location
+     * @param array|null   $iceServerList
      */
-    public function __construct($serverId, $key, $httpAddress, $webSocketAddress, array $pluginList, array $iceServerList = null) {
+    public function __construct($serverId, $key, $httpAddress, $webSocketAddress, array $pluginList, CM_Geo_Point $location, array $iceServerList = null) {
         if (null === $iceServerList) {
             $iceServerList = [];
         }
@@ -39,6 +43,7 @@ class CM_Janus_Server {
         $this->_pluginList = array_map(function ($plugin) {
             return (string) $plugin;
         }, $pluginList);
+        $this->_location = $location;
         $this->_iceServerList = $iceServerList;
     }
 
@@ -71,10 +76,24 @@ class CM_Janus_Server {
     }
 
     /**
+     * @return string
+     */
+    public function getWebSocketAddressSubscribeOnly() {
+        return CM_Util::link($this->getWebSocketAddress(), ['subscribeOnly' => 1]);
+    }
+
+    /**
      * @return string[]
      */
     public function getPluginList() {
         return $this->_pluginList;
+    }
+
+    /**
+     * @return CM_Geo_Point
+     */
+    public function getLocation() {
+        return $this->_location;
     }
 
     /**

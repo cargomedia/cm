@@ -2,19 +2,19 @@
 
 class CM_Janus_Service extends CM_MediaStreams_Service {
 
-    /** @var CM_Janus_Configuration */
-    protected $_configuration;
+    /** @var CM_Janus_ServerList */
+    protected $_serverList;
 
     /** @var CM_Janus_HttpApiClient */
     protected $_httpApiClient;
 
     /**
-     * @param CM_Janus_Configuration                $configuration
+     * @param CM_Janus_ServerList                   $serverList
      * @param CM_Janus_HttpApiClient                $httpClient
      * @param CM_MediaStreams_StreamRepository|null $streamRepository
      */
-    public function __construct(CM_Janus_Configuration $configuration, CM_Janus_HttpApiClient $httpClient, CM_MediaStreams_StreamRepository $streamRepository = null) {
-        $this->_configuration = $configuration;
+    public function __construct(CM_Janus_ServerList $serverList, CM_Janus_HttpApiClient $httpClient, CM_MediaStreams_StreamRepository $streamRepository = null) {
+        $this->_serverList = $serverList;
         $this->_httpApiClient = $httpClient;
         parent::__construct($streamRepository);
     }
@@ -70,10 +70,10 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
     }
 
     /**
-     * @return CM_Janus_Configuration
+     * @return CM_Janus_ServerList
      */
-    public function getConfiguration() {
-        return $this->_configuration;
+    public function getServerList() {
+        return $this->_serverList;
     }
 
     /**
@@ -82,7 +82,7 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
      */
     protected function _fetchStatus() {
         $status = [];
-        foreach ($this->_configuration->getServers() as $server) {
+        foreach ($this->_serverList->getAll() as $server) {
             foreach ($this->_httpApiClient->fetchStatus($server) as $streamInfo) {
                 $status[] = new CM_Janus_Stream($streamInfo['id'], $streamInfo['channelName'], $server);
             }
@@ -98,7 +98,7 @@ class CM_Janus_Service extends CM_MediaStreams_Service {
     protected function _stopStream(CM_Model_Stream_Abstract $stream) {
         /** @var $streamChannel CM_Model_StreamChannel_Media */
         $streamChannel = $stream->getStreamChannel();
-        $server = $this->_configuration->getServer($streamChannel->getServerId());
+        $server = $this->_serverList->getById($streamChannel->getServerId());
         $result = $this->_httpApiClient->stopStream($server, $stream->getKey());
         if (array_key_exists('error', $result)) {
             throw new CM_Janus_StopStreamError($result['error']);

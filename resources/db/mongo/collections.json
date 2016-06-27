@@ -26,6 +26,14 @@
       "options": {
         "name": "context_extra_type_1_level_1_createdAt_1"
       }
+    },
+    {
+      "key": {
+        "message": 1
+      },
+      "options": {
+        "name": "message_1"
+      }
     }
   ]
 }

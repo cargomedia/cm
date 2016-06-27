@@ -19,7 +19,7 @@ class CM_Janus_RpcEndpoints {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
 
-        $server = $janus->getConfiguration()->findServerByKey($serverKey);
+        $server = $janus->getServerList()->findByKey($serverKey);
         $sessionParams = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
         $session = new CM_Session($sessionParams->getString('sessionId'));
         $user = $session->getUser(true);
@@ -87,7 +87,7 @@ class CM_Janus_RpcEndpoints {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
 
-        $server = $janus->getConfiguration()->findServerByKey($serverKey);
+        $server = $janus->getServerList()->findByKey($serverKey);
         $sessionParams = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
         $session = new CM_Session($sessionParams->getString('sessionId'));
         $user = $session->getUser(true);
@@ -150,7 +150,7 @@ class CM_Janus_RpcEndpoints {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
 
-        $server = $janus->getConfiguration()->findServerByKey($serverKey);
+        $server = $janus->getServerList()->findByKey($serverKey);
         $channelKey = (string) $channelKey;
         $streamKey = (string) $streamKey;
 
@@ -186,7 +186,7 @@ class CM_Janus_RpcEndpoints {
         $janus = CM_Service_Manager::getInstance()->getJanus('janus');
         self::_authenticate($janus, $serverKey);
 
-        $server = $janus->getConfiguration()->findServerByKey($serverKey);
+        $server = $janus->getServerList()->findByKey($serverKey);
 
         $streamRepository = $janus->getStreamRepository();
         /** @var CM_Model_StreamChannel_Media $streamChannel */
@@ -204,7 +204,7 @@ class CM_Janus_RpcEndpoints {
      * @throws CM_Exception_AuthFailed
      */
     protected static function _authenticate(CM_Janus_Service $janus, $serverKey) {
-        if (!$janus->getConfiguration()->findServerByKey($serverKey)) {
+        if (!$janus->getServerList()->findByKey($serverKey)) {
             throw new CM_Exception_AuthFailed('Invalid serverKey');
         }
     }

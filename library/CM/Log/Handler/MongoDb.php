@@ -33,7 +33,6 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         };
 
         $this->_insertOptions = null !== $insertOptions ? $insertOptions : ['w' => 0];
-        $this->_validateCollection($this->_collection);
     }
 
     /**
@@ -99,7 +98,15 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
 
         if ($exception = $recordContext->getException()) {
             $serializableException = new CM_ExceptionHandling_SerializableException($exception);
-            $formattedContext['exception'] = $serializableException;
+            $formattedContext['exception'] = [
+                'class'       => $serializableException->getClass(),
+                'message'     => $serializableException->getMessage(),
+                'line'        => $serializableException->getLine(),
+                'file'        => $serializableException->getFile(),
+                'trace'       => $serializableException->getTrace(),
+                'traceString' => $serializableException->getTraceAsString(),
+                'meta'        => $serializableException->getMeta(),
+            ];
         }
 
         $formattedRecord = [
@@ -115,23 +122,31 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             $formattedRecord['expireAt'] = new MongoDate($expireAt->getTimestamp());
         }
 
+        $formattedRecord = $this->_sanitizeRecord($formattedRecord); //TODO remove after investigation
         return $formattedRecord;
     }
 
     /**
-     * @param string $collection
-     * @throws CM_Exception_Invalid
+     * @param array $formattedRecord
+     * @return array
      */
-    protected function _validateCollection($collection) {
-        if (null !== $this->_recordTtl) {
-            $indexInfo = $this->_mongoDb->getIndexInfo($collection);
-            $foundIndex = \Functional\some($indexInfo, function ($el) {
-                return isset($el['key']['expireAt']) && isset($el['expireAfterSeconds']) && $el['expireAfterSeconds'] == 0;
-            });
+    protected function _sanitizeRecord(array $formattedRecord) {
+        $nonUtfBytesList = [];
 
-            if (!$foundIndex) {
-                throw new CM_Exception_Invalid('MongoDb Collection `' . $collection . '` does not contain valid TTL index');
-            };
+        array_walk_recursive($formattedRecord, function (&$value, $key) use (&$nonUtfBytesList) {
+            if (is_string($value) && !mb_check_encoding($value)) {
+                $nonUtfBytesList[$key] = unpack('H*', $value)[1];
+                $value = 'SANITIZED: ' . mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+            }
+        });
+
+        if (!empty($nonUtfBytesList)) {
+            $formattedRecord['context']['extra']['sanitized'] = true;
         }
+        foreach ($nonUtfBytesList as $key => $nonUtfByte) {
+            $formattedRecord['context']['extra'][$key . '-UTF'] = $nonUtfByte;
+        }
+
+        return $formattedRecord;
     }
 }

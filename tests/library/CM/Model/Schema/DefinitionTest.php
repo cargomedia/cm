@@ -257,6 +257,18 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
                 'expected' => true,
             ),
 
+            array(
+                'value'    => '{"foo":"bar"}',
+                'schema'   => array('type' => $this->mockInterface('CM_ArrayConvertible')->getClassName()),
+                'expected' => true,
+            ),
+
+            array(
+                'value'    => 'invalid-json',
+                'schema'   => array('type' => $this->mockInterface('CM_ArrayConvertible')->getClassName()),
+                'expected' => 'CM_Model_Exception_Validation',
+            ),
+
             // type invalid
             array(
                 'value'    => -12,
@@ -325,6 +337,11 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
                 'value'       => '',
                 'schema'      => array('type' => 'string'),
                 'returnValue' => '',
+            ),
+            array(
+                'value'       => 123,
+                'schema'      => array('type' => 'string'),
+                'returnValue' => '123',
             ),
 
             // type float
@@ -479,6 +496,11 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
                 'schema'      => array('type' => 'string'),
                 'returnValue' => '',
             ),
+            array(
+                'value'       => 123,
+                'schema'      => array('type' => 'string'),
+                'returnValue' => '123',
+            ),
 
             // type float
             array(
@@ -571,6 +593,34 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
         }
     }
 
+    public function testEncodeArrayConvertible() {
+        $class = $this->mockInterface('CM_ArrayConvertible');
+        $className = $class->getClassName();
+        $arrayConvertible = $class->newInstanceWithoutConstructor();
+        $toArray = ['key' => 'value'];
+        $arrayConvertible->mockMethod('toArray')->set($toArray);
+        $schema = new CM_Model_Schema_Definition([
+            'arrayConvertible' => ['type' => $className]
+        ]);
+        $value = $schema->encodeField('arrayConvertible', $arrayConvertible);
+        $this->assertSame('{"key":"value"}', $value);
+    }
+
+    public function testDecodeArrayConvertible() {
+        $class = $this->mockInterface('CM_ArrayConvertible');
+        $className = $class->getClassName();
+        $arrayConvertible = $class->newInstanceWithoutConstructor();
+        $fromArray = $class->mockStaticMethod('fromArray')->set($arrayConvertible);
+        $schema = new CM_Model_Schema_Definition([
+            'arrayConvertible' => ['type' => $className]
+        ]);
+        $jsonData = '{"key":"value"}';
+        $value = $schema->decodeField('arrayConvertible', $jsonData);
+        
+        $this->assertSame(['key' => 'value'], $fromArray->getLastCall()->getArgument(0));
+        $this->assertSame($arrayConvertible, $value);
+    }
+
     /**
      * @expectedException CM_Model_Exception_Validation
      * @expectedExceptionMessage Value `bar` is not an instance of `CM_Model_Mock_Validation2`
@@ -582,7 +632,7 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 
     /**
      * @expectedException CM_Model_Exception_Validation
-     * @expectedExceptionMessage Field `foo` is not a valid model
+     * @expectedExceptionMessage Value `bar` is not an instance of `CM_Class_Abstract`
      */
     public function testEncodeInvalidClass() {
         $schema = new CM_Model_Schema_Definition(array('foo' => array('type' => 'CM_Class_Abstract')));

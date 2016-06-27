@@ -8,7 +8,7 @@ class CM_Janus_Factory {
      * @throws CM_Exception_Invalid
      */
     public function createService(array $servers) {
-        $configuration = new CM_Janus_Configuration();
+        $serverList = new CM_Janus_ServerList();
 
         foreach ($servers as $serverId => $serverConfig) {
             $iceServerList = isset($serverConfig['iceServerList']) ? $serverConfig['iceServerList'] : null;
@@ -16,19 +16,22 @@ class CM_Janus_Factory {
             if (empty($serverConfig['pluginList'])) {
                 throw new CM_Exception_Invalid('Server pluginList is empty');
             }
-            $configuration->addServer(new CM_Janus_Server(
+            $serverList->addServer(new CM_Janus_Server(
                 $serverId,
                 $serverConfig['key'],
                 $serverConfig['httpAddress'],
                 $serverConfig['webSocketAddress'],
                 $serverConfig['pluginList'],
+                new CM_Geo_Point($serverConfig['coordinates']['latitude'], $serverConfig['coordinates']['longitude']),
                 $iceServerList
             ));
         }
 
         $httpClient = new GuzzleHttp\Client();
-        $httpApiClient = new CM_Janus_HttpApiClient($httpClient);
-        $janus = new CM_Janus_Service($configuration, $httpApiClient);
+        $appName = CM_App::getInstance()->getName();
+        $contextFormatter = new CM_Log_ContextFormatter_Cargomedia($appName);
+        $httpApiClient = new CM_Janus_HttpApiClient($httpClient, $contextFormatter);
+        $janus = new CM_Janus_Service($serverList, $httpApiClient);
         return $janus;
     }
 }
