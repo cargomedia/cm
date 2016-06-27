@@ -69,12 +69,15 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
 
         $cacheKey = __METHOD__ . '_md5:' . md5($content) . '_generateSourceMaps:' . $generateSourceMaps;
         $cache = CM_Cache_Persistent::getInstance();
-        return $cache->get($cacheKey, function () use ($mainPaths, $rootPaths, $generateSourceMaps) {
-            $args = $mainPaths;
-            if ($generateSourceMaps) {
-                $args[] = '--debug';
-            }
-            return CM_Util::exec('NODE_PATH="' . implode(':', $rootPaths) . '" browserify', $args);
+        $config = [
+            'browserify' => [
+                'entries' => $mainPaths,
+                'paths'   => $rootPaths,
+                'debug'   => (bool) $generateSourceMaps
+            ]
+        ];
+        return $cache->get($cacheKey, function () use ($config) {
+            return CM_Util::exec(DIR_ROOT . '/bin/jscompile', null, json_encode($config));
         });
     }
 

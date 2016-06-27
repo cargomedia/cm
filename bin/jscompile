@@ -1,0 +1,73 @@
+#!/usr/bin/env node
+
+var browserify = require('/usr/lib/node_modules/browserify');
+
+var defaultConfig = {
+  browserify: {
+    libraries: [],
+    entries: [],
+    paths: [],
+    debug: false
+  }
+};
+
+getConfig()
+  .then(function(config) {
+    var b = browserify({
+      entries: config.browserify.entries,
+      paths: config.browserify.paths,
+      debug: config.browserify.debug
+    });
+
+    config.browserify.libraries.forEach(function(library) {
+      b.require(library);
+    });
+
+    b.bundle().pipe(process.stdout);
+  })
+  .catch(function(error) {
+    process.stderr.write(error.stack + "\n");
+    process.exit(1);
+  });
+
+
+/**
+ * @returns {Promise}
+ */
+function getConfig() {
+  return getInput().then(function(input) {
+    var config = JSON.parse(input);
+    var processor, name;
+    config = config || {};
+    ['browserify'].forEach(function(processor) {
+      config[processor] = config[processor] || {};
+      for (name in defaultConfig[processor]) {
+        if (!(name in config[processor])) {
+          config[processor][name] = defaultConfig[processor][name];
+        }
+      }
+    });
+    return config;
+  });
+}
+
+/**
+ * @returns {Promise}
+ */
+function getInput() {
+  return new Promise(function(resolve, reject) {
+    var stdin = process.stdin;
+    stdin.resume();
+    stdin.setEncoding('utf8');
+    var input = '';
+    stdin.on('data', function(chunk) {
+      input += chunk;
+    });
+    stdin.on('error', function(error) {
+      reject(error);
+    });
+    stdin.on('end', function() {
+      resolve(input);
+    });
+  });
+}
