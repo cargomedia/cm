@@ -108,7 +108,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
      * @param int|null  $severity
      * @throws CM_Exception_Invalid
      */
-    protected function _logException(Exception $exception, $severity = null) {
+    protected function _logException(Exception $exception, $severity) {
         if (null === $severity) {
             $logLevel = CM_Log_Logger::exceptionToLevel($exception);
         } else {
