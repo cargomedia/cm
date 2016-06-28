@@ -247,6 +247,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         ]);
         $expectedEncoded = array(
             'foo' => 1,
+            '_class' => get_class($object),
         );
         $this->assertEquals($expectedEncoded, CM_Params::encode($object));
         $this->assertSame(1, $toArrayMethod->getCallCount());
