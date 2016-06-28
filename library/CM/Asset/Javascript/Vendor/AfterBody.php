@@ -6,7 +6,7 @@ class CM_Asset_Javascript_Vendor_AfterBody extends CM_Asset_Javascript_Vendor_Ab
         return 'client-vendor/after-body/';
     }
 
-    protected function _getSourcePath() {
-        return 'client-vendor/after-body-source/';
+    protected function _getMainPath() {
+        return 'client-vendor/after-body-main/';
     }
 }
