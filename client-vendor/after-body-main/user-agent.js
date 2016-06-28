@@ -1,3 +1,3 @@
 (function(global) {
-  global.UserAgentParser = require('./browser');
+  global.UserAgentParser = require('user-agent/browser');
 })(window || {});
