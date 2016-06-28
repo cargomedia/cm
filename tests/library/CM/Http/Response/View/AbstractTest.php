@@ -170,7 +170,7 @@ EOL;
 
         $expected = <<<EOL
 cm.window.appendHidden("<div id=\\"$newAutoId\\" class=\\"CM_Component_Mock CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\\">Sorry, this page was not found. It has been removed or never existed.\\n<\/div>");
-cm.views["$newAutoId"] = new CM_Component_Mock({el:$("#$newAutoId").get(0),params:{"entity":{"_type":123,"_id":{"id":"1"},"_class":"CM_Model_Entity_Mock2","id":1,"path":null}}});
+cm.views["$newAutoId"] = new CM_Component_Mock({el:$("#$newAutoId").get(0),params:{"entity":{"_class":"CM_Model_Entity_Mock2","_type":123,"_id":{"id":"1"},"id":1,"path":null}}});
 cm.views["$oldAutoId"].getParent().registerChild(cm.views["$newAutoId"]);
 cm.views["$oldAutoId"].replaceWithHtml(cm.views["$newAutoId"].\$el);
 cm.views["$newAutoId"]._ready();
