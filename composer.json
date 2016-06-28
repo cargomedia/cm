@@ -40,8 +40,7 @@
   },
   "bin": [
     "bin/cm",
-    "bin/qunit",
-    "bin/jscompile"
+    "bin/qunit"
   ],
   "extra": {
     "cm-modules": {
