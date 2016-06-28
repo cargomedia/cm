@@ -550,11 +550,9 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
         if (is_array($value)) {
             $result = array_map('self::encode', $value);
         } elseif ($value instanceof CM_ArrayConvertible || $value instanceof JsonSerializable) {
-            $class = get_class($value);
-            $result = [];
+            $result = ['_class' => get_class($value)];
             if ($value instanceof CM_ArrayConvertible) {
                 $array = $value->toArray();
-                $array = array_merge($array, array('_class' => $class));
                 $result = array_merge($result, $array);
             }
             if ($value instanceof JsonSerializable) {
