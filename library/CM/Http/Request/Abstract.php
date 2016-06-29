@@ -582,7 +582,6 @@ abstract class CM_Http_Request_Abstract {
      */
     public static function factory($method, $uri, array $headers = null, array $server = null, $body = null) {
         $method = strtolower($method);
-
         if ($method === 'post') {
             return new CM_Http_Request_Post($uri, $headers, $server, $body);
         }
