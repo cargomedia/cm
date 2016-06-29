@@ -12,7 +12,7 @@ class CM_Janus_ConnectionDescriptionTest extends CMTest_TestCase {
         $this->assertSame($janusServer, $connectionDescription->getServer());
     }
 
-    public function testJsonSerialize() {
+    public function testJsonSerializable() {
         $channelDefinition = $this->mockClass('CM_StreamChannel_Definition')->newInstanceWithoutConstructor();
         $channelDefinition->mockMethod('jsonSerialize')->set(['foo' => 'bar']);
         /** @var CM_StreamChannel_Definition $channelDefinition */
@@ -21,6 +21,8 @@ class CM_Janus_ConnectionDescriptionTest extends CMTest_TestCase {
         $janusServer->mockMethod('jsonSerialize')->set(['bar' => 'foo']);
         /** @var CM_Janus_Server $janusServer */
         $connectionDescription = new CM_Janus_ConnectionDescription($channelDefinition, $janusServer);
-        $this->assertSame(['foo' => 'bar', 'server' => ['bar' => 'foo']], $connectionDescription->jsonSerialize());
+        $this->assertJsonStringEqualsJsonString(
+            json_encode(['channel' => ['foo' => 'bar'], 'server' => ['bar' => 'foo']]),
+            json_encode($connectionDescription));
     }
 }
