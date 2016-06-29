@@ -156,12 +156,15 @@ class CM_Bootloader {
 
     /**
      * @param Closure $code
+     * @return int
      */
     public function execute(Closure $code) {
         try {
             $code();
+            return 0;
         } catch (Exception $e) {
             self::getExceptionHandler()->handleException($e);
+            return 1;
         }
     }
 
