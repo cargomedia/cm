@@ -310,6 +310,7 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Http_Request_Get', $request);
         $this->assertTrue(mb_check_encoding($request->getUri(), 'UTF-8'));
         $this->assertTrue(mb_check_encoding($request->getServer()['baz'], 'UTF-8'));
+        $this->assertNotEmpty(CM_Util::jsonEncode($request->getUri()));
     }
 
     /**
