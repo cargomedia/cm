@@ -10,7 +10,7 @@ var CM_Janus_Server = Backbone.Model.extend({
    * @returns {String}
    */
   getWebSocketAddress: function() {
-    return this._appendContext(this.get('webSocketAddress'));
+    return this.get('webSocketAddress');
   },
 
   /**
@@ -24,7 +24,7 @@ var CM_Janus_Server = Backbone.Model.extend({
    * @returns {String}
    */
   getWebSocketAddressSubscribeOnly: function() {
-    return this._appendContext(this.get('webSocketAddressSubscribeOnly'));
+    return this.get('webSocketAddressSubscribeOnly');
   },
 
   /**
@@ -46,17 +46,5 @@ var CM_Janus_Server = Backbone.Model.extend({
    */
   setIceServerList: function(iceServerList) {
     this.set('iceServerList', iceServerList);
-  },
-
-  /**
-   * @param {String} address
-   * @returns {String}
-   * @private
-   */
-  _appendContext: function(address) {
-    var separator = /\?[^\?]*$/.test(address) ? '&' : '?';
-    return address + separator + jQuery.param({
-        context: JSON.stringify(cm.getContext())
-      });
   }
 });
