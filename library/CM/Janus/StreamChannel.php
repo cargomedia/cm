@@ -14,6 +14,7 @@ class CM_Janus_StreamChannel extends CM_Model_StreamChannel_Media {
     public function jsonSerialize() {
         $array = parent::jsonSerialize();
         $array['server'] = $this->getServer();
+        $array['connectionDescription'] = $this->getConnectionDescription();
         return $array;
     }
 
