@@ -418,6 +418,18 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertEquals($streamChannel, $params->getStreamChannel('channel'));
     }
 
+    public function testGetStreamChannelMedia() {
+        $streamChannel = CMTest_TH::createStreamChannel(CM_Model_StreamChannel_Media::getTypeStatic());
+        $params = new CM_Params(['channel' => $streamChannel]);
+        $this->assertEquals($streamChannel, $params->getStreamChannelMedia('channel'));
+    }
+
+    public function testGetStreamChannelJanus() {
+        $streamChannel = CMTest_TH::createStreamChannel(CM_Janus_StreamChannel::getTypeStatic());
+        $params = new CM_Params(['channel' => $streamChannel]);
+        $this->assertEquals($streamChannel, $params->getStreamChannelJanus('channel'));
+    }
+
     public function testGetStreamChannelDefinition() {
         $definition = new CM_StreamChannel_Definition('foo', 12);
         $params = new CM_Params(['def' => $definition]);
