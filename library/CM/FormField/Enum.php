@@ -10,6 +10,7 @@ class CM_FormField_Enum extends CM_FormField_Set_Select {
         if (!is_a($enumClassName, 'CM_Type_Enum', true)) {
             throw new CM_Exception_Invalid('Invalid "className" parameter');
         }
+        /** @type CM_Type_Enum $enumClassName */
         $this->_params->set('values', $enumClassName::getConstantList());
         parent::_initialize();
     }
