@@ -56,9 +56,14 @@ abstract class CM_Http_Request_Abstract {
             $this->_headers = array_change_key_case($headers);
         }
         if (null !== $server) {
+            foreach ($server as &$serverValue) {
+                if (is_string($serverValue)) {
+                    $serverValue = self::_sanitizeUtf($serverValue);
+                }
+            }
             $this->_server = array_change_key_case($server);
         }
-
+        $uri = self::_sanitizeUtf((string) $uri);
         $this->setUri($uri);
 
         if ($sessionId = $this->getCookie('sessionId')) {
@@ -577,15 +582,6 @@ abstract class CM_Http_Request_Abstract {
      */
     public static function factory($method, $uri, array $headers = null, array $server = null, $body = null) {
         $method = strtolower($method);
-
-        $uri = self::_sanitizeUtf($uri);
-        if (null !== $server) {
-            foreach ($server as &$serverValue) {
-                if (is_string($serverValue)) {
-                    $serverValue = self::_sanitizeUtf($serverValue);
-                }
-            }
-        }
 
         if ($method === 'post') {
             return new CM_Http_Request_Post($uri, $headers, $server, $body);
