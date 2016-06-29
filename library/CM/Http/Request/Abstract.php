@@ -579,7 +579,7 @@ abstract class CM_Http_Request_Abstract {
         $method = strtolower($method);
 
         $uri = self::_sanitizeUtf($uri);
-        if (null !== $headers) {
+        if (null !== $server) {
             foreach ($server as &$serverValue) {
                 if (is_string($serverValue)) {
                     $serverValue = self::_sanitizeUtf($serverValue);
