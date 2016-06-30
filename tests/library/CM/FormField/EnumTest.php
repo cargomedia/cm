@@ -12,6 +12,11 @@ class CM_FormField_EnumTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertSame('Invalid "className" parameter', $exception->getMessage());
     }
+
+    public function testGetValues() {
+        $field = new CM_FormField_Enum(['name' => 'foo', 'className' => 'FormFieldEnumMock']);
+        $this->assertSame(['foo', 'bar'], $field->getValues());
+    }
 }
 
 class FormFieldEnumMock extends CM_Type_Enum {
