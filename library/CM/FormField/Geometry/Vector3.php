@@ -12,7 +12,7 @@ class CM_FormField_Geometry_Vector3 extends CM_FormField_Geometry_Vector2 {
         $this->_validate($userInput);
 
         try {
-            $vector3 = new CM_Geometry_Vector3($userInput['xCoordinate'], $userInput['yCoordinate'], $userInput['zCoordinate']);
+            $vector3 = new CM_Geometry_Vector3($userInput['x'], $userInput['y'], $userInput['z']);
         } catch (CM_Exception_Invalid $e) {
             throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid x, y or z value'));
         }
@@ -26,11 +26,11 @@ class CM_FormField_Geometry_Vector3 extends CM_FormField_Geometry_Vector2 {
 
         parent::prepare($renderParams, $environment, $viewResponse);
         $z = $value ? $value->getZ() : null;
-        $viewResponse->set('zCoordinate', $z);
+        $viewResponse->set('z', $z);
     }
 
     public function isEmpty($userInput) {
-        return parent::isEmpty($userInput) || empty($userInput['zCoordinate']);
+        return parent::isEmpty($userInput) || empty($userInput['z']);
     }
 
     /**
@@ -39,7 +39,7 @@ class CM_FormField_Geometry_Vector3 extends CM_FormField_Geometry_Vector2 {
      */
     protected function _validate($userInput) {
         parent::_validate($userInput);
-        if (!isset($userInput['zCoordinate'])) {
+        if (!isset($userInput['z'])) {
             throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('z needs to be numeric'));
         }
     }

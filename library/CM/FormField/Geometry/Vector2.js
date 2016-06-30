@@ -12,24 +12,24 @@ var CM_FormField_Geometry_Vector2 = CM_FormField_Abstract.extend({
   },
 
   isEmpty: function(value) {
-    return _.isEmpty(value.xCoordinate) || _.isEmpty(value.yCoordinate);
+    return _.isEmpty(value.x) || _.isEmpty(value.y);
   },
 
   /**
-   * @returns {{xCoordinate: *, yCoordinate: *}}
+   * @returns {{x: *, y: *}}
    */
   getValue: function() {
     return {
-      xCoordinate: this.$('[name*=xCoordinate]').val(),
-      yCoordinate: this.$('[name*=yCoordinate]').val()
+      x: this.$('[name*=xCoordinate]').val(),
+      y: this.$('[name*=yCoordinate]').val()
     }
   },
 
   /**
-   * @param {{xCoordinate: *, yCoordinate: *}} data
+   * @param {{x: *, y: *}} data
    */
   setValue: function(data) {
-    this.$('[name*=xCoordinate]').val(data.xCoordinate);
-    this.$('[name*=yCoordinate]').val(data.yCoordinate);
+    this.$('[name*=xCoordinate]').val(data.x);
+    this.$('[name*=yCoordinate]').val(data.y);
   }
 });

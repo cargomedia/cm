@@ -12,7 +12,7 @@ class CM_FormField_Geometry_Vector2 extends CM_FormField_Abstract {
         $this->_validate($userInput);
 
         try {
-            $vector2 = new CM_Geometry_Vector2($userInput['xCoordinate'], $userInput['yCoordinate']);
+            $vector2 = new CM_Geometry_Vector2($userInput['x'], $userInput['y']);
         } catch (CM_Exception_Invalid $e) {
             throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid x or y value'));
         }
@@ -25,12 +25,12 @@ class CM_FormField_Geometry_Vector2 extends CM_FormField_Abstract {
         $x = $value ? $value->getX() : null;
         $y = $value ? $value->getY() : null;
 
-        $viewResponse->set('xCoordinate', $x);
-        $viewResponse->set('yCoordinate', $y);
+        $viewResponse->set('x', $x);
+        $viewResponse->set('y', $y);
     }
 
     public function isEmpty($userInput) {
-        return empty($userInput['xCoordinate']) || empty($userInput['yCoordinate']);
+        return empty($userInput['x']) || empty($userInput['y']);
     }
 
     /**
@@ -38,10 +38,10 @@ class CM_FormField_Geometry_Vector2 extends CM_FormField_Abstract {
      * @throws CM_Exception_FormFieldValidation
      */
     protected function _validate($userInput) {
-        if (!isset($userInput['xCoordinate'])) {
+        if (!isset($userInput['x'])) {
             throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('x needs to be numeric'));
         }
-        if (!isset($userInput['yCoordinate'])) {
+        if (!isset($userInput['y'])) {
             throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('y needs to be numeric'));
         }
     }
