@@ -35,19 +35,21 @@ class CM_Janus_ServerList extends CM_Class_Abstract implements CM_Typed {
     }
 
     /**
-     * @param CM_StreamChannel_Definition $channelDefinition
+     * @param CM_Geo_Point $location
      * @return CM_Janus_ServerList
-     * @throws CM_Class_Exception_TypeNotConfiguredException
-     * @throws CM_Exception_Invalid
      */
-    public function filterByChannelDefinition(CM_StreamChannel_Definition $channelDefinition) {
-        $streamChannelClassName = CM_Model_StreamChannel_Media::_getClassName($channelDefinition->getType());
+    public function filterByClosestDistanceTo(CM_Geo_Point $location) {
+        $servers = $this->_servers;
+        if (!empty($servers)) {
+            $groupedServers = \Functional\group($servers, function (CM_Janus_Server $server) use ($location) {
+                return $server->getLocation()->calculateDistanceTo($location);
+            });
+            $distances = array_keys($groupedServers);
+            $minimumDistance = min($distances);
 
-        if (!is_subclass_of($streamChannelClassName, 'CM_Janus_StreamChannelInterface')) {
-            throw new CM_Exception_Invalid('`' . $streamChannelClassName . '` does not implement CM_Janus_StreamChannelInterface');
+            $servers = array_values($groupedServers[$minimumDistance]);
         }
-        /** @var CM_Janus_StreamChannelInterface $streamChannelClassName */
-        return $this->filterByPlugin($streamChannelClassName::getJanusPluginName());
+        return new CM_Janus_ServerList($servers);
     }
 
     /**
@@ -55,6 +57,20 @@ class CM_Janus_ServerList extends CM_Class_Abstract implements CM_Typed {
      */
     public function getAll() {
         return $this->_servers;
+    }
+
+    /**
+     * @param string $key
+     * @return CM_Janus_Server|null
+     */
+    public function findByKey($key) {
+        $key = (string) $key;
+        foreach ($this->_servers as $server) {
+            if ($server->getKey() === $key) {
+                return $server;
+            }
+        }
+        return null;
     }
 
     /**
@@ -95,34 +111,12 @@ class CM_Janus_ServerList extends CM_Class_Abstract implements CM_Typed {
     }
 
     /**
-     * @param string $key
-     * @return CM_Janus_Server|null
+     * @param int $identifier
+     * @return CM_Janus_Server
      */
-    public function findByKey($key) {
-        $key = (string) $key;
-        foreach ($this->_servers as $server) {
-            if ($server->getKey() === $key) {
-                return $server;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @param CM_Geo_Point $location
-     * @return CM_Janus_ServerList
-     */
-    public function filterByClosestDistanceTo(CM_Geo_Point $location) {
-        $servers = $this->_servers;
-        if (!empty($servers)) {
-            $groupedServers = \Functional\group($servers, function (CM_Janus_Server $server) use ($location) {
-                return $server->getLocation()->calculateDistanceTo($location);
-            });
-            $distances = array_keys($groupedServers);
-            $minimumDistance = min($distances);
-
-            $servers = array_values($groupedServers[$minimumDistance]);
-        }
-        return new CM_Janus_ServerList($servers);
+    public function getForIdentifier($identifier) {
+        $serverCount = count($this->_servers);
+        $key = $identifier % $serverCount;
+        return $this->_servers[$key];
     }
 }

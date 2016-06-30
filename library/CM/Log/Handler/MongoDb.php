@@ -33,7 +33,6 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         };
 
         $this->_insertOptions = null !== $insertOptions ? $insertOptions : ['w' => 0];
-        $this->_validateCollection($this->_collection);
     }
 
     /**
@@ -149,22 +148,5 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         }
 
         return $formattedRecord;
-    }
-
-    /**
-     * @param string $collection
-     * @throws CM_Exception_Invalid
-     */
-    protected function _validateCollection($collection) {
-        if (null !== $this->_recordTtl) {
-            $indexInfo = $this->_mongoDb->getIndexInfo($collection);
-            $foundIndex = \Functional\some($indexInfo, function ($el) {
-                return isset($el['key']['expireAt']) && isset($el['expireAfterSeconds']) && $el['expireAfterSeconds'] == 0;
-            });
-
-            if (!$foundIndex) {
-                throw new CM_Exception_Invalid('MongoDb Collection `' . $collection . '` does not contain valid TTL index');
-            };
-        }
     }
 }

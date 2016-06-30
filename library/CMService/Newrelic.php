@@ -21,7 +21,7 @@ class CMService_Newrelic extends CM_Class_Abstract {
     }
 
     public function setConfig() {
-        if ($this->_getEnabled()) {
+        if ($this->getEnabled()) {
             newrelic_set_appname($this->_appName);
         }
     }
@@ -30,7 +30,7 @@ class CMService_Newrelic extends CM_Class_Abstract {
      * @param Exception $exception
      */
     public function setNoticeError(Exception $exception) {
-        if ($this->_getEnabled()) {
+        if ($this->getEnabled()) {
             newrelic_notice_error($exception->getMessage(), $exception);
         }
     }
@@ -39,7 +39,7 @@ class CMService_Newrelic extends CM_Class_Abstract {
      * @param string $name
      */
     public function startTransaction($name) {
-        if ($this->_getEnabled()) {
+        if ($this->getEnabled()) {
             $this->endTransaction();
             newrelic_start_transaction($this->_appName);
             $this->setNameTransaction($name);
@@ -51,19 +51,19 @@ class CMService_Newrelic extends CM_Class_Abstract {
      */
     public function setNameTransaction($name) {
         $name = (string) $name;
-        if ($this->_getEnabled()) {
+        if ($this->getEnabled()) {
             newrelic_name_transaction($name);
         }
     }
 
     public function endTransaction() {
-        if ($this->_getEnabled()) {
+        if ($this->getEnabled()) {
             newrelic_end_transaction();
         }
     }
 
     public function ignoreTransaction() {
-        if ($this->_getEnabled()) {
+        if ($this->getEnabled()) {
             newrelic_ignore_transaction();
         }
     }
@@ -75,7 +75,7 @@ class CMService_Newrelic extends CM_Class_Abstract {
         if (null === $flag) {
             $flag = true;
         }
-        if ($this->_getEnabled()) {
+        if ($this->getEnabled()) {
             newrelic_background_job($flag);;
         }
     }
@@ -87,7 +87,7 @@ class CMService_Newrelic extends CM_Class_Abstract {
     public function setCustomMetric($name, $milliseconds) {
         $name = 'Custom/' . (string) $name;
         $milliseconds = (int) $milliseconds;
-        if ($this->_getEnabled()) {
+        if ($this->getEnabled()) {
             newrelic_custom_metric($name, $milliseconds);
         }
     }
@@ -96,7 +96,7 @@ class CMService_Newrelic extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      * @return bool
      */
-    protected function _getEnabled() {
+    public function getEnabled() {
         if ($this->_enabled) {
             if (!extension_loaded('newrelic')) {
                 throw new CM_Exception_Invalid('Newrelic Extension is not installed.');
