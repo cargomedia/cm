@@ -581,20 +581,4 @@ class CM_Util {
         }
         return $result;
     }
-
-    /**
-     * @param float    $min
-     * @param float    $max
-     * @param int|null $precision
-     * @return float
-     */
-    public static function randFloat($min, $max, $precision = null) {
-        $min = (float) $min;
-        $max = (float) $max;
-        if (null === $precision) {
-            $precision = 1;
-        }
-        $factor = pow(10, (int) $precision);
-        return mt_rand($min * $factor, $max * $factor) / $factor;
-    }
 }

@@ -141,13 +141,4 @@ class CM_UtilTest extends CMTest_TestCase {
     public function testJsonDecodeInvalid() {
         CM_Util::jsonDecode('{[foo:bar)}');
     }
-
-    public function testRandFloat() {
-        $min = -100;
-        $max = 5;
-
-        $rand = CM_Util::randFloat($min, $max, 2);
-        $this->assertLessThanOrEqual($max, $rand);
-        $this->assertGreaterThanOrEqual($min, $rand);
-    }
 }
