@@ -7,10 +7,10 @@ class CM_AdproviderAdapter_OpenxTest extends CMTest_TestCase {
         CM_Config::get()->CM_AdproviderAdapter_Openx->host = 'www.foo.org';
         $openx = new CM_AdproviderAdapter_Openx();
 
-        $html = $openx->getHtml(array('zoneId' => 'zone1'), array('foo' => 'bar'));
+        $html = $openx->getHtml('zoneName1', array('zoneId' => 'zone1'), array('foo' => 'bar'));
         $this->assertContains('<div class="openx-ad" data-zone-id="zone1" data-host="www.foo.org" data-variables="{&quot;foo&quot;:&quot;bar&quot;}"', $html);
 
-        $html = $openx->getHtml(array('zoneId' => 'zone1'), array());
+        $html = $openx->getHtml('zoneName1', array('zoneId' => 'zone1'), array());
         $this->assertContains('<div class="openx-ad" data-zone-id="zone1" data-host="www.foo.org" data-variables="{}"', $html);
     }
 }

@@ -14,13 +14,13 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
      * @throws Exception
      */
     private function _executeJob(CM_Params $params) {
-        CMService_Newrelic::getInstance()->startTransaction('CM Job: ' . $this->_getClassName());
+        CM_Service_Manager::getInstance()->getNewrelic()->startTransaction('CM Job: ' . $this->_getClassName());
         try {
             $return = $this->_execute($params);
-            CMService_Newrelic::getInstance()->endTransaction();
+            CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
             return $return;
         } catch (Exception $ex) {
-            CMService_Newrelic::getInstance()->endTransaction();
+            CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
             throw $ex;
         }
     }
@@ -44,6 +44,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
      * @throws CM_Exception
      */
     public function runMultiple(array $paramsList) {
+        $this->_verifyParams($paramsList);
         if (!$this->_getGearmanEnabled()) {
             return $this->_runMultipleWithoutGearman($paramsList);
         }
@@ -62,7 +63,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 
         foreach ($paramsList as $params) {
             $workload = CM_Params::encode($params, true);
-            $task = $gearmanClient->addTask($this->_getJobName(), $workload);
+            $task = $gearmanClient->addTaskHigh($this->_getJobName(), $workload);
             if (false === $task) {
                 throw new CM_Exception('Cannot add task `' . $this->_getJobName() . '`.');
             }
@@ -82,6 +83,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
         if (null === $params) {
             $params = array();
         }
+        $this->_verifyParams($params);
         if (!$this->_getGearmanEnabled()) {
             $this->_runMultipleWithoutGearman(array($params));
             return;
@@ -90,6 +92,18 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
         $workload = CM_Params::encode($params, true);
         $gearmanClient = $this->_getGearmanClient();
         $gearmanClient->doBackground($this->_getJobName(), $workload);
+    }
+
+    /**
+     * @param int        $seconds
+     * @param array|null $params
+     */
+    public function queueDelayed($seconds, array $params = null) {
+        if (null === $params) {
+            $params = array();
+        }
+        $executeAt = time() + $seconds;
+        $this->_getDelayedQueue()->addJob($this, $params, $executeAt);
     }
 
     /**
@@ -102,9 +116,8 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
         try {
             $params = CM_Params::factory(CM_Params::jsonDecode($workload), true);
         } catch (CM_Exception_Nonexistent $ex) {
-            throw new CM_Exception_Nonexistent(
-                'Cannot decode workload for Job `' . get_class($this) . '`: Original exception message `' . $ex->getMessage() .
-                '`', null, null, CM_Exception::WARN);
+            throw new CM_Exception_Nonexistent('Cannot decode workload for Job `' . get_class($this) . '`: Original exception message `' .
+                $ex->getMessage() . '`', CM_Exception::WARN);
         }
         return CM_Params::encode($this->_executeJob($params), true);
     }
@@ -149,5 +162,25 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
             $gearmanClient->addServer($server['host'], $server['port']);
         }
         return $gearmanClient;
+    }
+
+    /**
+     * @param mixed $value
+     * @throws CM_Exception_InvalidParam
+     */
+    protected static function _verifyParams($value) {
+        if (is_array($value)) {
+            $value = array_map('self::_verifyParams', $value);
+        }
+        if (is_object($value) && false === $value instanceof CM_ArrayConvertible) {
+            throw new CM_Exception_InvalidParam('Object of class `' . get_class($value) . '` is not an instance of CM_ArrayConvertible');
+        }
+    }
+
+    /**
+     * @return CM_Jobdistribution_DelayedQueue
+     */
+    protected function _getDelayedQueue() {
+        return new CM_Jobdistribution_DelayedQueue(CM_Service_Manager::getInstance());
     }
 }

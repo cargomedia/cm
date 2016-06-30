@@ -5,16 +5,13 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     /** @var CM_Page_Abstract|null */
     private $_page;
 
-    /** @var CM_Params|null */
-    private $_pageParams;
-
     /** @var string|null */
     private $_redirectUrl;
 
     public function __construct(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
         $this->_request = clone $request;
-        $this->_site = CM_Site_Abstract::findByRequest($this->_request);
         $this->_request->popPathLanguage();
+        $this->_site = CM_Site_Abstract::findByRequest($this->_request);
 
         $this->setServiceManager($serviceManager);
     }
@@ -28,17 +25,6 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             throw new CM_Exception_Invalid('Page not set');
         }
         return $this->_page;
-    }
-
-    /**
-     * @throws CM_Exception_Invalid
-     * @return CM_Params
-     */
-    public function getPageParams() {
-        if (null == $this->_pageParams) {
-            throw new CM_Exception_Invalid('Page params not set');
-        }
-        return $this->_pageParams;
     }
 
     /**
@@ -81,6 +67,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     }
 
     protected function _process() {
+        $this->setHeaderDisableCache();
         $this->_site->preprocessPageResponse($this);
         $this->_processContentOrRedirect();
         if ($redirectUrl = $this->getRedirectUrl()) {
@@ -100,8 +87,6 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             $this->_request->setLanguageUrl(null);
         }
         if (!$this->getRedirectUrl()) {
-            $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
-            $render->getServiceManager()->getTrackings()->trackPageView($render->getEnvironment(), $path);
             $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);
         }
@@ -113,26 +98,31 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
      * @return string|null
      */
     protected function _processPageLoop(CM_Http_Request_Abstract $request) {
+        $processingResult = new CM_Http_Response_Page_ProcessingResult();
         $count = 0;
-        $paths = array($request->getPath());
-        while (false === ($html = $this->_processPage($request))) {
-            $paths[] = $request->getPath();
+        while (false === $this->_processPage($request, $processingResult)) {
             if ($count++ > 10) {
-                throw new CM_Exception_Invalid('Page dispatch loop detected (' . implode(' -> ', $paths) . ').');
+                throw new CM_Exception_Invalid('Page dispatch loop detected (' . implode(' -> ', $processingResult->getPathList()) . ').');
             }
         }
-        return $html;
+
+        $this->_setStringRepresentation(get_class($processingResult->getPageInitial()));
+        $this->_page = $processingResult->getPage();
+        return $processingResult->hasHtml() ? $processingResult->getHtml() : null;
     }
 
     /**
-     * @param CM_Http_Request_Abstract $request
-     * @throws CM_Exception_Nonexistent
+     * @param CM_Http_Request_Abstract               $request
+     * @param CM_Http_Response_Page_ProcessingResult $result
      * @throws CM_Exception
-     * @throws CM_Exception_Nonexistent
-     * @return string|null|boolean
+     * @throws Exception
+     * @return boolean
      */
-    private function _processPage(CM_Http_Request_Abstract $request) {
-        try {
+    private function _processPage(CM_Http_Request_Abstract $request, CM_Http_Response_Page_ProcessingResult $result) {
+        return $this->_runWithCatching(function () use ($request, $result) {
+            $path = CM_Util::link($request->getPath(), $request->getQuery());
+            $result->addPath($path);
+
             $this->getSite()->rewrite($request);
             $pageParams = CM_Params::factory($request->getQuery(), true);
 
@@ -142,34 +132,44 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             } catch (CM_Exception $ex) {
                 throw new CM_Exception_Nonexistent('Cannot load page `' . $request->getPath() . '`: ' . $ex->getMessage());
             }
+            $result->addPage($page);
 
-            $this->_setStringRepresentation(get_class($page));
-            $page->prepareResponse($this->getRender()->getEnvironment(), $this);
+            $environment = $this->getRender()->getEnvironment();
+            $page->prepareResponse($environment, $this);
             if ($this->getRedirectUrl()) {
                 $request->setUri($this->getRedirectUrl());
-                return null;
+                return true;
             }
-            $html = $this->_renderPage($page);
-            $this->_page = $page;
-            $this->_pageParams = $pageParams;
-            return $html;
-        } catch (CM_Exception $e) {
-            $exceptionClass = get_class($e);
-            $configCatch = $this->_getConfig()->catch;
-            if (!array_key_exists($exceptionClass, $configCatch)) {
-                throw $e;
-            } else {
-                $options = $configCatch[$exceptionClass];
-                $this->getRender()->getGlobalResponse()->clear();
-                $request->setPath($options['path']);
-                $request->setQuery(array());
-                if (true === $options['log']) {
-                    $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
-                    $log = new CM_Paging_Log_NotFound();
-                    $log->add($formatter->formatException($e), $e->getMetaInfo());
-                }
+            if ($page->getCanTrackPageView()) {
+                $this->getRender()->getServiceManager()->getTrackings()->trackPageView($environment, $result->getPathTracking());
             }
-        }
-        return false;
+            $result->setHtml($this->_renderPage($page));
+            return true;
+        }, function (CM_Exception $ex, array $errorOptions) use ($request) {
+            $this->getRender()->getGlobalResponse()->clear();
+            /** @var CM_Page_Abstract $errorPage */
+            $errorPage = $errorOptions['errorPage'];
+            $request->setPath($errorPage::getPath());
+            $request->setQuery(array());
+            return false;
+        });
     }
+
+    /**
+     * @return string
+     */
+    public static function getPageResponseClass() {
+        return self::_getClassName();
+    }
+
+    /**
+     * @param CM_Http_Request_Abstract $request
+     * @param CM_Service_Manager       $serviceManager
+     * @return CM_Http_Response_Page
+     */
+    public static function factory(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
+        $className = self::getPageResponseClass();
+        return new $className($request, $serviceManager);
+    }
+
 }

@@ -47,28 +47,44 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
     }
 
     public function testMatch() {
-        $siteClassMatchFoo = $this->getMockBuilder('CM_Site_Abstract')
+        $siteClassMatchCom = $this->getMockBuilder('CM_Site_Abstract')
             ->setMethods(array('getUrl'))
             ->setMockClassName('CM_Site_MockFoo')
             ->getMockForAbstractClass();
-        $siteClassMatchFoo->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.com'));
-        /** @var CM_Site_Abstract $siteClassMatchFoo */
+        $siteClassMatchCom->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.com'));
+        /** @var CM_Site_Abstract $siteClassMatchCom */
 
-        $siteClassMatchBar = $this->getMockBuilder('CM_Site_Abstract')
+        $siteClassMatchXxx = $this->getMockBuilder('CM_Site_Abstract')
             ->setMethods(array('getUrl'))
             ->setMockClassName('CM_Site_MockBar')
             ->getMockForAbstractClass();
-        $siteClassMatchBar->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.xxx'));
-        /** @var CM_Site_Abstract $siteClassMatchBar */
+        $siteClassMatchXxx->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.xxx'));
+        /** @var CM_Site_Abstract $siteClassMatchXxx */
 
         $requestCom = new CM_Http_Request_Get('/', array('host' => 'www.example.com'));
-        $this->assertTrue($siteClassMatchFoo->match($requestCom));
+        $this->assertTrue($siteClassMatchCom->match($requestCom, []));
 
         $requestXxx = new CM_Http_Request_Get('/', array('host' => 'www.example.xxx'));
-        $this->assertTrue($siteClassMatchBar->match($requestXxx));
+        $this->assertTrue($siteClassMatchXxx->match($requestXxx, []));
 
         $requestNot = new CM_Http_Request_Get('/', array('host' => 'www.example.foo'));
-        $this->assertFalse($siteClassMatchBar->match($requestNot));
+        $this->assertFalse($siteClassMatchXxx->match($requestNot, []));
+
+        $requestNotPartial = new CM_Http_Request_Get('/', array('host' => 'www.example.xxx.com'));
+        $this->assertFalse($siteClassMatchXxx->match($requestNotPartial, []));
+    }
+
+    public function testMatchCdn() {
+        $siteClass = $this->getMockBuilder('CM_Site_Abstract')
+            ->setMethods(array('getUrl'))
+            ->setMethods(array('getUrlCdn'))
+            ->getMockForAbstractClass();
+        $siteClass->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.com'));
+        $siteClass->expects($this->any())->method('getUrlCdn')->will($this->returnValue('http://cdn.example.com'));
+        /** @var CM_Site_Abstract $siteClass */
+
+        $this->assertTrue($siteClass->match(new CM_Http_Request_Get('/', array('host' => 'cdn.example.com')), []));
+        $this->assertFalse($siteClass->match(new CM_Http_Request_Get('/', array('host' => 'www.google.com')), []));
     }
 
     public function testFactory() {
@@ -78,5 +94,24 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
             $this->assertContains('Site with type `9999` not configured', $ex->getMessage());
         }
+    }
+
+    public function testEquals() {
+        $siteFoo = $this->mockClass('CM_Site_Abstract');
+        /** @var CM_Site_Abstract $siteFoo1 */
+        $siteFoo1 = $siteFoo->newInstance();
+        /** @var CM_Site_Abstract $siteFoo2 */
+        $siteFoo2 = $siteFoo->newInstance();
+
+        $siteBar = $this->mockClass('CM_Site_Abstract');
+        /** @var CM_Site_Abstract $siteBar1 */
+        $siteBar1 = $siteBar->newInstance();
+
+        $this->assertSame(true, $siteFoo2->equals($siteFoo1));
+        $this->assertSame(true, $siteFoo1->equals($siteFoo2));
+        $this->assertSame(false, $siteFoo1->equals(null));
+
+        $this->assertSame(false, $siteFoo1->equals($siteBar1));
+        $this->assertSame(false, $siteBar1->equals($siteFoo1));
     }
 }

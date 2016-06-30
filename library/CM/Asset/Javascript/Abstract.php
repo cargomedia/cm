@@ -2,11 +2,28 @@
 
 class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
 
-    protected $_content;
+    /** @var CM_Frontend_JavascriptContainer */
+    protected $_js;
 
-    public function get($compress = null) {
-        $content = (string) $this->_content;
-        if ($compress) {
+    /** @var CM_Site_Abstract */
+    protected $_site;
+
+    /** @var bool */
+    protected $_debug;
+
+    /**
+     * @param CM_Site_Abstract $site
+     * @param bool|null        $debug
+     */
+    public function __construct(CM_Site_Abstract $site, $debug = null) {
+        $this->_site = $site;
+        $this->_debug = (bool) $debug;
+        $this->_js = new CM_Frontend_JavascriptContainer();
+    }
+
+    public function get() {
+        $content = $this->_js->compile();
+        if (!$this->_isDebug()) {
             $content = $this->_minify($content);
         }
         return $content;
@@ -19,7 +36,7 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
     protected function _minify($content) {
         $md5 = md5($content);
         $cacheKey = CM_CacheConst::App_Resource . '_md5:' . $md5;
-        $cache = new CM_Cache_Storage_File();
+        $cache = CM_Cache_Persistent::getInstance();
         if (false === ($contentMinified = $cache->get($cacheKey))) {
             $uglifyCommand = 'uglifyjs --no-copyright';
             /**
@@ -31,5 +48,85 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
             $cache->set($cacheKey, $contentMinified);
         }
         return $contentMinified;
+    }
+
+    /**
+     * @param string[] $mainPaths
+     * @param string[] $rootPaths
+     * @param bool     $generateSourceMaps
+     * @return string
+     */
+    protected function _browserify(array $mainPaths, array $rootPaths, $generateSourceMaps) {
+        if (!count($mainPaths)) {
+            return '';
+        }
+
+        $content = \Functional\reduce_left($rootPaths, function ($rootPath, $index, $collection, $carry) {
+            return $carry . \Functional\reduce_left(CM_Util::rglob('*.js', $rootPath), function ($filePath, $index, $collection, $carry) {
+                return $carry . md5((new CM_File($filePath))->read());
+            }, '');
+        }, '');
+
+        $cacheKey = __METHOD__ . '_md5:' . md5($content) . '_generateSourceMaps:' . $generateSourceMaps;
+        $cache = CM_Cache_Persistent::getInstance();
+        return $cache->get($cacheKey, function () use ($mainPaths, $rootPaths, $generateSourceMaps) {
+            $args = $mainPaths;
+            if ($generateSourceMaps) {
+                $args[] = '--debug';
+            }
+            return CM_Util::exec('NODE_PATH="' . implode(':', $rootPaths) . '" browserify', $args);
+        });
+    }
+
+    /**
+     * @param string $path
+     */
+    protected function _appendDirectoryGlob($path) {
+        foreach (array_reverse($this->_site->getModules()) as $moduleName) {
+            $initPath = $this->_getPathInModule($moduleName, $path);
+            foreach (CM_Util::rglob('*.js', $initPath) as $filePath) {
+                $content = (new CM_File($filePath))->read();
+                $this->_js->append($content);
+            }
+        }
+    }
+
+    /**
+     * @param string $path
+     * @param bool   $generateSourceMaps
+     * @throws CM_Exception
+     */
+    protected function _appendDirectoryBrowserify($path, $generateSourceMaps) {
+        $sourceMainPaths = [];
+        $sourcePaths = [];
+
+        if ($generateSourceMaps && !$this->_js->isEmpty()) {
+            throw new CM_Exception('Cannot generate source maps when output container already contains code.');
+        }
+
+        foreach (array_reverse($this->_site->getModules()) as $moduleName) {
+            $sourcePath = $this->_getPathInModule($moduleName, $path);
+            $sourcePaths[] = $sourcePath;
+            $sourceMainPaths = array_merge($sourceMainPaths, glob($sourcePath . '*/main.js'));
+        }
+
+        $content = $this->_browserify($sourceMainPaths, $sourcePaths, $generateSourceMaps);
+        $this->_js->append($content);
+    }
+
+    /**
+     * @param string $moduleName
+     * @param string $path
+     * @return string
+     */
+    protected function _getPathInModule($moduleName, $path) {
+        return DIR_ROOT . CM_Bootloader::getInstance()->getModulePath($moduleName) . $path;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _isDebug() {
+        return $this->_debug;
     }
 }

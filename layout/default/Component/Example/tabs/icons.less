@@ -1,16 +1,24 @@
+.CM_Form_ExampleIcon {
+  @media (min-width: @breakpointSmall) {
+    display: flex;
+  }
+}
+
 .column {
   box-sizing: border-box;
   padding: 10px 10px 10px 0;
-  width: 50%;
-  float: left;
+
+  &.column-controls {
+    flex-basis: 300px;
+    min-width: 300px;
+  }
 }
 
 .iconBox {
-  float: left;
+  display: inline-block;
   text-align: center;
   padding: 10px;
   margin: 5px;
-  background-color: darken(@colorBg, 2);
   border: 2px solid transparent;
   cursor: pointer;
 

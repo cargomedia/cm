@@ -39,10 +39,40 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
 
     /**
      * @param int $timestamp
+     * @return CM_Model_Splittest
      */
     public function setCreated($timestamp) {
         $timestamp = (int) $timestamp;
-        $this->_set('createStamp', $timestamp);
+        CM_Db_Db::update('cm_splittest', ['createStamp' => $timestamp], ['id' => $this->getId()]);
+        return $this->_change();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getOptimized() {
+        return (bool) $this->_get('optimized');
+    }
+
+    /**
+     * @param bool $optimized
+     * @return CM_Model_Splittest
+     */
+    public function setOptimized($optimized) {
+        $optimized = (bool) $optimized;
+        CM_Db_Db::update('cm_splittest', ['optimized' => $optimized], ['id' => $this->getId()]);
+        return $this->_change();
+    }
+
+    /**
+     * @return CM_Model_SplittestVariation[]
+     */
+    public function getVariationListSorted() {
+        $variationList = $this->getVariations()->getItems();
+        usort($variationList, function (CM_Model_SplittestVariation $variationA, CM_Model_SplittestVariation $variationB) {
+            return $variationA->getConversionRate() > $variationB->getConversionRate() ? -1 : 1;
+        });
+        return $variationList;
     }
 
     /**
@@ -151,8 +181,9 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
         if (empty($variations)) {
             throw new CM_Exception('Cannot create splittest without variations');
         }
+        $optimized = !empty($data['optimized']);
 
-        $id = CM_Db_Db::insert('cm_splittest', array('name' => $name, 'createStamp' => time()));
+        $id = CM_Db_Db::insert('cm_splittest', array('name' => $name, 'optimized' => $optimized, 'createStamp' => time()));
         try {
             foreach ($variations as $variation) {
                 CM_Db_Db::insert('cm_splittestVariation', array('splittestId' => $id, 'name' => $variation));
@@ -186,18 +217,17 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
      * @throws CM_Exception_Invalid
      */
     protected function _setConversion(CM_Splittest_Fixture $fixture, $weight = null) {
-        $columnId = $fixture->getColumnId();
         $fixtureId = $fixture->getId();
+        $columnIdQuoted = CM_Db_Db::getClient()->quoteIdentifier($fixture->getColumnId());
         if (null === $weight) {
-            CM_Db_Db::update('cm_splittestVariation_fixture',
-                array('conversionStamp' => time(), 'conversionWeight' => 1),
-                array('splittestId' => $this->getId(), $columnId => $fixtureId, 'conversionStamp' => null));
+            CM_Db_Db::exec('UPDATE `cm_splittestVariation_fixture`
+                SET `conversionStamp` = COALESCE(`conversionStamp`, ?), `conversionWeight` = 1
+                WHERE `splittestId` = ? AND ' . $columnIdQuoted . ' = ?',
+                array(time(), $this->getId(), $fixtureId));
         } else {
             $weight = (float) $weight;
-            $columnIdQuoted = CM_Db_Db::getClient()->quoteIdentifier($columnId);
             CM_Db_Db::exec('UPDATE `cm_splittestVariation_fixture`
-                SET `conversionStamp` = COALESCE(`conversionStamp`, ?),
-                `conversionWeight` = `conversionWeight` + ?
+                SET `conversionStamp` = COALESCE(`conversionStamp`, ?), `conversionWeight` = `conversionWeight` + ?
                 WHERE `splittestId` = ? AND ' . $columnIdQuoted . ' = ?',
                 array(time(), $weight, $this->getId(), $fixtureId));
         }
@@ -214,34 +244,51 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
 
     /**
      * @param CM_Splittest_Fixture $fixture
+     * @param bool|null            $updateCache
+     * @return string|null
+     */
+    protected function _findVariationNameFixture(CM_Splittest_Fixture $fixture, $updateCache = null) {
+        $updateCache = (bool) $updateCache;
+        $variationListFixture = $this->_getVariationListFixture($fixture, $updateCache);
+        if ($updateCache) {
+            $this->_change();
+        }
+        if (!isset($variationListFixture[$this->getId()]) || (int) $variationListFixture[$this->getId()]['flushStamp'] !== $this->getCreated()) {
+            return null;
+        }
+        return $variationListFixture[$this->getId()]['variation'];
+    }
+
+    /**
+     * @param CM_Splittest_Fixture $fixture
      * @throws CM_Db_Exception
      * @throws CM_Exception_Invalid
      * @return string
      */
     protected function _getVariationFixture(CM_Splittest_Fixture $fixture) {
-        $columnId = $fixture->getColumnId();
-        $fixtureId = $fixture->getId();
-
-        $variationListFixture = $this->_getVariationListFixture($fixture);
-        if (!array_key_exists($this->getId(), $variationListFixture) || $variationListFixture[$this->getId()]['flushStamp'] != $this->getCreated()) {
+        $variationName = $this->_findVariationNameFixture($fixture);
+        if (null === $variationName) {
             $variation = $this->_getVariationRandom();
+            $variationName = $variation->getName();
             try {
+                $columnId = $fixture->getColumnId();
+                $fixtureId = $fixture->getId();
                 CM_Db_Db::insert('cm_splittestVariation_fixture',
                     array('splittestId' => $this->getId(), $columnId => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
-                $variationListFixture[$this->getId()] = ['variation' => $variation->getName(), 'flushStamp' => $this->getCreated()];
+                $variationListFixture = $this->_getVariationListFixture($fixture);
+                $variationListFixture[$this->getId()] = ['variation' => $variationName, 'flushStamp' => $this->getCreated()];
                 $cacheKey = self::_getCacheKeyFixture($fixture);
                 $cache = CM_Cache_Local::getInstance();
                 $cache->set($cacheKey, $variationListFixture);
                 $this->getServiceManager()->getTrackings()->trackSplittest($fixture, $variation);
             } catch (CM_Db_Exception $exception) {
-                $variationListFixture = $this->_getVariationListFixture($fixture, true);
-                if (!array_key_exists($this->getId(), $variationListFixture) || $variationListFixture[$this->getId()]['flushStamp'] != $this->getCreated()) {
+                $variationName = $this->_findVariationNameFixture($fixture, true);
+                if (null === $variationName) {
                     throw $exception;
                 }
             }
         }
-
-        return $variationListFixture[$this->getId()]['variation'];
+        return $variationName;
     }
 
     /**
@@ -274,25 +321,12 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
      * @return CM_Model_SplittestVariation
      */
     protected function _getVariationRandom() {
-        if (!isset($this->_variationWeightList)) {
-            $variation = $this->getVariationsEnabled()->getItemRand();
+        if (isset($this->_variationWeightList)) {
+            $variation = $this->_getVariationWithFixedWeightPolicy();
+        } elseif ($this->getOptimized()) {
+            $variation = $this->_getVariationWithUpperConfidenceBoundPolicy();
         } else {
-            $variationList = array();
-            $variationWeightList = array();
-            /** @var CM_Model_SplittestVariation $variation */
-            foreach ($this->getVariationsEnabled()->getItems() as $variation) {
-                $variationName = $variation->getName();
-                if (isset($this->_variationWeightList[$variationName])) {
-                    $variationList[] = $variation;
-                    $variationWeightList[] = $this->_variationWeightList[$variationName];
-                }
-            }
-            if (empty($variationList)) {
-                $variation = null;
-            } else {
-                $weightedRandom = new CM_WeightedRandom($variationList, $variationWeightList);
-                $variation = $weightedRandom->lookup();
-            }
+            $variation = $this->_getVariationWithUniformPolicy();
         }
         if (!$variation) {
             throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
@@ -301,12 +335,73 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
     }
 
     /**
-     * @param string   $name
-     * @param string[] $variations
+     * @return CM_Model_SplittestVariation|null
+     */
+    protected function _getVariationWithFixedWeightPolicy() {
+        $variationList = [];
+        $variationWeightList = [];
+        /** @var CM_Model_SplittestVariation $variation */
+        foreach ($this->getVariationsEnabled()->getItems() as $variation) {
+            $variationName = $variation->getName();
+            if (isset($this->_variationWeightList[$variationName])) {
+                $variationList[] = $variation;
+                $variationWeightList[] = $this->_variationWeightList[$variationName];
+            }
+        }
+        if (empty($variationList)) {
+            return null;
+        }
+        $weightedRandom = new CM_WeightedRandom($variationList, $variationWeightList);
+        return $weightedRandom->lookup();
+    }
+
+    /**
+     * @return CM_Model_SplittestVariation|null
+     */
+    protected function _getVariationWithUniformPolicy() {
+        $variationList = $this->getVariationsEnabled();
+        return $variationList->getItemRand();
+    }
+
+    /**
+     * @see Section 4 of http://homes.di.unimi.it/~cesabian/Pubblicazioni/ml-02.pdf
+     * @return CM_Model_SplittestVariation|null
+     */
+    protected function _getVariationWithUpperConfidenceBoundPolicy() {
+        $variationList = $this->getVariationsEnabled();
+        $variationListUninitialized = [];
+        /** @var CM_Model_SplittestVariation $variationEnabled */
+        foreach ($variationList as $variationEnabled) {
+            if (0. === $variationEnabled->getStandardDeviation()) {
+                $variationListUninitialized[$variationEnabled->getFixtureCount()] = $variationEnabled;
+            }
+        }
+        if (!empty($variationListUninitialized)) {
+            ksort($variationListUninitialized);
+            return reset($variationListUninitialized);
+        }
+        $variation = null;
+        $upperConfidenceBoundMax = null;
+        foreach ($variationList as $variationEnabled) {
+            $upperConfidenceBound = $variationEnabled->getUpperConfidenceBound();
+            if ((null === $upperConfidenceBoundMax) || ($upperConfidenceBound > $upperConfidenceBoundMax)) {
+                $variation = $variationEnabled;
+                $upperConfidenceBoundMax = $upperConfidenceBound;
+            }
+        }
+        return $variation;
+    }
+
+    /**
+     * @param string    $name
+     * @param string[]  $variations
+     * @param bool|null $optimized
      * @return static
      */
-    public static function create($name, array $variations) {
-        return static::createStatic(['name' => (string) $name, 'variations' => (array) $variations]);
+    public static function create($name, array $variations, $optimized = null) {
+        $name = (string) $name;
+        $optimized = (bool) $optimized;
+        return static::createStatic(['name' => $name, 'variations' => $variations, 'optimized' => $optimized]);
     }
 
     /**

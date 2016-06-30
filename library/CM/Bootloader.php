@@ -59,10 +59,12 @@ class CM_Bootloader {
     public function getExceptionHandler() {
         if (!$this->_exceptionHandler) {
             if ($this->isCli()) {
-                $this->_exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
+                $exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
             } else {
-                $this->_exceptionHandler = new CM_ExceptionHandling_Handler_Http();
+                $exceptionHandler = new CM_ExceptionHandling_Handler_Http();
             }
+            $exceptionHandler->setServiceManager(CM_Service_Manager::getInstance());
+            $this->_exceptionHandler = $exceptionHandler;
         }
         return $this->_exceptionHandler;
     }
@@ -173,13 +175,11 @@ class CM_Bootloader {
 
     protected function _registerServices() {
         $serviceManager = CM_Service_Manager::getInstance();
-
-        $serviceManager->registerInstance('debug', new CM_Debug($this->isDebug()));
+        $serviceManager->register('debug', 'CM_Debug', ['enabled' => $this->isDebug()]);
         $serviceManager->register('filesystems', 'CM_Service_Filesystems');
-        $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', array(
-            new CM_File_Filesystem_Adapter_Local($this->getDirTmp()),
-        ));
-
+        $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', [
+            'adapter' => new CM_File_Filesystem_Adapter_Local($this->getDirTmp())
+        ]);
         foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
             $serviceManager->registerWithArray($serviceKey, $serviceDefinition);
         }
@@ -187,7 +187,7 @@ class CM_Bootloader {
 
     protected function _defaults() {
         date_default_timezone_set($this->getTimeZone()->getName());
-        CMService_Newrelic::getInstance()->setConfig();
+        CM_Service_Manager::getInstance()->getNewrelic()->setConfig();
     }
 
     /**

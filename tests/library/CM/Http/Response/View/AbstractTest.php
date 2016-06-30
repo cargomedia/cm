@@ -23,22 +23,33 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertSame('CM_Layout_Mock1', $responseContent['success']['data']['layoutClass']);
     }
 
-    public function testNotFoundErrorLogging() {
-        CM_Config::get()->CM_Http_Response_Page->catch['CM_Exception_Nonexistent'] = [
-            'path' => CM_Page_View_Ajax_Test_Mock::getPath(),
-            'log'  => true,
-        ];
+    public function testProcessExceptionCatching() {
+        CM_Config::get()->CM_Http_Response_View_Abstract->catchPublicExceptions = true;
+        CM_Config::get()->CM_Http_Response_View_Abstract->exceptionsToCatch = ['CM_Exception_Nonexistent' => []];
+        $response = $this->mockClass('CM_Http_Response_View_Abstract')->newInstanceWithoutConstructor();
+        $response->mockMethod('_processView')->set(function () {
+            throw new CM_Exception_Invalid('foo', null, null, [
+                'messagePublic' => new CM_I18n_Phrase('bar'),
+            ]);
+        });
+        $response->mockMethod('getRender')->set(new CM_Frontend_Render());
+        /** @var CM_Http_Response_View_Abstract $response */
+        CMTest_TH::callProtectedMethod($response, '_process');
+        $this->assertViewResponseError($response, 'CM_Exception_Invalid', 'bar', true);
 
-        $log = new CM_Paging_Log_NotFound();
-        $this->assertCount(0, $log);
+        $response->mockMethod('_processView')->set(function () {
+            throw new CM_Exception_Nonexistent('foo');
+        });
 
-        $viewer = CMTest_TH::createUser();
-        $environment = new CM_Frontend_Environment(null, $viewer);
-        $component = new CM_Page_View_Ajax_Test_Mock();
-        $this->getResponseAjax($component, 'loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath() . '/NotExist'], $environment);
+        CMTest_TH::callProtectedMethod($response, '_process');
+        $this->assertViewResponseError($response, 'CM_Exception_Nonexistent', 'Internal server error', false);
+    }
 
-        $log = new CM_Paging_Log_NotFound();
-        $this->assertCount(1, $log);
+    public function testProcessReturnDeployVersion() {
+        $response = $this->getResponseAjax(new CM_Page_View_Ajax_Test_Mock(), 'loadPage', ['path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()]);
+        $responseDecoded = CM_Params::jsonDecode($response->getContent());
+        $this->assertArrayHasKey('deployVersion', $responseDecoded);
+        $this->assertSame(CM_App::getInstance()->getDeployVersion(), $responseDecoded['deployVersion']);
     }
 
     public function testLoadPageRedirectExternal() {
@@ -81,7 +92,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
         $this->assertViewResponseSuccess($response);
         $responseContent = CM_Params::decode($response->getContent(), true);
-        $this->assertContains('ga("send", "pageview", "' . $page::getPath() . '")', $responseContent['success']['data']['jsTracking']);
+        $pageview = CM_Params::jsonEncode($page::getPath());
+        $this->assertContains('ga("send", "pageview", ' . $pageview . ')', $responseContent['success']['data']['jsTracking']);
     }
 
     public function testLoadPageTrackingRedirect() {
@@ -94,13 +106,13 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $responseContent = CM_Params::decode($response->getContent(), true);
         $jsTracking = $responseContent['success']['data']['jsTracking'];
         $this->assertSame(1, substr_count($jsTracking, 'ga("send", "pageview"'));
-        $this->assertContains('ga("send", "pageview", "' . $page::getPath() . '?count=0")', $jsTracking);
+        $pageview = CM_Params::jsonEncode($page::getPath() . '?count=0');
+        $this->assertContains('ga("send", "pageview", ' . $pageview . ')', $jsTracking);
     }
 
     public function testLoadPageTrackingError() {
-        CM_Config::get()->CM_Http_Response_Page->catch['CM_Exception_Nonexistent'] = [
-            'path' => CM_Page_View_Ajax_Test_Mock::getPath(),
-            'log'  => true,
+        CM_Config::get()->CM_Http_Response_Page->exceptionsToCatch['CM_Exception_Nonexistent'] = [
+            'errorPage' => 'CM_Page_View_Ajax_Test_Mock',
         ];
 
         $page = new CM_Page_View_Ajax_Test_Mock();
@@ -114,19 +126,19 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $html = $responseContent['success']['data']['html'];
 
         $this->assertSame(1, substr_count($jsTracking, 'ga("send", "pageview"'));
-        $this->assertContains('ga("send", "pageview", "/iwhdfkjlsh")', $jsTracking);
+        $this->assertContains('ga("send", "pageview", "\/iwhdfkjlsh")', $jsTracking);
         $this->assertContains('CM_Page_View_Ajax_Test_Mock', $html);
     }
 
     public function testReloadComponent() {
         $component = new CM_Component_Notfound([]);
-        $scopeView = new CM_Frontend_ViewResponse($component);
-        $request = $this->createRequestAjax($component, 'reloadComponent', ['foo' => 'bar'], $scopeView, $scopeView);
+        $viewResponse = new CM_Frontend_ViewResponse($component);
+        $request = $this->createRequestAjax($component, 'reloadComponent', ['foo' => 'bar'], $viewResponse);
         $response = $this->processRequest($request);
         $this->assertViewResponseSuccess($response);
 
         $frontend = $response->getRender()->getGlobalResponse();
-        $oldAutoId = $scopeView->getAutoId();
+        $oldAutoId = $viewResponse->getAutoId();
         $newAutoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
         $expected = <<<EOL
@@ -147,18 +159,18 @@ EOL;
         $config->CM_Model_Entity_Mock2->type = CM_Model_Entity_Mock2::getTypeStatic();
 
         $component = new CM_Component_Mock();
-        $scopeView = new CM_Frontend_ViewResponse($component);
-        $request = $this->createRequestAjax($component, 'reloadComponent', ['entity' => $entity], $scopeView, $scopeView);
+        $viewResponse = new CM_Frontend_ViewResponse($component);
+        $request = $this->createRequestAjax($component, 'reloadComponent', ['entity' => $entity], $viewResponse);
         $response = $this->processRequest($request);
 
         $this->assertViewResponseSuccess($response);
         $frontend = $response->getRender()->getGlobalResponse();
-        $oldAutoId = $scopeView->getAutoId();
+        $oldAutoId = $viewResponse->getAutoId();
         $newAutoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
         $expected = <<<EOL
 cm.window.appendHidden("<div id=\\"$newAutoId\\" class=\\"CM_Component_Mock CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\\">Sorry, this page was not found. It has been removed or never existed.\\n<\/div>");
-cm.views["$newAutoId"] = new CM_Component_Mock({el:$("#$newAutoId").get(0),params:{"entity":{"_type":123,"_id":{"id":"1"},"id":1,"path":null,"_class":"CM_Model_Entity_Mock2"}}});
+cm.views["$newAutoId"] = new CM_Component_Mock({el:$("#$newAutoId").get(0),params:{"entity":{"_class":"CM_Model_Entity_Mock2","_type":123,"_id":{"id":"1"},"id":1,"path":null}}});
 cm.views["$oldAutoId"].getParent().registerChild(cm.views["$newAutoId"]);
 cm.views["$oldAutoId"].replaceWithHtml(cm.views["$newAutoId"].\$el);
 cm.views["$newAutoId"]._ready();
@@ -185,8 +197,11 @@ EOL;
      */
     private function _getServiceManagerWithGA($code) {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('googleanalytics', 'CMService_GoogleAnalytics_Client', [$code]);
-        $serviceManager->register('trackings', 'CM_Service_Trackings', [['googleanalytics']]);
+        $serviceManager->registerInstance('googleanalytics', new CMService_GoogleAnalytics_Client($code));
+        $serviceManager->registerInstance('trackings', new CM_Service_Trackings(['googleanalytics']));
+        $serviceManager->registerInstance('logger', $this->getServiceManager()->getLogger());
+        $serviceManager->registerInstance('newrelic', $this->getServiceManager()->getNewrelic());
+
         return $serviceManager;
     }
 }

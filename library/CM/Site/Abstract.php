@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed {
+abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed, CM_Comparable {
 
     /** @var string[] */
     protected $_themes = array();
@@ -92,7 +92,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return string Theme
      */
     public function getTheme() {
-        return $this->_themes[0];
+        return $this->getThemes()[0];
     }
 
     /**
@@ -122,14 +122,20 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     /**
      * @return string
-     * @throws CM_Exception_Invalid
+     * @throws CM_Exception
      */
     public function getHost() {
-        $siteHost = parse_url($this->getUrl(), PHP_URL_HOST);
-        if (false === $siteHost || null === $siteHost) {
-            throw new CM_Exception_Invalid('Cannot detect host from `' . $this->getUrl() . '`.');
-        }
-        return $siteHost;
+        $urlParser = new CM_Http_UrlParser($this->getUrl());
+        return $urlParser->getHost();
+    }
+
+    /**
+     * @return string
+     * @throws CM_Exception
+     */
+    public function getUrlBase() {
+        $urlParser = new CM_Http_UrlParser($this->getUrl());
+        return $urlParser->getScheme() . '://' . $urlParser->getHost();
     }
 
     /**
@@ -173,12 +179,30 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     /**
      * @param CM_Http_Request_Abstract $request
+     * @param array                    $data
+     * @return bool
+     * @throws CM_Exception
+     */
+    public function match(CM_Http_Request_Abstract $request, array $data) {
+        $hostList = [
+            $this->getHost(),
+            preg_replace('/^www\./', '', $this->getHost()),
+        ];
+
+        if ($this->getUrlCdn()) {
+            $urlCdn = new CM_Http_UrlParser($this->getUrlCdn());
+            $hostList[] = $urlCdn->getHost();
+        }
+
+        return in_array($request->getHost(), $hostList, true);
+    }
+
+    /**
+     * @param CM_Site_Abstract $other
      * @return boolean
      */
-    public function match(CM_Http_Request_Abstract $request) {
-        $urlRequest = $request->getHost();
-        $urlSite = $this->getHost();
-        return 0 === strpos(preg_replace('/^www\./', '', $urlRequest), preg_replace('/^www\./', '', $urlSite));
+    public function equals(CM_Comparable $other = null) {
+        return $other && (get_class($other) === get_class($this));
     }
 
     /**
@@ -190,7 +214,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         try {
             $class = self::_getClassName($type);
         } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
-            throw new CM_Class_Exception_TypeNotConfiguredException('Site with type `' . $type . '` not configured', null, null, CM_Exception::WARN);
+            throw new CM_Class_Exception_TypeNotConfiguredException('Site with type `' . $type . '` not configured', CM_Exception::WARN);
         }
         return new $class();
     }
@@ -204,14 +228,18 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     /**
      * @param CM_Http_Request_Abstract $request
+     * @param array|null               $matchData
      * @return CM_Site_Abstract
-     * @throws CM_Exception_Invalid
+     * @throws CM_Class_Exception_TypeNotConfiguredException
      */
-    public static function findByRequest(CM_Http_Request_Abstract $request) {
+    public static function findByRequest(CM_Http_Request_Abstract $request, array $matchData = null) {
+        if (null === $matchData) {
+            $matchData = [];
+        }
         foreach (array_reverse(static::getClassChildren()) as $className) {
             /** @var CM_Site_Abstract $site */
             $site = new $className();
-            if ($site->match($request)) {
+            if ($site->match($request, $matchData)) {
                 return $site;
             }
         }

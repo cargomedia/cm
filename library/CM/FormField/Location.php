@@ -13,16 +13,21 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         parent::_initialize();
     }
 
+    /**
+     * @param CM_Model_Location  $location
+     * @param CM_Frontend_Render $render
+     * @return array list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img, 'class' => string])
+     */
     public function getSuggestion($location, CM_Frontend_Render $render) {
         $names = array();
         for ($level = $location->getLevel(); $level >= CM_Model_Location::LEVEL_COUNTRY; $level--) {
             $names[] = $location->getName($level);
         }
         return array(
-            'id'   => $location->getLevel() . '.' . $location->getId(),
+            'id'   => $location->toArray(),
             'name' => implode(', ', array_filter($names)),
             'img'  => $render->getUrlResource('layout',
-                    'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),
+                'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),
         );
     }
 
@@ -34,15 +39,14 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
      */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         $value = parent::validate($environment, $userInput);
-        if (!preg_match('/^(\d+)\.(\d+)$/', $value, $matches)) {
-            throw new CM_Exception_FormFieldValidation('Invalid input format');
+        if (null === $value) {
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid location data.'));
         }
-        $level = $matches[1];
-        $id = $matches[2];
-        if ($level < $this->_options['levelMin'] || $level > $this->_options['levelMax']) {
-            throw new CM_Exception_FormFieldValidation('Invalid location level.');
+        $location = CM_Model_Location::fromArray($value);
+        if ($location->getLevel() < $this->_options['levelMin'] || $location->getLevel() > $this->_options['levelMax']) {
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid location level.'));
         }
-        return new CM_Model_Location($level, $id);
+        return $location;
     }
 
     /**

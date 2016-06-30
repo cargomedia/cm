@@ -25,7 +25,7 @@ class smarty_function_locationTest extends CMTest_TestCase {
         $debug = new CM_Debug(true);
 
         $flag = '<img class="flag" src="' . $this->_render->getUrlResource('layout', 'img/flags/fo.png') . '" title="countryFoo" />';
-        $expected = '<span class="function-location">cityFoo, stateFoo, countryFoo' . $flag . '</span>';
+        $expected = '<span class="function-location contains-flag">cityFoo, stateFoo, countryFoo' . $flag . '</span>';
         $this->_assertSame($expected, array('location' => $this->_location));
 
         $debug->setEnabled(false);
@@ -39,7 +39,7 @@ class smarty_function_locationTest extends CMTest_TestCase {
         $flagLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
             return '[' . $locationPart->getName() . ']';
         };
-        $expected = '<span class="function-location">(cityFoo), (stateFoo), (countryFoo)[countryFoo]</span>';
+        $expected = '<span class="function-location contains-flag">(cityFoo), (stateFoo), (countryFoo)[countryFoo]</span>';
         $this->_assertSame($expected, array('location' => $this->_location, 'partLabeler' => $partLabeler, 'flagLabeler' => $flagLabeler));
     }
 
@@ -54,7 +54,7 @@ class smarty_function_locationTest extends CMTest_TestCase {
         $flagLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
             return null;
         };
-        $expected = '<span class="function-location">foo, foo</span>';
+        $expected = '<span class="function-location contains-flag">foo, foo</span>';
         $this->_assertSame($expected, array('location' => $this->_location, 'partLabeler' => $partLabeler, 'flagLabeler' => $flagLabeler));
     }
 
@@ -66,7 +66,7 @@ class smarty_function_locationTest extends CMTest_TestCase {
         $flagLabeler = function (CM_Model_Location $locationPart, CM_Model_Location $location) {
             return null;
         };
-        $expected = '<span class="function-location">My country</span>';
+        $expected = '<span class="function-location contains-flag">My country</span>';
         $this->_assertSame($expected, array('location' => $country, 'partLabeler' => $partLabeler, 'flagLabeler' => $flagLabeler));
     }
 

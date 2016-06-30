@@ -3,7 +3,7 @@
 class CM_Model_User extends CM_Model_Abstract {
 
     const ONLINE_EXPIRATION = 1800;
-    const OFFLINE_DELAY = 10;
+    const OFFLINE_DELAY = 5;
     const ACTIVITY_EXPIRATION = 60;
 
     /**
@@ -28,7 +28,7 @@ class CM_Model_User extends CM_Model_Abstract {
      * @return int
      */
     public function getCreated() {
-        return $this->_get('createStamp');
+        return (int) $this->_get('createStamp');
     }
 
     /**
@@ -79,10 +79,6 @@ class CM_Model_User extends CM_Model_Abstract {
             CM_Db_Db::delete('cm_user_online', array('userId' => $this->getId()));
             $this->_set(array('online' => null, 'visible' => null));
         }
-    }
-
-    public function setOfflineStamp() {
-        CM_Db_Db::update('cm_user_online', ['offlineStamp' => time()], ['userId' => $this->getId()]);
     }
 
     /**
@@ -140,13 +136,6 @@ class CM_Model_User extends CM_Model_Abstract {
     }
 
     /**
-     * @return CM_Paging_StreamChannelArchiveVideo_User
-     */
-    public function getStreamChannelArchiveVideoList() {
-        return new CM_Paging_StreamChannelArchiveVideo_User($this);
-    }
-
-    /**
      * @return boolean
      */
     public function getVisible() {
@@ -201,6 +190,31 @@ class CM_Model_User extends CM_Model_Abstract {
         $this->_change();
     }
 
+    /**
+     * @return CM_Model_Currency|null
+     */
+    public function getCurrency() {
+        if (!$this->_get('currencyId')) {
+            return null;
+        }
+        return new CM_Model_Currency($this->_get('currencyId'));
+    }
+
+    /**
+     * @param CM_Model_Currency $currency
+     */
+    public function setCurrency(CM_Model_Currency $currency) {
+        CM_Db_Db::update('cm_user', array('currencyId' => $currency->getId()), array('userId' => $this->getId()));
+        $this->_change();
+    }
+
+    /**
+     * @return CM_Frontend_Environment
+     */
+    public function getEnvironment() {
+        return new CM_Frontend_Environment($this->getSite(), $this, $this->getLanguage(), null, null, null, $this->getCurrency());
+    }
+
     public function updateLatestActivityThrottled() {
         if ($this->getLatestActivity() < time() - self::ACTIVITY_EXPIRATION) {
             $this->_updateLatestActivity();
@@ -247,18 +261,6 @@ class CM_Model_User extends CM_Model_Abstract {
         return new $className($id);
     }
 
-    public static function offlineDelayed() {
-        $result = CM_Db_Db::exec('SELECT `userId` FROM `cm_user_online` WHERE `offlineStamp` < ?', [time() - self::OFFLINE_DELAY]);
-        while ($userId = $result->fetchColumn()) {
-            try {
-                $user = CM_Model_User::factory($userId);
-                $user->setOnline(false);
-            } catch (CM_Exception_Nonexistent $e) {
-                CM_Db_Db::delete('cm_user_online', array('userId' => $userId));
-            }
-        }
-    }
-
     public static function offlineOld() {
         $res = CM_Db_Db::exec('
 			SELECT `o`.`userId`
@@ -293,8 +295,19 @@ class CM_Model_User extends CM_Model_Abstract {
             $language = $data['language'];
             $languageId = $language->getId();
         }
-        $userId = CM_Db_Db::insert('cm_user', array('createStamp' => time(), 'activityStamp' => time(), 'site' => $siteType,
-                                                    'languageId'  => $languageId));
+        $currencyId = null;
+        if (isset($data['currency'])) {
+            /** @var CM_Model_Currency $currency */
+            $currency = $data['currency'];
+            $currencyId = $currency->getId();
+        }
+        $userId = CM_Db_Db::insert('cm_user', array(
+            'createStamp'   => time(),
+            'activityStamp' => time(),
+            'site'          => $siteType,
+            'languageId'    => $languageId,
+            'currencyId'    => $currencyId,
+        ));
         return new static($userId);
     }
 
@@ -315,8 +328,8 @@ class CM_Model_User extends CM_Model_Abstract {
         CM_Db_Db::delete('cm_user', array('userId' => $this->getId()));
     }
 
-    public function toArray() {
-        $array = parent::toArray();
+    public function jsonSerialize() {
+        $array = parent::jsonSerialize();
         $array['displayName'] = $this->getDisplayName();
         $array['visible'] = $this->getVisible();
         return $array;

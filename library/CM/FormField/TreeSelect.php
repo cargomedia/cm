@@ -12,7 +12,7 @@ class CM_FormField_TreeSelect extends CM_FormField_Abstract {
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (!$this->_tree->findNodeById($userInput)) {
-            throw new CM_Exception_FormFieldValidation('Invalid value');
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid value'));
         }
         return $userInput;
     }

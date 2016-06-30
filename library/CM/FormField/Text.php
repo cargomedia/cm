@@ -16,15 +16,15 @@ class CM_FormField_Text extends CM_FormField_Abstract {
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (isset($this->_options['lengthMax']) && mb_strlen($userInput) > $this->_options['lengthMax']) {
-            throw new CM_Exception_FormFieldValidation('Too long');
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Too long'));
         }
         if (isset($this->_options['lengthMin']) && mb_strlen($userInput) < $this->_options['lengthMin']) {
-            throw new CM_Exception_FormFieldValidation('Too short');
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Too short'));
         }
         if (!empty($this->_options['forbidBadwords'])) {
-            $badwordList = new CM_Paging_ContentList_Badwords();
-            if ($badword = $badwordList->getMatch($userInput)) {
-                throw new CM_Exception_FormFieldValidation('The word `{$badword}` is not allowed', array('badword' => $badword));
+            $badwordFilter = new CM_Usertext_Filter_Badwords();
+            if ($badword = $badwordFilter->getMatch($userInput)) {
+                throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('The word `{$badword}` is not allowed', ['badword' => $badword]));
             }
         }
         return $userInput;
@@ -33,6 +33,7 @@ class CM_FormField_Text extends CM_FormField_Abstract {
     public function prepare(CM_Params $renderParams, CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $viewResponse->set('autocorrect', $renderParams->has('autocorrect') ? $renderParams->getString('autocorrect') : null);
         $viewResponse->set('autocapitalize', $renderParams->has('autocapitalize') ? $renderParams->getString('autocapitalize') : null);
+        $viewResponse->set('autocomplete', $renderParams->has('autocomplete') ? $renderParams->getString('autocomplete') : null);
         $viewResponse->set('tabindex', $renderParams->has('tabindex') ? $renderParams->getInt('tabindex') : null);
         $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
         $viewResponse->set('placeholder', $renderParams->has('placeholder') ? $renderParams->getString('placeholder') : null);

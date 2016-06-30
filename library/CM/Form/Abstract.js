@@ -45,7 +45,9 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       $btn.on(event, {action: name}, function(event) {
         event.preventDefault();
         event.stopPropagation();
-        return handler.submit(event.data.action);
+        return handler.submit(event.data.action).catch(CM_Exception_FormFieldValidation, function(error) {
+          // this error type is already handled and displayed in `submit`
+        });
       });
     }, this);
 
@@ -81,7 +83,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    */
   getField: function(name) {
     if (!this._fields[name]) {
-      cm.error.triggerThrow(this.getClass() + ' cannot find form field `' + name + '`');
+      throw new CM_Exception(this.getClass() + ' cannot find form field `' + name + '`');
     }
     return this._fields[name];
   },
@@ -105,42 +107,48 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String|Null} [actionName]
+   * @returns {String[]}
    */
-  getData: function(actionName) {
-    var form_data = this.$().serializeArray();
-    var action = actionName ? this._actions[actionName] : null;
+  getFieldNames: function() {
+    return _.keys(this._fields);
+  },
 
+  /**
+   * @returns {CM_FormField_Abstract[]}
+   */
+  getFields: function() {
+    return _.values(this._fields);
+  },
+
+  /**
+   * @returns {{}}
+   */
+  getData: function() {
     var data = {};
-    var regex = /^([\w\-]+)(\[([^\]]+)?\])?$/;
-    var name, match;
-
-    for (var i = 0, item; item = form_data[i]; i++) {
-      match = regex.exec(item.name);
-      name = match[1];
-      item.value = item.value || '';
-
-      if (action && typeof action.fields[name] == 'undefined') {
-        continue;
+    _.each(this._fields, function(field) {
+      if (field.getEnabled()) {
+        data[field.getName()] = field.getValue();
       }
+    });
+    return data;
+  },
 
-      if (!match[2]) {
-        // Scalar
-        data[name] = item.value;
-      } else if (match[2] == '[]') {
-        // Array
-        if (typeof data[name] == 'undefined') {
-          data[name] = [];
+  /**
+   * @param {String} actionName
+   * @returns {{}}
+   */
+  getActionData: function(actionName) {
+    var action = this._getAction(actionName);
+    var data = {};
+
+    _.each(action.fields, function(isRequired, fieldName) {
+      if (this.hasField(fieldName)) {
+        var field = this.getField(fieldName);
+        if (field.getEnabled()) {
+          data[field.getName()] = field.getValue();
         }
-        data[name].push(item.value);
-      } else if (match[3]) {
-        // Associative array
-        if (typeof data[name] == 'undefined') {
-          data[name] = {};
-        }
-        data[name][match[3]] = item.value;
       }
-    }
+    }, this);
 
     return data;
   },
@@ -156,10 +164,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       disableUI: true
     });
     var action = this._getAction(actionName);
-    var data = this.getData(action.name);
-    var deferred = $.Deferred();
-
-    var errorList = this._getErrorList(action.name);
+    var data = this.getActionData(action.name);
+    var errorList = this._getErrorList(action.name, data);
 
     if (options.handleErrors) {
       _.each(this._fields, function(field, fieldName) {
@@ -172,8 +178,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     }
 
     if (_.size(errorList)) {
-      deferred.reject();
-
+      return Promise.reject(new CM_Exception_FormFieldValidation(errorList));
     } else {
       if (options.disableUI) {
         this.disable();
@@ -181,8 +186,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       this.trigger('submit', [data]);
 
       var handler = this;
-      cm.ajax('form', {viewInfoList: this.getViewInfoList(), actionName: action.name, data: data}, {
-        success: function(response) {
+      return cm.ajax('form', {viewInfoList: this.getViewInfoList(), actionName: action.name, data: data})
+        .then(function(response) {
           if (response.errors) {
             if (options.handleErrors) {
               for (var i = response.errors.length - 1, error; error = response.errors[i]; i--) {
@@ -194,8 +199,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
               }
             }
 
-            handler.trigger('error error.' + action.name);
-            deferred.reject();
+            throw new CM_Exception_FormFieldValidation(response.errors);
           }
 
           if (response.exec) {
@@ -209,27 +213,23 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
             }
           }
 
-          if (!response.errors) {
-            handler.trigger('success success.' + action.name, response.data);
-            deferred.resolve(response.data);
-          }
-        },
-        error: function(msg, type, isPublic) {
+          handler.trigger('success success.' + action.name, response.data);
+          return response.data;
+        })
+        .catch(CM_Exception_FormFieldValidation, function(error) {
           handler._stopErrorPropagation = false;
-          handler.trigger('error error.' + action.name, msg, type, isPublic);
-          deferred.reject();
-          return !handler._stopErrorPropagation;
-        },
-        complete: function() {
+          handler.trigger('error error.' + action.name, error.message, error.name, error.isPublic);
+          if (!handler._stopErrorPropagation) {
+            throw error;
+          }
+        })
+        .finally(function() {
           if (options.disableUI) {
             handler.enable();
           }
           handler.trigger('complete');
-        }
-      });
+        });
     }
-
-    return deferred.promise();
   },
 
   stopErrorPropagation: function() {
@@ -269,42 +269,32 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String} [actionName]
+   * @param {String} actionName
    * @returns {Object}
    */
   _getAction: function(actionName) {
-    actionName = actionName || _.first(_.keys(this._actions));
     var action = this._actions[actionName];
     if (!action) {
-      cm.error.triggerThrow('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
+      throw new CM_Exception('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
     }
     action.name = actionName;
     return action;
   },
 
   /**
-   * @param {String} [actionName]
+   * @param {String} actionName
+   * @param {Object} data
    * @returns {Object}
    */
-  _getErrorList: function(actionName) {
+  _getErrorList: function(actionName, data) {
     var action = this._getAction(actionName);
-    var data = this.getData(action.name);
-
     var errorList = {};
 
-    _.each(_.keys(action.fields).reverse(), function(fieldName) {
-      var required = action.fields[fieldName];
-      if (required) {
+    _.each(action.fields, function(isRequired, fieldName) {
+      if (isRequired) {
         var field = this.getField(fieldName);
         if (field.isEmpty(data[fieldName])) {
-          var label;
-          var $textInput = field.$('input, textarea');
-          var $labels = $('label[for="' + field.getAutoId() + '-input"]');
-          if ($labels.length) {
-            label = $labels.first().text();
-          } else if ($textInput.attr('placeholder')) {
-            label = $textInput.attr('placeholder');
-          }
+          var label = this._getFieldLabel(field);
           if (label) {
             errorList[fieldName] = cm.language.get('{$label} is required.', {label: label});
           } else {
@@ -315,5 +305,21 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     }, this);
 
     return errorList;
+  },
+
+  /**
+   * @param {CM_FormField_Abstract} field
+   * @returns {String|null}
+   * @private
+   */
+  _getFieldLabel: function(field) {
+    var $labels = this.$('label[for="' + field.getAutoId() + '-input"]');
+    if ($labels.length) {
+      return $labels.first().text();
+    }
+    if (field.getInput().attr('placeholder')) {
+      return field.getInput().attr('placeholder');
+    }
+    return null;
   }
 });

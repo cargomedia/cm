@@ -36,7 +36,9 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
         if (null === $templatePath) {
             return null;
         }
-        return trim($this->getRender()->fetchTemplate($templatePath, $this->_getViewResponse()->getData()));
+        $this->_getPage()->checkAccessible($this->getRender()->getEnvironment());
+        $html = $this->getRender()->fetchTemplate($templatePath, $this->_getViewResponse()->getData());
+        return trim($html);
     }
 
     /**
@@ -49,5 +51,12 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
             $templatePath = $this->getRender()->getLayoutPath('Page/Abstract/' . $templateName . '.tpl', null, null, null, false);
         }
         return $templatePath;
+    }
+
+    /**
+     * @return CM_Page_Abstract
+     */
+    private function _getPage() {
+        return $this->_getView();
     }
 }

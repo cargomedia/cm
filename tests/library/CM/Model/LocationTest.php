@@ -313,7 +313,8 @@ class CM_Model_LocationTest extends CMTest_TestCase {
     }
 
     public function testFindByAttributesCache() {
-        $cacheKey = CM_CacheConst::Location_ByAttribute . '_level:' . CM_Model_Location::LEVEL_COUNTRY . '_name:abbreviation_value:CH_name:name_value:Switzerland';
+        $cacheKey = CM_CacheConst::Location_ByAttribute . '_level:' . CM_Model_Location::LEVEL_COUNTRY .
+            '_name:abbreviation_value:CH_name:name_value:Switzerland';
         $cache = CM_Cache_Local::getInstance();
 
         $this->assertFalse($cache->get($cacheKey));
@@ -328,5 +329,47 @@ class CM_Model_LocationTest extends CMTest_TestCase {
      */
     public function testFindByAttributesException() {
         CM_Model_Location::findByAttributes(CM_Model_Location::LEVEL_COUNTRY, ['notExistingField' => 'CH']);
+    }
+
+    public function testGetTimezone() {
+        /** @var CM_Model_Location|\Mocka\AbstractClassTrait $locationMock */
+        $locationMock = $this->mockClass('CM_Model_Location')->newInstanceWithoutConstructor();
+
+        $locationMock->mockMethod('getCoordinates')->set(['lat' => 51.58742, 'lon' => -0.28425]);
+        $timeZone = $locationMock->getTimeZone();
+        $this->assertInstanceOf('DateTimeZone', $timeZone);
+        $this->assertSame('Europe/London', $timeZone->getName());
+
+        $locationMock->mockMethod('getCoordinates')->set(['lat' => 49.82072, 'lon' => 1.44115]);
+        $timeZone = $locationMock->getTimeZone();
+        $this->assertSame('Europe/Paris', $timeZone->getName());
+
+        $locationMock->mockMethod('getCoordinates')->set(['lat' => 40.58026, 'lon' => -74.84595]);
+        $timeZone = $locationMock->getTimeZone();
+        $this->assertSame('America/New_York', $timeZone->getName());
+
+        $locationMock->mockMethod('getCoordinates')->set(['lat' => 35.80933, 'lon' => -118.55927]);
+        $timeZone = $locationMock->getTimeZone();
+        $this->assertSame('America/Los_Angeles', $timeZone->getName());
+    }
+
+    public function testGetGeoPoint() {
+        /** @var CM_Model_Location|\Mocka\AbstractClassTrait $locationMock */
+        $locationMock = $this->mockClass('CM_Model_Location')->newInstanceWithoutConstructor();
+        $locationMock->mockMethod('getCoordinates')->set(['lat' => 51.58742, 'lon' => -0.28425]);
+
+        $point = $locationMock->getGeoPoint();
+        $this->assertInstanceOf('CM_Geo_Point', $point);
+        $this->assertEquals(51.58742, $point->getLatitude());
+        $this->assertEquals(-0.28425, $point->getLongitude());
+
+        $locationMock->mockMethod('getCoordinates')->set(null);
+        $this->assertNull($locationMock->getGeoPoint());
+    }
+
+    public function testArrayConvertible() {
+        $location = CMTest_TH::createLocation();
+
+        $this->assertEquals($location, CM_Model_Location::fromArray($location->toArray()));
     }
 }

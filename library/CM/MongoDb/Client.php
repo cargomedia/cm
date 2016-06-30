@@ -16,6 +16,18 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     }
 
     /**
+     * @param string $collection
+     * @param array  $index
+     * @return array
+     * @throws CM_MongoDb_Exception
+     */
+    public function deleteIndex($collection, array $index) {
+        $result = $this->_getCollection($collection)->deleteIndex($index);
+        $this->_checkResultForErrors($result);
+        return $result;
+    }
+
+    /**
      * @return string[]
      */
     public function listCollectionNames() {
@@ -23,8 +35,8 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $collection
-     * @param array $object
+     * @param string     $collection
+     * @param array      $object
      * @param array|null $options
      * @return mixed insertId
      * @throws CM_MongoDb_Exception
@@ -50,7 +62,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     public function batchInsert($collection, array $objectList, array $options = null) {
         $options = $options ?: [];
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Batch Insert `{$collection}`: " . CM_Params::jsonEncode($objectList));
-        $dataList = \Functional\map($objectList, function(array $object) {
+        $dataList = \Functional\map($objectList, function (array $object) {
             return $object;
         });
         $result = $this->_getCollection($collection)->batchInsert($dataList, $options);
@@ -79,8 +91,8 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      */
     public function createIndex($collection, array $keys, array $options = null) {
         $options = $options ?: [];
-        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "create index on {$collection}: " . CM_Params::jsonEncode($keys) . ' ' .
-            CM_Params::jsonEncode($options));
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "create index on {$collection}: " .
+            CM_Params::jsonEncode($keys) . ' ' . CM_Params::jsonEncode($options));
         $result = $this->_getCollection($collection)->createIndex($keys, $options);
         $this->_checkResultForErrors($result);
         return $result;
@@ -115,8 +127,8 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
             $result = $resultSet->current();
         } else {
             $result = $this->_getCollection($collection)->findOne($criteria, $projection);
-            CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "findOne `{$collection}`: " . CM_Params::jsonEncode(['projection' => $projection,
-                                                                                                            'criteria'   => $criteria]));
+            CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "findOne `{$collection}`: " .
+                CM_Params::jsonEncode(['projection' => $projection, 'criteria' => $criteria]));
         }
 
         return $result;
@@ -139,9 +151,8 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
         }
         $criteria = (array) $criteria;
         $projection = (array) $projection;
-        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "find `{$collection}`: " . CM_Params::jsonEncode(['projection'  => $projection,
-                                                                                                     'criteria'    => $criteria,
-                                                                                                     'aggregation' => $aggregation]));
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "find `{$collection}`: " .
+            CM_Params::jsonEncode(['projection' => $projection, 'criteria' => $criteria, 'aggregation' => $aggregation]));
         $collection = $this->_getCollection($collection);
         if ($aggregation) {
             $pipeline = $aggregation;
@@ -199,8 +210,8 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
         $criteria = (array) $criteria;
         $limit = (int) $limit;
         $offset = (int) $offset;
-        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "count `{$collection}`: " . CM_Params::jsonEncode(['criteria'    => $criteria,
-                                                                                                      'aggregation' => $aggregation]));
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "count `{$collection}`: " .
+            CM_Params::jsonEncode(['criteria' => $criteria, 'aggregation' => $aggregation]));
         if ($aggregation) {
             $pipeline = $aggregation;
             if ($criteria) {
@@ -284,8 +295,8 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      */
     public function update($collection, array $criteria, array $newObject, array $options = null) {
         $options = (array) $options;
-        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Update `{$collection}`: " . CM_Params::jsonEncode(['criteria'  => $criteria,
-                                                                                                       'newObject' => $newObject]));
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Update `{$collection}`: " .
+            CM_Params::jsonEncode(['criteria' => $criteria, 'newObject' => $newObject]));
         $result = $this->_getCollection($collection)->update($criteria, $newObject, $options);
         $this->_checkResultForErrors($result);
         return is_array($result) ? $result['n'] : $result;
@@ -321,7 +332,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      */
     protected function _checkResultForErrors($result) {
         if (true !== $result && empty($result['ok'])) {
-            throw new CM_MongoDb_Exception('Cannot perform mongodb operation', ['result' => $result]);
+            throw new CM_MongoDb_Exception('Cannot perform mongodb operation', null, ['result' => $result]);
         }
     }
 
@@ -348,7 +359,6 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      */
     protected function _getDatabaseName() {
         return CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
-
     }
 
     /**

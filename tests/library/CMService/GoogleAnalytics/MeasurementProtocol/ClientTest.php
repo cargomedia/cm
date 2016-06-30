@@ -20,13 +20,17 @@ class CMService_GoogleAnalytics_MeasurementProtocol_ClientTest extends CMTest_Te
 
     public function testTrackEvent() {
         $clientMock = $this->mockClass('CMService_GoogleAnalytics_MeasurementProtocol_Client');
-        $submitRequestMock = $clientMock->mockMethod('trackHit')->set(function ($parameterList) {
+        $submitRequestMock = $clientMock->mockMethod('_queueHit')->set(function ($parameterList) {
             $this->assertSame([
-                'ec' => 'MyCategory',
-                'ea' => 'MyAction',
-                'el' => 'MyLabel',
-                'ev' => 123,
-                't'  => 'event',
+                'propertyId'    => 'prop1',
+                'parameterList' => [
+                    'ec' => 'MyCategory',
+                    'ea' => 'MyAction',
+                    'el' => 'MyLabel',
+                    'ev' => 123,
+                    'dh' => 'example.com',
+                    't'  => 'event',
+                ]
             ], $parameterList);
         });
         /** @var CMService_GoogleAnalytics_MeasurementProtocol_Client $client */
@@ -37,6 +41,33 @@ class CMService_GoogleAnalytics_MeasurementProtocol_ClientTest extends CMTest_Te
             'eventAction'   => 'MyAction',
             'eventLabel'    => 'MyLabel',
             'eventValue'    => 123,
+            'hostname'      => 'example.com',
+        ]);
+        $this->assertSame(1, $submitRequestMock->getCallCount());
+    }
+
+    public function testTrackPageView() {
+        $clientMock = $this->mockClass('CMService_GoogleAnalytics_MeasurementProtocol_Client');
+        $submitRequestMock = $clientMock->mockMethod('_queueHit')->set(function ($parameterList) {
+            $this->assertSame([
+                'propertyId'    => 'prop1',
+                'parameterList' => [
+                    'dp'  => '/foo',
+                    'dh'  => 'example.com',
+                    'cid' => 'abc',
+                    'uid' => 123,
+                    't'   => 'pageview',
+                ]
+            ], $parameterList);
+        });
+        /** @var CMService_GoogleAnalytics_MeasurementProtocol_Client $client */
+        $client = $clientMock->newInstance(['prop1']);
+
+        $client->trackPageView([
+            'page'     => '/foo',
+            'hostname' => 'example.com',
+            'clientId' => 'abc',
+            'userId'   => 123,
         ]);
         $this->assertSame(1, $submitRequestMock->getCallCount());
     }
@@ -52,6 +83,40 @@ class CMService_GoogleAnalytics_MeasurementProtocol_ClientTest extends CMTest_Te
 
         $client->trackEvent([
             'foo' => 12,
+        ]);
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Value `12.23` for parameter `ev` did not pass validation
+     */
+    public function testTrackEventFloatValue() {
+        $clientMock = $this->mockClass('CMService_GoogleAnalytics_MeasurementProtocol_Client');
+        /** @var CMService_GoogleAnalytics_MeasurementProtocol_Client $client */
+        $client = $clientMock->newInstance(['prop1']);
+
+        $client->trackEvent([
+            'eventCategory' => 'MyCategory',
+            'eventAction'   => 'MyAction',
+            'eventLabel'    => 'MyLabel',
+            'eventValue'    => 12.23,
+        ]);
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Value `-12` for parameter `ev` did not pass validation
+     */
+    public function testTrackEventNegativeValue() {
+        $clientMock = $this->mockClass('CMService_GoogleAnalytics_MeasurementProtocol_Client');
+        /** @var CMService_GoogleAnalytics_MeasurementProtocol_Client $client */
+        $client = $clientMock->newInstance(['prop1']);
+
+        $client->trackEvent([
+            'eventCategory' => 'MyCategory',
+            'eventAction'   => 'MyAction',
+            'eventLabel'    => 'MyLabel',
+            'eventValue'    => -12,
         ]);
     }
 

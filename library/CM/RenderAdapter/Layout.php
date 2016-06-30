@@ -39,22 +39,20 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $viewResponse->set('renderDefault', $renderDefault);
         $viewResponse->set('languageList', new CM_Paging_Language_Enabled());
 
+        $serviceManager = CM_Service_Manager::getInstance();
         $options = array();
+        $options['name'] = CM_App::getInstance()->getName();
         $options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
         $options['renderStamp'] = floor(microtime(true) * 1000);
         $options['site'] = CM_Params::encode($this->getRender()->getSite());
-        $options['url'] = $this->getRender()->getUrl();
-        $options['urlStatic'] = $this->getRender()->getUrlStatic();
-        $options['urlUserContentList'] = CM_Service_Manager::getInstance()->getUserContent()->getUrlList();
-        $options['urlResource'] = $this->getRender()->getUrlResource();
+        $options['url'] = $this->getRender()->getSite()->getUrl();
+        $options['urlBase'] = $this->getRender()->getSite()->getUrlBase();
+        $options['urlCdn'] = $this->getRender()->getSite()->getUrlCdn();
+        $options['urlUserContentList'] = $serviceManager->getUserContent()->getUrlList();
+        $options['urlServiceWorker'] = $this->getRender()->getUrlServiceWorker();
         $options['language'] = $this->getRender()->getLanguage();
         $options['debug'] = CM_Bootloader::getInstance()->isDebug();
-        $options['stream'] = array();
-        $options['stream']['enabled'] = CM_Stream_Message::getInstance()->getEnabled();
-        if (CM_Stream_Message::getInstance()->getEnabled()) {
-            $options['stream']['adapter'] = CM_Stream_Message::getInstance()->getAdapterClass();
-            $options['stream']['options'] = CM_Stream_Message::getInstance()->getOptions();
-        }
+        $options['stream'] = $serviceManager->getStreamMessage()->getClientOptions();
         if ($viewer = $this->getRender()->getViewer()) {
             $options['stream']['channel']['key'] = CM_Model_StreamChannel_Message_User::getKeyByUser($viewer);
             $options['stream']['channel']['type'] = CM_Model_StreamChannel_Message_User::getTypeStatic();

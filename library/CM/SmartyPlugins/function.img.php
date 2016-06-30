@@ -5,12 +5,12 @@ function smarty_function_img(array $params, Smarty_Internal_Template $template) 
     $render = $template->smarty->getTemplateVars('render');
 
     $path = $params['path'];
-    $params = array_merge(array('width' => null, 'height' => null, 'title' => null, 'class' => null), $params);
+    $params = array_merge(array('width' => null, 'height' => null, 'title' => null, 'class' => null, 'site' => null), $params);
 
     if (!empty($params['static'])) {
-        $url = $render->getUrlStatic('/img/' . $path);
+        $url = $render->getUrlStatic('/img/' . $path, $params['site']);
     } else {
-        $url = $render->getUrlResource('layout', 'img/' . $path);
+        $url = $render->getUrlResource('layout', 'img/' . $path, null, $params['site']);
     }
 
     $html = '<img src="' . $url . '"';

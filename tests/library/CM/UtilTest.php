@@ -96,6 +96,14 @@ class CM_UtilTest extends CMTest_TestCase {
         }
     }
 
+    public function testLink() {
+        $this->assertSame('/test', CM_Util::link('/test'));
+        $this->assertSame('/test?a=1&b=%C3%B8', CM_Util::link('/test', ['a' => 1, 'b' => 'ø']));
+        $this->assertSame('/test?foo%5Bbar%5D=12', CM_Util::link('/test', ['foo' => ['bar' => 12]]));
+        $this->assertSame('/test?a=1#anchor', CM_Util::link('/test', ['a' => 1], 'anchor'));
+        $this->assertSame('/test#anchor', CM_Util::link('/test', null, 'anchor'));
+    }
+
     public function testParseXml() {
         $xml = CM_Util::parseXml('<?xml version="1.0" encoding="utf-8"?><document><foo>bar</foo></document>');
         $this->assertInstanceOf('SimpleXMLElement', $xml);
@@ -107,5 +115,30 @@ class CM_UtilTest extends CMTest_TestCase {
         } catch (CM_Exception_Invalid $e) {
             $this->assertTrue(true);
         }
+    }
+
+    public function testJsonEncode() {
+        $actual = CM_Util::jsonEncode(['foo' => 'bar']);
+        $this->assertSame('{"foo":"bar"}', $actual);
+    }
+
+    public function testJsonEncodePrettyPrint() {
+        $actual = CM_Util::jsonEncode(['foo' => 'bar'], true);
+        $this->assertSame('{' . "\n" . '    "foo": "bar"' . "\n" . '}', $actual);
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     */
+    public function testJsonEncodeInvalid() {
+        $resource = fopen(sys_get_temp_dir(), 'r');
+        CM_Util::jsonEncode(['foo' => $resource]);
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     */
+    public function testJsonDecodeInvalid() {
+        CM_Util::jsonDecode('{[foo:bar)}');
     }
 }

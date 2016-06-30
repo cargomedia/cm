@@ -3,6 +3,12 @@
 abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract {
 
     /**
+     * @param array $output
+     * @return array
+     */
+    abstract protected function _processView(array $output);
+
+    /**
      * @param array|null $additionalParams
      */
     public function reloadComponent(array $additionalParams = null) {
@@ -32,11 +38,12 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
     }
 
     /**
+     * @param string    $className
      * @param CM_Params $params
      * @return array
      */
-    public function loadComponent(CM_Params $params) {
-        $component = CM_Component_Abstract::factory($params->getString('className'), $params);
+    public function loadComponent($className, CM_Params $params) {
+        $component = CM_Component_Abstract::factory($className, $params);
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
         $html = $renderAdapter->fetch();
 
@@ -57,48 +64,54 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      * @return array
      */
     public function loadPage(CM_Params $params, CM_Http_Response_View_Ajax $response) {
-        $request = new CM_Http_Request_Get($params->getString('path'), $this->getRequest()->getHeaders(), $this->getRequest()->getServer(), $this->getRequest()->getViewer());
+        $request = $this->_createGetRequestWithUrl($params->getString('path'));
 
         $count = 0;
         $paths = array($request->getPath());
         do {
             $url = $this->getRender()->getUrl(CM_Util::link($request->getPath(), $request->getQuery()));
+            if (!$this->_isPageOnSameSite($url)) {
+                return array('redirectExternal' => $url);
+            }
             if ($count++ > 10) {
                 throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $paths) . ').');
             }
-            $responsePage = new CM_Http_Response_Page_Embed($request, $this->getServiceManager());
-            $responsePage->process();
-            $request = $responsePage->getRequest();
+            $responseEmbed = new CM_Http_Response_Page_Embed($request, $response->getSite(), $this->getServiceManager());
+            $responseEmbed->process();
+            $request = $responseEmbed->getRequest();
 
             $paths[] = $request->getPath();
 
-            if ($redirectUrl = $responsePage->getRedirectUrl()) {
-                $redirectExternal = (0 !== mb_stripos($redirectUrl, $this->getRender()->getUrl()));
-                if ($redirectExternal) {
+            if ($redirectUrl = $responseEmbed->getRedirectUrl()) {
+                if (!$this->_isPageOnSameSite($redirectUrl)) {
                     return array('redirectExternal' => $redirectUrl);
+                } else {
+                    // Process redirect URL with page response constructor
+                    $responsePage = CM_Http_Response_Page::factory($request, $this->getServiceManager());
+                    $request = $responsePage->getRequest();
                 }
             }
         } while ($redirectUrl);
 
-        foreach ($responsePage->getCookies() as $name => $cookieParameters) {
+        foreach ($responseEmbed->getCookies() as $name => $cookieParameters) {
             $response->setCookie($name, $cookieParameters['value'], $cookieParameters['expire'], $cookieParameters['path']);
         }
-        $page = $responsePage->getPage();
+        $page = $responseEmbed->getPage();
 
         $this->_setStringRepresentation(get_class($page));
 
-        $frontend = $responsePage->getRender()->getGlobalResponse();
-        $html = $responsePage->getContent();
+        $frontend = $responseEmbed->getRender()->getGlobalResponse();
+        $html = $responseEmbed->getContent();
         $js = $frontend->getJs();
         $autoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
         $frontend->clear();
 
-        $title = $responsePage->getTitle();
+        $title = $responseEmbed->getTitle();
         $layoutClass = get_class($page->getLayout($this->getRender()->getEnvironment()));
-        $menuList = array_merge($this->getSite()->getMenus(), $responsePage->getRender()->getMenuList());
-        $menuEntryHashList = $this->_getMenuEntryHashList($menuList, get_class($page), $responsePage->getPageParams());
-        $jsTracking = $responsePage->getRender()->getServiceManager()->getTrackings()->getJs();
+        $menuList = array_merge($this->getSite()->getMenus(), $responseEmbed->getRender()->getMenuList());
+        $menuEntryHashList = $this->_getMenuEntryHashList($menuList, get_class($page), $page->getParams());
+        $jsTracking = $responseEmbed->getRender()->getServiceManager()->getTrackings()->getJs();
 
         return array(
             'autoId'            => $autoId,
@@ -147,6 +160,19 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $this->getRender()->getGlobalResponse()->getOnloadPrepareJs()->append($js);
     }
 
+    protected function _process() {
+        $output = array();
+        $this->_runWithCatching(function () use (&$output) {
+            $output = $this->_processView($output);
+        }, function (CM_Exception $e, array $errorOptions) use (&$output) {
+            $output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());
+        });
+        $output['deployVersion'] = CM_App::getInstance()->getDeployVersion();
+
+        $this->setHeader('Content-Type', 'application/json');
+        $this->_setContent(json_encode($output));
+    }
+
     /**
      * @param string|null $className
      * @return CM_View_Abstract
@@ -171,25 +197,24 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         }
         $query = $this->_request->getQuery();
         if (!array_key_exists('viewInfoList', $query)) {
-            throw new CM_Exception_Invalid('viewInfoList param not found.', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('viewInfoList param not found.', CM_Exception::WARN);
         }
         $viewInfoList = $query['viewInfoList'];
         if (!array_key_exists($className, $viewInfoList)) {
-            throw new CM_Exception_Invalid('View `' . $className . '` not set.', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('View `' . $className . '` not set.', CM_Exception::WARN);
         }
         $viewInfo = $viewInfoList[$className];
         if (!is_array($viewInfo)) {
-            throw new CM_Exception_Invalid('View `' . $className . '` is not an array', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('View `' . $className . '` is not an array', CM_Exception::WARN);
         }
         if (!isset($viewInfo['id'])) {
-            throw new CM_Exception_Invalid('View id `' . $className . '` not set.', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('View id `' . $className . '` not set.', CM_Exception::WARN);
         }
         if (!isset($viewInfo['className']) || !class_exists($viewInfo['className']) || !is_a($viewInfo['className'], 'CM_View_Abstract', true)) {
-            throw new CM_Exception_Invalid('View className `' . $className . '` is illegal: `' . $viewInfo['className'] .
-                '`.', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('View className `' . $className . '` is illegal: `' . $viewInfo['className'] . '`.', CM_Exception::WARN);
         }
         if (!isset($viewInfo['params'])) {
-            throw new CM_Exception_Invalid('View params `' . $className . '` not set.', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('View params `' . $className . '` not set.', CM_Exception::WARN);
         }
         if (!isset($viewInfo['parentId'])) {
             $viewInfo['parentId'] = null;
@@ -223,4 +248,28 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         }
         return $menuEntryHashList;
     }
+
+    /**
+     * @param string $url
+     * @return CM_Http_Request_Get
+     */
+    private function _createGetRequestWithUrl($url) {
+        $request = $this->getRequest();
+        return new CM_Http_Request_Get($url, $request->getHeaders(), $request->getServer(), $request->getViewer());
+    }
+
+    /**
+     * @param string $url
+     * @return bool
+     */
+    private function _isPageOnSameSite($url) {
+        $isSameBaseUrl = (0 === mb_stripos($url, $this->getRender()->getUrl()));
+        if (!$isSameBaseUrl) {
+            return false;
+        }
+        $request = $this->_createGetRequestWithUrl($url);
+        $response = CM_Http_Response_Page::factory($request, $this->getServiceManager());
+        return $response->getSite()->equals($this->getSite());
+    }
+
 }

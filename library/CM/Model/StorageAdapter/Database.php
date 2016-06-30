@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractAdapter implements CM_Model_StorageAdapter_FindableInterface {
+class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractAdapter implements CM_Model_StorageAdapter_FindableInterface, CM_Model_StorageAdapter_ReplaceableInterface {
 
     public function load($type, array $id) {
         return CM_Db_Db::select($this->_getTableName($type), '*', $id)->fetch();
@@ -46,9 +46,17 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
     }
 
     public function create($type, array $data) {
-        $id = CM_Db_Db::insert($this->_getTableName($type), $data);
+        $id = CM_Db_Db::insert($this->_getTableName($type), $data, null, null, 'INSERT');
         if (null === $id) {
             throw new CM_Exception_Invalid('Insert statement did not return an ID');
+        }
+        return array('id' => (int) $id);
+    }
+
+    public function replace($type, array $data) {
+        $id = CM_Db_Db::insert($this->_getTableName($type), $data, null, null, 'REPLACE');
+        if (null === $id) {
+            throw new CM_Exception_Invalid('Replace statement did not return an ID');
         }
         return array('id' => (int) $id);
     }

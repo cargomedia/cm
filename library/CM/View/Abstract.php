@@ -12,6 +12,7 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
         if (!$params instanceof CM_Params) {
             $params = CM_Params::factory($params, false);
         }
+        /** @var CM_Params $params */
         $this->_params = $params;
     }
 
@@ -23,7 +24,12 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
     }
 
     public function ajax_loadComponent(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
-        return $response->loadComponent($params);
+        $className = $params->getString('className');
+        $params->remove('className');
+        if (!class_exists($className)) {
+            throw new CM_Exception_Invalid('Class not found: `' . $className . '`', CM_Exception::WARN);
+        }
+        return $response->loadComponent($className, $params);
     }
 
     public function ajax_loadPage(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {

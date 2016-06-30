@@ -80,15 +80,15 @@ class CMService_XVerify_Client implements CM_Service_EmailVerification_ClientInt
                 503 => 'Invalid API Key/Service Not Active',
             );
             if (null === $responseCode || isset($responseCodeInvalidList[$responseCode])) {
-                throw new CM_Exception('Invalid XVerify email validation response', array(
+                throw new CM_Exception('Invalid XVerify email validation response', null, [
                     'email'   => $email,
                     'code'    => $response->getStatusCode(),
                     'headers' => $response->getHeaders(),
                     'body'    => (string) $response->getBody(),
-                ));
+                ]);
             }
         } catch (Exception $exception) {
-            $this->_logException($exception);
+            $this->_handleException($exception);
             return null;
         }
         return $body['email'];
@@ -97,7 +97,10 @@ class CMService_XVerify_Client implements CM_Service_EmailVerification_ClientInt
     /**
      * @param Exception $exception
      */
-    protected function _logException(Exception $exception) {
-        CM_Bootloader::getInstance()->getExceptionHandler()->logException($exception);
+    protected function _handleException(Exception $exception) {
+        $logLevel = CM_Log_Logger::exceptionSeverityToLevel($exception);
+        $context = new CM_Log_Context();
+        $context->setException($exception);
+        CM_Service_Manager::getInstance()->getLogger()->addMessage('XVerify client error', $logLevel, $context);
     }
 }

@@ -66,15 +66,60 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
         $responseMock = new \Kickbox\HttpClient\Response(array('result' => 'unknown'), 403, array('header' => 'value'));
         $kickBoxMock = $this->getMock('CMService_KickBox_Client', array('_getResponse', '_logException'), array('', true, false, 0));
         $kickBoxMock->expects($this->once())->method('_getResponse')->will($this->returnValue($responseMock));
-        $exception = new CM_Exception('Invalid KickBox email validation response', array(
+        $exception = new CM_Exception('Invalid KickBox email validation response', null, [
             'email'   => 'test@example.com',
             'code'    => 403,
             'headers' => array('header' => 'value'),
             'body'    => array('result' => 'unknown'),
-        ));
+        ]);
         $kickBoxMock->expects($this->once())->method('_logException')->with($exception);
         /** @var CMService_KickBox_Client $kickBoxMock */
         $kickBoxMock->isValid('test@example.com');
+    }
+
+    public function testLogExceptionTimeout() {
+        /** @var CMService_KickBox_Client|\Mocka\AbstractClassTrait $kickBoxMock */
+        $kickBoxMock = $this->mockObject('CMService_KickBox_Client', array('', true, false, 0));
+        $logException = $kickBoxMock->mockMethod('_logException');
+
+        $i = 0;
+        foreach ([
+                     '[curl] 28: Operation timed out after 1595 milliseconds with 0 out of -1 bytes received [url] https://api.kickbox.io/v1/verify?email=testLogExceptionTimeout%40example.com',
+                     '[curl] 6: name lookup timed out [url] https://api.kickbox.io/v1/verify?email=testLogExceptionTimeout%40example.com',
+                     '[curl] 28: Connection timed out after 7007 milliseconds [url] https://api.kickbox.io/v1/verify?email=testLogExceptionTimeout%40example.com',
+                 ] as $exceptionMessage) {
+            $kickBoxMock->mockMethod('_getResponse')->set(function () use ($exceptionMessage) {
+                throw new RuntimeException($exceptionMessage);
+            });
+            $logException->set(function (Exception $exception) use ($exceptionMessage) {
+                $this->assertTrue($exception instanceof CM_Exception);
+                /** @var CM_Exception $exception */
+                $this->assertSame($exceptionMessage, $exception->getMessage());
+                $this->assertSame(CM_Exception::WARN, $exception->getSeverity());
+            });
+
+            /** @var CMService_KickBox_Client $kickBoxMock */
+            $kickBoxMock->isValid('testLogExceptionTimeout@example.com');
+            $this->assertSame(++$i, $logException->getCallCount());
+        }
+    }
+
+    public function testLogExceptionOther() {
+        /** @var CMService_KickBox_Client|\Mocka\AbstractClassTrait $kickBoxMock */
+        $kickBoxMock = $this->mockObject('CMService_KickBox_Client', array('', true, false, 0));
+        $logException = $kickBoxMock->mockMethod('_logException');
+
+        $exceptionMessage = '[curl] 6: Couldn\'t resolve host \'api.kickbox.io\' [url] https://api.kickbox.io/v1/verify?email=testLogExceptionOther%40example.com';
+        $kickBoxMock->mockMethod('_getResponse')->set(function () use ($exceptionMessage) {
+            throw new RuntimeException($exceptionMessage);
+        });
+        $logException->set(function (Exception $exception) {
+            $this->assertTrue('RuntimeException' === get_class($exception));
+        });
+
+        /** @var CMService_KickBox_Client $kickBoxMock */
+        $kickBoxMock->isValid('testLogExceptionOther@example.com');
+        $this->assertSame(1, $logException->getCallCount());
     }
 
     /**

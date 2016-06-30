@@ -1,5 +1,5 @@
 .clearfix {
-  &:after {
+  &::after {
     content: "";
     display: table;
     clear: both;
@@ -33,7 +33,7 @@
 }
 
 .triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = top) {
-  &:after, &:before {
+  &::after, &::before {
     border: solid transparent;
     content: " ";
     height: 0;
@@ -44,7 +44,7 @@
     left: 50%;
   }
 
-  &:after {
+  &::after {
     border-color: transparent;
     border-width: @size;
     margin-left: -@size;
@@ -52,7 +52,7 @@
     border-bottom-color: @colorInner;
   }
 
-  &:before {
+  &::before {
     border-width: @size + @borderSize;
     margin-left: -(@size + @borderSize);
     margin-right: -(@size + @borderSize);
@@ -61,7 +61,7 @@
 }
 
 .triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = bottom) {
-  &:after, &:before {
+  &::after, &::before {
     border: solid transparent;
     content: " ";
     height: 0;
@@ -72,7 +72,7 @@
     top: 100%;
   }
 
-  &:after {
+  &::after {
     border-color: transparent;
     border-width: @size;
     margin-left: -@size;
@@ -80,7 +80,7 @@
     border-top-color: @colorInner;
   }
 
-  &:before {
+  &::before {
     border-width: @size + @borderSize;
     margin-left: -(@size + @borderSize);
     margin-right: -(@size + @borderSize);
@@ -89,7 +89,7 @@
 }
 
 .triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = left) {
-  &:after, &:before {
+  &::after, &::before {
     border: solid transparent;
     content: " ";
     height: 0;
@@ -100,7 +100,7 @@
     right: 100%;
   }
 
-  &:after {
+  &::after {
     border-color: transparent;
     border-width: @size;
     margin-top: -@size;
@@ -108,7 +108,7 @@
     border-right-color: @colorInner;
   }
 
-  &:before {
+  &::before {
     border-width: @size + @borderSize;
     margin-top: -(@size + @borderSize);
     margin-bottom: -(@size + @borderSize);
@@ -117,7 +117,7 @@
 }
 
 .triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = right) {
-  &:after, &:before {
+  &::after, &::before {
     border: solid transparent;
     content: " ";
     height: 0;
@@ -128,7 +128,7 @@
     left: 100%;
   }
 
-  &:after {
+  &::after {
     border-width: @size;
     border-color: transparent;
     margin-top: -@size;
@@ -136,7 +136,7 @@
     border-left-color: @colorInner;
   }
 
-  &:before {
+  &::before {
     border-width: @size + @borderSize;
     margin-top: -(@size + @borderSize);
     margin-bottom: -(@size + @borderSize);
@@ -145,7 +145,7 @@
 }
 
 .clipper(@height: 20px, @colorBg: @colorBg) {
-  &:after {
+  &::after {
     pointer-events: none;
     position: absolute;
     content: "";

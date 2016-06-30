@@ -2,81 +2,93 @@
 
 class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
 
-    public function testLogException() {
-        $log = $this->getMockBuilder('CM_Paging_Log_Error')->setMethods(array('add'))->disableOriginalConstructor()->getMock();
-        $log->expects($this->once())->method('add')->will($this->returnValue(null));
+    public function testHandleException() {
+        $expectedException = new Exception('foo');
+        $handlerMock = $this->mockClass('CM_Log_Handler_Abstract')->newInstanceWithoutConstructor();
 
-        $exception = $this->getMockBuilder('CM_Exception')->setMethods(array('getLog', 'getMetaInfo'))->getMock();
-        $exception->expects($this->any())->method('getLog')->will($this->returnValue($log));
-        $exception->expects($this->any())->method('getMetaInfo')->will($this->returnValue(array()));
+        /** @var CM_Log_Logger|\Mocka\ClassMock $logger */
+        $logger = $this->mockClass('CM_Log_Logger')->newInstance([
+            new CM_Log_Context(),
+            new CM_Log_Handler_Layered([
+                new CM_Log_Handler_Layered_Layer([$handlerMock])
+            ])
+        ]);
+        $methodAddMessage = $logger->mockMethod('addMessage');
+        $methodAddMessage->set(
+            function ($message, $level, CM_Log_Context $context) use ($expectedException) {
+                $this->assertSame('Application error', $message);
+                $this->assertSame(CM_Log_Logger::ERROR, $level);
+                $this->assertEquals($expectedException, $context->getException());
+            }
+        );
 
-        $method = CMTest_TH::getProtectedMethod('CM_ExceptionHandling_Handler_Abstract', 'logException');
-        $exceptionHandler = $this->getMockBuilder('CM_ExceptionHandling_Handler_Abstract')->getMockForAbstractClass();
-        $method->invoke($exceptionHandler, $exception);
-    }
+        /** @var CM_Service_Manager|\Mocka\ClassMock $serviceManager */
+        $serviceManager = $this->mockClass('CM_Service_Manager')->newInstance();
+        $serviceManager->mockMethod('getLogger')->set($logger);
 
-    public function testLogExceptionFileLog() {
-        $errorLog = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
-        $log = $this->getMockBuilder('CM_Paging_Log_Error')->setMethods(array('add'))->disableOriginalConstructor()->getMock();
-        $log->expects($this->any())->method('add')->will($this->throwException(new Exception('foo')));
-
-        $exception = $this->getMockBuilder('CM_Exception')->setMethods(array('getLog', 'getMetaInfo'))->getMock();
-        $exception->expects($this->any())->method('getLog')->will($this->returnValue($log));
-        $exception->expects($this->any())->method('getMetaInfo')->will($this->returnValue(array()));
-
-        $method = CMTest_TH::getProtectedMethod('CM_ExceptionHandling_Handler_Abstract', 'logException');
-        $exceptionHandler = $this->getMockBuilder('CM_ExceptionHandling_Handler_Abstract')->setMethods(array('_getLogFile'))->getMockForAbstractClass();
-        $exceptionHandler->expects($this->any())->method('_getLogFile')->will($this->returnValue(new CM_File($errorLog)));
-
-        $this->assertFileNotExists($errorLog);
-        $method->invoke($exceptionHandler, $exception);
-
-        $logContents = file_get_contents($errorLog);
-        $this->assertNotEmpty($logContents);
-        $this->assertContains('### Cannot log error: ', $logContents);
-        $this->assertContains('### Original Exception: ', $logContents);
+        /** @var CM_ExceptionHandling_Handler_Abstract $exceptionHandler */
+        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstance();
+        $exceptionHandler->setServiceManager($serviceManager);
+        $exceptionHandler->handleException($expectedException);
+        $this->assertSame(1, $methodAddMessage->getCallCount());
     }
 
     public function testPrintException() {
         $errorException = new CM_Exception();
         $nativeException = new Exception();
-        $fatalException = new CM_Exception(null, null, array('severity' => CM_Exception::FATAL));
+        $fatalException = new CM_Exception(null, CM_Exception::FATAL);
 
-        $exceptionHandler = $this->getMockBuilder('CM_ExceptionHandling_Handler_Abstract')
-            ->setMethods(array('logException', '_printException'))->getMockForAbstractClass();
-        $exceptionHandler->expects($this->at(1))->method('_printException')->with($errorException);
-        $exceptionHandler->expects($this->at(3))->method('_printException')->with($nativeException);
-        $exceptionHandler->expects($this->at(5))->method('_printException')->with($fatalException);
+        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
+        $exceptionHandler->mockMethod('_logException')->set(function () {
+        });
+
+        $printExceptionMock = $exceptionHandler->mockMethod('_printException')
+            ->at(0, function (Exception $ex) use ($errorException) {
+                $this->assertEquals($errorException, $ex);
+            })
+            ->at(1, function (Exception $ex) use ($nativeException) {
+                $this->assertEquals($nativeException, $ex);
+            })
+            ->at(2, function (Exception $ex) use ($fatalException) {
+                $this->assertEquals($fatalException, $ex);
+            });
+
         /** @var CM_ExceptionHandling_Handler_Abstract $exceptionHandler */
-
         $exceptionHandler->handleException($errorException);
         $exceptionHandler->handleException($nativeException);
         $exceptionHandler->handleException($fatalException);
+
+        $this->assertSame(3, $printExceptionMock->getCallCount());
     }
 
     public function testPrintExceptionPrintSeverity() {
         $errorException = new CM_Exception();
         $nativeException = new Exception();
-        $fatalException = new CM_Exception(null, null, array('severity' => CM_Exception::FATAL));
+        $fatalException = new CM_Exception(null, CM_Exception::FATAL);
 
-        $exceptionHandler = $this->getMockBuilder('CM_ExceptionHandling_Handler_Abstract')
-            ->setMethods(array('logException', '_printException'))->getMockForAbstractClass();
-        $exceptionHandler->expects($this->any())->method('logException');
-        $exceptionHandler->expects($this->at(2))->method('_printException')->with($nativeException);
-        $exceptionHandler->expects($this->at(4))->method('_printException')->with($fatalException);
-        /** @var CM_ExceptionHandling_Handler_Abstract $exceptionHandler */
+        /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\AbstractClassTrait $exceptionHandler */
+        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
+
+        $logExceptionMock = $exceptionHandler->mockMethod('_logException');
+        $logExceptionMock->set(function () {
+        });
+
+        $printExceptionMock = $exceptionHandler->mockMethod('_printException');
+        $printExceptionMock
+            ->at(0, function (Exception $ex) use ($nativeException) {
+                $this->assertEquals($nativeException, $ex);
+            })
+            ->at(1, function (Exception $ex) use ($fatalException) {
+                $this->assertEquals($fatalException, $ex);
+            });
 
         $exceptionHandler->setPrintSeverityMin(CM_Exception::FATAL);
+
         $exceptionHandler->handleException($errorException);
         $exceptionHandler->handleException($nativeException);
         $exceptionHandler->handleException($fatalException);
-    }
 
-    /**
-     * @expectedException ErrorException
-     * @expectedExceptionMessage E_USER_ERROR: Raw error message
-     */
-    public function testHandleErrorRaw() {
-        trigger_error('Raw error message', E_USER_ERROR);
+        $this->assertSame(2, $printExceptionMock->getCallCount());
+        $this->assertSame(3, $logExceptionMock->getCallCount());
     }
 }

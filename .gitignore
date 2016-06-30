@@ -3,6 +3,7 @@
 /composer.lock
 /bin
 !/bin/cm
+!/bin/qunit
 
 /data
 /resources/config/local.php

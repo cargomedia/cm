@@ -54,7 +54,11 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
             }
             return $this->getLimit();
         }
-        return $roles[$role]['limit'];
+        $limit = $roles[$role]['limit'];
+        if (null !== $limit) {
+            $limit = (int) $limit;
+        }
+        return $limit;
     }
 
     /**
@@ -64,15 +68,27 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
     public function setLimit($role, $limit) {
         $role = $role ? (int) $role : null;
         $limit = !isset($limit) ? null : (int) $limit;
-        if (CM_Db_Db::count('cm_actionLimit', array('actionType' => $this->getActionType(), 'actionVerb' => $this->getActionVerb(),
-                                                    'type'       => $this->getType(), 'role' => $role))
+        if (CM_Db_Db::count('cm_actionLimit', array(
+            'actionType' => $this->getActionType(),
+            'actionVerb' => $this->getActionVerb(),
+            'type'       => $this->getType(),
+            'role'       => $role,
+        ))
         ) {
-            CM_Db_Db::update('cm_actionLimit', array('limit' => $limit), array('actionType' => $this->getActionType(),
-                                                                               'actionVerb' => $this->getActionVerb(), 'type' => $this->getType(),
-                                                                               'role'       => $role));
+            CM_Db_Db::update('cm_actionLimit', array('limit' => $limit), array(
+                'actionType' => $this->getActionType(),
+                'actionVerb' => $this->getActionVerb(),
+                'type'       => $this->getType(),
+                'role'       => $role,
+            ));
         } else {
-            CM_Db_Db::insert('cm_actionLimit', array('limit'      => $limit, 'actionType' => $this->getActionType(),
-                                                     'actionVerb' => $this->getActionVerb(), 'type' => $this->getType(), 'role' => $role));
+            CM_Db_Db::insert('cm_actionLimit', array(
+                'limit'      => $limit,
+                'actionType' => $this->getActionType(),
+                'actionVerb' => $this->getActionVerb(),
+                'type'       => $this->getType(),
+                'role'       => $role,
+            ));
         }
         $this->_change();
     }
@@ -100,15 +116,27 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
     public function setPeriod($role, $period) {
         $role = $role ? (int) $role : null;
         $period = (int) $period;
-        if (CM_Db_Db::count('cm_actionLimit', array('actionType' => $this->getActionType(), 'actionVerb' => $this->getActionVerb(),
-                                                    'type'       => $this->getType(), 'role' => $role))
+        if (CM_Db_Db::count('cm_actionLimit', array(
+            'actionType' => $this->getActionType(),
+            'actionVerb' => $this->getActionVerb(),
+            'type'       => $this->getType(),
+            'role'       => $role,
+        ))
         ) {
-            CM_Db_Db::update('cm_actionLimit', array('period' => $period), array('actionType' => $this->getActionType(),
-                                                                                 'actionVerb' => $this->getActionVerb(), 'type' => $this->getType(),
-                                                                                 'role'       => $role));
+            CM_Db_Db::update('cm_actionLimit', array('period' => $period), array(
+                'actionType' => $this->getActionType(),
+                'actionVerb' => $this->getActionVerb(),
+                'type'       => $this->getType(),
+                'role'       => $role,
+            ));
         } else {
-            CM_Db_Db::insert('cm_actionLimit', array('period'     => $period, 'actionType' => $this->getActionType(),
-                                                     'actionVerb' => $this->getActionVerb(), 'type' => $this->getType(), 'role' => $role));
+            CM_Db_Db::insert('cm_actionLimit', array(
+                'period'     => $period,
+                'actionType' => $this->getActionType(),
+                'actionVerb' => $this->getActionVerb(),
+                'type'       => $this->getType(),
+                'role'       => $role,
+            ));
         }
         $this->_change();
     }
@@ -128,15 +156,33 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
      */
     public function unsetLimit($role = null) {
         $role = $role ? (int) $role : null;
-        CM_Db_Db::delete('cm_actionLimit', array('actionType' => $this->getActionType(), 'actionVerb' => $this->getActionVerb(),
-                                                 'type'       => $this->getType(), 'role' => $role));
+        CM_Db_Db::delete('cm_actionLimit', array(
+            'actionType' => $this->getActionType(),
+            'actionVerb' => $this->getActionVerb(),
+            'type'       => $this->getType(),
+            'role'       => $role,
+        ));
         $this->_change();
     }
 
+    /**
+     * @param int|null $role
+     * @param int|null $limit
+     * @param int      $period
+     * @return $this
+     */
+    public function setLimitAndPeriod($role, $limit, $period) {
+        $this->setLimit($role, $limit);
+        $this->setPeriod($role, $period);
+        return $this;
+    }
+
     protected function _loadData() {
-        return array('roles' => CM_Db_Db::select('cm_actionLimit', array('role', 'limit', 'period'), array('actionType' => $this->getActionType(),
-                                                                                                           'actionVerb' => $this->getActionVerb(),
-                                                                                                           'type'       => $this->getType()))->fetchAllTree());
+        return array('roles' => CM_Db_Db::select('cm_actionLimit', array('role', 'limit', 'period'), array(
+            'actionType' => $this->getActionType(),
+            'actionVerb' => $this->getActionVerb(),
+            'type'       => $this->getType(),
+        ))->fetchAllTree(),);
     }
 
     /**

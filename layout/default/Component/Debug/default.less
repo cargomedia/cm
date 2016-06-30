@@ -18,9 +18,9 @@
     border-right: 1px solid @colorNotice;
     color: @colorFg;
 
-    &:hover, &.active {
+    &.active {
       background-color: @colorNotice;
-      color: @colorFgTheme;
+      color: contrast(darken(@colorNotice, 30), black, white);
       text-decoration: none;
     }
 
@@ -68,7 +68,7 @@
     padding: 0 5px;
     line-height: 22px;
     background-color: @colorNotice;
-    color: @colorFgTheme;
+    color: contrast(darken(@colorNotice, 30), black, white);
     border-top: 1px solid @colorNotice;
     border-left: 1px solid @colorNotice;
   }

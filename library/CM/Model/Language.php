@@ -73,10 +73,11 @@ class CM_Model_Language extends CM_Model_Abstract {
     }
 
     /**
-     * @return CM_Paging_Translation_Language
+     * @param boolean|null $javascriptOnly
+     * @return CM_Paging_Translation_Language_All
      */
-    public function getTranslations() {
-        return new CM_Paging_Translation_Language($this);
+    public function getTranslations($javascriptOnly = null) {
+        return new CM_Paging_Translation_Language_All($this, $javascriptOnly);
     }
 
     /**
@@ -133,8 +134,8 @@ class CM_Model_Language extends CM_Model_Abstract {
         $this->getTranslations()->set($phrase, $value, $variables);
     }
 
-    public function toArray() {
-        $array = parent::toArray();
+    public function jsonSerialize() {
+        $array = parent::jsonSerialize();
         $array['abbreviation'] = $this->getAbbreviation();
         return $array;
     }

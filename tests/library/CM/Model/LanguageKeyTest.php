@@ -136,4 +136,15 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         CM_Model_LanguageKey::create('.foo');
         $this->assertNotNull(CM_Model_LanguageKey::getTree()->findNodeById('.foo'));
     }
+
+    public function testSetName() {
+        $language = CMTest_TH::createLanguage();
+        $key = CM_Model_LanguageKey::create('foo');
+
+        $key->setName('bar');
+        $this->assertSame('bar', $key->getName());
+        $this->assertTrue(Functional\some($language->getTranslations()->getItems(), function ($translation) {
+            return $translation['key'] === 'bar';
+        }));
+    }
 }

@@ -24,7 +24,9 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
         $state = (bool) $state;
         $variationsEnabled = $this->getSplittest()->getVariationsEnabled();
         if (!$state && $state != $this->getEnabled() && $variationsEnabled->getCount() <= 1) {
-            throw new CM_Exception('No variations for Splittest', null, array('messagePublic' => 'At least one variation needs to be enabled'));
+            throw new CM_Exception('No variations for Splittest', null, null, [
+                'messagePublic' => new CM_I18n_Phrase('At least one variation needs to be enabled'),
+            ]);
         }
         CM_Db_Db::update('cm_splittestVariation', array('enabled' => $state), array('id' => $this->getId()));
         $this->_change();
@@ -32,41 +34,45 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
     }
 
     /**
-     * @param bool $refreshCache
      * @return int
      */
-    public function getConversionCount($refreshCache = null) {
-        $aggregationData = $this->_getAggregationData($refreshCache);
+    public function getConversionCount() {
+        $aggregationData = $this->_getAggregationData();
         return $aggregationData['conversionCount'];
     }
 
     /**
-     * @param bool $refreshCache
      * @return float
      */
-    public function getConversionWeight($refreshCache = null) {
-        $aggregationData = $this->_getAggregationData($refreshCache);
+    public function getConversionWeight() {
+        $aggregationData = $this->_getAggregationData();
         return $aggregationData['conversionWeight'];
     }
 
     /**
-     * @param bool $refreshCache
      * @return float
      */
-    public function getConversionRate($refreshCache = null) {
-        $fixtureCount = $this->getFixtureCount($refreshCache);
-        if (0 == $fixtureCount) {
-            return 0;
-        }
-        return $this->getConversionWeight($refreshCache) / $fixtureCount;
+    public function getConversionWeightSquared() {
+        $aggregationData = $this->_getAggregationData();
+        return $aggregationData['conversionWeightSquared'];
     }
 
     /**
-     * @param bool $refreshCache
+     * @return float
+     */
+    public function getConversionRate() {
+        $fixtureCount = $this->getFixtureCount();
+        if (0 === $fixtureCount) {
+            return 0.;
+        }
+        return $this->getConversionWeight() / $fixtureCount;
+    }
+
+    /**
      * @return int
      */
-    public function getFixtureCount($refreshCache = null) {
-        $aggregationData = $this->_getAggregationData($refreshCache);
+    public function getFixtureCount() {
+        $aggregationData = $this->_getAggregationData();
         return $aggregationData['fixtureCount'];
     }
 
@@ -140,6 +146,38 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
     }
 
     /**
+     * @return float
+     */
+    public function getStandardDeviation() {
+        $fixtureCount = $this->getFixtureCount();
+        if (0 === $fixtureCount) {
+            return 0.;
+        }
+        $conversionRate = $this->getConversionRate();
+        $conversionWeightSquared = $this->getConversionWeightSquared();
+        return sqrt($conversionWeightSquared / $fixtureCount - $conversionRate * $conversionRate);
+    }
+
+    /**
+     * @return float
+     */
+    public function getUpperConfidenceBound() {
+        $conversionRate = $this->getConversionRate();
+        $fixtureCount = $this->getFixtureCount();
+        if (0 === $fixtureCount) {
+            return $conversionRate;
+        }
+        $fixtureCountSplittest = 0;
+        foreach ($this->getSplittest()->getVariations() as $variation) {
+            /** @var CM_Model_SplittestVariation $variation */
+            $fixtureCountSplittest += $variation->getFixtureCount();
+        }
+        $standardDeviation = $this->getStandardDeviation();
+        $upperConfidenceBound = $conversionRate + $standardDeviation * sqrt(log($fixtureCountSplittest) / $fixtureCount);
+        return $upperConfidenceBound;
+    }
+
+    /**
      * @param CM_Model_SplittestVariation $variationWorse
      * @return bool
      */
@@ -152,23 +190,25 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
     }
 
     /**
-     * @param bool $refreshCache
      * @return array
      */
-    protected function _getAggregationData($refreshCache = null) {
+    protected function _getAggregationData() {
         $cacheKey = $this->_getCacheKeyAggregation();
         $cache = CM_Cache_Local::getInstance();
-        if ($refreshCache || false === ($aggregationData = $cache->get($cacheKey))) {
-            $conversionData = CM_Db_Db::execRead('SELECT COUNT(1) as `conversionCount`, SUM(`conversionWeight`) as `conversionWeight` FROM `cm_splittestVariation_fixture`
+        if (false === ($aggregationData = $cache->get($cacheKey))) {
+            $conversionData = CM_Db_Db::execRead('
+              SELECT COUNT(1) as `conversionCount`, SUM(`conversionWeight`) as `conversionWeight`, SUM(`conversionWeight` * `conversionWeight`) as `conversionWeightSquared`
+                FROM `cm_splittestVariation_fixture`
 				WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL',
                 array($this->_getSplittestId(), $this->getId()))->fetch();
             $fixtureCount = (int) CM_Db_Db::execRead('SELECT COUNT(1) FROM `cm_splittestVariation_fixture`
 				WHERE `splittestId`=? AND `variationId`=?',
                 array($this->_getSplittestId(), $this->getId()))->fetchColumn();
             $aggregationData = array(
-                'conversionCount'  => (int) $conversionData['conversionCount'],
-                'conversionWeight' => (float) $conversionData['conversionWeight'],
-                'fixtureCount'     => $fixtureCount,
+                'conversionCount'         => (int) $conversionData['conversionCount'],
+                'conversionWeight'        => (float) $conversionData['conversionWeight'],
+                'conversionWeightSquared' => (float) $conversionData['conversionWeightSquared'],
+                'fixtureCount'            => $fixtureCount,
             );
             $cache->set($cacheKey, $aggregationData, 30);
         }

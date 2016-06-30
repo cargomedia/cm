@@ -3,39 +3,45 @@ language: php
 php:
   - 5.4
   - 5.5
+  - 5.6
 
 services:
   - mysql
   - memcached
   - elasticsearch
   - redis-server
-  - mongodb
 
-before_install:
-  - "sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10"
-  - "echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list"
-  - "sudo apt-get update"
-  - "sudo apt-get install mongodb-org-server"
+addons:
+  apt:
+    sources:
+      - mongodb-upstart
+    packages:
+      - libgearman-dev
+      - libsvm-dev
+      - mongodb-org-server
+      - re2c
 
 before_script:
-  - "until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done"
   - tests/travis/install-php-runkit.sh
   - tests/travis/install-php-svm.sh
-  - printf "\n" | pecl install imagick
-  - pecl install stats
-  - sudo apt-get install libgearman-dev && pecl install gearman-1.0.3
-  - sh -c "if [ `php-config --vernum` -ge 50500 ]; then printf "yes\n" | pecl install apcu-beta; fi"
+  - yes '' | travis_retry pecl install imagick
+  - travis_retry pecl install stats-1.0.3
+  - travis_retry pecl install gearman-1.0.3
+  - if [ `php-config --vernum` -ge 50500 ]; then yes '' | travis_retry pecl install apcu-4.0.10; fi
   - phpenv config-add tests/travis/php.ini
   - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
   - npm install -g autoprefixer@4.0.0
   - npm install -g uglify-js@2.4.13
-
-  - composer self-update
-  - composer install --dev
+  - npm install -g browserify@11.2.0
+  - composer install
   - cp tests/travis/config.php resources/config/local.php
   - bin/cm app set-deploy-version
 
-script: bin/phpunit
+script:
+  - bin/phpunit
+  - bin/qunit
+
+sudo: false
 
 notifications:
   email: false

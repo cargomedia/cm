@@ -5,7 +5,7 @@
   min-height: @spinnerSize;
   min-width: @spinnerSize;
 
-  &:before {
+  &::before {
     box-sizing: border-box;
     content: '';
     position: absolute;
@@ -25,7 +25,7 @@
   bottom: 0;
   left: 0;
 
-  &:before {
+  &::before {
     top: 50%;
     left: 50%;
     margin-top: -@spinnerSize/2;
@@ -37,9 +37,13 @@
   position: relative;
 
   &.hasSpinner {
+    > *:not(.spinner):not(.clickFeedback-ripple) {
+      opacity: 0.1;
+      transition: 200ms;
+    }
+
     .spinner {
       .spinner-expanded;
-      background-color: fadeout(@colorBg, 30);
     }
   }
 }

@@ -10,10 +10,11 @@ abstract class CM_Model_Stream_Abstract extends CM_Model_Abstract {
     abstract public function unsetUser();
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getAllowedUntil() {
-        return (int) $this->_get('allowedUntil');
+        $allowedUntil = $this->_get('allowedUntil');
+        return null !== $allowedUntil ? (int) $allowedUntil : $allowedUntil;
     }
 
     /**

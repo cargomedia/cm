@@ -31,35 +31,6 @@ class CM_Util {
     }
 
     /**
-     * @param mixed $argument
-     * @return string
-     */
-    public static function varDump($argument) {
-        if (is_object($argument)) {
-            if ($argument instanceof stdClass) {
-                return 'object';
-            }
-            $value = get_class($argument);
-            if ($argument instanceof CM_Model_Abstract) {
-                if ($argument->hasIdRaw()) {
-                    $value .= '(' . implode(', ', (array) $argument->getIdRaw()) . ')';
-                }
-            }
-            return $value;
-        }
-        if (is_string($argument)) {
-            if (strlen($argument) > 20) {
-                $argument = substr($argument, 0, 20) . '...';
-            }
-            return '\'' . $argument . '\'';
-        }
-        if (is_bool($argument) || is_numeric($argument)) {
-            return var_export($argument, true);
-        }
-        return gettype($argument);
-    }
-
-    /**
      * @param string $pattern OPTIONAL
      * @param string $path    OPTIONAL
      * @return array
@@ -194,11 +165,15 @@ class CM_Util {
     }
 
     /**
-     * @param string $path
-     * @param array  $params Query parameters
+     * @param string      $path
+     * @param array       $params Query parameters
+     * @param string|null $fragment
      * @return string
      */
-    public static function link($path, array $params = null) {
+    public static function link($path, array $params = null, $fragment = null) {
+        $path = (string) $path;
+        $fragment = (string) $fragment;
+
         $link = $path;
 
         if (!empty($params)) {
@@ -207,6 +182,10 @@ class CM_Util {
             if (strlen($query) > 0) {
                 $link .= '?' . $query;
             }
+        }
+
+        if ('' !== $fragment) {
+            $link .= '#' . $fragment;
         }
 
         return $link;
@@ -323,10 +302,11 @@ class CM_Util {
      * @param array|null  $args
      * @param string|null $input
      * @param string|null $inputPath
+     * @param array|null  $env
      * @throws CM_Exception
      * @return string Output
      */
-    public static function exec($command, array $args = null, $input = null, $inputPath = null) {
+    public static function exec($command, array $args = null, $input = null, $inputPath = null, array $env = null) {
         if (null === $args) {
             $args = array();
         }
@@ -339,18 +319,19 @@ class CM_Util {
         if ($inputPath) {
             $command .= ' <' . escapeshellarg($inputPath);
         }
-        return self::_exec($command, $input);
+        return self::_exec($command, $input, $env);
     }
 
     /**
-     * @param string $command
-     * @param string $stdin
+     * @param string     $command
+     * @param string     $stdin
+     * @param array|null $env
      * @return string
      * @throws CM_Exception
      */
-    private static function _exec($command, $stdin) {
+    private static function _exec($command, $stdin, array $env = null) {
         $descriptorSpec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w"));
-        $process = proc_open($command, $descriptorSpec, $pipes);
+        $process = proc_open($command, $descriptorSpec, $pipes, null, $env);
         if (!is_resource($process)) {
             throw new CM_Exception('Cannot open command file pointer to `' . $command . '`');
         }
@@ -543,5 +524,61 @@ class CM_Util {
             }
         }
         return null;
+    }
+
+    /**
+     * @param mixed     $value
+     * @param bool|null $prettyPrint
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    public static function jsonEncode($value, $prettyPrint = null) {
+        $options = 0;
+        if ($prettyPrint) {
+            $options = $options | JSON_PRETTY_PRINT;
+        }
+        $result = '';
+        $errorMessage = null;
+        try {
+            $result = json_encode($value, $options);
+        } catch (ErrorException $e) {
+            $errorMessage = $e->getMessage();
+        }
+        if (null === $errorMessage && $jsonError = json_last_error()) {
+            $errorMessage = 'json error code: `' . $jsonError . '`';
+        }
+        if (null !== $errorMessage) {
+            throw new CM_Exception_Invalid('Cannot json_encode value.', null, [
+                'value'     => $value,
+                'jsonError' => $errorMessage,
+            ]);
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $value
+     * @return mixed
+     * @throws CM_Exception_Invalid
+     */
+    public static function jsonDecode($value) {
+        $valueString = (string) $value;
+        $result = '';
+        $errorMessage = null;
+        try {
+            $result = json_decode($valueString, true);
+        } catch (ErrorException $e) {
+            $errorMessage = $e->getMessage();
+        }
+        if (null === $errorMessage && $jsonError = json_last_error()) {
+            $errorMessage = 'json error code: `' . $jsonError . '`';
+        }
+        if (null !== $errorMessage) {
+            throw new CM_Exception_Invalid('Cannot json_decode value.', null, [
+                'value'     => $valueString,
+                'jsonError' => $errorMessage,
+            ]);
+        }
+        return $result;
     }
 }

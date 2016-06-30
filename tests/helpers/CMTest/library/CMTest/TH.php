@@ -25,6 +25,7 @@ class CMTest_TH {
         self::clearCache();
         self::timeReset();
         self::clearFilesystem();
+        CM_Service_Manager::getInstance()->resetServiceInstances();
         CM_Config::set(unserialize(self::$_configBackup));
     }
 
@@ -53,7 +54,6 @@ class CMTest_TH {
 
     public static function timeForward($sec) {
         self::$timeDelta += $sec;
-        self::clearCache();
     }
 
     public static function timeDaysForward($days) {
@@ -62,7 +62,6 @@ class CMTest_TH {
 
     public static function timeReset() {
         self::$timeDelta = 0;
-        self::clearCache();
     }
 
     public static function timeDelta() {
@@ -126,44 +125,51 @@ class CMTest_TH {
     }
 
     /**
-     * @param int|null $type
-     * @param int|null $adapterType
+     * @param int|null    $type
+     * @param int|null    $adapterType
+     * @param string|null $mediaId
      * @return CM_Model_StreamChannel_Abstract
      */
-    public static function createStreamChannel($type = null, $adapterType = null) {
+    public static function createStreamChannel($type = null, $adapterType = null, $mediaId = null) {
         if (null === $type) {
-            $type = CM_Model_StreamChannel_Video::getTypeStatic();
+            $type = CM_Model_StreamChannel_Media::getTypeStatic();
         }
 
         if (null === $adapterType) {
-            $adapterType = CM_Stream_Adapter_Video_Wowza::getTypeStatic();
+            $adapterType = CM_Janus_Service::getTypeStatic();
         }
 
         $data = array('key' => rand(1, 10000) . '_' . rand(1, 100));
-        if (CM_Model_StreamChannel_Video::getTypeStatic() == $type) {
+        $className = CM_Model_Abstract::getClassName($type);
+        if ('CM_Model_StreamChannel_Media' === $className || is_subclass_of($className, 'CM_Model_StreamChannel_Media')) {
+            $mediaId = (null !== $mediaId) ? (string) $mediaId : null;
             $data['width'] = 480;
             $data['height'] = 720;
             $data['serverId'] = 1;
-            $data['thumbnailCount'] = 0;
             $data['adapterType'] = $adapterType;
+            $data['mediaId'] = $mediaId;
         }
         return CM_Model_StreamChannel_Abstract::createType($type, $data);
     }
 
     /**
-     * @param CM_Model_StreamChannel_Video|null $streamChannel
+     * @param CM_Model_StreamChannel_Media|null $streamChannel
      * @param CM_Model_User|null                $user
-     * @return CM_Model_StreamChannelArchive_Video
+     * @param string|null                       $filename
+     * @return CM_Model_StreamChannelArchive_Media
      */
-    public static function createStreamChannelVideoArchive(CM_Model_StreamChannel_Video $streamChannel = null, CM_Model_User $user = null) {
+    public static function createStreamChannelVideoArchive(CM_Model_StreamChannel_Media $streamChannel = null, CM_Model_User $user = null, $filename = null) {
         if (is_null($streamChannel)) {
-            $streamChannel = self::createStreamChannel();
-            self::createStreamPublish($user, $streamChannel);
+            $streamChannel = static::createStreamChannel();
+            static::createStreamPublish($user, $streamChannel);
         }
         if (!$streamChannel->hasStreamPublish()) {
-            self::createStreamPublish($user, $streamChannel);
+            static::createStreamPublish($user, $streamChannel);
         }
-        return CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
+        if (null !== $filename) {
+            $filename = (string) $filename;
+        }
+        return CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel, 'file' => $filename));
     }
 
     /**
@@ -180,7 +186,8 @@ class CMTest_TH {
         }
         return CM_Model_Stream_Publish::createStatic(array(
             'streamChannel' => $streamChannel,
-            'user'          => $user, 'start' => time(),
+            'user'          => $user,
+            'start'         => time(),
             'key'           => rand(1, 10000) . '_' . rand(1, 100),
         ));
     }
@@ -214,18 +221,29 @@ class CMTest_TH {
     }
 
     /**
-     * @param string             $uri
-     * @param array|null         $headers
-     * @param CM_Model_User|null $viewer
+     * @param string                $uri
+     * @param array|null            $headers
+     * @param CM_Model_User|null    $viewer
+     * @param CM_Site_Abstract|null $site
      * @return CM_Http_Response_Page
+     * @throws CM_Class_Exception_TypeNotConfiguredException
      */
-    public static function createResponsePageEmbed($uri, array $headers = null, CM_Model_User $viewer = null) {
-        if (!$headers) {
+    public static function createResponsePageEmbed($uri, array $headers = null, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
+        if (null === $site) {
             $site = CM_Site_Abstract::factory();
+        }
+        if (!$headers) {
             $headers = array('host' => $site->getHost());
         }
         $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
-        return new CM_Http_Response_Page_Embed($request, self::getServiceManager());
+        return new CM_Http_Response_Page_Embed($request, $site, self::getServiceManager());
+    }
+
+    /**
+     * @return CM_Geo_Point
+     */
+    public static function createGeoPoint() {
+        return new CM_Geo_Point(rand(-90, 90), rand(-180, 180));
     }
 
     /**
@@ -254,6 +272,17 @@ class CMTest_TH {
             default:
                 return new CM_Model_Location(CM_Model_Location::LEVEL_ZIP, $zip);
         }
+    }
+
+    /**
+     * @return CM_Model_Currency
+     */
+    public static function createDefaultCurrency() {
+        $defaultCurrencyConfig = CM_Config::get()->CM_Model_Currency->default;
+        if (!$defaultCurrency = CM_Model_Currency::findByAbbreviation($defaultCurrencyConfig['abbreviation'])) {
+            $defaultCurrency = CM_Model_Currency::create($defaultCurrencyConfig['code'], $defaultCurrencyConfig['abbreviation']);
+        }
+        return $defaultCurrency;
     }
 
     /**

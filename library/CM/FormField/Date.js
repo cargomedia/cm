@@ -13,5 +13,29 @@ var CM_FormField_Date = CM_FormField_Abstract.extend({
 
   isEmpty: function(value) {
     return _.isEmpty(value.day) || _.isEmpty(value.month) || _.isEmpty(value.year);
+  },
+
+  getInput: function() {
+    return this.$('select');
+  },
+
+  /**
+   * @returns {{day: *, month: *, year: *}}
+   */
+  getValue: function() {
+    return {
+      day: this.$('select.day').val(),
+      month: this.$('select.month').val(),
+      year: this.$('select.year').val()
+    };
+  },
+
+  /**
+   * @param {{day: *, month: *, year: *}} date
+   */
+  setValue: function(date) {
+    this.$('select.day').val(date.day);
+    this.$('select.month').val(date.month);
+    this.$('select.year').val(date.year);
   }
 });

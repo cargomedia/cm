@@ -107,6 +107,10 @@ class CM_Service_Manager extends CM_Class_Abstract {
         $this->_serviceInstanceList[$serviceName] = $instance;
     }
 
+    public function resetServiceInstances() {
+        $this->_serviceInstanceList = [];
+    }
+
     /**
      * @param string $serviceName
      */
@@ -168,7 +172,7 @@ class CM_Service_Manager extends CM_Class_Abstract {
      * @return CM_Debug
      */
     public function getDebug() {
-        return $this->get('debug' ,'CM_Debug');
+        return $this->get('debug', 'CM_Debug');
     }
 
     /**
@@ -186,6 +190,15 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @param string $serviceName
+     * @return CM_Janus_Service
+     * @throws CM_Exception_Invalid
+     */
+    public function getJanus($serviceName) {
+        return $this->get($serviceName, 'CM_Janus_Service');
+    }
+
+    /**
      * @return CM_Memcache_Client
      */
     public function getMemcache() {
@@ -193,10 +206,38 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_MessageStream_Service
+     */
+    public function getStreamMessage() {
+        return $this->get('stream-message', 'CM_MessageStream_Service');
+    }
+
+    /**
      * @return CM_Redis_Client
      */
     public function getRedis() {
         return $this->get('redis', 'CM_Redis_Client');
+    }
+
+    /**
+     * @return CM_Elasticsearch_Cluster
+     */
+    public function getElasticsearch() {
+        return $this->get('elasticsearch', 'CM_Elasticsearch_Cluster');
+    }
+
+    /**
+     * @return CMService_Newrelic
+     */
+    public function getNewrelic() {
+        return $this->get('newrelic', 'CMService_Newrelic');
+    }
+
+    /**
+     * @return CM_Log_Logger
+     */
+    public function getLogger() {
+        return $this->get('logger', 'CM_Log_Logger');
     }
 
     /**
@@ -210,14 +251,39 @@ class CM_Service_Manager extends CM_Class_Abstract {
         }
         $config = $this->_serviceConfigList[$serviceName];
         $reflection = new ReflectionClass($config['class']);
-        $instance = $reflection->newInstanceArgs($config['arguments']);
-        if (null !== $config['method']) {
-            $instance = call_user_func_array(array($instance, $config['method']['name']), $config['method']['arguments']);
+
+        $arguments = $config['arguments'];
+        if ($constructor = $reflection->getConstructor()) {
+            $arguments = $this->_matchNamedArgs($serviceName, $constructor, $arguments);
         }
+        $instance = $reflection->newInstanceArgs($arguments);
+
         if ($instance instanceof CM_Service_ManagerAwareInterface) {
             $instance->setServiceManager($this);
         }
+
+        if (null !== $config['method']) {
+            $method = $reflection->getMethod($config['method']['name']);
+            $methodArguments = $this->_matchNamedArgs($serviceName, $method, $config['method']['arguments']);
+            $instance = $method->invokeArgs($instance, $methodArguments);
+        }
         return $instance;
+    }
+
+    /**
+     * @param string           $serviceName
+     * @param ReflectionMethod $method
+     * @param array            $arguments
+     * @throws CM_Exception_Invalid
+     * @return array
+     */
+    protected function _matchNamedArgs($serviceName, ReflectionMethod $method, array $arguments) {
+        $namedArgs = new CM_Util_NamedArgs();
+        try {
+            return $namedArgs->matchNamedArgs($method, $arguments);
+        } catch (CM_Exception_Invalid $e) {
+            throw new CM_Exception_Invalid("Cannot match arguments for `{$serviceName}`: {$e->getMessage()}");
+        }
     }
 
     /**

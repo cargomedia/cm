@@ -60,6 +60,9 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
      * @throws CM_Exception
      */
     public function getMimeType() {
+        if ($mimeType = self::findMimeTypeByExtension($this->getExtension())) {
+            return $mimeType;
+        }
         try {
             return self::getMimeTypeByContent($this->read());
         } catch (CM_Exception $ex) {
@@ -181,9 +184,16 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
      * @param CM_File $file
      */
     public function copyToFile(CM_File $file) {
-        $sameFilesystemAdapter = $this->_filesystem->equals($file->_filesystem);
-        if ($sameFilesystemAdapter) {
+        $filesystemSource = $this->_filesystem;
+        $filesystemDestination = $file->_filesystem;
+        $adapterSource = $filesystemSource->getAdapter();
+        $adapterDestination = $filesystemDestination->getAdapter();
+        if ($filesystemSource->equals($filesystemDestination)) {
             $this->copy($file->getPath());
+        } elseif ($adapterSource instanceof CM_File_Filesystem_Adapter_StreamInterface &&
+            $adapterDestination instanceof CM_File_Filesystem_Adapter_StreamInterface
+        ) {
+            $this->_copyToFileStreaming($file, $adapterSource, $adapterDestination);
         } else {
             $file->write($this->read());
         }
@@ -326,6 +336,22 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
     }
 
     /**
+     * @param string $extension
+     * @return string|null
+     */
+    public static function findMimeTypeByExtension($extension) {
+        $extension = strtolower($extension);
+        $mimeType = null;
+        $extensionToMimeType = [
+            'js' => 'text/javascript',
+        ];
+        if (array_key_exists($extension, $extensionToMimeType)) {
+            $mimeType = $extensionToMimeType[$extension];
+        }
+        return $mimeType;
+    }
+
+    /**
      * @param string $path
      * @return CM_File
      */
@@ -367,5 +393,33 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
         $samePath = $this->getPath() === $other->getPath();
         $sameFilesystemAdapter = $this->_filesystem->equals($other->_filesystem);
         return ($samePath && $sameFilesystemAdapter);
+    }
+
+    /**
+     * @param CM_File                    $file
+     * @param CM_File_Filesystem_Adapter $adapterSource
+     * @param CM_File_Filesystem_Adapter $adapterDestination
+     * @throws CM_Exception
+     */
+    protected function _copyToFileStreaming(CM_File $file, CM_File_Filesystem_Adapter $adapterSource, CM_File_Filesystem_Adapter $adapterDestination) {
+        /** @var CM_File_Filesystem_Adapter_StreamInterface $adapterSource */
+        /** @var CM_File_Filesystem_Adapter_StreamInterface $adapterDestination */
+        $streamSource = $adapterSource->getStreamRead($this->getPath());
+        $adapterDestination->writeStream($file->getPath(), $streamSource);
+        $sizeDestination = $file->getSize();
+        $sizeSource = $this->getSize();
+        if ($sizeSource !== $sizeDestination) {
+            throw new CM_Exception('Copy of `' . $this->getPath() . '` to `' . $file->getPath() . '` failed', null, [
+                'Original size'       => $sizeSource,
+                'Bytes copied'        => $sizeDestination,
+                'Source adapter'      => get_class($adapterSource),
+                'Destination adapter' => get_class($adapterDestination),
+            ]);
+        }
+        if (is_resource($streamSource) && !@fclose($streamSource)) {
+            throw new CM_Exception('Could not close stream for `' . $this->getPath() . '`', null, [
+                'Source adapter' => get_class($adapterSource),
+            ]);
+        }
     }
 }

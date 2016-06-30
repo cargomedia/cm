@@ -54,7 +54,7 @@ var CM_FormField_TreeSelect = CM_FormField_Abstract.extend({
   },
 
   close: function() {
-    this.$options.toggleModalClose();
+    this.$options.toggleModal('hide');
   },
 
   /**

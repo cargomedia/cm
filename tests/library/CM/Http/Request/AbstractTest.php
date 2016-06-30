@@ -30,10 +30,14 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
 
         $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
         $this->assertEquals($user, $mock->getViewer(true));
+    }
 
-        $user2 = CMTest_TH::createUser();
-        $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers, null, $user2));
-        $this->assertEquals($user2, $mock->getViewer(true));
+    public function testGetViewerDoesntCreateSession() {
+        $request = new CM_Http_Request_Get('/');
+        $this->assertFalse($request->hasSession());
+
+        $request->getViewer();
+        $this->assertFalse($request->hasSession());
     }
 
     public function testGetCookie() {
@@ -182,6 +186,13 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $response->process();
     }
 
+    public function testGetUserAgent() {
+        $request = new CM_Http_Request_Get('/foo');
+        $this->assertSame('', $request->getUserAgent());
+        $request = new CM_Http_Request_Get('/foo', ['user-agent' => 'Mozilla/5.0']);
+        $this->assertSame('Mozilla/5.0', $request->getUserAgent());
+    }
+
     public function testIsBotCrawler() {
         $useragents = array(
             'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'   => true,
@@ -222,7 +233,8 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
             'MSIE 6.0'                                            => false,
             'MSIE 9.0'                                            => false,
             'MSIE 9.1'                                            => false,
-            'MSIE 10.0'                                           => true,
+            'MSIE 10.0'                                           => false,
+            'Edge'                                                => true,
             'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0)'  => true,
             'Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC)'   => false,
             'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus)'    => true,
@@ -237,6 +249,68 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
     public function testIsSupportedWithoutUserAgent() {
         $request = new CM_Http_Request_Get('/', []);
         $this->assertSame(true, $request->isSupported());
+    }
+
+    public function testSetSession() {
+        $user = CMTest_TH::createUser();
+        $session = new CM_Session();
+        $request = new CM_Http_Request_Get('/');
+
+        $session->setUser($user);
+        $request->setSession($session);
+        $this->assertEquals($session, $request->getSession());
+        $this->assertEquals($user, $request->getViewer());
+
+        $session->deleteUser();
+        $request->setSession($session);
+        $this->assertEquals($session, $request->getSession());
+        $this->assertSame(null, $request->getViewer());
+    }
+
+    public function testGetTimeZoneFromCookie() {
+        $request = new CM_Http_Request_Get('/foo/bar/', ['cookie' => 'timezoneOffset=9000; clientId=7']);
+        $timeZone = $request->getTimeZone();
+        $this->assertInstanceOf('DateTimeZone', $timeZone);
+        $this->assertSame('-02:30', $timeZone->getName());
+
+        $request = new CM_Http_Request_Get('/foo/bar/', ['cookie' => 'timezoneOffset=-9000; clientId=7']);
+        $timeZone = $request->getTimeZone();
+        $this->assertInstanceOf('DateTimeZone', $timeZone);
+        $this->assertSame('+02:30', $timeZone->getName());
+
+        $request = new CM_Http_Request_Post('/foo/bar/', ['cookie' => 'timezoneOffset=3600']);
+        $timeZone = $request->getTimeZone();
+        $this->assertInstanceOf('DateTimeZone', $timeZone);
+        $this->assertSame('-01:00', $timeZone->getName());
+
+        $request = new CM_Http_Request_Post('/foo/bar/', ['cookie' => 'timezoneOffset=50400']);
+        $timeZone = $request->getTimeZone();
+        $this->assertNull($timeZone);
+
+        $request = new CM_Http_Request_Post('/foo/bar/', ['cookie' => 'timezoneOffset=-62400']);
+        $timeZone = $request->getTimeZone();
+        $this->assertNull($timeZone);
+
+        $request = new CM_Http_Request_Get('/foo/baz/');
+        $timeZone = $request->getTimeZone();
+        $this->assertNull($timeZone);
+    }
+
+    public function testSanitize() {
+        $malformedString = pack("H*", 'c32e');
+        $malformedUri = 'http://foo.bar/' . $malformedString;
+        $this->assertFalse(mb_check_encoding($malformedUri, 'UTF-8'));
+        $exception = $this->catchException(function () use ($malformedUri) {
+            CM_Util::jsonEncode($malformedUri);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Cannot json_encode value.', $exception->getMessage());
+
+        $request = new CM_Http_Request_Get($malformedUri, null, ['baz' => pack("H*", 'c32e')]);
+        $this->assertInstanceOf('CM_Http_Request_Get', $request);
+        $this->assertTrue(mb_check_encoding($request->getUri(), 'UTF-8'));
+        $this->assertTrue(mb_check_encoding($request->getServer()['baz'], 'UTF-8'));
+        $this->assertNotEmpty(CM_Util::jsonEncode($request->getUri()));
     }
 
     /**

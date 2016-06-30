@@ -2,17 +2,21 @@
 
 class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInterface {
 
+    use CM_Service_Tracking_QueueTrait;
+
     /** @var string */
     protected $_code;
 
     /** @var array */
-    protected $_eventList = array(), $_transactionList = array(), $_pageViewList = array(), $_fieldList = array();
+    protected $_eventList = [], $_transactionList = [], $_pageViewList = [], $_fieldList = [];
 
     /**
-     * @param string $code
+     * @param string   $code
+     * @param int|null $ttl
      */
-    public function __construct($code) {
+    public function __construct($code, $ttl = null) {
         $this->_code = (string) $code;
+        $this->_setTrackingQueueTtl($ttl);
     }
 
     /**
@@ -55,13 +59,13 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
         $label = isset($label) ? (string) $label : null;
         $value = isset($value) ? (int) $value : null;
         $nonInteraction = (bool) $nonInteraction;
-        $this->_eventList[] = array(
+        $this->_eventList[] = [
             'category'       => $category,
             'action'         => $action,
             'label'          => $label,
             'value'          => $value,
             'nonInteraction' => $nonInteraction,
-        );
+        ];
     }
 
     /**
@@ -106,10 +110,10 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     public function getJs() {
         $js = '';
         foreach ($this->_fieldList as $fieldName => $fieldValue) {
-            $js .= 'ga("set", "' . $fieldName . '", "' . $fieldValue . '");';
+            $js .= 'ga("set", ' . CM_Params::jsonEncode($fieldName) . ', ' . CM_Params::jsonEncode($fieldValue) . ');';
         }
         foreach ($this->_pageViewList as $pageView) {
-            $js .= 'ga("send", "pageview", "' . $pageView . '");';
+            $js .= 'ga("send", "pageview", ' . CM_Params::jsonEncode($pageView) . ');';
         }
         foreach ($this->_eventList as $event) {
             $js .= 'ga("send", ' . CM_Params::jsonEncode(array_filter([
@@ -164,14 +168,11 @@ EOF;
         $fieldList = [
             'cookieDomain' => $environment->getSite()->getHost(),
         ];
-        if (CM_Http_Request_Abstract::hasInstance()) {
-            $fieldList['clientId'] = (string) CM_Http_Request_Abstract::getInstance()->getClientId();
-        }
         if ($user = $environment->getViewer()) {
-            $fieldList['userId'] = $user->getId();
+            $fieldList['userId'] = (string) $user->getId();
         }
 
-        $html .= 'ga("create", "' . $this->_getCode() . '", ' . CM_Params::jsonEncode(array_filter($fieldList)) . ');';
+        $html .= 'ga("create", ' . CM_Params::jsonEncode($this->_getCode()) . ', ' . CM_Params::jsonEncode(array_filter($fieldList)) . ');';
         $html .= $this->getJs();
         $html .= '</script>';
 
@@ -185,13 +186,57 @@ EOF;
     }
 
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
+        $this->setPageView($path);
         if ($viewer = $environment->getViewer()) {
             $this->setUserId($viewer->getId());
+            $this->_flushTrackingQueue($viewer);
         }
-        $this->setPageView($path);
     }
 
     public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
+    }
+
+    /**
+     * @param CM_Model_User $user
+     */
+    protected function _flushTrackingQueue(CM_Model_User $user) {
+        while ($trackingData = $this->_popTrackingData($user)) {
+            $data = $trackingData['data'];
+            switch ($trackingData['hitType']) {
+                case 'event':
+                    $eventCategory = $data['category'];
+                    $eventAction = $data['action'];
+                    $eventLabel = isset($data['label']) ? $data['label'] : null;
+                    $eventValue = isset($data['value']) ? $data['value'] : null;
+                    $nonInteraction = isset($data['nonInteraction']) ? $data['nonInteraction'] : null;
+                    $this->addEvent($eventCategory, $eventAction, $eventLabel, $eventValue, $nonInteraction);
+                    break;
+                case 'pageview':
+                    $path = $data['path'];
+                    $this->addPageView($path);
+                    break;
+            }
+        }
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getCode() {
+        return $this->_code;
+    }
+
+    /**
+     * @param CM_Model_User $user
+     * @param string        $hitType
+     * @param array|null    $data
+     * @throws CM_Exception_Invalid
+     */
+    protected function _pushHit(CM_Model_User $user, $hitType, array $data = null) {
+        if (!in_array($hitType, ['event', 'pageview'])) {
+            throw new CM_Exception_Invalid('Invalid hit type `' . $hitType . '`');
+        }
+        $this->_pushTrackingData($user, ['hitType' => $hitType, 'data' => $data]);
     }
 
     /**
@@ -202,12 +247,5 @@ EOF;
         $name = (string) $name;
         $value = (string) $value;
         $this->_fieldList[$name] = $value;
-    }
-
-    /**
-     * @return string
-     */
-    protected function _getCode() {
-        return $this->_code;
     }
 }

@@ -1,13 +1,18 @@
 <?php
 
 return function (CM_Config_Node $config) {
+
+    $config->installationName = 'CM';
+
     $config->CM_App->setupScriptClasses = array();
     $config->CM_App->setupScriptClasses[] = 'CM_File_Filesystem_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_Db_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_MongoDb_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_Elasticsearch_SetupScript';
+    $config->CM_App->setupScriptClasses[] = 'CM_Class_TypeDumper';
     $config->CM_App->setupScriptClasses[] = 'CM_Http_SetupScript';
     $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Translations';
+    $config->CM_App->setupScriptClasses[] = 'CM_App_SetupScript_Currency';
 
     $config->timeZone = 'UTC';
 
@@ -16,31 +21,20 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Site_Abstract->class = null;
 
-    $config->CM_Elasticsearch_Client->enabled = true;
-    $config->CM_Elasticsearch_Client->servers = array(
-        array('host' => 'localhost', 'port' => 9200),
-    );
-
     $config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
     $config->CM_Cache_Local->lifetime = 86400;
 
     $config->CM_Cache_Shared->storage = 'CM_Cache_Storage_Memcache';
     $config->CM_Cache_Shared->lifetime = 3600;
 
+    $config->CM_Cache_Persistent->storage = 'CM_Cache_Storage_File';
+    $config->CM_Cache_Persistent->lifetime = null;
+
     $config->CM_Paging_Ip_Blocked->maxAge = (7 * 86400);
 
     $config->CM_Model_Language->cacheLifetime = 3600;
 
     $config->classConfigCacheEnabled = true;
-
-    $config->CM_Stream_Message->enabled = true;
-    $config->CM_Stream_Message->adapter = 'CM_Stream_Adapter_Message_SocketRedis';
-
-    $config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
-        array('httpHost' => 'localhost', 'httpPort' => 8085, 'sockjsUrls' => array(
-            'http://localhost:8090',
-        )),
-    );
 
     $config->CM_Db_Db->delayedEnabled = true;
 
@@ -52,33 +46,32 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Usertext_Usertext->class = 'CM_Usertext_Usertext';
 
-    $config->CM_Http_Response_Page->catch = array(
-        'CM_Exception_Nonexistent'  => ['path' => '/error/not-found', 'log' => true],
-        'CM_Exception_InvalidParam' => ['path' => '/error/not-found', 'log' => true],
-        'CM_Exception_AuthRequired' => ['path' => '/error/auth-required', 'log' => false],
-        'CM_Exception_NotAllowed'   => ['path' => '/error/not-allowed', 'log' => false],
+    $config->CM_Model_Currency->default = ['code' => '840', 'abbreviation' => 'USD'];
+
+    $config->CM_Http_Response_Page->class = 'CM_Http_Response_Page';
+    $config->CM_Http_Response_Page->exceptionsToCatch = array(
+        'CM_Exception_Nonexistent'  => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => true, 'level' => CM_Log_Logger::INFO],
+        'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => true, 'level' => CM_Log_Logger::INFO],
+        'CM_Exception_AuthRequired' => ['errorPage' => 'CM_Page_Error_AuthRequired', 'log' => false],
+        'CM_Exception_NotAllowed'   => ['errorPage' => 'CM_Page_Error_NotAllowed', 'log' => false],
     );
 
-    $config->CM_Http_Response_View_Abstract->catch = array(
-        'CM_Exception_Nonexistent',
-        'CM_Exception_AuthRequired',
-        'CM_Exception_NotAllowed',
-        'CM_Exception_Blocked',
-        'CM_Exception_ActionLimit',
+    $config->CM_Http_Response_View_Abstract->exceptionsToCatch = array(
+        'CM_Exception_Nonexistent'  => ['log' => true, 'level' => CM_Log_Logger::INFO],
+        'CM_Exception_InvalidParam' => ['log' => true, 'level' => CM_Log_Logger::INFO],
+        'CM_Exception_AuthRequired' => [],
+        'CM_Exception_NotAllowed'   => [],
+        'CM_Exception_Blocked'      => [],
+        'CM_Exception_ActionLimit'  => [],
     );
+    $config->CM_Http_Response_View_Abstract->catchPublicExceptions = true;
 
-    $config->CM_Http_Response_RPC->catch = array(
-        'CM_Exception_AuthRequired',
-        'CM_Exception_NotAllowed',
+    $config->CM_Http_Response_RPC->exceptionsToCatch = array(
+        'CM_Exception_InvalidParam' => ['log' => true, 'level' => CM_Log_Logger::WARNING],
+        'CM_Exception_AuthRequired' => ['log' => true, 'level' => CM_Log_Logger::WARNING],
+        'CM_Exception_NotAllowed'   => ['log' => true, 'level' => CM_Log_Logger::WARNING],
     );
-
-    $config->CM_Stream_Video->adapter = 'CM_Stream_Adapter_Video_Wowza';
-    $config->CM_Stream_Video->servers = array(
-        array('publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'),
-    );
-
-    $config->CM_Stream_Adapter_Video_Wowza->httpPort = '8086';
-    $config->CM_Stream_Adapter_Video_Wowza->wowzaPort = '1935';
+    $config->CM_Http_Response_RPC->catchPublicExceptions = true;
 
     $config->CM_Adprovider->enabled = true;
     $config->CM_Adprovider->zones = array();
@@ -93,9 +86,6 @@ return function (CM_Config_Node $config) {
 
     $config->CMService_MaxMind->licenseKey = null;
 
-    $config->CMService_Newrelic->enabled = false;
-    $config->CMService_Newrelic->appName = 'CM Application';
-
     $config->services = array();
 
     $config->services['databases'] = array(
@@ -105,34 +95,34 @@ return function (CM_Config_Node $config) {
     $config->services['database-master'] = array(
         'class'     => 'CM_Db_Client',
         'arguments' => array(
-            array(
+            'config' => array(
                 'host'     => 'localhost',
                 'port'     => 3306,
                 'username' => 'root',
                 'password' => '',
                 'db'       => 'cm',
-            )
-        )
+            ),
+        ),
     );
 
     $config->services['MongoDb'] = array(
         'class'     => 'CM_MongoDb_Client',
         'arguments' => array(
-            array(
+            'config' => array(
                 'db'      => 'cm',
                 'server'  => 'mongodb://localhost:27017',
                 'options' => array('connect' => true),
-            )
+            ),
         ),
     );
 
     $config->services['redis'] = array(
         'class'     => 'CM_Redis_Client',
         'arguments' => array(
-            array(
+            'config' => array(
                 'host' => 'localhost',
                 'port' => '6379',
-            )
+            ),
         ),
     );
 
@@ -141,12 +131,12 @@ return function (CM_Config_Node $config) {
         'method' => array(
             'name'      => 'createFilesystem',
             'arguments' => array(
-                'CM_File_Filesystem_Adapter_Local',
-                array(
+                'adapterClassName' => 'CM_File_Filesystem_Adapter_Local',
+                'options'          => array(
                     'pathPrefix' => DIR_ROOT . 'data/',
-                )
+                ),
             ),
-        )
+        ),
     );
 
     $config->services['filesystem-usercontent'] = array(
@@ -154,49 +144,96 @@ return function (CM_Config_Node $config) {
         'method' => array(
             'name'      => 'createFilesystem',
             'arguments' => array(
-                'CM_File_Filesystem_Adapter_Local',
-                array(
+                'adapterClassName' => 'CM_File_Filesystem_Adapter_Local',
+                'options'          => array(
                     'pathPrefix' => DIR_PUBLIC . 'userfiles/',
-                )
+                ),
             ),
-        )
+        ),
     );
 
     $config->services['usercontent'] = array(
         'class'     => 'CM_Service_UserContent',
-        'arguments' => array(array(
-            'default' => array(
-                'filesystem' => 'filesystem-usercontent',
-                'url'        => 'http://localhost/userfiles',
+        'arguments' => array(
+            'configList' => array(
+                'default' => array(
+                    'filesystem' => 'filesystem-usercontent',
+                    'url'        => 'http://localhost/userfiles',
+                ),
             ),
-        ))
+        ),
     );
 
     $config->services['trackings'] = array(
         'class'     => 'CM_Service_Trackings',
-        'arguments' => array(array())
+        'arguments' => array(
+            'trackingServiceNameList' => array(),
+        ),
     );
+
+    $config->services['tracking-adagnit'] = [
+        'class'     => 'CMService_Adagnit_Client',
+        'arguments' => [
+            'ttl' => 86400,
+        ],
+    ];
 
     $config->services['tracking-googleanalytics'] = array(
         'class'     => 'CMService_GoogleAnalytics_Client',
-        'arguments' => array('my-web-property-id')
+        'arguments' => array(
+            'code' => 'my-web-property-id',
+            'ttl'  => 86400,
+        ),
     );
 
     $config->services['tracking-kissmetrics'] = array(
         'class'     => 'CMService_KissMetrics_Client',
-        'arguments' => array('my-api-key')
+        'arguments' => array(
+            'code' => 'my-api-key',
+        ),
+    );
+
+    $config->services['tracking-inspectlet'] = array(
+        'class'     => 'CMService_Inspectlet_Client',
+        'arguments' => array(
+            'code' => 'my-wid',
+        ),
     );
 
     $config->services['email-verification'] = array(
         'class'     => 'CM_Service_EmailVerification_Standard',
-        'arguments' => array()
+        'arguments' => array(),
     );
 
     $config->services['memcache'] = array(
         'class'     => 'CM_Memcache_Client',
         'arguments' => array(
-            array(
+            'servers' => array(
                 ['host' => 'localhost', 'port' => 11211],
+            ),
+        ),
+    );
+
+    $config->services['stream-message'] = array(
+        'class'  => 'CM_MessageStream_Factory',
+        'method' => [
+            'name'      => 'createService',
+            'arguments' => [
+                'adapterClass'     => 'CM_MessageStream_Adapter_SocketRedis',
+                'adapterArguments' => [
+                    'servers' => [
+                        ['httpHost' => 'localhost', 'httpPort' => 8085, 'sockjsUrls' => ['http://localhost:8090']],
+                    ],
+                ],
+            ],
+        ],
+    );
+
+    $config->services['elasticsearch'] = array(
+        'class'     => 'CM_Elasticsearch_Cluster',
+        'arguments' => array(
+            'servers' => array(
+                ['host' => 'localhost', 'port' => 9200],
             ),
         ),
     );
@@ -205,4 +242,53 @@ return function (CM_Config_Node $config) {
         'class'     => 'CM_Options',
         'arguments' => array(),
     );
+
+    $config->services['newrelic'] = array(
+        'class'     => 'CMService_Newrelic',
+        'arguments' => array(
+            'enabled' => false,
+            'appName' => 'CM Application',
+        ),
+    );
+
+    $config->services['logger-handler-newrelic'] = [
+        'class'     => 'CMService_NewRelic_Log_Handler',
+        'arguments' => [
+            'minLevel' => CM_Log_Logger::ERROR,
+        ],
+    ];
+
+    $config->services['logger-handler-mongodb'] = [
+        'class'     => 'CM_Log_Handler_MongoDb',
+        'arguments' => [
+            'collection'    => 'cm_log',
+            'recordTtl'     => null,
+            'insertOptions' => null,
+            'minLevel'      => CM_Log_Logger::DEBUG,
+        ],
+    ];
+
+    $config->services['logger-handler-file-error'] = [
+        'class'  => 'CM_Log_Handler_Factory',
+        'method' => [
+            'name'      => 'createFileHandler',
+            'arguments' => [
+                'path'     => 'logs/error.log',
+                'minLevel' => CM_Log_Logger::DEBUG,
+            ],
+        ],
+    ];
+
+    $config->services['logger'] = [
+        'class'  => 'CM_Log_Factory',
+        'method' => [
+            'name'      => 'createLayeredLogger',
+            'arguments' => [
+                'handlersLayerConfigList' => [
+                    ['logger-handler-mongodb', 'logger-handler-newrelic'],
+                    ['logger-handler-file-error']
+                ],
+            ],
+        ]
+    ];
 };

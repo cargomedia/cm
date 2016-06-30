@@ -151,9 +151,12 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
      */
     public function isAllowed() {
         $arguments = func_get_args();
-        if (!call_user_func_array(array($this, '_isAllowed'), $arguments)) {
-            return false;
+
+        $isAllowed = call_user_func_array(array($this, '_isAllowed'), $arguments);
+        if (null !== $isAllowed) {
+            return $isAllowed;
         }
+
         $actionLimitList = $this->getActionLimitsTransgressed();
         foreach ($actionLimitList as $actionLimitData) {
             /** @var CM_Model_ActionLimit_Abstract $actionLimit */
@@ -162,6 +165,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
                 return false;
             }
         }
+
         return true;
     }
 
@@ -174,10 +178,17 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
     public function prepare() {
         $arguments = func_get_args();
-        if (!call_user_func_array(array($this, '_isAllowed'), $arguments)) {
-            throw new CM_Exception_NotAllowed('Action not allowed', null, array('messagePublic' => 'The content you tried to interact with has become private.'));
+
+        $isAllowed = call_user_func_array(array($this, '_isAllowed'), $arguments);
+        if (false === $isAllowed) {
+            throw new CM_Exception_NotAllowed('Action not allowed', null, null, [
+                'messagePublic' => new CM_I18n_Phrase('The content you tried to interact with has become private.'),
+            ]);
         }
-        $this->_checkActionLimits();
+        if (true !== $isAllowed) {
+            $this->_checkActionLimits();
+        }
+
         $this->_prepare();
     }
 
@@ -193,23 +204,27 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     protected function _isAllowed() {
         $arguments = func_get_args();
-        $methodName = '_isAllowed' . CM_Util::camelize($this->getVerbName());
 
-        if (method_exists($this, $methodName)) {
-            return call_user_func_array(array($this, $methodName), $arguments);
+        $methodNameAllowed = '_isAllowed' . CM_Util::camelize($this->getVerbName());
+        if (is_callable([$this, $methodNameAllowed])) {
+            $isAllowed = call_user_func_array(array($this, $methodNameAllowed), $arguments);
+            if (null !== $isAllowed) {
+                return (bool) $isAllowed;
+            }
         }
-        return true;
+
+        return null;
     }
 
     protected function _notify() {
         $arguments = func_get_args();
         $methodName = '_notify' . CM_Util::camelize($this->getVerbName());
 
-        if (method_exists($this, $methodName)) {
+        if (is_callable([$this, $methodName])) {
             call_user_func_array(array($this, $methodName), $arguments);
         }
 

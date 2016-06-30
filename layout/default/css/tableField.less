@@ -1,29 +1,9 @@
 .tableField {
-  padding: 5px 0 5px 5px;
-}
-
-.tableField:first-child {
-  border-width: 0;
+  margin-bottom: 16px;
 }
 
 .tableField > .label {
-  box-sizing: border-box;
+  margin-bottom: 2px;
   font-weight: bold;
   color: @fontColorStrong;
-
-  @media (min-width: @breakpointSmall) {
-    width: 100px;
-    float: left;
-    text-align: right;
-  }
-}
-
-.tableField > .label:after {
-  content: ":";
-}
-
-.tableField > .value {
-  @media (min-width: @breakpointSmall) {
-    margin-left: 110px;
-  }
 }

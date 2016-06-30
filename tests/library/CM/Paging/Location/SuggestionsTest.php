@@ -34,11 +34,11 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
         CM_Model_Location_City::create($country2, $state6, 'Baden', '-42.433', '147.467', '242082');
 
         CM_Model_Location::createAggregation();
-        CM_Config::get()->CM_Elasticsearch_Client->enabled = true;
-
-        self::$_type = new CM_Elasticsearch_Type_Location();
+        $elasticCluster = CMTest_TH::getServiceManager()->getElasticsearch();
+        $elasticCluster->setEnabled(true);
+        self::$_type = new CM_Elasticsearch_Type_Location($elasticCluster->getClient());
         self::$_searchIndexCli = new CM_Elasticsearch_Index_Cli();
-        self::$_searchIndexCli->create(self::$_type->getIndex()->getName());
+        self::$_searchIndexCli->create(self::$_type->getIndexName());
         self::$_countryId1 = $country1->getId();
         self::$_countryId2 = $country2->getId();
         self::$_stateId1 = $state1->getId();
@@ -48,7 +48,8 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
     }
 
     public static function tearDownAfterClass() {
-        self::$_type->getIndex()->delete();
+        self::$_type->deleteIndex();
+        CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(false);
         parent::tearDownAfterClass();
     }
 
@@ -100,7 +101,7 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
     }
 
     public function testSearchWithoutSearchEnabled() {
-        CM_Config::get()->CM_Elasticsearch_Client->enabled = false;
+        CMTest_TH::getServiceManager()->getElasticsearch()->setEnabled(false);
         CM_Cache_Local::getInstance()->flush();
 
         $source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);

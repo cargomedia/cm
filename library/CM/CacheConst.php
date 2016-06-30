@@ -23,8 +23,6 @@ class CM_CacheConst {
     // _text:X_filter:X
     const Usertext = 'Usertext';
 
-    const ContentList_BadwordRegex = 'ContentList_BadwordRegex';
-
     // _fixedHeight:X
     const Usertext_Filter_EmoticonList = 'Usertext_Filter_EmoticonList';
 
@@ -51,8 +49,6 @@ class CM_CacheConst {
 
     //_md5:X
     //_md5:X_compress:X
-    //_md5:X_compress:X_siteId:X
-    //_md5:X_compress:X_siteId:X_languageId:X
     const App_Resource = 'App_Resource';
 
     //_lock:X
@@ -89,4 +85,11 @@ class CM_CacheConst {
     const AdproviderZones = 'AdproviderZones';
 
     const Emoticons = 'Emoticons';
+
+
+    // _abbreviation:X
+    const Currency_ByAbbreviation = 'Currency_ByAbbreviation';
+
+    // _countryId:X
+    const Currency_CountryId = 'Currency_CountryId';
 }

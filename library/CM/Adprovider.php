@@ -21,22 +21,35 @@ class CM_Adprovider extends CM_Class_Abstract {
         if (!$this->_getEnabled()) {
             return '';
         }
-        $zoneData = $this->_getZone($site, $zoneName);
+        $zoneData = $this->_getZoneData($site, $zoneName);
+        if (null === $zoneData) {
+            throw new CM_Exception_Invalid('Zone `' . $zoneName . '` not configured.');
+        }
         if (!array_key_exists('adapter', $zoneData)) {
             throw new CM_Exception_Invalid('Zone `' . $zoneName . '` has no adapter configured.');
         }
         $adapterClassName = (string) $zoneData['adapter'];
         unset($zoneData['adapter']);
-        return (string) $this->_getAdapter($adapterClassName)->getHtml($zoneData, $variables);
+        return (string) $this->_getAdapter($adapterClassName)->getHtml($zoneName, $zoneData, $variables);
     }
 
     /**
      * @param CM_Site_Abstract $site
      * @param string           $zoneName
-     * @return mixed
+     * @return bool
+     */
+    public function hasZone(CM_Site_Abstract $site, $zoneName) {
+        $zoneData = $this->_getZoneData($site, $zoneName);
+        return (null !== $zoneData);
+    }
+
+    /**
+     * @param CM_Site_Abstract $site
+     * @param string           $zoneName
+     * @return array
      * @throws CM_Exception_Invalid
      */
-    protected function _getZone(CM_Site_Abstract $site, $zoneName) {
+    protected function _getZoneData(CM_Site_Abstract $site, $zoneName) {
         $cacheKey = CM_CacheConst::AdproviderZones . '_siteId:' . $site->getId();
         $cache = CM_Cache_Local::getInstance();
         if (false === ($zones = $cache->get($cacheKey))) {
@@ -47,7 +60,7 @@ class CM_Adprovider extends CM_Class_Abstract {
             $cache->set($cacheKey, $zones);
         }
         if (!array_key_exists($zoneName, $zones)) {
-            throw new CM_Exception_Invalid('Zone `' . $zoneName . '` not configured.');
+            return null;
         }
         return $zones[$zoneName];
     }

@@ -45,14 +45,105 @@ CREATE TABLE `cm_captcha` (
   KEY `create_time` (`create_time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_cli_command_manager_process`;
+
+
+CREATE TABLE `cm_cli_command_manager_process` (
+  `commandName` varchar(100) NOT NULL,
+  `hostId` int(10) unsigned NOT NULL,
+  `processId` int(10) unsigned DEFAULT NULL,
+  `timeoutStamp` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`commandName`),
+  KEY `hostId` (`hostId`),
+  KEY `timeoutStamp` (`timeoutStamp`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `cm_ipBlocked`;
 
 
 CREATE TABLE `cm_ipBlocked` (
   `ip` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
+  `expirationStamp` int(10) unsigned NOT NULL,
   PRIMARY KEY (`ip`),
+  KEY `createStamp` (`createStamp`),
+  KEY `expirationStamp` (`expirationStamp`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_jobdistribution_delayedqueue`;
+
+
+CREATE TABLE `cm_jobdistribution_delayedqueue` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `className` varchar(255) NOT NULL,
+  `params` text NOT NULL,
+  `executeAt` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `executeAt` (`executeAt`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_languageValue`;
+
+
+CREATE TABLE `cm_languageValue` (
+  `languageKeyId` int(11) unsigned NOT NULL,
+  `languageId` int(11) unsigned NOT NULL,
+  `value` text NOT NULL,
+  PRIMARY KEY (`languageKeyId`,`languageId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_log`;
+
+
+CREATE TABLE `cm_log` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `type` int(10) unsigned NOT NULL,
+  `msg` varchar(5000) NOT NULL,
+  `timeStamp` int(10) unsigned NOT NULL,
+  `metaInfo` text,
+  PRIMARY KEY (`id`),
+  KEY `type` (`type`,`timeStamp`),
+  KEY `msg` (`msg`(333))
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_mail`;
+
+
+CREATE TABLE `cm_mail` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `subject` varchar(256) DEFAULT NULL,
+  `text` text,
+  `html` mediumtext,
+  `createStamp` int(10) unsigned NOT NULL,
+  `sender` text,
+  `replyTo` text,
+  `to` text,
+  `cc` text,
+  `bcc` text,
+  `customHeaders` text,
+  PRIMARY KEY (`id`),
   KEY `createStamp` (`createStamp`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_model_currency`;
+
+
+CREATE TABLE `cm_model_currency` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(3) NOT NULL DEFAULT '',
+  `abbreviation` varchar(3) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`),
+  UNIQUE KEY `string` (`abbreviation`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_model_currency_country`;
+
+
+CREATE TABLE `cm_model_currency_country` (
+  `currencyId` int(10) NOT NULL,
+  `countryId` int(10) NOT NULL,
+  UNIQUE KEY `countryId` (`countryId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_model_language`;
@@ -75,22 +166,12 @@ DROP TABLE IF EXISTS `cm_model_languagekey`;
 CREATE TABLE `cm_model_languagekey` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `variables` text CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `variables` text CHARACTER SET utf8 COLLATE utf8_bin,
   `updateCountResetVersion` int(10) unsigned DEFAULT NULL,
   `updateCount` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `javascript` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `javascript` (`javascript`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_languageValue`;
-
-
-CREATE TABLE `cm_languageValue` (
-  `languageKeyId` int(11) unsigned NOT NULL,
-  `languageId` int(11) unsigned NOT NULL,
-  `value` text NOT NULL,
-  PRIMARY KEY (`languageKeyId`,`languageId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_model_location_city`;
@@ -161,38 +242,6 @@ CREATE TABLE `cm_model_location_zip` (
   KEY `name` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_log`;
-
-
-CREATE TABLE `cm_log` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `type` int(10) unsigned NOT NULL,
-  `msg` varchar(5000) NOT NULL,
-  `timeStamp` int(10) unsigned NOT NULL,
-  `metaInfo` text,
-  PRIMARY KEY (`id`),
-  KEY `type` (`type`,`timeStamp`),
-  KEY `msg` (`msg`(333))
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_mail`;
-
-
-CREATE TABLE `cm_mail` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `subject` varchar(256) DEFAULT NULL,
-  `text` text,
-  `html` mediumtext,
-  `createStamp` int(10) unsigned NOT NULL,
-  `sender` text,
-  `replyTo` text,
-  `to` text,
-  `cc` text,
-  `bcc` text,
-  PRIMARY KEY (`id`),
-  KEY `createStamp` (`createStamp`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
 DROP TABLE IF EXISTS `cm_option`;
 
 
@@ -200,19 +249,6 @@ CREATE TABLE `cm_option` (
   `key` varchar(100) NOT NULL,
   `value` blob NOT NULL,
   PRIMARY KEY (`key`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_cli_command_manager_process`;
-
-
-CREATE TABLE `cm_cli_command_manager_process` (
-  `commandName` varchar(100) NOT NULL,
-  `hostId` int(10) unsigned NOT NULL,
-  `processId` int(10) unsigned DEFAULT NULL,
-  `timeoutStamp` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`commandName`),
-  KEY `hostId` (`hostId`),
-  KEY `timeoutStamp` (`timeoutStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_requestClientCounter`;
@@ -275,6 +311,7 @@ DROP TABLE IF EXISTS `cm_splittest`;
 CREATE TABLE `cm_splittest` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
+  `optimized` int(1) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
@@ -310,9 +347,8 @@ CREATE TABLE `cm_splittestVariation_fixture` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `userSplittest` (`userId`,`splittestId`),
   UNIQUE KEY `requestClientSplittest` (`requestClientId`,`splittestId`),
-  KEY `splittestId` (`splittestId`),
-  KEY `conversionStamp` (`conversionStamp`),
-  KEY `createStamp` (`createStamp`)
+  KEY `splittestVariationCreateStamp` (`splittestId`,`variationId`,`createStamp`),
+  KEY `splittestVariationConversionStamp` (`splittestId`,`variationId`,`conversionStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_streamChannel`;
@@ -321,6 +357,7 @@ DROP TABLE IF EXISTS `cm_streamChannel`;
 CREATE TABLE `cm_streamChannel` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(64) NOT NULL,
+  `createStamp` int(10) unsigned NOT NULL,
   `type` int(10) unsigned NOT NULL,
   `adapterType` int(11) NOT NULL,
   PRIMARY KEY (`id`),
@@ -328,36 +365,35 @@ CREATE TABLE `cm_streamChannel` (
   KEY `type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_streamChannelArchive_video`;
+DROP TABLE IF EXISTS `cm_streamChannelArchive_media`;
 
 
-CREATE TABLE `cm_streamChannelArchive_video` (
+CREATE TABLE `cm_streamChannelArchive_media` (
   `id` int(10) unsigned NOT NULL,
-  `userId` int(10) unsigned DEFAULT NULL,
-  `width` int(10) unsigned NOT NULL,
-  `height` int(10) unsigned NOT NULL,
   `duration` int(10) unsigned NOT NULL,
-  `thumbnailCount` int(10) unsigned NOT NULL,
   `hash` char(32) NOT NULL,
+  `file` varchar(255) DEFAULT NULL,
   `streamChannelType` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
+  `key` varchar(64) DEFAULT NULL,
+  `mediaId` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `userId` (`userId`),
+  UNIQUE KEY `mediaId` (`mediaId`),
   KEY `createStamp` (`createStamp`),
-  KEY `streamChannelType` (`streamChannelType`)
+  KEY `streamChannelType` (`streamChannelType`),
+  KEY `key` (`key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_streamChannel_video`;
+DROP TABLE IF EXISTS `cm_streamChannel_media`;
 
 
-CREATE TABLE `cm_streamChannel_video` (
+CREATE TABLE `cm_streamChannel_media` (
   `id` int(10) unsigned NOT NULL,
-  `width` int(10) unsigned NOT NULL,
-  `height` int(10) unsigned NOT NULL,
-  `thumbnailCount` int(10) unsigned NOT NULL DEFAULT '0',
   `serverId` int(10) unsigned NOT NULL,
+  `mediaId` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `cm_streamChannel_video-cm_streamChannel` FOREIGN KEY (`id`) REFERENCES `cm_streamChannel` (`id`)
+  UNIQUE KEY `mediaId` (`mediaId`),
+  CONSTRAINT `cm_streamChannel_media-cm_streamChannel` FOREIGN KEY (`id`) REFERENCES `cm_streamChannel` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_stream_publish`;
@@ -367,7 +403,7 @@ CREATE TABLE `cm_stream_publish` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `userId` int(10) unsigned DEFAULT NULL,
   `start` int(10) unsigned NOT NULL,
-  `allowedUntil` int(10) unsigned NOT NULL,
+  `allowedUntil` int(10) unsigned DEFAULT NULL,
   `key` varchar(36) NOT NULL,
   `channelId` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
@@ -383,7 +419,7 @@ CREATE TABLE `cm_stream_subscribe` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `userId` int(10) unsigned DEFAULT NULL,
   `start` int(10) unsigned NOT NULL,
-  `allowedUntil` int(10) unsigned NOT NULL,
+  `allowedUntil` int(10) unsigned DEFAULT NULL,
   `key` varchar(36) NOT NULL,
   `channelId` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
@@ -391,6 +427,17 @@ CREATE TABLE `cm_stream_subscribe` (
   KEY `userId` (`userId`),
   CONSTRAINT `cm_stream_subscribe-cm_streamChannel` FOREIGN KEY (`channelId`) REFERENCES `cm_streamChannel` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_streamchannel_thumbnail`;
+
+
+CREATE TABLE `cm_streamchannel_thumbnail` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `channelId` int(10) unsigned NOT NULL,
+  `createStamp` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `channelId-createStamp` (`channelId`,`createStamp`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_string`;
 
@@ -421,6 +468,15 @@ CREATE TABLE `cm_svmtraining` (
   `createStamp` int(10) unsigned NOT NULL,
   KEY `svmId` (`svmId`),
   KEY `createStamp` (`createStamp`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_tmp_classType`;
+
+
+CREATE TABLE `cm_tmp_classType` (
+  `type` int(10) unsigned NOT NULL,
+  `className` varchar(255) NOT NULL,
+  PRIMARY KEY (`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_tmp_location`;
@@ -471,6 +527,7 @@ CREATE TABLE `cm_user` (
   `createStamp` int(10) unsigned NOT NULL,
   `site` int(10) unsigned DEFAULT NULL,
   `languageId` int(10) unsigned DEFAULT NULL,
+  `currencyId` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`userId`),
   KEY `activityStamp` (`activityStamp`),
   KEY `createStamp` (`createStamp`),
@@ -483,10 +540,8 @@ DROP TABLE IF EXISTS `cm_user_online`;
 CREATE TABLE `cm_user_online` (
   `userId` int(10) unsigned NOT NULL,
   `visible` tinyint(3) unsigned NOT NULL DEFAULT '1',
-  `offlineStamp` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`userId`),
-  KEY `visible` (`visible`),
-  KEY `offlineStamp` (`offlineStamp`)
+  KEY `visible` (`visible`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_user_preference`;

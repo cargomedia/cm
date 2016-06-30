@@ -6,29 +6,28 @@ class CM_Exception extends Exception {
     const ERROR = 2;
     const FATAL = 3;
 
-    /** @var string|null */
-    private $_messagePublic;
-
-    /** @var array|null */
-    private $_messagePublicVariables;
-
     /** @var int */
     protected $_severity = self::ERROR;
 
     /** @var array */
     private $_metaInfo;
 
+    /** @var CM_I18n_Phrase|null */
+    private $_messagePublic;
+
     /**
      * @param string|null $message
+     * @param int|null    $severity
      * @param array|null  $metaInfo
      * @param array|null  $options
      */
-    public function __construct($message = null, array $metaInfo = null, array $options = null) {
+    public function __construct($message = null, $severity = null, array $metaInfo = null, array $options = null) {
+        if (null !== $severity) {
+            $this->setSeverity((int) $severity);
+        }
         $this->_metaInfo = null !== $metaInfo ? $metaInfo : array();
-        $this->_messagePublic = isset($options['messagePublic']) ? (string) $options['messagePublic'] : null;
-        $this->_messagePublicVariables = isset($options['messagePublicVariables']) ? (array) $options['messagePublicVariables'] : null;
-        if (isset($options['severity'])) {
-            $this->setSeverity($options['severity']);
+        if (isset($options['messagePublic'])) {
+            $this->_setMessagePublic($options['messagePublic']);
         }
         parent::__construct($message);
     }
@@ -41,7 +40,7 @@ class CM_Exception extends Exception {
         if (!$this->isPublic()) {
             return 'Internal server error';
         }
-        return $render->getTranslation($this->_messagePublic, $this->_messagePublicVariables);
+        return $this->_messagePublic->translate($render);
     }
 
     /**
@@ -70,33 +69,16 @@ class CM_Exception extends Exception {
     }
 
     /**
-     * @param boolean|null $raw
-     * @return string[]
+     * @return mixed[]
      */
-    public function getMetaInfo($raw = null) {
-        if ($raw) {
-            return $this->_metaInfo;
-        }
-        return Functional\map($this->_metaInfo, function ($value) {
-            return CM_Util::varDump($value);
-        });
+    public function getMetaInfo() {
+        return $this->_metaInfo;
     }
 
     /**
-     * @return CM_Paging_Log_Error|CM_Paging_Log_Fatal|CM_Paging_Log_Warn
+     * @param CM_I18n_Phrase $messagePublic
      */
-    public function getLog() {
-        switch ($this->getSeverity()) {
-            case self::WARN:
-                return new CM_Paging_Log_Warn();
-                break;
-            case self::ERROR:
-                return new CM_Paging_Log_Error();
-                break;
-            case self::FATAL:
-            default:
-                return new CM_Paging_Log_Fatal();
-                break;
-        }
+    private function _setMessagePublic(CM_I18n_Phrase $messagePublic) {
+        $this->_messagePublic = $messagePublic;
     }
 }

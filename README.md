@@ -1,4 +1,4 @@
-CM Framework  [![Build Status](https://travis-ci.org/cargomedia/CM.png)](https://travis-ci.org/cargomedia/CM)
+CM Framework  [![Build Status](https://travis-ci.org/cargomedia/cm.png)](https://travis-ci.org/cargomedia/cm)
 ============
 
 Major concepts
@@ -143,6 +143,46 @@ CM_Paging_Photo_User                           # All photos of a given user
 CM_Paging_User_Country                         # All users from a given country
 ```
 
+Structuring files
+-----------------
+Class definitions should be grouped by topic and stored in a common directory.
+Within such a *topic module* directories should be used to group files with common parent classes.
+A *topic module* can again contain a directory for another (sub) topic module.
+
+Example of a topic module "Payments", inside another topic module "Accounting":
+```
+library/
+└── CM
+    └── Payments
+        ├── Accounting
+        │   ├── Account.php
+        │   ├── Transaction.php
+        │   └── TransactionList
+        │       ├── Abstract.php
+        │       └── User.php
+        ├── Bank.php
+        ├── BankList
+        │   ├── Abstract.php
+        │   ├── All.php
+        │   └── PaymentProvider.php
+        ├── ExchangeRateUpdater.php
+        └── SetupScript.php
+```
+
+Views like *components* and *pages* need to reside in their respective directory.
+It's recommended to group them by topic within a sub-directory.
+
+Example of *components* for the topic "Payments":
+```
+library/
+└── CM
+    └── Component
+        └── Payments
+            ├── AccountList.js
+            ├── AccountList.php
+            ├── TransactionList.js
+            └── TransactionList.php
+```
 
 Creating a new project
 ----------------------
@@ -191,28 +231,37 @@ Options:
  --forks=<value>
 
 Commands:
- app setup
- app fill-caches
  app deploy
+ app fill-caches
  app generate-config-internal
  app set-deploy-version [--deploy-version=<value>]
+ app setup [--reload]
+ cache clear
  console interactive
- css icon-refresh
  db db-to-file <namespace>
  db file-to-db
- db run-updates
  db run-update <version> [--namespace=<value>]
- generator create-view <class-name>
+ db run-updates
+ generator bootstrap-project [--project-name=<value>] [--domain=<value>] [--module-name=<value>]
  generator create-class <class-name>
- generator create-namespace <namespace>
- generator create-javascript-files
- job-distribution start-manager
+ generator create-module <module-name> [--single-module-structure] [--module-path=<value>]
+ generator create-site <class-name> <name> <domain>
+ generator create-view <class-name>
+ frontend icon-refresh
+ frontend generate-favicon
+ job-distribution start-worker
+ location outdated [--verbose]
+ location upgrade [--without-ip-blocks] [--verbose]
  maintenance start
- search-index create [--index-name=<value>]
- search-index update [--index-name=<value>] [--host=<Elasticsearch host>] [--port=<Elasticsearch port>]
+ maintenance start-local
+ message-stream start-synchronization
+ search-index create [--index-name=<value>] [--skip-if-exist]
+ search-index delete [--index-name=<value>]
  search-index optimize
  search-index start-maintenance
- stream start-message-synchronization
+ search-index update [--index-name=<value>]
+ stream import-video-archive <stream-channel-id> <archive-source>
+ stream import-video-thumbnail <stream-channel-id> <thumbnail-source>
 ```
 
 Deployment

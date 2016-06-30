@@ -5,6 +5,7 @@ class CM_Http_Response_JsError extends CM_Http_Response_Abstract {
     protected function _process() {
         $request = $this->getRequest();
         $query = $request->getQuery();
+
         $counter = (int) $query['counter'];
         $url = (string) $query['url'];
         $message = (string) $query['message'];
@@ -13,11 +14,11 @@ class CM_Http_Response_JsError extends CM_Http_Response_Abstract {
 
         $suppressLogging = $request->isBotCrawler() || !$request->isSupported();
         if (!$suppressLogging) {
-            $text = $message . PHP_EOL;
-            $text .= '## ' . $fileUrl . '(' . $fileLine . ')' . PHP_EOL;
-
-            $log = new CM_Paging_Log_JsError();
-            $log->add($text, array('url' => $url, 'errorCounter' => $counter));
+            $exception = new CM_Exception_Javascript($message, $url, $counter, $fileUrl, $fileLine);
+            $context = new CM_Log_Context();
+            $context->setExtra(['type' => CM_Paging_Log_Javascript::getTypeStatic()]);
+            $context->setException($exception);
+            $this->getServiceManager()->getLogger()->warning('Javascript error', $context);
         }
 
         $this->setHeader('Content-Type', 'text/javascript');

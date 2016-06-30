@@ -16,9 +16,9 @@ class CM_PagingSource_Elasticsearch extends CM_PagingSource_Abstract {
 
     /**
      * @param CM_Elasticsearch_Type_Abstract|CM_Elasticsearch_Type_Abstract[] $types
-     * @param CM_Elasticsearch_Query                               $query
-     * @param array|null                                            $fields
-     * @param bool|null                                             $returnType
+     * @param CM_Elasticsearch_Query                                          $query
+     * @param array|null                                                      $fields
+     * @param bool|null                                                       $returnType
      * @throws CM_Exception_Invalid
      */
     function __construct($types, CM_Elasticsearch_Query $query, array $fields = null, $returnType = null) {
@@ -45,7 +45,7 @@ class CM_PagingSource_Elasticsearch extends CM_PagingSource_Abstract {
     protected function _cacheKeyBase() {
         $keyParts = array();
         foreach ($this->_types as $type) {
-            $keyParts[] = $type->getIndex()->getName() . '_' . $type->getType()->getName();
+            $keyParts[] = $type->getIndexName() . '_' . $type->getIndexName();
         }
         sort($keyParts);
         return array(implode(',', $keyParts), $this->_query->getQuery());
@@ -69,7 +69,7 @@ class CM_PagingSource_Elasticsearch extends CM_PagingSource_Abstract {
             if ($count !== null) {
                 $data['size'] = $count;
             }
-            $searchResult = CM_Elasticsearch_Client::getInstance()->query($this->_types, $data);
+            $searchResult = CM_Service_Manager::getInstance()->getElasticsearch()->query($this->_types, $data);
             $result = array('items' => array(), 'total' => 0);
             if (isset($searchResult['hits'])) {
                 foreach ($searchResult['hits']['hits'] as $hit) {
@@ -80,7 +80,7 @@ class CM_PagingSource_Elasticsearch extends CM_PagingSource_Abstract {
                             $idArray = array('id' => $hit['_id']);
                         }
                         $fields = $hit['fields'];
-                        $fields = Functional\map($fields, function($field) {
+                        $fields = Functional\map($fields, function ($field) {
                             if (is_array($field) && 1 == count($field)) {
                                 $field = reset($field);
                             }

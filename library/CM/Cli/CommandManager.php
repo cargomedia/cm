@@ -151,39 +151,33 @@ class CM_Cli_CommandManager {
                 $this->_outputError($this->getHelp($packageName));
                 return 1;
             }
+            $process = $this->_getProcess();
             $command = $this->_getCommand($packageName, $methodName);
 
             if ($command->getSynchronized()) {
                 $this->monitorSynchronizedCommands();
                 $this->_checkLock($command);
                 $this->_lockCommand($command);
-                $commandManager = $this;
-                $terminationCallback = function () use ($commandManager, $command) {
-                    $commandManager->unlockCommand($command);
-                };
-            } else {
-                $terminationCallback = null;
+                $process->bind('exit', function () use ($command) {
+                    $this->unlockCommand($command);
+                });
             }
 
             $transactionName = 'cm ' . $packageName . ' ' . $methodName;
             $streamInput = $this->_streamInput;
             $streamOutput = $this->_streamOutput;
             $streamError = $this->_streamError;
-            $workload = function () use ($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError) {
-                if ($command->getKeepalive()) {
-                    CMService_Newrelic::getInstance()->ignoreTransaction();
-                } else {
-                    CMService_Newrelic::getInstance()->startTransaction($transactionName);
-                }
-                $command->run($arguments, $streamInput, $streamOutput, $streamError);
-            };
+
+            $workload = $this->_getProcessWorkload($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError);
 
             $forks = max($this->_forks, 1);
-            $process = $this->_getProcess();
             for ($i = 0; $i < $forks; $i++) {
                 $process->fork($workload);
             }
-            $resultList = $process->waitForChildren($command->getKeepalive(), $terminationCallback);
+            $resultList = $process->waitForChildren($command->getKeepalive());
+            if ($command->getSynchronized()) {
+                $this->unlockCommand($command);
+            }
             $failure = Functional\some($resultList, function (CM_Process_WorkloadResult $result) {
                 return !$result->isSuccess();
             });
@@ -191,14 +185,6 @@ class CM_Cli_CommandManager {
                 return 1;
             }
             return 0;
-        } catch (CM_Cli_Exception_InvalidArguments $e) {
-            $this->_outputError('ERROR: ' . $e->getMessage() . PHP_EOL);
-            if (isset($command)) {
-                $this->_outputError('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
-            } else {
-                $this->_outputError($this->getHelp());
-            }
-            return 1;
         } catch (CM_Cli_Exception_Internal $e) {
             $this->_outputError('ERROR: ' . $e->getMessage() . PHP_EOL);
             return 1;
@@ -229,6 +215,19 @@ class CM_Cli_CommandManager {
         $hostId = dechex($lock['hostId']);
         $processId = (int) $lock['processId'];
         throw new CM_Cli_Exception_Internal("Command `$commandName` still running (process `$processId` on host `$hostId`)");
+    }
+
+    /**
+     * @param CM_Cli_Arguments $arguments
+     * @throws CM_Cli_Exception_InvalidArguments
+     */
+    protected function _checkUnusedArguments(CM_Cli_Arguments $arguments) {
+        if ($arguments->getNumeric()->getParamsDecoded()) {
+            throw new CM_Cli_Exception_InvalidArguments('Too many arguments provided');
+        }
+        if ($named = $arguments->getNamed()->getParamsDecoded()) {
+            throw new CM_Cli_Exception_InvalidArguments('Illegal option used: `--' . key($named) . '`');
+        }
     }
 
     /**
@@ -264,6 +263,42 @@ class CM_Cli_CommandManager {
      */
     protected function  _getProcess() {
         return CM_Process::getInstance();
+    }
+
+    /**
+     * @param string                    $transactionName
+     * @param CM_Cli_Command            $command
+     * @param CM_Cli_Arguments          $arguments
+     * @param CM_InputStream_Interface  $streamInput
+     * @param CM_OutputStream_Interface $streamOutput
+     * @param CM_OutputStream_Interface $streamError
+     * @return callable
+     */
+    protected function _getProcessWorkload($transactionName, CM_Cli_Command $command, CM_Cli_Arguments $arguments, CM_InputStream_Interface $streamInput, CM_OutputStream_Interface $streamOutput, CM_OutputStream_Interface $streamError) {
+        return function (CM_Process_WorkloadResult $result) use ($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError) {
+            try {
+                $parameters = $command->extractParameters($arguments);
+                $this->_checkUnusedArguments($arguments);
+                if ($command->getKeepalive()) {
+                    CM_Service_Manager::getInstance()->getNewrelic()->ignoreTransaction();
+                } else {
+                    CM_Service_Manager::getInstance()->getNewrelic()->startTransaction($transactionName);
+                }
+
+                $command->run($parameters, $streamInput, $streamOutput, $streamError);
+            } catch (CM_Cli_Exception_InvalidArguments $ex) {
+                $this->_outputError('ERROR: ' . $ex->getMessage() . PHP_EOL);
+                if (isset($command)) {
+                    $this->_outputError('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
+                } else {
+                    $this->_outputError($this->getHelp());
+                }
+                $result->setException($ex);
+            } catch (CM_Cli_Exception_Internal $ex) {
+                $this->_outputError('ERROR: ' . $ex->getMessage() . PHP_EOL);
+                $result->setException($ex);
+            }
+        };
     }
 
     /**

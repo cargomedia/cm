@@ -18,9 +18,16 @@ class CM_FormField_Set extends CM_FormField_Abstract {
         parent::_initialize();
     }
 
+    /**
+     * @return array
+     */
+    public function getValues() {
+        return array_keys($this->_getOptionList());
+    }
+
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         foreach ($userInput as $key => $value) {
-            if (!in_array($value, $this->_getValues())) {
+            if (!in_array($value, $this->getValues())) {
                 unset($userInput[$key]);
             }
         }
@@ -43,12 +50,5 @@ class CM_FormField_Set extends CM_FormField_Abstract {
         } else {
             return array_combine($this->_values, $this->_values);
         }
-    }
-
-    /**
-     * @return array
-     */
-    protected function _getValues() {
-        return array_keys($this->_getOptionList());
     }
 }

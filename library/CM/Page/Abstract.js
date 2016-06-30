@@ -14,24 +14,24 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
   _state: null,
 
   /** @type String|Null */
-  _fragment: null,
+  _url: null,
 
   _ready: function() {
     CM_Component_Abstract.prototype._ready.call(this);
 
     if (this.hasStateParams()) {
       var location = window.location;
-      var params = queryString.parse(location.search);
+      var params = cm.request.parseQueryParams(location.search);
       var state = _.pick(params, _.intersection(_.keys(params), this.getStateParams()));
-      this.routeToState(state, location.pathname + location.search);
+      this.routeToState(state, location.href);
     }
   },
 
   /**
    * @returns {String|Null}
    */
-  getFragment: function() {
-    return this._fragment;
+  getUrl: function() {
+    return this._url;
   },
 
   /**
@@ -46,7 +46,7 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
    */
   getStateParams: function() {
     if (!this.hasStateParams()) {
-      cm.error.triggerThrow('Page has no state params');
+      throw new CM_Exception('Page has no state params');
     }
     return this._stateParams;
   },
@@ -56,7 +56,7 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
    */
   getState: function() {
     if (!this.hasStateParams()) {
-      cm.error.triggerThrow('Page has no state params');
+      throw new CM_Exception('Page has no state params');
     }
     return this._state;
   },
@@ -66,18 +66,18 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
    */
   setState: function(state) {
     if (!_.isEmpty(_.difference(_.keys(state), this.getStateParams()))) {
-      cm.error.triggerThrow('Invalid state');
+      throw new CM_Exception('Invalid state');
     }
     this._state = state;
   },
 
   /**
    * @param {Object} state
-   * @param {String} fragment
+   * @param {String} url
    * @returns {Boolean}
    */
-  routeToState: function(state, fragment) {
-    this._fragment = fragment;
+  routeToState: function(state, url) {
+    this._url = url;
     this.setState(state);
     return this._changeState(state);
   },

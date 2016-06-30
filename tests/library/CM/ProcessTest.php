@@ -4,30 +4,53 @@ require_once dirname(dirname(__DIR__)) . '/bootstrap.php'; // Bootstrap the test
 
 class CM_ProcessTest extends CMTest_TestCase {
 
-    /** @var resource */
-    protected static $_file;
-
-    public static function setupBeforeClass() {
-        parent::setUpBeforeClass();
-        self::$_file = tmpfile();
-    }
-
-    public static function tearDownAfterClass() {
-        fclose(self::$_file);
-        parent::tearDownAfterClass();
-    }
-
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
     public function testFork() {
         $process = CM_Process::getInstance();
-        $seq1 = $process->fork(function() {});
-        $seq2 = $process->fork(function() {});
-        $seq3 = $process->fork(function() {});
-        $this->assertSame(1, $seq2 - $seq1);
-        $this->assertSame(1, $seq3 - $seq2);
+        $forkHandler1 = $process->fork(function () {
+        });
+        $forkHandler2 = $process->fork(function () {
+        });
+        $forkHandler3 = $process->fork(function () {
+        });
+        $this->assertSame(1, $forkHandler2->getIdentifier() - $forkHandler1->getIdentifier());
+        $this->assertSame(1, $forkHandler3->getIdentifier() - $forkHandler2->getIdentifier());
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testBindOnFork() {
+        /** @var CM_Process|\Mocka\AbstractClassTrait $process */
+        $process = $this->mockObject('CM_Process');
+
+        $bindMock = $process->mockMethod('bind');
+        $bindMock->set(function ($event, callable $callback) {
+            $this->assertSame('exit', $event);
+            $this->assertSame('killChildren', $callback[1]);
+        });
+        /** @var CM_Process_ForkHandler|\Mocka\FunctionMock $forkHandlerMock */
+        $forkHandlerMock = $process->mockMethod('_getForkHandler');
+        $forkHandlerMock->set(function () {
+            $mockForkHandler = $this->mockClass('CM_Process_ForkHandler')->newInstanceWithoutConstructor();
+            $mockForkHandler->mockMethod('runAndSendWorkload');
+            $mockForkHandler->mockMethod('closeIpcStream');
+            return $mockForkHandler;
+        });
+
+        $this->assertSame(0, $bindMock->getCallCount());
+        $process->mockMethod('_hasForks')->set(true);
+        $process->fork(function () {
+        });
+        $this->assertSame(0, $bindMock->getCallCount());
+        $process->mockMethod('_hasForks')->set(false);
+        $process->fork(function () {
+        });
+        $this->assertSame(1, $bindMock->getCallCount());
     }
 
     /**
@@ -35,39 +58,41 @@ class CM_ProcessTest extends CMTest_TestCase {
      * @preserveGlobalState disabled
      */
     public function testForkAndWaitForChildren() {
+        $file = CM_File::createTmp();
+
         $process = CM_Process::getInstance();
+        $parentOutput = [];
         for ($i = 1; $i <= 4; $i++) {
-            CM_ProcessTest::writeln("Child $i forked.");
-            $process->fork(function () use ($i) {
+            $parentOutput[] = "Child $i forked.";
+            $process->fork(function () use ($i, $file) {
                 $ms = 100 * $i;
                 usleep($ms * 1000);
-                CM_ProcessTest::writeln("Child $i terminated after $ms ms.");
+                $file->appendLine("Child $i terminated after $ms ms.");
             });
         }
-        CM_ProcessTest::writeln('Parent waiting for 250 ms...');
+        $parentOutput[] = 'Parent waiting for 250 ms...';
         usleep(250000);
-        CM_ProcessTest::writeln('Parent listening to children...');
-        $process->waitForChildren(null, function () {
-            CM_ProcessTest::writeln('All children terminated.');
-        });
-        CM_ProcessTest::writeln('Parent terminated.');
+        $parentOutput[] = 'Parent listening to children...';
+        $process->waitForChildren();
+        $parentOutput[] = 'Parent terminated.';
+        $childrenOutput = explode(PHP_EOL, $file->read());
 
-        $outputFileExpected = 'Child 1 forked.
-Child 2 forked.
-Child 3 forked.
-Child 4 forked.
-Parent waiting for 250 ms...
-Child 1 terminated after 100 ms.
-Child 2 terminated after 200 ms.
-Parent listening to children...
-Child 3 terminated after 300 ms.
-Child 4 terminated after 400 ms.
-All children terminated.
-Parent terminated.
-';
-        rewind(self::$_file);
-        $outputFileActual = fread(self::$_file, 8192);
-        $this->assertEquals($outputFileExpected, $outputFileActual);
+        $this->assertSame([
+            'Child 1 forked.',
+            'Child 2 forked.',
+            'Child 3 forked.',
+            'Child 4 forked.',
+            'Parent waiting for 250 ms...',
+            'Parent listening to children...',
+            'Parent terminated.'
+        ], $parentOutput);
+
+        $this->assertContainsAll([
+            'Child 2 terminated after 200 ms.',
+            'Child 1 terminated after 100 ms.',
+            'Child 3 terminated after 300 ms.',
+            'Child 4 terminated after 400 ms.',
+        ], $childrenOutput);
     }
 
     /**
@@ -76,74 +101,23 @@ Parent terminated.
      */
     public function testForkAndListenForChildren() {
         $process = CM_Process::getInstance();
-        for ($i = 1; $i <= 4; $i++) {
-            CM_ProcessTest::writeln("Child $i forked.");
-            $process->fork(function () use ($i) {
-                $ms = 100 * $i - 25;
-                usleep($ms * 1000);
-                CM_ProcessTest::writeln("Child $i terminated after $ms ms.");
-                ob_clean(); // Remove any test output buffered by phpUnit, which uses STDOUT itself to return test results from isolated processes
-                return "Child $i heard by parent...";
-            });
-        }
-        $terminationCallback = function() {
-            CM_ProcessTest::writeln('Parent stops listening to children...');
-        };
-        $handleChildrenResponses = function(CM_Process_WorkloadResult $result) {
-            CM_ProcessTest::writeln($result->getResult());
-        };
-        CM_ProcessTest::writeln('Parent waiting for 250 ms...');
-        usleep(250000);
-        CM_ProcessTest::writeln('Parent listening for children...');
-        $responseList = $process->listenForChildren(null, $terminationCallback);
-        \Functional\each($responseList, $handleChildrenResponses);
-        CM_ProcessTest::writeln('Parent waiting for 100 ms...');
-        usleep(100000);
-        CM_ProcessTest::writeln('Parent listening for children...');
-        $responseList = $process->listenForChildren(null, $terminationCallback);
-        \Functional\each($responseList, $handleChildrenResponses);
-        CM_ProcessTest::writeln('Parent waiting for 100 ms...');
-        usleep(100000);
-        CM_ProcessTest::writeln('Parent listening for children...');
-        $responseList = $process->listenForChildren(null, $terminationCallback);
-        \Functional\each($responseList, $handleChildrenResponses);
-        CM_ProcessTest::writeln('Parent waiting for 100 ms...');
-        usleep(100000);
-        CM_ProcessTest::writeln('Parent listening for children...');
-        $responseList = $process->listenForChildren(null, $terminationCallback);
-        \Functional\each($responseList, $handleChildrenResponses);
-        CM_ProcessTest::writeln('Parent terminated.');
-
-        $outputFileExpected = 'Child 1 forked.
-Child 2 forked.
-Child 3 forked.
-Child 4 forked.
-Parent waiting for 250 ms...
-Child 1 terminated after 75 ms.
-Child 2 terminated after 175 ms.
-Parent listening for children...
-Parent stops listening to children...
-Child 1 heard by parent...
-Child 2 heard by parent...
-Parent waiting for 100 ms...
-Child 3 terminated after 275 ms.
-Parent listening for children...
-Parent stops listening to children...
-Child 3 heard by parent...
-Parent waiting for 100 ms...
-Child 4 terminated after 375 ms.
-Parent listening for children...
-Parent stops listening to children...
-Child 4 heard by parent...
-Parent waiting for 100 ms...
-Parent listening for children...
-Parent stops listening to children...
-Parent terminated.
-';
-
-        rewind(self::$_file);
-        $outputFileActual = fread(self::$_file, 8192);
-        $this->assertEquals($outputFileExpected, $outputFileActual);
+        $process->fork(function () {
+            return 'foo';
+        });
+        $process->fork(function () {
+            usleep(1000000);
+            return 'bar';
+        });
+        usleep(500000);
+        $responses = $process->listenForChildren();
+        $this->assertCount(1, $responses);
+        $this->assertContainsOnlyInstancesOf('CM_Process_WorkloadResult', $responses);
+        $this->assertSame([1 => 'foo'], \Functional\invoke($responses, 'getResult'));
+        usleep(1000000);
+        $responses = $process->listenForChildren();
+        $this->assertCount(1, $responses);
+        $this->assertContainsOnlyInstancesOf('CM_Process_WorkloadResult', $responses);
+        $this->assertSame([2 => 'bar'], \Functional\invoke($responses, 'getResult'));
     }
 
     /**
@@ -159,6 +133,8 @@ Parent terminated.
          */
         $exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
         $exceptionHandler->setPrintSeverityMin(CM_Exception::FATAL);
+        $exceptionHandler->setServiceManager($this->getServiceManager());
+
         $bootloader->setExceptionHandler($exceptionHandler);
 
         $process = CM_Process::getInstance();
@@ -174,21 +150,29 @@ Parent terminated.
             usleep(150 * 1000);
             throw new CM_Exception('Child 3 finished');
         });
+        $process->fork(function (CM_Process_WorkloadResult $result) {
+            usleep(200 * 1000);
+            $result->setException(new CM_Exception('Child 4 finished'));
+        });
 
         $workloadResultList = $process->waitForChildren();
-        $this->assertCount(3, $workloadResultList);
+        $this->assertCount(4, $workloadResultList);
 
         $this->assertSame('Child 1 finished', $workloadResultList[1]->getResult());
         $this->assertSame(null, $workloadResultList[1]->getException());
+        $this->assertTrue($workloadResultList[1]->isSuccess());
 
         $this->assertSame(array('msg' => 'Child 2 finished'), $workloadResultList[2]->getResult());
         $this->assertSame(null, $workloadResultList[2]->getException());
+        $this->assertTrue($workloadResultList[2]->isSuccess());
 
         $this->assertSame(null, $workloadResultList[3]->getResult());
         $this->assertSame('Child 3 finished', $workloadResultList[3]->getException()->getMessage());
-        $errorLog = new CM_Paging_Log_Error();
-        $this->assertSame(1, $errorLog->getCount());
-        $this->assertContains('Child 3 finished', $errorLog->getItem(0)['msg']);
+        $this->assertFalse($workloadResultList[3]->isSuccess());
+
+        $this->assertSame(null, $workloadResultList[4]->getResult());
+        $this->assertSame('Child 4 finished', $workloadResultList[4]->getException()->getMessage());
+        $this->assertFalse($workloadResultList[4]->isSuccess());
 
         $bootloader->setExceptionHandler($exceptionHandlerBackup);
     }
@@ -254,6 +238,50 @@ Parent terminated.
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
+    public function testKillChildrenOnExit() {
+        $bootloader = CM_Bootloader::getInstance();
+        $exceptionHandlerBackup = $bootloader->getExceptionHandler();
+
+        /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\ClassMock $exceptionHandler */
+        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
+        $exceptionHandler->mockMethod('handleException');
+
+        $bootloader->setExceptionHandler($exceptionHandler);
+
+        $loopEcho = function () {
+            usleep(50000);
+        };
+
+        $process = $this->mockObject('CM_Process');
+        $killChildrenMethod = $process->mockMethod('killChildren');
+        /** @var CM_Process $process */
+        $this->assertSame(0, $killChildrenMethod->getCallCount());
+
+        $process->trigger('exit');
+        $this->assertSame(0, $killChildrenMethod->getCallCount());
+
+        // Bind killChildren
+        $process->fork($loopEcho);
+        $process->trigger('exit');
+        $this->assertSame(1, $killChildrenMethod->getCallCount());
+
+        // Unbind killChildren
+        $process->waitForChildren();
+        $process->trigger('exit');
+        $this->assertSame(1, $killChildrenMethod->getCallCount());
+
+        // Rebind killChildren
+        $process->fork($loopEcho);
+        $process->trigger('exit');
+        $this->assertSame(2, $killChildrenMethod->getCallCount());
+
+        $bootloader->setExceptionHandler($exceptionHandlerBackup);
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function testKillChildrenSigKill() {
         $loopEcho = function () {
             while (true) {
@@ -281,18 +309,54 @@ Parent terminated.
 
         $this->assertCount(2, $pidListBefore);
         $this->assertCount(0, $this->_getChildrenPidList());
-        $this->assertSameTime(0.5, microtime(true) - $timeStart, 0.15);
+        $this->assertSameTime(0.65, microtime(true) - $timeStart, 0.15);
 
-        $logError = new CM_Paging_Log_Error();
+        $logError = new CM_Paging_Log([CM_Log_Logger::ERROR]);
         $this->assertSame(1, $logError->getCount());
-        $this->assertContains('killing with signal `9`', $logError->getItem(0)['msg']);
+        $this->assertContains('killing with signal `9`', $logError->getItem(0)['message']);
     }
 
     /**
-     * @param string $message
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
-    public static function writeln($message) {
-        fwrite(self::$_file, "$message\n");
+    public function testServicesReset() {
+        $mysql = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+        $mysql->setBuffered(false);
+
+        $process = CM_Process::getInstance();
+        $process->fork(function () {
+            $mysql = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+            $mysql->setBuffered(false);
+            for ($i = 0; $i < 1000; $i++) {
+                $result2 = $mysql->createStatement('SELECT "bar"')->execute()->fetchColumn();
+                $this->assertSame('bar', $result2, 'Separate processes should not share connections to services');
+            }
+        });
+
+        for ($i = 0; $i < 1000; $i++) {
+            $result1 = $mysql->createStatement('SELECT "foo"')->execute()->fetchColumn();
+            $this->assertSame('foo', $result1, 'Separate processes should not share connection to services');
+        }
+
+        $process->waitForChildren();
+    }
+
+    public function testEventHandler() {
+        $counter = 0;
+        $process = CM_Process::getInstance();
+        $process->bind('foo', function () use (&$counter) {
+            $counter++;
+        });
+        $process->trigger('foo');
+        $this->assertSame(1, $counter);
+
+        $process->trigger('foo');
+        $this->assertSame(2, $counter);
+
+        $process->unbind('foo');
+        $process->trigger('foo');
+        $this->assertSame(2, $counter);
     }
 
     /**

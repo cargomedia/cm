@@ -17,7 +17,7 @@ class CM_ExceptionHandling_SerializableException {
     /** @var array|null */
     public $trace;
 
-    /** @var array */
+    /** @var string */
     public $traceString;
 
     /** @var array */
@@ -73,7 +73,7 @@ class CM_ExceptionHandling_SerializableException {
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getTraceAsString() {
         return $this->traceString;
@@ -88,7 +88,10 @@ class CM_ExceptionHandling_SerializableException {
         $this->line = $exception->getLine();
         $this->file = $exception->getFile();
         if ($exception instanceof CM_Exception) {
-            $this->metaInfo = $exception->getMetaInfo();
+            $variableInspector = new CM_Debug_VariableInspector();
+            $this->metaInfo = Functional\map($exception->getMetaInfo(), function ($value) use ($variableInspector) {
+                return $variableInspector->getDebugInfo($value);
+            });
         }
 
         try {
@@ -104,8 +107,8 @@ class CM_ExceptionHandling_SerializableException {
             $this->trace = $trace;
         } catch (Exception $e) {
             $this->trace = null;
-            $this->traceString = $e->getTraceAsString();
         }
+        $this->traceString = $exception->getTraceAsString();
     }
 
     /**
@@ -122,8 +125,9 @@ class CM_ExceptionHandling_SerializableException {
             $code .= $row['function'];
             if (array_key_exists('args', $row)) {
                 $arguments = array();
+                $variableInspector = new CM_Debug_VariableInspector();
                 foreach ($row['args'] as $argument) {
-                    $arguments[] = CM_Util::varDump($argument);
+                    $arguments[] = $variableInspector->getDebugInfo($argument, ['lengthMax' => 30]);
                 }
                 $code .= '(' . implode(', ', $arguments) . ')';
             }

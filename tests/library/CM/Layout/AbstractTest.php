@@ -3,7 +3,7 @@
 class CM_Layout_AbstractTest extends CMTest_TestCase {
 
     public function testTrackingDisabled() {
-        $site = $this->getMockSite('CM_Site_Abstract');
+        $site = $this->getMockSite('CM_Site_Abstract', null, ['url' => 'http://www.my-website.net']);
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
         $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
         $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
@@ -81,9 +81,9 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
      */
     protected function _getServiceManager($codeGoogleAnalytics, $codeKissMetrics) {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('googleanalytics', 'CMService_GoogleAnalytics_Client', [$codeGoogleAnalytics]);
-        $serviceManager->register('kissmetrics', 'CMService_KissMetrics_Client', array($codeKissMetrics));
-        $serviceManager->register('trackings', 'CM_Service_Trackings', [['googleanalytics', 'kissmetrics']]);
+        $serviceManager->registerInstance('googleanalytics', new CMService_GoogleAnalytics_Client($codeGoogleAnalytics));
+        $serviceManager->registerInstance('kissmetrics', new CMService_KissMetrics_Client($codeKissMetrics));
+        $serviceManager->registerInstance('trackings', new CM_Service_Trackings(['googleanalytics', 'kissmetrics']));
         return $serviceManager;
     }
 }

@@ -15,7 +15,12 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
     this.on('change', function() {
       this.updateDistanceField();
     }, this);
-    this.updateDistanceField();
+    if (this.getDistanceField()) {
+      var self = this;
+      this.getDistanceField().on('ready', function() {
+        self.updateDistanceField();
+      });
+    }
   },
 
   /**
@@ -31,47 +36,50 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
   updateDistanceField: function() {
     if (this.getDistanceField()) {
       var distanceEnabled = false;
-      var items = this.getValue();
-      if (items.length > 0) {
-        distanceEnabled = items[0].id.split(".")[0] >= this.getOption("distanceLevelMin");
+      var value = this.getValue();
+      if (value) {
+        distanceEnabled = value.id.level >= this.getOption("distanceLevelMin");
       }
-      this.getDistanceField().$("input").prop("disabled", !distanceEnabled);
+      this.getDistanceField().setEnabled(distanceEnabled);
     }
   },
 
+  /**
+   * @returns {Promise}
+   */
   detectLocation: function() {
     if (!'geolocation' in navigator) {
-      cm.error.triggerThrow('Geolocation support unavailable');
+      throw new CM_Exception('Geolocation support unavailable');
     }
     this.$('.detect-location').addClass('waiting');
 
     var self = this;
-    var deferred = $.Deferred();
-    navigator.geolocation.getCurrentPosition(deferred.resolve, deferred.reject);
 
-    deferred.then(function(position) {
-      self._lookupCoordinates(position.coords.latitude, position.coords.longitude);
-    }, function(error) {
-      cm.error.trigger('Unable to detect location: ' + error.message);
-    });
-    deferred.always(function() {
-      self.$('.detect-location').removeClass('waiting');
-    });
-
-    return deferred;
+    return new Promise(function(resolve, reject) {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    })
+      .then(function(position) {
+        return self._lookupCoordinates(position.coords.latitude, position.coords.longitude);
+      })
+      .then(function(data) {
+        if (data) {
+          self.setValue(data);
+        }
+      })
+      .catch(function(error) {
+        self.error(cm.language.get('Unable to detect location'));
+      })
+      .finally(function() {
+        self.$('.detect-location').removeClass('waiting');
+      });
   },
 
   /**
    * @param {Number} lat
    * @param {Number} lon
+   * @return {Promise}
    */
   _lookupCoordinates: function(lat, lon) {
-    this.ajax('getSuggestionByCoordinates', {lat: lat, lon: lon, levelMin: this.getOption('levelMin'), levelMax: this.getOption('levelMax')}, {
-      success: function(data) {
-        if (data) {
-          this.setValue(data);
-        }
-      }
-    });
+    return this.ajax('getSuggestionByCoordinates', {lat: lat, lon: lon, levelMin: this.getOption('levelMin'), levelMax: this.getOption('levelMax')});
   }
 });

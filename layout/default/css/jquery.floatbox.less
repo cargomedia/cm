@@ -10,11 +10,6 @@
     font-size: 18px;
     color: @colorFgSubtle;
     text-align: center;
-
-    &:hover, &:active {
-      color: @colorClose;
-      text-decoration: none;
-    }
   }
 }
 
@@ -24,6 +19,16 @@
 
 .floatbox {
   transition: opacity 200ms;
+
+  &:not(.fullscreen) {
+    box-sizing: border-box;
+    padding: 15px;
+
+    .floatbox-controls {
+      right: 16px;
+      top: 16px;
+    }
+  }
 
   &:focus {
     outline: none;

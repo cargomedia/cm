@@ -135,7 +135,7 @@ class CM_SessionTest extends CMTest_TestCase {
         }
     }
 
-    public function testLogin() {
+    public function testSetUser() {
         $user = CM_Model_User::createStatic();
         $session = new CM_Session();
 
@@ -144,7 +144,17 @@ class CM_SessionTest extends CMTest_TestCase {
         $this->assertTrue($session->getUser(true)->getOnline());
     }
 
-    public function testLogout() {
+    public function testSetUserWithRequest() {
+        $user = CM_Model_User::createStatic();
+        $request = new CM_Http_Request_Get('/', ['user-agent' => 'Chrome']);
+        $session = new CM_Session(null, $request);
+
+        $session->setUser($user);
+        $userAgentList = $user->getUseragents();
+        $this->assertSame([['useragent' => 'Chrome', 'createStamp' => time()]], $userAgentList->getItems());
+    }
+
+    public function testDeleteUser() {
         $session = new CM_Session();
         $session->setUser(CM_Model_User::createStatic());
         $user = $session->getUser(true);
@@ -153,6 +163,18 @@ class CM_SessionTest extends CMTest_TestCase {
         $this->assertNull($session->getUser());
         $user->_change();
         $this->assertFalse($user->getOnline());
+    }
+
+    public function testLogoutUser() {
+        $session = new CM_Session();
+        $session->setUser(CM_Model_User::createStatic());
+        $session->setLifetime(123);
+        $this->assertNotNull($session->getUser());
+        $this->assertTrue($session->hasLifetime());
+
+        $session->logoutUser();
+        $this->assertNull($session->getUser());
+        $this->assertFalse($session->hasLifetime());
     }
 
     public function testGetViewer() {

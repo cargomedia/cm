@@ -39,25 +39,35 @@ abstract class CM_Http_Request_Abstract {
     private static $_instance;
 
     /**
+     * @return string
+     */
+    abstract public function getMethodName();
+
+    /**
      * @param string             $uri
      * @param array|null         $headers OPTIONAL
      * @param array|null         $server
      * @param CM_Model_User|null $viewer
+     * @throws CM_Exception
+     * @throws CM_Exception_Invalid
      */
     public function __construct($uri, array $headers = null, array $server = null, CM_Model_User $viewer = null) {
         if (null !== $headers) {
             $this->_headers = array_change_key_case($headers);
         }
         if (null !== $server) {
+            foreach ($server as &$serverValue) {
+                if (is_string($serverValue)) {
+                    $serverValue = self::_sanitizeUtf($serverValue);
+                }
+            }
             $this->_server = array_change_key_case($server);
         }
-
+        $uri = self::_sanitizeUtf((string) $uri);
         $this->setUri($uri);
 
         if ($sessionId = $this->getCookie('sessionId')) {
-            if ($this->_session = CM_Session::findById($sessionId)) {
-                $this->_session->start();
-            }
+            $this->setSession(CM_Session::findById($sessionId));
         }
 
         if ($viewer) {
@@ -250,7 +260,7 @@ abstract class CM_Http_Request_Abstract {
         if (false === ($path = parse_url($uriWithHost, PHP_URL_PATH))) {
             throw new CM_Exception_Invalid('Cannot detect path from `' . $uriWithHost . '`.');
         }
-        if ($path === null) {
+        if (null === $path) {
             $path = '/';
         }
         $this->setPath($path);
@@ -309,6 +319,17 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @param CM_Session|null $session
+     */
+    public function setSession(CM_Session $session = null) {
+        if (null !== $session) {
+            $session->start();
+        }
+        $this->_session = $session;
+        $this->resetViewer();
+    }
+
+    /**
      * @return boolean
      */
     public function hasSession() {
@@ -330,14 +351,15 @@ abstract class CM_Http_Request_Abstract {
      * @throws CM_Exception_AuthRequired
      */
     public function getViewer($needed = false) {
-        if ($this->_viewer === false) {
-            $this->_viewer = $this->getSession()->getUser();
-        }
-        if (!$this->_viewer) {
-            if ($needed) {
-                throw new CM_Exception_AuthRequired();
+        if (false === $this->_viewer) {
+            $this->_viewer = null;
+            if ($this->hasSession()) {
+                $this->_viewer = $this->getSession()->getUser();
             }
-            return null;
+        }
+
+        if ($needed && null === $this->_viewer) {
+            throw new CM_Exception_AuthRequired();
         }
         return $this->_viewer;
     }
@@ -415,13 +437,31 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @return DateTimeZone|null
+     */
+    public function getTimeZone() {
+        $timeZone = $this->_getTimeZoneFromCookie();
+        if (null === $timeZone && $location = $this->getLocation()) {
+            $timeZone = $location->getTimeZone();
+        }
+        return $timeZone;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUserAgent() {
+        if (!$this->hasHeader('user-agent')) {
+            return '';
+        }
+        return $this->getHeader('user-agent');
+    }
+
+    /**
      * @return bool
      */
     public function isBotCrawler() {
-        if (!$this->hasHeader('user-agent')) {
-            return false;
-        }
-        $useragent = $this->getHeader('user-agent');
+        $useragent = $this->getUserAgent();
         $useragentMatches = array(
             'Googlebot',
             'bingbot',
@@ -443,14 +483,14 @@ abstract class CM_Http_Request_Abstract {
      * @return bool
      */
     public function isSupported() {
-        if (!$this->hasHeader('user-agent')) {
-            return true;
+        $userAgent = $this->getUserAgent();
+        if (preg_match('#UCWEB|UCBrowser#', $userAgent)) {
+            return false;
         }
-        $userAgent = $this->getHeader('user-agent');
         if (preg_match('#Opera Mini#', $userAgent)) {
             return false;
         }
-        if (preg_match('#MSIE (?<version>[\d\.]{1,6})#', $userAgent, $matches) && $matches['version'] < 10) {
+        if (preg_match('#MSIE (?<version>[\d\.]{1,6})#', $userAgent, $matches) && $matches['version'] < 11) {
             return false;
         }
         if (preg_match('#Android (?<version>[\d\.]{1,6})#', $userAgent, $matches) && $matches['version'] < 4) {
@@ -488,6 +528,30 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @return DateTimeZone|null
+     */
+    private function _getTimeZoneFromCookie() {
+        if ($timeZoneOffset = $this->getCookie('timezoneOffset')) {
+            //timezoneOffset is seconds behind UTC
+            $timeZoneOffset = (int) $timeZoneOffset;
+            if ($timeZoneOffset < -50400 || $timeZoneOffset > 43200) { //UTC+14 UTC-12
+                return null;
+            }
+            $timeZoneAbs = abs($timeZoneOffset);
+            $offsetHours = floor($timeZoneAbs / 3600);
+            $offsetMinutes = floor($timeZoneAbs % 3600 / 60);
+            if ($timeZoneOffset > 0) {
+                $offsetHours *= -1;
+            }
+            $dateTime = DateTime::createFromFormat('O', sprintf("%+03d%02d", $offsetHours, $offsetMinutes));
+            if (false !== $dateTime) {
+                return $dateTime->getTimezone();
+            }
+        }
+        return null;
+    }
+
+    /**
      * @return bool
      */
     public static function hasInstance() {
@@ -495,6 +559,8 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @deprecated Singleton access to HTTP-request is unreliable and should not be used.
+     *
      * @throws CM_Exception_Invalid
      * @return CM_Http_Request_Abstract
      */
@@ -556,5 +622,13 @@ abstract class CM_Http_Request_Abstract {
         }
 
         return self::factory($method, $uri, $headers, $server, $body);
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    protected static function _sanitizeUtf($value) {
+        return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
     }
 }

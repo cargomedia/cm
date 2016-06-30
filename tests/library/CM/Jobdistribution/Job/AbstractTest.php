@@ -12,8 +12,8 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         }
         CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
 
-        $gearmanClient = $this->getMock('GearmanClient', array('addTask', 'runTasks', 'setCompleteCallback', 'setFailCallback'));
-        $gearmanClient->expects($this->exactly(2))->method('addTask')->will($this->returnValue(true));
+        $gearmanClient = $this->getMock('GearmanClient', array('addTaskHigh', 'runTasks', 'setCompleteCallback', 'setFailCallback'));
+        $gearmanClient->expects($this->exactly(2))->method('addTaskHigh')->will($this->returnValue(true));
         $gearmanClient->expects($this->exactly(1))->method('runTasks')->will($this->returnValue(true));
         $gearmanClient->expects($this->exactly(1))->method('setCompleteCallback')->will($this->returnCallback(function ($completeCallback) {
             $task1 = $this->getMockBuilder('GearmanTask')->setMethods(array('data'))->getMock();
@@ -52,8 +52,8 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         }
         CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
 
-        $gearmanClient = $this->getMock('GearmanClient', array('addTask', 'runTasks', 'setCompleteCallback', 'setFailCallback'));
-        $gearmanClient->expects($this->exactly(2))->method('addTask')->will($this->returnValue(true));
+        $gearmanClient = $this->getMock('GearmanClient', array('addTaskHigh', 'runTasks', 'setCompleteCallback', 'setFailCallback'));
+        $gearmanClient->expects($this->exactly(2))->method('addTaskHigh')->will($this->returnValue(true));
         $gearmanClient->expects($this->exactly(1))->method('runTasks')->will($this->returnValue(true));
         $gearmanClient->expects($this->exactly(1))->method('setCompleteCallback')->will($this->returnCallback(function ($completeCallback) {
             $task1 = $this->getMockBuilder('GearmanTask')->setMethods(array('data'))->getMock();
@@ -119,6 +119,26 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
             $this->fail('Job should have thrown an exception');
         } catch (Exception $ex) {
             $this->assertSame('Job failed', $ex->getMessage());
+        }
+    }
+
+    public function testVerifyParamsThrows() {
+        $job = $this->getMockForAbstractClass('CM_Jobdistribution_Job_Abstract');
+
+        /** @var CM_Jobdistribution_Job_Abstract $job */
+        try {
+            $job->run(array('foo' => 'foo', 'bar' => new stdClass()));
+            $this->fail('Job should have thrown an exception');
+        } catch (Exception $ex) {
+            $this->assertSame('Object of class `stdClass` is not an instance of CM_ArrayConvertible', $ex->getMessage());
+        }
+
+        /** @var CM_Jobdistribution_Job_Abstract $job */
+        try {
+            $job->queue(array('foo' => 'foo', 'bar' => ['bar' => new stdClass()]));
+            $this->fail('Job should have thrown an exception');
+        } catch (Exception $ex) {
+            $this->assertSame('Object of class `stdClass` is not an instance of CM_ArrayConvertible', $ex->getMessage());
         }
     }
 }

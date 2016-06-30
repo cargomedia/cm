@@ -11,15 +11,23 @@ class CM_Process_ForkHandler {
     /** @var resource */
     private $_ipcStream;
 
+    /** @var int */
+    private $_identifier;
+
     /**
      * @param int      $pid
      * @param Closure  $workload
      * @param resource $ipcStream
+     * @param int|null $identifier
      */
-    public function __construct($pid, Closure $workload, $ipcStream) {
+    public function __construct($pid, Closure $workload, $ipcStream, $identifier = null) {
         $this->_pid = (int) $pid;
         $this->_workload = $workload;
         $this->_ipcStream = $ipcStream;
+        if (null !== $identifier) {
+            $identifier = (int) $identifier;
+        }
+        $this->_identifier = $identifier;
     }
 
     /**
@@ -48,20 +56,30 @@ class CM_Process_ForkHandler {
     }
 
     /**
+     * @throws CM_Exception
+     * @return int
+     */
+    public function getIdentifier() {
+        if (null === $this->_identifier) {
+            throw new CM_Exception('Fork-handler has no identifier');
+        }
+        return $this->_identifier;
+    }
+
+    /**
      * @throws Exception
      */
     public function runAndSendWorkload() {
         $workload = $this->_workload;
-        $return = null;
-        $exception = null;
+        $result = new CM_Process_WorkloadResult();
         try {
-            $return = $workload();
+            $return = $workload($result);
+            $result->setResult($return);
         } catch (Exception $e) {
             CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
-            $exception = $e;
+            $result->setException($e);
         }
 
-        $result = new CM_Process_WorkloadResult($return, $exception);
         fwrite($this->_ipcStream, serialize($result));
     }
 
@@ -69,17 +87,20 @@ class CM_Process_ForkHandler {
      * @return CM_Process_WorkloadResult
      */
     public function receiveWorkloadResult() {
-        $ipcData = fgets($this->_ipcStream);
+        $ipcData = stream_get_contents($this->_ipcStream);
         if (false === $ipcData) {
-            return new CM_Process_WorkloadResult(null, new CM_Exception('Received no data from IPC stream.'));
+                return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception('Failed to receive IPC data.'));
+        }
+        if ('' === $ipcData) {
+            return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception('Received no data from IPC stream.'));
         }
         try {
             $workloadResult = unserialize($ipcData);
         } catch (ErrorException $e) {
-            return new CM_Process_WorkloadResult(null, new CM_Exception('Received unserializable IPC data.'));
+            return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception("Received unserializable IPC data: `{$ipcData}"));
         }
         if (!$workloadResult instanceof CM_Process_WorkloadResult) {
-            return new CM_Process_WorkloadResult(null, new CM_Exception('Received unexpected IPC data.'));
+            return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception("Received unexpected IPC data: `{$ipcData}`"));
         }
         return $workloadResult;
     }

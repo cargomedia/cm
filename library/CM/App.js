@@ -6,6 +6,9 @@ var CM_App = CM_Class_Abstract.extend({
   /** @type Object **/
   views: {},
 
+  /** @type Object **/
+  lib: (cm.lib || {}),
+
   /** @type {Object|Null} **/
   viewer: null,
 
@@ -13,11 +16,20 @@ var CM_App = CM_Class_Abstract.extend({
   options: {},
 
   ready: function() {
+    this.promise.ready();
+    this.error.ready();
     this.dom.ready();
     this.window.ready();
     this.date.ready();
     this.template.ready();
     this.router.ready();
+  },
+
+  /**
+   * @returns {Number}
+   */
+  getDeployVersion: function() {
+    return cm.options.deployVersion;
   },
 
   /**
@@ -37,13 +49,13 @@ var CM_App = CM_Class_Abstract.extend({
         return !view.getParent();
       });
       if (!view) {
-        cm.error.triggerThrow('Cannot find root component');
+        throw new CM_Exception('Cannot find root component');
       }
       return view;
     }
     return _.find(this.views, function(view) {
-      return view.hasClass(className);
-    }) || null;
+        return view.hasClass(className);
+      }) || null;
   },
 
   /**
@@ -65,7 +77,7 @@ var CM_App = CM_Class_Abstract.extend({
   getLayout: function() {
     var layout = this.findView('CM_Layout_Abstract');
     if (!layout) {
-      cm.error.triggerThrow('Cannot find layout');
+      throw new CM_Exception('Cannot find layout');
     }
     return layout;
   },
@@ -126,7 +138,7 @@ var CM_App = CM_Class_Abstract.extend({
     params = params || null;
     relative = relative || false;
     if (params) {
-      path += '?' + jQuery.param(params, true);
+      path += '?' + jQuery.param(params);
     }
     if (!relative) {
       path = cm.options.url + path
@@ -139,28 +151,60 @@ var CM_App = CM_Class_Abstract.extend({
    * @return {String}
    */
   getUrlStatic: function(path) {
-    var url = cm.options.urlStatic;
+    var url = '';
+    if (cm.options.urlCdn) {
+      url = cm.options.urlCdn + url;
+    } else {
+      url = cm.options.urlBase + url;
+    }
+
+    url += '/static';
     if (path) {
       url += path + '?' + cm.options.deployVersion;
     }
+
     return url;
   },
 
   /**
    * @param {String} type
    * @param {String} path
+   * @param {Object} [options]
    * @return {String}
    */
-  getUrlResource: function(type, path) {
-    var urlPath = '';
-    if (type && path) {
-      urlPath += '/' + type;
-      if (cm.options.language) {
-        urlPath += '/' + cm.options.language.abbreviation;
-      }
-      urlPath += '/' + cm.getSiteId() + '/' + cm.options.deployVersion + '/' + path;
+  getUrlResource: function(type, path, options) {
+    options = _.defaults(options || {}, {
+      'sameOrigin': false
+    });
+
+    var url = '';
+    if (!options['sameOrigin'] && cm.options.urlCdn) {
+      url = cm.options.urlCdn + url;
+    } else {
+      url = cm.options.urlBase + url;
     }
-    return cm.options.urlResource + urlPath;
+
+    if (type && path) {
+      var urlParts = [];
+      urlParts.push(type);
+      if (cm.options.language) {
+        urlParts.push(cm.options.language.abbreviation);
+      }
+      urlParts.push(cm.getSiteId());
+      urlParts.push(cm.options.deployVersion);
+      urlParts = urlParts.concat(path.split('/'));
+
+      url += '/' + urlParts.join('/');
+    }
+
+    return url;
+  },
+
+  /**
+   * @returns {string}
+   */
+  getUrlServiceWorker: function() {
+    return cm.options.urlServiceWorker;
   },
 
   /**
@@ -170,7 +214,7 @@ var CM_App = CM_Class_Abstract.extend({
   getUrlUserContent: function(path) {
     var matches = path.match(new RegExp('^([^/]+)/'));
     if (null === matches) {
-      cm.error.triggerThrow('Cannot detect namespace for user-content file `' + path + '`.');
+      throw new CM_Exception('Cannot detect namespace for user-content file `' + path + '`.');
     }
     var namespace = matches[1];
     var urlList = cm.options.urlUserContentList;
@@ -188,66 +232,137 @@ var CM_App = CM_Class_Abstract.extend({
       path += '/' + cm.options.language.abbreviation;
     }
     path += '/' + this.getSiteId();
-    return this.getUrl(path, null, true);
+    return cm.options.urlBase + path;
+  },
+
+  /**
+   * @returns {String}
+   */
+  getClientId: function() {
+    return $.cookie('clientId');
+  },
+
+  /**
+   * @returns {Object}
+   */
+  getContext: function() {
+    var context = {};
+    context[cm.options.name] = {
+      client: cm.getClientId(),
+      browserWindow: cm.window.getId()
+    };
+    if (cm.viewer) {
+      context[cm.options.name].user = cm.viewer.id;
+    }
+    return context;
+  },
+
+  factory: {
+
+    /**
+     * @param {*} data
+     * @returns {*|CM_Model_Abstract}
+     */
+    create: function(data) {
+      return this._create(data);
+    },
+
+    /**
+     * @param {*} data
+     * @returns {*|CM_Model_Abstract}
+     */
+    _create: function(data) {
+      if ($.isPlainObject(data) || _.isArray(data)) {
+        _.each(data, function(value, key) {
+          data[key] = this._create(value);
+        }.bind(this));
+      }
+      if (this._isCmObject(data)) {
+        return this._toCmObject(data);
+      }
+      return data;
+    },
+
+    /**
+     * @param {*} data
+     * @returns {Boolean}
+     */
+    _isCmObject: function(data) {
+      var className = data && data['_class'];
+      var isClass = className && window[className];
+      var isBackbone = data instanceof Backbone.Model || data instanceof Backbone.Collection;
+      return isClass && !isBackbone;
+    },
+
+    /**
+     * @param {Object} data
+     * @returns {CM_Model_Abstract}
+     */
+    _toCmObject: function(data) {
+      return new window[data['_class']](data);
+    }
+  },
+
+  promise: {
+    ready: function() {
+      var promiseConfig = {};
+      if (cm.options.debug) {
+        promiseConfig['warnings'] = {
+          wForgottenReturn: false
+        };
+      } else {
+        promiseConfig['warnings'] = false;
+      }
+      Promise.config(promiseConfig);
+    }
   },
 
   error: {
     _callbacks: {_all: []},
-    /**
-     * @param {String} msg
-     * @param {String} [type]
-     * @param {Boolean} [isPublic]
-     */
-    trigger: function(msg, type, isPublic) {
-      for (var i = 0; i < this._callbacks._all.length; i++) {
-        if (false === this._callbacks._all[i](msg, type, isPublic)) {
-          return;
+
+    ready: function() {
+      $(window).on('unhandledrejection', function(e) {
+        e.preventDefault();
+        var event = e.originalEvent;
+        var error = null;
+        if (event.detail && event.detail.reason) {
+          error = event.detail.reason;
+        } else if (event.reason) {
+          error = event.reason;
+        } else {
+          error = new Error('Unhandled promise rejection without reason.');
         }
-      }
-      if (this._callbacks[type]) {
-        for (var j = 0; j < this._callbacks[type].length; j++) {
-          if (false === this._callbacks[type][j](msg, type, isPublic)) {
-            return;
-          }
+        if (!(error instanceof Promise.CancellationError)) {
+          cm.error._globalHandler(error);
         }
-      }
-      if (isPublic) {
-        cm.window.hint(msg);
-      } else {
-        if (type) {
-          msg = type + ': ' + msg;
-        }
-        cm.window.hint(msg);
-        if (window.console && console.error) {
-          console.error('Error: ' + msg);
-        }
-      }
+      });
     },
+
     /**
-     * @param {String} msg
-     * @param {String} [type]
-     * @param {Boolean} [isPublic]
-     * @throws {String}
+     * @param {Function} fn
      */
-    triggerThrow: function(msg, type, isPublic) {
-      this.trigger(msg, type, isPublic);
-      throw msg;
+    setGlobalHandler: function(fn) {
+      cm.error._globalHandler = fn;
     },
+
     /**
-     * @param {Function} callback fn(msg, type, isPublic)
+     * @param {Error} error
      */
-    bind: function(callback) {
-      this.bindType('_all', callback);
+    log: function(error) {
+      _.defer(function() {
+        throw error;
+      });
     },
+
     /**
-     * @param {String} type
-     * @param {Function} callback fn(msg, type, isPublic)
+     * @param {Error} error
+     * @throws Error
      */
-    bindType: function(type, callback) {
-      if (!this._callbacks[type]) {
-        this._callbacks[type] = [];
+    _globalHandler: function(error) {
+      if (error instanceof CM_Exception) {
+        cm.window.hint(error.message);
       }
-      this._callbacks[type].push(callback);
+      throw error;
     }
   },
 
@@ -275,7 +390,9 @@ var CM_App = CM_Class_Abstract.extend({
         return;
       }
       var messages = _.toArray(arguments);
-      messages.unshift('[CM]');
+      var time = (Date.now() - performance.timing.navigationStart) / 1000;
+      var timeFormatted = time.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false});
+      messages.unshift('[CM ' + timeFormatted + (performance.timing.isPolyfilled ? '!' : '') + ']');
       if (window.console && window.console.log) {
         var log = window.console.log;
         if (typeof log == "object" && Function.prototype.bind) {
@@ -289,12 +406,6 @@ var CM_App = CM_Class_Abstract.extend({
   dom: {
     _swfId: 0,
     ready: function() {
-      if (window.addEventListener) {
-        window.addEventListener('load', function() {
-          new FastClick(document.body);
-        }, false);
-      }
-
       window.viewportUnitsBuggyfill.init();
     },
     /**
@@ -304,31 +415,60 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('.timeago').timeago();
       $dom.find('textarea.autosize, .autosize textarea').autosize({append: ''});
       $dom.find('.clipSlide').clipSlide();
-      $dom.find('.showTooltip[title]').tooltip();
       $dom.find('.toggleNext').toggleNext();
       $dom.find('.tabs').tabs();
       $dom.find('.openx-ad:visible').openx();
+      $dom.find('.epom-ad').epom();
       $dom.find('.fancySelect').fancySelect();
+      this._setupContentPlaceholder($dom);
+    },
+
+    /**
+     * @param {jQuery} $dom
+     */
+    _setupContentPlaceholder: function($dom) {
+      var $doNotLoadOnReady = $();
+      $dom.find('.clipSlide').each(function() {
+        var $notFirstImages = $(this).find('.contentPlaceholder:gt(0)');
+        $doNotLoadOnReady = $doNotLoadOnReady.add($notFirstImages);
+
+        $(this).on('toggle.clipSlide', function() {
+          $(this).find('.contentPlaceholder:gt(0)').lazyImageSetup();
+        });
+      });
+
+      $dom.find('.contentPlaceholder').not($doNotLoadOnReady).lazyImageSetup();
+    },
+
+    /**
+     * @param {jQuery} $dom
+     */
+    teardown: function($dom) {
+      $dom.find('.timeago').timeago('dispose');
+      $dom.find('textarea.autosize, .autosize textarea').trigger('autosize.destroy');
     },
     /**
-     * @param {jQuery} $element
-     * @param {Function} [success] fn(MediaElement, Element)
-     * @param {Boolean} [preferPlugins]
+     * @param {HTMLVideoElement} element
+     * @param {Object} [options]
+     * @returns {MediaElementPlayer}
      */
-    setupVideo: function($element, success, preferPlugins) {
-      var mode = 'auto';
-      if (preferPlugins) {
-        mode = 'auto_plugin';
-      }
+    setupVideo: function(element, options) {
+      options = _.extend({
+        preferPlugins: false,
+        success: null
+      }, options || {});
 
-      $element.mediaelementplayer({
+      return new mejs.MediaElementPlayer(element, {
         flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
         silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
         videoWidth: '100%',
         videoHeight: '100%',
         defaultVideoWidth: '100%',
         defaultVideoHeight: '100%',
-        mode: mode,
+        mode: (options.preferPlugins ? 'auto_plugin' : 'auto'),
+        error: function() {
+          throw new Error('Cannot initialize MediaElement video player.');
+        },
         success: function(mediaElement, domObject) {
           var mediaElementMuted = cm.storage.get('mediaElement-muted');
           var mediaElementVolume = cm.storage.get('mediaElement-volume');
@@ -338,15 +478,31 @@ var CM_App = CM_Class_Abstract.extend({
           if (null !== mediaElementVolume) {
             mediaElement.setVolume(mediaElementVolume);
           }
-          mediaElement.addEventListener("volumechange", function() {
+          mediaElement.addEventListener('volumechange', function() {
             cm.storage.set('mediaElement-volume', mediaElement.volume);
             cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
           });
-          if (success) {
-            success(mediaElement, domObject);
+          if (options.success) {
+            options.success(mediaElement, domObject);
           }
         }
       });
+    },
+
+    /**
+     * @param {String|String[]} sourceList
+     * @param {Object} [options]
+     * @param {Boolean} [options.loop=false]
+     * @param {Boolean} [options.autoplay=false]
+     * @param {String} [options.crossOrigin='anonymous']
+     * @return {Audio}
+     */
+    createAudio: function(sourceList, options) {
+      sourceList = _.isString(sourceList) ? [sourceList] : sourceList;
+      var audio = new cm.lib.Media.Audio(options);
+      audio.setOptions(options);
+      audio.setSources(sourceList);
+      return audio;
     }
   },
 
@@ -380,6 +536,7 @@ var CM_App = CM_Class_Abstract.extend({
         wordSeparator: " ",
         numbers: []
       };
+      $.cookie('timezoneOffset', (new Date()).getTimezoneOffset() * 60);
     },
     /**
      * @return {Number} Unix-timestamp
@@ -753,75 +910,72 @@ var CM_App = CM_Class_Abstract.extend({
   /**
    * @param {String} type
    * @param {Object} data
-   * @param {Object} [callbacks]
-   * @return jqXHR
+   * @return Promise
    */
-  ajax: function(type, data, callbacks) {
-    callbacks = callbacks || {};
+  ajax: function(type, data) {
     var url = this.getUrlAjax(type);
-    var errorHandler = function(msg, type, isPublic, callback) {
-      if (!callback || callback(msg, type, isPublic) !== false) {
-        cm.error.trigger(msg, type, isPublic);
-      }
-    };
-    var jqXHR = $.ajax(url, {
-      data: JSON.stringify(data),
-      type: 'POST',
-      dataType: 'json',
-      contentType: 'application/json',
-      cache: false
-    });
-    jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
-      if (response.error) {
-        errorHandler(response.error.msg, response.error.type, response.error.isPublic, callbacks.error);
-      } else if (response.success) {
-        if (callbacks.success) {
-          callbacks.success(response.success);
+    var jqXHR;
+
+    var ajaxPromise = new Promise(function(resolve, reject, onCancel) {
+      jqXHR = $.ajax(url, {
+        data: JSON.stringify(data),
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        cache: false
+      });
+      jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]})
+        .done(function(response) {
+          if (cm.getDeployVersion() != response.deployVersion) {
+            cm.router.forceReload();
+          }
+          if (response.error) {
+            reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
+          } else {
+            resolve(cm.factory.create(response.success));
+          }
+        })
+        .fail(function(xhr, textStatus) {
+          if (xhr.status === 0) {
+            if (window.navigator.onLine) {
+              ajaxPromise.cancel();
+            } else {
+              reject(new CM_Exception_RequestFailed(cm.language.get('No Internet connection')));
+            }
+          } else {
+            var msg = cm.language.get('An unexpected connection problem occurred.');
+            if (cm.options.debug) {
+              msg = xhr.responseText || textStatus;
+            }
+            reject(new CM_Exception(msg));
+          }
+        });
+      onCancel(function() {
+        if (jqXHR) {
+          jqXHR.abort();
         }
-      }
-    }).fail(function(xhr, textStatus) {
-      if (xhr.status === 0) {
-        return; // Ignore interrupted ajax-request caused by leaving a page
-      }
-
-      var msg = cm.language.get('An unexpected connection problem occurred.');
-      if (cm.options.debug) {
-        msg = xhr.responseText || textStatus;
-      }
-      errorHandler(msg, null, false, callbacks.error);
-    }).always(function() {
-      if (callbacks.complete) {
-        callbacks.complete();
-      }
+      });
     });
-
-    return jqXHR;
+    return ajaxPromise;
   },
 
   /**
    * @param {String} methodName
    * @param {Object} params
-   * @param {Object|Null} [callbacks]
-   * @return jqXHR
+   * @return Promise
    */
-  rpc: function(methodName, params, callbacks) {
-    callbacks = callbacks || {};
-    return this.ajax('rpc', {method: methodName, params: params}, {
-      success: function(response) {
+  rpc: function(methodName, params) {
+    return this.ajax('rpc', {method: methodName, params: params})
+      .then(function(response) {
         if (typeof(response.result) === 'undefined') {
-          cm.error.trigger('RPC response has undefined result');
+          throw new CM_Exception('RPC response has undefined result');
         }
-        if (callbacks.success) {
-          callbacks.success(response.result);
-        }
-      },
-      error: callbacks.error,
-      complete: callbacks.complete
-    });
+        return response.result;
+      });
   },
 
   stream: {
-    /** @type {CM_Stream_Adapter_Message_Abstract} */
+    /** @type {CM_MessageStream_Adapter_Abstract} */
     _adapter: null,
 
     /** @type {Object} */
@@ -841,7 +995,7 @@ var CM_App = CM_Class_Abstract.extend({
         return;
       }
       if (!channelKey || !channelType) {
-        cm.error.triggerThrow('No channel provided');
+        throw new CM_Exception('No channel provided');
       }
       if (!this._channelDispatchers[channel]) {
         this._subscribe(channel);
@@ -862,7 +1016,7 @@ var CM_App = CM_Class_Abstract.extend({
         return;
       }
       if (!channelKey || !channelType) {
-        cm.error.triggerThrow('No channel provided');
+        throw new CM_Exception('No channel provided');
       }
       this._channelDispatchers[channel].off(this._getEventNames(namespace, true), callback, context);
       if (this._getBindCount(channel) === 0) {
@@ -905,7 +1059,7 @@ var CM_App = CM_Class_Abstract.extend({
     },
 
     /**
-     * @return {CM_Stream_Adapter_Message_Abstract}
+     * @return {CM_MessageStream_Adapter_Abstract}
      */
     _getAdapter: function() {
       if (!this._adapter) {
@@ -922,8 +1076,9 @@ var CM_App = CM_Class_Abstract.extend({
       this._channelDispatchers[channel] = _.clone(Backbone.Events);
       this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(event, data) {
         if (handler._channelDispatchers[channel]) {
-          handler._channelDispatchers[channel].trigger(event, data);
+          data = cm.factory.create(data);
           cm.debug.log('Stream channel (' + channel + '): event `' + event + '`: ', data);
+          handler._channelDispatchers[channel].trigger(event, data);
         }
       });
       cm.debug.log('Stream channel (' + channel + '): subscribe');
@@ -1026,8 +1181,7 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   model: {
-    types: {
-    }
+    types: {}
   },
 
   action: {
@@ -1094,6 +1248,10 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   router: {
+
+    /** @type {Boolean} **/
+    _shouldReload: false,
+
     /** @type {String|Null} */
     hrefInitialIgnore: null,
 
@@ -1108,15 +1266,15 @@ var CM_App = CM_Class_Abstract.extend({
           return;
         }
         router.hrefInitialIgnore = null;
-        router._handleLocationChange(router._getFragment());
+        router._handleLocationChange(location.href);
       });
 
-      var urlBase = cm.getUrl();
+      var urlSite = cm.getUrl();
       $(document).on('click', 'a[href]:not([data-router-disabled=true])', function(event) {
         var metaPressed = (event.ctrlKey || event.metaKey);
-        var partOfUrlBase = 0 === this.href.indexOf(urlBase);
-        if (!metaPressed && partOfUrlBase) {
-          var fragment = this.href.substr(urlBase.length);
+        var partOfUrlSite = 0 === this.href.indexOf(urlSite);
+        if (!metaPressed && partOfUrlSite) {
+          var fragment = this.href.substr(urlSite.length);
           var forceReload = $(this).data('force-reload');
           router.route(fragment, forceReload);
           event.preventDefault();
@@ -1124,24 +1282,27 @@ var CM_App = CM_Class_Abstract.extend({
       });
     },
 
+    forceReload: function() {
+      this._shouldReload = true;
+    },
+
     /**
      * @param {String} url
      * @param {Boolean|Null} [forceReload]
      * @param {Boolean|Null} [replaceState]
+     * @returns {Promise}
      */
     route: function(url, forceReload, replaceState) {
-      forceReload = forceReload || false;
+      forceReload = this._shouldReload || forceReload || false;
       replaceState = replaceState || false;
-      var urlBase = cm.getUrl();
-      var fragment = url;
+      var urlSite = cm.getUrl();
       if ('/' == url.charAt(0)) {
-        url = urlBase + fragment;
-      } else {
-        fragment = url.substr(urlBase.length);
+        url = urlSite + url;
       }
-      if (forceReload || 0 !== url.indexOf(urlBase)) {
+      var fragment = this._getFragmentByUrl(url);
+      if (forceReload || 0 !== url.indexOf(urlSite)) {
         window.location.assign(url);
-        return;
+        return Promise.resolve();
       }
       if (fragment !== this._getFragment()) {
         if (replaceState) {
@@ -1150,7 +1311,7 @@ var CM_App = CM_Class_Abstract.extend({
           this.pushState(fragment);
         }
       }
-      this._handleLocationChange(fragment);
+      return this._handleLocationChange(url);
     },
 
     /**
@@ -1173,36 +1334,52 @@ var CM_App = CM_Class_Abstract.extend({
      * @returns string
      */
     _getFragment: function() {
-      var location = window.location;
-      return location.pathname + location.search;
+      return this._getFragmentByLocation(window.location);
     },
 
     /**
-     * @param {String} fragment
+     * @param {String} url
      * @returns Location
      */
-    _getLocationByFragment: function(fragment) {
+    _getLocationByUrl: function(url) {
       var location = document.createElement('a');
-      if (fragment) {
-        location.href = fragment;
+      if (url) {
+        location.href = url;
       }
       return location;
     },
 
     /**
-     * @param {String} fragment
+     * @param {Location} location
+     * @returns string
      */
-    _handleLocationChange: function(fragment) {
+    _getFragmentByLocation: function(location) {
+      return location.pathname + location.search + location.hash;
+    },
+
+    /**
+     * @param {String} url
+     * @returns string
+     */
+    _getFragmentByUrl: function(url) {
+      return this._getFragmentByLocation(this._getLocationByUrl(url));
+    },
+
+    /**
+     * @param {String} url
+     * @returns {Promise}
+     */
+    _handleLocationChange: function(url) {
       var paramsStateNext = null;
       var pageCurrent = cm.getLayout().findPage();
 
       if (pageCurrent && pageCurrent.hasStateParams()) {
-        var locationCurrent = this._getLocationByFragment(pageCurrent.getFragment());
-        var locationNext = this._getLocationByFragment(fragment);
+        var locationCurrent = this._getLocationByUrl(pageCurrent.getUrl());
+        var locationNext = this._getLocationByUrl(url);
 
         if (locationCurrent.pathname === locationNext.pathname) {
-          var paramsCurrent = queryString.parse(locationCurrent.search);
-          var paramsNext = queryString.parse(locationNext.search);
+          var paramsCurrent = cm.request.parseQueryParams(locationCurrent.search);
+          var paramsNext = cm.request.parseQueryParams(locationNext.search);
 
           var stateParamNames = pageCurrent.getStateParams();
 
@@ -1216,11 +1393,48 @@ var CM_App = CM_Class_Abstract.extend({
       }
 
       if (paramsStateNext) {
-        if (false !== cm.getLayout().getPage().routeToState(paramsStateNext, fragment)) {
-          return;
+        if (false !== cm.getLayout().getPage().routeToState(paramsStateNext, url)) {
+          return Promise.resolve();
         }
       }
-      cm.getLayout().loadPage(fragment);
+
+      var urlSite = cm.getUrl();
+      if (0 === url.indexOf(urlSite)) {
+        var pageFragment = url.substr(urlSite.length);
+        cm.getLayout().loadPage(pageFragment);
+      } else {
+        window.location.assign(url);
+        return Promise.resolve();
+      }
     }
-  }
+  },
+
+  request: {
+
+    /**
+     * @param {Object} queryParams
+     * @return {Object}
+     */
+    parseQueryParams: function(queryParams) {
+      var params = queryString.parse(queryParams);
+      var arrayParamRegex = /^(\w+)\[(\w+)]$/;
+      _.each(params, function(value, key) {
+        var result = arrayParamRegex.exec(key);
+        if (result) {
+          var paramName = result[1];
+          var arrayKey = result[2];
+          delete params[key];
+          if (!params[paramName]) {
+            params[paramName] = {};
+          }
+          params[paramName][arrayKey] = value;
+        }
+      });
+      return params;
+    }
+  },
+
+  userAgent: (function(ua) {
+    return window.UserAgentParser.parse(ua);
+  })(navigator.userAgent || '')
 });

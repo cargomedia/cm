@@ -6,8 +6,8 @@ class CM_FormField_Set_Select extends CM_FormField_Set {
     const DISPLAY_RADIOS = 'radios';
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {
-        if (!in_array($userInput, $this->_getValues())) {
-            throw new CM_Exception_FormFieldValidation('Invalid value');
+        if (!in_array($userInput, $this->getValues())) {
+            throw new CM_Exception_FormFieldValidation(new CM_I18n_Phrase('Invalid value'));
         }
         return $userInput;
     }

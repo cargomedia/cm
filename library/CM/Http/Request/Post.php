@@ -33,12 +33,16 @@ class CM_Http_Request_Post extends CM_Http_Request_Abstract {
         return $this->_body;
     }
 
+    public function getMethodName() {
+        return 'POST';
+    }
+
     public function getQuery() {
         if ($this->_bodyQuery === null) {
             if ($this->_bodyEncoding == self::ENCODING_JSON) {
-                if (!is_array($this->_bodyQuery = json_decode($this->getBody(), true))) {
-                    throw new CM_Exception_Invalid('Cannot extract query from body `' . $this->getBody() .
-                    '`.', null, array('severity' => CM_Exception::WARN));
+                $body = self::_sanitizeUtf($this->getBody());
+                if (!is_array($this->_bodyQuery = json_decode($body, true))) {
+                    throw new CM_Exception_Invalid('Cannot extract query from body', CM_Exception::WARN, ['body' => $body]);
                 }
             } elseif ($this->_bodyEncoding == self::ENCODING_FORM) {
                 parse_str($this->getBody(), $this->_bodyQuery);
@@ -55,7 +59,7 @@ class CM_Http_Request_Post extends CM_Http_Request_Abstract {
      */
     public function setBodyEncoding($bodyEncoding) {
         if (!in_array($bodyEncoding, array(self::ENCODING_NONE, self::ENCODING_JSON, self::ENCODING_FORM), true)) {
-            throw new CM_Exception_Invalid('Invalid body encoding `' . $bodyEncoding . '`.');
+            throw new CM_Exception_Invalid('Invalid body encoding', null, ['bodyEncoding' => $bodyEncoding]);
         }
         $this->_bodyEncoding = (int) $bodyEncoding;
         $this->_bodyQuery = null;

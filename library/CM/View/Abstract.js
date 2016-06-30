@@ -240,7 +240,7 @@ var CM_View_Abstract = Backbone.View.extend({
    * @param {String} functionName
    * @param {Object|Null} [params]
    * @param {Object|Null} [options]
-   * @return jqXHR
+   * @return Promise
    */
   ajax: function(functionName, params, options) {
     options = _.defaults(options || {}, {
@@ -251,47 +251,33 @@ var CM_View_Abstract = Backbone.View.extend({
     var handler = this;
 
     if (options.modal) {
-      var callbackComplete = options.complete;
-      options.complete = function() {
-        handler.enable();
-        if (callbackComplete) {
-          return callbackComplete(handler);
-        }
-      };
       this.disable();
     }
 
-    var xhr = cm.ajax('ajax', {viewInfoList: options.view.getViewInfoList(), method: functionName, params: params}, {
-      success: function(response) {
+    var promise = cm.ajax('ajax', {viewInfoList: options.view.getViewInfoList(), method: functionName, params: params})
+      .then(function(response) {
         if (response.exec) {
           new Function(response.exec).call(handler);
         }
-        if (options.success) {
-          return options.success.call(handler, response.data);
+        return response.data;
+      })
+      .finally(function() {
+        if (options.modal) {
+          handler.enable();
         }
-      },
-      error: function(msg, type, isPublic) {
-        if (options.error) {
-          return options.error.call(handler, msg, type, isPublic);
-        }
-      },
-      complete: function() {
-        if (options.complete) {
-          return options.complete.call(handler);
-        }
-      }
-    });
+      });
+
     this.on('destruct', function() {
-      xhr.abort();
+      promise.cancel();
     });
-    return xhr;
+    return promise;
   },
 
   /**
    * @param {String} functionName
    * @param {Object|Null} [params]
    * @param {Object|Null} [options]
-   * @return jqXHR
+   * @return Promise
    */
   ajaxModal: function(functionName, params, options) {
     options = _.defaults(options || {}, {
@@ -304,23 +290,48 @@ var CM_View_Abstract = Backbone.View.extend({
    * @param {String} className
    * @param {Object|Null} [params]
    * @param {Object|Null} [options]
-   * @return jqXHR
+   * @return Promise
    */
   loadComponent: function(className, params, options) {
     options = _.defaults(options || {}, {
-      'success': function() {
-        this.popOut();
-      },
       'modal': true,
       'method': 'loadComponent'
     });
     params = params || {};
     params.className = className;
-    var success = options.success;
-    options.success = function(response) {
-      this._injectView(response, success);
-    };
-    return this.ajax(options.method, params, options);
+    var self = this;
+    return this.ajax(options.method, params, options)
+      .then(function(response) {
+        return self._injectView(response);
+      });
+  },
+
+  /**
+   * @param {String} className
+   * @param {Object|Null} [params]
+   * @param {Object|Null} [options]
+   * @return Promise
+   */
+  prepareComponent: function(className, params, options) {
+    return this.loadComponent(className, params, options)
+      .then(function(component) {
+        component._ready();
+        return component;
+      });
+  },
+
+  /**
+   * @param {String} className
+   * @param {Object|Null} [params]
+   * @param {Object|Null} [options]
+   * @return Promise
+   */
+  popOutComponent: function(className, params, options) {
+    return this.prepareComponent(className, params, options)
+      .then(function(component) {
+        component.popOut();
+        return component;
+      });
   },
 
   /**
@@ -459,43 +470,6 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
-   * @param {String} mp3Path
-   * @param {Object} [params]
-   * @return {MediaElement}
-   */
-  createAudioPlayer: function(mp3Path, params) {
-    params = _.extend({loop: false, autoplay: false}, params);
-
-    var $element = $('<audio />');
-    $element.wrap('<div />');	// MediaElement needs a parent to show error msgs
-    $element.attr('src', cm.getUrlResource('layout', 'audio/' + mp3Path));
-    $element.attr('autoplay', params.autoplay);
-
-    var error = false;
-    var mediaElement = new MediaElement($element.get(0), {
-      startVolume: 1,
-      flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
-      silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
-      error: function() {
-        error = true;
-      },
-      success: function(mediaElement, domObject) {
-        if (params.loop) {
-          mediaElement.addEventListener('ended', function() {
-            mediaElement.load();
-          });
-        }
-      }
-    });
-    if (error) {
-      mediaElement.play = new Function();
-      mediaElement.pause = new Function();
-    }
-
-    return mediaElement;
-  },
-
-  /**
    * @param {jQuery} $element
    * @param {String} url
    * @param {Object} [flashvars]
@@ -522,8 +496,7 @@ var CM_View_Abstract = Backbone.View.extend({
     }
     var idSwf = id + '-object', attributes = {
       id: idSwf,
-      name: idSwf,
-      styleclass: 'embeddedWrapper-object'
+      name: idSwf
     };
 
     var self = this;
@@ -578,7 +551,7 @@ var CM_View_Abstract = Backbone.View.extend({
     var template = this.cacheGet('template-' + name, function() {
       var $template = this.$('> script[type="text/template"].' + name);
       if (!$template.length) {
-        cm.error.triggerThrow('Template `' + name + '` does not exist in `' + this.getClass() + '`');
+        throw new CM_Exception('Template `' + name + '` does not exist in `' + this.getClass() + '`');
       }
       return $template.html();
     });
@@ -653,18 +626,13 @@ var CM_View_Abstract = Backbone.View.extend({
 
   /**
    * @param {Object} response
-   * @param {Function} [successPre]
-   * @private
+   * @return CM_Abstract_View
    */
-  _injectView: function(response, successPre) {
+  _injectView: function(response) {
     cm.window.appendHidden(response.html);
     new Function(response.js).call(this);
     var view = cm.views[response.autoId];
     this.registerChild(view);
-    if (successPre) {
-      successPre.call(view, response);
-    }
-    view._ready();
     return view;
   }
 });
