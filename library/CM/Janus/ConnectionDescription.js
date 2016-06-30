@@ -27,6 +27,11 @@ var CM_Janus_ConnectionDescription = Backbone.Model.extend({
     };
   },
 
+  clear: function() {
+    this.getServer().clear();
+    this.getChannel().clear();
+  },
+
   /**
    * @param {*} description
    */

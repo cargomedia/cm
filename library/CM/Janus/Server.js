@@ -46,5 +46,13 @@ var CM_Janus_Server = Backbone.Model.extend({
    */
   setIceServerList: function(iceServerList) {
     this.set('iceServerList', iceServerList);
+  },
+
+  clear: function() {
+    this.set({
+      iceServerList: [],
+      webSocketAddress: '',
+      webSocketAddressSubscribeOnly: ''
+    });
   }
 });

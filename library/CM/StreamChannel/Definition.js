@@ -14,7 +14,7 @@ var CM_StreamChannel_Definition = Backbone.Model.extend({
   },
 
   /**
-   * @returns {Number}
+   * @returns {Number|null}
    */
   getType: function() {
     return this.get('type');
@@ -26,5 +26,12 @@ var CM_StreamChannel_Definition = Backbone.Model.extend({
    */
   equals: function(definition) {
     return definition instanceof CM_StreamChannel_Definition && _.isEqual(this.toJSON(), definition.toJSON());
+  },
+
+  clear: function() {
+    this.set({
+      key: '',
+      type: null
+    });
   }
 });
