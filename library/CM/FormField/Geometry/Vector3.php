@@ -29,6 +29,10 @@ class CM_FormField_Geometry_Vector3 extends CM_FormField_Geometry_Vector2 {
         $viewResponse->set('z', $z);
     }
 
+    /**
+     * @param array $userInput
+     * @return bool
+     */
     public function isEmpty($userInput) {
         return parent::isEmpty($userInput) || CM_FormField_Abstract::isEmpty($userInput['z']);
     }
