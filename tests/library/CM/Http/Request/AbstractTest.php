@@ -277,7 +277,7 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $timeZone = $request->getTimeZone();
         $this->assertInstanceOf('DateTimeZone', $timeZone);
         $this->assertSame('+02:30', $timeZone->getName());
-        
+
         $request = new CM_Http_Request_Post('/foo/bar/', ['cookie' => 'timezoneOffset=3600']);
         $timeZone = $request->getTimeZone();
         $this->assertInstanceOf('DateTimeZone', $timeZone);
@@ -294,6 +294,23 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $request = new CM_Http_Request_Get('/foo/baz/');
         $timeZone = $request->getTimeZone();
         $this->assertNull($timeZone);
+    }
+
+    public function testSanitize() {
+        $malformedString = pack("H*", 'c32e');
+        $malformedUri = 'http://foo.bar/' . $malformedString;
+        $this->assertFalse(mb_check_encoding($malformedUri, 'UTF-8'));
+        $exception = $this->catchException(function () use ($malformedUri) {
+            CM_Util::jsonEncode($malformedUri);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Cannot json_encode value.', $exception->getMessage());
+
+        $request = new CM_Http_Request_Get($malformedUri, null, ['baz' => pack("H*", 'c32e')]);
+        $this->assertInstanceOf('CM_Http_Request_Get', $request);
+        $this->assertTrue(mb_check_encoding($request->getUri(), 'UTF-8'));
+        $this->assertTrue(mb_check_encoding($request->getServer()['baz'], 'UTF-8'));
+        $this->assertNotEmpty(CM_Util::jsonEncode($request->getUri()));
     }
 
     /**

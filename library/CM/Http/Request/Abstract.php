@@ -56,9 +56,14 @@ abstract class CM_Http_Request_Abstract {
             $this->_headers = array_change_key_case($headers);
         }
         if (null !== $server) {
+            foreach ($server as &$serverValue) {
+                if (is_string($serverValue)) {
+                    $serverValue = self::_sanitizeUtf($serverValue);
+                }
+            }
             $this->_server = array_change_key_case($server);
         }
-
+        $uri = self::_sanitizeUtf((string) $uri);
         $this->setUri($uri);
 
         if ($sessionId = $this->getCookie('sessionId')) {
@@ -617,5 +622,13 @@ abstract class CM_Http_Request_Abstract {
         }
 
         return self::factory($method, $uri, $headers, $server, $body);
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    protected static function _sanitizeUtf($value) {
+        return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
     }
 }
