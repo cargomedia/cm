@@ -223,6 +223,18 @@ class CM_Model_Language extends CM_Model_Abstract {
         return (int) CM_Service_Manager::getInstance()->getOptions()->get('language.javascript.version');
     }
 
+    public static function refreshCaches() {
+        $cache = CM_Cache_Local::getInstance();
+        /** @var CM_Model_Language $language */
+        foreach (new CM_Paging_Language_All() as $language) {
+            $cacheKey = CM_CacheConst::Language_Translations . '_languageId:' . $language->getId();
+            $translations = $language->getTranslations();
+            $translations->_change();
+            $cache->set($cacheKey, $translations->getAssociativeArray(), $language->_getConfig()->cacheLifetime);
+        }
+        $language->getTranslations(true)->_change();
+    }
+
     public static function updateVersionJavascript() {
         CM_Service_Manager::getInstance()->getOptions()->set('language.javascript.version', time());
     }
