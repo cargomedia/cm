@@ -1,6 +1,6 @@
 <?php
 
-class CM_Geometry_Vector2 implements CM_Geometry_Vector {
+class CM_Geometry_Vector2 implements CM_ArrayConvertible {
 
     /** @var float */
     protected $_x;
