@@ -13,4 +13,17 @@ class CM_Log_ContextTest extends CMTest_TestCase {
         $context->setHttpRequest($request);
         $this->assertSame($request, $context->getHttpRequest());
     }
+
+    public function testSetExtra() {
+        $extra = ['foo' => 'bar', 'baz' => ['quux' => 1, 'foo' => 0]];
+        $context = new CM_Log_Context();
+        $context->setExtra($extra);
+        $this->assertSame($extra, $context->getExtra());
+
+        $exception = $this->catchException(function () use ($context) {
+            $context->setExtra(['foo' => 'bar', 'fooBar' => ['1' => ['2' => new stdClass()]]]);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Object can not be passed to "Extra"', $exception->getMessage());
+    }
 }
