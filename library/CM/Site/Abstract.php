@@ -224,8 +224,8 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
             ];
         }
 
+        $path = new Stringy\Stringy($path);
         return Functional\some($matchList, function ($match) use ($host, $path) {
-            $path = new Stringy\Stringy($path);
             return ($host === $match['host'] && $path->startsWith($match['path']));
         });
     }
