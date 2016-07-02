@@ -1,6 +1,6 @@
 <?php
 
-class CM_Janus_Server {
+class CM_Janus_Server implements JsonSerializable {
 
     /** @var int */
     protected $_id;
@@ -101,5 +101,14 @@ class CM_Janus_Server {
      */
     public function getIceServerList() {
         return $this->_iceServerList;
+    }
+
+    public function jsonSerialize() {
+        return [
+            'id'                            => $this->_id,
+            'webSocketAddress'              => $this->getWebSocketAddress(),
+            'webSocketAddressSubscribeOnly' => $this->getWebSocketAddressSubscribeOnly(),
+            'iceServerList'                 => $this->getIceServerList(),
+        ];
     }
 }

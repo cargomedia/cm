@@ -11,15 +11,6 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Log_Handler_MongoDb', $handler);
     }
 
-    public function testFailWithWrongCollection() {
-        $exception = $this->catchException(function () {
-            new CM_Log_Handler_MongoDb('badCollection', 1000);
-        });
-
-        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('MongoDb Collection `badCollection` does not contain valid TTL index', $exception->getMessage());
-    }
-
     public function testFailWithWrongTtl() {
         $collection = 'cm_event_log';
         $mongoClient = $this->getServiceManager()->getMongoDb();

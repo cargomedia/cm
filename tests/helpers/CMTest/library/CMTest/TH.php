@@ -136,11 +136,12 @@ class CMTest_TH {
         }
 
         if (null === $adapterType) {
-            $adapterType = CM_Wowza_Service::getTypeStatic();
+            $adapterType = CM_Janus_Service::getTypeStatic();
         }
 
         $data = array('key' => rand(1, 10000) . '_' . rand(1, 100));
-        if (CM_Model_StreamChannel_Media::getTypeStatic() == $type) {
+        $className = CM_Model_Abstract::getClassName($type);
+        if ('CM_Model_StreamChannel_Media' === $className || is_subclass_of($className, 'CM_Model_StreamChannel_Media')) {
             $mediaId = (null !== $mediaId) ? (string) $mediaId : null;
             $data['width'] = 480;
             $data['height'] = 720;

@@ -50,9 +50,9 @@
           {elseif (!empty($exception.traceString))}
             <div>{$exception.traceString}</div>
           {/if}
-          {if (!empty($exception.metaInfo))}
+          {if (!empty($exception.meta))}
             <div><span class="label">Exception meta info:</span>
-              <pre>{print_r($exception.metaInfo, true)}</pre>
+              <pre>{print_r($exception.meta, true)}</pre>
             </div>
           {/if}
         </div>

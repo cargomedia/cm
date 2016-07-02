@@ -67,17 +67,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             },
         ));
 
-        if ($this->getServiceManager()->has('wowza')) {
-            $this->_registerClockworkCallbacks('1 minute', array(
-                'CM_Wowza_Service::synchronize'  => function () {
-                    $this->getServiceManager()->getWowza('wowza')->synchronize();
-                },
-                'CM_Wowza_Service::checkStreams' => function () {
-                    $this->getServiceManager()->getWowza('wowza')->checkStreams();
-                },
-            ));
-        }
-
         if ($this->getServiceManager()->has('janus')) {
             $this->_registerClockworkCallbacks('1 minute', array(
                 'CM_Janus_Service::synchronize'  => function () {

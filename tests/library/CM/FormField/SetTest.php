@@ -19,6 +19,12 @@ class CM_FormField_SetTest extends CMTest_TestCase {
         $this->assertSame($value, $field->getValue());
     }
 
+    public function testGetValues() {
+        $data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
+        $field = new CM_FormField_Set(['name' => 'foo', 'values' => $data, 'labelsInValues' => true]);
+        $this->assertSame(array_keys($data), $field->getValues());
+    }
+
     public function testValidate() {
         $data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
         $field = new CM_FormField_Set(['name' => 'foo', 'values' => $data, 'labelsInValues' => true]);

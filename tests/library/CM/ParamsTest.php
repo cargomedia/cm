@@ -247,6 +247,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         ]);
         $expectedEncoded = array(
             'foo' => 1,
+            '_class' => get_class($object),
         );
         $this->assertEquals($expectedEncoded, CM_Params::encode($object));
         $this->assertSame(1, $toArrayMethod->getCallCount());
@@ -415,6 +416,18 @@ class CM_ParamsTest extends CMTest_TestCase {
         $streamChannel = CMTest_TH::createStreamChannel();
         $params = new CM_Params(['channel' => $streamChannel]);
         $this->assertEquals($streamChannel, $params->getStreamChannel('channel'));
+    }
+
+    public function testGetStreamChannelMedia() {
+        $streamChannel = CMTest_TH::createStreamChannel(CM_Model_StreamChannel_Media::getTypeStatic());
+        $params = new CM_Params(['channel' => $streamChannel]);
+        $this->assertEquals($streamChannel, $params->getStreamChannelMedia('channel'));
+    }
+
+    public function testGetStreamChannelJanus() {
+        $streamChannel = CMTest_TH::createStreamChannel(CM_Janus_StreamChannel::getTypeStatic());
+        $params = new CM_Params(['channel' => $streamChannel]);
+        $this->assertEquals($streamChannel, $params->getStreamChannelJanus('channel'));
     }
 
     public function testGetStreamChannelDefinition() {

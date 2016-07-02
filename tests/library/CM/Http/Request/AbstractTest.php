@@ -285,6 +285,23 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertNull($timeZone);
     }
 
+    public function testSanitize() {
+        $malformedString = pack("H*", 'c32e');
+        $malformedUri = 'http://foo.bar/' . $malformedString;
+        $this->assertFalse(mb_check_encoding($malformedUri, 'UTF-8'));
+        $exception = $this->catchException(function () use ($malformedUri) {
+            CM_Util::jsonEncode($malformedUri);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Cannot json_encode value.', $exception->getMessage());
+
+        $request = new CM_Http_Request_Get($malformedUri, null, ['baz' => pack("H*", 'c32e')]);
+        $this->assertInstanceOf('CM_Http_Request_Get', $request);
+        $this->assertTrue(mb_check_encoding($request->getUri(), 'UTF-8'));
+        $this->assertTrue(mb_check_encoding($request->getServer()['baz'], 'UTF-8'));
+        $this->assertNotEmpty(CM_Util::jsonEncode($request->getUri()));
+    }
+
     public function testPopPathPart() {
         $request = new CM_Http_Request_Get('/part0/part1/part2');
         $this->assertSame('part1', $request->popPathPart(1));
