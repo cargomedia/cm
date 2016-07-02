@@ -285,6 +285,37 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertNull($timeZone);
     }
 
+    public function testPopPathPart() {
+        $request = new CM_Http_Request_Get('/part0/part1/part2');
+        $this->assertSame('part1', $request->popPathPart(1));
+        $this->assertSame('part0', $request->popPathPart(0));
+        $this->assertSame('/part2', $request->getPath());
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot pop
+     */
+    public function testPopPathPartNoMatch() {
+        $request = new CM_Http_Request_Get('/part0/part1/part2');
+        $request->popPathPart(5);
+    }
+
+    public function testPopPathPrefix() {
+        $request = new CM_Http_Request_Get('/part0/part1/part2');
+        $request->popPathPrefix('/part0/part1/');
+        $this->assertSame('/part2', $request->getPath());
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot pop
+     */
+    public function testPopPathPrefixNoMatch() {
+        $request = new CM_Http_Request_Get('/part0/part1/part2');
+        $request->popPathPrefix('/foo');
+    }
+
     /**
      * @param string             $uri
      * @param array|null         $additionalHeaders

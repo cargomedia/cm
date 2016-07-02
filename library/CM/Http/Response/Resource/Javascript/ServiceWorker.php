@@ -9,7 +9,7 @@ class CM_Http_Response_Resource_Javascript_ServiceWorker extends CM_Http_Respons
     }
 
     public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
-        if (0 === stripos($request->getPath(), '/serviceworker-')) {
+        if ($request->hasPathPrefix('/serviceworker-')) {
             $request = clone $request;
             $request->setPath(str_replace('-', '/', $request->getPath()));
             $request->popPathPart(0);
