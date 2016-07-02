@@ -28,6 +28,9 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_Set_Select(['name' => 'setSelect2', 'values' => [1 => 'Eins', 2 => 'Zwei'], 'labelsInValues' => true]));
         $this->registerField(new CM_FormField_Set_Select(['name' => 'setSelect3', 'values' => [1 => 'Foo', 2 => 'Bar'], 'labelsInValues' => true]));
         $this->registerField(new CM_FormField_TreeSelect(['name' => 'treeselect', 'tree' => CM_Model_LanguageKey::getTree()]));
+        $this->registerField(new CM_FormField_Captcha(['name' => 'captcha']));
+
+        $this->registerAction(new CM_FormAction_Example_Submit($this));
     }
 
     public function ajax_validate(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {

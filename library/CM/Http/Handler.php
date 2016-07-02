@@ -19,7 +19,8 @@ class CM_Http_Handler implements CM_Service_ManagerAwareInterface {
     public function processRequest(CM_Http_Request_Abstract $request) {
         try {
             $this->getServiceManager()->getLogger()->getContext()->setHttpRequest($request);
-            $response = CM_Http_Response_Abstract::factory($request, $this->getServiceManager());
+            $responseFactory = new CM_Http_ResponseFactory($this->getServiceManager());
+            $response = $responseFactory->getResponse($request);
         } catch (CM_Exception $e) {
             $e->setSeverity(CM_Exception::WARN);
             throw $e;

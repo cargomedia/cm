@@ -2,19 +2,6 @@
 
 class CM_Http_Response_Page_Embed extends CM_Http_Response_Page {
 
-    /**
-     * @param CM_Http_Request_Abstract $request
-     * @param CM_Site_Abstract         $site
-     * @param CM_Service_Manager       $serviceManager
-     */
-    public function __construct(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
-        $this->_request = clone $request;
-        $this->_request->popPathLanguage();
-        $this->_site = $site;
-
-        $this->setServiceManager($serviceManager);
-    }
-
     /** @var string|null */
     private $_title;
 
@@ -42,4 +29,9 @@ class CM_Http_Response_Page_Embed extends CM_Http_Response_Page {
     protected function _process() {
         $this->_processContentOrRedirect();
     }
+
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
+        return null;
+    }
+
 }
