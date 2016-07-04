@@ -96,8 +96,16 @@ class CM_Log_Context {
 
     /**
      * @param array $extra
+     * @throws CM_Exception_Invalid
      */
     public function setExtra(array $extra) {
+        $flattenExtra = Functional\flatten($extra);
+        if (Functional\some($flattenExtra, function ($el) {
+            return is_object($el);
+        })) {
+            throw new CM_Exception_Invalid('Object can not be passed to "Extra"');
+        }
+
         $this->_extra = $extra;
     }
 
