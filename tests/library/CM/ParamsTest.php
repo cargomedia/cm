@@ -435,4 +435,37 @@ class CM_ParamsTest extends CMTest_TestCase {
         $params = new CM_Params(['def' => $definition]);
         $this->assertEquals($definition, $params->getStreamChannelDefinition('def'));
     }
+
+    public function testGetGeometryVector2() {
+        $vector2 = new CM_Geometry_Vector2(1.1, 2.2);
+        $params = new CM_Params(array('vector2' => $vector2));
+        $value = $params->getGeometryVector2('vector2');
+        $this->assertInstanceOf('CM_Geometry_Vector2', $value);
+        $this->assertSame(1.1, $value->getX());
+        $this->assertSame(2.2, $value->getY());
+
+        $exception = $this->catchException(function () {
+            $params = new CM_Params(array('vector2' => 'foo'));
+            $params->getGeometryVector2('vector2');
+        });
+        $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
+        $this->assertSame('Not enough parameters', $exception->getMessage());
+    }
+
+    public function testGetGeometryVector3() {
+        $vector3 = new CM_Geometry_Vector3(1.1, 2.2, 3.3);
+        $params = new CM_Params(array('vector3' => $vector3));
+        $value = $params->getGeometryVector3('vector3');
+        $this->assertInstanceOf('CM_Geometry_Vector3', $value);
+        $this->assertSame(1.1, $value->getX());
+        $this->assertSame(2.2, $value->getY());
+        $this->assertSame(3.3, $value->getZ());
+
+        $exception = $this->catchException(function () {
+            $params = new CM_Params(array('vector3' => 'foo'));
+            $params->getGeometryVector3('vector3');
+        });
+        $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
+        $this->assertSame('Not enough parameters', $exception->getMessage());
+    }
 }
