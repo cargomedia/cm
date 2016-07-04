@@ -92,22 +92,31 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
     }
 
     /**
-     * @param string $path
+     * @param string $mainPath
      * @param bool   $generateSourceMaps
      * @throws CM_Exception
      */
-    protected function _appendDirectoryBrowserify($path, $generateSourceMaps) {
+    protected function _appendDirectoryBrowserify($mainPath, $generateSourceMaps) {
         $sourceMainPaths = [];
-        $sourcePaths = [];
+        foreach (array_reverse($this->_site->getModules()) as $moduleName) {
+            $sourceMainPaths = array_merge($sourceMainPaths, glob($this->_getPathInModule($moduleName, $mainPath) . '*.js'));
+        }
+        $this->_appendSourceMainBrowserify($sourceMainPaths, $generateSourceMaps);
+    }
 
+    /**
+     * @param string[] $sourceMainPaths
+     * @param bool     $generateSourceMaps
+     * @throws CM_Exception
+     */
+    protected function _appendSourceMainBrowserify($sourceMainPaths, $generateSourceMaps) {
         if ($generateSourceMaps && !$this->_js->isEmpty()) {
             throw new CM_Exception('Cannot generate source maps when output container already contains code.');
         }
 
+        $sourcePaths = [];
         foreach (array_reverse($this->_site->getModules()) as $moduleName) {
-            $sourcePath = $this->_getPathInModule($moduleName, $path);
-            $sourcePaths[] = $sourcePath;
-            $sourceMainPaths = array_merge($sourceMainPaths, glob($sourcePath . '*/main.js'));
+            $sourcePaths[] = $this->_getPathInModule($moduleName, 'client-vendor/source');
         }
 
         $content = $this->_browserify($sourceMainPaths, $sourcePaths, $generateSourceMaps);

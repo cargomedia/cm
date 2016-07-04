@@ -35,4 +35,19 @@ class CM_Http_UrlParser {
         }
         return $scheme;
     }
+
+    /**
+     * @return string
+     * @throws CM_Exception
+     */
+    public function getPath() {
+        $path = parse_url($this->_url, PHP_URL_PATH);
+        if (null === $path) {
+            return '/';
+        }
+        if (false === $path) {
+            throw new CM_Exception('Cannot detect path from `' . $this->_url . '`.');
+        }
+        return $path;
+    }
 }

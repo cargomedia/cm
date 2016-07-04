@@ -46,7 +46,6 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Model_Currency->default = ['code' => '840', 'abbreviation' => 'USD'];
 
-    $config->CM_Http_Response_Page->class = 'CM_Http_Response_Page';
     $config->CM_Http_Response_Page->exceptionsToCatch = array(
         'CM_Exception_Nonexistent'  => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => true, 'level' => CM_Log_Logger::INFO],
         'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => true, 'level' => CM_Log_Logger::INFO],

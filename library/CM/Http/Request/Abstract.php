@@ -183,18 +183,48 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @param string $prefix
+     * @return bool
+     */
+    public function hasPathPrefix($prefix) {
+        $prefix = (string) $prefix;
+        $path = new Stringy\Stringy($this->getPath());
+        return $path->startsWith($prefix);
+    }
+
+    /**
      * @param int|null $position
      * @return string
-     * @throws CM_Exception_Invalid
+     * @throws CM_Exception
      */
     public function popPathPart($position = null) {
         $position = (int) $position;
         if (!array_key_exists($position, $this->getPathParts())) {
-            throw new CM_Exception_Invalid('Cannot find request\'s path part at position `' . $position . '`.');
+            throw new CM_Exception('Cannot pop request\'s path by position.', null, [
+                'path'     => $this->getPath(),
+                'position' => $position,
+            ]);
         }
         $value = array_splice($this->_pathParts, $position, 1);
         $this->setPathParts($this->_pathParts);
         return current($value);
+    }
+
+    /**
+     * @param string $prefix
+     * @throws CM_Exception
+     */
+    public function popPathPrefix($prefix) {
+        $path = new Stringy\Stringy($this->getPath());
+        if (!$path->startsWith($prefix)) {
+            throw new CM_Exception('Cannot pop request\'s path by prefix.', null, [
+                'path'   => $this->getPath(),
+                'prefix' => $prefix,
+            ]);
+        }
+        $path = $path->removeLeft($prefix);
+        $path = $path->ensureLeft('/');
+        $this->setPath((string) $path);
     }
 
     /**
@@ -221,6 +251,23 @@ abstract class CM_Http_Request_Abstract {
             $siteId = null;
         }
         return CM_Site_Abstract::factory($siteId);
+    }
+
+    /**
+     * @return CM_Site_Abstract
+     */
+    public function popPathSiteByMatch() {
+        $siteFactory = new CM_Site_SiteFactory();
+        $site = $siteFactory->findSite($this);
+        if (null === $site) {
+            $site = CM_Site_Abstract::factory();
+        }
+
+        $sitePath = $site->getUrlParser()->getPath();
+        if ($this->hasPathPrefix($sitePath)) {
+            $this->popPathPrefix($sitePath);
+        }
+        return $site;
     }
 
     /**

@@ -1,6 +1,6 @@
 module.exports = {
   config: {
-    baseUrl: 'client-vendor/after-body-source'
+    baseUrl: 'client-vendor/source'
   },
   modules: [
     'cm/tests/media/videoTest',

@@ -23,11 +23,11 @@ abstract class CM_Asset_Javascript_Vendor_Abstract extends CM_Asset_Javascript_A
                 $this->_appendDirectoryGlob($this->_getDistPath());
                 break;
             case 'source':
-                $this->_appendDirectoryBrowserify($this->_getSourcePath(), true);
+                $this->_appendDirectoryBrowserify($this->_getMainPath(), true);
                 break;
             default:
                 $this->_appendDirectoryGlob($this->_getDistPath());
-                $this->_appendDirectoryBrowserify($this->_getSourcePath(), false);
+                $this->_appendDirectoryBrowserify($this->_getMainPath(), false);
         }
     }
 
@@ -39,6 +39,6 @@ abstract class CM_Asset_Javascript_Vendor_Abstract extends CM_Asset_Javascript_A
     /**
      * @return string
      */
-    abstract protected function _getSourcePath();
+    abstract protected function _getMainPath();
 
 }

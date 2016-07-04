@@ -25,7 +25,6 @@ class CM_Component_Example extends CM_Component_Abstract {
 
     public function ajax_test(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
         $x = $params->getString('x');
-        sleep(2);
         return 'x=' . $x;
     }
 

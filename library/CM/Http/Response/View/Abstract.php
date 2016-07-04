@@ -65,30 +65,31 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      */
     public function loadPage(CM_Params $params, CM_Http_Response_View_Ajax $response) {
         $request = $this->_createGetRequestWithUrl($params->getString('path'));
+        $responseFactory = new CM_Http_ResponseFactory($this->getServiceManager());
 
         $count = 0;
-        $paths = array($request->getPath());
+        $fragments = [];
         do {
-            $url = $this->getRender()->getUrl(CM_Util::link($request->getPath(), $request->getQuery()));
-            if (!$this->_isPageOnSameSite($url)) {
-                return array('redirectExternal' => $url);
-            }
+            $fragment = CM_Util::link($request->getPath(), $request->getQuery());
+            $fragments[] = $fragment;
+            $url = $this->getRender()->getSite()->getUrlBase() . $fragment;
             if ($count++ > 10) {
-                throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $paths) . ').');
+                throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $fragments) . ').');
             }
-            $responseEmbed = new CM_Http_Response_Page_Embed($request, $response->getSite(), $this->getServiceManager());
+
+            $responsePage = $responseFactory->getResponse($request);
+            if (!$responsePage->getSite()->equals($this->getSite())) {
+                $redirectExternalFragment = CM_Util::link($responsePage->getRequest()->getPath(), $responsePage->getRequest()->getQuery());
+                return array('redirectExternal' => $responsePage->getRender()->getUrl($redirectExternalFragment));
+            }
+
+            $responseEmbed = new CM_Http_Response_Page_Embed($responsePage->getRequest(), $responsePage->getSite(), $this->getServiceManager());
             $responseEmbed->process();
             $request = $responseEmbed->getRequest();
-
-            $paths[] = $request->getPath();
 
             if ($redirectUrl = $responseEmbed->getRedirectUrl()) {
                 if (!$this->_isPageOnSameSite($redirectUrl)) {
                     return array('redirectExternal' => $redirectUrl);
-                } else {
-                    // Process redirect URL with page response constructor
-                    $responsePage = CM_Http_Response_Page::factory($request, $this->getServiceManager());
-                    $request = $responsePage->getRequest();
                 }
             }
         } while ($redirectUrl);
@@ -263,12 +264,14 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      * @return bool
      */
     private function _isPageOnSameSite($url) {
-        $isSameBaseUrl = (0 === mb_stripos($url, $this->getRender()->getUrl()));
-        if (!$isSameBaseUrl) {
+        $urlParser = new CM_Http_UrlParser($url);
+        if (!$this->_site->isUrlMatch($urlParser->getHost(), $urlParser->getPath())) {
             return false;
         }
+
         $request = $this->_createGetRequestWithUrl($url);
-        $response = CM_Http_Response_Page::factory($request, $this->getServiceManager());
+        $responseFactory = new CM_Http_ResponseFactory($this->getServiceManager());
+        $response = $responseFactory->getResponse($request);
         return $response->getSite()->equals($this->getSite());
     }
 

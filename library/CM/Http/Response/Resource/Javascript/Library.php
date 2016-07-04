@@ -20,7 +20,16 @@ class CM_Http_Response_Resource_Javascript_Library extends CM_Http_Response_Reso
         throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', CM_Exception::WARN);
     }
 
-    public static function match(CM_Http_Request_Abstract $request) {
-        return $request->getPathPart(0) === 'library-js';
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
+        if ($request->getPathPart(0) === 'library-js') {
+            $request = clone $request;
+            $request->popPathPart(0);
+            $request->popPathLanguage();
+            $site = $request->popPathSite();
+            $deployVersion = $request->popPathPart(0);
+            return new self($request, $site, $serviceManager);
+        }
+        return null;
     }
+
 }

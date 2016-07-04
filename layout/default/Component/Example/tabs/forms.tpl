@@ -30,4 +30,6 @@
 {formField name='treeselect' label="Tree select"}
 {formField name='vector2' label="Vector 2D"}
 {formField name='vector3' label="Vector 3D"}
+{formField name='captcha' label="Captcha"}
+{formAction action='Submit' label='Submit'}
 {/form}

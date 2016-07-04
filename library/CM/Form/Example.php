@@ -30,6 +30,9 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_TreeSelect(['name' => 'treeselect', 'tree' => CM_Model_LanguageKey::getTree()]));
         $this->registerField(new CM_FormField_Geometry_Vector2(['name' => 'vector2']));
         $this->registerField(new CM_FormField_Geometry_Vector3(['name' => 'vector3']));
+        $this->registerField(new CM_FormField_Captcha(['name' => 'captcha']));
+
+        $this->registerAction(new CM_FormAction_Example_Submit($this));
     }
 
     public function ajax_validate(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {

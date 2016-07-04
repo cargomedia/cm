@@ -222,7 +222,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         /** @var CM_Page_Abstract $pageClassName */
         $path = $pageClassName::getPath($params);
 
-        $languageRewrite = $this->_languageRewrite || $language;
+        $languageRewrite = $this->getLanguageRewrite()|| $language;
         if (!$language) {
             $language = $this->getLanguage();
         }
@@ -299,7 +299,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             throw new CM_Exception_Invalid('Needs user');
         }
         $params = array('user' => $mail->getRecipient()->getId(), 'mailType' => $mail->getType());
-        return CM_Util::link($this->getSite()->getUrlBase() . '/emailtracking/' . $this->getSite()->getId(), $params);
+        return CM_Util::link($this->getSite()->getUrl() . '/emailtracking', $params);
     }
 
     /**
@@ -357,6 +357,13 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         }
 
         return $language;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getLanguageRewrite() {
+        return $this->_languageRewrite;
     }
 
     /**
