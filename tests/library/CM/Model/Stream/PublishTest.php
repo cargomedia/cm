@@ -158,8 +158,8 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
         /** @var CM_Model_StreamChannel_Media $streamChannel */
         /** @var CM_Model_Stream_Publish $streamPublish */
 
-        $onDeleteBefore = CMTest_TH::getProtectedMethod('CM_Model_Stream_Publish', '_onDeleteAfter');
-        $onDeleteBefore->invoke($streamPublish);
+        $onDeleteAfter = CMTest_TH::getProtectedMethod('CM_Model_Stream_Publish', '_onDeleteAfter');
+        $onDeleteAfter->invoke($streamPublish);
     }
 
     public function testDeleteOnUnpublishInvalid() {
