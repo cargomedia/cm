@@ -23,12 +23,12 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
         return CM_Db_Db::select('cm_stream_publish', '*', array('id' => $this->getId()))->fetch();
     }
 
-    protected function _onDeleteBefore() {
-        $this->getStreamChannel()->onUnpublish($this);
-    }
-
     protected function _onDelete() {
         CM_Db_Db::delete('cm_stream_publish', array('id' => $this->getId()));
+    }
+
+    protected function _onDeleteAfter() {
+        $this->getStreamChannel()->onUnpublish($this);
     }
 
     /**
