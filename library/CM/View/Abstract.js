@@ -558,6 +558,40 @@ var CM_View_Abstract = Backbone.View.extend({
     return cm.template.render(template, variables);
   },
 
+
+  /**
+   * @param {Function} callback
+   * @returns {Promise}
+   */
+  try: function(callback) {
+    return Promise.try(callback.bind(this)).bind(this);
+  },
+
+  /**
+   * @param {Number} milliseconds
+   * @returns {Promise}
+   */
+  delay: function(milliseconds) {
+    return Promise.delay(milliseconds).bind(this);
+  },
+
+  /**
+   * @param {String} eventName
+   * @param {*} [obj]
+   * @returns {Promise}
+   */
+  wait: function(eventName, obj) {
+    var observer = new cm.lib.Observer();
+    var target = obj || this;
+    var promise = new Promise(function(resolve) {
+      observer.listenTo(target, eventName, resolve);
+    });
+    return promise.finally(function() {
+      observer.stopListening();
+      observer = null;
+    });
+  },
+
   /**
    * @param {Object} actions
    * @param {String} [channelKey]
