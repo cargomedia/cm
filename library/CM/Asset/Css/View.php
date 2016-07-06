@@ -10,7 +10,7 @@ class CM_Asset_Css_View extends CM_Asset_Css {
     public function __construct(CM_Frontend_Render $render, $className) {
         parent::__construct($render);
         if (!preg_match('#^([^_]+)_([^_]+)_?(.*)$#', $className, $matches)) {
-            throw new CM_Exception('Cannot detect all className parts from view\'s classNname `' . $className . '`');
+            throw new CM_Exception('Cannot detect all className parts from view\'s className', null, ['className' => $className]);
         }
         list($className, $namespace, $viewType, $viewName) = $matches;
         $viewPath = $viewType . '/';

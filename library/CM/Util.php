@@ -89,7 +89,7 @@ class CM_Util {
             if ($ignoreInvalid) {
                 return null;
             }
-            throw new CM_Exception_Invalid('Could not detect namespace of `' . $className . '`.');
+            throw new CM_Exception_Invalid('Could not detect namespace of class.', null, ['className' => $className]);
         }
         return $namespace;
     }
@@ -211,7 +211,7 @@ class CM_Util {
         foreach ($paths as $path) {
             $file = CM_File::factory($path);
             if (!$file instanceof CM_File_ClassInterface) {
-                throw new CM_Exception_Invalid('Can only accept Class files. `' . $path . '` is not one.');
+                throw new CM_Exception_Invalid('Can only accept Class files. Given path is not one.', null, ['path' => $path]);
             }
             $meta = $file->getClassDeclaration();
             $classes[$meta['class']] = array('parent' => $meta['parent'], 'path' => $path);
@@ -333,7 +333,7 @@ class CM_Util {
         $descriptorSpec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w"));
         $process = proc_open($command, $descriptorSpec, $pipes, null, $env);
         if (!is_resource($process)) {
-            throw new CM_Exception('Cannot open command file pointer to `' . $command . '`');
+            throw new CM_Exception('Cannot open command file pointer to command', null, ['command' => $command]);
         }
 
         if ($stdin) {
@@ -349,7 +349,11 @@ class CM_Util {
 
         $returnStatus = proc_close($process);
         if ($returnStatus != 0) {
-            throw new CM_Exception('Command `' . $command . '` failed. STDERR: `' . trim($stderr) . '` STDOUT: `' . trim($stdout) . '`.');
+            throw new CM_Exception('Command failed.', null, [
+                'command' => $command,
+                'STDERR'  => trim($stderr),
+                'STDOUT'  => trim($stdout),
+            ]);
         }
         return $stdout;
     }
@@ -481,14 +485,16 @@ class CM_Util {
         $result = array();
         foreach ($items as $item) {
             if (!is_array($item) || count($item) < ($level + 1)) {
-                throw new CM_Exception_Invalid('Item is not an array or has less than `' . ($level + 1) . '` elements.');
+                throw new CM_Exception_Invalid('Item is not an array or has less elements than needed elements.', null, [
+                    'levelsNeeded' => $level + 1,
+                ]);
             }
             $resultEntry = &$result;
             for ($i = 0; $i < $level; $i++) {
                 if (isset($keyNames[$i])) {
                     $keyName = $keyNames[$i];
                     if (!array_key_exists($keyName, $item)) {
-                        throw new CM_Exception_Invalid('Item has no key `' . $keyName . '`.');
+                        throw new CM_Exception_Invalid('Item has no key.', null, ['key' => $keyName]);
                     }
                     $value = $item[$keyName];
                     unset($item[$keyName]);

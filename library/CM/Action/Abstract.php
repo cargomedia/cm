@@ -270,7 +270,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
             }
             $actionLimit->overshoot($this, $role, $isFirst);
             if (!$actionLimit->getOvershootAllowed()) {
-                throw new CM_Exception_NotAllowed('ActionLimit `' . $actionLimit->getType() . '` breached.');
+                throw new CM_Exception_NotAllowed('ActionLimit breached.', null, ['actionLimitType' => $actionLimit->getType()]);
             }
         }
         $this->_log();
@@ -452,7 +452,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     public static function getVerbByVerbName($name) {
         $actionVerbs = self::_getConfig()->verbs;
         if (!array_key_exists($name, $actionVerbs)) {
-            throw new CM_Exception_Invalid('Action `' . $name . '` does not exist!');
+            throw new CM_Exception_Invalid('Action does not exist!', null, ['actionName' => $name]);
         }
         return $actionVerbs[$name];
     }

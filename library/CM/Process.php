@@ -279,7 +279,7 @@ class CM_Process {
                         $this->unbind('exit', [$this, 'killChildren']);
                     }
                     if ($keepAlive) {
-                        $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', CM_Exception::WARN);
+                        $warning = new CM_Exception('Respawning dead child.', CM_Exception::WARN, ['pid' => $pid]);
                         CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
                         usleep(self::RESPAWN_TIMEOUT * 1000000);
                         $this->_fork($forkHandler->getWorkload(), $forkHandler->getIdentifier());
@@ -302,6 +302,6 @@ class CM_Process {
                 return $forkHandler;
             }
         }
-        throw new CM_Exception('Cannot find reference to fork-handler with PID `' . $pid . '`.');
+        throw new CM_Exception('Cannot find reference to fork-handler.', null, ['pid' => $pid]);
     }
 }
