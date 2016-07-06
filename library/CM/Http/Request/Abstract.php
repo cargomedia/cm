@@ -315,8 +315,16 @@ abstract class CM_Http_Request_Abstract {
         if (false === ($queryString = parse_url($uriWithHost, PHP_URL_QUERY))) {
             throw new CM_Exception_Invalid('Cannot detect query from `' . $uriWithHost . '`.');
         }
-        parse_str($queryString, $query);
-        $this->setQuery($query);
+        mb_parse_str($queryString, $query);
+
+        $querySanitized = [];
+        foreach ($query as $key => $value) {
+            $key = self::_sanitizeUtf($key);
+            $value = self::_sanitizeUtf($value);
+            $querySanitized[$key] = $value;
+        }
+
+        $this->setQuery($querySanitized);
 
         $this->setLanguageUrl(null);
 
