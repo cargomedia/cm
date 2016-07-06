@@ -320,8 +320,7 @@ abstract class CM_Http_Request_Abstract {
         $querySanitized = [];
         foreach ($query as $key => $value) {
             $key = self::_sanitizeUtf($key);
-            $value = self::_sanitizeUtf($value);
-            $querySanitized[$key] = $value;
+            $querySanitized[$key] = self::_sanitizeUtf($value);
         }
 
         $this->setQuery($querySanitized);
