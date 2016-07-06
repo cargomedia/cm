@@ -66,7 +66,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
         try {
             return self::getMimeTypeByContent($this->read());
         } catch (CM_Exception $ex) {
-            throw new CM_Exception('Cannot detect FILEINFO_MIME of `' . $this->getPath() . '`');
+            throw new CM_Exception('Cannot detect FILEINFO_MIME of file', null, ['path' => $this->getPath()]);
         }
     }
 
@@ -417,7 +417,8 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
             ]);
         }
         if (is_resource($streamSource) && !@fclose($streamSource)) {
-            throw new CM_Exception('Could not close stream for `' . $this->getPath() . '`', null, [
+            throw new CM_Exception('Could not close stream for path', null, [
+                'path' => $this->getPath(),
                 'Source adapter' => get_class($adapterSource),
             ]);
         }

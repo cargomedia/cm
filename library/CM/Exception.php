@@ -63,7 +63,7 @@ class CM_Exception extends Exception {
      */
     public function setSeverity($severity) {
         if (!in_array($severity, array(self::WARN, self::ERROR, self::FATAL), true)) {
-            throw new CM_Exception_Invalid('Invalid severity `' . $severity . '`');
+            throw new CM_Exception_Invalid('Invalid severity', null, ['severity' => $severity]);
         }
         $this->_severity = $severity;
     }

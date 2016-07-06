@@ -199,7 +199,10 @@ class CM_App implements CM_Service_ManagerAwareInterface {
         }
         $file = new CM_File($path . 'resources/db/update/' . $version . '.php');
         if (!$file->exists()) {
-            throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $moduleName . '` namespace.');
+            throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $moduleName . '` namespace.', null, [
+                'version'    => $version,
+                'moduleName' => $moduleName,
+            ]);
         }
         return $file->getPath();
     }
