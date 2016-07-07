@@ -63,8 +63,8 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         $configJs->ensureParentDirectory();
         $configJs->truncate();
         $classTypes = $generator->getNamespaceTypes();
-        $configJs->appendLine('cm.model.types = ' . CM_Params::encode(array_flip($classTypes['CM_Model_Abstract']), true) . ';');
-        $configJs->appendLine('cm.action.types = ' . CM_Params::encode(array_flip($classTypes['CM_Action_Abstract']), true) . ';');
+        $configJs->appendLine('cm.model.types = ' . CM_Util::jsonEncode(array_flip($classTypes['CM_Model_Abstract']), true) . ';');
+        $configJs->appendLine('cm.action.types = ' . CM_Util::jsonEncode(array_flip($classTypes['CM_Action_Abstract']), true) . ';');
         $this->_getStreamOutput()->writeln('Created `' . $configJs->getPath() . '`');
     }
 
