@@ -8,32 +8,59 @@ var CM_JsonSerialized_Abstract = Backbone.Model.extend({
 
   /**
    * @param {CM_JsonSerialized_Abstract} jsonSerialized
+   * @returns {{removed: Array, added: Object, updated: Object}}
    */
   sync: function(jsonSerialized) {
     if (!this.compatible(jsonSerialized)) {
       throw Error('Failed to update the model, incompatible parameter.');
     }
 
-    var current = null;
-    var syncAttributes = {};
-    var syncChildAttributes = null;
+    var result = {
+      removed: [],
+      added: {},
+      updated: {}
+    };
 
     if (!this.equals(jsonSerialized)) {
-      jsonSerialized.each(function(value, key) {
-        current = this.get(key);
-        if (this.compatible(current)) {
-          syncChildAttributes = current.sync(value);
-          if (!_.isEmpty(syncChildAttributes)) {
-            syncAttributes[key] = syncChildAttributes;
+      var keys = _.union(this.keys(), jsonSerialized.keys());
+      _.each(keys, function(key) {
+        var localValue = this.get(key);
+        var externalValue = jsonSerialized.get(key);
+        var resultTarget = this.has(key) ? result.updated : result.added;
+
+        if (!jsonSerialized.has(key)) {
+          if (this.compatible(localValue)) {
+            localValue.trigger('remove');
+          }
+          result.removed.push(key);
+          this.unset(key);
+
+        } else if (this.compatible(localValue)) {
+          var resultChild = localValue.sync(externalValue);
+          if (_.any(resultChild, function(value) {
+              return !_.isEmpty(value);
+            })) {
+            resultTarget[key] = resultChild;
           }
         } else {
-          this.set(key, value);
-          _.extend(syncAttributes, this.changedAttributes());
+          this.set(key, externalValue);
+          var attrs = {};
+          _.each(this.changedAttributes(), function(val, key) {
+            attrs[key] = val instanceof CM_JsonSerialized_Abstract ? val.toJSON() : val;
+          });
+          _.extend(resultTarget, attrs);
         }
       }, this);
-      this.trigger('sync', this, syncAttributes);
+
+      _.each(result, function(val, key) {
+        if (_.isEmpty(val)) {
+          delete result[key];
+        }
+      });
+
+      this.trigger('sync', this, result);
     }
-    return syncAttributes;
+    return result;
   },
 
   fetch: function() {
@@ -91,18 +118,5 @@ var CM_JsonSerialized_Abstract = Backbone.Model.extend({
         return _.isEqual(externalValue, localValue);
       }
     }, this);
-  },
-
-  /**
-   * @param {CM_JsonSerialized_Abstract~eachCallback} callback
-   * @param {*} [context]
-   */
-  each: function(callback, context) {
-    /**
-     * @callback CM_JsonSerialized_Abstract~eachCallback
-     * @param {*} value
-     * @param {String} key
-     */
-    _.each(this.attributes, callback, context || this);
   }
 });
