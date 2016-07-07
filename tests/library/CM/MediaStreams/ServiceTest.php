@@ -8,8 +8,7 @@ class CM_MediaStreams_ServiceTest extends CMTest_TestCase {
 
         $streamChannel = $this->mockClass('CM_Model_StreamChannel_Media', ['CM_StreamChannel_DisallowInterface'])->newInstanceWithoutConstructor();
         $streamChannel->mockMethod('isValid')->set(false);
-        $streamChannel->mockMethod('hasStreamPublish')->set(true);
-        $streamChannel->mockMethod('getStreamPublish')->set($streamPublish);
+        $streamChannel->mockMethod('findStreamPublish')->set($streamPublish);
         $streamChannel->mockMethod('getStreamSubscribes')->set([$streamSubscribe]);
 
         $streamRepository = $this->mockClass('CM_MediaStreams_StreamRepository')->newInstanceWithoutConstructor();
@@ -37,8 +36,7 @@ class CM_MediaStreams_ServiceTest extends CMTest_TestCase {
 
         $streamChannel = $this->mockClass('CM_Model_StreamChannel_Media', ['CM_StreamChannel_DisallowInterface'])->newInstanceWithoutConstructor();
         $streamChannel->mockMethod('isValid')->set(true);
-        $streamChannel->mockMethod('hasStreamPublish')->set(true);
-        $streamChannel->mockMethod('getStreamPublish')->set($streamPublish);
+        $streamChannel->mockMethod('findStreamPublish')->set($streamPublish);
         $streamChannel->mockMethod('getStreamSubscribes')->set([$streamSubscribe]);
 
         $streamRepository = $this->mockClass('CM_MediaStreams_StreamRepository')->newInstanceWithoutConstructor();
@@ -75,8 +73,7 @@ class CM_MediaStreams_ServiceTest extends CMTest_TestCase {
 
         $streamChannel = $this->mockClass('CM_Model_StreamChannel_Media')->newInstanceWithoutConstructor();
         $isValidMethod = $streamChannel->mockMethod('isValid');
-        $streamChannel->mockMethod('hasStreamPublish')->set(true);
-        $streamChannel->mockMethod('getStreamPublish')->set($streamPublish);
+        $streamChannel->mockMethod('findStreamPublish')->set($streamPublish);
         $streamChannel->mockMethod('getStreamSubscribes')->set([$streamSubscribe]);
 
         $streamRepository = $this->mockClass('CM_MediaStreams_StreamRepository')->newInstanceWithoutConstructor();
