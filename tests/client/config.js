@@ -1,5 +1,6 @@
 module.exports = {
   suites: [
+    'tests/client/suites/library.js',
     'tests/client/suites/after-body.js',
     'tests/client/suites/source.js'
   ],
