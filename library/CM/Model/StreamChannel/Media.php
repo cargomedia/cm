@@ -50,6 +50,13 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
     }
 
     /**
+     * @return bool
+     */
+    public function hasStreamPublish() {
+        return null !== $this->findStreamPublish();
+    }
+
+    /**
      * @return int
      */
     public function getServerId() {
