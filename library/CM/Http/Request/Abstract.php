@@ -320,7 +320,18 @@ abstract class CM_Http_Request_Abstract {
         $querySanitized = [];
         foreach ($query as $key => $value) {
             $key = self::_sanitizeUtf($key);
-            $querySanitized[$key] = self::_sanitizeUtf($value);
+
+            if (is_array($value)) {
+                array_walk_recursive($value, function (&$innerValue) {
+                    if (is_string($innerValue)) {
+                        $innerValue = self::_sanitizeUtf($innerValue);
+                    }
+                });
+            } else {
+                $value = self::_sanitizeUtf($value);
+            }
+
+            $querySanitized[$key] = $value;
         }
 
         $this->setQuery($querySanitized);
