@@ -113,7 +113,7 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
     }
 
     public function testSetUriNonUtf() {
-        $uri = '/foo/bar?%%aff%%=quux&bar=%%AFF%%';
+        $uri = '/foo/bar?%%aff%%=quux&bar=%%AFF%%&baz[]=%%aff%%&baz[]=%%aff%%';
         $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
         /** @var CM_Http_Request_Abstract $mock */
         $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
@@ -124,7 +124,11 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
             array(
                 '%?f%%' => 'quux',
                 'bar'   => '%?F%%',
-            ),
+                'baz'   => [
+                    '%?f%%',
+                    '%?f%%',
+                ] 
+             ),
             $mock->getQuery()
         );
         $this->assertSame($uri, $mock->getUri());
