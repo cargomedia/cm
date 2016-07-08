@@ -131,18 +131,10 @@ define(["CM/Frontend/JsonSerializable"], function() {
   QUnit.test("sync with defaults", function(assert) {
     var foo = this.models.fooWithDefaults;
     var bar = this.models.bar;
-    var result = null;
 
-    result = foo.sync(bar);
-    assert.equal(result, null);
-    assert.equal(foo.get('foo'), 'defaultValue');
-
-    bar.set({val1: 3, val2: 1, foo: 'newValue'});
-    result = foo.sync(bar);
-    assert.equal(foo.get('val1'), 3);
-    assert.equal(foo.get('val2'), 1);
-    assert.equal(foo.get('foo'), 'newValue');
-    assert.deepEqual(result, {updated: {val1: 3, foo: 'newValue'}, added: {val2: 1}});
+    var result = foo.sync(bar);
+    assert.deepEqual(result, {removed: ['foo']});
+    assert.ok(typeof foo.get('foo') === 'undefined');
   });
 
   // Nested CM_Frontend_JsonSerializable instances

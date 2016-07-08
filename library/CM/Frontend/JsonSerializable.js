@@ -30,7 +30,6 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
     };
 
     if (!this.equals(jsonSerialized)) {
-      var defaultKeys = _(_.result(this, 'defaults', {})).keys();
       var keys = _.union(this.keys(), jsonSerialized.keys());
       _.each(keys, function(key) {
         var localValue = this.get(key);
@@ -38,13 +37,11 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
         var resultTarget = this.has(key) ? result.updated : result.added;
 
         if (!jsonSerialized.has(key)) {
-          if (!_.contains(defaultKeys, key)) {
-            if (this.compatible(localValue)) {
-              localValue.trigger('remove');
-            }
-            result.removed.push(key);
-            this.unset(key);
+          if (this.compatible(localValue)) {
+            localValue.trigger('remove');
           }
+          result.removed.push(key);
+          this.unset(key);
         } else if (this.compatible(localValue)) {
           var resultChild = localValue.sync(externalValue);
           if (resultChild) {
