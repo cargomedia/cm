@@ -91,13 +91,19 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
    * @returns {Object}
    */
   toJSON: function() {
-    var data = Backbone.Model.prototype.toJSON.apply(this, arguments);
-    _.each(data, function(value, key) {
-      if (this.compatible(value)) {
-        data[key] = value.toJSON();
-      }
-    }, this);
-    return data;
+    var encode = function(data) {
+      _.each(data, function(value, key) {
+        if (this.compatible(value)) {
+          data[key] = value.toJSON();
+        } else if (_.isArray(value)) {
+          _.each(value, function(item, index) {
+            data[key][index] = this.compatible(item) ? item.toJSON() : encode(item);
+          }, this);
+        }
+      }, this);
+      return data;
+    }.bind(this);
+    return encode(Backbone.Model.prototype.toJSON.apply(this, arguments));
   },
 
   /**

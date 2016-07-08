@@ -201,6 +201,29 @@ define(["CM/Frontend/JsonSerializable"], function() {
     });
   });
 
+  QUnit.test("toJSON with array", function(assert) {
+    var foo001 = this.models.foo.foo001;
+    var foo011 = this.models.foo.foo011;
+    var clone111 = this.models.clone.clone111;
+
+    foo011.set('list', [
+      clone111.clone(), [clone111.clone()], null, 1, {foo: 1, bar: clone111.clone()}
+    ]);
+
+    assert.deepEqual(foo001.toJSON(), {
+      'name': '1',
+      '1.1': {
+        'name': '1.1',
+        '1.1.1': {
+          'name': '1.1.1'
+        },
+        'list': [
+          {name: '1.1.1'}, [{name: '1.1.1'}], null, 1, {foo: 1, bar: {name: '1.1.1'}}
+        ]
+      }
+    });
+  });
+
   QUnit.test("sync: change higher level child attribute", function(assert) {
     var foo001 = this.models.foo.foo001;
     var clone001 = this.models.clone.clone001;
