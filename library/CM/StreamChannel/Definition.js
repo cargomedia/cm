@@ -1,8 +1,8 @@
 /**
  * @class CM_StreamChannel_Definition
- * @extends Backbone.Model
+ * @extends CM_Frontend_JsonSerializable
  */
-var CM_StreamChannel_Definition = Backbone.Model.extend({
+var CM_StreamChannel_Definition = CM_Frontend_JsonSerializable.extend({
 
   _class: 'CM_StreamChannel_Definition',
 
@@ -18,13 +18,5 @@ var CM_StreamChannel_Definition = Backbone.Model.extend({
    */
   getType: function() {
     return this.get('type');
-  },
-
-  /**
-   * @param {*} definition
-   * @returns {Boolean}
-   */
-  equals: function(definition) {
-    return definition instanceof CM_StreamChannel_Definition && _.isEqual(this.toJSON(), definition.toJSON());
   }
 });

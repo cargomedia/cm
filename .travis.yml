@@ -24,6 +24,7 @@ addons:
 before_script:
   - tests/travis/install-php-runkit.sh
   - tests/travis/install-php-svm.sh
+  - source tests/travis/install-phantomjs.sh
   - yes '' | travis_retry pecl install imagick
   - travis_retry pecl install stats-1.0.3
   - travis_retry pecl install gearman-1.0.3

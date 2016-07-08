@@ -89,7 +89,7 @@ define(["cm/tests/media/common"], function() {
           assert.equal(events['media:stopped'], 2);
           assert.equal(events['media:release'], 1);
           assert.equal(events['media:released'], 1);
-          assert.equal(el.networkState, HTMLMediaElement.NETWORK_EMPTY);
+          assert.equal(el.networkState, HTMLMediaElement.NETWORK_NO_SOURCE);
           assert.equal(el.readyState, HTMLMediaElement.HAVE_NOTHING);
           assert.equal(media.isPlaying(), false);
           assert.equal(media.getPromiseLoaded().isFulfilled(), false);
