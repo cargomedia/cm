@@ -33,6 +33,7 @@ before_script:
   - npm install -g autoprefixer@4.0.0
   - npm install -g uglify-js@2.4.13
   - npm install -g browserify@11.2.0
+  - npm install -g phantomjs-prebuilt@2.1.7
   - composer install
   - cp tests/travis/config.php resources/config/local.php
   - bin/cm app set-deploy-version
