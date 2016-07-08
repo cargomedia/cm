@@ -36,7 +36,6 @@ define(["CM/Frontend/JsonSerializable"], function() {
     var foo = this.models.foo;
 
     assert.deepEqual(foo.toJSON(), {val1: 1});
-
     foo.set({
       val1: 1,
       val2: {foo: 1}
@@ -89,7 +88,6 @@ define(["CM/Frontend/JsonSerializable"], function() {
     assert.ok(!foo.equals(bar) && !bar.equals(foo));
   });
 
-
   QUnit.test("sync", function(assert) {
     var foo = this.models.foo;
     var bar = this.models.bar;
@@ -107,7 +105,6 @@ define(["CM/Frontend/JsonSerializable"], function() {
     assert.equal(foo.get('val1'), 3);
     assert.equal(foo.get('val2'), 1);
     assert.deepEqual(synced, [{updated: {val1: 3}, added: {val2: 1}}]);
-
 
     bar.unset('val2');
     foo.sync(bar);
@@ -231,7 +228,6 @@ define(["CM/Frontend/JsonSerializable"], function() {
     assert.deepEqual(synced.foo111, null);
   });
 
-
   QUnit.test("sync: add child attribute", function(assert) {
     var foo001 = this.models.foo.foo001;
     var clone001 = this.models.clone.clone001;
@@ -304,7 +300,6 @@ define(["CM/Frontend/JsonSerializable"], function() {
     });
     assert.deepEqual(synced.foo111, null);
   });
-
 
   QUnit.test("sync: remove child JsonSerialized attribute", function(assert) {
     var foo001 = this.models.foo.foo001;

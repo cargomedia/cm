@@ -34,7 +34,6 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
           }
           result.removed.push(key);
           this.unset(key);
-
         } else if (this.compatible(localValue)) {
           var resultChild = localValue.sync(externalValue);
           if (_.any(resultChild, function(value) {
@@ -63,18 +62,24 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
     return result;
   },
 
-  fetch: function() {
-    throw new Error('Not implemented.');
-  },
-
   /**
-   * @returns {String}
+   * @param {CM_Frontend_JsonSerializable|*} jsonSerialized
+   * @returns {Boolean}
    */
-  getClass: function() {
-    return this._class;
-  },
-
-  destruct: function() {
+  equals: function(jsonSerialized) {
+    if (!this.compatible(jsonSerialized)) {
+      return false;
+    }
+    var keys = _.union(this.keys(), jsonSerialized.keys());
+    return _.every(keys, function(key) {
+      var localValue = this.get(key);
+      var externalValue = jsonSerialized.get(key);
+      if (this.compatible(externalValue)) {
+        return externalValue.equals(localValue);
+      } else {
+        return _.isEqual(externalValue, localValue);
+      }
+    }, this);
   },
 
   /**
@@ -99,24 +104,16 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
   },
 
   /**
-   * @param {CM_Frontend_JsonSerializable|*} jsonSerialized
-   * @returns {Boolean}
+   * @returns {String}
    */
-  equals: function(jsonSerialized) {
-    if (!this.compatible(jsonSerialized)) {
-      return false;
-    }
+  getClass: function() {
+    return this._class;
+  },
 
-    var keys = _.union(this.keys(), jsonSerialized.keys());
+  destruct: function() {
+  },
 
-    return _.every(keys, function(key) {
-      var localValue = this.get(key);
-      var externalValue = jsonSerialized.get(key);
-      if (this.compatible(externalValue)) {
-        return externalValue.equals(localValue);
-      } else {
-        return _.isEqual(externalValue, localValue);
-      }
-    }, this);
+  fetch: function() {
+    throw new Error('Not implemented.');
   }
 });
