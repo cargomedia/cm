@@ -120,7 +120,7 @@ define(["CM/Frontend/JsonSerializable"], function() {
 
     bar.unset('val2');
     result = foo.sync(bar);
-    assert.equal(foo.get('val2'), undefined);
+    assert.ok(typeof foo.get('val2') === 'undefined');
     assert.deepEqual(result, {removed: ['val2']});
     assert.deepEqual(synced, [
       {updated: {val1: 3}, added: {val2: 1}},
@@ -380,7 +380,7 @@ define(["CM/Frontend/JsonSerializable"], function() {
     clone011.unset('name');
 
     result = foo001.sync(clone001);
-    assert.equal(foo001.get('1.1').get('name'), undefined);
+    assert.ok(typeof foo001.get('1.1').get('name') === 'undefined');
     assert.deepEqual(result, {
       updated: {
         '1.1': {
@@ -417,7 +417,7 @@ define(["CM/Frontend/JsonSerializable"], function() {
     });
 
     result = foo001.sync(clone001);
-    assert.equal(foo001.get('1.1').get('1.1.1'), undefined);
+    assert.ok(typeof foo001.get('1.1').get('1.1.1') === 'undefined');
     assert.deepEqual(result, {
       updated: {
         '1.1': {
