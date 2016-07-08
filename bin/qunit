@@ -12,4 +12,5 @@ php -S 127.0.0.1:8080 &>/dev/null &
 SERVER_PID=$!
 trap "kill ${SERVER_PID}" EXIT
 timeout --signal=9 3 bash -c "while ! (nc -z 127.0.0.1 8080 &>/dev/null); do sleep 0.1; done"
+echo "QUnit tests running with phantomjs $(phantomjs --version)"
 phantomjs ${DIR}/../tests/client/phantomjs-runner.js http://127.0.0.1:8080/tests.html
