@@ -2,9 +2,18 @@ define(["CM/Frontend/JsonSerializable"], function() {
 
   QUnit.module('CM/Frontend/JsonSerializable:flat', {
     beforeEach: function() {
+      var FooDefaults = CM_Frontend_JsonSerializable.extend({
+        defaults: function() {
+          return {
+            foo: 'defaultValue'
+          };
+        }
+      });
+
       var models = {
         foo: new CM_Frontend_JsonSerializable({val1: 1}),
-        bar: new CM_Frontend_JsonSerializable({val1: 1})
+        bar: new CM_Frontend_JsonSerializable({val1: 1}),
+        fooWithDefaults: new FooDefaults({val1: 1})
       };
 
       var synced = [];
@@ -92,31 +101,48 @@ define(["CM/Frontend/JsonSerializable"], function() {
     var foo = this.models.foo;
     var bar = this.models.bar;
     var synced = this.synced;
+    var result = null;
 
     assert.throws(function() {
       foo.sync({val1: 1});
     }, /Failed to update the model, incompatible parameter/);
 
-    var result = foo.sync(bar);
+    result = foo.sync(bar);
     assert.equal(result, null);
     assert.deepEqual(synced, []);
 
-
     bar.set({val1: 3, val2: 1});
-    var result = foo.sync(bar);
+    result = foo.sync(bar);
     assert.equal(foo.get('val1'), 3);
     assert.equal(foo.get('val2'), 1);
     assert.deepEqual(result, {updated: {val1: 3}, added: {val2: 1}});
     assert.deepEqual(synced, [{updated: {val1: 3}, added: {val2: 1}}]);
 
     bar.unset('val2');
-    var result = foo.sync(bar);
+    result = foo.sync(bar);
     assert.equal(foo.get('val2'), undefined);
     assert.deepEqual(result, {removed: ['val2']});
     assert.deepEqual(synced, [
       {updated: {val1: 3}, added: {val2: 1}},
       {removed: ['val2']}
     ]);
+  });
+
+  QUnit.test("sync with defaults", function(assert) {
+    var foo = this.models.fooWithDefaults;
+    var bar = this.models.bar;
+    var result = null;
+
+    result = foo.sync(bar);
+    assert.equal(result, null);
+    assert.equal(foo.get('foo'), 'defaultValue');
+
+    bar.set({val1: 3, val2: 1, foo: 'newValue'});
+    result = foo.sync(bar);
+    assert.equal(foo.get('val1'), 3);
+    assert.equal(foo.get('val2'), 1);
+    assert.equal(foo.get('foo'), 'newValue');
+    assert.deepEqual(result, {updated: {val1: 3, foo: 'newValue'}, added: {val2: 1}});
   });
 
   // Nested CM_Frontend_JsonSerializable instances
@@ -180,9 +206,10 @@ define(["CM/Frontend/JsonSerializable"], function() {
     var clone001 = this.models.clone.clone001;
     var clone111 = this.models.clone.clone111;
     var synced = this.synced;
+    var result = null;
 
     clone111.set('name', 'clone 1.1.1');
-    var result = foo001.sync(clone001);
+    result = foo001.sync(clone001);
     assert.equal(foo001.get('1.1').get('1.1.1').get('name'), 'clone 1.1.1');
     assert.deepEqual(result, {
       updated: {
@@ -225,10 +252,11 @@ define(["CM/Frontend/JsonSerializable"], function() {
     var clone001 = this.models.clone.clone001;
     var clone011 = this.models.clone.clone011;
     var synced = this.synced;
+    var result = null;
 
     clone011.set('name', 'clone 1.1');
 
-    var result = foo001.sync(clone001);
+    result = foo001.sync(clone001);
     assert.equal(foo001.get('1.1').get('name'), 'clone 1.1');
     assert.deepEqual(result, {
       updated: {
@@ -255,10 +283,11 @@ define(["CM/Frontend/JsonSerializable"], function() {
     var clone001 = this.models.clone.clone001;
     var clone011 = this.models.clone.clone011;
     var synced = this.synced;
+    var result = null;
 
     clone011.set('val1', 1);
 
-    var result = foo001.sync(clone001);
+    result = foo001.sync(clone001);
     assert.equal(foo001.get('1.1').get('val1'), 1);
     assert.deepEqual(result, {
       updated: {
@@ -285,10 +314,11 @@ define(["CM/Frontend/JsonSerializable"], function() {
     var clone001 = this.models.clone.clone001;
     var clone011 = this.models.clone.clone011;
     var synced = this.synced;
+    var result = null;
 
     clone011.set('val1', new CM_Frontend_JsonSerializable({foo: 1}));
 
-    var result = foo001.sync(clone001);
+    result = foo001.sync(clone001);
     assert.ok(foo001.get('1.1').get('val1') instanceof CM_Frontend_JsonSerializable);
     assert.deepEqual(result, {
       updated: {
@@ -321,10 +351,11 @@ define(["CM/Frontend/JsonSerializable"], function() {
     var clone001 = this.models.clone.clone001;
     var clone011 = this.models.clone.clone011;
     var synced = this.synced;
+    var result = null;
 
     clone011.unset('name');
 
-    var result = foo001.sync(clone001);
+    result = foo001.sync(clone001);
     assert.equal(foo001.get('1.1').get('name'), undefined);
     assert.deepEqual(result, {
       updated: {
@@ -352,6 +383,7 @@ define(["CM/Frontend/JsonSerializable"], function() {
     var clone001 = this.models.clone.clone001;
     var clone011 = this.models.clone.clone011;
     var synced = this.synced;
+    var result = null;
 
     clone011.unset('1.1.1');
 
@@ -360,7 +392,7 @@ define(["CM/Frontend/JsonSerializable"], function() {
       isFoo111Removed = true;
     });
 
-    var result = foo001.sync(clone001);
+    result = foo001.sync(clone001);
     assert.equal(foo001.get('1.1').get('1.1.1'), undefined);
     assert.deepEqual(result, {
       updated: {
