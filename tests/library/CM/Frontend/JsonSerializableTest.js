@@ -1,10 +1,10 @@
-define(["CM/JsonSerialized"], function() {
+define(["CM/Frontend/JsonSerializable"], function() {
 
-  QUnit.module('CM/JsonSerialized:flat', {
+  QUnit.module('CM/Frontend/JsonSerializable:flat', {
     beforeEach: function() {
       var models = {
-        foo: new CM_JsonSerialized_Abstract({val1: 1}),
-        bar: new CM_JsonSerialized_Abstract({val1: 1})
+        foo: new CM_Frontend_JsonSerializable({val1: 1}),
+        bar: new CM_Frontend_JsonSerializable({val1: 1})
       };
 
       var synced = [];
@@ -52,18 +52,18 @@ define(["CM/JsonSerialized"], function() {
     assert.ok(!foo.equals());
     assert.ok(!foo.equals(null));
     assert.ok(!foo.equals({val1: 1}));
-    assert.ok(!foo.equals(new CM_JsonSerialized_Abstract()));
+    assert.ok(!foo.equals(new CM_Frontend_JsonSerializable()));
 
     foo.set({val1: 2});
     assert.ok(!foo.equals(bar) && !bar.equals(foo));
 
     foo.set({
       val1: 1,
-      val2: new CM_JsonSerialized_Abstract({val: 2})
+      val2: new CM_Frontend_JsonSerializable({val: 2})
     });
     bar.set({
       val1: 1,
-      val2: new CM_JsonSerialized_Abstract({val: 2})
+      val2: new CM_Frontend_JsonSerializable({val: 2})
     });
     assert.ok(foo.equals(bar) && bar.equals(foo));
 
@@ -118,13 +118,13 @@ define(["CM/JsonSerialized"], function() {
     ]);
   });
 
-  // Nested CM_JsonSerialized_Abstract instances
+  // Nested CM_Frontend_JsonSerializable instances
 
-  QUnit.module('CM/JsonSerialized:nested', {
+  QUnit.module('CM/Frontend/JsonSerializable:nested', {
     beforeEach: function() {
-      var foo001 = new CM_JsonSerialized_Abstract({name: '1'});
-      var foo011 = new CM_JsonSerialized_Abstract({name: '1.1'});
-      var foo111 = new CM_JsonSerialized_Abstract({name: '1.1.1'});
+      var foo001 = new CM_Frontend_JsonSerializable({name: '1'});
+      var foo011 = new CM_Frontend_JsonSerializable({name: '1.1'});
+      var foo111 = new CM_Frontend_JsonSerializable({name: '1.1.1'});
       foo001.set('1.1', foo011);
       foo011.set('1.1.1', foo111);
 
@@ -261,10 +261,10 @@ define(["CM/JsonSerialized"], function() {
     var clone011 = this.models.clone.clone011;
     var synced = this.synced;
 
-    clone011.set('val1', new CM_JsonSerialized_Abstract({foo: 1}));
+    clone011.set('val1', new CM_Frontend_JsonSerializable({foo: 1}));
 
     foo001.sync(clone001);
-    assert.ok(foo001.get('1.1').get('val1') instanceof CM_JsonSerialized_Abstract);
+    assert.ok(foo001.get('1.1').get('val1') instanceof CM_Frontend_JsonSerializable);
     assert.deepEqual(synced.foo001, {
       updated: {
         '1.1': {

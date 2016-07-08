@@ -1,13 +1,13 @@
 /**
- * @class CM_JsonSerialized_Abstract
+ * @class CM_Frontend_JsonSerializable
  * @extends Backbone.Model
  */
-var CM_JsonSerialized_Abstract = Backbone.Model.extend({
+var CM_Frontend_JsonSerializable = Backbone.Model.extend({
 
-  _class: 'CM_JsonSerialized_Abstract',
+  _class: 'CM_Frontend_JsonSerializable',
 
   /**
-   * @param {CM_JsonSerialized_Abstract} jsonSerialized
+   * @param {CM_Frontend_JsonSerializable} jsonSerialized
    * @returns {{removed: Array, added: Object, updated: Object}}
    */
   sync: function(jsonSerialized) {
@@ -46,7 +46,7 @@ var CM_JsonSerialized_Abstract = Backbone.Model.extend({
           this.set(key, externalValue);
           var attrs = {};
           _.each(this.changedAttributes(), function(val, key) {
-            attrs[key] = val instanceof CM_JsonSerialized_Abstract ? val.toJSON() : val;
+            attrs[key] = val instanceof CM_Frontend_JsonSerializable ? val.toJSON() : val;
           });
           _.extend(resultTarget, attrs);
         }
@@ -91,15 +91,15 @@ var CM_JsonSerialized_Abstract = Backbone.Model.extend({
   },
 
   /**
-   * @param {CM_JsonSerialized_Abstract|*} value
+   * @param {CM_Frontend_JsonSerializable|*} value
    * @returns {Boolean}
    */
   compatible: function(value) {
-    return value instanceof CM_JsonSerialized_Abstract;
+    return value instanceof CM_Frontend_JsonSerializable;
   },
 
   /**
-   * @param {CM_JsonSerialized_Abstract|*} jsonSerialized
+   * @param {CM_Frontend_JsonSerializable|*} jsonSerialized
    * @returns {Boolean}
    */
   equals: function(jsonSerialized) {

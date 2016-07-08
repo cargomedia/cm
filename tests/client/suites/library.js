@@ -3,6 +3,6 @@ module.exports = {
     baseUrl: 'library'
   },
   modules: [
-    "../tests/library/CM/JsonSerializedTest"
+    "../tests/library/CM/Frontend/JsonSerializableTest"
   ]
 };
