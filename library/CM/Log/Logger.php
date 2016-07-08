@@ -183,8 +183,19 @@ class CM_Log_Logger {
      * @param Exception $exception
      * @return int
      */
-    public static function exceptionSeverityToLevel(Exception $exception) {
+    public static function exceptionToLevel(Exception $exception) {
         $severity = $exception instanceof CM_Exception ? $exception->getSeverity() : null;
+        return self::severityToLevel($severity);
+    }
+
+    /**
+     * @param int|null $severity
+     * @return int
+     */
+    public static function severityToLevel($severity = null) {
+        if (null !== $severity) {
+            $severity = (int) $severity;
+        }
         $map = [
             CM_Exception::WARN  => CM_Log_Logger::WARNING,
             CM_Exception::ERROR => CM_Log_Logger::ERROR,

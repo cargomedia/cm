@@ -39,7 +39,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
                 $message = $this->_errorCodes[$code] . ': ' . $message;
             }
             $exception = new ErrorException($message, 0, $code, $file, $line);
-            $this->handleException($exception);
+            $this->handleExceptionWithSeverity($exception, CM_Exception::FATAL);
         }
     }
 
@@ -65,16 +65,24 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
      * @param Exception $exception
      */
     public function handleException(Exception $exception) {
+        $severity = $exception instanceof CM_Exception ? $exception->getSeverity() : null;
+        $this->handleExceptionWithSeverity($exception, $severity);
+    }
+
+    /**
+     * @param Exception $exception
+     * @param int|null  $severity
+     */
+    public function handleExceptionWithSeverity(Exception $exception, $severity) {
         $printException = true;
         if ($exception instanceof CM_Exception) {
-            $printException = $exception->getSeverity() >= $this->_getPrintSeverityMin();
+            $printException = $severity >= $this->_getPrintSeverityMin();
         }
-
         if ($printException) {
             $this->_printException($exception);
         }
-
-        $this->_logException($exception);
+        $logLevel = CM_Log_Logger::severityToLevel($severity);
+        $this->_logException($exception, $logLevel);
     }
 
     /**
@@ -98,9 +106,10 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
 
     /**
      * @param Exception $exception
+     * @param  int      $logLevel
+     * @throws CM_Exception_Invalid
      */
-    protected function _logException(Exception $exception) {
-        $logLevel = CM_Log_Logger::exceptionSeverityToLevel($exception);
+    protected function _logException(Exception $exception, $logLevel) {
         $context = new CM_Log_Context();
         $context->setException($exception);
         $this->getServiceManager()->getLogger()->addMessage('Application error', $logLevel, $context);
