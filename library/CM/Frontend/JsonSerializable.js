@@ -50,12 +50,10 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
           if (resultChild) {
             resultTarget[key] = resultChild;
           }
-        } else {
+        } else if (!_.isEqual(localValue, externalValue)) {
           this.set(key, externalValue);
           var attrs = {};
-          _.each(this.changedAttributes(), function(val, key) {
-            attrs[key] = val instanceof CM_Frontend_JsonSerializable ? val.toJSON() : val;
-          });
+          attrs[key] = this.compatible(externalValue) ? externalValue.toJSON() : externalValue;
           _.extend(resultTarget, attrs);
         }
       }, this);
