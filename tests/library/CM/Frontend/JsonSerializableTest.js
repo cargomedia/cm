@@ -128,13 +128,31 @@ define(["CM/Frontend/JsonSerializable"], function() {
     ]);
   });
 
-  QUnit.test("sync with defaults", function(assert) {
+  QUnit.test("sync: defaults", function(assert) {
     var foo = this.models.fooWithDefaults;
     var bar = this.models.bar;
 
     var result = foo.sync(bar);
     assert.deepEqual(result, {removed: ['foo']});
     assert.ok(typeof foo.get('foo') === 'undefined');
+  });
+
+
+  QUnit.test("sync: add JsonSerializable array", function(assert) {
+    var foo = this.models.foo;
+    var bar = this.models.bar;
+    var bar1 = bar.clone();
+    var bar2 = bar.clone();
+
+    bar.set({
+      val2: [bar1],
+      val3: {bar: bar2}
+    });
+    var result = foo.sync(bar);
+    assert.deepEqual(foo.get('val2')[0].toJSON(), {val1: 1});
+    assert.deepEqual(foo.get('val3').bar.toJSON(), {val1: 1});
+    assert.deepEqual(result.added.val2[0].toJSON(), {val1: 1});
+    assert.deepEqual(result.added.val3.bar.toJSON(), {val1: 1});
   });
 
   // Nested CM_Frontend_JsonSerializable instances
@@ -336,29 +354,9 @@ define(["CM/Frontend/JsonSerializable"], function() {
 
     result = foo001.sync(clone001);
     assert.ok(foo001.get('1.1').get('val1') instanceof CM_Frontend_JsonSerializable);
-    assert.deepEqual(result, {
-      updated: {
-        '1.1': {
-          added: {
-            'val1': {foo: 1}
-          }
-        }
-      }
-    });
-    assert.deepEqual(synced.foo001, {
-      updated: {
-        '1.1': {
-          added: {
-            'val1': {foo: 1}
-          }
-        }
-      }
-    });
-    assert.deepEqual(synced.foo011, {
-      added: {
-        'val1': {foo: 1}
-      }
-    });
+    assert.deepEqual(result.updated['1.1'].added.val1.toJSON(), {foo: 1});
+    assert.deepEqual(synced.foo001.updated['1.1'].added.val1.toJSON(), {foo: 1});
+    assert.deepEqual(synced.foo011.added.val1.toJSON(), {foo: 1});
     assert.deepEqual(synced.foo111, null);
   });
 
