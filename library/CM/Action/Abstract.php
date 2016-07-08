@@ -349,7 +349,10 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         foreach ($intervals as &$intervalRef) {
             if (!empty($intervalRef['interval'])) {
                 if ($intervalRef['interval'] % $intervalValueLast !== 0) {
-                    throw new CM_Exception_Invalid('Interval `' . $intervalRef['interval'] . '` is not a multiple of `' . $intervalValueLast . '`.');
+                    throw new CM_Exception_Invalid('Interval is not a multiple of last value.', null, [
+                        'interval'          => $intervalRef['interval'],
+                        'intervalValueLast' => $intervalValueLast,
+                    ]);
                 }
                 $intervalValueLast = $intervalRef['interval'];
             }

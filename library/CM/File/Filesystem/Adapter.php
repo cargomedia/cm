@@ -102,7 +102,7 @@ abstract class CM_File_Filesystem_Adapter implements CM_Comparable {
         $path = CM_File_Filesystem::normalizePath($this->_pathPrefix . '/' . $pathRelative);
 
         if (0 !== strpos($path, $this->_pathPrefix)) {
-            throw new CM_Exception('Path is out of filesystem directory: `' . $path . '`.');
+            throw new CM_Exception('Path is out of filesystem directory.', null, ['path' => $path]);
         }
         return $path;
     }
@@ -115,7 +115,7 @@ abstract class CM_File_Filesystem_Adapter implements CM_Comparable {
     protected function _getRelativePath($pathAbsolute) {
         $pathAbsolute = CM_File_Filesystem::normalizePath($pathAbsolute);
         if (0 !== strpos($pathAbsolute, $this->_pathPrefix)) {
-            throw new CM_Exception('Path is out of filesystem directory: `' . $pathAbsolute . '`.');
+            throw new CM_Exception('Path is out of filesystem directory.', null, ['path' => $pathAbsolute]);
         }
         if ($pathAbsolute === $this->_pathPrefix) {
             return '';

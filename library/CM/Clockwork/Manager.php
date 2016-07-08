@@ -192,7 +192,9 @@ class CM_Clockwork_Manager {
      */
     protected function _markRunning(CM_Clockwork_Event $event, $identifier, DateTime $startTime) {
         if ($this->_isRunning($event)) {
-            throw new CM_Exception_Invalid("Event `{$event->getName()}` is already running");
+            throw new CM_Exception_Invalid('Event is already running', null, [
+                'eventName' => $event->getName(),
+            ]);
         }
         $this->_eventsRunning[$event->getName()] = ['event' => $event, 'identifier' => $identifier, 'startTime' => $startTime];
     }
@@ -203,7 +205,7 @@ class CM_Clockwork_Manager {
      */
     protected function _markStopped(CM_Clockwork_Event $event) {
         if (!$this->_isRunning($event)) {
-            throw new CM_Exception_Invalid("Cannot stop event. `{$event->getName()}` is already running");
+            throw new CM_Exception_Invalid('Cannot stop event. Event is already running', null, ['eventName' => $event->getName()]);
         }
         unset($this->_eventsRunning[$event->getName()]);
     }
