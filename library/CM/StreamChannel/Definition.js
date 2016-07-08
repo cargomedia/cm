@@ -1,8 +1,8 @@
 /**
  * @class CM_StreamChannel_Definition
- * @extends CM_JsonSerialized_Abstract
+ * @extends CM_Frontend_JsonSerializable
  */
-var CM_StreamChannel_Definition = CM_JsonSerialized_Abstract.extend({
+var CM_StreamChannel_Definition = CM_Frontend_JsonSerializable.extend({
 
   _class: 'CM_StreamChannel_Definition',
 

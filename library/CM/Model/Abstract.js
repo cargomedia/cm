@@ -1,8 +1,8 @@
 /**
  * @class CM_Model_Abstract
- * @extends Backbone.Model
+ * @extends CM_Frontend_JsonSerializable
  */
-var CM_Model_Abstract = Backbone.Model.extend({
+var CM_Model_Abstract = CM_Frontend_JsonSerializable.extend({
 
   _class: 'CM_Model_Abstract',
 
