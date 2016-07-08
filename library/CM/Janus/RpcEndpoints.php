@@ -21,7 +21,7 @@ class CM_Janus_RpcEndpoints {
 
         $server = $janus->getServerList()->findByKey($serverKey);
         $sessionParams = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
-        $session = new CM_Session($sessionParams->getString('sessionId'));
+        $session = self::_getSession($sessionParams);
         $user = $session->getUser(true);
 
         $channelKey = (string) $channelKey;
@@ -89,7 +89,7 @@ class CM_Janus_RpcEndpoints {
 
         $server = $janus->getServerList()->findByKey($serverKey);
         $sessionParams = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
-        $session = new CM_Session($sessionParams->getString('sessionId'));
+        $session = self::_getSession($sessionParams);
         $user = $session->getUser(true);
 
         $channelKey = (string) $channelKey;
@@ -206,6 +206,20 @@ class CM_Janus_RpcEndpoints {
     protected static function _authenticate(CM_Janus_Service $janus, $serverKey) {
         if (!$janus->getServerList()->findByKey($serverKey)) {
             throw new CM_Exception_AuthFailed('Invalid serverKey');
+        }
+    }
+
+    /**
+     * @param CM_Params $sessionParams
+     * @return CM_Session
+     * @throws CM_Exception_Nonexistent
+     */
+    protected static function _getSession(CM_Params $sessionParams) {
+        try {
+            return new CM_Session($sessionParams->getString('sessionId'));
+        } catch (CM_Exception_Nonexistent $e) {
+            $e->setSeverity(CM_Exception::WARN);
+            throw $e;
         }
     }
 }
