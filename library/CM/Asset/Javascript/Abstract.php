@@ -52,29 +52,38 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
 
     /**
      * @param string[] $mainPaths
-     * @param string[] $rootPaths
+     * @param string[] $sourcePaths
      * @param bool     $generateSourceMaps
      * @return string
      */
-    protected function _browserify(array $mainPaths, array $rootPaths, $generateSourceMaps) {
+    protected function _browserify(array $mainPaths, array $sourcePaths, $generateSourceMaps) {
         if (!count($mainPaths)) {
             return '';
         }
 
-        $content = \Functional\reduce_left($rootPaths, function ($rootPath, $index, $collection, $carry) {
-            return $carry . \Functional\reduce_left(CM_Util::rglob('*.js', $rootPath), function ($filePath, $index, $collection, $carry) {
-                return $carry . md5((new CM_File($filePath))->read());
-            }, '');
+        $involvedFiles = [];
+        foreach ($sourcePaths as $sourcePath) {
+            $involvedFiles = array_merge($involvedFiles, CM_Util::rglob('*.js', $sourcePath));
+        }
+        foreach ($mainPaths as $mainPath) {
+            $involvedFiles[] = $mainPath;
+        }
+        $cacheKeyContent = \Functional\reduce_left(array_unique($involvedFiles), function ($path, $index, $collection, $carry) {
+            return md5($carry . (new CM_File($path))->read());
         }, '');
 
-        $cacheKey = __METHOD__ . '_md5:' . md5($content) . '_generateSourceMaps:' . $generateSourceMaps;
+        $cacheKeyMainPaths = \Functional\reduce_left($mainPaths, function ($path, $index, $collection, $carry) {
+            return md5($carry . $path);
+        }, '');
+
         $cache = CM_Cache_Persistent::getInstance();
-        return $cache->get($cacheKey, function () use ($mainPaths, $rootPaths, $generateSourceMaps) {
+        $cacheKey = $cache->key(__METHOD__, $cacheKeyContent, $cacheKeyMainPaths, $generateSourceMaps);
+        return $cache->get($cacheKey, function () use ($mainPaths, $sourcePaths, $generateSourceMaps) {
             $args = $mainPaths;
             if ($generateSourceMaps) {
                 $args[] = '--debug';
             }
-            return CM_Util::exec('NODE_PATH="' . implode(':', $rootPaths) . '" browserify', $args);
+            return CM_Util::exec('NODE_PATH="' . implode(':', $sourcePaths) . '" browserify', $args);
         });
     }
 
