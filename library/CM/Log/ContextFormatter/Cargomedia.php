@@ -1,7 +1,7 @@
 <?php
 
 class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Interface {
-    
+
     /** @var string */
     protected $_appName;
 
@@ -59,9 +59,10 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
         if ($exception = $context->getException()) {
             $serializableException = new CM_ExceptionHandling_SerializableException($exception);
             $result['exception'] = [
-                'type'    => $serializableException->getClass(),
-                'message' => $serializableException->getMessage(),
-                'stack'   => $serializableException->getTraceAsString(),
+                'type'     => $serializableException->getClass(),
+                'message'  => $serializableException->getMessage(),
+                'stack'    => $serializableException->getTraceAsString(),
+                'metaInfo' => $serializableException->getMeta(),
             ];
         }
         return $result;
