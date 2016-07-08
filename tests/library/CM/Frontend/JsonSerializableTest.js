@@ -222,6 +222,7 @@ define(["CM/Frontend/JsonSerializable"], function() {
         ]
       }
     });
+    assert.equal(JSON.stringify(foo001), '{"name":"1","1.1":{"name":"1.1","1.1.1":{"name":"1.1.1"},"list":[{"name":"1.1.1"},[{"name":"1.1.1"}],null,1,{"foo":1,"bar":{"name":"1.1.1"}}]}}');
   });
 
   QUnit.test("sync: change higher level child attribute", function(assert) {
