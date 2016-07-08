@@ -97,18 +97,22 @@ define(["CM/Frontend/JsonSerializable"], function() {
       foo.sync({val1: 1});
     }, /Failed to update the model, incompatible parameter/);
 
-    foo.sync(bar);
+    var result = foo.sync(bar);
+    assert.equal(result, null);
     assert.deepEqual(synced, []);
 
+
     bar.set({val1: 3, val2: 1});
-    foo.sync(bar);
+    var result = foo.sync(bar);
     assert.equal(foo.get('val1'), 3);
     assert.equal(foo.get('val2'), 1);
+    assert.deepEqual(result, {updated: {val1: 3}, added: {val2: 1}});
     assert.deepEqual(synced, [{updated: {val1: 3}, added: {val2: 1}}]);
 
     bar.unset('val2');
-    foo.sync(bar);
+    var result = foo.sync(bar);
     assert.equal(foo.get('val2'), undefined);
+    assert.deepEqual(result, {removed: ['val2']});
     assert.deepEqual(synced, [
       {updated: {val1: 3}, added: {val2: 1}},
       {removed: ['val2']}
@@ -178,8 +182,19 @@ define(["CM/Frontend/JsonSerializable"], function() {
     var synced = this.synced;
 
     clone111.set('name', 'clone 1.1.1');
-    foo001.sync(clone001);
+    var result = foo001.sync(clone001);
     assert.equal(foo001.get('1.1').get('1.1.1').get('name'), 'clone 1.1.1');
+    assert.deepEqual(result, {
+      updated: {
+        '1.1': {
+          updated: {
+            '1.1.1': {
+              updated: {'name': 'clone 1.1.1'}
+            }
+          }
+        }
+      }
+    });
     assert.deepEqual(synced.foo001, {
       updated: {
         '1.1': {
@@ -213,8 +228,15 @@ define(["CM/Frontend/JsonSerializable"], function() {
 
     clone011.set('name', 'clone 1.1');
 
-    foo001.sync(clone001);
+    var result = foo001.sync(clone001);
     assert.equal(foo001.get('1.1').get('name'), 'clone 1.1');
+    assert.deepEqual(result, {
+      updated: {
+        '1.1': {
+          updated: {'name': 'clone 1.1'}
+        }
+      }
+    });
     assert.deepEqual(synced.foo001, {
       updated: {
         '1.1': {
@@ -236,8 +258,15 @@ define(["CM/Frontend/JsonSerializable"], function() {
 
     clone011.set('val1', 1);
 
-    foo001.sync(clone001);
+    var result = foo001.sync(clone001);
     assert.equal(foo001.get('1.1').get('val1'), 1);
+    assert.deepEqual(result, {
+      updated: {
+        '1.1': {
+          added: {'val1': 1}
+        }
+      }
+    });
     assert.deepEqual(synced.foo001, {
       updated: {
         '1.1': {
@@ -259,8 +288,17 @@ define(["CM/Frontend/JsonSerializable"], function() {
 
     clone011.set('val1', new CM_Frontend_JsonSerializable({foo: 1}));
 
-    foo001.sync(clone001);
+    var result = foo001.sync(clone001);
     assert.ok(foo001.get('1.1').get('val1') instanceof CM_Frontend_JsonSerializable);
+    assert.deepEqual(result, {
+      updated: {
+        '1.1': {
+          added: {
+            'val1': {foo: 1}
+          }
+        }
+      }
+    });
     assert.deepEqual(synced.foo001, {
       updated: {
         '1.1': {
@@ -286,8 +324,15 @@ define(["CM/Frontend/JsonSerializable"], function() {
 
     clone011.unset('name');
 
-    foo001.sync(clone001);
+    var result = foo001.sync(clone001);
     assert.equal(foo001.get('1.1').get('name'), undefined);
+    assert.deepEqual(result, {
+      updated: {
+        '1.1': {
+          removed: ['name']
+        }
+      }
+    });
     assert.deepEqual(synced.foo001, {
       updated: {
         '1.1': {
@@ -315,8 +360,15 @@ define(["CM/Frontend/JsonSerializable"], function() {
       isFoo111Removed = true;
     });
 
-    foo001.sync(clone001);
+    var result = foo001.sync(clone001);
     assert.equal(foo001.get('1.1').get('1.1.1'), undefined);
+    assert.deepEqual(result, {
+      updated: {
+        '1.1': {
+          removed: ['1.1.1']
+        }
+      }
+    });
     assert.deepEqual(synced.foo001, {
       updated: {
         '1.1': {

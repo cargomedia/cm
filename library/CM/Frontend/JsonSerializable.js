@@ -8,7 +8,7 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
 
   /**
    * @param {CM_Frontend_JsonSerializable} jsonSerialized
-   * @returns {{removed: Array, added: Object, updated: Object}}
+   * @returns {{removed: Array, added: Object, updated: Object}|null}
    */
   sync: function(jsonSerialized) {
     if (!this.compatible(jsonSerialized)) {
@@ -19,6 +19,14 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
       removed: [],
       added: {},
       updated: {}
+    };
+    var resultCleanup = function(result) {
+      _.each(result, function(val, key) {
+        if (_.isEmpty(val)) {
+          delete result[key];
+        }
+      });
+      return _.isEmpty(result) ? null : result;
     };
 
     if (!this.equals(jsonSerialized)) {
@@ -36,9 +44,7 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
           this.unset(key);
         } else if (this.compatible(localValue)) {
           var resultChild = localValue.sync(externalValue);
-          if (_.any(resultChild, function(value) {
-              return !_.isEmpty(value);
-            })) {
+          if (resultChild) {
             resultTarget[key] = resultChild;
           }
         } else {
@@ -50,13 +56,9 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
           _.extend(resultTarget, attrs);
         }
       }, this);
+    }
 
-      _.each(result, function(val, key) {
-        if (_.isEmpty(val)) {
-          delete result[key];
-        }
-      });
-
+    if (result = resultCleanup(result)) {
       this.trigger('sync', this, result);
     }
     return result;
