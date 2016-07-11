@@ -21,7 +21,7 @@ class CM_Janus_RpcEndpoints {
 
         $server = $janus->getServerList()->findByKey($serverKey);
         $sessionParams = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
-        $session = self::_getSession($sessionParams);
+        $session = self::_getSession($sessionParams->getString('sessionId'));
         $user = $session->getUser(true);
 
         $channelKey = (string) $channelKey;
@@ -89,7 +89,7 @@ class CM_Janus_RpcEndpoints {
 
         $server = $janus->getServerList()->findByKey($serverKey);
         $sessionParams = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
-        $session = self::_getSession($sessionParams);
+        $session = self::_getSession($sessionParams->getString('sessionId'));
         $user = $session->getUser(true);
 
         $channelKey = (string) $channelKey;
@@ -210,14 +210,14 @@ class CM_Janus_RpcEndpoints {
     }
 
     /**
-     * @param CM_Params $sessionParams
+     * @param string $sessionId
      * @return CM_Session
-     * @throws CM_Exception_Nonexistent
+     * @throws CM_Exception_UnknownSessionId
      */
-    protected static function _getSession(CM_Params $sessionParams) {
+    protected static function _getSession($sessionId) {
         try {
-            return new CM_Session($sessionParams->getString('sessionId'));
-        } catch (CM_Exception_Nonexistent $e) {
+            return new CM_Session((string) $sessionId);
+        } catch (CM_Exception_UnknownSessionId $e) {
             $e->setSeverity(CM_Exception::WARN);
             throw $e;
         }
