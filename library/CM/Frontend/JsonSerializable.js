@@ -1,7 +1,7 @@
 /**
  * @class CM_Frontend_JsonSerializable
  * @extends Backbone.Model
- * @mixes CM_Frontend_SynchronizableTrait
+ * @mixes CM_Frontend_SynchronizableTrait~traitProperties
  */
 var CM_Frontend_JsonSerializable = Backbone.Model.extend({
 

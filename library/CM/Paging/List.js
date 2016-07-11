@@ -1,7 +1,7 @@
 /**
  * @class CM_Paging_List
  * @extends Backbone.Collection
- * @mixes CM_Frontend_SynchronizableTrait
+ * @mixes CM_Frontend_SynchronizableTrait~traitProperties
  */
 var CM_Paging_List = Backbone.Collection.extend({
 
@@ -19,7 +19,7 @@ var CM_Paging_List = Backbone.Collection.extend({
 
   /**
    * @param {CM_Paging_List} list
-   * @returns {{removed: Array, added: Object, updated: Object}|null}
+   * @returns {{removed: Array, added: Array, updated: Object}|null}
    */
   sync: function(list) {
     if (!(list instanceof CM_Paging_List)) {

@@ -1,5 +1,12 @@
+/**
+ * @namespace CM_Frontend_AbstractTrait
+ */
 var CM_Frontend_AbstractTrait = {
 
+  /**
+   * @inner
+   * @mixin
+   */
   traitProperties: {},
 
   /**
