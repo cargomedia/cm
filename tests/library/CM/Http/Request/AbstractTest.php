@@ -112,6 +112,21 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertSame('/foo1/bar1?foo=bar', $mock->getUri());
     }
 
+    public function testFindQuery() {
+        $uri = '/foo/bar?foo1=bar1';
+        $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
+        /** @var CM_Http_Request_Abstract $mock */
+        $requestMockClass = $this->mockClass('CM_Http_Request_Abstract');
+        /** @var \Mocka\AbstractClassTrait|CM_Http_Request_Abstract $requestMock */
+        $requestMock = $requestMockClass->newInstance([$uri, $headers]);
+
+        $this->assertSame(['foo1' => 'bar1'], $requestMock->findQuery());
+        $requestMock->mockMethod('getQuery')->set(function () {
+            throw new CM_Exception_Invalid('error');
+        });
+        $this->assertSame([], $requestMock->findQuery());
+    }
+
     public function testSetUriNonUtf() {
         $uri = '/foo/bar?%%aff%%=quux&bar=%%AFF%%&baz[]=%%aff%%&baz[]=%%aff%%';
         $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
@@ -127,8 +142,8 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
                 'baz'   => [
                     '%?f%%',
                     '%?f%%',
-                ] 
-             ),
+                ]
+            ),
             $mock->getQuery()
         );
         $this->assertSame($uri, $mock->getUri());
