@@ -31,6 +31,18 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
     }
   });
 
+  QUnit.test("default model", function(assert) {
+    var list = this.list;
+    list.add({id: 4, foo: 4});
+    assert.ok(list.get(4) instanceof CM_Frontend_JsonSerializable);
+    assert.deepEqual(list.get(4).toJSON(), {id: 4, foo: 4});
+
+    var Foo = CM_Frontend_JsonSerializable.extend({});
+    list.add(new Foo({id: 5, foo: 5}));
+    assert.ok(list.get(5) instanceof Foo);
+    assert.deepEqual(list.get(5).toJSON(), {id: 5, foo: 5});
+  });
+
   QUnit.test("equals", function(assert) {
     var list = this.list;
     var clone = this.clone;

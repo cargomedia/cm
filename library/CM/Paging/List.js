@@ -13,6 +13,10 @@ var CM_Paging_List = Backbone.Collection.extend({
     return Backbone.Collection.prototype.constructor.apply(this, arguments);
   },
 
+  model: function(attrs, options) {
+    return new CM_Frontend_JsonSerializable(attrs, options);
+  },
+
   /**
    * @param {CM_Paging_List} list
    * @returns {{removed: Array, added: Object, updated: Object}|null}
