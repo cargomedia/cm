@@ -6,12 +6,18 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
 
   _class: 'CM_Frontend_JsonSerializable',
 
+  constructor: function() {
+    // TODO: move me out of the constructor when CM will use CommonJS module... ;(
+    CM_Frontend_SynchronizableTrait.applyImplementation(CM_Frontend_JsonSerializable.prototype);
+    return Backbone.Model.prototype.constructor.apply(this, arguments);
+  },
+
   /**
    * @param {CM_Frontend_JsonSerializable} jsonSerialized
    * @returns {{removed: Array, added: Object, updated: Object}|null}
    */
   sync: function(jsonSerialized) {
-    if (!this.compatible(jsonSerialized)) {
+    if (!this.isCompatible(jsonSerialized)) {
       throw Error('Failed to update the model, incompatible parameter.');
     }
 
@@ -37,12 +43,12 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
         var resultTarget = this.has(key) ? result.updated : result.added;
 
         if (!jsonSerialized.has(key)) {
-          if (this.compatible(localValue)) {
+          if (_.isObject(localValue) && _.isFunction(localValue.trigger)) {
             localValue.trigger('remove');
           }
           result.removed.push(key);
           this.unset(key);
-        } else if (this.compatible(localValue)) {
+        } else if (this.isCompatible(localValue) && localValue.isCompatible(externalValue)) {
           var resultChild = localValue.sync(externalValue);
           if (resultChild) {
             resultTarget[key] = resultChild;
@@ -67,14 +73,14 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
    * @returns {Boolean}
    */
   equals: function(jsonSerialized) {
-    if (!this.compatible(jsonSerialized)) {
+    if (!this.isCompatible(jsonSerialized)) {
       return false;
     }
     var keys = _.union(this.keys(), jsonSerialized.keys());
     return _.every(keys, function(key) {
       var localValue = this.get(key);
       var externalValue = jsonSerialized.get(key);
-      if (this.compatible(externalValue)) {
+      if (this.isCompatible(externalValue)) {
         return externalValue.equals(localValue);
       } else {
         return _.isEqual(externalValue, localValue);
@@ -88,25 +94,17 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
   toJSON: function() {
     var encode = function(data) {
       _.each(data, function(value, key) {
-        if (this.compatible(value)) {
+        if (this.isCompatible(value)) {
           data[key] = value.toJSON();
         } else if (_.isArray(value)) {
           _.each(value, function(item, index) {
-            data[key][index] = this.compatible(item) ? item.toJSON() : encode(item);
+            data[key][index] = this.isCompatible(item) ? item.toJSON() : encode(item);
           }, this);
         }
       }, this);
       return data;
     }.bind(this);
     return encode(Backbone.Model.prototype.toJSON.apply(this, arguments));
-  },
-
-  /**
-   * @param {CM_Frontend_JsonSerializable|*} value
-   * @returns {Boolean}
-   */
-  compatible: function(value) {
-    return value instanceof CM_Frontend_JsonSerializable;
   },
 
   /**
