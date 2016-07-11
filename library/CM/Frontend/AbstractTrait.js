@@ -1,5 +1,5 @@
 /**
- * @namespace CM_Frontend_AbstractTrait
+ * @class CM_Frontend_AbstractTrait
  */
 var CM_Frontend_AbstractTrait = {
 

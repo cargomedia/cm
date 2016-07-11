@@ -1,5 +1,5 @@
 /**
- * @namespace CM_Frontend_SynchronizableTrait
+ * @class CM_Frontend_SynchronizableTrait
  * @extends CM_Frontend_AbstractTrait
  */
 var CM_Frontend_SynchronizableTrait = _.clone(CM_Frontend_AbstractTrait);
