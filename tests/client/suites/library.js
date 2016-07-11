@@ -4,6 +4,7 @@ module.exports = {
   },
   modules: [
     "../tests/library/CM/Frontend/JsonSerializableTest",
-    "../tests/library/CM/Frontend/AbstractTraitTest"
+    "../tests/library/CM/Frontend/AbstractTraitTest",
+    "../tests/library/CM/Frontend/SynchronizableTraitTest"
   ]
 };
