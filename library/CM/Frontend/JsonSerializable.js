@@ -18,7 +18,7 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
    * @returns {{removed: Array, added: Object, updated: Object}|null}
    */
   sync: function(jsonSerialized) {
-    if (!this.isSynchronizable(jsonSerialized)) {
+    if (!(jsonSerialized instanceof CM_Frontend_JsonSerializable)) {
       throw Error('Failed to update the model, incompatible parameter.');
     }
 
