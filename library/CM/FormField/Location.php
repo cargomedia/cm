@@ -67,7 +67,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         $location = $this->_squashLocationInConstraints($location);
 
         if (!$location) {
-            throw new CM_Exception('Cannot find a location by coordinates `' . $lat . '` / `' . $lon . '`.');
+            throw new CM_Exception('Cannot find a location by coordinates `' . $lat . '` / `' . $lon . '`.', CM_Exception::WARN);
         }
 
         return $this->getSuggestion($location, $response->getRender());
