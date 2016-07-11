@@ -33,12 +33,12 @@ define(["CM/Frontend/JsonSerializable"], function() {
     }
   });
 
-  QUnit.test("isCompatible", function(assert) {
+  QUnit.test("isSynchronizable", function(assert) {
     var foo = this.models.foo;
     var bar = this.models.bar;
-    assert.ok(foo.isCompatible(bar) && bar.isCompatible(foo));
-    assert.ok(!foo.isCompatible({val1: 1}));
-    assert.ok(!bar.isCompatible({val1: 1}));
+    assert.ok(foo.isSynchronizable(bar) && bar.isSynchronizable(foo));
+    assert.ok(!foo.isSynchronizable({val1: 1}));
+    assert.ok(!bar.isSynchronizable({val1: 1}));
   });
 
   QUnit.test("toJSON", function(assert) {

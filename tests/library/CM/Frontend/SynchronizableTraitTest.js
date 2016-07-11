@@ -2,7 +2,7 @@ define(["CM/Frontend/AbstractTrait", "CM/Frontend/SynchronizableTrait"], functio
 
   QUnit.module('CM/Frontend/SynchronizableTrait');
 
-  QUnit.test("isCompatible", function(assert) {
+  QUnit.test("isSynchronizable", function(assert) {
 
     var Foo = Backbone.Model.extend({
       equals: function() {
@@ -18,8 +18,8 @@ define(["CM/Frontend/AbstractTrait", "CM/Frontend/SynchronizableTrait"], functio
     var notSync = new Backbone.Model();
     var foo = new Foo();
 
-    assert.notOk(foo.isCompatible(notSync));
-    assert.ok(foo.isCompatible(new Foo()));
+    assert.notOk(foo.isSynchronizable(notSync));
+    assert.ok(foo.isSynchronizable(new Foo()));
     assert.ok(foo.equals());
 
     var FooBar = Foo.extend({
@@ -29,9 +29,9 @@ define(["CM/Frontend/AbstractTrait", "CM/Frontend/SynchronizableTrait"], functio
     });
     var fooBar = new FooBar();
 
-    assert.notOk(fooBar.isCompatible(notSync));
-    assert.ok(fooBar.isCompatible(foo));
-    assert.ok(fooBar.isCompatible(fooBar));
+    assert.notOk(fooBar.isSynchronizable(notSync));
+    assert.ok(fooBar.isSynchronizable(foo));
+    assert.ok(fooBar.isSynchronizable(fooBar));
     assert.ok(!fooBar.equals());
 
   });

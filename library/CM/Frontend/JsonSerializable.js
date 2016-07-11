@@ -1,6 +1,7 @@
 /**
  * @class CM_Frontend_JsonSerializable
  * @extends Backbone.Model
+ * @mixes CM_Frontend_SynchronizableTrait
  */
 var CM_Frontend_JsonSerializable = Backbone.Model.extend({
 
@@ -17,7 +18,7 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
    * @returns {{removed: Array, added: Object, updated: Object}|null}
    */
   sync: function(jsonSerialized) {
-    if (!this.isCompatible(jsonSerialized)) {
+    if (!this.isSynchronizable(jsonSerialized)) {
       throw Error('Failed to update the model, incompatible parameter.');
     }
 
@@ -48,7 +49,7 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
           }
           result.removed.push(key);
           this.unset(key);
-        } else if (this.isCompatible(localValue) && localValue.isCompatible(externalValue)) {
+        } else if (this.isSynchronizable(localValue) && localValue.isSynchronizable(externalValue)) {
           var resultChild = localValue.sync(externalValue);
           if (resultChild) {
             resultTarget[key] = resultChild;
@@ -73,14 +74,14 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
    * @returns {Boolean}
    */
   equals: function(jsonSerialized) {
-    if (!this.isCompatible(jsonSerialized)) {
+    if (!this.isSynchronizable(jsonSerialized)) {
       return false;
     }
     var keys = _.union(this.keys(), jsonSerialized.keys());
     return _.every(keys, function(key) {
       var localValue = this.get(key);
       var externalValue = jsonSerialized.get(key);
-      if (this.isCompatible(externalValue)) {
+      if (this.isSynchronizable(externalValue)) {
         return externalValue.equals(localValue);
       } else {
         return _.isEqual(externalValue, localValue);
@@ -94,11 +95,11 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
   toJSON: function() {
     var encode = function(data) {
       _.each(data, function(value, key) {
-        if (this.isCompatible(value)) {
+        if (this.isSynchronizable(value)) {
           data[key] = value.toJSON();
         } else if (_.isArray(value)) {
           _.each(value, function(item, index) {
-            data[key][index] = this.isCompatible(item) ? item.toJSON() : encode(item);
+            data[key][index] = this.isSynchronizable(item) ? item.toJSON() : encode(item);
           }, this);
         }
       }, this);
