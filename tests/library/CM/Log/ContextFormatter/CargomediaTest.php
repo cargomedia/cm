@@ -41,12 +41,13 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
         $this->assertSame('www.example.com', $formattedRecord['computerInfo']['fqdn']);
         $this->assertSame('v7.0.1', $formattedRecord['computerInfo']['phpVersion']);
         $this->assertSame('/foo?bar=1&baz=quux', $formattedRecord['httpRequest']['uri']);
-        $this->assertSame([
-            'bar' => '1',
-            'baz' => 'quux',
-            'foo' => 'bar',
-            'quux' => 'baz',
-        ],
+        $this->assertSame(
+            [
+                'bar'  => '1',
+                'baz'  => 'quux',
+                'foo'  => 'bar',
+                'quux' => 'baz',
+            ],
             $formattedRecord['httpRequest']['query']
         );
 
