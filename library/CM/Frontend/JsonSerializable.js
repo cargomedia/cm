@@ -14,11 +14,11 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
   },
 
   /**
-   * @param {CM_Frontend_JsonSerializable} jsonSerialized
+   * @param {CM_Frontend_JsonSerializable} serializable
    * @returns {{removed: Array, added: Object, updated: Object}|null}
    */
-  sync: function(jsonSerialized) {
-    if (!(jsonSerialized instanceof CM_Frontend_JsonSerializable)) {
+  sync: function(serializable) {
+    if (!(serializable instanceof CM_Frontend_JsonSerializable)) {
       throw Error('Failed to update the model, incompatible parameter.');
     }
 
@@ -36,14 +36,14 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
       return _.isEmpty(result) ? null : result;
     };
 
-    if (!this.equals(jsonSerialized)) {
-      var keys = _.union(this.keys(), jsonSerialized.keys());
+    if (!this.equals(serializable)) {
+      var keys = _.union(this.keys(), serializable.keys());
       _.each(keys, function(key) {
         var localValue = this.get(key);
-        var externalValue = jsonSerialized.get(key);
+        var externalValue = serializable.get(key);
         var resultTarget = this.has(key) ? result.updated : result.added;
 
-        if (!jsonSerialized.has(key)) {
+        if (!serializable.has(key)) {
           if (_.isObject(localValue) && _.isFunction(localValue.trigger)) {
             localValue.trigger('remove');
           }
@@ -70,17 +70,17 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
   },
 
   /**
-   * @param {CM_Frontend_JsonSerializable|*} jsonSerialized
+   * @param {CM_Frontend_JsonSerializable|*} serializable
    * @returns {Boolean}
    */
-  equals: function(jsonSerialized) {
-    if (!this.isSynchronizable(jsonSerialized)) {
+  equals: function(serializable) {
+    if (!this.isSynchronizable(serializable)) {
       return false;
     }
-    var keys = _.union(this.keys(), jsonSerialized.keys());
+    var keys = _.union(this.keys(), serializable.keys());
     return _.every(keys, function(key) {
       var localValue = this.get(key);
-      var externalValue = jsonSerialized.get(key);
+      var externalValue = serializable.get(key);
       if (this.isSynchronizable(externalValue)) {
         return externalValue.equals(localValue);
       } else {
