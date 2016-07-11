@@ -7,10 +7,15 @@ var CM_Paging_List = Backbone.Collection.extend({
 
   _class: 'CM_Paging_List',
 
-  constructor: function() {
+  constructor: function(obj, options) {
+    var models = obj;
+    if (_.isObject(obj) && _.isArray(obj.list)) {
+      models = obj.list;
+    }
+
     // TODO: move me out of the constructor when CM will use CommonJS module... ;(
     CM_Frontend_SynchronizableTrait.applyImplementation(CM_Paging_List.prototype);
-    return Backbone.Collection.prototype.constructor.apply(this, arguments);
+    return Backbone.Collection.prototype.constructor.call(this, models, options);
   },
 
   model: function(attrs, options) {
