@@ -26,7 +26,7 @@ var CM_StreamChannel_Definition = CM_Frontend_JsonSerializable.extend({
    * @param {Object} [context]
    * @param {Boolean} [allowClientMessage]
    */
-  bind: function(eventName, callback, context, allowClientMessage) {
+  bindStream: function(eventName, callback, context, allowClientMessage) {
     cm.stream.bind(this.getKey(), this.getType(), eventName, callback, context, allowClientMessage);
   },
 
@@ -35,7 +35,7 @@ var CM_StreamChannel_Definition = CM_Frontend_JsonSerializable.extend({
    * @param {Function} [callback]
    * @param {Object} [context]
    */
-  unbind: function(eventName, callback, context) {
+  unbindStream: function(eventName, callback, context) {
     cm.stream.unbind(this.getKey(), this.getType(), eventName, callback, context);
   }
 });
