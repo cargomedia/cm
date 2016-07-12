@@ -61,9 +61,14 @@
       {if !empty($log.context)}
         <div class="toggleNext">Context</div>
         <div class="toggleNext-content">
-          {if (!empty($log.context))}
-            <pre>{print_r($log.context, true)}</pre>
-          {/if}
+          <pre>{print_r($log.context, true)}</pre>
+        </div>
+      {/if}
+
+      {if !empty($log.loggerNotifications)}
+        <div class="toggleNext">Logger notifications</div>
+        <div class="toggleNext-content">
+          <pre>{print_r($log.loggerNotifications, true)}</pre>
         </div>
       {/if}
     </li>
