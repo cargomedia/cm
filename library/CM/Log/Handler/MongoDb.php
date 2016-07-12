@@ -136,15 +136,15 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         array_walk_recursive($formattedRecord, function (&$value, $key) use (&$nonUtfBytesList) {
             if (is_string($value) && !mb_check_encoding($value)) {
                 $nonUtfBytesList[$key] = unpack('H*', $value)[1];
-                $value = 'SANITIZED: ' . mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
             }
         });
 
         if (!empty($nonUtfBytesList)) {
-            $formattedRecord['context']['extra']['sanitized'] = true;
-        }
-        foreach ($nonUtfBytesList as $key => $nonUtfByte) {
-            $formattedRecord['context']['extra'][$key . '-UTF'] = $nonUtfByte;
+            $formattedRecord['loggerNotifications']['sanitizedFields'] = [];
+            foreach ($nonUtfBytesList as $key => $nonUtfByte) {
+                $formattedRecord['loggerNotifications']['sanitizedFields'][$key] = $nonUtfByte;
+            }
         }
 
         return $formattedRecord;
