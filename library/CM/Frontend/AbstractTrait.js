@@ -18,12 +18,12 @@ var CM_Frontend_AbstractTrait = {
       throw new Error('Trait must be applied to an Object.');
     }
     var abstractMethod = this.abstractMethod;
-    _.each(this.traitProperties, function(property, traitPropertyName) {
-      if (!(traitPropertyName in obj)) {
+    _.each(this.traitProperties, function(property, name) {
+      if (!(name in obj)) {
         if (property === abstractMethod) {
-          throw new Error(traitPropertyName + ' not implemented.');
+          throw new Error(name + ' not implemented.');
         } else {
-          obj[traitPropertyName] = property;
+          obj[name] = property;
         }
       }
     });
@@ -36,8 +36,8 @@ var CM_Frontend_AbstractTrait = {
    */
   isImplementedBy: function(value) {
     if (_.isObject(value)) {
-      return _.every(this.traitProperties, function(property, traitPropertyName) {
-        return traitPropertyName in value;
+      return _.every(this.traitProperties, function(property, name) {
+        return name in value;
       });
     }
     return false;
