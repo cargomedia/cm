@@ -9,7 +9,7 @@ class CM_SessionTest extends CMTest_TestCase {
         try {
             new CM_Session('nonexistent');
             $this->fail('Can instantiate nonexistent session.');
-        } catch (CM_Exception_Nonexistent $ex) {
+        } catch (CM_Exception_UnknownSessionId $ex) {
             $this->assertTrue(true);
         }
     }
@@ -35,7 +35,7 @@ class CM_SessionTest extends CMTest_TestCase {
         try {
             new CM_Session($sessionId);
             $this->fail('Empty Session stored in db.');
-        } catch (CM_Exception_Nonexistent $ex) {
+        } catch (CM_Exception_UnknownSessionId $ex) {
             $this->assertTrue(true);
         }
         $session = new CM_Session();
@@ -54,7 +54,7 @@ class CM_SessionTest extends CMTest_TestCase {
         try {
             $session = new CM_Session($sessionId);
             $this->assertTrue(true);
-        } catch (CM_Exception_Nonexistent $ex) {
+        } catch (CM_Exception_UnknownSessionId $ex) {
             $this->fail('Session not persistent.');
         }
         $this->assertEquals('bar', $session->get('foo'));
@@ -91,7 +91,7 @@ class CM_SessionTest extends CMTest_TestCase {
         try {
             $session = new CM_Session($sessionId);
             $this->fail('Session not deleted.');
-        } catch (CM_Exception_Nonexistent $ex) {
+        } catch (CM_Exception_UnknownSessionId $ex) {
             $this->assertTrue(true);
         }
     }
@@ -109,7 +109,7 @@ class CM_SessionTest extends CMTest_TestCase {
         try {
             new CM_Session($oldSessionId);
             $this->fail('Db entry not updated.');
-        } catch (CM_Exception_Nonexistent $ex) {
+        } catch (CM_Exception_UnknownSessionId $ex) {
             $this->assertTrue(true);
         }
         try {
@@ -130,7 +130,7 @@ class CM_SessionTest extends CMTest_TestCase {
         try {
             new CM_Session($sessionId);
             $this->fail('Expired Session was not deleted.');
-        } catch (CM_Exception_Nonexistent $ex) {
+        } catch (CM_Exception_UnknownSessionId $ex) {
             $this->assertTrue(true);
         }
     }

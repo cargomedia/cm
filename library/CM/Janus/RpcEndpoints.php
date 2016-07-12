@@ -21,7 +21,7 @@ class CM_Janus_RpcEndpoints {
 
         $server = $janus->getServerList()->findByKey($serverKey);
         $sessionParams = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
-        $session = new CM_Session($sessionParams->getString('sessionId'));
+        $session = $sessionParams->getSession('sessionId');
         $user = $session->getUser(true);
 
         $channelKey = (string) $channelKey;
@@ -89,7 +89,7 @@ class CM_Janus_RpcEndpoints {
 
         $server = $janus->getServerList()->findByKey($serverKey);
         $sessionParams = CM_Params::factory(CM_Params::jsonDecode($sessionData), true);
-        $session = new CM_Session($sessionParams->getString('sessionId'));
+        $session = $sessionParams->getSession('sessionId');
         $user = $session->getUser(true);
 
         $channelKey = (string) $channelKey;
