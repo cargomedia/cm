@@ -55,7 +55,7 @@ define(["CM/Frontend/AbstractTrait"], function() {
     FooTrait.applyImplementation(Foo.prototype);
     var foo = new Foo();
     assert.ok(FooTrait.isImplementedBy(foo));
-    assert.ok(foo.bar());
+    assert.ok(foo.foo());
     assert.ok(foo.bar());
 
     var Bar = function() {
