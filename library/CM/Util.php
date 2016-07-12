@@ -581,4 +581,12 @@ class CM_Util {
         }
         return $result;
     }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    public static function sanitizeUtf($value) {
+        return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+    }
 }

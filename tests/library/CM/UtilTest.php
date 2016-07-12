@@ -141,4 +141,8 @@ class CM_UtilTest extends CMTest_TestCase {
     public function testJsonDecodeInvalid() {
         CM_Util::jsonDecode('{[foo:bar)}');
     }
+    
+    public function testSanitizeUtf() {
+        $this->assertSame('?.', CM_Util::sanitizeUtf(pack("H*", 'c32e')));
+    }
 }
