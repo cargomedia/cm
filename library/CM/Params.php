@@ -497,6 +497,21 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
 
     /**
      * @param string $key
+     * @return CM_Session
+     * @throws CM_Exception_InvalidParam
+     */
+    public function getSession($key) {
+        $key = (string) $key;
+        $sessionId = $this->getString($key);
+        try {
+            return new CM_Session($sessionId);
+        } catch (CM_Exception_UnknownSessionId $e) {
+            throw new CM_Exception_InvalidParam('Session is not found', null, ['key' => $key]);
+        }
+    }
+
+    /**
+     * @param string $key
      * @param mixed  $default
      * @throws CM_Exception_InvalidParam
      * @return mixed
