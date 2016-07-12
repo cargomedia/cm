@@ -168,6 +168,24 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
     assert.notOk(list.equals(clone));
   });
 
+  QUnit.test("equals: redundant ids", function(assert) {
+    var list1 = new CM_Paging_List([
+      new CM_Frontend_JsonSerializable({id: 2}),
+      new CM_Frontend_JsonSerializable({id: 2}),
+      new CM_Frontend_JsonSerializable({id: 3})
+    ]);
+
+    var list2 = new CM_Paging_List([
+      new CM_Frontend_JsonSerializable({id: 3}),
+      new CM_Frontend_JsonSerializable({id: 3}),
+      new CM_Frontend_JsonSerializable({id: 2})
+    ]);
+
+    assert.ok(list1.size(), 2);
+    assert.ok(list2.size(), 2);
+    assert.ok(list1.equals(list2));
+  });
+
   QUnit.test("toJSON", function(assert) {
     var list = this.list;
     assert.deepEqual(list.toJSON(), [{
