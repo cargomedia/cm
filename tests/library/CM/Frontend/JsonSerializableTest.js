@@ -33,12 +33,12 @@ define(["CM/Frontend/JsonSerializable"], function() {
     }
   });
 
-  QUnit.test("compatible", function(assert) {
+  QUnit.test("isSynchronizable", function(assert) {
     var foo = this.models.foo;
     var bar = this.models.bar;
-    assert.ok(foo.compatible(bar) && bar.compatible(foo));
-    assert.ok(!foo.compatible({val1: 1}));
-    assert.ok(!bar.compatible({val1: 1}));
+    assert.ok(foo.isSynchronizable(bar) && bar.isSynchronizable(foo));
+    assert.ok(!foo.isSynchronizable({val1: 1}));
+    assert.ok(!bar.isSynchronizable({val1: 1}));
   });
 
   QUnit.test("toJSON", function(assert) {
@@ -137,6 +137,26 @@ define(["CM/Frontend/JsonSerializable"], function() {
     assert.ok(typeof foo.get('foo') === 'undefined');
   });
 
+  QUnit.test("sync: add/change JsonSerializable", function(assert) {
+    var foo = this.models.foo;
+    var bar = this.models.bar;
+    var bar1 = bar.clone();
+    var result = null;
+
+    bar.set({
+      val2: bar1
+    });
+    result = foo.sync(bar);
+    assert.deepEqual(foo.get('val2').toJSON(), {val1: 1});
+    assert.deepEqual(result.added.val2.toJSON(), {val1: 1});
+
+    bar.set({
+      val2: {val1: 2}
+    });
+    result = foo.sync(bar);
+    assert.deepEqual(foo.get('val2'), {val1: 2});
+    assert.deepEqual(result.updated.val2, {val1: 2});
+  });
 
   QUnit.test("sync: add JsonSerializable array", function(assert) {
     var foo = this.models.foo;

@@ -1,17 +1,24 @@
 /**
  * @class CM_Frontend_JsonSerializable
  * @extends Backbone.Model
+ * @mixes CM_Frontend_SynchronizableTrait~traitProperties
  */
 var CM_Frontend_JsonSerializable = Backbone.Model.extend({
 
   _class: 'CM_Frontend_JsonSerializable',
 
+  constructor: function() {
+    // TODO: move me out of the constructor when CM will use CommonJS module... ;(
+    CM_Frontend_SynchronizableTrait.applyImplementation(CM_Frontend_JsonSerializable.prototype);
+    return Backbone.Model.prototype.constructor.apply(this, arguments);
+  },
+
   /**
-   * @param {CM_Frontend_JsonSerializable} jsonSerialized
+   * @param {CM_Frontend_JsonSerializable} serializable
    * @returns {{removed: Array, added: Object, updated: Object}|null}
    */
-  sync: function(jsonSerialized) {
-    if (!this.compatible(jsonSerialized)) {
+  sync: function(serializable) {
+    if (!(serializable instanceof CM_Frontend_JsonSerializable)) {
       throw Error('Failed to update the model, incompatible parameter.');
     }
 
@@ -29,20 +36,20 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
       return _.isEmpty(result) ? null : result;
     };
 
-    if (!this.equals(jsonSerialized)) {
-      var keys = _.union(this.keys(), jsonSerialized.keys());
+    if (!this.equals(serializable)) {
+      var keys = _.union(this.keys(), serializable.keys());
       _.each(keys, function(key) {
         var localValue = this.get(key);
-        var externalValue = jsonSerialized.get(key);
+        var externalValue = serializable.get(key);
         var resultTarget = this.has(key) ? result.updated : result.added;
 
-        if (!jsonSerialized.has(key)) {
-          if (this.compatible(localValue)) {
+        if (!serializable.has(key)) {
+          if (_.isObject(localValue) && _.isFunction(localValue.trigger)) {
             localValue.trigger('remove');
           }
           result.removed.push(key);
           this.unset(key);
-        } else if (this.compatible(localValue)) {
+        } else if (this.isSynchronizable(localValue) && localValue.isSynchronizable(externalValue)) {
           var resultChild = localValue.sync(externalValue);
           if (resultChild) {
             resultTarget[key] = resultChild;
@@ -63,18 +70,18 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
   },
 
   /**
-   * @param {CM_Frontend_JsonSerializable|*} jsonSerialized
+   * @param {CM_Frontend_JsonSerializable|*} serializable
    * @returns {Boolean}
    */
-  equals: function(jsonSerialized) {
-    if (!this.compatible(jsonSerialized)) {
+  equals: function(serializable) {
+    if (!this.isSynchronizable(serializable)) {
       return false;
     }
-    var keys = _.union(this.keys(), jsonSerialized.keys());
+    var keys = _.union(this.keys(), serializable.keys());
     return _.every(keys, function(key) {
       var localValue = this.get(key);
-      var externalValue = jsonSerialized.get(key);
-      if (this.compatible(externalValue)) {
+      var externalValue = serializable.get(key);
+      if (this.isSynchronizable(externalValue)) {
         return externalValue.equals(localValue);
       } else {
         return _.isEqual(externalValue, localValue);
@@ -88,25 +95,17 @@ var CM_Frontend_JsonSerializable = Backbone.Model.extend({
   toJSON: function() {
     var encode = function(data) {
       _.each(data, function(value, key) {
-        if (this.compatible(value)) {
+        if (this.isSynchronizable(value)) {
           data[key] = value.toJSON();
         } else if (_.isArray(value)) {
           _.each(value, function(item, index) {
-            data[key][index] = this.compatible(item) ? item.toJSON() : encode(item);
+            data[key][index] = this.isSynchronizable(item) ? item.toJSON() : encode(item);
           }, this);
         }
       }, this);
       return data;
     }.bind(this);
     return encode(Backbone.Model.prototype.toJSON.apply(this, arguments));
-  },
-
-  /**
-   * @param {CM_Frontend_JsonSerializable|*} value
-   * @returns {Boolean}
-   */
-  compatible: function(value) {
-    return value instanceof CM_Frontend_JsonSerializable;
   },
 
   /**
