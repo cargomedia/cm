@@ -152,8 +152,11 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         }
 
         if ($needed) {
-            throw new CM_Exception_Invalid('Cannot find `' . $template . '` in modules `' . implode('`, `', $moduleList) . '` and themes `' .
-                implode('`, `', $site->getThemes()) . '`');
+            throw new CM_Exception_Invalid('Cannot find template in modules and themes', null, [
+                'template' => $template,
+                'modules'  => implode('`, `', $moduleList),
+                'themes'   => implode('`, `', $site->getThemes()),
+            ]);
         }
         return null;
     }
@@ -213,16 +216,19 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             throw new CM_Exception_Invalid('Cannot find valid class definition for page `' . $pageClassName . '`.');
         }
         if (!preg_match('/^([A-Za-z]+)_/', $pageClassName, $matches)) {
-            throw new CM_Exception_Invalid('Cannot find namespace of `' . $pageClassName . '`');
+            throw new CM_Exception_Invalid('Cannot find namespace of page class name', null, ['pageClassName' => $pageClassName]);
         }
         $namespace = $matches[1];
         if (!in_array($namespace, $site->getModules())) {
-            throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
+            throw new CM_Exception_Invalid('Site does not contain namespace', null, [
+                'site'      => get_class($site),
+                'namespace' => $namespace,
+            ]);
         }
         /** @var CM_Page_Abstract $pageClassName */
         $path = $pageClassName::getPath($params);
 
-        $languageRewrite = $this->getLanguageRewrite()|| $language;
+        $languageRewrite = $this->getLanguageRewrite() || $language;
         if (!$language) {
             $language = $this->getLanguage();
         }
@@ -444,8 +450,10 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         $templateName = (string) $templateName;
         foreach ($view->getClassHierarchy() as $className) {
             if (!preg_match('/^([a-zA-Z]+)_([a-zA-Z]+)_(.+)$/', $className, $matches)) {
-                throw new CM_Exception('Cannot detect namespace/view-class/view-name for className:`' . $className . '` templateName: `' .
-                    $templateName . '`.');
+                throw new CM_Exception('Cannot detect namespace/view-class/view-name for className and templateName.', null, [
+                    'className'    => $className,
+                    'templateName' => $templateName,
+                ]);
             }
             $templatePathRelative = $matches[2] . DIRECTORY_SEPARATOR . $matches[3] . DIRECTORY_SEPARATOR . $templateName . '.tpl';
             $namespace = $matches[1];
@@ -509,7 +517,10 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         $assetCss->add('foo:@' . $variableName);
         $css = $assetCss->get(true);
         if (!preg_match('/^foo:(.+);$/', $css, $matches)) {
-            throw new CM_Exception_Invalid('Cannot detect variable `' . $variableName . '` from CSS `' . $css . '`.');
+            throw new CM_Exception_Invalid('Cannot detect variable from CSS.', null, [
+                'variableName' => $variableName,
+                'css'          => $css,
+            ]);
         }
         return (string) $matches[1];
     }
