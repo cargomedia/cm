@@ -87,7 +87,7 @@ var CM_Paging_List = Backbone.Collection.extend({
       return false;
     }
 
-    return list.any(function(item) {
+    return list.every(function(item) {
       var localItem = this.get(item);
       if (localItem) {
         if (this.isSynchronizable(localItem) && this.isSynchronizable(item)) {

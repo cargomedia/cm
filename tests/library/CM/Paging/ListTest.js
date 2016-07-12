@@ -127,7 +127,8 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
           '1.1': new CM_Paging_List([
             new CM_Frontend_JsonSerializable({id: 'a', bar: 1})
           ])
-        })
+        }),
+        new CM_Frontend_JsonSerializable({id: 2})
       ]);
       var clone = new CM_Paging_List([
         new CM_Frontend_JsonSerializable({
@@ -136,7 +137,8 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
           '1.1': new CM_Paging_List([
             new CM_Frontend_JsonSerializable({id: 'a', bar: 1})
           ])
-        })
+        }),
+        new CM_Frontend_JsonSerializable({id: 2})
       ]);
 
       var synced = [];
@@ -172,6 +174,8 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
       id: 1,
       foo: 1,
       '1.1': [{id: 'a', bar: 1}]
+    }, {
+      id: 2
     }]);
   });
 
@@ -181,7 +185,7 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
     var synced = this.synced;
 
     var result = list.sync(clone);
-    assert.equal(list.size(), 1);
+    assert.equal(list.size(), 2);
     assert.equal(list.get(1).get('1.1').size(), 1);
     assert.equal(result, null);
     assert.deepEqual(synced, []);
@@ -194,7 +198,7 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
 
     clone.get(1).get('1.1').add(new CM_Frontend_JsonSerializable({id: 'b', bar: 2}));
     var result = list.sync(clone);
-    assert.equal(list.size(), 1);
+    assert.equal(list.size(), 2);
     assert.equal(list.get(1).get('1.1').size(), 2);
     assert.deepEqual(result.updated[1].updated['1.1'].added[0].toJSON(), {id: 'b', bar: 2});
     assert.deepEqual(synced[0].updated[1].updated['1.1'].added[0].toJSON(), {id: 'b', bar: 2});
@@ -207,7 +211,7 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
 
     clone.get(1).get('1.1').get('a').set('bar', 9);
     var result = list.sync(clone);
-    assert.equal(list.size(), 1);
+    assert.equal(list.size(), 2);
     assert.equal(list.get(1).get('1.1').size(), 1);
     assert.deepEqual(result.updated[1].updated['1.1'].updated['a'], {updated: {bar: 9}});
     assert.deepEqual(synced[0].updated[1].updated['1.1'].updated['a'], {updated: {bar: 9}});
@@ -220,7 +224,7 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
 
     clone.get(1).get('1.1').remove('a');
     var result = list.sync(clone);
-    assert.equal(list.size(), 1);
+    assert.equal(list.size(), 2);
     assert.equal(list.get(1).get('1.1').size(), 0);
     assert.deepEqual(result.updated[1].updated['1.1'].removed[0].toJSON(), {id: 'a', bar: 1});
     assert.deepEqual(synced[0].updated[1].updated['1.1'].removed[0].toJSON(), {id: 'a', bar: 1});
