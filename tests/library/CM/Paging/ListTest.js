@@ -43,6 +43,82 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
     assert.deepEqual(list.get(5).toJSON(), {id: 5, foo: 5});
   });
 
+  QUnit.test("get models", function(assert) {
+    var list1 = new CM_Paging_List([
+      new Backbone.Model({foo: 1}),
+      new Backbone.Model({foo: 1}),
+      new Backbone.Model({foo: 2})
+    ]);
+    assert.notOk(list1.get(1));
+    assert.notOk(list1.get({foo: 1}));
+    assert.ok(list1.get(list1.at(0)));
+    assert.ok(list1.get(list1.at(0).cid));
+    assert.ok(list1.get(new Backbone.Model({foo: 1})));
+    assert.ok(list1.get(new Backbone.Model({foo: 2})));
+
+    var list2 = new CM_Paging_List([
+      new Backbone.Model({id: 1, foo: 1}),
+      new Backbone.Model({id: 2, foo: 1})
+    ]);
+    assert.ok(list2.get({id: 1, foo: 2}));
+    assert.ok(list2.get(1));
+    assert.ok(list2.get(list2.at(0)));
+    assert.ok(list2.get(list2.at(0).cid));
+    assert.ok(list2.get(new Backbone.Model({id: 1, foo: 1})));
+    assert.ok(list2.get(new Backbone.Model({id: 2, foo: 1})));
+
+    var list3 = new CM_Paging_List([
+      new CM_Frontend_JsonSerializable({
+        foo: 1,
+        bar: new CM_Frontend_JsonSerializable({
+          val: 1
+        })
+      }),
+      new CM_Frontend_JsonSerializable({foo: 1, bar: 2}),
+      new CM_Frontend_JsonSerializable({foo: 2})
+    ]);
+    assert.notOk(list3.get(1));
+    assert.notOk(list3.get(new CM_Frontend_JsonSerializable({
+        foo: 1,
+        bar: new CM_Frontend_JsonSerializable({
+          val: 2
+        })
+      })
+    ));
+    assert.ok(list3.get(new CM_Frontend_JsonSerializable({
+        foo: 1,
+        bar: new CM_Frontend_JsonSerializable({
+          val: 1
+        })
+      })
+    ));
+    assert.ok(list3.get(list3.at(0)));
+    assert.ok(list3.get(list3.at(0).cid));
+
+    var list4 = new CM_Paging_List([
+      new CM_Frontend_JsonSerializable({
+        id: 1,
+        bar: new CM_Frontend_JsonSerializable({
+          val: 1
+        })
+      }),
+      new CM_Frontend_JsonSerializable({id: 1, bar: 2}),
+      new CM_Frontend_JsonSerializable({id: 2})
+    ]);
+    assert.ok(list4.get(1));
+    assert.ok(list4.get({id: 1}));
+    assert.ok(list4.get(new CM_Frontend_JsonSerializable({id: 1})));
+    assert.ok(list4.get(new CM_Frontend_JsonSerializable({
+        id: 1,
+        bar: new CM_Frontend_JsonSerializable({
+          val: 2
+        })
+      })
+    ));
+    assert.ok(list4.get(list4.at(0)));
+    assert.ok(list4.get(list4.at(0).cid));
+  });
+
   QUnit.test("equals", function(assert) {
     var list = this.list;
     var clone = this.clone;
@@ -50,6 +126,56 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
     assert.notOk(list.equals([]));
     assert.notOk(list.equals([{id: 1, foo: 1}, {id: 2, foo: 2}, {id: 3, foo: 3}]));
     assert.ok(list.equals(clone));
+  });
+
+  QUnit.test("equals: native Backbone.Model", function(assert) {
+    var list1 = new CM_Paging_List([
+      new Backbone.Model({foo: 2}),
+      new Backbone.Model({foo: 3})
+    ]);
+
+    var list2 = new CM_Paging_List([
+      new Backbone.Model({foo: 2}),
+      new Backbone.Model({foo: 3})
+    ]);
+
+    assert.ok(list1.size(), 2);
+    assert.ok(list2.size(), 2);
+    assert.ok(list1.equals(list2));
+  });
+
+  QUnit.test("equals: native Backbone.Model with redundant data", function(assert) {
+    var list1 = new CM_Paging_List([
+      new Backbone.Model({foo: 2}),
+      new Backbone.Model({foo: 2}),
+      new Backbone.Model({foo: 3})
+    ]);
+
+    var list2 = new CM_Paging_List([
+      new Backbone.Model({foo: 2}),
+      new Backbone.Model({foo: 3}),
+      new Backbone.Model({foo: 3})
+    ]);
+
+    assert.ok(list1.size(), 3);
+    assert.ok(list2.size(), 3);
+    assert.notOk(list1.equals(list2));
+  });
+
+  QUnit.test("equals: same list without ids", function(assert) {
+    var list1 = new CM_Paging_List([
+      new CM_Frontend_JsonSerializable({foo: 2}),
+      new CM_Frontend_JsonSerializable({foo: 3})
+    ]);
+
+    var list2 = new CM_Paging_List([
+      new CM_Frontend_JsonSerializable({foo: 2}),
+      new CM_Frontend_JsonSerializable({foo: 3})
+    ]);
+
+    assert.ok(list1.size(), 2);
+    assert.ok(list2.size(), 2);
+    assert.ok(list1.equals(list2));
   });
 
   QUnit.test("equals: redundant data", function(assert) {

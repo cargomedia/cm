@@ -87,14 +87,12 @@ var CM_Paging_List = Backbone.Collection.extend({
       return false;
     }
 
+    var checkedModelCids = [];
     return list.every(function(item) {
       var localItem = this.get(item);
-      if (localItem) {
-        if (this.isSynchronizable(localItem) && this.isSynchronizable(item)) {
-          return localItem.equals(item);
-        } else {
-          return _.isEqual(localItem, item);
-        }
+      if (localItem && !_.contains(checkedModelCids, localItem.cid)) {
+        checkedModelCids.push(localItem.cid);
+        return this._compareModels(localItem, item);
       }
       return false;
     }, this);
@@ -102,6 +100,20 @@ var CM_Paging_List = Backbone.Collection.extend({
 
   toJSON: function() {
     return Backbone.Collection.prototype.toJSON.apply(this, arguments);
+  },
+
+  /**
+   * @param {*} value
+   * @returns {Backbone.Model|undefined}
+   */
+  get: function(value) {
+    var item = Backbone.Collection.prototype.get.call(this, value);
+    if (!item && value instanceof Backbone.Model) {
+      item = this.find(function(currentItem) {
+        return this._compareModels(value, currentItem);
+      }, this);
+    }
+    return item;
   },
 
   /**
@@ -116,5 +128,19 @@ var CM_Paging_List = Backbone.Collection.extend({
 
   fetch: function() {
     throw new Error('Not implemented.');
+  },
+
+  /**
+   * @param {Backbone.Model} model1
+   * @param {Backbone.Model} model2
+   * @returns {Boolean}
+   * @private
+   */
+  _compareModels: function(model1, model2) {
+    if (CM_Frontend_SynchronizableTrait.isImplementedBy(model1)) {
+      return model1.equals(model2);
+    } else {
+      return _.isEqual(model1.toJSON(), model2.toJSON());
+    }
   }
 });
