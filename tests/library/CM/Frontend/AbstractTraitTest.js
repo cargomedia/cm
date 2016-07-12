@@ -2,7 +2,7 @@ define(["CM/Frontend/AbstractTrait"], function() {
 
   QUnit.module('CM/Frontend/AbstractTrait', {
     beforeEach: function() {
-      var FooTrait = _(CM_Frontend_AbstractTrait).clone();
+      var FooTrait = _.clone(CM_Frontend_AbstractTrait);
       FooTrait.traitProperties = {
         foo: function() {
           return true;
