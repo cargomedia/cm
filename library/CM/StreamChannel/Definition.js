@@ -49,7 +49,7 @@ var CM_StreamChannel_Definition = CM_Frontend_JsonSerializable.extend({
   /**
    * @param {String} eventName
    * @param {CM_StreamChannel_Definition~streamCallback} callback
-   * @param {Object} [context]
+   * @param {*} [context]
    * @param {Boolean} [allowClientMessage]
    */
   addStreamEventListener: function(eventName, callback, context, allowClientMessage) {
@@ -63,7 +63,7 @@ var CM_StreamChannel_Definition = CM_Frontend_JsonSerializable.extend({
   /**
    * @param {String} [eventName]
    * @param {CM_StreamChannel_Definition~streamCallback} [callback]
-   * @param {Object} [context]
+   * @param {*} [context]
    */
   removeStreamEventListeners: function(eventName, callback, context) {
     cm.stream.unbind(this.getKey(), this.getType(), eventName, callback, context);
