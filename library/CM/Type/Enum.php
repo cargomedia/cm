@@ -16,13 +16,16 @@ abstract class CM_Type_Enum {
         if (null === $value) {
             $defaultValue = (string) $this->_getDefaultValue();
             if (!$this->_isValidValue($defaultValue)) {
-                throw new CM_Exception_Invalid('Invalid default value for enum class `' . get_class($this) . '`');
+                throw new CM_Exception_Invalid('Invalid default value for enum class', null, ['className' => get_class($this)]);
             }
             $this->_currentValue = $defaultValue;
         } else {
             $value = (string) $value;
             if (!$this->_isValidValue($value)) {
-                throw new CM_Exception_Invalid('Invalid value `' . $value . '` for enum class `' . get_class($this) . '`');
+                throw new CM_Exception_Invalid('Invalid value for enum class', null, [
+                    'value'         => $value,
+                    'enumClassName' => get_class($this),
+                ]);
             }
             $this->_currentValue = $value;
         }
@@ -37,7 +40,7 @@ abstract class CM_Type_Enum {
      * @throws CM_Exception_Invalid
      */
     protected function _getDefaultValue() {
-        throw new CM_Exception_Invalid('Default value in not defined for enum class `' . get_class($this) . '`');
+        throw new CM_Exception_Invalid('Default value in not defined for enum class', null, ['className' => get_class($this)]);
     }
 
     /**

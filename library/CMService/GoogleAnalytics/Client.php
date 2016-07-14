@@ -234,7 +234,7 @@ EOF;
      */
     protected function _pushHit(CM_Model_User $user, $hitType, array $data = null) {
         if (!in_array($hitType, ['event', 'pageview'])) {
-            throw new CM_Exception_Invalid('Invalid hit type `' . $hitType . '`');
+            throw new CM_Exception_Invalid('Invalid hit type', null, ['hitType' => $hitType]);
         }
         $this->_pushTrackingData($user, ['hitType' => $hitType, 'data' => $data]);
     }

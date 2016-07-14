@@ -21,11 +21,11 @@ class CM_Util_NamedArgs {
                 $finalArgs[] = $parameter->getDefaultValue();
                 continue;
             }
-            throw new CM_Exception_Invalid("Cannot find value for `{$parameter->getName()}``");
+            throw new CM_Exception_Invalid('Cannot find value for parameter', null, ['parameter' => $parameter->getName()]);
         }
         if (count($args) > 0) {
             $argNames = join(', ', array_keys($args));
-            throw new CM_Exception_Invalid("Unmatched arguments: `{$argNames}`");
+            throw new CM_Exception_Invalid('Unmatched arguments', null, ['argNames' => $argNames]);
         }
         return $finalArgs;
     }

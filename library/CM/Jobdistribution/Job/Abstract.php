@@ -179,7 +179,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
             $value = array_map('self::_verifyParams', $value);
         }
         if (is_object($value) && false === $value instanceof CM_ArrayConvertible) {
-            throw new CM_Exception_InvalidParam('Object of class `' . get_class($value) . '` is not an instance of CM_ArrayConvertible');
+            throw new CM_Exception_InvalidParam('Object is not an instance of CM_ArrayConvertible', null, ['className' => get_class($value)]);
         }
     }
 
