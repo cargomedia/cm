@@ -235,7 +235,10 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         try {
             return (int) $this->_client->headObject($options)->get('ContentLength');
         } catch (\Exception $e) {
-            throw new CM_Exception('Cannot get size for `' . $path . '`: ' . $e->getMessage());
+            throw new CM_Exception('Cannot get size for path', null, [
+                'path'                     => $path,
+                'originalExceptionMessage' => $e->getMessage(),
+            ]);
         }
     }
 

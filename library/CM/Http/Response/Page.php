@@ -122,7 +122,10 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
                 $className = CM_Page_Abstract::getClassnameByPath($this->getRender(), $request->getPath());
                 $page = CM_Page_Abstract::factory($className, $pageParams);
             } catch (CM_Exception $ex) {
-                throw new CM_Exception_Nonexistent('Cannot load page `' . $request->getPath() . '`: ' . $ex->getMessage());
+                throw new CM_Exception_Nonexistent('Cannot load page', null, [
+                    'requestPath'              => $request->getPath(),
+                    'originalExceptionMessage' => $ex->getMessage(),
+                ]);
             }
             $result->addPage($page);
 

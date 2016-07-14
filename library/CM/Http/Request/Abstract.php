@@ -99,7 +99,7 @@ abstract class CM_Http_Request_Abstract {
     public final function getHeader($name) {
         $name = strtolower($name);
         if (!$this->hasHeader($name)) {
-            throw new CM_Exception_Invalid('Header `' . $name . '` not set.');
+            throw new CM_Exception_Invalid('Header is not set.', null, ['headerName' => $name]);
         }
         return (string) $this->_headers[$name];
     }
@@ -305,7 +305,7 @@ abstract class CM_Http_Request_Abstract {
         }
 
         if (false === ($path = parse_url($uriWithHost, PHP_URL_PATH))) {
-            throw new CM_Exception_Invalid('Cannot detect path from `' . $uriWithHost . '`.');
+            throw new CM_Exception_Invalid('Cannot detect path from url.', null, ['url' => $uriWithHost]);
         }
         if (null === $path) {
             $path = '/';
@@ -313,7 +313,7 @@ abstract class CM_Http_Request_Abstract {
         $this->setPath($path);
 
         if (false === ($queryString = parse_url($uriWithHost, PHP_URL_QUERY))) {
-            throw new CM_Exception_Invalid('Cannot detect query from `' . $uriWithHost . '`.');
+            throw new CM_Exception_Invalid('Cannot detect query from url.', null, ['url' => $uriWithHost]);
         }
         parse_str($queryString, $query);
         $this->setQuery($query);
@@ -341,7 +341,7 @@ abstract class CM_Http_Request_Abstract {
             if ($this->hasHeader('cookie')) {
                 $header = $this->getHeader('cookie');
                 if (false === preg_match_all('/([^=;\s]+)\s*=\s*([^=;\s]+)/', $header, $matches, PREG_SET_ORDER)) {
-                    throw new CM_Exception('Cannot parse Cookie-header `' . $header . '`');
+                    throw new CM_Exception('Cannot parse Cookie-header', null, ['header' => $header]);
                 }
                 foreach ($matches as $match) {
                     $this->_cookies[urldecode($match[1])] = urldecode($match[2]);
@@ -641,7 +641,7 @@ abstract class CM_Http_Request_Abstract {
         if ($method === 'options') {
             return new CM_Http_Request_Options($uri, $headers, $server);
         }
-        throw new CM_Exception_Invalid('Invalid request method `' . $method . '`');
+        throw new CM_Exception_Invalid('Invalid request method', null, ['method' => $method]);
     }
 
     /**

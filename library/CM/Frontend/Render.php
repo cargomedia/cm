@@ -213,7 +213,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         $pageClassName = (string) $pageClassName;
 
         if (!class_exists($pageClassName) || !is_subclass_of($pageClassName, 'CM_Page_Abstract')) {
-            throw new CM_Exception_Invalid('Cannot find valid class definition for page `' . $pageClassName . '`.');
+            throw new CM_Exception_Invalid('Cannot find valid class definition for page class name', null, ['pageClassName' => $pageClassName]);
         }
         if (!preg_match('/^([A-Za-z]+)_/', $pageClassName, $matches)) {
             throw new CM_Exception_Invalid('Cannot find namespace of page class name', null, ['pageClassName' => $pageClassName]);
@@ -474,7 +474,10 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     public function fetchViewTemplate(CM_View_Abstract $view, $templateName, array $data = null) {
         $templatePath = $this->getTemplatePath($view, $templateName);
         if (null === $templatePath) {
-            throw new CM_Exception('Cannot find template `' . $templateName . '` for `' . get_class($view) . '`.');
+            throw new CM_Exception('Cannot find template for view class name', null, [
+                'template'      => $templateName,
+                'viewClassName' => get_class($view),
+            ]);
         }
         $viewClassName = get_class($view);
         return $this->fetchTemplate($templatePath, $data, [$viewClassName]);
