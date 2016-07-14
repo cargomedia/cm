@@ -253,7 +253,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         try {
             $class = self::_getClassName($type);
         } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
-            throw new CM_Class_Exception_TypeNotConfiguredException('Site with type `' . $type . '` not configured', CM_Exception::WARN);
+            throw new CM_Class_Exception_TypeNotConfiguredException('Site with given type is not configured', CM_Exception::WARN, ['siteType' => $type]);
         }
         return new $class();
     }

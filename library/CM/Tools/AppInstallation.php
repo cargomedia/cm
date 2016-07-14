@@ -51,7 +51,10 @@ class CM_Tools_AppInstallation {
      */
     public function getModulePath($name) {
         if (!$this->moduleExists($name)) {
-            throw new CM_Exception_Invalid('Cannot find `' . $name . '` module/namespace within `' . implode('`', $this->getModuleNames()) . '`');
+            throw new CM_Exception_Invalid('Cannot find module/namespace within module paths', null, [
+                'name'        => $name,
+                'modulePaths' => implode('`', $this->getModuleNames()),
+            ]);
         }
         return $this->_getModulePaths()[$name];
     }
@@ -137,7 +140,7 @@ class CM_Tools_AppInstallation {
         try {
             return $this->getModulePath($namespace) . 'library/';
         } catch (CM_Exception_Invalid $e) {
-            throw new CM_Exception_Invalid('Namespace `' . $namespace . '` not found within cm-based module-namespaces.');
+            throw new CM_Exception_Invalid('Namespace not found within cm-based module-namespaces.', null, ['namespace' => $namespace]);
         }
     }
 
@@ -185,6 +188,6 @@ class CM_Tools_AppInstallation {
                 return $package;
             }
         }
-        throw new CM_Exception_Invalid('No package with rootPackageName `' . $rootPackageName . '` was found.');
+        throw new CM_Exception_Invalid('No package with rootPackageName was found.', null, ['rootPackageName' => $rootPackageName]);
     }
 }

@@ -104,9 +104,9 @@ class CM_Model_Location_City extends CM_Model_Location_Abstract {
             case CM_Model_Location::LEVEL_CITY:
                 return $this;
             case CM_Model_Location::LEVEL_ZIP:
-                throw new CM_Exception_Invalid('Invalid parent location level `' . $level . '` for a city');
+                throw new CM_Exception_Invalid('Invalid parent location level for a city', null, ['level' => $level]);
         }
-        throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
+        throw new CM_Exception_Invalid('Invalid location level', null, ['level' => $level]);
     }
 
     public function _getSchema() {

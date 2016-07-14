@@ -33,7 +33,11 @@ class CM_Service_Manager extends CM_Class_Abstract {
         }
         $service = $this->_serviceInstanceList[$serviceName];
         if (null !== $assertInstanceOf && !is_a($service, $assertInstanceOf, true)) {
-            throw new CM_Exception_Invalid('Service `' . $serviceName . '` is a `' . get_class($service) . '`, but not `' . $assertInstanceOf . '`.');
+            throw new CM_Exception_Invalid('Service has an invalid class.', null, [
+                'service'           => $serviceName,
+                'actualClassName'   => get_class($service),
+                'expectedClassName' => $assertInstanceOf,
+            ]);
         }
         return $service;
     }
@@ -67,7 +71,7 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public function registerWithArray($serviceName, array $config) {
         if ($this->has($serviceName)) {
-            throw new CM_Exception_Invalid('Service `' . $serviceName . '` already registered.');
+            throw new CM_Exception_Invalid('Service is already registered.', null, ['service' => $serviceName]);
         }
         $class = (string) $config['class'];
         $arguments = array();
@@ -98,7 +102,7 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public function registerInstance($serviceName, $instance) {
         if ($this->has($serviceName)) {
-            throw new CM_Exception_Invalid('Service `' . $serviceName . '` already registered.');
+            throw new CM_Exception_Invalid('Service is already registered.', null, ['service' => $serviceName]);
         }
         $serviceName = (string) $serviceName;
         if ($instance instanceof CM_Service_ManagerAwareInterface) {
@@ -132,7 +136,7 @@ class CM_Service_Manager extends CM_Class_Abstract {
             $serviceName = $matches[1];
             return $this->get($serviceName);
         }
-        throw new CM_Exception_Invalid('Cannot extract service name from `' . $name . '`.');
+        throw new CM_Exception_Invalid('Cannot extract service name.', null, ['name' => $name]);
     }
 
     /**
@@ -282,7 +286,10 @@ class CM_Service_Manager extends CM_Class_Abstract {
         try {
             return $namedArgs->matchNamedArgs($method, $arguments);
         } catch (CM_Exception_Invalid $e) {
-            throw new CM_Exception_Invalid("Cannot match arguments for `{$serviceName}`: {$e->getMessage()}");
+            throw new CM_Exception_Invalid('Cannot match arguments for service', null, [
+                'serviceName'              => $serviceName,
+                'originalExceptionMessage' => $e->getMessage(),
+            ]);
         }
     }
 

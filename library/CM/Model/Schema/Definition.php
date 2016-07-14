@@ -54,8 +54,7 @@ class CM_Model_Schema_Definition {
                             }
                             $className = $type;
                             if (!$value instanceof $className) {
-                                throw new CM_Model_Exception_Validation(
-                                    'Value `' . CM_Util::var_line($value) . '` is not an instance of `' . $className . '`');
+                                throw new CM_Model_Exception_Validation('Value `' . CM_Util::var_line($value) . '` is not an instance of `' . $className . '`');
                             }
 
                             if (is_a($className, 'CM_Model_Abstract', true)) {
@@ -71,8 +70,7 @@ class CM_Model_Schema_Definition {
                                 $value = $value->toArray();
                                 $value = CM_Util::jsonEncode($value);
                             } else {
-                                throw new CM_Model_Exception_Validation(
-                                    'Class `' . $className . '` is neither CM_Model_Abstract nor CM_ArrayConvertible');
+                                throw new CM_Model_Exception_Validation('Class `' . $className . '` is neither CM_Model_Abstract nor CM_ArrayConvertible');
                             }
                     }
                 }
@@ -137,13 +135,11 @@ class CM_Model_Schema_Definition {
                                 $value = CM_Util::jsonDecode($value);
                                 $value = $className::fromArray($value);
                             } else {
-                                throw new CM_Model_Exception_Validation(
-                                    'Class `' . $className . '` is neither CM_Model_Abstract nor CM_ArrayConvertible');
+                                throw new CM_Model_Exception_Validation('Class `' . $className . '` is neither CM_Model_Abstract nor CM_ArrayConvertible');
                             }
 
                             if (!$value instanceof $className) {
-                                throw new CM_Model_Exception_Validation(
-                                    'Value `' . CM_Util::var_line($value) . '` is not an instance of `' . $className . '`');
+                                throw new CM_Model_Exception_Validation('Value `' . CM_Util::var_line($value) . '` is not an instance of `' . $className . '`');
                             }
                     }
                 }
@@ -244,7 +240,7 @@ class CM_Model_Schema_Definition {
                                 }
                                 break;
                             }
-                            throw new CM_Exception_Invalid('Invalid type `' . $type . '`');
+                            throw new CM_Exception_Invalid('Invalid type', null, ['type' => $type]);
                     }
                 }
             }
