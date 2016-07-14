@@ -147,7 +147,7 @@ class CM_Image_Image {
             case'SVG':
                 return self::FORMAT_SVG;
             default:
-                throw new CM_Exception_Invalid('Unsupported format `' . $imagickFormat . '`.');
+                throw new CM_Exception_Invalid('Unsupported format', null, ['format' => $imagickFormat]);
         }
     }
 
@@ -167,7 +167,7 @@ class CM_Image_Image {
      */
     public function setFormat($format) {
         if (true !== $this->_imagick->setImageFormat($this->_getImagickFormat($format))) {
-            throw new CM_Exception('Cannot set image format `' . $format . '`');
+            throw new CM_Exception('Cannot set image format', null, ['format' => $format]);
         }
         $this->_animated = $this->_getAnimationRequired($format);
         return $this;
@@ -259,7 +259,7 @@ class CM_Image_Image {
 
         $this->_invokeOnEveryFrame(function (Imagick $frame) use ($angle) {
             if (true !== $frame->rotateImage(new ImagickPixel('#00000000'), $angle)) {
-                throw new CM_Exception('Cannot rotate image by `' . $angle . '` degrees');
+                throw new CM_Exception('Cannot rotate image by given angle', null, ['angleDegrees' => $angle]);
             }
         });
         return $this;
@@ -273,7 +273,7 @@ class CM_Image_Image {
     public function setCompressionQuality($quality) {
         $quality = (int) $quality;
         if ($quality < 1 || $quality > 100) {
-            throw new CM_Exception_Invalid('Invalid compression quality `' . $quality . '`, should be between 1-100.');
+            throw new CM_Exception_Invalid('Invalid compression quality. It should be between 1-100.', null, ['quality' => $quality]);
         }
         $this->_imagick->setImageCompressionQuality($quality);
         return $this;
@@ -321,7 +321,7 @@ class CM_Image_Image {
             case self::FORMAT_PNG:
                 return 'PNG';
             default:
-                throw new CM_Exception_Invalid('Invalid format `' . $format . '`.');
+                throw new CM_Exception_Invalid('Invalid format', null, ['format' => $format]);
         }
     }
 
@@ -389,7 +389,7 @@ class CM_Image_Image {
             case self::FORMAT_PNG:
                 return 'png';
             default:
-                throw new CM_Exception_Invalid('Invalid format `' . $format . '`.');
+                throw new CM_Exception_Invalid('Invalid format', null, ['format' => $format]);
         }
     }
 

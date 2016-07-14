@@ -113,7 +113,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
             }
         }
         if (!$variationBest) {
-            throw new CM_Exception('Splittest `' . $this->getId() . '` has no variations');
+            throw new CM_Exception('Splittest has no variations', null, ['splitTestId' => $this->getId()]);
         }
         return $variationBest;
     }
@@ -133,10 +133,13 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
             $variationWeight = (float) $variationWeight;
             $variation = $variationList->findByName($variationName);
             if (!$variation) {
-                throw new CM_Exception_Invalid('There is no variation `' . $variationName . '` in split test `' . $this->getName() . '`');
+                throw new CM_Exception_Invalid('There is no variation in split test', null, [
+                    'variation' => $variationName,
+                    'splitTest' => $this->getName(),
+                ]);
             }
             if ($variationWeight < 0) {
-                throw new CM_Exception_Invalid('Split test variation weight `' . $variationWeight . '` should be positive');
+                throw new CM_Exception_Invalid('Split test variation weight. It should be positive', null, ['variationWeight' => $variationWeight]);
             }
             if ($variation->getEnabled() && ($variationWeight > 0)) {
                 $this->_variationWeightList[$variationName] = $variationWeight;
@@ -161,7 +164,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
         $id = (int) $id;
         $name = CM_Db_Db::select('cm_splittest', 'name', array('id' => $id))->fetchColumn();
         if (false === $name) {
-            throw new CM_Exception_Nonexistent('Cannot find splittest with id `' . $id . '`');
+            throw new CM_Exception_Nonexistent('Cannot find splittest by id', null, ['id' => $id]);
         }
         return new static($name);
     }
@@ -329,7 +332,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
             $variation = $this->_getVariationWithUniformPolicy();
         }
         if (!$variation) {
-            throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
+            throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.', null, ['splitTestId' => $this->getId(),]);
         }
         return $variation;
     }

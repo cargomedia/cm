@@ -179,7 +179,7 @@ class CM_Model_Location extends CM_Model_Abstract {
                 $location = new CM_Model_Location_Zip($id);
                 break;
             default:
-                throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
+                throw new CM_Exception_Invalid('Invalid location level', null, ['level' => $level]);
         }
         $this->_locationList = array();
         $locationDataList = array();
@@ -325,7 +325,7 @@ class CM_Model_Location extends CM_Model_Abstract {
             self::LEVEL_ZIP     => CM_Model_Location_Zip::getTypeStatic(),
         );
         if (!isset($typeList[$level])) {
-            throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
+            throw new CM_Exception_Invalid('Invalid location level', null, ['level' => $level]);
         }
         return $typeList[$level];
     }

@@ -162,7 +162,10 @@ class CM_Janus_RpcEndpoints {
         }
 
         if ($streamChannel->getServerId() !== $server->getId()) {
-            throw new CM_Exception_Invalid("Request server `{$server->getId()}` does not match existing `{$streamChannel->getServerId()}`");
+            throw new CM_Exception_Invalid('Request server does not match existing in stream channel', null, [
+                'requestServerId'       => $server->getId(),
+                'streamChannelServerId' => $streamChannel->getServerId(),
+            ]);
         }
         $streamSubscribe = $streamChannel->getStreamSubscribes()->findKey($streamKey);
         if ($streamSubscribe) {

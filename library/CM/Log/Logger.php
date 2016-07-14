@@ -93,7 +93,7 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param string                  $message
+     * @param string              $message
      * @param CM_Log_Context|null $context
      * @return CM_Log_Logger
      */
@@ -102,7 +102,7 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param string                  $message
+     * @param string              $message
      * @param CM_Log_Context|null $context
      * @return CM_Log_Logger
      */
@@ -111,7 +111,7 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param string                  $message
+     * @param string              $message
      * @param CM_Log_Context|null $context
      * @return CM_Log_Logger
      */
@@ -120,7 +120,7 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param string                  $message
+     * @param string              $message
      * @param CM_Log_Context|null $context
      * @return CM_Log_Logger
      */
@@ -129,7 +129,7 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param string                  $message
+     * @param string              $message
      * @param CM_Log_Context|null $context
      * @return CM_Log_Logger
      */
@@ -165,7 +165,10 @@ class CM_Log_Logger {
     public static function getLevelName($level) {
         $level = (int) $level;
         if (!isset(self::$_levels[$level])) {
-            throw new CM_Exception_Invalid('Level `' . $level . '` is not defined, use one of: ' . implode(', ', array_keys(self::$_levels)));
+            throw new CM_Exception_Invalid('Level is not defined', null, [
+                'level'           => $level,
+                'availableLevels' => implode(', ', array_keys(self::$_levels)),
+            ]);
         }
         return self::$_levels[$level];
     }

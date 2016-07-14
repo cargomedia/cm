@@ -107,7 +107,7 @@ class CM_Janus_ServerList extends CM_Class_Abstract implements CM_Typed {
                 return $server;
             }
         }
-        throw new CM_Exception_Invalid('Cannot find server with id `' . $id . '`');
+        throw new CM_Exception_Invalid('Cannot find server', null, ['id' => $id]);
     }
 
     /**

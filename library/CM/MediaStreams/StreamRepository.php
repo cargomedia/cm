@@ -39,7 +39,7 @@ class CM_MediaStreams_StreamRepository {
         if (null !== $mediaId) {
             $mediaId = (string) $mediaId;
             if (null !== CM_Model_StreamChannelArchive_Media::findByMediaId($mediaId)) {
-                throw new CM_Exception_Invalid('Channel archive with mediaId `' . $mediaId . '` already exists');
+                throw new CM_Exception_Invalid('Channel archive with given mediaId already exists', null, ['mediaId' => $mediaId]);
             }
         }
 

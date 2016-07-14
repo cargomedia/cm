@@ -53,7 +53,7 @@ class CM_Log_Handler_Layered implements CM_Log_Handler_HandlerInterface {
      */
     protected function _getLayer($number) {
         if (!$this->_hasLayer($number)) {
-            throw new CM_Exception_Invalid("Layer `#{$number}` not found");
+            throw new CM_Exception_Invalid('Layer not found', null, ['layerNumber' => $number]);
         }
         return $this->_layers[$number];
     }
