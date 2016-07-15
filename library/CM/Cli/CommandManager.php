@@ -232,7 +232,7 @@ class CM_Cli_CommandManager {
             throw new CM_Cli_Exception_InvalidArguments('Too many arguments provided');
         }
         if ($named = $arguments->getNamed()->getParamsDecoded()) {
-            throw new CM_Cli_Exception_InvalidArguments('Illegal option used: `--' . key($named) . '`');
+            throw new CM_Cli_Exception_InvalidArguments(new CM_I18n_Phrase('Illegal option used: `--{$option}`', ['option' => key($named)]));
         }
     }
 
@@ -261,7 +261,10 @@ class CM_Cli_CommandManager {
                 return $command;
             }
         }
-        throw new CM_Cli_Exception_InvalidArguments('Command `' . $packageName . ' ' . $methodName . '` not found');
+        throw new CM_Cli_Exception_InvalidArguments(new CM_I18n_Phrase('Command `{$packageName} {$methodName}` not found', [
+            'packageName' => $packageName,
+            'methodName'  => $methodName,
+        ]));
     }
 
     /**
