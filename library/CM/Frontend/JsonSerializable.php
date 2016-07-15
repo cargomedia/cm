@@ -6,6 +6,13 @@ class CM_Frontend_JsonSerializable implements JsonSerializable {
     protected $_data;
 
     /**
+     * @param array|null $data
+     */
+    public function __construct(array $data = null) {
+        $this->setData(null === $data ? [] : $data);
+    }
+
+    /**
      * @return array
      */
     public function getData() {
@@ -15,12 +22,8 @@ class CM_Frontend_JsonSerializable implements JsonSerializable {
     /**
      * @param array $data
      */
-    public function setData($data) {
+    public function setData(array $data) {
         $this->_data = $data;
-    }
-
-    public function __construct(array $data) {
-        $this->setData($data);
     }
 
     function jsonSerialize() {
