@@ -31,21 +31,29 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
     }
 
     /**
-     * @return CM_Model_Stream_Publish
-     * @throws CM_Exception_Invalid
+     * @return CM_Model_Stream_Publish|null
      */
-    public function getStreamPublish() {
-        if (!$this->hasStreamPublish()) {
-            throw new CM_Exception_Invalid('StreamChannel has no StreamPublish.', null, ['streamChannelId' => $this->getId()]);
-        }
+    public function findStreamPublish() {
         return $this->getStreamPublishs()->getItem(0);
     }
 
     /**
-     * @return boolean
+     * @return CM_Model_Stream_Publish
+     * @throws CM_Exception_Invalid
+     */
+    public function getStreamPublish() {
+        $publish = $this->findStreamPublish();
+        if (null === $publish) {
+            throw new CM_Exception_Invalid('StreamChannel has no StreamPublish.', null, ['streamChannelId' => $this->getId()]);
+        }
+        return $publish;
+    }
+
+    /**
+     * @return bool
      */
     public function hasStreamPublish() {
-        return (boolean) $this->getStreamPublishs()->getCount();
+        return null !== $this->findStreamPublish();
     }
 
     /**
@@ -57,8 +65,8 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
 
     public function jsonSerialize() {
         $array = parent::jsonSerialize();
-        if ($this->hasStreamPublish()) {
-            $array['user'] = $this->getStreamPublish()->getUser();
+        if ($publish = $this->findStreamPublish()) {
+            $array['user'] = $publish->getUser();
         }
         return $array;
     }

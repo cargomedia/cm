@@ -14,14 +14,14 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
                 'host' => 'foo.bar:8080',
             ],
             [
-                'http_referer'   => 'http://bar/baz',
+                'http_referer'    => 'http://bar/baz',
                 'http_user_agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)',
                 'foo'             => 'quux',
             ]
         );
         $clientId = $httpRequest->getClientId();
         $computerInfo = new CM_Log_Context_ComputerInfo('www.example.com', 'v7.0.1');
-        $exception = new CM_Exception_Invalid('Bad');
+        $exception = new CM_Exception_Invalid('Bad', null, ['foo' => 'bar']);
 
         $context = new CM_Log_Context();
         $context->setExtra(['bar' => 'baz', 'baz' => 'quux']);
@@ -33,7 +33,7 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
 
         $contextFormatter = new CM_Log_ContextFormatter_Cargomedia('appName');
         $formattedRecord = $contextFormatter->formatRecordContext($record);
-        
+
         $this->assertSame($message, $formattedRecord['message']);
         $this->assertSame('debug', $formattedRecord['level']);
         $this->assertArrayHasKey('timestamp', $formattedRecord);
@@ -54,6 +54,7 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
         $this->assertSame('Bad', $formattedRecord['exception']['message']);
         $this->assertArrayHasKey('stack', $formattedRecord['exception']);
         $this->assertInternalType('string', $formattedRecord['exception']['stack']);
+        $this->assertSame(['foo' => "'bar'"], $formattedRecord['exception']['metaInfo']);
         $this->assertRegExp('/CM_Log_ContextFormatter_CargomediaTest->testGetRecordContext\(\)/', $formattedRecord['exception']['stack']);
     }
 }

@@ -27,9 +27,7 @@ abstract class CM_MediaStreams_Service extends CM_Class_Abstract implements CM_T
             if ($streamChannel instanceof CM_StreamChannel_DisallowInterface) {
                 /** @var CM_Model_StreamChannel_Media|CM_StreamChannel_DisallowInterface $streamChannel */
                 $streamChannelIsValid = $streamChannel->isValid();
-                if ($streamChannel->hasStreamPublish()) {
-                    /** @var CM_Model_Stream_Publish $streamPublish */
-                    $streamPublish = $streamChannel->getStreamPublish();
+                if ($streamPublish = $streamChannel->findStreamPublish()) {
                     if (!$streamChannelIsValid || !$this->_isPublishAllowed($streamPublish)) {
                         $this->_stopStream($streamPublish);
                     }

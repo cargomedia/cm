@@ -25,14 +25,14 @@ class CM_Session implements CM_Comparable {
     /**
      * @param string|null                   $id
      * @param CM_Http_Request_Abstract|null $request
-     * @throws CM_Exception_Nonexistent
+     * @throws CM_Exception_UnknownSessionId
      */
     public function __construct($id = null, CM_Http_Request_Abstract $request = null) {
         if (null !== $id) {
             $this->_id = (string) $id;
             $data = self::_findDataById($this->getId());
             if (null === $data) {
-                throw new CM_Exception_Nonexistent('Session does not exist.', null, ['sessionId' => $this->getId()]);
+                throw new CM_Exception_UnknownSessionId('Session does not exist.', null, ['sessionId' => $this->getId()]);
             }
             $this->_isPersistent = true;
             $expires = (int) $data['expires'];

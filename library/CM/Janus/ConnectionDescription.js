@@ -1,8 +1,8 @@
 /**
  * @class CM_Janus_ConnectionDescription
- * @extends Backbone.Model
+ * @extends CM_Frontend_JsonSerializable
  */
-var CM_Janus_ConnectionDescription = Backbone.Model.extend({
+var CM_Janus_ConnectionDescription = CM_Frontend_JsonSerializable.extend({
 
   _class: 'CM_Janus_ConnectionDescription',
 

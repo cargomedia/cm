@@ -246,7 +246,7 @@ class CM_ParamsTest extends CMTest_TestCase {
             'foo' => 1
         ]);
         $expectedEncoded = array(
-            'foo' => 1,
+            'foo'    => 1,
             '_class' => get_class($object),
         );
         $this->assertEquals($expectedEncoded, CM_Params::encode($object));
@@ -467,5 +467,34 @@ class CM_ParamsTest extends CMTest_TestCase {
         });
         $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
         $this->assertSame('Not enough parameters', $exception->getMessage());
+    }
+
+    public function testGetSession() {
+        $session1 = CMTest_TH::createSession();
+        $sessionId1 = $session1->getId();
+        $session2 = CMTest_TH::createSession();
+        $sessionId2 = $session2->getId();
+
+        $params = new CM_Params(['foo' => $sessionId1, 'bar' => 'baz', 'baz' => $session2, 'quux' => 5]);
+
+        $session1 = $params->getSession('foo');
+        $this->assertInstanceOf('CM_Session', $session1);
+        $this->assertSame($sessionId1, $session1->getId());
+
+        $exception = $this->catchException(function () use ($params) {
+            $params->getSession('bar');
+        });
+        $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
+        $this->assertSame('Session is not found', $exception->getMessage());
+
+        $session2 = $params->getSession('baz');
+        $this->assertInstanceOf('CM_Session', $session2);
+        $this->assertSame($sessionId2, $session2->getId());
+
+        $exception = $this->catchException(function () use ($params) {
+            $params->getSession('quux');
+        });
+        $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
+        $this->assertSame('Invalid param type for session', $exception->getMessage());
     }
 }

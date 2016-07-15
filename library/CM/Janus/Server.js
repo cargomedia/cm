@@ -1,8 +1,8 @@
 /**
  * @class CM_Janus_Server
- * @extends Backbone.Model
+ * @extends CM_Frontend_JsonSerializable
  */
-var CM_Janus_Server = Backbone.Model.extend({
+var CM_Janus_Server = CM_Frontend_JsonSerializable.extend({
 
   _class: 'CM_Janus_Server',
 

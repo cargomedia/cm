@@ -1,6 +1,6 @@
 require(["cm/media/audio/engine"], function(AudioEngine) {
 
-  var audioUrl = 'client-vendor/after-body-source/cm/tests/resources/drums.ogg';
+  var audioUrl = 'client-vendor/source/cm/tests/resources/drums.ogg';
 
   QUnit.module('cm/media/audio/engine');
   var tester = AudioEngine.isAudioAPISupported() ? QUnit.test.bind(QUnit) : QUnit.skip.bind(QUnit);
