@@ -9,7 +9,7 @@ class CM_Tools_Generator_Config extends CM_Class_Abstract {
     private $_filesystemHelper;
 
     /**
-     * @param CM_Tools_AppInstallation  $appInstallation
+     * @param CM_Tools_AppInstallation $appInstallation
      * @param CM_OutputStream_Interface $output
      */
     public function __construct(CM_Tools_AppInstallation $appInstallation, CM_OutputStream_Interface $output) {
@@ -111,9 +111,7 @@ class CM_Tools_Generator_Config extends CM_Class_Abstract {
         }
         $configSetter = require $configFile->getPath();
         if (!$configSetter instanceof Closure) {
-            throw new CM_Exception_Invalid(new CM_I18n_Phrase('Invalid config file. `{$configPath}` must return closure', [
-                'configPath' => $configFile->getPath()
-            ]));
+            throw new CM_Exception_Invalid('Invalid config file. `' . $configFile->getPath() . '` must return closure');
         }
         return $configSetter;
     }

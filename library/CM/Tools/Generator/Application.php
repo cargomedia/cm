@@ -9,7 +9,7 @@ class CM_Tools_Generator_Application extends CM_Class_Abstract {
     private $_filesystemHelper;
 
     /**
-     * @param CM_Tools_AppInstallation  $appInstallation
+     * @param CM_Tools_AppInstallation $appInstallation
      * @param CM_OutputStream_Interface $output
      */
     public function __construct(CM_Tools_AppInstallation $appInstallation, CM_OutputStream_Interface $output) {
@@ -85,10 +85,7 @@ class CM_Tools_Generator_Application extends CM_Class_Abstract {
             $content = $file->read();
             foreach ($replacements as $search => $replace) {
                 if (!strstr($content, $search)) {
-                    throw new CM_Exception_Invalid(new CM_I18n_Phrase('Cannot find `{$search}` in `{$filePath}`', [
-                        'search'   => $search,
-                        'filePath' => $file->getPath(),
-                    ]));
+                    throw new CM_Exception_Invalid("Cannot find `{$search}` in `{$file->getPath()}`");
                 }
                 $content = str_replace($search, $replace, $content);
             }

@@ -9,7 +9,7 @@ abstract class CM_Tools_Generator_Class_Abstract {
     protected $_filesystemHelper;
 
     /**
-     * @param CM_Tools_AppInstallation  $appInstallation
+     * @param CM_Tools_AppInstallation $appInstallation
      * @param CM_OutputStream_Interface $output
      */
     public function __construct(CM_Tools_AppInstallation $appInstallation, CM_OutputStream_Interface $output) {
@@ -29,10 +29,8 @@ abstract class CM_Tools_Generator_Class_Abstract {
         $namespaces = array_reverse($this->_appInstallation->getModuleNames());
         $position = array_search($classNamespace, $namespaces);
         if (false === $position) {
-            throw new CM_Exception_Invalid(new CM_I18n_Phrase('Namespace module `{$classNamespace}` not found within `{$modules}`.', [
-                'classNamespace' => $classNamespace,
-                'modules'        => implode(', ', $namespaces),
-            ]));
+            throw new CM_Exception_Invalid('Namespace module `' . $classNamespace . '` not found within `' . implode(', ', $namespaces) .
+            '` modules.');
         }
         $namespaces = array_splice($namespaces, $position);
         foreach ($namespaces as $namespace) {

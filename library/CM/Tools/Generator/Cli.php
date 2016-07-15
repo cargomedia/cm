@@ -17,7 +17,7 @@ class CM_Tools_Generator_Cli extends CM_Cli_Runnable_Abstract {
         }
         $appInstallation = $this->_getAppInstallation();
         if ($appInstallation->moduleExists($moduleName)) {
-            throw new CM_Cli_Exception_Internal(new CM_I18n_Phrase('Module `{$moduleName}` already exists', ['moduleName' => $moduleName]));
+            throw new CM_Cli_Exception_Internal('Module `' . $moduleName . '` already exists');
         }
 
         if ($singleModuleStructure) {
@@ -54,9 +54,7 @@ class CM_Tools_Generator_Cli extends CM_Cli_Runnable_Abstract {
 
         $parentClassName = $generatorPhp->getParentClassName($className);
         if (!is_subclass_of($parentClassName, 'CM_View_Abstract')) {
-            throw new CM_Exception_Invalid(new CM_I18n_Phrase('Detected parent className `{$parentClassName}` is not a subclass of `CM_View_Abstract`.',
-                ['parentClassName' => $parentClassName]
-            ));
+            throw new CM_Exception_Invalid('Detected parent className `' . $parentClassName . '` is not a subclass of `CM_View_Abstract`.');
         }
         $generatorPhp->createClassFile($className);
 
@@ -96,9 +94,7 @@ class CM_Tools_Generator_Cli extends CM_Cli_Runnable_Abstract {
         $moduleName = CM_Util::getNamespace($className);
         $parentClassName = $generatorPhp->getParentClassName($className);
         if (!is_a($parentClassName, 'CM_Site_Abstract', true)) {
-            throw new CM_Exception_Invalid(new CM_I18n_Phrase('Detected parent className `{$parentClassName}` is not a `CM_Site_Abstract`.',
-                ['parentClassName' => $parentClassName]
-            ));
+            throw new CM_Exception_Invalid('Detected parent className `' . $parentClassName . '` is not a `CM_Site_Abstract`.');
         }
         $classBlock = $generatorPhp->createClass($className);
         $classBlock->addMethod(new \CodeGenerator\MethodBlock('__construct', "parent::__construct();\n\$this->_setModule('{$moduleName}');"));
@@ -172,13 +168,11 @@ class CM_Tools_Generator_Cli extends CM_Cli_Runnable_Abstract {
     protected function _createNamespace($moduleName, $namespace) {
         $appInstallation = $this->_getAppInstallation();
         if (!$appInstallation->moduleExists($moduleName)) {
-            throw new CM_Cli_Exception_Internal(new CM_I18n_Phrase('Module `{$moduleName}` must exist! Existing modules: {$modules}', [
-                'moduleName' => $moduleName,
-                'modules'    => join(', ', $appInstallation->getModuleNames()),
-            ]));
+            throw new CM_Cli_Exception_Internal('Module `' . $moduleName . '` must exist! Existing modules: ' .
+                join(', ', $appInstallation->getModuleNames()));
         }
         if (array_key_exists($namespace, $appInstallation->getNamespaces())) {
-            throw new CM_Cli_Exception_Internal(new CM_I18n_Phrase('Namespace `{$namespace}` already exists', ['namespace' => $namespace]));
+            throw new CM_Cli_Exception_Internal('Namespace `' . $namespace . '` already exists');
         }
         $namespacePath = $appInstallation->getModulePath($moduleName) . 'library/' . $namespace;
         $generatorApp = new CM_Tools_Generator_Application($appInstallation, $this->_getStreamOutput());

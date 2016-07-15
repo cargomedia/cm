@@ -107,7 +107,7 @@ class CM_Cli_CommandManager {
             }
         }
         if ($packageName && !$help) {
-            throw new CM_Cli_Exception_InvalidArguments(new CM_I18n_Phrase('Package {$packageName} not found.', ['packageName' => $packageName]));
+            throw new CM_Cli_Exception_InvalidArguments('Package `' . $packageName . '` not found.');
         }
         return $helpHeader . $help;
     }
@@ -214,11 +214,7 @@ class CM_Cli_CommandManager {
         $commandName = $command->getName();
         $hostId = dechex($lock['hostId']);
         $processId = (int) $lock['processId'];
-        throw new CM_Cli_Exception_Internal(new CM_I18n_Phrase('Command `{$commandName}` still running (process `{$processId}` on host `{$hostId}`)', [
-            'commandName' => $commandName,
-            'processId'   => $processId,
-            'hostId'      => $hostId,
-        ]));
+        throw new CM_Cli_Exception_Internal("Command `$commandName` still running (process `$processId` on host `$hostId`)");
     }
 
     /**
@@ -230,7 +226,7 @@ class CM_Cli_CommandManager {
             throw new CM_Cli_Exception_InvalidArguments('Too many arguments provided');
         }
         if ($named = $arguments->getNamed()->getParamsDecoded()) {
-            throw new CM_Cli_Exception_InvalidArguments(new CM_I18n_Phrase('Illegal option used: `--{$option}`', ['option' => key($named)]));
+            throw new CM_Cli_Exception_InvalidArguments('Illegal option used: `--' . key($named) . '`');
         }
     }
 
@@ -259,16 +255,13 @@ class CM_Cli_CommandManager {
                 return $command;
             }
         }
-        throw new CM_Cli_Exception_InvalidArguments(new CM_I18n_Phrase('Command `{$packageName} {$methodName}` not found', [
-            'packageName' => $packageName,
-            'methodName'  => $methodName,
-        ]));
+        throw new CM_Cli_Exception_InvalidArguments('Command `' . $packageName . ' ' . $methodName . '` not found');
     }
 
     /**
      * @return CM_Process
      */
-    protected function _getProcess() {
+    protected function  _getProcess() {
         return CM_Process::getInstance();
     }
 

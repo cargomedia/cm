@@ -18,7 +18,7 @@ class CM_Tools_Generator_Class_Php extends CM_Tools_Generator_Class_Abstract {
      */
     public function createClass($className) {
         if (class_exists($className)) {
-            throw new CM_Exception_Invalid(new CM_I18n_Phrase('Class `{$className}` already exists', ['className' => $className]));
+            throw new CM_Exception_Invalid('Class `' . $className . '` already exists');
         }
         $parentClassName = $this->getParentClassName($className);
         $class = new CodeGenerator\ClassBlock($className, $parentClassName);
