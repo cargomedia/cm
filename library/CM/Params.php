@@ -245,7 +245,10 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
                     try {
                         $arguments = $namedArgs->matchNamedArgs($constructor, $arguments);
                     } catch (CM_Exception_Invalid $ex) {
-                        throw new CM_Exception_InvalidParam("Not enough parameters", null, ['parameters' => $param, 'class' => $className]);
+                        throw new CM_Exception_InvalidParam('Not enough parameters', null, [
+                            'parameters' => $param,
+                            'className'  => $className,
+                        ]);
                     }
                 }
 

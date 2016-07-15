@@ -229,7 +229,7 @@ class CM_Dom_NodeList implements Iterator, Countable, ArrayAccess {
 
     public function offsetSet($offset, $value) {
         if (!$value instanceof DOMNode) {
-            throw new CM_Exception_Invalid('Element is not an instance of \'DOMNode\'', null, ['element' => $value]);
+            throw new CM_Exception_Invalid('Element is not an instance of `DOMNode`', null, ['element' => $value]);
         }
         if (null === $offset) {
             $this->_elementList[] = $value;

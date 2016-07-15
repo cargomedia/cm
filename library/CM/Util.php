@@ -142,8 +142,10 @@ class CM_Util {
 
         curl_close($curlConnection);
         if ($curlError) {
-            $curlError = 'Fetching contents from `' . $url . '` failed: `' . $curlError;
-            throw new CM_Exception_Invalid($curlError);
+            throw new CM_Exception_Invalid('Fetching contents failed', null, [
+                'url'       => $url,
+                'curlError' => $curlError,
+            ]);
         }
         return $contents;
     }

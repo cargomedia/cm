@@ -45,7 +45,7 @@ class CM_Clockwork_Manager {
             return $event->getName() == $eventName;
         });
         if ($duplicateEventName) {
-            throw new CM_Exception('Duplicate event-name', null, ['name' => $eventName]);
+            throw new CM_Exception('Duplicate event-name', null, ['eventName' => $eventName]);
         }
         $this->_events[] = $event;
     }
@@ -192,9 +192,7 @@ class CM_Clockwork_Manager {
      */
     protected function _markRunning(CM_Clockwork_Event $event, $identifier, DateTime $startTime) {
         if ($this->_isRunning($event)) {
-            throw new CM_Exception_Invalid('Event is already running', null, [
-                'eventName' => $event->getName(),
-            ]);
+            throw new CM_Exception_Invalid('Event is already running', null, ['eventName' => $event->getName()]);
         }
         $this->_eventsRunning[$event->getName()] = ['event' => $event, 'identifier' => $identifier, 'startTime' => $startTime];
     }

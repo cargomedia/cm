@@ -105,6 +105,6 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
             }
         }
 
-        throw new CM_Exception_Invalid('layout is not defined in any namespace', null, ['layout' => $layoutName]);
+        throw new CM_Exception_Invalid('Layout is not defined in any namespace', null, ['layoutName' => $layoutName]);
     }
 }

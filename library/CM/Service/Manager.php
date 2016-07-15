@@ -251,7 +251,7 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     protected function _instantiateService($serviceName) {
         if (!array_key_exists($serviceName, $this->_serviceConfigList)) {
-            throw new CM_Exception_Invalid("Service {$serviceName} has no config.");
+            throw new CM_Exception_Invalid('Service has no config.', null, ['serviceName' => $serviceName]);
         }
         $config = $this->_serviceConfigList[$serviceName];
         $reflection = new ReflectionClass($config['class']);

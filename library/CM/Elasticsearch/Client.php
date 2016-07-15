@@ -292,7 +292,10 @@ class CM_Elasticsearch_Client {
                 }
             }
 
-            throw new CM_Exception_Invalid('Error(s) in ' . count($response['items']) . ' bulk request action(s)' . PHP_EOL . $message);
+            throw new CM_Exception_Invalid('Error(s) in bulk request action(s)', null, [
+                'errorsCount' => count($response['items']),
+                'message'     => $message
+            ]);
         }
     }
 

@@ -173,8 +173,8 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
             foreach ($itemsRaw as $itemRaw) {
                 if (!array_key_exists($field, $itemRaw)) {
                     throw new CM_Exception_Invalid('Class has no requested field.', null, [
-                        'class' => get_called_class(),
-                        'field' => $field,
+                        'className' => get_called_class(),
+                        'field'     => $field,
                     ]);
                 }
                 $sum += $itemRaw[$field];

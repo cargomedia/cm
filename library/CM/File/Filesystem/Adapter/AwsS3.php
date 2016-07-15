@@ -284,7 +284,7 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
                 if ($retryCount > 0) {
                     $this->_ensureBucket($retryCount - 1);
                 } else {
-                    throw new CM_Exception('Cannot create bucket: ' . $e->getMessage());
+                    throw new CM_Exception('Cannot create bucket', null, ['originalExceptionMessage' => $e->getMessage()]);
                 }
             }
         }

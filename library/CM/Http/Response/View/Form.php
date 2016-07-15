@@ -50,7 +50,7 @@ class CM_Http_Response_View_Form extends CM_Http_Response_View_Abstract {
         $form = $this->_getView();
         $className = get_class($form);
         if (!$form instanceof CM_Form_Abstract) {
-            throw new CM_Exception_Invalid('ClassName is not \'CM_Form_Abstract\' instance', null, ['className' => $className]);
+            throw new CM_Exception_Invalid('ClassName is not `CM_Form_Abstract` instance', null, ['className' => $className]);
         }
 
         $query = $this->_request->getQuery();

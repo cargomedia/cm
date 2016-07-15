@@ -81,7 +81,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             if ($useReplace) {
                 if (!$persistence instanceof CM_Model_StorageAdapter_ReplaceableInterface) {
                     $adapterName = get_class($persistence);
-                    throw new CM_Exception_NotImplemented('Param \'useReplace\' is not allowed with adapter', null, ['adapterName' => $adapterName]);
+                    throw new CM_Exception_NotImplemented('Param `useReplace` is not allowed with adapter', null, ['adapterName' => $adapterName]);
                 }
                 $idRaw = $persistence->replace($type, $dataSchema);
             } else {
@@ -623,7 +623,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         foreach ($idTypeList as $originalKey => $idType) {
             if (null === $modelType) {
                 if (!is_array($idType)) {
-                    throw new CM_Exception_Invalid('\'idType\' should be an array if \'modelType\' is not defined', null, ['idType' => CM_Util::var_line($idType)]);
+                    throw new CM_Exception_Invalid('`idType` should be an array if `modelType` is not defined', null, ['idType' => CM_Util::var_line($idType)]);
                 }
                 $type = (int) $idType['type'];
                 $id = $idType['id'];

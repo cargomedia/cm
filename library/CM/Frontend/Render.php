@@ -474,7 +474,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     public function fetchViewTemplate(CM_View_Abstract $view, $templateName, array $data = null) {
         $templatePath = $this->getTemplatePath($view, $templateName);
         if (null === $templatePath) {
-            throw new CM_Exception('Cannot find template for view class name', null, [
+            throw new CM_Exception('Cannot find template for the view', null, [
                 'template'      => $templateName,
                 'viewClassName' => get_class($view),
             ]);

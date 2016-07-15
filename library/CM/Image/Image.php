@@ -24,14 +24,14 @@ class CM_Image_Image {
             try {
                 $imagick->readImageBlob($imageContainer);
             } catch (ImagickException $e) {
-                throw new CM_Exception_Invalid('Cannot load image blob ' . $e->getMessage());
+                throw new CM_Exception_Invalid('Cannot load image blob', null, ['originalExceptionMessage' => $e->getMessage()]);
             }
         } else {
             $imagick = $imageContainer;
             try {
                 $imagick->valid(); //seems to be the only method to check if it contains an image
             } catch (ImagickException $e) {
-                throw new CM_Exception_Invalid('$imagick does not contain any image ' . $e->getMessage());
+                throw new CM_Exception_Invalid('$imagick does not contain any image', null, ['originalExceptionMessage' => $e->getMessage()]);
             }
         }
         try {
@@ -42,7 +42,7 @@ class CM_Image_Image {
                 $this->_animated = false;
             }
         } catch (ImagickException $e) {
-            throw new CM_Exception('Cannot process image ' . $e->getMessage());
+            throw new CM_Exception('Cannot process image', null, ['originalExceptionMessage' => $e->getMessage()]);
         }
         $this->_imagick = $imagick;
     }
@@ -119,7 +119,7 @@ class CM_Image_Image {
                 $imageBlob = $this->_imagick->getImageBlob();
             }
         } catch (ImagickException $e) {
-            throw new CM_Exception('Cannot get image blob: ' . $e->getMessage());
+            throw new CM_Exception('Cannot get image blob', null, ['originalExceptionMessage' => $e->getMessage()]);
         }
         return $imageBlob;
     }
@@ -181,7 +181,7 @@ class CM_Image_Image {
         try {
             return $this->_imagick->getImageHeight();
         } catch (ImagickException $e) {
-            throw new CM_Exception('Cannot detect image height: ' . $e->getMessage());
+            throw new CM_Exception('Cannot detect image height', null, ['originalExceptionMessage' => $e->getMessage()]);
         }
     }
 
@@ -193,7 +193,7 @@ class CM_Image_Image {
         try {
             return $this->_imagick->getImageWidth();
         } catch (ImagickException $e) {
-            throw new CM_Exception('Cannot detect image width: ' . $e->getMessage());
+            throw new CM_Exception('Cannot detect image width', null, ['originalExceptionMessage' => $e->getMessage()]);
         }
     }
 
@@ -245,7 +245,7 @@ class CM_Image_Image {
                 $frame->resizeImage($widthResize, $heightResize, Imagick::FILTER_CATROM, 1);
             });
         } catch (ImagickException $e) {
-            throw new CM_Exception('Error when resizing image: ' . $e->getMessage());
+            throw new CM_Exception('Error when resizing image', null, ['originalExceptionMessage' => $e->getMessage()]);
         }
         return $this;
     }
@@ -417,7 +417,7 @@ class CM_Image_Image {
         try {
             $imagick->readImageBlob($imageBlob);
         } catch (ImagickException $e) {
-            throw new CM_Exception_Invalid('Cannot load Imagick instance ' . $e->getMessage());
+            throw new CM_Exception_Invalid('Cannot load Imagick instance', null, ['originalExceptionMessage' => $e->getMessage()]);
         }
         return new self($imagick);
     }

@@ -94,7 +94,9 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
         $count = 0;
         while (false === $this->_processPage($request, $processingResult)) {
             if ($count++ > 10) {
-                throw new CM_Exception_Invalid('Page dispatch loop detected (' . implode(' -> ', $processingResult->getPathList()) . ').');
+                throw new CM_Exception_Invalid('Page dispatch loop detected.', null, [
+                    'processingRequestList' => implode(' -> ', $processingResult->getPathList()),
+                ]);
             }
         }
 

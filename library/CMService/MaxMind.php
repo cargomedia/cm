@@ -222,9 +222,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
         foreach ($this->_regionListByCountryAdded as $countryCode => $regionListAdded) {
             if (!isset($this->_countryList[$countryCode])) {
-                throw new CM_Exception('Unknown country code', null, [
-                    'countryCode' => $countryCode,
-                ]);
+                throw new CM_Exception('Unknown country code', null, ['countryCode' => $countryCode]);
             }
             $countryName = $this->_countryList[$countryCode];
             foreach ($regionListAdded as $regionCode => $regionName) {
@@ -234,9 +232,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
         foreach ($this->_regionListByCountryRemoved as $countryCode => $regionListRemoved) {
             if (!isset($this->_countryListOld[$countryCode])) {
-                throw new CM_Exception('Unknown country code', null, [
-                    'countryCode' => $countryCode,
-                ]);
+                throw new CM_Exception('Unknown country code', null, ['countryCode' => $countryCode]);
             }
             $countryName = $this->_countryListOld[$countryCode];
             foreach ($regionListRemoved as $regionCode => $regionName) {
@@ -246,9 +242,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
         foreach ($this->_regionListByCountryRemovedCodeInUse as $countryCode => $regionListRemovedCodeInUse) {
             if (!isset($this->_countryListOld[$countryCode])) {
-                throw new CM_Exception('Unknown country code', null, [
-                    'countryCode' => $countryCode,
-                ]);
+                throw new CM_Exception('Unknown country code', null, ['countryCode' => $countryCode]);
             }
             $countryName = $this->_countryListOld[$countryCode];
             foreach ($regionListRemovedCodeInUse as $regionCode) {
@@ -259,9 +253,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
         foreach ($this->_regionListByCountryRenamed as $countryCode => $regionListRenamed) {
             if (!isset($this->_countryList[$countryCode])) {
-                throw new CM_Exception('Unknown country code', null, [
-                    'countryCode' => $countryCode,
-                ]);
+                throw new CM_Exception('Unknown country code', null, ['countryCode' => $countryCode]);
             }
             $countryName = $this->_countryList[$countryCode];
             foreach ($regionListRenamed as $regionCode => $regionNames) {
@@ -272,9 +264,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
         foreach ($this->_regionListByCountryUpdatedCode as $countryCode => $regionListUpdatedCode) {
             if (!isset($this->_countryList[$countryCode])) {
-                throw new CM_Exception('Unknown country code', null, [
-                    'countryCode' => $countryCode,
-                ]);
+                throw new CM_Exception('Unknown country code', null, ['countryCode' => $countryCode]);
             }
             $countryName = $this->_countryList[$countryCode];
             foreach ($regionListUpdatedCode as $regionCodeOld => $regionCode) {
@@ -766,9 +756,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $countriesPath = $countriesFile->getPathOnLocalFilesystem();
         $handle = fopen($countriesPath, 'r');
         if (!$handle) {
-            throw new CM_Exception('Could not open file', null, [
-                'file' => $countriesPath,
-            ]);
+            throw new CM_Exception('Could not open file', null, ['file' => $countriesPath]);
         }
 
         $this->_streamOutput->writeln('Reading new country listing…');
@@ -787,9 +775,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             ++$item;
         }
         if (!fclose($handle)) {
-            throw new CM_Exception('Could not close file', null, [
-                'file' => $countriesPath,
-            ]);
+            throw new CM_Exception('Could not close file', null, ['file' => $countriesPath]);
         }
         return $countryData;
     }
@@ -808,9 +794,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $regionsPath = $regionsFile->getPathOnLocalFilesystem();
         $handle = fopen($regionsPath, 'r');
         if (!$handle) {
-            throw new CM_Exception('Could not open file', null, [
-                'file' => $regionsPath,
-            ]);
+            throw new CM_Exception('Could not open file', null, ['file' => $regionsPath]);
         }
 
         $this->_streamOutput->writeln('Reading new region listing…');
@@ -821,9 +805,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             }
         }
         if (!fclose($handle)) {
-            throw new CM_Exception('Could not close file', null, [
-                'file' => $regionsPath,
-            ]);
+            throw new CM_Exception('Could not close file', null, ['file' => $regionsPath]);
         }
         return $regionData;
     }
@@ -1512,9 +1494,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $geoIpFilePath = $geoIpFile->getPathOnLocalFilesystem();
         $zip = zip_open($geoIpFilePath);
         if (!is_resource($zip)) {
-            throw new CM_Exception_Invalid('Could not read zip file', null, [
-                'file' => $geoIpFilePath
-            ]);
+            throw new CM_Exception_Invalid('Could not read zip file', null, ['file' => $geoIpFilePath]);
         }
         $entryName = null;
         while ($entry = zip_read($zip)) {
@@ -1537,9 +1517,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         }
         $stream = fopen('php://temp', 'r+');
         if (!$stream) {
-            throw new CM_Exception('Could not open temporary file to extract file', null, [
-                'entry' => $entryName,
-            ]);
+            throw new CM_Exception('Could not open temporary file to extract file', null, ['entry' => $entryName]);
         }
         $lineCount = 0;
         while ('' !== ($buffer = zip_entry_read($entry))) {
@@ -1555,9 +1533,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         }
         zip_close($zip);
         if (!rewind($stream)) {
-            throw new CM_Exception('Could not rewind temporary file used to extract file', null, [
-                'entry' => $entryName
-            ]);
+            throw new CM_Exception('Could not rewind temporary file used to extract file', null, ['entry' => $entryName]);
         }
         return ['stream' => $stream, 'lineCount' => $lineCount];
     }

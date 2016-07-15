@@ -107,9 +107,7 @@ class CM_Cli_CommandManager {
             }
         }
         if ($packageName && !$help) {
-            throw new CM_Cli_Exception_InvalidArguments('Package not found.', null, [
-                'package' => $packageName,
-            ]);
+            throw new CM_Cli_Exception_InvalidArguments(new CM_I18n_Phrase('Package {$packageName} not found.', ['packageName' => $packageName]));
         }
         return $helpHeader . $help;
     }
@@ -216,11 +214,11 @@ class CM_Cli_CommandManager {
         $commandName = $command->getName();
         $hostId = dechex($lock['hostId']);
         $processId = (int) $lock['processId'];
-        throw new CM_Cli_Exception_Internal('Command still running', null, [
-            'command'   => $commandName,
-            'processId' => $processId,
-            'hostId'    => $hostId,
-        ]);
+        throw new CM_Cli_Exception_Internal(new CM_I18n_Phrase('Command `{$commandName}` still running (process `{$processId}` on host `{$hostId}`)', [
+            'commandName' => $commandName,
+            'processId'   => $processId,
+            'hostId'      => $hostId,
+        ]));
     }
 
     /**

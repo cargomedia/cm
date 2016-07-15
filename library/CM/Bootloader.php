@@ -142,7 +142,7 @@ class CM_Bootloader {
     public function getModulePath($name) {
         $namespacePaths = $this->_getModulePaths();
         if (!array_key_exists($name, $namespacePaths)) {
-            throw new CM_Exception_Invalid('Module not found within module paths', null, ['name' => $name]);
+            throw new CM_Exception_Invalid('Module not found within module paths', null, ['moduleName' => $name]);
         }
         return $namespacePaths[$name];
     }

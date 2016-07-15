@@ -104,7 +104,7 @@ class CM_Cli_Arguments {
         if (!$param->isOptional()) {
             $argumentsNumeric = $this->getNumeric();
             if (!$argumentsNumeric->getParamsDecoded()) {
-                throw new CM_Cli_Exception_InvalidArguments('Missing argument', null, ['argument' => $paramName]);
+                throw new CM_Cli_Exception_InvalidArguments(new CM_I18n_Phrase('Missing argument {$argument}', ['argument' => $paramName]));
             }
             $value = $argumentsNumeric->shift();
         } else {
@@ -134,10 +134,10 @@ class CM_Cli_Arguments {
         try {
             return $param->getClass()->newInstance($value);
         } catch (Exception $e) {
-            throw new CM_Cli_Exception_InvalidArguments('Invalid value for parameter.', null, [
+            throw new CM_Cli_Exception_InvalidArguments(new CM_I18n_Phrase('Invalid value for parameter {$parameter}. {$message}', [
                 'parameter' => $param->getName(),
                 'message'   => $e->getMessage(),
-            ]);
+            ]));
         }
     }
 

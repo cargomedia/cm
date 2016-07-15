@@ -21,7 +21,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 
         $className = get_class($this);
         if (!preg_match('/^\w+_Form_(.+)$/', $className, $matches)) {
-            throw new CM_Exception('Cannot detect namespace from form\'s classname', null, ['class-name' => $className]);
+            throw new CM_Exception('Cannot detect namespace from form\'s classname', null, ['className' => $className]);
         }
         $name = lcfirst($matches[1]);
         $name = preg_replace('/([A-Z])/', '_\1', $name);
