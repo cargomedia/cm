@@ -339,7 +339,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
             } elseif (is_array($param)) {
                 $array = $param;
             } else {
-                throw new CM_Exception_InvalidParam('Unexpected input of type to create CM_Params', null, ['type' => gettype($param)]);
+                throw new CM_Exception_InvalidParam('Unexpected type of arguments', null, ['type' => gettype($param)]);
             }
             return CM_Params::factory($array, false);
         });

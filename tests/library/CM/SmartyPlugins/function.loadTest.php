@@ -26,7 +26,7 @@ class smarty_function_loadTest extends CMTest_TestCase {
         });
 
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Cannot find template in modules and themes', $exception->getMessage());
+        $this->assertSame('Can\'t find template', $exception->getMessage());
         /** @var CM_Exception_Invalid $exception */
         $this->assertSame(
             [
