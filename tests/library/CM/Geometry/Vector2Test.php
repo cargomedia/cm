@@ -12,7 +12,9 @@ class CM_Geometry_Vector2Test extends CMTest_TestCase {
             new CM_Geometry_Vector2('foo', 2);
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Non numeric value `foo`', $exception->getMessage());
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Non numeric value', $exception->getMessage());
+        $this->assertSame(['value' => 'foo'], $exception->getMetaInfo());
 
         $vector2 = CM_Geometry_Vector2::fromArray([
             'x' => 1.2,

@@ -51,17 +51,17 @@ class CM_AdproviderTest extends CMTest_TestCase {
         $adprovider->getHtml($site, 'foo');
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Zone `foo` not configured.
-     */
     public function testGetHtmlMissingConfig() {
         $site = $this->getMockSite();
-
         CM_Config::get()->CM_Adprovider->enabled = true;
         $adprovider = new CM_Adprovider();
-
-        $adprovider->getHtml($site, 'foo');
+        $exception = $this->catchException(function () use ($adprovider,$site ) {
+            $adprovider->getHtml($site, 'foo');
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Zone not configured.', $exception->getMessage());
+        $this->assertSame(['zoneName' => 'foo'], $exception->getMetaInfo());
     }
 
     public function testHasZone() {

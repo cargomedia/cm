@@ -152,7 +152,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         }
 
         if ($needed) {
-            throw new CM_Exception_Invalid('Cannot find template in modules and themes', null, [
+            throw new CM_Exception_Invalid('Can\'t find template', null, [
                 'template' => $template,
                 'modules'  => implode('`, `', $moduleList),
                 'themes'   => implode('`, `', $site->getThemes()),

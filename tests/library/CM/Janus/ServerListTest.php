@@ -40,7 +40,9 @@ class CM_Janus_ServerListTest extends CMTest_TestCase {
             $serverList->getById(2);
         });
         $this->assertTrue($exception instanceof CM_Exception_Invalid);
-        $this->assertSame('Cannot find server with id `2`', $exception->getMessage());
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Cannot find server', $exception->getMessage());
+        $this->assertSame(['serverId' => 2], $exception->getMetaInfo());
     }
 
     public function testFilterByClosestDistanceTo() {

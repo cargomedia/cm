@@ -5,7 +5,7 @@ class CM_Db_DbTest extends CMTest_TestCase {
     public function setUp() {
         CM_Db_Db::exec('
 			CREATE TABLE `test` (
-				`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
+				`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 				`foo` VARCHAR(100) NULL,
 				`bar` VARCHAR(100) NULL,
 				`sequence` INT UNSIGNED NOT NULL,
@@ -51,7 +51,7 @@ class CM_Db_DbTest extends CMTest_TestCase {
     public function testDescribeColumn() {
         CM_Db_Db::exec('
 			CREATE TABLE `test2` (
-				`id` int(12) unsigned NOT NULL AUTO_INCREMENT,
+				`id` INT(12) UNSIGNED NOT NULL AUTO_INCREMENT,
 				PRIMARY KEY (`id`)
 			)');
         $column = CM_Db_Db::describeColumn('test2', 'id');
@@ -68,7 +68,7 @@ class CM_Db_DbTest extends CMTest_TestCase {
     public function testDescribeColumnThrowsException() {
         CM_Db_Db::exec('
 			CREATE TABLE `test2` (
-				`id` int(12) unsigned NOT NULL AUTO_INCREMENT,
+				`id` INT(12) UNSIGNED NOT NULL AUTO_INCREMENT,
 				PRIMARY KEY (`id`)
 			)');
         try {
@@ -76,7 +76,8 @@ class CM_Db_DbTest extends CMTest_TestCase {
             CM_Db_Db::describeColumn('test2', 'id1');
             $this->fail('Column doesn\'t exist');
         } catch (CM_Db_Exception $e) {
-            $this->assertContains('`id1`', $e->getMessage());
+            $this->assertSame('Column not found', $e->getMessage());
+            $this->assertSame(['column' => 'id1'], $e->getMetaInfo());
         }
 
         try {

@@ -32,14 +32,16 @@ class CM_ExceptionTest extends CMTest_TestCase {
             $exception->setSeverity(9999);
             $this->fail('Could set invalid severity');
         } catch (CM_Exception_Invalid $e) {
-            $this->assertSame('Invalid severity `9999`', $e->getMessage());
+            $this->assertSame('Invalid severity', $e->getMessage());
+            $this->assertSame(['severity' => 9999], $e->getMetaInfo());
         }
 
         try {
             $exception->setSeverity('1');
             $this->fail('Could set invalid severity');
         } catch (CM_Exception_Invalid $e) {
-            $this->assertSame('Invalid severity `1`', $e->getMessage());
+            $this->assertSame('Invalid severity', $e->getMessage());
+            $this->assertSame(['severity' => '1'], $e->getMetaInfo());
         }
     }
 }
