@@ -144,10 +144,6 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $this->assertSame(1, $methodValidateFields->getCallCount());
     }
 
-    /**
-     * @expectedException CM_Model_Exception_Validation
-     * @expectedExceptionMessage Field `foo` is mandatory
-     */
     public function testCreateMissingField() {
         $modelMock = $this->mockObject('CM_Model_Abstract');
         $modelMock->mockMethod('_getPersistence')->set(function () {
@@ -160,7 +156,14 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
             return new CM_Model_Schema_Definition(['foo' => ['type' => 'int']]);
         });
         /** @var CM_Model_Abstract $modelMock */
-        $modelMock->commit();
+        $exception = $this->catchException(function () use ($modelMock) {
+            $modelMock->commit();
+        });
+
+        $this->assertInstanceOf('CM_Model_Exception_Validation', $exception);
+        /** @var CM_Model_Exception_Validation $exception */
+        $this->assertSame('Field is mandatory', $exception->getMessage());
+        $this->assertSame(['key' => 'foo'], $exception->getMetaInfo());
     }
 
     public function testCommit() {
@@ -1158,8 +1161,10 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $exception = $this->catchException(function () use ($cacheModel) {
             $cacheModel->commit(true);
         });
-        $this->isInstanceOf('CM_Exception_NotImplemented', $exception);
-        $this->assertSame('Param `useReplace` is not allowed with ' . CM_ModelMock4::getPersistenceClass(), $exception->getMessage());
+        $this->assertInstanceOf('CM_Exception_NotImplemented', $exception);
+        /** @var CM_Exception_NotImplemented $exception */
+        $this->assertSame('Param `useReplace` is not allowed with adapter', $exception->getMessage());
+        $this->assertSame(['adapterName' => CM_ModelMock4::getPersistenceClass()], $exception->getMetaInfo());
     }
 }
 

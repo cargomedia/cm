@@ -31,7 +31,8 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
             $modelPaging->getItem(2);
             $this->fail('Can access nonexistent item.');
         } catch (CM_Exception_Nonexistent $ex) {
-            $this->assertContains('Model itemRaw: `2000` has no data', $ex->getMessage());
+            $this->assertSame('Model itemRaw has no data', $ex->getMessage());
+            $this->assertSame(['itemRaw' => '2000'], $ex->getMetaInfo());
         }
     }
 
@@ -55,10 +56,8 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
             $modelPaging->getItem(2);
             $this->fail('Can access nonexistent item.');
         } catch (CM_Exception_Nonexistent $ex) {
-            $this->assertContains('Model itemRaw: `Array', $ex->getMessage());
-            $this->assertContains('[type] => ' . $model1->getType(), $ex->getMessage());
-            $this->assertContains('[id] => 9999', $ex->getMessage());
-            $this->assertContains('` has no data', $ex->getMessage());
+            $this->assertSame('Model itemRaw has no data', $ex->getMessage());
+            $this->assertContains('Array (', $ex->getMetaInfo()['itemRaw']);
         }
     }
 }

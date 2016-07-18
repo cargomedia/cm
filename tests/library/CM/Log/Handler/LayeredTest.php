@@ -245,7 +245,7 @@ class CM_Log_Handler_LayeredTest extends CMTest_TestCase {
             $this->assertSame('Warning alert', $record->getMessage());
             $this->assertSame(CM_Log_Logger::WARNING, $record->getLevel());
         });
-        $context= new CM_Log_Context();
+        $context = new CM_Log_Context();
         $context->setException($exception);
         $logger->warning('Warning alert', $context);
         $this->assertSame(2, $mockHandleRecord->getCallCount());
@@ -338,11 +338,20 @@ class CM_Log_Handler_LayeredTest extends CMTest_TestCase {
         return $loggerMock;
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage is not defined, use one of
-     */
     public function testStaticGetLevelNameException() {
-        CM_Log_Logger::getLevelName(666);
+        $exception = $this->catchException(function () {
+            CM_Log_Logger::getLevelName(666);
+        });
+
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Level is not defined', $exception->getMessage());
+        $this->assertSame(
+            [
+                'level'           => 666,
+                'availableLevels' => '100, 200, 300, 400, 500',
+            ],
+            $exception->getMetaInfo()
+        );
     }
 }

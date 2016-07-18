@@ -71,7 +71,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
         $gearmanClient->runTasks();
 
         if (count($resultList) != count($paramsList)) {
-            throw new CM_Exception('Job failed. Result list size is not equal to expected', null, [
+            throw new CM_Exception('Job failed. Invalid results', null, [
                 'jobName'         => $this->_getJobName(),
                 'countResultList' => count($resultList),
                 'countParamList'  => count($paramsList),

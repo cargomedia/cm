@@ -265,13 +265,22 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $this->assertSame(0, $v1);
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage `v3`
-     */
     public function testWeightedSplittest_variationNonExistent() {
         $test = CM_Model_Splittest_Mock::create('foo', ['v1', 'v2']);
-        $test->setVariationWeightList(array('v1' => 1, 'v2' => 2, 'v3' => 3));
+        $exception = $this->catchException(function () use ($test) {
+            $test->setVariationWeightList(array('v1' => 1, 'v2' => 2, 'v3' => 3));
+        });
+
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('There is no variation in split test', $exception->getMessage());
+        $this->assertSame(
+            [
+                'variation' => 'v3',
+                'splitTest' => 'foo',
+            ],
+            $exception->getMetaInfo()
+        );
     }
 
     /**
@@ -294,13 +303,16 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $test->setVariationWeightList(array('v1' => 0, 'v2' => 0.));
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage `-2`
-     */
     public function testWeightedSplittest_weightNegative() {
         $test = CM_Model_Splittest_Mock::create('foo', ['v1', 'v2']);
-        $test->setVariationWeightList(array('v1' => 1, 'v2' => -2, 'v3' => 3));
+        $exception = $this->catchException(function () use ($test) {
+            $test->setVariationWeightList(array('v1' => 1, 'v2' => -2, 'v3' => 3));
+        });
+
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Split test variation weight. It should be positive', $exception->getMessage());
+        $this->assertSame(['variationWeight' => -2.0], $exception->getMetaInfo());
     }
 
     public function testWeightedSplittest_weightZero() {

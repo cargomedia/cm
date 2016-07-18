@@ -38,7 +38,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
     /**
      * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Unexpected instance of
+     * @expectedExceptionMessage Unexpected instance
      */
     public function testFactoryInvalidInstance() {
         $messageStreamChannel = CM_Model_StreamChannel_Message::createStatic(array('key'         => 'message-stream-channel',

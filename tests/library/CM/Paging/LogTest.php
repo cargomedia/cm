@@ -11,7 +11,9 @@ class CM_Paging_LogTest extends CMTest_TestCase {
             new CM_Paging_Log([1]);
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Log level `1` does not exist.', $exception->getMessage());
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Log level does not exist.', $exception->getMessage());
+        $this->assertSame(['level' => 1], $exception->getMetaInfo());
 
         $exception = $this->catchException(function () {
             new CM_Paging_Log([CM_Log_Logger::INFO], 1);
