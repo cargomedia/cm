@@ -33,7 +33,8 @@ class CM_UtilTest extends CMTest_TestCase {
             CM_Util::getNamespace('NoNamespace', false);
             $this->fail('Namespace detected in a className without namespace.');
         } catch (CM_Exception_Invalid $ex) {
-            $this->assertContains('Could not detect namespace of `NoNamespace`.', $ex->getMessage());
+            $this->assertContains('Could not detect namespace', $ex->getMessage());
+            $this->assertSame(['className' => 'NoNamespace'], $ex->getMetaInfo());
         }
     }
 
@@ -78,21 +79,23 @@ class CM_UtilTest extends CMTest_TestCase {
             CM_Util::getArrayTree($array, 1, true, 'foo');
             $this->fail('Item has key `foo`.');
         } catch (CM_Exception_Invalid $ex) {
-            $this->assertContains('Item has no key `foo`.', $ex->getMessage());
+            $this->assertContains('Item has no key.', $ex->getMessage());
+            $this->assertSame(['key' => 'foo'], $ex->getMetaInfo());
         }
 
         try {
             CM_Util::getArrayTree(array(1, 2));
             $this->fail('Item is not an array.');
         } catch (CM_Exception_Invalid $ex) {
-            $this->assertContains('Item is not an array or has less than `2` elements.', $ex->getMessage());
+            $this->assertContains('Item is not an array or has less elements elements than needed.', $ex->getMessage());
+            $this->assertSame(['levelsNeeded' => 2], $ex->getMetaInfo());
         }
 
         try {
             CM_Util::getArrayTree(array(array(1), array(2)));
             $this->fail('Item has less than two elements.');
         } catch (CM_Exception_Invalid $ex) {
-            $this->assertContains('Item is not an array or has less than `2` elements.', $ex->getMessage());
+            $this->assertContains('Item is not an array or has less elements elements than needed.', $ex->getMessage());
         }
     }
 

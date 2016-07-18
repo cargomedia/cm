@@ -26,7 +26,16 @@ class smarty_function_loadTest extends CMTest_TestCase {
         });
 
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Cannot find `badFileName.tpl` in modules `CM` and themes `default`', $exception->getMessage());
+        $this->assertSame('Cannot find template in modules and themes', $exception->getMessage());
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame(
+            [
+                'template' => 'badFileName.tpl',
+                'modules'  => 'CM',
+                'themes'   => 'default',
+            ],
+            $exception->getMetaInfo()
+        );
 
         $paramsPass = array(
             'file'   => 'badFileName.tpl',

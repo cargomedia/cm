@@ -487,7 +487,7 @@ class CM_Util {
         $result = array();
         foreach ($items as $item) {
             if (!is_array($item) || count($item) < ($level + 1)) {
-                throw new CM_Exception_Invalid('Item is not an array or has less elements than needed elements.', null, [
+                throw new CM_Exception_Invalid('Item is not an array or has less elements elements than needed.', null, [
                     'levelsNeeded' => $level + 1,
                 ]);
             }

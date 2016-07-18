@@ -75,10 +75,12 @@ class CM_Usertext_UsertextTest extends CMTest_TestCase {
 
     public function testAddFilterAfterNoFilterFound() {
         $usertext = new CM_Usertext_Usertext();
-        $exception = $this->catchException(function() use ($usertext) {
+        $exception = $this->catchException(function () use ($usertext) {
             $usertext->addFilterAfter('Filter Not Set', new CM_Usertext_Filter_Emoticon());
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('No filter called `Filter Not Set` found', $exception->getMessage());
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Filter not found', $exception->getMessage());
+        $this->assertSame(['filter' => 'Filter Not Set'], $exception->getMetaInfo());
     }
 }

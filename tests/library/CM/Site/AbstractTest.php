@@ -48,7 +48,7 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 
     public function testIsUrlMatch() {
         $site = $this->getMockSite(null, null, [
-            'url' => 'http://www.my-site.com',
+            'url'    => 'http://www.my-site.com',
             'urlCdn' => 'http://cdn.my-site.com',
         ]);
 
@@ -77,7 +77,8 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
             CM_Site_Abstract::factory(9999);
             $this->fail('Factory returned non-configured site');
         } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
-            $this->assertContains('Site with type `9999` not configured', $ex->getMessage());
+            $this->assertSame('Site with given type is not configured', $ex->getMessage());
+            $this->assertSame(['siteType' => 9999], $ex->getMetaInfo());
         }
     }
 

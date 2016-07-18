@@ -23,8 +23,8 @@ abstract class CM_Type_Enum {
             $value = (string) $value;
             if (!$this->_isValidValue($value)) {
                 throw new CM_Exception_Invalid('Invalid value for enum class', null, [
-                    'value'         => $value,
-                    'enumClassName' => get_class($this),
+                    'value'     => $value,
+                    'className' => get_class($this),
                 ]);
             }
             $this->_currentValue = $value;

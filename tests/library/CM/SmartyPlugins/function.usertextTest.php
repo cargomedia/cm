@@ -69,7 +69,8 @@ class smarty_function_usertextTest extends CMTest_TestCase {
         try {
             smarty_function_usertext(array('text' => 'foo', 'mode' => 'foo'), $this->_template);
         } catch (CM_Exception_Invalid $ex) {
-            $this->assertSame('Invalid mode `foo`', $ex->getMessage());
+            $this->assertSame('Invalid mode', $ex->getMessage());
+            $this->assertSame(['mode' => 'foo'], $ex->getMetaInfo());
         }
     }
 
