@@ -270,8 +270,8 @@ class CM_Process {
                 $this->handleSignals();
                 if (-1 === $pid) {
                     throw new CM_Exception('Waiting on child processes failed');
-                } elseif ($pid > 0) {
-                    $forkHandler = $this->_getForkHandlerByPid($pid);
+                }
+                if ($pid > 0 && ($forkHandler = $this->_findForkHandlerByPid($pid))) {
                     unset($this->_forkHandlerList[$forkHandler->getIdentifier()]);
                     $workloadResultList[$forkHandler->getIdentifier()] = $forkHandler->receiveWorkloadResult();
                     $forkHandler->closeIpcStream();
@@ -293,14 +293,26 @@ class CM_Process {
 
     /**
      * @param int $pid
-     * @return CM_Process_ForkHandler
-     * @throws CM_Exception
+     * @return CM_Process_ForkHandler|null
      */
-    private function _getForkHandlerByPid($pid) {
+    private function _findForkHandlerByPid($pid) {
+        $pid = (int) $pid;
         foreach ($this->_forkHandlerList as $forkHandler) {
             if ($pid === $forkHandler->getPid()) {
                 return $forkHandler;
             }
+        }
+        return null;
+    }
+
+    /**
+     * @param int $pid
+     * @return CM_Process_ForkHandler
+     * @throws CM_Exception
+     */
+    private function _getForkHandlerByPid($pid) {
+        if ($forkHandler = $this->_findForkHandlerByPid($pid)) {
+            return $forkHandler;
         }
         throw new CM_Exception('Cannot find reference to fork-handler with PID `' . $pid . '`.');
     }
