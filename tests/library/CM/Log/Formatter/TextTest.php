@@ -41,7 +41,28 @@ class CM_Log_Formatter_TextTest extends CMTest_TestCase {
         $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', $context);
         $formatter = new CM_Log_Formatter_Text();
         $this->assertSame(
-            ' - httpRequest: GET /foo/bar HTTP/1.1, host: foo.com, ip: 10.10.0.1, referer: http://foo.com/foo, user-agent: Mozilla/5.0',
+            ' - httpRequest: GET /foo/bar HTTP/1.1, host: foo.com, ip: 10.10.0.1, user-agent: Mozilla/5.0, referer: http://foo.com/foo',
+            $formatter->renderContext($record));
+    }
+
+    public function testFormatContextWithHttpRequestWithoutReferer() {
+        /** @var CM_Http_Request_Abstract|\Mocka\ClassMock $mockHttpRequest */
+        $mockHttpRequest = $this->mockClass('CM_Http_Request_Abstract')->newInstance(['', [
+            'user-agent' => 'Mozilla/5.0',
+        ]]);
+
+        // can't mock final getPath...
+        $mockHttpRequest->setPath('/foo/bar');
+        $mockHttpRequest->mockMethod('getServer')->set(['REQUEST_METHOD' => 'GET', 'SERVER_PROTOCOL' => 'HTTP/1.1']);
+        $mockHttpRequest->mockMethod('getHost')->set('foo.com');
+        $mockHttpRequest->mockMethod('getIp')->set('10.10.0.1');
+
+        $context = new CM_Log_Context();
+        $context->setHttpRequest($mockHttpRequest);
+        $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', $context);
+        $formatter = new CM_Log_Formatter_Text();
+        $this->assertSame(
+            ' - httpRequest: GET /foo/bar HTTP/1.1, host: foo.com, ip: 10.10.0.1, user-agent: Mozilla/5.0',
             $formatter->renderContext($record));
     }
 

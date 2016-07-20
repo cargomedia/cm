@@ -21,18 +21,20 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
             ]);
         }
         if (null != $httpRequest) {
-            $headers = $httpRequest->getHeaders();
             $server = $httpRequest->getServer();
-            $httpRequestText = '{type} {path} {proto}, host: {host}, ip: {ip}, referer: {referer}, user-agent: {agent}';
+            $httpRequestText = '{type} {path} {proto}, host: {host}, ip: {ip}, user-agent: {agent}';
             $data['httpRequest'] = $this->_format($httpRequestText, [
                 'type'    => isset($server['REQUEST_METHOD']) ? $server['REQUEST_METHOD'] : '',
                 'path'    => $httpRequest->getPath(),
                 'proto'   => isset($server['SERVER_PROTOCOL']) ? $server['SERVER_PROTOCOL'] : '',
                 'host'    => $httpRequest->getHost(),
                 'ip'      => $httpRequest->getIp(),
-                'referer' => isset($headers['referer']) ? $headers['referer'] : '',
                 'agent'   => $httpRequest->getUserAgent(),
             ]);
+
+            if ($httpRequest->hasHeader('referer')) {
+                $data['httpRequest'] .= ', referer: ' . $httpRequest->getHeader('referer');
+            }
         }
         if (!empty($extra)) {
             $extraText = [];
