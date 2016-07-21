@@ -8,8 +8,11 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
     }
 
     public function onSubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
-        if (!$streamSubscribe->getUser()->getOnline()) {
-            $streamSubscribe->getUser()->setOnline(true);
+        if ($this->hasUser()) {
+            $user = $streamSubscribe->getUser();
+            if ($user && !$user->getOnline()) {
+                $user->setOnline(true);
+            }
         }
     }
 
@@ -19,7 +22,7 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
     public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
         if ($this->hasUser()) {
             $user = $streamSubscribe->getUser();
-            if ($user && $user->getOnline() && !$this->isSubscriber($user, $streamSubscribe)) {
+            if ($user && !$this->isSubscriber($user, $streamSubscribe)) {
                 $offlineJob = new CM_User_OfflineJob();
                 $offlineJob->queueDelayed(CM_Model_User::OFFLINE_DELAY, ['user' => $user]);
             }
