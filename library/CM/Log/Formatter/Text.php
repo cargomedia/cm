@@ -29,7 +29,7 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
                 'proto'   => isset($server['SERVER_PROTOCOL']) ? $server['SERVER_PROTOCOL'] : '',
                 'host'    => $httpRequest->getHost(),
                 'ip'      => $httpRequest->getIp(),
-                'referer' => $httpRequest->getHeader('referer'),
+                'referer' => $httpRequest->hasHeader('referer') ? $httpRequest->getHeader('referer') : '',
                 'agent'   => $httpRequest->getUserAgent(),
             ]);
         }
