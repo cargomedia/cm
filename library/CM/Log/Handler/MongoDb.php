@@ -83,12 +83,8 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
                 'headers' => $request->getHeaders(),
             ];
 
-            try {
-                $formattedContext['httpRequest']['query'] = $request->getQuery();
-            } catch (CM_Exception_Invalid $e) {
-                //CM_Http_Request_Post can throw.
-            }
-
+            $formattedContext['httpRequest']['query'] = $request->findQuery();
+            
             if ($request instanceof CM_Http_Request_Post) {
                 $formattedContext['httpRequest']['body'] = $request->getBody();
             }
