@@ -23,7 +23,7 @@ class CM_FormField_TimeTest extends CMTest_TestCase {
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
 
         $actual = $renderAdapter->fetch(new CM_Params());
-        $this->assertContains('value="10:30"', $actual);
+        $this->assertContains('value="10:30:00"', $actual);
     }
 
     public function testRenderDateTime() {
@@ -37,6 +37,6 @@ class CM_FormField_TimeTest extends CMTest_TestCase {
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
 
         $actual = $renderAdapter->fetch(new CM_Params());
-        $this->assertContains('value="10:30"', $actual);
+        $this->assertContains('value="10:30:00"', $actual);
     }
 }
