@@ -22,13 +22,19 @@ class smarty_function_date_timeTest extends CMTest_TestCase {
         $date = new DateTime('2003-02-01 11:22:33');
         foreach ([[
             'params'   => ['date' => $date],
+            'expected' => '11:22',
+        ], [
+            'params'   => ['date' => $date, 'showSeconds' => true],
             'expected' => '11:22:33',
         ], [
             'params'   => ['time' => $time],
+            'expected' => '12:34',
+        ], [
+            'params'   => ['time' => $time, 'showSeconds' => true],
             'expected' => '12:34:56',
         ], [
             'params'   => ['time' => $time, 'timeZone' => new DateTimeZone('US/Eastern')],
-            'expected' => '7:34:56',
+            'expected' => '7:34',
         ]] as $testData) {
             $this->_assertSame($testData['expected'], $testData['params']);
         }
