@@ -215,15 +215,22 @@ class CM_Model_User extends CM_Model_Abstract {
         return new CM_Frontend_Environment($this->getSite(), $this, $this->getLanguage(), null, null, null, $this->getCurrency());
     }
 
-    public function updateLatestActivityThrottled() {
+    public function updateLatestActivityThrottled(CM_Site_Abstract $site = null) {
         if ($this->getLatestActivity() < time() - self::ACTIVITY_EXPIRATION) {
-            $this->_updateLatestActivity();
+            $this->_updateLatestActivity($site);
         }
     }
 
-    protected function _updateLatestActivity() {
+    /**
+     * @param CM_Site_Abstract|null $site
+     */
+    protected function _updateLatestActivity(CM_Site_Abstract $site = null) {
         $currentTime = time();
-        CM_Db_Db::update('cm_user', array('activityStamp' => $currentTime), array('userId' => $this->getId()));
+        $values = ['activityStamp' => $currentTime];
+        if (null !== $site) {
+            $values['lastSessionSite'] = $site->getId();
+        }
+        CM_Db_Db::update('cm_user', $values, ['userId' => $this->getId()]);
         $this->_set('activityStamp', $currentTime);
     }
 

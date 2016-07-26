@@ -142,6 +142,20 @@ class CM_Session implements CM_Comparable {
     }
 
     /**
+     * @return bool
+     */
+    public function hasRequest() {
+        return null !== $this->_request;
+    }
+
+    /**
+     * @param CM_Http_Request_Abstract $request
+     */
+    public function setRequest(CM_Http_Request_Abstract $request) {
+        $this->_request = $request;
+    }
+
+    /**
      * @param bool|null $needed
      * @throws CM_Exception_AuthRequired
      * @return CM_Model_User|null
@@ -223,7 +237,12 @@ class CM_Session implements CM_Comparable {
                 $this->deleteUser();
                 return;
             }
-            $user->updateLatestActivityThrottled();
+            $site = null;
+            if ($this->hasRequest()) {
+                $siteFactory = new CM_Site_SiteFactory();
+                $site = $siteFactory->findSite($this->getRequest());
+            }
+            $user->updateLatestActivityThrottled($site);
             if (!$user->getOnline()) {
                 $user->setOnline(true);
             }

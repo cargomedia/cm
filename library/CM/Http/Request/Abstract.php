@@ -399,6 +399,7 @@ abstract class CM_Http_Request_Abstract {
      */
     public function setSession(CM_Session $session = null) {
         if (null !== $session) {
+            $session->setRequest($this);
             $session->start();
         }
         $this->_session = $session;
