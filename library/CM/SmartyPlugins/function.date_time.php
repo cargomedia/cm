@@ -11,6 +11,9 @@ function smarty_function_date_time(array $params, Smarty_Internal_Template $temp
         $timeStamp = (int) $params['time'];
     }
     $timeZone = isset($params['timeZone']) ? $params['timeZone'] : null;
+    if (is_string($timeZone)) {
+        $timeZone = new \DateTimeZone($timeZone);
+    }
     $pattern = !empty($params['showSeconds']) ? 'H:mm:ss' : 'H:mm';
 
     $formatter = $render->getFormatterDate(IntlDateFormatter::NONE, IntlDateFormatter::NONE, $pattern, $timeZone);

@@ -35,6 +35,9 @@ class smarty_function_date_timeTest extends CMTest_TestCase {
         ], [
             'params'   => ['time' => $time, 'timeZone' => new DateTimeZone('US/Eastern')],
             'expected' => '7:34',
+        ], [
+            'params'   => ['time' => $time, 'timeZone' => 'US/Eastern'],
+            'expected' => '7:34',
         ]] as $testData) {
             $this->_assertSame($testData['expected'], $testData['params']);
         }
