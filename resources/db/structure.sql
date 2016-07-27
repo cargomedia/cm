@@ -528,7 +528,7 @@ CREATE TABLE `cm_user` (
   `site` int(10) unsigned DEFAULT NULL,
   `languageId` int(10) unsigned DEFAULT NULL,
   `currencyId` int(10) unsigned DEFAULT NULL,
-  `lastSessioSite` int(10) unsigned DEFAULT NULL,
+  `lastSessionSite` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`userId`),
   KEY `activityStamp` (`activityStamp`),
   KEY `createStamp` (`createStamp`),
