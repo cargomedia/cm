@@ -51,4 +51,14 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
 
         $this->assertSame(3, $instantiateMethod->getCallCount());
     }
+
+    public function test_instantiateJobSetServiceManager() {
+        /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait|CM_Service_ManagerAwareInterface $job */
+        $job = $this->mockClass('CM_Jobdistribution_Job_Abstract', ['CM_Service_ManagerAwareInterface'], ['CM_Service_ManagerAwareTrait'])->newInstance();
+
+        $queue = new CM_Jobdistribution_DelayedQueue($this->getServiceManager());
+        $job = CMTest_TH::callProtectedMethod($queue, '_instantiateJob', [get_class($job)]);
+        $this->assertEquals($this->getServiceManager(), $job->getServiceManager());
+    }
+
 }
