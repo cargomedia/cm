@@ -237,12 +237,12 @@ class CM_Model_User extends CM_Model_Abstract {
      */
     protected function _updateLatestActivity(CM_Site_Abstract $site = null) {
         $currentTime = time();
-        $values = ['activityStamp' => $currentTime];
+        $updateData = ['activityStamp' => $currentTime];
         if (null !== $site) {
-            $values['lastSessionSite'] = $site->getId();
+            $updateData['lastSessionSite'] = $site->getId();
         }
-        CM_Db_Db::update('cm_user', $values, ['userId' => $this->getId()]);
-        $this->_set('activityStamp', $currentTime);
+        CM_Db_Db::update('cm_user', $updateData, ['userId' => $this->getId()]);
+        $this->_set($updateData);
     }
 
     protected function _getAssets() {
