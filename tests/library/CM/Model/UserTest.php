@@ -13,6 +13,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertEquals(CM_Site_Abstract::factory(), $user->getSite());
         $this->assertSame(null, $user->getLanguage());
         $this->assertSame(null, $user->getCurrency());
+        $this->assertNull($user->getLastSessionSite());
     }
 
     public function testCreateAllData() {
@@ -31,6 +32,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertEquals($site, $user->getSite());
         $this->assertEquals($language, $user->getLanguage());
         $this->assertEquals($currency, $user->getCurrency());
+        $this->assertEquals($site, $user->getLastSessionSite());
     }
 
     public function testGetSetOnline() {

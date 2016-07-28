@@ -222,14 +222,14 @@ class CM_Model_User extends CM_Model_Abstract {
     }
 
     /**
-     * @return CM_Site_SiteFactory|null
+     * @return CM_Site_Abstract|null
      */
     public function getLastSessionSite() {
-        $siteType = !$this->_get('lastSessionSite');
+        $siteType = $this->_get('lastSessionSite');
         if (!$siteType) {
             return null;
         }
-        return new CM_Site_SiteFactory($siteType);
+        return CM_Site_Abstract::factory($siteType);
     }
 
     /**
@@ -320,11 +320,12 @@ class CM_Model_User extends CM_Model_Abstract {
             $currencyId = $currency->getId();
         }
         $userId = CM_Db_Db::insert('cm_user', array(
-            'createStamp'   => time(),
-            'activityStamp' => time(),
-            'site'          => $siteType,
-            'languageId'    => $languageId,
-            'currencyId'    => $currencyId,
+            'createStamp'     => time(),
+            'activityStamp'   => time(),
+            'site'            => $siteType,
+            'languageId'      => $languageId,
+            'currencyId'      => $currencyId,
+            'lastSessionSite' => $siteType,
         ));
         return new static($userId);
     }
