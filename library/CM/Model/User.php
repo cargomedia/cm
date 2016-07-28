@@ -222,6 +222,17 @@ class CM_Model_User extends CM_Model_Abstract {
     }
 
     /**
+     * @return CM_Site_SiteFactory|null
+     */
+    public function getLastSessionSite() {
+        $siteType = !$this->_get('lastSessionSite');
+        if (!$siteType) {
+            return null;
+        }
+        return new CM_Site_SiteFactory($siteType);
+    }
+
+    /**
      * @param CM_Site_Abstract|null $site
      */
     protected function _updateLatestActivity(CM_Site_Abstract $site = null) {
