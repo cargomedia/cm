@@ -42,7 +42,13 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
      */
     protected function _instantiateJob($className) {
         try {
-            return new $className();
+            /** @var CM_Jobdistribution_Job_Abstract $job */
+            $job = new $className();
+            if ($job instanceof CM_Service_ManagerAwareInterface) {
+                /** @var CM_Service_ManagerAwareInterface $job */
+                $job->setServiceManager($this->getServiceManager());
+            }
+            return $job;
         } catch (Exception $e) {
             $logLevel = CM_Log_Logger::exceptionToLevel($e);
             $context = new CM_Log_Context();

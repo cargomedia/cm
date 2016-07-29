@@ -9,6 +9,10 @@ function smarty_function_date($params, Smarty_Internal_Template $template) {
     $showTime = !empty($params['showTime']);
     $showWeekday = !empty($params['showWeekday']);
 
+    if (is_string($timeZone)) {
+        $timeZone = new \DateTimeZone($timeZone);
+    }
+
     if ($showTime) {
         $formatter = $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::SHORT, null, $timeZone);
     } else {
@@ -18,7 +22,7 @@ function smarty_function_date($params, Smarty_Internal_Template $template) {
 
     if ($showWeekday) {
         $formatterWeekday = $render->getFormatterDate(IntlDateFormatter::NONE, IntlDateFormatter::NONE, 'eee', $timeZone);
-        $stringDate = $formatterWeekday->format($time) . ' ' .$stringDate;
+        $stringDate = $formatterWeekday->format($time) . ' ' . $stringDate;
     }
 
     return $stringDate;
