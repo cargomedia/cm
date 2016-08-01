@@ -239,8 +239,11 @@ class CM_Session implements CM_Comparable {
             }
             $site = null;
             if ($this->hasRequest()) {
-                $siteFactory = new CM_Site_SiteFactory();
-                $site = $siteFactory->findSite($this->getRequest());
+                $request = $this->getRequest();
+                if ($request->hasHeader('host')) {
+                    $siteFactory = new CM_Site_SiteFactory();
+                    $site = $siteFactory->findSite($request);
+                }
             }
             $user->updateLatestActivityThrottled($site);
             if (!$user->getOnline()) {
