@@ -63,8 +63,10 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
         $this->assertSame('CM_Exception_Invalid', $formattedRecord['exception']['type']);
         $this->assertSame('Bad', $formattedRecord['exception']['message']);
         $this->assertArrayHasKey('stack', $formattedRecord['exception']);
-        $this->assertInternalType('string', $formattedRecord['exception']['stack']);
+        $this->assertArrayHasKey('stackAsString', $formattedRecord['exception']);
+        $this->assertInternalType('array', $formattedRecord['exception']['stack']);
+        $this->assertInternalType('string', $formattedRecord['exception']['stackAsString']);
         $this->assertSame(['foo' => "'bar'"], $formattedRecord['exception']['metaInfo']);
-        $this->assertRegExp('/CM_Log_ContextFormatter_CargomediaTest->testGetRecordContext\(\)/', $formattedRecord['exception']['stack']);
+        $this->assertRegExp('/CM_Log_ContextFormatter_CargomediaTest->testGetRecordContext\(\)/', $formattedRecord['exception']['stackAsString']);
     }
 }
