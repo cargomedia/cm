@@ -96,24 +96,16 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
-   * @param {String} componentName
+   * @param {String} className
    * @returns {CM_View_Abstract}
    */
-  getChild: (function() {
-    var components = {};
-    return function(componentName) {
-      if (!components[componentName]) {
-        var component = components[componentName] = this.findChild(componentName);
-        if (!component) {
-          throw new Error('Failed to retrieve child view: ' + componentName);
-        }
-        component.on('destruct', function() {
-          delete components[componentName];
-        });
-      }
-      return components[componentName];
+  getChild: function(className) {
+    var child = this.findChild(className);
+    if (!child) {
+      throw new Error('Failed to retrieve `' + className + '` child view of `' + this.getClass() + '`.');
     }
-  })(),
+    return child;
+  },
 
   /**
    * @return CM_View_Abstract|null
