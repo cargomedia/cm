@@ -225,9 +225,9 @@ class CM_Model_User extends CM_Model_Abstract {
      * @param CM_Site_Abstract $site
      */
     public function updateLastSessionSite(CM_Site_Abstract $site) {
-        $this->updateLatestActivityThrottled();
+        $this->_updateLatestActivity();
         CM_Db_Db::update('cm_user', ['lastSessionSite' => $site->getId()], ['userId' => $this->getId()]);
-        $this->_change();
+        $this->_set('lastSessionSite', $site->getId());
     }
 
     /**
