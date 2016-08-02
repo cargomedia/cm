@@ -35,6 +35,9 @@ abstract class CM_Http_Request_Abstract {
     /** @var int */
     private $_clientId;
 
+    /** @var  CM_Site_Abstract|null */
+    private $_site;
+
     /** @var CM_Http_Request_Abstract */
     private static $_instance;
 
@@ -257,11 +260,11 @@ abstract class CM_Http_Request_Abstract {
      * @return CM_Site_Abstract
      */
     public function popPathSiteByMatch() {
-        $siteFactory = new CM_Site_SiteFactory();
-        $site = $siteFactory->findSite($this);
+        $site = $this->_findSite();
         if (null === $site) {
             $site = CM_Site_Abstract::factory();
         }
+        $this->_site = $site;
 
         $sitePath = $site->getUrlParser()->getPath();
         if ($this->hasPathPrefix($sitePath)) {
@@ -584,8 +587,7 @@ abstract class CM_Http_Request_Abstract {
         if (!$this->hasHeader('host') || !$session->hasUser()) {
             return;
         }
-        $siteFactory = new CM_Site_SiteFactory();
-        $site = $siteFactory->findSite($this);
+        $site = $this->_findSite();
         if (!$site) {
             return;
         }
@@ -642,6 +644,17 @@ abstract class CM_Http_Request_Abstract {
             }
         }
         return null;
+    }
+
+    /**
+     * @return CM_Site_Abstract|null
+     */
+    private function _findSite() {
+        if (null === $this->_site) {
+            $siteFactory = new CM_Site_SiteFactory();
+            $this->_site = $siteFactory->findSite($this);
+        }
+        return $this->_site;
     }
 
     /**
