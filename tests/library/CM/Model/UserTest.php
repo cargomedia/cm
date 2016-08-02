@@ -24,7 +24,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $user = CM_Model_User::createStatic([
             'site'     => $site,
             'language' => $language,
-            'currency'  => $currency,
+            'currency' => $currency,
         ]);
         $this->assertInternalType('int', $user->getCreated());
         $this->assertEquals(time(), $user->getCreated());
@@ -116,19 +116,21 @@ class CM_Model_UserTest extends CMTest_TestCase {
     public function testUpdateLatestActivityThrottled() {
         $user = CMTest_TH::createUser();
         $activityStamp1 = time();
-        $siteDefault = CM_Site_Abstract::factory();
         $this->assertSameTime($activityStamp1, $user->getLatestActivity());
-        $this->assertNull($user->getLastSessionSite());
         CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2);
         $user->updateLatestActivityThrottled();
         $this->assertSameTime($activityStamp1, $user->getLatestActivity());
         CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2 + 1);
         $activityStamp2 = time();
-        $user->updateLatestActivityThrottled($siteDefault);
+        $user->updateLatestActivityThrottled();
         $this->assertSameTime($activityStamp2, $user->getLatestActivity());
-        $this->assertEquals($siteDefault, $user->getLastSessionSite());
-        $user->_change();
-        $this->assertSameTime($activityStamp2, $user->getLatestActivity());
-        $this->assertEquals($siteDefault, $user->getLastSessionSite());
+    }
+
+    public function testUpdateLastSessionSite() {
+        $site = CM_Site_Abstract::factory();
+        $user = CMTest_TH::createUser();
+        $this->assertNull($user->getLastSessionSite());
+        $user->updateLastSessionSite($site);
+        $this->assertEquals($site, $user->getLastSessionSite());
     }
 }

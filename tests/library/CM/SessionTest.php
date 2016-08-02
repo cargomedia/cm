@@ -217,10 +217,8 @@ class CM_SessionTest extends CMTest_TestCase {
         CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2 + 1);
         $activityStamp2 = time();
         $session = new CM_Session($sessionId);
-        $session->setRequest(new CM_Http_Request_Get('http://www.default.dev/', ['host' => 'www.default.dev']));
         $session->start();
         $this->assertEquals($activityStamp2, $session->getUser(true)->getLatestActivity(), null, 1);
-        $this->assertSame('http://www.default.dev', $session->getUser(true)->getLastSessionSite()->getUrl());
         CMTest_TH::timeForward($session->getLifetime() / 2);
         $session->start();
 

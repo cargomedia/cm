@@ -390,6 +390,7 @@ abstract class CM_Http_Request_Abstract {
         if (!$this->hasSession()) {
             $this->_session = new CM_Session(null, $this);
             $this->_session->start();
+            $this->_updateLastActivitySite($this->_session);
         }
         return $this->_session;
     }
@@ -399,8 +400,8 @@ abstract class CM_Http_Request_Abstract {
      */
     public function setSession(CM_Session $session = null) {
         if (null !== $session) {
-            $session->setRequest($this);
             $session->start();
+            $this->_updateLastActivitySite($session);
         }
         $this->_session = $session;
         $this->resetViewer();
@@ -574,6 +575,21 @@ abstract class CM_Http_Request_Abstract {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @param CM_Session $session
+     */
+    private function _updateLastActivitySite(CM_Session $session) {
+        if (!$this->hasHeader('host') || !$session->hasUser()) {
+            return;
+        }
+        $siteFactory = new CM_Site_SiteFactory();
+        $site = $siteFactory->findSite($this);
+        if (!$site) {
+            return;
+        }
+        $session->getUser()->updateLastSessionSite($site);
     }
 
     /**
