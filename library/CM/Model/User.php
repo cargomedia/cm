@@ -241,16 +241,10 @@ class CM_Model_User extends CM_Model_Abstract {
         return CM_Site_Abstract::factory($siteType);
     }
 
-    /**
-     * @param CM_Site_Abstract|null $site
-     */
-    protected function _updateLatestActivity(CM_Site_Abstract $site = null) {
+    protected function _updateLatestActivity() {
         $currentTime = time();
         $updateData = ['activityStamp' => $currentTime];
-        if (null !== $site) {
-            $updateData['lastSessionSite'] = $site->getId();
-        }
-        CM_Db_Db::update('cm_user', $updateData, ['userId' => $this->getId()]);
+        CM_Db_Db::update('cm_user', ['activityStamp' => $currentTime], ['userId' => $this->getId()]);
         $this->_set($updateData);
     }
 
