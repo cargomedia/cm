@@ -243,9 +243,8 @@ class CM_Model_User extends CM_Model_Abstract {
 
     protected function _updateLatestActivity() {
         $currentTime = time();
-        $updateData = ['activityStamp' => $currentTime];
         CM_Db_Db::update('cm_user', ['activityStamp' => $currentTime], ['userId' => $this->getId()]);
-        $this->_set($updateData);
+        $this->_set('activityStamp', $currentTime);
     }
 
     protected function _getAssets() {
