@@ -1,6 +1,6 @@
 <?php
 
-class CM_Frontend_JavascriptContainer_Bundle extends CM_Frontend_JavascriptContainer {
+class CM_Frontend_JavascriptContainer_Bundle {
 
     /** @var array */
     protected $_content = [];
@@ -11,32 +11,50 @@ class CM_Frontend_JavascriptContainer_Bundle extends CM_Frontend_JavascriptConta
     /** @var string[] */
     protected $_sourcePath = [];
 
+    /** @var string[] */
+    protected $_rawPath = [];
+
     /** @var array */
-    protected $_library = [];
+    protected $_libraryPath = [];
 
-    public function compile($generateSourceMaps) {
-        $generateSourceMaps = (bool) $generateSourceMaps;
-        $cacheKey = __METHOD__ . '_md5:' . md5($this->_getContent()) . '_generateSourceMaps:' . $generateSourceMaps;
-        $config = $this->_getConfig([
-            'sourceMaps' => $generateSourceMaps,
-        ]);
+    /** @var array */
+    protected $_sourceMapping = [];
 
-        return CM_Cache_Persistent::getInstance()->get($cacheKey, function () use ($config) {
-            return CM_Util::exec(DIR_ROOT . '/bin/jscompile', null, json_encode($config));
-        });
+    /**
+     * CM_Frontend_JavascriptContainer_Bundle constructor.
+     */
+    public function __construct() {
+    }
+
+    /**
+     * @param string     $command code|sourcemaps
+     * @param array|null $options
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    public function compile($command, array $options = null) {
+        if (!in_array($command, ['code', 'sourcemaps', 'checksum'])) {
+            throw new CM_Exception_Invalid('Invalid cm-bundler command: `' . $command . '`');
+        }
+        if (null === $options) {
+            $options = [];
+        }
+
+        $config = $this->_getConfig($options);
+        return CM_Util::exec('cm-bundler', [$command, json_encode($config)]);
     }
 
     /**
      * @param string      $name     require() module name
      * @param string      $content  inline script
      * @param bool|null   $loadOnly true to execute the inline script, not executed by default
-     * @param string|null $path     source map path, use the module name by default
+     * @param string|null $mapPath  source map path, use the module name by default
      */
-    public function addInlineContent($name, $content, $loadOnly = null, $path = null) {
+    public function addInlineContent($name, $content, $loadOnly = null, $mapPath = null) {
         $this->_content[] = [
             'name'    => $name,
-            'path'    => $path || $name,
             'data'    => $content,
+            'mapPath' => is_string($mapPath) ? $mapPath : $name,
             'require' => (bool) $loadOnly
         ];
     }
@@ -49,6 +67,13 @@ class CM_Frontend_JavascriptContainer_Bundle extends CM_Frontend_JavascriptConta
     }
 
     /**
+     * @param array $entryPaths
+     */
+    public function addEntryPaths($entryPaths) {
+        $this->_entryPath = array_merge($this->_entryPath, $entryPaths);
+    }
+
+    /**
      * @param string $sourcePath use those paths to resolve require() calls
      */
     public function addSourcePath($sourcePath) {
@@ -56,14 +81,52 @@ class CM_Frontend_JavascriptContainer_Bundle extends CM_Frontend_JavascriptConta
     }
 
     /**
-     * Include the js module in the bundle and expose it to the global scope
-     *
-     * @param string $name       require() module name
-     * @param string $sourcePath module source
+     * @param array $sourcePaths
      */
-    public function addLibrary($name, $sourcePath) {
-        $this->addSourcePath($sourcePath);
-        $this->_library[] = $name;
+    public function addSourcePaths($sourcePaths) {
+        $this->_sourcePath = array_merge($this->_sourcePath, $sourcePaths);
+    }
+
+    /**
+     * @param string $rawPath concatenated source code
+     */
+    public function addRawPath($rawPath) {
+        $this->_rawPath[] = $rawPath;
+    }
+
+    /**
+     * @param array $rawPaths
+     */
+    public function addRawPaths($rawPaths) {
+        $this->_rawPath = array_merge($this->_rawPath, $rawPaths);
+    }
+
+    /**
+     * @param string $libraryPath exposed library path (available in the global scope with require())
+     */
+    public function addLibraryPath($libraryPath) {
+        $this->_libraryPath[] = $libraryPath;
+    }
+
+    /**
+     * @param array $libraryPaths
+     */
+    public function addLibraryPaths($libraryPaths) {
+        $this->_libraryPath = array_merge($this->_libraryPath, $libraryPaths);
+    }
+
+    /**
+     * @param array $mapping
+     */
+    public function addSourceMapping($mapping) {
+        $this->_sourceMapping = array_merge($this->_sourceMapping, $mapping);
+    }
+
+    /**
+     * @return array
+     */
+    public function getSourceMapping() {
+        return $this->_sourceMapping;
     }
 
     /**
@@ -76,9 +139,11 @@ class CM_Frontend_JavascriptContainer_Bundle extends CM_Frontend_JavascriptConta
         }
         return array_merge([
             'entries'   => $this->_entryPath,
+            'libraries' => $this->_libraryPath,
             'content'   => $this->_content,
-            'libraries' => $this->_library,
-            'paths'     => $this->_sourcePath
+            'concat'    => $this->_rawPath,
+            'paths'     => $this->_sourcePath,
+            'baseDir'   => '/'
         ], $extra);
     }
 
