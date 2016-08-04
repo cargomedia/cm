@@ -60,6 +60,12 @@ class CM_ProcessTest extends CMTest_TestCase {
     public function testForkAndWaitForChildren() {
         $file = CM_File::createTmp();
 
+        // Previous fork, which should be ignored silently by CM_Process::_wait
+        if (0 === pcntl_fork()) {
+            usleep(200 * 1000);
+            exit;
+        }
+
         $process = CM_Process::getInstance();
         $parentOutput = [];
         for ($i = 1; $i <= 4; $i++) {
@@ -70,6 +76,16 @@ class CM_ProcessTest extends CMTest_TestCase {
                 $file->appendLine("Child $i terminated after $ms ms.");
             });
         }
+        $parentOutput[] = "Child $i forked.";
+        $process->fork(function () use ($i, $file) {
+            if (0 === pcntl_fork()) {
+                usleep(200 * 1000);
+                exit;
+            }
+            $ms = 100 * $i;
+            usleep($ms * 1000);
+            $file->appendLine("Child $i forked own sub-process and terminated after $ms ms.");
+        });
         $parentOutput[] = 'Parent waiting for 250 ms...';
         usleep(250000);
         $parentOutput[] = 'Parent listening to children...';
@@ -82,6 +98,7 @@ class CM_ProcessTest extends CMTest_TestCase {
             'Child 2 forked.',
             'Child 3 forked.',
             'Child 4 forked.',
+            'Child 5 forked.',
             'Parent waiting for 250 ms...',
             'Parent listening to children...',
             'Parent terminated.'
@@ -92,6 +109,7 @@ class CM_ProcessTest extends CMTest_TestCase {
             'Child 1 terminated after 100 ms.',
             'Child 3 terminated after 300 ms.',
             'Child 4 terminated after 400 ms.',
+            'Child 5 forked own sub-process and terminated after 500 ms.',
         ], $childrenOutput);
     }
 

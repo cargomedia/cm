@@ -13,6 +13,9 @@ class CM_Image_Image {
     /** @var bool|null */
     private $_animated;
 
+    /** @var int */
+    private $_compressionQuality = 80;
+
     /**
      * @param string|Imagick $imageContainer
      * @throws CM_Exception
@@ -112,6 +115,7 @@ class CM_Image_Image {
      * @throws CM_Exception
      */
     public function getBlob() {
+        $this->_imagick->setImageCompressionQuality($this->getCompressionQuality());
         try {
             if ($this->_getAnimationRequired($this->getFormat())) {
                 $imageBlob = $this->_imagick->getImagesBlob();
@@ -275,8 +279,15 @@ class CM_Image_Image {
         if ($quality < 1 || $quality > 100) {
             throw new CM_Exception_Invalid('Invalid compression quality. It should be between 1-100.', null, ['quality' => $quality]);
         }
-        $this->_imagick->setImageCompressionQuality($quality);
+        $this->_compressionQuality = $quality;
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCompressionQuality() {
+        return $this->_compressionQuality;
     }
 
     /**

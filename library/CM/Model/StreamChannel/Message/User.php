@@ -8,6 +8,12 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
     }
 
     public function onSubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
+        if ($this->hasUser()) {
+            $user = $streamSubscribe->getUser();
+            if ($user && !$user->getOnline()) {
+                $user->setOnline(true);
+            }
+        }
     }
 
     public function onUnpublish(CM_Model_Stream_Publish $streamPublish) {

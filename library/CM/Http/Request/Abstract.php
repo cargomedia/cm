@@ -58,12 +58,12 @@ abstract class CM_Http_Request_Abstract {
         if (null !== $server) {
             foreach ($server as &$serverValue) {
                 if (is_string($serverValue)) {
-                    $serverValue = self::_sanitizeUtf($serverValue);
+                    $serverValue = CM_Util::sanitizeUtf($serverValue);
                 }
             }
             $this->_server = array_change_key_case($server);
         }
-        $uri = self::_sanitizeUtf((string) $uri);
+        $uri = CM_Util::sanitizeUtf((string) $uri);
         $this->setUri($uri);
 
         if ($sessionId = $this->getCookie('sessionId')) {
@@ -278,6 +278,17 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @return array
+     */
+    public function findQuery() {
+        try {
+            return $this->getQuery();
+        } catch (CM_Exception_Invalid $e) {
+            return [];
+        }
+    }
+
+    /**
      * @param array $query
      */
     public function setQuery(array $query) {
@@ -319,16 +330,16 @@ abstract class CM_Http_Request_Abstract {
 
         $querySanitized = [];
         foreach ($query as $key => $value) {
-            $key = self::_sanitizeUtf($key);
+            $key = CM_Util::sanitizeUtf($key);
 
             if (is_array($value)) {
                 array_walk_recursive($value, function (&$innerValue) {
                     if (is_string($innerValue)) {
-                        $innerValue = self::_sanitizeUtf($innerValue);
+                        $innerValue = CM_Util::sanitizeUtf($innerValue);
                     }
                 });
             } else {
-                $value = self::_sanitizeUtf($value);
+                $value = CM_Util::sanitizeUtf($value);
             }
 
             $querySanitized[$key] = $value;
@@ -687,13 +698,5 @@ abstract class CM_Http_Request_Abstract {
         }
 
         return self::factory($method, $uri, $headers, $server, $body);
-    }
-
-    /**
-     * @param string $value
-     * @return string
-     */
-    protected static function _sanitizeUtf($value) {
-        return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
     }
 }

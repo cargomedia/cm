@@ -40,6 +40,7 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
                 'uri'    => $request->getUri(),
                 'method' => $request->getMethodName(),
             ];
+            $formattedRequest['query'] = $request->findQuery();
             if (array_key_exists('http_referer', $serverArray)) {
                 $formattedRequest['referer'] = (string) $serverArray['http_referer'];
             }

@@ -218,15 +218,18 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $image->setCompressionQuality(-188);
     }
 
-    public function testSetFormat() {
-        $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
-        $image = new CM_Image_Image($imageFile->read());
-        $this->assertSame(CM_Image_Image::FORMAT_JPEG, $image->getFormat());
-        $image->setFormat(CM_Image_Image::FORMAT_GIF);
-        $this->assertSame(CM_Image_Image::FORMAT_GIF, $image->getFormat());
+    public function testSetCompressionQualityDefault() {
+        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/nature.jpg');
+        $image = new CM_Image_Image($imageFileOriginal->read());
+        $qualityDefault = 80;
+
+        $blobOriginal = $image->getClone()->getBlob();
+        $blobModified = $image->getClone()->setCompressionQuality($qualityDefault)->getBlob();
+
+        $this->assertEquals(strlen($blobModified), strlen($blobOriginal));
     }
 
-    public function testConvertJpegCompression() {
+    public function testSetCompressionQualityDefaultJpegFileSize() {
         $qualityList = array(
             1   => 4056,
             30  => 6439,
@@ -246,6 +249,14 @@ class CM_Image_ImageTest extends CMTest_TestCase {
             $fileSizeDelta = $expectedFileSize * 0.05;
             $this->assertEquals($expectedFileSize, $imageFile->getSize(), 'File size mismatch for quality `' . $quality . '`', $fileSizeDelta);
         }
+    }
+
+    public function testSetFormat() {
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $image = new CM_Image_Image($imageFile->read());
+        $this->assertSame(CM_Image_Image::FORMAT_JPEG, $image->getFormat());
+        $image->setFormat(CM_Image_Image::FORMAT_GIF);
+        $this->assertSame(CM_Image_Image::FORMAT_GIF, $image->getFormat());
     }
 
     public function testResize() {
@@ -383,7 +394,7 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $this->assertSame('image/jpeg', $imageFile->getMimeType());
         $this->assertSame(50, $image->getWidth());
         $this->assertSame(50, $image->getHeight());
-        $this->assertEquals(1682, $imageFile->getSize(), '', 100);
+        $this->assertEquals(1173, $imageFile->getSize(), '', 100);
     }
 
     public function testResizeSpecific() {

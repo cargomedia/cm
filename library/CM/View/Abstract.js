@@ -96,6 +96,18 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
+   * @param {String} className
+   * @returns {CM_View_Abstract}
+   */
+  getChild: function(className) {
+    var child = this.findChild(className);
+    if (!child) {
+      throw new Error('Failed to retrieve `' + className + '` child view of `' + this.getClass() + '`.');
+    }
+    return child;
+  },
+
+  /**
    * @return CM_View_Abstract|null
    */
   getParent: function() {

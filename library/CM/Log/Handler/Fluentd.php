@@ -6,7 +6,7 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
 
     /** @var \Fluent\Logger\FluentLogger */
     protected $_fluentdLogger;
-    
+
     /** @var CM_Log_ContextFormatter_Interface */
     protected $_contextFormatter;
 
@@ -38,6 +38,7 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
      */
     protected function _writeRecord(CM_Log_Record $record) {
         $formattedRecord = $this->_formatRecord($record);
+        $formattedRecord = $this->_sanitizeRecord($formattedRecord);
         $this->_getFluentd()->post($this->_tag, $formattedRecord);
     }
 
@@ -47,5 +48,18 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
      */
     protected function _formatRecord(CM_Log_Record $record) {
         return $this->_contextFormatter->formatRecordContext($record);
+    }
+
+    /**
+     * @param array $formattedRecord
+     * @return array
+     */
+    protected function _sanitizeRecord(array $formattedRecord) {
+        array_walk_recursive($formattedRecord, function (&$value, $key) {
+            if (is_string($value) && !mb_check_encoding($value, 'UTF-8')) {
+                $value = CM_Util::sanitizeUtf($value);
+            }
+        });
+        return $formattedRecord;
     }
 }

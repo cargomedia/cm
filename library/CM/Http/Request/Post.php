@@ -40,7 +40,7 @@ class CM_Http_Request_Post extends CM_Http_Request_Abstract {
     public function getQuery() {
         if ($this->_bodyQuery === null) {
             if ($this->_bodyEncoding == self::ENCODING_JSON) {
-                $body = self::_sanitizeUtf($this->getBody());
+                $body = CM_Util::sanitizeUtf($this->getBody());
                 if (!is_array($this->_bodyQuery = json_decode($body, true))) {
                     throw new CM_Exception_Invalid('Cannot extract query from body', CM_Exception::WARN, ['body' => $body]);
                 }
