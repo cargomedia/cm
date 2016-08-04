@@ -27,21 +27,21 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
             }
         }
         if (null === $filterPosition) {
-            throw new CM_Exception_Invalid("No filter called `{$filterName}` found");
+            throw new CM_Exception_Invalid('Filter not found', null, ['filter' => $filterName]);
         }
         array_splice($this->_filterList, $filterPosition, 0, [$filter]);
     }
 
     /**
-     * @param string $mode
-     * @param array|null  $options
+     * @param string     $mode
+     * @param array|null $options
      * @throws CM_Exception_Invalid
      */
     public function setMode($mode, $options = null) {
         $options = $options ? $options : [];
         $acceptedModes = array('escape', 'oneline', 'simple', 'markdown', 'markdownPlain');
         if (!in_array($mode, $acceptedModes)) {
-            throw new CM_Exception_Invalid('Invalid mode `' . $mode . '`');
+            throw new CM_Exception_Invalid('Invalid mode', null, ['mode' => $mode]);
         }
         $mode = (string) $mode;
         $optionsDefault = [
@@ -58,7 +58,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $text
+     * @param string             $text
      * @param CM_Frontend_Render $render
      * @return string
      */

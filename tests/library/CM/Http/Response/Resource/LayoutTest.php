@@ -45,7 +45,10 @@ class CM_Http_Response_Resource_LayoutTest extends CMTest_TestCase {
         $exception = $this->catchException(function () use ($render) {
             $render->getLayoutFile('resource/browserconfig.xml');
         });
-        $this->assertContains('Cannot find `resource/browserconfig.xml`', $exception->getMessage());
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Can\'t find template', $exception->getMessage());
+        $this->assertSame('resource/browserconfig.xml', $exception->getMetaInfo()['template']);
     }
 
     public function testNonexistentFile() {

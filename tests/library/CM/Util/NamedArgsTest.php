@@ -6,9 +6,9 @@ class CM_Util_NamedArgsTest extends CMTest_TestCase {
         $namedArgs = new CM_Util_NamedArgs();
         $results = [
             $namedArgs->instantiateReflection(function () {
-                }),
+            }),
             $namedArgs->instantiateReflection(new ReflectionFunction(function () {
-                    })),
+            })),
             $namedArgs->instantiateReflection(new ReflectionMethod('DateTime', 'format')),
             $namedArgs->instantiateReflection(array(new DateTime(), 'format')),
             $namedArgs->instantiateReflection('sprintf'),
@@ -35,25 +35,32 @@ class CM_Util_NamedArgsTest extends CMTest_TestCase {
         $this->assertSame(['foo', 'bar', 'zoo'], $finalArgs);
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Cannot find value for `foo`
-     */
     public function testMatchNamedArgsMissing() {
         $function = function ($foo) {
         };
         $namedArgs = new CM_Util_NamedArgs();
-        $namedArgs->matchNamedArgs($function, []);
+
+        $exception = $this->catchException(function () use ($namedArgs, $function) {
+            $namedArgs->matchNamedArgs($function, []);
+        });
+
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Cannot find value for parameter', $exception->getMessage());
+        $this->assertSame(['parameter' => 'foo'], $exception->getMetaInfo());
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Unmatched arguments: `bar, 0`
-     */
     public function testMatchNamedArgsTooMany() {
         $function = function ($foo) {
         };
         $namedArgs = new CM_Util_NamedArgs();
-        $namedArgs->matchNamedArgs($function, ['foo' => 'foo', 'bar' => 'bar', 'numeric']);
+        $exception = $this->catchException(function () use ($namedArgs, $function) {
+            $namedArgs->matchNamedArgs($function, ['foo' => 'foo', 'bar' => 'bar', 'numeric']);
+        });
+
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Unmatched arguments', $exception->getMessage());
+        $this->assertSame(['argNames' => 'bar, 0'], $exception->getMetaInfo());
     }
 }

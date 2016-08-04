@@ -40,7 +40,7 @@ class CM_Geometry_Vector2 implements CM_ArrayConvertible {
      */
     protected function _validateArgument($value) {
         if (!is_numeric($value)) {
-            throw new CM_Exception_Invalid('Non numeric value `' . $value . '`');
+            throw new CM_Exception_Invalid('Non numeric value', null, ['value' => $value]);
         }
     }
 

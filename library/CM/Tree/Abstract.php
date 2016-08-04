@@ -42,7 +42,7 @@ abstract class CM_Tree_Abstract {
 
     /**
      * @param string $path
-     * @return CM_TreeNode_Abstract
+     * @return CM_TreeNode_Abstract|boolean
      * @throws CM_TreeException
      */
     public function findNode($path) {
@@ -104,7 +104,10 @@ abstract class CM_Tree_Abstract {
         $nodeId = (string) $nodeId;
         $id = (string) $id;
         if (!array_key_exists($nodeId, $this->_nodesTmp)) {
-            throw new CM_Exception_Invalid("Cannot add leaf `$id` because node `$nodeId` does not exist.");
+            throw new CM_Exception_Invalid('Cannot add leaf because node does not exist.', null, [
+                'leafId' => $id,
+                'nodeId' => $nodeId,
+            ]);
         }
         $this->_nodesTmp[$nodeId]->setLeaf($id, $value);
     }

@@ -36,7 +36,10 @@ abstract class CM_Class_Abstract {
         }
         $type = (int) $type;
         if (empty($config->types[$type])) {
-            throw new CM_Class_Exception_TypeNotConfiguredException('Type `' . $type . '` not configured for class `' . get_called_class() . '`.');
+            throw new CM_Class_Exception_TypeNotConfiguredException('Type is not configured for class.', null, [
+                'type'      => $type,
+                'className' => get_called_class(),
+            ]);
         }
         return $config->types[$type];
     }
@@ -81,7 +84,7 @@ abstract class CM_Class_Abstract {
             }
         }
         if (empty($result)) {
-            throw new CM_Exception_Invalid('Class `' . get_called_class() . '` has no configuration.');
+            throw new CM_Exception_Invalid('Class has no configuration.', null, ['className' => get_called_class()]);
         }
         return (object) $result;
     }
@@ -124,7 +127,7 @@ abstract class CM_Class_Abstract {
      */
     public static function getTypeStatic() {
         if (!isset(self::_getConfig()->type)) {
-            throw new CM_Class_Exception_TypeNotConfiguredException('Class `' . get_called_class() . '` has no type configured.');
+            throw new CM_Class_Exception_TypeNotConfiguredException('Class has no type configured.', null, ['className' => get_called_class()]);
         }
         return self::_getConfig()->type;
     }

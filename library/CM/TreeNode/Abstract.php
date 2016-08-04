@@ -21,7 +21,7 @@ abstract class CM_TreeNode_Abstract {
     private $_leaves = array();
 
     /**
-     * @param strin       $id
+     * @param string       $id
      * @param string      $name
      * @param string|null $parentId
      */
@@ -94,7 +94,10 @@ abstract class CM_TreeNode_Abstract {
      */
     public function getNode($name) {
         if (!$this->hasNode($name)) {
-            throw new CM_TreeException("Node `" . $this->getId() . "` does not contain node `$name`.");
+            throw new CM_TreeException('Node does not contain inner node', null, [
+                'parentNodeId'  => $this->getId(),
+                'innerNodeName' => $name,
+            ]);
         }
         return $this->_nodes[$name];
     }
@@ -124,7 +127,10 @@ abstract class CM_TreeNode_Abstract {
      */
     public function getLeaf($key) {
         if (!$this->hasLeaf($key)) {
-            throw new CM_TreeException("Node `" . $this->getId() . "` does not contain leaf `$key`.");
+            throw new CM_TreeException('Node does not contain leaf.', null, [
+                'parentNodeId' => $this->getId(),
+                'leafKey'      => $key,
+            ]);
         }
         return $this->_leaves[$key];
     }

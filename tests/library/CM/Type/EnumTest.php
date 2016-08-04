@@ -24,19 +24,31 @@ class CM_Type_EnumTest extends CMTest_TestCase {
             new FiguresValidMock('bar');
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Invalid value `bar` for enum class `FiguresValidMock`', $exception->getMessage());
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Invalid value for enum class', $exception->getMessage());
+        $this->assertSame(
+            [
+                'value'         => 'bar',
+                'className' => 'FiguresValidMock',
+            ],
+            $exception->getMetaInfo()
+        );
 
         $exception = $this->catchException(function () {
             new FiguresInvalidNoDefaultMock();
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Default value in not defined for enum class `FiguresInvalidNoDefaultMock`', $exception->getMessage());
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Default value in not defined for enum class', $exception->getMessage());
+        $this->assertSame(['className' => 'FiguresInvalidNoDefaultMock'], $exception->getMetaInfo());
 
         $exception = $this->catchException(function () {
             new FiguresInvalidValidDefaultMock();
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Invalid default value for enum class `FiguresInvalidValidDefaultMock`', $exception->getMessage());
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Invalid default value for enum class', $exception->getMessage());
+        $this->assertSame(['className' => 'FiguresInvalidValidDefaultMock'], $exception->getMetaInfo());
     }
 }
 

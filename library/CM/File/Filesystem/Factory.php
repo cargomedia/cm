@@ -31,7 +31,7 @@ class CM_File_Filesystem_Factory {
                 return new CM_File_Filesystem_Adapter_AwsS3($client, $options['bucket'], $acl, $pathPrefix);
                 break;
             default:
-                throw new CM_Exception('Unsupported adapter class `' . $className . '`.');
+                throw new CM_Exception('Unsupported adapter class.', null, ['className' => $className]);
         }
     }
 

@@ -47,7 +47,7 @@ class CM_Elasticsearch_Document {
      */
     public function get($key) {
         if (!$this->has($key)) {
-            throw new CM_Exception_Invalid("Field `{$key}` does not exist");
+            throw new CM_Exception_Invalid('Field does not exist', null, ['key' => $key]);
         }
         return $this->_data[$key];
     }

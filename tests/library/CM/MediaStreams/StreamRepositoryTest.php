@@ -23,7 +23,9 @@ class CM_MediaStreams_StreamRepositoryTest extends CMTest_TestCase {
             $repository->createStreamChannel('bar', CM_Model_StreamChannel_Media::getTypeStatic(), 2, $mediaId);
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Channel archive with mediaId `' . $mediaId . '` already exists', $exception->getMessage());
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Channel archive with this mediaId already exists', $exception->getMessage());
+        $this->assertSame(['mediaId' => $mediaId], $exception->getMetaInfo());
     }
 
     public function testRemoveStreamChannel() {

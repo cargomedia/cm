@@ -25,7 +25,7 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
             foreach ($filterLevelList as $level) {
                 $level = (int) $level;
                 if (!CM_Log_Logger::hasLevel($level)) {
-                    throw new CM_Exception_Invalid('Log level `' . $level . '` does not exist.');
+                    throw new CM_Exception_Invalid('Log level does not exist.', null, ['level' => $level]);
                 }
             }
         }

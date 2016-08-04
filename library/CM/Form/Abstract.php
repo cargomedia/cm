@@ -21,7 +21,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 
         $className = get_class($this);
         if (!preg_match('/^\w+_Form_(.+)$/', $className, $matches)) {
-            throw new CM_Exception("Cannot detect namespace from form's class-name: `{$className}`");
+            throw new CM_Exception('Cannot detect namespace from form\'s classname', null, ['className' => $className]);
         }
         $name = lcfirst($matches[1]);
         $name = preg_replace('/([A-Z])/', '_\1', $name);
@@ -40,7 +40,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     protected function registerField(CM_FormField_Abstract $field) {
         $fieldName = $field->getName();
         if ($this->hasField($fieldName)) {
-            throw new CM_Exception_Invalid('Form field `' . $fieldName . '` is already registered.');
+            throw new CM_Exception_Invalid('Form field is already registered.', null, ['fieldName' => $fieldName]);
         }
 
         $this->_fields[$fieldName] = $field;
@@ -53,7 +53,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     protected function registerAction(CM_FormAction_Abstract $action) {
         $actionName = $action->getName();
         if (isset($this->_actions[$actionName])) {
-            throw new CM_Exception_Invalid('Form action `' . $actionName . '` is already registered.');
+            throw new CM_Exception_Invalid('Form action is already registered.', null, ['actionName' => $actionName]);
         }
         $this->_actions[$actionName] = $action;
     }
@@ -79,7 +79,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
      */
     public function getAction($name) {
         if (!isset($this->_actions[$name])) {
-            throw new CM_Exception_Invalid('Unrecognized action `' . $name . '`.');
+            throw new CM_Exception_Invalid('Unrecognized action.', null, ['actionName' => $name]);
         }
         return $this->_actions[$name];
     }
@@ -98,7 +98,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
      */
     public function getField($fieldName) {
         if (!$this->hasField($fieldName)) {
-            throw new CM_Exception_Invalid('Unrecognized field `' . $fieldName . '`.');
+            throw new CM_Exception_Invalid('Unrecognized field.', null, ['fieldName' => $fieldName]);
         }
         return $this->_fields[$fieldName];
     }
@@ -126,8 +126,8 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     }
 
     /**
-     * @param array                 $data
-     * @param string                $actionName
+     * @param array                      $data
+     * @param string                     $actionName
      * @param CM_Http_Response_View_Form $response
      * @return mixed
      */

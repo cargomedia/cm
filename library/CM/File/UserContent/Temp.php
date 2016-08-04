@@ -16,7 +16,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
     public function __construct($uniqid, CM_Service_Manager $serviceManager = null) {
         $data = CM_Db_Db::select('cm_tmp_userfile', '*', array('uniqid' => $uniqid))->fetch();
         if (!$data) {
-            throw new CM_Exception_Nonexistent('Uniqid for file does not exists: `' . $uniqid . '`');
+            throw new CM_Exception_Nonexistent('Uniqid for file does not exist', null, ['uniqid' => $uniqid]);
         }
         $this->_uniqid = $data['uniqid'];
         $this->_filenameLabel = $data['filename'];

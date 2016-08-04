@@ -12,7 +12,10 @@ class CM_Memcache_Client extends CM_Class_Abstract {
         $this->_memcache = new Memcache();
         foreach ($servers as $server) {
             $this->_memcache->addServer($server['host'], $server['port'], true, 1, 1, 15, true, function ($host, $port) {
-                $warning = new CM_Exception('Cannot connect to memcached host `' . $host . '` on port `' . $port . '`', CM_Exception::WARN);
+                $warning = new CM_Exception('Cannot connect to memcached server', CM_Exception::WARN, [
+                    'host' => $host,
+                    'port' => $port,
+                ]);
                 CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
             });
         }

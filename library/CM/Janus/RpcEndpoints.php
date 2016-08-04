@@ -61,12 +61,12 @@ class CM_Janus_RpcEndpoints {
             if (!$streamChannel->hasStreams()) {
                 $streamChannel->delete();
             }
-            throw new CM_Exception_NotAllowed('Cannot publish: ' . $exception->getMessage(), $exception->getSeverity());
+            throw new CM_Exception_NotAllowed('Cannot publish', $exception->getSeverity(), ['originalExceptionMessage' => $exception->getMessage()]);
         } catch (CM_Exception_Invalid $exception) {
             if (!$streamChannel->hasStreams()) {
                 $streamChannel->delete();
             }
-            throw new CM_Exception_Invalid('Cannot publish: ' . $exception->getMessage(), $exception->getSeverity());
+            throw new CM_Exception_Invalid('Cannot publish', $exception->getSeverity(), ['originalExceptionMessage' => $exception->getMessage()]);
         }
     }
 
@@ -129,12 +129,12 @@ class CM_Janus_RpcEndpoints {
             if (!$streamChannel->hasStreams()) {
                 $streamChannel->delete();
             }
-            throw new CM_Exception_NotAllowed('Cannot subscribe: ' . $exception->getMessage(), $exception->getSeverity());
+            throw new CM_Exception_NotAllowed('Cannot subscribe', $exception->getSeverity(), ['originalExceptionMessage' => $exception->getMessage()]);
         } catch (CM_Exception_Invalid $exception) {
             if (!$streamChannel->hasStreams()) {
                 $streamChannel->delete();
             }
-            throw new CM_Exception_Invalid('Cannot subscribe: ' . $exception->getMessage(), $exception->getSeverity());
+            throw new CM_Exception_Invalid('Cannot subscribe', $exception->getSeverity(), ['originalExceptionMessage' => $exception->getMessage()]);
         }
     }
 
@@ -162,7 +162,10 @@ class CM_Janus_RpcEndpoints {
         }
 
         if ($streamChannel->getServerId() !== $server->getId()) {
-            throw new CM_Exception_Invalid("Request server `{$server->getId()}` does not match existing `{$streamChannel->getServerId()}`");
+            throw new CM_Exception_Invalid('Request server does not match existing in stream channel', null, [
+                'requestServerId'       => $server->getId(),
+                'streamChannelServerId' => $streamChannel->getServerId(),
+            ]);
         }
         $streamSubscribe = $streamChannel->getStreamSubscribes()->findKey($streamKey);
         if ($streamSubscribe) {

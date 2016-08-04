@@ -19,7 +19,7 @@ class CM_Http_UrlParser {
     public function getHost() {
         $host = parse_url($this->_url, PHP_URL_HOST);
         if (false === $host || null === $host) {
-            throw new CM_Exception('Cannot detect host from `' . $this->_url . '`.');
+            throw new CM_Exception('Cannot detect host from url.', null, ['url' => $this->_url]);
         }
         return $host;
     }
@@ -31,7 +31,7 @@ class CM_Http_UrlParser {
     public function getScheme() {
         $scheme = parse_url($this->_url, PHP_URL_SCHEME);
         if (false === $scheme || null === $scheme) {
-            throw new CM_Exception('Cannot detect scheme from `' . $this->_url . '`.');
+            throw new CM_Exception('Cannot detect scheme from url.', null, ['url' => $this->_url]);
         }
         return $scheme;
     }
@@ -46,7 +46,7 @@ class CM_Http_UrlParser {
             return '/';
         }
         if (false === $path) {
-            throw new CM_Exception('Cannot detect path from `' . $this->_url . '`.');
+            throw new CM_Exception('Cannot detect path from url.', null, ['url' => $this->_url]);
         }
         return $path;
     }

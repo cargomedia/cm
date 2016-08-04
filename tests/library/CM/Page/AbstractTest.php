@@ -61,10 +61,6 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
         $this->assertEquals('Foo_Layout_Default', get_class($page->getLayout($environment)));
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage layout `Default` is not defined in any namespace
-     */
     public function testGetLayoutNotExists() {
         $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getModules'))->getMock();
         $site->expects($this->any())->method('getModules')->will($this->returnValue(array('FooBar')));
@@ -72,6 +68,12 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
         /** @var CM_Page_Abstract $page */
         $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Foo_Page_Test', false);
 
-        $this->assertEquals('Bar_Layout_Default', get_class($page->getLayout($environment)));
+        $exception = $this->catchException(function () use ($page,$environment) {
+            $page->getLayout($environment);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Layout is not defined in any namespace', $exception->getMessage());
+        $this->assertSame(['layoutName' => 'Default'], $exception->getMetaInfo());
     }
 }

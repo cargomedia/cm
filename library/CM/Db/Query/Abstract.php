@@ -117,7 +117,7 @@ abstract class CM_Db_Query_Abstract {
                     throw new CM_Exception_Invalid('Order field name is not string');
                 }
                 if ('ASC' !== $direction && 'DESC' !== $direction) {
-                    throw new CM_Exception_Invalid('Invalid order direction `' . $direction . '`.');
+                    throw new CM_Exception_Invalid('Invalid order direction.', null, ['direction' => $direction]);
                 }
                 $sqlParts[] = $this->_getClient()->quoteIdentifier($field) . ' ' . $direction;
             }

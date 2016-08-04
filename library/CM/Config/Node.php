@@ -103,7 +103,7 @@ class CM_Config_Node {
     public function extendWithFile(CM_File $configFile) {
         $configSetter = require $configFile->getPath();
         if (!$configSetter instanceof Closure) {
-            throw new CM_Exception_Invalid('Invalid config file. `' . $configFile->getPath() . '` must return closure');
+            throw new CM_Exception_Invalid('Invalid config file. Path must return closure', null, ['path' => $configFile->getPath()]);
         }
         $configSetter($this);
     }

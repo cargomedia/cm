@@ -143,7 +143,11 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
         if (false !== $data) {
             $type = (int) $data['type'];
             if ($this->getType() !== $type) {
-                throw new CM_Exception_Invalid('Invalid type `' . $type . '` for `' . get_class($this) . '` (type: `' . $this->getType() . '`)');
+                throw new CM_Exception_Invalid('Invalid loaded type', null, [
+                    'loadedType' => $type,
+                    'className'  => get_class($this),
+                    'classType'  => $this->getType(),
+                ]);
             }
         }
         return $data;
@@ -183,7 +187,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
             if (false === ($type = $cache->get($cacheKey))) {
                 $type = CM_Db_Db::select('cm_streamChannel', 'type', array('id' => $id))->fetchColumn();
                 if (false === $type) {
-                    throw new CM_Exception_Nonexistent('No record found in `cm_streamChannel` for id `' . $id . '`');
+                    throw new CM_Exception_Nonexistent('No record found in `cm_streamChannel`', null, ['id' => $id]);
                 }
                 $cache->set($cacheKey, $type);
             }
@@ -191,7 +195,10 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
         $class = self::_getClassName($type);
         $instance = new $class($id);
         if (!$instance instanceof static) {
-            throw new CM_Exception_Invalid('Unexpected instance of `' . $class . '`. Expected `' . get_called_class() . '`.');
+            throw new CM_Exception_Invalid('Unexpected instance', null, [
+                'actualClass'   => $class,
+                'expectedClass' => get_called_class()
+            ]);
         }
         return $instance;
     }

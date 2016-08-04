@@ -114,7 +114,7 @@ class CMService_AwsS3Versioning_Client {
 
     private function _assertVersioningEnabled() {
         if (!$this->getVersioningEnabled()) {
-            throw new CM_Exception_Invalid('Versioning is not enabled on bucket `' . $this->_bucket . '`.');
+            throw new CM_Exception_Invalid('Versioning is not enabled on bucket.', null, ['bucket' => $this->_bucket]);
         }
     }
 }

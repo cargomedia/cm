@@ -4,7 +4,7 @@ class CM_Janus_HttpApiClient {
 
     /** @var \GuzzleHttp\Client */
     protected $_httpClient;
-    
+
     /** @var CM_Log_ContextFormatter_Interface */
     protected $_contextFormatter;
 
@@ -49,10 +49,10 @@ class CM_Janus_HttpApiClient {
     protected function _request($method, CM_Janus_Server $server, $path, array $body = null) {
         $context = CM_Service_Manager::getInstance()->getLogger()->getContext();
         $appContext = $this->_contextFormatter->formatAppContext($context);
-        
+
         $url = $server->getHttpAddress() . $path;
         $body = (array) $body;
-        
+
         $options = [
             'query'   => ['context' => CM_Util::jsonEncode($appContext)],
             'body'    => $body,
@@ -62,7 +62,10 @@ class CM_Janus_HttpApiClient {
         try {
             $response = $this->_httpClient->send($request);
         } catch (GuzzleHttp\Exception\TransferException $e) {
-            throw new CM_Exception_Invalid('Fetching contents from `' . $url . '` failed: `' . $e->getMessage());
+            throw new CM_Exception_Invalid('Fetching contents from url failed', null, [
+                'url'                      => $url,
+                'originalExceptionMessage' => $e->getMessage(),
+            ]);
         }
         $body = $response->getBody();
         if (null === $body) {

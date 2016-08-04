@@ -154,7 +154,8 @@ class CM_ParamsTest extends CMTest_TestCase {
             $params->getLanguage('no-object-param');
             $this->fail('getObject should fail and throw exception');
         } catch (CM_Exception $e) {
-            $this->assertContains(get_class($language), $e->getMessage());
+            $this->assertSame('Model has no data', $e->getMessage());
+            $this->assertContains(get_class($language), $e->getMetaInfo());
         }
     }
 
@@ -299,7 +300,7 @@ class CM_ParamsTest extends CMTest_TestCase {
             $this->fail('Instantiating location with insufficient parameters');
         } catch (CM_Exception_InvalidParam $ex) {
             $this->assertSame('Not enough parameters', $ex->getMessage());
-            $this->assertSame(['parameters' => 1, 'class' => 'CM_Model_Location'], $ex->getMetaInfo());
+            $this->assertSame(['parameters' => 1, 'className' => 'CM_Model_Location'], $ex->getMetaInfo());
         }
     }
 
@@ -380,13 +381,16 @@ class CM_ParamsTest extends CMTest_TestCase {
         $params->getParams('foo');
     }
 
-    /**
-     * @expectedException CM_Exception_InvalidParam
-     * @expectedExceptionMessage Unexpected input of type `integer`
-     */
     public function testGetParamsInvalidInt() {
         $params = new CM_Params(array('foo' => 12));
-        $params->getParams('foo');
+        $exception = $this->catchException(function () use ($params) {
+            $params->getParams('foo');
+        });
+
+        $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
+        /** @var CM_Exception_InvalidParam $exception */
+        $this->assertSame('Unexpected type of arguments', $exception->getMessage());
+        $this->assertSame(['type' => 'integer'], $exception->getMetaInfo());
     }
 
     /**

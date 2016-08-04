@@ -23,10 +23,10 @@ class CM_Adprovider extends CM_Class_Abstract {
         }
         $zoneData = $this->_getZoneData($site, $zoneName);
         if (null === $zoneData) {
-            throw new CM_Exception_Invalid('Zone `' . $zoneName . '` not configured.');
+            throw new CM_Exception_Invalid('Zone not configured.', null, ['zoneName' => $zoneName]);
         }
         if (!array_key_exists('adapter', $zoneData)) {
-            throw new CM_Exception_Invalid('Zone `' . $zoneName . '` has no adapter configured.');
+            throw new CM_Exception_Invalid('Zone has no adapter configured.', null, ['zoneName' => $zoneName]);
         }
         $adapterClassName = (string) $zoneData['adapter'];
         unset($zoneData['adapter']);
@@ -74,7 +74,7 @@ class CM_Adprovider extends CM_Class_Abstract {
         /** @var string $className */
         $className = (string) $className;
         if (!class_exists($className) || !is_subclass_of($className, 'CM_AdproviderAdapter_Abstract')) {
-            throw new CM_Exception_Invalid('Invalid ad adapter `' . $className . '`');
+            throw new CM_Exception_Invalid('Invalid ad adapter', null, ['className' => $className]);
         }
         if (!array_key_exists($className, $this->_adapters)) {
             $this->_adapters[$className] = new $className();

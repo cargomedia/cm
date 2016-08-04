@@ -187,7 +187,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
                     $datetime = new DateTime($date, new DateTimeZone($timezone));
                     break;
                 default:
-                    throw new CM_Exception_InvalidParam('Invalid timezone type `' . $timezoneType . '`');
+                    throw new CM_Exception_InvalidParam('Invalid timezone type', null, ['timezoneType' => $timezoneType]);
             }
             return $datetime;
         }
@@ -245,7 +245,10 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
                     try {
                         $arguments = $namedArgs->matchNamedArgs($constructor, $arguments);
                     } catch (CM_Exception_Invalid $ex) {
-                        throw new CM_Exception_InvalidParam("Not enough parameters", null, ['parameters' => $param, 'class' => $className]);
+                        throw new CM_Exception_InvalidParam('Not enough parameters', null, [
+                            'parameters' => $param,
+                            'className'  => $className,
+                        ]);
                     }
                 }
 
@@ -331,12 +334,12 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
                 try {
                     $array = CM_Params::decode($json, true);
                 } catch (CM_Exception_Invalid $e) {
-                    throw new CM_Exception_InvalidParam('Cannot decode input: ' . $e->getMessage());
+                    throw new CM_Exception_InvalidParam('Cannot decode input', null, ['message' => $e->getMessage()]);
                 }
             } elseif (is_array($param)) {
                 $array = $param;
             } else {
-                throw new CM_Exception_InvalidParam('Unexpected input of type `' . gettype($param) . '` to create CM_Params');
+                throw new CM_Exception_InvalidParam('Unexpected type of arguments', null, ['type' => gettype($param)]);
             }
             return CM_Params::factory($array, false);
         });
@@ -522,7 +525,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      */
     protected function _get($key, $default = null) {
         if (!$this->has($key) && $default === null) {
-            throw new CM_Exception_InvalidParam("Param `$key` not set");
+            throw new CM_Exception_InvalidParam('Param not set', null, ['key' => $key]);
         }
         if (!$this->has($key) && $default !== null) {
             return $default;

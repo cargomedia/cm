@@ -44,7 +44,7 @@ class CM_Model_StreamChannel_Media extends CM_Model_StreamChannel_Abstract {
     public function getStreamPublish() {
         $publish = $this->findStreamPublish();
         if (null === $publish) {
-            throw new CM_Exception_Invalid('StreamChannel `' . $this->getId() . '` has no StreamPublish.');
+            throw new CM_Exception_Invalid('StreamChannel has no StreamPublish.', null, ['streamChannelId' => $this->getId()]);
         }
         return $publish;
     }

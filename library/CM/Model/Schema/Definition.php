@@ -50,12 +50,14 @@ class CM_Model_Schema_Definition {
                             break;
                         default:
                             if (!class_exists($type)) {
-                                throw new CM_Model_Exception_Validation('Field type `' . $type . '` is not a valid class');
+                                throw new CM_Model_Exception_Validation('Field type is not a valid class', null, ['type' => $type]);
                             }
                             $className = $type;
                             if (!$value instanceof $className) {
-                                throw new CM_Model_Exception_Validation(
-                                    'Value `' . CM_Util::var_line($value) . '` is not an instance of `' . $className . '`');
+                                throw new CM_Model_Exception_Validation('Value is not an instance of the class', null, [
+                                    'value'     => CM_Util::var_line($value),
+                                    'className' => $className,
+                                ]);
                             }
 
                             if (is_a($className, 'CM_Model_Abstract', true)) {
@@ -71,8 +73,9 @@ class CM_Model_Schema_Definition {
                                 $value = $value->toArray();
                                 $value = CM_Util::jsonEncode($value);
                             } else {
-                                throw new CM_Model_Exception_Validation(
-                                    'Class `' . $className . '` is neither CM_Model_Abstract nor CM_ArrayConvertible');
+                                throw new CM_Model_Exception_Validation('Class is neither CM_Model_Abstract nor CM_ArrayConvertible', null, [
+                                    'className' => $className
+                                ]);
                             }
                     }
                 }
@@ -118,7 +121,7 @@ class CM_Model_Schema_Definition {
                             break;
                         default:
                             if (!class_exists($type)) {
-                                throw new CM_Model_Exception_Validation('Field type `' . $type . '` is not a valid class/interface');
+                                throw new CM_Model_Exception_Validation('Field type is not a valid class/interface', null, ['type' => $type]);
                             }
                             $className = $type;
                             if (is_a($className, 'CM_Model_Abstract', true)) {
@@ -137,13 +140,16 @@ class CM_Model_Schema_Definition {
                                 $value = CM_Util::jsonDecode($value);
                                 $value = $className::fromArray($value);
                             } else {
-                                throw new CM_Model_Exception_Validation(
-                                    'Class `' . $className . '` is neither CM_Model_Abstract nor CM_ArrayConvertible');
+                                throw new CM_Model_Exception_Validation('Class is neither CM_Model_Abstract nor CM_ArrayConvertible', null, [
+                                    'className' => $className,
+                                ]);
                             }
 
                             if (!$value instanceof $className) {
-                                throw new CM_Model_Exception_Validation(
-                                    'Value `' . CM_Util::var_line($value) . '` is not an instance of `' . $className . '`');
+                                throw new CM_Model_Exception_Validation('Value is not an instance of the class', null, [
+                                    'value'     => CM_Util::var_line($value),
+                                    'className' => $className,
+                                ]);
                             }
                     }
                 }
@@ -192,7 +198,7 @@ class CM_Model_Schema_Definition {
             $optional = !empty($schemaField['optional']);
 
             if (!$optional && null === $value) {
-                throw new CM_Model_Exception_Validation('Field `' . $key . '` is mandatory');
+                throw new CM_Model_Exception_Validation('Field is mandatory', null, ['key' => $key]);
             }
 
             if (null !== $value) {
@@ -202,49 +208,49 @@ class CM_Model_Schema_Definition {
                         case 'integer':
                         case 'int':
                             if (!$this->_isInt($value)) {
-                                throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an integer');
+                                throw new CM_Model_Exception_Validation('Field is not an integer', null, ['key' => $key]);
                             }
                             break;
                         case 'float':
                             if (!$this->_isFloat($value)) {
-                                throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a float');
+                                throw new CM_Model_Exception_Validation('Field is not a float', null, ['key' => $key]);
                             }
                             break;
                         case 'string':
                             if (!$this->_isString($value)) {
-                                throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a string');
+                                throw new CM_Model_Exception_Validation('Field is not a string', null, ['key' => $key]);
                             }
                             break;
                         case 'boolean':
                         case 'bool':
                             if (!$this->_isBoolean($value)) {
-                                throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a boolean');
+                                throw new CM_Model_Exception_Validation('Field is not a boolean', null, ['key' => $key]);
                             }
                             break;
                         case 'array':
                             if (!$this->_isArray($value)) {
-                                throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an array');
+                                throw new CM_Model_Exception_Validation('Field is not an array', null, ['key' => $key]);
                             }
                             break;
                         case 'DateTime':
                             if (!$this->_isInt($value)) {
-                                throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a valid timestamp');
+                                throw new CM_Model_Exception_Validation('Field is not a valid timestamp', null, ['key' => $key]);
                             }
                             break;
                         default:
                             if (is_subclass_of($type, 'CM_Model_Abstract')) {
                                 if (!$this->_isModel($value)) {
-                                    throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a valid model');
+                                    throw new CM_Model_Exception_Validation('Field is not a valid model', null, ['key' => $key]);
                                 }
                                 break;
                             }
                             if (is_subclass_of($type, 'CM_ArrayConvertible')) {
                                 if (!$this->_isJson($value)) {
-                                    throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a valid json');
+                                    throw new CM_Model_Exception_Validation('Field is not a valid json', null, ['key' => $key]);
                                 }
                                 break;
                             }
-                            throw new CM_Exception_Invalid('Invalid type `' . $type . '`');
+                            throw new CM_Exception_Invalid('Invalid type', null, ['type' => $type]);
                     }
                 }
             }

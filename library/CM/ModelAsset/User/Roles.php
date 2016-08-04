@@ -107,7 +107,10 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
      */
     private function _get($role, $key) {
         if (!$this->contains($role)) {
-            throw new CM_Exception_Invalid('User `' . $this->_model->getId() . '` does not have the role `' . $role . '`');
+            throw new CM_Exception_Invalid('User does not have the role', null, [
+                'userId' => $this->_model->getId(),
+                'role'   => $role,
+            ]);
         }
         $values = $this->_getAll();
         if (!isset($values[$role][$key])) {
