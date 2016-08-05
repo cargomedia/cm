@@ -104,9 +104,10 @@ class CM_PagingSource_ArrayTest extends CMTest_TestCase {
         $internalSource = $this->mockObject('CM_PagingSource_Abstract');
         $getStalenessMock = $internalSource->mockMethod('getStalenessChance');
         $getStalenessMock->set(0.5);
-        $arraySource = new CM_PagingSource_Array([1,2,3]);
 
+        $arraySource = new CM_PagingSource_Array([1,2,3]);
         $this->assertSame(0, $arraySource->getStalenessChance());
+
         $arraySource = new CM_PagingSource_Array($internalSource);
         $this->assertSame(0.5, $arraySource->getStalenessChance());
         $this->assertSame(1, $getStalenessMock->getCallCount());
