@@ -3,6 +3,7 @@
 class CM_PagingSource_ArrayTest extends CMTest_TestCase {
 
     public function testClearCache() {
+        /** @var CM_PagingSource_Array|\Mocka\AbstractClassTrait $dataSource */
         $dataSource = $this->mockClass('CM_PagingSource_Array')->newInstanceWithoutConstructor();
         $dataSource->mockMethod('getItems')->set([1, 2, 3]);
         $clearCache = $dataSource->mockMethod('clearCache');
@@ -96,5 +97,18 @@ class CM_PagingSource_ArrayTest extends CMTest_TestCase {
             return $item;
         }, SORT_DESC, SORT_STRING);
         $this->assertSame(array(9, 8, 7, 6, 5, 4, 3, 2, 10, 1), $pagingSource->getItems());
+    }
+
+    public function testGetStalenessChance() {
+        /** @var CM_PagingSource_Abstract|\Mocka\AbstractClassTrait $internalSource */
+        $internalSource = $this->mockObject('CM_PagingSource_Abstract');
+        $getStalenessMock = $internalSource->mockMethod('getStalenessChance');
+        $getStalenessMock->set(0.5);
+        $arraySource = new CM_PagingSource_Array([1,2,3]);
+
+        $this->assertSame(0, $arraySource->getStalenessChance());
+        $arraySource = new CM_PagingSource_Array($internalSource);
+        $this->assertSame(0.5, $arraySource->getStalenessChance());
+        $this->assertSame(1, $getStalenessMock->getCallCount());
     }
 }

@@ -64,6 +64,13 @@ class CM_PagingSource_Array extends CM_PagingSource_Abstract {
         return array_slice($this->_getData(), $offset, $count);
     }
 
+    public function getStalenessChance() {
+        if ($this->_source) {
+            return $this->_source->getStalenessChance();
+        }
+        return 0;
+    }
+
     protected function _cacheKeyBase() {
         throw new CM_Exception_Invalid('`' . __CLASS__ . '` does not support caching.');
     }
