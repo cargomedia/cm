@@ -13,6 +13,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertEquals(CM_Site_Abstract::factory(), $user->getSite());
         $this->assertSame(null, $user->getLanguage());
         $this->assertSame(null, $user->getCurrency());
+        $this->assertNull($user->getLastSessionSite());
     }
 
     public function testCreateAllData() {
@@ -23,7 +24,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $user = CM_Model_User::createStatic([
             'site'     => $site,
             'language' => $language,
-            'currency'  => $currency,
+            'currency' => $currency,
         ]);
         $this->assertInternalType('int', $user->getCreated());
         $this->assertEquals(time(), $user->getCreated());
@@ -31,6 +32,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertEquals($site, $user->getSite());
         $this->assertEquals($language, $user->getLanguage());
         $this->assertEquals($currency, $user->getCurrency());
+        $this->assertEquals($site, $user->getLastSessionSite());
     }
 
     public function testGetSetOnline() {
@@ -122,5 +124,13 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $activityStamp2 = time();
         $user->updateLatestActivityThrottled();
         $this->assertSameTime($activityStamp2, $user->getLatestActivity());
+    }
+
+    public function testUpdateLastSessionSite() {
+        $site = CM_Site_Abstract::factory();
+        $user = CMTest_TH::createUser();
+        $this->assertNull($user->getLastSessionSite());
+        $user->updateLastSessionSite($site);
+        $this->assertEquals($site, $user->getLastSessionSite());
     }
 }

@@ -221,9 +221,29 @@ class CM_Model_User extends CM_Model_Abstract {
         }
     }
 
+    /**
+     * @param CM_Site_Abstract $site
+     */
+    public function updateLastSessionSite(CM_Site_Abstract $site) {
+        $this->_updateLatestActivity();
+        CM_Db_Db::update('cm_user', ['lastSessionSite' => $site->getId()], ['userId' => $this->getId()]);
+        $this->_set('lastSessionSite', $site->getId());
+    }
+
+    /**
+     * @return CM_Site_Abstract|null
+     */
+    public function getLastSessionSite() {
+        $siteType = $this->_get('lastSessionSite');
+        if (!$siteType) {
+            return null;
+        }
+        return CM_Site_Abstract::factory($siteType);
+    }
+
     protected function _updateLatestActivity() {
         $currentTime = time();
-        CM_Db_Db::update('cm_user', array('activityStamp' => $currentTime), array('userId' => $this->getId()));
+        CM_Db_Db::update('cm_user', ['activityStamp' => $currentTime], ['userId' => $this->getId()]);
         $this->_set('activityStamp', $currentTime);
     }
 
@@ -302,11 +322,12 @@ class CM_Model_User extends CM_Model_Abstract {
             $currencyId = $currency->getId();
         }
         $userId = CM_Db_Db::insert('cm_user', array(
-            'createStamp'   => time(),
-            'activityStamp' => time(),
-            'site'          => $siteType,
-            'languageId'    => $languageId,
-            'currencyId'    => $currencyId,
+            'createStamp'     => time(),
+            'activityStamp'   => time(),
+            'site'            => $siteType,
+            'languageId'      => $languageId,
+            'currencyId'      => $currencyId,
+            'lastSessionSite' => $siteType,
         ));
         return new static($userId);
     }
