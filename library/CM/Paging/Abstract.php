@@ -13,6 +13,9 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
     /** @var boolean */
     private $_flattenItems = true;
 
+    /** @var boolean */
+    private $_isOnLoadItemsRawCalled = false;
+
     /**
      * @param CM_PagingSource_Abstract $source
      */
@@ -29,7 +32,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
     public function getItems($offset = null, $length = null, $returnNonexistentItems = false) {
         $negativeOffset = false;
         $itemsRaw = $this->_getItemsRaw();
-
+        $this->_callOnLoadItemsRaw($itemsRaw);
         // Count of available items
         $count = count($itemsRaw);
         if (null !== $this->_pageSize) {
@@ -405,6 +408,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
      */
     private function _getItems($offset, $length, $returnNonexistentItems, $allowBackwardsLookup) {
         $itemsRaw = $this->_getItemsRaw();
+        $this->_callOnLoadItemsRaw($itemsRaw);
         $itemsRawCount = count($itemsRaw);
         $items = array();
         $direction = 1;
@@ -448,6 +452,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
      */
     private function _getItemsInstantiable($offset, $length) {
         $itemsRaw = $this->_getItemsRaw();
+        $this->_callOnLoadItemsRaw($itemsRaw);
         $items = array();
         for ($i = $offset; $i < $offset + $length; $i++) {
             if (!array_key_exists($i, $this->_items)) {
@@ -477,6 +482,16 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
                     $this->_pageOffset = (int) ceil($this->getCount() / $this->_pageSize) - 1;
                 }
             }
+        }
+    }
+
+    /**
+     * @param array $itemsRaw
+     */
+    private function _callOnLoadItemsRaw(array $itemsRaw) {
+        if (false === $this->_isOnLoadItemsRawCalled) {
+            $this->_onLoadItemsRaw($itemsRaw);
+            $this->_isOnLoadItemsRawCalled = true;
         }
     }
 
