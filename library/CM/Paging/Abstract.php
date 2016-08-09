@@ -393,6 +393,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
         $this->_itemsRawTree = null;
         $this->_iteratorPosition = 0;
         $this->_iteratorItems = null;
+        $this->_isOnLoadItemsRawCalled = false;
     }
 
     private function _clearCount() {
