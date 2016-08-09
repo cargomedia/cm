@@ -42,13 +42,16 @@ class smarty_function_checkboxTest extends CMTest_TestCase {
     }
 
     public function testAdditionalAttributes() {
-        $this->_assertSame('<input type="checkbox" id="foo" class="my class" name="my name" tabindex="12" value="my value"><label for="foo"><span class="label">Hello</span></label>', array(
-            'id'       => 'foo',
-            'label'    => 'Hello',
-            'class'    => 'my class',
-            'name'     => 'my name',
-            'tabindex' => '12',
-            'value'    => 'my value',
+        $this->_assertSame('<input type="checkbox" id="foo" class="my class" name="my name" tabindex="12" value="my value" data-click-disable="true"><label for="foo"><span class="label">Hello</span></label>', array(
+            'id'                 => 'foo',
+            'label'              => 'Hello',
+            'class'              => 'my class',
+            'name'               => 'my name',
+            'tabindex'           => '12',
+            'value'              => 'my value',
+            'data' => [
+                'click-disable' => "true",
+            ],
         ));
     }
 

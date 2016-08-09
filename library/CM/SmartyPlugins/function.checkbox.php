@@ -19,11 +19,17 @@ function smarty_function_checkbox(array $params, Smarty_Internal_Template $templ
         $classList[] = 'checkbox-switch';
     }
 
+    $data = [];
+    if (isset($params['data'])) {
+        $data = (array) $params['data'];
+        unset($params['data']);
+    }
+
     if (null === $id) {
         $id = uniqid();
     }
 
-    $html = smarty_function_tag([
+    $attributeList = [
         'el'       => 'input',
         'type'     => 'checkbox',
         'id'       => $id,
@@ -32,7 +38,13 @@ function smarty_function_checkbox(array $params, Smarty_Internal_Template $templ
         'name'     => $name,
         'tabindex' => $tabindex,
         'value'    => $value,
-    ], $template);
+    ];
+    if (!empty($data)) {
+        foreach ($data as $name => $value) {
+            $attributeList['data-' . $name] = CM_Util::htmlspecialchars($value);
+        }
+    }
+    $html = smarty_function_tag($attributeList, $template);
 
     $htmlLabelContent = '';
     if ($isSwitch) {
