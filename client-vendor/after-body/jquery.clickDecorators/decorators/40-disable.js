@@ -3,7 +3,7 @@
  */
 (function($) {
 
-  $.clickDecorators.spinner = {
+  $.clickDecorators.disable = {
     isApplicable: function($element) {
       return $element.data('click-disable');
     },
