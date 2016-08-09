@@ -73,7 +73,7 @@ class CM_App_Installation {
             }
         }
         if (!isset($composerPackagesFiltered)) {
-            throw new CM_Exception_Invalid('`' . $mainPackageName . '` package not found within composer packages');
+            throw new CM_Exception_Invalid('Package not found within composer packages', null, ['package' => $mainPackageName]);
         }
 
         for (; $parentPackage = current($composerPackagesFiltered); next($composerPackagesFiltered)) {

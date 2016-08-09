@@ -69,7 +69,7 @@ class CM_StreamChannel_Definition implements CM_ArrayConvertible, JsonSerializab
     public function getStreamChannel() {
         $channel = self::findStreamChannel();
         if (null === $channel) {
-            throw new CM_Exception('StreamChannel with key `' . $this->getKey() . '` doesn\'t exist');
+            throw new CM_Exception('StreamChannel doesn\'t exist', null, ['key' => $this->getKey()]);
         }
         return $channel;
     }

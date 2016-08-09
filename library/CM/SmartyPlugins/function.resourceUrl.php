@@ -19,6 +19,6 @@ function smarty_function_resourceUrl(array $params, Smarty_Internal_Template $te
         case 'static':
             return $render->getUrlStatic($path, $site);
         default:
-            throw new CM_Exception_Invalid('Invalid type `' . $type . '` provided');
+            throw new CM_Exception_Invalid('Invalid type provided', null, ['type' => $type]);
     }
 }

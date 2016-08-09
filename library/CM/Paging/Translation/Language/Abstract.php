@@ -26,7 +26,7 @@ abstract class CM_Paging_Translation_Language_Abstract extends CM_Paging_Abstrac
     public function get($phrase) {
         $translations = $this->getAssociativeArray();
         if (!array_key_exists($phrase, $translations)) {
-            throw new CM_Exception_Invalid('Translation `' . $phrase . '` does not exist');
+            throw new CM_Exception_Invalid('Translation does not exist', null, ['phrase' => $phrase]);
         }
         return $translations[$phrase]['value'];
     }

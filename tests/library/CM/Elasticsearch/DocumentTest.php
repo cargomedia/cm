@@ -28,7 +28,9 @@ class CM_Elasticsearch_DocumentTest extends CMTest_TestCase {
             $document->get('someReallyWeirdKey');
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Field `someReallyWeirdKey` does not exist', $exception->getMessage());
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Field does not exist', $exception->getMessage());
+        $this->assertSame(['key' => 'someReallyWeirdKey'], $exception->getMetaInfo());
 
         $data2 = ['name' => 'Bill', 'height' => 178];
         $document->setData(['name' => 'Bill', 'height' => 178]);

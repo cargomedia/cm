@@ -38,7 +38,7 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         }
         $stream = @fopen($streamUrl, 'r');
         if (false === $stream) {
-            throw new CM_Exception('Cannot open read stream for `' . $streamUrl . '`.');
+            throw new CM_Exception('Cannot open read stream.', null, ['streamUrl' => $streamUrl]);
         }
         return $stream;
     }
@@ -50,7 +50,7 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         }
         $stream = @fopen($streamUrl, 'w');
         if (false === $stream) {
-            throw new CM_Exception('Cannot open write stream for `' . $streamUrl . '`.');
+            throw new CM_Exception('Cannot open write stream.', null, ['streamUrl' => $streamUrl]);
         }
         return $stream;
     }
@@ -60,7 +60,10 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         try {
             return (string) $this->_client->getObject($options)->get('Body');
         } catch (\Exception $e) {
-            throw new CM_Exception('Cannot read contents of `' . $path . '`: ' . $e->getMessage());
+            throw new CM_Exception('Cannot read contents of path.', null, [
+                'path'                     => $path,
+                'originalExceptionMessage' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -76,7 +79,11 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         try {
             $this->_client->putObject($options);
         } catch (\Exception $e) {
-            throw new CM_Exception('Cannot write ' . strlen($content) . ' bytes to `' . $path . '`: ' . $e->getMessage());
+            throw new CM_Exception('Cannot write bytes to the path', null, [
+                'bytesCount'               => strlen($content),
+                'path'                     => $path,
+                'originalExceptionMessage' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -94,7 +101,8 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
             $uploader->upload();
         } catch (\Aws\Common\Exception\MultipartUploadException $exception) {
             $uploader->abort();
-            throw new CM_Exception('AWS S3 Upload to `' . $path . '` failed', null, [
+            throw new CM_Exception('AWS S3 Upload to path failed', null, [
+                'path'                     => $path,
                 'originalExceptionMessage' => $exception->getMessage(),
             ]);
         }
@@ -104,7 +112,10 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         try {
             return $this->_client->doesObjectExist($this->_bucket, $this->_getAbsolutePath($path));
         } catch (\Exception $e) {
-            throw new CM_Exception('Cannot check existence of `' . $path . '`: ' . $e->getMessage());
+            throw new CM_Exception('Cannot check existence of path', null, [
+                'path'                     => $path,
+                'originalExceptionMessage' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -114,7 +125,10 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
             $lastModified = $this->_client->headObject($options)->get('LastModified');
             return strtotime($lastModified);
         } catch (\Exception $e) {
-            throw new CM_Exception_Invalid('Cannot get modified time of `' . $path . '`: ' . $e->getMessage());
+            throw new CM_Exception_Invalid('Cannot get modified time of path', null, [
+                'path'                     => $path,
+                'originalExceptionMessage' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -123,7 +137,10 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         try {
             return trim($this->_client->headObject($options)->get('ETag'), '"');
         } catch (\Exception $e) {
-            throw new CM_Exception('Cannot get AWS::ETag of `' . $path . '`: ' . $e->getMessage());
+            throw new CM_Exception('Cannot get AWS::ETag of path', null, [
+                'path'                     => $path,
+                'originalExceptionMessage' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -132,7 +149,10 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         try {
             $this->_client->deleteObject($options);
         } catch (\Exception $e) {
-            throw new CM_Exception_Invalid('Cannot delete file `' . $path . '`: ' . $e->getMessage());
+            throw new CM_Exception_Invalid('Cannot delete file in path', null, [
+                'path'                     => $path,
+                'originalExceptionMessage' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -169,7 +189,11 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
             $this->copy($sourcePath, $targetPath);
             $this->delete($sourcePath);
         } catch (CM_Exception $e) {
-            throw new CM_Exception('Cannot rename `' . $sourcePath . '` to `' . $targetPath . '`: ' . $e->getMessage());
+            throw new CM_Exception('Cannot rename', null, [
+                'sourcePath'               => $sourcePath,
+                'targetPath'               => $targetPath,
+                'originalExceptionMessage' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -180,7 +204,11 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         try {
             $this->_client->copyObject($options);
         } catch (Exception $e) {
-            throw new CM_Exception('Cannot copy `' . $sourcePath . '` to `' . $targetPath . '`: ' . $e->getMessage());
+            throw new CM_Exception('Cannot copy', null, [
+                'sourcePath'               => $sourcePath,
+                'targetPath'               => $targetPath,
+                'originalExceptionMessage' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -195,7 +223,10 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
             $result = $this->_client->listObjects($options);
             return count($result->get('Contents')) > 0;
         } catch (Exception $e) {
-            throw new CM_Exception('Cannot get directory-info for `' . $path . '`: ' . $e->getMessage());
+            throw new CM_Exception('Cannot get directory-info for the path', null, [
+                'path'                     => $path,
+                'originalExceptionMessage' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -204,7 +235,10 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
         try {
             return (int) $this->_client->headObject($options)->get('ContentLength');
         } catch (\Exception $e) {
-            throw new CM_Exception('Cannot get size for `' . $path . '`: ' . $e->getMessage());
+            throw new CM_Exception('Cannot get size for path', null, [
+                'path'                     => $path,
+                'originalExceptionMessage' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -250,7 +284,7 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
                 if ($retryCount > 0) {
                     $this->_ensureBucket($retryCount - 1);
                 } else {
-                    throw new CM_Exception('Cannot create bucket: ' . $e->getMessage());
+                    throw new CM_Exception('Cannot create bucket', null, ['originalExceptionMessage' => $e->getMessage()]);
                 }
             }
         }

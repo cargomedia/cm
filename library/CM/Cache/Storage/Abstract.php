@@ -154,7 +154,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
     protected static final function _extractKeyArmored($keyArmored) {
         $prefix = CM_Bootloader::getInstance()->getDataPrefix() . DIR_ROOT;
         if (!preg_match('/^' . preg_quote($prefix, '/') . '_' . '(.+)$/', $keyArmored, $matches)) {
-            throw new CM_Exception_Invalid('Cannot extract key from `' . $keyArmored . '`');
+            throw new CM_Exception_Invalid('Cannot extract key from keyArmored', null, ['keyArmored' => $keyArmored]);
         }
         return $matches[1];
     }

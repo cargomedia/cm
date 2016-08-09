@@ -28,7 +28,7 @@ class CMService_Adagnit_Client implements CM_Service_Tracking_ClientInterface {
             'signup',
         ];
         if (!in_array($eventType, $eventTypeList, true)) {
-            throw new CM_Exception_Invalid('Unknown event type `' . $eventType . '`');
+            throw new CM_Exception_Invalid('Unknown event type', null, ['eventType' => $eventType]);
         }
         $this->_eventList[] = array(
             'eventType' => $eventType,

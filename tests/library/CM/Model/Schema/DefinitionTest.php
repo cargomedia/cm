@@ -429,8 +429,8 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
                 'returnValue' => new CM_Model_Mock_Validation2('4', 'bar'),
             ),
             array(
-                'value'    => 'mongo123mixed321id',
-                'schema'   => array('type' => 'CM_Model_Mock_Validation'),
+                'value'       => 'mongo123mixed321id',
+                'schema'      => array('type' => 'CM_Model_Mock_Validation'),
                 'returnValue' => new CM_Model_Mock_Validation('mongo123mixed321id'),
             ),
         );
@@ -616,27 +616,44 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
         ]);
         $jsonData = '{"key":"value"}';
         $value = $schema->decodeField('arrayConvertible', $jsonData);
-        
+
         $this->assertSame(['key' => 'value'], $fromArray->getLastCall()->getArgument(0));
         $this->assertSame($arrayConvertible, $value);
     }
 
-    /**
-     * @expectedException CM_Model_Exception_Validation
-     * @expectedExceptionMessage Value `bar` is not an instance of `CM_Model_Mock_Validation2`
-     */
     public function testEncodeInvalidModel() {
         $schema = new CM_Model_Schema_Definition(array('foo' => array('type' => 'CM_Model_Mock_Validation2')));
-        $schema->encodeField('foo', 'bar');
+        $exception = $this->catchException(function () use ($schema) {
+            $schema->encodeField('foo', 'bar');
+        });
+
+        $this->assertInstanceOf('CM_Model_Exception_Validation', $exception);
+        /** @var CM_Model_Exception_Validation $exception */
+        $this->assertSame('Value is not an instance of the class', $exception->getMessage());
+        $this->assertSame(
+            [
+                'value'     => 'bar',
+                'className' => 'CM_Model_Mock_Validation2',
+            ],
+            $exception->getMetaInfo()
+        );
     }
 
-    /**
-     * @expectedException CM_Model_Exception_Validation
-     * @expectedExceptionMessage Value `bar` is not an instance of `CM_Class_Abstract`
-     */
     public function testEncodeInvalidClass() {
         $schema = new CM_Model_Schema_Definition(array('foo' => array('type' => 'CM_Class_Abstract')));
-        $schema->encodeField('foo', 'bar');
+        $exception = $this->catchException(function () use ($schema) {
+            $schema->encodeField('foo', 'bar');
+        });
+        $this->assertInstanceOf('CM_Model_Exception_Validation', $exception);
+        /** @var CM_Model_Exception_Validation $exception */
+        $this->assertSame('Value is not an instance of the class', $exception->getMessage());
+        $this->assertSame(
+            [
+                'value'     => 'bar',
+                'className' => 'CM_Class_Abstract',
+            ],
+            $exception->getMetaInfo()
+        );
     }
 }
 

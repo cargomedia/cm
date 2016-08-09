@@ -32,7 +32,7 @@ class CM_Geo_Point implements CM_Comparable, CM_ArrayConvertible {
     public function setLatitude($latitude) {
         $latitude = (float) $latitude;
         if ($latitude > 90 || $latitude < -90) {
-            throw new CM_Exception_Invalid('Latitude `' . $latitude . '` out of range');
+            throw new CM_Exception_Invalid('Latitude is out of range', null, ['latitude' => $latitude]);
         }
         $this->_latitude = $latitude;
     }
@@ -51,7 +51,7 @@ class CM_Geo_Point implements CM_Comparable, CM_ArrayConvertible {
     public function setLongitude($longitude) {
         $longitude = (float) $longitude;
         if ($longitude > 180 || $longitude < -180) {
-            throw new CM_Exception_Invalid('Longitude `' . $longitude . '` out of range');
+            throw new CM_Exception_Invalid('Longitude is out of range', null, ['longitude' => $longitude]);
         }
         $this->_longitude = $longitude;
     }

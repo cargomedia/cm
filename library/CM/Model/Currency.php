@@ -132,7 +132,7 @@ class CM_Model_Currency extends CM_Model_Abstract {
      */
     public static function getByAbbreviation($abbreviation) {
         if (!$currency = self::findByAbbreviation($abbreviation)) {
-            throw new CM_Exception_Invalid('No currency with abbreviation `' . $abbreviation . '` set');
+            throw new CM_Exception_Invalid('No currency with abbreviation is set', null, ['abbreviation' => $abbreviation]);
         }
         return $currency;
     }

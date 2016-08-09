@@ -74,7 +74,10 @@ class CM_Elasticsearch_Client {
         $responseCount = $this->_getClient()->count($requestParams);
 
         if (!isset($responseCount['count'])) {
-            throw new CM_Exception_Invalid('Count query to `' . $indexName . '`:`' . $typeName . '` returned invalid value');
+            throw new CM_Exception_Invalid('Count query to index returned invalid value', null, [
+                'indexName' => $indexName,
+                'typeName'  => $typeName,
+            ]);
         }
 
         return (int) $responseCount['count'];
@@ -289,7 +292,10 @@ class CM_Elasticsearch_Client {
                 }
             }
 
-            throw new CM_Exception_Invalid('Error(s) in ' . count($response['items']) . ' bulk request action(s)' . PHP_EOL . $message);
+            throw new CM_Exception_Invalid('Error(s) in bulk request action(s)', null, [
+                'errorsCount' => count($response['items']),
+                'message'     => $message
+            ]);
         }
     }
 

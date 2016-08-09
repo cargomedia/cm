@@ -33,13 +33,16 @@ class CM_View_AbstractTest extends CMTest_TestCase {
         $this->assertSame(1, $mockLoadComponentMethod->getCallCount());
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Class not found: `absentClassName`
-     */
     public function testAjax_loadComponentBadClass() {
         /** @var CM_View_Abstract $view */
         $view = $this->getMockForAbstractClass('CM_View_Abstract');
-        $this->getResponseAjax($view, 'loadComponent', ['className' => 'absentClassName']);
+        $exception = $this->catchException(function () use ($view) {
+            $this->getResponseAjax($view, 'loadComponent', ['className' => 'absentClassName']);
+        });
+
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Class not found', $exception->getMessage());
+        $this->assertSame(['className' => 'absentClassName'], $exception->getMetaInfo());
     }
 }

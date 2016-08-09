@@ -234,7 +234,7 @@ class CM_Model_Language extends CM_Model_Abstract {
     public static function rpc_requestTranslationJs($phrase) {
         $languageKey = CM_Model_LanguageKey::findByName($phrase);
         if (!$languageKey) {
-            throw new CM_Exception_Invalid('Language key `' . $phrase . '` not found');
+            throw new CM_Exception_Invalid('Language key not found', null, ['phrase' => $phrase]);
         }
         if (!$languageKey->getJavascript()) {
             $languageKey->enableJavascript();

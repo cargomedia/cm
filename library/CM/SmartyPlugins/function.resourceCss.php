@@ -8,7 +8,7 @@ function smarty_function_resourceCss(array $params, Smarty_Internal_Template $te
     $urlOnly = isset($params['urlOnly']) ? (bool) $params['urlOnly'] : false;
 
     if (!in_array($type, array('vendor', 'library'))) {
-        throw new CM_Exception_Invalid('Invalid type `' . $type . '` provided');
+        throw new CM_Exception_Invalid('Invalid type provided', null, ['type' => $type]);
     }
 
     $url = $render->getUrlResource($type . '-css', $file);

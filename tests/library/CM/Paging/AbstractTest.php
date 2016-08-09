@@ -75,7 +75,7 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 
     public static function setUpBeforeClass() {
         CM_Db_Db::exec('CREATE TABLE `test` (
-					`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
+					`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 					`num` INT(10) NOT NULL,
 					PRIMARY KEY (`id`)
 				)');
@@ -84,7 +84,7 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
         }
         self::$_source = new CM_PagingSource_Sql('`num`', 'test');
         CM_Db_Db::exec('CREATE TABLE `test2` (
-					`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
+					`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 					`num` INT(10) NOT NULL,
 					PRIMARY KEY (`id`)
 				)');
@@ -389,7 +389,14 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
         try {
             $paging->getSum('amount');
         } catch (CM_Exception_Invalid $ex) {
-            $this->assertContains('CM_Paging_Mock has no field `amount`.', $ex->getMessage());
+            $this->assertSame('Class has no requested field.', $ex->getMessage());
+            $this->assertSame(
+                [
+                    'className' => 'CM_Paging_Mock',
+                    'field'     => 'amount',
+                ],
+                $ex->getMetaInfo()
+            );
         }
         $this->assertSame(4, $paging->getSum('id'));
     }

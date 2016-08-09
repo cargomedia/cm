@@ -202,20 +202,23 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         }
         $viewInfoList = $query['viewInfoList'];
         if (!array_key_exists($className, $viewInfoList)) {
-            throw new CM_Exception_Invalid('View `' . $className . '` not set.', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View not set.', CM_Exception::WARN, ['viewClassName' => $className]);
         }
         $viewInfo = $viewInfoList[$className];
         if (!is_array($viewInfo)) {
-            throw new CM_Exception_Invalid('View `' . $className . '` is not an array', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View is not an array', CM_Exception::WARN, ['viewClassName' => $className]);
         }
         if (!isset($viewInfo['id'])) {
-            throw new CM_Exception_Invalid('View id `' . $className . '` not set.', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View id not set.', CM_Exception::WARN, ['viewClassName' => $className]);
         }
         if (!isset($viewInfo['className']) || !class_exists($viewInfo['className']) || !is_a($viewInfo['className'], 'CM_View_Abstract', true)) {
-            throw new CM_Exception_Invalid('View className `' . $className . '` is illegal: `' . $viewInfo['className'] . '`.', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View className  is illegal.', CM_Exception::WARN, [
+                'viewClassName'     => $className,
+                'viewInfoClassName' => $viewInfo['className'],
+            ]);
         }
         if (!isset($viewInfo['params'])) {
-            throw new CM_Exception_Invalid('View params `' . $className . '` not set.', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View params not set.', CM_Exception::WARN, ['viewClassName' => $className]);
         }
         if (!isset($viewInfo['parentId'])) {
             $viewInfo['parentId'] = null;

@@ -65,13 +65,17 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
             $workload = CM_Params::encode($params, true);
             $task = $gearmanClient->addTaskHigh($this->_getJobName(), $workload);
             if (false === $task) {
-                throw new CM_Exception('Cannot add task `' . $this->_getJobName() . '`.');
+                throw new CM_Exception('Cannot add task', null, ['jobName' => $this->_getJobName()]);
             }
         }
         $gearmanClient->runTasks();
 
         if (count($resultList) != count($paramsList)) {
-            throw new CM_Exception('Job `' . $this->_getJobName() . '` failed (' . count($resultList) . '/' . count($paramsList) . ' results).');
+            throw new CM_Exception('Job failed. Invalid results', null, [
+                'jobName'         => $this->_getJobName(),
+                'countResultList' => count($resultList),
+                'countParamList'  => count($paramsList),
+            ]);
         }
         return $resultList;
     }
@@ -116,8 +120,10 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
         try {
             $params = CM_Params::factory(CM_Params::jsonDecode($workload), true);
         } catch (CM_Exception_Nonexistent $ex) {
-            throw new CM_Exception_Nonexistent('Cannot decode workload for Job `' . get_class($this) . '`: Original exception message `' .
-                $ex->getMessage() . '`', CM_Exception::WARN);
+            throw new CM_Exception_Nonexistent('Cannot decode workload for Job', CM_Exception::WARN, [
+                'job'                      => get_class($this),
+                'originalExceptionMessage' => $ex->getMessage(),
+            ]);
         }
         return CM_Params::encode($this->_executeJob($params), true);
     }
@@ -173,7 +179,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
             $value = array_map('self::_verifyParams', $value);
         }
         if (is_object($value) && false === $value instanceof CM_ArrayConvertible) {
-            throw new CM_Exception_InvalidParam('Object of class `' . get_class($value) . '` is not an instance of CM_ArrayConvertible');
+            throw new CM_Exception_InvalidParam('Object is not an instance of CM_ArrayConvertible', null, ['className' => get_class($value)]);
         }
     }
 

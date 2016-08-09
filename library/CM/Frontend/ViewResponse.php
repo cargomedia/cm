@@ -51,7 +51,7 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
      */
     public function setTemplateName($name) {
         if (preg_match('/[^\w\.-]/', $name)) {
-            throw new CM_Exception_Invalid('Invalid tpl-name `' . $name . '`');
+            throw new CM_Exception_Invalid('Invalid tpl-name', null, ['name' => $name]);
         }
         $this->_templateName = $name;
     }

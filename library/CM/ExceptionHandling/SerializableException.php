@@ -104,6 +104,11 @@ class CM_ExceptionHandling_SerializableException {
             foreach (array_reverse($exception->getTrace()) as $row) {
                 $trace[] = self::_extractTraceRow($row);
             }
+            $trace[] = [
+                'code' => '{throw}',
+                'line' => $this->line,
+                'file' => $this->file,
+            ];
             $this->trace = $trace;
         } catch (Exception $e) {
             $this->trace = null;

@@ -34,7 +34,7 @@ class CM_DataResponse extends CM_Class_Abstract {
      */
     public function get($key) {
         if (!array_key_exists($key, $this->_data)) {
-            throw new CM_Exception_Invalid('Key `' . $key . '` not found');
+            throw new CM_Exception_Invalid('Key not found', null, ['key' => $key]);
         }
         return $this->_data[$key];
     }

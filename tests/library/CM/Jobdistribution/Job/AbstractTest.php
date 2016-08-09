@@ -42,10 +42,6 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         ), $result);
     }
 
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Job `myJob` failed (1/2 results)
-     */
     public function testRunMultipleWithFailures() {
         if (!extension_loaded('gearman')) {
             $this->markTestSkipped('Gearman Pecl Extension not installed.');
@@ -71,10 +67,24 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         $job->expects($this->any())->method('_getJobName')->will($this->returnValue('myJob'));
         /** @var CM_Jobdistribution_Job_Abstract $job */
 
-        $job->runMultiple(array(
-            array('foo1' => 'bar1'),
-            array('foo2' => 'bar2'),
-        ));
+        $exception = $this->catchException(function () use ($job) {
+            $job->runMultiple(array(
+                array('foo1' => 'bar1'),
+                array('foo2' => 'bar2'),
+            ));
+        });
+
+        $this->assertInstanceOf('CM_Exception', $exception);
+        /** @var CM_Exception $exception */
+        $this->assertSame('Job failed. Invalid results', $exception->getMessage());
+        $this->assertSame(
+            [
+                'jobName'         => 'myJob',
+                'countResultList' => 1,
+                'countParamList'  => 2,
+            ],
+            $exception->getMetaInfo()
+        );
     }
 
     public function testRun() {
@@ -129,16 +139,18 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         try {
             $job->run(array('foo' => 'foo', 'bar' => new stdClass()));
             $this->fail('Job should have thrown an exception');
-        } catch (Exception $ex) {
-            $this->assertSame('Object of class `stdClass` is not an instance of CM_ArrayConvertible', $ex->getMessage());
+        } catch (CM_Exception_InvalidParam $ex) {
+            $this->assertSame('Object is not an instance of CM_ArrayConvertible', $ex->getMessage());
+            $this->assertSame(['className' => 'stdClass'], $ex->getMetaInfo());
         }
 
         /** @var CM_Jobdistribution_Job_Abstract $job */
         try {
             $job->queue(array('foo' => 'foo', 'bar' => ['bar' => new stdClass()]));
             $this->fail('Job should have thrown an exception');
-        } catch (Exception $ex) {
-            $this->assertSame('Object of class `stdClass` is not an instance of CM_ArrayConvertible', $ex->getMessage());
+        } catch (CM_Exception_InvalidParam $ex) {
+            $this->assertSame('Object is not an instance of CM_ArrayConvertible', $ex->getMessage());
+            $this->assertSame(['className' => 'stdClass'], $ex->getMetaInfo());
         }
     }
 }
