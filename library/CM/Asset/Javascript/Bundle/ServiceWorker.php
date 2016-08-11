@@ -24,6 +24,6 @@ class CM_Asset_Javascript_Bundle_ServiceWorker extends CM_Asset_Javascript_Bundl
         $config = [
             'site' => $this->_site,
         ];
-        $this->_js->addInlineContent('worker/config', 'module.exports = ' . CM_Params::encode($config, true) . ';', false);
+        $this->_js->addInlineContent('worker/config', 'module.exports = ' . CM_Params::encode($config, true) . ';', true, true);
     }
 }

@@ -45,17 +45,17 @@ class CM_Frontend_JavascriptContainer_Bundle {
     }
 
     /**
-     * @param string      $name     require() module name
-     * @param string      $content  inline script
-     * @param bool|null   $loadOnly true to execute the inline script, not executed by default
-     * @param string|null $mapPath  source map path, use the module name by default
+     * @param string    $name     require() module name
+     * @param string    $content  inline script
+     * @param bool|null $loadOnly true to execute the inline script, not executed by default
+     * @param bool|null $expose   make the module available with require()
      */
-    public function addInlineContent($name, $content, $loadOnly = null, $mapPath = null) {
+    public function addInlineContent($name, $content, $loadOnly = null, $expose = null) {
         $this->_content[] = [
-            'name'    => $name,
-            'data'    => $content,
-            'mapPath' => is_string($mapPath) ? $mapPath : $name,
-            'require' => (bool) $loadOnly
+            'path'    => $name,
+            'source'  => $content,
+            'execute' => !((bool) $loadOnly),
+            'expose'  => (bool) $expose
         ];
     }
 
