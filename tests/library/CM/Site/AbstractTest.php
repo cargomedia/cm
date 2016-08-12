@@ -46,6 +46,12 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertEquals('http://www.cdn.com', $site->getUrlCdn());
     }
 
+    public function testGetTypekit() {
+        /** @var CM_Site_Abstract $site */
+        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
+        $this->assertEquals(true, $site->getTypekit());
+    }
+
     public function testIsUrlMatch() {
         $site = $this->getMockSite(null, null, [
             'url'    => 'http://www.my-site.com',
