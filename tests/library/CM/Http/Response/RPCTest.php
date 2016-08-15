@@ -17,11 +17,7 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
         $response->process();
 
         $responseData = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame([
-            'success' => [
-                'result' => 5
-            ]
-        ], $responseData);
+        $this->assertSame(['result' => 5], $responseData['success']);
     }
 
     public function testProcessExceptionCatching() {
@@ -41,12 +37,10 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
         $responseData = CM_Params::jsonDecode($response->getContent());
 
         $this->assertSame([
-            'error' => [
-                'type'     => 'CM_Exception_Invalid',
-                'msg'      => 'bar',
-                'isPublic' => true,
-            ]
-        ], $responseData);
+            'type'     => 'CM_Exception_Invalid',
+            'msg'      => 'bar',
+            'isPublic' => true,
+        ], $responseData['error']);
 
         $request->mockMethod('getQuery')->set(function () {
             throw new CM_Exception_Nonexistent('foo');
@@ -56,13 +50,11 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
         $response->process();
         $responseData = CM_Params::jsonDecode($response->getContent());
 
-        $this->assertSame(
-            ['error' =>
-                 ['type'     => 'CM_Exception_Nonexistent',
-                  'msg'      => 'Internal server error',
-                  'isPublic' => false
-                 ]
-            ], $responseData);
+        $this->assertSame([
+            'type'     => 'CM_Exception_Nonexistent',
+            'msg'      => 'Internal server error',
+            'isPublic' => false
+        ], $responseData['error']);
     }
 
     public function testProcessingWithoutMethod() {
@@ -74,12 +66,10 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
 
         $responseData = CM_Params::jsonDecode($response->getContent());
         $this->assertSame([
-            'error' => [
-                'type'     => 'CM_Exception_InvalidParam',
-                'msg'      => 'Internal server error',
-                'isPublic' => false,
-            ]
-        ], $responseData);
+            'type'     => 'CM_Exception_InvalidParam',
+            'msg'      => 'Internal server error',
+            'isPublic' => false,
+        ], $responseData['error']);
     }
 
     public function testProcessingInvalidMethod() {
@@ -91,12 +81,10 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
 
         $responseData = CM_Params::jsonDecode($response->getContent());
         $this->assertSame([
-            'error' => [
-                'type'     => 'CM_Exception_InvalidParam',
-                'msg'      => 'Internal server error',
-                'isPublic' => false,
-            ]
-        ], $responseData);
+            'type'     => 'CM_Exception_InvalidParam',
+            'msg'      => 'Internal server error',
+            'isPublic' => false,
+        ], $responseData['error']);
     }
 
     public function testProcessReturnDeployVersion() {
