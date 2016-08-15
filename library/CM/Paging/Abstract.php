@@ -32,7 +32,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
     public function getItems($offset = null, $length = null, $returnNonexistentItems = false) {
         $negativeOffset = false;
         $itemsRaw = $this->_getItemsRaw();
-        $this->_callOnLoadItemsRaw($itemsRaw);
         // Count of available items
         $count = count($itemsRaw);
         if (null !== $this->_pageSize) {
@@ -85,10 +84,11 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
     /**
      * Return Un-processed, un-filtered items
      *
+     * @param boolean|null $skipCallback skip _onLoadItemsRaw() invocation
      * @return array
      */
-    public function getItemsRaw() {
-        $itemsRaw = $this->_getItemsRaw();
+    public function getItemsRaw($skipCallback = null) {
+        $itemsRaw = $this->_getItemsRaw($skipCallback);
         if (null !== $this->_pageSize && count($itemsRaw) > $this->_pageSize) {
             $itemsRaw = array_slice($itemsRaw, 0, $this->_pageSize);
         }
@@ -358,9 +358,10 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
     }
 
     /**
+     * @param boolean|null $skipCallback
      * @return array Raw items (might contain more than $this->_pageSize)
      */
-    private function _getItemsRaw() {
+    private function _getItemsRaw($skipCallback = null) {
         if ($this->_itemsRaw === null) {
             $this->_itemsRaw = array();
             if ($this->_source) {
@@ -375,8 +376,12 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
                     $this->_itemsRaw[] = $itemRaw;
                 }
             }
-            $this->_onLoadItemsRaw($this->_itemsRaw);
         }
+        if (false === $this->_isOnLoadItemsRawCalled && true !== $skipCallback) {
+            $this->_onLoadItemsRaw($this->_itemsRaw);
+            $this->_isOnLoadItemsRawCalled = true;
+        }
+
         return $this->_itemsRaw;
     }
 
@@ -412,7 +417,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
      */
     private function _getItems($offset, $length, $returnNonexistentItems, $allowBackwardsLookup) {
         $itemsRaw = $this->_getItemsRaw();
-        $this->_callOnLoadItemsRaw($itemsRaw);
         $itemsRawCount = count($itemsRaw);
         $items = array();
         $direction = 1;
@@ -456,7 +460,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
      */
     private function _getItemsInstantiable($offset, $length) {
         $itemsRaw = $this->_getItemsRaw();
-        $this->_callOnLoadItemsRaw($itemsRaw);
         $items = array();
         for ($i = $offset; $i < $offset + $length; $i++) {
             if (!array_key_exists($i, $this->_items)) {
@@ -486,16 +489,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
                     $this->_pageOffset = (int) ceil($this->getCount() / $this->_pageSize) - 1;
                 }
             }
-        }
-    }
-
-    /**
-     * @param array $itemsRaw
-     */
-    private function _callOnLoadItemsRaw(array $itemsRaw) {
-        if (false === $this->_isOnLoadItemsRawCalled) {
-            $this->_onLoadItemsRaw($itemsRaw);
-            $this->_isOnLoadItemsRawCalled = true;
         }
     }
 
