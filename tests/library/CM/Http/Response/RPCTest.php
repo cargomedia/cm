@@ -99,6 +99,21 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
         ], $responseData);
     }
 
+    public function testProcessReturnDeployVersion() {
+        $body = CM_Params::jsonEncode([
+            'method' => 'CM_Http_Response_RPCTest.add',
+            'params' => [2, 3],
+        ]);
+        $site = $this->getMockSite();
+        $request = new CM_Http_Request_Post('/rpc', null, null, $body);
+        $response = CM_Http_Response_RPC::createFromRequest($request, $site, $this->getServiceManager());
+        $response->process();
+
+        $responseDecoded = CM_Params::jsonDecode($response->getContent());
+        $this->assertArrayHasKey('deployVersion', $responseDecoded);
+        $this->assertSame(CM_App::getInstance()->getDeployVersion(), $responseDecoded['deployVersion']);
+    }
+
     public static function rpc_add($foo, $bar) {
         return $foo + $bar;
     }
