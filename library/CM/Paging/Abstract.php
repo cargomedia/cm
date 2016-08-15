@@ -32,6 +32,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
     public function getItems($offset = null, $length = null, $returnNonexistentItems = false) {
         $negativeOffset = false;
         $itemsRaw = $this->_getItemsRaw();
+
         // Count of available items
         $count = count($itemsRaw);
         if (null !== $this->_pageSize) {
@@ -381,7 +382,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
             $this->_onLoadItemsRaw($this->_itemsRaw);
             $this->_isOnLoadItemsRawCalled = true;
         }
-
         return $this->_itemsRaw;
     }
 
