@@ -1,13 +1,13 @@
-define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
+define(["CM/Frontend/JsonSerializable", "CM/Paging/Abstract"], function() {
 
-  QUnit.module('CM/Paging/List:flat', {
+  QUnit.module('CM/Paging/Abstract:flat', {
     beforeEach: function() {
-      var list = new CM_Paging_List([
+      var list = new CM_Paging_Abstract([
         new CM_Frontend_JsonSerializable({id: 1, foo: 1}),
         new CM_Frontend_JsonSerializable({id: 2, foo: 2}),
         new CM_Frontend_JsonSerializable({id: 3, foo: 3})
       ]);
-      var clone = new CM_Paging_List([
+      var clone = new CM_Paging_Abstract([
         new CM_Frontend_JsonSerializable({id: 1, foo: 1}),
         new CM_Frontend_JsonSerializable({id: 2, foo: 2}),
         new CM_Frontend_JsonSerializable({id: 3, foo: 3})
@@ -44,7 +44,7 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
   });
 
   QUnit.test("get models", function(assert) {
-    var list1 = new CM_Paging_List([
+    var list1 = new CM_Paging_Abstract([
       new Backbone.Model({foo: 1}),
       new Backbone.Model({foo: 1}),
       new Backbone.Model({foo: 2})
@@ -56,7 +56,7 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
     assert.ok(list1.get(new Backbone.Model({foo: 1})));
     assert.ok(list1.get(new Backbone.Model({foo: 2})));
 
-    var list2 = new CM_Paging_List([
+    var list2 = new CM_Paging_Abstract([
       new Backbone.Model({id: 1, foo: 1}),
       new Backbone.Model({id: 2, foo: 1})
     ]);
@@ -67,7 +67,7 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
     assert.ok(list2.get(new Backbone.Model({id: 1, foo: 1})));
     assert.ok(list2.get(new Backbone.Model({id: 2, foo: 1})));
 
-    var list3 = new CM_Paging_List([
+    var list3 = new CM_Paging_Abstract([
       new CM_Frontend_JsonSerializable({
         foo: 1,
         bar: new CM_Frontend_JsonSerializable({
@@ -95,7 +95,7 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
     assert.ok(list3.get(list3.at(0)));
     assert.ok(list3.get(list3.at(0).cid));
 
-    var list4 = new CM_Paging_List([
+    var list4 = new CM_Paging_Abstract([
       new CM_Frontend_JsonSerializable({
         id: 1,
         bar: new CM_Frontend_JsonSerializable({
@@ -129,12 +129,12 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
   });
 
   QUnit.test("equals: native Backbone.Model", function(assert) {
-    var list1 = new CM_Paging_List([
+    var list1 = new CM_Paging_Abstract([
       new Backbone.Model({foo: 2}),
       new Backbone.Model({foo: 3})
     ]);
 
-    var list2 = new CM_Paging_List([
+    var list2 = new CM_Paging_Abstract([
       new Backbone.Model({foo: 2}),
       new Backbone.Model({foo: 3})
     ]);
@@ -145,13 +145,13 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
   });
 
   QUnit.test("equals: native Backbone.Model with redundant data", function(assert) {
-    var list1 = new CM_Paging_List([
+    var list1 = new CM_Paging_Abstract([
       new Backbone.Model({foo: 2}),
       new Backbone.Model({foo: 2}),
       new Backbone.Model({foo: 3})
     ]);
 
-    var list2 = new CM_Paging_List([
+    var list2 = new CM_Paging_Abstract([
       new Backbone.Model({foo: 2}),
       new Backbone.Model({foo: 3}),
       new Backbone.Model({foo: 3})
@@ -163,12 +163,12 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
   });
 
   QUnit.test("equals: same list without ids", function(assert) {
-    var list1 = new CM_Paging_List([
+    var list1 = new CM_Paging_Abstract([
       new CM_Frontend_JsonSerializable({foo: 2}),
       new CM_Frontend_JsonSerializable({foo: 3})
     ]);
 
-    var list2 = new CM_Paging_List([
+    var list2 = new CM_Paging_Abstract([
       new CM_Frontend_JsonSerializable({foo: 2}),
       new CM_Frontend_JsonSerializable({foo: 3})
     ]);
@@ -179,13 +179,13 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
   });
 
   QUnit.test("equals: redundant data", function(assert) {
-    var list1 = new CM_Paging_List([
+    var list1 = new CM_Paging_Abstract([
       new CM_Frontend_JsonSerializable({foo: 2}),
       new CM_Frontend_JsonSerializable({foo: 2}),
       new CM_Frontend_JsonSerializable({foo: 3})
     ]);
 
-    var list2 = new CM_Paging_List([
+    var list2 = new CM_Paging_Abstract([
       new CM_Frontend_JsonSerializable({foo: 3}),
       new CM_Frontend_JsonSerializable({foo: 3}),
       new CM_Frontend_JsonSerializable({foo: 2})
@@ -197,13 +197,13 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
   });
 
   QUnit.test("equals: redundant ids", function(assert) {
-    var list1 = new CM_Paging_List([
+    var list1 = new CM_Paging_Abstract([
       new CM_Frontend_JsonSerializable({id: 2}),
       new CM_Frontend_JsonSerializable({id: 2}),
       new CM_Frontend_JsonSerializable({id: 3})
     ]);
 
-    var list2 = new CM_Paging_List([
+    var list2 = new CM_Paging_Abstract([
       new CM_Frontend_JsonSerializable({id: 3}),
       new CM_Frontend_JsonSerializable({id: 3}),
       new CM_Frontend_JsonSerializable({id: 2})
@@ -280,23 +280,23 @@ define(["CM/Frontend/JsonSerializable", "CM/Paging/List"], function() {
   });
 
 
-  QUnit.module('CM/Paging/List:nested', {
+  QUnit.module('CM/Paging/Abstract:nested', {
     beforeEach: function() {
-      var list = new CM_Paging_List([
+      var list = new CM_Paging_Abstract([
         new CM_Frontend_JsonSerializable({
           id: 1,
           foo: 1,
-          '1.1': new CM_Paging_List([
+          '1.1': new CM_Paging_Abstract([
             new CM_Frontend_JsonSerializable({id: 'a', bar: 1})
           ])
         }),
         new CM_Frontend_JsonSerializable({id: 2})
       ]);
-      var clone = new CM_Paging_List([
+      var clone = new CM_Paging_Abstract([
         new CM_Frontend_JsonSerializable({
           id: 1,
           foo: 1,
-          '1.1': new CM_Paging_List([
+          '1.1': new CM_Paging_Abstract([
             new CM_Frontend_JsonSerializable({id: 'a', bar: 1})
           ])
         }),
