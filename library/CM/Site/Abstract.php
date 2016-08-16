@@ -128,14 +128,14 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @return bool
+     * @return array
      */
-    public function getTypekit() {
+    public function getTypekitConfig() {
         $config = $this->getConfig();
         if (!isset($config->typekit)) {
-            return true;
+            return null;
         }
-        return (bool) $config->typekit;
+        return $config->typekit;
     }
 
     /**

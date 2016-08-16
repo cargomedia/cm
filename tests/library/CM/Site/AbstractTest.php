@@ -49,7 +49,7 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
     public function testGetTypekit() {
         /** @var CM_Site_Abstract $site */
         $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $this->assertEquals(true, $site->getTypekit());
+        $this->assertEquals(null, $site->getTypekitConfig());
     }
 
     public function testIsUrlMatch() {
