@@ -3,7 +3,12 @@
 abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
 
     /** @var array */
-    protected $_modelList = array();
+    protected $_modelList = [];
+
+    public function _change() {
+        parent::_change();
+        $this->_modelList = [];
+    }
 
     /**
      * @return int|null
@@ -17,7 +22,7 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
 
     protected function _populateModelList(array $itemsRaw) {
         $modelList = CM_Model_Abstract::factoryGenericMultiple($itemsRaw, $this->_getModelType());
-        $this->_modelList = array();
+        $this->_modelList = [];
         foreach ($itemsRaw as $index => $itemRaw) {
             $this->_modelList[serialize($itemRaw)] = $modelList[$index];
         }
@@ -25,7 +30,7 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
 
     protected function _processItem($itemRaw) {
         if (empty($this->_modelList)) {
-             $this->_populateModelList($this->getItemsRaw());
+            $this->_populateModelList($this->getItemsRaw());
         }
         $index = serialize($itemRaw);
         if (null === ($model = $this->_modelList[$index])) {
