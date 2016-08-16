@@ -53,6 +53,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         if ($this->getRender()->getLanguageRewrite()) {
             $options['urlLanguage'] = $this->getRender()->getLanguage();
         }
+        $options['typekit'] = $this->getRender()->getSite()->getTypekitConfig();
         $options['debug'] = CM_Bootloader::getInstance()->isDebug();
         $options['stream'] = $serviceManager->getStreamMessage()->getClientOptions();
         if ($viewer = $this->getRender()->getViewer()) {

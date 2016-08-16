@@ -406,6 +406,9 @@ var CM_App = CM_Class_Abstract.extend({
     _swfId: 0,
     ready: function() {
       window.viewportUnitsBuggyfill.init();
+      if (cm.options.typekit) {
+        cm.lib.loadTypekit(cm.options.typekit, document);
+      }
     },
     /**
      * @param {jQuery} $dom
