@@ -15,7 +15,7 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
         return null;
     }
 
-    protected function _onLoadItemsRaw(array $itemsRaw) {
+    protected function _populateModelList(array $itemsRaw) {
         $modelList = CM_Model_Abstract::factoryGenericMultiple($itemsRaw, $this->_getModelType());
         $this->_modelList = array();
         foreach ($itemsRaw as $index => $itemRaw) {
@@ -24,6 +24,9 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
     }
 
     protected function _processItem($itemRaw) {
+        if (empty($this->_modelList)) {
+             $this->_populateModelList($this->getItemsRaw());
+        }
         $index = serialize($itemRaw);
         if (null === ($model = $this->_modelList[$index])) {
             throw new CM_Exception_Nonexistent('Model itemRaw has no data', null, ['itemRaw' => CM_Util::var_line($itemRaw)]);
