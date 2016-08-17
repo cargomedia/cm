@@ -100,12 +100,6 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
         CM_Db_Db::exec('DROP TABLE `test2`');
     }
 
-    public function testJsonSerialize() {
-        $paging = new CM_Paging_Mock(self::$_source);
-        $items = $paging->getItems();
-        $this->assertSame(['items' => $items], $paging->jsonSerialize());
-    }
-
     public function testGetCount() {
         $paging = new CM_Paging_Mock(self::$_source);
         $this->assertEquals(100, $paging->getCount());
