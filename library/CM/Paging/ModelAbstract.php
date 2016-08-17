@@ -2,12 +2,12 @@
 
 abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
 
-    /** @var array */
-    protected $_modelList = [];
+    /** @var array|null */
+    protected $_modelList = null;
 
     public function _change() {
         parent::_change();
-        $this->_modelList = [];
+        $this->_modelList = null;
     }
 
     /**
@@ -29,7 +29,7 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
     }
 
     protected function _processItem($itemRaw) {
-        if (empty($this->_modelList)) {
+        if (null === $this->_modelList) {
             $this->_populateModelList($this->getItemsRaw());
         }
         $index = serialize($itemRaw);
