@@ -1,4 +1,8 @@
 module.exports = function(config, d) {
+  config = _.defaults({}, config, {
+    scriptTimeout: 3000,
+    async: true
+  });
   var h = d.documentElement, t = setTimeout(function() {
       h.className = h.className.replace(/\bwf-loading\b/g, "") + " wf-inactive";
     }, config.scriptTimeout), tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a;
