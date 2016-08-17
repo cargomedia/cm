@@ -177,6 +177,13 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
         return $this;
     }
 
+    public function jsonSerialize() {
+        return [
+            'actionType' => $this->getActionType(),
+            'actionVerb' => $this->getActionVerb(),
+        ];
+    }
+
     protected function _loadData() {
         return array('roles' => CM_Db_Db::select('cm_actionLimit', array('role', 'limit', 'period'), array(
             'actionType' => $this->getActionType(),
