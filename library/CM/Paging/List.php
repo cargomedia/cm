@@ -1,6 +1,6 @@
 <?php
 
-class CM_Paging_List extends CM_Paging_Abstract {
+class CM_Paging_List extends CM_Paging_Abstract implements JsonSerializable {
 
     /**
      * @param CM_PagingSource_Array|array $source
@@ -14,5 +14,11 @@ class CM_Paging_List extends CM_Paging_Abstract {
             throw new CM_Exception_Invalid('CM_Paging_List should be instantiated with either an array or CM_PagingSource_Array instance.');
         }
         parent::__construct($source);
+    }
+
+    public function jsonSerialize() {
+        return [
+            'items' => $this->getItems()
+        ];
     }
 }

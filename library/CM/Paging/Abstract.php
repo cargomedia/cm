@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator, Countable, CM_Cacheable, JsonSerializable {
+abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator, Countable, CM_Cacheable {
 
     private $_count = null;
     private $_itemsRaw = null, $_items = array(), $_itemsRawTree = null;
@@ -295,11 +295,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
         $this->_flattenItems = (bool) $state;
     }
 
-    public function jsonSerialize() {
-        return [
-            'items' => $this->getItems()
-        ];
-    }
 
     /**
      * @return bool
