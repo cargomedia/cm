@@ -6,6 +6,6 @@ module.exports = {
     "../tests/library/CM/Frontend/JsonSerializableTest",
     "../tests/library/CM/Frontend/AbstractTraitTest",
     "../tests/library/CM/Frontend/SynchronizableTraitTest",
-    "../tests/library/CM/Paging/ListTest"
+    "../tests/library/CM/Paging/AbstractTest"
   ]
 };
