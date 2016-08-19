@@ -18,7 +18,7 @@ class CM_Paging_List extends CM_Paging_Abstract implements JsonSerializable {
 
     public function jsonSerialize() {
         return [
-            'list' => $this->getItems()
+            'items' => $this->getItems()
         ];
     }
 }

@@ -23,4 +23,10 @@ class CM_Paging_ListTest extends CMTest_TestCase {
         $this->assertSame(3, $paging->count());
         $this->assertSame('bar', $paging->getItem(1));
     }
+
+    public function testJsonSerialize() {
+        $paging = new CM_Paging_List(['foo', 'bar', 'foobar']);
+        $items = $paging->getItems();
+        $this->assertSame(['items' => $items], $paging->jsonSerialize());
+    }
 }
