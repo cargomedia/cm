@@ -597,4 +597,28 @@ class CM_Util {
     public static function sanitizeUtf($value) {
         return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
     }
+
+    /**
+     * @param int $count
+     * @param int $position
+     * @param int $offset
+     * @return int
+     * @throws CM_Exception_Invalid
+     */
+    public static function applyOffset($count, $position, $offset) {
+        $count = (int) $count;
+        $position = (int) $position;
+        $offset = (int) $offset;
+        if ($position > $count - 1 || $position < 0) {
+            throw new CM_Exception_Invalid('Initial position is invalid', null, ['position' => $position]);
+        }
+        if (0 === $offset) {
+            $newPosition = $position;
+        } elseif ($offset > 0) {
+            $newPosition = ($position + $offset) % $count;
+        } else {
+            $newPosition = ($count - 1) - ($count - 1 - $position - $offset) % $count;
+        }
+        return $newPosition;
+    }
 }

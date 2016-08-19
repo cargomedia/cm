@@ -144,8 +144,27 @@ class CM_UtilTest extends CMTest_TestCase {
     public function testJsonDecodeInvalid() {
         CM_Util::jsonDecode('{[foo:bar)}');
     }
-    
+
     public function testSanitizeUtf() {
         $this->assertSame('?.', CM_Util::sanitizeUtf(pack("H*", 'c32e')));
+    }
+
+    public function testApplyOffset() {
+        $this->assertSame(5, CM_Util::applyOffset(7, 5, 0));
+        $this->assertSame(0, CM_Util::applyOffset(7, 0, 0));
+        $this->assertSame(4, CM_Util::applyOffset(7, 2, 2));
+        $this->assertSame(5, CM_Util::applyOffset(7, 6, -1));
+        $this->assertSame(0, CM_Util::applyOffset(7, 1, 20));
+        $this->assertSame(2, CM_Util::applyOffset(7, 5, -31));
+        $exception = $this->catchException(function () {
+            CM_Util::applyOffset(7, 7, 2);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Initial position is invalid', $exception->getMessage());
+        $exception = $this->catchException(function () {
+            CM_Util::applyOffset(5, -1, 3);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Initial position is invalid', $exception->getMessage());
     }
 }
