@@ -1,13 +1,11 @@
 Vagrant.configure('2') do |config|
   config.ssh.forward_agent = true
-  config.vm.box = 'cargomedia/debian-7-amd64-cm'
+  config.vm.box = 'cargomedia/debian-8-amd64-cm'
 
   config.vm.hostname = 'www.cm.dev.cargomedia.ch'
 
   config.vm.network :private_network, ip: '10.10.10.13'
   config.vm.synced_folder '.', '/home/vagrant/cm', :type => 'nfs'
-
-  config.phpstorm_tunnel.project_home = '/home/vagrant/cm'
 
   config.librarian_puppet.puppetfile_dir = 'puppet'
   config.librarian_puppet.placeholder_filename = '.gitkeep'
