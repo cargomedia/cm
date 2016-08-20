@@ -24,13 +24,25 @@ class smarty_function_dateTest extends CMTest_TestCase {
             'expected' => '2/1/03',
         ], [
             'params'   => ['time' => $time, 'showTime' => true],
-            'expected' => '2/1/03 12:34 PM',
+            'expected' =>
+                (CMTest_TH::getVersionICU() < 50)
+                    ? '2/1/03 12:34 PM'
+                    : '2/1/03, 12:34 PM'
+            ,
         ], [
             'params'   => ['time' => $time, 'showTime' => true, 'timeZone' => new DateTimeZone('US/Eastern')],
-            'expected' => '2/1/03 7:34 AM',
+            'expected' =>
+                (CMTest_TH::getVersionICU() < 50)
+                    ? '2/1/03 7:34 AM'
+                    : '2/1/03, 7:34 AM'
+            ,
         ], [
             'params'   => ['time' => $time, 'showTime' => true, 'timeZone' => 'US/Eastern'],
-            'expected' => '2/1/03 7:34 AM',
+            'expected' =>
+                (CMTest_TH::getVersionICU() < 50)
+                    ? '2/1/03 7:34 AM'
+                    : '2/1/03, 7:34 AM'
+            ,
         ], [
             'params'   => ['time' => $time, 'showWeekday' => true],
             'expected' => 'Sat 2/1/03',

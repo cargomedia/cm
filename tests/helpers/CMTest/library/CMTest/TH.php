@@ -317,6 +317,21 @@ class CMTest_TH {
     }
 
     /**
+     * @return float
+     * @throws CM_Exception
+     */
+    public static function getVersionICU() {
+        $ext = new ReflectionExtension('intl');
+        ob_start();
+        $ext->info();
+        $info = ob_get_clean();
+        if (!preg_match('#^ICU version => ([\d\.]+)$#um', $info, $matches)) {
+            throw new CM_Exception('Cannot detect ICU version', null, ['info' => $info]);
+        }
+        return (float) $matches[1];
+    }
+
+    /**
      * @param int    $length
      * @param string $charset
      * @return string

@@ -38,41 +38,62 @@ class smarty_function_date_rangeTest extends CMTest_TestCase {
                 ' years</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'showTime' => true],
-            'expected' => '<span class="date-range">2/1/03 12:34 PM – now (<span class="date-period">' .
-                $yearsAgo .
-                ' years</span>)</span>',
+            'expected' =>
+                (CMTest_TH::getVersionICU() < 50)
+                    ? '<span class="date-range">2/1/03 12:34 PM – now (<span class="date-period">' . $yearsAgo . ' years</span>)</span>'
+                    : '<span class="date-range">2/1/03, 12:34 PM – now (<span class="date-period">' . $yearsAgo . ' years</span>)</span>'
+            ,
         ], [
             'params'   => ['start' => $start, 'short' => true],
             'expected' => '<span class="date-range">2/1/03 – now (<span class="date-period">' . $yearsAgo .
                 ' years</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'showTime' => true, 'short' => true],
-            'expected' => '<span class="date-range">2/1/03 12:34 PM – now (<span class="date-period">' . $yearsAgo .
-                ' years</span>)</span>',
+            'expected' =>
+                (CMTest_TH::getVersionICU() < 50)
+                    ? '<span class="date-range">2/1/03 12:34 PM – now (<span class="date-period">' . $yearsAgo . ' years</span>)</span>'
+                    : '<span class="date-range">2/1/03, 12:34 PM – now (<span class="date-period">' . $yearsAgo . ' years</span>)</span>'
+            ,
         ], [
             'params'   => ['start' => $start, 'stop' => $stop1],
             'expected' => '<span class="date-range">2/1/03 – 2/1/03 (<span class="date-period">1 hour</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'stop' => $stop1, 'showTime' => true],
-            'expected' => '<span class="date-range">2/1/03 12:34 PM – 2/1/03 1:45 PM (<span class="date-period">1 hour</span>)</span>',
+            'expected' =>
+                (CMTest_TH::getVersionICU() < 50)
+                    ? '<span class="date-range">2/1/03 12:34 PM – 2/1/03 1:45 PM (<span class="date-period">1 hour</span>)</span>'
+                    : '<span class="date-range">2/1/03, 12:34 PM – 2/1/03, 1:45 PM (<span class="date-period">1 hour</span>)</span>'
+            ,
         ], [
             'params'   => ['start' => $start, 'stop' => $stop1, 'short' => true],
             'expected' => '<span class="date-range">2/1/03 – 2/1/03 (<span class="date-period">01:11:00</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'stop' => $stop1, 'showTime' => true, 'short' => true],
-            'expected' => '<span class="date-range">2/1/03 12:34 PM – 2/1/03 1:45 PM (<span class="date-period">01:11:00</span>)</span>',
+            'expected' =>
+                (CMTest_TH::getVersionICU() < 50)
+                    ? '<span class="date-range">2/1/03 12:34 PM – 2/1/03 1:45 PM (<span class="date-period">01:11:00</span>)</span>'
+                    : '<span class="date-range">2/1/03, 12:34 PM – 2/1/03, 1:45 PM (<span class="date-period">01:11:00</span>)</span>'
+            ,
         ], [
             'params'   => ['start' => $start, 'stop' => $stop2],
             'expected' => '<span class="date-range">2/1/03 – 2/2/03 (<span class="date-period">1 day</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'stop' => $stop2, 'showTime' => true],
-            'expected' => '<span class="date-range">2/1/03 12:34 PM – 2/2/03 1:45 PM (<span class="date-period">1 day</span>)</span>',
+            'expected' =>
+                (CMTest_TH::getVersionICU() < 50)
+                    ? '<span class="date-range">2/1/03 12:34 PM – 2/2/03 1:45 PM (<span class="date-period">1 day</span>)</span>'
+                    : '<span class="date-range">2/1/03, 12:34 PM – 2/2/03, 1:45 PM (<span class="date-period">1 day</span>)</span>'
+            ,
         ], [
             'params'   => ['start' => $start, 'stop' => $stop2, 'short' => true],
             'expected' => '<span class="date-range">2/1/03 – 2/2/03 (<span class="date-period">1 day</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'stop' => $stop2, 'showTime' => true, 'short' => true],
-            'expected' => '<span class="date-range">2/1/03 12:34 PM – 2/2/03 1:45 PM (<span class="date-period">1 day</span>)</span>',
+            'expected' =>
+                (CMTest_TH::getVersionICU() < 50)
+                    ? '<span class="date-range">2/1/03 12:34 PM – 2/2/03 1:45 PM (<span class="date-period">1 day</span>)</span>'
+                    : '<span class="date-range">2/1/03, 12:34 PM – 2/2/03, 1:45 PM (<span class="date-period">1 day</span>)</span>'
+            ,
         ]] as $testData) {
             $this->_assertSame($testData['expected'], $testData['params']);
         }
