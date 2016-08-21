@@ -279,20 +279,16 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     public function getUrlServiceWorker() {
-        $site = $this->getSite();
-        $url = $site->getUrlBase();
-
         $pathParts = [];
         $pathParts[] = 'serviceworker';
         if ($this->getLanguage()) {
             $pathParts[] = $this->getLanguage()->getAbbreviation();
         }
-        $pathParts[] = $site->getId();
         $pathParts[] = CM_App::getInstance()->getDeployVersion();
-        $pathParts[] = 'default.js';
-        $url .= '/' . implode('-', $pathParts);
 
-        return $url;
+        $path = '/' . implode('-', $pathParts) . '.js';
+
+        return $this->getUrl($path);
     }
 
     /**
