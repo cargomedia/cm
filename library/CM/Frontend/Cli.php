@@ -129,6 +129,10 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
             'tile-medium-270x270-transparent.png' => ['width' => 270, 'height' => 270, 'transparent' => true, 'iconSize' => 0.5],
             'tile-large-558x558-transparent.png'  => ['width' => 558, 'height' => 558, 'transparent' => true, 'iconSize' => 0.5],
             'tile-wide-558x270-transparent.png'   => ['width' => 558, 'height' => 270, 'transparent' => true, 'iconSize' => 0.5],
+
+            // Push Notification
+            'push-notification-icon.png'          => ['width' => 192, 'height' => 192],
+            'push-notification-badge.png'         => ['width' => 72, 'height' => 72, 'transparent' => true],
         ];
 
         foreach ($configImageList as &$config) {
