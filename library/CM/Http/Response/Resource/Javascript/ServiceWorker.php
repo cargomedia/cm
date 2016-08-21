@@ -14,7 +14,6 @@ class CM_Http_Response_Resource_Javascript_ServiceWorker extends CM_Http_Respons
             $request->setPath(str_replace('-', '/', $request->getPath()));
             $request->popPathPart(0);
             $request->popPathLanguage();
-            $site = $request->popPathSite();
             $deployVersion = $request->popPathPart(0);
             return new self($request, $site, $serviceManager);
         }
