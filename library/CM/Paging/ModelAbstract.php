@@ -35,7 +35,7 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
 
     protected function _processItem($itemRaw) {
         if (null === $this->_modelList) {
-            $this->_populateModelList($this->getItemsRaw());
+            $this->_populateModelList($this->_getItemsRaw());
         }
         $index = serialize($itemRaw);
         if (null === ($model = $this->_modelList[$index])) {
