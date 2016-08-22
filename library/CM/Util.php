@@ -610,7 +610,10 @@ class CM_Util {
         $position = (int) $position;
         $offset = (int) $offset;
         if ($position > $count - 1 || $position < 0) {
-            throw new CM_Exception_Invalid('Initial position is invalid', null, ['position' => $position]);
+            throw new CM_Exception_Invalid('Initial position is invalid', null, [
+                'position' => $position,
+                'count'    => $count,
+            ]);
         }
         if (0 === $offset) {
             $newPosition = $position;
