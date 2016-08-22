@@ -33,7 +33,10 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $viewResponse->set('pageDescription', $this->fetchDescription());
         $viewResponse->set('pageKeywords', $this->fetchKeywords());
         $viewResponse->set('renderAdapter', $this);
-        $viewResponse->set('webFontLoaderConfig', CM_Params::encode($this->getRender()->getSite()->getWebFontLoaderConfig(), true));
+        $webFontLoaderConfig = $this->getRender()->getSite()->getWebFontLoaderConfig();
+        if ($webFontLoaderConfig) {
+            $viewResponse->set('webFontLoaderConfig', CM_Params::encode($webFontLoaderConfig, true));
+        }
 
         $environmentDefault = new CM_Frontend_Environment($this->getRender()->getEnvironment()->getSite());
         $renderDefault = new CM_Frontend_Render($environmentDefault);
