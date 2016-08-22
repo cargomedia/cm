@@ -337,6 +337,28 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
     }
 
     /**
+     * @return array Raw items (might contain more than $this->_pageSize)
+     */
+    protected function _getItemsRaw() {
+        if ($this->_itemsRaw === null) {
+            $this->_itemsRaw = array();
+            if ($this->_source) {
+                $count = ($this->_pageSize === null) ? null : (int) ceil($this->_pageSize * $this->_getPageFillRate());
+                $itemsRaw = $this->_source->getItems($this->_getItemOffset(), $count);
+                foreach ($itemsRaw as &$itemRaw) {
+                    if ($this->_flattenItems) {
+                        if (is_array($itemRaw) && count($itemRaw) == 1) {
+                            $itemRaw = reset($itemRaw);
+                        }
+                    }
+                    $this->_itemsRaw[] = $itemRaw;
+                }
+            }
+        }
+        return $this->_itemsRaw;
+    }
+
+    /**
      * @param mixed $item
      * @return boolean Whether the item is matched by any of the registered filters
      */
@@ -354,28 +376,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
      */
     private function _hasFilters() {
         return count($this->_filters) > 0;
-    }
-
-    /**
-     * @return array Raw items (might contain more than $this->_pageSize)
-     */
-    private function _getItemsRaw() {
-        if ($this->_itemsRaw === null) {
-            $this->_itemsRaw = array();
-            if ($this->_source) {
-                $count = ($this->_pageSize === null) ? null : (int) ceil($this->_pageSize * $this->_getPageFillRate());
-                $itemsRaw = $this->_source->getItems($this->_getItemOffset(), $count);
-                foreach ($itemsRaw as &$itemRaw) {
-                    if ($this->_flattenItems) {
-                        if (is_array($itemRaw) && count($itemRaw) == 1) {
-                            $itemRaw = reset($itemRaw);
-                        }
-                    }
-                    $this->_itemsRaw[] = $itemRaw;
-                }
-            }
-        }
-        return $this->_itemsRaw;
     }
 
     /**
