@@ -1,3 +1,17 @@
+// Adobe Typekit Loading
+.font-typekit(@fontFamily) {
+  font-family: @fontFamily;
+  transition: opacity @transitionDuration;
+
+  html.wf-loading & {
+    opacity: 0;
+  }
+
+  html.wf-active &, html.wf-inactive & {
+    opacity: 1;
+  }
+}
+
 .clearfix {
   &::after {
     content: "";
