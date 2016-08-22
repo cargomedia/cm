@@ -985,6 +985,12 @@ var CM_App = CM_Class_Abstract.extend({
     _channelDispatchers: {},
 
     ready: function() {
+      if (!cm.options.stream.enabled) {
+        return;
+      }
+      if (!cm.options.stream.channel) {
+        return;
+      }
       if (cm.options.stream.channel.key && cm.options.stream.channel.type) {
         var channel = cm.options.stream.channel.key + ':' + cm.options.stream.channel.type;
         this._subscribe(channel);
