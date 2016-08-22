@@ -10,14 +10,8 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
         $this->_modelList = null;
     }
 
-    public function setPage($page, $size) {
-        parent::setPage($page, $size);
-        $this->_modelList = null;
-        return $this;
-    }
-
-    public function filter(Closure $filter) {
-        parent::filter($filter);
+    protected function _clearItems() {
+        parent::_clearItems();
         $this->_modelList = null;
     }
 

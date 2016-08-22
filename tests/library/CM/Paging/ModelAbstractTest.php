@@ -61,7 +61,7 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
         }
     }
 
-    public function testPagedPaging() {
+    public function testModelListInvalidation() {
         CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock::getTypeStatic()] = 'CM_Paging_ModelAbstractTest_ModelMock';
         CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock2::getTypeStatic()] = 'CM_Paging_ModelAbstractTest_ModelMock2';
         $model1 = CM_Paging_ModelAbstractTest_ModelMock::create('foo');
