@@ -46,10 +46,10 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertEquals('http://www.cdn.com', $site->getUrlCdn());
     }
 
-    public function testGetTypekit() {
+    public function testGetWebFontLoaderConfig() {
         /** @var CM_Site_Abstract $site */
         $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $this->assertEquals(null, $site->getTypekitConfig());
+        $this->assertEquals(null, $site->getWebFontLoaderConfig());
     }
 
     public function testIsUrlMatch() {
