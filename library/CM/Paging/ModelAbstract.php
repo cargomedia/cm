@@ -10,6 +10,11 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
         $this->_modelList = null;
     }
 
+    protected function _clearItems() {
+        parent::_clearItems();
+        $this->_modelList = null;
+    }
+
     /**
      * @return int|null
      *

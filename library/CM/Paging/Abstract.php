@@ -295,12 +295,19 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
         $this->_flattenItems = (bool) $state;
     }
 
-
     /**
      * @return bool
      */
     protected function _canContainUnprocessableItems() {
         return ($this->_getStalenessChance() != 0);
+    }
+
+    protected function _clearItems() {
+        $this->_items = array();
+        $this->_itemsRaw = null;
+        $this->_itemsRawTree = null;
+        $this->_iteratorPosition = 0;
+        $this->_iteratorItems = null;
     }
 
     /**
@@ -379,14 +386,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
             return null;
         }
         return (int) $this->_pageOffset * $this->_pageSize;
-    }
-
-    private function _clearItems() {
-        $this->_items = array();
-        $this->_itemsRaw = null;
-        $this->_itemsRawTree = null;
-        $this->_iteratorPosition = 0;
-        $this->_iteratorItems = null;
     }
 
     private function _clearCount() {
