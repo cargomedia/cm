@@ -15,8 +15,8 @@
         failure_limit: 10
       });
       var $this = $(this);
-      if ($this.hasClass('scrollable')) {
-        options.container = $this;
+      if ($this.closest('.scrollable').length) {
+        options.container = $this.closest('.scrollable');
       }
       $this.find('img.lazy').lazyload(options);
     });
