@@ -120,6 +120,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
             $render->getUrlResource('layout', 'foo.jpg', ['sameOrigin' => true])
         );
     }
+
     public function testGetUrlResourceWithoutCdn() {
         $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getType', 'getUrlCdn'))->getMockForAbstractClass();
         $site->expects($this->any())->method('getType')->will($this->returnValue(12));
@@ -241,7 +242,11 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $timeZone = new DateTimeZone('Europe/Zurich');
         $render = new CM_Frontend_Render(new CM_Frontend_Environment(null, null, null, $timeZone));
         $formatter = $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
-        $this->assertSame('5/21/16 2:00 AM', $formatter->format($time));
+        if (CMTest_TH::getVersionICU() < 50) {
+            $this->assertSame('5/21/16 2:00 AM', $formatter->format($time));
+        } else {
+            $this->assertSame('5/21/16, 2:00 AM', $formatter->format($time));
+        }
     }
 
     public function testGetFormatterDateNumericalTimeZone() {
@@ -250,7 +255,11 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $timeZone = DateTime::createFromFormat('O', '+02:00')->getTimezone();
         $render = new CM_Frontend_Render(new CM_Frontend_Environment(null, null, null, $timeZone));
         $formatter = $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
-        $this->assertSame('5/21/16 2:00 AM', $formatter->format($time));
+        if (CMTest_TH::getVersionICU() < 50) {
+            $this->assertSame('5/21/16 2:00 AM', $formatter->format($time));
+        } else {
+            $this->assertSame('5/21/16, 2:00 AM', $formatter->format($time));
+        }
     }
 
     public function testGetFormatterDateNumericalOverrideTimeZone() {
@@ -260,7 +269,11 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $timeZoneOverride = DateTime::createFromFormat('O', '+03:00')->getTimezone();
         $render = new CM_Frontend_Render(new CM_Frontend_Environment(null, null, null, $timeZone));
         $formatter = $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::SHORT, null, $timeZoneOverride);
-        $this->assertSame('5/21/16 3:00 AM', $formatter->format($time));
+        if (CMTest_TH::getVersionICU() < 50) {
+            $this->assertSame('5/21/16 3:00 AM', $formatter->format($time));
+        } else {
+            $this->assertSame('5/21/16, 3:00 AM', $formatter->format($time));
+        }
     }
 
     public function testGetLayoutPath() {
