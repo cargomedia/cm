@@ -23,6 +23,7 @@ var CM_App = CM_Class_Abstract.extend({
     this.date.ready();
     this.template.ready();
     this.router.ready();
+    this.stream.ready();
   },
 
   /**
@@ -982,6 +983,19 @@ var CM_App = CM_Class_Abstract.extend({
 
     /** @type {Object} */
     _channelDispatchers: {},
+
+    ready: function() {
+      if (!cm.options.stream.enabled) {
+        return;
+      }
+      if (!cm.options.stream.channel) {
+        return;
+      }
+      if (cm.options.stream.channel.key && cm.options.stream.channel.type) {
+        var channel = cm.options.stream.channel.key + ':' + cm.options.stream.channel.type;
+        this._subscribe(channel);
+      }
+    },
 
     /**
      * @param {String} channelKey
