@@ -8,7 +8,7 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
         $user = CMTest_TH::createUser();
         $httpRequest = CM_Http_Request_Abstract::factory(
             'post',
-            '/foo?bar=1&baz=quux',
+            '/foo?bar=1&baz=quux&viewInfoList=fooBar',
             [
                 'bar'  => 'baz',
                 'host' => 'foo.bar:8080',
@@ -40,13 +40,13 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
         $this->assertArrayHasKey('timestamp', $formattedRecord);
         $this->assertSame('www.example.com', $formattedRecord['computerInfo']['fqdn']);
         $this->assertSame('v7.0.1', $formattedRecord['computerInfo']['phpVersion']);
-        $this->assertSame('/foo?bar=1&baz=quux', $formattedRecord['httpRequest']['uri']);
+        $this->assertSame('/foo?bar=1&baz=quux&viewInfoList=fooBar', $formattedRecord['httpRequest']['uri']);
         $this->assertSame(
             [
-                'bar'  => '1',
-                'baz'  => 'quux',
-                'foo'  => 'bar',
-                'quux' => 'baz',
+                ['key' => 'bar', 'value' => '1'],
+                ['key' => 'baz', 'value' => 'quux'],
+                ['key' => 'foo', 'value' => 'bar'],
+                ['key' => 'quux', 'value' => 'baz'],
             ],
             $formattedRecord['httpRequest']['query']
         );
