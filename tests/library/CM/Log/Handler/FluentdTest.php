@@ -74,35 +74,4 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
             'foo2' => 2,
         ], $sanitizedRecord);
     }
-
-    public function testArrayEncoding() {
-        /** @var CM_Log_Handler_Fluentd|\Mocka\AbstractClassTrait $mock */
-        $mock = $this->mockClass('CM_Log_Handler_Fluentd')->newInstanceWithoutConstructor();
-
-        $this->assertSame([], CMTest_TH::callProtectedMethod($mock, '_encodeAsArray', [[]])); //empty array
-        $array = [
-            'foo4' => 'val4',
-            'foo1' => ['bar1' => ['quux1' => 'val11', 'baz1' => 'val12']],
-            'foo2' => ['bar2' => 'val21'],
-            'foo3' => [4, '1', 3],
-            'foo7' => ['bar4' => [1, 2]],
-            'foo5' => '',
-            'foo6' => [],
-        ];
-        $this->assertSame(
-            [
-                ['key' => 'foo1.bar1.baz1', 'value' => 'val12'],
-                ['key' => 'foo1.bar1.quux1', 'value' => 'val11'],
-                ['key' => 'foo2.bar2', 'value' => 'val21'],
-                ['key' => 'foo3.0', 'value' => 4],
-                ['key' => 'foo3.1', 'value' => '1'],
-                ['key' => 'foo3.2', 'value' => 3],
-                ['key' => 'foo4', 'value' => 'val4'],
-                ['key' => 'foo5', 'value' => ''],
-                ['key' => 'foo7.bar4.0', 'value' => 1],
-                ['key' => 'foo7.bar4.1', 'value' => 2],
-            ],
-            CMTest_TH::callProtectedMethod($mock, '_encodeAsArray', [$array])
-        );
-    }
 }

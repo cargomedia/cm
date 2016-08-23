@@ -62,37 +62,4 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
         });
         return $formattedRecord;
     }
-
-    /**
-     * @param array $data
-     * @return array
-     */
-    protected function _encodeAsArray(array $data) {
-        $iterator = new RecursiveIteratorIterator(new RecursiveArrayIterator($data));
-        $result = [];
-        foreach ($iterator as $key => $value) {
-            $result[] = [
-                'key'   => $this->_getKeysPath($iterator),
-                'value' => $value,
-            ];
-        }
-        usort($result, function (array $a, array $b) {
-            return strcmp($a['key'], $b['key']);
-        });
-        return $result;
-    }
-
-    /**
-     * @param RecursiveIteratorIterator $iterator
-     * @return string
-     */
-    private function _getKeysPath(RecursiveIteratorIterator $iterator) {
-        $i = 0;
-        $keyList = [];
-        while ($subIterator = $iterator->getSubIterator($i)) {
-            $keyList[] = $subIterator->key();
-            $i += 1;
-        }
-        return join('.', $keyList);
-    }
 }
