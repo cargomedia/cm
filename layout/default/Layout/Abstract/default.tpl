@@ -1,5 +1,5 @@
 <!doctype html>{block name="before-html"}{/block}
-<html {if $render->getLanguage()}lang="{$render->getLanguage()->getAbbreviation()}"{/if} class="{block name='html-class'}{/block}">
+<html {if $render->getLanguage()}lang="{$render->getLanguage()->getAbbreviation()}"{/if} class="{block name='html-class'}{/block}" {if isset($webFontLoaderConfig)}data-web-font-loader='{$webFontLoaderConfig}'{/if}>
   {capture name='pageContent'}{$renderAdapter->fetchPage()}{/capture}
   <head>
     <meta charset="utf-8">

@@ -130,12 +130,12 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     /**
      * @return array
      */
-    public function getTypekitConfig() {
+    public function getWebFontLoaderConfig() {
         $config = $this->getConfig();
-        if (!isset($config->typekit)) {
+        if (!isset($config->webFontLoaderConfig)) {
             return null;
         }
-        return $config->typekit;
+        return $config->webFontLoaderConfig;
     }
 
     /**
