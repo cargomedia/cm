@@ -57,6 +57,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
 
     public function testSanitizeRecord() {
         $mock = $this->mockClass('CM_Log_Handler_Fluentd')->newInstanceWithoutConstructor();
+
         $record = [
             'foo'  => [
                 'baz' => 'quux',

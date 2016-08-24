@@ -43,7 +43,6 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
             $query = $request->findQuery();
             unset($query['viewInfoList']);
             $formattedRequest['query'] = $this->_encodeAsArray($query);
-
             if (array_key_exists('http_referer', $serverArray)) {
                 $formattedRequest['referer'] = (string) $serverArray['http_referer'];
             }
