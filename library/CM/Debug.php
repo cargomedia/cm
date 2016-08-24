@@ -60,7 +60,7 @@ class CM_Debug {
     }
 
     /**
-     * @param {String} $message
+     * @param string $message
      */
     public static function log($message) {
         $message = (string) $message;
