@@ -34,9 +34,9 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
             })
             ->at(2, null);
 
-        $delayedQueue->addJob($job, $params2, time() + 3);
-        $delayedQueue->addJob($job, $params1, time() + 2);
-        $delayedQueue->addJob($job, [], time() + 4);
+        $delayedQueue->addJob($job, $params2, 3);
+        $delayedQueue->addJob($job, $params1, 2);
+        $delayedQueue->addJob($job, [], 4);
 
         $delayedQueue->queueOutstanding();
         $this->assertSame(0, $queueMethod->getCallCount());
