@@ -102,6 +102,11 @@ return function (CM_Config_Node $config) {
         ),
     );
 
+    $config->services['delayedJobQueue'] = [
+        'class'     => 'CM_Jobdistribution_DelayedQueue',
+        'arguments' => [],
+    ];
+
     $config->services['MongoDb'] = array(
         'class'     => 'CM_MongoDb_Client',
         'arguments' => array(

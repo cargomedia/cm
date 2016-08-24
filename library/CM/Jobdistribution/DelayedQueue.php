@@ -7,8 +7,10 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
     /**
      * @param CM_Service_Manager $serviceManager
      */
-    public function __construct(CM_Service_Manager $serviceManager) {
-        $this->setServiceManager($serviceManager);
+    public function __construct(CM_Service_Manager $serviceManager = null) {
+        if ($serviceManager) {
+            $this->setServiceManager($serviceManager);
+        }
     }
 
     /**
