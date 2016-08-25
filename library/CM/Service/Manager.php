@@ -323,4 +323,10 @@ class CM_Service_Manager extends CM_Class_Abstract {
         self::$instance = $serviceManager;
     }
 
+    function __clone() {
+        foreach ($this->_serviceInstanceList as &$instance) {
+            $instance = clone $instance;
+        }
+    }
+
 }
