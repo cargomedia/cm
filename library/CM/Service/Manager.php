@@ -294,6 +294,8 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @deprecated Instead make your class manager-aware (`CM_Service_ManagerAwareInterface`) and pass the manager.
+     *
      * @return CM_Service_Manager
      */
     public static function getInstance() {
