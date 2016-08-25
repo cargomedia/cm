@@ -57,19 +57,27 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         /** @var CM_Log_Context $loggerContext */
 
         $logger = $this->mockObject('CM_Log_Logger');
+
         $addRecord = $logger->mockMethod('_addRecord');
         /** @var CM_Log_Logger $logger */
-        $logger->setContext($loggerContext);
+        $message = 'messageFoo';
+        $level = CM_Log_Logger::INFO;
+        $context = new CM_Log_Context();
+        $logger->addMessage($message, $level, $context);
+        /** @var CM_Log_Record $record */
+        $record = $addRecord->getCall(0)->getArgument(0);
+        $this->assertSame($message, $record->getMessage());
+        $this->assertSame($level, $record->getLevel());
+        $this->assertSame(0, $merge->getCallCount());
 
+        $logger->setContext($loggerContext);
         $message = 'message';
         $level = CM_Log_Logger::DEBUG;
         $context = new CM_Log_Context();
-
         $logger->addMessage($message, $level, $context);
-
         $this->assertSame([$context], $merge->getCall(0)->getArguments());
         /** @var CM_Log_Record $record */
-        $record = $addRecord->getCall(0)->getArgument(0);
+        $record = $addRecord->getCall(1)->getArgument(0);
         $this->assertSame($message, $record->getMessage());
         $this->assertSame($level, $record->getLevel());
         $this->assertInstanceOf($loggerContextClass->getClassName(), $record->getContext());
