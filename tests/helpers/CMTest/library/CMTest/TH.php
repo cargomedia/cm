@@ -14,7 +14,9 @@ class CMTest_TH {
         $loader->load($output);
 
         self::$_configBackup = serialize(CM_Config::get());
-        self::$_serviceManagerBackup = clone (CM_Service_Manager::getInstance());
+        $serviceManager = CM_Service_Manager::getInstance();
+        $serviceManager->resetServiceInstances();
+        self::$_serviceManagerBackup = clone $serviceManager;
 
         // Reset environment
         self::clearEnv();
