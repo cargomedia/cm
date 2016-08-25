@@ -2,6 +2,6 @@ mod 'cargomedia/cm',
   :git => 'git@github.com:cargomedia/puppet-packages.git',
   :path => 'modules/cm'
 
-mod 'cargomedia/environment',
+mod 'cargomedia/env',
   :git => 'git@github.com:cargomedia/puppet-packages.git',
-  :path => 'modules/environment'
+  :path => 'modules/env'
