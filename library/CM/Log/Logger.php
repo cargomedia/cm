@@ -85,7 +85,7 @@ class CM_Log_Logger {
         $message = (string) $message;
         $level = (int) $level;
 
-        if (null !== $this->_context) {
+        if ($this->_context) {
             $recordContext = clone $this->_context;
         } else {
             $recordContext = new CM_Log_Context();
