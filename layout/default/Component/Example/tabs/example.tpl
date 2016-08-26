@@ -43,7 +43,6 @@
     <div class="innerPopup">
       <h3>Popup Level 3</h3>
       {button_link class="innerPopinComponent" label="PopIn()"}
-      {button_link class="innerPopoutComponent" label="PopOut()"}
     </div>
   </div>
 </div>

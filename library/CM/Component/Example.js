@@ -53,16 +53,11 @@ var CM_Component_Example = CM_Component_Abstract.extend({
 
       $el.hide();
       $subpopup.hide();
-      $popout.hide();
 
-      if (0 !== $subpopup.length) {
-        $popout.show();
-        $popout.on('click', function() {
-          applyFloatbox($subpopup);
-          $subpopup.floatOut();
-        });
-      }
-
+      $popout.on('click', function() {
+        applyFloatbox($subpopup);
+        $subpopup.floatOut();
+      });
       $popin.on('click', function() {
         $el.floatIn();
       });
@@ -71,7 +66,6 @@ var CM_Component_Example = CM_Component_Abstract.extend({
         event.stopPropagation();
         $el.show();
       });
-
       $el.on('floatbox-close', function(event) {
         event.stopPropagation();
         $popout.off('click');
