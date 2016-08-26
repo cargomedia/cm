@@ -318,7 +318,7 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   error: {
-    _callbacks: {_all: []},
+    _handlers: {},
 
     ready: function() {
       $(window).on('unhandledrejection', function(e) {
@@ -333,16 +333,36 @@ var CM_App = CM_Class_Abstract.extend({
           error = new Error('Unhandled promise rejection without reason.');
         }
         if (!(error instanceof Promise.CancellationError)) {
-          cm.error._globalHandler(error);
+          cm.error.handle(error);
         }
       });
     },
 
     /**
-     * @param {Function} fn
+     * @param {{String:Function}} handlers
+     * @param {*} [context]
      */
-    setGlobalHandler: function(fn) {
-      cm.error._globalHandler = fn;
+    registerHandlers: function(handlers, context) {
+      var name = null;
+      for (name in handlers) {
+        if (handlers.hasOwnProperty(name) && _.isFunction(handlers[name])) {
+          cm.error.registerHandler(name, handlers[name], context);
+        }
+      }
+    },
+
+    /**
+     * @param {String} name
+     * @param {Function} handler
+     * @param {*} [context]
+     */
+    registerHandler: function(name, handler, context) {
+      context = context || window;
+      var handlers = cm.error._handlers;
+      handlers[name] = _.isArray(handlers[name]) ? handlers[name] : [];
+      handlers[name].push(function(error) {
+        return handler.call(context, error);
+      });
     },
 
     /**
@@ -358,9 +378,16 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {Error} error
      * @throws Error
      */
-    _globalHandler: function(error) {
+    handle: function(error) {
       if (error instanceof CM_Exception) {
-        cm.window.hint(error.message);
+        var handlers = cm.error._handlers[error.name];
+        if (_.isArray(handlers) && handlers.length > 0) {
+          _.every(handlers, function(handler) {
+            return false !== handler(error);
+          });
+        } else {
+          cm.window.hint(error.message);
+        }
       }
       throw error;
     }
