@@ -33,6 +33,7 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
     public function getCode($compressed) {
         $cacheKey = $this->_getCacheKey([
             'method'     => __METHOD__,
+            'checksum'   => $this->getChecksum(),
             'compressed' => $compressed
         ]);
         return CM_Cache_Persistent::getInstance()->get($cacheKey, function () use ($compressed) {
@@ -51,6 +52,7 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
         $mapping = $this->_js->getSourceMapping();
         $cacheKey = $this->_getCacheKey([
             'method'     => __METHOD__,
+            'checksum'   => $this->getChecksum(),
             'compressed' => $compressed
         ]);
         return CM_Cache_Persistent::getInstance()->get($cacheKey, function () use ($compressed, $mapping, $bundleName) {
