@@ -8,7 +8,7 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
         $user = CMTest_TH::createUser();
         $httpRequest = CM_Http_Request_Abstract::factory(
             'post',
-            '/foo?bar=1&baz=quux',
+            '/foo?bar=1&baz=quux&viewInfoList=fooBar',
             [
                 'bar'  => 'baz',
                 'host' => 'foo.bar:8080',
@@ -40,13 +40,13 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
         $this->assertArrayHasKey('timestamp', $formattedRecord);
         $this->assertSame('www.example.com', $formattedRecord['computerInfo']['fqdn']);
         $this->assertSame('v7.0.1', $formattedRecord['computerInfo']['phpVersion']);
-        $this->assertSame('/foo?bar=1&baz=quux', $formattedRecord['httpRequest']['uri']);
+        $this->assertSame('/foo?bar=1&baz=quux&viewInfoList=fooBar', $formattedRecord['httpRequest']['uri']);
         $this->assertSame(
             [
-                'bar'  => '1',
-                'baz'  => 'quux',
-                'foo'  => 'bar',
-                'quux' => 'baz',
+                ['key' => 'bar', 'value' => '1'],
+                ['key' => 'baz', 'value' => 'quux'],
+                ['key' => 'foo', 'value' => 'bar'],
+                ['key' => 'quux', 'value' => 'baz'],
             ],
             $formattedRecord['httpRequest']['query']
         );
@@ -66,5 +66,63 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
         $this->assertInternalType('string', $formattedRecord['exception']['stack']);
         $this->assertSame(['foo' => "'bar'"], $formattedRecord['exception']['metaInfo']);
         $this->assertRegExp('/library\/CM\/Log\/ContextFormatter\/CargomediaTest\.php\(\d+\)/', $formattedRecord['exception']['stack']);
+    }
+
+    public function testArrayEncoding() {
+        /** @var CM_Log_ContextFormatter_Cargomedia|\Mocka\AbstractClassTrait $mock */
+        $mock = $this->mockClass('CM_Log_ContextFormatter_Cargomedia')->newInstanceWithoutConstructor();
+
+        $this->assertSame([], CMTest_TH::callProtectedMethod($mock, '_encodeAsArray', [[]])); //empty array
+        $array = [
+            'foo4' => 'val4',
+            'foo1' => ['bar1' => ['quux1' => 'val11', 'baz1' => 'val12']],
+            'foo2' => ['bar2' => 'val21'],
+            'foo3' => [4, '1', 3],
+            'foo7' => ['bar4' => [1, 2]],
+            'foo5' => '',
+            'foo6' => [],
+        ];
+        $this->assertSame(
+            [
+                ['key' => 'foo1.bar1.baz1', 'value' => 'val12'],
+                ['key' => 'foo1.bar1.quux1', 'value' => 'val11'],
+                ['key' => 'foo2.bar2', 'value' => 'val21'],
+                ['key' => 'foo3.0', 'value' => 4],
+                ['key' => 'foo3.1', 'value' => '1'],
+                ['key' => 'foo3.2', 'value' => 3],
+                ['key' => 'foo4', 'value' => 'val4'],
+                ['key' => 'foo5', 'value' => ''],
+                ['key' => 'foo7.bar4.0', 'value' => 1],
+                ['key' => 'foo7.bar4.1', 'value' => 2],
+            ],
+            CMTest_TH::callProtectedMethod($mock, '_encodeAsArray', [$array])
+        );
+
+        $array = [
+            [
+                4,
+                5,
+                6,
+                [1, 2, 3]
+            ],
+            [1, 2, 3],
+            [7, 8]
+        ];
+        $this->assertSame(
+            [
+                ['key' => '0.0', 'value' => 4],
+                ['key' => '0.1', 'value' => 5],
+                ['key' => '0.2', 'value' => 6],
+                ['key' => '0.3.0', 'value' => 1],
+                ['key' => '0.3.1', 'value' => 2],
+                ['key' => '0.3.2', 'value' => 3],
+                ['key' => '1.0', 'value' => 1],
+                ['key' => '1.1', 'value' => 2],
+                ['key' => '1.2', 'value' => 3],
+                ['key' => '2.0', 'value' => 7],
+                ['key' => '2.1', 'value' => 8],
+            ],
+            CMTest_TH::callProtectedMethod($mock, '_encodeAsArray', [$array])
+        );
     }
 }
