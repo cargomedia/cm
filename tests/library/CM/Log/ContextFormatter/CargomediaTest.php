@@ -97,5 +97,32 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
             ],
             CMTest_TH::callProtectedMethod($mock, '_encodeAsArray', [$array])
         );
+
+        $array = [
+            [
+                4,
+                5,
+                6,
+                [1, 2, 3]
+            ],
+            [1, 2, 3],
+            [7, 8]
+        ];
+        $this->assertSame(
+            [
+                ['key' => '0.0', 'value' => 4],
+                ['key' => '0.1', 'value' => 5],
+                ['key' => '0.2', 'value' => 6],
+                ['key' => '0.3.0', 'value' => 1],
+                ['key' => '0.3.1', 'value' => 2],
+                ['key' => '0.3.2', 'value' => 3],
+                ['key' => '1.0', 'value' => 1],
+                ['key' => '1.1', 'value' => 2],
+                ['key' => '1.2', 'value' => 3],
+                ['key' => '2.0', 'value' => 7],
+                ['key' => '2.1', 'value' => 8],
+            ],
+            CMTest_TH::callProtectedMethod($mock, '_encodeAsArray', [$array])
+        );
     }
 }
