@@ -58,4 +58,19 @@ class CM_Debug {
     public static function getInstance() {
         return CM_Service_Manager::getInstance()->getDebug();
     }
+
+    /**
+     * @param string $message
+     */
+    public static function log($message) {
+        $message = (string) $message;
+        $trace = debug_backtrace();
+        $className = 'none';
+        $functionName = 'none';
+        if (isset($trace[1])) {
+            $className = isset($trace[1]['class']) ? $trace[1]['class'] : $className;
+            $functionName = isset($trace[1]['function']) ? $trace[1]['function'] : $functionName;
+        }
+        CM_Service_Manager::getInstance()->getLogger()->debug(sprintf('%s:%s - %s', $className, $functionName, $message));
+    }
 }

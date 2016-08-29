@@ -86,7 +86,7 @@
       this._getFocusElement().focus();
       this.$floatbox.trap();
 
-      this.$layer.data('floatbox', this);
+      $element.data('floatbox', this);
       $element.trigger('floatbox-open');
     },
     close: function() {
@@ -97,7 +97,7 @@
       if (this.$parent.length) {
         this.$parent.append($element);
       }
-      this.$layer.removeData('floatbox');
+      $element.removeData('floatbox');
       this.$layer.remove();
       $viewport.children('.floatbox-layer:last').addClass('active');
       if (lastFocusedElement) {
@@ -141,7 +141,7 @@
 
   $.fn.floatOut = function(options) {
     return this.each(function() {
-      if (!$(this).parents('.floatbox-layer').addBack().data('floatbox')) {
+      if (!$(this).data('floatbox')) {
         var floatbox = new $.floatbox(options);
         floatbox.show($(this));
       }
@@ -149,7 +149,7 @@
   };
   $.fn.floatIn = function() {
     return this.each(function() {
-      var floatbox = $(this).parents('.floatbox-layer').addBack().data('floatbox');
+      var floatbox = $(this).data('floatbox');
       if (floatbox) {
         floatbox.close();
       }

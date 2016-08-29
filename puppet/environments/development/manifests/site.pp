@@ -9,7 +9,7 @@ node default {
     ssl_cert => template('cm_ssl/wildcard.dev.cargomedia.ch.pem'),
   }
 
-  environment::variable {'PHP_IDE_CONFIG':
+  env::variable {'PHP_IDE_CONFIG':
     value => 'serverName=www.cm.dev',
   }
 
