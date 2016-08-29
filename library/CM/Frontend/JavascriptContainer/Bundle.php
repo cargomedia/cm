@@ -150,25 +150,6 @@ class CM_Frontend_JavascriptContainer_Bundle {
     /**
      * @return string
      */
-    protected function _getContent() {
-        return $this->_getInlineContent() . $this->_getFileContent();
-    }
-
-    /**
-     * @return string
-     */
-    protected function _getFileContent() {
-        $paths = array_merge($this->_sourcePath, $this->_entryPath);
-        return \Functional\reduce_left($paths, function ($path, $index, $collection, $carry) {
-            return $carry . \Functional\reduce_left(CM_Util::rglob('*.js', $path), function ($filePath, $index, $collection, $carry) {
-                return $carry . md5((new CM_File($filePath))->read());
-            }, '');
-        }, '');
-    }
-
-    /**
-     * @return string
-     */
     protected function _getInlineContent() {
         return \Functional\reduce_left($this->_content, function ($content, $index, $collection, $carry) {
             return $carry . $content['name'] . $content['data'] . $content['require'];

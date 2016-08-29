@@ -32,7 +32,8 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
      */
     public function getCode($compressed) {
         $cacheKey = $this->_getCacheKey([
-            'method'     => __METHOD__,
+            'class'      => get_class($this),
+            'method'     => __FUNCTION__,
             'checksum'   => $this->getChecksum(),
             'compressed' => $compressed
         ]);
@@ -51,7 +52,8 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
         $bundleName = $this->_getBundleName();
         $mapping = $this->_js->getSourceMapping();
         $cacheKey = $this->_getCacheKey([
-            'method'     => __METHOD__,
+            'class'      => get_class($this),
+            'method'     => __FUNCTION__,
             'checksum'   => $this->getChecksum(),
             'compressed' => $compressed
         ]);
@@ -77,13 +79,14 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
         ]);
         $checksum = $storage->get($cacheKey);
         if (!$checksum) {
+            $checksum = '';
             foreach (array_reverse($this->getSite()->getModules()) as $moduleName) {
                 $path = $this->_getPathInModule($moduleName);
-                $checksum = \Functional\reduce_left(CM_Util::rglob('**/*.js', $path), function ($path, $index, $collection, $carry) {
+                $checksum .= \Functional\reduce_left(CM_Util::rglob('**/*.js', $path), function ($path, $index, $collection, $carry) {
                     return md5($carry . (new CM_File($path))->read());
                 }, '');
             }
-            $storage->set($cacheKey, $checksum);
+            $storage->set($cacheKey, md5($checksum));
         }
         return $checksum;
     }
