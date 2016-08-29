@@ -102,7 +102,7 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
         $result = [];
         foreach ($iterator as $key => $value) {
             $result[] = [
-                'key'   => $this->_getKeysPath($iterator),
+                'key'   => $this->_getCurrentKeyPath($iterator),
                 'value' => $value,
             ];
         }
@@ -116,7 +116,7 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
      * @param RecursiveIteratorIterator $iterator
      * @return string
      */
-    private function _getKeysPath(RecursiveIteratorIterator $iterator) {
+    private function _getCurrentKeyPath(RecursiveIteratorIterator $iterator) {
         $i = 0;
         $keyList = [];
         while ($subIterator = $iterator->getSubIterator($i)) {
