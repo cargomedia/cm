@@ -31,8 +31,10 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
      * @return string
      */
     public function getCode($compressed) {
-        $checksum = $this->_js->compile('checksum');
-        $cacheKey = __METHOD__ . '_md5:' . $checksum . '_compressed:' . $compressed;
+        $cacheKey = $this->_getCacheKey([
+            'method'     => __METHOD__,
+            'compressed' => $compressed
+        ]);
         return CM_Cache_Persistent::getInstance()->get($cacheKey, function () use ($compressed) {
             return $this->_js->compile('code', [
                 'uglify' => $compressed
@@ -47,8 +49,10 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
     public function getSourceMaps($compressed) {
         $bundleName = $this->_getBundleName();
         $mapping = $this->_js->getSourceMapping();
-        $checksum = $this->_js->compile('checksum');
-        $cacheKey = __METHOD__ . '_md5:' . $checksum . '_compressed:' . $compressed;
+        $cacheKey = $this->_getCacheKey([
+            'method'     => __METHOD__,
+            'compressed' => $compressed
+        ]);
         return CM_Cache_Persistent::getInstance()->get($cacheKey, function () use ($compressed, $mapping, $bundleName) {
             return $this->_js->compile('sourcemaps', [
                 'bundleName' => $bundleName,
@@ -59,6 +63,34 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
                 ]
             ]);
         });
+    }
+
+    /**
+     * @return string
+     */
+    public function getChecksum() {
+        $storage = CM_Cache_Storage_Runtime::getInstance();
+        $cacheKey = $this->_getCacheKey([
+            'method' => __METHOD__,
+        ]);
+        $checksum = $storage->get($cacheKey);
+        if (!$checksum) {
+            foreach (array_reverse($this->getSite()->getModules()) as $moduleName) {
+                $path = $this->_getPathInModule($moduleName);
+                $checksum = \Functional\reduce_left(CM_Util::rglob('**/*.js', $path), function ($path, $index, $collection, $carry) {
+                    return md5($carry . (new CM_File($path))->read());
+                }, '');
+            }
+            $storage->set($cacheKey, $checksum);
+        }
+        return $checksum;
+    }
+
+    /**
+     * @return CM_Site_Abstract
+     */
+    public function getSite() {
+        return $this->_site;
     }
 
     /**
@@ -117,12 +149,30 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
     }
 
     /**
-     * @param string $moduleName
-     * @param string $path
+     * @param string      $moduleName
+     * @param string|null $path
      * @return string
      */
-    protected function _getPathInModule($moduleName, $path) {
+    protected function _getPathInModule($moduleName, $path = null) {
+        $path = null === $path ? '' : $path;
         return DIR_ROOT . CM_Bootloader::getInstance()->getModulePath($moduleName) . $path;
+    }
+
+    /**
+     * @param $extra
+     * @return string
+     */
+    protected function _getCacheKey(array $extra = null) {
+        $extra = null === $extra ? [] : $extra;
+        $modules = $this->getSite()->getModules();
+        sort($modules);
+        $cacheKey = array_merge($extra, [
+            'modules' => join('_', $modules),
+        ]);
+        $cacheKey = \Functional\map($cacheKey, function ($value, $key) {
+            return $key . ':' . $value;
+        });
+        return join('/', $cacheKey);
     }
 
     /**
