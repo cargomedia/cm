@@ -45,7 +45,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         if (!is_null($recipient)) {
             if (is_string($recipient)) {
                 $this->addTo($recipient);
-            } elseif ($recipient instanceof CM_Model_User) {
+            } elseif ($recipient instanceof CM_Model_User && $recipient->getEmail()) {
                 $this->_recipient = $recipient;
                 $this->addTo($this->_recipient->getEmail());
                 $this->setTplParam('recipient', $recipient);

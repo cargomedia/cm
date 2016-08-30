@@ -7,7 +7,7 @@ class CM_MailTest extends CMTest_TestCase {
     }
 
     public function testWithTemplate() {
-        $user = $this->_getMockUser();
+        $user = $this->getMockUser();
         $templateVariables = array('foo' => 'bar');
         $msg = new CM_Mail_Welcome($user, $templateVariables);
         list($subject, $html, $text) = $msg->render();
@@ -128,7 +128,7 @@ class CM_MailTest extends CMTest_TestCase {
 
     public function testGetRenderRecipient() {
         $site = $this->getMockSite();
-        $recipient = $this->_getMockUser('foo@example.com', $site);
+        $recipient = $this->getMockUser('foo@example.com', $site);
         $mail = new CM_Mail($recipient);
         $this->assertEquals($site, $mail->getRender()->getSite());
     }
@@ -151,7 +151,7 @@ class CM_MailTest extends CMTest_TestCase {
 
     public function testGetSiteRecipient() {
         $site = $this->getMockSite();
-        $recipient = $this->_getMockUser('foo@example.com', $site);
+        $recipient = $this->getMockUser('foo@example.com', $site);
         $mail = new CM_Mail($recipient);
         $this->assertEquals($site, $mail->getSite());
     }
@@ -169,19 +169,5 @@ class CM_MailTest extends CMTest_TestCase {
         $result = CM_Db_Db::select('cm_mail', 'customHeaders', array('subject' => $subject));
         $row = $result->fetch();
         $this->assertEquals(unserialize($row['customHeaders']), array('X-Foo' => ['bar', 'baz'], 'X-Bar' => ['foo']));
-    }
-
-    /**
-     * @param string|null           $email
-     * @param CM_Site_Abstract|null $site
-     * @return CM_Model_User|\Mocka\AbstractClassTrait
-     */
-    protected function _getMockUser($email = null, CM_Site_Abstract $site = null) {
-        $email = null === $email ? 'foo@example.com' : $email;
-        $site = null === $site ? $this->getMockSite() : $site;
-        $user = $this->getMock('CM_Model_User', array('getEmail', 'getSite'), array(CMTest_TH::createUser()->getId()));
-        $user->expects($this->any())->method('getEmail')->will($this->returnValue($email));
-        $user->expects($this->any())->method('getSite')->will($this->returnValue($site));
-        return $user;
     }
 }
