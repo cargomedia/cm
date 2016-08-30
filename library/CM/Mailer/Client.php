@@ -2,13 +2,20 @@
 
 class CM_Mailer_Client extends CM_Class_Abstract {
 
-    /** @var array */
-    private $_config;
+    /** @var Swift_Transport */
+    private $_transport;
 
     /**
-     * @param array $config
+     * @param Swift_Transport $transport
      */
-    public function __construct(array $config) {
-        $this->_config = $config;
+    public function __construct(Swift_Transport $transport) {
+        $this->_transport = $transport;
+    }
+
+    /**
+     * @return Swift_Transport
+     */
+    public function getTransport() {
+        return $this->_transport;
     }
 }

@@ -85,13 +85,6 @@ return function (CM_Config_Node $config) {
 
     $config->services = array();
 
-    $config->services['mailer'] = array(
-        'class'     => 'CM_Mailer_Client',
-        'arguments' => array(
-            'config' => array(),
-        ),
-    );
-
     $config->services['databases'] = array(
         'class' => 'CM_Service_Databases',
     );
@@ -254,6 +247,24 @@ return function (CM_Config_Node $config) {
             'appName' => 'CM Application',
         ),
     );
+
+    $config->services['mailer-transport-smtp'] = [
+        'class'     => 'Swift_SmtpTransport',
+        'arguments' => array(
+            'host' => '10.10.10.1',
+            'port' => 44425
+        ),
+    ];
+
+    $config->services['mailer'] = [
+        'class'  => 'CM_Mailer_Factory',
+        'method' => [
+            'name'      => 'createMailer',
+            'arguments' => [
+                'transportServiceName' => 'mailer-transport-smtp',
+            ],
+        ],
+    ];
 
     $config->services['logger-handler-newrelic'] = [
         'class'     => 'CMService_NewRelic_Log_Handler',
