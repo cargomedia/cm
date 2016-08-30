@@ -7,12 +7,9 @@ class CM_MailTest extends CMTest_TestCase {
     }
 
     public function testWithTemplate() {
-        $user = $this->getMock('CM_Model_User', array('getEmail', 'getSite'), array(CMTest_TH::createUser()->getId()));
-        $user->expects($this->any())->method('getEmail')->will($this->returnValue('foo@example.com'));
-        $user->expects($this->any())->method('getSite')->will($this->returnValue(CM_Site_Abstract::factory()));
-
-        $templateVariabels = array('foo' => 'bar');
-        $msg = new CM_Mail_Welcome($user, $templateVariabels);
+        $user = $this->_getMockUser();
+        $templateVariables = array('foo' => 'bar');
+        $msg = new CM_Mail_Welcome($user, $templateVariables);
         list($subject, $html, $text) = $msg->render();
         $this->assertNotEmpty($subject);
         $this->assertNotEmpty($html);
@@ -34,7 +31,7 @@ class CM_MailTest extends CMTest_TestCase {
         } catch (CM_Exception_Invalid $ex) {
             $this->assertTrue(true);
         }
-        $msg->setHtml('<a href="http://www.foo.bar">Hello</a>');
+        $msg->setBody('<a href="http://www.foo.bar">Hello</a>');
         list($subject, $html, $text) = $msg->render();
         $this->assertEquals('blabla', $subject);
         $this->assertEquals('<a href="http://www.foo.bar">Hello</a>', $html);
@@ -48,7 +45,7 @@ class CM_MailTest extends CMTest_TestCase {
 
         $msg = new CM_Mail($user, null);
         $msg->setSubject('testSubject');
-        $msg->setHtml('<b>hallo</b>');
+        $msg->setBody('<b>hallo</b>');
         $msg->addReplyTo('foo@bar.com');
         $msg->addCc('foo@bar.org', 'foobar');
         $msg->addBcc('foo@bar.net');
@@ -67,71 +64,43 @@ class CM_MailTest extends CMTest_TestCase {
         $this->assertEquals(0, CM_Db_Db::count('cm_mail', 'id'));
     }
 
-    public function testSetText() {
+    public function testSetPart() {
         $mail = new CM_Mail();
         $text = 'foo bar foo bar';
-        $mail->setText($text);
+        $mail->setPart($text);
         $this->assertSame($text, $mail->getText());
     }
 
     public function testSend() {
         CM_Config::get()->CM_Mail->send = true;
 
-        /** @var PHPMailer|\Mocka\AbstractClassTrait $_mockPHPMailer */
-        $phpMailer = $this->mockObject('PHPMailer');
+        $transport = $this->mockInterface('Swift_Transport')->newInstance();
+        $sendMethod = $transport->mockMethod('send')->set(1);
+        $mailer = new CM_Mailer_Client($transport);
 
-        $setFromMethod = $phpMailer->mockMethod('SetFrom')->set(function ($address, $name) {
-            $this->assertSame('sender@example.com', $address);
-            $this->assertSame('Sender', $name);
-        });
-        $addReplyToMethod = $phpMailer->mockMethod('AddReplyTo')->set(function ($address) {
-            $this->assertSame('foo@bar.com', $address);
-        });
-        $addAddress = $phpMailer->mockMethod('AddAddress')->set(function ($address) {
-            $this->assertSame('foo@example.com', $address);
-        });
-        $addCC = $phpMailer->mockMethod('AddCC')->set(function ($address, $name) {
-            $this->assertSame('foo@bar.org', $address);
-            $this->assertSame('foobar', $name);
-        });
-        $addBCC = $phpMailer->mockMethod('AddBCC')->set(function ($address) {
-            $this->assertSame('foo@bar.net', $address);
-        });
-        $addCustomHeader = $phpMailer->mockMethod('AddCustomHeader')
-            ->at(0, function ($name, $value) {
-                $this->assertSame('X-Foo', $name);
-                $this->assertSame('bar,foo', $value);
-            })
-            ->at(1, function ($name, $value) {
-                $this->assertSame('X-Bar', $name);
-                $this->assertSame('foo', $value);
-            });
-
-        $sendMethod = $phpMailer->mockMethod('Send');
-
-        $mail = $this->mockObject('CM_Mail', ['foo@example.com']);
-        $mail->mockMethod('_getPHPMailer')->set(function () use ($phpMailer) {
-            return $phpMailer;
-        });
-        /** @var CM_Mail $mail */
-
+        $mail = new CM_Mail('foo@example.com', null, null, $mailer);
         $mail->setSender('sender@example.com', 'Sender');
         $mail->setSubject('testSubject');
-        $mail->setHtml('<b>hallo</b>');
+        $mail->setBody('<b>hallo</b>');
         $mail->addReplyTo('foo@bar.com');
         $mail->addCc('foo@bar.org', 'foobar');
         $mail->addBcc('foo@bar.net');
         $mail->addCustomHeader('X-Foo', 'bar');
         $mail->addCustomHeader('X-Bar', 'foo');
         $mail->addCustomHeader('X-Foo', 'foo');
-        $mail->send();
 
-        $this->assertSame(1, $setFromMethod->getCallCount());
-        $this->assertSame(1, $addReplyToMethod->getCallCount());
-        $this->assertSame(1, $addAddress->getCallCount());
-        $this->assertSame(1, $addCC->getCallCount());
-        $this->assertSame(1, $addBCC->getCallCount());
-        $this->assertSame(2, $addCustomHeader->getCallCount());
+        $message = $mail->getMessage();
+        $this->assertSame(['sender@example.com' => 'Sender'], $message->getSender());
+        $this->assertSame('testSubject', $message->getSubject());
+        $this->assertSame('<b>hallo</b>', $message->getBody());
+        $this->assertSame(['foo@bar.com' => null], $message->getReplyTo());
+        $this->assertSame(['foo@bar.org' => 'foobar'], $message->getCc());
+        $this->assertSame(['foo@bar.net' => null], $message->getBcc());
+        $this->assertSame('foo', $message->getHeaders()->get('X-Bar')->getFieldBody());
+        $this->assertSame('bar', $message->getHeaders()->get('X-Foo', 0)->getFieldBody());
+        $this->assertSame('foo', $message->getHeaders()->get('X-Foo', 1)->getFieldBody());
+
+        $mail->send();
         $this->assertSame(1, $sendMethod->getCallCount());
     }
 
@@ -139,7 +108,7 @@ class CM_MailTest extends CMTest_TestCase {
         $mail = new CM_Mail();
         $mail->addTo('foo@example.com');
         $mail->setSubject('foo');
-        $mail->setText('bar');
+        $mail->setPart('bar');
         $mail->addCustomHeader('X-Foo', 'bar');
         $mail->send(true);
         $mail->send(true);
@@ -159,8 +128,7 @@ class CM_MailTest extends CMTest_TestCase {
 
     public function testGetRenderRecipient() {
         $site = $this->getMockSite();
-        $recipient = CMTest_TH::createUser();
-        $recipient->setSite($site);
+        $recipient = $this->_getMockUser('foo@example.com', $site);
         $mail = new CM_Mail($recipient);
         $this->assertEquals($site, $mail->getRender()->getSite());
     }
@@ -183,8 +151,7 @@ class CM_MailTest extends CMTest_TestCase {
 
     public function testGetSiteRecipient() {
         $site = $this->getMockSite();
-        $recipient = CMTest_TH::createUser();
-        $recipient->setSite($site);
+        $recipient = $this->_getMockUser('foo@example.com', $site);
         $mail = new CM_Mail($recipient);
         $this->assertEquals($site, $mail->getSite());
     }
@@ -196,11 +163,25 @@ class CM_MailTest extends CMTest_TestCase {
         $mail->addCustomHeader('X-Foo', 'bar');
         $mail->addCustomHeader('X-Bar', 'foo');
         $mail->addCustomHeader('X-Foo', 'baz');
-        $mail->addTo('test');
-        $mail->setText('bla');
+        $mail->addTo('foo@example.com');
+        $mail->setPart('bla');
         $mail->send(true);
         $result = CM_Db_Db::select('cm_mail', 'customHeaders', array('subject' => $subject));
         $row = $result->fetch();
         $this->assertEquals(unserialize($row['customHeaders']), array('X-Foo' => ['bar', 'baz'], 'X-Bar' => ['foo']));
+    }
+
+    /**
+     * @param string|null           $email
+     * @param CM_Site_Abstract|null $site
+     * @return CM_Model_User|\Mocka\AbstractClassTrait
+     */
+    protected function _getMockUser($email = null, CM_Site_Abstract $site = null) {
+        $email = null === $email ? 'foo@example.com' : $email;
+        $site = null === $site ? $this->getMockSite() : $site;
+        $user = $this->getMock('CM_Model_User', array('getEmail', 'getSite'), array(CMTest_TH::createUser()->getId()));
+        $user->expects($this->any())->method('getEmail')->will($this->returnValue($email));
+        $user->expects($this->any())->method('getSite')->will($this->returnValue($site));
+        return $user;
     }
 }
