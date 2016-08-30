@@ -85,6 +85,13 @@ return function (CM_Config_Node $config) {
 
     $config->services = array();
 
+    $config->services['mailer'] = array(
+        'class'     => 'CM_Mailer_Client',
+        'arguments' => array(
+            'config' => array(),
+        ),
+    );
+
     $config->services['databases'] = array(
         'class' => 'CM_Service_Databases',
     );
