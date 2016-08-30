@@ -1,4 +1,19 @@
 <?php
 
 class CM_Mailer_Client extends Swift_Mailer {
+
+    public function send(Swift_Mime_Message $message, &$failedRecipients = null) {
+        $to = $message->getTo();
+        if (empty($to)) {
+            throw new CM_Exception_Invalid('No recipient specified.');
+        }
+        $numSent = parent::send($message, $failedRecipients);
+        if (0 === $numSent) {
+            throw new CM_Exception_Invalid('Failed to send email', null, [
+                'message'          => $message,
+                'failedRecipients' => $failedRecipients,
+            ]);
+        }
+        return $numSent;
+    }
 }

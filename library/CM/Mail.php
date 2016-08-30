@@ -1,8 +1,6 @@
 <?php
 
-class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAwareInterface {
-
-    use CM_Service_ManagerAwareTrait;
+class CM_Mail extends CM_View_Abstract implements CM_Typed {
 
     /** @var CM_Model_User|null */
     private $_recipient;
@@ -10,38 +8,17 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
     /** @var CM_Site_Abstract */
     private $_site;
 
-    /** @var array */
-    private $_to = [];
-
-    /** @var array */
-    private $_replyTo = [];
-
-    /** @var array */
-    private $_cc = [];
-
-    /** @var array */
-    private $_bcc = [];
-
-    /** @var array */
-    private $_sender = [];
-
-    /** @var string|null */
-    private $_subject = null;
-
-    /** @var array */
-    private $_customHeaders = [];
-
-    /** @var string|null */
-    private $_textBody = null;
-
-    /** @var string|null */
-    private $_htmlBody = null;
-
     /** @var boolean */
     private $_verificationRequired = true;
 
     /** @var boolean */
     private $_renderLayout = false;
+
+    /** @var CM_Mailer_Client */
+    private $_mailer;
+
+    /** @var  Swift_Message */
+    private $_message;
 
     /** @var array */
     protected $_tplParams = [];
@@ -50,11 +27,13 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
      * @param CM_Model_User|string|null $recipient
      * @param array|null                $tplParams
      * @param CM_Site_Abstract|null     $site
+     * @param CM_Mailer_Client|null     $mailer
      * @throws CM_Exception_Invalid
      */
-    public function __construct($recipient = null, array $tplParams = null, CM_Site_Abstract $site = null) {
-        $this->setServiceManager(CM_Service_Manager::getInstance());
-
+    public function __construct($recipient = null, array $tplParams = null, CM_Site_Abstract $site = null, CM_Mailer_Client $mailer = null) {
+        if (null !== $mailer) {
+            $this->_mailer = $mailer;
+        }
         if ($this->hasTemplate()) {
             $this->setRenderLayout(true);
         }
@@ -88,20 +67,41 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
     }
 
     /**
+     * @return Swift_Message
+     */
+    public function getMessage() {
+        if (!$this->_message) {
+            $this->_message = $this->getMailer()->createMessage();
+            $this->_message->setCharset('utf-8');
+        }
+        return $this->_message;
+    }
+
+    /**
+     * @return CM_Mailer_Client
+     */
+    public function getMailer() {
+        if (!$this->_mailer) {
+            $this->_mailer = CM_Service_Manager::getInstance()->getMailer();
+        }
+        return $this->_mailer;
+    }
+
+    /**
      * @param string      $address
      * @param string|null $name
      */
     public function addBcc($address, $name = null) {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
-        $this->_bcc[] = ['address' => $address, 'name' => $name];
+        $this->getMessage()->addBcc($address, $name);
     }
 
     /**
      * @return array
      */
     public function getBcc() {
-        return $this->_bcc;
+        return $this->getMessage()->getBcc();
     }
 
     /**
@@ -111,14 +111,14 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
     public function addCc($address, $name = null) {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
-        $this->_cc[] = ['address' => $address, 'name' => $name];
+        $this->getMessage()->addCc($address, $name);
     }
 
     /**
      * @return array
      */
     public function getCc() {
-        return $this->_cc;
+        return $this->getMessage()->getCc();
     }
 
     /**
@@ -128,14 +128,14 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
     public function addReplyTo($address, $name = null) {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
-        $this->_replyTo[] = ['address' => $address, 'name' => $name];
+        $this->getMessage()->addReplyTo($address, $name);
     }
 
     /**
      * @return array
      */
     public function getReplyTo() {
-        return $this->_replyTo;
+        return $this->getMessage()->getReplyTo();
     }
 
     /**
@@ -145,7 +145,14 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
     public function addTo($address, $name = null) {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
-        $this->_to[] = ['address' => $address, 'name' => $name];
+        $this->getMessage()->addTo($address, $name);
+    }
+
+    /**
+     * @return array
+     */
+    public function getTo() {
+        return $this->getMessage()->getTo();
     }
 
     /**
@@ -155,28 +162,51 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
     public function addCustomHeader($label, $value) {
         $label = (string) $label;
         $value = (string) $value;
-        $this->_customHeaders[$label][] = $value;
+        $this->getMessage()->getHeaders()->addTextHeader($label, $value);
     }
 
     /**
-     * @return array
+     * @param string      $text
+     * @param string|null $contentType
      */
-    public function getTo() {
-        return $this->_to;
+    public function setBody($text, $contentType = null) {
+        $contentType = null === $contentType ? 'text/html' : $contentType;
+        $this->getMessage()->setBody($text, $contentType);
+    }
+
+    /**
+     * @param string      $text
+     * @param string|null $contentType
+     */
+    public function setPart($text, $contentType = null) {
+        $contentType = null === $contentType ? 'text/plain' : $contentType;
+        $this->getMessage()->addPart($text, $contentType);
     }
 
     /**
      * @return string|null
      */
     public function getHtml() {
-        return $this->_htmlBody;
+        $message = $this->getMessage();
+        if ('text/html' !== $message->getContentType()) {
+            return null;
+        }
+        return $message->getBody();
     }
 
     /**
-     * @param string $html
+     * @return string|null
      */
-    public function setHtml($html) {
-        $this->_htmlBody = $html;
+    public function getText() {
+        $entities = array_merge([$this->getMessage()], $this->getMessage()->getChildren());
+        /** @var Swift_Mime_MimeEntity $entity */
+        $entity = \Functional\first($entities, function (Swift_Mime_MimeEntity $entity) {
+            return 'text/plain' === $entity->getContentType();
+        });
+        if (!$entity) {
+            return null;
+        }
+        return $entity->getBody();
     }
 
     /**
@@ -210,20 +240,20 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
     }
 
     /**
-     * @return array
-     */
-    public function getSender() {
-        return $this->_sender;
-    }
-
-    /**
      * @param string      $address
      * @param string|null $name
      */
     public function setSender($address, $name = null) {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
-        $this->_sender = ['address' => $address, 'name' => $name];
+        $this->getMessage()->setSender($address, $name);
+    }
+
+    /**
+     * @return string
+     */
+    public function getSender() {
+        return $this->getMessage()->getSender();
     }
 
     /**
@@ -234,31 +264,17 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
     }
 
     /**
-     * @return string|null
-     */
-    public function getSubject() {
-        return $this->_subject;
-    }
-
-    /**
      * @param string $subject
      */
     public function setSubject($subject) {
-        $this->_subject = $subject;
+        $this->getMessage()->setSubject($subject);
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getText() {
-        return $this->_textBody;
-    }
-
-    /**
-     * @param string $text
-     */
-    public function setText($text) {
-        $this->_textBody = $text;
+    public function getSubject() {
+        return $this->getMessage()->getSubject();
     }
 
     /**
@@ -271,7 +287,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
     /**
      * @param string $key
      * @param mixed  $value
-     * @return CM_Component_Abstract
+     * @return CM_Mail
      */
     public function setTplParam($key, $value) {
         $this->_tplParams[$key] = $value;
@@ -314,9 +330,6 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
      */
     public function send($delayed = null) {
         $delayed = (boolean) $delayed;
-        if (empty($this->_to)) {
-            throw new CM_Exception_Invalid('No recipient specified.');
-        }
         $verificationMissing = $this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified();
         if ($verificationMissing) {
             return;
@@ -348,19 +361,23 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
     public static function processQueue($limit) {
         $limit = (int) $limit;
         $result = CM_Db_Db::execRead('SELECT * FROM `cm_mail` ORDER BY `createStamp` LIMIT ' . $limit);
+        $readEmails = function ($data, $key) {
+            $val = unserialize($data[$key]);
+            return is_array($val) ? $val : [];
+        };
         while ($row = $result->fetch()) {
             $mail = new CM_Mail();
-            foreach (unserialize($row['to']) as $to) {
-                $mail->addTo($to['address'], $to['name']);
+            foreach ($readEmails($row, 'to') as $address => $name) {
+                $mail->addTo($address, $name);
             }
-            foreach (unserialize($row['replyTo']) as $replyTo) {
-                $mail->addReplyTo($replyTo['address'], $replyTo['name']);
+            foreach ($readEmails($row, 'replyTo') as $address => $name) {
+                $mail->addReplyTo($address, $name);
             }
-            foreach (unserialize($row['cc']) as $cc) {
-                $mail->addCc($cc['address'], $cc['name']);
+            foreach ($readEmails($row, 'cc') as $address => $name) {
+                $mail->addCc($address, $name);
             }
-            foreach (unserialize($row['bcc']) as $bcc) {
-                $mail->addBcc($bcc['address'], $bcc['name']);
+            foreach ($readEmails($row, 'bcc') as $address => $name) {
+                $mail->addBcc($address, $name);
             }
             if ($headerList = unserialize($row['customHeaders'])) {
                 foreach ($headerList as $label => $valueList) {
@@ -370,7 +387,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
                 }
             }
             $sender = unserialize($row['sender']);
-            $mail->setSender($sender['address'], $sender['name']);
+            $mail->setSender(key($sender), $sender[key($sender)]);
             $mail->_send($row['subject'], $row['text'], $row['html']);
             CM_Db_Db::delete('cm_mail', ['id' => $row['id']]);
         }
@@ -384,61 +401,26 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
     }
 
     /**
-     * @return array
-     */
-    protected function _getCustomHeaders() {
-        return $this->_customHeaders;
-    }
-
-    /**
-     * @return PHPMailer
-     */
-    protected function _getPHPMailer() {
-        $phpMailer = new PHPMailer(true);
-        $phpMailer->CharSet = 'utf-8';
-        return $phpMailer;
-    }
-
-    /**
      * @throws CM_Exception_Invalid
      */
     protected function _send($subject, $text, $html = null) {
         if (!self::_getConfig()->send) {
             $this->_log($subject, $text);
         } else {
-            $phpMailer = $this->_getPHPMailer();
-            foreach ($this->_replyTo as $replyTo) {
-                $phpMailer->AddReplyTo($replyTo['address'], $replyTo['name']);
-            }
-            foreach ($this->_to as $to) {
-                $phpMailer->AddAddress($to['address'], $to['name']);
-            }
-            foreach ($this->_cc as $cc) {
-                $phpMailer->AddCC($cc['address'], $cc['name']);
-            }
-            foreach ($this->_bcc as $bcc) {
-                $phpMailer->AddBCC($bcc['address'], $bcc['name']);
-            }
             if ($mailDeliveryAgent = $this->_getMailDeliveryAgent()) {
                 $this->addCustomHeader('X-MDA', $mailDeliveryAgent);
             }
-            if ($headerList = $this->_getCustomHeaders()) {
-                foreach ($headerList as $label => $value) {
-                    $phpMailer->AddCustomHeader($label, implode(',', $value));
-                }
-            }
-            $phpMailer->SetFrom($this->_sender['address'], $this->_sender['name']);
 
-            $phpMailer->Subject = $subject;
-            $phpMailer->IsHTML($html);
-            $phpMailer->Body = $html ? $html : $text;
-            $phpMailer->AltBody = $html ? $text : '';
-
-            try {
-                $phpMailer->Send();
-            } catch (phpmailerException $e) {
-                throw new CM_Exception_Invalid('Cannot send email, phpmailer throw exception', null, ['message' => $e->getMessage()]);
+            $this->setSubject($subject);
+            if (null === $html) {
+                $this->setBody($text, 'text/plain');
+            } else {
+                $this->setBody($html, 'text/html');
+                $this->setPart($text, 'text/plain');
             }
+
+            $this->getMailer()->send($this->getMessage());
+
             if ($recipient = $this->getRecipient()) {
                 $action = new CM_Action_Email(CM_Action_Abstract::SEND, $recipient, $this->getType());
                 $action->prepare($recipient);
@@ -460,6 +442,20 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAw
             'bcc'           => serialize($this->getBcc()),
             'customHeaders' => serialize($this->_getCustomHeaders()),
         ]);
+    }
+
+    /**
+     * @return array
+     */
+    private function _getCustomHeaders() {
+        $result = [];
+        $headers = $this->getMessage()->getHeaders()->getAll();
+        foreach ($headers as $header) {
+            if ($header instanceof Swift_Mime_Headers_UnstructuredHeader && preg_match('/^X-.*/', $header->getFieldName())) {
+                $result[$header->getFieldName()][] = $header->getFieldBody();
+            }
+        }
+        return $result;
     }
 
     private function _log($subject, $text) {
