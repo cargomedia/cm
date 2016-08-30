@@ -1,6 +1,8 @@
 <?php
 
-class CM_Mail extends CM_View_Abstract implements CM_Typed {
+class CM_Mail extends CM_View_Abstract implements CM_Typed, CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var CM_Model_User|null */
     private $_recipient;
@@ -51,6 +53,8 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @throws CM_Exception_Invalid
      */
     public function __construct($recipient = null, array $tplParams = null, CM_Site_Abstract $site = null) {
+        $this->setServiceManager(CM_Service_Manager::getInstance());
+
         if ($this->hasTemplate()) {
             $this->setRenderLayout(true);
         }
