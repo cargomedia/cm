@@ -8,7 +8,7 @@ var regexps = require('./vendor/lib/regexps');
 /**
  * Reduce references by storing the lookups.
  */
-// OperatingSystem parsers:
+  // OperatingSystem parsers:
 var osparsers = regexps.os
   , osparserslength = osparsers.length;
 
@@ -471,16 +471,16 @@ exports.parse = function parse(userAgent, jsAgent) {
 exports.is = function is(useragent) {
   var ua = (useragent || '').toLowerCase()
     , details = {
-      chrome: false
-      , firefox: false
-      , ie: false
-      , mobile_safari: false
-      , mozilla: false
-      , opera: false
-      , safari: false
-      , webkit: false
-      , version: (ua.match(exports.is.versionRE) || [0, "0"])[1]
-    };
+    chrome: false
+    , firefox: false
+    , ie: false
+    , mobile_safari: false
+    , mozilla: false
+    , opera: false
+    , safari: false
+    , webkit: false
+    , version: (ua.match(exports.is.versionRE) || [0, "0"])[1]
+  };
 
   if (~ua.indexOf('webkit')) {
     details.webkit = true;
