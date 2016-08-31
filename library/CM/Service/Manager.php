@@ -245,6 +245,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return bool
+     */
+    public function hasLogger() {
+        return $this->has('logger');
+    }
+
+    /**
      * @return CM_Mailer_Client
      */
     public function getMailer() {

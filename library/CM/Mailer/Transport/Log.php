@@ -18,14 +18,18 @@ class CM_Mailer_Transport_Log implements Swift_Transport, CM_Service_ManagerAwar
         $this->_started = false;
     }
 
+    /**
+     * @return int
+     */
+    public function getLogLevel() {
+        return $this->_logLevel;
+    }
+
     public function isStarted() {
         return $this->_started;
     }
 
     public function start() {
-        if (!$this->getServiceManager()) {
-            throw new CM_Exception_Invalid('No service manager available');
-        }
         if (!$this->getServiceManager()->hasLogger()) {
             throw new CM_Exception_Invalid('Logger service not available');
         }
@@ -37,8 +41,14 @@ class CM_Mailer_Transport_Log implements Swift_Transport, CM_Service_ManagerAwar
     }
 
     public function send(Swift_Mime_Message $message, &$failedRecipients = null) {
+        $failedRecipients = (array) $failedRecipients;
+
         $msg = '* ' . $message->getSubject() . ' *' . PHP_EOL . PHP_EOL;
-        $msg .= $message->getBody() . PHP_EOL;
+        if ($message instanceof CM_Mailer_Message) {
+            $msg .= $message->getText() . PHP_EOL;
+        } else {
+            $msg .= $message->getBody() . PHP_EOL;
+        }
         $logger = $this->getServiceManager()->getLogger();
         $context = new CM_Log_Context();
         $context->setExtra([
@@ -49,7 +59,12 @@ class CM_Mailer_Transport_Log implements Swift_Transport, CM_Service_ManagerAwar
             'cc'      => $message->getCc(),
             'bcc'     => $message->getBcc(),
         ]);
-        $logger->addMessage($message, $this->_logLevel, $context);
+        $logger->addMessage($msg, $this->_logLevel, $context);
+
+        return
+            count($message->getTo()) +
+            count($message->getCc()) +
+            count($message->getBcc());
     }
 
     public function registerPlugin(Swift_Events_EventListener $plugin) {
