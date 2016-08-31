@@ -8,20 +8,20 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     /** @var CM_Site_Abstract */
     private $_site;
 
-    /** @var boolean */
-    private $_verificationRequired = true;
-
-    /** @var boolean */
-    private $_renderLayout = false;
-
     /** @var CM_Mailer_Client */
     private $_mailer;
 
     /** @var  Swift_Message */
     private $_message;
 
+    /** @var boolean */
+    private $_verificationRequired;
+
+    /** @var boolean */
+    private $_renderLayout;
+
     /** @var array */
-    protected $_tplParams = [];
+    protected $_tplParams;
 
     /**
      * @param CM_Model_User|string|null $recipient
@@ -31,6 +31,10 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @throws CM_Exception_Invalid
      */
     public function __construct($recipient = null, array $tplParams = null, CM_Site_Abstract $site = null, CM_Mailer_Client $mailer = null) {
+        $this->_renderLayout = false;
+        $this->_verificationRequired = true;
+        $this->_tplParams = [];
+
         if (null !== $mailer) {
             $this->_mailer = $mailer;
         }
@@ -67,259 +71,6 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
-     * @return CM_Mailer_Message
-     */
-    public function getMessage() {
-        if (!$this->_message) {
-            $this->_message = $this->getMailer()->createMessage();
-            $this->_message->setCharset('utf-8');
-        }
-        return $this->_message;
-    }
-
-    /**
-     * @return CM_Mailer_Client
-     */
-    public function getMailer() {
-        if (!$this->_mailer) {
-            $this->_mailer = CM_Service_Manager::getInstance()->getMailer();
-        }
-        return $this->_mailer;
-    }
-
-    /**
-     * @param string      $address
-     * @param string|null $name
-     */
-    public function addBcc($address, $name = null) {
-        $address = (string) $address;
-        $name = is_null($name) ? $name : (string) $name;
-        $this->getMessage()->addBcc($address, $name);
-    }
-
-    /**
-     * @return array
-     */
-    public function getBcc() {
-        return $this->getMessage()->getBcc();
-    }
-
-    /**
-     * @param string      $address
-     * @param string|null $name
-     */
-    public function addCc($address, $name = null) {
-        $address = (string) $address;
-        $name = is_null($name) ? $name : (string) $name;
-        $this->getMessage()->addCc($address, $name);
-    }
-
-    /**
-     * @return array
-     */
-    public function getCc() {
-        return $this->getMessage()->getCc();
-    }
-
-    /**
-     * @param string      $address
-     * @param string|null $name
-     */
-    public function addReplyTo($address, $name = null) {
-        $address = (string) $address;
-        $name = is_null($name) ? $name : (string) $name;
-        $this->getMessage()->addReplyTo($address, $name);
-    }
-
-    /**
-     * @return array
-     */
-    public function getReplyTo() {
-        return $this->getMessage()->getReplyTo();
-    }
-
-    /**
-     * @param string      $address
-     * @param string|null $name
-     */
-    public function addTo($address, $name = null) {
-        $address = (string) $address;
-        $name = is_null($name) ? $name : (string) $name;
-        $this->getMessage()->addTo($address, $name);
-    }
-
-    /**
-     * @return array
-     */
-    public function getTo() {
-        return $this->getMessage()->getTo();
-    }
-
-    /**
-     * @param string $label
-     * @param string $value
-     */
-    public function addCustomHeader($label, $value) {
-        $label = (string) $label;
-        $value = (string) $value;
-        $this->getMessage()->getHeaders()->addTextHeader($label, $value);
-    }
-
-    /**
-     * @param string      $text
-     * @param string|null $contentType
-     */
-    public function setBody($text, $contentType = null) {
-        $contentType = null === $contentType ? 'text/html' : $contentType;
-        $this->getMessage()->setBody($text, $contentType);
-    }
-
-    /**
-     * @param string      $text
-     * @param string|null $contentType
-     */
-    public function setPart($text, $contentType = null) {
-        $contentType = null === $contentType ? 'text/plain' : $contentType;
-        $this->getMessage()->addPart($text, $contentType);
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getHtml() {
-        return $this->getMessage()->getHtml();
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getText() {
-        return $this->getMessage()->getText();
-    }
-
-    /**
-     * @return CM_Model_User|null
-     */
-    public function getRecipient() {
-        return $this->_recipient;
-    }
-
-    /**
-     * @return CM_Frontend_Render
-     */
-    public function getRender() {
-        $environment = $this->_recipient ? $this->_recipient->getEnvironment() : new CM_Frontend_Environment();
-        $environment->setSite($this->_site);
-        return new CM_Frontend_Render($environment);
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getRenderLayout() {
-        return $this->_renderLayout;
-    }
-
-    /**
-     * @param boolean $state OPTIONAL
-     */
-    public function setRenderLayout($state = true) {
-        $this->_renderLayout = (boolean) $state;
-    }
-
-    /**
-     * @param string      $address
-     * @param string|null $name
-     */
-    public function setSender($address, $name = null) {
-        $address = (string) $address;
-        $name = is_null($name) ? $name : (string) $name;
-        $this->getMessage()->setSender($address, $name);
-    }
-
-    /**
-     * @return string
-     */
-    public function getSender() {
-        return $this->getMessage()->getSender();
-    }
-
-    /**
-     * @return CM_Site_Abstract
-     */
-    public function getSite() {
-        return $this->_site;
-    }
-
-    /**
-     * @param string $subject
-     */
-    public function setSubject($subject) {
-        $this->getMessage()->setSubject($subject);
-    }
-
-    /**
-     * @return string
-     */
-    public function getSubject() {
-        return $this->getMessage()->getSubject();
-    }
-
-    /**
-     * @return array
-     */
-    public function getCustomHeaders() {
-        return $this->getMessage()->getCustomHeaders();
-    }
-
-    /**
-     * @return array
-     */
-    public function getTplParams() {
-        return $this->_tplParams;
-    }
-
-    /**
-     * @param string $key
-     * @param mixed  $value
-     * @return CM_Mail
-     */
-    public function setTplParam($key, $value) {
-        $this->_tplParams[$key] = $value;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getVerificationRequired() {
-        return (bool) $this->_verificationRequired;
-    }
-
-    /**
-     * @param boolean $state OPTIONAL
-     */
-    public function setVerificationRequired($state = true) {
-        $this->_verificationRequired = $state;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function hasTemplate() {
-        return is_subclass_of($this, 'CM_Mail');
-    }
-
-    /**
-     * @return array array($subject, $html, $text)
-     */
-    public function render() {
-        $render = $this->getRender();
-        $renderAdapter = new CM_RenderAdapter_Mail($render, $this);
-        return $renderAdapter->fetch();
-    }
-
-    /**
      * @param boolean|null $delayed
      * @throws CM_Exception_Invalid
      */
@@ -341,6 +92,259 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 
     public function sendDelayed() {
         $this->send(true);
+    }
+
+    /**
+     * @return array array($subject, $html, $text)
+     */
+    public function render() {
+        $render = $this->getRender();
+        $renderAdapter = new CM_RenderAdapter_Mail($render, $this);
+        return $renderAdapter->fetch();
+    }
+
+    /**
+     * @return CM_Model_User|null
+     */
+    public function getRecipient() {
+        return $this->_recipient;
+    }
+
+    /**
+     * @return CM_Site_Abstract
+     */
+    public function getSite() {
+        return $this->_site;
+    }
+
+    /**
+     * @return CM_Mailer_Message
+     */
+    public function getMessage() {
+        if (!$this->_message) {
+            $this->_message = $this->getMailer()->createMessage();
+            $this->_message->setCharset('utf-8');
+        }
+        return $this->_message;
+    }
+
+    /**
+     * @return CM_Mailer_Client
+     */
+    public function getMailer() {
+        if (!$this->_mailer) {
+            $this->_mailer = CM_Service_Manager::getInstance()->getMailer();
+        }
+        return $this->_mailer;
+    }
+
+    /**
+     * @return CM_Frontend_Render
+     */
+    public function getRender() {
+        $environment = $this->_recipient ? $this->_recipient->getEnvironment() : new CM_Frontend_Environment();
+        $environment->setSite($this->_site);
+        return new CM_Frontend_Render($environment);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getRenderLayout() {
+        return $this->_renderLayout;
+    }
+
+    /**
+     * @param boolean|null $state
+     */
+    public function setRenderLayout($state = null) {
+        $this->_renderLayout = (boolean) $state;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTplParams() {
+        return $this->_tplParams;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $value
+     * @return CM_Mail
+     */
+    public function setTplParam($key, $value) {
+        $this->_tplParams[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getVerificationRequired() {
+        return (boolean) $this->_verificationRequired;
+    }
+
+    /**
+     * @param boolean|null $state
+     */
+    public function setVerificationRequired($state = null) {
+        $this->_verificationRequired = (boolean) $state;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasTemplate() {
+        return is_subclass_of($this, 'CM_Mail');
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubject() {
+        return $this->getMessage()->getSubject();
+    }
+
+    /**
+     * @param string $subject
+     */
+    public function setSubject($subject) {
+        $this->getMessage()->setSubject($subject);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getHtml() {
+        return $this->getMessage()->getHtml();
+    }
+
+    /**
+     * @param string      $text
+     * @param string|null $contentType
+     */
+    public function setBody($text, $contentType = null) {
+        $contentType = null === $contentType ? 'text/html' : $contentType;
+        $this->getMessage()->setBody($text, $contentType);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getText() {
+        return $this->getMessage()->getText();
+    }
+
+    /**
+     * @param string      $text
+     * @param string|null $contentType
+     */
+    public function addPart($text, $contentType = null) {
+        $contentType = null === $contentType ? 'text/plain' : $contentType;
+        $this->getMessage()->addPart($text, $contentType);
+    }
+
+    /**
+     * @return string
+     */
+    public function getSender() {
+        return $this->getMessage()->getSender();
+    }
+
+    /**
+     * @param string      $address
+     * @param string|null $name
+     */
+    public function setSender($address, $name = null) {
+        $address = (string) $address;
+        $name = is_null($name) ? $name : (string) $name;
+        $this->getMessage()->setSender($address, $name);
+    }
+
+    /**
+     * @return array
+     */
+    public function getTo() {
+        return $this->getMessage()->getTo();
+    }
+
+    /**
+     * @param string      $address
+     * @param string|null $name
+     */
+    public function addTo($address, $name = null) {
+        $address = (string) $address;
+        $name = is_null($name) ? $name : (string) $name;
+        $this->getMessage()->addTo($address, $name);
+    }
+
+    /**
+     * @return array
+     */
+    public function getCc() {
+        return $this->getMessage()->getCc();
+    }
+
+    /**
+     * @param string      $address
+     * @param string|null $name
+     */
+    public function addCc($address, $name = null) {
+        $address = (string) $address;
+        $name = is_null($name) ? $name : (string) $name;
+        $this->getMessage()->addCc($address, $name);
+    }
+
+    /**
+     * @return array
+     */
+    public function getBcc() {
+        return $this->getMessage()->getBcc();
+    }
+
+    /**
+     * @param string      $address
+     * @param string|null $name
+     */
+    public function addBcc($address, $name = null) {
+        $address = (string) $address;
+        $name = is_null($name) ? $name : (string) $name;
+        $this->getMessage()->addBcc($address, $name);
+    }
+
+    /**
+     * @return array
+     */
+    public function getReplyTo() {
+        return $this->getMessage()->getReplyTo();
+    }
+
+    /**
+     * @param string      $address
+     * @param string|null $name
+     */
+    public function addReplyTo($address, $name = null) {
+        $address = (string) $address;
+        $name = is_null($name) ? $name : (string) $name;
+        $this->getMessage()->addReplyTo($address, $name);
+    }
+
+    /**
+     * @return array
+     */
+    public function getCustomHeaders() {
+        return $this->getMessage()->getCustomHeaders();
+    }
+
+    /**
+     * @param string $label
+     * @param string $value
+     */
+    public function addCustomHeader($label, $value) {
+        $label = (string) $label;
+        $value = (string) $value;
+        $this->getMessage()->getHeaders()->addTextHeader($label, $value);
     }
 
     /**
@@ -397,7 +401,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             $this->setBody($text, 'text/plain');
         } else {
             $this->setBody($html, 'text/html');
-            $this->setPart($text, 'text/plain');
+            $this->addPart($text, 'text/plain');
         }
 
         $this->getMailer()->send($this->getMessage());

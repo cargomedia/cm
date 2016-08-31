@@ -64,10 +64,10 @@ class CM_MailTest extends CMTest_TestCase {
         $this->assertEquals(0, CM_Db_Db::count('cm_mail', 'id'));
     }
 
-    public function testSetPart() {
+    public function testAddPart() {
         $mail = new CM_Mail();
         $text = 'foo bar foo bar';
-        $mail->setPart($text);
+        $mail->addPart($text);
         $this->assertSame($text, $mail->getText());
     }
 
@@ -108,7 +108,7 @@ class CM_MailTest extends CMTest_TestCase {
         $mail = new CM_Mail();
         $mail->addTo('foo@example.com');
         $mail->setSubject('foo');
-        $mail->setPart('bar');
+        $mail->addPart('bar');
         $mail->addCustomHeader('X-Foo', 'bar');
         $mail->send(true);
         $mail->send(true);
@@ -164,7 +164,7 @@ class CM_MailTest extends CMTest_TestCase {
         $mail->addCustomHeader('X-Bar', 'foo');
         $mail->addCustomHeader('X-Foo', 'baz');
         $mail->addTo('foo@example.com');
-        $mail->setPart('bla');
+        $mail->addPart('bla');
         $mail->send(true);
         $result = CM_Db_Db::select('cm_mail', 'customHeaders', array('subject' => $subject));
         $row = $result->fetch();
