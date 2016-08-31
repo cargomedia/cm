@@ -2,8 +2,6 @@
 
 class CM_Mail extends CM_View_Abstract implements CM_Typed {
 
-    const QUEUE_DELAY = 0;
-
     /** @var CM_Model_User|null */
     private $_recipient;
 
@@ -72,13 +70,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         $this->setSender($this->_site->getEmailAddress(), $this->_site->getName());
     }
 
-    /**
-     * @param boolean|null $delayed
-     * @throws CM_Exception_Invalid
-     */
-    public function send($delayed = null) {
-        $delayed = (boolean) $delayed;
-
+    public function send() {
         $recipient = $this->getRecipient();
         if ($this->getVerificationRequired() && $recipient && !$recipient->getEmailVerified()) {
             return;
@@ -89,26 +81,13 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         $message->setSubject($subject);
         $message->setBodyWithAlternative($text, $html);
 
-        if ($delayed) {
-            $job = new CM_Mailer_Job_Queue();
-            $params = ['message' => $message];
-            if ($recipient) {
-                $params['recipient'] = $recipient;
-                $params['mailType'] = $this->getType();
-            }
-            $job->queueDelayed(static::QUEUE_DELAY, $params);
-        } else {
-            $this->getMailer()->send($message);
-            if ($recipient) {
-                $action = new CM_Action_Email(CM_Action_Abstract::SEND, $recipient, $this->getType());
-                $action->prepare($recipient);
-                $action->notify($recipient);
-            }
+        $job = new CM_Mailer_Job_Queue();
+        $params = ['message' => $message];
+        if ($recipient) {
+            $params['recipient'] = $recipient;
+            $params['mailType'] = $this->getType();
         }
-    }
-
-    public function sendDelayed() {
-        $this->send(true);
+        $job->queue($params);
     }
 
     /**
