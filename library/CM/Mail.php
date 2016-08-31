@@ -221,28 +221,10 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
-     * @param string      $text
-     * @param string|null $contentType
-     */
-    public function setBody($text, $contentType = null) {
-        $contentType = null === $contentType ? 'text/html' : $contentType;
-        $this->getMessage()->setBody($text, $contentType);
-    }
-
-    /**
      * @return string|null
      */
     public function getText() {
         return $this->getMessage()->getText();
-    }
-
-    /**
-     * @param string      $text
-     * @param string|null $contentType
-     */
-    public function addPart($text, $contentType = null) {
-        $contentType = null === $contentType ? 'text/plain' : $contentType;
-        $this->getMessage()->addPart($text, $contentType);
     }
 
     /**
@@ -397,13 +379,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      */
     protected function _send($subject, $text, $html = null) {
         $this->setSubject($subject);
-        if (null === $html) {
-            $this->setBody($text, 'text/plain');
-        } else {
-            $this->setBody($html, 'text/html');
-            $this->addPart($text, 'text/plain');
-        }
-
+        $this->getMessage()->setBodyWithAlternative($text, $html);
         $this->getMailer()->send($this->getMessage());
 
         if ($recipient = $this->getRecipient()) {
