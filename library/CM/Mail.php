@@ -336,52 +336,9 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
-     * @return int
-     */
-    public static function getQueueSize() {
-        return CM_Db_Db::count('cm_mail');
-    }
-
-    /**
-     * @param int $limit
-     */
-    public static function processQueue($limit) {
-        $limit = (int) $limit;
-        $result = CM_Db_Db::execRead('SELECT * FROM `cm_mail` ORDER BY `createStamp` LIMIT ' . $limit);
-        $readEmails = function ($data, $key) {
-            $val = unserialize($data[$key]);
-            return is_array($val) ? $val : [];
-        };
-        while ($row = $result->fetch()) {
-            $mail = new CM_Mail();
-            foreach ($readEmails($row, 'to') as $address => $name) {
-                $mail->addTo($address, $name);
-            }
-            foreach ($readEmails($row, 'replyTo') as $address => $name) {
-                $mail->addReplyTo($address, $name);
-            }
-            foreach ($readEmails($row, 'cc') as $address => $name) {
-                $mail->addCc($address, $name);
-            }
-            foreach ($readEmails($row, 'bcc') as $address => $name) {
-                $mail->addBcc($address, $name);
-            }
-            if ($headerList = unserialize($row['customHeaders'])) {
-                foreach ($headerList as $label => $valueList) {
-                    foreach ($valueList as $value) {
-                        $mail->addCustomHeader($label, $value);
-                    }
-                }
-            }
-            $sender = unserialize($row['sender']);
-            $mail->setSender(key($sender), $sender[key($sender)]);
-            $mail->_send($row['subject'], $row['text'], $row['html']);
-            CM_Db_Db::delete('cm_mail', ['id' => $row['id']]);
-        }
-    }
-
-    /**
-     * @throws CM_Exception_Invalid
+     * @param string      $subject
+     * @param string      $text
+     * @param string|null $html
      */
     protected function _send($subject, $text, $html = null) {
         $this->setSubject($subject);
@@ -395,18 +352,11 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         }
     }
 
-    private function _queue($subject, $text, $html) {
-        CM_Db_Db::insert('cm_mail', [
-            'subject'       => $subject,
-            'text'          => $text,
-            'html'          => $html,
-            'createStamp'   => time(),
-            'sender'        => serialize($this->getSender()),
-            'replyTo'       => serialize($this->getReplyTo()),
-            'to'            => serialize($this->getTo()),
-            'cc'            => serialize($this->getCc()),
-            'bcc'           => serialize($this->getBcc()),
-            'customHeaders' => serialize($this->getCustomHeaders()),
-        ]);
+    /**
+     * @param string      $subject
+     * @param string      $text
+     * @param string|null $html
+     */
+    private function _queue($subject, $text, $html = null) {
     }
 }
