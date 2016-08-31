@@ -1,6 +1,6 @@
 <?php
 
-class CM_Mailer_Message extends Swift_Message {
+class CM_Mailer_Message extends Swift_Message implements CM_ArrayConvertible {
 
     /** @var string|null */
     private $_text;
@@ -79,5 +79,57 @@ class CM_Mailer_Message extends Swift_Message {
         if (!$dep->has('message.cm-message')) {
             $dep->register('message.cm-message')->asNewInstanceOf('CM_Mailer_Message');
         }
+    }
+
+    public function toArray() {
+        return [
+            'subject'       => $this->getSubject(),
+            'html'          => $this->getHtml(),
+            'text'          => $this->getText(),
+            'sender'        => $this->getSender(),
+            'replyTo'       => $this->getReplyTo(),
+            'to'            => $this->getTo(),
+            'cc'            => $this->getCc(),
+            'bcc'           => $this->getBcc(),
+            'customHeaders' => $this->getCustomHeaders(),
+        ];
+    }
+
+    public static function fromArray(array $array) {
+        $message = new self($array['subject']);
+        if (null !== $array['sender']) {
+            foreach ($array['sender'] as $address => $name) {
+                $message->setSender($address, $name);
+            }
+        }
+        if (null !== $array['to']) {
+            foreach ($array['to'] as $address => $name) {
+                $message->addTo($address, $name);
+            }
+        }
+        if (null !== $array['replyTo']) {
+            foreach ($array['replyTo'] as $address => $name) {
+                $message->addReplyTo($address, $name);
+            }
+        }
+        if (null !== $array['cc']) {
+            foreach ($array['cc'] as $address => $name) {
+                $message->addCc($address, $name);
+            }
+        }
+        if (null !== $array['bcc']) {
+            foreach ($array['bcc'] as $address => $name) {
+                $message->addBcc($address, $name);
+            }
+        }
+        if (null !== $array['text']) {
+            $message->setBodyWithAlternative($array['text'], $array['html']);
+        }
+        foreach ($array['customHeaders'] as $label => $valueList) {
+            foreach ($valueList as $value) {
+                $message->getHeaders()->addTextHeader($label, $value);
+            }
+        }
+        return $message;
     }
 }
