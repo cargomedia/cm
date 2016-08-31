@@ -248,11 +248,10 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['mailer-transport-smtp'] = [
-        'class'     => 'Swift_SmtpTransport',
-        'arguments' => array(
-            'host' => '10.10.10.1',
-            'port' => 44425
-        ),
+        'class'     => 'CM_Mailer_Transport_Log',
+        'arguments' => [
+            'logLevel' => CM_Log_Logger::INFO
+        ],
     ];
 
     $config->services['mailer'] = [
