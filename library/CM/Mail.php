@@ -2,6 +2,8 @@
 
 class CM_Mail extends CM_View_Abstract implements CM_Typed {
 
+    const QUEUE_DELAY = 0;
+
     /** @var CM_Model_User|null */
     private $_recipient;
 
@@ -76,16 +78,32 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      */
     public function send($delayed = null) {
         $delayed = (boolean) $delayed;
-        if ($this->getVerificationRequired() && $this->hasRecipient() && !$this->getRecipient()->getEmailVerified()) {
+
+        $recipient = $this->getRecipient();
+        if ($this->getVerificationRequired() && $recipient && !$recipient->getEmailVerified()) {
             return;
         }
 
         list($subject, $html, $text) = $this->render();
+        $message = $this->getMessage();
+        $message->setSubject($subject);
+        $message->setBodyWithAlternative($text, $html);
 
         if ($delayed) {
-            $this->_queue($subject, $text, $html);
+            $job = new CM_Mailer_Job_Queue();
+            $params = ['message' => $message];
+            if ($recipient) {
+                $params['recipient'] = $recipient;
+                $params['mailType'] = $this->getType();
+            }
+            $job->queueDelayed(static::QUEUE_DELAY, $params);
         } else {
-            $this->_send($subject, $text, $html);
+            $this->getMailer()->send($message);
+            if ($recipient) {
+                $action = new CM_Action_Email(CM_Action_Abstract::SEND, $recipient, $this->getType());
+                $action->prepare($recipient);
+                $action->notify($recipient);
+            }
         }
     }
 
@@ -107,13 +125,6 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      */
     public function getRecipient() {
         return $this->_recipient;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function hasRecipient() {
-        return (boolean) $this->_recipient;
     }
 
     /**
@@ -333,30 +344,5 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         $label = (string) $label;
         $value = (string) $value;
         $this->getMessage()->getHeaders()->addTextHeader($label, $value);
-    }
-
-    /**
-     * @param string      $subject
-     * @param string      $text
-     * @param string|null $html
-     */
-    protected function _send($subject, $text, $html = null) {
-        $this->setSubject($subject);
-        $this->getMessage()->setBodyWithAlternative($text, $html);
-        $this->getMailer()->send($this->getMessage());
-
-        if ($recipient = $this->getRecipient()) {
-            $action = new CM_Action_Email(CM_Action_Abstract::SEND, $recipient, $this->getType());
-            $action->prepare($recipient);
-            $action->notify($recipient);
-        }
-    }
-
-    /**
-     * @param string      $subject
-     * @param string      $text
-     * @param string|null $html
-     */
-    private function _queue($subject, $text, $html = null) {
     }
 }

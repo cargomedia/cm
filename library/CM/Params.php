@@ -472,6 +472,14 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     }
 
     /**
+     * @param $key
+     * @return CM_Mailer_Message
+     */
+    public function getMailerMessage($key) {
+        return $this->getObject($key, 'CM_Mailer_Message');
+    }
+
+    /**
      * @return mixed
      */
     public function shift() {
