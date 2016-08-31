@@ -15,6 +15,9 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
         $type = (int) $type;
         $id = (string) $id['id'];
         $collectionName = $this->_getCollectionName($type);
+        if (!$this->_checkIdFormat($id)) {
+            return false;
+        }
         $mongoId = new MongoId($id);
         $data = $this->_getMongoDb()->findOne($collectionName, ['_id' => $mongoId]);
         if (null === $data) {
@@ -70,6 +73,14 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
         $collectionName = $this->_getCollectionName($type);
         $mongoId = new MongoId($id);
         $this->_getMongoDb()->remove($collectionName, ['_id' => $mongoId]);
+    }
+
+    /**
+     * @param string $id
+     * @return bool
+     */
+    protected function _checkIdFormat($id) {
+        return (bool) preg_match('/^[0-9a-fA-F]{24}$/', (string) $id);
     }
 
     /**
