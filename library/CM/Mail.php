@@ -394,23 +394,12 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
-     * @return string|null
-     */
-    protected function _getMailDeliveryAgent() {
-        return $this->_getConfig()->mailDeliveryAgent;
-    }
-
-    /**
      * @throws CM_Exception_Invalid
      */
     protected function _send($subject, $text, $html = null) {
         if (!self::_getConfig()->send) {
             $this->_log($subject, $text);
         } else {
-            if ($mailDeliveryAgent = $this->_getMailDeliveryAgent()) {
-                $this->addCustomHeader('X-MDA', $mailDeliveryAgent);
-            }
-
             $this->setSubject($subject);
             if (null === $html) {
                 $this->setBody($text, 'text/plain');
@@ -451,7 +440,10 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         $result = [];
         $headers = $this->getMessage()->getHeaders()->getAll();
         foreach ($headers as $header) {
-            if ($header instanceof Swift_Mime_Headers_UnstructuredHeader && preg_match('/^X-.*/', $header->getFieldName())) {
+            if (
+                $header instanceof Swift_Mime_Headers_UnstructuredHeader &&
+                preg_match('/^X-.*/', $header->getFieldName())
+            ) {
                 $result[$header->getFieldName()][] = $header->getFieldBody();
             }
         }

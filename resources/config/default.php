@@ -17,7 +17,6 @@ return function (CM_Config_Node $config) {
     $config->timeZone = 'UTC';
 
     $config->CM_Mail->send = true;
-    $config->CM_Mail->mailDeliveryAgent = null;
 
     $config->CM_Site_Abstract->class = null;
 
