@@ -15,7 +15,7 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
         $type = (int) $type;
         $id = (string) $id['id'];
         $collectionName = $this->_getCollectionName($type);
-        if (!$this->_checkIdFormat($id)) {
+        if (!$this->_isValidId($id)) {
             return false;
         }
         $mongoId = new MongoId($id);
@@ -79,7 +79,7 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
      * @param string $id
      * @return bool
      */
-    protected function _checkIdFormat($id) {
+    protected function _isValidId($id) {
         return (bool) preg_match('/^[0-9a-fA-F]{24}$/', (string) $id);
     }
 
