@@ -67,7 +67,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
-     * @return Swift_Message
+     * @return CM_Mailer_Message
      */
     public function getMessage() {
         if (!$this->_message) {
@@ -187,26 +187,14 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @return string|null
      */
     public function getHtml() {
-        $message = $this->getMessage();
-        if ('text/html' !== $message->getContentType()) {
-            return null;
-        }
-        return $message->getBody();
+        return $this->getMessage()->getHtml();
     }
 
     /**
      * @return string|null
      */
     public function getText() {
-        $entities = array_merge([$this->getMessage()], $this->getMessage()->getChildren());
-        /** @var Swift_Mime_MimeEntity $entity */
-        $entity = \Functional\first($entities, function (Swift_Mime_MimeEntity $entity) {
-            return 'text/plain' === $entity->getContentType();
-        });
-        if (!$entity) {
-            return null;
-        }
-        return $entity->getBody();
+        return $this->getMessage()->getText();
     }
 
     /**
@@ -275,6 +263,13 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      */
     public function getSubject() {
         return $this->getMessage()->getSubject();
+    }
+
+    /**
+     * @return array
+     */
+    public function getCustomHeaders() {
+        return $this->getMessage()->getCustomHeaders();
     }
 
     /**
@@ -397,24 +392,20 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @throws CM_Exception_Invalid
      */
     protected function _send($subject, $text, $html = null) {
-        if (!self::_getConfig()->send) {
-            $this->_log($subject, $text);
+        $this->setSubject($subject);
+        if (null === $html) {
+            $this->setBody($text, 'text/plain');
         } else {
-            $this->setSubject($subject);
-            if (null === $html) {
-                $this->setBody($text, 'text/plain');
-            } else {
-                $this->setBody($html, 'text/html');
-                $this->setPart($text, 'text/plain');
-            }
+            $this->setBody($html, 'text/html');
+            $this->setPart($text, 'text/plain');
+        }
 
-            $this->getMailer()->send($this->getMessage());
+        $this->getMailer()->send($this->getMessage());
 
-            if ($recipient = $this->getRecipient()) {
-                $action = new CM_Action_Email(CM_Action_Abstract::SEND, $recipient, $this->getType());
-                $action->prepare($recipient);
-                $action->notify($recipient);
-            }
+        if ($recipient = $this->getRecipient()) {
+            $action = new CM_Action_Email(CM_Action_Abstract::SEND, $recipient, $this->getType());
+            $action->prepare($recipient);
+            $action->notify($recipient);
         }
     }
 
@@ -429,40 +420,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
             'to'            => serialize($this->getTo()),
             'cc'            => serialize($this->getCc()),
             'bcc'           => serialize($this->getBcc()),
-            'customHeaders' => serialize($this->_getCustomHeaders()),
+            'customHeaders' => serialize($this->getCustomHeaders()),
         ]);
-    }
-
-    /**
-     * @return array
-     */
-    private function _getCustomHeaders() {
-        $result = [];
-        $headers = $this->getMessage()->getHeaders()->getAll();
-        foreach ($headers as $header) {
-            if (
-                $header instanceof Swift_Mime_Headers_UnstructuredHeader &&
-                preg_match('/^X-.*/', $header->getFieldName())
-            ) {
-                $result[$header->getFieldName()][] = $header->getFieldBody();
-            }
-        }
-        return $result;
-    }
-
-    private function _log($subject, $text) {
-        $msg = '* ' . $subject . ' *' . PHP_EOL . PHP_EOL;
-        $msg .= $text . PHP_EOL;
-        $logger = CM_Service_Manager::getInstance()->getLogger();
-        $context = new CM_Log_Context();
-        $context->setExtra([
-            'type'    => CM_Paging_Log_Mail::getTypeStatic(),
-            'sender'  => $this->getSender(),
-            'replyTo' => $this->getReplyTo(),
-            'to'      => $this->getTo(),
-            'cc'      => $this->getCc(),
-            'bcc'     => $this->getBcc(),
-        ]);
-        $logger->info($msg, $context);
     }
 }
