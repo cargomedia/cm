@@ -76,8 +76,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      */
     public function send($delayed = null) {
         $delayed = (boolean) $delayed;
-        $verificationMissing = $this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified();
-        if ($verificationMissing) {
+        if ($this->getVerificationRequired() && $this->hasRecipient() && !$this->getRecipient()->getEmailVerified()) {
             return;
         }
 
@@ -108,6 +107,13 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      */
     public function getRecipient() {
         return $this->_recipient;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasRecipient() {
+        return (boolean) $this->_recipient;
     }
 
     /**
