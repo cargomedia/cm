@@ -2,10 +2,6 @@
 
 class CM_Mailer_Transport_LogTest extends CMTest_TestCase {
 
-    public function tearDown() {
-        CMTest_TH::clearEnv();
-    }
-
     public function testConstruct() {
         $transport = new CM_Mailer_Transport_Log();
         $this->assertSame(CM_Log_Logger::INFO, $transport->getLogLevel());
