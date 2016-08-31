@@ -36,6 +36,8 @@ class CM_Model_StorageAdapter_MongoDbTest extends CMTest_TestCase {
 
         $this->assertEquals(['_id' => $id1['id'], '_type' => 99, 'foo' => 'foo1', 'bar' => 1], $adapter->load($type, $id1));
         $this->assertEquals(['_id' => $id2['id'], '_type' => 99, 'foo' => 'foo2', 'bar' => 2], $adapter->load($type, $id2));
+
+        $this->assertSame(false, $adapter->load($type, ['id' => '234']));
     }
 
     public function testLoad_nonExistent() {
