@@ -1,6 +1,6 @@
 <?php
 
-class CM_Mailer_Transport_Log implements Swift_Transport, CM_Service_ManagerAwareInterface {
+class CM_Mail_Transport_Log implements Swift_Transport, CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
 

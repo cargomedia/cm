@@ -246,7 +246,7 @@ return function (CM_Config_Node $config) {
     );
 
     $config->services['mailer-transport-log'] = [
-        'class'     => 'CM_Mailer_Transport_Log',
+        'class'     => 'CM_Mail_Transport_Log',
         'arguments' => [
             'logLevel' => CM_Log_Logger::INFO
         ],

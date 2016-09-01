@@ -1,17 +1,17 @@
 <?php
 
-class CM_Mailer_Transport_LogTest extends CMTest_TestCase {
+class CM_Mail_Transport_LogTest extends CMTest_TestCase {
 
     public function testConstruct() {
-        $transport = new CM_Mailer_Transport_Log();
+        $transport = new CM_Mail_Transport_Log();
         $this->assertSame(CM_Log_Logger::INFO, $transport->getLogLevel());
 
-        $transport = new CM_Mailer_Transport_Log(CM_Log_Logger::DEBUG);
+        $transport = new CM_Mail_Transport_Log(CM_Log_Logger::DEBUG);
         $this->assertSame(CM_Log_Logger::DEBUG, $transport->getLogLevel());
     }
 
     public function testStart() {
-        $transport = new CM_Mailer_Transport_Log();
+        $transport = new CM_Mail_Transport_Log();
         $exception = $this->catchException(function () use ($transport) {
             $transport->start();
         });
@@ -37,7 +37,7 @@ class CM_Mailer_Transport_LogTest extends CMTest_TestCase {
     }
 
     public function testStop() {
-        $transport = new CM_Mailer_Transport_Log();
+        $transport = new CM_Mail_Transport_Log();
         $serviceManager = new CM_Service_Manager();
         $logger = $this->mockObject('CM_Log_Logger');
         $serviceManager->registerInstance('logger', $logger);
@@ -50,7 +50,7 @@ class CM_Mailer_Transport_LogTest extends CMTest_TestCase {
     }
 
     public function testSend() {
-        $transport = new CM_Mailer_Transport_Log();
+        $transport = new CM_Mail_Transport_Log();
         $serviceManager = new CM_Service_Manager();
         $logger = $this->mockObject('CM_Log_Logger');
         $serviceManager->registerInstance('logger', $logger);
