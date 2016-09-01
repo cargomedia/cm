@@ -11,7 +11,7 @@ class CM_Mail_Mailable extends CM_View_Abstract implements CM_Typed {
     /** @var CM_Mail_Mailer */
     private $_mailer;
 
-    /** @var  Swift_Message */
+    /** @var  CM_Mail_Message */
     private $_message;
 
     /** @var boolean */
