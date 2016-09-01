@@ -9,7 +9,7 @@ class CM_MailTest extends CMTest_TestCase {
     public function testWithTemplate() {
         $user = $this->getMockUser();
         $templateVariables = array('foo' => 'bar');
-        $msg = new CM_Mail_Welcome($user, $templateVariables);
+        $msg = new CM_Mail_ExampleMailable($user, $templateVariables);
         list($subject, $html, $text) = $msg->render();
         $this->assertNotEmpty($subject);
         $this->assertNotEmpty($html);

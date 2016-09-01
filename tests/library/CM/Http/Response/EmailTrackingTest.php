@@ -8,7 +8,7 @@ class CM_Http_Response_EmailTrackingTest extends CMTest_TestCase {
 
     public function testProcess() {
         $user = $this->getMockUser();
-        $mail = new CM_Mail_Welcome($user);
+        $mail = new CM_Mail_ExampleMailable($user);
 
         $site = CM_Site_Abstract::factory();
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
@@ -23,7 +23,7 @@ class CM_Http_Response_EmailTrackingTest extends CMTest_TestCase {
 
     public function testProcessNonexistentUser() {
         $user = $this->getMockUser();
-        $mail = new CM_Mail_Welcome($user);
+        $mail = new CM_Mail_ExampleMailable($user);
 
         $site = CM_Site_Abstract::factory();
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));

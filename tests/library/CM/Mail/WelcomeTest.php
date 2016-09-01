@@ -7,7 +7,7 @@ class CM_Mail_WelcomeTest extends CMTest_TestCase {
             'url' => 'http://www.foo.com',
         ]);
         $recipient = $this->getMockUser(null, $site);
-        $mail = new CM_Mail_Welcome($recipient);
+        $mail = new CM_Mail_ExampleMailable($recipient);
         $language = CM_Model_Language::create('Test language', 'foo', true);
         $language->setTranslation('Welcome to {$siteName}!', 'foo');
 
