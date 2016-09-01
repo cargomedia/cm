@@ -245,19 +245,12 @@ return function (CM_Config_Node $config) {
         ),
     );
 
-    $config->services['mailer-transport-log'] = [
-        'class'     => 'CM_Mail_Transport_Log',
-        'arguments' => [
-            'logLevel' => CM_Log_Logger::INFO
-        ],
-    ];
-
     $config->services['mailer'] = [
         'class'  => 'CM_Mail_MailerFactory',
         'method' => [
-            'name'      => 'create',
+            'name'      => 'createLogMailer',
             'arguments' => [
-                'transportServiceName' => 'mailer-transport-log',
+                'logLevel' => CM_Log_Logger::INFO,
             ],
         ],
     ];

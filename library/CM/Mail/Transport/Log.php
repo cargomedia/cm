@@ -1,8 +1,9 @@
 <?php
 
-class CM_Mail_Transport_Log implements Swift_Transport, CM_Service_ManagerAwareInterface {
+class CM_Mail_Transport_Log implements Swift_Transport {
 
-    use CM_Service_ManagerAwareTrait;
+    /** @var CM_Log_Logger */
+    private $_logger;
 
     /** @var bool */
     private $_started;
@@ -13,9 +14,17 @@ class CM_Mail_Transport_Log implements Swift_Transport, CM_Service_ManagerAwareI
     /**
      * @param int|null $logLevel
      */
-    public function __construct($logLevel = null) {
+    public function __construct(CM_Log_Logger $logger, $logLevel = null) {
+        $this->_logger = $logger;
         $this->_logLevel = null === $logLevel ? CM_Log_Logger::INFO : $logLevel;
         $this->_started = false;
+    }
+
+    /**
+     * @return CM_Log_Logger
+     */
+    public function getLogger() {
+        return $this->_logger;
     }
 
     /**
@@ -30,9 +39,6 @@ class CM_Mail_Transport_Log implements Swift_Transport, CM_Service_ManagerAwareI
     }
 
     public function start() {
-        if (!$this->getServiceManager()->hasLogger()) {
-            throw new CM_Exception_Invalid('Logger service not available');
-        }
         $this->_started = true;
     }
 
@@ -49,7 +55,7 @@ class CM_Mail_Transport_Log implements Swift_Transport, CM_Service_ManagerAwareI
         } else {
             $msg .= $message->getBody() . PHP_EOL;
         }
-        $logger = $this->getServiceManager()->getLogger();
+        $logger = $this->getLogger();
         $context = new CM_Log_Context();
         $context->setExtra([
             'type'    => CM_Paging_Log_Mail::getTypeStatic(),

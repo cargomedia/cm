@@ -3,46 +3,25 @@
 class CM_Mail_Transport_LogTest extends CMTest_TestCase {
 
     public function testConstruct() {
-        $transport = new CM_Mail_Transport_Log();
+        $logger = $this->mockObject('CM_Log_Logger');
+        $transport = new CM_Mail_Transport_Log($logger);
         $this->assertSame(CM_Log_Logger::INFO, $transport->getLogLevel());
 
-        $transport = new CM_Mail_Transport_Log(CM_Log_Logger::DEBUG);
+        $transport = new CM_Mail_Transport_Log($logger, CM_Log_Logger::DEBUG);
         $this->assertSame(CM_Log_Logger::DEBUG, $transport->getLogLevel());
     }
 
     public function testStart() {
-        $transport = new CM_Mail_Transport_Log();
-        $exception = $this->catchException(function () use ($transport) {
-            $transport->start();
-        });
-        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        /** @var CM_Exception_Invalid $exception */
-        $this->assertSame('Service manager not set', $exception->getMessage());
-        $this->assertFalse($transport->isStarted());
-
-        $serviceManager = new CM_Service_Manager();
-        $transport->setServiceManager($serviceManager);
-        $exception = $this->catchException(function () use ($transport) {
-            $transport->start();
-        });
-        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        /** @var CM_Exception_Invalid $exception */
-        $this->assertSame('Logger service not available', $exception->getMessage());
-        $this->assertFalse($transport->isStarted());
-
         $logger = $this->mockObject('CM_Log_Logger');
-        $serviceManager->registerInstance('logger', $logger);
+        $transport = new CM_Mail_Transport_Log($logger);
+        $this->assertFalse($transport->isStarted());
         $transport->start();
         $this->assertTrue($transport->isStarted());
     }
 
     public function testStop() {
-        $transport = new CM_Mail_Transport_Log();
-        $serviceManager = new CM_Service_Manager();
         $logger = $this->mockObject('CM_Log_Logger');
-        $serviceManager->registerInstance('logger', $logger);
-        $transport->setServiceManager($serviceManager);
-
+        $transport = new CM_Mail_Transport_Log($logger);
         $transport->start();
         $this->assertTrue($transport->isStarted());
         $transport->stop();
@@ -50,11 +29,8 @@ class CM_Mail_Transport_LogTest extends CMTest_TestCase {
     }
 
     public function testSend() {
-        $transport = new CM_Mail_Transport_Log();
-        $serviceManager = new CM_Service_Manager();
         $logger = $this->mockObject('CM_Log_Logger');
-        $serviceManager->registerInstance('logger', $logger);
-        $transport->setServiceManager($serviceManager);
+        $transport = new CM_Mail_Transport_Log($logger);
 
         $message = new CM_Mail_Message();
         $message
