@@ -154,7 +154,8 @@ class CM_Mail_Mailable extends CM_View_Abstract implements CM_Typed {
      * @param boolean|null $state
      */
     public function setRenderLayout($state = null) {
-        $this->_renderLayout = (boolean) $state;
+        $state = null === $state ? true : (boolean) $state;
+        $this->_renderLayout = $state;
     }
 
     /**
@@ -185,7 +186,8 @@ class CM_Mail_Mailable extends CM_View_Abstract implements CM_Typed {
      * @param boolean|null $state
      */
     public function setVerificationRequired($state = null) {
-        $this->_verificationRequired = (boolean) $state;
+        $state = null === $state ? true : (boolean) $state;
+        $this->_verificationRequired = $state;
     }
 
     /**
