@@ -81,7 +81,7 @@ class CM_Mail_Mailable extends CM_View_Abstract implements CM_Typed {
         $message->setSubject($subject);
         $message->setBodyWithAlternative($text, $html);
 
-        $job = new CM_Mailer_Job_Queue();
+        $job = new CM_Mail_SendJob();
         $params = ['message' => $message];
         if ($recipient) {
             $params['recipient'] = $recipient;
