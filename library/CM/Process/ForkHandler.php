@@ -76,7 +76,7 @@ class CM_Process_ForkHandler {
             $return = $workload($result);
             $result->setResult($return);
         } catch (Exception $e) {
-            CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
+            CM_Service_Manager::getInstance()->getLogger()->logException($e);
             $result->setException($e);
         }
 

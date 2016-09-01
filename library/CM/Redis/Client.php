@@ -347,7 +347,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
                     $response = $callback($message->channel, $message->payload);
                 }
             } catch (Exception $e) {
-                CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
+                CM_Service_Manager::getInstance()->getLogger()->logException($e);
             }
             if (!is_null($response)) {
                 break;

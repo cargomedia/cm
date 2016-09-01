@@ -118,13 +118,11 @@ class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abst
                             }
                         }
                     } catch (CM_Exception $e) {
-                        $e->setSeverity(CM_Exception::WARN);
-                        $this->_handleException($e);
+                        CM_Service_Manager::getInstance()->getLogger()->logException($e, CM_Log_Logger::WARNING);
                     }
                 }
             } catch (CM_Exception $e) {
-                $e->setSeverity(CM_Exception::WARN);
-                $this->_handleException($e);
+                CM_Service_Manager::getInstance()->getLogger()->logException($e, CM_Log_Logger::WARNING);
             }
         }
     }
@@ -229,13 +227,6 @@ class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abst
                 'http://' . $server['httpHost'] . ':' . $server['httpPort'])));
         }
         return $statusData;
-    }
-
-    /**
-     * @param CM_Exception $exception
-     */
-    protected function _handleException(CM_Exception $exception) {
-        CM_Bootloader::getInstance()->getExceptionHandler()->handleException($exception);
     }
 
     /**
