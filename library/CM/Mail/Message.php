@@ -91,29 +91,19 @@ class CM_Mail_Message extends Swift_Message implements CM_ArrayConvertible {
     public static function fromArray(array $array) {
         $message = new self($array['subject']);
         if (null !== $array['sender']) {
-            foreach ($array['sender'] as $address => $name) {
-                $message->setSender($address, $name);
-            }
+            $message->setSender($array['sender']);
         }
         if (null !== $array['to']) {
-            foreach ($array['to'] as $address => $name) {
-                $message->addTo($address, $name);
-            }
+            $message->setTo($array['to']);
         }
         if (null !== $array['replyTo']) {
-            foreach ($array['replyTo'] as $address => $name) {
-                $message->addReplyTo($address, $name);
-            }
+            $message->setReplyTo($array['replyTo']);
         }
         if (null !== $array['cc']) {
-            foreach ($array['cc'] as $address => $name) {
-                $message->addCc($address, $name);
-            }
+            $message->setCc($array['cc']);
         }
         if (null !== $array['bcc']) {
-            foreach ($array['bcc'] as $address => $name) {
-                $message->addBcc($address, $name);
-            }
+            $message->setBcc($array['bcc']);
         }
         if (null !== $array['text']) {
             $message->setBodyWithAlternative($array['text'], $array['html']);
