@@ -1,5 +1,5 @@
 <?php
 
-class CM_Mail_ExampleMailable extends CM_Mail {
+class CM_Mail_ExampleMailable extends CM_Mail_Mailable {
 
 }

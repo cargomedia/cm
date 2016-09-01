@@ -1,6 +1,6 @@
 <?php
 
-class CM_Mail extends CM_View_Abstract implements CM_Typed {
+class CM_Mail_Mailable extends CM_View_Abstract implements CM_Typed {
 
     /** @var CM_Model_User|null */
     private $_recipient;
@@ -167,7 +167,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     /**
      * @param string $key
      * @param mixed  $value
-     * @return CM_Mail
+     * @return CM_Mail_Mailable
      */
     public function setTplParam($key, $value) {
         $this->_tplParams[$key] = $value;
@@ -192,7 +192,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @return boolean
      */
     public function hasTemplate() {
-        return is_subclass_of($this, 'CM_Mail');
+        return is_subclass_of($this, 'CM_Mail_Mailable');
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-class CM_MailTest extends CMTest_TestCase {
+class CM_Mail_MailableTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
@@ -17,7 +17,7 @@ class CM_MailTest extends CMTest_TestCase {
     }
 
     public function testNoTemplate() {
-        $msg = new CM_Mail('foo@example.com');
+        $msg = new CM_Mail_Mailable('foo@example.com');
 
         $exception = $this->catchException(function () use ($msg) {
             $msg->send();
@@ -47,7 +47,7 @@ class CM_MailTest extends CMTest_TestCase {
         $sendMethod = $transport->mockMethod('send')->set(1);
         $mailer = new CM_Mailer_Client($transport);
 
-        $mail = new CM_Mail('foo@example.com', null, null, $mailer);
+        $mail = new CM_Mail_Mailable('foo@example.com', null, null, $mailer);
         $mail->setSender('sender@example.com', 'Sender');
         $mail->setSubject('testSubject');
         $mail->addReplyTo('foo@bar.com');
@@ -77,37 +77,37 @@ class CM_MailTest extends CMTest_TestCase {
 
     public function testGetRender() {
         $site = $this->getMockSite();
-        $mail = new CM_Mail(null, null, $site);
+        $mail = new CM_Mail_Mailable(null, null, $site);
         $this->assertEquals($site, $mail->getRender()->getSite());
     }
 
     public function testGetRenderRecipient() {
         $site = $this->getMockSite();
         $recipient = $this->getMockUser('foo@example.com', $site);
-        $mail = new CM_Mail($recipient);
+        $mail = new CM_Mail_Mailable($recipient);
         $this->assertEquals($site, $mail->getRender()->getSite());
     }
 
     public function testGetRenderDefault() {
-        $mail = new CM_Mail();
+        $mail = new CM_Mail_Mailable();
         $this->assertEquals(CM_Site_Abstract::factory(), $mail->getRender()->getSite());
     }
 
     public function testGetSite() {
         $site = $this->getMockSite();
-        $mail = new CM_Mail(null, null, $site);
+        $mail = new CM_Mail_Mailable(null, null, $site);
         $this->assertEquals($site, $mail->getSite());
     }
 
     public function testGetSiteDefault() {
-        $mail = new CM_Mail();
+        $mail = new CM_Mail_Mailable();
         $this->assertEquals(CM_Site_Abstract::factory(), $mail->getSite());
     }
 
     public function testGetSiteRecipient() {
         $site = $this->getMockSite();
         $recipient = $this->getMockUser('foo@example.com', $site);
-        $mail = new CM_Mail($recipient);
+        $mail = new CM_Mail_Mailable($recipient);
         $this->assertEquals($site, $mail->getSite());
     }
 }

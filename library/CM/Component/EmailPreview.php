@@ -7,7 +7,7 @@ class CM_Component_EmailPreview extends CM_Component_Abstract {
 
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $email = $this->_params->get('email');
-        if (!$email instanceof CM_Mail) {
+        if (!$email instanceof CM_Mail_Mailable) {
             throw new CM_Exception_InvalidParam('Invalid `email` param');
         }
 
