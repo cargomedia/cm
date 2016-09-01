@@ -13,8 +13,8 @@ class CM_Memcache_Client extends CM_Class_Abstract implements CM_Service_Manager
     public function __construct(array $servers) {
         $this->_memcache = new Memcache();
         foreach ($servers as $server) {
-            $this->_memcache->addServer($server['host'], $server['port'], true, 1, 1, 15, true, function ($host, $port) {
-                $this->getServiceManager()->getLogger()->warning('Cannot connect to memcached server', (new CM_Log_Context())->setExtra([
+            $this->_memcache->addServer($server['host'], $server['port'], true, 1, 1, 1, true, function ($host, $port) {
+                $this->getServiceManager()->getLogger()->error('Cannot connect to memcached server', (new CM_Log_Context())->setExtra([
                     'host' => $host,
                     'port' => $port,
                 ]));
