@@ -1,18 +1,16 @@
 <?php
 
-class CM_Memcache_Client extends CM_Class_Abstract {
+class CM_Memcache_Client extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var \Memcache */
     private $_memcache;
 
     /**
-     * @param array[]            $servers
-     * @param CM_Log_Logger|null $logger
+     * @param array[] $servers
      */
-    public function __construct(array $servers, CM_Log_Logger $logger = null) {
-        if (null === $logger) {
-            $logger = CM_Service_Manager::getInstance()->getLogger();
-        }
+    public function __construct(array $servers) {
         $this->_memcache = new Memcache();
         foreach ($servers as $server) {
             $this->_memcache->addserver($server['host'], $server['port'], true, 1, 1, 1, true, function ($host, $port) use ($logger) {
@@ -21,7 +19,7 @@ class CM_Memcache_Client extends CM_Class_Abstract {
                     'host' => $host,
                     'port' => $port,
                 ]);
-                $logger->error('Cannot connect to memcached server', $context);
+                $this->getServiceManager()->getLogger()->error('Cannot connect to memcached server', $context);
             });
         }
     }
