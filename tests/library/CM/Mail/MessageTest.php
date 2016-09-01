@@ -98,7 +98,7 @@ class CM_Mail_MessageTest extends CMTest_TestCase {
             'bcc'           => null,
             'customHeaders' => [],
         ]);
-        $this->assertInstanceOf('CM_Mailer_Message', $message);
+        $this->assertInstanceOf('CM_Mail_Message', $message);
         $this->assertSame((new CM_Mail_Message())->toArray(), $message->toArray());
 
         $message = CM_Mail_Message::fromArray([
@@ -133,7 +133,7 @@ class CM_Mail_MessageTest extends CMTest_TestCase {
         $expectedMessage->getHeaders()->addTextHeader('X-bar', 'foo');
         $expectedMessage->getHeaders()->addTextHeader('X-bar', 'foobar');
 
-        $this->assertInstanceOf('CM_Mailer_Message', $message);
+        $this->assertInstanceOf('CM_Mail_Message', $message);
         $this->assertSame($expectedMessage->toArray(), $message->toArray());
     }
 }
