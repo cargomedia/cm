@@ -13,7 +13,7 @@ class CM_Memcache_Client extends CM_Class_Abstract implements CM_Service_Manager
     public function __construct(array $servers) {
         $this->_memcache = new Memcache();
         foreach ($servers as $server) {
-            $this->_memcache->addserver($server['host'], $server['port'], true, 1, 1, 1, true, function ($host, $port) use ($logger) {
+            $this->_memcache->addserver($server['host'], $server['port'], true, 1, 1, 1, true, function ($host, $port) {
                 $context = new CM_Log_Context();
                 $context->setExtra([
                     'host' => $host,
