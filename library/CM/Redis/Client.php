@@ -1,6 +1,8 @@
 <?php
 
-class CM_Redis_Client extends CM_Class_Abstract {
+class CM_Redis_Client extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var Predis\Client */
     private $_redis = null;
@@ -347,7 +349,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
                     $response = $callback($message->channel, $message->payload);
                 }
             } catch (Exception $e) {
-                CM_Service_Manager::getInstance()->getLogger()->logException($e);
+                $this->getServiceManager()->getLogger()->logException($e);
             }
             if (!is_null($response)) {
                 break;
