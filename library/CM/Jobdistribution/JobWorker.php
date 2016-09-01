@@ -1,6 +1,8 @@
 <?php
 
-class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
+class CM_Jobdistribution_JobWorker extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var GearmanWorker */
     private $_gearmanWorker;
@@ -27,7 +29,7 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
                 CM_Cache_Storage_Runtime::getInstance()->flush();
                 $workFailed = !$this->_getGearmanWorker()->work();
             } catch (Exception $ex) {
-                CM_Service_Manager::getInstance()->getLogger()->logException($ex);
+                $this->getServiceManager()->getLogger()->logException($ex);
             }
             if ($workFailed) {
                 throw new CM_Exception_Invalid('Worker failed');

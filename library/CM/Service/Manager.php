@@ -117,10 +117,12 @@ class CM_Service_Manager extends CM_Class_Abstract {
 
     /**
      * @param string $serviceName
+     * @return $this
      */
     public function unregister($serviceName) {
         unset($this->_serviceConfigList[$serviceName]);
         unset($this->_serviceInstanceList[$serviceName]);
+        return $this;
     }
 
     /**

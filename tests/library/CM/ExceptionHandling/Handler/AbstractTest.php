@@ -38,9 +38,12 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $nativeException = new Exception();
         $fatalException = new CM_Exception(null, CM_Exception::FATAL);
 
-        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
-        $exceptionHandler->mockMethod('_logException')->set(function () {
-        });
+        /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\AbstractClassTrait $exceptionHandler */
+        $exceptionHandler = $this->mockObject('CM_ExceptionHandling_Handler_Abstract');
+        $exceptionHandler->setServiceManager($this->getServiceManager());
+        /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
+        $logger = $this->mockObject('CM_Log_Logger');
+        $this->getServiceManager()->unregister('logger')->registerInstance('logger', $logger);
 
         $printExceptionMock = $exceptionHandler->mockMethod('_printException')
             ->at(0, function (Exception $ex) use ($errorException) {
@@ -52,6 +55,18 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
             ->at(2, function (Exception $ex) use ($fatalException) {
                 $this->assertEquals($fatalException, $ex);
             });
+        $logExceptionMock = $logger->mockMethod('logException')
+            ->at(0, function (Exception $exception, $level = null) use ($errorException) {
+                $this->assertEquals($errorException, $exception);
+                $this->assertEquals(CM_Log_Logger::ERROR, $level);
+            })
+            ->at(1, function (Exception $exception, $level = null) use ($nativeException) {
+                $this->assertEquals(CM_Log_Logger::ERROR, $level);
+            })
+            ->at(2, function (Exception $exception, $level = null) use ($fatalException) {
+                $this->assertEquals($fatalException, $exception);
+                $this->assertEquals(CM_Log_Logger::CRITICAL, $level);
+            });
 
         /** @var CM_ExceptionHandling_Handler_Abstract $exceptionHandler */
         $exceptionHandler->handleException($errorException);
@@ -59,6 +74,7 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $exceptionHandler->handleException($fatalException);
 
         $this->assertSame(3, $printExceptionMock->getCallCount());
+        $this->assertSame(3, $logExceptionMock->getCallCount());
     }
 
     public function testPrintExceptionPrintSeverity() {
@@ -67,11 +83,11 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $fatalException = new CM_Exception(null, CM_Exception::FATAL);
 
         /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\AbstractClassTrait $exceptionHandler */
-        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
-
-        $logExceptionMock = $exceptionHandler->mockMethod('_logException');
-        $logExceptionMock->set(function () {
-        });
+        $exceptionHandler = $this->mockObject('CM_ExceptionHandling_Handler_Abstract');
+        $exceptionHandler->setServiceManager($this->getServiceManager());
+        /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
+        $logger = $this->mockObject('CM_Log_Logger');
+        $this->getServiceManager()->unregister('logger')->registerInstance('logger', $logger);
 
         $printExceptionMock = $exceptionHandler->mockMethod('_printException');
         $printExceptionMock
@@ -80,6 +96,18 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
             })
             ->at(1, function (Exception $ex) use ($fatalException) {
                 $this->assertEquals($fatalException, $ex);
+            });
+        $logExceptionMock = $logger->mockMethod('logException')
+            ->at(0, function (Exception $exception, $level = null) use ($errorException) {
+                $this->assertEquals($errorException, $exception);
+                $this->assertEquals(CM_Log_Logger::ERROR, $level);
+            })
+            ->at(1, function (Exception $exception, $level = null) use ($nativeException) {
+                $this->assertEquals(CM_Log_Logger::ERROR, $level);
+            })
+            ->at(2, function (Exception $exception, $level = null) use ($fatalException) {
+                $this->assertEquals($fatalException, $exception);
+                $this->assertEquals(CM_Log_Logger::CRITICAL, $level);
             });
 
         $exceptionHandler->setPrintSeverityMin(CM_Exception::FATAL);

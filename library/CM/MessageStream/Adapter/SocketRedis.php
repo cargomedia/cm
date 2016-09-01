@@ -1,6 +1,8 @@
 <?php
 
-class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abstract {
+class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     const SYNCHRONIZE_DELAY = 10;
 
@@ -118,11 +120,11 @@ class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abst
                             }
                         }
                     } catch (CM_Exception $e) {
-                        CM_Service_Manager::getInstance()->getLogger()->logException($e, CM_Log_Logger::WARNING);
+                        $this->getServiceManager()->getLogger()->logException($e, CM_Log_Logger::WARNING);
                     }
                 }
             } catch (CM_Exception $e) {
-                CM_Service_Manager::getInstance()->getLogger()->logException($e, CM_Log_Logger::WARNING);
+                $this->getServiceManager()->getLogger()->logException($e, CM_Log_Logger::WARNING);
             }
         }
     }
