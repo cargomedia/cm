@@ -11,9 +11,6 @@ class CM_Mail_MailerFactory implements CM_Service_ManagerAwareInterface {
     public function create($transportServiceName) {
         /** @var Swift_Transport $transport */
         $transport = $this->getServiceManager()->get((string) $transportServiceName, 'Swift_Transport');
-        if ($transport instanceof CM_Service_ManagerAwareInterface) {
-            $transport->setServiceManager($this->getServiceManager());
-        }
         return new CM_Mail_Mailer($transport);
     }
 }
