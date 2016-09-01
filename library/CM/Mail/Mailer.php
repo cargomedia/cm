@@ -2,6 +2,11 @@
 
 class CM_Mail_Mailer extends Swift_Mailer {
 
+    public function __construct(Swift_Transport $transport) {
+        CM_Mail_Message::register();
+        parent::__construct($transport);
+    }
+
     public function send(Swift_Mime_Message $message, &$failedRecipients = null) {
         $failedRecipients = (array) $failedRecipients;
         $to = $message->getTo();
@@ -19,7 +24,6 @@ class CM_Mail_Mailer extends Swift_Mailer {
     }
 
     public function createMessage($service = null) {
-        CM_Mail_Message::register();
         $service = null === $service ? 'cm-message' : $service;
         return parent::createMessage($service);
     }
