@@ -6,17 +6,22 @@ class CM_Memcache_Client extends CM_Class_Abstract {
     private $_memcache;
 
     /**
-     * @param array[] $servers
+     * @param array[]            $servers
+     * @param CM_Log_Logger|null $logger
      */
-    public function __construct(array $servers) {
+    public function __construct(array $servers, CM_Log_Logger $logger = null) {
+        if (null === $logger) {
+            $logger = CM_Service_Manager::getInstance()->getLogger();
+        }
         $this->_memcache = new Memcache();
         foreach ($servers as $server) {
-            $this->_memcache->addServer($server['host'], $server['port'], true, 1, 1, 15, true, function ($host, $port) {
-                $warning = new CM_Exception('Cannot connect to memcached server', CM_Exception::WARN, [
+            $this->_memcache->addserver($server['host'], $server['port'], true, 1, 1, 15, true, function ($host, $port) use ($logger) {
+                $context = new CM_Log_Context();
+                $context->setExtra([
                     'host' => $host,
                     'port' => $port,
                 ]);
-                CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
+                $logger->error('Cannot connect to memcached server', $context);
             });
         }
     }
