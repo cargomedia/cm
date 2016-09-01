@@ -131,4 +131,18 @@ class CM_Mail_MailableTest extends CMTest_TestCase {
         $mail = new CM_Mail_Mailable($recipient);
         $this->assertEquals($site, $mail->getSite());
     }
+
+    /**
+     * @param string|null           $email
+     * @param CM_Site_Abstract|null $site
+     * @return CM_Model_User|\Mocka\AbstractClassTrait
+     */
+    public function getMockUser($email = null, CM_Site_Abstract $site = null) {
+        $email = null === $email ? 'foo@example.com' : $email;
+        $site = null === $site ? $this->getMockSite() : $site;
+        $user = $this->getMock('CM_Model_User', array('getEmail', 'getSite'), array(CMTest_TH::createUser()->getId()));
+        $user->expects($this->any())->method('getEmail')->will($this->returnValue($email));
+        $user->expects($this->any())->method('getSite')->will($this->returnValue($site));
+        return $user;
+    }
 }
