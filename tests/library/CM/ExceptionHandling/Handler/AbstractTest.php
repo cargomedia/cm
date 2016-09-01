@@ -40,10 +40,11 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
 
         /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\AbstractClassTrait $exceptionHandler */
         $exceptionHandler = $this->mockObject('CM_ExceptionHandling_Handler_Abstract');
-        $exceptionHandler->setServiceManager($this->getServiceManager());
+        $serviceManager = new CM_Service_Manager();
+        $exceptionHandler->setServiceManager($serviceManager);
         /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
         $logger = $this->mockObject('CM_Log_Logger');
-        $this->getServiceManager()->unregister('logger')->registerInstance('logger', $logger);
+        $serviceManager->registerInstance('logger', $logger);
 
         $printExceptionMock = $exceptionHandler->mockMethod('_printException')
             ->at(0, function (Exception $ex) use ($errorException) {
@@ -84,10 +85,11 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
 
         /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\AbstractClassTrait $exceptionHandler */
         $exceptionHandler = $this->mockObject('CM_ExceptionHandling_Handler_Abstract');
-        $exceptionHandler->setServiceManager($this->getServiceManager());
+        $serviceManager = new CM_Service_Manager();
+        $exceptionHandler->setServiceManager($serviceManager);
         /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
         $logger = $this->mockObject('CM_Log_Logger');
-        $this->getServiceManager()->unregister('logger')->registerInstance('logger', $logger);
+        $serviceManager->registerInstance('logger', $logger);
 
         $printExceptionMock = $exceptionHandler->mockMethod('_printException');
         $printExceptionMock

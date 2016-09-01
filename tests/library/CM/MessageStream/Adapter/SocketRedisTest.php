@@ -141,9 +141,12 @@ class CM_MessageStream_Adapter_SocketRedisTest extends CMTest_TestCase {
 
         $adapter = $this->mockClass('CM_MessageStream_Adapter_SocketRedis')->newInstanceWithoutConstructor();
         $adapter->mockMethod('_fetchStatus')->set($status);
+        /** @var CM_MessageStream_Adapter_SocketRedis $adapter */
+        $serviceManager = new CM_Service_Manager();
+        $adapter->setServiceManager($serviceManager);
         /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
         $logger = $this->mockObject('CM_Log_Logger');
-        $this->getServiceManager()->unregister('logger')->registerInstance('logger', $logger);
+        $serviceManager->registerInstance('logger', $logger);
         $logExceptionMock = $logger->mockMethod('logException')->set(function (Exception $exception, $level = null) {
             $this->assertSame('Type is not configured for class.', $exception->getMessage());
             $this->assertInstanceOf('CM_Exception', $exception);
@@ -156,8 +159,6 @@ class CM_MessageStream_Adapter_SocketRedisTest extends CMTest_TestCase {
                 $exception->getMetaInfo()
             );
         });
-        /** @var CM_MessageStream_Adapter_SocketRedis $adapter */
-        $adapter->setServiceManager($this->getServiceManager());
         $adapter->synchronize();
         $this->assertSame(1, $logExceptionMock->getCallCount());
     }

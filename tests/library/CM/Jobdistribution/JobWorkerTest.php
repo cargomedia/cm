@@ -16,11 +16,12 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
         }));
         $jobWorkerMock = $this->getMock('CM_Jobdistribution_JobWorker', array('_getGearmanWorker', '_handleException'), array(), '', false);
         $jobWorkerMock->expects($this->any())->method('_getGearmanWorker')->will($this->returnValue($gearmanWorkerMock));
+        /** @var CM_JobDistribution_JobWorker $jobWorkerMock */
+        $serviceManager = new CM_Service_Manager();
+        $jobWorkerMock->setServiceManager($serviceManager);
         /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
         $logger = $this->mockObject('CM_Log_Logger');
-        $this->getServiceManager()->unregister('logger')->registerInstance('logger', $logger);
-        /** @var CM_JobDistribution_JobWorker $jobWorkerMock */
-        $jobWorkerMock->setServiceManager($this->getServiceManager());
+        $serviceManager->unregister('logger')->registerInstance('logger', $logger);
         $logExceptionMock = $logger->mockMethod('logException')->set(function (Exception $exception, $level = null) {
             $this->assertEquals('foo-bar', $exception->getMessage());
             $this->assertEquals(null, $level);
