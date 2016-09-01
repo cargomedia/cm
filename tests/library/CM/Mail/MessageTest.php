@@ -1,16 +1,16 @@
 <?php
 
-class CM_Mailer_MessageTest extends CMTest_TestCase {
+class CM_Mail_MessageTest extends CMTest_TestCase {
 
     public function testSetBodyWithAlternativel() {
-        $message = new CM_Mailer_Message();
+        $message = new CM_Mail_Message();
         $message->setBodyWithAlternative('content');
         $this->assertSame('text/plain', $message->getContentType());
         $this->assertSame('content', $message->getBody());
         $this->assertSame('content', $message->getText());
         $this->assertNull($message->getHtml());
 
-        $message = new CM_Mailer_Message();
+        $message = new CM_Mail_Message();
         $message->setBodyWithAlternative('content', '<p>content</p>');
         $this->assertSame('multipart/alternative', $message->getContentType());
         $this->assertSame('<p>content</p>', $message->getBody());
@@ -21,7 +21,7 @@ class CM_Mailer_MessageTest extends CMTest_TestCase {
     }
 
     public function testGetCustomHeaders() {
-        $message = new CM_Mailer_Message();
+        $message = new CM_Mail_Message();
         $this->assertSame([], $message->getCustomHeaders());
 
         $message->getHeaders()->addTextHeader('foo', 'bar');
@@ -38,7 +38,7 @@ class CM_Mailer_MessageTest extends CMTest_TestCase {
     }
 
     public function testToArray() {
-        $message1 = new CM_Mailer_Message();
+        $message1 = new CM_Mail_Message();
         $this->assertSame([
             'subject'       => null,
             'html'          => null,
@@ -51,7 +51,7 @@ class CM_Mailer_MessageTest extends CMTest_TestCase {
             'customHeaders' => [],
         ], $message1->toArray());
 
-        $message2 = new CM_Mailer_Message();
+        $message2 = new CM_Mail_Message();
         $message2
             ->setSubject('foo')
             ->setSender('foo@example.com')
@@ -87,7 +87,7 @@ class CM_Mailer_MessageTest extends CMTest_TestCase {
     }
 
     public function testFromArray() {
-        $message = CM_Mailer_Message::fromArray([
+        $message = CM_Mail_Message::fromArray([
             'subject'       => null,
             'html'          => null,
             'text'          => null,
@@ -99,9 +99,9 @@ class CM_Mailer_MessageTest extends CMTest_TestCase {
             'customHeaders' => [],
         ]);
         $this->assertInstanceOf('CM_Mailer_Message', $message);
-        $this->assertSame((new CM_Mailer_Message())->toArray(), $message->toArray());
+        $this->assertSame((new CM_Mail_Message())->toArray(), $message->toArray());
 
-        $message = CM_Mailer_Message::fromArray([
+        $message = CM_Mail_Message::fromArray([
             'subject'       => 'foo',
             'html'          => '<p>content</p>',
             'text'          => 'content',
@@ -118,7 +118,7 @@ class CM_Mailer_MessageTest extends CMTest_TestCase {
                 'X-bar' => ['foo', 'foobar'],
             ],
         ]);
-        $expectedMessage = new CM_Mailer_Message();
+        $expectedMessage = new CM_Mail_Message();
         $expectedMessage
             ->setSubject('foo')
             ->setSender('foo@example.com')

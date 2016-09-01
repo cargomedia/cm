@@ -114,7 +114,7 @@ class CM_Mail_Mailable extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
-     * @return CM_Mailer_Message
+     * @return CM_Mail_Message
      */
     public function getMessage() {
         if (!$this->_message) {

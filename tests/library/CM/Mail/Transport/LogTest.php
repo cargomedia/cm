@@ -56,7 +56,7 @@ class CM_Mail_Transport_LogTest extends CMTest_TestCase {
         $serviceManager->registerInstance('logger', $logger);
         $transport->setServiceManager($serviceManager);
 
-        $message = new CM_Mailer_Message();
+        $message = new CM_Mail_Message();
         $message
             ->setSubject('foo')
             ->setSender('foo@example.com')

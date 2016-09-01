@@ -19,7 +19,7 @@ class CM_Mailer_Client extends Swift_Mailer {
     }
 
     public function createMessage($service = null) {
-        CM_Mailer_Message::register();
+        CM_Mail_Message::register();
         $service = null === $service ? 'cm-message' : $service;
         return parent::createMessage($service);
     }

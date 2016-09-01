@@ -1,6 +1,6 @@
 <?php
 
-class CM_Mailer_Message extends Swift_Message implements CM_ArrayConvertible {
+class CM_Mail_Message extends Swift_Message implements CM_ArrayConvertible {
 
     /** @var string|null */
     private $_text;
@@ -74,13 +74,6 @@ class CM_Mailer_Message extends Swift_Message implements CM_ArrayConvertible {
         return parent::setBody($body, $contentType, $charset);
     }
 
-    public static function register() {
-        $dep = Swift_DependencyContainer::getInstance();
-        if (!$dep->has('message.cm-message')) {
-            $dep->register('message.cm-message')->asNewInstanceOf('CM_Mailer_Message');
-        }
-    }
-
     public function toArray() {
         return [
             'subject'       => $this->getSubject(),
@@ -131,5 +124,12 @@ class CM_Mailer_Message extends Swift_Message implements CM_ArrayConvertible {
             }
         }
         return $message;
+    }
+
+    public static function register() {
+        $dep = Swift_DependencyContainer::getInstance();
+        if (!$dep->has('message.cm-message')) {
+            $dep->register('message.cm-message')->asNewInstanceOf('CM_Mail_Message');
+        }
     }
 }

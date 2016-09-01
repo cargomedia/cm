@@ -44,7 +44,7 @@ class CM_Mail_Transport_Log implements Swift_Transport, CM_Service_ManagerAwareI
         $failedRecipients = (array) $failedRecipients;
 
         $msg = '* ' . $message->getSubject() . ' *' . PHP_EOL . PHP_EOL;
-        if ($message instanceof CM_Mailer_Message) {
+        if ($message instanceof CM_Mail_Message) {
             $msg .= $message->getText() . PHP_EOL;
         } else {
             $msg .= $message->getBody() . PHP_EOL;
