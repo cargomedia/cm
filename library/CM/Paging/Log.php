@@ -109,7 +109,7 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
      * @return array
      */
     protected function _getCriteria() {
-        $criteria = ['message' => ['$exists' => true]];
+        $criteria = [];
 
         if (false === $this->_filterType) {
             $criteria['context.extra.type'] = ['$exists' => false];
