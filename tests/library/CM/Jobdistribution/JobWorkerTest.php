@@ -21,7 +21,7 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
         $jobWorkerMock->setServiceManager($serviceManager);
         /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
         $logger = $this->mockObject('CM_Log_Logger');
-        $serviceManager->unregister('logger')->registerInstance('logger', $logger);
+        $serviceManager->registerInstance('logger', $logger);
         $logExceptionMock = $logger->mockMethod('logException')->set(function (Exception $exception, $level = null) {
             $this->assertEquals('foo-bar', $exception->getMessage());
             $this->assertEquals(null, $level);
