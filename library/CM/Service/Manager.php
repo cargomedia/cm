@@ -252,10 +252,10 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_Mailer_Client
+     * @return CM_Mail_Mailer
      */
     public function getMailer() {
-        return $this->get('mailer', 'CM_Mailer_Client');
+        return $this->get('mailer', 'CM_Mail_Mailer');
     }
 
     /**

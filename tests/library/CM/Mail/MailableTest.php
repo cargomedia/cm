@@ -66,7 +66,7 @@ class CM_Mail_MailableTest extends CMTest_TestCase {
     public function testSend() {
         $transport = $this->mockInterface('Swift_Transport')->newInstance();
         $sendMethod = $transport->mockMethod('send')->set(1);
-        $mailer = new CM_Mailer_Client($transport);
+        $mailer = new CM_Mail_Mailer($transport);
 
         $mail = new CM_Mail_Mailable('foo@example.com', null, null, $mailer);
         $mail->setSender('sender@example.com', 'Sender');

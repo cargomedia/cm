@@ -8,7 +8,7 @@ class CM_Mail_Mailable extends CM_View_Abstract implements CM_Typed {
     /** @var CM_Site_Abstract */
     private $_site;
 
-    /** @var CM_Mailer_Client */
+    /** @var CM_Mail_Mailer */
     private $_mailer;
 
     /** @var  Swift_Message */
@@ -27,10 +27,10 @@ class CM_Mail_Mailable extends CM_View_Abstract implements CM_Typed {
      * @param CM_Model_User|string|null $recipient
      * @param array|null                $tplParams
      * @param CM_Site_Abstract|null     $site
-     * @param CM_Mailer_Client|null     $mailer
+     * @param CM_Mail_Mailer|null       $mailer
      * @throws CM_Exception_Invalid
      */
-    public function __construct($recipient = null, array $tplParams = null, CM_Site_Abstract $site = null, CM_Mailer_Client $mailer = null) {
+    public function __construct($recipient = null, array $tplParams = null, CM_Site_Abstract $site = null, CM_Mail_Mailer $mailer = null) {
         $this->_renderLayout = false;
         $this->_verificationRequired = true;
         $this->_tplParams = [];
@@ -125,7 +125,7 @@ class CM_Mail_Mailable extends CM_View_Abstract implements CM_Typed {
     }
 
     /**
-     * @return CM_Mailer_Client
+     * @return CM_Mail_Mailer
      */
     public function getMailer() {
         if (!$this->_mailer) {

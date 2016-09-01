@@ -6,7 +6,7 @@ class CM_Mail_MailerFactory implements CM_Service_ManagerAwareInterface {
 
     /**
      * @param string $transportServiceName
-     * @return CM_Mailer_Client
+     * @return CM_Mail_Mailer
      */
     public function create($transportServiceName) {
         /** @var Swift_Transport $transport */
@@ -14,6 +14,6 @@ class CM_Mail_MailerFactory implements CM_Service_ManagerAwareInterface {
         if ($transport instanceof CM_Service_ManagerAwareInterface) {
             $transport->setServiceManager($this->getServiceManager());
         }
-        return new CM_Mailer_Client($transport);
+        return new CM_Mail_Mailer($transport);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-class CM_Mailer_ClientTest extends CMTest_TestCase {
+class CM_Mail_MailerTest extends CMTest_TestCase {
 
     public function testSend() {
         $transport = $this->mockInterface('Swift_Transport')->newInstance();
@@ -8,7 +8,7 @@ class CM_Mailer_ClientTest extends CMTest_TestCase {
         $message = new Swift_Message('foo', 'content');
         $message->setTo('foo@example.com');
         $message->setCc('bar@example.com', 'bar');
-        $client = new CM_Mailer_Client($transport);
+        $client = new CM_Mail_Mailer($transport);
 
         $sendMethod = $transport->mockMethod('send')->set(2);
 
@@ -24,7 +24,7 @@ class CM_Mailer_ClientTest extends CMTest_TestCase {
         $transport = $this->mockInterface('Swift_Transport')->newInstance();
         $transport->mockMethod('isStarted')->set(true);
         $message = new Swift_Message();
-        $client = new CM_Mailer_Client($transport);
+        $client = new CM_Mail_Mailer($transport);
 
         $sendMethod = $transport->mockMethod('send');
 
@@ -44,7 +44,7 @@ class CM_Mailer_ClientTest extends CMTest_TestCase {
         $message = new Swift_Message('foo', 'content');
         $message->setTo('foo@example.com');
         $message->setCc('bar@example.com', 'bar');
-        $client = new CM_Mailer_Client($transport);
+        $client = new CM_Mail_Mailer($transport);
 
         $sendMethod = $transport->mockMethod('send')->set(0);
         $exception = $this->catchException(function () use ($client, $message) {

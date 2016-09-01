@@ -1,6 +1,6 @@
 <?php
 
-class CM_Mailer_Client extends Swift_Mailer {
+class CM_Mail_Mailer extends Swift_Mailer {
 
     public function send(Swift_Mime_Message $message, &$failedRecipients = null) {
         $failedRecipients = (array) $failedRecipients;
