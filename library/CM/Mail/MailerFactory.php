@@ -1,6 +1,6 @@
 <?php
 
-class CM_Mailer_Factory implements CM_Service_ManagerAwareInterface {
+class CM_Mail_MailerFactory implements CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
 
@@ -8,7 +8,7 @@ class CM_Mailer_Factory implements CM_Service_ManagerAwareInterface {
      * @param string $transportServiceName
      * @return CM_Mailer_Client
      */
-    public function createMailer($transportServiceName) {
+    public function create($transportServiceName) {
         /** @var Swift_Transport $transport */
         $transport = $this->getServiceManager()->get((string) $transportServiceName, 'Swift_Transport');
         if ($transport instanceof CM_Service_ManagerAwareInterface) {

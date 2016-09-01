@@ -253,9 +253,9 @@ return function (CM_Config_Node $config) {
     ];
 
     $config->services['mailer'] = [
-        'class'  => 'CM_Mailer_Factory',
+        'class'  => 'CM_Mail_MailerFactory',
         'method' => [
-            'name'      => 'createMailer',
+            'name'      => 'create',
             'arguments' => [
                 'transportServiceName' => 'mailer-transport-log',
             ],
