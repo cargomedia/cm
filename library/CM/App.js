@@ -318,7 +318,7 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   error: {
-    _callbacks: {_all: []},
+    _handlers: [],
 
     ready: function() {
       $(window).on('unhandledrejection', function(e) {
@@ -333,16 +333,48 @@ var CM_App = CM_Class_Abstract.extend({
           error = new Error('Unhandled promise rejection without reason.');
         }
         if (!(error instanceof Promise.CancellationError)) {
-          cm.error._globalHandler(error);
+          cm.error.handle(error);
         }
       });
     },
 
     /**
-     * @param {Function} fn
+     * @param {{String:Function}} handlers
+     * @param {*} [context]
      */
-    setGlobalHandler: function(fn) {
-      cm.error._globalHandler = fn;
+    registerHandlers: function(handlers, context) {
+      _.each(handlers, function(callback, errorName) {
+        cm.error.registerHandler(errorName, callback, context);
+      });
+    },
+
+    /**
+     * @param {String} errorName
+     * @param {Function} callback
+     * @param {*} [context]
+     */
+    registerHandler: function(errorName, callback, context) {
+      context = context || window;
+      cm.error._handlers.push({
+        errorName: errorName,
+        callback: callback,
+        context: context
+      });
+    },
+
+    /**
+     * @param {String} errorName
+     * @param {Function} [callback]
+     * @param {*} [context]
+     */
+    unregisterHandler: function(errorName, callback, context) {
+      cm.error._handlers = _.reject(cm.error._handlers, function(handler) {
+        return (
+          errorName === handler.errorName &&
+          (_.isFunction(callback) ? callback === handler.callback : true) &&
+          (!_.isUndefined(context) ? context === handler.context : true)
+        );
+      });
     },
 
     /**
@@ -358,9 +390,18 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {Error} error
      * @throws Error
      */
-    _globalHandler: function(error) {
+    handle: function(error) {
       if (error instanceof CM_Exception) {
-        cm.window.hint(error.message);
+        var handlers = _.filter(cm.error._handlers, function(handler) {
+          return handler.errorName === error.name;
+        });
+        if (0 !== handlers.length) {
+          _.every(handlers, function(handler) {
+            return false !== handler.callback.call(handler.context, error);
+          });
+        } else {
+          cm.window.hint(error.message);
+        }
       }
       throw error;
     }

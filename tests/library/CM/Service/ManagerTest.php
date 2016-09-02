@@ -148,6 +148,17 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
         $serviceManager->unregister('foo');
         $this->assertSame(false, $serviceManager->has('foo'));
     }
+
+    public function testReplaceInstance() {
+        $serviceManager = new CM_Service_Manager();
+        $this->assertSame(false, $serviceManager->has('foo'));
+
+        $serviceManager->replaceInstance('foo', 12.3);
+        $this->assertSame(12.3, $serviceManager->get('foo'));
+
+        $serviceManager->replaceInstance('foo', 12.4);
+        $this->assertSame(12.4, $serviceManager->get('foo'));
+    }
 }
 
 class DummyService implements CM_Service_ManagerAwareInterface {

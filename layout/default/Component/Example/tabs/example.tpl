@@ -6,6 +6,7 @@
 {button_link class="reloadComponent" label="reload()" icon="refresh"}
 {button_link class="popoutComponent" label="popOut()"}
 {button_link class="popinComponent" label="popIn()"}
+{button_link class="multiLevelPopoutComponent" label="Multi-level PopOut()"}
 {button_link class="loadComponent" label="load()"}
 {button_link class="loadComponent_callback" label="load()+callback"}
 {button_link class="removeComponent" label="remove()"}
@@ -27,4 +28,21 @@
 <div class="stream">
   <div class="output"></div>
   {button_link class="callAjaxPing" label="ajax: ping()"}
+</div>
+
+<div class="innerPopup first">
+  <h3>Popup Level 1</h3>
+  {button_link class="innerPopinComponent" label="PopIn()"}
+  {button_link class="innerPopoutComponent" label="PopOut()"}
+
+  <div class="innerPopup">
+    <h3>Popup Level 2</h3>
+    {button_link class="innerPopinComponent" label="PopIn()"}
+    {button_link class="innerPopoutComponent" label="PopOut()"}
+
+    <div class="innerPopup">
+      <h3>Popup Level 3</h3>
+      {button_link class="innerPopinComponent" label="PopIn()"}
+    </div>
+  </div>
 </div>

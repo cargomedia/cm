@@ -118,6 +118,17 @@ class CM_Service_Manager extends CM_Class_Abstract {
 
     /**
      * @param string $serviceName
+     * @param mixed  $instance
+     */
+    public function replaceInstance($serviceName, $instance) {
+        if ($this->has($serviceName)) {
+            $this->unregister($serviceName);
+        }
+        $this->registerInstance($serviceName, $instance);
+    }
+
+    /**
+     * @param string $serviceName
      */
     public function unregister($serviceName) {
         unset($this->_serviceConfigList[$serviceName]);
@@ -302,12 +313,28 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @deprecated Instead make your class manager-aware (`CM_Service_ManagerAwareInterface`) and pass the manager.
+     *
      * @return CM_Service_Manager
      */
     public static function getInstance() {
         if (null === self::$instance) {
-            self::$instance = new self();
+            self::setInstance(new self());
         }
         return self::$instance;
     }
+
+    /**
+     * @param CM_Service_Manager $serviceManager
+     */
+    public static function setInstance(CM_Service_Manager $serviceManager) {
+        self::$instance = $serviceManager;
+    }
+
+    function __clone() {
+        foreach ($this->_serviceInstanceList as &$instance) {
+            $instance = clone $instance;
+        }
+    }
+
 }
