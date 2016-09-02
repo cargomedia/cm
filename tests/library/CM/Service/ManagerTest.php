@@ -134,10 +134,6 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertSame(['service' => 'bar'], $exception->getMetaInfo());
-
-        // overwrite
-        $serviceManager->registerInstance('bar', $serviceBar2, true);
-        $this->assertSame($serviceBar2, $serviceManager->get('bar'));
     }
 
     public function testUnregister() {

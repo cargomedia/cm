@@ -10,7 +10,7 @@ class CM_Model_StreamChannel_Message_UserTest extends CMTest_TestCase {
             $this->assertEquals(['user' => $user], $params);
             $this->assertSame(CM_Model_User::OFFLINE_DELAY, $executeAt);
         });
-        $this->getServiceManager()->registerInstance('delayedJobQueue', $delayedQueue, true);
+        $this->getServiceManager()->replaceInstance('delayedJobQueue', $delayedQueue);
         /** @var CM_Model_StreamChannel_Message_User $channel */
         $channel = CM_Model_StreamChannel_Message_User::createStatic([
             'key'         => CM_Model_StreamChannel_Message_User::getKeyByUser($user),

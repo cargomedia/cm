@@ -98,11 +98,10 @@ class CM_Service_Manager extends CM_Class_Abstract {
     /**
      * @param string       $serviceName
      * @param mixed        $instance
-     * @param boolean|null $overwrite
      * @throws CM_Exception_Invalid
      */
-    public function registerInstance($serviceName, $instance, $overwrite = null) {
-        if ($this->has($serviceName) && !$overwrite) {
+    public function registerInstance($serviceName, $instance) {
+        if ($this->has($serviceName)) {
             throw new CM_Exception_Invalid('Service is already registered.', null, ['service' => $serviceName]);
         }
         $serviceName = (string) $serviceName;
