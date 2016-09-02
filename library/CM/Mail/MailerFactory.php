@@ -20,9 +20,9 @@ class CM_Mail_MailerFactory implements CM_Service_ManagerAwareInterface {
      * @return CM_Mail_Mailer
      */
     public function createSmtpMailer($host = null, $port = null, $security = null) {
-        $host = null === $host ? 'localhost' : (string) $host;
-        $port = null === $port ? 25 : (int) $port;
-        $security = null === $security ? (string) $security : $security;
+        $host = null !== $host ? (string) $host : 'localhost';
+        $port = null !== $port ? (int) $port : 25;
+        $security = null !== $security ? (string) $security : null;
         $transport = new Swift_SmtpTransport($host, $port, $security);
         return new CM_Mail_Mailer($transport);
     }
