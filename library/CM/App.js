@@ -363,6 +363,21 @@ var CM_App = CM_Class_Abstract.extend({
     },
 
     /**
+     * @param {String} errorName
+     * @param {Function} [callback]
+     * @param {*} [context]
+     */
+    unregisterHandler: function(errorName, callback, context) {
+      cm.error._handlers = _.filter(cm.error._handlers, function(handler) {
+        return !(
+          errorName === handler.errorName &&
+          (_.isFunction(callback) ? callback === handler.callback : true) &&
+          (!_.isUndefined(context) ? context === handler.context : true)
+        );
+      });
+    },
+
+    /**
      * @param {Error} error
      */
     log: function(error) {
