@@ -34,11 +34,7 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
             ]);
         }
         if (!empty($extra)) {
-            $extraText = [];
-            foreach ($extra as $key => $value) {
-                $extraText[] = sprintf('%s: %s', $key, $value);
-            }
-            $data['extra'] = implode(', ', $extraText);
+            $data['extra'] = json_encode($extra, JSON_PRETTY_PRINT);
         }
         if ($exception = $record->getContext()->getException()) {
             $serializableException = new CM_ExceptionHandling_SerializableException($exception);
