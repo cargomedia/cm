@@ -16,7 +16,7 @@ class CM_Mail_Mailer extends Swift_Mailer implements CM_Service_ManagerAwareInte
             throw new CM_Exception_Invalid('No recipient specified');
         }
         $numSent = parent::send($message, $failedRecipients);
-        if ($failedRecipients) {
+        if (0 === $numSent || 0 !== count($failedRecipients)) {
             $context = new CM_Log_Context();
             $context->setExtra([
                 'message'          => [
@@ -28,11 +28,7 @@ class CM_Mail_Mailer extends Swift_Mailer implements CM_Service_ManagerAwareInte
                 ],
                 'failedRecipients' => $failedRecipients,
             ]);
-            if (0 === $numSent) {
-                $this->getServiceManager()->getLogger()->error('Failed to send email to all recipients', $context);
-            } else {
-                $this->getServiceManager()->getLogger()->warning('Failed to send email to some recipients', $context);
-            }
+            $this->getServiceManager()->getLogger()->error('Failed to send email to all recipients', $context);
         }
         return $numSent;
     }
