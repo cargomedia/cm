@@ -318,7 +318,7 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   error: {
-    _handlers: {},
+    _handlers: [],
 
     ready: function() {
       $(window).on('unhandledrejection', function(e) {
@@ -343,25 +343,22 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {*} [context]
      */
     registerHandlers: function(handlers, context) {
-      var name = null;
-      for (name in handlers) {
-        if (handlers.hasOwnProperty(name) && _.isFunction(handlers[name])) {
-          cm.error.registerHandler(name, handlers[name], context);
-        }
-      }
+      _.each(handlers, function(callback, errorName) {
+        cm.error.registerHandler(errorName, callback, context);
+      });
     },
 
     /**
-     * @param {String} name
-     * @param {Function} handler
+     * @param {String} errorName
+     * @param {Function} callback
      * @param {*} [context]
      */
-    registerHandler: function(name, handler, context) {
+    registerHandler: function(errorName, callback, context) {
       context = context || window;
-      var handlers = cm.error._handlers;
-      handlers[name] = _.isArray(handlers[name]) ? handlers[name] : [];
-      handlers[name].push(function(error) {
-        return handler.call(context, error);
+      cm.error._handlers.push({
+        errorName: errorName,
+        callback: callback,
+        context: context
       });
     },
 
@@ -380,10 +377,12 @@ var CM_App = CM_Class_Abstract.extend({
      */
     handle: function(error) {
       if (error instanceof CM_Exception) {
-        var handlers = cm.error._handlers[error.name];
-        if (_.isArray(handlers) && handlers.length > 0) {
+        var handlers = _.filter(cm.error._handlers, function(handler) {
+          return handler.errorName === error.name;
+        });
+        if (0 !== handlers.length) {
           _.every(handlers, function(handler) {
-            return false !== handler(error);
+            return false !== handler.callback.call(handler.context, error);
           });
         } else {
           cm.window.hint(error.message);
