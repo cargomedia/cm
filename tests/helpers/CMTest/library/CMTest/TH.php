@@ -5,6 +5,7 @@ class CMTest_TH {
     private static $_timeStart;
     private static $timeDelta = 0;
     private static $_configBackup;
+    private static $_serviceManagerBackup;
 
     public static function init() {
         $output = new CM_OutputStream_Null();
@@ -13,6 +14,8 @@ class CMTest_TH {
         $loader->load($output);
 
         self::$_configBackup = serialize(CM_Config::get());
+        $serviceManager = CM_Service_Manager::getInstance();
+        self::$_serviceManagerBackup = clone $serviceManager;
 
         // Reset environment
         self::clearEnv();
@@ -21,11 +24,11 @@ class CMTest_TH {
     }
 
     public static function clearEnv() {
+        CM_Service_Manager::setInstance(clone self::$_serviceManagerBackup);
         self::clearDb();
         self::clearCache();
         self::timeReset();
         self::clearFilesystem();
-        CM_Service_Manager::getInstance()->resetServiceInstances();
         CM_Config::set(unserialize(self::$_configBackup));
     }
 
