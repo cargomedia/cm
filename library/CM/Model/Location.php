@@ -392,6 +392,9 @@ class CM_Model_Location extends CM_Model_Abstract {
         CM_Db_Db::exec('RENAME TABLE `cm_tmp_location` TO `cm_tmp_location_old`, `cm_tmp_location_new` TO `cm_tmp_location`');
         CM_Db_Db::exec('DROP TABLE `cm_tmp_location_old`');
         CM_Db_Db::exec('RENAME TABLE `cm_tmp_location_coordinates` TO `cm_tmp_location_coordinates_old`, `cm_tmp_location_coordinates_new` TO `cm_tmp_location_coordinates`');
+        while (!CM_Model_Location::getCreateAggregationInProgress(CM_Service_Manager::getInstance()->getDatabases()->getReadMaintenance())) {
+            sleep(1);
+        }
         CM_Db_Db::exec('DROP TABLE `cm_tmp_location_coordinates_old`');
     }
 
