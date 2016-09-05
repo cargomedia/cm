@@ -142,27 +142,16 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param Exception   $exception
-     * @param int|null    $level
-     * @param string|null $message
+     * @param Exception $exception
+     * @param int|null  $level
      * @return CM_Log_Logger
      */
-    public function logException(Exception $exception, $level = null, $message = null) {
+    public function logException(Exception $exception, $level = null) {
         if (null === $level) {
             $level = self::exceptionToLevel($exception);
         }
-        if (null === $message) {
-            if ($exception instanceof CM_Exception && '' !== $exception->getMessage()) {
-                $message = $exception->getMessage();
-            } else {
-                $message = 'Application error';
-            }
-        }
         $context = (new CM_Log_Context())->setException($exception);
-        if ($exception instanceof CM_Exception) {
-            $context->setExtra($exception->getMetaInfo());
-        }
-        return $this->addMessage($message, $level, $context);
+        return $this->addMessage('Application error', $level, $context);
     }
 
     /**

@@ -349,7 +349,7 @@ class CM_Redis_Client extends CM_Class_Abstract implements CM_Service_ManagerAwa
                     $response = $callback($message->channel, $message->payload);
                 }
             } catch (Exception $e) {
-                $this->getServiceManager()->getLogger()->logException($e, null, 'Cannot execute callback for redis message');
+                $this->getServiceManager()->getLogger()->logException($e);
             }
             if (!is_null($response)) {
                 break;

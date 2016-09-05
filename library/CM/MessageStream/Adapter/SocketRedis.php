@@ -120,11 +120,11 @@ class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abst
                             }
                         }
                     } catch (CM_Exception $e) {
-                        $this->getServiceManager()->getLogger()->logException($e, CM_Log_Logger::WARNING, 'Cannot add socket redis subscriber when synchronizing status');
+                        $this->getServiceManager()->getLogger()->warning('Cannot add socket redis subscriber when synchronizing status', (new CM_Log_Context())->setException($e));
                     }
                 }
             } catch (CM_Exception $e) {
-                $this->getServiceManager()->getLogger()->logException($e, CM_Log_Logger::WARNING);
+                $this->getServiceManager()->getLogger()->warning('Error synchronizing socket redis status', (new CM_Log_Context())->setException($e));
             }
         }
     }
