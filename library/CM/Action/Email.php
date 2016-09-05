@@ -17,7 +17,7 @@ class CM_Action_Email extends CM_Action_Abstract {
             $className = CM_Mail::_getClassName($typeEmail);
             $this->_nameEmail = ucwords(CM_Util::uncamelize(str_replace('_', '', preg_replace('#\\A[^_]++_[^_]++_#', '', $className)), ' '));
         } catch (CM_Class_Exception_TypeNotConfiguredException $exception) {
-            CM_Service_Manager::getInstance()->getLogger()->logException($exception, CM_Log_Logger::WARNING);
+            CM_Service_Manager::getInstance()->getLogger()->logException($exception, CM_Log_Logger::WARNING, 'Unrecognized mail type when creating mail action');
             $this->_nameEmail = (string) $typeEmail;
         }
     }

@@ -76,7 +76,7 @@ class CM_Process_ForkHandler {
             $return = $workload($result);
             $result->setResult($return);
         } catch (Exception $e) {
-            CM_Service_Manager::getInstance()->getLogger()->logException($e);
+            CM_Service_Manager::getInstance()->getLogger()->logException($e, null, 'Cannot execute workload in forked child process');
             $result->setException($e);
         }
 
