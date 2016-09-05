@@ -147,9 +147,11 @@ class CM_MessageStream_Adapter_SocketRedisTest extends CMTest_TestCase {
         /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
         $logger = $this->mockObject('CM_Log_Logger');
         $serviceManager->registerInstance('logger', $logger);
-        $logExceptionMock = $logger->mockMethod('logException')->set(function (Exception $exception, $level = null) {
-            $this->assertSame('Type is not configured for class.', $exception->getMessage());
+        $warningMock = $logger->mockMethod('warning')->set(function ($message, CM_Log_Context $context = null) {
+            $this->assertSame('Error synchronizing socket redis status', $message);
+            $exception = $context->getException();
             $this->assertInstanceOf('CM_Exception', $exception);
+            $this->assertSame('Type is not configured for class.', $exception->getMessage());
             /** @var CM_Exception $exception */
             $this->assertSame(
                 [
@@ -160,7 +162,7 @@ class CM_MessageStream_Adapter_SocketRedisTest extends CMTest_TestCase {
             );
         });
         $adapter->synchronize();
-        $this->assertSame(1, $logExceptionMock->getCallCount());
+        $this->assertSame(1, $warningMock->getCallCount());
     }
 
     /**
