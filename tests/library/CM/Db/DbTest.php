@@ -206,4 +206,15 @@ class CM_Db_DbTest extends CMTest_TestCase {
         $this->assertSame(3, $counter);
         $this->assertSame(3, (int) CM_Db_Db::select('test', array('foo'))->fetchColumn('foo'));
     }
+
+    public function testReplaceTable() {
+        $this->assertInstanceOf('CM_Db_Exception', $this->catchException(function () {
+            CM_Db_Db::replaceTable('test', 'test_new');
+        }));
+        CM_Db_Db::exec('CREATE TABLE `test_new` (`id` INT(10) UNSIGNED NOT NULL)');
+        CM_Db_Db::insert('test_new', ['id' => 123]);
+        CM_Db_Db::replaceTable('test', 'test_new');
+        $this->assertSame([['id' => '123']], CM_Db_Db::select('test', '*')->fetchAll());
+        $this->assertSame(false, CM_Db_Db::existsTable('test_new'));
+    }
 }

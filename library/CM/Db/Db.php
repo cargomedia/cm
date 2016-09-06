@@ -178,6 +178,19 @@ class CM_Db_Db extends CM_Class_Abstract {
     }
 
     /**
+     * @param string $table
+     * @param string $replacement
+     */
+    public static function replaceTable($table, $replacement) {
+        $client = self::getClient();
+        $tableQuoted = $client->quoteIdentifier($table);
+        $replacementQuoted = $client->quoteIdentifier($replacement);
+        $temporaryTableQuoted = $client->quoteIdentifier(uniqid($table . '_'));
+        self::exec("RENAME TABLE {$tableQuoted} TO {$temporaryTableQuoted}, {$replacementQuoted} TO {$tableQuoted}");
+        self::exec("DROP TABLE {$temporaryTableQuoted}");
+    }
+
+    /**
      * @param string            $table
      * @param string|array      $fields Column-name OR Column-names array
      * @param string|array|null $where  Associative array field=>value OR string
