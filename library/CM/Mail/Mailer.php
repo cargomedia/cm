@@ -17,13 +17,11 @@ class CM_Mail_Mailer extends Swift_Mailer implements CM_Service_ManagerAwareInte
         }
 
         $numSent = 0;
-        $failedRecipients = null;
         $context = new CM_Log_Context();
         try {
             $numSent = parent::send($message, $failedRecipients);
         } catch (Exception $e) {
             $context->setException($e);
-            throw $e;
         }
 
         $this->getTransport()->stop();
