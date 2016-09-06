@@ -85,6 +85,7 @@ class CM_Mail_Message extends Swift_Message implements CM_ArrayConvertible {
             'html'          => $this->getHtml(),
             'text'          => $this->getText(),
             'sender'        => $this->getSender(),
+            'from'          => $this->getFrom(),
             'replyTo'       => $this->getReplyTo(),
             'to'            => $this->getTo(),
             'cc'            => $this->getCc(),
@@ -97,6 +98,9 @@ class CM_Mail_Message extends Swift_Message implements CM_ArrayConvertible {
         $message = new self($array['subject']);
         if (null !== $array['sender']) {
             $message->setSender($array['sender']);
+        }
+        if (null !== $array['from']) {
+            $message->setFrom($array['from']);
         }
         if (null !== $array['to']) {
             $message->setTo($array['to']);

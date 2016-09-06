@@ -2,7 +2,7 @@
 
 class CM_Mail_MessageTest extends CMTest_TestCase {
 
-    public function testSetBodyWithAlternativel() {
+    public function testSetBodyWithAlternative() {
         $message = new CM_Mail_Message();
         $message->setBodyWithAlternative('content');
         $this->assertSame('text/plain', $message->getContentType());
@@ -44,6 +44,7 @@ class CM_Mail_MessageTest extends CMTest_TestCase {
             'html'          => null,
             'text'          => null,
             'sender'        => null,
+            'from'          => [],
             'replyTo'       => null,
             'to'            => null,
             'cc'            => null,
@@ -55,6 +56,7 @@ class CM_Mail_MessageTest extends CMTest_TestCase {
         $message2
             ->setSubject('foo')
             ->setSender('foo@example.com')
+            ->setFrom('foo@example.com')
             ->setReplyTo('bar@example.com')
             ->addTo('bar@example.com', 'Bar')
             ->addCc('bar1@example.com')
@@ -72,6 +74,7 @@ class CM_Mail_MessageTest extends CMTest_TestCase {
             'html'          => '<p>content</p>',
             'text'          => 'content',
             'sender'        => ['foo@example.com' => null],
+            'from'          => ['foo@example.com' => null],
             'replyTo'       => ['bar@example.com' => null],
             'to'            => ['bar@example.com' => 'Bar'],
             'cc'            => [
@@ -92,6 +95,7 @@ class CM_Mail_MessageTest extends CMTest_TestCase {
             'html'          => null,
             'text'          => null,
             'sender'        => null,
+            'from'          => [],
             'replyTo'       => null,
             'to'            => null,
             'cc'            => null,
@@ -106,6 +110,7 @@ class CM_Mail_MessageTest extends CMTest_TestCase {
             'html'          => '<p>content</p>',
             'text'          => 'content',
             'sender'        => ['foo@example.com' => null],
+            'from'          => ['foo@example.com' => null],
             'replyTo'       => ['bar@example.com' => null],
             'to'            => ['bar@example.com' => 'Bar'],
             'cc'            => [
@@ -122,6 +127,7 @@ class CM_Mail_MessageTest extends CMTest_TestCase {
         $expectedMessage
             ->setSubject('foo')
             ->setSender('foo@example.com')
+            ->setFrom('foo@example.com')
             ->setReplyTo('bar@example.com')
             ->addTo('bar@example.com', 'Bar')
             ->addCc('bar1@example.com')
