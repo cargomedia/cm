@@ -339,12 +339,7 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @return bool
      */
     public static function getCreateAggregationInProgress(CM_Db_Client $db) {
-        foreach ([
-                     'cm_tmp_location_new',
-                     'cm_tmp_location_coordinates_new',
-                     'cm_tmp_location_old',
-                     'cm_tmp_location_coordinates_old',
-                 ] as $table) {
+        foreach (['cm_tmp_location_new', 'cm_tmp_location_coordinates_new'] as $table) {
             if (CM_Db_Db::exec('SHOW TABLES LIKE ?', [$table], null, $db)->getAffectedRows()) {
                 return true;
             }
@@ -352,10 +347,7 @@ class CM_Model_Location extends CM_Model_Abstract {
         return false;
     }
 
-    /**
-     * @param CM_Db_Client|null $waitForDb
-     */
-    public static function createAggregation(CM_Db_Client $waitForDb = null) {
+    public static function createAggregation() {
         CM_Db_Db::exec('DROP TABLE IF EXISTS `cm_tmp_location_new`');
         CM_Db_Db::exec('CREATE TABLE `cm_tmp_location_new` LIKE `cm_tmp_location`');
         CM_Db_Db::exec('INSERT INTO `cm_tmp_location_new` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `nameFull`, `lat`,`lon`)
@@ -392,20 +384,8 @@ class CM_Model_Location extends CM_Model_Abstract {
 			FROM `cm_model_location_zip`
 			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL');
 
-        CM_Db_Db::exec('RENAME TABLE `cm_tmp_location` TO `cm_tmp_location_old`, `cm_tmp_location_new` TO `cm_tmp_location`');
-        CM_Db_Db::exec('DROP TABLE `cm_tmp_location_old`');
-        CM_Db_Db::exec('RENAME TABLE `cm_tmp_location_coordinates` TO `cm_tmp_location_coordinates_old`, `cm_tmp_location_coordinates_new` TO `cm_tmp_location_coordinates`');
-        if ($waitForDb) {
-            while (!CM_Model_Location::getCreateAggregationInProgress($waitForDb)) {
-                sleep(1);
-            }
-        }
-        CM_Db_Db::exec('DROP TABLE `cm_tmp_location_coordinates_old`');
-        if ($waitForDb) {
-            while (CM_Model_Location::getCreateAggregationInProgress($waitForDb)) {
-                sleep(1);
-            }
-        }
+        CM_Db_Db::replaceTable('cm_tmp_location', 'cm_tmp_location_new');
+        CM_Db_Db::replaceTable('cm_tmp_location_coordinates', 'cm_tmp_location_coordinates_new');
     }
 
     /**
