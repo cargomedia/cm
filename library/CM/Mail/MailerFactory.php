@@ -34,4 +34,14 @@ class CM_Mail_MailerFactory implements CM_Service_ManagerAwareInterface {
         }
         return new CM_Mail_Mailer($transport);
     }
+
+    /**
+     * @param string|null $extraParams
+     * @return CM_Mail_Mailer
+     */
+    public function createMailMailer($extraParams = null) {
+        $extraParams = null !== $extraParams ? (string) $extraParams : '-f%s';
+        $transport = new Swift_MailTransport($extraParams);
+        return new CM_Mail_Mailer($transport);
+    }
 }
