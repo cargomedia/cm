@@ -22,11 +22,6 @@ class CM_Mail_Message extends Swift_Message implements CM_ArrayConvertible {
         return $this->_text;
     }
 
-    public function setSender($address, $name = null) {
-        parent::setFrom($address, $name);
-        return parent::setSender($address, $name);
-    }
-
     /**
      * @return array
      */

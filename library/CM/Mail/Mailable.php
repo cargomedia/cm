@@ -240,6 +240,7 @@ class CM_Mail_Mailable extends CM_View_Abstract implements CM_Typed {
         $address = (string) $address;
         $name = is_null($name) ? $name : (string) $name;
         $this->getMessage()->setSender($address, $name);
+        $this->getMessage()->setFrom($address, $name);
     }
 
     /**

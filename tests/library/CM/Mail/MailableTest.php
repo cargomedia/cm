@@ -81,6 +81,7 @@ class CM_Mail_MailableTest extends CMTest_TestCase {
 
         $message = $mail->getMessage();
         $this->assertSame(['sender@example.com' => 'Sender'], $message->getSender());
+        $this->assertSame(['sender@example.com' => 'Sender'], $message->getFrom());
         $this->assertSame('testSubject', $message->getSubject());
         $this->assertSame('content', $message->getText());
         $this->assertSame('<b>content</b>', $message->getHtml());
