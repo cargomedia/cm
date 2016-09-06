@@ -292,11 +292,11 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
-     * @param CM_Mail $mail
+     * @param CM_Mail_Mailable $mail
      * @return string
      * @throws CM_Exception_Invalid
      */
-    public function getUrlEmailTracking(CM_Mail $mail) {
+    public function getUrlEmailTracking(CM_Mail_Mailable $mail) {
         if (!$mail->getRecipient()) {
             throw new CM_Exception_Invalid('Needs user');
         }

@@ -79,9 +79,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
         }
 
         $this->_registerClockworkCallbacks('15 minutes', array(
-            'CM_Mail::processQueue'                         => function () {
-                CM_Mail::processQueue(500);
-            },
             'CM_Action_Abstract::aggregate'                 => function () {
                 CM_Action_Abstract::aggregate();
             },

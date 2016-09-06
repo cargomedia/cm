@@ -7,7 +7,7 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function fetch() {
-        /** @var CM_Mail $mail */
+        /** @var CM_Mail_Mailable $mail */
         $mail = $this->_getView();
         $viewParams = $mail->getTplParams();
         if (!($subject = $mail->getSubject())) {
@@ -55,10 +55,10 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
     }
 
     /**
-     * @param CM_Mail $mail
+     * @param CM_Mail_Mailable $mail
      * @return string
      */
-    protected function _getTrackingImageTag(CM_Mail $mail) {
+    protected function _getTrackingImageTag(CM_Mail_Mailable $mail) {
         return '<img src="' . CM_Util::htmlspecialchars($this->getRender()->getUrlEmailTracking($mail)) . '" width="1" height="1" />';
     }
 
