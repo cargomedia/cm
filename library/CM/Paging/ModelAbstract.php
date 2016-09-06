@@ -38,7 +38,8 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
             $this->_populateModelList($this->_getItemsRaw());
         }
         $index = serialize($itemRaw);
-        if (!array_key_exists($index, $this->_modelList) || null === ($model = $this->_modelList[$index])) {
+        $model = isset($this->_modelList[$index]) ? $this->_modelList[$index] : null;
+        if (null === $model) {
             throw new CM_Exception_Nonexistent('Model itemRaw has no data', null, ['itemRaw' => CM_Util::var_line($itemRaw)]);
         }
         return $model;
