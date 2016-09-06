@@ -263,6 +263,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Mail_Mailer
+     */
+    public function getMailer() {
+        return $this->get('mailer', 'CM_Mail_Mailer');
+    }
+
+    /**
      * @param string $serviceName
      * @throws CM_Exception_Invalid
      * @return mixed

@@ -16,9 +16,6 @@ return function (CM_Config_Node $config) {
 
     $config->timeZone = 'UTC';
 
-    $config->CM_Mail->send = true;
-    $config->CM_Mail->mailDeliveryAgent = null;
-
     $config->CM_Site_Abstract->class = null;
 
     $config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
@@ -252,6 +249,16 @@ return function (CM_Config_Node $config) {
             'appName' => 'CM Application',
         ),
     );
+
+    $config->services['mailer'] = [
+        'class'  => 'CM_Mail_MailerFactory',
+        'method' => [
+            'name'      => 'createLogMailer',
+            'arguments' => [
+                'logLevel' => CM_Log_Logger::INFO,
+            ],
+        ],
+    ];
 
     $config->services['logger-handler-newrelic'] = [
         'class'     => 'CMService_NewRelic_Log_Handler',
