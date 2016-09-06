@@ -82,7 +82,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
             $this->_printException($exception);
         }
         $logLevel = CM_Log_Logger::severityToLevel($severity);
-        $this->getServiceManager()->getLogger()->logException($exception, $logLevel);
+        $this->getServiceManager()->getLogger()->addMessage('Application error', $logLevel, (new CM_Log_Context())->setException($exception));
     }
 
     /**

@@ -142,19 +142,6 @@ class CM_Log_Logger {
     }
 
     /**
-     * @param Exception $exception
-     * @param int|null  $level
-     * @return CM_Log_Logger
-     */
-    public function logException(Exception $exception, $level = null) {
-        if (null === $level) {
-            $level = self::exceptionToLevel($exception);
-        }
-        $context = (new CM_Log_Context())->setException($exception);
-        return $this->addMessage('Application error', $level, $context);
-    }
-
-    /**
      * @param CM_Log_Record $record
      * @return CM_Log_Logger
      */
