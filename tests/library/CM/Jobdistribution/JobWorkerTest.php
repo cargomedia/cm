@@ -22,16 +22,19 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
         /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
         $logger = $this->mockObject('CM_Log_Logger');
         $serviceManager->registerInstance('logger', $logger);
-        $logExceptionMock = $logger->mockMethod('logException')->set(function (Exception $exception, $level = null) {
+        $addMessageMock = $logger->mockMethod('addMessage')->set(function ($message, $level, CM_Log_Context $context = null) {
+            $this->assertSame('Worker failed', $message);
+            $this->assertEquals(CM_Log_Logger::ERROR, $level);
+            $exception = $context->getException();
+            $this->assertInstanceOf('Exception', $exception);
             $this->assertEquals('foo-bar', $exception->getMessage());
-            $this->assertEquals(null, $level);
         });
         try {
             $jobWorkerMock->run();
         } catch (CM_Exception_Invalid $ex) {
             $this->assertContains('Worker failed', $ex->getMessage());
             $this->assertSame(2, $counter);
-            $this->assertSame(1, $logExceptionMock->getCallCount());
+            $this->assertSame(1, $addMessageMock->getCallCount());
         } catch (Exception $ex) {
             $this->fail('Exception not caught.');
         }
