@@ -1362,8 +1362,7 @@ class CMService_MaxMind extends CM_Class_Abstract implements CM_Service_ManagerA
             $this->_printProgressCounter(++$item, $count);
         }
 
-        CM_Db_Db::exec('RENAME TABLE `cm_model_location_ip` TO `cm_model_location_ip_old`, `cm_model_location_ip_new` TO `cm_model_location_ip`');
-        CM_Db_Db::exec('DROP TABLE `cm_model_location_ip_old`');
+        CM_Db_Db::replaceTable('cm_model_location_ip', 'cm_model_location_ip_new');
 
         $this->_printInfoList($infoListWarning, '!');
     }
