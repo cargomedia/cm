@@ -272,6 +272,36 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame(1, $jsonSerializeMethod->getCallCount());
     }
 
+    public function testEncodeRecursive() {
+        $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable'])->newInstance();
+        $nestedObject1 = $this->mockClass(null, ['CM_ArrayConvertible'])->newInstance();
+        $nestedObject2 = $this->mockClass(null, ['JsonSerializable'])->newInstance();
+        $object->mockMethod('toArray')->set([
+            'foo'     => 1,
+            'nested1' => $nestedObject1,
+        ]);
+        $object->mockMethod('jsonSerialize')->set([
+            'bar'     => 1,
+            'nested2' => $nestedObject2
+        ]);
+        $nestedObject1->mockMethod('toArray')->set(['foo' => 2]);
+        $nestedObject2->mockMethod('jsonSerialize')->set(['bar' => 2]);
+        $expected = [
+            '_class' => get_class($object),
+            'foo'    => 1,
+            'nested1' => [
+                '_class' => get_class($nestedObject1),
+                'foo'    => 2,
+            ],
+            'bar' => 1,
+            'nested2' => [
+                '_class' => get_class($nestedObject2),
+                'bar' => 2,
+            ]
+        ];
+        $this->assertSame($expected, CM_Params::encode($object));
+    }
+
     public function testGetDateTime() {
         $dateTimeList = array(
             new DateTime('2012-12-12 13:00:00 +0300'),
