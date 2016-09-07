@@ -17,28 +17,14 @@ class CM_Mail_Mailer extends Swift_Mailer implements CM_Service_ManagerAwareInte
         }
 
         $numSent = 0;
-        $context = new CM_Log_Context();
         try {
             $numSent = parent::send($message, $failedRecipients);
-        } catch (Exception $e) {
-            $context->setException($e);
-        }
-
-        $this->getTransport()->stop();
-
-        $succeeded = 0 !== $numSent && null !== $failedRecipients && 0 === count($failedRecipients);
-        if (!$succeeded) {
-            $context->setExtra([
-                'message'          => [
-                    'subject' => $message->getSubject(),
-                    'from'    => $message->getFrom(),
-                    'to'      => $message->getTo(),
-                    'cc'      => $message->getCc(),
-                    'bcc'     => $message->getBcc(),
-                ],
-                'failedRecipients' => $failedRecipients,
-            ]);
-            $this->getServiceManager()->getLogger()->error('Failed to send email', $context);
+            $this->getTransport()->stop();
+            if (0 === $numSent || 0 !== count($failedRecipients)) {
+                $this->_logSendError($message, $failedRecipients);
+            }
+        } catch (Exception $exception) {
+            $this->_logSendError($message, $failedRecipients, $exception);
         }
 
         return $numSent;
@@ -47,5 +33,28 @@ class CM_Mail_Mailer extends Swift_Mailer implements CM_Service_ManagerAwareInte
     public function createMessage($service = null) {
         $service = null === $service ? 'cm-message' : $service;
         return parent::createMessage($service);
+    }
+
+    /**
+     * @param Swift_Mime_Message $message
+     * @param array|null         $failedRecipients
+     * @param Exception|null     $exception
+     */
+    protected function _logSendError(Swift_Mime_Message $message, array $failedRecipients = null, Exception $exception = null) {
+        $context = new CM_Log_Context();
+        $context->setExtra([
+            'message'          => [
+                'subject' => $message->getSubject(),
+                'from'    => $message->getFrom(),
+                'to'      => $message->getTo(),
+                'cc'      => $message->getCc(),
+                'bcc'     => $message->getBcc(),
+            ],
+            'failedRecipients' => $failedRecipients,
+        ]);
+        if ($exception) {
+            $context->setException($exception);
+        }
+        $this->getServiceManager()->getLogger()->error('Failed to send email', $context);
     }
 }
