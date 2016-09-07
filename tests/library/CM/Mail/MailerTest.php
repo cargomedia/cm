@@ -19,6 +19,27 @@ class CM_Mail_MailerTest extends CMTest_TestCase {
         $this->assertSame([], $failedRecipients);
     }
 
+    public function testSendWithHeaders() {
+        $transport = $this->mockInterface('Swift_Transport')->newInstance();
+        $transport->mockMethod('isStarted')->set(true);
+        $message = new CM_Mail_Message('foo', 'content');
+        $message->setTo('foo@example.com');
+        $message->setCc('bar@example.com', 'bar');
+        $client = new CM_Mail_Mailer($transport, ['X-foo' => 'bar']);
+
+        $sendMethod = $transport->mockMethod('send')->set(function (CM_Mail_Message $message) {
+            $this->assertSame(['X-foo' => ['bar']], $message->getCustomHeaders());
+            return 2;
+        });
+        $failedRecipients = [];
+        $this->assertSame([], $message->getCustomHeaders());
+        $numSent = $client->send($message, $failedRecipients);
+        $this->assertSame([], $message->getCustomHeaders());
+        $this->assertSame(1, $sendMethod->getCallCount());
+        $this->assertSame(2, $numSent);
+        $this->assertSame([], $failedRecipients);
+    }
+
     public function testSendNoRecipient() {
         $transport = $this->mockInterface('Swift_Transport')->newInstance();
         $transport->mockMethod('isStarted')->set(true);
@@ -37,6 +58,46 @@ class CM_Mail_MailerTest extends CMTest_TestCase {
         $this->assertSame(0, $sendMethod->getCallCount());
     }
 
+    public function testSendThrows() {
+        $serviceManager = new CM_Service_Manager();
+        $logger = $this->mockObject('CM_Log_Logger');
+        $serviceManager->registerInstance('logger', $logger);
+        $transport = $this->mockInterface('Swift_Transport')->newInstance();
+        $transport->mockMethod('isStarted')->set(true);
+        $message = new Swift_Message('foo', 'content');
+        $message->setFrom('foobar@example.com', 'Foobar');
+        $message->setTo('foo@example.com');
+        $message->setCc('bar@example.com', 'bar');
+
+        $client = new CM_Mail_Mailer($transport);
+        $client->setServiceManager($serviceManager);
+
+        $sendMethod = $transport->mockMethod('send')->set(function () {
+            throw new Exception('Failed');
+        });
+        $errorMethod = $logger->mockMethod('error')->set(function ($message, CM_Log_Context $context = null) {
+            $exception = $context->getException();
+            $this->assertSame('Failed to send email', $message);
+            $this->assertSame([
+                'message'          => [
+                    'subject' => 'foo',
+                    'from'    => ['foobar@example.com' => 'Foobar'],
+                    'to'      => ['foo@example.com' => null],
+                    'cc'      => ['bar@example.com' => 'bar'],
+                    'bcc'     => null,
+                ],
+                'failedRecipients' => [],
+            ], $context->getExtra());
+            $this->assertInstanceOf('Exception', $exception);
+            $this->assertSame('Failed', $exception->getMessage());
+        });
+
+        $client->send($message);
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame(1, $sendMethod->getCallCount());
+        $this->assertSame(1, $errorMethod->getCallCount());
+    }
+
     public function testSendFailed() {
         $serviceManager = new CM_Service_Manager();
         $logger = $this->mockObject('CM_Log_Logger');
@@ -44,7 +105,7 @@ class CM_Mail_MailerTest extends CMTest_TestCase {
         $transport = $this->mockInterface('Swift_Transport')->newInstance();
         $transport->mockMethod('isStarted')->set(true);
         $message = new Swift_Message('foo', 'content');
-        $message->setSender('foobar@example.com', 'Foobar');
+        $message->setFrom('foobar@example.com', 'Foobar');
         $message->setTo('foo@example.com');
         $message->setCc('bar@example.com', 'bar');
 
@@ -52,9 +113,8 @@ class CM_Mail_MailerTest extends CMTest_TestCase {
         $client->setServiceManager($serviceManager);
 
         $sendMethod = $transport->mockMethod('send')->set(0);
-        $warningMethod = $logger->mockMethod('warning');
         $errorMethod = $logger->mockMethod('error')->set(function ($message, CM_Log_Context $context = null) {
-            $this->assertSame('Failed to send email to all recipients', $message);
+            $this->assertSame('Failed to send email', $message);
             $this->assertSame([
                 'message'          => [
                     'subject' => 'foo',
@@ -72,7 +132,6 @@ class CM_Mail_MailerTest extends CMTest_TestCase {
 
         /** @var CM_Exception_Invalid $exception */
         $this->assertSame(1, $sendMethod->getCallCount());
-        $this->assertSame(0, $warningMethod->getCallCount());
         $this->assertSame(1, $errorMethod->getCallCount());
     }
 }
