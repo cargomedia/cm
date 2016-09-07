@@ -27,13 +27,7 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
         $this->assertCount(3, $modelPaging);
         $this->assertEquals($model2, $modelPaging->getItem(0));
         $this->assertEquals($model1, $modelPaging->getItem(1));
-        try {
-            $modelPaging->getItem(2);
-            $this->fail('Can access nonexistent item.');
-        } catch (CM_Exception_Nonexistent $ex) {
-            $this->assertSame('Model itemRaw has no data', $ex->getMessage());
-            $this->assertSame(['itemRaw' => '2000'], $ex->getMetaInfo());
-        }
+        $this->assertNull($modelPaging->getItem(2));
     }
 
     public function testPagingVariableType() {
@@ -52,13 +46,7 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
         $this->assertCount(3, $modelPaging);
         $this->assertEquals($model1, $modelPaging->getItem(0));
         $this->assertEquals($model2, $modelPaging->getItem(1));
-        try {
-            $modelPaging->getItem(2);
-            $this->fail('Can access nonexistent item.');
-        } catch (CM_Exception_Nonexistent $ex) {
-            $this->assertSame('Model itemRaw has no data', $ex->getMessage());
-            $this->assertContains('Array (', $ex->getMetaInfo()['itemRaw']);
-        }
+        $this->assertNull($modelPaging->getItem(2));
     }
 
     public function testModelListInvalidation() {
