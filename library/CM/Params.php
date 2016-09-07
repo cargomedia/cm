@@ -472,6 +472,14 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     }
 
     /**
+     * @param $key
+     * @return CM_Mail_Message
+     */
+    public function getMailMessage($key) {
+        return $this->getObject($key, 'CM_Mail_Message');
+    }
+
+    /**
      * @return mixed
      */
     public function shift() {
@@ -591,12 +599,12 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
             $result = ['_class' => get_class($value)];
             if ($value instanceof CM_ArrayConvertible) {
                 $array = $value->toArray();
-                $result = array_merge($result, $array);
+                $result = array_merge($result, self::encode($array));
             }
             if ($value instanceof JsonSerializable) {
                 $array = $value->jsonSerialize();
                 if (is_array($array)) {
-                    $result = array_merge($result, array_map('self::encode', $array));
+                    $result = array_merge($result, self::encode($array));
                 }
             }
         } else {

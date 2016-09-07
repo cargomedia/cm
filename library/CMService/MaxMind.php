@@ -1,6 +1,8 @@
 <?php
 
-class CMService_MaxMind extends CM_Class_Abstract {
+class CMService_MaxMind extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     const COUNTRY_URL = 'https://raw.githubusercontent.com/lukes/ISO-3166-Countries-with-Regional-Codes/56efb650f927eda08c18c2a077226104d0e41744/all/all.csv';
     const REGION_URL = 'http://www.maxmind.com/download/geoip/misc/region_codes.csv';
@@ -1360,15 +1362,17 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $this->_printProgressCounter(++$item, $count);
         }
 
-        CM_Db_Db::exec('RENAME TABLE `cm_model_location_ip` TO `cm_model_location_ip_old`, `cm_model_location_ip_new` TO `cm_model_location_ip`');
-        CM_Db_Db::exec('DROP TABLE `cm_model_location_ip_old`');
+        CM_Db_Db::replaceTable('cm_model_location_ip', 'cm_model_location_ip_new');
 
         $this->_printInfoList($infoListWarning, '!');
     }
 
     protected function _updateSearchIndex() {
         CM_Model_Location::createAggregation();
-        $client = CM_Service_Manager::getInstance()->getElasticsearch()->getClient();
+        while (CM_Model_Location::getCreateAggregationInProgress($this->getServiceManager()->getDatabases()->getReadMaintenance())) {
+            sleep(1);
+        }
+        $client = $this->getServiceManager()->getElasticsearch()->getClient();
         $type = new CM_Elasticsearch_Type_Location($client);
         $searchIndexCli = new CM_Elasticsearch_Index_Cli(null, $this->_streamOutput, $this->_streamError);
         $searchIndexCli->create($type->getIndexName());
@@ -1479,7 +1483,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @codeCoverageIgnore
      */
     private function _getFileTmp($name) {
-        return new CM_File($name, CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
+        return new CM_File($name, $this->getServiceManager()->getFilesystems()->getTmp());
     }
 
     /**

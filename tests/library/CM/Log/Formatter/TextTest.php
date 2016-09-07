@@ -67,12 +67,26 @@ class CM_Log_Formatter_TextTest extends CMTest_TestCase {
     }
 
     public function testFormattingWithExtra() {
-        $extra = ['foo', 'bar', 'foo' => 'bar'];
+        $extra = ['foo', 'bar' => true, 'foo' => ['foobar' => 1], 'baz' => [1, 2, true, null]];
         $context = new CM_Log_Context();
         $context->setExtra($extra);
         $record = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', $context);
         $formatter = new CM_Log_Formatter_Text();
-        $this->assertSame(' - extra: 0: foo, 1: bar, foo: bar', $formatter->renderContext($record));
+        $this->assertSame(join(PHP_EOL, [
+            ' - extra: {',
+            '    "0": "foo",',
+            '    "bar": true,',
+            '    "foo": {',
+            '        "foobar": 1',
+            '    },',
+            '    "baz": [',
+            '        1,',
+            '        2,',
+            '        true,',
+            '        null',
+            '    ]',
+            '}',
+        ]), $formatter->renderContext($record));
     }
 
     public function testFormattingWithException() {

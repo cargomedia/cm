@@ -334,9 +334,23 @@ class CM_Model_Location extends CM_Model_Abstract {
         return 'CM_Model_StorageAdapter_CacheLocal';
     }
 
+    /**
+     * @param CM_Db_Client $db
+     * @return bool
+     */
+    public static function getCreateAggregationInProgress(CM_Db_Client $db) {
+        foreach (['cm_tmp_location_new', 'cm_tmp_location_coordinates_new'] as $table) {
+            if (CM_Db_Db::exec('SHOW TABLES LIKE ?', [$table], null, $db)->getAffectedRows()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static function createAggregation() {
-        CM_Db_Db::truncate('cm_tmp_location');
-        CM_Db_Db::exec('INSERT INTO `cm_tmp_location` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `nameFull`, `lat`,`lon`)
+        CM_Db_Db::exec('DROP TABLE IF EXISTS `cm_tmp_location_new`');
+        CM_Db_Db::exec('CREATE TABLE `cm_tmp_location_new` LIKE `cm_tmp_location`');
+        CM_Db_Db::exec('INSERT INTO `cm_tmp_location_new` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `nameFull`, `lat`,`lon`)
 			SELECT 1, `1`.`id`, `1`.`id`, NULL, NULL, NULL,
 					`1`.`name`, `1`.`abbreviation`, CONCAT_WS(" ", `1`.`name`, `1`.`abbreviation`), NULL, NULL
 			FROM `cm_model_location_country` AS `1`
@@ -359,8 +373,9 @@ class CM_Model_Location extends CM_Model_Abstract {
 			LEFT JOIN `cm_model_location_state` AS `2` ON(`3`.`stateId`=`2`.`id`)
 			LEFT JOIN `cm_model_location_country` AS `1` ON(`3`.`countryId`=`1`.`id`)');
 
-        CM_Db_Db::truncate('cm_tmp_location_coordinates');
-        CM_Db_Db::exec('INSERT INTO `cm_tmp_location_coordinates` (`level`,`id`,`coordinates`)
+        CM_Db_Db::exec('DROP TABLE IF EXISTS `cm_tmp_location_coordinates_new`');
+        CM_Db_Db::exec('CREATE TABLE `cm_tmp_location_coordinates_new` LIKE `cm_tmp_location_coordinates`');
+        CM_Db_Db::exec('INSERT INTO `cm_tmp_location_coordinates_new` (`level`,`id`,`coordinates`)
 			SELECT 3, `id`, POINT(lat, lon)
 			FROM `cm_model_location_city`
 			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL
@@ -368,6 +383,9 @@ class CM_Model_Location extends CM_Model_Abstract {
 			SELECT 4, `id`, POINT(lat, lon)
 			FROM `cm_model_location_zip`
 			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL');
+
+        CM_Db_Db::replaceTable('cm_tmp_location', 'cm_tmp_location_new');
+        CM_Db_Db::replaceTable('cm_tmp_location_coordinates', 'cm_tmp_location_coordinates_new');
     }
 
     /**
