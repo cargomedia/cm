@@ -16,15 +16,18 @@ class CM_Mail_MailerFactory implements CM_Service_ManagerAwareInterface {
     /**
      * @param string|null $host
      * @param int|null    $port
+     * @param array|null  $headers
      * @param string|null $username
      * @param string|null $password
      * @param string|null $security
      * @return CM_Mail_Mailer
      */
-    public function createSmtpMailer($host = null, $port = null, $username = null, $password = null, $security = null) {
+    public function createSmtpMailer($host = null, $port = null, array $headers = null, $username = null, $password = null, $security = null) {
         $host = null !== $host ? (string) $host : 'localhost';
         $port = null !== $port ? (int) $port : 25;
+        $headers = null !== $headers ? (array) $headers : [];
         $security = null !== $security ? (string) $security : null;
+
         $transport = new Swift_SmtpTransport($host, $port, $security);
         if (null !== $username) {
             $transport->setUsername((string) $username);
@@ -32,7 +35,7 @@ class CM_Mail_MailerFactory implements CM_Service_ManagerAwareInterface {
         if (null !== $password) {
             $transport->setPassword((string) $password);
         }
-        return new CM_Mail_Mailer($transport);
+        return new CM_Mail_Mailer($transport, $headers);
     }
 
     /**
