@@ -4,7 +4,19 @@ class CM_Mail_Mailer extends Swift_Mailer implements CM_Service_ManagerAwareInte
 
     use CM_Service_ManagerAwareTrait;
 
-    public function __construct(Swift_Transport $transport) {
+    /** @var array */
+    private $_headers;
+
+    /**
+     * @param Swift_Transport $transport
+     * @param array|null      $headers
+     */
+    public function __construct(Swift_Transport $transport, array $headers = null) {
+        if (null === $headers) {
+            $headers = [];
+        }
+        $this->_headers = $headers;
+
         CM_Mail_Message::register();
         parent::__construct($transport);
     }
@@ -18,6 +30,10 @@ class CM_Mail_Mailer extends Swift_Mailer implements CM_Service_ManagerAwareInte
 
         $numSent = 0;
         try {
+            $message = clone $message;
+            foreach ($this->_getHeaders() as $key => $value) {
+                $message->getHeaders()->addTextHeader($key, $value);
+            }
             $numSent = parent::send($message, $failedRecipients);
             $this->getTransport()->stop();
             if (0 === $numSent || 0 !== count($failedRecipients)) {
@@ -33,6 +49,13 @@ class CM_Mail_Mailer extends Swift_Mailer implements CM_Service_ManagerAwareInte
     public function createMessage($service = null) {
         $service = null === $service ? 'cm-message' : $service;
         return parent::createMessage($service);
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getHeaders() {
+        return $this->_headers;
     }
 
     /**

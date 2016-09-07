@@ -19,6 +19,27 @@ class CM_Mail_MailerTest extends CMTest_TestCase {
         $this->assertSame([], $failedRecipients);
     }
 
+    public function testSendWithHeaders() {
+        $transport = $this->mockInterface('Swift_Transport')->newInstance();
+        $transport->mockMethod('isStarted')->set(true);
+        $message = new CM_Mail_Message('foo', 'content');
+        $message->setTo('foo@example.com');
+        $message->setCc('bar@example.com', 'bar');
+        $client = new CM_Mail_Mailer($transport, ['X-foo' => 'bar']);
+
+        $sendMethod = $transport->mockMethod('send')->set(function (CM_Mail_Message $message) {
+            $this->assertSame(['X-foo' => ['bar']], $message->getCustomHeaders());
+            return 2;
+        });
+        $failedRecipients = [];
+        $this->assertSame([], $message->getCustomHeaders());
+        $numSent = $client->send($message, $failedRecipients);
+        $this->assertSame([], $message->getCustomHeaders());
+        $this->assertSame(1, $sendMethod->getCallCount());
+        $this->assertSame(2, $numSent);
+        $this->assertSame([], $failedRecipients);
+    }
+
     public function testSendNoRecipient() {
         $transport = $this->mockInterface('Swift_Transport')->newInstance();
         $transport->mockMethod('isStarted')->set(true);
