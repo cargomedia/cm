@@ -2,6 +2,8 @@
 
 class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
 
+    const DEFAULT_TYPE = 0;
+
     /** @var  string */
     protected $_collection;
 
@@ -65,9 +67,10 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
                 'phpVersion' => $computerInfo->getPhpVersion(),
             ];
         }
-        if ($extra) {
-            $formattedContext['extra'] = $extra;
+        if (!isset($extra['type'])) {
+            $extra['type'] = self::DEFAULT_TYPE;
         }
+        $formattedContext['extra'] = $extra;
         if (null !== $user) {
             $formattedContext['user'] = [
                 'id'   => $user->getId(),
@@ -84,7 +87,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             ];
 
             $formattedContext['httpRequest']['query'] = $request->findQuery();
-            
+
             if ($request instanceof CM_Http_Request_Post) {
                 $formattedContext['httpRequest']['body'] = $request->getBody();
             }

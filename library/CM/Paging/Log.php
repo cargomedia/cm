@@ -112,13 +112,17 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         $criteria = [];
 
         if (false === $this->_filterType) {
-            $criteria['context.extra.type'] = ['$exists' => false];
+            $criteria['context.extra.type'] = CM_Log_Handler_MongoDb::DEFAULT_TYPE;
         } elseif (null !== $this->_filterType) {
             $criteria['context.extra.type'] = (int) $this->_filterType;
         }
 
         if (null !== $this->_filterLevelList) {
-            $criteria['level'] = ['$in' => $this->_filterLevelList];
+            if (1 === sizeof($this->_filterLevelList)) {
+                $criteria['level'] = $this->_filterLevelList[0];
+            } else {
+                $criteria['level'] = ['$in' => $this->_filterLevelList];
+            }
         }
 
         if (null !== $this->_ageMax) {
