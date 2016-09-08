@@ -7,20 +7,22 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
     /**
      * @param CM_Service_Manager $serviceManager
      */
-    public function __construct(CM_Service_Manager $serviceManager) {
-        $this->setServiceManager($serviceManager);
+    public function __construct(CM_Service_Manager $serviceManager = null) {
+        if ($serviceManager) {
+            $this->setServiceManager($serviceManager);
+        }
     }
 
     /**
      * @param CM_Jobdistribution_Job_Abstract $job
      * @param array                           $params
-     * @param int                             $executeAt
+     * @param int                             $delay
      */
-    public function addJob(CM_Jobdistribution_Job_Abstract $job, array $params, $executeAt) {
+    public function addJob(CM_Jobdistribution_Job_Abstract $job, array $params, $delay) {
         CM_Db_Db::insert('cm_jobdistribution_delayedqueue', [
             'className' => get_class($job),
             'params'    => CM_Params::encode($params, true),
-            'executeAt' => (int) $executeAt,
+            'executeAt' => time() + (int) $delay,
         ]);
     }
 
