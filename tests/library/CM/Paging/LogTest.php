@@ -45,7 +45,12 @@ class CM_Paging_LogTest extends CMTest_TestCase {
         $this->assertSame('foo', $items[1]['message']);
         $this->assertSame(CM_Log_Logger::DEBUG, $items[1]['level']);
         $this->assertSame($user->getDisplayName(), $items[1]['context']['user']['name']);
-        $this->assertSame(['bar' => 'quux'], $items[1]['context']['extra']);
+        $this->assertSame(
+            [
+                'bar'  => 'quux',
+                'type' => CM_Log_Handler_MongoDb::DEFAULT_TYPE
+            ], $items[1]['context']['extra']
+        );
 
         $age = 86400;
         CMTest_TH::timeForward($age);
