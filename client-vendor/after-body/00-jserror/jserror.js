@@ -52,8 +52,8 @@
         var suppressLogging = originatesFromLogging || (suppressWithoutDetails && detailsUnavailable) || counterMaxReached;
         if (!suppressLogging) {
           var previousLog = null;
-          if (cm && cm.logger && cm.logger.hasRecords()) {
-            previousLog = cm.logger.getRecords().toString();
+          if (cm && cm.logger) {
+            previousLog = cm.logger.getFormattedRecords();
           }
           jserror.report({
             uid: jserror._uid,
