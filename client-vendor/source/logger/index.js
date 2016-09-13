@@ -22,6 +22,13 @@ Logger.getRecords = function() {
   return logRecorder.getRecords();
 };
 
+/**
+ * @param {Error} error
+ */
+Logger.addRecordError = function(error) {
+  logRecorder.addRecord([error.message], {level: Logger.ERROR});
+};
+
 Logger.setHandler(function(messages, context) {
   var isDev = context.level.value < Logger.WARN.value;
   if (!isDev || (options.dev && isDev)) {

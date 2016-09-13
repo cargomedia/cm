@@ -388,7 +388,7 @@ var CM_App = CM_Class_Abstract.extend({
      */
     log: function(error) {
       _.defer(function() {
-        cm.logger.error(error.message);
+        cm.logger.addRecordError(error);
         throw error;
       });
     },
