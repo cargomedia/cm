@@ -4,6 +4,10 @@ var Recorder = require('./handlers/recorder');
 var consoleHandler = Logger.createDefaultHandler();
 var logRecorder = new Recorder();
 
+var options = {
+  dev: false
+};
+
 /**
  * @returns {String}
  */
@@ -19,9 +23,16 @@ Logger.getRecords = function() {
 };
 
 Logger.setHandler(function(messages, context) {
-  consoleHandler(messages, context);
+  var isDev = context.level.value < Logger.WARN.value;
+  if (!isDev || (options.dev && isDev)) {
+    consoleHandler(messages, context);
+  }
   logRecorder.addRecord(messages, context);
 });
+
+Logger.configure = function(newOptions) {
+  _.extend(options, newOptions);
+};
 
 Logger.setLevel(Logger.DEBUG);
 
