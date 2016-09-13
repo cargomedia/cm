@@ -19,6 +19,9 @@ var CM_App = CM_Class_Abstract.extend({
   options: {},
 
   ready: function() {
+    this.logger.configure({
+      dev: cm.options.debug
+    });
     this.promise.ready();
     this.error.ready();
     this.dom.ready();
@@ -385,6 +388,7 @@ var CM_App = CM_Class_Abstract.extend({
      */
     log: function(error) {
       _.defer(function() {
+        cm.logger.error(error.message);
         throw error;
       });
     },
@@ -428,22 +432,12 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {*...} messages
      */
     log: function(messages) {
-      if (!cm.options.debug) {
-        return;
-      }
       var args = _.toArray(arguments);
       var message = args.shift();
       var time = (Date.now() - performance.timing.navigationStart) / 1000;
       var timeFormatted = time.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false});
       var prefix = '[CM ' + timeFormatted + (performance.timing.isPolyfilled ? '!' : '') + ']';
-      cm.debug.logRaw.apply(cm.debug, _.union([prefix + ' ' + message], args));
-    },
-
-    logRaw: function() {
-      if (!cm.options.debug) {
-        return;
-      }
-      cm.logger.debug.apply(cm.logger, arguments);
+      cm.logger.debug.apply(cm.logger, _.union([prefix + ' ' + message], args));
     }
   },
 
