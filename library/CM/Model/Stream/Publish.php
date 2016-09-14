@@ -23,6 +23,10 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
         return CM_Db_Db::select('cm_stream_publish', '*', array('id' => $this->getId()))->fetch();
     }
 
+    protected function _onCreate() {
+        $this->getStreamChannel()->onPublish($this);
+    }
+
     protected function _onDelete() {
         CM_Db_Db::delete('cm_stream_publish', array('id' => $this->getId()));
     }
@@ -72,7 +76,6 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
             'channelId'    => $streamChannel->getId(),
         ));
         $streamPublish = new self($id);
-        $streamChannel->onPublish($streamPublish);
         return $streamPublish;
     }
 }
