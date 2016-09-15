@@ -83,12 +83,14 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
                 return array('redirectExternal' => $responsePage->getRender()->getUrl($redirectExternalFragment));
             }
 
-            $responseEmbed = new CM_Http_Response_Page_Embed($responsePage->getRequest(), $responsePage->getSite(), $this->getServiceManager());
+            $view = $this->_getView();
+            $layout = $view instanceof CM_Layout_Abstract ? $view : null;
+            $responseEmbed = new CM_Http_Response_Page_Embed($responsePage->getRequest(), $responsePage->getSite(), $this->getServiceManager(), $layout);
             $responseEmbed->process();
             $request = $responseEmbed->getRequest();
 
             if ($redirectUrl = $responseEmbed->getRedirectUrl()) {
-                if (!$this->_isPageOnSameSite($redirectUrl)) {
+                if ($responseEmbed->getForceReload() || !$this->_isPageOnSameSite($redirectUrl)) {
                     return array('redirectExternal' => $redirectUrl);
                 }
             }
