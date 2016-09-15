@@ -124,9 +124,12 @@ class CM_Model_Location extends CM_Model_Abstract {
         if (null === $pointCurrent) {
             return null;
         }
-        $timezoneNameList = \Functional\select(DateTimeZone::listIdentifiers(), function ($timeZone) {
-            return IntlTimeZone::fromDateTimeZone(new DateTimeZone($timeZone));
-        });
+        $timezoneNameList = DateTimeZone::listIdentifiers();
+        if (PHP_VERSION_ID >= 50500) {
+            $timezoneNameList = \Functional\select($timezoneNameList, function ($timeZone) {
+                return IntlTimeZone::fromDateTimeZone(new DateTimeZone($timeZone));
+            });
+        }
         $distanceList = Functional\map($timezoneNameList, function ($timezoneName) use ($pointCurrent) {
             $timezoneLocation = (new DateTimeZone($timezoneName))->getLocation();
             $pointTimeZone = new CM_Geo_Point($timezoneLocation['latitude'], $timezoneLocation['longitude']);
