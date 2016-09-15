@@ -276,6 +276,16 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         }
     }
 
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot create date formatter
+     */
+    public function testGetFormatterDateException() {
+        $timeZone = new DateTimeZone('Europe/Kirov');
+        $render = new CM_Frontend_Render();
+        $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::SHORT, null, $timeZone);
+    }
+
     public function testGetLayoutPath() {
         $render = new CM_Frontend_Render();
         $this->assertSame(
