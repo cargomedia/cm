@@ -1,6 +1,8 @@
 <?php
 
-class CM_MessageStream_Service {
+class CM_MessageStream_Service implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var CM_MessageStream_Adapter_Abstract|null */
     private $_adapter;
@@ -11,6 +13,13 @@ class CM_MessageStream_Service {
      */
     public function __construct(CM_MessageStream_Adapter_Abstract $adapter = null) {
         $this->_adapter = $adapter;
+    }
+
+    public function setServiceManager(CM_Service_Manager $serviceManager) {
+        $this->_serviceManager = $serviceManager;
+        if ($this->_adapter instanceof CM_Service_ManagerAwareInterface) {
+            $this->_adapter->setServiceManager($serviceManager);
+        }
     }
 
     /**
