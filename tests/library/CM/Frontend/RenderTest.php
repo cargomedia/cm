@@ -277,13 +277,24 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
     }
 
     /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot create date formatter
+     * @requires PHP 5.5
      */
     public function testGetFormatterDateException() {
-        $timeZone = new DateTimeZone('Europe/Kirov');
-        $render = new CM_Frontend_Render();
-        $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::SHORT, null, $timeZone);
+        $timezoneNameList = \Functional\reject(DateTimeZone::listIdentifiers(), function ($timeZone) {
+            return IntlTimeZone::fromDateTimeZone(new DateTimeZone($timeZone));
+        });
+        if (empty($timezoneNameList)) {
+            $this->markTestSkipped('No unsupported timezones');
+        }
+
+        try {
+            $timeZoneName = \Functional\first($timezoneNameList);
+            $render = new CM_Frontend_Render();
+            $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::SHORT, null, new DateTimeZone($timeZoneName));
+            $this->fail('Date formatter created with unsupported timezone');
+        } catch (CM_Exception $ex) {
+            $this->assertSame('Cannot create date formatter', $ex->getMessage());
+        }
     }
 
     public function testGetLayoutPath() {
