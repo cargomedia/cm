@@ -26,7 +26,7 @@ Logger.getRecords = function() {
  * @param {Error} error
  */
 Logger.addRecordError = function(error) {
-  logRecorder.addRecord(['%s\n%s', error.message, error.stack], {level: Logger.ERROR});
+  logRecorder.addRecord([error.message], {level: Logger.ERROR});
 };
 
 Logger.setHandler(function(messages, context) {
