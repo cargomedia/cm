@@ -6,14 +6,16 @@
    *
    * @param {String} message
    * @param {Boolean} [isPublic]
+   * @param {Object} [metaInfo]
    * @constructor
    */
-  function CM_Exception(message, isPublic) {
+  function CM_Exception(message, isPublic, metaInfo) {
     var temp = Error.call(this, message);
     this.name = 'CM_Exception';
     this.stack = temp.stack;
     this.message = temp.message;
-    this.isPublic = isPublic;
+    this.isPublic = Boolean(isPublic);
+    this.metaInfo = metaInfo || {};
     return this;
   }
 

@@ -276,6 +276,24 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         }
     }
 
+    public function testGetFormatterDateException() {
+        $timezoneNameList = \Functional\reject(DateTimeZone::listIdentifiers(), function ($timeZoneName) {
+            return IntlTimeZone::fromDateTimeZone(new DateTimeZone($timeZoneName));
+        });
+        if (empty($timezoneNameList)) {
+            $this->markTestSkipped('No unsupported timezones');
+        }
+
+        try {
+            $timeZoneName = \Functional\first($timezoneNameList);
+            $render = new CM_Frontend_Render();
+            $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::SHORT, null, new DateTimeZone($timeZoneName));
+            $this->fail('Date formatter created with unsupported timezone');
+        } catch (CM_Exception $ex) {
+            $this->assertSame('Cannot create date formatter', $ex->getMessage());
+        }
+    }
+
     public function testGetLayoutPath() {
         $render = new CM_Frontend_Render();
         $this->assertSame(

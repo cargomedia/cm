@@ -99,18 +99,6 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param int        $seconds
-     * @param array|null $params
-     */
-    public function queueDelayed($seconds, array $params = null) {
-        if (null === $params) {
-            $params = array();
-        }
-        $executeAt = time() + $seconds;
-        $this->_getDelayedQueue()->addJob($this, $params, $executeAt);
-    }
-
-    /**
      * @param GearmanJob $job
      * @return string|null
      * @throws CM_Exception_Nonexistent
@@ -181,12 +169,5 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
         if (is_object($value) && false === $value instanceof CM_ArrayConvertible) {
             throw new CM_Exception_InvalidParam('Object is not an instance of CM_ArrayConvertible', null, ['className' => get_class($value)]);
         }
-    }
-
-    /**
-     * @return CM_Jobdistribution_DelayedQueue
-     */
-    protected function _getDelayedQueue() {
-        return new CM_Jobdistribution_DelayedQueue(CM_Service_Manager::getInstance());
     }
 }

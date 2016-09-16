@@ -1,6 +1,8 @@
 <?php
 
-class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abstract {
+class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     const SYNCHRONIZE_DELAY = 10;
 
@@ -118,13 +120,11 @@ class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abst
                             }
                         }
                     } catch (CM_Exception $e) {
-                        $e->setSeverity(CM_Exception::WARN);
-                        $this->_handleException($e);
+                        $this->getServiceManager()->getLogger()->warning('Cannot add socket redis subscriber when synchronizing status', (new CM_Log_Context())->setException($e));
                     }
                 }
             } catch (CM_Exception $e) {
-                $e->setSeverity(CM_Exception::WARN);
-                $this->_handleException($e);
+                $this->getServiceManager()->getLogger()->warning('Error synchronizing socket redis status', (new CM_Log_Context())->setException($e));
             }
         }
     }
@@ -229,13 +229,6 @@ class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abst
                 'http://' . $server['httpHost'] . ':' . $server['httpPort'])));
         }
         return $statusData;
-    }
-
-    /**
-     * @param CM_Exception $exception
-     */
-    protected function _handleException(CM_Exception $exception) {
-        CM_Bootloader::getInstance()->getExceptionHandler()->handleException($exception);
     }
 
     /**

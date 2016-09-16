@@ -1,0 +1,13 @@
+# artefacts
+dist/
+build/
+
+# IDE junk
+.settings
+.project
+.DS_Store
+.idea/
+
+# NodeJS
+node_modules
+npm-debug.log

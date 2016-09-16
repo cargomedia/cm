@@ -96,8 +96,8 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $serviceName
-     * @param mixed  $instance
+     * @param string       $serviceName
+     * @param mixed        $instance
      * @throws CM_Exception_Invalid
      */
     public function registerInstance($serviceName, $instance) {
@@ -128,10 +128,12 @@ class CM_Service_Manager extends CM_Class_Abstract {
 
     /**
      * @param string $serviceName
+     * @return $this
      */
     public function unregister($serviceName) {
         unset($this->_serviceConfigList[$serviceName]);
         unset($this->_serviceInstanceList[$serviceName]);
+        return $this;
     }
 
     /**
@@ -155,6 +157,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public function getDatabases() {
         return $this->get('databases', 'CM_Service_Databases');
+    }
+
+    /**
+     * @return CM_Jobdistribution_DelayedQueue
+     */
+    public function getDelayedJobQueue() {
+        return $this->get('delayedJobQueue', 'CM_Jobdistribution_DelayedQueue');
     }
 
     /**

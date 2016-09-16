@@ -34,9 +34,9 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
             })
             ->at(2, null);
 
-        $delayedQueue->addJob($job, $params2, time() + 3);
-        $delayedQueue->addJob($job, $params1, time() + 2);
-        $delayedQueue->addJob($job, [], time() + 4);
+        $delayedQueue->addJob($job, $params2, 3);
+        $delayedQueue->addJob($job, $params1, 2);
+        $delayedQueue->addJob($job, [], 4);
 
         $delayedQueue->queueOutstanding();
         $this->assertSame(0, $queueMethod->getCallCount());
@@ -50,6 +50,53 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
         $this->assertSame(2, $queueMethod->getCallCount());
 
         $this->assertSame(3, $instantiateMethod->getCallCount());
+    }
+
+    public function testCancelJob() {
+        /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait $job */
+        $jobToExec = $this->mockObject('CM_Jobdistribution_Job_Abstract');
+        /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait $job */
+        $jobToCancel = $this->mockObject('CM_Jobdistribution_Job_Abstract');
+        $user = CMTest_TH::createUser();
+        $params1 = ['foo' => 1, 'bar' => $user];
+        $params2 = ['foo' => 2, 'bar' => $user];
+
+        $queueExecMethod = $jobToExec->mockMethod('queue')->set(function (array $params) use ($params1) {
+            $this->assertEquals($params1, $params);
+        });
+        $queueCancelMethod = $jobToCancel->mockMethod('queue');
+        /** @var CM_Jobdistribution_DelayedQueue|\Mocka\AbstractClassTrait $delayedQueue */
+        $delayedQueue = $this->mockObject('CM_Jobdistribution_DelayedQueue', [$this->getServiceManager()]);
+        /** @var \Mocka\FunctionMock $instantiateMethod */
+        $instantiateMethod = $delayedQueue->mockMethod('_instantiateJob')->set(function ($className) use ($jobToExec, $jobToCancel) {
+            $job = null;
+            if ($className === get_class($jobToExec)) {
+                $job = $jobToExec;
+            } elseif ($className === get_class($jobToCancel)) {
+                $job = $jobToCancel;
+            }
+            $this->assertNotNull($job);
+            return $job;
+        });
+
+        $delayedQueue->addJob($jobToExec, $params1, 2);
+        $delayedQueue->addJob($jobToCancel, $params2, 2);
+
+        CMTest_TH::timeForward(1);
+        $delayedQueue->queueOutstanding();
+
+        $this->assertSame(0, $instantiateMethod->getCallCount());
+        $this->assertSame(0, $queueExecMethod->getCallCount());
+        $this->assertSame(0, $queueCancelMethod->getCallCount());
+
+        $delayedQueue->cancelJob($jobToCancel, $params2);
+
+        CMTest_TH::timeForward(2);
+        $delayedQueue->queueOutstanding();
+
+        $this->assertSame(1, $instantiateMethod->getCallCount());
+        $this->assertSame(1, $queueExecMethod->getCallCount());
+        $this->assertSame(0, $queueCancelMethod->getCallCount());
     }
 
     public function test_instantiateJobSetServiceManager() {
