@@ -38,9 +38,13 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $nativeException = new Exception();
         $fatalException = new CM_Exception(null, CM_Exception::FATAL);
 
-        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
-        $exceptionHandler->mockMethod('_logException')->set(function () {
-        });
+        /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\AbstractClassTrait $exceptionHandler */
+        $exceptionHandler = $this->mockObject('CM_ExceptionHandling_Handler_Abstract');
+        $serviceManager = new CM_Service_Manager();
+        $exceptionHandler->setServiceManager($serviceManager);
+        /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
+        $logger = $this->mockObject('CM_Log_Logger');
+        $serviceManager->registerInstance('logger', $logger);
 
         $printExceptionMock = $exceptionHandler->mockMethod('_printException')
             ->at(0, function (Exception $ex) use ($errorException) {
@@ -52,6 +56,22 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
             ->at(2, function (Exception $ex) use ($fatalException) {
                 $this->assertEquals($fatalException, $ex);
             });
+        $addMessageMock = $logger->mockMethod('addMessage')
+            ->at(0, function ($message, $level, CM_Log_Context $context = null) use ($errorException) {
+                $this->assertSame('Application error', $message);
+                $this->assertSame(CM_Log_Logger::ERROR, $level);
+                $this->assertEquals($errorException, $context->getException());
+            })
+            ->at(1, function ($message, $level, CM_Log_Context $context = null) use ($nativeException) {
+                $this->assertSame('Application error', $message);
+                $this->assertSame(CM_Log_Logger::ERROR, $level);
+                $this->assertEquals($nativeException, $context->getException());
+            })
+            ->at(2, function ($message, $level, CM_Log_Context $context = null) use ($fatalException) {
+                $this->assertSame('Application error', $message);
+                $this->assertSame(CM_Log_Logger::CRITICAL, $level);
+                $this->assertEquals($fatalException, $context->getException());
+            });
 
         /** @var CM_ExceptionHandling_Handler_Abstract $exceptionHandler */
         $exceptionHandler->handleException($errorException);
@@ -59,6 +79,7 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $exceptionHandler->handleException($fatalException);
 
         $this->assertSame(3, $printExceptionMock->getCallCount());
+        $this->assertSame(3, $addMessageMock->getCallCount());
     }
 
     public function testPrintExceptionPrintSeverity() {
@@ -67,11 +88,12 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $fatalException = new CM_Exception(null, CM_Exception::FATAL);
 
         /** @var CM_ExceptionHandling_Handler_Abstract|\Mocka\AbstractClassTrait $exceptionHandler */
-        $exceptionHandler = $this->mockClass('CM_ExceptionHandling_Handler_Abstract')->newInstanceWithoutConstructor();
-
-        $logExceptionMock = $exceptionHandler->mockMethod('_logException');
-        $logExceptionMock->set(function () {
-        });
+        $exceptionHandler = $this->mockObject('CM_ExceptionHandling_Handler_Abstract');
+        $serviceManager = new CM_Service_Manager();
+        $exceptionHandler->setServiceManager($serviceManager);
+        /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
+        $logger = $this->mockObject('CM_Log_Logger');
+        $serviceManager->registerInstance('logger', $logger);
 
         $printExceptionMock = $exceptionHandler->mockMethod('_printException');
         $printExceptionMock
@@ -81,6 +103,22 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
             ->at(1, function (Exception $ex) use ($fatalException) {
                 $this->assertEquals($fatalException, $ex);
             });
+        $addMessageMock = $logger->mockMethod('addMessage')
+            ->at(0, function ($message, $level, CM_Log_Context $context = null) use ($errorException) {
+                $this->assertSame('Application error', $message);
+                $this->assertSame(CM_Log_Logger::ERROR, $level);
+                $this->assertEquals($errorException, $context->getException());
+            })
+            ->at(1, function ($message, $level, CM_Log_Context $context = null) use ($nativeException) {
+                $this->assertSame('Application error', $message);
+                $this->assertSame(CM_Log_Logger::ERROR, $level);
+                $this->assertEquals($nativeException, $context->getException());
+            })
+            ->at(2, function ($message, $level, CM_Log_Context $context = null) use ($fatalException) {
+                $this->assertSame('Application error', $message);
+                $this->assertSame(CM_Log_Logger::CRITICAL, $level);
+                $this->assertEquals($fatalException, $context->getException());
+            });
 
         $exceptionHandler->setPrintSeverityMin(CM_Exception::FATAL);
 
@@ -89,6 +127,6 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $exceptionHandler->handleException($fatalException);
 
         $this->assertSame(2, $printExceptionMock->getCallCount());
-        $this->assertSame(3, $logExceptionMock->getCallCount());
+        $this->assertSame(3, $addMessageMock->getCallCount());
     }
 }
