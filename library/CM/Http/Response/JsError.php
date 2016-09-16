@@ -12,7 +12,9 @@ class CM_Http_Response_JsError extends CM_Http_Response_Abstract {
                 ]);
             }
             $context = new CM_Log_Context();
-            $context->setExtra($query);
+            $context->setExtra(array_merge($query, [
+                'type' => CM_Paging_Log_Javascript::getTypeStatic(),
+            ]));
             $this->getServiceManager()->getLogger()->warning('JS Error - ' . $query['error']['message'], $context);
         }
         $this->setHeader('Content-Type', 'application/json');
