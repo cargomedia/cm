@@ -15,13 +15,6 @@ class CM_MessageStream_Service implements CM_Service_ManagerAwareInterface {
         $this->_adapter = $adapter;
     }
 
-    public function setServiceManager(CM_Service_Manager $serviceManager) {
-        $this->_serviceManager = $serviceManager;
-        if ($this->_adapter instanceof CM_Service_ManagerAwareInterface) {
-            $this->_adapter->setServiceManager($serviceManager);
-        }
-    }
-
     /**
      * @return boolean
      */
@@ -76,5 +69,11 @@ class CM_MessageStream_Service implements CM_Service_ManagerAwareInterface {
             return;
         }
         $this->getAdapter()->publish($channel, $event, CM_Params::encode($data));
+    }
+
+    protected function _onSetServiceManager() {
+        if ($this->_adapter instanceof CM_Service_ManagerAwareInterface) {
+            $this->_adapter->setServiceManager($this->getServiceManager());
+        }
     }
 }
