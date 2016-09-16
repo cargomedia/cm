@@ -65,7 +65,5 @@ require(["logger/vendor/src/logger", "logger/handlers/recorder"], function(Logge
       '[' + date + ' INFO] 0 0 -1 1.123 -1.123 16',
       '[' + date + ' INFO] [] {} [1,2,3] {"foo":123} [{"foo":10}] /foo/ [Foo_Bar] [Foo_Bar_ID:1] ' + date + ' [object HTMLDivElement] {"foo1":1,"foo2":2,"foo3":3,"foo4":4,"foo5":5,…} ["foo1","foo2","foo3","foo4","foo5","foo6","fo…]'
     ].join('\n'));
-
-    console.log(recorder.getFormattedRecords());
   });
 });
