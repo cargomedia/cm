@@ -5,6 +5,8 @@ module.exports = {
   modules: [
     'cm/tests/media/videoTest',
     'cm/tests/media/audioTest',
-    'cm/tests/media/audio/engineTest'
+    'cm/tests/media/audio/engineTest',
+
+    'logger/tests/handlers/recorderTest'
   ]
 };

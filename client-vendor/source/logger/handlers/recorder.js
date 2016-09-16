@@ -8,6 +8,7 @@ var Recorder = function(options) {
   this._records = [];
   this._options = _.defaults(options || {}, {
     retention: 300,
+    jsonMaxSize: 50,
     format: '[{date} {level}] {message}'
   });
 };
@@ -41,6 +42,10 @@ Recorder.prototype = {
     };
     this._records.push(record);
     this._cleanupRecords();
+  },
+
+  flushRecords: function() {
+    this._records = [];
   },
 
   /**
@@ -80,8 +85,44 @@ Recorder.prototype = {
    */
   _messageFormatter: function(messages) {
     var clone = _.toArray(messages);
-    if (clone.length > 0 && _.isString(clone[0])) {
-      clone[0] = clone[0].replace(/%o/g, '%j');
+    var index, value, encoded;
+    for (index = 0; index < clone.length; index++) {
+      encoded = value = clone[index];
+
+      if (_.isString(value) && 0 === index) {
+        // about console.log and util.format substitution,
+        // see https://developers.google.com/web/tools/chrome-devtools/debug/console/console-write#string-substitution-and-formatting
+        // and https://nodejs.org/api/util.html#util_util_format_format
+        value = value.replace(/%[idfoO]/g, '%s');
+      } else if (value instanceof RegExp) {
+        value = value.toString();
+      } else if (value instanceof Date) {
+        value = value.toISOString();
+      } else if (_.isObject(value) && value._class) {
+        value = '[' + value._class + (value._id && value._id.id ? ':' + value._id.id : '') + ']';
+      } else if (_.isObject(value) && /^\[object ((?!Object).)+\]$/.test(value.toString())) {
+        value = value.toString();
+      }
+
+      try {
+        if (_.isString(value) || _.isNumber(value)) {
+          encoded = value;
+        } else {
+          encoded = JSON.stringify(value);
+          if (encoded.length > this._options.jsonMaxSize) {
+            encoded = encoded.slice(0, this._options.jsonMaxSize - 4) + '…' + encoded[encoded.length - 1];
+          }
+        }
+      } catch (e) {
+        if (_.isUndefined(value)) {
+          encoded = 'undefined';
+        } else if (_.isNull(value)) {
+          encoded = 'null';
+        } else {
+          encoded = '[unknown]'
+        }
+      }
+      clone[index] = encoded;
     }
     return util.format.apply(util.format, clone);
   },

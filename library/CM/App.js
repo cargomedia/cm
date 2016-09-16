@@ -437,7 +437,7 @@ var CM_App = CM_Class_Abstract.extend({
       var time = (Date.now() - performance.timing.navigationStart) / 1000;
       var timeFormatted = time.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false});
       var prefix = '[CM ' + timeFormatted + (performance.timing.isPolyfilled ? '!' : '') + ']';
-      cm.logger.debug.apply(cm.logger, _.union([prefix + ' ' + message], args));
+      cm.logger.debug.apply(cm.logger, [prefix + ' ' + message].concat(args));
     }
   },
 

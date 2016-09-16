@@ -23,7 +23,10 @@ define(["cm/tests/media/common"], function() {
         .getPromiseLoaded()
         .then(function() {
           assert.equal(events['media:setSource'], 1);
-          assert.equal(el.networkState, HTMLMediaElement.NETWORK_IDLE);
+          assert.ok(
+            el.networkState == HTMLMediaElement.NETWORK_IDLE ||
+            el.networkState == HTMLMediaElement.NETWORK_LOADING
+          );
           assert.equal(el.readyState, HTMLMediaElement.HAVE_ENOUGH_DATA);
           assert.equal(media.isPlaying(), false);
           return media.play();
