@@ -277,8 +277,8 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
     }
 
     public function testGetFormatterDateException() {
-        $timezoneNameList = \Functional\reject(DateTimeZone::listIdentifiers(), function ($timeZone) {
-            return IntlTimeZone::fromDateTimeZone(new DateTimeZone($timeZone));
+        $timezoneNameList = \Functional\reject(DateTimeZone::listIdentifiers(), function ($timeZoneName) {
+            return IntlTimeZone::fromDateTimeZone(new DateTimeZone($timeZoneName));
         });
         if (empty($timezoneNameList)) {
             $this->markTestSkipped('No unsupported timezones');
