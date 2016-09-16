@@ -27,6 +27,10 @@ module.exports = {
           cancellation: true
         });
       }
+    },
+    {
+      name: 'util',
+      path: 'tests/client/vendor/builtins/util'
     }
   ]
 };
