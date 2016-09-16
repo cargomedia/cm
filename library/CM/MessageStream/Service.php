@@ -1,8 +1,6 @@
 <?php
 
-class CM_MessageStream_Service implements CM_Service_ManagerAwareInterface {
-
-    use CM_Service_ManagerAwareTrait;
+class CM_MessageStream_Service {
 
     /** @var CM_MessageStream_Adapter_Abstract|null */
     private $_adapter;
@@ -69,11 +67,5 @@ class CM_MessageStream_Service implements CM_Service_ManagerAwareInterface {
             return;
         }
         $this->getAdapter()->publish($channel, $event, CM_Params::encode($data));
-    }
-
-    protected function _onSetServiceManager() {
-        if ($this->_adapter instanceof CM_Service_ManagerAwareInterface) {
-            $this->_adapter->setServiceManager($this->getServiceManager());
-        }
     }
 }
