@@ -38,41 +38,41 @@ class smarty_function_date_rangeTest extends CMTest_TestCase {
                 ' years</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'showTime' => true],
-            'expected' => '<span class="date-range">2/1/03, 12:34 – now (<span class="date-period">' . $yearsAgo . ' years</span>)</span>',
+            'expected' => '<span class="date-range">2/1/03 12:34 – now (<span class="date-period">' . $yearsAgo . ' years</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'short' => true],
             'expected' => '<span class="date-range">2/1/03 – now (<span class="date-period">' . $yearsAgo .
                 ' years</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'showTime' => true, 'short' => true],
-            'expected' => '<span class="date-range">2/1/03, 12:34 – now (<span class="date-period">' . $yearsAgo . ' years</span>)</span>',
+            'expected' => '<span class="date-range">2/1/03 12:34 – now (<span class="date-period">' . $yearsAgo . ' years</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'stop' => $stop1],
             'expected' => '<span class="date-range">2/1/03 – 2/1/03 (<span class="date-period">1 hour</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'stop' => $stop1, 'showTime' => true],
-            'expected' => '<span class="date-range">2/1/03, 12:34 – 2/1/03, 13:45 (<span class="date-period">1 hour</span>)</span>',
+            'expected' => '<span class="date-range">2/1/03 12:34 – 2/1/03 13:45 (<span class="date-period">1 hour</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'stop' => $stop1, 'short' => true],
             'expected' => '<span class="date-range">2/1/03 – 2/1/03 (<span class="date-period">01:11:10</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'stop' => $stop1, 'showTime' => true, 'short' => true],
-            'expected' => '<span class="date-range">2/1/03, 12:34 – 2/1/03, 13:45 (<span class="date-period">01:11:10</span>)</span>',
+            'expected' => '<span class="date-range">2/1/03 12:34 – 2/1/03 13:45 (<span class="date-period">01:11:10</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'stop' => $stop1, 'showTime' => true, 'short' => true, 'showSeconds' => true],
-            'expected' => '<span class="date-range">2/1/03, 12:34:00 – 2/1/03, 13:45:10 (<span class="date-period">01:11:10</span>)</span>',
+            'expected' => '<span class="date-range">2/1/03 12:34:00 – 2/1/03 13:45:10 (<span class="date-period">01:11:10</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'stop' => $stop2],
             'expected' => '<span class="date-range">2/1/03 – 2/2/03 (<span class="date-period">1 day</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'stop' => $stop2, 'showTime' => true],
-            'expected' => '<span class="date-range">2/1/03, 12:34 – 2/2/03, 13:45 (<span class="date-period">1 day</span>)</span>',
+            'expected' => '<span class="date-range">2/1/03 12:34 – 2/2/03 13:45 (<span class="date-period">1 day</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'stop' => $stop2, 'short' => true],
             'expected' => '<span class="date-range">2/1/03 – 2/2/03 (<span class="date-period">1 day</span>)</span>',
         ], [
             'params'   => ['start' => $start, 'stop' => $stop2, 'showTime' => true, 'short' => true],
-            'expected' => '<span class="date-range">2/1/03, 12:34 – 2/2/03, 13:45 (<span class="date-period">1 day</span>)</span>',
+            'expected' => '<span class="date-range">2/1/03 12:34 – 2/2/03 13:45 (<span class="date-period">1 day</span>)</span>',
         ]] as $testData) {
             $this->_assertSame($testData['expected'], $testData['params']);
         }

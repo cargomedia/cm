@@ -23,7 +23,7 @@ function smarty_function_date_range(array $params, Smarty_Internal_Template $tem
     if (null !== $start) {
         $text .= smarty_function_date(['time' => $start], $template);
         if ($showTime) {
-            $text .= ', ';
+            $text .= ' ';
             $text .= smarty_function_date_time(['time' => $start, 'showSeconds' => $showSeconds, 'timeZone' => $timeZone], $template);
         }
         $text .= ' – ';
@@ -33,7 +33,7 @@ function smarty_function_date_range(array $params, Smarty_Internal_Template $tem
         } else {
             $text .= smarty_function_date(['time' => $stop], $template);
             if ($showTime) {
-                $text .= ', ';
+                $text .= ' ';
                 $text .= smarty_function_date_time(['time' => $stop, 'showSeconds' => $showSeconds, 'timeZone' => $timeZone], $template);
             }
         }
