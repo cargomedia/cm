@@ -6,6 +6,11 @@ class CM_Http_Response_JsError extends CM_Http_Response_Abstract {
         $request = $this->getRequest();
         if (!$request->isBotCrawler() && $request->isSupported()) {
             $query = $request->getQuery();
+            if (!isset($query['error']) || !isset($query['error']['message'])) {
+                throw new CM_Exception_Invalid('Failed to process a JS Error, "error.message" expected', CM_Exception::WARN, [
+                    'query' => $query
+                ]);
+            }
             $context = new CM_Log_Context();
             $context->setExtra($query);
             $this->getServiceManager()->getLogger()->warning('JS Error - ' . $query['error']['message'], $context);
