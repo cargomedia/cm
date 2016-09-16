@@ -276,9 +276,6 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         }
     }
 
-    /**
-     * @requires PHP 5.5
-     */
     public function testGetFormatterDateException() {
         $timezoneNameList = \Functional\reject(DateTimeZone::listIdentifiers(), function ($timeZone) {
             return IntlTimeZone::fromDateTimeZone(new DateTimeZone($timeZone));
