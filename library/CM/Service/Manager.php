@@ -96,8 +96,8 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
-     * @param string       $serviceName
-     * @param mixed        $instance
+     * @param string $serviceName
+     * @param mixed  $instance
      * @throws CM_Exception_Invalid
      */
     public function registerInstance($serviceName, $instance) {

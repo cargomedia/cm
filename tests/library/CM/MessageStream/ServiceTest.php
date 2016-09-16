@@ -54,20 +54,27 @@ class CM_MessageStream_ServiceTest extends CMTest_TestCase {
         $this->assertSame(1, $publishMethod->getCallCount());
     }
 
-    public function testSetServiceManager_AdapterNotServiceManagerAware() {
+    public function testServiceInstantiation() {
         $serviceManager = new CM_Service_Manager();
-        $adapter = $this->mockObject('CM_MessageStream_Adapter_Abstract');
-        $stream = new CM_MessageStream_Service($adapter);
-        $stream->setServiceManager($serviceManager);
-        $this->assertSame($serviceManager, $stream->getServiceManager());
-    }
-
-    public function testSetServiceManager_AdapterServiceManagerAware() {
-        $serviceManager = new CM_Service_Manager();
-        $adapter = new CM_MessageStream_Adapter_SocketRedis([]);
-        $stream = new CM_MessageStream_Service($adapter);
-        $stream->setServiceManager($serviceManager);
-        $this->assertSame($serviceManager, $stream->getServiceManager());
+        $serviceManager->registerWithArray('stream-message', [
+            'class'  => 'CM_MessageStream_Factory',
+            'method' => [
+                'name'      => 'createService',
+                'arguments' => [
+                    'adapterClass'     => 'CM_MessageStream_Adapter_SocketRedis',
+                    'adapterArguments' => [
+                        'servers' => [
+                            ['httpHost' => 'localhost', 'httpPort' => 8085, 'sockjsUrls' => ['http://localhost:8090']],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $stream = $serviceManager->get('stream-message');
+        $this->assertSame(true, $stream instanceof CM_MessageStream_Service);
+        $adapter = $stream->getAdapter();
+        $this->assertSame(true, $adapter instanceof CM_MessageStream_Adapter_SocketRedis);
+        /** @var CM_MessageStream_Adapter_SocketRedis $adapter */
         $this->assertSame($serviceManager, $adapter->getServiceManager());
     }
 }
