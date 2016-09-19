@@ -12,6 +12,11 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @param array $config
      */
     public function __construct(array $config) {
+        $defaults = [
+            'options'       => [],
+            'driverOptions' => [],
+        ];
+        $config = array_merge($config, $defaults);
         $this->_config = $config;
     }
 
@@ -337,11 +342,11 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     }
 
     /**
-     * @return MongoClient
+     * @return MongoDB\Client
      */
     protected function _getClient() {
         if (null === $this->_client) {
-            $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
+            $this->_client = new MongoDB\Client($this->_config['server'], $this->_config['options'], $this->_config['driverOptions']);
         }
         return $this->_client;
     }
