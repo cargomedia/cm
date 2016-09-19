@@ -36,7 +36,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @return string[]
      */
     public function listCollectionNames() {
-        return $this->_getDatabase()->getCollectionNames();
+        return \Functional\invoke($this->_getDatabase()->listCollections(), 'getName');
     }
 
     /**
@@ -183,12 +183,11 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
 
     /**
      * @param $collection
-     * @return array
+     * @return \MongoDB\Model\IndexInfoIterator
      */
     public function getIndexInfo($collection) {
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "indexInfo {$collection}");
-        $indexInfo = $this->_getCollection($collection)->getIndexInfo();
-        return $indexInfo;
+        return $this->_getCollection($collection)->listIndexes();
     }
 
     /**
@@ -198,8 +197,8 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      */
     public function hasIndex($collection, array $index) {
         $indexInfo = $this->getIndexInfo($collection);
-        return \Functional\some($indexInfo, function ($indexInfo) use ($index) {
-            return array_keys($index) === array_keys($indexInfo['key']) && $index == $indexInfo['key'];
+        return \Functional\some($indexInfo, function (\MongoDB\Model\IndexInfo $indexInfo) use ($index) {
+            return array_keys($index) === array_keys($indexInfo->getKey()) && $index == $indexInfo->getKey();
         });
     }
 
@@ -355,8 +354,8 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @return string[]
      */
     protected function _listDatabaseNames() {
-        $databasesInfo = $this->_getClient()->listDBs();
-        return \Functional\pluck($databasesInfo['databases'], 'name');
+        $databases = $this->_getClient()->listDatabases();
+        return \Functional\invoke($databases, 'getName');
     }
 
     /**
@@ -367,16 +366,16 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     }
 
     /**
-     * @return MongoDB
+     * @return MongoDB\Database
      * @throws CM_Exception_Nonexistent
      */
     protected function _getDatabase() {
-        return $this->_getClient()->selectDB($this->_getDatabaseName());
+        return $this->_getClient()->selectDatabase($this->_getDatabaseName());
     }
 
     /**
      * @param string $collection
-     * @return MongoCollection
+     * @return \MongoDB\Collection
      */
     protected function _getCollection($collection) {
         $collection = (string) $collection;
