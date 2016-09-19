@@ -20,6 +20,7 @@ addons:
       - re2c
 
 before_script:
+  - phpenv config-rm xdebug.ini
   - tests/travis/install-php-runkit.sh
   - tests/travis/install-php-svm.sh
   - source tests/travis/install-phantomjs.sh
