@@ -80,11 +80,12 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     /**
      * @param string $name
      * @param array  $options
-     * @return MongoCollection
+     * @return array
      */
     public function createCollection($name, array $options = null) {
+        $options = (array) $options;
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "create collection {$name}: " . CM_Params::jsonEncode($options));
-        return $this->_getDatabase()->createCollection($name, $options);
+        return (array) $this->_getDatabase()->createCollection($name, $options);
     }
 
     /**
