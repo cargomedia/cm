@@ -9,11 +9,13 @@ var PersistentStorage = Event.extend({
   /**
    * @param {String} name
    * @param {Storage} adapter
+   * @param {*} [logger]
    */
-  constructor: function(name, adapter) {
+  constructor: function(name, adapter, logger) {
     this._name = name;
     this._data = {};
     this._adapter = null;
+    this._logger = logger && logger.warn ? logger : console;
     if (this._isSupported(adapter)) {
       this._adapter = adapter;
       this.read();
@@ -100,14 +102,9 @@ var PersistentStorage = Event.extend({
       adapter.removeItem(key);
       return true;
     } catch (error) {
-      this._warning('Storage adapter not supported', error);
+      this._logger.warn('Storage adapter not supported', error);
       return false;
     }
-  },
-
-  _warning: function() {
-    var logger = cm && cm.logger ? cm.logger : console;
-    logger.warn.apply(console, arguments);
   }
 });
 

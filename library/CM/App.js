@@ -944,7 +944,7 @@ var CM_App = CM_Class_Abstract.extend({
      */
     _getPersistentStorage: function() {
       if (!this._data) {
-        this._data = new cm.lib.PersistentStorage(cm.options.name + ':' + cm.getSiteId(), localStorage);
+        this._data = new cm.lib.PersistentStorage(cm.options.name + ':' + cm.getSiteId(), localStorage, cm.logger);
       }
       return this._data;
     }

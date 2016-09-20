@@ -47,13 +47,13 @@ define(["cm/storage"], function(PersistentStorage) {
 
   QUnit.test("Storage: not supported adapter", function(assert) {
     assert.expect(10);
-    var originalWarning = PersistentStorage.prototype._warning;
-
-    PersistentStorage.prototype._warning = function(message, error) {
-      assert.equal('Storage adapter not supported', message);
-      assert.ok(error instanceof TypeError);
+    var logger = {
+      warn: function(message, error) {
+        assert.equal('Storage adapter not supported', message);
+        assert.ok(error instanceof TypeError);
+      }
     };
-    var data = new PersistentStorage('foo');
+    var data = new PersistentStorage('foo', null, logger);
 
     data.set({
       foo: 100
@@ -63,10 +63,13 @@ define(["cm/storage"], function(PersistentStorage) {
     data.remove('foo');
     assert.equal(data.has('foobar'), false);
 
-    PersistentStorage.prototype._warning = function(message, error) {
-      assert.equal('Storage adapter not supported', message);
-      assert.equal("Error: Failed to retrieve data from storage adapter", error.toString());
+    var logger = {
+      warn: function(message, error) {
+        assert.equal('Storage adapter not supported', message);
+        assert.equal("Error: Failed to retrieve data from storage adapter", error.toString());
+      }
     };
+
     var data = new PersistentStorage('foo', {
       setItem: function() {
       },
@@ -74,7 +77,7 @@ define(["cm/storage"], function(PersistentStorage) {
       },
       removeItem: function() {
       }
-    });
+    }, logger);
 
     data.set({
       foo: 100
@@ -83,7 +86,5 @@ define(["cm/storage"], function(PersistentStorage) {
     assert.equal(data.get('foo'), 100);
     data.remove('foo');
     assert.equal(data.has('foobar'), false);
-
-    PersistentStorage.prototype._warning = originalWarning;
   });
 });
