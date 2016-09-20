@@ -106,7 +106,8 @@ var PersistentStorage = Event.extend({
   },
 
   _warning: function() {
-    console.warn.apply(console, arguments);
+    var logger = cm && cm.logger ? cm.logger : console;
+    logger.warn.apply(console, arguments);
   }
 });
 
