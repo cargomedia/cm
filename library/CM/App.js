@@ -914,34 +914,39 @@ var CM_App = CM_Class_Abstract.extend({
   storage: {
     /**
      * @param {String} key
-     * @param {Object} value
+     * @param {*} value
      */
     set: function(key, value) {
-      try {
-        localStorage.setItem(cm.getSiteId() + ':' + key, JSON.stringify(value));
-      } catch (e) {
-        // iOS5 Private Browsing mode which throws QUOTA_EXCEEDED_ERR: DOM Exception 22
-      }
+      this._getPersistentStorage().set(key, value);
     },
 
     /**
      * @param {String} key
-     * @return {*|Null}
+     * @return {*|null}
      */
     get: function(key) {
-      var value = localStorage.getItem(cm.getSiteId() + ':' + key);
-      if (value === null) {
-        // See: https://code.google.com/p/android/issues/detail?id=11973
-        return null;
-      }
-      return JSON.parse(value);
+      return this._getPersistentStorage().get(key) || null;
     },
 
     /**
      * @param {String} key
      */
     del: function(key) {
-      localStorage.removeItem(cm.getSiteId() + ':' + key);
+      this._getPersistentStorage().del(key);
+    },
+
+    /** @type {PersistentStorage|null} **/
+    _data: null,
+
+    /**
+     * @returns {PersistentStorage}
+     * @private
+     */
+    _getPersistentStorage: function() {
+      if (!this._data) {
+        this._data = new cm.lib.PersistentStorage(cm.options.name + ':' + cm.getSiteId(), localStorage);
+      }
+      return this._data;
     }
   },
 
