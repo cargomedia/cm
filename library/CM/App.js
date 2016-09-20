@@ -929,7 +929,8 @@ var CM_App = CM_Class_Abstract.extend({
      * @return {*|null}
      */
     get: function(key) {
-      return this._getPersistentStorage().get(key) || null;
+      var value = this._getPersistentStorage().get(key);
+      return !_.isUndefined(value) ? value : null;
     },
 
     /**
