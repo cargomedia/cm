@@ -398,11 +398,13 @@ var CM_App = CM_Class_Abstract.extend({
      * @throws Error
      */
     handle: function(error) {
+      var throwError = true;
       if (error instanceof CM_Exception) {
         var handlers = _.filter(cm.error._handlers, function(handler) {
           return handler.errorName === error.name;
         });
         if (0 !== handlers.length) {
+          throwError = false;
           _.every(handlers, function(handler) {
             return false !== handler.callback.call(handler.context, error);
           });
@@ -410,7 +412,9 @@ var CM_App = CM_Class_Abstract.extend({
           cm.window.hint(error.message);
         }
       }
-      throw error;
+      if (throwError) {
+        throw error;
+      }
     }
   },
 
