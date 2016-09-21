@@ -1,4 +1,5 @@
 var Event = require('./event');
+var AdapterMemory = require('./adapter/memory');
 
 /**
  * @class PersistentStorage
@@ -18,7 +19,8 @@ var PersistentStorage = Event.extend({
     this._logger = logger && logger.warn ? logger : console;
     if (this._isSupported(adapter)) {
       this._adapter = adapter;
-      this.read();
+    } else {
+      this._adapter = new AdapterMemory();
     }
   },
 
@@ -27,10 +29,11 @@ var PersistentStorage = Event.extend({
    * @returns {*}
    */
   get: function(name) {
+    var obj = this.read();
     if (name) {
-      return this._data[name];
+      return obj[name];
     } else {
-      return this._data;
+      return obj;
     }
   },
 
@@ -39,14 +42,14 @@ var PersistentStorage = Event.extend({
    * @param {*} [value]
    */
   set: function(key, value) {
-    var obj = {};
-    if (_.isString(key)) {
+    var obj = this.read();
+    if (!_.isUndefined(value)) {
       obj[key] = value;
     } else {
+      _.extend(obj, key);
       obj = key;
     }
-    _.extend(this._data, obj);
-    this.write();
+    this.write(obj);
   },
 
   /**
@@ -54,38 +57,49 @@ var PersistentStorage = Event.extend({
    * @returns {Boolean}
    */
   has: function(key) {
-    return !!_.contains(_.keys(this._data), key);
+    var obj = this.read();
+    return !!_.contains(_.keys(obj), key);
   },
 
   /**
    * @param {String} name
    */
   remove: function(name) {
-    delete this._data[name];
-    this.write();
+    var obj = this.read();
+    delete obj[name];
+    this.write(obj);
   },
 
   clear: function() {
-    this._data = {};
     this.write();
   },
 
   delete: function() {
-    if (this._adapter) {
-      this._adapter.removeItem(this._name);
-    }
+    this._adapter.removeItem(this._name);
   },
 
+  /**
+   * @returns {Object}
+   */
   read: function() {
-    if (this._adapter) {
-      this.set(JSON.parse(this._adapter.getItem(this._name)) || {});
+    var data = {};
+    try {
+      var rawData = this._adapter.getItem(this._name);
+      if (!_.isUndefined(rawData)) {
+        data = JSON.parse(rawData);
+      }
+    } catch (error) {
+      this.getLogger().warn('Failed to parse the `%s` PersistentStorage', this._name);
     }
+    return data;
   },
 
-  write: function() {
-    if (this._adapter) {
-      this._adapter.setItem(this._name, JSON.stringify(this._data));
-    }
+  /**
+   * @param {Object} [obj]
+   */
+  write: function(obj) {
+    obj = !_.isUndefined(obj) ? obj : {};
+    this._adapter.setItem(this._name, JSON.stringify(obj));
   },
 
   /**
