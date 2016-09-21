@@ -36,8 +36,18 @@ define(["cm/storage", "cm/adapter/memory"], function(PersistentStorage, AdapterM
     data.delete();
     assert.equal(adapter.getItem('foo'), null);
 
+    var logger = {
+      callCount: 0,
+      warn: function(message, key, error) {
+        this.callCount++;
+        assert.equal('Failed to parse the `%s` PersistentStorage', message);
+        assert.equal('bar', key);
+        assert.equal("SyntaxError", error.name);
+      }
+    };
+
     adapter.setItem('bar', '{\"foo\":100}');
-    data = new PersistentStorage('bar', adapter);
+    data = new PersistentStorage('bar', adapter, logger);
     assert.strictEqual(data.has('foo'), true);
     assert.equal(data.get('foo'), 100);
     assert.deepEqual(data.get(), {foo: 100});
@@ -45,8 +55,23 @@ define(["cm/storage", "cm/adapter/memory"], function(PersistentStorage, AdapterM
     adapter.setItem('bar', '{\"foo\":200}');
     assert.equal(data.get('foo'), 200);
     assert.deepEqual(data.get(), {foo: 200});
+    assert.equal(logger.callCount, 0);
 
-    sessionStorage.clear();
+    adapter.setItem('bar', 'invalid json string');
+    assert.strictEqual(data.get('foo'), undefined);
+    assert.equal(logger.callCount, 1);
+
+    data.set('foo', 300);
+    assert.equal(data.get('foo'), 300);
+    assert.equal(logger.callCount, 2);
+
+    data.set('foo', 400);
+    assert.equal(data.get('foo'), 400);
+    assert.equal(logger.callCount, 2);
+
+    adapter.clear();
+    assert.equal(adapter.getItem('foo'), null);
+    assert.equal(adapter.getItem('bar'), null);
   });
 
   QUnit.test("Storage: not supported adapter", function(assert) {
