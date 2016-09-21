@@ -1,4 +1,4 @@
-define(["cm/storage"], function(PersistentStorage) {
+define(["cm/storage", "cm/adapter/memory"], function(PersistentStorage, AdapterMemory) {
 
   QUnit.module('cm/storage');
 
@@ -41,6 +41,10 @@ define(["cm/storage"], function(PersistentStorage) {
     assert.strictEqual(data.has('foo'), true);
     assert.equal(data.get('foo'), 100);
     assert.deepEqual(data.get(), {foo: 100});
+
+    adapter.setItem('bar', '{\"foo\":200}');
+    assert.equal(data.get('foo'), 200);
+    assert.deepEqual(data.get(), {foo: 200});
 
     sessionStorage.clear();
   });
