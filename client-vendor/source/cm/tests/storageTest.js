@@ -25,7 +25,6 @@ define(["cm/storage", "cm/adapter/memory"], function(PersistentStorage, AdapterM
       assert.equal(adapter.getItem('foo'), '{\"foo\":100,\"bar\":"10"}');
 
       data.set({
-        foo: 100,
         bar: '100'
       });
       assert.deepEqual(data.get(), {foo: 100, bar: "100"});
@@ -44,11 +43,10 @@ define(["cm/storage", "cm/adapter/memory"], function(PersistentStorage, AdapterM
 
       var logger = {
         callCount: 0,
-        warn: function(message, key, error) {
+        warn: function(message, key) {
           this.callCount++;
-          assert.equal('Failed to parse the `%s` PersistentStorage', message);
-          assert.equal('bar', key);
-          assert.equal("SyntaxError", error.name);
+          assert.equal(message, 'Invalid value stored in `%s`, reset as an empty Object');
+          assert.equal(key, 'bar');
         }
       };
 
@@ -61,19 +59,37 @@ define(["cm/storage", "cm/adapter/memory"], function(PersistentStorage, AdapterM
       adapter.setItem('bar', '{\"foo\":200}');
       assert.equal(data.get('foo'), 200);
       assert.deepEqual(data.get(), {foo: 200});
+
+      adapter.setItem('bar', '{\"foo\":300}');
+      data.set('foo2', 100);
+      assert.deepEqual(data.get(), {foo: 300, foo2: 100});
+
+      adapter.setItem('bar', '{\"foo3\":100}');
+      data.set({
+        'foo4': 100
+      });
+      assert.deepEqual(data.get(), {foo3: 100, foo4: 100});
+
       assert.equal(logger.callCount, 0);
 
       adapter.setItem('bar', 'invalid json string');
       assert.strictEqual(data.get('foo'), undefined);
+      assert.deepEqual(data.get(), {});
       assert.equal(logger.callCount, 1);
 
-      data.set('foo', 300);
-      assert.equal(data.get('foo'), 300);
+      adapter.setItem('bar', 'null');
+      assert.strictEqual(data.get('foo'), undefined);
+      assert.deepEqual(data.get(), {});
       assert.equal(logger.callCount, 2);
+
+      adapter.setItem('bar', '[]');
+      assert.strictEqual(data.get('foo'), undefined);
+      assert.deepEqual(data.get(), {});
+      assert.equal(logger.callCount, 3);
 
       data.set('foo', 400);
       assert.equal(data.get('foo'), 400);
-      assert.equal(logger.callCount, 2);
+      assert.equal(logger.callCount, 3);
 
       adapter.clear();
       assert.strictEqual(adapter.getItem('foo'), null);
@@ -85,11 +101,21 @@ define(["cm/storage", "cm/adapter/memory"], function(PersistentStorage, AdapterM
     assert.expect(10);
     var logger = {
       warn: function(message, error) {
-        assert.equal('Storage adapter not supported', message);
-        assert.ok(error instanceof TypeError);
+        assert.equal(message, 'Storage adapter not supported');
+        assert.ok(error instanceof Error);
       }
     };
-    var data = new PersistentStorage('foo', null, logger);
+    var data = new PersistentStorage('foo', {
+      setItem: function() {
+        throw new Error('Not Supported');
+      },
+      getItem: function() {
+        throw new Error('Not Supported');
+      },
+      removeItem: function() {
+        throw new Error('Not Supported');
+      }
+    }, logger);
 
     data.set({
       foo: 100
@@ -101,8 +127,8 @@ define(["cm/storage", "cm/adapter/memory"], function(PersistentStorage, AdapterM
 
     var logger = {
       warn: function(message, error) {
-        assert.equal('Storage adapter not supported', message);
-        assert.equal("Error: Failed to retrieve data from storage adapter", error.toString());
+        assert.equal(message, 'Storage adapter not supported');
+        assert.equal(error.toString(), "Error: Failed to retrieve data from storage adapter");
       }
     };
 

@@ -46,7 +46,6 @@ var PersistentStorage = Event.extend({
       obj[key] = value;
     } else {
       _.extend(obj, key);
-      obj = key;
     }
     this.write(obj);
   },
@@ -57,7 +56,7 @@ var PersistentStorage = Event.extend({
    */
   has: function(key) {
     var obj = this.read();
-    return !!_.contains(_.keys(obj), key);
+    return _.contains(_.keys(obj), key);
   },
 
   /**
@@ -81,14 +80,17 @@ var PersistentStorage = Event.extend({
    * @returns {Object}
    */
   read: function() {
-    var data = {};
+    var data = null;
     try {
       var rawData = this.getAdapter().getItem(this.getName());
-      if (!_.isUndefined(rawData)) {
-        data = JSON.parse(rawData);
-      }
+      data = !_.isNull(rawData) ? JSON.parse(rawData) : {};
     } catch (error) {
-      this.getLogger().warn('Failed to parse the `%s` PersistentStorage', this.getName(), error);
+    }
+
+    if (!_.isObject(data) || _.isArray(data)) {
+      this.getLogger().warn('Invalid value stored in `%s`, reset as an empty Object', this.getName(), data);
+      data = {};
+      this.write(data);
     }
     return data;
   },
@@ -136,7 +138,7 @@ var PersistentStorage = Event.extend({
       adapter.removeItem(key);
       return true;
     } catch (error) {
-      this._logger.warn('Storage adapter not supported', error);
+      this.getLogger().warn('Storage adapter not supported', error);
       return false;
     }
   }
