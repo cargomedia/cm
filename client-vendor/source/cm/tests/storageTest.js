@@ -40,7 +40,7 @@ define(["cm/storage", "cm/adapter/memory"], function(PersistentStorage, AdapterM
       assert.equal(adapter.getItem('foo'), '{}');
 
       data.delete();
-      assert.equal(adapter.getItem('foo'), null);
+      assert.strictEqual(adapter.getItem('foo'), null);
 
       var logger = {
         callCount: 0,
@@ -76,8 +76,8 @@ define(["cm/storage", "cm/adapter/memory"], function(PersistentStorage, AdapterM
       assert.equal(logger.callCount, 2);
 
       adapter.clear();
-      assert.equal(adapter.getItem('foo'), null);
-      assert.equal(adapter.getItem('bar'), null);
+      assert.strictEqual(adapter.getItem('foo'), null);
+      assert.strictEqual(adapter.getItem('bar'), null);
     });
   });
 
@@ -97,7 +97,7 @@ define(["cm/storage", "cm/adapter/memory"], function(PersistentStorage, AdapterM
     assert.strictEqual(data.has('foo'), true);
     assert.equal(data.get('foo'), 100);
     data.remove('foo');
-    assert.equal(data.has('foobar'), false);
+    assert.strictEqual(data.has('foobar'), false);
 
     var logger = {
       warn: function(message, error) {
@@ -121,6 +121,6 @@ define(["cm/storage", "cm/adapter/memory"], function(PersistentStorage, AdapterM
     assert.strictEqual(data.has('foo'), true);
     assert.equal(data.get('foo'), 100);
     data.remove('foo');
-    assert.equal(data.has('foobar'), false);
+    assert.strictEqual(data.has('foobar'), false);
   });
 });
