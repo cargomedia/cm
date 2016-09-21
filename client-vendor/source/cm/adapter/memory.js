@@ -17,10 +17,11 @@ AdapterMemory.prototype = {
 
   /**
    * @param {String} key
-   * @returns {*|undefined}
+   * @returns {*|null}
    */
   getItem: function(key) {
-    return this._data[key];
+    var value = this._data[key];
+    return !_.isUndefined(value) ? value : null;
   },
 
   removeItem: function(key) {
