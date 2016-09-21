@@ -14,7 +14,6 @@ var PersistentStorage = Event.extend({
    */
   constructor: function(name, adapter, logger) {
     this._name = name;
-    this._data = {};
     this._adapter = null;
     this._logger = logger && logger.warn ? logger : console;
     if (this._isSupported(adapter)) {
@@ -75,7 +74,7 @@ var PersistentStorage = Event.extend({
   },
 
   delete: function() {
-    this._adapter.removeItem(this._name);
+    this.getAdapter().removeItem(this.getName());
   },
 
   /**
@@ -84,12 +83,12 @@ var PersistentStorage = Event.extend({
   read: function() {
     var data = {};
     try {
-      var rawData = this._adapter.getItem(this._name);
+      var rawData = this.getAdapter().getItem(this.getName());
       if (!_.isUndefined(rawData)) {
         data = JSON.parse(rawData);
       }
     } catch (error) {
-      this.getLogger().warn('Failed to parse the `%s` PersistentStorage', this._name);
+      this.getLogger().warn('Failed to parse the `%s` PersistentStorage', this.getName(), error);
     }
     return data;
   },
@@ -99,7 +98,28 @@ var PersistentStorage = Event.extend({
    */
   write: function(obj) {
     obj = !_.isUndefined(obj) ? obj : {};
-    this._adapter.setItem(this._name, JSON.stringify(obj));
+    this.getAdapter().setItem(this.getName(), JSON.stringify(obj));
+  },
+
+  /**
+   * @returns {String}
+   */
+  getName: function() {
+    return this._name;
+  },
+
+  /**
+   * @returns {Storage|*}
+   */
+  getAdapter: function() {
+    return this._adapter;
+  },
+
+  /**
+   * @returns {*}
+   */
+  getLogger: function() {
+    return this._logger;
   },
 
   /**
