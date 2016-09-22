@@ -25,7 +25,7 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $mongoDb->createIndex($collectionName, ['bar' => 1]);
         $this->assertTrue($mongoDb->hasIndex($collectionName, ['foo' => 1]));
         $this->assertTrue($mongoDb->hasIndex($collectionName, ['bar' => 1]));
-        $mongoDb->deleteIndex($collectionName, ['bar' => 1]);
+        $mongoDb->deleteIndex($collectionName, 'bar_1');
         $this->assertTrue($mongoDb->hasIndex($collectionName, ['foo' => 1]));
         $this->assertFalse($mongoDb->hasIndex($collectionName, ['bar' => 1]));
     }

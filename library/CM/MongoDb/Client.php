@@ -25,11 +25,11 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
 
     /**
      * @param string $collection
-     * @param array  $index
+     * @param string $index
      * @return array
      * @throws CM_MongoDb_Exception
      */
-    public function deleteIndex($collection, array $index) {
+    public function deleteIndex($collection, $index) {
         $result = $this->_getCollection($collection)->dropIndex($index);
         $this->_checkResultForErrors($result);
         return $result;
@@ -95,7 +95,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @param string $collection
      * @param array  $keys
      * @param array  $options
-     * @return array
+     * @return string
      * @throws CM_MongoDb_Exception
      */
     public function createIndex($collection, array $keys, array $options = null) {
@@ -103,7 +103,6 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "create index on {$collection}: " .
             CM_Params::jsonEncode($keys) . ' ' . CM_Params::jsonEncode($options));
         $result = $this->_getCollection($collection)->createIndex($keys, $options);
-        $this->_checkResultForErrors($result);
         return $result;
     }
 
