@@ -72,7 +72,7 @@ class CM_Db_Client {
             CM_Service_Manager::getInstance()->getNewrelic()->setCustomMetric('DB connect', (microtime(true) * 1000) - $time);
             $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            throw new CM_Db_Exception('Database connection failed: ' . $e->getMessage());
+            throw new CM_Db_Exception('Database connection failed', null, ['originalExceptionMessage' => $e->getMessage()]);
         }
         $this->_lastConnect = time();
     }
@@ -191,7 +191,10 @@ class CM_Db_Client {
                     $this->connect();
                     continue;
                 }
-                throw new CM_Db_Exception('Cannot prepare statement (retried ' . $try . 'x): ' . $e->getMessage());
+                throw new CM_Db_Exception('Cannot prepare statement', null, [
+                    'tries'                    => $try,
+                    'originalExceptionMessage' => $e->getMessage(),
+                ]);
             }
         }
         throw new CM_Db_Exception('Line should never be reached');
