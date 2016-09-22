@@ -48,7 +48,7 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
         $data = ['userId' => 3, 'name' => 'Dexter'];
         $id = $mongoDb->insert($collectionName, $data, ['w' => 0]);
-        $this->assertInstanceOf('MongoId', $id);
+        $this->assertInstanceOf('MongoDB\BSON\ObjectID', $id);
     }
 
     public function testBatchInsert() {

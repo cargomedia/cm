@@ -52,12 +52,8 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     public function insert($collection, array $object, array $options = null) {
         $options = $options ?: [];
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Insert `{$collection}`: " . CM_Params::jsonEncode($object));
-        $intermediary = &$object;
-        $data = $intermediary;
-        $result = $this->_getCollection($collection)->insert($data, $options);
-        $this->_checkResultForErrors($result);
-        $id = $data['_id'];
-        return $id;
+        $result = $this->_getCollection($collection)->insertOne($object, $options);
+        return $result->getInsertedId();
     }
 
     /**
