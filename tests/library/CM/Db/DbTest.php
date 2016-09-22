@@ -84,7 +84,7 @@ class CM_Db_DbTest extends CMTest_TestCase {
             CM_Db_Db::describeColumn('test_', 'id');
             $this->fail('Table doesn\'t exist');
         } catch (CM_Db_Exception $e) {
-            $this->assertContains('`id`', $e->getMessage());
+            $this->assertContains('`id`', $e->getMetaInfo()['query']);
         }
         CM_Db_Db::exec('DROP TABLE `test2`');
     }
@@ -176,7 +176,7 @@ class CM_Db_DbTest extends CMTest_TestCase {
         try {
             CM_Db_Db::getRandId('test', 'id');
             $this->fail();
-        } catch (CM_DB_Exception $e) {
+        } catch (CM_Db_Exception $e) {
             $this->assertContains('Cannot find random id', $e->getMessage());
         }
     }
