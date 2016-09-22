@@ -44,7 +44,7 @@ class CM_Db_Statement {
                     $this->_reCreatePdoStatement();
                     continue;
                 }
-                throw new CM_Db_Exception('Cannot execute statement', null, [
+                throw new CM_Db_Exception('Cannot execute SQL statement', null, [
                     'tries'                    => $try,
                     'originalExceptionMessage' => $e->getMessage(),
                     'query'                    => $this->_pdoStatement->queryString,

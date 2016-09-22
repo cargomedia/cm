@@ -191,7 +191,7 @@ class CM_Db_Client {
                     $this->connect();
                     continue;
                 }
-                throw new CM_Db_Exception('Cannot prepare statement', null, [
+                throw new CM_Db_Exception('Cannot prepare SQL statement', null, [
                     'tries'                    => $try,
                     'originalExceptionMessage' => $e->getMessage(),
                 ]);
