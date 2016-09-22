@@ -14,7 +14,10 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     public function __construct(array $config) {
         $defaults = [
             'options'       => [],
-            'driverOptions' => [],
+            'driverOptions' =>
+                [
+                    'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
+                ],
         ];
         $config = array_merge($config, $defaults);
         $this->_config = $config;
@@ -27,7 +30,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @throws CM_MongoDb_Exception
      */
     public function deleteIndex($collection, array $index) {
-        $result = $this->_getCollection($collection)->deleteIndex($index);
+        $result = $this->_getCollection($collection)->dropIndex($index);
         $this->_checkResultForErrors($result);
         return $result;
     }
@@ -85,7 +88,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     public function createCollection($name, array $options = null) {
         $options = (array) $options;
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "create collection {$name}: " . CM_Params::jsonEncode($options));
-        return (array) $this->_getDatabase()->createCollection($name, $options);
+        return $this->_getDatabase()->createCollection($name, $options);
     }
 
     /**
