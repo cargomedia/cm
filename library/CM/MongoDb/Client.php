@@ -143,16 +143,20 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @param array|null $criteria
      * @param array|null $projection
      * @param array|null $aggregation
-     * @return Iterator
+     * @param array|null $options
+     * @return MongoDB\Driver\Cursor
      *
      * When using aggregation, $criteria and $projection, if defined, automatically
      * function as `$match` and `$project` operator respectively at the front of the pipeline
      */
-    public function find($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
+    public function find($collection, array $criteria = null, array $projection = null, array $aggregation = null, array $options = null) {
         $batchSize = null;
+        $defaultOptions = [];
         if (isset(self::_getConfig()->batchSize)) {
             $batchSize = (int) self::_getConfig()->batchSize;
+            $defaultOptions = ['batchSize' => $batchSize];
         }
+        $options = array_merge($defaultOptions, (array) $options);
         $criteria = (array) $criteria;
         $projection = (array) $projection;
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "find `{$collection}`: " .
@@ -166,16 +170,15 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
             if ($criteria) {
                 array_unshift($pipeline, ['$match' => $criteria]);
             }
-            $options = [];
-            if (null !== $batchSize) {
-                $options['cursor'] = ['batchSize' => $batchSize];
+            if (!isset($options['useCursor'])) {
+                $options['useCursor'] = true;
             }
-            $resultCursor = $collection->aggregateCursor($pipeline, $options);
+            $resultCursor = $collection->aggregate($pipeline, $options);
         } else {
-            $resultCursor = $collection->find($criteria, $projection);
-        }
-        if (null !== $batchSize) {
-            $resultCursor->batchSize($batchSize);
+            if ($projection) {
+                $options['projection'] = $projection;
+            }
+            $resultCursor = $collection->find($criteria, $options);
         }
         return $resultCursor;
     }

@@ -143,22 +143,47 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'find';
 
-        $mongoDb->insert($collectionName, array('userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]));
-        $mongoDb->insert($collectionName, array('userId' => 2, 'groupId' => 2, 'name' => 'steve', 'foo' => [1, 2]));
-        $mongoDb->insert($collectionName, array('userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [1, 2, 3]));
-        $users = $mongoDb->find($collectionName, array('groupId' => 1));
-        $this->assertSame(2, $users->count());
-        $expectedNames = array('alice', 'bob');
-        foreach ($users as $user) {
-            $expectedNames = array_diff($expectedNames, array($user['name']));
-        }
-        $this->assertEmpty($expectedNames);
+        $doc1 = ['userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]];
+        $doc2 = ['userId' => 2, 'groupId' => 2, 'name' => 'steve', 'foo' => [1, 2]];
+        $doc3 = ['userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [1, 2, 3]];
+        $mongoDb->insert($collectionName, $doc1);
+        $mongoDb->insert($collectionName, $doc2);
+        $mongoDb->insert($collectionName, $doc3);
 
+        $users = $mongoDb->find($collectionName);
+        $expected = [$doc1, $doc2, $doc3];
+        $this->assertSame($expected, \Functional\map($users, function ($doc) {
+            unset($doc['_id']);
+            return $doc;
+        }));
+
+        // with criteria
+        $expected = [$doc1, $doc3];
+        $users = $mongoDb->find($collectionName, ['groupId' => 1]);
+        $this->assertSame($expected, \Functional\map($users, function ($doc) {
+            unset($doc['_id']);
+            return $doc;
+        }));
+
+        // with projection
+        $expected = [['name' => 'alice'], ['name' => 'steve'], ['name' => 'bob']];
+        $this->assertSame($expected, $mongoDb->find($collectionName, null, ['name' => 1, '_id' => 0])->toArray());
+
+        // skip
+        $expected = [$doc2, $doc3];
+        $this->assertSame($expected, $mongoDb->find($collectionName, null, ['_id' => 0], null, ['skip' => 1])->toArray());
+
+        // limit
+        $expected = [$doc1, $doc2];
+        $this->assertSame($expected, $mongoDb->find($collectionName, null, ['_id' => 0], null, ['limit' => 2])->toArray());
+
+        // sort
+        $expected = [$doc3, $doc1, $doc2];
+        $this->assertSame($expected, $mongoDb->find($collectionName, null, ['_id' => 0], null, ['sort' => ['groupId' => 1, 'userId' => -1]])->toArray());
+
+        // aggregation
         $result = $mongoDb->find($collectionName, ['groupId' => 1], ['_id' => 0, 'foo' => 1], [['$unwind' => '$foo']]);
-        $actual = \Functional\map($result, function ($val) {
-            return $val;
-        });
-        $this->assertEquals([['foo' => 1], ['foo' => 1], ['foo' => 2], ['foo' => 3]], $actual);
+        $this->assertEquals([['foo' => 1], ['foo' => 1], ['foo' => 2], ['foo' => 3]], $result->toArray());
     }
 
     public function testFindBatchSize() {
