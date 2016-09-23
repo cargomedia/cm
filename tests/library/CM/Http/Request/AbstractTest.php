@@ -206,10 +206,13 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $request = new CM_Http_Request_Post('/foo/null/');
         $clientId = $request->getClientId();
         $site = $this->getMockSite();
-        /** @var CM_Http_Response_Abstract $response */
-        $response = $this->getMock('CM_Http_Response_Abstract', array('_process', 'setCookie'), array($request, $site, $this->getServiceManager()));
-        $response->expects($this->once())->method('setCookie')->with('clientId', (string) $clientId);
-        $response->process();
+        /** @var CM_Http_Response_Abstract $responseMock */
+        $mockBuilder = $this->getMockBuilder('CM_Http_Response_Abstract');
+        $mockBuilder->setMethods(['_process', 'setCookie']);
+        $mockBuilder->setConstructorArgs([$request, $site, $this->getServiceManager()]);
+        $responseMock = $mockBuilder->getMock();
+        $responseMock->expects($this->once())->method('setCookie')->with('clientId', (string) $clientId);
+        $responseMock->process();
     }
 
     public function testGetUserAgent() {

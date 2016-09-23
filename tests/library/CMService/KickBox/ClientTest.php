@@ -3,7 +3,10 @@
 class CMService_KickBox_ClientTest extends CMTest_TestCase {
 
     public function testMalformedEmailAddress() {
-        $kickBoxMock = $this->getMock('CMService_KickBox_Client', array('_getResponseBody'), array('', true, true, 0.2));
+        $mockBuilder = $this->getMockBuilder('CMService_KickBox_Client');
+        $mockBuilder->setMethods(['_getResponseBody']);
+        $mockBuilder->setConstructorArgs(['', true, true, 0.2]);
+        $kickBoxMock = $mockBuilder->getMock();
         $kickBoxMock->expects($this->never())->method('_getResponseBody');
         /** @var CMService_KickBox_Client $kickBoxMock */
         $this->assertFalse($kickBoxMock->isValid('invalid email@example.com'));
@@ -54,7 +57,10 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
     }
 
     public function testHandleExceptionNoCredits() {
-        $kickBoxMock = $this->getMock('CMService_KickBox_Client', array('_getResponse', '_logException'), array('', true, false, 0));
+        $mockBuilder = $this->getMockBuilder('CMService_KickBox_Client');
+        $mockBuilder->setMethods(['_getResponse', '_logException']);
+        $mockBuilder->setConstructorArgs(['', true, false, 0]);
+        $kickBoxMock = $mockBuilder->getMock();
         $exception = new Exception('No credits');
         $kickBoxMock->expects($this->once())->method('_getResponse')->will($this->throwException($exception));
         $kickBoxMock->expects($this->once())->method('_logException')->with($exception);
@@ -64,7 +70,10 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
 
     public function testHandleInvalidResponseCodeNoCredits() {
         $responseMock = new \Kickbox\HttpClient\Response(array('result' => 'unknown'), 403, array('header' => 'value'));
-        $kickBoxMock = $this->getMock('CMService_KickBox_Client', array('_getResponse', '_logException'), array('', true, false, 0));
+        $mockBuilder = $this->getMockBuilder('CMService_KickBox_Client');
+        $mockBuilder->setMethods(['_getResponse', '_logException']);
+        $mockBuilder->setConstructorArgs(['', true, false, 0]);
+        $kickBoxMock = $mockBuilder->getMock();
         $kickBoxMock->expects($this->once())->method('_getResponse')->will($this->returnValue($responseMock));
         $exception = new CM_Exception('Invalid KickBox email validation response', null, [
             'email'   => 'test@example.com',
@@ -130,12 +139,11 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
      * @return CMService_KickBox_Client
      */
     protected function _getKickBoxMock($disallowInvalid, $disallowDisposable, $disallowUnknownThreshold, $responseBodyMock) {
-        $kickBoxMock = $this->getMock('CMService_KickBox_Client', array('_getResponseBody'), array(
-            '',
-            $disallowInvalid,
-            $disallowDisposable,
-            $disallowUnknownThreshold
-        ));
+        $mockBuilder = $this->getMockBuilder('CMService_KickBox_Client');
+        $mockBuilder->setMethods(['_getResponseBody']);
+        $mockBuilder->setConstructorArgs(['', $disallowInvalid, $disallowDisposable, $disallowUnknownThreshold]);
+        $kickBoxMock = $mockBuilder->getMock();
+
         $kickBoxMock->expects($this->once())->method('_getResponseBody')->will($this->returnValue($responseBodyMock));
         return $kickBoxMock;
     }

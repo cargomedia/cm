@@ -3353,19 +3353,20 @@ class CMService_MaxMindTest extends CMTest_TestCase {
     protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock, $regionListLegacyMock) {
         $ipBlocksReaderMock = $this->_getReaderMock($ipDataMock, "Copyright (c) 2011 MaxMind Inc.  All Rights Reserved.\nstartIpNum,endIpNum,locId\n");
         $locationReaderMock = $this->_getReaderMock($locationDataMock, "Copyright (c) 2012 MaxMind LLC.  All Rights Reserved.\nlocId,country,region,city,postalCode,latitude,longitude,metroCode,areaCode\n");
-        $maxMind = $this->getMock('CMService_MaxMind',
-            ['_getCountryData', '_getRegionData', '_getLocationReader', '_getIpBlocksReader', '_getRegionListLegacy', '_updateSearchIndex']);
-        $maxMind->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
-        $maxMind->expects($this->any())->method('_getRegionData')->will($this->returnValue($regionDataMock));
-        $maxMind->expects($this->any())->method('_getLocationReader')->will($this->returnValue($locationReaderMock));
-        $maxMind->expects($this->any())->method('_getIpBlocksReader')->will($this->returnValue($ipBlocksReaderMock));
-        $maxMind->expects($this->any())->method('_getRegionListLegacy')->will($this->returnValue($regionListLegacyMock));
-        $maxMind->expects($this->any())->method('_updateSearchIndex')->will($this->returnValue(null));
-        /** @var CMService_MaxMind $maxMind */
-        $maxMind->setStreamOutput($this->_outputStream);
-        $maxMind->setStreamError($this->_errorStream);
-        $maxMind->setVerbose(true);
-        $maxMind->upgrade();
+        $mockBuilder = $this->getMockBuilder('CMService_MaxMind');
+        $mockBuilder->setMethods(['_getCountryData', '_getRegionData', '_getLocationReader', '_getIpBlocksReader', '_getRegionListLegacy', '_updateSearchIndex']);
+        $maxMindMock = $mockBuilder->getMock();
+        $maxMindMock->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
+        $maxMindMock->expects($this->any())->method('_getRegionData')->will($this->returnValue($regionDataMock));
+        $maxMindMock->expects($this->any())->method('_getLocationReader')->will($this->returnValue($locationReaderMock));
+        $maxMindMock->expects($this->any())->method('_getIpBlocksReader')->will($this->returnValue($ipBlocksReaderMock));
+        $maxMindMock->expects($this->any())->method('_getRegionListLegacy')->will($this->returnValue($regionListLegacyMock));
+        $maxMindMock->expects($this->any())->method('_updateSearchIndex')->will($this->returnValue(null));
+        /** @var CMService_MaxMind $maxMindMock */
+        $maxMindMock->setStreamOutput($this->_outputStream);
+        $maxMindMock->setStreamError($this->_errorStream);
+        $maxMindMock->setVerbose(true);
+        $maxMindMock->upgrade();
     }
 
     protected function _verify($countryDataExpected, $regionDataExpected, $cityDataExpected, $zipCodeDataExpected, $ipDataExpected) {
