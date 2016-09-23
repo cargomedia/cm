@@ -115,12 +115,17 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
     }
 
     public function testMonitorSynchronizedCommands() {
-        $processMock = $this->getMock('CM_Process', array('getHostId', 'isRunning'), array(), '', false);
+        $mockBuilder = $this->getMockBuilder('CM_Process');
+        $mockBuilder->setMethods(['getHostId', 'isRunning']);
+        $mockBuilder->disableOriginalConstructor();
+        $processMock = $mockBuilder->getMock();
         $processMock->expects($this->any())->method('getHostId')->will($this->returnValue(1));
         $processMock->expects($this->any())->method('isRunning')->will($this->returnCallback(function ($processId) {
             return $processId !== 3;
         }));
-        $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('_getProcess'));
+        $mockBuilder = $this->getMockBuilder('CM_Cli_CommandManager');
+        $mockBuilder->setMethods(['_getProcess']);
+        $commandManagerMock = $mockBuilder->getMock();
         $commandManagerMock->expects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
         CM_Db_Db::insert('cm_cli_command_manager_process',
             array('commandName' => 'command-mock1', 'hostId' => 1, 'processId' => 1, 'timeoutStamp' => time() + 60));
@@ -189,8 +194,9 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
     protected function _getCommandManagerMock($commandMock, $errorMessageExpected = null) {
         $keepAliveExpected = $commandMock->getKeepalive();
         $processMock = $this->_getProcessMock($keepAliveExpected);
-        $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
-            array('getCommands', '_getProcess', '_findLock', '_lockCommand', 'unlockCommand', '_outputError', '_checkUnusedArguments'));
+        $mockBuilder = $this->getMockBuilder('CM_Cli_CommandManager');
+        $mockBuilder->setMethods(['getCommands', '_getProcess', '_findLock', '_lockCommand', 'unlockCommand', '_outputError', '_checkUnusedArguments']);
+        $commandManagerMock = $mockBuilder->getMock();
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         if (null === $errorMessageExpected) {
             $commandManagerMock->expects($this->never())->method('_outputError');
@@ -209,9 +215,10 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
      * @return CM_Cli_Command
      */
     protected function _getCommandMock($synchronized, $keepAlive, $expectedRuns) {
-        $commandMock = $this->getMock('CM_Cli_Command',
-            array('getPackageName', '_getMethodName', 'isAbstract', 'getSynchronized', 'getKeepalive', 'run', 'extractParameters'),
-            array(), '', false);
+        $mockBuilder = $this->getMockBuilder('CM_Cli_Command');
+        $mockBuilder->setMethods(['getPackageName', '_getMethodName', 'isAbstract', 'getSynchronized', 'getKeepalive', 'run', 'extractParameters']);
+        $mockBuilder->disableOriginalConstructor();
+        $commandMock = $mockBuilder->getMock();
         $commandMock->expects($this->any())->method('getPackageName')->will($this->returnValue('package-mock'));
         $commandMock->expects($this->any())->method('_getMethodName')->will($this->returnValue('command-mock'));
         $commandMock->expects($this->any())->method('isAbstract')->will($this->returnValue(false));
@@ -227,7 +234,10 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
      * @return CM_Process
      */
     protected function _getProcessMock($keepAliveExpected) {
-        $processMock = $this->getMock('CM_Process', array('fork', 'waitForChildren'), array(), '', false);
+        $mockBuilder = $this->getMockBuilder('CM_Process');
+        $mockBuilder->setMethods(['fork', 'waitForChildren']);
+        $mockBuilder->disableOriginalConstructor();
+        $processMock = $mockBuilder->getMock();
         $processMock->expects($this->any())->method('fork')->will($this->returnCallback(function ($workload) {
             $workload(new CM_Process_WorkloadResult());
         }));
