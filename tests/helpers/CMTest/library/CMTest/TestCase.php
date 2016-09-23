@@ -39,35 +39,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param string      $originalClassName
-     * @param array       $methods
-     * @param array       $arguments
-     * @param string      $mockClassName
-     * @param bool        $callOriginalConstructor
-     * @param bool        $callOriginalClone
-     * @param bool        $callAutoload
-     * @param bool        $cloneArguments
-     * @param bool        $callOriginalMethods
-     * @param object|null $proxyTarget
-     * @return PHPUnit_Framework_MockObject_MockObject
-     */
-    public function getMock($originalClassName, $methods = [], array $arguments = [], $mockClassName = '', $callOriginalConstructor = true, $callOriginalClone = true, $callAutoload = true, $cloneArguments = false, $callOriginalMethods = false, $proxyTarget = null) {
-        $mockBuilder = $this->getMockBuilder($originalClassName)
-            ->setMethods($methods)
-            ->setConstructorArgs($arguments)
-            ->setMockClassName($mockClassName)
-            ->setProxyTarget($proxyTarget);
-
-        $callOriginalConstructor ? $mockBuilder->enableOriginalConstructor() : $mockBuilder->disableOriginalConstructor();
-        $callOriginalClone ? $mockBuilder->enableOriginalClone() : $mockBuilder->disableOriginalClone();
-        $callAutoload ? $mockBuilder->enableAutoload() : $mockBuilder->disableAutoload();
-        $cloneArguments ? $mockBuilder->enableArgumentCloning() : $mockBuilder->disableArgumentCloning();
-        $callOriginalMethods ? $mockBuilder->enableProxyingToOriginalMethods() : $mockBuilder->disableProxyingToOriginalMethods();
-
-        return $mockBuilder->getMock();
-    }
-
-    /**
      * @return CM_Form_Abstract
      */
     public function getMockForm() {
