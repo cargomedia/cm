@@ -18,7 +18,7 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
             CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 50));
             $this->fail('Could create duplicate splitfeature');
         } catch (CM_Exception $e) {
-            $this->assertContains("Duplicate entry 'foo' for key 'name'", $e->getMessage());
+            $this->assertContains("Duplicate entry 'foo' for key 'name'", $e->getMetaInfo()['originalExceptionMessage']);
         }
     }
 
