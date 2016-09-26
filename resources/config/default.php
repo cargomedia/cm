@@ -177,6 +177,11 @@ return function (CM_Config_Node $config) {
         ],
     ];
 
+    $config->services['tracking-adwords'] = [
+        'class'     => 'CMService_AdWords_Client',
+        'arguments' => [],
+    ];
+
     $config->services['tracking-googleanalytics'] = array(
         'class'     => 'CMService_GoogleAnalytics_Client',
         'arguments' => array(

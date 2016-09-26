@@ -63,7 +63,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
             CM_Model_Language::create('Another one', $language->getAbbreviation(), true);
             $this->fail('Could create language with duplicate abbreviation');
         } catch (CM_Exception $e) {
-            $this->assertContains('Duplicate entry', $e->getMessage());
+            $this->assertContains('Duplicate entry', $e->getMetaInfo()['originalExceptionMessage']);
         }
     }
 
@@ -83,7 +83,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
             CM_Model_Language::create('Another', 'pl', true);
             $this->fail('Could set language with duplicate abbreviation');
         } catch (CM_Exception $e) {
-            $this->assertContains('Duplicate entry', $e->getMessage());
+            $this->assertContains('Duplicate entry', $e->getMetaInfo()['originalExceptionMessage']);
         }
     }
 

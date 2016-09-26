@@ -52,7 +52,7 @@
           {/if}
           {if (!empty($exception.meta))}
             <div><span class="label">Exception meta info:</span>
-              <pre>{print_r($exception.meta, true)}</pre>
+              <pre>{print_r($exception.meta, true)|escape}</pre>
             </div>
           {/if}
         </div>
@@ -61,7 +61,7 @@
       {if !empty($log.context)}
         <div class="toggleNext">Context</div>
         <div class="toggleNext-content">
-          <pre>{print_r($log.context, true)}</pre>
+          <pre>{print_r($log.context, true)|escape}</pre>
         </div>
       {/if}
 

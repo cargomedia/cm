@@ -64,7 +64,9 @@ textarea.textinput {
   }
 
   &:disabled {
-    opacity: .5;
+    .icon, .label {
+      opacity: .5;
+    }
   }
 
   &.hasIcon:not(.hasLabel) {

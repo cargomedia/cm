@@ -7,22 +7,39 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
             $this->markTestSkipped('Gearman Pecl Extension not installed.');
         }
         $counter = 0;
-        $gearmanWorkerMock = $this->getMock('GearmanWorker', array('work'));
+        $mockBuilder = $this->getMockBuilder('GearmanWorker');
+        $mockBuilder->setMethods(['work']);
+        $gearmanWorkerMock = $mockBuilder->getMock();
         $gearmanWorkerMock->expects($this->exactly(2))->method('work')->will($this->returnCallback(function () use (&$counter) {
             if (++$counter >= 2) {
                 return false;
             }
             throw new Exception('foo-bar');
         }));
-        $jobWorkerMock = $this->getMock('CM_Jobdistribution_JobWorker', array('_getGearmanWorker', '_handleException'), array(), '', false);
+        $mockBuilder = $this->getMockBuilder('CM_Jobdistribution_JobWorker');
+        $mockBuilder->setMethods(['_getGearmanWorker', '_handleException']);
+        $mockBuilder->disableOriginalConstructor();
+        $jobWorkerMock = $mockBuilder->getMock();
         $jobWorkerMock->expects($this->any())->method('_getGearmanWorker')->will($this->returnValue($gearmanWorkerMock));
-        $jobWorkerMock->expects($this->once())->method('_handleException')->with(new PHPUnit_Framework_Constraint_ExceptionMessage('foo-bar'));
         /** @var CM_JobDistribution_JobWorker $jobWorkerMock */
+        $serviceManager = new CM_Service_Manager();
+        $jobWorkerMock->setServiceManager($serviceManager);
+        /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
+        $logger = $this->mockObject('CM_Log_Logger');
+        $serviceManager->registerInstance('logger', $logger);
+        $addMessageMock = $logger->mockMethod('addMessage')->set(function ($message, $level, CM_Log_Context $context = null) {
+            $this->assertSame('Worker failed', $message);
+            $this->assertEquals(CM_Log_Logger::ERROR, $level);
+            $exception = $context->getException();
+            $this->assertInstanceOf('Exception', $exception);
+            $this->assertEquals('foo-bar', $exception->getMessage());
+        });
         try {
             $jobWorkerMock->run();
         } catch (CM_Exception_Invalid $ex) {
             $this->assertContains('Worker failed', $ex->getMessage());
             $this->assertSame(2, $counter);
+            $this->assertSame(1, $addMessageMock->getCallCount());
         } catch (Exception $ex) {
             $this->fail('Exception not caught.');
         }

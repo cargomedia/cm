@@ -228,7 +228,7 @@ class CM_Process {
                 $forkHandler->runAndSendWorkload();
                 $forkHandler->closeIpcStream();
             } catch (Exception $e) {
-                CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
+                CM_Service_Manager::getInstance()->getLogger()->addMessage('Forking workload failed', CM_Log_Logger::exceptionToLevel($e), (new CM_Log_Context())->setException($e));
             }
             exit;
         }
@@ -279,8 +279,7 @@ class CM_Process {
                         $this->unbind('exit', [$this, 'killChildren']);
                     }
                     if ($keepAlive) {
-                        $warning = new CM_Exception('Respawning dead child.', CM_Exception::WARN, ['pid' => $pid]);
-                        CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
+                        CM_Service_Manager::getInstance()->getLogger()->warning('Respawning dead child.', (new CM_Log_Context())->setExtra(['pid' => $pid]));
                         usleep(self::RESPAWN_TIMEOUT * 1000000);
                         $this->_fork($forkHandler->getWorkload(), $forkHandler->getIdentifier());
                     }

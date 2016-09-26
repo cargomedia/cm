@@ -89,13 +89,16 @@ class CM_Log_Context {
 
     /**
      * @param Exception|null $exception
+     * @return $this
      */
     public function setException($exception) {
         $this->_exception = $exception;
+        return $this;
     }
 
     /**
      * @param array $extra
+     * @return $this
      * @throws CM_Exception_Invalid
      */
     public function setExtra(array $extra) {
@@ -105,8 +108,8 @@ class CM_Log_Context {
         })) {
             throw new CM_Exception_Invalid('Object can not be passed to "Extra"');
         }
-
         $this->_extra = $extra;
+        return $this;
     }
 
     /**

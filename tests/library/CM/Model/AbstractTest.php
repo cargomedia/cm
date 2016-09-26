@@ -254,8 +254,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $idRaw = array('id' => '1');
         $schema = new CM_Model_Schema_Definition(array('foo' => array(), 'bar' => array()));
 
-        $cacheable = $this->getMock('CM_Cacheable');
-        $cacheable->expects($this->once())->method('_change');
+        $cacheableMock = $this->getMockBuilder('CM_Cacheable')->getMock();
+        $cacheableMock->expects($this->once())->method('_change');
 
         $assetClassHierarchy = array('CM_ModelAsset_Abstract', 'CM_ModelAsset_Concrete');
         $asset = $this->getMockBuilder('CM_ModelAsset_Abstract')->setMethods(array('getClassHierarchy', '_loadAsset'))
@@ -279,7 +279,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $model->expects($this->once())->method('_getPersistence')->will($this->returnValue($persistence));
         $model->expects($this->once())->method('_getCache')->will($this->returnValue($cache));
         $model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
-        $model->expects($this->once())->method('_getContainingCacheables')->will($this->returnValue(array($cacheable)));
+        $model->expects($this->once())->method('_getContainingCacheables')->will($this->returnValue(array($cacheableMock)));
         $model->expects($this->once())->method('_getAssets')->will($this->returnValue(array($asset)));
         $model->expects($this->once())->method('_onChange');
         $model->expects($this->once())->method('_onCreate');

@@ -16,7 +16,9 @@ class CM_FormField_EmailTest extends CMTest_TestCase {
     }
 
     public function testDisableEmailVerification() {
-        $emailVerificationMock = $this->getMock('CM_Service_EmailVerification_Standard', ['isValid']);
+        $mockBuilder = $this->getMockBuilder('CM_Service_EmailVerification_Standard');
+        $mockBuilder->setMethods(['isValid']);
+        $emailVerificationMock = $mockBuilder->getMock();
         $emailVerificationMock->expects($this->never())->method('isValid');
         $serviceManager = CM_Service_Manager::getInstance();
         $emailVerificationDefault = $serviceManager->get('email-verification');

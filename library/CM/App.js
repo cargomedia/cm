@@ -3,19 +3,25 @@
  * @extends CM_Class_Abstract
  */
 var CM_App = CM_Class_Abstract.extend({
-  /** @type Object **/
+  /** @type {Object} **/
   views: {},
 
-  /** @type Object **/
+  /** @type {Logger} **/
+  logger: (cm.logger || null),
+
+  /** @type {Object} **/
   lib: (cm.lib || {}),
 
   /** @type {Object|Null} **/
   viewer: null,
 
-  /** @type Object **/
+  /** @type {Object} **/
   options: {},
 
   ready: function() {
+    this.logger.configure({
+      dev: cm.options.debug
+    });
     this.promise.ready();
     this.error.ready();
     this.dom.ready();
@@ -382,6 +388,7 @@ var CM_App = CM_Class_Abstract.extend({
      */
     log: function(error) {
       _.defer(function() {
+        cm.logger.addRecordError(error);
         throw error;
       });
     },
@@ -391,11 +398,13 @@ var CM_App = CM_Class_Abstract.extend({
      * @throws Error
      */
     handle: function(error) {
+      var throwError = true;
       if (error instanceof CM_Exception) {
         var handlers = _.filter(cm.error._handlers, function(handler) {
           return handler.errorName === error.name;
         });
         if (0 !== handlers.length) {
+          throwError = false;
           _.every(handlers, function(handler) {
             return false !== handler.callback.call(handler.context, error);
           });
@@ -403,7 +412,9 @@ var CM_App = CM_Class_Abstract.extend({
           cm.window.hint(error.message);
         }
       }
-      throw error;
+      if (throwError) {
+        throw error;
+      }
     }
   },
 
@@ -415,32 +426,22 @@ var CM_App = CM_Class_Abstract.extend({
     viewTree: function(view, indentation) {
       view = view || cm.findView();
       indentation = indentation || 0;
-      console.log(new Array(indentation + 1).join("  ") + view.getClass() + " (", view.el, ")");
+      cm.logger.info(new Array(indentation + 1).join("  ") + view.getClass() + " (", view.el, ")");
       _.each(view.getChildren(), function(child) {
         cm.debug.viewTree(child, indentation + 1);
       });
     },
 
     /**
-     * @param message
-     * @param [message2]
-     * @param [message3]
+     * @param {*...} messages
      */
-    log: function(message, message2, message3) {
-      if (!cm.options.debug) {
-        return;
-      }
-      var messages = _.toArray(arguments);
+    log: function(messages) {
+      var args = _.toArray(arguments);
+      var message = args.shift();
       var time = (Date.now() - performance.timing.navigationStart) / 1000;
       var timeFormatted = time.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false});
-      messages.unshift('[CM ' + timeFormatted + (performance.timing.isPolyfilled ? '!' : '') + ']');
-      if (window.console && window.console.log) {
-        var log = window.console.log;
-        if (typeof log == "object" && Function.prototype.bind) {
-          log = Function.prototype.bind.call(console.log, console);
-        }
-        log.apply(console, messages);
-      }
+      var prefix = '[CM ' + timeFormatted + (performance.timing.isPolyfilled ? '!' : '') + ']';
+      cm.logger.debug.apply(cm.logger, [prefix + ' ' + message].concat(args));
     }
   },
 
@@ -917,34 +918,40 @@ var CM_App = CM_Class_Abstract.extend({
   storage: {
     /**
      * @param {String} key
-     * @param {Object} value
+     * @param {*} value
      */
     set: function(key, value) {
-      try {
-        localStorage.setItem(cm.getSiteId() + ':' + key, JSON.stringify(value));
-      } catch (e) {
-        // iOS5 Private Browsing mode which throws QUOTA_EXCEEDED_ERR: DOM Exception 22
-      }
+      this._getPersistentStorage().set(key, value);
     },
 
     /**
      * @param {String} key
-     * @return {*|Null}
+     * @return {*|null}
      */
     get: function(key) {
-      var value = localStorage.getItem(cm.getSiteId() + ':' + key);
-      if (value === null) {
-        // See: https://code.google.com/p/android/issues/detail?id=11973
-        return null;
-      }
-      return JSON.parse(value);
+      var value = this._getPersistentStorage().get(key);
+      return !_.isUndefined(value) ? value : null;
     },
 
     /**
      * @param {String} key
      */
     del: function(key) {
-      localStorage.removeItem(cm.getSiteId() + ':' + key);
+      this._getPersistentStorage().del(key);
+    },
+
+    /** @type {PersistentStorage|null} **/
+    _data: null,
+
+    /**
+     * @returns {PersistentStorage}
+     * @private
+     */
+    _getPersistentStorage: function() {
+      if (!this._data) {
+        this._data = new cm.lib.PersistentStorage(cm.options.name + ':' + cm.getSiteId(), localStorage, cm.logger);
+      }
+      return this._data;
     }
   },
 
@@ -1131,11 +1138,11 @@ var CM_App = CM_Class_Abstract.extend({
       this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(event, data) {
         if (handler._channelDispatchers[channel]) {
           data = cm.factory.create(data);
-          cm.debug.log('Stream channel (' + channel + '): event `' + event + '`: ', data);
+          cm.debug.log('Stream channel (`%s): event `%s`: %o', channel, event, data);
           handler._channelDispatchers[channel].trigger(event, data);
         }
       });
-      cm.debug.log('Stream channel (' + channel + '): subscribe');
+      cm.debug.log('Stream channel (`%s`): subscribe', channel);
     },
 
     /**
@@ -1146,7 +1153,7 @@ var CM_App = CM_Class_Abstract.extend({
         delete this._channelDispatchers[channel];
       }
       this._adapter.unsubscribe(channel);
-      cm.debug.log('Stream channel (' + channel + '): unsubscribe');
+      cm.debug.log('Stream channel (`%s`): unsubscribe', channel);
     }
   },
 

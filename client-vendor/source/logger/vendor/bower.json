@@ -1,0 +1,11 @@
+{
+  "name": "js-logger",
+  "version": "1.3.0",
+  "main": "src/logger.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "test-src"
+  ]
+}

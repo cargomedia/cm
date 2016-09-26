@@ -12,10 +12,12 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         }
         CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
 
-        $gearmanClient = $this->getMock('GearmanClient', array('addTaskHigh', 'runTasks', 'setCompleteCallback', 'setFailCallback'));
-        $gearmanClient->expects($this->exactly(2))->method('addTaskHigh')->will($this->returnValue(true));
-        $gearmanClient->expects($this->exactly(1))->method('runTasks')->will($this->returnValue(true));
-        $gearmanClient->expects($this->exactly(1))->method('setCompleteCallback')->will($this->returnCallback(function ($completeCallback) {
+        $mockBuilder = $this->getMockBuilder('GearmanClient');
+        $mockBuilder->setMethods(['addTaskHigh', 'runTasks', 'setCompleteCallback', 'setFailCallback']);
+        $gearmanClientMock = $mockBuilder->getMock();
+        $gearmanClientMock->expects($this->exactly(2))->method('addTaskHigh')->will($this->returnValue(true));
+        $gearmanClientMock->expects($this->exactly(1))->method('runTasks')->will($this->returnValue(true));
+        $gearmanClientMock->expects($this->exactly(1))->method('setCompleteCallback')->will($this->returnCallback(function ($completeCallback) {
             $task1 = $this->getMockBuilder('GearmanTask')->setMethods(array('data'))->getMock();
             $task1->expects($this->once())->method('data')->will($this->returnValue(json_encode(array('bar1' => 'foo1'))));
             $completeCallback($task1);
@@ -24,11 +26,11 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
             $task2->expects($this->once())->method('data')->will($this->returnValue(json_encode(array('bar2' => 'foo2'))));
             $completeCallback($task2);
         }));
-        $gearmanClient->expects($this->exactly(1))->method('setFailCallback');
-        /** @var GearmanClient $gearmanClient */
+        $gearmanClientMock->expects($this->exactly(1))->method('setFailCallback');
+        /** @var GearmanClient $gearmanClientMock */
 
         $job = $this->getMockBuilder('CM_Jobdistribution_Job_Abstract')->setMethods(array('_getGearmanClient'))->getMockForAbstractClass();
-        $job->expects($this->any())->method('_getGearmanClient')->will($this->returnValue($gearmanClient));
+        $job->expects($this->any())->method('_getGearmanClient')->will($this->returnValue($gearmanClientMock));
         /** @var CM_Jobdistribution_Job_Abstract $job */
 
         $result = $job->runMultiple(array(
@@ -48,22 +50,24 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         }
         CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
 
-        $gearmanClient = $this->getMock('GearmanClient', array('addTaskHigh', 'runTasks', 'setCompleteCallback', 'setFailCallback'));
-        $gearmanClient->expects($this->exactly(2))->method('addTaskHigh')->will($this->returnValue(true));
-        $gearmanClient->expects($this->exactly(1))->method('runTasks')->will($this->returnValue(true));
-        $gearmanClient->expects($this->exactly(1))->method('setCompleteCallback')->will($this->returnCallback(function ($completeCallback) {
+        $mockBuilder = $this->getMockBuilder('GearmanClient');
+        $mockBuilder->setMethods(['addTaskHigh', 'runTasks', 'setCompleteCallback', 'setFailCallback']);
+        $gearmanClientMock = $mockBuilder->getMock();
+        $gearmanClientMock->expects($this->exactly(2))->method('addTaskHigh')->will($this->returnValue(true));
+        $gearmanClientMock->expects($this->exactly(1))->method('runTasks')->will($this->returnValue(true));
+        $gearmanClientMock->expects($this->exactly(1))->method('setCompleteCallback')->will($this->returnCallback(function ($completeCallback) {
             $task1 = $this->getMockBuilder('GearmanTask')->setMethods(array('data'))->getMock();
             $task1->expects($this->once())->method('data')->will($this->returnValue(json_encode(array('bar1' => 'foo1'))));
             $completeCallback($task1);
         }));
-        $gearmanClient->expects($this->exactly(1))->method('setFailCallback')->will($this->returnCallback(function ($failCallback) {
+        $gearmanClientMock->expects($this->exactly(1))->method('setFailCallback')->will($this->returnCallback(function ($failCallback) {
             $failCallback(new GearmanTask());
         }));
-        /** @var GearmanClient $gearmanClient */
+        /** @var GearmanClient $gearmanClientMock */
 
         $job = $this->getMockBuilder('CM_Jobdistribution_Job_Abstract')
             ->setMethods(array('_getGearmanClient', '_getJobName'))->getMockForAbstractClass();
-        $job->expects($this->any())->method('_getGearmanClient')->will($this->returnValue($gearmanClient));
+        $job->expects($this->any())->method('_getGearmanClient')->will($this->returnValue($gearmanClientMock));
         $job->expects($this->any())->method('_getJobName')->will($this->returnValue('myJob'));
         /** @var CM_Jobdistribution_Job_Abstract $job */
 

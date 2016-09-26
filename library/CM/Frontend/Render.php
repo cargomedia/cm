@@ -393,6 +393,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @param string|null       $pattern
      * @param DateTimeZone|null $timeZone
      * @return IntlDateFormatter
+     * @throws CM_Exception
      */
     public function getFormatterDate($dateType, $timeType, $pattern = null, DateTimeZone $timeZone = null) {
         if (null === $timeZone) {
@@ -402,7 +403,18 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         if (in_array(substr($timeZoneName, 0, 1), ['+', '-'])) {
             $timeZoneName = 'GMT' . $timeZoneName;
         }
-        return new IntlDateFormatter($this->getLocale(), $dateType, $timeType, $timeZoneName, null, $pattern);
+
+        $formatter = new IntlDateFormatter($this->getLocale(), $dateType, $timeType, $timeZoneName, null, $pattern);
+        if (null === $formatter) {
+            throw new CM_Exception('Cannot create date formatter', null, [
+                'locale'       => $this->getLocale(),
+                'dateType'     => $dateType,
+                'timeType'     => $timeType,
+                'timeZoneName' => $timeZoneName,
+                'pattern'      => $pattern,
+            ]);
+        }
+        return $formatter;
     }
 
     /**

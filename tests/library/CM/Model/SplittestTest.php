@@ -172,11 +172,14 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $variation = $test->getVariations()->getItem(0);
         $variation->getName(); // Fill data
 
-        $kissMetrics = $this->getMock('CMService_KissMetrics_Client', array('trackSplittest'), array('km123'));
-        $kissMetrics->expects($this->once())->method('trackSplittest')->with($fixture, $this->equalTo($variation));
+        $mockBuilder = $this->getMockBuilder('CMService_KissMetrics_Client');
+        $mockBuilder->setMethods(['trackSplittest']);
+        $mockBuilder->setConstructorArgs(['km123']);
+        $kissMetricsMock = $mockBuilder->getMock();
+        $kissMetricsMock->expects($this->once())->method('trackSplittest')->with($fixture, $this->equalTo($variation));
 
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->registerInstance('kissmetrics', $kissMetrics);
+        $serviceManager->registerInstance('kissmetrics', $kissMetricsMock);
         $serviceManager->registerInstance('trackings', new CM_Service_Trackings(['kissmetrics']));
         $test->setServiceManager($serviceManager);
 
@@ -193,11 +196,14 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $variation = $test->getVariations()->getItem(0);
         $variation->getName(); // Fill data
 
-        $kissMetrics = $this->getMock('CMService_KissMetrics_Client', array('trackSplittest'), array('km123'));
-        $kissMetrics->expects($this->once())->method('trackSplittest')->with($fixture, $this->equalTo($variation));
+        $mockBuilder = $this->getMockBuilder('CMService_KissMetrics_Client');
+        $mockBuilder->setMethods(['trackSplittest']);
+        $mockBuilder->setConstructorArgs(['km123']);
+        $kissMetricsMock = $mockBuilder->getMock();
+        $kissMetricsMock->expects($this->once())->method('trackSplittest')->with($fixture, $this->equalTo($variation));
 
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->registerInstance('tracking-kissmetrics-test', $kissMetrics);
+        $serviceManager->registerInstance('tracking-kissmetrics-test', $kissMetricsMock);
         $serviceManager->unregister('trackings');
         $serviceManager->registerInstance('trackings', new CM_Service_Trackings(['tracking-kissmetrics-test']));
 
@@ -211,7 +217,9 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $test->setVariationWeightList(array('v1' => .3, 'v2' => .7));
         $v1 = 0;
         for ($i = 0; $i < 100; $i++) {
-            $userMock = $this->getMock('CM_Model_User', array('getId'));
+            $mockBuilder = $this->getMockBuilder('CM_Model_User');
+            $mockBuilder->setMethods(['getId']);
+            $userMock = $mockBuilder->getMock();
             $userMock->expects($this->any())->method('getId')->will($this->returnValue(mt_rand()));
             /** @var CM_Model_User $userMock */
             $fixture = new CM_Splittest_Fixture($userMock);
@@ -238,7 +246,9 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $test->setVariationWeightList(array('v1' => 3, 'v2' => 7, 'v3' => 10));
         $v1 = 0;
         for ($i = 0; $i < 10; $i++) {
-            $userMock = $this->getMock('CM_Model_User', array('getId'));
+            $mockBuilder = $this->getMockBuilder('CM_Model_User');
+            $mockBuilder->setMethods(['getId']);
+            $userMock = $mockBuilder->getMock();
             $userMock->expects($this->any())->method('getId')->will($this->returnValue(mt_rand()));
             /** @var CM_Model_User $userMock */
             $fixture = new CM_Splittest_Fixture($userMock);
@@ -254,7 +264,9 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $test->setVariationWeightList(array('v2' => 3, 'v3' => 7));
         $v1 = 0;
         for ($i = 0; $i < 10; $i++) {
-            $userMock = $this->getMock('CM_Model_User', array('getId'));
+            $mockBuilder = $this->getMockBuilder('CM_Model_User');
+            $mockBuilder->setMethods(['getId']);
+            $userMock = $mockBuilder->getMock();
             $userMock->expects($this->any())->method('getId')->will($this->returnValue(mt_rand()));
             /** @var CM_Model_User $userMock */
             $fixture = new CM_Splittest_Fixture($userMock);
@@ -320,7 +332,9 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $test->setVariationWeightList(array('v1' => 0, 'v2' => 1));
         $v1 = 0;
         for ($i = 0; $i < 10; $i++) {
-            $userMock = $this->getMock('CM_Model_User', array('getId'));
+            $mockBuilder = $this->getMockBuilder('CM_Model_User');
+            $mockBuilder->setMethods(['getId']);
+            $userMock = $mockBuilder->getMock();
             $userMock->expects($this->any())->method('getId')->will($this->returnValue(mt_rand()));
             /** @var CM_Model_User $userMock */
             $fixture = new CM_Splittest_Fixture($userMock);
@@ -342,7 +356,9 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
     public function testOutdatedLocalCache() {
         $test1 = CM_Model_Splittest_Mock::create('foo', range(1, 10));
         $test2 = CM_Model_Splittest_Mock::create('bar', range(1, 10));
-        $userMock = $this->getMock('CM_Model_User', array('getId'));
+        $mockBuilder = $this->getMockBuilder('CM_Model_User');
+        $mockBuilder->setMethods(['getId']);
+        $userMock = $mockBuilder->getMock();
         $userMock->expects($this->any())->method('getId')->will($this->returnValue(mt_rand()));
         /** @var CM_Model_User $userMock */
         $fixture = new CM_Splittest_Fixture($userMock);

@@ -9,7 +9,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     public function testLoadPage() {
         $site = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
         $page = new CM_Page_View_Ajax_Test_Mock();
-        $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
+        $this->getMockClass('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
         $request = $this->createRequestAjax($page, 'loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath()], null, null, $site);
         /** @var CM_Http_Response_View_Abstract $response */
         $response = $this->processRequest($request);
@@ -28,7 +28,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     public function testLoadPageSiteWithPath() {
         $site = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
         $page = new CM_Page_View_Ajax_Test_Mock();
-        $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
+        $this->getMockClass('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
         $request = $this->createRequestAjax($page, 'loadPage', ['path' => '/foo' . CM_Page_View_Ajax_Test_Mock::getPath()], null, null, $site);
         /** @var CM_Http_Response_View_Abstract $response */
         $response = $this->processRequest($request);

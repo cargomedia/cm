@@ -23,6 +23,10 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
         return CM_Db_Db::select('cm_stream_subscribe', '*', array('id' => $this->getId()))->fetch();
     }
 
+    protected function _onCreate() {
+        $this->getStreamChannel()->onSubscribe($this);
+    }
+
     protected function _onDeleteBefore() {
         $this->getStreamChannel()->onUnsubscribe($this);
     }
@@ -77,7 +81,6 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
             'key'          => $key,
         ));
         $streamSubscribe = new self($id);
-        $streamChannel->onSubscribe($streamSubscribe);
         return $streamSubscribe;
     }
 }

@@ -377,7 +377,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
     }
 
     public function testGetLabel() {
-        $userMock = $this->getMock('CM_Model_User');
+        $userMock = $this->getMockBuilder('CM_Model_User')->getMock();
         $argumentList = array(CM_Action_Abstract::VIEW, $userMock);
         $actionMock = $this->getMockForAbstractClass('CM_Action_Abstract', $argumentList, 'CM_Action_EmailNotification_Reminder');
         /** @var CM_Action_Abstract $actionMock */

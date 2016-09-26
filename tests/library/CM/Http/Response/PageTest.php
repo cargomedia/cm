@@ -164,7 +164,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         CM_Config::get()->CM_Http_Response_Page->exceptionsToCatch = [
             'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => false],
         ];
-        $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
+        $this->getMockClass('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
 
         $site = CM_Site_Abstract::factory();
         $request = new CM_Http_Request_Get('/mock10', ['host' => $site->getHost()]);
@@ -200,15 +200,16 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessTrackingViewer() {
-        /** @var CM_Model_User|PHPUnit_Framework_MockObject_MockObject $viewer */
-        $viewer = $this->getMock('CM_Model_User', array('getIdRaw', 'getVisible', 'getLanguage', 'getCurrency'));
-        $viewer->expects($this->any())->method('getIdRaw')->will($this->returnValue(array('id' => '1')));
-        $viewer->expects($this->any())->method('getVisible')->will($this->returnValue(false));
-        $viewer->expects($this->any())->method('getLanguage')->will($this->returnValue(null));
-        $viewer->expects($this->any())->method('getCurrency')->will($this->returnValue(null));
+        $mockBuilder = $this->getMockBuilder('CM_Model_User');
+        $mockBuilder->setMethods(['getIdRaw', 'getVisible', 'getLanguage', 'getCurrency']);
+        $viewerMock = $mockBuilder->getMock();
+        $viewerMock->expects($this->any())->method('getIdRaw')->will($this->returnValue(array('id' => '1')));
+        $viewerMock->expects($this->any())->method('getVisible')->will($this->returnValue(false));
+        $viewerMock->expects($this->any())->method('getLanguage')->will($this->returnValue(null));
+        $viewerMock->expects($this->any())->method('getCurrency')->will($this->returnValue(null));
 
         $site = CM_Site_Abstract::factory();
-        $request = new CM_Http_Request_Get('/mock5', ['host' => $site->getHost()], null, $viewer);
+        $request = new CM_Http_Request_Get('/mock5', ['host' => $site->getHost()], null, $viewerMock);
         $serviceManager = $this->_getServiceManager('ga123', 'km123');
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $serviceManager);
 
@@ -228,7 +229,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         CM_Config::get()->CM_Http_Response_Page->exceptionsToCatch = [
             'CM_Exception_InvalidParam' => ['errorPage' => 'CM_Page_Error_NotFound', 'log' => false],
         ];
-        $this->getMock('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
+        $this->getMockClass('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
 
         $site = CM_Site_Abstract::factory();
         $request = new CM_Http_Request_Get('/example', ['host' => $site->getHost()]);
