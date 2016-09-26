@@ -118,11 +118,7 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         }
 
         if (null !== $this->_filterLevelList) {
-            if (1 === sizeof($this->_filterLevelList)) {
-                $criteria['level'] = $this->_filterLevelList[0];
-            } else {
-                $criteria['level'] = ['$in' => $this->_filterLevelList];
-            }
+            $criteria['level'] = ['$in' => $this->_filterLevelList];
         }
 
         if (null !== $this->_ageMax) {
