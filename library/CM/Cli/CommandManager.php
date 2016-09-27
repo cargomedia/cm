@@ -121,10 +121,11 @@ class CM_Cli_CommandManager {
         foreach ($result->fetchAll() as $row) {
             $commandName = $row['commandName'];
             $processId = (int) $row['processId'];
+            $where = ['machineId' => $machineId, 'commandName' => $commandName];
             if ($process->isRunning($processId)) {
-                CM_Db_Db::update('cm_cli_command_manager_process', ['timeoutStamp' => $timeoutStamp], ['commandName' => $commandName]);
+                CM_Db_Db::update('cm_cli_command_manager_process', ['timeoutStamp' => $timeoutStamp], $where);
             } else {
-                CM_Db_Db::delete('cm_cli_command_manager_process', ['commandName' => $commandName]);
+                CM_Db_Db::delete('cm_cli_command_manager_process', $where);
             }
         }
         CM_Db_Db::delete('cm_cli_command_manager_process', '`timeoutStamp` < ' . $time);
