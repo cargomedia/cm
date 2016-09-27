@@ -68,13 +68,6 @@ class CM_Process {
     /**
      * @return int
      */
-    public function getHostId() {
-        return (int) hexdec(CM_Util::exec('hostid'));
-    }
-
-    /**
-     * @return int
-     */
     public function getProcessId() {
         return posix_getpid();
     }
