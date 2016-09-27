@@ -12,19 +12,6 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
         $this->_appName = (string) $appName;
     }
 
-    public function formatRecordContext(CM_Log_Record $record) {
-        $levelsMapping = array_flip(CM_Log_Logger::getLevels());
-        $context = $record->getContext();
-
-        $result = [
-            'message'   => (string) $record->getMessage(),
-            'level'     => strtolower($levelsMapping[$record->getLevel()]),
-            'timestamp' => $record->getCreatedAt()->format(DateTime::ISO8601),
-        ];
-        $result = array_merge($result, $this->formatContext($context));
-        return $result;
-    }
-
     public function formatContext(CM_Log_Context $context) {
         $result = [];
         if ($computerInfo = $context->getComputerInfo()) {

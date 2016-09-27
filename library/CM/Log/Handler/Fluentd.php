@@ -47,7 +47,16 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
      * @return array
      */
     protected function _formatRecord(CM_Log_Record $record) {
-        return $this->_contextFormatter->formatRecordContext($record);
+        $levelsMapping = array_flip(CM_Log_Logger::getLevels());
+        $context = $record->getContext();
+
+        $result = [
+            'message'   => (string) $record->getMessage(),
+            'level'     => strtolower($levelsMapping[$record->getLevel()]),
+            'timestamp' => $record->getCreatedAt()->format(DateTime::ISO8601),
+        ];
+        $result = array_merge($result, $this->_contextFormatter->formatContext($context));
+        return $result;
     }
 
     /**
