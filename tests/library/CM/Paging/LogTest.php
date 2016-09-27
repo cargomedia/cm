@@ -23,7 +23,10 @@ class CM_Paging_LogTest extends CMTest_TestCase {
     }
 
     public function testAddGet() {
-        $handler = new CM_Log_Handler_MongoDb(CM_Paging_Log::COLLECTION_NAME);
+        $client = $this->getServiceManager()->getMongoDb();
+        $contextFormatter = new CM_Log_ContextFormatter_MongoDb();
+        $handler = new CM_Log_Handler_MongoDb($client, $contextFormatter, CM_Paging_Log::COLLECTION_NAME);
+
         $user = CMTest_TH::createUser();
         $context = new CM_Log_Context();
         $context->setExtra(['bar' => 'quux']);
@@ -48,7 +51,7 @@ class CM_Paging_LogTest extends CMTest_TestCase {
         $this->assertSame(
             [
                 'bar'  => 'quux',
-                'type' => CM_Log_Handler_MongoDb::DEFAULT_TYPE
+                'type' => CM_Log_ContextFormatter_MongoDb::DEFAULT_TYPE
             ], $items[1]['context']['extra']
         );
 
@@ -67,7 +70,10 @@ class CM_Paging_LogTest extends CMTest_TestCase {
     }
 
     public function testCleanUp() {
-        $handler = new CM_Log_Handler_MongoDb(CM_Paging_Log::COLLECTION_NAME);
+        $client = $this->getServiceManager()->getMongoDb();
+        $contextFormatter = new CM_Log_ContextFormatter_MongoDb();
+        $handler = new CM_Log_Handler_MongoDb($client, $contextFormatter, CM_Paging_Log::COLLECTION_NAME);
+
         $context1 = new CM_Log_Context();
         $context1->setExtra(['bar' => 'quux']);
         $record1 = new CM_Log_Record(CM_Log_Logger::DEBUG, 'foo', $context1);
@@ -98,7 +104,10 @@ class CM_Paging_LogTest extends CMTest_TestCase {
     }
 
     public function testFlush() {
-        $handler = new CM_Log_Handler_MongoDb(CM_Paging_Log::COLLECTION_NAME);
+        $client = $this->getServiceManager()->getMongoDb();
+        $contextFormatter = new CM_Log_ContextFormatter_MongoDb();
+        $handler = new CM_Log_Handler_MongoDb($client, $contextFormatter, CM_Paging_Log::COLLECTION_NAME);
+
         $context1 = new CM_Log_Context();
         $context1->setExtra(['bar' => 'quux']);
         $record1 = new CM_Log_Record(CM_Log_Logger::INFO, 'foo', $context1);
@@ -124,7 +133,9 @@ class CM_Paging_LogTest extends CMTest_TestCase {
     }
 
     public function testAggregate() {
-        $handler = new CM_Log_Handler_MongoDb(CM_Paging_Log::COLLECTION_NAME);
+        $client = $this->getServiceManager()->getMongoDb();
+        $contextFormatter = new CM_Log_ContextFormatter_MongoDb();
+        $handler = new CM_Log_Handler_MongoDb($client, $contextFormatter, CM_Paging_Log::COLLECTION_NAME);
 
         $context1 = new CM_Log_Context();
         $context1->setExtra(['bar' => 'quux']);

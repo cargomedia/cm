@@ -85,7 +85,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertSame(
             [
                 'bar'  => ['baz' => 'quux'],
-                'type' => CM_Log_Handler_MongoDb::DEFAULT_TYPE,
+                'type' => CM_Log_ContextFormatter_MongoDb::DEFAULT_TYPE,
             ],
             $context['extra']
         );
@@ -93,12 +93,14 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
     }
 
     public function testWritingTyped() {
+        $mongoClient = $this->getServiceManager()->getMongoDb();
+        $contextFormatter = new CM_Log_ContextFormatter_MongoDb();
+
         $collection = 'cm_log';
         $level = CM_Log_Logger::INFO;
         $message = 'foo';
         $computerInfo = new CM_Log_Context_ComputerInfo('www.example.com', 'v7.0.1');
 
-        $mongoClient = $this->getServiceManager()->getMongoDb();
         $this->assertSame(0, $mongoClient->count($collection));
 
         $recordContext = new CM_Log_Context();
@@ -109,7 +111,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $recordContext->setComputerInfo($computerInfo);
         $record = new CM_Log_Record($level, $message, $recordContext);
 
-        $handler = new CM_Log_Handler_MongoDb($collection, null, ['w' => 0], $level);
+        $handler = new CM_Log_Handler_MongoDb($mongoClient, $contextFormatter, $collection, null, ['w' => 0], $level);
         $this->callProtectedMethod($handler, '_writeRecord', [$record]);
         $this->assertSame(1, $mongoClient->count($collection));
 

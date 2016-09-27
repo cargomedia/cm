@@ -57,13 +57,13 @@ class CM_Log_ContextFormatter_MongoDbTest extends CMTest_TestCase {
         unset($extra['foo']['a']);
         unset($extra['foo']['d']['bar']);
         $this->assertSame([
-            'bar' => 1,
-            'b'   => '[stdClass]',
-            'c'   => '[CM_Model_ContextFormatter_MongoDb_Mock:123]',
-            'd'   => [
+            'bar'  => 1,
+            'b'    => '[stdClass]',
+            'c'    => '[CM_Model_ContextFormatter_MongoDb_Mock:123]',
+            'd'    => [
                 'foo' => 'bar2',
             ],
-            'foo' => [
+            'foo'  => [
                 'b' => '[stdClass]',
                 'c' => '[CM_Model_ContextFormatter_MongoDb_Mock:456]',
                 'd' => [
@@ -71,6 +71,7 @@ class CM_Log_ContextFormatter_MongoDbTest extends CMTest_TestCase {
                     'baz' => '[CM_Model_ContextFormatter_MongoDb_Mock:789]',
                 ],
             ],
+            'type' => CM_Log_ContextFormatter_MongoDb::DEFAULT_TYPE,
         ], $extra);
     }
 

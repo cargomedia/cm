@@ -2,6 +2,8 @@
 
 class CM_Log_ContextFormatter_MongoDb implements CM_Log_ContextFormatter_Interface {
 
+    const DEFAULT_TYPE = 0;
+
     public function formatContext(CM_Log_Context $context) {
         $computerInfo = $context->getComputerInfo();
         $user = $context->getUser();
@@ -15,9 +17,10 @@ class CM_Log_ContextFormatter_MongoDb implements CM_Log_ContextFormatter_Interfa
                 'phpVersion' => $computerInfo->getPhpVersion(),
             ];
         }
-        if ($extra) {
-            $formattedContext['extra'] = $this->_encodeExtra($extra);
+        if (!isset($extra['type'])) {
+            $extra['type'] = self::DEFAULT_TYPE;
         }
+        $formattedContext['extra'] = $this->_encodeExtra($extra);
         if (null !== $user) {
             $formattedContext['user'] = [
                 'id'   => $user->getId(),

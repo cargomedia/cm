@@ -2,8 +2,6 @@
 
 class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
 
-    const DEFAULT_TYPE = 0;
-
     /** @var  string */
     protected $_collection;
 
