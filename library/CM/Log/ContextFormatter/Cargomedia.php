@@ -81,7 +81,7 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
 
     public function formatAppContext(CM_Log_Context $context) {
         $result = [];
-        $appAttributes = $context->getExtra();
+        $appAttributes = $this->_encodeExtra($context->getExtra());
         if ($user = $context->getUser()) {
             $appAttributes['user'] = $user->getId();
         }
@@ -91,6 +91,14 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
         }
         $result[$this->_appName] = $appAttributes;
         return $result;
+    }
+
+    /**
+     * @param array $extra
+     * @return array
+     */
+    protected function _encodeExtra(array $extra) {
+        return $extra;
     }
 
     /**
