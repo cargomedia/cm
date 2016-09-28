@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge; requiresActiveX=true">
-    {if isset($pageDescription)}<meta name="description" content="{$pageDescription|escape}">{/if}
-    {if isset($pageKeywords)}<meta name="keywords" content="{$pageKeywords|escape}">{/if}
+    {if isset($metaDescription)}<meta name="description" content="{$metaDescription|escape}">{/if}
+    {if isset($metaKeywords)}<meta name="keywords" content="{$metaKeywords|escape}">{/if}
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="{$render->getSite()->getName()|escape}">
@@ -36,7 +36,7 @@
       <link rel="alternate" href="{$renderDefault->getUrlPage($page, $page->getParams()->getParamsEncoded(), null, $language)|escape}" hreflang="{$language->getAbbreviation()}">
     {/foreach}
 
-    <title>{$pageTitle|escape}</title>
+    <title>{$title|escape}</title>
     {resourceCss file='all.css' type="vendor"}
     {resourceCss file='all.css' type="library"}
     {resourceJs file='before-body.js' type="vendor"}
@@ -52,7 +52,7 @@
     {/if}
 
     {block name='body-start'}{/block}
-    {$pageContent}
+    {$layoutContent}
     {if CM_Bootloader::getInstance()->isDebug()}{component name='CM_Component_Debug'}{/if}
     {resourceJs file='after-body.js' type="vendor"}
     {resourceJs file='library.js' type="library"}

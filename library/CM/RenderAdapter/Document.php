@@ -35,11 +35,10 @@ class CM_RenderAdapter_Document extends CM_RenderAdapter_Abstract {
         $document->prepare($render->getEnvironment(), $viewResponse);
         $viewResponse->set('viewResponse', $viewResponse);
         $viewResponse->set('page', $page);
-        $viewResponse->set('pageContent', $renderAdapterLayout->fetch());
-        $viewResponse->set('pageTitle', $renderAdapterLayout->fetchTitle());
-        $viewResponse->set('pageDescription', $renderAdapterLayout->fetchDescription());
-        $viewResponse->set('pageKeywords', $renderAdapterLayout->fetchKeywords());
-        $viewResponse->set('renderAdapter', $this);
+        $viewResponse->set('layoutContent', $renderAdapterLayout->fetch());
+        $viewResponse->set('title', $renderAdapterLayout->fetchTitle());
+        $viewResponse->set('metaDescription', $renderAdapterLayout->fetchDescription());
+        $viewResponse->set('metaKeywords', $renderAdapterLayout->fetchKeywords());
         $webFontLoaderConfig = $render->getSite()->getWebFontLoaderConfig();
         if ($webFontLoaderConfig) {
             $viewResponse->set('webFontLoaderConfig', CM_Params::encode($webFontLoaderConfig, true));
