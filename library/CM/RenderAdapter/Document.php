@@ -11,7 +11,7 @@ class CM_RenderAdapter_Document extends CM_RenderAdapter_Abstract {
      */
     public function __construct(CM_Frontend_Render $render, CM_Page_Abstract $page) {
         $this->_page = $page;
-        $document = new CM_View_Document();
+        $document = $render->getSite()->getDocument();
 
         parent::__construct($render, $document);
     }
