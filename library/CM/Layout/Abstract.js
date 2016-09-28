@@ -1,8 +1,8 @@
 /**
  * @class CM_Layout_Abstract
- * @extends CM_View_Abstract
+ * @extends CM_Component_Abstract
  */
-var CM_Layout_Abstract = CM_View_Abstract.extend({
+var CM_Layout_Abstract = CM_Component_Abstract.extend({
 
   /** @type String */
   _class: 'CM_Layout_Abstract',

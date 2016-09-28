@@ -23,7 +23,9 @@ class CM_Http_Response_Page_Embed extends CM_Http_Response_Page {
     protected function _renderPage(CM_Page_Abstract $page) {
         $renderAdapterLayout = new CM_RenderAdapter_Layout($this->getRender(), $page);
         $this->_title = $renderAdapterLayout->fetchTitle();
-        return $renderAdapterLayout->fetchPage();
+        
+        $renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $page);
+        return $renderAdapterPage->fetch();
     }
 
     protected function _process() {

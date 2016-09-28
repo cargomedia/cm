@@ -10,17 +10,18 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
      */
     public function fetch() {
         $component = $this->_getComponent();
-        $frontend = $this->getRender()->getGlobalResponse();
-        $environment = $this->getRender()->getEnvironment();
+        $render = $this->getRender();
 
-        $component->checkAccessible($environment);
+        $component->checkAccessible($render->getEnvironment());
+
         $viewResponse = $this->_getViewResponse();
-        $this->_prepareViewResponse($viewResponse);
-
+        $frontend = $render->getGlobalResponse();
         $frontend->treeExpand($viewResponse);
 
+        $this->_prepareViewResponse($viewResponse);
+
         $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . join(' ', $viewResponse->getCssClasses()) . '">';
-        $html .= $this->getRender()->fetchViewResponse($viewResponse);
+        $html .= $render->fetchViewResponse($viewResponse);
         $html .= '</div>';
 
         $frontend->treeCollapse();
