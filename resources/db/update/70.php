@@ -1,12 +1,12 @@
 <?php
 
-if (CM_Db_Db::existsColumn('cm_cli_command_manager_process', 'hostId')) {
-    CM_Db_Db::exec('
-        ALTER TABLE `cm_cli_command_manager_process`
-          DROP KEY `hostId`,
-          DROP COLUMN `hostId`,
-          ADD COLUMN `machineId` varchar(100) NOT NULL AFTER `commandName`,
-          ADD KEY `machineId` (`machineId`)
-    ');
-    CM_Db_Db::delete('cm_cli_command_manager_process');
-}
+return;
+
+$mongo = CM_Service_Manager::getInstance()->getMongoDb();
+
+$mongo->update(
+    'cm_log',
+    ['context.extra.type' => ['$exists' => false]],
+    ['$set' => ['context.extra.type' => CM_Log_Handler_MongoDb::DEFAULT_TYPE]],
+    ['multiple' => true, 'wTimeoutMS' => 0, 'socketTimeoutMS' => -1]
+);
