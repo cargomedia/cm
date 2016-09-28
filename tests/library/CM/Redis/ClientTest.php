@@ -223,6 +223,7 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
         foreach ($resultList as $result) {
             $this->assertSame(['foo', 'bar'], $result->getResult());
         }
+        $process->waitForChildren();
     }
 
     /**
@@ -252,6 +253,7 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
             return null;
         });
         $this->assertSame(['foo', ['bar0', 'bar1']], $response);
+        $process->waitForChildren();
     }
 
     /**
@@ -278,5 +280,6 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
             }
         });
         $this->assertSame(['foo', 'test', 'bar'], $response);
+        $process->waitForChildren();
     }
 }
