@@ -334,7 +334,19 @@ class CM_Cli_CommandManager {
      * @return string
      */
     protected function _getMachineId() {
-        $file = new CM_File('/etc/machine-id'); // https://www.freedesktop.org/software/systemd/man/machine-id.html
+        // Global machine-id from systemd https://www.freedesktop.org/software/systemd/man/machine-id.html
+        $file = new CM_File('/etc/machine-id');
+
+        if (!$file->exists()) {
+            // Local machine-id as a backup
+            $serviceManager = CM_Service_Manager::getInstance();
+            $file = new CM_File('machine-id', $serviceManager->getFilesystems()->getData());
+            if (!$file->exists()) {
+                $uuid = Ramsey\Uuid\Uuid::uuid4()->toString();
+                $file->write($uuid);
+            }
+        }
+
         return trim($file->read());
     }
 
