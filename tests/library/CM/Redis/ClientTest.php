@@ -223,7 +223,6 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
         foreach ($resultList as $result) {
             $this->assertSame(['foo', 'bar'], $result->getResult());
         }
-        $process->waitForChildren();
     }
 
     /**
