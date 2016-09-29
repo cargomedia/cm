@@ -17,13 +17,17 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
     /** @var CM_Frontend_JavascriptContainer_View */
     protected $_js;
 
+    /** @var array */
+    protected $_dataHtml;
+
     /**
      * @param CM_View_Abstract $view
      */
     public function __construct(CM_View_Abstract $view) {
         $this->_templateName = 'default';
-        $this->_cssClasses = array();
+        $this->_cssClasses = [];
         $this->_view = $view;
+        $this->_dataHtml = [];
         $this->_js = new CM_Frontend_JavascriptContainer_View();
     }
 
@@ -81,6 +85,40 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
         }
         $cssClasses = array_unique($cssClasses);
         return $cssClasses;
+    }
+
+    /**
+     * @param string[] $data
+     */
+    public function setDataHtml(array $data) {
+        $this->_dataHtml = $data;
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     */
+    public function addDataHtml($key, $value) {
+        $this->_dataHtml[(string) $key] = (string) $value;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getDataHtml() {
+        return $this->_dataHtml;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDataHtmlFormatted() {
+        $dataHtml = $this->getDataHtml();
+        $dataAttributes = '';
+        foreach ($dataHtml as $key => $value) {
+            $dataAttributes .= 'data-' . htmlspecialchars($key) . '="' . htmlspecialchars($value) . '" ';
+        }
+        return $dataAttributes;
     }
 
     /**
