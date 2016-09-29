@@ -116,7 +116,7 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
         $dataHtml = $this->getDataHtml();
         $dataAttributes = '';
         foreach ($dataHtml as $key => $value) {
-            $dataAttributes .= 'data-' . htmlspecialchars($key) . '="' . htmlspecialchars($value) . '" ';
+            $dataAttributes .= ' data-' . htmlspecialchars($key) . '="' . htmlspecialchars($value) . '"';
         }
         return $dataAttributes;
     }

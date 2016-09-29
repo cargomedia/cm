@@ -19,7 +19,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
         $frontend->treeExpand($viewResponse);
 
-        $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . join(' ', $viewResponse->getCssClasses()) . '" ' .
+        $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . join(' ', $viewResponse->getCssClasses()) . '"' .
             $viewResponse->getDataHtmlFormatted() . '>';
         $html .= $this->getRender()->fetchViewResponse($viewResponse);
         $html .= '</div>';

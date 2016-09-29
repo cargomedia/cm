@@ -58,7 +58,7 @@ class CM_Frontend_ViewResponseTest extends CMTest_TestCase {
                 'baz'    => 'quux',
                 'fooBar' => 'barFoo'
             ], $viewResponse->getDataHtml());
-        $this->assertSame('data-foo="bar" data-baz="quux" data-fooBar="barFoo" ', $viewResponse->getDataHtmlFormatted());
+        $this->assertSame(' data-foo="bar" data-baz="quux" data-fooBar="barFoo"', $viewResponse->getDataHtmlFormatted());
     }
 
 }
