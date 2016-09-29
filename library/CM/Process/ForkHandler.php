@@ -76,7 +76,7 @@ class CM_Process_ForkHandler {
             $return = $workload($result);
             $result->setResult($return);
         } catch (Exception $e) {
-            CM_Service_Manager::getInstance()->getLogger()->addMessage('Forked workload failed', CM_Log_Logger::exceptionToLevel($e), (new CM_Log_Context())->setException($e));
+            CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
             $result->setException($e);
         }
 
