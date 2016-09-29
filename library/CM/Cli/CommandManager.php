@@ -116,15 +116,16 @@ class CM_Cli_CommandManager {
         $time = time();
         $timeoutStamp = $time + self::TIMEOUT;
         $process = $this->_getProcess();
-        $hostId = $process->getHostId();
-        $result = CM_Db_Db::select('cm_cli_command_manager_process', array('commandName', 'processId'), array('hostId' => $hostId));
+        $machineId = $this->_getMachineId();
+        $result = CM_Db_Db::select('cm_cli_command_manager_process', ['commandName', 'processId'], ['machineId' => $machineId]);
         foreach ($result->fetchAll() as $row) {
             $commandName = $row['commandName'];
             $processId = (int) $row['processId'];
+            $where = ['machineId' => $machineId, 'commandName' => $commandName];
             if ($process->isRunning($processId)) {
-                CM_Db_Db::update('cm_cli_command_manager_process', array('timeoutStamp' => $timeoutStamp), array('commandName' => $commandName));
+                CM_Db_Db::update('cm_cli_command_manager_process', ['timeoutStamp' => $timeoutStamp], $where);
             } else {
-                CM_Db_Db::delete('cm_cli_command_manager_process', array('commandName' => $commandName));
+                CM_Db_Db::delete('cm_cli_command_manager_process', $where);
             }
         }
         CM_Db_Db::delete('cm_cli_command_manager_process', '`timeoutStamp` < ' . $time);
@@ -196,10 +197,14 @@ class CM_Cli_CommandManager {
      */
     public function unlockCommand(CM_Cli_Command $command) {
         $commandName = $command->getName();
-        $process = $this->_getProcess();
-        $hostId = $process->getHostId();
-        $processId = $process->getProcessId();
-        CM_Db_Db::delete('cm_cli_command_manager_process', array('commandName' => $commandName, 'hostId' => $hostId, 'processId' => $processId));
+        $machineId = $this->_getMachineId();
+        $processId = $this->_getProcess()->getProcessId();
+
+        CM_Db_Db::delete('cm_cli_command_manager_process', [
+            'commandName' => $commandName,
+            'machineId'   => $machineId,
+            'processId'   => $processId,
+        ]);
     }
 
     /**
@@ -212,9 +217,9 @@ class CM_Cli_CommandManager {
             return;
         }
         $commandName = $command->getName();
-        $hostId = dechex($lock['hostId']);
+        $machineId = $lock['machineId'];
         $processId = (int) $lock['processId'];
-        throw new CM_Cli_Exception_Internal("Command `$commandName` still running (process `$processId` on host `$hostId`)");
+        throw new CM_Cli_Exception_Internal("Command `$commandName` still running (process `$processId` on machine `$machineId`)");
     }
 
     /**
@@ -236,7 +241,7 @@ class CM_Cli_CommandManager {
      */
     protected function _findLock(CM_Cli_Command $command) {
         $commandName = $command->getName();
-        $lock = CM_Db_Db::select('cm_cli_command_manager_process', array('hostId', 'processId'), array('commandName' => $commandName))->fetch();
+        $lock = CM_Db_Db::select('cm_cli_command_manager_process', ['machineId', 'processId'], ['commandName' => $commandName])->fetch();
         if (false === $lock) {
             return null;
         }
@@ -261,7 +266,7 @@ class CM_Cli_CommandManager {
     /**
      * @return CM_Process
      */
-    protected function  _getProcess() {
+    protected function _getProcess() {
         return CM_Process::getInstance();
     }
 
@@ -307,11 +312,15 @@ class CM_Cli_CommandManager {
     protected function _lockCommand(CM_Cli_Command $command) {
         $commandName = $command->getName();
         $process = $this->_getProcess();
-        $hostId = $process->getHostId();
+        $machineId = $this->_getMachineId();
         $processId = $process->getProcessId();
         $timeoutStamp = time() + self::TIMEOUT;
-        CM_Db_Db::insert('cm_cli_command_manager_process',
-            array('commandName' => $commandName, 'hostId' => $hostId, 'processId' => $processId, 'timeoutStamp' => $timeoutStamp));
+        CM_Db_Db::insert('cm_cli_command_manager_process', [
+            'commandName'  => $commandName,
+            'machineId'    => $machineId,
+            'processId'    => $processId,
+            'timeoutStamp' => $timeoutStamp,
+        ]);
     }
 
     /**
@@ -319,6 +328,26 @@ class CM_Cli_CommandManager {
      */
     protected function _outputError($message) {
         $this->_streamError->writeln($message);
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getMachineId() {
+        // Global machine-id from systemd https://www.freedesktop.org/software/systemd/man/machine-id.html
+        $file = new CM_File('/etc/machine-id');
+
+        if (!$file->exists()) {
+            // Local machine-id as a backup
+            $serviceManager = CM_Service_Manager::getInstance();
+            $file = new CM_File('machine-id', $serviceManager->getFilesystems()->getData());
+            if (!$file->exists()) {
+                $uuid = Ramsey\Uuid\Uuid::uuid4()->toString();
+                $file->write($uuid);
+            }
+        }
+
+        return trim($file->read());
     }
 
     /**
