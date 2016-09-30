@@ -19,9 +19,10 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
     if (isset($params['view'])) {
         $view = $params['view'];
         unset($params['view']);
-        if ($view instanceof CM_Component_Abstract) {
-            $component = $view;
+        if (!$view instanceof CM_Component_Abstract) {
+            throw new CM_Exception('Unexpected component instance');
         }
+        $component = $view;
     }
 
     if (!$component) {
