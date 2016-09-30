@@ -8,9 +8,6 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
     /** @var string */
     protected $_templateName;
 
-    /** @var string[] */
-    protected $_cssClasses;
-
     /** @var CM_View_Abstract */
     protected $_view;
 
@@ -18,16 +15,18 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
     protected $_js;
 
     /** @var array */
-    protected $_dataHtml;
+    protected $_attributes;
 
     /**
      * @param CM_View_Abstract $view
      */
     public function __construct(CM_View_Abstract $view) {
         $this->_templateName = 'default';
-        $this->_cssClasses = [];
+        $this->_attributes = [
+            'css'  => [],
+            'data' => [],
+        ];
         $this->_view = $view;
-        $this->_dataHtml = [];
         $this->_js = new CM_Frontend_JavascriptContainer_View();
     }
 
@@ -71,14 +70,14 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
      * @param string $name
      */
     public function addCssClass($name) {
-        $this->_cssClasses[] = (string) $name;
+        $this->_attributes['css'][] = (string) $name;
     }
 
     /**
      * @return string[]
      */
     public function getCssClasses() {
-        $cssClasses = array_merge($this->getView()->getClassHierarchy(), $this->_cssClasses);
+        $cssClasses = array_merge($this->getView()->getClassHierarchy(), $this->_attributes['css']);
         $templateName = $this->getTemplateName();
         if ('default' !== $templateName) {
             $cssClasses[] = $templateName;
@@ -91,7 +90,7 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
      * @param string[] $data
      */
     public function setDataHtml(array $data) {
-        $this->_dataHtml = $data;
+        $this->_attributes['data'] = $data;
     }
 
     /**
@@ -99,14 +98,14 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
      * @param string $value
      */
     public function addDataHtml($key, $value) {
-        $this->_dataHtml[(string) $key] = (string) $value;
+        $this->_attributes['data'][(string) $key] = (string) $value;
     }
 
     /**
      * @return string[]
      */
     public function getDataHtml() {
-        return $this->_dataHtml;
+        return $this->_attributes['data'];
     }
 
     /**
