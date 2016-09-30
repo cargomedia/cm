@@ -210,31 +210,6 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame(1, $fromArrayMethod->getCallCount());
     }
 
-    public function testDecodeArrayConvertibleRecursive() {
-        $objectOuter = $this->mockInterface('CM_ArrayConvertible');
-        $fromArrayMethodOuter = $objectOuter->mockStaticMethod('fromArray')->set(function ($encoded) {
-            $this->assertSame(['foo' => 1, 'object' => 2], $encoded);
-            return (int) $encoded['foo'] . $encoded['object'];
-        });
-        $objectInner = $this->mockInterface('CM_ArrayConvertible');
-        $fromArrayMethodInner = $objectInner->mockStaticMethod('fromArray')->set(function ($encoded) {
-            $this->assertSame(['bar' => 2], $encoded);
-            return $encoded['bar'];
-        });
-
-        $encodedArrayConvertible = [
-            'foo'    => 1,
-            '_class' => get_class($objectOuter->newInstance()),
-            'object' => [
-                'bar'    => 2,
-                '_class' => get_class($objectInner->newInstance()),
-            ]
-        ];
-        $this->assertEquals(12, CM_Params::decode($encodedArrayConvertible));
-        $this->assertSame(1, $fromArrayMethodInner->getCallCount());
-        $this->assertSame(1, $fromArrayMethodOuter->getCallCount());
-    }
-
     public function testEncodeArrayConvertible() {
         $object = $this->mockInterface('CM_ArrayConvertible')->newInstance();
         $toArrayMethod = $object->mockMethod('toArray')->set([
