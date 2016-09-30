@@ -650,6 +650,9 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
             if (!is_subclass_of($className, 'CM_ArrayConvertible')) {
                 throw new CM_Exception_InvalidParam('Class for decoding is not CM_ArrayConvertible', null, ['class' => $className]);
             }
+            if (!empty($value)) {
+                $value = self::decode($value);
+            }
             /** @var CM_ArrayConvertible $className */
             $value = $className::fromArray($value);
             if (!$value) {
