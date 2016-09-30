@@ -1,1 +1,1 @@
-{component view=$page}
+{page view=$page}
