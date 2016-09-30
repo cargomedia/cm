@@ -3,7 +3,10 @@
 class CM_View_DocumentTest extends CMTest_TestCase {
 
     public function testRender() {
-        $site = $this->getMockSite('CM_Site_Abstract', null, ['url' => 'http://www.my-website.net']);
+        $site = $this->getMockSite('CM_Site_Abstract', null, [
+            'url'  => 'http://www.my-website.net',
+            'name' => 'My website',
+        ]);
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
         $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
         $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
@@ -12,7 +15,7 @@ class CM_View_DocumentTest extends CMTest_TestCase {
         $html = $renderAdapter->fetch();
 
         $this->assertContains('<html', $html);
-        $this->assertContains('<title></title>', $html);
+        $this->assertContains('<title>My website</title>', $html);
         $this->assertContains('<body', $html);
         $this->assertContains('class="CM_Layout_Default', $html);
     }

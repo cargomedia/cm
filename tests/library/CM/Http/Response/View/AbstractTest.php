@@ -7,7 +7,10 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPage() {
-        $site = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
+        $site = $this->getMockSite(null, null, [
+            'url' => 'http://my-site.com',
+            'name' => 'My site',
+        ]);
         $page = new CM_Page_View_Ajax_Test_Mock();
         $this->getMockClass('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
         $request = $this->createRequestAjax($page, 'loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath()], null, null, $site);
@@ -20,7 +23,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertArrayHasKey('html', $responseContent['success']['data']);
         $this->assertArrayHasKey('autoId', $responseContent['success']['data']);
         $this->assertSame(array(), $responseContent['success']['data']['menuEntryHashList']);
-        $this->assertSame('', $responseContent['success']['data']['title']);
+        $this->assertSame('My site', $responseContent['success']['data']['title']);
         $this->assertSame($response->getRender()->getUrlPage('CM_Page_View_Ajax_Test_Mock'), $responseContent['success']['data']['url']);
         $this->assertSame('CM_Layout_Mock1', $responseContent['success']['data']['layoutClass']);
     }

@@ -23,6 +23,7 @@ class CM_RenderAdapter_Document extends CM_RenderAdapter_Abstract {
         $document = $this->_getDocument();
         $page = $this->_getPage();
         $render = $this->getRender();
+        $renderAdapterPage = new CM_RenderAdapter_Page($render, $page);
         $renderAdapterLayout = new CM_RenderAdapter_Layout($render, $page);
 
         $page->checkAccessible($render->getEnvironment());
@@ -36,9 +37,9 @@ class CM_RenderAdapter_Document extends CM_RenderAdapter_Abstract {
         $viewResponse->set('viewResponse', $viewResponse);
         $viewResponse->set('page', $page);
         $viewResponse->set('layoutContent', $renderAdapterLayout->fetch());
-        $viewResponse->set('title', $renderAdapterLayout->fetchTitle());
-        $viewResponse->set('metaDescription', $renderAdapterLayout->fetchDescription());
-        $viewResponse->set('metaKeywords', $renderAdapterLayout->fetchKeywords());
+        $viewResponse->set('title', $renderAdapterPage->fetchTitleWithBranding());
+        $viewResponse->set('metaDescription', $renderAdapterPage->fetchDescription());
+        $viewResponse->set('metaKeywords', $renderAdapterPage->fetchKeywords());
         $webFontLoaderConfig = $render->getSite()->getWebFontLoaderConfig();
         if ($webFontLoaderConfig) {
             $viewResponse->set('webFontLoaderConfig', CM_Params::encode($webFontLoaderConfig, true));
