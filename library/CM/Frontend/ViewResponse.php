@@ -110,18 +110,6 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
     }
 
     /**
-     * @return string
-     */
-    public function getDataHtmlFormatted() {
-        $dataHtml = $this->getDataHtml();
-        $dataAttributes = '';
-        foreach ($dataHtml as $key => $value) {
-            $dataAttributes .= ' data-' . htmlspecialchars($key) . '="' . htmlspecialchars($value) . '"';
-        }
-        return $dataAttributes;
-    }
-
-    /**
      * @return CM_View_Abstract
      */
     public function getView() {

@@ -43,7 +43,6 @@ class CM_Frontend_ViewResponseTest extends CMTest_TestCase {
         $viewResponse = new CM_Frontend_ViewResponse($viewMock);
 
         $this->assertSame([], $viewResponse->getDataHtml());
-        $this->assertSame('', $viewResponse->getDataHtmlFormatted());
         $viewResponse->setDataHtml(['foo' => 'bar', 'baz' => 'quux']);
         $this->assertSame(
             [
@@ -58,7 +57,5 @@ class CM_Frontend_ViewResponseTest extends CMTest_TestCase {
                 'baz'    => 'quux',
                 'fooBar' => 'barFoo'
             ], $viewResponse->getDataHtml());
-        $this->assertSame(' data-foo="bar" data-baz="quux" data-fooBar="barFoo"', $viewResponse->getDataHtmlFormatted());
     }
-
 }

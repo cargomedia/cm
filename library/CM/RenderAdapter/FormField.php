@@ -18,8 +18,8 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 
         $frontend->treeExpand($viewResponse);
 
-        $html = '<div class="' . implode(' ', $viewResponse->getCssClasses()) . '" id="' . $viewResponse->getAutoId() . '" ' .
-            $viewResponse->getDataHtmlFormatted() . '>';
+        $tagAttributesRenderer = new CM_Frontend_HtmlTagAttributesRenderer($viewResponse);
+        $html = '<div ' . $tagAttributesRenderer->renderTagAttributes() . '>';
         $html .= trim($this->getRender()->fetchViewResponse($viewResponse));
         if (!$field instanceof CM_FormField_Hidden) {
             $html .= '<span class="messages"></span>';

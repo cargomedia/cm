@@ -19,8 +19,8 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
         $frontend->treeExpand($viewResponse);
 
-        $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . join(' ', $viewResponse->getCssClasses()) . '"' .
-            $viewResponse->getDataHtmlFormatted() . '>';
+        $tagAttributesRenderer = new CM_Frontend_HtmlTagAttributesRenderer($viewResponse);
+        $html = '<div ' . $tagAttributesRenderer->renderTagAttributes() . '>';
         $html .= $this->getRender()->fetchViewResponse($viewResponse);
         $html .= '</div>';
 
