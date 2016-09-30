@@ -125,7 +125,7 @@ var CM_Layout_Abstract = CM_Component_Abstract.extend({
 
   _createPagePlaceholder: function() {
     if (!this._$pagePlaceholder) {
-      this._$pagePlaceholder = $('<div class="router-placeholder" />');
+      this._$pagePlaceholder = $('<div class="page-placeholder" />');
       this.getPage().replaceWithHtml(this._$pagePlaceholder);
       this._onPageTeardown();
     } else {
