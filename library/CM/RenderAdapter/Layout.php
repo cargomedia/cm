@@ -13,7 +13,8 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Component {
         $this->_page = $page;
 
         $environment = $render->getEnvironment();
-        $layout = $page->getLayout($environment);
+        $layoutClass = $page->getLayout($environment);
+        $layout = new $layoutClass(['page' => $page]);
 
         parent::__construct($render, $layout);
     }

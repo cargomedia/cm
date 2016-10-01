@@ -269,8 +269,8 @@ class CM_Page_View_Ajax_Test_MockRedirect extends CM_Page_Abstract {
 
 class CM_Page_View_Ajax_Test_Mock extends CM_Page_Abstract {
 
-    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
-        return new CM_Layout_Mock1();
+    public function getLayout(CM_Frontend_Environment $environment) {
+        return CM_Layout_Mock1::class;
     }
 }
 
@@ -283,8 +283,8 @@ class CM_Page_View_Ajax_Test_MockRedirectSelf extends CM_Page_Abstract {
         }
     }
 
-    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
-        return new CM_Layout_Mock1();
+    public function getLayout(CM_Frontend_Environment $environment) {
+        return CM_Layout_Mock1::class;
     }
 }
 
