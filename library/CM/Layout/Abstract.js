@@ -16,7 +16,7 @@ var CM_Layout_Abstract = CM_Component_Abstract.extend({
     layout._createPagePlaceholder();
     layout._chargeSpinnerTimeout();
 
-    return this.ajaxModal('loadPage', {path: path})
+    return this.ajaxModal('loadPage', {path: path, currentLayout: layout.getClass()})
       .finally(function() {
         clearTimeout(layout._timeoutLoading);
       })
@@ -25,7 +25,7 @@ var CM_Layout_Abstract = CM_Component_Abstract.extend({
           window.location.replace(response.redirectExternal);
           return;
         }
-        var view = layout._injectView(response);
+        var view = layout._injectView(response.pageRendering);
         var reload = (layout.getClass() != response.layoutClass);
         if (reload) {
           window.location.replace(response.url);
