@@ -65,6 +65,9 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
      * @return CM_RenderAdapter_Component
      */
     public static function factory(CM_Frontend_Render $render, CM_Component_Abstract $view) {
+        if ($view instanceof CM_Layout_Abstract) {
+            return new CM_RenderAdapter_Layout($render, $view);
+        }
         if ($view instanceof CM_Page_Abstract) {
             return new CM_RenderAdapter_Page($render, $view);
         }

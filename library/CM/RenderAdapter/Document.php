@@ -22,11 +22,15 @@ class CM_RenderAdapter_Document extends CM_RenderAdapter_Abstract {
      * @return string
      */
     public function fetch() {
-        $document = $this->_getDocument();
-        $page = $this->_getPage();
         $render = $this->getRender();
+
+        $page = $this->_getPage();
+        $layoutClass = $page->getLayout($render->getEnvironment());
+        $layout = new $layoutClass(['page' => $page]);
+        $document = $this->_getDocument();
+
         $renderAdapterPage = new CM_RenderAdapter_Page($render, $page);
-        $renderAdapterLayout = new CM_RenderAdapter_Layout($render, $page);
+        $renderAdapterLayout = new CM_RenderAdapter_Layout($render, $layout);
 
         $page->checkAccessible($render->getEnvironment());
 
