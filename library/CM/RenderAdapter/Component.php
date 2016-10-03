@@ -19,11 +19,12 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
         $frontend->treeExpand($viewResponse);
 
-        $tagAttributesRenderer = new CM_Frontend_HtmlTagAttributesRenderer($viewResponse);
-        $html = '<div ' . $tagAttributesRenderer->renderTagAttributes() . '>';
-        $html .= $this->getRender()->fetchViewResponse($viewResponse);
-        $html .= '</div>';
-
+        $tagRenderer = new CM_Frontend_HtmlTagRenderer();
+        $tagAttributes = [
+            'id'    => $viewResponse->getAutoId(),
+            'class' => join(' ', $viewResponse->getCssClasses()),
+        ];
+        $html = $tagRenderer->renderTag('div', $this->getRender()->fetchViewResponse($viewResponse), $tagAttributes, $viewResponse->getDataHtml());
         $frontend->treeCollapse();
         return $html;
     }
