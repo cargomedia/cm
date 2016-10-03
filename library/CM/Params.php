@@ -641,21 +641,14 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
         if ($json) {
             $value = CM_Util::jsonDecode($value);
         }
-        if (is_array($value) && isset($value['_class'])) {
+        if (is_array($value) && isset($value['_class']) && is_subclass_of($value['_class'], 'CM_ArrayConvertible')) {
             $className = (string) $value['_class'];
             unset($value['_class']);
-            if (!class_exists($className)) {
-                throw new CM_Exception_InvalidParam('Class for decoding does not exist', null, ['class' => $className]);
-            }
             if (!empty($value)) {
                 $value = self::decode($value);
             }
-            if (is_subclass_of($className, 'CM_ArrayConvertible')) {
-                /** @var CM_ArrayConvertible $className */
-                $value = $className::fromArray($value);
-            } elseif (!is_subclass_of($className, 'JsonSerializable')) {
-                throw new CM_Exception_InvalidParam('Class for decoding is neither CM_ArrayConvertible nor JsonSerializable', null, ['class' => $className]);
-            }
+            /** @var CM_ArrayConvertible $className */
+            $value = $className::fromArray($value);
             if (!$value) {
                 return false;
             }

@@ -13,13 +13,9 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertFalse($params->has('6'));
     }
 
-    /**
-     * @expectedException CM_Exception_InvalidParam
-     * @expectedExceptionMessage Class for decoding does not exist
-     */
     public function testGetWithInvalidEncodedData() {
         $params = new CM_Params(['foo' => ['_class' => 'Some_Nonexistent_Class', '_id' => 123]]);
-        $params->get('foo');
+        $this->assertSame (['_class' => 'Some_Nonexistent_Class', '_id' => 123], $params->get('foo'));
     }
 
     public function testGetString() {
@@ -285,7 +281,7 @@ class CM_ParamsTest extends CMTest_TestCase {
             'foo'    => 1,
             '_class' => get_class($object->newInstance()),
         ];
-        $this->assertEquals(['foo' => 1], CM_Params::decode($encodedJsonSerializable));
+        $this->assertEquals($encodedJsonSerializable, CM_Params::decode($encodedJsonSerializable));
     }
 
     public function testEncodeArrayConvertibleAndJsonSerializable() {
@@ -340,27 +336,29 @@ class CM_ParamsTest extends CMTest_TestCase {
         $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable']);
         $nestedArrayConvertible = $this->mockClass(null, ['CM_ArrayConvertible']);
         $nestedJsonSerializable = $this->mockClass(null, ['JsonSerializable']);
-        $fromArrayMethodObject = $object->mockStaticMethod('fromArray')->set(function ($encoded) {
-            $this->assertSame(['foo' => 1, 'nested1' => 2, 'bar' => 1, 'nested2' => ['bar' => 2]], $encoded);
+        $encodedArrayConvertible = [
+            '_class' => $nestedArrayConvertible->getClassName(),
+            'foo'    => 2,
+        ];
+        $encodedJsonSerializable = [
+            '_class' => $nestedJsonSerializable->getClassName(),
+            'bar'    => 2,
+        ];
+        $encodedObject = [
+            '_class' => $object->getClassName(),
+            'foo'    => 1,
+            'nested1' => $encodedArrayConvertible,
+            'bar' => 1,
+            'nested2' => $encodedJsonSerializable
+        ];
+        $fromArrayMethodObject = $object->mockStaticMethod('fromArray')->set(function ($encoded) use ($encodedJsonSerializable) {
+            $this->assertSame(['foo' => 1, 'nested1' => 2, 'bar' => 1, 'nested2' => $encodedJsonSerializable], $encoded);
             return [$encoded['foo'], $encoded['nested1']];
         });
         $fromArrayMethodNestedObject = $nestedArrayConvertible->mockStaticMethod('fromArray')->set(function ($encoded) {
             $this->assertSame(['foo' => 2], $encoded);
             return $encoded['foo'];
         });
-        $encodedObject = [
-            '_class' => $object->getClassName(),
-            'foo'    => 1,
-            'nested1' => [
-                '_class' => $nestedArrayConvertible->getClassName(),
-                'foo'    => 2,
-            ],
-            'bar' => 1,
-            'nested2' => [
-                '_class' => $nestedJsonSerializable->getClassName(),
-                'bar' => 2,
-            ]
-        ];
         $this->assertEquals([1, 2], CM_Params::decode($encodedObject));
         $this->assertSame(1, $fromArrayMethodNestedObject->getCallCount());
         $this->assertSame(1, $fromArrayMethodObject->getCallCount());
