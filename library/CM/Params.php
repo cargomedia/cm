@@ -635,7 +635,6 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @param string       $value
      * @param boolean|null $json
      * @return mixed|false
-     * @throws CM_Exception_InvalidParam
      */
     public static function decode($value, $json = null) {
         if ($json) {
