@@ -279,6 +279,15 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame(1, $toArrayMethod->getCallCount());
     }
 
+    public function testDecodeJsonSerializable() {
+        $object = $this->mockInterface('JsonSerializable');
+        $encodedJsonSerializable = [
+            'foo'    => 1,
+            '_class' => get_class($object->newInstance()),
+        ];
+        $this->assertEquals(['foo' => 1], CM_Params::decode($encodedJsonSerializable));
+    }
+
     public function testEncodeArrayConvertibleAndJsonSerializable() {
         $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable'])->newInstance();
         $toArrayMethod = $object->mockMethod('toArray')->set([
@@ -325,6 +334,36 @@ class CM_ParamsTest extends CMTest_TestCase {
             ]
         ];
         $this->assertSame($expected, CM_Params::encode($object));
+    }
+
+    public function testDecodeRecursive() {
+        $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable']);
+        $nestedArrayConvertible = $this->mockClass(null, ['CM_ArrayConvertible']);
+        $nestedJsonSerializable = $this->mockClass(null, ['JsonSerializable']);
+        $fromArrayMethodObject = $object->mockStaticMethod('fromArray')->set(function ($encoded) {
+            $this->assertSame(['foo' => 1, 'nested1' => 2, 'bar' => 1, 'nested2' => ['bar' => 2]], $encoded);
+            return [$encoded['foo'], $encoded['nested1']];
+        });
+        $fromArrayMethodNestedObject = $nestedArrayConvertible->mockStaticMethod('fromArray')->set(function ($encoded) {
+            $this->assertSame(['foo' => 2], $encoded);
+            return $encoded['foo'];
+        });
+        $encodedObject = [
+            '_class' => $object->getClassName(),
+            'foo'    => 1,
+            'nested1' => [
+                '_class' => $nestedArrayConvertible->getClassName(),
+                'foo'    => 2,
+            ],
+            'bar' => 1,
+            'nested2' => [
+                '_class' => $nestedJsonSerializable->getClassName(),
+                'bar' => 2,
+            ]
+        ];
+        $this->assertEquals([1, 2], CM_Params::decode($encodedObject));
+        $this->assertSame(1, $fromArrayMethodNestedObject->getCallCount());
+        $this->assertSame(1, $fromArrayMethodObject->getCallCount());
     }
 
     public function testGetDateTime() {
