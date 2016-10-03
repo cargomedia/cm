@@ -27,7 +27,7 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
             'class' => join(' ', $viewResponse->getCssClasses()),
         ];
         $tagRenderer = new CM_Frontend_HtmlTagRenderer();
-        $html = $tagRenderer->renderTag('div', $content, $tagAttributes, $viewResponse->getDataHtml());
+        $html = $tagRenderer->renderTag('div', $content, $tagAttributes, $viewResponse->getDataAttributes());
 
         $formViewResponse = $frontend->getClosestViewResponse('CM_Form_Abstract');
         if ($formViewResponse) {

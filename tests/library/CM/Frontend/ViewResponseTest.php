@@ -42,20 +42,20 @@ class CM_Frontend_ViewResponseTest extends CMTest_TestCase {
         $viewMock = $this->getMockBuilder('CM_View_Abstract')->getMock();
         $viewResponse = new CM_Frontend_ViewResponse($viewMock);
 
-        $this->assertSame([], $viewResponse->getDataHtml());
-        $viewResponse->setDataHtml(['foo' => 'bar', 'baz' => 'quux']);
+        $this->assertSame([], $viewResponse->getDataAttributes());
+        $viewResponse->setDataAttributes(['foo' => 'bar', 'baz' => 'quux']);
         $this->assertSame(
             [
                 'foo' => 'bar',
                 'baz' => 'quux'
-            ], $viewResponse->getDataHtml());
+            ], $viewResponse->getDataAttributes());
 
-        $viewResponse->addDataHtml('fooBar', 'barFoo');
+        $viewResponse->addDataAttribute('fooBar', 'barFoo');
         $this->assertSame(
             [
                 'foo'    => 'bar',
                 'baz'    => 'quux',
                 'fooBar' => 'barFoo'
-            ], $viewResponse->getDataHtml());
+            ], $viewResponse->getDataAttributes());
     }
 }
