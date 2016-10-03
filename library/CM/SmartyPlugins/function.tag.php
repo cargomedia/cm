@@ -22,7 +22,7 @@ function smarty_function_tag(array $params, Smarty_Internal_Template $template) 
         unset($params['data']);
     }
 
-    $renderer = new CM_Frontend_HtmlTagRenderer();
-    return $renderer->renderTag($elementName, $content, $params, $dataHtml);
+    $tagRenderer = new CM_Frontend_HtmlTagRenderer();
+    return $tagRenderer->renderTag($elementName, $content, $params, $dataHtml);
 }
 
