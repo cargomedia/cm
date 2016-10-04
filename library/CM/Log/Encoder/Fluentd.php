@@ -1,13 +1,9 @@
 <?php
 
-class CM_Log_ContextFormatter_Fluentd extends CM_Log_ContextFormatter_Cargomedia {
+class CM_Log_Encoder_Fluentd implements CM_Log_Encoder_Interface {
 
-    /**
-     * @param array $extra
-     * @return array
-     */
-    protected function _encodeExtra(array $extra) {
-        array_walk_recursive($extra, function (&$value) {
+    public function encode(array $entry) {
+        array_walk_recursive($entry, function (&$value) {
             $encoded = $value;
             if ($value instanceof DateTime) {
                 $encoded = $value->format('c');
@@ -21,6 +17,6 @@ class CM_Log_ContextFormatter_Fluentd extends CM_Log_ContextFormatter_Cargomedia
             }
             $value = $encoded;
         });
-        return $extra;
+        return $entry;
     }
 }

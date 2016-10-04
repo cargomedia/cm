@@ -67,8 +67,9 @@ class CM_Log_Handler_Factory implements CM_Service_ManagerAwareInterface {
     public function createFluentdLogger($hostname, $port, $tag, $minLevel = null) {
         $fluentd = new \Fluent\Logger\FluentLogger($hostname, $port);
         $appName = CM_App::getInstance()->getName();
-        $contextFormatter = new CM_Log_ContextFormatter_Fluentd($appName);
-        return new CM_Log_Handler_Fluentd($fluentd, $contextFormatter, $tag, $minLevel);
+        $contextFormatter = new CM_Log_ContextFormatter_Cargomedia($appName);
+        $encoder = new CM_Log_Encoder_Fluentd();
+        return new CM_Log_Handler_Fluentd($fluentd, $contextFormatter, $encoder, $tag, $minLevel);
     }
 
     /**
@@ -80,7 +81,8 @@ class CM_Log_Handler_Factory implements CM_Service_ManagerAwareInterface {
      */
     public function createMongoDbHandler($collection, $recordTtl = null, array $insertOptions = null, $minLevel = null) {
         $client = $this->getServiceManager()->getMongoDb();
-        return new CM_Log_Handler_MongoDb($client, $collection, $recordTtl, $insertOptions, $minLevel);
+        $encoder = new CM_Log_Encoder_MongoDb();
+        return new CM_Log_Handler_MongoDb($client, $collection, $encoder, $recordTtl, $insertOptions, $minLevel);
     }
 
     /**
