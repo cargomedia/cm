@@ -37,7 +37,7 @@ class CM_Frontend_ViewResponseTest extends CMTest_TestCase {
         $this->assertSame($classNames, $viewResponse->getCssClasses());
     }
 
-    public function testAddGetSetDataHtml() {
+    public function testAddGetSetDataAttributes() {
         /** @var CM_View_Abstract $viewMock */
         $viewMock = $this->getMockBuilder('CM_View_Abstract')->getMock();
         $viewResponse = new CM_Frontend_ViewResponse($viewMock);

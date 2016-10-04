@@ -13,16 +13,16 @@ function smarty_function_tag(array $params, Smarty_Internal_Template $template) 
         unset($params['content']);
     }
 
-    $dataHtml = [];
+    $dataAttributes = [];
     if (isset($params['data'])) {
         if (!is_array($params['data'])) {
             trigger_error('Param `data` should be an array.');
         }
-        $dataHtml = $params['data'];
+        $dataAttributes = $params['data'];
         unset($params['data']);
     }
 
     $tagRenderer = new CM_Frontend_HtmlTagRenderer();
-    return $tagRenderer->renderTag($elementName, $content, $params, $dataHtml);
+    return $tagRenderer->renderTag($elementName, $content, $params, $dataAttributes);
 }
 
