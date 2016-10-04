@@ -23,7 +23,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertSame('TTL should be positive value', $exception->getMessage());
     }
 
-    public function testWritingUntyped() {
+    public function testWriting() {
         $collection = 'cm_event_log';
         $level = CM_Log_Logger::DEBUG;
         $message = 'foo';
@@ -73,52 +73,8 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertSame($clientId, $context['httpRequest']['clientId']);
         $this->assertSame('www.example.com', $context['computerInfo']['fqdn']);
         $this->assertSame('v7.0.1', $context['computerInfo']['phpVersion']);
-        $this->assertSame(
-            [
-                'bar'  => ['baz' => 'quux'],
-                'type' => CM_Log_Handler_MongoDb::DEFAULT_TYPE,
-            ],
-            $context['extra']
-        );
+        $this->assertSame(['bar' => ['baz' => 'quux']], $context['extra']);
         $this->assertSame('{"bar":"2", "quux":"baz"}', $context['httpRequest']['body']);
-    }
-
-    public function testWritingTyped() {
-        $collection = 'cm_log';
-        $level = CM_Log_Logger::INFO;
-        $message = 'foo';
-        $computerInfo = new CM_Log_Context_ComputerInfo('www.example.com', 'v7.0.1');
-
-        $mongoClient = $this->getServiceManager()->getMongoDb();
-        $this->assertSame(0, $mongoClient->count($collection));
-
-        $recordContext = new CM_Log_Context();
-        $recordContext->setExtra([
-            'bar'  => ['baz' => 'quux'],
-            'type' => 123,
-        ]);
-        $recordContext->setComputerInfo($computerInfo);
-        $record = new CM_Log_Record($level, $message, $recordContext);
-
-        $handler = new CM_Log_Handler_MongoDb($collection, null, ['w' => 0], $level);
-        $this->callProtectedMethod($handler, '_writeRecord', [$record]);
-        $this->assertSame(1, $mongoClient->count($collection));
-
-        $savedRecord = $mongoClient->findOne($collection);
-
-        $this->assertSame($level, $savedRecord['level']);
-        $this->assertSame($message, $savedRecord['message']);
-
-        $context = $savedRecord['context'];
-        $this->assertSame('www.example.com', $context['computerInfo']['fqdn']);
-        $this->assertSame('v7.0.1', $context['computerInfo']['phpVersion']);
-        $this->assertSame(
-            [
-                'bar'  => ['baz' => 'quux'],
-                'type' => 123,
-            ],
-            $context['extra']
-        );
     }
 
     public function testSanitizeRecord() {
