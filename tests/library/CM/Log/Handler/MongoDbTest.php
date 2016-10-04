@@ -7,33 +7,23 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
     }
 
     public function testConstructor() {
-        /** @var CM_MongoDb_Client $client */
-        $client = $this->mockClass('CM_MongoDb_Client')->newInstanceWithoutConstructor();
-        /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
-        $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
-
-        $handler = new CM_Log_Handler_MongoDb($client, $contextFormatter, 'foo');
+        $handler = new CM_Log_Handler_MongoDb('foo');
         $this->assertInstanceOf('CM_Log_Handler_MongoDb', $handler);
     }
 
     public function testFailWithWrongTtl() {
         $collection = 'cm_event_log';
-        /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
-        $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
         $mongoClient = $this->getServiceManager()->getMongoDb();
         $mongoClient->createIndex($collection, ['expireAt' => 1], ['expireAfterSeconds' => 0]);
-        $exception = $this->catchException(function () use ($collection, $mongoClient, $contextFormatter) {
-            new CM_Log_Handler_MongoDb($mongoClient, $contextFormatter, $collection, -10);
+        $exception = $this->catchException(function () use ($collection) {
+            new CM_Log_Handler_MongoDb($collection, -10);
         });
 
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertSame('TTL should be positive value', $exception->getMessage());
     }
 
-    public function testWritingUntyped() {
-        $mongoClient = $this->getServiceManager()->getMongoDb();
-        $contextFormatter = new CM_Log_ContextFormatter_MongoDb();
-
+    public function testWriting() {
         $collection = 'cm_event_log';
         $level = CM_Log_Logger::DEBUG;
         $message = 'foo';
@@ -43,6 +33,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $clientId = $httpRequest->getClientId();
         $computerInfo = new CM_Log_Context_ComputerInfo('www.example.com', 'v7.0.1');
 
+        $mongoClient = $this->getServiceManager()->getMongoDb();
         $this->assertSame(0, $mongoClient->count($collection));
 
         $mongoClient->createIndex($collection, ['expireAt' => 1], ['expireAfterSeconds' => 0]);
@@ -53,7 +44,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $recordContext->setComputerInfo($computerInfo);
         $record = new CM_Log_Record($level, $message, $recordContext);
 
-        $handler = new CM_Log_Handler_MongoDb($mongoClient, $contextFormatter, $collection, $ttl, ['w' => 0], $level);
+        $handler = new CM_Log_Handler_MongoDb($collection, $ttl, ['w' => 0], $level);
         $this->callProtectedMethod($handler, '_writeRecord', [$record]);
         $this->assertSame(1, $mongoClient->count($collection));
 
@@ -82,62 +73,12 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertSame($clientId, $context['httpRequest']['clientId']);
         $this->assertSame('www.example.com', $context['computerInfo']['fqdn']);
         $this->assertSame('v7.0.1', $context['computerInfo']['phpVersion']);
-        $this->assertSame(
-            [
-                'bar'  => ['baz' => 'quux'],
-                'type' => CM_Log_ContextFormatter_MongoDb::DEFAULT_TYPE,
-            ],
-            $context['extra']
-        );
+        $this->assertSame(['bar' => ['baz' => 'quux']], $context['extra']);
         $this->assertSame('{"bar":"2", "quux":"baz"}', $context['httpRequest']['body']);
     }
 
-    public function testWritingTyped() {
-        $mongoClient = $this->getServiceManager()->getMongoDb();
-        $contextFormatter = new CM_Log_ContextFormatter_MongoDb();
-
-        $collection = 'cm_log';
-        $level = CM_Log_Logger::INFO;
-        $message = 'foo';
-        $computerInfo = new CM_Log_Context_ComputerInfo('www.example.com', 'v7.0.1');
-
-        $this->assertSame(0, $mongoClient->count($collection));
-
-        $recordContext = new CM_Log_Context();
-        $recordContext->setExtra([
-            'bar'  => ['baz' => 'quux'],
-            'type' => 123,
-        ]);
-        $recordContext->setComputerInfo($computerInfo);
-        $record = new CM_Log_Record($level, $message, $recordContext);
-
-        $handler = new CM_Log_Handler_MongoDb($mongoClient, $contextFormatter, $collection, null, ['w' => 0], $level);
-        $this->callProtectedMethod($handler, '_writeRecord', [$record]);
-        $this->assertSame(1, $mongoClient->count($collection));
-
-        $savedRecord = $mongoClient->findOne($collection);
-
-        $this->assertSame($level, $savedRecord['level']);
-        $this->assertSame($message, $savedRecord['message']);
-
-        $context = $savedRecord['context'];
-        $this->assertSame('www.example.com', $context['computerInfo']['fqdn']);
-        $this->assertSame('v7.0.1', $context['computerInfo']['phpVersion']);
-        $this->assertSame(
-            [
-                'bar'  => ['baz' => 'quux'],
-                'type' => 123,
-            ],
-            $context['extra']
-        );
-    }
-
     public function testSanitizeRecord() {
-        /** @var CM_MongoDb_Client $client */
-        $client = $this->mockClass('CM_MongoDb_Client')->newInstanceWithoutConstructor();
-        /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
-        $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
-        $handler = new CM_Log_Handler_MongoDb($client, $contextFormatter, 'foo');
+        $handler = new CM_Log_Handler_MongoDb('foo');
         $record = [
             'foo'  => [
                 'baz' => 'quux',
