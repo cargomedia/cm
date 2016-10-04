@@ -202,11 +202,9 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
         $encryptMethod->setAccessible(true);
         $encryptedData = $encryptMethod->invoke(null, $data, $encryptionKey);
 
-        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Abstract')->setMethods(array('getKey'))->disableOriginalConstructor()->getMockForAbstractClass();
-        $streamChannel->expects($this->any())->method('getKey')->will($this->returnValue($encryptedData));
         $decryptMethod = new ReflectionMethod('CM_Model_StreamChannel_Abstract', '_decryptKey');
         $decryptMethod->setAccessible(true);
-        $decryptedData = $decryptMethod->invoke($streamChannel, $encryptionKey);
+        $decryptedData = $decryptMethod->invoke(null, $encryptedData, $encryptionKey);
         $this->assertSame($data, $decryptedData);
     }
 
