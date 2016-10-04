@@ -17,13 +17,17 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
     /** @var CM_Frontend_JavascriptContainer_View */
     protected $_js;
 
+    /** @var array */
+    protected $_dataAttributes;
+
     /**
      * @param CM_View_Abstract $view
      */
     public function __construct(CM_View_Abstract $view) {
         $this->_templateName = 'default';
-        $this->_cssClasses = array();
+        $this->_cssClasses = [];
         $this->_view = $view;
+        $this->_dataAttributes = [];
         $this->_js = new CM_Frontend_JavascriptContainer_View();
     }
 
@@ -81,6 +85,28 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
         }
         $cssClasses = array_unique($cssClasses);
         return $cssClasses;
+    }
+
+    /**
+     * @param string[] $data
+     */
+    public function setDataAttributes(array $data) {
+        $this->_dataAttributes = $data;
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     */
+    public function addDataAttribute($key, $value) {
+        $this->_dataAttributes[(string) $key] = (string) $value;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getDataAttributes() {
+        return $this->_dataAttributes;
     }
 
     /**
