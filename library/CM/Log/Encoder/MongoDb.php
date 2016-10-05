@@ -2,23 +2,22 @@
 
 class CM_Log_Encoder_MongoDb implements CM_Log_Encoder_Interface {
 
-    public function encode(array $entry) {
-        array_walk_recursive($entry, function (&$value) {
-            $encoded = $value;
-            if ($value instanceof DateTime) {
-                $encoded = new MongoDate($value->getTimestamp());
-            } elseif ($value instanceof CM_Model_Abstract) {
-                $encoded = '[' . get_class($value) . ':' . $value->getId() . ']';
-            } elseif ($value instanceof JsonSerializable) {
-                $encoded = $value->jsonSerialize();
-                if (is_array($encoded)) {
-                    $encoded = $this->encode($encoded);
-                }
-            } elseif (is_object($value)) {
-                $encoded = '[' . get_class($value) . ']';
-            }
-            $value = $encoded;
-        });
-        return $entry;
+    public function encode($value) {
+        if ($value instanceof DateTime) {
+            return new MongoDate($value->getTimestamp());
+        }
+        if ($value instanceof CM_Model_Abstract) {
+            return '[' . get_class($value) . ':' . $value->getId() . ']';
+        }
+        if ($value instanceof JsonSerializable) {
+            return $this->encode($value->jsonSerialize());
+        }
+        if (is_array($value)) {
+            return array_map([$this, 'encode'], $value);
+        }
+        if (is_object($value)) {
+            return '[' . get_class($value) . ']';
+        }
+        return $value;
     }
 }

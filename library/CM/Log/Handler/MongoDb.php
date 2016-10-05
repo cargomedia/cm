@@ -114,13 +114,13 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         $formattedRecord = [
             'level'     => (int) $record->getLevel(),
             'message'   => (string) $record->getMessage(),
-            'createdAt' => new MongoDate($createdAt->getTimestamp()),
+            'createdAt' => $createdAt,
             'context'   => $formattedContext,
         ];
         if (null !== $this->_recordTtl) {
             $expireAt = clone $createdAt;
             $expireAt->add(new DateInterval('PT' . $this->_recordTtl . 'S'));
-            $formattedRecord['expireAt'] = new MongoDate($expireAt->getTimestamp());
+            $formattedRecord['expireAt'] = $expireAt;
         }
         $formattedRecord = $this->_sanitizeRecord($formattedRecord); //TODO remove after investigation
         return $formattedRecord;

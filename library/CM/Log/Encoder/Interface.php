@@ -3,8 +3,8 @@
 interface CM_Log_Encoder_Interface {
 
     /**
-     * @param array $entry
-     * @return array
+     * @param mixed $value
+     * @return mixed
      */
-    public function encode(array $entry);
+    public function encode($value);
 }

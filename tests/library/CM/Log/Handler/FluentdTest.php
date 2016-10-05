@@ -13,8 +13,8 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
         /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
 
-        $encoder = $this->mockInterface(CM_Log_Encoder_Interface::class)->newInstanceWithoutConstructor();
-        /** @var CM_Log_Encoder_Interface $encoder */
+        $encoder = $this->mockObject(CM_Log_Encoder_Fluentd::class);
+        /** @var CM_Log_Handler_Fluentd $encoder */
         
         $handler = new CM_Log_Handler_Fluentd($fluentd, $contextFormatter, $encoder, 'tag');
         $this->assertInstanceOf('CM_Log_Handler_Fluentd', $handler);
@@ -28,8 +28,8 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $getFromattedContext = $contextFormatter->mockMethod('formatContext')->set(['bar' => 'foo']);
         /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
 
-        $encoder = $this->mockInterface(CM_Log_Encoder_Interface::class)->newInstanceWithoutConstructor();
-        /** @var CM_Log_Encoder_Interface $encoder */
+        $encoder = $this->mockObject(CM_Log_Encoder_Fluentd::class);
+        /** @var CM_Log_Handler_Fluentd $encoder */
         
         $handler = new CM_Log_Handler_Fluentd($fluentd, $contextFormatter, $encoder, 'tag');
         $record = new CM_Log_Record(CM_Log_Logger::DEBUG, 'log message foo', new CM_Log_Context());
@@ -60,8 +60,8 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $contextFormatter->mockMethod('formatContext')->set(['key' => 'value']);
         /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
 
-        $encoder = $this->mockInterface(CM_Log_Encoder_Interface::class)->newInstanceWithoutConstructor();
-        /** @var CM_Log_Encoder_Interface $encoder */
+        $encoder = $this->mockObject(CM_Log_Encoder_Fluentd::class);
+        /** @var CM_Log_Handler_Fluentd $encoder */
         
         $handler = new CM_Log_Handler_Fluentd($fluentd, $contextFormatter, $encoder, 'tag');
 

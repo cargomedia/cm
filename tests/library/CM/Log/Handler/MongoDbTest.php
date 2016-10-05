@@ -7,13 +7,12 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
     }
 
     public function testConstructor() {
-        $client = $this->mockClass(CM_MongoDb_Client::class)->newInstanceWithoutConstructor();
-        /** @var CM_MongoDb_Client $client */
+        $mongoClient = $this->getServiceManager()->getMongoDb();
+
+        $encoder = $this->mockObject(CM_Log_Encoder_MongoDb::class);
+        /** @var CM_Log_Encoder_MongoDb $encoder */
         
-        $encoder = $this->mockInterface(CM_Log_Encoder_Interface::class)->newInstanceWithoutConstructor();
-        /** @var CM_Log_Encoder_Interface $encoder */
-        
-        $handler = new CM_Log_Handler_MongoDb($client, 'foo', $encoder);
+        $handler = new CM_Log_Handler_MongoDb($mongoClient, 'foo', $encoder);
         $this->assertInstanceOf('CM_Log_Handler_MongoDb', $handler);
     }
 
@@ -21,15 +20,12 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $collection = 'cm_event_log';
         $mongoClient = $this->getServiceManager()->getMongoDb();
         $mongoClient->createIndex($collection, ['expireAt' => 1], ['expireAfterSeconds' => 0]);
-        $exception = $this->catchException(function () use ($collection) {
+        $exception = $this->catchException(function () use ($collection, $mongoClient) {
 
-            $client = $this->mockClass(CM_MongoDb_Client::class)->newInstanceWithoutConstructor();
-            /** @var CM_MongoDb_Client $client */
+            $encoder = $this->mockObject(CM_Log_Encoder_MongoDb::class);
+            /** @var CM_Log_Encoder_MongoDb $encoder */
 
-            $encoder = $this->mockInterface(CM_Log_Encoder_Interface::class)->newInstanceWithoutConstructor();
-            /** @var CM_Log_Encoder_Interface $encoder */
-
-            $handler = new CM_Log_Handler_MongoDb($client, 'foo', $encoder, -10);
+            new CM_Log_Handler_MongoDb($mongoClient, 'foo', $encoder, -10);
         });
 
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
@@ -57,14 +53,10 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $recordContext->setComputerInfo($computerInfo);
         $record = new CM_Log_Record($level, $message, $recordContext);
 
-
-        $client = $this->mockClass(CM_MongoDb_Client::class)->newInstanceWithoutConstructor();
-        /** @var CM_MongoDb_Client $client */
-
-        $encoder = $this->mockInterface(CM_Log_Encoder_Interface::class)->newInstanceWithoutConstructor();
-        /** @var CM_Log_Encoder_Interface $encoder */
+        $encoder = $this->mockObject(CM_Log_Encoder_MongoDb::class);
+        /** @var CM_Log_Encoder_MongoDb $encoder */
         
-        $handler = new CM_Log_Handler_MongoDb($client, $collection, $encoder, $ttl, ['w' => 0], $level);
+        $handler = new CM_Log_Handler_MongoDb($mongoClient, $collection, $encoder, $ttl, ['w' => 0], $level);
         $this->callProtectedMethod($handler, '_writeRecord', [$record]);
         $this->assertSame(1, $mongoClient->count($collection));
 
@@ -93,18 +85,17 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertSame($clientId, $context['httpRequest']['clientId']);
         $this->assertSame('www.example.com', $context['computerInfo']['fqdn']);
         $this->assertSame('v7.0.1', $context['computerInfo']['phpVersion']);
-        $this->assertSame(['bar' => ['baz' => 'quux']], $context['extra']);
+        $this->assertSame(['bar' => ['baz' => 'quux'], 'type' => CM_Log_Handler_MongoDb::DEFAULT_TYPE], $context['extra']);
         $this->assertSame('{"bar":"2", "quux":"baz"}', $context['httpRequest']['body']);
     }
 
     public function testSanitizeRecord() {
-        $client = $this->mockClass(CM_MongoDb_Client::class)->newInstanceWithoutConstructor();
-        /** @var CM_MongoDb_Client $client */
+        $mongoClient = $this->getServiceManager()->getMongoDb();
 
-        $encoder = $this->mockInterface(CM_Log_Encoder_Interface::class)->newInstanceWithoutConstructor();
-        /** @var CM_Log_Encoder_Interface $encoder */
+        $encoder = $this->mockObject(CM_Log_Encoder_MongoDb::class);
+        /** @var CM_Log_Encoder_MongoDb $encoder */
 
-        $handler = new CM_Log_Handler_MongoDb($client, 'foo', $encoder);
+        $handler = new CM_Log_Handler_MongoDb($mongoClient, 'foo', $encoder);
         $record = [
             'foo'  => [
                 'baz' => 'quux',

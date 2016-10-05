@@ -90,8 +90,6 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
         $exception = $this->catchException(function () use ($api, $server) {
             $api->fetchStatus($server);
         });
-        var_dump($exception);
-        die();
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertStringStartsWith('Fetching contents from', $exception->getMessage());
 
