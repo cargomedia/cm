@@ -27,7 +27,10 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
         /** @var CM_Geo_Point $location */
 
         $server = new CM_Janus_Server(0, 'bar', 'http://cm-janus.dev:8080', 'ws://cm-janus.dev:8188', [], $location);
-        $api = new CM_Janus_HttpApiClient($httpClient, $contextFormatter);
+        $encoder = $this->mockObject(CM_Log_Encoder_JSON::class);
+        /** @var CM_Log_Encoder_JSON $encoder */
+        
+        $api = new CM_Janus_HttpApiClient($httpClient, $contextFormatter, $encoder);
         $api->stopStream($server, 'foo');
         $this->assertSame(1, $sendRequestMethod->getCallCount());
     }
@@ -56,7 +59,10 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
         /** @var CM_Geo_Point $location */
         
         $server = new CM_Janus_Server(0, 'bar', 'http://cm-janus.dev:8080', 'ws://cm-janus.dev:8188', [], $location);
-        $api = new CM_Janus_HttpApiClient($httpClient, $contextFormatter);
+        $encoder = $this->mockObject(CM_Log_Encoder_JSON::class);
+        /** @var CM_Log_Encoder_JSON $encoder */
+        
+        $api = new CM_Janus_HttpApiClient($httpClient, $contextFormatter, $encoder);
         $result = $api->fetchStatus($server);
         $this->assertSame([['id' => 'foo', 'channelName' => 'bar'], ['id' => 'baz', 'channelName' => 'quux']], $result);
         $this->assertSame(1, $sendRequestMethod->getCallCount());
@@ -77,10 +83,15 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
         /** @var CM_Geo_Point $location */
 
         $server = new CM_Janus_Server(0, 'bar', 'http://cm-janus.dev:8080', 'ws://cm-janus.dev:8188', [], $location);
-        $api = new CM_Janus_HttpApiClient($httpClient, $contextFormatter);
+        $encoder = $this->mockObject(CM_Log_Encoder_JSON::class);
+        /** @var CM_Log_Encoder_JSON $encoder */
+        
+        $api = new CM_Janus_HttpApiClient($httpClient, $contextFormatter, $encoder);
         $exception = $this->catchException(function () use ($api, $server) {
             $api->fetchStatus($server);
         });
+        var_dump($exception);
+        die();
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertStringStartsWith('Fetching contents from', $exception->getMessage());
 
