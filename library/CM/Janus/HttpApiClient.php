@@ -8,17 +8,13 @@ class CM_Janus_HttpApiClient {
     /** @var CM_Log_ContextFormatter_Interface */
     protected $_contextFormatter;
 
-    /** @var CM_Log_Encoder_Interface */
-    protected $_encoder;
-
     /**
      * @param \GuzzleHttp\Client                $httpClient
      * @param CM_Log_ContextFormatter_Interface $contextFormatter
      */
-    public function __construct(GuzzleHttp\Client $httpClient, CM_Log_ContextFormatter_Interface $contextFormatter, CM_Log_Encoder_Interface $encoder) {
+    public function __construct(GuzzleHttp\Client $httpClient, CM_Log_ContextFormatter_Interface $contextFormatter) {
         $this->_httpClient = $httpClient;
         $this->_contextFormatter = $contextFormatter;
-        $this->_encoder = $encoder;
     }
 
     /**
@@ -58,7 +54,7 @@ class CM_Janus_HttpApiClient {
         $body = (array) $body;
 
         $options = [
-            'query'   => ['context' => $this->_encoder->encode($appContext)],
+            'query'   => ['context' => CM_Util::jsonEncode($appContext)],
             'body'    => $body,
             'headers' => ['Server-Key' => $server->getKey()],
         ];
