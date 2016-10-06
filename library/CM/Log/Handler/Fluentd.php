@@ -10,24 +10,19 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
     /** @var CM_Log_ContextFormatter_Interface */
     protected $_contextFormatter;
 
-    /** @var CM_Log_Encoder_Fluentd */
-    protected $_encoder;
-
     /** @var string */
     protected $_tag;
 
     /**
      * @param FluentLogger                      $fluentdLogger
      * @param CM_Log_ContextFormatter_Interface $contextFormatter
-     * @param CM_Log_Encoder_Fluentd            $encoder
      * @param string                            $tag
      * @param int|null                          $minLevel
      */
-    public function __construct(FluentLogger $fluentdLogger, CM_Log_ContextFormatter_Interface $contextFormatter, CM_Log_Encoder_Fluentd $encoder, $tag, $minLevel = null) {
+    public function __construct(FluentLogger $fluentdLogger, CM_Log_ContextFormatter_Interface $contextFormatter, $tag, $minLevel = null) {
         parent::__construct($minLevel);
         $this->_fluentdLogger = $fluentdLogger;
         $this->_contextFormatter = $contextFormatter;
-        $this->_encoder = $encoder;
         $this->_tag = (string) $tag;
     }
 
@@ -79,10 +74,28 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
     }
 
     /**
-     * @param array $entry
+     * @param array $value
      * @return array
      */
-    protected function _encodeRecord(array $entry) {
-        return $this->_encoder->encode($entry);
+    protected function _encodeRecord($value) {
+        if ($value instanceof DateTime) {
+            return $value->format('c');
+        }
+
+        if (is_object($value)) {
+            $encoded = '[';
+            $encoded .= get_class($value);
+            if ($value instanceof CM_Model_Abstract) {
+                $encoded .= ':' . $value->getId();
+            }
+            $encoded .= ']';
+            return $encoded;
+        }
+
+        if (is_array($value)) {
+            return array_map([$this, '_encodeRecord'], $value);
+        }
+
+        return $value;
     }
 }
