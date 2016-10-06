@@ -9,8 +9,8 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
 
     /** @var CM_Log_ContextFormatter_Interface */
     protected $_contextFormatter;
-    
-    /** @var CM_Log_Encoder_Interface */
+
+    /** @var CM_Log_Encoder_Fluentd */
     protected $_encoder;
 
     /** @var string */
@@ -19,11 +19,11 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
     /**
      * @param FluentLogger                      $fluentdLogger
      * @param CM_Log_ContextFormatter_Interface $contextFormatter
-     * @param CM_Log_Encoder_Interface          $encoder
+     * @param CM_Log_Encoder_Fluentd            $encoder
      * @param string                            $tag
      * @param int|null                          $minLevel
      */
-    public function __construct(FluentLogger $fluentdLogger, CM_Log_ContextFormatter_Interface $contextFormatter, CM_Log_Encoder_Interface $encoder, $tag, $minLevel = null) {
+    public function __construct(FluentLogger $fluentdLogger, CM_Log_ContextFormatter_Interface $contextFormatter, CM_Log_Encoder_Fluentd $encoder, $tag, $minLevel = null) {
         parent::__construct($minLevel);
         $this->_fluentdLogger = $fluentdLogger;
         $this->_contextFormatter = $contextFormatter;

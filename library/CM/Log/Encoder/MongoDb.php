@@ -1,6 +1,6 @@
 <?php
 
-class CM_Log_Encoder_MongoDb implements CM_Log_Encoder_Interface {
+class CM_Log_Encoder_MongoDb {
 
     public function encode($value) {
         if ($value instanceof DateTime) {

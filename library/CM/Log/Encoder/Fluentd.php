@@ -1,6 +1,6 @@
 <?php
 
-class CM_Log_Encoder_Fluentd implements CM_Log_Encoder_Interface {
+class CM_Log_Encoder_Fluentd {
 
     public function encode($value) {
         if ($value instanceof DateTime) {
