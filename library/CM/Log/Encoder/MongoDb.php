@@ -2,6 +2,10 @@
 
 class CM_Log_Encoder_MongoDb {
 
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
     public function encode($value) {
         if ($value instanceof DateTime) {
             return new MongoDate($value->getTimestamp());
