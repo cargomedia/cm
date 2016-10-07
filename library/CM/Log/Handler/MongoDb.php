@@ -22,14 +22,14 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
     /**
      * CM_Log_Handler_MongoDb constructor.
      * @param CM_MongoDb_Client      $client
-     * @param string                 $collection
      * @param CM_Log_Encoder_MongoDb $encoder
+     * @param string                 $collection
      * @param int|null               $recordTtl Time To Live in seconds
      * @param array|null             $insertOptions
      * @param int|null               $minLevel
      * @throws CM_Exception_Invalid
      */
-    public function __construct(CM_MongoDb_Client $client, $collection, CM_Log_Encoder_MongoDb $encoder, $recordTtl = null, array $insertOptions = null, $minLevel = null) {
+    public function __construct(CM_MongoDb_Client $client, CM_Log_Encoder_MongoDb $encoder, $collection, $recordTtl = null, array $insertOptions = null, $minLevel = null) {
         parent::__construct($minLevel);
         $this->_collection = (string) $collection;
         $this->_encoder = $encoder;

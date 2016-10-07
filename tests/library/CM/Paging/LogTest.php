@@ -25,7 +25,7 @@ class CM_Paging_LogTest extends CMTest_TestCase {
     public function testAddGet() {
         $client = $this->getServiceManager()->getMongoDb();
         $encoder = new CM_Log_Encoder_MongoDb();
-        $handler = new CM_Log_Handler_MongoDb($client, CM_Paging_Log::COLLECTION_NAME, $encoder);
+        $handler = new CM_Log_Handler_MongoDb($client, $encoder, CM_Paging_Log::COLLECTION_NAME);
 
         $user = CMTest_TH::createUser();
         $context = new CM_Log_Context();
@@ -72,7 +72,7 @@ class CM_Paging_LogTest extends CMTest_TestCase {
     public function testCleanUp() {
         $client = $this->getServiceManager()->getMongoDb();
         $encoder = new CM_Log_Encoder_MongoDb();
-        $handler = new CM_Log_Handler_MongoDb($client, CM_Paging_Log::COLLECTION_NAME, $encoder);
+        $handler = new CM_Log_Handler_MongoDb($client, $encoder, CM_Paging_Log::COLLECTION_NAME);
 
         $context1 = new CM_Log_Context();
         $context1->setExtra(['bar' => 'quux']);
@@ -106,7 +106,7 @@ class CM_Paging_LogTest extends CMTest_TestCase {
     public function testFlush() {
         $client = $this->getServiceManager()->getMongoDb();
         $encoder = new CM_Log_Encoder_MongoDb();
-        $handler = new CM_Log_Handler_MongoDb($client, CM_Paging_Log::COLLECTION_NAME, $encoder);
+        $handler = new CM_Log_Handler_MongoDb($client, $encoder, CM_Paging_Log::COLLECTION_NAME);
 
         $context1 = new CM_Log_Context();
         $context1->setExtra(['bar' => 'quux']);
@@ -135,7 +135,7 @@ class CM_Paging_LogTest extends CMTest_TestCase {
     public function testAggregate() {
         $client = $this->getServiceManager()->getMongoDb();
         $encoder = new CM_Log_Encoder_MongoDb();
-        $handler = new CM_Log_Handler_MongoDb($client, CM_Paging_Log::COLLECTION_NAME, $encoder);
+        $handler = new CM_Log_Handler_MongoDb($client, $encoder, CM_Paging_Log::COLLECTION_NAME);
 
         $context1 = new CM_Log_Context();
         $context1->setExtra(['bar' => 'quux']);

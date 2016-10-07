@@ -12,7 +12,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $encoder = $this->mockObject(CM_Log_Encoder_MongoDb::class);
         /** @var CM_Log_Encoder_MongoDb $encoder */
         
-        $handler = new CM_Log_Handler_MongoDb($mongoClient, 'foo', $encoder);
+        $handler = new CM_Log_Handler_MongoDb($mongoClient, $encoder, 'foo');
         $this->assertInstanceOf('CM_Log_Handler_MongoDb', $handler);
     }
 
@@ -25,7 +25,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
             $encoder = $this->mockObject(CM_Log_Encoder_MongoDb::class);
             /** @var CM_Log_Encoder_MongoDb $encoder */
 
-            new CM_Log_Handler_MongoDb($mongoClient, 'foo', $encoder, -10);
+            new CM_Log_Handler_MongoDb($mongoClient, $encoder, 'foo', -10);
         });
 
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
@@ -56,7 +56,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $encoder = $this->mockObject(CM_Log_Encoder_MongoDb::class);
         /** @var CM_Log_Encoder_MongoDb $encoder */
         
-        $handler = new CM_Log_Handler_MongoDb($mongoClient, $collection, $encoder, $ttl, ['w' => 0], $level);
+        $handler = new CM_Log_Handler_MongoDb($mongoClient, $encoder, $collection, $ttl, ['w' => 0], $level);
         $this->callProtectedMethod($handler, '_writeRecord', [$record]);
         $this->assertSame(1, $mongoClient->count($collection));
 
@@ -95,7 +95,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $encoder = $this->mockObject(CM_Log_Encoder_MongoDb::class);
         /** @var CM_Log_Encoder_MongoDb $encoder */
 
-        $handler = new CM_Log_Handler_MongoDb($mongoClient, 'foo', $encoder);
+        $handler = new CM_Log_Handler_MongoDb($mongoClient, $encoder, 'foo');
         $record = [
             'foo'  => [
                 'baz' => 'quux',
