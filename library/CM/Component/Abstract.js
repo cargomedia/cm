@@ -39,7 +39,6 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
     if (!selector) {
       return this.$el;
     }
-    selector = selector.replace('#', '#' + this.getAutoId() + '-');
     return $(selector, this.el);
   },
 

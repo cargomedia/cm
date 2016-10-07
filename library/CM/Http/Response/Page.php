@@ -54,8 +54,8 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
      * @return string
      */
     protected function _renderPage(CM_Page_Abstract $page) {
-        $renderAdapterLayout = new CM_RenderAdapter_Layout($this->getRender(), $page);
-        return $renderAdapterLayout->fetch();
+        $renderAdapterDocument = new CM_RenderAdapter_Document($this->getRender(), $page);
+        return $renderAdapterDocument->fetch();
     }
 
     protected function _process() {

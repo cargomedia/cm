@@ -28,16 +28,30 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
     }
 
     /**
-     * @param string $templateName
      * @return string|null
      */
-    protected function _fetchMetaTemplate($templateName) {
+    public function fetchTitleWithBranding() {
+        return $this->_fetchMetaTemplate('title-with-branding', [
+            'title' => $this->fetchTitle(),
+        ]);
+    }
+
+    /**
+     * @param string     $templateName
+     * @param array|null $variables
+     * @return null|string
+     */
+    protected function _fetchMetaTemplate($templateName, array $variables = null) {
         $templatePath = $this->_getMetaTemplatePath($templateName);
         if (null === $templatePath) {
             return null;
         }
+        if (null === $variables) {
+            $variables = [];
+        }
+        $variables = array_merge($this->_getViewResponse()->getData(), $variables);
         $this->_getPage()->checkAccessible($this->getRender()->getEnvironment());
-        $html = $this->getRender()->fetchTemplate($templatePath, $this->_getViewResponse()->getData());
+        $html = $this->getRender()->fetchTemplate($templatePath, $variables);
         return trim($html);
     }
 
