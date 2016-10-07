@@ -36,4 +36,26 @@ class CM_Frontend_ViewResponseTest extends CMTest_TestCase {
         $viewResponse->addCssClass('zoo');
         $this->assertSame($classNames, $viewResponse->getCssClasses());
     }
+
+    public function testAddGetSetDataAttributes() {
+        /** @var CM_View_Abstract $viewMock */
+        $viewMock = $this->getMockBuilder('CM_View_Abstract')->getMock();
+        $viewResponse = new CM_Frontend_ViewResponse($viewMock);
+
+        $this->assertSame([], $viewResponse->getDataAttributes());
+        $viewResponse->setDataAttributes(['foo' => 'bar', 'baz' => 'quux']);
+        $this->assertSame(
+            [
+                'foo' => 'bar',
+                'baz' => 'quux'
+            ], $viewResponse->getDataAttributes());
+
+        $viewResponse->addDataAttribute('fooBar', 'barFoo');
+        $this->assertSame(
+            [
+                'foo'    => 'bar',
+                'baz'    => 'quux',
+                'fooBar' => 'barFoo'
+            ], $viewResponse->getDataAttributes());
+    }
 }

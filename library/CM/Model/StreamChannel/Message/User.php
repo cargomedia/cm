@@ -49,7 +49,7 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
      * @return CM_Model_User
      */
     public function getUser() {
-        $userId = $this->_decryptKey(self::SALT);
+        $userId = self::_decryptKey($this->getKey(), self::SALT);
         return CM_Model_User::factory($userId);
     }
 

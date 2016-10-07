@@ -141,8 +141,6 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
           $errorMessage.html(message);
           $errorMessage.slideDown('fast');
         }
-        this.setFocus();
-
       } else {
         throw new CM_Exception('FormField `' + this.getName() + '`: ' + message);
       }

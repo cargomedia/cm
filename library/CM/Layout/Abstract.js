@@ -92,7 +92,7 @@ var CM_Layout_Abstract = CM_Component_Abstract.extend({
 
   _onPageTeardown: function() {
     $(document).scrollTop(0);
-    $('.floatbox-layer').floatIn();
+    $('.floatbox-layer .floatbox-body > *').floatIn();
   },
 
   /**

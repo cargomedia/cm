@@ -68,13 +68,6 @@ class CM_Process {
     /**
      * @return int
      */
-    public function getHostId() {
-        return (int) hexdec(CM_Util::exec('hostid'));
-    }
-
-    /**
-     * @return int
-     */
     public function getProcessId() {
         return posix_getpid();
     }
@@ -228,7 +221,7 @@ class CM_Process {
                 $forkHandler->runAndSendWorkload();
                 $forkHandler->closeIpcStream();
             } catch (Exception $e) {
-                CM_Service_Manager::getInstance()->getLogger()->addMessage('Forking workload failed', CM_Log_Logger::exceptionToLevel($e), (new CM_Log_Context())->setException($e));
+                CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
             }
             exit;
         }
