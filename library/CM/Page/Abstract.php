@@ -88,23 +88,30 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 
     /**
      * @param CM_Frontend_Environment $environment
-     * @param string|null             $layoutName
+     * @return string
      * @throws CM_Exception_Invalid
-     * @return CM_Layout_Abstract
      */
-    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
-        if (null === $layoutName) {
-            $layoutName = 'Default';
-        }
+    public function getLayout(CM_Frontend_Environment $environment) {
+        return $this->_getLayoutClassByName($environment, 'Default');
+    }
+
+    /**
+     * @param CM_Frontend_Environment $environment
+     * @param string                  $layoutName
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    protected function _getLayoutClassByName(CM_Frontend_Environment $environment, $layoutName) {
         $layoutName = (string) $layoutName;
 
         foreach ($environment->getSite()->getModules() as $moduleNamespace) {
             $classname = $moduleNamespace . '_Layout_' . $layoutName;
             if (class_exists($classname)) {
-                return new $classname();
+                return $classname;
             }
         }
 
         throw new CM_Exception_Invalid('Layout is not defined in any namespace', null, ['layoutName' => $layoutName]);
     }
+
 }

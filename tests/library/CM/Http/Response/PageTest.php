@@ -103,12 +103,12 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $expectedList = [
             '/foo/mock5?foo=bar' => $site1,
             '/bar/mock5?foo=bar' => $site2,
-            '/mock5?foo=bar' => $site3,
+            '/mock5?foo=bar'     => $site3,
         ];
 
         $responseFactory = new CM_Http_ResponseFactory($this->getServiceManager());
 
-        foreach($expectedList as $path => $site) {
+        foreach ($expectedList as $path => $site) {
             $request = new CM_Http_Request_Get($path, ['host' => 'my-site.com']);
             $response = $responseFactory->getResponse($request);
             $response->process();
@@ -266,8 +266,8 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
 
 class CM_Page_Mock5 extends CM_Page_Abstract {
 
-    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
-        return new CM_Layout_Mock();
+    public function getLayout(CM_Frontend_Environment $environment) {
+        return CM_Layout_Mock::class;
     }
 }
 
@@ -277,8 +277,8 @@ class CM_Page_Mock8 extends CM_Page_Abstract {
         return false;
     }
 
-    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
-        return new CM_Layout_Mock();
+    public function getLayout(CM_Frontend_Environment $environment) {
+        return CM_Layout_Mock::class;
     }
 }
 
@@ -288,8 +288,8 @@ class CM_Page_Mock9 extends CM_Page_Abstract {
         return '/v/foo';
     }
 
-    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
-        return new CM_Layout_Mock();
+    public function getLayout(CM_Frontend_Environment $environment) {
+        return CM_Layout_Mock::class;
     }
 }
 
@@ -299,8 +299,8 @@ class CM_Page_Mock10 extends CM_Page_Abstract {
         return '/v/bar';
     }
 
-    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
-        return new CM_Layout_Mock();
+    public function getLayout(CM_Frontend_Environment $environment) {
+        return CM_Layout_Mock::class;
     }
 
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
@@ -317,8 +317,8 @@ class CM_Page_Mock11 extends CM_Page_Abstract {
         }
     }
 
-    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
-        return new CM_Layout_Mock();
+    public function getLayout(CM_Frontend_Environment $environment) {
+        return CM_Layout_Mock::class;
     }
 }
 

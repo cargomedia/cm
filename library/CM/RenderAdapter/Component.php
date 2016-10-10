@@ -10,14 +10,15 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
      */
     public function fetch() {
         $component = $this->_getComponent();
-        $frontend = $this->getRender()->getGlobalResponse();
-        $environment = $this->getRender()->getEnvironment();
+        $render = $this->getRender();
 
-        $component->checkAccessible($environment);
+        $component->checkAccessible($render->getEnvironment());
+
         $viewResponse = $this->_getViewResponse();
-        $this->_prepareViewResponse($viewResponse);
-
+        $frontend = $render->getGlobalResponse();
         $frontend->treeExpand($viewResponse);
+
+        $this->_prepareViewResponse($viewResponse);
 
         $tagRenderer = new CM_Frontend_HtmlTagRenderer();
         $tagAttributes = [
@@ -25,6 +26,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
             'class' => join(' ', $viewResponse->getCssClasses()),
         ];
         $html = $tagRenderer->renderTag('div', $this->getRender()->fetchViewResponse($viewResponse), $tagAttributes, $viewResponse->getDataAttributes());
+
         $frontend->treeCollapse();
         return $html;
     }
@@ -66,6 +68,9 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
      * @return CM_RenderAdapter_Component
      */
     public static function factory(CM_Frontend_Render $render, CM_Component_Abstract $view) {
+        if ($view instanceof CM_Layout_Abstract) {
+            return new CM_RenderAdapter_Layout($render, $view);
+        }
         if ($view instanceof CM_Page_Abstract) {
             return new CM_RenderAdapter_Page($render, $view);
         }

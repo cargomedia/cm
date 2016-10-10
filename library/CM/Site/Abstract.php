@@ -75,6 +75,13 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
+     * @return string
+     */
+    public function getDocument() {
+        return CM_View_Document::class;
+    }
+
+    /**
      * @return CM_Menu[]
      */
     public function getMenus() {
