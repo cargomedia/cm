@@ -53,6 +53,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
         $options = $options ?: [];
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Insert `{$collection}`: " . CM_Params::jsonEncode($object));
         $result = $this->_getCollection($collection)->insertOne($object, $options);
+        $this->_checkResultForErrors($result);
         return $result->getInsertedId();
     }
 
@@ -331,11 +332,27 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     }
 
     /**
-     * @param array|boolean $result
+     * @param array|boolean|MongoDB\InsertOneResult|MongoDB\InsertManyResult|MongoDB\DeleteResult|MongoDB\UpdateResult $result
      * @throws CM_MongoDb_Exception
      */
     protected function _checkResultForErrors($result) {
-        if (true !== $result && empty($result['ok'])) {
+        if ($result instanceof MongoDB\InsertOneResult) {
+            if (!$result->isAcknowledged()) {
+                throw new CM_MongoDb_Exception('Operation not acknowledged');
+            }
+        } elseif ($result instanceof MongoDB\InsertManyResult) {
+            if (!$result->isAcknowledged()) {
+                throw new CM_MongoDb_Exception('Operation not acknowledged');
+            }
+        } elseif ($result instanceof MongoDB\DeleteResult) {
+            if (!$result->isAcknowledged()) {
+                throw new CM_MongoDb_Exception('Operation not acknowledged');
+            }
+        } elseif ($result instanceof MongoDB\UpdateResult) {
+            if (!$result->isAcknowledged()) {
+                throw new CM_MongoDb_Exception('Operation not acknowledged');
+            }
+        } elseif (true !== $result && empty($result['ok'])) {
             throw new CM_MongoDb_Exception('Cannot perform mongodb operation', null, ['result' => $result]);
         }
     }
