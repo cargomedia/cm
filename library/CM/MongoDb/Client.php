@@ -69,11 +69,9 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
         $dataList = \Functional\map($objectList, function (array $object) {
             return $object;
         });
-        $result = $this->_getCollection($collection)->batchInsert($dataList, $options);
+        $result = $this->_getCollection($collection)->insertMany($dataList, $options);
         $this->_checkResultForErrors($result);
-        return \Functional\map($dataList, function (array $data) {
-            return $data['_id'];
-        });
+        return $result->getInsertedIds();
     }
 
     /**
