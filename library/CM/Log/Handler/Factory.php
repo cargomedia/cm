@@ -72,6 +72,19 @@ class CM_Log_Handler_Factory implements CM_Service_ManagerAwareInterface {
     }
 
     /**
+     * @param string     $collection
+     * @param int|null   $recordTtl Time To Live in seconds
+     * @param array|null $insertOptions
+     * @param int|null   $minLevel
+     * @return CM_Log_Handler_MongoDb
+     */
+    public function createMongoDbHandler($collection, $recordTtl = null, array $insertOptions = null, $minLevel = null) {
+        $client = $this->getServiceManager()->getMongoDb();
+        $encoder = new CM_Log_Encoder_MongoDb();
+        return new CM_Log_Handler_MongoDb($client, $encoder, $collection, $recordTtl, $insertOptions, $minLevel);
+    }
+
+    /**
      * @param CM_OutputStream_Interface $stream
      * @param CM_Log_Formatter_Abstract $formatter
      * @param int|null                  $minLevel
