@@ -122,7 +122,6 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
             'layoutRendering'   => $layoutRendering,
             'title'             => $title,
             'url'               => $url,
-            'layoutClass'       => $layoutClass, // @todo remove in favor of "layoutRendering"
             'menuEntryHashList' => $menuEntryHashList,
             'jsTracking'        => $jsTracking,
         ];
