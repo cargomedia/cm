@@ -22,16 +22,18 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         /** @var \Fluent\Logger\FluentLogger $fluentd */
 
         $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
-        $getRecordContext = $contextFormatter->mockMethod('formatRecordContext')->set('formatted-record');
+        $getFromattedContext = $contextFormatter->mockMethod('formatContext')->set(['bar' => 'foo']);
         /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
 
         $handler = new CM_Log_Handler_Fluentd($fluentd, $contextFormatter, 'tag');
-        $record = $this->mockClass('CM_Log_Record')->newInstanceWithoutConstructor();
+        $record = new CM_Log_Record(CM_Log_Logger::DEBUG, 'log message foo', new CM_Log_Context());
         $formattedRecord = $this->callProtectedMethod($handler, '_formatRecord', [$record]);
 
-        $this->assertSame(1, $getRecordContext->getCallCount());
-        $this->assertSame($record, $getRecordContext->getLastCall()->getArgument(0));
-        $this->assertSame('formatted-record', $formattedRecord);
+        $this->assertSame(1, $getFromattedContext->getCallCount());
+        $this->assertSame('log message foo', $formattedRecord['message']);
+        $this->assertSame('debug', $formattedRecord['level']);
+        $this->assertSame('foo', $formattedRecord['bar']);
+        $this->assertArrayHasKey('timestamp', $formattedRecord);
     }
 
     public function testWriteRecord() {
@@ -39,15 +41,19 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $postMock = $fluentd->mockMethod('post')->set(
             function ($tag, array $data) {
                 $this->assertSame('tag', $tag);
+                $this->assertSame('critical', $data['level']);
+                $this->assertSame('foo', $data['message']);
+                $this->assertArrayHasKey('timestamp', $data);
                 $this->assertSame('value', $data['key']);
+
             }
         );
         /** @var \Fluent\Logger\FluentLogger $fluentd */
 
         $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
-        $contextFormatter->mockMethod('formatRecordContext')->set(['key' => 'value']);
+        $contextFormatter->mockMethod('formatContext')->set(['key' => 'value']);
         /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
-
+        
         $handler = new CM_Log_Handler_Fluentd($fluentd, $contextFormatter, 'tag');
 
         $record = new CM_Log_Record(CM_Log_Logger::CRITICAL, 'foo', new CM_Log_Context());

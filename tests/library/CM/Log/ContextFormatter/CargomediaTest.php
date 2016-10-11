@@ -3,8 +3,6 @@
 class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
 
     public function testGetRecordContext() {
-        $level = CM_Log_Logger::DEBUG;
-        $message = 'foo';
         $user = CMTest_TH::createUser();
         $httpRequest = CM_Http_Request_Abstract::factory(
             'post',
@@ -30,17 +28,13 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
         $context->setException($exception);
         $context->setComputerInfo($computerInfo);
         $context->setHttpRequest($httpRequest);
-        $record = new CM_Log_Record($level, $message, $context);
 
         $contextFormatter = new CM_Log_ContextFormatter_Cargomedia('appName');
-        $formattedRecord = $contextFormatter->formatRecordContext($record);
+        $formattedContext = $contextFormatter->formatContext($context);
 
-        $this->assertSame($message, $formattedRecord['message']);
-        $this->assertSame('debug', $formattedRecord['level']);
-        $this->assertArrayHasKey('timestamp', $formattedRecord);
-        $this->assertSame('www.example.com', $formattedRecord['computerInfo']['fqdn']);
-        $this->assertSame('v7.0.1', $formattedRecord['computerInfo']['phpVersion']);
-        $this->assertSame('/foo?bar=1&baz=quux&viewInfoList=fooBar', $formattedRecord['httpRequest']['uri']);
+        $this->assertSame('www.example.com', $formattedContext['computerInfo']['fqdn']);
+        $this->assertSame('v7.0.1', $formattedContext['computerInfo']['phpVersion']);
+        $this->assertSame('/foo?bar=1&baz=quux&viewInfoList=fooBar', $formattedContext['httpRequest']['uri']);
         $this->assertSame(
             [
                 ['key' => 'bar', 'value' => '1'],
@@ -48,24 +42,24 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
                 ['key' => 'foo', 'value' => 'bar'],
                 ['key' => 'quux', 'value' => 'baz'],
             ],
-            $formattedRecord['httpRequest']['query']
+            $formattedContext['httpRequest']['query']
         );
 
-        $this->assertSame('POST', $formattedRecord['httpRequest']['method']);
-        $this->assertSame('http://bar/baz', $formattedRecord['httpRequest']['referer']);
-        $this->assertSame('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)', $formattedRecord['httpRequest']['useragent']);
-        $this->assertSame('foo.bar', $formattedRecord['httpRequest']['hostname']);
-        $this->assertSame($user->getId(), $formattedRecord['appName']['user']);
-        $this->assertSame($clientId, $formattedRecord['appName']['clientId']);
-        $this->assertSame('baz', $formattedRecord['appName']['bar']);
-        $this->assertSame('quux', $formattedRecord['appName']['baz']);
+        $this->assertSame('POST', $formattedContext['httpRequest']['method']);
+        $this->assertSame('http://bar/baz', $formattedContext['httpRequest']['referer']);
+        $this->assertSame('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)', $formattedContext['httpRequest']['useragent']);
+        $this->assertSame('foo.bar', $formattedContext['httpRequest']['hostname']);
+        $this->assertSame($user->getId(), $formattedContext['appName']['user']);
+        $this->assertSame($clientId, $formattedContext['appName']['clientId']);
+        $this->assertSame('baz', $formattedContext['appName']['bar']);
+        $this->assertSame('quux', $formattedContext['appName']['baz']);
 
-        $this->assertSame('CM_Exception_Invalid', $formattedRecord['exception']['type']);
-        $this->assertSame('Bad', $formattedRecord['exception']['message']);
-        $this->assertArrayHasKey('stack', $formattedRecord['exception']);
-        $this->assertInternalType('string', $formattedRecord['exception']['stack']);
-        $this->assertSame(['foo' => "'bar'"], $formattedRecord['exception']['metaInfo']);
-        $this->assertRegExp('/library\/CM\/Log\/ContextFormatter\/CargomediaTest\.php\(\d+\)/', $formattedRecord['exception']['stack']);
+        $this->assertSame('CM_Exception_Invalid', $formattedContext['exception']['type']);
+        $this->assertSame('Bad', $formattedContext['exception']['message']);
+        $this->assertArrayHasKey('stack', $formattedContext['exception']);
+        $this->assertInternalType('string', $formattedContext['exception']['stack']);
+        $this->assertSame(['foo' => "'bar'"], $formattedContext['exception']['metaInfo']);
+        $this->assertRegExp('/library\/CM\/Log\/ContextFormatter\/CargomediaTest\.php\(\d+\)/', $formattedContext['exception']['stack']);
     }
 
     public function testArrayEncoding() {
