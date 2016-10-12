@@ -523,17 +523,21 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     public function getLessVariable($variableName) {
         $variableName = (string) $variableName;
 
-        $assetCss = new CM_Asset_Css($this);
-        $assetCss->addVariables();
-        $assetCss->add('foo:@' . $variableName);
-        $css = $assetCss->get(true);
-        if (!preg_match('/^foo:(.+);$/', $css, $matches)) {
-            throw new CM_Exception_Invalid('Cannot detect variable from CSS.', null, [
-                'variableName' => $variableName,
-                'css'          => $css,
-            ]);
-        }
-        return (string) $matches[1];
+        $cache = new CM_Cache_Local();
+        return $cache->get($cache->key(__METHOD__, $variableName) , function () use ($variableName) {
+            $assetCss = new CM_Asset_Css($this);
+            $assetCss->addVariables();
+            $assetCss->add('foo:@' . $variableName);
+
+            $css = $assetCss->get(true);
+            if (!preg_match('/^foo:(.+);$/', $css, $matches)) {
+                throw new CM_Exception_Invalid('Cannot detect variable from CSS.', null, [
+                    'variableName' => $variableName,
+                    'css'          => $css,
+                ]);
+            }
+            return (string) $matches[1];
+        });
     }
 
     /**
