@@ -37,6 +37,39 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertSame('', $data['jsTracking']);
     }
 
+    public function testLoadPageDifferentLayout() {
+        $site = $this->getMockSite(null, null, [
+            'url'  => 'http://my-site.com',
+            'name' => 'My site',
+        ]);
+        $page = new CM_Page_View_Ajax_Test_Mock();
+        $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
+        $params = [
+            'path'          => $page::getPath(),
+            'currentLayout' => 'CM_Layout_Default',
+        ];
+        $request = $this->createRequestAjax($page, 'loadPage', $params, null, null, $site);
+        /** @var CM_Http_Response_View_Abstract $response */
+        $response = $this->processRequest($request);
+
+        $this->assertViewResponseSuccess($response);
+        $responseContent = CM_Params::decode($response->getContent(), true);
+        $data = $responseContent['success']['data'];
+        $pageRendering = $data['pageRendering'];
+        $layoutRendering = $data['layoutRendering'];
+
+        $this->assertArrayHasKey('js', $layoutRendering);
+        $this->assertArrayHasKey('html', $layoutRendering);
+        $this->assertArrayHasKey('autoId', $layoutRendering);
+        $this->assertArrayHasKey('js', $pageRendering);
+        $this->assertArrayHasKey('html', $pageRendering);
+        $this->assertArrayHasKey('autoId', $pageRendering);
+        $this->assertSame(array(), $data['menuEntryHashList']);
+        $this->assertSame('My site', $data['title']);
+        $this->assertSame($response->getRender()->getUrlPage('CM_Page_View_Ajax_Test_Mock'), $data['url']);
+        $this->assertSame('', $data['jsTracking']);
+    }
+
     public function testLoadPageSiteWithPath() {
         $site = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
         $page = new CM_Page_View_Ajax_Test_Mock();
