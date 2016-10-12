@@ -34,6 +34,14 @@
       "options": {
         "name": "message_1"
       }
+    },
+    {
+      "key": {
+        "level": 1
+      },
+      "options": {
+        "name": "level_1"
+      }
     }
   ]
 }
