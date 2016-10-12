@@ -524,7 +524,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         $variableName = (string) $variableName;
 
         $cache = new CM_Cache_Local();
-        return $cache->get($cache->key(__METHOD__, $variableName) , function () use ($variableName) {
+        return $cache->get($cache->key(__METHOD__, $variableName), function () use ($variableName) {
             $assetCss = new CM_Asset_Css($this);
             $assetCss->addVariables();
             $assetCss->add('foo:@' . $variableName);
