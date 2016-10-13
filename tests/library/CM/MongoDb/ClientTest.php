@@ -205,16 +205,59 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $this->assertSame(10, $cursor->info()['query']['cursor']['batchSize']);
     }
 
-    public function testFindAndModify() {
+    public function testFindOneAndUpdate() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $collectionName = 'findAndModify';
+        $collectionName = 'findOneAndUpdate';
 
         $this->assertNull($mongoDb->findOne($collectionName, ['userId' => 1]));
-        $result = $mongoDb->findAndModify($collectionName, ['userId' => 1], ['$inc' => ['score' => 1]], ['_id' => 0], ['upsert' => true,
-                                                                                                                       'new'    => true]);
+        $result = $mongoDb->findOneAndUpdate($collectionName, ['userId' => 1], ['$inc' => ['score' => 1]], ['_id' => 0], ['upsert' => true,
+                                                                                                                          'new'    => true]);
         $this->assertSame(['userId' => 1, 'score' => 1], $result);
-        $this->assertSame($result, $mongoDb->findOne($collectionName, ['userId' => 1], ['_id' => 0]));
-        $this->assertNull($mongoDb->findAndModify($collectionName, ['userId' => 2], ['$inc' => ['score' => 1]], ['_id' => 0], ['new' => true]));
+        $this->assertSame($mongoDb->findOne($collectionName, ['userId' => 1], ['_id' => 0]), $result);
+
+        $this->assertNull($mongoDb->findOneAndUpdate($collectionName, ['userId' => 2], ['$inc' => ['score' => 1]], ['_id' => 0], ['new' => true]));
+
+        $result = $mongoDb->findOneAndUpdate($collectionName, ['userId' => 1], ['$inc' => ['score' => 1]]);
+        $this->assertSame(['_id' => $result['_id'], 'userId' => 1, 'score' => 1], $result);
+        $this->assertSame(['userId' => 1, 'score' => 2], $mongoDb->findOne($collectionName, ['userId' => 1], ['_id' => 0]));
+    }
+
+    public function testFindOneAndReplace() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = 'findOneAndReplace';
+
+        $this->assertNull($mongoDb->findOne($collectionName, ['userId' => 1]));
+        $result = $mongoDb->findOneAndReplace($collectionName, ['userId' => 1], ['userId' => 1, 'score' => 1], ['_id' => 0], ['upsert' => true,
+                                                                                                                              'new'    => true]);
+        $this->assertSame(['userId' => 1, 'score' => 1], $result);
+        $this->assertSame($mongoDb->findOne($collectionName, ['userId' => 1], ['_id' => 0]), $result);
+
+        $this->assertNull($mongoDb->findOneAndReplace($collectionName, ['userId' => 2], ['userId' => 2, 'score' => 2], ['_id' => 0], ['new' => true]));
+
+        $result = $mongoDb->findOneAndReplace($collectionName, ['userId' => 1], ['userId' => 2, 'score' => 2]);
+
+        $this->assertSame(['_id' => $result['_id'], 'userId' => 1, 'score' => 1], $result);
+        $this->assertSame(['userId' => 2, 'score' => 2], $mongoDb->findOne($collectionName, ['userId' => 2], ['_id' => 0]));
+        $this->assertSame(null, $mongoDb->findOne($collectionName, ['userId' => 1]));
+    }
+
+    public function testFindOneAndDelete() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = 'findOneAndDelete';
+
+        $mongoDb->insert($collectionName, ['userId' => 1, 'score' => 1]);
+        $result = $mongoDb->findOneAndDelete($collectionName, ['userId' => 1], ['_id' => 0]);
+        $this->assertSame(['userId' => 1, 'score' => 1], $result);
+
+        $mongoDb->insert($collectionName, ['userId' => 1, 'score' => 1]);
+        $result = $mongoDb->findOneAndDelete($collectionName, ['userId' => 2]);
+        $this->assertSame(null, $result);
+
+        $mongoDb->insert($collectionName, ['userId' => 2, 'score' => 1]);
+
+        $result = $mongoDb->findOneAndDelete($collectionName, ['score' => 1], null, ['sort' => ['userId' => -1]]);
+        $this->assertSame(['_id' => $result['_id'], 'userId' => 2, 'score' => 1], $result);
+        $this->assertEquals([['userId' => 1, 'score' => 1]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
     }
 
     public function testFindOne() {

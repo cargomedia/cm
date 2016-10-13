@@ -103,14 +103,58 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
 
     /**
      * @param string     $collection
-     * @param array|null $criteria
+     * @param array      $criteria
      * @param array|null $update
      * @param array|null $projection
      * @param array|null $options
      * @return array|null
      */
-    public function findAndModify($collection, $criteria = null, $update = null, $projection = null, $options = null) {
-        return $this->_getCollection($collection)->findAndModify($criteria, $update, $projection, $options);
+    public function findOneAndUpdate($collection, array $criteria, array $update = null, array $projection = null, array $options = null) {
+        $options = (array) $options;
+        if (null !== $projection) {
+            $options['projection'] = $projection;
+        }
+        if (!empty($options['new'])) {
+            $options['returnDocument'] = \MongoDB\Operation\FindOneAndUpdate::RETURN_DOCUMENT_AFTER;
+        }
+        $result = $this->_getCollection($collection)->findOneAndUpdate($criteria, $update, $options);
+        return (null !== $result) ? (array) $result : null;
+    }
+
+    /**
+     * @param string     $collection
+     * @param array      $criteria
+     * @param array|null $replace
+     * @param array|null $projection
+     * @param array|null $options
+     * @return array|null
+     */
+    public function findOneAndReplace($collection, array $criteria, array $replace = null, array $projection = null, array $options = null) {
+        $options = (array) $options;
+        if (null !== $projection) {
+            $options['projection'] = $projection;
+        }
+        if (!empty($options['new'])) {
+            $options['returnDocument'] = \MongoDB\Operation\FindOneAndReplace::RETURN_DOCUMENT_AFTER;
+        }
+        $result = $this->_getCollection($collection)->findOneAndReplace($criteria, $replace, $options);
+        return (null !== $result) ? (array) $result : null;
+    }
+
+    /**
+     * @param string     $collection
+     * @param array      $criteria
+     * @param array|null $projection
+     * @param array|null $options
+     * @return array|null
+     */
+    public function findOneAndDelete($collection, array $criteria, array $projection = null, array $options = null) {
+        $options = (array) $options;
+        if (null !== $projection) {
+            $options['projection'] = $projection;
+        }
+        $result = $this->_getCollection($collection)->findOneAndDelete($criteria, $options);
+        return (null !== $result) ? (array) $result : null;
     }
 
     /**
