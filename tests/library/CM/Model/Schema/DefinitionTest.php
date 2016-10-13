@@ -610,14 +610,14 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
         $class = $this->mockInterface('CM_ArrayConvertible');
         $className = $class->getClassName();
         $arrayConvertible = $class->newInstanceWithoutConstructor();
-        $fromArray = $class->mockStaticMethod('fromArray')->set($arrayConvertible);
+        $fromArray = $class->mockMethod('fromArray')->set($arrayConvertible);
         $schema = new CM_Model_Schema_Definition([
             'arrayConvertible' => ['type' => $className]
         ]);
         $jsonData = '{"key":"value"}';
         $value = $schema->decodeField('arrayConvertible', $jsonData);
 
-        $this->assertSame(['key' => 'value'], $fromArray->getLastCall()->getArgument(0));
+        $this->assertSame(['key' => 'value'], $fromArray->getCalls()->getLast()->getArgument(0));
         $this->assertSame($arrayConvertible, $value);
     }
 

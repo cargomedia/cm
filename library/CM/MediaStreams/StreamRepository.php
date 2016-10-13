@@ -102,9 +102,11 @@ class CM_MediaStreams_StreamRepository {
      * @param CM_Model_StreamChannel_Abstract $streamChannel
      */
     public function removeStreamChannel(CM_Model_StreamChannel_Abstract $streamChannel) {
+        /** @var CM_Model_Stream_Subscribe $streamSubscribe */
         foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
             $streamSubscribe->delete();
         }
+        /** @var CM_Model_Stream_Publish $streamPublish */
         foreach ($streamChannel->getStreamPublishs() as $streamPublish) {
             $streamPublish->delete();
         }

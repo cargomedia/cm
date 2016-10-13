@@ -20,7 +20,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $forkMock->set(function ($callback) use ($forkMock) {
             $callback();
             $forkHandler = $this->mockClass('CM_Process_ForkHandler')->newInstanceWithoutConstructor();
-            $forkHandler->mockMethod('getIdentifier')->set($forkMock->getCallCount());
+            $forkHandler->mockMethod('getIdentifier')->set($forkMock->getCallCount() + 1);
             return $forkHandler;
         });
 
@@ -99,7 +99,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $forkMock = $process->mockMethod('fork');
         $forkMock->set(function () use ($forkMock) {
             $forkHandler = $this->mockClass('CM_Process_ForkHandler')->newInstanceWithoutConstructor();
-            $forkHandler->mockMethod('getIdentifier')->set($forkMock->getCallCount());
+            $forkHandler->mockMethod('getIdentifier')->set($forkMock->getCallCount() + 1);
             return $forkHandler;
         });
         $manager = $this->mockObject('CM_Clockwork_Manager');
@@ -151,7 +151,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $forkMock = $process->mockMethod('fork');
         $forkMock->set(function () use ($forkMock) {
             $forkHandler = $this->mockClass('CM_Process_ForkHandler')->newInstanceWithoutConstructor();
-            $forkHandler->mockMethod('getIdentifier')->set($forkMock->getCallCount());
+            $forkHandler->mockMethod('getIdentifier')->set($forkMock->getCallCount() + 1);
             return $forkHandler;
         });
         $storage = new CM_Clockwork_Storage_Memory();

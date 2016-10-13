@@ -1126,8 +1126,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
     }
 
     public function testDebugInfo() {
-        $modelClass = new \Mocka\ClassMock('CM_Model_DebugInfoMock1', 'CM_Model_Abstract');
-        /** @var CM_Model_Abstract|\Mocka\AbstractClassTrait $model */
+        $modelClass = $this->mockClass('CM_Model_Abstract');
         $model = $modelClass->newInstance();
         $model->mockMethod('hasIdRaw')->set(function () {
             return true;
@@ -1135,19 +1134,19 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $model->mockMethod('getIdRaw')->set(function () {
             return ['id' => 12];
         });
-
-        $this->assertSame('CM_Model_DebugInfoMock1(12)', $model->getDebugInfo());
+        /** @var CM_Model_Abstract $model */
+        $this->assertSame($modelClass->getClassName() . '(12)', $model->getDebugInfo());
     }
 
     public function testDebugInfoWithoutId() {
-        $modelClass = new \Mocka\ClassMock('CM_Model_DebugInfoMock2', 'CM_Model_Abstract');
-        /** @var CM_Model_Abstract|\Mocka\AbstractClassTrait $model */
+        $modelClass = $this->mockClass('CM_Model_Abstract');
         $model = $modelClass->newInstance();
         $model->mockMethod('hasIdRaw')->set(function () {
             return false;
         });
+        /** @var CM_Model_Abstract $model */
 
-        $this->assertSame('CM_Model_DebugInfoMock2', $model->getDebugInfo());
+        $this->assertSame($modelClass->getClassName(), $model->getDebugInfo());
     }
 
     public function testCommitWithReplace() {
