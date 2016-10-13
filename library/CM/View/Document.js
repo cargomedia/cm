@@ -34,9 +34,6 @@ var CM_View_Document = CM_View_Abstract.extend({
         if (response.jsTracking) {
           this._updateTracking(response.jsTracking);
         }
-        if (window.location.hash) {
-          this._scrollToHash();
-        }
 
         var layout = this.getLayout();
         if (response.layoutRendering) {
@@ -134,16 +131,5 @@ var CM_View_Document = CM_View_Abstract.extend({
    */
   _updateTracking: function(jsTracking) {
     new Function(jsTracking).call(this);
-  },
-
-  /**
-   * @private
-   */
-  _scrollToHash: function() {
-    var hash = window.location.hash.substring(1);
-    var $anchor = $('#' + hash).add('[name=' + hash + ']');
-    if ($anchor.length) {
-      this.getLayout().scrollTo($anchor);
-    }
   }
 });
