@@ -278,20 +278,20 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
             }
             array_push($pipeline, ['$group' => ['_id' => null, 'count' => ['$sum' => 1]]]);
             array_push($pipeline, ['$project' => ['_id' => 0, 'count' => 1]]);
-            $result = $this->_getCollection($collection)->aggregate($pipeline);
-            if (!empty($result['result'])) {
-                return $result['result'][0]['count'];
+            $result = $this->find($collection, null, null, $pipeline)->toArray();
+            if (!empty($result)) {
+                return $result[0]['count'];
             }
             return 0;
         } else {
-            $count = $this->_getCollection($collection)->count($criteria);
+            $options = [];
             if ($offset) {
-                $count -= $offset;
+                $options['skip'] = $offset;
             }
             if ($limit) {
-                $count = min($count, $limit);
+                $options['limit'] = $limit;
             }
-            return max(0, $count);
+            return $this->_getCollection($collection)->count($criteria, $options);
         }
     }
 
