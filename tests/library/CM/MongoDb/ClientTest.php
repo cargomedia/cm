@@ -220,6 +220,13 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $result = $mongoDb->findOneAndUpdate($collectionName, ['userId' => 1], ['$inc' => ['score' => 1]]);
         $this->assertSame(['_id' => $result['_id'], 'userId' => 1, 'score' => 1], $result);
         $this->assertSame(['userId' => 1, 'score' => 2], $mongoDb->findOne($collectionName, ['userId' => 1], ['_id' => 0]));
+
+        $mongoDb->insert($collectionName, ['userId' => 2, 'score' => 3]);
+        $this->assertEquals([['userId' => 1, 'score' => 2], ['userId' => 2, 'score' => 3]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
+
+        $result = $mongoDb->findOneAndUpdate($collectionName, null, ['$inc' => ['score' => 1]], ['_id' => 0], ['sort' => ['userId' => 1]]);
+        $this->assertSame(['userId' => 1, 'score' => 2], $result);
+        $this->assertEquals([['userId' => 1, 'score' => 3], ['userId' => 2, 'score' => 3]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
     }
 
     public function testFindOneAndReplace() {
@@ -238,8 +245,14 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $result = $mongoDb->findOneAndReplace($collectionName, ['userId' => 1], ['userId' => 2, 'score' => 2]);
 
         $this->assertSame(['_id' => $result['_id'], 'userId' => 1, 'score' => 1], $result);
-        $this->assertSame(['userId' => 2, 'score' => 2], $mongoDb->findOne($collectionName, ['userId' => 2], ['_id' => 0]));
-        $this->assertSame(null, $mongoDb->findOne($collectionName, ['userId' => 1]));
+        $this->assertSame([['userId' => 2, 'score' => 2]], $mongoDb->find($collectionName, ['userId' => 2], ['_id' => 0])->toArray());
+
+        $mongoDb->insert($collectionName, ['userId' => 3, 'score' => 3]);
+        $this->assertEquals([['userId' => 2, 'score' => 2], ['userId' => 3, 'score' => 3]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
+
+        $result = $mongoDb->findOneAndReplace($collectionName, null, ['userId' => 4, 'score' => 4], ['_id' => 0], ['sort' => ['userId' => 1]]);
+        $this->assertSame(['userId' => 2, 'score' => 2], $result);
+        $this->assertEquals([['userId' => 4, 'score' => 4], ['userId' => 3, 'score' => 3]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
     }
 
     public function testFindOneAndDelete() {
@@ -259,6 +272,13 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $result = $mongoDb->findOneAndDelete($collectionName, ['score' => 1], null, ['sort' => ['userId' => -1]]);
         $this->assertSame(['_id' => $result['_id'], 'userId' => 2, 'score' => 1], $result);
         $this->assertEquals([['userId' => 1, 'score' => 1]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
+
+        $mongoDb->insert($collectionName, ['userId' => 2, 'score' => 2]);
+        $this->assertEquals([['userId' => 1, 'score' => 1], ['userId' => 2, 'score' => 2]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
+
+        $result = $mongoDb->findOneAndDelete($collectionName, null, ['_id' => 0], ['sort' => ['userId' => 1]]);
+        $this->assertSame(['userId' => 1, 'score' => 1], $result);
+        $this->assertEquals([['userId' => 2, 'score' => 2]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
     }
 
     public function testFindOne() {

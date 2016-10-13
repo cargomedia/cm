@@ -103,13 +103,14 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
 
     /**
      * @param string     $collection
-     * @param array      $criteria
+     * @param array|null $criteria
      * @param array|null $update
      * @param array|null $projection
      * @param array|null $options
      * @return array|null
      */
-    public function findOneAndUpdate($collection, array $criteria, array $update = null, array $projection = null, array $options = null) {
+    public function findOneAndUpdate($collection, array $criteria = null, array $update = null, array $projection = null, array $options = null) {
+        $criteria = (array) $criteria;
         $options = (array) $options;
         if (null !== $projection) {
             $options['projection'] = $projection;
@@ -123,13 +124,14 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
 
     /**
      * @param string     $collection
-     * @param array      $criteria
+     * @param array|null $criteria
      * @param array|null $replace
      * @param array|null $projection
      * @param array|null $options
      * @return array|null
      */
-    public function findOneAndReplace($collection, array $criteria, array $replace = null, array $projection = null, array $options = null) {
+    public function findOneAndReplace($collection, array $criteria = null, array $replace = null, array $projection = null, array $options = null) {
+        $criteria = (array) $criteria;
         $options = (array) $options;
         if (null !== $projection) {
             $options['projection'] = $projection;
@@ -143,12 +145,13 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
 
     /**
      * @param string     $collection
-     * @param array      $criteria
+     * @param array|null $criteria
      * @param array|null $projection
      * @param array|null $options
      * @return array|null
      */
-    public function findOneAndDelete($collection, array $criteria, array $projection = null, array $options = null) {
+    public function findOneAndDelete($collection, array $criteria = null, array $projection = null, array $options = null) {
+        $criteria = (array) $criteria;
         $options = (array) $options;
         if (null !== $projection) {
             $options['projection'] = $projection;
