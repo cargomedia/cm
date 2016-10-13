@@ -162,18 +162,22 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @param array|null $criteria
      * @param array|null $projection
      * @param array|null $aggregation
+     * @param array|null $options
      * @return array|null
      */
-    public function findOne($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
+    public function findOne($collection, array $criteria = null, array $projection = null, array $aggregation = null, array $options = null) {
         $criteria = (array) $criteria;
-        $projection = (array) $projection;
+        $options = (array) $options;
         if ($aggregation) {
             array_push($aggregation, ['$limit' => 1]);
-            $resultSet = $this->find($collection, $criteria, $projection, $aggregation);
+            $resultSet = new IteratorIterator($this->find($collection, $criteria, $projection, $aggregation, ['limit' => 1]));
             $resultSet->rewind();
             $result = $resultSet->current();
         } else {
-            $result = $this->_getCollection($collection)->findOne($criteria, $projection);
+            if ($projection) {
+                $options['projection'] = $projection;
+            }
+            $result = $this->_getCollection($collection)->findOne($criteria, $options);
             CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "findOne `{$collection}`: " .
                 CM_Params::jsonEncode(['projection' => $projection, 'criteria' => $criteria]));
         }

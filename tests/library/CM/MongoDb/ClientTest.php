@@ -179,7 +179,7 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
         // sort
         $expected = [$doc3, $doc1, $doc2];
-        $this->assertSame($expected, $mongoDb->find($collectionName, null, ['_id' => 0], null, ['sort' => ['groupId' => 1, 'userId' => -1]])->toArray());
+        $this->assertSame($expected, $mongoDb->find($collectionName, null, ['_id' => 0], null, ['sort' => ['groupId' => 1, 'userId'  => -1]])->toArray());
 
         // aggregation
         $result = $mongoDb->find($collectionName, ['groupId' => 1], ['_id' => 0, 'foo' => 1], [['$unwind' => '$foo']]);
@@ -232,7 +232,8 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $this->assertSame(['userId' => 1, 'score' => 1], $result);
         $this->assertSame($mongoDb->findOne($collectionName, ['userId' => 1], ['_id' => 0]), $result);
 
-        $this->assertNull($mongoDb->findOneAndReplace($collectionName, ['userId' => 2], ['userId' => 2, 'score' => 2], ['_id' => 0], ['new' => true]));
+        $this->assertNull($mongoDb->findOneAndReplace($collectionName, ['userId' => 2], ['userId' => 2, 'score' => 2], ['_id' => 0],
+            ['new' => true]));
 
         $result = $mongoDb->findOneAndReplace($collectionName, ['userId' => 1], ['userId' => 2, 'score' => 2]);
 
@@ -270,6 +271,8 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
         $user = $mongoDb->findOne($collectionName, array('groupId' => 1), ['_id' => 0]);
         $this->assertSame(['userId' => 1, 'groupId' => 1, 'name' => 'alice', 'foo' => [1]], $user);
+        $user = $mongoDb->findOne($collectionName, null, ['_id' => 0], null, ['sort' => ['userId' => -1]]);
+        $this->assertSame(['userId' => 3, 'groupId' => 1, 'name' => 'bob', 'foo' => [4, 5, 6]], $user);
 
         $this->assertSame(['foo' => 4], $mongoDb->findOne($collectionName, ['userId' => 3], ['_id' => 0, 'foo' => 1], [['$unwind' => '$foo']]));
 
