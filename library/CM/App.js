@@ -90,6 +90,17 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   /**
+   * @returns {CM_View_Document}
+   */
+  getDocument: function() {
+    var document = this.findView('CM_View_Document');
+    if (!document) {
+      throw new CM_Exception('Cannot find document');
+    }
+    return document;
+  },
+
+  /**
    * @param {Number} min
    * @param {Number} max
    * @return {Number}
@@ -1463,7 +1474,7 @@ var CM_App = CM_Class_Abstract.extend({
       var urlBase = cm.options.urlBase;
       if (0 === url.indexOf(urlSite)) {
         var path = url.substr(urlBase.length);
-        cm.getLayout().loadPage(path);
+        cm.getDocument().loadPage(path);
       } else {
         window.location.assign(url);
         return Promise.resolve();

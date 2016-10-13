@@ -44,17 +44,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      */
     public function loadComponent($className, CM_Params $params) {
         $component = CM_Component_Abstract::factory($className, $params);
-        $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
-        $html = $renderAdapter->fetch();
-
-        $frontend = $this->getRender()->getGlobalResponse();
-        $data = array(
-            'autoId' => $frontend->getTreeRoot()->getValue()->getAutoId(),
-            'html'   => $html,
-            'js'     => $frontend->getJs(),
-        );
-        $frontend->clear();
-        return $data;
+        return $this->_getComponentRendering($component);
     }
 
     /**
@@ -64,7 +54,10 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      * @return array
      */
     public function loadPage(CM_Params $params, CM_Http_Response_View_Ajax $response) {
-        $request = $this->_createGetRequestWithUrl($params->getString('path'));
+        $path = $params->getString('path');
+        $currentLayoutClass = $params->getString('currentLayout');
+
+        $request = $this->_createGetRequestWithUrl($path);
         $responseFactory = new CM_Http_ResponseFactory($this->getServiceManager());
 
         $count = 0;
@@ -108,22 +101,47 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
 
         $frontend->clear();
 
-        $title = $responseEmbed->getTitle();
+        $layoutRendering = null;
         $layoutClass = $page->getLayout($this->getRender()->getEnvironment());
+        if ($layoutClass !== $currentLayoutClass) {
+            $layout = new $layoutClass();
+            $layoutRendering = $this->_getComponentRendering($layout);
+        }
+
+        $title = $responseEmbed->getTitle();
         $menuList = array_merge($this->getSite()->getMenus(), $responseEmbed->getRender()->getMenuList());
         $menuEntryHashList = $this->_getMenuEntryHashList($menuList, get_class($page), $page->getParams());
         $jsTracking = $responseEmbed->getRender()->getServiceManager()->getTrackings()->getJs();
 
-        return array(
-            'autoId'            => $autoId,
-            'html'              => $html,
-            'js'                => $js,
+        return [
+            'pageRendering'     => [
+                'js'     => $js,
+                'html'   => $html,
+                'autoId' => $autoId,
+            ],
+            'layoutRendering'   => $layoutRendering,
             'title'             => $title,
             'url'               => $url,
-            'layoutClass'       => $layoutClass,
             'menuEntryHashList' => $menuEntryHashList,
             'jsTracking'        => $jsTracking,
-        );
+        ];
+    }
+
+    /**
+     * @param CM_Component_Abstract $component
+     * @return array
+     */
+    protected function _getComponentRendering(CM_Component_Abstract $component) {
+        $render = $this->createRender();
+        $renderAdapter = CM_RenderAdapter_Component::factory($render, $component);
+        $html = $renderAdapter->fetch();
+
+        $globalResponse = $render->getGlobalResponse();
+        return [
+            'js'     => $globalResponse->getJs(),
+            'html'   => $html,
+            'autoId' => $globalResponse->getTreeRoot()->getValue()->getAutoId(),
+        ];
     }
 
     public function popinComponent() {
