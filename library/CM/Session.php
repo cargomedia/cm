@@ -142,6 +142,13 @@ class CM_Session implements CM_Comparable {
     }
 
     /**
+     * @param CM_Http_Request_Abstract $request
+     */
+    public function setRequest(CM_Http_Request_Abstract $request) {
+        $this->_request = $request;
+    }
+
+    /**
      * @param bool|null $needed
      * @throws CM_Exception_AuthRequired
      * @return CM_Model_User|null
