@@ -231,6 +231,45 @@ class CM_SessionTest extends CMTest_TestCase {
         $this->assertEquals('bar', $session->get('foo'));
     }
 
+    public function testStartUpdateUserAgents() {
+        $user = CM_Model_User::createStatic();
+        $request = new CM_Http_Request_Get('/', ['user-agent' => 'Chrome']);
+        $session = new CM_Session(null, $request);
+
+        $timeFirstUA = time();
+        $session->setUser($user);
+        $this->assertSame([['useragent' => 'Chrome', 'createStamp' => $timeFirstUA]], $user->getUseragents()->getItems());
+
+        $session->start();
+        $this->assertSame([['useragent' => 'Chrome', 'createStamp' => $timeFirstUA]], $user->getUseragents()->getItems());
+
+        $sessionId = $session->getId();
+        unset($session);
+        $request = new CM_Http_Request_Get('/', ['user-agent' => 'Chrome']);
+        $session = new CM_Session($sessionId, $request);
+        $user = $session->getUser();
+
+        $this->assertSame([['useragent' => 'Chrome', 'createStamp' => $timeFirstUA]], $user->getUseragents()->getItems());
+        CMTest_TH::timeForward(1);
+        $session->start();
+        $timeSecondUA = time();
+        $this->assertSame([['useragent' => 'Chrome', 'createStamp' => $timeSecondUA]], $user->getUseragents()->getItems());
+
+        unset($session);
+        $request = new CM_Http_Request_Get('/', ['user-agent' => 'Chrome Foo']);
+        $session = new CM_Session($sessionId, $request);
+        $user = $session->getUser();
+
+        $this->assertSame([['useragent' => 'Chrome', 'createStamp' => $timeSecondUA]], $user->getUseragents()->getItems());
+        CMTest_TH::timeForward(1);
+        $session->start();
+        $timeThirdUA = time();
+        $this->assertSame([
+            ['useragent' => 'Chrome Foo', 'createStamp' => $timeThirdUA],
+            ['useragent' => 'Chrome', 'createStamp' => $timeSecondUA],
+        ], $user->getUseragents()->getItems());
+    }
+
     public function testExpiration() {
         $session = new CM_Session();
         $session->set('foo', 'bar');
