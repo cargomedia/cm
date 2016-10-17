@@ -93,7 +93,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
                 'id'  => 123,
                 'bar' => (object) ['baz'],
                 'baz' => new DateTime('01-01-2001'),
-                'bax' => new Fake_Model_Fluentd(),
+                'bax' => new CM_Model_Mock_Fluentd(),
             ],
         ];
         $this->assertSame([
@@ -104,7 +104,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
                 ],
                 'baz' => '2001-01-01T00:00:00+00:00',
                 'bax' => [
-                    'class' => 'Fake_Model_Fluentd',
+                    'class' => 'CM_Model_Mock_Fluentd',
                     'id'    => '42',
                 ],
             ],
@@ -112,7 +112,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
     }
 }
 
-class Fake_Model_Fluentd extends CM_Model_Abstract {
+class CM_Model_Mock_Fluentd extends CM_Model_Abstract {
 
     public function getIdRaw() {
         return ['id' => 42];
