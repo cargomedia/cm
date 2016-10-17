@@ -33,15 +33,20 @@ class CM_Frontend_JavascriptContainer_Bundle {
      * @throws CM_Exception_Invalid
      */
     public function compile($command, array $options = null) {
-        if (!in_array($command, ['code', 'sourcemaps', 'checksum'])) {
-            throw new CM_Exception_Invalid('Invalid cm-bundler command: `' . $command . '`');
-        }
         if (null === $options) {
             $options = [];
         }
 
         $config = $this->_getConfig($options);
-        return CM_Util::exec('cm-bundler', [$command, json_encode($config)]);
+        if ('code' === $command) {
+            return CM_Service_Manager::getInstance()->getBundler()->code($config);
+        } elseif ('sourcemaps' === $command) {
+            return CM_Service_Manager::getInstance()->getBundler()->sourceMaps($config);
+        } else {
+            throw new CM_Exception_Invalid('Invalid javascript bundle command', null, [
+                'command' => $command,
+            ]);
+        }
     }
 
     /**

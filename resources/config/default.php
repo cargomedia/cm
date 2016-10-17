@@ -308,4 +308,11 @@ return function (CM_Config_Node $config) {
             ],
         ]
     ];
+
+    $config->services['cm-bundler'] = [
+        'class'     => 'CM_Frontend_Bundler_Client',
+        'arguments' => array(
+            'socketPath' => '/tmp/cm-bundler.sock',
+        ),
+    ];
 };

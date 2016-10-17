@@ -48,7 +48,8 @@ class CM_Frontend_Bundler_Client {
                 'socketPath'   => $this->_socketPath,
             ]);
         }
-        fwrite($sock, json_encode($data) . "\r\n");
+
+        fwrite($sock, CM_Util::jsonEncode($data) . "\r\n");
         $rawResponse = stream_get_contents($sock);
         fclose($sock);
         return $this->_parseResponse($rawResponse);
@@ -61,7 +62,7 @@ class CM_Frontend_Bundler_Client {
      */
     protected function _parseResponse($rawResponse) {
         try {
-            $response = json_decode($rawResponse);
+            $response = CM_Util::jsonDecode($rawResponse);
         } catch (Exception $e) {
             throw new CM_Exception('Failed to parse cm-bundler response', null, [
                 'cmBundlerRawResponse' => $rawResponse,
