@@ -16,9 +16,6 @@ return function (CM_Config_Node $config) {
 
     $config->timeZone = 'UTC';
 
-    $config->CM_Mail->send = true;
-    $config->CM_Mail->mailDeliveryAgent = null;
-
     $config->CM_Site_Abstract->class = null;
 
     $config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
@@ -102,6 +99,11 @@ return function (CM_Config_Node $config) {
         ),
     );
 
+    $config->services['delayedJobQueue'] = [
+        'class'     => 'CM_Jobdistribution_DelayedQueue',
+        'arguments' => [],
+    ];
+
     $config->services['MongoDb'] = array(
         'class'     => 'CM_MongoDb_Client',
         'arguments' => array(
@@ -173,6 +175,11 @@ return function (CM_Config_Node $config) {
         'arguments' => [
             'ttl' => 86400,
         ],
+    ];
+
+    $config->services['tracking-adwords'] = [
+        'class'     => 'CMService_AdWords_Client',
+        'arguments' => [],
     ];
 
     $config->services['tracking-googleanalytics'] = array(
@@ -248,6 +255,16 @@ return function (CM_Config_Node $config) {
         ),
     );
 
+    $config->services['mailer'] = [
+        'class'  => 'CM_Mail_MailerFactory',
+        'method' => [
+            'name'      => 'createLogMailer',
+            'arguments' => [
+                'logLevel' => CM_Log_Logger::INFO,
+            ],
+        ],
+    ];
+
     $config->services['logger-handler-newrelic'] = [
         'class'     => 'CMService_NewRelic_Log_Handler',
         'arguments' => [
@@ -256,13 +273,16 @@ return function (CM_Config_Node $config) {
     ];
 
     $config->services['logger-handler-mongodb'] = [
-        'class'     => 'CM_Log_Handler_MongoDb',
-        'arguments' => [
+        'class'  => 'CM_Log_Handler_Factory',
+        'method' => [
+            'name'      => 'createMongoDbHandler',
+            'arguments' => [
             'collection'    => 'cm_log',
             'recordTtl'     => null,
             'insertOptions' => null,
             'minLevel'      => CM_Log_Logger::DEBUG,
-        ],
+            ],
+        ]
     ];
 
     $config->services['logger-handler-file-error'] = [

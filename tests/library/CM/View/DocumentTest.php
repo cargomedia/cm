@@ -1,6 +1,24 @@
 <?php
 
-class CM_Layout_AbstractTest extends CMTest_TestCase {
+class CM_View_DocumentTest extends CMTest_TestCase {
+
+    public function testRender() {
+        $site = $this->getMockSite('CM_Site_Abstract', null, [
+            'url'  => 'http://www.my-website.net',
+            'name' => 'My website',
+        ]);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
+        $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
+        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
+        /** @var CM_Page_Abstract $pageMock */
+        $renderAdapter = new CM_RenderAdapter_Document($render, $pageMock);
+        $html = $renderAdapter->fetch();
+
+        $this->assertContains('<html', $html);
+        $this->assertContains('<title>My website</title>', $html);
+        $this->assertContains('<body', $html);
+        $this->assertContains('class="CM_Layout_Default', $html);
+    }
 
     public function testTrackingDisabled() {
         $site = $this->getMockSite('CM_Site_Abstract', null, ['url' => 'http://www.my-website.net']);
@@ -8,7 +26,7 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
         $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
         $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
-        $renderAdapter = new CM_RenderAdapter_Layout($render, $pageMock);
+        $renderAdapter = new CM_RenderAdapter_Document($render, $pageMock);
         $html = $renderAdapter->fetch();
 
         $this->assertNotContains('ga("create", "key"', $html);
@@ -22,7 +40,7 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
         $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
         $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
-        $renderAdapter = new CM_RenderAdapter_Layout($render, $pageMock);
+        $renderAdapter = new CM_RenderAdapter_Document($render, $pageMock);
         $html = $renderAdapter->fetch();
 
         $this->assertContains('ga("create", "ga123"', $html);
@@ -35,17 +53,19 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
 
     public function testTrackingViewer() {
         $site = $this->getMockSite('CM_Site_Abstract', null, array('url' => 'http://www.example.com'));
-        $viewer = $this->getMock('CM_Model_User', array('getIdRaw', 'getVisible', 'getLanguage'));
-        $viewer->expects($this->any())->method('getIdRaw')->will($this->returnValue(array('id' => '1')));
-        $viewer->expects($this->any())->method('getVisible')->will($this->returnValue(false));
-        $viewer->expects($this->any())->method('getLanguage')->will($this->returnValue(null));
-        /** @var CM_Model_User $viewer */
-        $environment = new CM_Frontend_Environment($site, $viewer);
+        $mockBuilder = $this->getMockBuilder('CM_Model_User');
+        $mockBuilder->setMethods(['getIdRaw', 'getVisible', 'getLanguage']);
+        $viewerMock = $mockBuilder->getMock();
+        $viewerMock->expects($this->any())->method('getIdRaw')->will($this->returnValue(array('id' => '1')));
+        $viewerMock->expects($this->any())->method('getVisible')->will($this->returnValue(false));
+        $viewerMock->expects($this->any())->method('getLanguage')->will($this->returnValue(null));
+        /** @var CM_Model_User $viewerMock */
+        $environment = new CM_Frontend_Environment($site, $viewerMock);
         $render = new CM_Frontend_Render($environment, null, $this->_getServiceManager('ga123', 'km123'));
         $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
         $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
-        $renderAdapter = new CM_RenderAdapter_Layout($render, $pageMock);
+        $renderAdapter = new CM_RenderAdapter_Document($render, $pageMock);
         $html = $renderAdapter->fetch();
 
         $this->assertContains('ga("create", "ga123"', $html);
@@ -66,7 +86,7 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
 
         $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
         $page = new CM_Page_Example();
-        $renderAdapter = new CM_RenderAdapter_Layout($render, $page);
+        $renderAdapter = new CM_RenderAdapter_Document($render, $page);
         $html = $renderAdapter->fetch();
 
         $this->assertContains('<link rel="alternate" href="http://www.example.com/example" hreflang="x-default">', $html);
@@ -86,4 +106,5 @@ class CM_Layout_AbstractTest extends CMTest_TestCase {
         $serviceManager->registerInstance('trackings', new CM_Service_Trackings(['googleanalytics', 'kissmetrics']));
         return $serviceManager;
     }
+
 }

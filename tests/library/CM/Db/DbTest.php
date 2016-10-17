@@ -84,7 +84,7 @@ class CM_Db_DbTest extends CMTest_TestCase {
             CM_Db_Db::describeColumn('test_', 'id');
             $this->fail('Table doesn\'t exist');
         } catch (CM_Db_Exception $e) {
-            $this->assertContains('`id`', $e->getMessage());
+            $this->assertContains('`id`', $e->getMetaInfo()['query']);
         }
         CM_Db_Db::exec('DROP TABLE `test2`');
     }
@@ -176,7 +176,7 @@ class CM_Db_DbTest extends CMTest_TestCase {
         try {
             CM_Db_Db::getRandId('test', 'id');
             $this->fail();
-        } catch (CM_DB_Exception $e) {
+        } catch (CM_Db_Exception $e) {
             $this->assertContains('Cannot find random id', $e->getMessage());
         }
     }
@@ -205,5 +205,16 @@ class CM_Db_DbTest extends CMTest_TestCase {
         $counter = CM_Db_Db::incrementAndFetchColumn('test', 'foo');
         $this->assertSame(3, $counter);
         $this->assertSame(3, (int) CM_Db_Db::select('test', array('foo'))->fetchColumn('foo'));
+    }
+
+    public function testReplaceTable() {
+        $this->assertInstanceOf('CM_Db_Exception', $this->catchException(function () {
+            CM_Db_Db::replaceTable('test', 'test_new');
+        }));
+        CM_Db_Db::exec('CREATE TABLE `test_new` (`id` INT(10) UNSIGNED NOT NULL)');
+        CM_Db_Db::insert('test_new', ['id' => 123]);
+        CM_Db_Db::replaceTable('test', 'test_new');
+        $this->assertSame([['id' => '123']], CM_Db_Db::select('test', '*')->fetchAll());
+        $this->assertSame(false, CM_Db_Db::existsTable('test_new'));
     }
 }

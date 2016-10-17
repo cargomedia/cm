@@ -68,13 +68,6 @@ class CM_Process {
     /**
      * @return int
      */
-    public function getHostId() {
-        return (int) hexdec(CM_Util::exec('hostid'));
-    }
-
-    /**
-     * @return int
-     */
     public function getProcessId() {
         return posix_getpid();
     }
@@ -279,8 +272,7 @@ class CM_Process {
                         $this->unbind('exit', [$this, 'killChildren']);
                     }
                     if ($keepAlive) {
-                        $warning = new CM_Exception('Respawning dead child.', CM_Exception::WARN, ['pid' => $pid]);
-                        CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
+                        CM_Service_Manager::getInstance()->getLogger()->warning('Respawning dead child.', (new CM_Log_Context())->setExtra(['pid' => $pid]));
                         usleep(self::RESPAWN_TIMEOUT * 1000000);
                         $this->_fork($forkHandler->getWorkload(), $forkHandler->getIdentifier());
                     }

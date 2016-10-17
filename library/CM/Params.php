@@ -472,6 +472,14 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     }
 
     /**
+     * @param $key
+     * @return CM_Mail_Message
+     */
+    public function getMailMessage($key) {
+        return $this->getObject($key, 'CM_Mail_Message');
+    }
+
+    /**
      * @return mixed
      */
     public function shift() {
@@ -591,12 +599,12 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
             $result = ['_class' => get_class($value)];
             if ($value instanceof CM_ArrayConvertible) {
                 $array = $value->toArray();
-                $result = array_merge($result, $array);
+                $result = array_merge($result, self::encode($array));
             }
             if ($value instanceof JsonSerializable) {
                 $array = $value->jsonSerialize();
                 if (is_array($array)) {
-                    $result = array_merge($result, array_map('self::encode', $array));
+                    $result = array_merge($result, self::encode($array));
                 }
             }
         } else {
@@ -627,20 +635,16 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @param string       $value
      * @param boolean|null $json
      * @return mixed|false
-     * @throws CM_Exception_InvalidParam
      */
     public static function decode($value, $json = null) {
         if ($json) {
             $value = CM_Util::jsonDecode($value);
         }
-        if (is_array($value) && isset($value['_class'])) {
+        if (is_array($value) && isset($value['_class']) && is_subclass_of($value['_class'], 'CM_ArrayConvertible')) {
             $className = (string) $value['_class'];
             unset($value['_class']);
-            if (!class_exists($className)) {
-                throw new CM_Exception_InvalidParam('Class for decoding does not exist', null, ['class' => $className]);
-            }
-            if (!is_subclass_of($className, 'CM_ArrayConvertible')) {
-                throw new CM_Exception_InvalidParam('Class for decoding is not CM_ArrayConvertible', null, ['class' => $className]);
+            if (!empty($value)) {
+                $value = self::decode($value);
             }
             /** @var CM_ArrayConvertible $className */
             $value = $className::fromArray($value);

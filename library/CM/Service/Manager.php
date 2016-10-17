@@ -117,10 +117,23 @@ class CM_Service_Manager extends CM_Class_Abstract {
 
     /**
      * @param string $serviceName
+     * @param mixed  $instance
+     */
+    public function replaceInstance($serviceName, $instance) {
+        if ($this->has($serviceName)) {
+            $this->unregister($serviceName);
+        }
+        $this->registerInstance($serviceName, $instance);
+    }
+
+    /**
+     * @param string $serviceName
+     * @return $this
      */
     public function unregister($serviceName) {
         unset($this->_serviceConfigList[$serviceName]);
         unset($this->_serviceInstanceList[$serviceName]);
+        return $this;
     }
 
     /**
@@ -144,6 +157,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public function getDatabases() {
         return $this->get('databases', 'CM_Service_Databases');
+    }
+
+    /**
+     * @return CM_Jobdistribution_DelayedQueue
+     */
+    public function getDelayedJobQueue() {
+        return $this->get('delayedJobQueue', 'CM_Jobdistribution_DelayedQueue');
     }
 
     /**
@@ -245,6 +265,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Mail_Mailer
+     */
+    public function getMailer() {
+        return $this->get('mailer', 'CM_Mail_Mailer');
+    }
+
+    /**
      * @param string $serviceName
      * @throws CM_Exception_Invalid
      * @return mixed
@@ -300,8 +327,22 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public static function getInstance() {
         if (null === self::$instance) {
-            self::$instance = new self();
+            self::setInstance(new self());
         }
         return self::$instance;
     }
+
+    /**
+     * @param CM_Service_Manager $serviceManager
+     */
+    public static function setInstance(CM_Service_Manager $serviceManager) {
+        self::$instance = $serviceManager;
+    }
+
+    function __clone() {
+        foreach ($this->_serviceInstanceList as &$instance) {
+            $instance = clone $instance;
+        }
+    }
+
 }

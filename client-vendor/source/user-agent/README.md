@@ -6,7 +6,7 @@ Update
 
 `vendor` has been added as a git [subtree][subtree] and it can be updated like this:
 ```
-git subtree pull --prefix=client-vendor/after-body-source/user-agent/vendor https://github.com/3rd-Eden/useragent.git <branch|tag> --squash
+git subtree pull --prefix=client-vendor/source/user-agent/vendor https://github.com/3rd-Eden/useragent.git <branch|tag> --squash
 ```
 
 #### Regular Expressions

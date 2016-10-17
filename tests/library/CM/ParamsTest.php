@@ -13,13 +13,9 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertFalse($params->has('6'));
     }
 
-    /**
-     * @expectedException CM_Exception_InvalidParam
-     * @expectedExceptionMessage Class for decoding does not exist
-     */
     public function testGetWithInvalidEncodedData() {
         $params = new CM_Params(['foo' => ['_class' => 'Some_Nonexistent_Class', '_id' => 123]]);
-        $params->get('foo');
+        $this->assertSame (['_class' => 'Some_Nonexistent_Class', '_id' => 123], $params->get('foo'));
     }
 
     public function testGetString() {
@@ -210,6 +206,31 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame(1, $fromArrayMethod->getCallCount());
     }
 
+    public function testDecodeArrayConvertibleRecursive() {
+        $objectOuter = $this->mockInterface('CM_ArrayConvertible');
+        $fromArrayMethodOuter = $objectOuter->mockStaticMethod('fromArray')->set(function ($encoded) {
+            $this->assertSame(['foo' => 1, 'object' => 2], $encoded);
+            return (int) $encoded['foo'] . $encoded['object'];
+        });
+        $objectInner = $this->mockInterface('CM_ArrayConvertible');
+        $fromArrayMethodInner = $objectInner->mockStaticMethod('fromArray')->set(function ($encoded) {
+            $this->assertSame(['bar' => 2], $encoded);
+            return $encoded['bar'];
+        });
+
+        $encodedArrayConvertible = [
+            'foo'    => 1,
+            '_class' => get_class($objectOuter->newInstance()),
+            'object' => [
+                'bar'    => 2,
+                '_class' => get_class($objectInner->newInstance()),
+            ]
+        ];
+        $this->assertEquals(12, CM_Params::decode($encodedArrayConvertible));
+        $this->assertSame(1, $fromArrayMethodInner->getCallCount());
+        $this->assertSame(1, $fromArrayMethodOuter->getCallCount());
+    }
+
     public function testEncodeArrayConvertible() {
         $object = $this->mockInterface('CM_ArrayConvertible')->newInstance();
         $toArrayMethod = $object->mockMethod('toArray')->set([
@@ -254,6 +275,15 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame(1, $toArrayMethod->getCallCount());
     }
 
+    public function testDecodeJsonSerializable() {
+        $object = $this->mockInterface('JsonSerializable');
+        $encodedJsonSerializable = [
+            'foo'    => 1,
+            '_class' => get_class($object->newInstance()),
+        ];
+        $this->assertEquals($encodedJsonSerializable, CM_Params::decode($encodedJsonSerializable));
+    }
+
     public function testEncodeArrayConvertibleAndJsonSerializable() {
         $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable'])->newInstance();
         $toArrayMethod = $object->mockMethod('toArray')->set([
@@ -270,6 +300,68 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertEquals($expectedEncoded, CM_Params::encode($object));
         $this->assertSame(1, $toArrayMethod->getCallCount());
         $this->assertSame(1, $jsonSerializeMethod->getCallCount());
+    }
+
+    public function testEncodeRecursive() {
+        $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable'])->newInstance();
+        $nestedObject1 = $this->mockClass(null, ['CM_ArrayConvertible'])->newInstance();
+        $nestedObject2 = $this->mockClass(null, ['JsonSerializable'])->newInstance();
+        $object->mockMethod('toArray')->set([
+            'foo'     => 1,
+            'nested1' => $nestedObject1,
+        ]);
+        $object->mockMethod('jsonSerialize')->set([
+            'bar'     => 1,
+            'nested2' => $nestedObject2
+        ]);
+        $nestedObject1->mockMethod('toArray')->set(['foo' => 2]);
+        $nestedObject2->mockMethod('jsonSerialize')->set(['bar' => 2]);
+        $expected = [
+            '_class' => get_class($object),
+            'foo'    => 1,
+            'nested1' => [
+                '_class' => get_class($nestedObject1),
+                'foo'    => 2,
+            ],
+            'bar' => 1,
+            'nested2' => [
+                '_class' => get_class($nestedObject2),
+                'bar' => 2,
+            ]
+        ];
+        $this->assertSame($expected, CM_Params::encode($object));
+    }
+
+    public function testDecodeRecursive() {
+        $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable']);
+        $nestedArrayConvertible = $this->mockClass(null, ['CM_ArrayConvertible']);
+        $nestedJsonSerializable = $this->mockClass(null, ['JsonSerializable']);
+        $encodedArrayConvertible = [
+            '_class' => $nestedArrayConvertible->getClassName(),
+            'foo'    => 2,
+        ];
+        $encodedJsonSerializable = [
+            '_class' => $nestedJsonSerializable->getClassName(),
+            'bar'    => 2,
+        ];
+        $encodedObject = [
+            '_class' => $object->getClassName(),
+            'foo'    => 1,
+            'nested1' => $encodedArrayConvertible,
+            'bar' => 1,
+            'nested2' => $encodedJsonSerializable
+        ];
+        $fromArrayMethodObject = $object->mockStaticMethod('fromArray')->set(function ($encoded) use ($encodedJsonSerializable) {
+            $this->assertSame(['foo' => 1, 'nested1' => 2, 'bar' => 1, 'nested2' => $encodedJsonSerializable], $encoded);
+            return [$encoded['foo'], $encoded['nested1']];
+        });
+        $fromArrayMethodNestedObject = $nestedArrayConvertible->mockStaticMethod('fromArray')->set(function ($encoded) {
+            $this->assertSame(['foo' => 2], $encoded);
+            return $encoded['foo'];
+        });
+        $this->assertEquals([1, 2], CM_Params::decode($encodedObject));
+        $this->assertSame(1, $fromArrayMethodNestedObject->getCallCount());
+        $this->assertSame(1, $fromArrayMethodObject->getCallCount());
     }
 
     public function testGetDateTime() {

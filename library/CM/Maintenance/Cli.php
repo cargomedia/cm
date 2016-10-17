@@ -33,7 +33,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
     protected function _registerCallbacks() {
         $this->_registerClockworkCallbacks('1 second', [
             'CM_Jobdistribution_DelayedQueue::queueOutstanding' => function () {
-                $delayedQueue = new CM_Jobdistribution_DelayedQueue($this->getServiceManager());
+                $delayedQueue = $this->getServiceManager()->getDelayedJobQueue();
                 $delayedQueue->queueOutstanding();
             },
         ]);
@@ -79,9 +79,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
         }
 
         $this->_registerClockworkCallbacks('15 minutes', array(
-            'CM_Mail::processQueue'                         => function () {
-                CM_Mail::processQueue(500);
-            },
             'CM_Action_Abstract::aggregate'                 => function () {
                 CM_Action_Abstract::aggregate();
             },

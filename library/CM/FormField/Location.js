@@ -41,6 +41,7 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
         distanceEnabled = value.id.level >= this.getOption("distanceLevelMin");
       }
       this.getDistanceField().setEnabled(distanceEnabled);
+      this.trigger('distance-enabled', distanceEnabled);
     }
   },
 

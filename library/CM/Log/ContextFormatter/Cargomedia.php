@@ -12,19 +12,6 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
         $this->_appName = (string) $appName;
     }
 
-    public function formatRecordContext(CM_Log_Record $record) {
-        $levelsMapping = array_flip(CM_Log_Logger::getLevels());
-        $context = $record->getContext();
-
-        $result = [
-            'message'   => (string) $record->getMessage(),
-            'level'     => strtolower($levelsMapping[$record->getLevel()]),
-            'timestamp' => $record->getCreatedAt()->format(DateTime::ISO8601),
-        ];
-        $result = array_merge($result, $this->formatContext($context));
-        return $result;
-    }
-
     public function formatContext(CM_Log_Context $context) {
         $result = [];
         if ($computerInfo = $context->getComputerInfo()) {
@@ -42,7 +29,7 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
             ];
             $query = $request->findQuery();
             unset($query['viewInfoList']);
-            $formattedRequest['query'] = $this->_encodeAsArray($query);
+            $formattedRequest['query'] = CM_Util::jsonEncode($query, true);
             if (array_key_exists('http_referer', $serverArray)) {
                 $formattedRequest['referer'] = (string) $serverArray['http_referer'];
             }
@@ -91,38 +78,5 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
         }
         $result[$this->_appName] = $appAttributes;
         return $result;
-    }
-
-    /**
-     * @param array $data
-     * @return array
-     */
-    protected function _encodeAsArray(array $data) {
-        $iterator = new RecursiveIteratorIterator(new RecursiveArrayIterator($data));
-        $result = [];
-        foreach ($iterator as $key => $value) {
-            $result[] = [
-                'key'   => $this->_getCurrentKeyPath($iterator),
-                'value' => $value,
-            ];
-        }
-        usort($result, function (array $a, array $b) {
-            return strcmp($a['key'], $b['key']);
-        });
-        return $result;
-    }
-
-    /**
-     * @param RecursiveIteratorIterator $iterator
-     * @return string
-     */
-    private function _getCurrentKeyPath(RecursiveIteratorIterator $iterator) {
-        $i = 0;
-        $keyList = [];
-        while ($subIterator = $iterator->getSubIterator($i)) {
-            $keyList[] = $subIterator->key();
-            $i += 1;
-        }
-        return join('.', $keyList);
     }
 }

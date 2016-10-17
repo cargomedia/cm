@@ -46,7 +46,7 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
             ));
             $this->fail('Can create streamChannel without serverId');
         } catch (CM_Exception $ex) {
-            $this->assertContains("Column 'serverId' cannot be null", $ex->getMessage());
+            $this->assertContains("Column 'serverId' cannot be null", $ex->getMetaInfo()['originalExceptionMessage']);
         }
     }
 

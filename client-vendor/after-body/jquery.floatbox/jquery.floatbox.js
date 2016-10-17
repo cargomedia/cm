@@ -20,7 +20,7 @@
   $document.on('keydown.floatbox', function(e) {
     if (e.which == 27) { // Escape
       if ($viewport && $viewport.children().length) {
-        $viewport.children('.floatbox-layer:last').floatIn();
+        $viewport.children('.floatbox-layer:last').find('.floatbox-body > *').floatIn();
       }
     }
   });

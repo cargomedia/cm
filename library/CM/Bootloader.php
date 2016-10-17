@@ -163,7 +163,7 @@ class CM_Bootloader {
             $code();
             return 0;
         } catch (Exception $e) {
-            self::getExceptionHandler()->handleException($e);
+            $this->getExceptionHandler()->handleException($e);
             return 1;
         }
     }

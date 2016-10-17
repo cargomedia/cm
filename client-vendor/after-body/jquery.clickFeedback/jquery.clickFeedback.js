@@ -5,7 +5,7 @@
 (function($) {
 
   document.addEventListener('mousedown', function(event) {
-    var $elem = $(event.target).closest('.clickFeedback');
+    var $elem = $(event.target).closest('.clickFeedback:not(:disabled)');
 
     if ($elem.length) {
       var buttonOffset = $elem.offset();

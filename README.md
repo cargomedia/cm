@@ -21,7 +21,7 @@ A view (extending `CM_View_Abstract`) can be rendered, usually as HTML. The foll
 * `CM_Component_Abstract`: Sub-part of an HTML-document.
 * `CM_Form_Abstract`: Form with input elements and actions.
 * `CM_FormField_Abstract`: Form input field.
-* `CM_Mail`: E-mail.
+* `CM_Mail_Mailable`: E-mail.
 
 ### Model
 A model (extending `CM_Model_Abstract`) represents a "real-world" object, reads and writes data from a key-value store and provides functionality on top of that.

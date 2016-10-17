@@ -73,7 +73,7 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
             ];
             $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, null, null, $aggregate);
         } else {
-            $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, $criteria, null, null, ['_id' => -1]);
+            $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, $criteria, null, null, ['createdAt' => -1]);
         }
 
         parent::__construct($source);
@@ -109,10 +109,10 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
      * @return array
      */
     protected function _getCriteria() {
-        $criteria = ['message' => ['$exists' => true]];
+        $criteria = [];
 
         if (false === $this->_filterType) {
-            $criteria['context.extra.type'] = ['$exists' => false];
+            $criteria['context.extra.type'] = CM_Log_Handler_MongoDb::DEFAULT_TYPE;
         } elseif (null !== $this->_filterType) {
             $criteria['context.extra.type'] = (int) $this->_filterType;
         }

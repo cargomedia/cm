@@ -125,6 +125,15 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
         $serviceManager->registerInstance('bar', $serviceBar);
         $this->assertSame($serviceBar, $serviceManager->get('bar'));
         $this->assertSame($serviceManager, $serviceBar->getServiceManager());
+
+        // register again
+        $serviceBar2 = new DummyService('bar2');
+        /** @var CM_Exception_Invalid $exception */
+        $exception = $this->catchException(function() use ($serviceManager, $serviceBar2) {
+            $serviceManager->registerInstance('bar', $serviceBar2);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame(['service' => 'bar'], $exception->getMetaInfo());
     }
 
     public function testUnregister() {
@@ -134,6 +143,17 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
 
         $serviceManager->unregister('foo');
         $this->assertSame(false, $serviceManager->has('foo'));
+    }
+
+    public function testReplaceInstance() {
+        $serviceManager = new CM_Service_Manager();
+        $this->assertSame(false, $serviceManager->has('foo'));
+
+        $serviceManager->replaceInstance('foo', 12.3);
+        $this->assertSame(12.3, $serviceManager->get('foo'));
+
+        $serviceManager->replaceInstance('foo', 12.4);
+        $this->assertSame(12.4, $serviceManager->get('foo'));
     }
 }
 

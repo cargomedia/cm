@@ -4,7 +4,7 @@ function smarty_function_tag(array $params, Smarty_Internal_Template $template) 
     if (!isset($params['el'])) {
         trigger_error('Param `el` missing.');
     }
-    $name = $params['el'];
+    $elementName = $params['el'];
     unset($params['el']);
 
     $content = '';
@@ -13,23 +13,16 @@ function smarty_function_tag(array $params, Smarty_Internal_Template $template) 
         unset($params['content']);
     }
 
-    $attributes = $params;
-
-    // http://www.w3.org/TR/html-markup/syntax.html#void-element
-    $namesVoid = array('area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track',
-        'wbr');
-
-    $html = '<' . $name;
-    foreach ($attributes as $attributeName => $attributeValue) {
-        if (isset($attributeValue)) {
-            $html .= ' ' . $attributeName . '="' . CM_Util::htmlspecialchars($attributeValue) . '"';
+    $dataAttributes = [];
+    if (isset($params['data'])) {
+        if (!is_array($params['data'])) {
+            trigger_error('Param `data` should be an array.');
         }
+        $dataAttributes = $params['data'];
+        unset($params['data']);
     }
-    if (in_array($name, $namesVoid)) {
-        $html .= '>';
-    } else {
-        $html .= '>' . $content . '</' . $name . '>';
-    }
-    return $html;
+
+    $tagRenderer = new CM_Frontend_HtmlTagRenderer();
+    return $tagRenderer->renderTag($elementName, $content, $params, $dataAttributes);
 }
 

@@ -15,6 +15,9 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
         $type = (int) $type;
         $id = (string) $id['id'];
         $collectionName = $this->_getCollectionName($type);
+        if (!MongoId::isValid($id)) {
+            return false;
+        }
         $mongoId = new MongoId($id);
         $data = $this->_getMongoDb()->findOne($collectionName, ['_id' => $mongoId]);
         if (null === $data) {
