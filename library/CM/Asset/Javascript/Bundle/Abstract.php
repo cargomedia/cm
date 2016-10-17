@@ -31,17 +31,9 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
      * @return string
      */
     public function getCode($compressed) {
-        $cacheKey = $this->_getCacheKey([
-            'class'      => get_class($this),
-            'method'     => __FUNCTION__,
-            'checksum'   => $this->getChecksum(),
-            'compressed' => $compressed
+        return $this->_js->getCode([
+            'uglify' => $compressed
         ]);
-        return CM_Cache_Persistent::getInstance()->get($cacheKey, function () use ($compressed) {
-            return $this->_js->compile('code', [
-                'uglify' => $compressed
-            ]);
-        });
     }
 
     /**
@@ -49,46 +41,14 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
      * @return string
      */
     public function getSourceMaps($compressed) {
-        $bundleName = $this->_getBundleName();
-        $mapping = $this->_js->getSourceMapping();
-        $cacheKey = $this->_getCacheKey([
-            'class'      => get_class($this),
-            'method'     => __FUNCTION__,
-            'checksum'   => $this->getChecksum(),
-            'compressed' => $compressed
+        return $this->_js->getSourceMaps([
+            'bundleName' => $this->_getBundleName(),
+            'uglify'     => $compressed,
+            'sourceMaps' => [
+                'enabled' => true,
+                'replace' => $this->_js->getSourceMapping(),
+            ]
         ]);
-        return CM_Cache_Persistent::getInstance()->get($cacheKey, function () use ($compressed, $mapping, $bundleName) {
-            return $this->_js->compile('sourcemaps', [
-                'bundleName' => $bundleName,
-                'uglify'     => $compressed,
-                'sourceMaps' => [
-                    'enabled' => true,
-                    'replace' => $mapping
-                ]
-            ]);
-        });
-    }
-
-    /**
-     * @return string
-     */
-    public function getChecksum() {
-        $storage = CM_Cache_Storage_Runtime::getInstance();
-        $cacheKey = $this->_getCacheKey([
-            'method' => __METHOD__,
-        ]);
-        $checksum = $storage->get($cacheKey);
-        if (!$checksum) {
-            $checksum = '';
-            foreach (array_reverse($this->getSite()->getModules()) as $moduleName) {
-                $path = $this->_getPathInModule($moduleName);
-                $checksum .= \Functional\reduce_left(CM_Util::rglob('**/*.js', $path), function ($path, $index, $collection, $carry) {
-                    return md5($carry . (new CM_File($path))->read());
-                }, '');
-            }
-            $storage->set($cacheKey, md5($checksum));
-        }
-        return $checksum;
     }
 
     /**

@@ -27,26 +27,21 @@ class CM_Frontend_JavascriptContainer_Bundle {
     }
 
     /**
-     * @param string     $command code|sourcemaps
      * @param array|null $options
      * @return string
-     * @throws CM_Exception_Invalid
      */
-    public function compile($command, array $options = null) {
-        if (null === $options) {
-            $options = [];
-        }
-
+    public function getCode(array $options = null) {
         $config = $this->_getConfig($options);
-        if ('code' === $command) {
-            return CM_Service_Manager::getInstance()->getBundler()->code($config);
-        } elseif ('sourcemaps' === $command) {
-            return CM_Service_Manager::getInstance()->getBundler()->sourceMaps($config);
-        } else {
-            throw new CM_Exception_Invalid('Invalid javascript bundle command', null, [
-                'command' => $command,
-            ]);
-        }
+        return CM_Service_Manager::getInstance()->getBundler()->code($config);
+    }
+
+    /**
+     * @param array|null $options
+     * @return string
+     */
+    public function getSourceMaps(array $options = null) {
+        $config = $this->_getConfig($options);
+        return CM_Service_Manager::getInstance()->getBundler()->sourceMaps($config);
     }
 
     /**
