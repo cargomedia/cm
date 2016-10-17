@@ -43,7 +43,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
                 $this->assertSame('tag', $tag);
                 $this->assertSame('critical', $data['level']);
                 $this->assertSame('foo', $data['message']);
-                $this->assertArrayHasKey('timestamp', $data);
+                $this->assertRegExp('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}\+\d{4}$/', $data['timestamp']);
                 $this->assertSame('value', $data['key']);
 
             }
@@ -53,7 +53,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
         $contextFormatter->mockMethod('formatContext')->set(['key' => 'value']);
         /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
-        
+
         $handler = new CM_Log_Handler_Fluentd($fluentd, $contextFormatter, 'tag');
 
         $record = new CM_Log_Record(CM_Log_Logger::CRITICAL, 'foo', new CM_Log_Context());
