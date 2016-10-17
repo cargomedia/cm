@@ -232,42 +232,70 @@ class CM_SessionTest extends CMTest_TestCase {
     }
 
     public function testStartUpdateUserAgents() {
-        $user = CM_Model_User::createStatic();
+        $userClassMock = $this->mockClass('CM_Model_User');
+        /** @var CM_Model_User|\Mocka\AbstractClassTrait $user */
+        $user = $userClassMock->newInstance([CMTest_TH::createUser()->getId()]);
+
+        $sessionClassMock = $this->mockClass('CM_Session');
+        $sessionClassMock->mockMethod('getUser')->set($user);
+
+        /** @var CM_Paging_Useragent_User|\Mocka\AbstractClassTrait $userAgents */
+        $userAgents = $this->mockClass('CM_Paging_Useragent_User')->newInstance([$user]);
+        $uaAddMethod = $userAgents->mockMethod('addFromRequest');
+        $uaAddMethod
+            ->at(0, function (CM_Http_Request_Abstract $request) {
+                $this->assertSame('Chrome', $request->getUserAgent());
+            })
+            ->at(1, function (CM_Http_Request_Abstract $request) {
+                $this->assertSame('Chrome', $request->getUserAgent());
+            })
+            ->at(2, function (CM_Http_Request_Abstract $request) {
+                $this->assertSame('Chrome Foo', $request->getUserAgent());
+            });
+
+        $userClassMock->mockMethod('getUseragents')->set($userAgents);
+
+        // tests
+
         $request = new CM_Http_Request_Get('/', ['user-agent' => 'Chrome']);
-        $session = new CM_Session(null, $request);
+        /** @var CM_Session|\Mocka\AbstractClassTrait $session */
+        $session = $sessionClassMock->newInstance([null, $request]);
 
-        $timeFirstUA = time();
+        $this->assertSame(0, $uaAddMethod->getCallCount());
         $session->setUser($user);
-        $this->assertSame([['useragent' => 'Chrome', 'createStamp' => $timeFirstUA]], $user->getUseragents()->getItems());
-
+        $this->assertSame(1, $uaAddMethod->getCallCount());
         $session->start();
-        $this->assertSame([['useragent' => 'Chrome', 'createStamp' => $timeFirstUA]], $user->getUseragents()->getItems());
+        $this->assertSame(1, $uaAddMethod->getCallCount());
 
         $sessionId = $session->getId();
         unset($session);
         $request = new CM_Http_Request_Get('/', ['user-agent' => 'Chrome']);
-        $session = new CM_Session($sessionId, $request);
-        $user = $session->getUser();
+        /** @var CM_Session|\Mocka\AbstractClassTrait $session */
+        $session = $sessionClassMock->newInstance([$sessionId, $request]);
 
-        $this->assertSame([['useragent' => 'Chrome', 'createStamp' => $timeFirstUA]], $user->getUseragents()->getItems());
-        CMTest_TH::timeForward(1);
+        $this->assertSame(1, $uaAddMethod->getCallCount());
         $session->start();
-        $timeSecondUA = time();
-        $this->assertSame([['useragent' => 'Chrome', 'createStamp' => $timeSecondUA]], $user->getUseragents()->getItems());
+        $this->assertSame(1, $uaAddMethod->getCallCount());
+
+        unset($session);
+        $request = new CM_Http_Request_Get('/', ['user-agent' => 'Chrome']);
+        /** @var CM_Session|\Mocka\AbstractClassTrait $session */
+        $session = $sessionClassMock->newInstance([$sessionId, $request]);
+        $user->setOnline(false);
+
+        $this->assertSame(1, $uaAddMethod->getCallCount());
+        $session->start();
+        $this->assertSame(2, $uaAddMethod->getCallCount());
 
         unset($session);
         $request = new CM_Http_Request_Get('/', ['user-agent' => 'Chrome Foo']);
-        $session = new CM_Session($sessionId, $request);
-        $user = $session->getUser();
+        /** @var CM_Session|\Mocka\AbstractClassTrait $session */
+        $session = $sessionClassMock->newInstance([$sessionId, $request]);
+        $user->setOnline(false);
 
-        $this->assertSame([['useragent' => 'Chrome', 'createStamp' => $timeSecondUA]], $user->getUseragents()->getItems());
-        CMTest_TH::timeForward(1);
+        $this->assertSame(2, $uaAddMethod->getCallCount());
         $session->start();
-        $timeThirdUA = time();
-        $this->assertSame([
-            ['useragent' => 'Chrome Foo', 'createStamp' => $timeThirdUA],
-            ['useragent' => 'Chrome', 'createStamp' => $timeSecondUA],
-        ], $user->getUseragents()->getItems());
+        $this->assertSame(3, $uaAddMethod->getCallCount());
     }
 
     public function testExpiration() {
