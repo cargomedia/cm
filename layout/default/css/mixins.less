@@ -154,19 +154,6 @@
   }
 }
 
-.clipper(@height: 20px, @colorBg: @colorBg) {
-  &::after {
-    pointer-events: none;
-    position: absolute;
-    content: "";
-    width: 100%;
-    height: @height;
-    bottom: 0;
-    left: 0;
-    background-image: linear-gradient(to bottom, fadeout(@colorBg, 100) 0, @colorBg 80%);
-  }
-}
-
 .appearance(@value) {
   -webkit-appearance: @value;
   -moz-appearance: @value;
