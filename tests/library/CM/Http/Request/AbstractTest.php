@@ -296,6 +296,21 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertSame(null, $request->getViewer());
     }
 
+    public function testSetSessionFromCookie() {
+        $requestFoo = new CM_Http_Request_Get('/foo');
+        $sessionFoo = new CM_Session(null, $requestFoo);
+        $sessionFoo->set('foo', 'bar');
+        $sessionFoo->write();
+        $sessionFooId = $sessionFoo->getId();
+
+        $requestBar = new CM_Http_Request_Get('/bar', ['cookie' => 'sessionId=' . $sessionFooId . ';']);
+        $sessionBar = $requestBar->getSession();
+
+        $this->assertEquals($sessionFooId, $sessionBar->getId());
+        $this->assertEquals('bar', $sessionBar->get('foo'));
+        $this->assertEquals($requestBar, $sessionBar->getRequest());
+    }
+
     public function testGetTimeZoneFromCookie() {
         $request = new CM_Http_Request_Get('/foo/bar/', ['cookie' => 'timezoneOffset=9000; clientId=7']);
         $timeZone = $request->getTimeZone();
