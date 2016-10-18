@@ -7,7 +7,7 @@
     {/foreach}
   </ul>
 {/strip}
-<div class="button button-default button-upload uploadButton dropZone">
+<div class="button button-{$buttonTheme} button-upload uploadButton dropZone">
   <input type="file" name="{$name}-file" multiple />
   <span class="icon icon-{block name="button-icon"}upload{/block}"></span>
   <span class="label">{if $text}{$text}{else}{block name="button-text"}{translate 'Upload Files'}{/block}{/if}</span>
