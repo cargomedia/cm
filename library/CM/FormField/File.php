@@ -4,6 +4,7 @@ class CM_FormField_File extends CM_FormField_Abstract {
 
     protected function _initialize() {
         $this->_options['cardinality'] = $this->_params->getInt('cardinality', 1);
+        $this->_options['skipPreviews'] = $this->_params->getBoolean('skipPreviews', false);
         $this->_options['allowedExtensions'] = $this->_getAllowedExtensions();
         parent::_initialize();
     }
@@ -40,8 +41,11 @@ class CM_FormField_File extends CM_FormField_Abstract {
 
     public function prepare(CM_Params $renderParams, CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $text = $renderParams->has('text') ? $renderParams->getString('text') : null;
-
         $viewResponse->set('text', $text);
+
+        if ($this->_options['skipPreviews']) {
+            $viewResponse->setDataAttributes(['skip-previews' => '']);
+        }
     }
 
     /**
