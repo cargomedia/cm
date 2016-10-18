@@ -46,8 +46,8 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
         $this->assertSame('http://bar/baz', $formattedContext['httpRequest']['referer']);
         $this->assertSame('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_10)', $formattedContext['httpRequest']['useragent']);
         $this->assertSame('foo.bar', $formattedContext['httpRequest']['hostname']);
-        $this->assertSame($user->getId(), $formattedContext['appName']['user']);
-        $this->assertSame($clientId, $formattedContext['appName']['clientId']);
+        $this->assertSame(['id' => $user->getId(), 'displayName' => 'user' . $user->getId()], $formattedContext['appName']['user']);
+        $this->assertSame($clientId, $formattedContext['appName']['client']['id']);
         $this->assertSame('baz', $formattedContext['appName']['bar']);
         $this->assertSame('quux', $formattedContext['appName']['baz']);
 
