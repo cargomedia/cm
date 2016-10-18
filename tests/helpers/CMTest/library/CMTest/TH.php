@@ -47,8 +47,8 @@ class CMTest_TH {
             runkit_function_copy('time', 'time_original');
             runkit_function_redefine('time', '', 'return CMTest_TH::time();');
 
-            runkit_function_copy('gettimeofday', 'gettimeofday_original');
-            runkit_function_redefine('gettimeofday', '$returnFloat = null', 'return CMTest_TH::gettimeofday($returnFloat);');
+            runkit_function_copy('microtime', 'microtime_original');
+            runkit_function_redefine('microtime', '$get_as_float = null', 'return CMTest_TH::microtime($get_as_float);');
         }
         self::$_timeStart = time_original();
         self::$timeDelta = 0;
@@ -58,15 +58,12 @@ class CMTest_TH {
         return self::$_timeStart + self::$timeDelta;
     }
 
-    public static function gettimeofday($returnFloat = null) {
+    public static function microtime($getAsFloat = null) {
         $pseudoTime = self::time();
-        if ($returnFloat) {
+        if ($getAsFloat) {
             return $pseudoTime + 0.1234;
         }
-        $dateStruct = gettimeofday_original();
-        $dateStruct['sec'] = $pseudoTime;
-        $dateStruct['usec'] = 123456;
-        return $dateStruct;
+        return '0.12345600 ' . $pseudoTime;
     }
 
     public static function timeForward($sec) {
