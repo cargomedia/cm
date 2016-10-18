@@ -1,8 +1,4 @@
 .previews {
-  &:not(:empty) {
-    margin-bottom: 12px;
-  }
-
   .preview {
     display: inline-block;
     margin: 2px;
@@ -44,6 +40,20 @@ input {
 
   &.disabled {
     opacity: .5;
+  }
+
+  .spinner {
+    display: none;
+  }
+
+  &[data-progress] {
+    .icon, .label {
+      opacity: 0;
+    }
+
+    .spinner {
+      display: block;
+    }
   }
 }
 
