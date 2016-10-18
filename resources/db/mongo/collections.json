@@ -37,10 +37,11 @@
     },
     {
       "key": {
-        "level": 1
+        "context.extra.type": 1,
+        "createdAt": 1
       },
       "options": {
-        "name": "level_1"
+        "name": "context_extra_type_1_createdAt_1"
       }
     }
   ]
