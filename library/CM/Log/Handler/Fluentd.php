@@ -54,7 +54,7 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
         $result = [
             'message'   => (string) $record->getMessage(),
             'level'     => strtolower($levelsMapping[$record->getLevel()]),
-            'timestamp' => $record->getCreatedAt()->format(DateTime::ISO8601),
+            'timestamp' => $record->getCreatedAt()->format('Y-m-d\TH:i:s.uO'), // ISO8601 with fractions
         ];
         $result = array_merge($result, $this->_contextFormatter->formatContext($context));
         return $result;
