@@ -70,7 +70,7 @@ class CM_Frontend_Bundler_Client {
         }
         if (isset($response['error'])) {
             throw new CM_Exception('cm-bundler has responded with an error', null, [
-                'cmBundlerError' => $response['error'],
+                'cmBundlerError' => isset($response['stack']) ? $response['stack'] : $response['error'],
             ]);
         }
         if (!isset($response['content'])) {
