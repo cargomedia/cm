@@ -422,7 +422,7 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @param string            $name
      * @param float             $latitude
      * @param float             $longitude
-     * @param string|null       $_maxmind
+     * @param int|null          $_maxmind
      * @throws CM_Exception_Invalid
      * @return CM_Model_Location
      */
