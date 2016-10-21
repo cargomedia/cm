@@ -74,7 +74,7 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
         $mapping = [];
         foreach (array_reverse($this->_site->getModules()) as $moduleName) {
             $initPath = $this->_getPathInModule($moduleName, $path);
-            $this->_js->addRawPath($initPath . '/**/*.js');
+            $this->_js->addRawPath($initPath . '**/*.js');
             $mapping['/' . $moduleName . '/' . $mapPath . '/'] = '.*/' . $moduleName . '/' . $path;
         }
         $this->_js->addSourceMapping($mapping);
