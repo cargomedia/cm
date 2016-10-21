@@ -59,14 +59,14 @@ class CM_Model_Location_City extends CM_Model_Location_Abstract {
     }
 
     /**
-     * @return string|null
+     * @return int|null
      */
     public function getMaxMind() {
         return $this->_get('_maxmind');
     }
 
     /**
-     * @param string|null $maxMind
+     * @param int|null $maxMind
      */
     public function setMaxmind($maxMind) {
         $this->_set('_maxmind', $maxMind);
