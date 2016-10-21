@@ -48,9 +48,6 @@ EOF;
     public function trackAction(CM_Action_Abstract $action) {
     }
 
-    public function trackAffiliate($requestClientId, $affiliateName) {
-    }
-
     public function trackPageView(CM_Frontend_Environment $environment, $path) {
         if ($viewer = $environment->getViewer()) {
             $this->_setUser($viewer);
