@@ -93,43 +93,75 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $this->assertFalse($mongoDb->hasIndex($collectionName, ['foo' => 1, 'bar' => 1]));
     }
 
-    public function testUpdate() {
+    public function testUpdateOne() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $collectionName = 'update';
-        $doc1 = array('_id' => 1, 'name' => 'Bob', 'groupId' => 1);
-        $doc2 = array('_id' => 2, 'name' => 'Alice', 'groupId' => 1);
-        $doc3 = array('_id' => 3, 'name' => 'Dexter', 'groupId' => 2);
+        $collectionName = 'updateOne';
+        $doc1 = ['_id' => 1, 'name' => 'Bob', 'groupId' => 1];
+        $doc2 = ['_id' => 2, 'name' => 'Alice', 'groupId' => 1];
+        $doc3 = ['_id' => 3, 'name' => 'Dexter', 'groupId' => 2];
         $mongoDb->insert($collectionName, $doc1);
         $mongoDb->insert($collectionName, $doc2);
         $mongoDb->insert($collectionName, $doc3);
-        $this->assertSame($doc1, $mongoDb->findOne($collectionName, array('_id' => 1)));
+        $this->assertSame($doc1, $mongoDb->findOne($collectionName, ['_id' => 1]));
 
-        $res = $mongoDb->update($collectionName, array('_id' => 1), array('$set' => array('name' => 'Klaus')));
-        $this->assertSame(1, $res);
-        $this->assertSame(['_id' => 1, 'name' => 'Klaus', 'groupId' => 1], $mongoDb->findOne($collectionName, array('_id' => 1)));
-        $res = $mongoDb->update($collectionName, ['groupId' => 1], ['$set' => ['groupId' => 3]], ['multiple' => true]);
-        $this->assertSame(2, $res);
+        $result = $mongoDb->updateOne($collectionName, ['_id' => 1], ['$set' => ['name' => 'Klaus']]);
+        $this->assertSame(1, $result);
+        $this->assertSame(['_id' => 1, 'name' => 'Klaus', 'groupId' => 1], $mongoDb->findOne($collectionName, ['_id' => 1]));
+        $result = $mongoDb->updateOne($collectionName, ['groupId' => 1], ['$set' => ['groupId' => 3]]);
+        $this->assertSame(1, $result);
+        $this->assertSame(['_id' => 1, 'name' => 'Klaus', 'groupId' => 3], $mongoDb->findOne($collectionName, ['_id' => 1]));
 
-        $this->assertTrue($mongoDb->update($collectionName, ['_id' => 4], ['name' => 'Martin'], ['w' => 0]));
+        $result = $mongoDb->updateOne($collectionName, ['groupId' => 1, 'name' => 'Alice'], ['$set' => ['groupId' => 4]]);
+        $this->assertSame(1, $result);
+        $this->assertSame(['_id' => 2, 'name' => 'Alice', 'groupId' => 4], $mongoDb->findOne($collectionName, ['_id' => 2]));
 
-        $collectionName = 'update2';
-        $mongoDb->insert($collectionName, array('messageId'  => 1,
-                                                'recipients' => array(array('userId' => 1, 'read' => 0), array('userId' => 2, 'read' => 0))));
-        $mongoDb->update($collectionName, array('messageId' => 1, 'recipients.userId' => 2), array('$set' => array('recipients.$.read' => 1)));
+        $result = $mongoDb->updateOne($collectionName, ['groupId' => 1], ['$set' => ['groupId' => 4]]);
+        $this->assertSame(0, $result);
+    }
 
-        $message = $mongoDb->findOne($collectionName, array('messageId' => 1));
-        $this->assertNotEmpty($message);
-        foreach ($message['recipients'] as $recipient) {
-            if ($recipient['userId'] == 1) {
-                $this->assertSame(0, $recipient['read']);
-            } else {
-                if ($recipient['userId'] == 2) {
-                    $this->assertSame(1, $recipient['read']);
-                } else {
-                    $this->fail('Unexpected recipient id.');
-                }
-            }
-        }
+    public function testUpdateMany() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = 'updateMany';
+        $doc1 = ['_id' => 1, 'name' => 'Bob', 'groupId' => 1];
+        $doc2 = ['_id' => 2, 'name' => 'Alice', 'groupId' => 1];
+        $doc3 = ['_id' => 3, 'name' => 'Dexter', 'groupId' => 2];
+        $mongoDb->insert($collectionName, $doc1);
+        $mongoDb->insert($collectionName, $doc2);
+        $mongoDb->insert($collectionName, $doc3);
+        $this->assertSame($doc1, $mongoDb->findOne($collectionName, ['_id' => 1]));
+
+        $result = $mongoDb->updateMany($collectionName, ['_id' => 1], ['$set' => ['name' => 'Klaus']]);
+        $this->assertSame(1, $result);
+        $this->assertSame(['_id' => 1, 'name' => 'Klaus', 'groupId' => 1], $mongoDb->findOne($collectionName, ['_id' => 1]));
+        $result = $mongoDb->updateMany($collectionName, ['groupId' => 1], ['$set' => ['groupId' => 3]]);
+        $this->assertSame(2, $result);
+        $this->assertSame(['_id' => 1, 'name' => 'Klaus', 'groupId' => 3], $mongoDb->findOne($collectionName, ['_id' => 1]));
+        $this->assertSame(['_id' => 2, 'name' => 'Alice', 'groupId' => 3], $mongoDb->findOne($collectionName, ['_id' => 2]));
+
+        $result = $mongoDb->updateMany($collectionName, ['groupId' => 3, 'name' => 'Alice'], ['$set' => ['groupId' => 4]]);
+        $this->assertSame(1, $result);
+        $this->assertSame(['_id' => 2, 'name' => 'Alice', 'groupId' => 4], $mongoDb->findOne($collectionName, ['_id' => 2]));
+
+        $result = $mongoDb->updateMany($collectionName, ['groupId' => 1], ['$set' => ['groupId' => 4]]);
+        $this->assertSame(0, $result);
+    }
+
+    public function testReplaceOne() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = 'replace';
+        $doc1 = ['_id' => 1, 'name' => 'Bob', 'groupId' => 1];
+        $doc2 = ['_id' => 2, 'name' => 'Alice', 'groupId' => 1];
+        $doc3 = ['_id' => 1, 'name' => 'Dexter', 'groupId' => 2];
+        $mongoDb->insert($collectionName, $doc1);
+        $mongoDb->insert($collectionName, $doc2);
+        $this->assertSame($doc1, $mongoDb->findOne($collectionName));
+
+        $result = $mongoDb->replaceOne($collectionName, ['groupId' => 1], $doc3);
+        $this->assertSame(1, $result);
+        $this->assertSame($doc3, $mongoDb->findOne($collectionName));
+
+        $result = $mongoDb->replaceOne($collectionName, ['groupId' => 3], $doc3);
+        $this->assertSame(0, $result);
     }
 
     public function testGetNewId() {

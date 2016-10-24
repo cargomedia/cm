@@ -344,18 +344,52 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     /**
      * @param string     $collection
      * @param array      $criteria
-     * @param array      $newObject
+     * @param array      $update
      * @param array|null $options
-     * @return MongoCursor
+     * @return int
      * @throws CM_MongoDb_Exception
      */
-    public function update($collection, array $criteria, array $newObject, array $options = null) {
+    public function updateOne($collection, array $criteria, array $update, array $options = null) {
         $options = (array) $options;
-        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Update `{$collection}`: " .
-            CM_Params::jsonEncode(['criteria' => $criteria, 'newObject' => $newObject]));
-        $result = $this->_getCollection($collection)->update($criteria, $newObject, $options);
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "UpdateOne `{$collection}`: " .
+            CM_Params::jsonEncode(['criteria' => $criteria, 'newObject' => $update]));
+
+        $result = $this->_getCollection($collection)->updateOne($criteria, $update, $options);
         $this->_checkResultForErrors($result);
-        return is_array($result) ? $result['n'] : $result;
+        return $result->getModifiedCount();
+    }
+
+    /**
+     * @param string     $collection
+     * @param array      $criteria
+     * @param array      $update
+     * @param array|null $options
+     * @return int
+     * @throws CM_MongoDb_Exception
+     */
+    public function updateMany($collection, array $criteria, array $update, array $options = null) {
+        $options = (array) $options;
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "UpdateMany `{$collection}`: " .
+            CM_Params::jsonEncode(['criteria' => $criteria, 'newObject' => $update]));
+
+        $result = $this->_getCollection($collection)->updateMany($criteria, $update, $options);
+        $this->_checkResultForErrors($result);
+        return $result->getModifiedCount();
+    }
+
+    /**
+     * @param string     $collection
+     * @param array      $criteria
+     * @param array      $replacement
+     * @param array|null $options
+     * @return int
+     */
+    public function replaceOne($collection, array $criteria, array $replacement, array $options = null) {
+        $options = (array) $options;
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Replace `{$collection}`: " .
+            CM_Params::jsonEncode(['criteria' => $criteria, 'newObject' => $replacement]));
+        $result = $this->_getCollection($collection)->replaceOne($criteria, $replacement, $options);
+        return $result->getModifiedCount();
     }
 
     /**
