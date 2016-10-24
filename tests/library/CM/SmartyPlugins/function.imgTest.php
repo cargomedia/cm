@@ -51,4 +51,19 @@ class smarty_function_imgTest extends CMTest_TestCase {
             'background-image' => 'https://example.com/img/foo.gif'
         ], $template));
     }
+
+    public function testBackgroundImageData() {
+        $smarty = new Smarty();
+        $render = new CM_Frontend_Render();
+
+        $template = $smarty->createTemplate('string:');
+        $template->assignGlobal('render', $render);
+        $html = '<img src="https://example.com/img/foo.png" style="background-image: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)" class="background-cover" width="456" height="123" />';
+        $this->assertSame($html, smarty_function_img([
+            'path'             => 'https://example.com/img/foo.png',
+            'width'            => 456,
+            'height'           => 123,
+            'background-image' => 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+        ], $template));
+    }
 }
