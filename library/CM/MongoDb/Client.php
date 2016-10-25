@@ -417,10 +417,10 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
 
     /**
      * @param string|null $id
-     * @return MongoId
+     * @return \MongoDB\BSON\ObjectID
      */
     public function getObjectId($id = null) {
-        return new MongoId($id);
+        return new \MongoDB\BSON\ObjectID($id);
     }
 
     /**
