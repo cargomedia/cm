@@ -356,28 +356,58 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $this->assertFalse($mongoDb->existsCollection($collectionName));
     }
 
-    public function testRemove() {
+    public function testDeleteMany() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'remove';
-        $mongoDb->insert($collectionName, array('userId' => 1, 'name' => 'alice', 'groupId' => 1));
-        $mongoDb->insert($collectionName, array('userId' => 2, 'name' => 'steve', 'groupId' => 1));
-        $mongoDb->insert($collectionName, array('userId' => 3, 'name' => 'bob', 'groupId' => 1));
-        $mongoDb->insert($collectionName, array('userId' => 4, 'name' => 'dexter', 'groupId' => 2));
+        $mongoDb->insert($collectionName, ['userId' => 1, 'name' => 'alice', 'groupId' => 1]);
+        $mongoDb->insert($collectionName, ['userId' => 2, 'name' => 'steve', 'groupId' => 1]);
+        $mongoDb->insert($collectionName, ['userId' => 3, 'name' => 'bob', 'groupId' => 1]);
+        $mongoDb->insert($collectionName, ['userId' => 4, 'name' => 'dexter', 'groupId' => 2]);
         $this->assertSame(4, $mongoDb->count($collectionName));
 
-        $this->assertSame(1, $mongoDb->remove($collectionName, array('userId' => 2)));
+        $this->assertSame(1, $mongoDb->deleteMany($collectionName, ['userId' => 2]));
 
         $this->assertSame(3, $mongoDb->count($collectionName));
-        $this->assertSame(0, $mongoDb->find($collectionName, array('userId' => 2))->count());
+        $this->assertSame(null, $mongoDb->findOne($collectionName, ['userId' => 2]));
 
-        $this->assertSame(2, $mongoDb->remove($collectionName, ['groupId' => 1]));
+        $this->assertSame(2, $mongoDb->deleteMany($collectionName, ['groupId' => 1]));
         $this->assertSame(1, $mongoDb->count($collectionName));
+        $this->assertSame(null, $mongoDb->findOne($collectionName, ['userId' => 1]));
+        $this->assertSame(null, $mongoDb->findOne($collectionName, ['userId' => 3]));
 
-        $this->assertSame(1, $mongoDb->remove($collectionName));
-
+        $this->assertSame(1, $mongoDb->deleteMany($collectionName));
         $this->assertSame(0, $mongoDb->count($collectionName));
+        $this->assertSame(null, $mongoDb->findOne($collectionName, ['userId' => 3]));
 
-        $this->assertTrue($mongoDb->remove($collectionName, null, ['w' => 0]));
+        $this->assertSame(0, $mongoDb->deleteMany($collectionName));
+        $this->assertSame(null, $mongoDb->findOne($collectionName, ['userId' => 4]));
+    }
+
+    public function testDeleteOne() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $collectionName = 'remove';
+        $mongoDb->insert($collectionName, ['userId' => 1, 'name' => 'alice', 'groupId' => 1]);
+        $mongoDb->insert($collectionName, ['userId' => 2, 'name' => 'steve', 'groupId' => 1]);
+        $mongoDb->insert($collectionName, ['userId' => 3, 'name' => 'bob', 'groupId' => 1]);
+        $mongoDb->insert($collectionName, ['userId' => 4, 'name' => 'dexter', 'groupId' => 2]);
+        $this->assertSame(4, $mongoDb->count($collectionName));
+
+        $this->assertSame(1, $mongoDb->deleteOne($collectionName, ['userId' => 2]));
+
+        $this->assertSame(3, $mongoDb->count($collectionName));
+        $this->assertSame(null, $mongoDb->findOne($collectionName, ['userId' => 2]));
+
+        $this->assertSame(1, $mongoDb->deleteOne($collectionName, ['groupId' => 1]));
+        $this->assertSame(2, $mongoDb->count($collectionName));
+        $this->assertSame(null, $mongoDb->findOne($collectionName, ['userId' => 1]));
+
+        $this->assertSame(1, $mongoDb->deleteOne($collectionName, ['groupId' => 1]));
+        $this->assertSame(1, $mongoDb->count($collectionName));
+        $this->assertSame(null, $mongoDb->findOne($collectionName, ['userId' => 3]));
+
+        $this->assertSame(1, $mongoDb->deleteOne($collectionName));
+        $this->assertSame(null, $mongoDb->findOne($collectionName, ['userId' => 4]));
+        $this->assertSame(0, $mongoDb->deleteOne($collectionName));
     }
 
     public function testExistsCollection() {
