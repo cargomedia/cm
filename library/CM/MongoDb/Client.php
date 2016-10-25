@@ -214,9 +214,6 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
             if ($criteria) {
                 array_unshift($pipeline, ['$match' => $criteria]);
             }
-            if (!isset($options['useCursor'])) {
-                $options['useCursor'] = true;
-            }
             $resultCursor = $collection->aggregate($pipeline, $options);
         } else {
             if ($projection) {
