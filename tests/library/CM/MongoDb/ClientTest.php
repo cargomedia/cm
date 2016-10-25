@@ -242,12 +242,12 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $collectionName = 'findOneAndUpdate';
 
         $this->assertNull($mongoDb->findOne($collectionName, ['userId' => 1]));
-        $result = $mongoDb->findOneAndUpdate($collectionName, ['userId' => 1], ['$inc' => ['score' => 1]], ['_id' => 0], ['upsert' => true,
-                                                                                                                          'new'    => true]);
+        $options = ['returnDocument' => \MongoDB\Operation\FindOneAndUpdate::RETURN_DOCUMENT_AFTER];
+        $result = $mongoDb->findOneAndUpdate($collectionName, ['userId' => 1], ['$inc' => ['score' => 1]], ['_id' => 0], $options + ['upsert' => true]);
         $this->assertSame(['userId' => 1, 'score' => 1], $result);
         $this->assertSame($mongoDb->findOne($collectionName, ['userId' => 1], ['_id' => 0]), $result);
 
-        $this->assertNull($mongoDb->findOneAndUpdate($collectionName, ['userId' => 2], ['$inc' => ['score' => 1]], ['_id' => 0], ['new' => true]));
+        $this->assertNull($mongoDb->findOneAndUpdate($collectionName, ['userId' => 2], ['$inc' => ['score' => 1]], ['_id' => 0], $options));
 
         $result = $mongoDb->findOneAndUpdate($collectionName, ['userId' => 1], ['$inc' => ['score' => 1]]);
         $this->assertSame(['_id' => $result['_id'], 'userId' => 1, 'score' => 1], $result);
@@ -266,13 +266,12 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $collectionName = 'findOneAndReplace';
 
         $this->assertNull($mongoDb->findOne($collectionName, ['userId' => 1]));
-        $result = $mongoDb->findOneAndReplace($collectionName, ['userId' => 1], ['userId' => 1, 'score' => 1], ['_id' => 0], ['upsert' => true,
-                                                                                                                              'new'    => true]);
+        $options = ['returnDocument' => \MongoDB\Operation\FindOneAndReplace::RETURN_DOCUMENT_AFTER];
+        $result = $mongoDb->findOneAndReplace($collectionName, ['userId' => 1], ['userId' => 1, 'score' => 1], ['_id' => 0], $options + ['upsert' => true]);
         $this->assertSame(['userId' => 1, 'score' => 1], $result);
         $this->assertSame($mongoDb->findOne($collectionName, ['userId' => 1], ['_id' => 0]), $result);
 
-        $this->assertNull($mongoDb->findOneAndReplace($collectionName, ['userId' => 2], ['userId' => 2, 'score' => 2], ['_id' => 0],
-            ['new' => true]));
+        $this->assertNull($mongoDb->findOneAndReplace($collectionName, ['userId' => 2], ['userId' => 2, 'score' => 2], ['_id' => 0], $options));
 
         $result = $mongoDb->findOneAndReplace($collectionName, ['userId' => 1], ['userId' => 2, 'score' => 2]);
 
