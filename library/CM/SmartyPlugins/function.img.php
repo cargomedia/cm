@@ -18,7 +18,7 @@ function smarty_function_img(array $params, Smarty_Internal_Template $template) 
 
     if (isset($params['background-image'])) {
         $backgroundImage = (string) $params['background-image'];
-        if (preg_match('#(^/|://)#', $backgroundImage)) {
+        if (preg_match('#(^/|://|^data:)#', $backgroundImage)) {
             $backgroundImageUrl = $backgroundImage;
         } elseif (!empty($params['static'])) {
             $backgroundImageUrl = $render->getUrlStatic('/img/' . $backgroundImage, $params['site']);
