@@ -1,7 +1,5 @@
 node default {
 
-  require 'ucf'
-
   class {'cm::application':
     development => true,
   }
