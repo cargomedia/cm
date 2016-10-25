@@ -624,4 +624,12 @@ class CM_Util {
         }
         return $newPosition;
     }
+
+    /**
+     * @return DateTime
+     */
+    public static function createDateTimeWithMillis() {
+        $timeStruct = gettimeofday();
+        return DateTime::createFromFormat('U.u', $timeStruct['sec'] . '.' . $timeStruct['usec']);
+    }
 }
