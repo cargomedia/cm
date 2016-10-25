@@ -223,18 +223,29 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $collectionName = 'findBatchSize';
         CM_Config::get()->CM_MongoDb_Client->batchSize = null;
 
-        $cursor = $mongoDb->find($collectionName);
-        $this->assertSame(0, $cursor->info()['batchSize']);
-        $cursor = $mongoDb->find($collectionName, null, null, ['$match' => ['foo' => 'bar']]);
-        $this->assertSame(0, $cursor->info()['batchSize']);
+        /** @var CM_MongoDb_Client|\Mocka\AbstractClassTrait $mongoDb */
+        $mongoDb = $this->mockClass('CM_MongoDb_Client')->newInstanceWithoutConstructor();
+        $collection = $this->mockClass('MongoDB\Collection')->newInstanceWithoutConstructor();
+        $mongoDb->mockMethod('_getCollection')->set($collection);
+
+        $mockFind = $collection->mockMethod('find')->set(function($criteria, $options) {
+            $this->assertArrayNotHasKey('batchSize', $options);
+        });
+        $mongoDb->find($collectionName);
+        $this->assertSame(1, $mockFind->getCallCount());
 
         CM_Config::get()->CM_MongoDb_Client->batchSize = 10;
+        $mockFind = $collection->mockMethod('find')->set(function($criteria, $options) {
+            $this->assertSame(10, $options['batchSize']);
+        });
+        $mongoDb->find($collectionName);
+        $this->assertSame(2, $mockFind->getCallCount());
 
-        $cursor = $mongoDb->find($collectionName);
-        $this->assertSame(10, $cursor->info()['batchSize']);
-        $cursor = $mongoDb->find($collectionName, null, null, ['$match' => ['foo' => 'bar']]);
-        $this->assertSame(10, $cursor->info()['batchSize']);
-        $this->assertSame(10, $cursor->info()['query']['cursor']['batchSize']);
+        $mockFind = $collection->mockMethod('find')->set(function($criteria, $options) {
+            $this->assertSame(15, $options['batchSize']);
+        });
+        $mongoDb->find($collectionName, null, null, null, ['batchSize' => 15]);
+        $this->assertSame(3, $mockFind->getCallCount());
     }
 
     public function testFindOneAndUpdate() {
