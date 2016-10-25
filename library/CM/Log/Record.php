@@ -30,8 +30,7 @@ class CM_Log_Record {
         $this->_level = $level;
         $this->_message = $message;
         $this->_context = $context;
-        $timeStruct = gettimeofday();
-        $this->_createdAt = DateTime::createFromFormat('U.u', $timeStruct['sec'] . '.' . $timeStruct['usec']);
+        $this->_createdAt = CM_Util::createDateTimeWithMillis();
     }
 
     /**
