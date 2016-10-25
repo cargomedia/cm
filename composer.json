@@ -11,7 +11,7 @@
     "leafo/lessphp": "~0.5.0",
     "easybook/geshi": "1.0.8.11",
     "michelf/php-markdown": "1.4.0",
-    "lstrojny/functional-php": "1.0.0-alpha2",
+    "lstrojny/functional-php": "~1.2.4",
     "aws/aws-sdk-php": "~2.7",
     "nicmart/tree": "~0.2.0",
     "kissmetrics/kissmetrics-php": "~0.1.0",
