@@ -63,14 +63,19 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 
       },
       done: function(e, data) {
+        inProgressCount--;
         if (data.result.success) {
           data.$preview.html(data.result.success.preview + '<input type="hidden" name="' + field.getName() + '[]" value="' + data.result.success.id + '"/>');
+          if (inProgressCount === 0) {
+            field.trigger("uploadComplete", data.files);
+          }
         } else if (data.result.error) {
           data.$preview.remove();
           field.error(data.result.error.msg);
         }
       },
       fail: function(e, data) {
+        inProgressCount--;
         if (data.$preview) {
           data.$preview.remove();
         }
@@ -78,10 +83,8 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
           field.error('Upload error');
         }
       },
-      always: function(e, data) {
-        inProgressCount--;
+      always: function() {
         if (inProgressCount === 0) {
-          field.trigger("uploadComplete", data.files);
           field.$('.uploadButton').removeAttr('data-progress');
         }
       }
