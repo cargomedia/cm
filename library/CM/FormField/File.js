@@ -56,14 +56,14 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
           data.skipFailMessage = true;
           return false;
         }
-        data.$preview = $('<li class="preview"><div class="template"><span class="spinner spinner-expanded"></span></div></li>');
+        data.$preview = $('<li class="preview"></li>');
         field.$('.previews').append(data.$preview);
+
+        field.$('.uploadButton').attr('data-progress', '');
+
       },
       done: function(e, data) {
         if (data.result.success) {
-          while (field.getOption("cardinality") && field.getOption("cardinality") < field.getCountUploaded()) {
-            field.$('.previews .preview').first().remove();
-          }
           data.$preview.html(data.result.success.preview + '<input type="hidden" name="' + field.getName() + '[]" value="' + data.result.success.id + '"/>');
         } else if (data.result.error) {
           data.$preview.remove();
@@ -80,8 +80,9 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
       },
       always: function(e, data) {
         inProgressCount--;
-        if (inProgressCount === 0 && field.getCountUploaded() > 0) {
+        if (inProgressCount === 0) {
           field.trigger("uploadComplete", data.files);
+          field.$('.uploadButton').removeAttr('data-progress');
         }
       }
     });
@@ -111,13 +112,6 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 
   setValue: function(value) {
     throw new CM_Exception('Not implemented');
-  },
-
-  /**
-   * @returns {Number}
-   */
-  getCountUploaded: function() {
-    return this.$('.previews .preview').length;
   },
 
   reset: function() {
