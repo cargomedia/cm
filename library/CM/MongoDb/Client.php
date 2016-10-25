@@ -334,13 +334,14 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
 
     /**
      * @param string     $collection
-     * @param array      $criteria
+     * @param array|null $criteria
      * @param array      $update
      * @param array|null $options
      * @return int
      * @throws CM_MongoDb_Exception
      */
-    public function updateOne($collection, array $criteria, array $update, array $options = null) {
+    public function updateOne($collection, array $criteria = null, array $update, array $options = null) {
+        $criteria = (array) $criteria;
         $options = (array) $options;
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "UpdateOne `{$collection}`: " .
             CM_Params::jsonEncode(['criteria' => $criteria, 'newObject' => $update]));
@@ -352,13 +353,14 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
 
     /**
      * @param string     $collection
-     * @param array      $criteria
+     * @param array|null $criteria
      * @param array      $update
      * @param array|null $options
      * @return int
      * @throws CM_MongoDb_Exception
      */
-    public function updateMany($collection, array $criteria, array $update, array $options = null) {
+    public function updateMany($collection, array $criteria = null, array $update, array $options = null) {
+        $criteria = (array) $criteria;
         $options = (array) $options;
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "UpdateMany `{$collection}`: " .
             CM_Params::jsonEncode(['criteria' => $criteria, 'newObject' => $update]));
@@ -370,12 +372,13 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
 
     /**
      * @param string     $collection
-     * @param array      $criteria
+     * @param array|null $criteria
      * @param array      $replacement
      * @param array|null $options
      * @return int
      */
-    public function replaceOne($collection, array $criteria, array $replacement, array $options = null) {
+    public function replaceOne($collection, array $criteria = null, array $replacement, array $options = null) {
+        $criteria = (array) $criteria;
         $options = (array) $options;
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Replace `{$collection}`: " .
             CM_Params::jsonEncode(['criteria' => $criteria, 'newObject' => $replacement]));
@@ -391,7 +394,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @throws CM_MongoDb_Exception
      */
     public function deleteMany($collection, array $criteria = null, array $options = null) {
-        $criteria =  (array) $criteria;
+        $criteria = (array) $criteria;
         $options = (array) $options;
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "DeleteMany `{$collection}`: " . CM_Params::jsonEncode($criteria));
         $result = $this->_getCollection($collection)->deleteMany($criteria, $options);
@@ -407,7 +410,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @throws CM_MongoDb_Exception
      */
     public function deleteOne($collection, array $criteria = null, array $options = null) {
-        $criteria =  (array) $criteria;
+        $criteria = (array) $criteria;
         $options = (array) $options;
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "DeleteOne `{$collection}`: " . CM_Params::jsonEncode($criteria));
         $result = $this->_getCollection($collection)->deleteOne($criteria, $options);

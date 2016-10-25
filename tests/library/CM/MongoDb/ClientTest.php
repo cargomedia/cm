@@ -117,6 +117,10 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
         $result = $mongoDb->updateOne($collectionName, ['groupId' => 1], ['$set' => ['groupId' => 4]]);
         $this->assertSame(0, $result);
+
+        $result = $mongoDb->updateOne($collectionName, null, ['$set' => ['groupId' => 5]]);
+        $this->assertSame(1, $result);
+        $this->assertSame(['_id' => 1, 'name' => 'Klaus', 'groupId' => 5], $mongoDb->findOne($collectionName, ['_id' => 1]));
     }
 
     public function testUpdateMany() {
@@ -144,24 +148,31 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
         $result = $mongoDb->updateMany($collectionName, ['groupId' => 1], ['$set' => ['groupId' => 4]]);
         $this->assertSame(0, $result);
+
+        $result = $mongoDb->updateMany($collectionName, null, ['$set' => ['groupId' => 5]]);
+        $this->assertSame(3, $result);
     }
 
     public function testReplaceOne() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'replace';
-        $doc1 = ['_id' => 1, 'name' => 'Bob', 'groupId' => 1];
-        $doc2 = ['_id' => 2, 'name' => 'Alice', 'groupId' => 1];
-        $doc3 = ['_id' => 1, 'name' => 'Dexter', 'groupId' => 2];
-        $mongoDb->insert($collectionName, $doc1);
-        $mongoDb->insert($collectionName, $doc2);
-        $this->assertSame($doc1, $mongoDb->findOne($collectionName));
+        $doc1 = ['name' => 'Bob', 'groupId' => 1];
+        $doc2 = ['name' => 'Alice', 'groupId' => 1];
+        $doc3 = ['name' => 'Dexter', 'groupId' => 2];
+        $mongoDb->insert($collectionName, ['_id' => 1] + $doc1);
+        $mongoDb->insert($collectionName, ['_id' => 2] + $doc2);
+        $this->assertSame($doc1, $mongoDb->findOne($collectionName, null, ['_id' => 0]));
 
         $result = $mongoDb->replaceOne($collectionName, ['groupId' => 1], $doc3);
         $this->assertSame(1, $result);
-        $this->assertSame($doc3, $mongoDb->findOne($collectionName));
+        $this->assertSame($doc3, $mongoDb->findOne($collectionName, ['_id' => 1], ['_id' => 0]));
 
-        $result = $mongoDb->replaceOne($collectionName, ['groupId' => 3], $doc3);
+        $result = $mongoDb->replaceOne($collectionName, ['groupId' => 3], ['name' => 'foo']);
         $this->assertSame(0, $result);
+
+        $result = $mongoDb->replaceOne($collectionName, null, $doc2);
+        $this->assertSame(1, $result);
+        $this->assertSame($doc2, $mongoDb->findOne($collectionName, ['_id' => 1], ['_id' => 0]));
     }
 
     public function testGetNewId() {
