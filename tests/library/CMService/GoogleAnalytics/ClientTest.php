@@ -205,4 +205,16 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
         $js = $googleAnalytics->getJs($environment);
         $this->assertNotContains('ga("send", "pageview", "\/v\/join\/done");', $js);
     }
+
+    public function testAddPlugin() {
+        $ga = new CMService_GoogleAnalytics_Client('');
+        $ga->addPlugin('Foo');
+        $this->assertContains('ga("require", "Foo");', $ga->getJs());
+        $ga->addPlugin('Bar', 'tracker1');
+        $this->assertContains('ga("require", "Foo");ga("tracker1.require", "Bar");', $ga->getJs());
+        $ga->addPlugin('Baz', null, ['foo' => true]);
+        $this->assertContains('ga("require", "Foo");ga("tracker1.require", "Bar");ga("require", "Baz", {"foo":true});', $ga->getJs());
+        $ga->addPlugin('Boo', 'tracker2', ['foo' => true]);
+        $this->assertContains('ga("require", "Foo");ga("tracker1.require", "Bar");ga("require", "Baz", {"foo":true});ga("tracker2.require", "Boo", {"foo":true});', $ga->getJs());
+    }
 }
