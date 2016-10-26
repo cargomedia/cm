@@ -208,13 +208,14 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
 
     public function testAddPlugin() {
         $ga = new CMService_GoogleAnalytics_Client('');
+        $env = new CM_Frontend_Environment();
         $ga->addPlugin('Foo');
-        $this->assertContains('ga("require", "Foo");', $ga->getJs());
+        $this->assertContains('ga("require", "Foo");', $ga->getHtml($env));
         $ga->addPlugin('Bar', 'tracker1');
-        $this->assertContains('ga("require", "Foo");ga("tracker1.require", "Bar");', $ga->getJs());
+        $this->assertContains('ga("require", "Foo");ga("tracker1.require", "Bar");', $ga->getHtml($env));
         $ga->addPlugin('Baz', null, ['foo' => true]);
-        $this->assertContains('ga("require", "Foo");ga("tracker1.require", "Bar");ga("require", "Baz", {"foo":true});', $ga->getJs());
+        $this->assertContains('ga("require", "Foo");ga("tracker1.require", "Bar");ga("require", "Baz", {"foo":true});', $ga->getHtml($env));
         $ga->addPlugin('Boo', 'tracker2', ['foo' => true]);
-        $this->assertContains('ga("require", "Foo");ga("tracker1.require", "Bar");ga("require", "Baz", {"foo":true});ga("tracker2.require", "Boo", {"foo":true});', $ga->getJs());
+        $this->assertContains('ga("require", "Foo");ga("tracker1.require", "Bar");ga("require", "Baz", {"foo":true});ga("tracker2.require", "Boo", {"foo":true});', $ga->getHtml($env));
     }
 }

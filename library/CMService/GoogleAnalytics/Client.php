@@ -162,19 +162,6 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
             }
             $js .= 'ga("ecommerce:send");';
         }
-        if (!empty($this->_pluginList)) {
-            foreach ($this->_pluginList as $plugin) {
-                $key = 'require';
-                if (null !== $plugin['trackerName']) {
-                    $key = $plugin['trackerName'] . '.' . $key;
-                }
-                if (null !== $plugin['options']) {
-                    $js .= 'ga("' . $key . '", "' . $plugin['pluginName'] . '", ' . CM_Params::jsonEncode($plugin['options']) . ');';
-                } else {
-                    $js .= 'ga("' . $key . '", "' . $plugin['pluginName'] . '");';
-                }
-            }
-        }
         return $js;
     }
 
@@ -200,6 +187,19 @@ EOF;
         }
 
         $html .= 'ga("create", ' . CM_Params::jsonEncode($this->_getCode()) . ', ' . CM_Params::jsonEncode(array_filter($fieldList)) . ');';
+        if (!empty($this->_pluginList)) {
+            foreach ($this->_pluginList as $plugin) {
+                $key = 'require';
+                if (null !== $plugin['trackerName']) {
+                    $key = $plugin['trackerName'] . '.' . $key;
+                }
+                if (null !== $plugin['options']) {
+                    $html .= 'ga("' . $key . '", "' . $plugin['pluginName'] . '", ' . CM_Params::jsonEncode($plugin['options']) . ');';
+                } else {
+                    $html .= 'ga("' . $key . '", "' . $plugin['pluginName'] . '");';
+                }
+            }
+        }
         $html .= $this->getJs();
         $html .= '</script>';
 
