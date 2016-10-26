@@ -71,6 +71,13 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
           field.error(data.result.error.msg);
         }
         if (inProgressCount === 0) {
+          var cardinality = field.getOption("cardinality");
+          if (cardinality > 0) {
+            var $previews = field.$('.previews .preview');
+            if ($previews.length > cardinality) {
+              $previews.slice(0, $previews.length - cardinality).remove();
+            }
+          }
           field.trigger("uploadComplete", data.files);
         }
       },
