@@ -25,7 +25,8 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
     }
 
     // remove attr multiple on iPhone, iPod, iPad to allow upload photos via camera
-    if (navigator.userAgent.match(/iP(ad|hone|od)/i)) {
+    var iOS = navigator.userAgent.match(/iP(ad|hone|od)/i);
+    if (iOS || field.getOption("cardinality") == 1) {
       $input.removeAttr('multiple');
     }
 
@@ -63,19 +64,17 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 
       },
       done: function(e, data) {
-        inProgressCount--;
         if (data.result.success) {
-          data.$preview.html(data.result.success.preview + '<input type="hidden" name="' + field.getName() + '[]" value="' + data.result.success.id + '"/>');
-          if (inProgressCount === 0) {
-            field.trigger("uploadComplete", data.files);
+          while (field.getOption("cardinality") && field.getOption("cardinality") < field.$('.previews .preview').length) {
+            field.$('.previews .preview').first().remove();
           }
+          data.$preview.html(data.result.success.preview + '<input type="hidden" name="' + field.getName() + '[]" value="' + data.result.success.id + '"/>');
         } else if (data.result.error) {
           data.$preview.remove();
           field.error(data.result.error.msg);
         }
       },
       fail: function(e, data) {
-        inProgressCount--;
         if (data.$preview) {
           data.$preview.remove();
         }
@@ -83,8 +82,12 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
           field.error('Upload error');
         }
       },
-      always: function() {
+      always: function(e, data) {
+        inProgressCount--;
         if (inProgressCount === 0) {
+          if (field.getValue().length > 0) {
+            field.trigger("uploadComplete", data.files);
+          }
           field.$('.uploadButton').removeAttr('data-progress');
         }
       }
