@@ -8,7 +8,7 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     protected $_code;
 
     /** @var array */
-    protected $_eventList = [], $_transactionList = [], $_pageViewList = [], $_fieldList = [];
+    protected $_eventList = [], $_transactionList = [], $_pageViewList = [], $_fieldList = [], $_pluginList = [];
 
     /**
      * @param string   $code
@@ -65,6 +65,20 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
             'label'          => $label,
             'value'          => $value,
             'nonInteraction' => $nonInteraction,
+        ];
+    }
+
+    /**
+     * @param string      $pluginName
+     * @param string|null $trackerName
+     * @param array|null  $options
+     */
+    public function addPlugin($pluginName, $trackerName = null, array $options = null) {
+        $pluginName = (string) $pluginName;
+        $this->_pluginList[] = [
+            'pluginName'  => (string) $pluginName,
+            'trackerName' => null !== $trackerName ? (string) $trackerName : null,
+            'options'     => $options
         ];
     }
 
@@ -147,6 +161,19 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
                 }
             }
             $js .= 'ga("ecommerce:send");';
+        }
+        if (!empty($this->_pluginList)) {
+            foreach ($this->_pluginList as $plugin) {
+                $key = 'require';
+                if (null !== $plugin['trackerName']) {
+                    $key = $plugin['trackerName'] . '.' . $key;
+                }
+                if (null !== $plugin['options']) {
+                    $js .= 'ga("' . $key . '", "' . $plugin['pluginName'] . '", ' . CM_Params::jsonEncode($plugin['options']) . ');';
+                } else {
+                    $js .= 'ga("' . $key . '", "' . $plugin['pluginName'] . '");';
+                }
+            }
         }
         return $js;
     }
