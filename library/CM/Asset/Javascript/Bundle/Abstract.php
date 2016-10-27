@@ -32,7 +32,11 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
      */
     public function getCode($compressed) {
         return $this->_js->getCode([
-            'uglify' => $compressed
+            'bundleName' => $this->_site->getName() . '/' . $this->_getBundleName(),
+            'uglify'     => $compressed,
+            'sourceMaps' => [
+                'replace' => $this->_js->getSourceMapping(),
+            ]
         ]);
     }
 
@@ -42,10 +46,9 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
      */
     public function getSourceMaps($compressed) {
         return $this->_js->getSourceMaps([
-            'bundleName' => $this->_getBundleName(),
+            'bundleName' => $this->_site->getName() . '/' . $this->_getBundleName(),
             'uglify'     => $compressed,
             'sourceMaps' => [
-                'enabled' => true,
                 'replace' => $this->_js->getSourceMapping(),
             ]
         ]);
