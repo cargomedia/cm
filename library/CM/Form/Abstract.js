@@ -56,6 +56,12 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       return false;
     });
 
+    this.$el.on('reset', function() {
+      _.defer(function() {
+        handler.trigger('reset');
+      });
+    });
+
     CM_View_Abstract.prototype._ready.call(this);
   },
 

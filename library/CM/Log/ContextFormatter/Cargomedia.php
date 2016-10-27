@@ -70,11 +70,16 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
         $result = [];
         $appAttributes = $context->getExtra();
         if ($user = $context->getUser()) {
-            $appAttributes['user'] = $user->getId();
+            $appAttributes['user'] = [
+                'id'          => $user->getId(),
+                'displayName' => $user->getDisplayName(),
+            ];
         }
         $request = $context->getHttpRequest();
         if (null !== $request) {
-            $appAttributes['clientId'] = $request->getClientId();
+            $appAttributes['client'] = [
+                'id' => $request->getClientId(),
+            ];
         }
         $result[$this->_appName] = $appAttributes;
         return $result;

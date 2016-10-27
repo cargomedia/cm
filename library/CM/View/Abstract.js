@@ -605,6 +605,28 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
+   * @param {Function} callback
+   * @param {String} eventName
+   * @param {*} [obj]
+   */
+  cancellable: function(callback, eventName, obj) {
+    var target = obj || this;
+    var observer = new cm.lib.Observer();
+    var promise = null;
+    observer.listenTo(target, eventName, function() {
+      if (promise) {
+        promise.cancel();
+      }
+    });
+    promise = callback.apply(this);
+
+    return promise.finally(function() {
+      observer.stopListening();
+      observer = null;
+    });
+  },
+
+  /**
    * @param {Object} actions
    * @param {String} [channelKey]
    * @param {Number} [channelType]

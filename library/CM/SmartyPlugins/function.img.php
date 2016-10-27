@@ -5,15 +5,34 @@ function smarty_function_img(array $params, Smarty_Internal_Template $template) 
     $render = $template->smarty->getTemplateVars('render');
 
     $path = $params['path'];
-    $params = array_merge(array('width' => null, 'height' => null, 'title' => null, 'class' => null, 'site' => null), $params);
+    $params = array_merge(['width' => null, 'height' => null, 'title' => null, 'class' => null, 'site' => null], $params);
 
-    if (!empty($params['static'])) {
+    if (preg_match('#(^/|://)#', $path)) {
+        $url = $path;
+    } elseif (!empty($params['static'])) {
         $url = $render->getUrlStatic('/img/' . $path, $params['site']);
     } else {
         $url = $render->getUrlResource('layout', 'img/' . $path, null, $params['site']);
     }
-
     $html = '<img src="' . $url . '"';
+
+    if (isset($params['background-image'])) {
+        $backgroundImage = (string) $params['background-image'];
+        if (preg_match('#(^/|://|^data:)#', $backgroundImage)) {
+            $backgroundImageUrl = $backgroundImage;
+        } elseif (!empty($params['static'])) {
+            $backgroundImageUrl = $render->getUrlStatic('/img/' . $backgroundImage, $params['site']);
+        } else {
+            $backgroundImageUrl = $render->getUrlResource('layout', 'img/' . $backgroundImage, null, $params['site']);
+        }
+        $html .= ' style="background-image: url(' . CM_Util::htmlspecialchars($backgroundImageUrl) . ')"';
+
+        $params['class'] = (string) $params['class'];
+        if ('' !== $params['class']) {
+            $params['class'] .= ' ';
+        }
+        $params['class'] .= 'background-cover';
+    }
     if ($params['class']) {
         $html .= ' class="' . $params['class'] . '"';
     }

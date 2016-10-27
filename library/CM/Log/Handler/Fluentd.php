@@ -54,7 +54,7 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
         $result = [
             'message'   => (string) $record->getMessage(),
             'level'     => strtolower($levelsMapping[$record->getLevel()]),
-            'timestamp' => $record->getCreatedAt()->format(DateTime::ISO8601),
+            'timestamp' => $record->getCreatedAt()->format('Y-m-d\TH:i:s.uO'), // ISO8601 with fractions
         ];
         $result = array_merge($result, $this->_contextFormatter->formatContext($context));
         return $result;
@@ -74,28 +74,35 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
     }
 
     /**
-     * @param array $value
+     * @param array      $value
+     * @param mixed|null $key
      * @return array
      */
-    protected function _encodeRecord($value) {
+    protected function _encodeRecord($value, $key = null) {
+        if ('id' === $key) {
+            return (string) $value;
+        }
         if ($value instanceof DateTime) {
             return $value->format('c');
         }
-
+        if ($value instanceof CM_Model_Abstract) {
+            return [
+                'class' => get_class($value),
+                'id'    => (string) $value->getId(),
+            ];
+        }
         if (is_object($value)) {
-            $encoded = '[';
-            $encoded .= get_class($value);
-            if ($value instanceof CM_Model_Abstract) {
-                $encoded .= ':' . $value->getId();
+            return [
+                'class' => get_class($value),
+            ];
+        }
+        if (is_array($value)) {
+            $encoded = [];
+            foreach ($value as $key => $val) {
+                $encoded[$key] = $this->_encodeRecord($val, $key);
             }
-            $encoded .= ']';
             return $encoded;
         }
-
-        if (is_array($value)) {
-            return array_map([$this, '_encodeRecord'], $value);
-        }
-
         return $value;
     }
 }

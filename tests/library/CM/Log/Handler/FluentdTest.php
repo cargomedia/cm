@@ -43,7 +43,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
                 $this->assertSame('tag', $tag);
                 $this->assertSame('critical', $data['level']);
                 $this->assertSame('foo', $data['message']);
-                $this->assertArrayHasKey('timestamp', $data);
+                $this->assertRegExp('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}\+\d{4}$/', $data['timestamp']);
                 $this->assertSame('value', $data['key']);
 
             }
@@ -53,7 +53,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
         $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
         $contextFormatter->mockMethod('formatContext')->set(['key' => 'value']);
         /** @var CM_Log_ContextFormatter_Interface $contextFormatter */
-        
+
         $handler = new CM_Log_Handler_Fluentd($fluentd, $contextFormatter, 'tag');
 
         $record = new CM_Log_Record(CM_Log_Logger::CRITICAL, 'foo', new CM_Log_Context());
@@ -80,5 +80,41 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
             ],
             'foo2' => 2,
         ], $sanitizedRecord);
+    }
+
+    public function test_encodeRecord() {
+        /** @var CM_Log_Handler_Fluentd|\Mocka\AbstractClassTrait $mock */
+        $mock = $this->mockClass('CM_Log_Handler_Fluentd')->newInstanceWithoutConstructor();
+
+        $this->assertSame([], CMTest_TH::callProtectedMethod($mock, '_encodeRecord', [[]]));
+
+        $record = [
+            'foo' => [
+                'id'  => 123,
+                'bar' => (object) ['baz'],
+                'baz' => new DateTime('01-01-2001'),
+                'bax' => new CM_Model_Mock_Fluentd(),
+            ],
+        ];
+        $this->assertSame([
+            'foo' => [
+                'id'  => '123',
+                'bar' => [
+                    'class' => 'stdClass'
+                ],
+                'baz' => '2001-01-01T00:00:00+00:00',
+                'bax' => [
+                    'class' => 'CM_Model_Mock_Fluentd',
+                    'id'    => '42',
+                ],
+            ],
+        ], CMTest_TH::callProtectedMethod($mock, '_encodeRecord', [$record]));
+    }
+}
+
+class CM_Model_Mock_Fluentd extends CM_Model_Abstract {
+
+    public function getIdRaw() {
+        return ['id' => 42];
     }
 }

@@ -46,6 +46,9 @@ class CMTest_TH {
         if (!isset(self::$_timeStart)) {
             runkit_function_copy('time', 'time_original');
             runkit_function_redefine('time', '', 'return CMTest_TH::time();');
+
+            runkit_function_copy('gettimeofday', 'gettimeofday_original');
+            runkit_function_redefine('gettimeofday', '$returnFloat = null', 'return CMTest_TH::gettimeofday($returnFloat);');
         }
         self::$_timeStart = time_original();
         self::$timeDelta = 0;
@@ -53,6 +56,17 @@ class CMTest_TH {
 
     public static function time() {
         return self::$_timeStart + self::$timeDelta;
+    }
+
+    public static function gettimeofday($returnFloat = null) {
+        $pseudoTime = self::time();
+        if ($returnFloat) {
+            return $pseudoTime + 0.1234;
+        }
+        $dateStruct = gettimeofday_original();
+        $dateStruct['sec'] = $pseudoTime;
+        $dateStruct['usec'] = 123456;
+        return $dateStruct;
     }
 
     public static function timeForward($sec) {

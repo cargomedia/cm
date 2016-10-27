@@ -167,4 +167,9 @@ class CM_UtilTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertSame('Initial position is invalid', $exception->getMessage());
     }
+
+    public function testCreateDateTimeWithMillis() {
+        $dateTime = CM_Util::createDateTimeWithMillis();
+        $this->assertInstanceOf('DateTime', $dateTime);
+    }
 }
