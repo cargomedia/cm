@@ -20,6 +20,9 @@ class CM_Frontend_JavascriptContainer_Bundle {
     /** @var array */
     protected $_sourceMapping = [];
 
+    /** @var array */
+    protected $_watchPath = [];
+
     /**
      * CM_Frontend_JavascriptContainer_Bundle constructor.
      */
@@ -102,6 +105,20 @@ class CM_Frontend_JavascriptContainer_Bundle {
     }
 
     /**
+     * @param string $watchPath
+     */
+    public function addWatchPath($watchPath) {
+        $this->_watchPath[] = $watchPath;
+    }
+
+    /**
+     * @param array $watchPaths
+     */
+    public function addWatchPaths($watchPaths) {
+        $this->_watchPath = array_merge($this->_watchPath, $watchPaths);
+    }
+
+    /**
      * @param string $libraryPath exposed library path (available in the global scope with require())
      */
     public function addLibraryPath($libraryPath) {
@@ -138,6 +155,7 @@ class CM_Frontend_JavascriptContainer_Bundle {
             $extra = [];
         }
         return array_merge([
+            'watch'     => $this->_watchPath,
             'entries'   => $this->_entryPath,
             'libraries' => $this->_libraryPath,
             'content'   => $this->_content,
