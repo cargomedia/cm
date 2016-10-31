@@ -9,7 +9,7 @@ class CM_Asset_Javascript_Internal extends CM_Asset_Javascript_Abstract {
     public function __construct(CM_Site_Abstract $site, $debug = null) {
         parent::__construct($site, $debug);
 
-        $this->_js->append('var cm = new ' . $this->_getAppClassName($site) . '();');
+        $this->_js->append('window.cm = new ' . $this->_getAppClassName($site) . '();');
         $this->_js->append((new CM_File(DIR_ROOT . 'resources/config/js/internal.js'))->read());
     }
 

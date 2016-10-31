@@ -155,13 +155,16 @@ class CM_Frontend_JavascriptContainer_Bundle {
             $extra = [];
         }
         return array_merge([
-            'watch'     => $this->_watchPath,
-            'entries'   => $this->_entryPath,
-            'libraries' => $this->_libraryPath,
-            'content'   => $this->_content,
-            'concat'    => $this->_rawPath,
-            'paths'     => $this->_sourcePath,
-            'baseDir'   => '/'
+            'baseDir'    => '/',
+            'watch'      => $this->_watchPath,
+            'paths'      => $this->_sourcePath,
+            'entries'    => $this->_entryPath,
+            'libraries'  => $this->_libraryPath,
+            'concat'     => $this->_rawPath,
+            'content'    => $this->_content,
+            'sourceMaps' => [
+                'replace' => $this->getSourceMapping(),
+            ],
         ], $extra);
     }
 

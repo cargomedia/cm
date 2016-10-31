@@ -11,14 +11,27 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
     /** @var bool */
     protected $_debug;
 
+    /** @var bool */
+    protected $_sourceMapsOnly;
+
     /**
      * @param CM_Site_Abstract $site
      * @param bool|null        $debug
+     * @param bool|null        $sourceMapsOnly
      */
-    public function __construct(CM_Site_Abstract $site, $debug = null) {
+    public function __construct(CM_Site_Abstract $site, $debug = null, $sourceMapsOnly = null) {
         $this->_site = $site;
         $this->_debug = (bool) $debug;
+        $this->_sourceMapsOnly = (bool) $sourceMapsOnly;
         $this->_js = new CM_Frontend_JavascriptContainer_Bundle();
+    }
+
+    public function get() {
+        if ($this->_sourceMapsOnly) {
+            return $this->getSourceMaps(!$this->_isDebug());
+        } else {
+            return $this->getCode(!$this->_isDebug());
+        }
     }
 
     /**
@@ -33,10 +46,7 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
     public function getCode($compressed) {
         return $this->_js->getCode([
             'bundleName' => $this->_site->getName() . '/' . $this->_getBundleName(),
-            'uglify'     => $compressed,
-            'sourceMaps' => [
-                'replace' => $this->_js->getSourceMapping(),
-            ]
+            'uglify'     => $compressed
         ]);
     }
 
@@ -47,10 +57,7 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
     public function getSourceMaps($compressed) {
         return $this->_js->getSourceMaps([
             'bundleName' => $this->_site->getName() . '/' . $this->_getBundleName(),
-            'uglify'     => $compressed,
-            'sourceMaps' => [
-                'replace' => $this->_js->getSourceMapping(),
-            ]
+            'uglify'     => $compressed
         ]);
     }
 

@@ -2,8 +2,8 @@
 
 abstract class CM_Asset_Javascript_Bundle_Vendor_Abstract extends CM_Asset_Javascript_Bundle_Abstract {
 
-    public function __construct(CM_Site_Abstract $site, $debug = null) {
-        parent::__construct($site, $debug);
+    public function __construct(CM_Site_Abstract $site, $debug = null, $sourceMapsOnly = null) {
+        parent::__construct($site, $debug, $sourceMapsOnly);
         $this->_process();
     }
 

@@ -24,12 +24,12 @@ class CM_Http_Response_Resource_Javascript_Vendor extends CM_Http_Response_Resou
                 break;
             case '/before-body.js.map':
                 if ($debug || $dev) {
-                    $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_BeforeBody_SourceMaps($site, $debug));
+                    $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site, $debug, true));
                 }
                 break;
             case '/after-body.js.map':
                 if ($debug || $dev) {
-                    $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_AfterBody_SourceMaps($site, $debug));
+                    $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site, $debug, true));
                 }
                 break;
             default:

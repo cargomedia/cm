@@ -44,11 +44,12 @@ class CM_App implements CM_Service_ManagerAwareInterface {
         foreach ($siteList as $site) {
             $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
             $assetList[] = new CM_Asset_Javascript_Internal($site, $debug);
-            $assetList[] = new CM_Asset_Javascript_Library($site, $debug);
+            $assetList[] = new CM_Asset_Javascript_Bundle_Library($site, $debug);
+            $assetList[] = new CM_Asset_Javascript_Bundle_Library($site, $debug, true);
             $assetList[] = new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site, $debug);
-            $assetList[] = new CM_Asset_Javascript_Bundle_Vendor_BeforeBody_SourceMaps($site, $debug);
+            $assetList[] = new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site, $debug, true);
             $assetList[] = new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site, $debug);
-            $assetList[] = new CM_Asset_Javascript_Bundle_Vendor_AfterBody_SourceMaps($site, $debug);
+            $assetList[] = new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site, $debug, true);
             $assetList[] = new CM_Asset_Css_Vendor($render, $debug);
             $assetList[] = new CM_Asset_Css_Library($render, $debug);
             /** @var CM_Model_Language $language */
