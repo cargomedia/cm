@@ -325,11 +325,11 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     }
 
     /**
-     * @param string|MongoId $id
+     * @param string|\MongoDB\BSON\ObjectID $id
      * @return boolean
      */
     public function isValidObjectId($id) {
-        return MongoId::isValid($id);
+        return (boolean) preg_match('/^[[:xdigit:]]{24}$/i', (string) $id);
     }
 
     /**

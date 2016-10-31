@@ -445,7 +445,7 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
 
         $this->assertTrue($mongoDb->isValidObjectId('1234567890abcdef12345678'));
-        $this->assertTrue($mongoDb->isValidObjectId(new MongoId('1234567890abcdef12345678')));
+        $this->assertTrue($mongoDb->isValidObjectId(new \MongoDB\BSON\ObjectID('1234567890abcdef12345678')));
         $this->assertFalse($mongoDb->isValidObjectId('1234567890abcdef123456789'));
         $this->assertFalse($mongoDb->isValidObjectId('1234567890abcdef1234567'));
         $this->assertFalse($mongoDb->isValidObjectId('1234567890abcdef1234567g'));
