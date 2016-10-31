@@ -12,7 +12,7 @@ class CM_Asset_Javascript_Bundle_Library extends CM_Asset_Javascript_Bundle_Abst
         $watch = [];
         $mapping = [];
         foreach (array_reverse($this->_site->getModules()) as $moduleName) {
-            $mapping['/' . $moduleName . '/library/'] = '.*/' . $moduleName . '/library/' . $moduleName;
+            $mapping['/' . $moduleName . '/library/'] = '(^|.*/)' . $moduleName . '/library/' . $moduleName;
             $watch[] = CM_Util::getModulePath($moduleName) . '/library/**/*.js';
         }
         $this->_js->addSourceMapping($mapping);
