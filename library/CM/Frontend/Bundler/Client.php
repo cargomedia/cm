@@ -3,13 +3,13 @@
 class CM_Frontend_Bundler_Client {
 
     /** @var string */
-    protected $_socketPath;
+    protected $_socket;
 
     /**
-     * @param string $socketPath
+     * @param string $socket
      */
-    public function __construct($socketPath) {
-        $this->_socketPath = $socketPath;
+    public function __construct($socket) {
+        $this->_socket = $socket;
     }
 
     /**
@@ -40,12 +40,12 @@ class CM_Frontend_Bundler_Client {
      * @throws CM_Exception
      */
     protected function _sendRequest($data) {
-        $sock = stream_socket_client('unix://' . $this->_socketPath, $errorNumber, $errorMessage);
+        $sock = stream_socket_client($this->_socket, $errorNumber, $errorMessage);
         if (!$sock) {
             throw new CM_Exception('Connection to cm-bundler service failed', null, [
                 'errorNumber'  => $errorNumber,
                 'errorMessage' => $errorMessage,
-                'socketPath'   => $this->_socketPath,
+                'socket'       => $this->_socket,
             ]);
         }
 
