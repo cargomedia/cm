@@ -49,7 +49,7 @@ class CM_Frontend_Bundler_Client {
             ]);
         }
 
-        fwrite($sock, CM_Util::jsonEncode($data) . "\r\n");
+        fwrite($sock, CM_Util::jsonEncode($data) . chr(4) /* EOT */);
         $rawResponse = stream_get_contents($sock);
         fclose($sock);
         return $this->_parseResponse($rawResponse);
@@ -70,12 +70,12 @@ class CM_Frontend_Bundler_Client {
         }
         if (isset($response['error'])) {
             throw new CM_Exception('cm-bundler has responded with an error', null, [
-                'cmBundlerError' => isset($response['stack']) ? $response['stack'] : $response['error'],
+                'cmBundlerResponse' => CM_Util::jsonEncode($response, true),
             ]);
         }
         if (!isset($response['content'])) {
             throw new CM_Exception('cm-bundler has responded without any content', null, [
-                'cmBundlerResponse' => $response,
+                'cmBundlerResponse' => CM_Util::jsonEncode($response, true),
             ]);
         }
         return (string) $response['content'];
