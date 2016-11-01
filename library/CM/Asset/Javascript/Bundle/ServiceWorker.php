@@ -2,28 +2,24 @@
 
 class CM_Asset_Javascript_Bundle_ServiceWorker extends CM_Asset_Javascript_Bundle_Abstract {
 
-    /**
-     * @param CM_Site_Abstract $site
-     * @param bool|null        $debug
-     */
-    public function __construct(CM_Site_Abstract $site, $debug = null) {
-        parent::__construct($site, $debug);
-        $this->_appendConfig();
+    public function __construct(CM_Site_Abstract $site, $debug = null, $sourceMapsOnly = null) {
+        parent::__construct($site, $debug, $sourceMapsOnly);
+        $workerConfig = $this->_getWorkerConfig();
+        $this->_js->addInlineContent('worker/config', $workerConfig, true, true);
         $this->_appendDirectoryBrowserify('client-vendor/serviceworker/');
-    }
-
-    public function get() {
-        return $this->getCode(!$this->_isDebug());
     }
 
     protected function _getBundleName() {
         return 'worker.js';
     }
 
-    protected function _appendConfig() {
+    /**
+     * @return string
+     */
+    protected function _getWorkerConfig() {
         $config = [
             'site' => $this->_site,
         ];
-        $this->_js->addInlineContent('worker/config', 'module.exports = ' . CM_Params::encode($config, true) . ';', true, true);
+        return 'module.exports = ' . CM_Params::encode($config, true) . ';';
     }
 }

@@ -23,11 +23,8 @@ class CM_Frontend_JavascriptContainer_Bundle {
     /** @var array */
     protected $_watchPath = [];
 
-    /**
-     * CM_Frontend_JavascriptContainer_Bundle constructor.
-     */
-    public function __construct() {
-    }
+    /** @var bool */
+    protected $_ignoreMissing = false;
 
     /**
      * @param array|null $options
@@ -45,6 +42,13 @@ class CM_Frontend_JavascriptContainer_Bundle {
     public function getSourceMaps(array $options = null) {
         $config = $this->_getConfig($options);
         return CM_Service_Manager::getInstance()->getBundler()->sourceMaps($config);
+    }
+
+    /**
+     * @param bool|null $state
+     */
+    public function setIgnoreMissing($state = null) {
+        $this->_ignoreMissing = (bool) $state;
     }
 
     /**
@@ -160,13 +164,14 @@ class CM_Frontend_JavascriptContainer_Bundle {
         };
 
         return array_merge([
-            'watch'      => \Functional\map($this->_watchPath, $relativePath),
-            'paths'      => \Functional\map($this->_sourcePath, $relativePath),
-            'entries'    => \Functional\map($this->_entryPath, $relativePath),
-            'libraries'  => \Functional\map($this->_libraryPath, $relativePath),
-            'concat'     => \Functional\map($this->_rawPath, $relativePath),
-            'content'    => $this->_content,
-            'sourceMaps' => [
+            'watch'         => \Functional\map($this->_watchPath, $relativePath),
+            'paths'         => \Functional\map($this->_sourcePath, $relativePath),
+            'entries'       => \Functional\map($this->_entryPath, $relativePath),
+            'libraries'     => \Functional\map($this->_libraryPath, $relativePath),
+            'concat'        => \Functional\map($this->_rawPath, $relativePath),
+            'content'       => $this->_content,
+            'ignoreMissing' => $this->_ignoreMissing,
+            'sourceMaps'    => [
                 'replace' => $this->getSourceMapping(),
             ],
         ], $extra);

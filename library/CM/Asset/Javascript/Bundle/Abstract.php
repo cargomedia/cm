@@ -2,14 +2,8 @@
 
 abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_Abstract {
 
-    /** @var CM_Frontend_JavascriptContainer */
+    /** @var CM_Frontend_JavascriptContainer_Bundle */
     protected $_js;
-
-    /** @var CM_Site_Abstract */
-    protected $_site;
-
-    /** @var bool */
-    protected $_debug;
 
     /** @var bool */
     protected $_sourceMapsOnly;
@@ -20,8 +14,7 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
      * @param bool|null        $sourceMapsOnly
      */
     public function __construct(CM_Site_Abstract $site, $debug = null, $sourceMapsOnly = null) {
-        $this->_site = $site;
-        $this->_debug = (bool) $debug;
+        parent::__construct($site, $debug);
         $this->_sourceMapsOnly = (bool) $sourceMapsOnly;
         $this->_js = new CM_Frontend_JavascriptContainer_Bundle();
     }
@@ -33,11 +26,6 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
             return $this->getCode(!$this->_isDebug());
         }
     }
-
-    /**
-     * @return string
-     */
-    abstract protected function _getBundleName();
 
     /**
      * @param $compressed
@@ -62,11 +50,9 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
     }
 
     /**
-     * @return CM_Site_Abstract
+     * @return string
      */
-    public function getSite() {
-        return $this->_site;
-    }
+    abstract protected function _getBundleName();
 
     /**
      * @param string                       $name
@@ -121,39 +107,5 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
         $this->_js->addEntryPaths($sourceMainPaths);
         $this->_js->addSourcePaths($sourcePaths);
         $this->_js->addSourceMapping($mapping);
-    }
-
-    /**
-     * @param string      $moduleName
-     * @param string|null $path
-     * @return string
-     */
-    protected function _getPathInModule($moduleName, $path = null) {
-        $path = null === $path ? '' : $path;
-        return DIR_ROOT . CM_Bootloader::getInstance()->getModulePath($moduleName) . $path;
-    }
-
-    /**
-     * @param $extra
-     * @return string
-     */
-    protected function _getCacheKey(array $extra = null) {
-        $extra = null === $extra ? [] : $extra;
-        $modules = $this->getSite()->getModules();
-        sort($modules);
-        $cacheKey = array_merge($extra, [
-            'modules' => join('_', $modules),
-        ]);
-        $cacheKey = \Functional\map($cacheKey, function ($value, $key) {
-            return $key . ':' . $value;
-        });
-        return join('/', $cacheKey);
-    }
-
-    /**
-     * @return bool
-     */
-    protected function _isDebug() {
-        return $this->_debug;
     }
 }

@@ -54,7 +54,7 @@ class CM_App implements CM_Service_ManagerAwareInterface {
             $assetList[] = new CM_Asset_Css_Library($render, $debug);
             /** @var CM_Model_Language $language */
             foreach ($languageList as $language) {
-                $assetList[] = new CM_Asset_Javascript_Translations($site, $debug, $language);
+                $assetList[] = new CM_Asset_Javascript_Bundle_Translations($site, $debug, $language);
             }
         }
 
