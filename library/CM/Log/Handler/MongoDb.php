@@ -84,7 +84,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             ];
 
             $formattedContext['httpRequest']['query'] = $request->findQuery();
-            
+
             if ($request instanceof CM_Http_Request_Post) {
                 $formattedContext['httpRequest']['body'] = $request->getBody();
             }
@@ -108,14 +108,14 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         $formattedRecord = [
             'level'     => (int) $record->getLevel(),
             'message'   => (string) $record->getMessage(),
-            'createdAt' => new MongoDate($createdAt->getTimestamp()),
+            'createdAt' => new MongoDB\BSON\UTCDateTime($createdAt->getTimestamp() * 1000),
             'context'   => $formattedContext,
         ];
 
         if (null !== $this->_recordTtl) {
             $expireAt = clone $createdAt;
             $expireAt->add(new DateInterval('PT' . $this->_recordTtl . 'S'));
-            $formattedRecord['expireAt'] = new MongoDate($expireAt->getTimestamp());
+            $formattedRecord['expireAt'] = new MongoDB\BSON\UTCDateTime($expireAt->getTimestamp() * 1000);
         }
 
         $formattedRecord = $this->_sanitizeRecord($formattedRecord); //TODO remove after investigation
