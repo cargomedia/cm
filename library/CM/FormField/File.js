@@ -34,7 +34,6 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
       dataType: 'json',
       url: cm.getUrl('/upload', {'field': field.getClass()}, true),
       dropZone: this.$el,
-      acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
       formData: function(form) {
         return $input;
       },
