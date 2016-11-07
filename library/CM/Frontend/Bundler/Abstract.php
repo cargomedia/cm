@@ -2,24 +2,60 @@
 
 abstract class CM_Frontend_Bundler_Abstract {
 
+    /** @var string|null */
+    protected $_base_dir;
+
+    /** @var bool */
+    protected $_cache_enabled;
+
+    /**
+     * @param string|null $base_dir
+     * @param bool|null   $cache_enabled
+     */
+    public function __construct($base_dir = null, $cache_enabled = null) {
+        $this->_base_dir = null !== $base_dir ? (string) $base_dir : null;
+        $this->_cache_enabled = (bool) $cache_enabled;
+    }
+
     public function code(array $config) {
-        return $this->_request('code', $config);
+        return $this->_request([
+            'command' => 'code',
+            'config'  => $this->_mergeConfig($config),
+        ]);
     }
 
     public function sourceMaps(array $config) {
-        return $this->_request('sourcemaps', $config);
+        return $this->_request([
+            'command' => 'sourcemaps',
+            'config'  => $this->_mergeConfig($config),
+        ]);
     }
 
     /**
-     * @param string $command
-     * @param array  $config
+     * @param array $config
+     * @return array
+     */
+    protected function _mergeConfig(array $config) {
+        if ($this->_base_dir) {
+            $config['baseDir'] = $this->_base_dir;
+        }
+        return $config;
+    }
+
+    /**
+     * @param array  $data
      * @return string
      */
-    protected function _request($command, array $config) {
-        return $this->_parseResponse($this->_sendRequest([
-            'command' => $command,
-            'config'  => $config,
-        ]));
+    protected function _request(array $data) {
+        if ($this->_cache_enabled) {
+            $cache = CM_Cache_Persistent::getInstance();
+            $cacheKey = $cache->key(__METHOD__, $data);
+            return $cache->get($cacheKey, function () use ($data) {
+                return $this->_parseResponse($this->_sendRequest($data));
+            });
+        } else {
+            return $this->_parseResponse($this->_sendRequest($data));
+        }
     }
 
     /**
