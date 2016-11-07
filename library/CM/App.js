@@ -500,47 +500,6 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('.timeago').timeago('dispose');
       $dom.find('textarea.autosize, .autosize textarea').trigger('autosize.destroy');
     },
-    /**
-     * @param {HTMLVideoElement} element
-     * @param {Object} [options]
-     * @returns {MediaElementPlayer}
-     */
-    setupVideo: function(element, options) {
-      options = _.extend({
-        preferPlugins: false,
-        success: null
-      }, options || {});
-
-      return new mejs.MediaElementPlayer(element, {
-        flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
-        silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
-        videoWidth: '100%',
-        videoHeight: '100%',
-        defaultVideoWidth: '100%',
-        defaultVideoHeight: '100%',
-        mode: (options.preferPlugins ? 'auto_plugin' : 'auto'),
-        error: function() {
-          throw new Error('Cannot initialize MediaElement video player.');
-        },
-        success: function(mediaElement, domObject) {
-          var mediaElementMuted = cm.storage.get('mediaElement-muted');
-          var mediaElementVolume = cm.storage.get('mediaElement-volume');
-          if (null !== mediaElementMuted) {
-            mediaElement.setMuted(mediaElementMuted);
-          }
-          if (null !== mediaElementVolume) {
-            mediaElement.setVolume(mediaElementVolume);
-          }
-          mediaElement.addEventListener('volumechange', function() {
-            cm.storage.set('mediaElement-volume', mediaElement.volume);
-            cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
-          });
-          if (options.success) {
-            options.success(mediaElement, domObject);
-          }
-        }
-      });
-    },
 
     /**
      * @param {String|String[]} sourceList
