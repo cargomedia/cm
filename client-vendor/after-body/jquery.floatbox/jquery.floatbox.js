@@ -38,6 +38,8 @@
         //`value` as object to rewrite options
         _.extend(this.options, value);
         this.repaint();
+      } else {
+        throw new Error('Invalid param to floatbox.setOptions');
       }
     },
     show: function($element) {
