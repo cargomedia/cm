@@ -155,4 +155,12 @@
       }
     });
   };
+  $.fn.floatbox = function(method, value) {
+    return this.each(function() {
+      var floatbox = $(this).data('floatbox');
+      if (floatbox && _.isFunction(floatbox[method])) {
+        floatbox[method](value);
+      }
+    });
+  };
 })(jQuery);
