@@ -34,7 +34,6 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
       dataType: 'json',
       url: cm.getUrl('/upload', {'field': field.getClass()}, true),
       dropZone: this.$el,
-      acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
       formData: function(form) {
         return $input;
       },
@@ -53,7 +52,12 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
         data.files = _.reject(data.files, function(file) {
           return file.error;
         });
-        if (_.isEmpty(data.files)) {
+        var cardinality = field.getOption("cardinality");
+        var tooManyFiles = cardinality && cardinality <= field.$('.previews .preview').length;
+        if (tooManyFiles) {
+          field.error(cm.language.get('You can only select {$cardinality} items.', {cardinality: cardinality}));
+        }
+        if (_.isEmpty(data.files) || tooManyFiles) {
           data.skipFailMessage = true;
           return false;
         }
@@ -65,9 +69,6 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
       },
       done: function(e, data) {
         if (data.result.success) {
-          while (field.getOption("cardinality") && field.getOption("cardinality") < field.$('.previews .preview').length) {
-            field.$('.previews .preview').first().remove();
-          }
           data.$preview.html(data.result.success.preview + '<input type="hidden" name="' + field.getName() + '[]" value="' + data.result.success.id + '"/>');
         } else if (data.result.error) {
           data.$preview.remove();
