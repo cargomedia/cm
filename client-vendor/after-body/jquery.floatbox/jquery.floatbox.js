@@ -33,6 +33,13 @@
     $parent: null,
     $layer: null,
     $floatbox: null,
+    setOptions: function(value){
+      if (_.isObject(value)) {
+        //`value` as object to rewrite options
+        _.extend(this.options, value);
+        this.repaint();
+      }
+    },
     show: function($element) {
       var $floatboxConfig = $element.find('.floatbox-config:first');
       this.options.fullscreen = $floatboxConfig.data('fullscreen') || this.options.fullscreen;
