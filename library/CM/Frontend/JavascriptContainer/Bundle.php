@@ -158,17 +158,15 @@ class CM_Frontend_JavascriptContainer_Bundle {
         if (null === $extra) {
             $extra = [];
         }
-
-        $relativePath = function ($path) {
+        $makePathRelative = function ($path) {
             return str_replace(DIR_ROOT, '', $path);
         };
-
         return array_merge([
-            'watch'         => \Functional\map($this->_watchPath, $relativePath),
-            'paths'         => \Functional\map($this->_sourcePath, $relativePath),
-            'entries'       => \Functional\map($this->_entryPath, $relativePath),
-            'libraries'     => \Functional\map($this->_libraryPath, $relativePath),
-            'concat'        => \Functional\map($this->_rawPath, $relativePath),
+            'watch'         => \Functional\map($this->_watchPath, $makePathRelative),
+            'paths'         => \Functional\map($this->_sourcePath, $makePathRelative),
+            'entries'       => \Functional\map($this->_entryPath, $makePathRelative),
+            'libraries'     => \Functional\map($this->_libraryPath, $makePathRelative),
+            'concat'        => \Functional\map($this->_rawPath, $makePathRelative),
             'content'       => $this->_content,
             'ignoreMissing' => $this->_ignoreMissing,
             'sourceMaps'    => [
