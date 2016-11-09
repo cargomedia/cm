@@ -17,16 +17,28 @@ abstract class CM_Frontend_Bundler_Abstract {
         $this->_cacheEnabled = (bool) $cacheEnabled;
     }
 
-    public function code(array $config) {
+    /**
+     * @param string $name
+     * @param array  $config
+     * @return string
+     */
+    public function code($name, array $config) {
         return $this->_request([
             'command' => 'code',
+            'name'    => (string) $name,
             'config'  => $this->_mergeConfig($config),
         ]);
     }
 
-    public function sourceMaps(array $config) {
+    /**
+     * @param string $name
+     * @param array  $config
+     * @return string
+     */
+    public function sourceMaps($name, array $config) {
         return $this->_request([
             'command' => 'sourcemaps',
+            'name'    => (string) $name,
             'config'  => $this->_mergeConfig($config),
         ]);
     }
@@ -43,7 +55,7 @@ abstract class CM_Frontend_Bundler_Abstract {
     }
 
     /**
-     * @param array  $data
+     * @param array $data
      * @return string
      */
     protected function _request(array $data) {

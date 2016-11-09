@@ -12,8 +12,8 @@ class CM_Asset_Javascript_Bundle_Translations extends CM_Asset_Javascript_Bundle
      * @param bool|null         $sourceMapsOnly
      */
     public function __construct(CM_Model_Language $language, CM_Site_Abstract $site, $sourceMapsOnly = null) {
-        parent::__construct($site, $sourceMapsOnly);
         $this->_language = $language;
+        parent::__construct($site, $sourceMapsOnly);
         $this->_js->addInlineContent($this->_getModuleName(), $this->_getTranslations());
         $this->_js->setIgnoreMissing(true);
         $this->_js->addSourceMapping([

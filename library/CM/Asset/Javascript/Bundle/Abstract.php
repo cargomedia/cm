@@ -15,7 +15,7 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
     public function __construct(CM_Site_Abstract $site, $sourceMapsOnly = null) {
         parent::__construct($site);
         $this->_sourceMapsOnly = (bool) $sourceMapsOnly;
-        $this->_js = new CM_Frontend_JavascriptContainer_Bundle();
+        $this->_js = new CM_Frontend_JavascriptContainer_Bundle($this->_getName());
     }
 
     public function get() {
@@ -30,6 +30,13 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
      * @return string
      */
     abstract protected function _getBundleName();
+
+    /**
+     * @return string
+     */
+    protected function _getName() {
+        return $this->getSite()->getName() . '/' . $this->_getBundleName();
+    }
 
     /**
      * @param string                       $name

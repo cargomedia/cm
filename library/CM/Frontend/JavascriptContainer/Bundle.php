@@ -2,6 +2,9 @@
 
 class CM_Frontend_JavascriptContainer_Bundle {
 
+    /** @var string */
+    protected $_name;
+
     /** @var array */
     protected $_content = [];
 
@@ -27,12 +30,20 @@ class CM_Frontend_JavascriptContainer_Bundle {
     protected $_ignoreMissing = false;
 
     /**
+     * @param string $name
+     */
+    public function __construct($name) {
+        $this->_name = (string) $name;
+    }
+
+    /**
      * @param array|null $options
      * @return string
      */
     public function getCode(array $options = null) {
+        $name = $this->getName();
         $config = $this->_getConfig($options);
-        return CM_Service_Manager::getInstance()->getBundler()->code($config);
+        return CM_Service_Manager::getInstance()->getBundler()->code($name, $config);
     }
 
     /**
@@ -40,8 +51,9 @@ class CM_Frontend_JavascriptContainer_Bundle {
      * @return string
      */
     public function getSourceMaps(array $options = null) {
+        $name = $this->getName();
         $config = $this->_getConfig($options);
-        return CM_Service_Manager::getInstance()->getBundler()->sourceMaps($config);
+        return CM_Service_Manager::getInstance()->getBundler()->sourceMaps($name, $config);
     }
 
     /**
@@ -49,6 +61,13 @@ class CM_Frontend_JavascriptContainer_Bundle {
      */
     public function setIgnoreMissing($state = null) {
         $this->_ignoreMissing = (bool) $state;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName() {
+        return $this->_name;
     }
 
     /**
