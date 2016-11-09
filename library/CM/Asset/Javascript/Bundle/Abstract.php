@@ -68,42 +68,47 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
      */
     protected function _appendDirectoryGlob($path, $mapPath) {
         $mapping = [];
+        $initPaths = [];
         foreach (array_reverse($this->_site->getModules()) as $moduleName) {
-            $initPath = $this->_getPathInModule($moduleName, $path);
-            $this->_js->addRawPath($initPath . '**/*.js');
+            $initPaths[] = $this->_getPathInModule($moduleName, $path) . '**/*.js';
             $mapping['/' . $moduleName . '/' . $mapPath . '/'] = '^.*/?' . $moduleName . '/' . $path;
         }
+        $this->_js->addRawPaths($initPaths);
+        $this->_js->addWatchPaths($initPaths);
         $this->_js->addSourceMapping($mapping);
     }
 
     /**
-     * @param string $mainPath
-     * @throws CM_Exception
+     * @param $mainPath
      */
     protected function _appendDirectoryBrowserify($mainPath) {
         $mapping = [];
+        $watchPaths = [];
         $sourceMainPaths = [];
         foreach (array_reverse($this->_site->getModules()) as $moduleName) {
-            $sourceMainPaths = array_merge($sourceMainPaths, glob($this->_getPathInModule($moduleName, $mainPath) . '*.js'));
+            $path = $this->_getPathInModule($moduleName, $mainPath) . '*.js';
+            $watchPaths[] = $path;
+            $sourceMainPaths = array_merge($sourceMainPaths, glob($path));
             $mapping['/' . $moduleName . '/main/'] = '^.*/?' . $moduleName . '/' . $mainPath;
         }
-        $this->_appendSourceMainBrowserify($sourceMainPaths);
+        $this->_js->addEntryPaths($sourceMainPaths);
+        $this->_js->addWatchPaths($watchPaths);
         $this->_js->addSourceMapping($mapping);
+        $this->_appendSourceBrowserify();
     }
 
-    /**
-     * @param string[] $sourceMainPaths
-     */
-    protected function _appendSourceMainBrowserify($sourceMainPaths) {
+    protected function _appendSourceBrowserify() {
         $mapping = [];
+        $watchPaths = [];
         $sourcePaths = [];
         foreach (array_reverse($this->_site->getModules()) as $moduleName) {
             $path = $this->_getPathInModule($moduleName, 'client-vendor/source');
             $sourcePaths[] = $path;
+            $watchPaths[] = $path . '/**/*.js';
             $mapping['/' . $moduleName . '/source/'] = '^.*/?' . $moduleName . '/client-vendor/source/';
         }
-        $this->_js->addEntryPaths($sourceMainPaths);
         $this->_js->addSourcePaths($sourcePaths);
+        $this->_js->addWatchPaths($watchPaths);
         $this->_js->addSourceMapping($mapping);
     }
 }
