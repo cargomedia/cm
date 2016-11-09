@@ -3,18 +3,18 @@
 abstract class CM_Frontend_Bundler_Abstract {
 
     /** @var string|null */
-    protected $_base_dir;
+    protected $_baseDir;
 
     /** @var bool */
-    protected $_cache_enabled;
+    protected $_cacheEnabled;
 
     /**
-     * @param string|null $base_dir
-     * @param bool|null   $cache_enabled
+     * @param string|null $baseDir
+     * @param bool|null   $cacheEnabled
      */
-    public function __construct($base_dir = null, $cache_enabled = null) {
-        $this->_base_dir = null !== $base_dir ? (string) $base_dir : null;
-        $this->_cache_enabled = (bool) $cache_enabled;
+    public function __construct($baseDir = null, $cacheEnabled = null) {
+        $this->_baseDir = null !== $baseDir ? (string) $baseDir : null;
+        $this->_cacheEnabled = (bool) $cacheEnabled;
     }
 
     public function code(array $config) {
@@ -36,8 +36,8 @@ abstract class CM_Frontend_Bundler_Abstract {
      * @return array
      */
     protected function _mergeConfig(array $config) {
-        if ($this->_base_dir) {
-            $config['baseDir'] = $this->_base_dir;
+        if ($this->_baseDir) {
+            $config['baseDir'] = $this->_baseDir;
         }
         return $config;
     }
@@ -47,7 +47,7 @@ abstract class CM_Frontend_Bundler_Abstract {
      * @return string
      */
     protected function _request(array $data) {
-        if ($this->_cache_enabled) {
+        if ($this->_cacheEnabled) {
             $cache = CM_Cache_Persistent::getInstance();
             $cacheKey = $cache->key(__METHOD__, $data);
             return $cache->get($cacheKey, function () use ($data) {

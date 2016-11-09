@@ -312,9 +312,9 @@ return function (CM_Config_Node $config) {
     $config->services['cm-bundler'] = [
         'class'     => 'CM_Frontend_Bundler_Client',
         'arguments' => array(
-            'socket_url'    => 'tcp://10.10.11.1:6644',
-            'base_dir'      => null,
-            'cache_enabled' => false,
+            'socketUrl'    => 'tcp://10.10.11.1:6644',
+            'baseDir'      => null,
+            'cacheEnabled' => false,
         ),
     ];
 };
