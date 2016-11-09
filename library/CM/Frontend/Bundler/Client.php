@@ -21,17 +21,32 @@ class CM_Frontend_Bundler_Client extends CM_Frontend_Bundler_Abstract {
      * @throws CM_Exception
      */
     protected function _sendRequest(array $data) {
-        $sock = stream_socket_client($this->_socketUrl, $errorNumber, $errorMessage);
-        if (!$sock) {
+        if (!($sock = stream_socket_client($this->_socketUrl, $errorNumber, $errorMessage))) {
             throw new CM_Exception_Invalid('Connection to cm-bundler service failed', null, [
-                'errorNumber'  => $errorNumber,
+                'socketUrl'    => $this->_socketUrl,
                 'errorMessage' => $errorMessage,
-                'socket'       => $this->_socketUrl,
+                'errorNumber'  => $errorNumber,
             ]);
         }
-        fwrite($sock, CM_Util::jsonEncode($data) . chr(4) /* EOT */);
-        $rawResponse = stream_get_contents($sock);
-        fclose($sock);
+        if (!fwrite($sock, CM_Util::jsonEncode($data) . chr(4) /* EOT */)) {
+            throw new CM_Exception_Invalid('Failed to send a cm-bundler request', null, [
+                'socketUrl' => $this->_socketUrl,
+                'request'   => $data,
+            ]);
+        }
+        if (!($rawResponse = stream_get_contents($sock))) {
+            throw new CM_Exception_Invalid('Failed to get cm-bundler response', null, [
+                'socketUrl' => $this->_socketUrl,
+                'request'   => $data,
+            ]);
+        }
+        if (!fclose($sock)) {
+            throw new CM_Exception_Invalid('Failed to close cm-bundler connection', null, [
+                'socketUrl' => $this->_socketUrl,
+                'request'   => $data,
+                'response'  => $rawResponse,
+            ]);
+        }
         return $rawResponse;
     }
 }
