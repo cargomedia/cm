@@ -2,8 +2,8 @@
 
 class CM_Asset_Javascript_Bundle_ServiceWorker extends CM_Asset_Javascript_Bundle_Abstract {
 
-    public function __construct(CM_Site_Abstract $site, $debug = null, $sourceMapsOnly = null) {
-        parent::__construct($site, $debug, $sourceMapsOnly);
+    public function __construct(CM_Site_Abstract $site, $sourceMapsOnly = null) {
+        parent::__construct($site, $sourceMapsOnly);
         $workerConfig = $this->_getWorkerConfig();
         $this->_js->addInlineContent('worker/config', $workerConfig, true, true);
         $this->_appendDirectoryBrowserify('client-vendor/serviceworker/');

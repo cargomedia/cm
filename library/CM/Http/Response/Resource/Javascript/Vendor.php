@@ -6,30 +6,29 @@ class CM_Http_Response_Resource_Javascript_Vendor extends CM_Http_Response_Resou
         $user = $this->getRequest()->getSession()->getUser();
         // TODO: define who can access to sourcemaps....
         $dev = true;
-        $debug = $this->getEnvironment()->isDebug();
         $site = $this->getSite();
 
         switch ($this->getRequest()->getPath()) {
             case '/before-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site, $debug));
-                if ($debug || $dev) {
+                $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site));
+                if ($dev) {
                     $this->setHeader('X-SourceMap', $this->getRequest()->getUri() . '.map');
                 }
                 break;
             case '/after-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site, $debug));
-                if ($debug || $dev) {
+                $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site));
+                if ($dev) {
                     $this->setHeader('X-SourceMap', $this->getRequest()->getUri() . '.map');
                 }
                 break;
             case '/before-body.js.map':
-                if ($debug || $dev) {
-                    $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site, $debug, true));
+                if ($dev) {
+                    $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site, true));
                 }
                 break;
             case '/after-body.js.map':
-                if ($debug || $dev) {
-                    $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site, $debug, true));
+                if ($dev) {
+                    $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site, true));
                 }
                 break;
             default:

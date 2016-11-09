@@ -2,8 +2,8 @@
 
 class CM_Asset_Javascript_Bundle_Library extends CM_Asset_Javascript_Bundle_Abstract {
 
-    public function __construct(CM_Site_Abstract $site, $debug = null, $sourceMapsOnly = null) {
-        parent::__construct($site, $debug, $sourceMapsOnly);
+    public function __construct(CM_Site_Abstract $site, $sourceMapsOnly = null) {
+        parent::__construct($site, $sourceMapsOnly);
 
         $this->_js->addInlineContent('/App/init', $this->_getAppInit($this->_getAppClassName($site)), false, true);
         $this->_js->addInlineContent('/App/internals', $this->_getInternals());

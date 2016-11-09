@@ -5,16 +5,11 @@ abstract class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
     /** @var CM_Site_Abstract */
     protected $_site;
 
-    /** @var bool */
-    protected $_debug;
-
     /**
      * @param CM_Site_Abstract $site
-     * @param bool|null        $debug
      */
-    public function __construct(CM_Site_Abstract $site, $debug = null) {
+    public function __construct(CM_Site_Abstract $site) {
         $this->_site = $site;
-        $this->_debug = (bool) $debug;
     }
 
     /**
@@ -32,12 +27,5 @@ abstract class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
      */
     public function getSite() {
         return $this->_site;
-    }
-
-    /**
-     * @return bool
-     */
-    protected function _isDebug() {
-        return $this->_debug;
     }
 }

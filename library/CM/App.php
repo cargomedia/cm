@@ -43,18 +43,18 @@ class CM_App implements CM_Service_ManagerAwareInterface {
 
         foreach ($siteList as $site) {
             $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-            $assetList[] = new CM_Asset_Javascript_Bundle_Library($site, $debug);
-            $assetList[] = new CM_Asset_Javascript_Bundle_Library($site, $debug, true);
-            $assetList[] = new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site, $debug);
-            $assetList[] = new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site, $debug, true);
-            $assetList[] = new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site, $debug);
-            $assetList[] = new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site, $debug, true);
+            $assetList[] = new CM_Asset_Javascript_Bundle_Library($site);
+            $assetList[] = new CM_Asset_Javascript_Bundle_Library($site, true);
+            $assetList[] = new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site);
+            $assetList[] = new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site, true);
+            $assetList[] = new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site);
+            $assetList[] = new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site, true);
             $assetList[] = new CM_Asset_Css_Vendor($render, $debug);
             $assetList[] = new CM_Asset_Css_Library($render, $debug);
             /** @var CM_Model_Language $language */
             foreach ($languageList as $language) {
-                $assetList[] = new CM_Asset_Javascript_Bundle_Translations($language, $site, $debug);
-                $assetList[] = new CM_Asset_Javascript_Bundle_Translations($language, $site, $debug, true);
+                $assetList[] = new CM_Asset_Javascript_Bundle_Translations($language, $site);
+                $assetList[] = new CM_Asset_Javascript_Bundle_Translations($language, $site, true);
             }
         }
 

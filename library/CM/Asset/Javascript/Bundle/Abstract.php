@@ -10,43 +10,20 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
 
     /**
      * @param CM_Site_Abstract $site
-     * @param bool|null        $debug
      * @param bool|null        $sourceMapsOnly
      */
-    public function __construct(CM_Site_Abstract $site, $debug = null, $sourceMapsOnly = null) {
-        parent::__construct($site, $debug);
+    public function __construct(CM_Site_Abstract $site, $sourceMapsOnly = null) {
+        parent::__construct($site);
         $this->_sourceMapsOnly = (bool) $sourceMapsOnly;
         $this->_js = new CM_Frontend_JavascriptContainer_Bundle();
     }
 
     public function get() {
         if ($this->_sourceMapsOnly) {
-            return $this->getSourceMaps(!$this->_isDebug());
+            return $this->_js->getSourceMaps();
         } else {
-            return $this->getCode(!$this->_isDebug());
+            return $this->_js->getCode();
         }
-    }
-
-    /**
-     * @param $compressed
-     * @return string
-     */
-    public function getCode($compressed) {
-        return $this->_js->getCode([
-            'bundleName' => $this->_site->getName() . '/' . $this->_getBundleName(),
-            'uglify'     => $compressed
-        ]);
-    }
-
-    /**
-     * @param $compressed
-     * @return string
-     */
-    public function getSourceMaps($compressed) {
-        return $this->_js->getSourceMaps([
-            'bundleName' => $this->_site->getName() . '/' . $this->_getBundleName() . '.map',
-            'uglify'     => $compressed
-        ]);
     }
 
     /**

@@ -9,11 +9,10 @@ class CM_Asset_Javascript_Bundle_Translations extends CM_Asset_Javascript_Bundle
      * CM_Asset_Javascript_Bundle_Translations constructor.
      * @param CM_Model_Language $language
      * @param CM_Site_Abstract  $site
-     * @param bool|null         $debug
      * @param bool|null         $sourceMapsOnly
      */
-    public function __construct(CM_Model_Language $language, CM_Site_Abstract $site, $debug = null, $sourceMapsOnly = null) {
-        parent::__construct($site, $debug, $sourceMapsOnly);
+    public function __construct(CM_Model_Language $language, CM_Site_Abstract $site, $sourceMapsOnly = null) {
+        parent::__construct($site, $sourceMapsOnly);
         $this->_language = $language;
         $this->_js->addInlineContent($this->_getModuleName(), $this->_getTranslations());
         $this->_js->setIgnoreMissing(true);
