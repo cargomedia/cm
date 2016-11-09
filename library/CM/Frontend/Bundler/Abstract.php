@@ -72,14 +72,10 @@ abstract class CM_Frontend_Bundler_Abstract {
             ]);
         }
         if (isset($response['error'])) {
-            throw new CM_Exception_Invalid('cm-bundler has responded with an error', null, [
-                'cmBundlerResponse' => $response,
-            ]);
+            throw new CM_Exception_Invalid('cm-bundler has responded with an error', null, $response);
         }
         if (!isset($response['content'])) {
-            throw new CM_Exception_Invalid('cm-bundler has responded without any content', null, [
-                'cmBundlerResponse' => $response,
-            ]);
+            throw new CM_Exception_Invalid('cm-bundler has responded without any content', null, $response);
         }
         return (string) $response['content'];
     }

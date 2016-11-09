@@ -25,7 +25,7 @@ class CM_Frontend_Bundler_AbstractTest extends CMTest_TestCase {
         $this->assertEquals([
             'error' => 'foo',
             'stack' => 'bar'
-        ], $exception->getMetaInfo()['cmBundlerResponse']);
+        ], $exception->getMetaInfo());
 
         /** @var CM_Exception_Invalid $exception */
         $exception = $this->catchException(function () use ($bundler) {
@@ -33,6 +33,6 @@ class CM_Frontend_Bundler_AbstractTest extends CMTest_TestCase {
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertSame('cm-bundler has responded without any content', $exception->getMessage());
-        $this->assertSame(null, $exception->getMetaInfo()['cmBundlerResponse']);
+        $this->assertSame([], $exception->getMetaInfo());
     }
 }
