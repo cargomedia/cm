@@ -3,33 +3,18 @@
 class CM_Http_Response_Resource_Javascript_Vendor extends CM_Http_Response_Resource_Javascript_Abstract {
 
     protected function _process() {
-        $user = $this->getRequest()->getSession()->getUser();
-        // TODO: define who can access to sourcemaps....
-        $dev = true;
         $site = $this->getSite();
+
+        if ($this->_withSourceMaps) {
+            $this->setHeader('X-SourceMap', $this->_getSourceMapsUrl('vendor'));
+        }
 
         switch ($this->getRequest()->getPath()) {
             case '/before-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site));
-                if ($dev) {
-                    $this->setHeader('X-SourceMap', $this->getRequest()->getUri() . '.map');
-                }
+                $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site, $this->_isSourceMaps));
                 break;
             case '/after-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site));
-                if ($dev) {
-                    $this->setHeader('X-SourceMap', $this->getRequest()->getUri() . '.map');
-                }
-                break;
-            case '/before-body.js.map':
-                if ($dev) {
-                    $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site, true));
-                }
-                break;
-            case '/after-body.js.map':
-                if ($dev) {
-                    $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site, true));
-                }
+                $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site, $this->_isSourceMaps));
                 break;
             default:
                 throw new CM_Exception_Invalid('Invalid path provided', CM_Exception::WARN, ['path' => $this->getRequest()->getPath()]);
