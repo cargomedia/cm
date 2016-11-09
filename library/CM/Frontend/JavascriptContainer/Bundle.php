@@ -74,7 +74,7 @@ class CM_Frontend_JavascriptContainer_Bundle {
     }
 
     /**
-     * @param array $entryPaths
+     * @param string[] $entryPaths
      */
     public function addEntryPaths($entryPaths) {
         $this->_entryPath = array_merge($this->_entryPath, $entryPaths);
@@ -88,7 +88,7 @@ class CM_Frontend_JavascriptContainer_Bundle {
     }
 
     /**
-     * @param array $sourcePaths
+     * @param string[] $sourcePaths
      */
     public function addSourcePaths($sourcePaths) {
         $this->_sourcePath = array_merge($this->_sourcePath, $sourcePaths);
@@ -102,7 +102,7 @@ class CM_Frontend_JavascriptContainer_Bundle {
     }
 
     /**
-     * @param array $rawPaths
+     * @param string[] $rawPaths
      */
     public function addRawPaths($rawPaths) {
         $this->_rawPath = array_merge($this->_rawPath, $rawPaths);
@@ -116,7 +116,7 @@ class CM_Frontend_JavascriptContainer_Bundle {
     }
 
     /**
-     * @param array $watchPaths
+     * @param string[] $watchPaths
      */
     public function addWatchPaths($watchPaths) {
         $this->_watchPath = array_merge($this->_watchPath, $watchPaths);
@@ -130,7 +130,7 @@ class CM_Frontend_JavascriptContainer_Bundle {
     }
 
     /**
-     * @param array $libraryPaths
+     * @param string[] $libraryPaths
      */
     public function addLibraryPaths($libraryPaths) {
         $this->_libraryPath = array_merge($this->_libraryPath, $libraryPaths);
@@ -175,14 +175,5 @@ class CM_Frontend_JavascriptContainer_Bundle {
                 'replace' => $this->getSourceMapping(),
             ],
         ], $extra);
-    }
-
-    /**
-     * @return string
-     */
-    protected function _getInlineContent() {
-        return \Functional\reduce_left($this->_content, function ($content, $index, $collection, $carry) {
-            return $carry . $content['name'] . $content['data'] . $content['require'];
-        }, '');
     }
 }

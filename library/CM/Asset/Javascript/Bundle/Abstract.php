@@ -71,7 +71,7 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
         foreach (array_reverse($this->_site->getModules()) as $moduleName) {
             $initPath = $this->_getPathInModule($moduleName, $path);
             $this->_js->addRawPath($initPath . '**/*.js');
-            $mapping['/' . $moduleName . '/' . $mapPath . '/'] = '(^|.*/)' . $moduleName . '/' . $path;
+            $mapping['/' . $moduleName . '/' . $mapPath . '/'] = '^.*/?' . $moduleName . '/' . $path;
         }
         $this->_js->addSourceMapping($mapping);
     }
@@ -85,7 +85,7 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
         $sourceMainPaths = [];
         foreach (array_reverse($this->_site->getModules()) as $moduleName) {
             $sourceMainPaths = array_merge($sourceMainPaths, glob($this->_getPathInModule($moduleName, $mainPath) . '*.js'));
-            $mapping['/' . $moduleName . '/main/'] = '(^|.*/)' . $moduleName . '/' . $mainPath;
+            $mapping['/' . $moduleName . '/main/'] = '^.*/?' . $moduleName . '/' . $mainPath;
         }
         $this->_appendSourceMainBrowserify($sourceMainPaths);
         $this->_js->addSourceMapping($mapping);
@@ -93,8 +93,6 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
 
     /**
      * @param string[] $sourceMainPaths
-     * @param string   $mapPath
-     * @throws CM_Exception
      */
     protected function _appendSourceMainBrowserify($sourceMainPaths) {
         $mapping = [];
@@ -102,7 +100,7 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
         foreach (array_reverse($this->_site->getModules()) as $moduleName) {
             $path = $this->_getPathInModule($moduleName, 'client-vendor/source');
             $sourcePaths[] = $path;
-            $mapping['/' . $moduleName . '/source/'] = '(^|.*/)' . $moduleName . '/client-vendor/source/';
+            $mapping['/' . $moduleName . '/source/'] = '^.*/?' . $moduleName . '/client-vendor/source/';
         }
         $this->_js->addEntryPaths($sourceMainPaths);
         $this->_js->addSourcePaths($sourcePaths);
