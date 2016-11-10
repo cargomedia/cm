@@ -16,6 +16,10 @@ class CM_Http_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
         $mockBundler->mockMethod('_sendRequest')->set(function ($data) {
             return CM_Util::jsonEncode($data);
         });
+        $mockBundler->mockMethod('_parseResponse')->set(function ($rawResponse) {
+            return $rawResponse;
+        });
+
         $bundler = $mockBundler->newInstanceWithoutConstructor();
         $this->getServiceManager()->replaceInstance('cm-bundler', $bundler);
     }
@@ -34,7 +38,7 @@ class CM_Http_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
         $response->process();
         $this->assertContains('Cache-Control: max-age=31536000', $response->getHeaders());
         $this->assertContains('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 31536000), $response->getHeaders());
-        $this->assertContains('"bundleName":"Default\/library.js"', $response->getContent());
+        $this->assertContains('"name":"Default\/library.js"', $response->getContent());
         $this->assertRegExp('/"library\\\\\/CM\\\\\/.*?\.js"/', $response->getContent());
     }
 

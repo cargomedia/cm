@@ -7,6 +7,9 @@ class CM_Http_Response_Resource_Javascript_ServiceWorkerTest extends CMTest_Test
         $mockBundler->mockMethod('_sendRequest')->set(function ($data) {
             return CM_Util::jsonEncode($data);
         });
+        $mockBundler->mockMethod('_parseResponse')->set(function ($rawResponse) {
+            return $rawResponse;
+        });
         $bundler = $mockBundler->newInstanceWithoutConstructor();
         $this->getServiceManager()->replaceInstance('cm-bundler', $bundler);
     }
