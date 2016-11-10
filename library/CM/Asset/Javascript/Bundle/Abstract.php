@@ -35,7 +35,7 @@ abstract class CM_Asset_Javascript_Bundle_Abstract extends CM_Asset_Javascript_A
      * @return string
      */
     protected function _getName() {
-        return $this->getSite()->getName() . '/' . $this->_getBundleName();
+        return $this->getSite()->getName() . '/' . $this->_getBundleName() . ($this->_sourceMapsOnly ? '.map' : '');
     }
 
     /**
