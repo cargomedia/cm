@@ -61,7 +61,7 @@ abstract class CM_Frontend_Bundler_Abstract {
     protected function _request(array $data) {
         if ($this->_cacheEnabled) {
             $cache = CM_Cache_Persistent::getInstance();
-            $cacheKey = $cache->key(__METHOD__, $data);
+            $cacheKey = $cache->key(__METHOD__, $data['command'], $data['config']);
             return $cache->get($cacheKey, function () use ($data) {
                 return $this->_parseResponse($this->_sendRequest($data));
             });
