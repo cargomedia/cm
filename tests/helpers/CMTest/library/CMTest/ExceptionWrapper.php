@@ -7,7 +7,11 @@ class CMTest_ExceptionWrapper extends PHPUnit_Framework_ExceptionWrapper {
 
         if ($e instanceof CM_Exception) {
             $message = $e->getMessage();
-            foreach ($e->getMetaInfo() as $key => $value) {
+            $variableInspector = new CM_Debug_VariableInspector();
+            $metaInfo = Functional\map($e->getMetaInfo(), function ($value) use ($variableInspector) {
+                return $variableInspector->getDebugInfo($value);
+            });
+            foreach ($metaInfo as $key => $value) {
                 $message .= sprintf("\n - %s: %s", $key, $value);
             }
             $this->message = $message;
