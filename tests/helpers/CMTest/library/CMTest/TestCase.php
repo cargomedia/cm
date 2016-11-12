@@ -28,7 +28,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         CMTest_TH::clearEnv();
     }
 
-    protected function onNotSuccessfulTest(Exception $e) {
+    protected function onNotSuccessfulTest($e) {
         parent::onNotSuccessfulTest(new CMTest_ExceptionWrapper($e));
     }
 
