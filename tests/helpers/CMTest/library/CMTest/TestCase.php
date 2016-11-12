@@ -29,7 +29,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     protected function onNotSuccessfulTest($e) {
-        parent::onNotSuccessfulTest(new CMTest_ExceptionWrapper($e));
+        if ($e instanceof CM_Exception) {
+            $e = new CMTest_ExceptionWrapper($e);
+        }
+        parent::onNotSuccessfulTest($e);
     }
 
     /**
