@@ -250,23 +250,26 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @throws CM_MongoDb_Exception
      */
     public function rename($collectionSource, $collectionTarget, $dropTarget = null) {
+        $collectionSource = (string) $collectionSource;
+        $collectionTarget = (string) $collectionTarget;
+
         $dropTarget = (bool) $dropTarget;
         if (!$this->existsCollection($collectionSource)) {
             throw new CM_MongoDb_Exception('Source collection does not exist', null, [
                 'collectionSource' => $collectionSource,
-                'collectionTarget' => $collectionTarget
+                'collectionTarget' => $collectionTarget,
             ]);
         }
         if (!$dropTarget && $this->existsCollection($collectionTarget)) {
             throw new CM_MongoDb_Exception('Target collection already exists', null, [
                 'collectionSource' => $collectionSource,
-                'collectionTarget' => $collectionTarget
+                'collectionTarget' => $collectionTarget,
             ]);
         }
         $result = $this->_getClient()->selectDB('admin')->command([
             'renameCollection' => $this->_getDatabaseName() . '.' . $collectionSource,
             'to'               => $this->_getDatabaseName() . '.' . $collectionTarget,
-            'dropTarget'       => $dropTarget ? 'true' : 'false'
+            'dropTarget'       => $dropTarget,
         ]);
         $this->_checkResultForErrors($result);
         return $result;
