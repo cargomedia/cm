@@ -499,6 +499,7 @@ var CM_App = CM_Class_Abstract.extend({
     teardown: function($dom) {
       $dom.find('.timeago').timeago('dispose');
       $dom.find('textarea.autosize, .autosize textarea').trigger('autosize.destroy');
+      $dom.find('img.lazy').trigger('destroy.unveil');
     },
 
     /**
