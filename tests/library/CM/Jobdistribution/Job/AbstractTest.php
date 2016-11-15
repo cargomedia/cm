@@ -132,9 +132,9 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
 
         $mockBuilder = $this->getMockBuilder('GearmanClient');
-        $mockBuilder->setMethods(['addTaskHigh', 'runTasks', 'setCompleteCallback', 'setFailCallback']);
+        $mockBuilder->setMethods(['addTask', 'runTasks', 'setCompleteCallback', 'setFailCallback']);
         $gearmanClientMock = $mockBuilder->getMock();
-        $gearmanClientMock->expects($this->exactly(2))->method('addTaskHigh')->will($this->returnValue(true));
+        $gearmanClientMock->expects($this->exactly(2))->method('addTask')->will($this->returnValue(true));
         $gearmanClientMock->expects($this->exactly(1))->method('runTasks')->will($this->returnValue(true));
         $gearmanClientMock->expects($this->exactly(1))->method('setCompleteCallback')->will($this->returnCallback(function ($completeCallback) {
             $task1 = $this->getMockBuilder('GearmanTask')->setMethods(array('data'))->getMock();
