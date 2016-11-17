@@ -167,9 +167,8 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
         $options = (array) $options;
         if ($aggregation) {
             array_push($aggregation, ['$limit' => 1]);
-            $resultSet = new IteratorIterator($this->find($collection, $criteria, $projection, $aggregation, ['limit' => 1]));
-            $resultSet->rewind();
-            $result = $resultSet->current();
+            $resultSet = $this->find($collection, $criteria, $projection, $aggregation, ['limit' => 1]);
+            $result = \Functional\first($resultSet);
         } else {
             if ($projection) {
                 $options['projection'] = $projection;
@@ -451,6 +450,8 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
             throw new CM_MongoDb_Exception('Cannot perform mongodb operation', null, ['result' => $result]);
         }
     }
+
+    function findAndModify() {}
 
     /**
      * @return MongoDB\Client
