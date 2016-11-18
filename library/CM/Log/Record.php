@@ -30,8 +30,7 @@ class CM_Log_Record {
         $this->_level = $level;
         $this->_message = $message;
         $this->_context = $context;
-        $this->_createdAt = new DateTime();
-        $this->_createdAt->setTimestamp(time());
+        $this->_createdAt = CM_Util::createDateTimeWithMillis();
     }
 
     /**

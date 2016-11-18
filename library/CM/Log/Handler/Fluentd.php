@@ -38,8 +38,9 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
      */
     protected function _writeRecord(CM_Log_Record $record) {
         $formattedRecord = $this->_formatRecord($record);
-        $formattedRecord = $this->_sanitizeRecord($formattedRecord);
-        $this->_getFluentd()->post($this->_tag, $formattedRecord);
+        $sanitizedRecord = $this->_sanitizeRecord($formattedRecord);
+        $encodedRecord = $this->_encodeRecord($sanitizedRecord);
+        $this->_getFluentd()->post($this->_tag, $encodedRecord);
     }
 
     /**
@@ -47,7 +48,16 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
      * @return array
      */
     protected function _formatRecord(CM_Log_Record $record) {
-        return $this->_contextFormatter->formatRecordContext($record);
+        $levelsMapping = array_flip(CM_Log_Logger::getLevels());
+        $context = $record->getContext();
+
+        $result = [
+            'message'   => (string) $record->getMessage(),
+            'level'     => strtolower($levelsMapping[$record->getLevel()]),
+            'timestamp' => $record->getCreatedAt()->format('Y-m-d\TH:i:s.uO'), // ISO8601 with fractions
+        ];
+        $result = array_merge($result, $this->_contextFormatter->formatContext($context));
+        return $result;
     }
 
     /**
@@ -61,5 +71,38 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
             }
         });
         return $formattedRecord;
+    }
+
+    /**
+     * @param array      $value
+     * @param mixed|null $key
+     * @return array
+     */
+    protected function _encodeRecord($value, $key = null) {
+        if ('id' === $key) {
+            return (string) $value;
+        }
+        if ($value instanceof DateTime) {
+            return $value->format('c');
+        }
+        if ($value instanceof CM_Model_Abstract) {
+            return [
+                'class' => get_class($value),
+                'id'    => (string) $value->getId(),
+            ];
+        }
+        if (is_object($value)) {
+            return [
+                'class' => get_class($value),
+            ];
+        }
+        if (is_array($value)) {
+            $encoded = [];
+            foreach ($value as $key => $val) {
+                $encoded[$key] = $this->_encodeRecord($val, $key);
+            }
+            return $encoded;
+        }
+        return $value;
     }
 }

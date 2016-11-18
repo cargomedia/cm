@@ -7,14 +7,19 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
             $this->markTestSkipped('Gearman Pecl Extension not installed.');
         }
         $counter = 0;
-        $gearmanWorkerMock = $this->getMock('GearmanWorker', array('work'));
+        $mockBuilder = $this->getMockBuilder('GearmanWorker');
+        $mockBuilder->setMethods(['work']);
+        $gearmanWorkerMock = $mockBuilder->getMock();
         $gearmanWorkerMock->expects($this->exactly(2))->method('work')->will($this->returnCallback(function () use (&$counter) {
             if (++$counter >= 2) {
                 return false;
             }
             throw new Exception('foo-bar');
         }));
-        $jobWorkerMock = $this->getMock('CM_Jobdistribution_JobWorker', array('_getGearmanWorker', '_handleException'), array(), '', false);
+        $mockBuilder = $this->getMockBuilder('CM_Jobdistribution_JobWorker');
+        $mockBuilder->setMethods(['_getGearmanWorker', '_handleException']);
+        $mockBuilder->disableOriginalConstructor();
+        $jobWorkerMock = $mockBuilder->getMock();
         $jobWorkerMock->expects($this->any())->method('_getGearmanWorker')->will($this->returnValue($gearmanWorkerMock));
         /** @var CM_JobDistribution_JobWorker $jobWorkerMock */
         $serviceManager = new CM_Service_Manager();

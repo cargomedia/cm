@@ -9,5 +9,6 @@ _.extend(lib, {
   Media: {
     Video: require('cm/media/video'),
     Audio: require('cm/media/audio')
-  }
+  },
+  PersistentStorage: require('cm/storage')
 });

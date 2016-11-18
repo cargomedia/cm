@@ -69,7 +69,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     public function batchInsert($collection, array $objectList, array $options = null) {
         $options = $options ?: [];
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Batch Insert `{$collection}`: " . CM_Params::jsonEncode($objectList));
-        $dataList = \Functional\map($objectList, function (array $object) {
+        $dataList = \Functional\map($objectList, function (array &$object) {
             return $object;
         });
         $result = $this->_getCollection($collection)->insertMany($dataList, $options);

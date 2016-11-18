@@ -55,10 +55,10 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
         $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Foo_Page_Test', false);
 
         $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'Bar_Layout_Default', false);
-        $this->assertEquals('Bar_Layout_Default', get_class($page->getLayout($environment)));
+        $this->assertEquals('Bar_Layout_Default', $page->getLayout($environment));
 
         $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'Foo_Layout_Default', false);
-        $this->assertEquals('Foo_Layout_Default', get_class($page->getLayout($environment)));
+        $this->assertEquals('Foo_Layout_Default', $page->getLayout($environment));
     }
 
     public function testGetLayoutNotExists() {

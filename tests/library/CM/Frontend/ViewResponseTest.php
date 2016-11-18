@@ -3,9 +3,9 @@
 class CM_Frontend_ViewResponseTest extends CMTest_TestCase {
 
     public function testSetGetTemplate() {
-        /** @var CM_View_Abstract $view */
-        $view = $this->getMock('CM_View_Abstract');
-        $viewResponse = new CM_Frontend_ViewResponse($view);
+        /** @var CM_View_Abstract $viewMock */
+        $viewMock = $this->getMockBuilder('CM_View_Abstract')->getMock();
+        $viewResponse = new CM_Frontend_ViewResponse($viewMock);
 
         $this->assertSame('default', $viewResponse->getTemplateName());
         $viewResponse->setTemplateName('foo');
@@ -13,14 +13,16 @@ class CM_Frontend_ViewResponseTest extends CMTest_TestCase {
     }
 
     public function testGetCssClasses() {
-        $view = $this->getMock('CM_View_Abstract', ['getClassHierarchy']);
+        $mockBuilder = $this->getMockBuilder('CM_View_Abstract');
+        $mockBuilder->setMethods(['getClassHierarchy']);
+        $viewMock = $mockBuilder->getMock();
         $classNames = [
             'foo',
             'bar',
         ];
-        $view->expects($this->any())->method('getClassHierarchy')->will($this->returnValue($classNames));
-        /** @var CM_View_Abstract $view */
-        $viewResponse = new CM_Frontend_ViewResponse($view);
+        $viewMock->expects($this->any())->method('getClassHierarchy')->will($this->returnValue($classNames));
+        /** @var CM_View_Abstract $viewMock */
+        $viewResponse = new CM_Frontend_ViewResponse($viewMock);
         $this->assertSame($classNames, $viewResponse->getCssClasses());
 
         $viewResponse->addCssClass('jar');
@@ -33,5 +35,27 @@ class CM_Frontend_ViewResponseTest extends CMTest_TestCase {
 
         $viewResponse->addCssClass('zoo');
         $this->assertSame($classNames, $viewResponse->getCssClasses());
+    }
+
+    public function testAddGetSetDataAttributes() {
+        /** @var CM_View_Abstract $viewMock */
+        $viewMock = $this->getMockBuilder('CM_View_Abstract')->getMock();
+        $viewResponse = new CM_Frontend_ViewResponse($viewMock);
+
+        $this->assertSame([], $viewResponse->getDataAttributes());
+        $viewResponse->setDataAttributes(['foo' => 'bar', 'baz' => 'quux']);
+        $this->assertSame(
+            [
+                'foo' => 'bar',
+                'baz' => 'quux'
+            ], $viewResponse->getDataAttributes());
+
+        $viewResponse->addDataAttribute('fooBar', 'barFoo');
+        $this->assertSame(
+            [
+                'foo'    => 'bar',
+                'baz'    => 'quux',
+                'fooBar' => 'barFoo'
+            ], $viewResponse->getDataAttributes());
     }
 }

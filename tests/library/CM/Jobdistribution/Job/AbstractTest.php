@@ -12,10 +12,11 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         }
         CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
 
-        $gearmanClient = $this->getMock('GearmanClient', array('addTaskHigh', 'runTasks', 'setCompleteCallback', 'setFailCallback'));
-        $gearmanClient->expects($this->exactly(2))->method('addTaskHigh')->will($this->returnValue(true));
-        $gearmanClient->expects($this->exactly(1))->method('runTasks')->will($this->returnValue(true));
-        $gearmanClient->expects($this->exactly(1))->method('setCompleteCallback')->will($this->returnCallback(function ($completeCallback) {
+        $mockBuilder = $this->getMockBuilder('GearmanClient');
+        $mockBuilder->setMethods(['addTaskNormal', 'runTasks', 'setCompleteCallback', 'setFailCallback']);
+        $gearmanClientMock = $mockBuilder->getMock();
+        $gearmanClientMock->expects($this->exactly(1))->method('runTasks')->will($this->returnValue(true));
+        $gearmanClientMock->expects($this->exactly(1))->method('setCompleteCallback')->will($this->returnCallback(function ($completeCallback) {
             $task1 = $this->getMockBuilder('GearmanTask')->setMethods(array('data'))->getMock();
             $task1->expects($this->once())->method('data')->will($this->returnValue(json_encode(array('bar1' => 'foo1'))));
             $completeCallback($task1);
@@ -24,11 +25,12 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
             $task2->expects($this->once())->method('data')->will($this->returnValue(json_encode(array('bar2' => 'foo2'))));
             $completeCallback($task2);
         }));
-        $gearmanClient->expects($this->exactly(1))->method('setFailCallback');
-        /** @var GearmanClient $gearmanClient */
+        $gearmanClientMock->expects($this->exactly(1))->method('setFailCallback');
+        /** @var GearmanClient $gearmanClientMock */
 
-        $job = $this->getMockBuilder('CM_Jobdistribution_Job_Abstract')->setMethods(array('_getGearmanClient'))->getMockForAbstractClass();
-        $job->expects($this->any())->method('_getGearmanClient')->will($this->returnValue($gearmanClient));
+        $job = $this->getMockBuilder('CM_Jobdistribution_Job_Abstract')->setMethods(array('_getGearmanClient', '_addTask'))->getMockForAbstractClass();
+        $job->expects($this->any())->method('_getGearmanClient')->will($this->returnValue($gearmanClientMock));
+        $job->expects($this->exactly(2))->method('_addTask')->will($this->returnValue(true));
         /** @var CM_Jobdistribution_Job_Abstract $job */
 
         $result = $job->runMultiple(array(
@@ -42,28 +44,111 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         ), $result);
     }
 
+    public function testRunMultiplePriority() {
+        if (!extension_loaded('gearman')) {
+            $this->markTestSkipped('Gearman Pecl Extension not installed.');
+        }
+        CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
+
+        $gearmanClient = $this->mockClass('GearmanClient')->newInstanceWithoutConstructor();
+        $gearmanClient->mockMethod('runTasks')->set(true);
+        $gearmanClient->mockMethod('setCompleteCallback')->set(function($completeCallback) {
+            $task = $this->mockObject('GearmanTask');
+            $task->mockMethod('data')->set(CM_Util::jsonEncode(['foo' => 'bar']));
+            $completeCallback($task);
+        });
+        $mockAddTaskHigh = $gearmanClient->mockMethod('addTaskHigh');
+        $mockAddTask = $gearmanClient->mockMethod('addTask');
+        $mockAddTaskLow = $gearmanClient->mockMethod('addTaskLow');
+
+        /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait $job */
+        $job = $this->mockObject('CM_Jobdistribution_Job_Abstract');
+        $job->mockMethod('_getGearmanClient')->set($gearmanClient);
+
+        // standard priority
+        $job->runMultiple([['foo' => 'bar']]);
+        $this->assertSame(1, $mockAddTask->getCallCount());
+
+        // normal priority
+        $priorityMock = $job->mockMethod('getPriority');
+        $priorityMock->set(new CM_Jobdistribution_Priority('normal'));
+        $job->runMultiple([['foo' => 'bar']]);
+        $this->assertSame(2, $mockAddTask->getCallCount());
+
+        // high priority
+        $priorityMock->set(new CM_Jobdistribution_Priority('high'));
+        $job->runMultiple([['foo' => 'bar']]);
+        $this->assertSame(1, $mockAddTaskHigh->getCallCount());
+
+        // low priority
+        $priorityMock->set(new CM_Jobdistribution_Priority('low'));
+        $job->runMultiple([['foo' => 'bar']]);
+        $this->assertSame(1, $mockAddTaskLow->getCallCount());
+    }
+
+    public function testQueuePriority() {
+        if (!extension_loaded('gearman')) {
+            $this->markTestSkipped('Gearman Pecl Extension not installed.');
+        }
+        CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
+
+        $gearmanClient = $this->mockClass('GearmanClient')->newInstanceWithoutConstructor();
+
+        $mockDoHighBackground = $gearmanClient->mockMethod('doHighBackground');
+        $mockDoBackground = $gearmanClient->mockMethod('doBackground');
+        $mockDoLowBackground = $gearmanClient->mockMethod('doLowBackground');
+
+        /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait $job */
+        $job = $this->mockObject('CM_Jobdistribution_Job_Abstract');
+        $job->mockMethod('_getGearmanClient')->set($gearmanClient);
+
+        // standard priority
+        $job->queue([['foo' => 'bar']]);
+        $this->assertSame(1, $mockDoBackground->getCallCount());
+
+        // normal priority
+        $priorityMock = $job->mockMethod('getPriority');
+        $priorityMock->set(new CM_Jobdistribution_Priority('normal'));
+        $job->queue([['foo' => 'bar']]);
+        $this->assertSame(2, $mockDoBackground->getCallCount());
+
+        // high priority
+        $priorityMock = $job->mockMethod('getPriority');
+        $priorityMock->set(new CM_Jobdistribution_Priority('high'));
+        $job->queue([['foo' => 'bar']]);
+        $this->assertSame(1, $mockDoHighBackground->getCallCount());
+
+        // low priority
+        $priorityMock = $job->mockMethod('getPriority');
+        $priorityMock->set(new CM_Jobdistribution_Priority('low'));
+        $job->queue([['foo' => 'bar']]);
+        $this->assertSame(1, $mockDoLowBackground->getCallCount());
+    }
+
     public function testRunMultipleWithFailures() {
         if (!extension_loaded('gearman')) {
             $this->markTestSkipped('Gearman Pecl Extension not installed.');
         }
         CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
 
-        $gearmanClient = $this->getMock('GearmanClient', array('addTaskHigh', 'runTasks', 'setCompleteCallback', 'setFailCallback'));
-        $gearmanClient->expects($this->exactly(2))->method('addTaskHigh')->will($this->returnValue(true));
-        $gearmanClient->expects($this->exactly(1))->method('runTasks')->will($this->returnValue(true));
-        $gearmanClient->expects($this->exactly(1))->method('setCompleteCallback')->will($this->returnCallback(function ($completeCallback) {
+        $mockBuilder = $this->getMockBuilder('GearmanClient');
+        $mockBuilder->setMethods(['addTask', 'runTasks', 'setCompleteCallback', 'setFailCallback']);
+        $gearmanClientMock = $mockBuilder->getMock();
+        $gearmanClientMock->expects($this->exactly(2))->method('addTask')->will($this->returnValue(true));
+        $gearmanClientMock->expects($this->exactly(1))->method('runTasks')->will($this->returnValue(true));
+        $gearmanClientMock->expects($this->exactly(1))->method('setCompleteCallback')->will($this->returnCallback(function ($completeCallback) {
             $task1 = $this->getMockBuilder('GearmanTask')->setMethods(array('data'))->getMock();
             $task1->expects($this->once())->method('data')->will($this->returnValue(json_encode(array('bar1' => 'foo1'))));
             $completeCallback($task1);
         }));
-        $gearmanClient->expects($this->exactly(1))->method('setFailCallback')->will($this->returnCallback(function ($failCallback) {
+        $gearmanClientMock->expects($this->exactly(1))->method('setFailCallback')->will($this->returnCallback(function ($failCallback) {
             $failCallback(new GearmanTask());
         }));
-        /** @var GearmanClient $gearmanClient */
+        /** @var GearmanClient $gearmanClientMock */
 
         $job = $this->getMockBuilder('CM_Jobdistribution_Job_Abstract')
             ->setMethods(array('_getGearmanClient', '_getJobName'))->getMockForAbstractClass();
-        $job->expects($this->any())->method('_getGearmanClient')->will($this->returnValue($gearmanClient));
+        $job->expects($this->any())->method('_getGearmanClient')->will($this->returnValue($gearmanClientMock));
         $job->expects($this->any())->method('_getJobName')->will($this->returnValue('myJob'));
         /** @var CM_Jobdistribution_Job_Abstract $job */
 

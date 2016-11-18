@@ -26,6 +26,17 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
         ]);
     }
 
+    /**
+     * @param CM_Jobdistribution_Job_Abstract $job
+     * @param array                           $params
+     */
+    public function cancelJob(CM_Jobdistribution_Job_Abstract $job, array $params) {
+        CM_Db_Db::delete('cm_jobdistribution_delayedqueue', [
+            'className' => get_class($job),
+            'params'    => CM_Params::encode($params, true),
+        ]);
+    }
+
     public function queueOutstanding() {
         $executeAtMax = time();
         $result = CM_Db_Db::select('cm_jobdistribution_delayedqueue', '*', '`executeAt` <= ' . $executeAtMax, '`executeAt` ASC');

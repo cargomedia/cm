@@ -90,6 +90,17 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   /**
+   * @returns {CM_View_Document}
+   */
+  getDocument: function() {
+    var document = this.findView('CM_View_Document');
+    if (!document) {
+      throw new CM_Exception('Cannot find document');
+    }
+    return document;
+  },
+
+  /**
    * @param {Number} min
    * @param {Number} max
    * @return {Number}
@@ -398,11 +409,13 @@ var CM_App = CM_Class_Abstract.extend({
      * @throws Error
      */
     handle: function(error) {
+      var throwError = true;
       if (error instanceof CM_Exception) {
         var handlers = _.filter(cm.error._handlers, function(handler) {
           return handler.errorName === error.name;
         });
         if (0 !== handlers.length) {
+          throwError = false;
           _.every(handlers, function(handler) {
             return false !== handler.callback.call(handler.context, error);
           });
@@ -410,7 +423,9 @@ var CM_App = CM_Class_Abstract.extend({
           cm.window.hint(error.message);
         }
       }
-      throw error;
+      if (throwError) {
+        throw error;
+      }
     }
   },
 
@@ -437,7 +452,7 @@ var CM_App = CM_Class_Abstract.extend({
       var time = (Date.now() - performance.timing.navigationStart) / 1000;
       var timeFormatted = time.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false});
       var prefix = '[CM ' + timeFormatted + (performance.timing.isPolyfilled ? '!' : '') + ']';
-      cm.logger.debug.apply(cm.logger, _.union([prefix + ' ' + message], args));
+      cm.logger.debug.apply(cm.logger, [prefix + ' ' + message].concat(args));
     }
   },
 
@@ -484,47 +499,6 @@ var CM_App = CM_Class_Abstract.extend({
     teardown: function($dom) {
       $dom.find('.timeago').timeago('dispose');
       $dom.find('textarea.autosize, .autosize textarea').trigger('autosize.destroy');
-    },
-    /**
-     * @param {HTMLVideoElement} element
-     * @param {Object} [options]
-     * @returns {MediaElementPlayer}
-     */
-    setupVideo: function(element, options) {
-      options = _.extend({
-        preferPlugins: false,
-        success: null
-      }, options || {});
-
-      return new mejs.MediaElementPlayer(element, {
-        flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
-        silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
-        videoWidth: '100%',
-        videoHeight: '100%',
-        defaultVideoWidth: '100%',
-        defaultVideoHeight: '100%',
-        mode: (options.preferPlugins ? 'auto_plugin' : 'auto'),
-        error: function() {
-          throw new Error('Cannot initialize MediaElement video player.');
-        },
-        success: function(mediaElement, domObject) {
-          var mediaElementMuted = cm.storage.get('mediaElement-muted');
-          var mediaElementVolume = cm.storage.get('mediaElement-volume');
-          if (null !== mediaElementMuted) {
-            mediaElement.setMuted(mediaElementMuted);
-          }
-          if (null !== mediaElementVolume) {
-            mediaElement.setVolume(mediaElementVolume);
-          }
-          mediaElement.addEventListener('volumechange', function() {
-            cm.storage.set('mediaElement-volume', mediaElement.volume);
-            cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
-          });
-          if (options.success) {
-            options.success(mediaElement, domObject);
-          }
-        }
-      });
     },
 
     /**
@@ -914,34 +888,40 @@ var CM_App = CM_Class_Abstract.extend({
   storage: {
     /**
      * @param {String} key
-     * @param {Object} value
+     * @param {*} value
      */
     set: function(key, value) {
-      try {
-        localStorage.setItem(cm.getSiteId() + ':' + key, JSON.stringify(value));
-      } catch (e) {
-        // iOS5 Private Browsing mode which throws QUOTA_EXCEEDED_ERR: DOM Exception 22
-      }
+      this._getPersistentStorage().set(key, value);
     },
 
     /**
      * @param {String} key
-     * @return {*|Null}
+     * @return {*|null}
      */
     get: function(key) {
-      var value = localStorage.getItem(cm.getSiteId() + ':' + key);
-      if (value === null) {
-        // See: https://code.google.com/p/android/issues/detail?id=11973
-        return null;
-      }
-      return JSON.parse(value);
+      var value = this._getPersistentStorage().get(key);
+      return !_.isUndefined(value) ? value : null;
     },
 
     /**
      * @param {String} key
      */
     del: function(key) {
-      localStorage.removeItem(cm.getSiteId() + ':' + key);
+      this._getPersistentStorage().del(key);
+    },
+
+    /** @type {PersistentStorage|null} **/
+    _data: null,
+
+    /**
+     * @returns {PersistentStorage}
+     * @private
+     */
+    _getPersistentStorage: function() {
+      if (!this._data) {
+        this._data = new cm.lib.PersistentStorage(cm.options.name + ':' + cm.getSiteId(), localStorage, cm.logger);
+      }
+      return this._data;
     }
   },
 
@@ -1453,7 +1433,7 @@ var CM_App = CM_Class_Abstract.extend({
       var urlBase = cm.options.urlBase;
       if (0 === url.indexOf(urlSite)) {
         var path = url.substr(urlBase.length);
-        cm.getLayout().loadPage(path);
+        cm.getDocument().loadPage(path);
       } else {
         window.location.assign(url);
         return Promise.resolve();

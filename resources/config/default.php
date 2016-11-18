@@ -177,6 +177,11 @@ return function (CM_Config_Node $config) {
         ],
     ];
 
+    $config->services['tracking-adwords'] = [
+        'class'     => 'CMService_AdWords_Client',
+        'arguments' => [],
+    ];
+
     $config->services['tracking-googleanalytics'] = array(
         'class'     => 'CMService_GoogleAnalytics_Client',
         'arguments' => array(
@@ -268,13 +273,16 @@ return function (CM_Config_Node $config) {
     ];
 
     $config->services['logger-handler-mongodb'] = [
-        'class'     => 'CM_Log_Handler_MongoDb',
-        'arguments' => [
+        'class'  => 'CM_Log_Handler_Factory',
+        'method' => [
+            'name'      => 'createMongoDbHandler',
+            'arguments' => [
             'collection'    => 'cm_log',
             'recordTtl'     => null,
             'insertOptions' => null,
             'minLevel'      => CM_Log_Logger::DEBUG,
-        ],
+            ],
+        ]
     ];
 
     $config->services['logger-handler-file-error'] = [

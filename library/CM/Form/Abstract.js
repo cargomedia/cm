@@ -45,15 +45,19 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       $btn.on(event, {action: name}, function(event) {
         event.preventDefault();
         event.stopPropagation();
-        return handler.submit(event.data.action).catch(CM_Exception_FormFieldValidation, function(error) {
-          // this error type is already handled and displayed in `submit`
-        });
+        return handler.submit(event.data.action);
       });
     }, this);
 
     this.$el.on('submit', function() {
       handler.$el.find('input[type="submit"], button[type="submit"]').first().click();
       return false;
+    });
+
+    this.$el.on('reset', function() {
+      _.defer(function() {
+        handler.trigger('reset');
+      });
     });
 
     CM_View_Abstract.prototype._ready.call(this);
@@ -178,58 +182,62 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     }
 
     if (_.size(errorList)) {
-      return Promise.reject(new CM_Exception_FormFieldValidation(errorList));
-    } else {
-      if (options.disableUI) {
-        this.disable();
+      if (!options.handleErrors) {
+        return Promise.reject(new CM_Exception_FormFieldValidation(errorList));
       }
-      this.trigger('submit', [data]);
+      return Promise.resolve();
+    }
 
-      var handler = this;
-      return cm.ajax('form', {viewInfoList: this.getViewInfoList(), actionName: action.name, data: data})
-        .then(function(response) {
-          if (response.errors) {
-            if (options.handleErrors) {
-              for (var i = response.errors.length - 1, error; error = response.errors[i]; i--) {
-                if (_.isArray(error)) {
-                  handler.getField(error[1]).error(error[0]);
-                } else {
-                  handler.error(error);
-                }
+    return this
+      .try(function() {
+        if (options.disableUI) {
+          this.disable();
+        }
+        this.trigger('submit', [data]);
+        return cm.ajax('form', {viewInfoList: this.getViewInfoList(), actionName: action.name, data: data})
+      })
+      .then(function(response) {
+        if (response.errors) {
+          if (options.handleErrors) {
+            for (var i = response.errors.length - 1, error; error = response.errors[i]; i--) {
+              if (_.isArray(error)) {
+                this.getField(error[1]).error(error[0]);
+              } else {
+                this.error(error);
               }
             }
-
-            throw new CM_Exception_FormFieldValidation(response.errors);
           }
 
-          if (response.exec) {
-            handler.evaluation = new Function(response.exec);
-            handler.evaluation();
-          }
+          throw new CM_Exception_FormFieldValidation(response.errors);
+        }
 
-          if (response.messages) {
-            for (var i = 0, msg; msg = response.messages[i]; i++) {
-              handler.message(msg);
-            }
-          }
+        if (response.exec) {
+          this.evaluation = new Function(response.exec);
+          this.evaluation();
+        }
 
-          handler.trigger('success success.' + action.name, response.data);
-          return response.data;
-        })
-        .catch(CM_Exception_FormFieldValidation, function(error) {
-          handler._stopErrorPropagation = false;
-          handler.trigger('error error.' + action.name, error.message, error.name, error.isPublic);
-          if (!handler._stopErrorPropagation) {
-            throw error;
+        if (response.messages) {
+          for (var i = 0, msg; msg = response.messages[i]; i++) {
+            this.message(msg);
           }
-        })
-        .finally(function() {
-          if (options.disableUI) {
-            handler.enable();
-          }
-          handler.trigger('complete');
-        });
-    }
+        }
+
+        this.trigger('success success.' + action.name, response.data);
+        return response.data;
+      })
+      .catch(CM_Exception_FormFieldValidation, function(error) {
+        this._stopErrorPropagation = false;
+        this.trigger('error error.' + action.name, error.message, error.name, error.isPublic);
+        if (!this._stopErrorPropagation && !options.handleErrors) {
+          throw error;
+        }
+      })
+      .finally(function() {
+        if (options.disableUI) {
+          this.enable();
+        }
+        this.trigger('complete');
+      });
   },
 
   stopErrorPropagation: function() {

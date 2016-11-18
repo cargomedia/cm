@@ -124,7 +124,10 @@ class CM_Model_Location extends CM_Model_Abstract {
         if (null === $pointCurrent) {
             return null;
         }
-        $timezoneNameList = DateTimeZone::listIdentifiers();
+        $timezoneNameList = \Functional\reject(DateTimeZone::listIdentifiers(), function ($timeZoneName) {
+            return null === IntlTimeZone::fromDateTimeZone(new DateTimeZone($timeZoneName));
+        });
+
         $distanceList = Functional\map($timezoneNameList, function ($timezoneName) use ($pointCurrent) {
             $timezoneLocation = (new DateTimeZone($timezoneName))->getLocation();
             $pointTimeZone = new CM_Geo_Point($timezoneLocation['latitude'], $timezoneLocation['longitude']);
@@ -419,7 +422,7 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @param string            $name
      * @param float             $latitude
      * @param float             $longitude
-     * @param string|null       $_maxmind
+     * @param int|null          $_maxmind
      * @throws CM_Exception_Invalid
      * @return CM_Model_Location
      */

@@ -167,14 +167,6 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
     }
 
     /**
-     * @param string $encryptionKey
-     * @return string Data
-     */
-    protected function _decryptKey($encryptionKey) {
-        return (new CM_Util_Encryption())->decrypt($this->getKey(), $encryptionKey);
-    }
-
-    /**
      * @param int      $id
      * @param int|null $type
      * @throws CM_Exception_Invalid|CM_Exception_Nonexistent
@@ -232,6 +224,15 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
             return null;
         }
         return $streamChannel;
+    }
+
+    /**
+     * @param string $streamChannelKey
+     * @param string $encryptionKey
+     * @return string Data
+     */
+    protected static function _decryptKey($streamChannelKey, $encryptionKey) {
+        return (new CM_Util_Encryption())->decrypt($streamChannelKey, $encryptionKey);
     }
 
     /**

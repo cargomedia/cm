@@ -14,7 +14,7 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
         $activePage = $params['activePage'];
     } elseif ($pageViewResponse = $render->getGlobalResponse()->getClosestViewResponse('CM_Page_Abstract')) {
         $activePage = $pageViewResponse->getView();
-    } elseif ($layoutViewResponse = $render->getGlobalResponse()->getClosestViewResponse('CM_Layout_Abstract')) {
+    } elseif ($layoutViewResponse = $render->getGlobalResponse()->getClosestViewResponse('CM_View_Document')) {
         $activePage = $layoutViewResponse->get('page');
     }
 

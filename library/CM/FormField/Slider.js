@@ -31,6 +31,8 @@ var CM_FormField_Slider = CM_FormField_Abstract.extend({
     this._slider.noUiSlider.on('update', function(values, handle) {
       var val = parseFloat(values[handle]);
       $sliderValue.html(val);
+    });
+    this._slider.noUiSlider.on('change', function(values, handle) {
       field._onChange();
     });
 

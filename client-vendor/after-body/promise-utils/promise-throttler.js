@@ -41,9 +41,16 @@
   function nonameThrottler(fn, options) {
     var promise;
 
+    function resetClosurePromise(resetPromise) {
+      if (resetPromise === promise) {
+        promise = null;
+      }
+    }
+
     return function() {
       if (!promise || !promise.isPending()) {
         promise = fn.apply(this, arguments);
+        promise.finally(resetClosurePromise.bind(null, promise));
         return promise;
       }
       var cancelLeading = options.cancelLeading;
@@ -60,6 +67,7 @@
             resolve(fn.apply(self, args));
           });
         });
+        promise.finally(resetClosurePromise.bind(null, promise));
         return promise;
       }
       return promise;

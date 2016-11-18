@@ -121,9 +121,12 @@ class CM_Model_StreamChannelArchive_MediaTest extends CMTest_TestCase {
         }
 
         $streamChannel = CMTest_TH::createStreamChannel();
-        $streamChannel = $this->getMock('CM_Model_StreamChannel_Media', array('getType'), array($streamChannel->getId()));
-        $streamChannel->expects($this->any())->method('getType')->will($this->returnValue(3));
-        $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel);
+        $mockBuilder = $this->getMockBuilder('CM_Model_StreamChannel_Media');
+        $mockBuilder->setMethods(['getType']);
+        $mockBuilder->setConstructorArgs([$streamChannel->getId()]);
+        $streamChannelMock = $mockBuilder->getMock();
+        $streamChannelMock->expects($this->any())->method('getType')->will($this->returnValue(3));
+        $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannelMock);
         $archivesNotDeleted[] = $archive;
 
         CMTest_TH::timeForward(20);

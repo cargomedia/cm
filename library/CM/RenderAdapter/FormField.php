@@ -18,12 +18,16 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 
         $frontend->treeExpand($viewResponse);
 
-        $html = '<div class="' . implode(' ', $viewResponse->getCssClasses()) . '" id="' . $viewResponse->getAutoId() . '">';
-        $html .= trim($this->getRender()->fetchViewResponse($viewResponse));
+        $content = trim($this->getRender()->fetchViewResponse($viewResponse));
         if (!$field instanceof CM_FormField_Hidden) {
-            $html .= '<span class="messages"></span>';
+            $content .= '<span class="messages"></span>';
         }
-        $html .= '</div>';
+        $tagAttributes = [
+            'id'    => $viewResponse->getAutoId(),
+            'class' => join(' ', $viewResponse->getCssClasses()),
+        ];
+        $tagRenderer = new CM_Frontend_HtmlTagRenderer();
+        $html = $tagRenderer->renderTag('div', $content, $tagAttributes, $viewResponse->getDataAttributes());
 
         $formViewResponse = $frontend->getClosestViewResponse('CM_Form_Abstract');
         if ($formViewResponse) {

@@ -2,11 +2,16 @@
 
 class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
 
+    const DEFAULT_TYPE = 0;
+
     /** @var  string */
     protected $_collection;
 
     /** @var int|null */
     protected $_recordTtl = null;
+
+    /** @var CM_Log_Encoder_MongoDb */
+    protected $_encoder;
 
     /** @var  CM_MongoDb_Client */
     protected $_mongoDb;
@@ -15,23 +20,26 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
     protected $_insertOptions;
 
     /**
-     * @param string   $collection
-     * @param int|null $recordTtl Time To Live in seconds
-     * @param array    $insertOptions
-     * @param int|null $minLevel
+     * CM_Log_Handler_MongoDb constructor.
+     * @param CM_MongoDb_Client      $client
+     * @param CM_Log_Encoder_MongoDb $encoder
+     * @param string                 $collection
+     * @param int|null               $recordTtl Time To Live in seconds
+     * @param array|null             $insertOptions
+     * @param int|null               $minLevel
      * @throws CM_Exception_Invalid
      */
-    public function __construct($collection, $recordTtl = null, array $insertOptions = null, $minLevel = null) {
+    public function __construct(CM_MongoDb_Client $client, CM_Log_Encoder_MongoDb $encoder, $collection, $recordTtl = null, array $insertOptions = null, $minLevel = null) {
         parent::__construct($minLevel);
         $this->_collection = (string) $collection;
-        $this->_mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        $this->_encoder = $encoder;
+        $this->_mongoDb = $client;
         if (null !== $recordTtl) {
             $this->_recordTtl = (int) $recordTtl;
             if ($this->_recordTtl <= 0) {
                 throw new CM_Exception_Invalid('TTL should be positive value');
             }
         };
-
         $this->_insertOptions = null !== $insertOptions ? $insertOptions : ['w' => 0];
     }
 
@@ -41,7 +49,9 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
     protected function _writeRecord(CM_Log_Record $record) {
         /** @var array $formattedRecord */
         $formattedRecord = $this->_formatRecord($record);
-        $this->_mongoDb->insert($this->_collection, $formattedRecord, $this->_insertOptions);
+        $sanitizedRecord = $this->_sanitizeRecord($formattedRecord); //TODO remove after investigation
+        $encodedRecord = $this->_encodeRecord($sanitizedRecord);
+        $this->_mongoDb->insert($this->_collection, $encodedRecord, $this->_insertOptions);
     }
 
     /**
@@ -50,14 +60,11 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
      */
     protected function _formatRecord(CM_Log_Record $record) {
         $recordContext = $record->getContext();
-
         $computerInfo = $recordContext->getComputerInfo();
         $user = $recordContext->getUser();
         $extra = $recordContext->getExtra();
         $request = $recordContext->getHttpRequest();
-
         $createdAt = $record->getCreatedAt();
-
         $formattedContext = [];
         if (null !== $computerInfo) {
             $formattedContext['computerInfo'] = [
@@ -65,9 +72,10 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
                 'phpVersion' => $computerInfo->getPhpVersion(),
             ];
         }
-        if ($extra) {
-            $formattedContext['extra'] = $extra;
+        if (!isset($extra['type'])) {
+            $extra['type'] = self::DEFAULT_TYPE;
         }
+        $formattedContext['extra'] = $extra;
         if (null !== $user) {
             $formattedContext['user'] = [
                 'id'   => $user->getId(),
@@ -82,16 +90,12 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
                 'server'  => $request->getServer(),
                 'headers' => $request->getHeaders(),
             ];
-
             $formattedContext['httpRequest']['query'] = $request->findQuery();
-
             if ($request instanceof CM_Http_Request_Post) {
                 $formattedContext['httpRequest']['body'] = $request->getBody();
             }
-
             $formattedContext['httpRequest']['clientId'] = $request->getClientId();
         }
-
         if ($exception = $recordContext->getException()) {
             $serializableException = new CM_ExceptionHandling_SerializableException($exception);
             $formattedContext['exception'] = [
@@ -104,20 +108,17 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
                 'meta'        => $serializableException->getMeta(),
             ];
         }
-
         $formattedRecord = [
             'level'     => (int) $record->getLevel(),
             'message'   => (string) $record->getMessage(),
-            'createdAt' => new MongoDB\BSON\UTCDateTime($createdAt->getTimestamp() * 1000),
+            'createdAt' => $createdAt,
             'context'   => $formattedContext,
         ];
-
         if (null !== $this->_recordTtl) {
             $expireAt = clone $createdAt;
             $expireAt->add(new DateInterval('PT' . $this->_recordTtl . 'S'));
-            $formattedRecord['expireAt'] = new MongoDB\BSON\UTCDateTime($expireAt->getTimestamp() * 1000);
+            $formattedRecord['expireAt'] = $expireAt;
         }
-
         $formattedRecord = $this->_sanitizeRecord($formattedRecord); //TODO remove after investigation
         return $formattedRecord;
     }
@@ -142,5 +143,13 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             }
         }
         return $formattedRecord;
+    }
+
+    /**
+     * @param array $entry
+     * @return array
+     */
+    protected function _encodeRecord(array $entry) {
+        return $this->_encoder->encode($entry);
     }
 }

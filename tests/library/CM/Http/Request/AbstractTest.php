@@ -206,10 +206,13 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $request = new CM_Http_Request_Post('/foo/null/');
         $clientId = $request->getClientId();
         $site = $this->getMockSite();
-        /** @var CM_Http_Response_Abstract $response */
-        $response = $this->getMock('CM_Http_Response_Abstract', array('_process', 'setCookie'), array($request, $site, $this->getServiceManager()));
-        $response->expects($this->once())->method('setCookie')->with('clientId', (string) $clientId);
-        $response->process();
+        /** @var CM_Http_Response_Abstract $responseMock */
+        $mockBuilder = $this->getMockBuilder('CM_Http_Response_Abstract');
+        $mockBuilder->setMethods(['_process', 'setCookie']);
+        $mockBuilder->setConstructorArgs([$request, $site, $this->getServiceManager()]);
+        $responseMock = $mockBuilder->getMock();
+        $responseMock->expects($this->once())->method('setCookie')->with('clientId', (string) $clientId);
+        $responseMock->process();
     }
 
     public function testGetUserAgent() {
@@ -291,6 +294,21 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $request->setSession($session);
         $this->assertEquals($session, $request->getSession());
         $this->assertSame(null, $request->getViewer());
+    }
+
+    public function testSetSessionFromCookie() {
+        $requestFoo = new CM_Http_Request_Get('/foo');
+        $sessionFoo = new CM_Session(null, $requestFoo);
+        $sessionFoo->set('foo', 'bar');
+        $sessionFoo->write();
+        $sessionFooId = $sessionFoo->getId();
+
+        $requestBar = new CM_Http_Request_Get('/bar', ['cookie' => 'sessionId=' . $sessionFooId . ';']);
+        $sessionBar = $requestBar->getSession();
+
+        $this->assertEquals($sessionFooId, $sessionBar->getId());
+        $this->assertEquals('bar', $sessionBar->get('foo'));
+        $this->assertEquals($requestBar, $sessionBar->getRequest());
     }
 
     public function testGetTimeZoneFromCookie() {
