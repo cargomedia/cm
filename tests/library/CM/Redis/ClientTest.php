@@ -2,6 +2,10 @@
 
 class CM_Redis_ClientTest extends CMTest_TestCase {
 
+    public static function tearDownAfterClass() {
+        // To avoid forking issues  with the mongo-client. see https://jira.mongodb.org/browse/PHPC-433
+    }
+
     /** @var CM_Redis_Client */
     private $_client;
 

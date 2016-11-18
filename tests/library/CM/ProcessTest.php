@@ -4,6 +4,10 @@ require_once dirname(dirname(__DIR__)) . '/bootstrap.php'; // Bootstrap the test
 
 class CM_ProcessTest extends CMTest_TestCase {
 
+    public static function tearDownAfterClass() {
+        // To avoid forking issues  with the mongo-client. see https://jira.mongodb.org/browse/PHPC-433
+    }
+
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
