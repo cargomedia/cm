@@ -482,47 +482,6 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
-   * @param {jQuery} $element
-   * @param {String} url
-   * @param {Object} [flashvars]
-   * @param {Object} [flashparams]
-   * @param {Function} [callbackSuccess]
-   * @param {Function} [callbackFailure]
-   */
-  createFlash: function($element, url, flashvars, flashparams, callbackSuccess, callbackFailure) {
-    var eventCallbackName = this.createGlobalFunction(function(event) {
-      event = JSON.parse(event);
-      this.trigger(event.type, event.data);
-    });
-    flashvars = _.extend({'debug': cm.options.debug, 'eventCallback': eventCallbackName}, flashvars);
-    _.each(flashvars, function(value, key) {
-      flashvars[key] = window.encodeURIComponent(value);
-    });
-    flashparams = _.extend({'allowscriptaccess': 'sameDomain', 'allowfullscreen': 'true', 'wmode': 'transparent'}, flashparams);
-    callbackSuccess = callbackSuccess || new Function();
-    callbackFailure = callbackFailure || new Function();
-    var id = $element.attr('id');
-    if (!id) {
-      id = 'swf-' + cm.getUuid();
-      $element.attr('id', id);
-    }
-    var idSwf = id + '-object', attributes = {
-      id: idSwf,
-      name: idSwf
-    };
-
-    var self = this;
-    swfobject.embedSWF(url, id, "100%", "100%", "11.0.0", cm.getUrlResource('layout', 'swf/expressInstall.swf'), flashvars, flashparams, attributes, function(event) {
-      if (event.success) {
-        callbackSuccess.call(self, event.ref);
-      } else {
-        $element.html('<a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" /></a>');
-        callbackFailure.call(self);
-      }
-    });
-  },
-
-  /**
    * @param {String} key
    * @param {*} value
    */

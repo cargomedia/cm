@@ -4,7 +4,7 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
 
     const COLLECTION_NAME = 'cm_log';
 
-    /** @var array */
+    /** @var array|null */
     protected $_filterLevelList;
 
     /** @var int|boolean|null */
@@ -28,8 +28,6 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
                     throw new CM_Exception_Invalid('Log level does not exist.', null, ['level' => $level]);
                 }
             }
-        } else {
-            $filterLevelList = array_values(CM_Log_Logger::getLevels());
         }
 
         if (null !== $filterType && false !== $filterType && !self::isValidType((int) $filterType)) {
@@ -75,7 +73,8 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
             ];
             $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, null, null, $aggregate);
         } else {
-            $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, $criteria, null, null, ['createdAt' => -1]);
+            $sorting = empty($criteria) ? ['_id' => -1] : ['createdAt' => -1];
+            $source = new CM_PagingSource_MongoDb(self::COLLECTION_NAME, $criteria, null, null, $sorting);
         }
 
         parent::__construct($source);
@@ -118,7 +117,11 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         } elseif (null !== $this->_filterType) {
             $criteria['context.extra.type'] = (int) $this->_filterType;
         }
-        $criteria['level'] = ['$in' => $this->_filterLevelList];
+
+        if (null !== $this->_filterLevelList) {
+            $criteria['level'] = ['$in' => $this->_filterLevelList];
+        }
+
         if (null !== $this->_ageMax) {
             $criteria['createdAt'] = ['$gt' => new MongoDate(time() - $this->_ageMax)];
         }

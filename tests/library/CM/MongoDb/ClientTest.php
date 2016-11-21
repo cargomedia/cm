@@ -234,6 +234,58 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $this->assertFalse($mongoDb->existsCollection($collectionName));
     }
 
+    public function testRename() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+
+        $mongoDb->insert('source', array('foo' => 'origin'));
+        $this->assertTrue($mongoDb->existsCollection('source'));
+        $this->assertFalse($mongoDb->existsCollection('target'));
+
+        $mongoDb->rename('source', 'target');
+
+        $this->assertFalse($mongoDb->existsCollection('source'));
+        $this->assertTrue($mongoDb->existsCollection('target'));
+        $this->assertSame(1, $mongoDb->find('target', array('foo' => 'origin'))->count());
+
+        $mongoDb->insert('source', array('foo' => 'origin'));
+        $mongoDb->insert('target', array('foo' => 'existing-value'));
+        $this->assertSame(2, $mongoDb->count('target'));
+
+        $mongoDb->rename('source', 'target', true);
+
+        $this->assertFalse($mongoDb->existsCollection('source'));
+        $this->assertTrue($mongoDb->existsCollection('target'));
+        $this->assertSame(1, $mongoDb->count('target'));
+        $this->assertSame(1, $mongoDb->find('target', array('foo' => 'origin'))->count());
+    }
+
+    public function testRenameThrows() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        /** @var CM_MongoDb_Exception $exception */
+        $exception = $this->catchException(function () use ($mongoDb) {
+            $mongoDb->rename('not_defined', 'target');
+        });
+        $this->assertInstanceOf('CM_MongoDb_Exception', $exception);
+        $this->assertSame('Source collection does not exist', $exception->getMessage());
+        $this->assertSame([
+            'collectionSource' => 'not_defined',
+            'collectionTarget' => 'target'
+        ], $exception->getMetaInfo());
+
+        $mongoDb->insert('source', array('foo' => 'origin'));
+        $mongoDb->insert('target', array('foo' => 'existing-value'));
+        /** @var CM_MongoDb_Exception $exception */
+        $exception = $this->catchException(function () use ($mongoDb) {
+            $mongoDb->rename('source', 'target');
+        });
+        $this->assertInstanceOf('CM_MongoDb_Exception', $exception);
+        $this->assertSame('Target collection already exists', $exception->getMessage());
+        $this->assertSame([
+            'collectionSource' => 'source',
+            'collectionTarget' => 'target'
+        ], $exception->getMetaInfo());
+    }
+
     public function testRemove() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'remove';
