@@ -294,7 +294,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
                 $context = new CM_Log_Context();
                 $context->setUser($this->getViewer());
                 $context->setException($ex);
-                $this->getServiceManager()->getLogger()->addMessage('HTML response error', $logLevel, $context);
+                $this->getServiceManager()->getLogger()->addMessage('Response processing error', $logLevel, $context);
             }
             if (!$catchException && ($catchPublicExceptions && $ex->isPublic())) {
                 $errorOptions = [];
