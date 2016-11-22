@@ -115,6 +115,14 @@ class CM_App implements CM_Service_ManagerAwareInterface {
     }
 
     /**
+     * @return string
+     */
+    public function getDirRoot() {
+        $config = CM_Config::get();
+        return isset($config->dirRoot) ? $config->dirRoot : DIR_ROOT;
+    }
+
+    /**
      * @return string[]
      */
     public function getUpdateScriptPaths() {

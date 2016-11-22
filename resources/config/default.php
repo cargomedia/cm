@@ -310,11 +310,13 @@ return function (CM_Config_Node $config) {
     ];
 
     $config->services['cm-bundler'] = [
-        'class'     => 'CM_Frontend_Bundler_Client',
-        'arguments' => array(
-            'socketUrl'    => 'tcp://127.0.0.1:6644',
-            'baseDir'      => DIR_ROOT,
-            'cacheEnabled' => true,
-        ),
+        'class'  => 'CM_Frontend_Bundler_Factory',
+        'method' => [
+            'name'      => 'createBundler',
+            'arguments' => [
+                'socketUrl'    => 'tcp://127.0.0.1:6644',
+                'cacheEnabled' => true,
+            ],
+        ],
     ];
 };
