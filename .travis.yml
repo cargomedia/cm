@@ -34,7 +34,7 @@ before_script:
   - npm install -g browserify@11.2.0
   - composer install
   - cp tests/travis/config.php resources/config/local.php
-  - bin/cm app set-deploy-version
+  - bin/cm app set-config deploy '{"deployVersion":'$(date +"%s")'}'
 
 script:
   - bin/phpunit
