@@ -94,8 +94,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
                 $this->_loadAssets(true);
                 $cache->save($type, $this->getIdRaw(), $this->_getData());
             }
-            $this->_onCreate();
             $this->_changeContainingCacheables();
+            $this->_onCreate();
             if ($useReplace) {
                 $this->_onChange();
             }
