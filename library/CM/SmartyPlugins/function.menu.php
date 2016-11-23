@@ -35,7 +35,7 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
     $name = null;
     if (isset($params['name'])) {
         $name = $params['name'];
-        $menuArr = $render->getSite()->getMenus();
+        $menuArr = $render->getSite()->getMenus($environment);
         if (isset($menuArr[$name])) {
             $menu = $menuArr[$name];
         }
