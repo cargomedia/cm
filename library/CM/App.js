@@ -1433,7 +1433,7 @@ var CM_App = CM_Class_Abstract.extend({
       var urlBase = cm.options.urlBase;
       if (0 === url.indexOf(urlSite)) {
         var path = url.substr(urlBase.length);
-        cm.getDocument().loadPage(path);
+        return cm.getDocument().loadPage(path);
       } else {
         window.location.assign(url);
         return Promise.resolve();
