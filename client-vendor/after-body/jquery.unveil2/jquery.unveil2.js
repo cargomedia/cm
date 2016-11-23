@@ -284,13 +284,15 @@
         function lookup() {
             if (settings.debug) console.log('Unveiling');
 
-            var batch = containerContext.images.filter(inview);
+            if (containerContext.images) {
+                var batch = containerContext.images.filter(inview);
 
-            batch.trigger(unveilString + '.' + unveilString);
-            containerContext.images = containerContext.images.not(batch);
+                batch.trigger(unveilString + '.' + unveilString);
+                containerContext.images = containerContext.images.not(batch);
 
-            if (batch.length) {
-                if (settings.debug) console.log('New images in view', batch.length, ', leaves', containerContext.length, 'in collection');
+                if (batch.length) {
+                    if (settings.debug) console.log('New images in view', batch.length, ', leaves', containerContext.length, 'in collection');
+                }
             }
         }
 
