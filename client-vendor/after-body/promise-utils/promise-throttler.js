@@ -51,6 +51,7 @@
       if (!promise || !(promise instanceof Promise)) {
         throw new Error('Invalid usage of promiseThrottler');
       }
+      return true;
     }
 
     return function() {
