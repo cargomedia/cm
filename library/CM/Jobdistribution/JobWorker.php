@@ -7,11 +7,21 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract implements CM_Servi
     /** @var GearmanWorker */
     private $_gearmanWorker;
 
-    public function __construct() {
-        $worker = $this->_getGearmanWorker();
+    /** @var int */
+    private $_jobLimit;
+
+    /**
+     * @param int $jobLimit
+     */
+    public function __construct($jobLimit) {
+        $this->_jobLimit = (int) $jobLimit;
+
         $config = self::_getConfig();
-        foreach ($config->servers as $server) {
-            $worker->addServer($server['host'], $server['port']);
+        if ($config->servers) {
+            $worker = $this->_getGearmanWorker();
+            foreach ($config->servers as $server) {
+                $worker->addServer($server['host'], $server['port']);
+            }
         }
     }
 
@@ -19,13 +29,18 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract implements CM_Servi
      * @param CM_Jobdistribution_Job_Abstract $job
      */
     public function registerJob(CM_Jobdistribution_Job_Abstract $job) {
-        $this->_gearmanWorker->addFunction(get_class($job), array($job, '__executeGearman'));
+        $this->_gearmanWorker->addFunction(get_class($job), [$job, '__executeGearman']);
     }
 
     public function run() {
+        $jobsRun = 0;
         while (true) {
+            if ($jobsRun >= $this->_jobLimit) {
+                return;
+            }
             $workFailed = false;
             try {
+                $jobsRun++;
                 CM_Cache_Storage_Runtime::getInstance()->flush();
                 $workFailed = !$this->_getGearmanWorker()->work();
             } catch (Exception $ex) {

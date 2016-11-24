@@ -85,7 +85,8 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 
         $workload = CM_Params::encode($params, true);
         $gearmanClient = $this->_getGearmanClient();
-        switch ($this->getPriority()) {
+        $priority = $this->getPriority();
+        switch ($priority) {
             case CM_Jobdistribution_Priority::HIGH:
                 $gearmanClient->doHighBackground($this->_getJobName(), $workload);
                 break;
@@ -95,6 +96,8 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
             case CM_Jobdistribution_Priority::LOW:
                 $gearmanClient->doLowBackground($this->_getJobName(), $workload);
                 break;
+            default:
+                throw new CM_Exception('Invalid priority', null, ['priority' => (string) $priority]);
         }
     }
 
@@ -120,23 +123,9 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
      * @param string        $workload
      * @param GearmanClient $gearmanClient
      * @return GearmanTask
-     * @throws CM_Exception
      */
     protected function _addTask($workload, $gearmanClient) {
-        switch ($this->getPriority()) {
-            case CM_Jobdistribution_Priority::HIGH:
-                $task = $gearmanClient->addTaskHigh($this->_getJobName(), $workload);
-                break;
-            case CM_Jobdistribution_Priority::NORMAL:
-                $task = $gearmanClient->addTask($this->_getJobName(), $workload);
-                break;
-            case CM_Jobdistribution_Priority::LOW:
-                $task = $gearmanClient->addTaskLow($this->_getJobName(), $workload);
-                break;
-            default:
-                throw new CM_Exception('Invalid priority', null, ['priority' => (string) $this->getPriority()]);
-        }
-        return $task;
+        return $gearmanClient->addTaskHigh($this->_getJobName(), $workload);
     }
 
     /**
