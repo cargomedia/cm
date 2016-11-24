@@ -82,9 +82,10 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
+     * @param CM_Frontend_Environment $environment
      * @return CM_Menu[]
      */
-    public function getMenus() {
+    public function getMenus(CM_Frontend_Environment $environment) {
         return array();
     }
 

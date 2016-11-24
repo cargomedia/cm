@@ -3,6 +3,7 @@
 class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
 
     public function testRun() {
+        CM_Config::get()->CM_Jobdistribution_JobWorker->servers = [];
         if (!extension_loaded('gearman')) {
             $this->markTestSkipped('Gearman Pecl Extension not installed.');
         }
@@ -16,9 +17,8 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
             }
             throw new Exception('foo-bar');
         }));
-        $mockBuilder = $this->getMockBuilder('CM_Jobdistribution_JobWorker');
+        $mockBuilder = $this->getMockBuilder('CM_Jobdistribution_JobWorker')->setConstructorArgs([1000]);
         $mockBuilder->setMethods(['_getGearmanWorker', '_handleException']);
-        $mockBuilder->disableOriginalConstructor();
         $jobWorkerMock = $mockBuilder->getMock();
         $jobWorkerMock->expects($this->any())->method('_getGearmanWorker')->will($this->returnValue($gearmanWorkerMock));
         /** @var CM_JobDistribution_JobWorker $jobWorkerMock */
@@ -43,5 +43,25 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
         } catch (Exception $ex) {
             $this->fail('Exception not caught.');
         }
+    }
+
+    public function testRunJobLimit() {
+        $serviceManager = new CM_Service_Manager();
+        $logger = $this->mockObject('CM_Log_Logger');
+        $serviceManager->registerInstance('logger', $logger);
+        
+        if (!extension_loaded('gearman')) {
+            $this->markTestSkipped('Gearman Pecl Extension not installed.');
+        }
+        $gearmanWorker = $this->mockClass('GearmanWorker')->newInstanceWithoutConstructor();
+        $workMethod = $gearmanWorker->mockMethod('work')->set(true);
+
+        CM_Config::get()->CM_Jobdistribution_JobWorker->servers = [];
+        $worker = $this->mockClass(CM_Jobdistribution_JobWorker::class)->newInstance([5]);
+        $worker->mockMethod('_getGearmanWorker')->set($gearmanWorker);
+        /** @var CM_Jobdistribution_JobWorker $worker */
+        $worker->setServiceManager($serviceManager);
+        $worker->run();
+        $this->assertSame(5, $workMethod->getCallCount());
     }
 }
