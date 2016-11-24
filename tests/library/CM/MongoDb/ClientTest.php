@@ -381,26 +381,22 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
     public function testRename() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
 
-        $mongoDb->insert('source', array('foo' => 'origin'));
+        $mongoDb->insert('source', ['foo' => 'origin']);
+        $sourceDoc1 = $mongoDb->findOne('source');
         $this->assertTrue($mongoDb->existsCollection('source'));
         $this->assertFalse($mongoDb->existsCollection('target'));
 
         $mongoDb->rename('source', 'target');
-
         $this->assertFalse($mongoDb->existsCollection('source'));
         $this->assertTrue($mongoDb->existsCollection('target'));
-        $this->assertSame(1, $mongoDb->find('target', array('foo' => 'origin'))->count());
+        $this->assertEquals([$sourceDoc1], $mongoDb->find('target')->toArray());
 
-        $mongoDb->insert('source', array('foo' => 'origin'));
-        $mongoDb->insert('target', array('foo' => 'existing-value'));
-        $this->assertSame(2, $mongoDb->count('target'));
+        $mongoDb->insert('source', ['foo' => 'origin']);
+        $sourceDoc2 = $mongoDb->findOne('source');
 
         $mongoDb->rename('source', 'target', true);
-
         $this->assertFalse($mongoDb->existsCollection('source'));
-        $this->assertTrue($mongoDb->existsCollection('target'));
-        $this->assertSame(1, $mongoDb->count('target'));
-        $this->assertSame(1, $mongoDb->find('target', array('foo' => 'origin'))->count());
+        $this->assertEquals([$sourceDoc2], $mongoDb->find('target')->toArray());
     }
 
     public function testRenameThrows() {

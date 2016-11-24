@@ -294,7 +294,6 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @param string    $collectionSource
      * @param string    $collectionTarget
      * @param bool|null $dropTarget
-     * @return array
      * @throws CM_MongoDb_Exception
      */
     public function rename($collectionSource, $collectionTarget, $dropTarget = null) {
@@ -314,13 +313,11 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
                 'collectionTarget' => $collectionTarget,
             ]);
         }
-        $result = $this->_getClient()->selectDB('admin')->command([
+        $this->_getClient()->selectDatabase('admin')->command([
             'renameCollection' => $this->_getDatabaseName() . '.' . $collectionSource,
             'to'               => $this->_getDatabaseName() . '.' . $collectionTarget,
             'dropTarget'       => $dropTarget,
         ]);
-        $this->_checkResultForErrors($result);
-        return $result;
     }
 
     /**
