@@ -80,6 +80,7 @@ class CM_Model_User extends CM_Model_Abstract {
             CM_Db_Db::delete('cm_user_online', array('userId' => $this->getId()));
             $this->_set(array('online' => null, 'visible' => null));
         }
+        $this->updateLatestActivityThrottled();
     }
 
     /**

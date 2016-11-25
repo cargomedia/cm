@@ -128,34 +128,23 @@ class CM_Model_UserTest extends CMTest_TestCase {
     }
 
     public function testOfflineOld() {
+        $stampOffline = time();
         $user1 = CM_Model_User::createStatic();
         $user1->setOnline();
 
-        $stampOffline = time();
-        $user2 = CM_Model_User::createStatic();
-        $user2->updateLatestActivityThrottled();
-        $user2->setOnline();
-
         CMTest_TH::timeForward(CM_Model_User::ONLINE_EXPIRATION + 1);
         $stampOnline = time();
-        $user3 = CM_Model_User::createStatic();
-        $user3->updateLatestActivityThrottled();
-        $user3->setOnline();
+        $user2 = CM_Model_User::createStatic();
+        $user2->setOnline();
 
-        $this->assertTrue($user1->getOnline());
-        $this->assertTrue($user2->getOnline());
-        $this->assertTrue($user3->getOnline());
-        $this->assertNull($user1->getLatestActivity());
-        $this->assertSameTime($stampOffline, $user2->getLatestActivity());
-        $this->assertSameTime($stampOnline, $user3->getLatestActivity());
+        $this->assertSameTime($stampOffline, $user1->getLatestActivity());
+        $this->assertSameTime($stampOnline, $user2->getLatestActivity());
 
         CM_Model_User::offlineOld();
         CMTest_TH::reinstantiateModel($user1);
         CMTest_TH::reinstantiateModel($user2);
-        CMTest_TH::reinstantiateModel($user3);
 
         $this->assertFalse($user1->getOnline());
-        $this->assertFalse($user2->getOnline());
-        $this->assertTrue($user3->getOnline());
+        $this->assertTrue($user2->getOnline());
     }
 }
