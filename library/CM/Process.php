@@ -266,13 +266,15 @@ class CM_Process {
                 }
                 if ($pid > 0 && ($forkHandler = $this->_findForkHandlerByPid($pid))) {
                     unset($this->_forkHandlerList[$forkHandler->getIdentifier()]);
-                    $workloadResultList[$forkHandler->getIdentifier()] = $forkHandler->receiveWorkloadResult();
+                    $workloadResult = $forkHandler->receiveWorkloadResult();
+                    $workloadResultList[$forkHandler->getIdentifier()] = $workloadResult;
                     $forkHandler->closeIpcStream();
                     if (!$this->_hasForks()) {
                         $this->unbind('exit', [$this, 'killChildren']);
                     }
                     if ($keepAlive) {
-                        CM_Service_Manager::getInstance()->getLogger()->warning('Respawning dead child.', (new CM_Log_Context())->setExtra(['pid' => $pid]));
+                        $logLevel = $workloadResult->isSuccess() ? CM_Log_Logger::INFO : CM_Log_Logger::WARNING;
+                        CM_Service_Manager::getInstance()->getLogger()->addMessage('Respawning dead child.', $logLevel, (new CM_Log_Context())->setExtra(['pid' => $pid]));
                         usleep(self::RESPAWN_TIMEOUT * 1000000);
                         $this->_fork($forkHandler->getWorkload(), $forkHandler->getIdentifier());
                     }

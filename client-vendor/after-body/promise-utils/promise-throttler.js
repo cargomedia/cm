@@ -41,10 +41,26 @@
   function nonameThrottler(fn, options) {
     var promise;
 
+    function resetClosurePromise(resetPromise) {
+      if (resetPromise === promise) {
+        promise = null;
+      }
+    }
+
+    function isPromise(promise) {
+      if (!promise || !(promise instanceof Promise)) {
+        throw new Error('Invalid usage of promiseThrottler');
+      }
+      return true;
+    }
+
     return function() {
-      if (!promise || !promise.isPending()) {
+      if (!promise) {
         promise = fn.apply(this, arguments);
-        return promise;
+        if (isPromise(promise)) {
+          promise.finally(resetClosurePromise.bind(null, promise));
+          return promise;
+        }
       }
       var cancelLeading = options.cancelLeading;
       if (cancelLeading) {
@@ -57,9 +73,13 @@
         var leadingPromise = promise;
         promise = new Promise(function(resolve) {
           leadingPromise.finally(function() {
-            resolve(fn.apply(self, args));
+            var promise = fn.apply(self, args);
+            if (isPromise(promise)) {
+              resolve(promise);
+            }
           });
         });
+        promise.finally(resetClosurePromise.bind(null, promise));
         return promise;
       }
       return promise;

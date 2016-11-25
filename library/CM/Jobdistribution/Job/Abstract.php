@@ -9,20 +9,10 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     abstract protected function _execute(CM_Params $params);
 
     /**
-     * @param CM_Params $params
-     * @return mixed
-     * @throws Exception
+     * @return CM_Jobdistribution_Priority
      */
-    private function _executeJob(CM_Params $params) {
-        CM_Service_Manager::getInstance()->getNewrelic()->startTransaction('CM Job: ' . $this->_getClassName());
-        try {
-            $return = $this->_execute($params);
-            CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
-            return $return;
-        } catch (Exception $ex) {
-            CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
-            throw $ex;
-        }
+    public function getPriority() {
+        return new CM_Jobdistribution_Priority('normal');
     }
 
     /**
@@ -63,7 +53,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 
         foreach ($paramsList as $params) {
             $workload = CM_Params::encode($params, true);
-            $task = $gearmanClient->addTaskHigh($this->_getJobName(), $workload);
+            $task = $this->_addTask($workload, $gearmanClient);
             if (false === $task) {
                 throw new CM_Exception('Cannot add task', null, ['jobName' => $this->_getJobName()]);
             }
@@ -95,7 +85,20 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 
         $workload = CM_Params::encode($params, true);
         $gearmanClient = $this->_getGearmanClient();
-        $gearmanClient->doBackground($this->_getJobName(), $workload);
+        $priority = $this->getPriority();
+        switch ($priority) {
+            case CM_Jobdistribution_Priority::HIGH:
+                $gearmanClient->doHighBackground($this->_getJobName(), $workload);
+                break;
+            case CM_Jobdistribution_Priority::NORMAL:
+                $gearmanClient->doBackground($this->_getJobName(), $workload);
+                break;
+            case CM_Jobdistribution_Priority::LOW:
+                $gearmanClient->doLowBackground($this->_getJobName(), $workload);
+                break;
+            default:
+                throw new CM_Exception('Invalid priority', null, ['priority' => (string) $priority]);
+        }
     }
 
     /**
@@ -117,6 +120,15 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     }
 
     /**
+     * @param string        $workload
+     * @param GearmanClient $gearmanClient
+     * @return GearmanTask
+     */
+    protected function _addTask($workload, $gearmanClient) {
+        return $gearmanClient->addTaskHigh($this->_getJobName(), $workload);
+    }
+
+    /**
      * @return string
      */
     protected function _getJobName() {
@@ -133,6 +145,23 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
             $resultList[] = $this->_executeJob(CM_Params::factory($params, true));
         }
         return $resultList;
+    }
+
+    /**
+     * @param CM_Params $params
+     * @return mixed
+     * @throws Exception
+     */
+    private function _executeJob(CM_Params $params) {
+        CM_Service_Manager::getInstance()->getNewrelic()->startTransaction('CM Job: ' . $this->_getClassName());
+        try {
+            $return = $this->_execute($params);
+            CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
+            return $return;
+        } catch (Exception $ex) {
+            CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
+            throw $ex;
+        }
     }
 
     /**

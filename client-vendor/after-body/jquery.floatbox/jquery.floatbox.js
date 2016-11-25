@@ -33,6 +33,15 @@
     $parent: null,
     $layer: null,
     $floatbox: null,
+    setOptions: function(value){
+      if (_.isObject(value)) {
+        //`value` as object to rewrite options
+        _.extend(this.options, value);
+        this.repaint();
+      } else {
+        throw new Error('Invalid param to floatbox.setOptions');
+      }
+    },
     show: function($element) {
       var $floatboxConfig = $element.find('.floatbox-config:first');
       this.options.fullscreen = $floatboxConfig.data('fullscreen') || this.options.fullscreen;
@@ -152,6 +161,14 @@
       var floatbox = $(this).data('floatbox');
       if (floatbox) {
         floatbox.close();
+      }
+    });
+  };
+  $.fn.floatbox = function(method, value) {
+    return this.each(function() {
+      var floatbox = $(this).data('floatbox');
+      if (floatbox && _.isFunction(floatbox[method])) {
+        floatbox[method](value);
       }
     });
   };
