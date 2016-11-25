@@ -523,7 +523,7 @@ DROP TABLE IF EXISTS `cm_user`;
 
 CREATE TABLE `cm_user` (
   `userId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `activityStamp` int(10) unsigned NOT NULL,
+  `activityStamp` int(10) unsigned DEFAULT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   `site` int(10) unsigned DEFAULT NULL,
   `languageId` int(10) unsigned DEFAULT NULL,
