@@ -127,12 +127,12 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
   error: function(message) {
     var $container = this.$('.messages');
     var $errorMessage = $container.find('.formField-error');
-    this.$el.removeClass('hasError');
+    delete this.$el[0].dataset.formfieldError;
 
     if (message) {
       if ($container.length) {
         this.$el[0].offsetWidth;	// Force reflow for CSS-animation
-        this.$el.addClass('hasError');
+        this.$el[0].dataset.formfieldError = true;
 
         if ($errorMessage.length) {
           $errorMessage.html(message);
