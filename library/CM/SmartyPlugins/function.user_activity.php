@@ -9,6 +9,9 @@ function smarty_function_user_activity(array $params, Smarty_Internal_Template $
     $user = $params['user'];
 
     $activityStamp = $user->getLatestActivity();
+    if (null === $activityStamp) {
+        return '';
+    }
     $activityDelta = time() - $activityStamp;
     if (!$forceDisplay && $activityDelta > 10 * 86400) {
         return '';
