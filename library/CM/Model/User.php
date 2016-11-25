@@ -303,13 +303,8 @@ class CM_Model_User extends CM_Model_Abstract {
             $currency = $data['currency'];
             $currencyId = $currency->getId();
         }
-        $activityStamp = null;
-        if (isset($data['activityStamp'])) {
-            $activityStamp = (int) $data['activityStamp'];
-        }
         $userId = CM_Db_Db::insert('cm_user', array(
             'createStamp'   => time(),
-            'activityStamp' => $activityStamp,
             'site'          => $siteType,
             'languageId'    => $languageId,
             'currencyId'    => $currencyId,

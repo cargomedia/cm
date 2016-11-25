@@ -195,10 +195,8 @@ class CM_SessionTest extends CMTest_TestCase {
 
     public function testStart() {
         /** @var CM_Model_User $user */
-        $user = CM_Model_User::createStatic([
-            'activityStamp' => time(),
-        ]);
-
+        $user = CM_Model_User::createStatic();
+        $user->updateLatestActivityThrottled();
         $activityStamp1 = time();
         $session = new CM_Session();
         $session->setUser($user);

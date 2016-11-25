@@ -21,12 +21,11 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $language = CM_Model_Language::create('English', 'en', true);
         $currency = CM_Model_Currency::create('978', 'EUR');
         $user = CM_Model_User::createStatic([
-            'activityStamp' => time(),
             'site'          => $site,
             'language'      => $language,
             'currency'      => $currency,
         ]);
-        $this->assertEquals(time(), $user->getLatestActivity());
+        $this->assertNull($user->getLatestActivity());
         $this->assertInternalType('int', $user->getCreated());
         $this->assertEquals(time(), $user->getCreated());
         $this->assertEquals($site, $user->getSite());
@@ -133,17 +132,14 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $user1->setOnline();
 
         $stampOffline = time();
-        $user2 = CM_Model_User::createStatic([
-            'activityStamp' => $stampOffline,
-        ]);
+        $user2 = CM_Model_User::createStatic();
+        $user2->updateLatestActivityThrottled();
         $user2->setOnline();
 
         CMTest_TH::timeForward(CM_Model_User::ONLINE_EXPIRATION + 1);
-
         $stampOnline = time();
-        $user3 = CM_Model_User::createStatic([
-            'activityStamp' => $stampOnline,
-        ]);
+        $user3 = CM_Model_User::createStatic();
+        $user3->updateLatestActivityThrottled();
         $user3->setOnline();
 
         $this->assertTrue($user1->getOnline());
