@@ -59,7 +59,12 @@ class CM_Config_Node {
             if (!is_scalar($value)) {
                 $output .= $this->exportAsString($getFullKey($baseKey, $key), $value);
             } else {
-                $output .= $getFullKey($baseKey, $key) . " = " . var_export($value, true) . ";" . PHP_EOL;
+                if (preg_match('/^(\w+)::class$/', $value, $matches) && class_exists($matches[1])) {
+                    $configValue = $value;
+                } else {
+                    $configValue = var_export($value, true);
+                }
+                $output .= $getFullKey($baseKey, $key) . " = " . $configValue . ";" . PHP_EOL;
             }
         }
         return $output;
