@@ -36,7 +36,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         };
 
         $generator = new CM_Config_Generator();
-        $classTypesConfig = $generator->getConfigClassTypes()->exportAsString('$config');
+        $classTypesConfig = $generator->getConfigClassTypes(true)->exportAsString('$config');
         $actionVerbsConfig = $generator->getConfigActionVerbs()->exportAsString('$config');
         foreach ($generator->getClassTypesRemoved() as $classRemoved) {
             $this->_getStreamOutput()->writeln('Removed `' . $classRemoved . '`');
