@@ -39,7 +39,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @return string[]
      */
     public function listCollectionNames() {
-        return  \Functional\reject(\Functional\invoke($this->_getDatabase()->listCollections(), 'getName'), function($collectionName) {
+        return \Functional\reject(\Functional\invoke($this->_getDatabase()->listCollections(), 'getName'), function ($collectionName) {
             return 0 === stripos($collectionName, 'system.'); // new driver does not filter out system collections
         });
     }
@@ -482,8 +482,6 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
             throw new CM_MongoDb_Exception('Cannot perform mongodb operation', null, ['result' => $result]);
         }
     }
-
-    function findAndModify() {}
 
     /**
      * @return MongoDB\Client
