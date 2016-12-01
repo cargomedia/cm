@@ -19,14 +19,10 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @return CM_Site_Abstract[]
+     * @return int Site id
      */
-    public static function getAll() {
-        $siteList = array();
-        foreach (CM_Config::get()->CM_Site_Abstract->types as $className) {
-            $siteList[] = new $className();
-        }
-        return $siteList;
+    public function getId() {
+        return $this->getType();
     }
 
     /**
@@ -189,26 +185,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @param string $theme
-     * @return CM_Site_Abstract
-     */
-    protected function _addTheme($theme) {
-        array_unshift($this->_themes, (string) $theme);
-        return $this;
-    }
-
-    /**
-     * @param string $name
-     * @return CM_Site_Abstract
-     */
-    protected function _setModule($name) {
-        array_unshift($this->_modules, (string) $name);
-        // Resets themes if new module is set
-        $this->_themes = array('default');
-        return $this;
-    }
-
-    /**
      * @param CM_Http_Request_Abstract $request
      * @return bool
      * @throws CM_Exception
@@ -264,6 +240,37 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
+     * @param string $theme
+     * @return CM_Site_Abstract
+     */
+    protected function _addTheme($theme) {
+        array_unshift($this->_themes, (string) $theme);
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return CM_Site_Abstract
+     */
+    protected function _setModule($name) {
+        array_unshift($this->_modules, (string) $name);
+        // Resets themes if new module is set
+        $this->_themes = array('default');
+        return $this;
+    }
+
+    /**
+     * @return CM_Site_Abstract[]
+     */
+    public static function getAll() {
+        $siteList = array();
+        foreach (CM_Config::get()->CM_Site_Abstract->types as $className) {
+            $siteList[] = new $className();
+        }
+        return $siteList;
+    }
+
+    /**
      * @param int|null $type
      * @return CM_Site_Abstract
      * @throws CM_Class_Exception_TypeNotConfiguredException
@@ -275,13 +282,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
             throw new CM_Class_Exception_TypeNotConfiguredException('Site with given type is not configured', CM_Exception::WARN, ['siteType' => $type]);
         }
         return new $class();
-    }
-
-    /**
-     * @return int Site id
-     */
-    public function getId() {
-        return $this->getType();
     }
 
     public static function fromArray(array $array) {
