@@ -112,6 +112,7 @@
       if (lastFocusedElement) {
         lastFocusedElement.focus();
       }
+      lastFocusedElement = null;
       if (!$viewport.children().length) {
         $viewport.remove();
         $viewport = null;
