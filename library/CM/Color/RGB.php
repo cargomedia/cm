@@ -9,9 +9,14 @@ class CM_Color_RGB {
      * @param float $red   0-255
      * @param float $green 0-255
      * @param float $blue  0-255
+     * @throws CM_Exception_Invalid
      */
     public function __construct($red, $green, $blue) {
-        $this->_colorJizz = new \MischiefCollective\ColorJizz\Formats\RGB($red, $green, $blue);
+        try {
+            $this->_colorJizz = new \MischiefCollective\ColorJizz\Formats\RGB($red, $green, $blue);
+        } catch (\MischiefCollective\ColorJizz\Exceptions\InvalidArgumentException $ex) {
+            throw new CM_Exception_Invalid($ex->getMessage());
+        }
     }
 
     /**
@@ -75,16 +80,21 @@ class CM_Color_RGB {
     /**
      * @return string
      */
-    public function toHexString() {
+    public function getHexString() {
         return $this->_colorJizz->toHex()->__toString();
     }
 
     /**
      * @param string $hexString
      * @return CM_Color_RGB
+     * @throws CM_Exception_Invalid
      */
     public static function factoryByHexString($hexString) {
-        $hex = \MischiefCollective\ColorJizz\Formats\Hex::fromString($hexString);
+        try {
+            $hex = \MischiefCollective\ColorJizz\Formats\Hex::fromString($hexString);
+        } catch (\MischiefCollective\ColorJizz\Exceptions\InvalidArgumentException $ex) {
+            throw new CM_Exception_Invalid($ex->getMessage());
+        }
         $rgb = $hex->toRGB();
         return new self($rgb->red, $rgb->green, $rgb->blue);
     }
