@@ -5,3 +5,11 @@
     .animation(highlightErrorField, 1000ms, ease, 0s, 1);
   }
 }
+
+&[data-formfield-success=true] {
+  .textinput, select + .button, input[type=checkbox] + label::before, input[type=radio] + label::before {
+    outline: 2px solid transparent;
+    outline-offset: -1px;
+    .animation(highlightSuccessField, 1000ms, ease, 0s, 1);
+  }
+}
