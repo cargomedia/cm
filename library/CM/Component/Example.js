@@ -56,10 +56,10 @@ var CM_Component_Example = CM_Component_Abstract.extend({
 
       $popout.on('click', function() {
         applyFloatbox($subpopup);
-        $subpopup.floatOut();
+        $subpopup.floatbox();
       });
       $popin.on('click', function() {
-        $el.floatIn();
+        $el.floatbox('close');
       });
 
       $el.on('floatbox-open', function(event) {
@@ -77,7 +77,7 @@ var CM_Component_Example = CM_Component_Abstract.extend({
 
     var $popup = this.$('.innerPopup.first').clone();
     applyFloatbox($popup);
-    $popup.floatOut();
+    $popup.floatbox();
   },
 
   /**

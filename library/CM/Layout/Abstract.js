@@ -104,6 +104,6 @@ var CM_Layout_Abstract = CM_Component_Abstract.extend({
    */
   _onPageTeardown: function() {
     $(document).scrollTop(0);
-    $('.floatbox-layer .floatbox-body > *').floatIn();
+    $('.floatbox').floatbox('close');
   }
 });
