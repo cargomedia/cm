@@ -49,7 +49,7 @@ class CM_Color_RGB {
         $hsl = $this->_colorJizz->toHSL();
         $hsl->hue = $relative ? $hsl->hue + $hue : $hue;
         $hsl->hue = fmod($hsl->hue, 360);
-        return self::_factoryByColorJizz($hsl);
+        return self::_fromColorJizz($hsl);
     }
 
     /**
@@ -61,7 +61,7 @@ class CM_Color_RGB {
         $hsl = $this->_colorJizz->toHSL();
         $hsl->saturation = $relative ? $hsl->saturation + $saturation : $saturation;
         $hsl->saturation = fmod($hsl->saturation, 100);
-        return self::_factoryByColorJizz($hsl);
+        return self::_fromColorJizz($hsl);
     }
 
     /**
@@ -74,7 +74,7 @@ class CM_Color_RGB {
         $hsl = $this->_colorJizz->toHSL();
         $hsl->lightness = $relative ? $hsl->lightness + $lightness : $lightness;
         $hsl->lightness = fmod($hsl->lightness, 100);
-        return self::_factoryByColorJizz($hsl);
+        return self::_fromColorJizz($hsl);
     }
 
     /**
@@ -89,7 +89,7 @@ class CM_Color_RGB {
      * @return CM_Color_RGB
      * @throws CM_Exception_Invalid
      */
-    public static function factoryByHexString($hexString) {
+    public static function fromHexString($hexString) {
         try {
             $hex = \MischiefCollective\ColorJizz\Formats\Hex::fromString($hexString);
         } catch (\MischiefCollective\ColorJizz\Exceptions\InvalidArgumentException $ex) {
@@ -103,7 +103,7 @@ class CM_Color_RGB {
      * @param \MischiefCollective\ColorJizz\ColorJizz $colorJizz
      * @return CM_Color_RGB
      */
-    private static function _factoryByColorJizz(\MischiefCollective\ColorJizz\ColorJizz $colorJizz) {
+    private static function _fromColorJizz(\MischiefCollective\ColorJizz\ColorJizz $colorJizz) {
         $rgb = $colorJizz->toRGB();
         return new self($rgb->red, $rgb->green, $rgb->blue);
     }

@@ -44,8 +44,8 @@ class CM_Color_RGBTest extends CMTest_TestCase {
         $this->assertSame('00FF00', $color->getHexString());
     }
 
-    public function factoryByHexString() {
-        $color = CM_Color_RGB::factoryByHexString('00FF00');
+    public function testFromHexString() {
+        $color = CM_Color_RGB::fromHexString('00FF00');
 
         $this->assertSame(0, $color->getRed());
         $this->assertSame(255, $color->getGreen());
@@ -55,8 +55,8 @@ class CM_Color_RGBTest extends CMTest_TestCase {
     /**
      * @expectedException CM_Exception_Invalid
      */
-    public function factoryByHexStringInvalid() {
-        CM_Color_RGB::factoryByHexString('00ZZZZ');
+    public function testFromHexStringInvalid() {
+        CM_Color_RGB::fromHexString('00ZZZZ');
     }
 
 }
