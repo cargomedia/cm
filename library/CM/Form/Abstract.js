@@ -5,6 +5,9 @@
 var CM_Form_Abstract = CM_View_Abstract.extend({
   _class: 'CM_Form_Abstract',
 
+  /** @type String **/
+  autosave: null,
+
   /** @type Object **/
   _fields: {},
 
@@ -49,10 +52,24 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       });
     }, this);
 
-    this.$el.on('submit', function() {
-      handler.$el.find('input[type="submit"], button[type="submit"]').first().click();
-      return false;
-    });
+    if (this.autosave) {
+      this.on('change', function(field) {
+        if (field) {
+          handler._submitOnly(handler.autosave, false)
+            .then(function() {
+              field.success();
+            })
+            .catch(CM_Exception_FormFieldValidation, function(error) {
+              handler._handleValidationError(error, handler.autosave, true);
+            });
+        }
+      });
+    } else {
+      this.$el.on('submit', function() {
+        handler.$el.find('input[type="submit"], button[type="submit"]').first().click();
+        return false;
+      });
+    }
 
     this.$el.on('reset', function() {
       _.defer(function() {
@@ -70,7 +87,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     this._fields[field.getName()] = field;
 
     field.on('change', function() {
-      this.trigger('change');
+      this.trigger('change', field);
     }, this);
   },
 

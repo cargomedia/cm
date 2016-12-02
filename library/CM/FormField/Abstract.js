@@ -121,18 +121,25 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
     this.getInput().focus();
   },
 
+  success: function() {
+    this.error(null);
+    this.$el[0].dataset.formfieldSuccess = true;
+  },
+
   /**
    * @param {String|Null} [message]
    */
   error: function(message) {
     var $container = this.$('.messages');
     var $errorMessage = $container.find('.formField-error');
-    delete this.$el[0].dataset.formfieldError;
+    var el = this.$el[0];
+    delete el.dataset.formfieldError;
+    delete el.dataset.formfieldSuccess;
 
     if (message) {
       if ($container.length) {
-        this.$el[0].offsetWidth;	// Force reflow for CSS-animation
-        this.$el[0].dataset.formfieldError = true;
+        el.offsetWidth;	// Force reflow for CSS-animation
+        el.dataset.formfieldError = true;
 
         if ($errorMessage.length) {
           $errorMessage.html(message);

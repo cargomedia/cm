@@ -31,6 +31,11 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     }
 
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
+        $autosave = $this->_params->has('autosave') ? $this->_params->getString('autosave') : null;
+        if (null !== $autosave) {
+            $action = $this->getAction($autosave);
+            $viewResponse->getJs()->setProperty('autosave', $action->getName());
+        }
     }
 
     /**
