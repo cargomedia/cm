@@ -59,4 +59,12 @@ class CM_Color_RGBTest extends CMTest_TestCase {
         CM_Color_RGB::fromHexString('00ZZZZ');
     }
 
+    public function testComparable() {
+        $color = CM_Color_RGB::fromHexString('00FF00');
+
+        $this->assertSame(true, $color->equals(CM_Color_RGB::fromHexString('00FF00')));
+        $this->assertSame(false, $color->equals(CM_Color_RGB::fromHexString('FF0000')));
+        $this->assertSame(false, $color->equals(null));
+    }
+
 }

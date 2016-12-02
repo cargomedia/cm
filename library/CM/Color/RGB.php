@@ -1,6 +1,6 @@
 <?php
 
-class CM_Color_RGB {
+class CM_Color_RGB implements CM_Comparable {
 
     /** @var \MischiefCollective\ColorJizz\Formats\RGB */
     private $_colorJizz;
@@ -107,4 +107,12 @@ class CM_Color_RGB {
         $rgb = $colorJizz->toRGB();
         return new self($rgb->red, $rgb->green, $rgb->blue);
     }
+
+    public function equals(CM_Comparable $other = null) {
+        if (!$other instanceof CM_Color_RGB) {
+            return false;
+        }
+        return $this->getRed() === $other->getRed() && $this->getGreen() === $other->getGreen() && $this->getBlue() === $other->getBlue();
+    }
+
 }
