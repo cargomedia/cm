@@ -17,6 +17,11 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_File(['name' => 'file', 'cardinality' => 2]));
         $this->registerField(new CM_FormField_FileImage(['name' => 'image', 'cardinality' => 2]));
         $this->registerField(new CM_FormField_Color(['name' => 'color']));
+        $this->registerField(new CM_FormField_ColorPalette(['name' => 'color2', 'palette' => [
+            CM_Color_RGB::fromHexString('ff0000'),
+            CM_Color_RGB::fromHexString('00ff00'),
+            CM_Color_RGB::fromHexString('0000ff'),
+        ]]));
         $this->registerField(new CM_FormField_Date(['name' => 'date']));
         $this->registerField(new CM_FormField_DateTimeInterval(['name' => 'dateTimeInterval', 'yearFirst' => date('Y'), 'yearLast' => (int) date('Y') + 1]));
         $this->registerField(new CM_FormField_Birthdate(['name' => 'birthdate', 'minAge' => 18, 'maxAge' => 30]));

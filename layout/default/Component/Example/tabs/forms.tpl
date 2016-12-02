@@ -17,6 +17,7 @@
 {formField name='file' label="Upload Files"}
 {formField name='image' label="Upload Photos"}
 {formField name='color' label="Color"}
+{formField name='color2' label="Color (Palette)"}
 {formField name='date' label="Date"}
 {formField name='dateTimeInterval' label = "DateTimeInterval" placeholderStart='Starting Time' placeholderEnd='End'}
 {formField name='birthdate' label="Birth Date between 18 and 30"}
