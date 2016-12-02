@@ -33,8 +33,8 @@ class CM_StreamChannel_Thumbnail extends CM_Model_Abstract {
 
     protected function _getSchema() {
         return new CM_Model_Schema_Definition([
-            'channelId'   => 'int',
-            'createStamp' => 'int',
+            'channelId'   => ['type' => 'int'],
+            'createStamp' => ['type' => 'int'],
         ]);
     }
 
