@@ -1,1 +1,1 @@
-<input type="color" name="{$name}" id="{$inputId}" value="{$value}" />
+<input type="color" name="{$name}" id="{$inputId}" {if $color}value="#{$color->getHexString()}"{/if} />
