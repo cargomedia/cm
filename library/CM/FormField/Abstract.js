@@ -18,25 +18,27 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
   },
 
   validate: function() {
-    var value = this.getValue();
-    if (this.isEmpty(value)) {
-      this.error(null);
-      return;
-    }
-    var self = this;
-    this.ajax('validate', {'userInput': value, 'form': this.getForm().getClass(), 'fieldName': this.getName()})
-      .then(function() {
-        if (value == self.getValue()) {
-          self.error();
-        }
-      })
-      .catch(CM_Exception, function(error) {
-        if (error instanceof CM_Exception_FormFieldValidation) {
-          self.error(error.message);
-        } else if (value == self.getValue()) {
-          throw error;
-        }
-      });
+    return this.try(function(){
+      var value = this.getValue();
+      if (this.isEmpty(value)) {
+        this.error(null);
+        return;
+      }
+      var self = this;
+      return this.ajax('validate', {'userInput': value, 'form': this.getForm().getClass(), 'fieldName': this.getName()})
+        .then(function() {
+          if (value == self.getValue()) {
+            self.error();
+          }
+        })
+        .catch(CM_Exception, function(error) {
+          if (error instanceof CM_Exception_FormFieldValidation) {
+            self.error(error.message);
+          } else if (value == self.getValue()) {
+            throw error;
+          }
+        });
+    });
   },
 
   reset: function() {
