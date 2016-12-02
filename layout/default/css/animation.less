@@ -1,23 +1,20 @@
-@keyframes highlightErrorField {
+@keyframes formError {
   0% {
-    outline-color: transparent;
-  }
-  40% {
-    outline-color: @colorError;
+    opacity: 0;
   }
   100% {
-    outline-color: transparent;
+    opacity: 1;
   }
 }
-@keyframes highlightSuccessField {
+@keyframes formSuccess {
   0% {
-    outline-color: transparent;
+    opacity: 0;
   }
-  40% {
-    outline-color: @colorOk;
+  80% {
+    opacity: 1;
   }
   100% {
-    outline-color: transparent;
+    opacity: 0;
   }
 }
 

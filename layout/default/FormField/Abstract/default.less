@@ -1,15 +1,18 @@
+& {
+  position: relative;
+}
+
 &[data-formfield-error=true] {
-  .textinput, select + .button, input[type=checkbox] + label::before, input[type=radio] + label::before {
-    outline: 2px solid transparent;
-    outline-offset: -1px;
-    animation: highlightErrorField 1000ms ease 0s 1;
+  .formFieldFeedback-error {
+    visibility: visible;
+    animation: formError 1000ms ease 0s 1;
+    animation-fill-mode: forwards;
   }
 }
 
 &[data-formfield-success=true] {
-  .textinput, select + .button, input[type=checkbox] + label::before, input[type=radio] + label::before {
-    outline: 2px solid transparent;
-    outline-offset: -1px;
-    animation: highlightSuccessField 1000ms ease 0s 1;
+  .formFieldFeedback-success {
+    visibility: visible;
+    animation: formSuccess 2s ease 0s 1;
   }
 }
