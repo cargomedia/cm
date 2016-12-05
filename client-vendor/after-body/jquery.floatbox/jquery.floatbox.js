@@ -20,7 +20,7 @@
   $document.on('keydown.floatbox', function(e) {
     if (e.which == 27) { // Escape
       if ($viewport && $viewport.children().length) {
-        $viewport.children('.floatbox-layer:last').find('.floatbox-body > *').floatIn();
+        $viewport.children('.floatbox-layer:last').find('.floatbox').floatbox('close');
       }
     }
   });
@@ -33,7 +33,7 @@
     $parent: null,
     $layer: null,
     $floatbox: null,
-    setOptions: function(value){
+    setOptions: function(value) {
       if (_.isObject(value)) {
         //`value` as object to rewrite options
         _.extend(this.options, value);
@@ -95,7 +95,6 @@
       this._getFocusElement().focus();
       this.$floatbox.trap();
 
-      $element.data('floatbox', this);
       $element.trigger('floatbox-open');
     },
     close: function() {
@@ -112,6 +111,7 @@
       if (lastFocusedElement) {
         lastFocusedElement.focus();
       }
+      lastFocusedElement = null;
       if (!$viewport.children().length) {
         $viewport.remove();
         $viewport = null;
@@ -148,27 +148,28 @@
     }
   });
 
-  $.fn.floatOut = function(options) {
+  /**
+   * @param {String} methodOrOptions
+   * @param {...*} args
+   * @returns {jQuery}
+   */
+  $.fn.floatbox = function(methodOrOptions, args) {
+    var method;
+    if (methodOrOptions && _.isString(methodOrOptions)) {
+      method = methodOrOptions;
+      args = [].slice.call(arguments, 1);
+    }
     return this.each(function() {
-      if (!$(this).data('floatbox')) {
-        var floatbox = new $.floatbox(options);
+      var floatbox;
+      if (method) {
+        floatbox = $(this).closest('.floatbox-layer').data('floatbox');
+        if (floatbox && _.isFunction(floatbox[method])) {
+          floatbox[method].apply(floatbox, args);
+        }
+      } else {
+        floatbox = new $.floatbox(methodOrOptions);
         floatbox.show($(this));
-      }
-    });
-  };
-  $.fn.floatIn = function() {
-    return this.each(function() {
-      var floatbox = $(this).data('floatbox');
-      if (floatbox) {
-        floatbox.close();
-      }
-    });
-  };
-  $.fn.floatbox = function(method, value) {
-    return this.each(function() {
-      var floatbox = $(this).data('floatbox');
-      if (floatbox && _.isFunction(floatbox[method])) {
-        floatbox[method](value);
+        $(this).closest('.floatbox-layer').data('floatbox', floatbox);
       }
     });
   };

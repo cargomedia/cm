@@ -658,13 +658,13 @@ var CM_App = CM_Class_Abstract.extend({
       $html.find('.box-body').text(question);
       $html.find('.box-footer').append($ok, $cancel);
 
-      $html.floatOut();
+      $html.floatbox();
       $ok.click(function() {
-        $html.floatIn();
+        $html.floatbox('close');
         callback.call(context);
       });
       $cancel.click(function() {
-        $html.floatIn();
+        $html.floatbox('close');
       });
       $ok.focus();
     }
