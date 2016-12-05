@@ -5,18 +5,31 @@
 }
 
 .palette-item {
+  align-items: center;
   border: 3px solid white;
   border-radius: 50%;
-  box-shadow: 0 0 4px rgba(0, 0, 0, .3);
-  cursor: pointer;
+  box-shadow: 0 0 4px 1px @colorFgBorderEmphasize3;
+  display: flex;
   flex: 0 0 auto;
   height: @sizeButton;
+  justify-content: center;
   transform: scale(.8);
   text-align: center;
-  transition: transform @transitionDuration;
+  transition: transform @transitionDuration cubic-bezier(0.175, 0.885, 0.32, 1.275);
   width: @sizeButton;
+
+  .icon-check {
+    color: white;
+    opacity: 0;
+    pointer-events: none;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, .3);
+  }
 
   &.selected {
     transform: scale(.95);
+
+    .icon-check {
+      opacity: 1;
+    }
   }
 }
