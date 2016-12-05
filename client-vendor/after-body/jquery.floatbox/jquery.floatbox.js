@@ -105,7 +105,6 @@
       if (this.$parent.length) {
         this.$parent.append($element);
       }
-      $element.removeData('floatbox');
       this.$layer.remove();
       $viewport.children('.floatbox-layer:last').addClass('active');
       if (lastFocusedElement) {
@@ -122,6 +121,10 @@
       }
       $(window).off('resize.floatbox', this.windowResizeCallback);
       $element.trigger('floatbox-close');
+
+      this.$parent = null;
+      this.$floatbox = null;
+      this.$layer = null;
     },
     repaint: function() {
       if (this.options.fullscreen) {
