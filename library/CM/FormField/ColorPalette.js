@@ -10,10 +10,11 @@ var CM_FormField_ColorPalette = CM_FormField_Abstract.extend({
       this.trigger('change');
     },
     'click .setValueFromPalette': function(event) {
-      var value = $(event.currentTarget).data('value');
-      this.setValue(value);
+      this.$('.palette-item').removeClass('selected');
+      var $selectedItem = $(event.currentTarget);
+      $selectedItem.addClass('selected');
+      this.setValue($selectedItem.data('value'));
       this.trigger('change');
     }
   }
-
 });

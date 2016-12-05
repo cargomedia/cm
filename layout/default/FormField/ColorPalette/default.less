@@ -1,0 +1,22 @@
+.palette {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 3px;
+}
+
+.palette-item {
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(0, 0, 0, .3);
+  cursor: pointer;
+  flex: 0 0 auto;
+  height: @sizeButton;
+  transform: scale(.8);
+  text-align: center;
+  transition: transform @transitionDuration;
+  width: @sizeButton;
+
+  &.selected {
+    transform: scale(.95);
+  }
+}
