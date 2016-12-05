@@ -6,15 +6,23 @@ var CM_FormField_ColorPalette = CM_FormField_Abstract.extend({
   _class: 'CM_FormField_ColorPalette',
 
   events: {
-    'input input': function() {
-      this.trigger('change');
-    },
     'click .setValueFromPalette': function(event) {
-      this.$('.palette-item').removeClass('selected');
-      var $selectedItem = $(event.currentTarget);
-      $selectedItem.addClass('selected');
-      this.setValue($selectedItem.data('value'));
-      this.trigger('change');
+      var value = $(event.currentTarget).data('value');
+      this.setValue(value);
     }
+  },
+
+  /**
+   * @param {String} value
+   */
+  setValue: function(value) {
+    var $paletteItem = this.$('.palette-item[data-value="' + value + '"]');
+    this.$('.palette-item').not($paletteItem).removeClass('selected');
+    $paletteItem.addClass('selected');
+
+    CM_FormField_Abstract.prototype.setValue.call(this, value);
+
+    this.trigger('change');
   }
+
 });
