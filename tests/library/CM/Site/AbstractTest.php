@@ -88,6 +88,10 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         }
     }
 
+    public function testFindClassName() {
+        $this->assertNull(CM_Site_Abstract::findClassName(9999));
+    }
+
     public function testEquals() {
         $siteFoo = $this->mockClass('CM_Site_Abstract');
         /** @var CM_Site_Abstract $siteFoo1 */

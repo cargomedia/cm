@@ -11,11 +11,15 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     /** @var CM_EventHandler_EventHandler */
     protected $_eventHandler = null;
 
+    /** @var CM_Site_SiteSettings */
+    protected $_siteSettings;
+
     /**
      * Default constructor to set CM module
      */
     public function __construct() {
         $this->_setModule('CM');
+        //        $this->_loadSettings();
     }
 
     /**
@@ -259,6 +263,10 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         return $this;
     }
 
+    private function _loadSettings() {
+        $this->_siteSettings = new CM_Site_SiteSettings($this->getId());
+    }
+
     /**
      * @return CM_Site_Abstract[]
      */
@@ -282,6 +290,19 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
             throw new CM_Class_Exception_TypeNotConfiguredException('Site with given type is not configured', CM_Exception::WARN, ['siteType' => $type]);
         }
         return new $class();
+    }
+
+    /**
+     * @param $type
+     * @return null|string
+     */
+    public static function findClassName($type) {
+        try {
+            $className = self::_getClassName((int) $type);
+        } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
+            $className = null;
+        }
+        return $className;
     }
 
     public static function fromArray(array $array) {
