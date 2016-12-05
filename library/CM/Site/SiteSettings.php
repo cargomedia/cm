@@ -48,12 +48,25 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
         return $this->_set('name', $name);
     }
 
+    /**
+     * @return null|string
+     */
+    public function findClassName() {
+        return CM_Site_Abstract::findClassName($this->getClassType());
+    }
+
     protected function _getSchema() {
         return new CM_Model_Schema_Definition([
             'classType' => ['type' => 'int'],
             'settings'  => ['type' => 'string'],
             'name'      => ['type' => 'string'],
         ]);
+    }
+
+    protected function _getContainingCacheables() {
+        $cacheables = parent::_getContainingCacheables();
+        $cacheables[] = new CM_Paging_SiteSettings_All();
+        return $cacheables;
     }
 
     /**
