@@ -161,7 +161,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         foreach ($actionLimitList as $actionLimitData) {
             /** @var CM_Model_ActionLimit_Abstract $actionLimit */
             $actionLimit = $actionLimitData['actionLimit'];
-            if (!$actionLimit->getOvershootAllowed()) {
+            if (!$actionLimit->getOvershootAllowed($this)) {
                 return false;
             }
         }
@@ -269,7 +269,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
                 $this->_log($actionLimit);
             }
             $actionLimit->overshoot($this, $role, $isFirst);
-            if (!$actionLimit->getOvershootAllowed()) {
+            if (!$actionLimit->getOvershootAllowed($this)) {
                 throw new CM_Exception_NotAllowed('ActionLimit breached.', null, ['actionLimitType' => $actionLimit->getType()]);
             }
         }
