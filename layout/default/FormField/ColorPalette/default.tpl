@@ -2,7 +2,7 @@
 <ul class="palette">
   {foreach $palette as $paletteColor}
     <li>
-      <a href="javascript:;" class="setValueFromPalette palette-item" data-value="#{$paletteColor->getHexString()}" style="background-color: #{$paletteColor->getHexString()}">
+      <a href="javascript:;" class="setValueFromPalette palette-item {if $paletteColor->equals($color)}selected{/if}" data-value="#{$paletteColor->getHexString()}" style="background-color: #{$paletteColor->getHexString()}">
         <span class="icon icon-check"></span>
       </a>
     </li>
