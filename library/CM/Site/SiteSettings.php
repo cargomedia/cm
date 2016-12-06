@@ -70,12 +70,15 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
     }
 
     /**
-     * @param int       $siteId
-     * @param CM_Params $configuration
-     * @param string    $name
+     * @param int            $siteId
+     * @param string         $name
+     * @param CM_Params|null $configuration
      * @return CM_Site_SiteSettings
      */
-    public static function create($siteId, CM_Params $configuration, $name) {
+    public static function create($siteId, $name, CM_Params $configuration = null) {
+        if (null === $configuration) {
+            $configuration = CM_Params::factory([]);
+        }
         $siteSettings = new self();
         $siteSettings->_set([
             'siteId'        => (int) $siteId,

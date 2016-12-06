@@ -15,7 +15,7 @@ class CM_ParamsTest extends CMTest_TestCase {
 
     public function testGetWithInvalidEncodedData() {
         $params = new CM_Params(['foo' => ['_class' => 'Some_Nonexistent_Class', '_id' => 123]]);
-        $this->assertSame (['_class' => 'Some_Nonexistent_Class', '_id' => 123], $params->get('foo'));
+        $this->assertSame(['_class' => 'Some_Nonexistent_Class', '_id' => 123], $params->get('foo'));
     }
 
     public function testGetString() {
@@ -317,16 +317,16 @@ class CM_ParamsTest extends CMTest_TestCase {
         $nestedObject1->mockMethod('toArray')->set(['foo' => 2]);
         $nestedObject2->mockMethod('jsonSerialize')->set(['bar' => 2]);
         $expected = [
-            '_class' => get_class($object),
-            'foo'    => 1,
+            '_class'  => get_class($object),
+            'foo'     => 1,
             'nested1' => [
                 '_class' => get_class($nestedObject1),
                 'foo'    => 2,
             ],
-            'bar' => 1,
+            'bar'     => 1,
             'nested2' => [
                 '_class' => get_class($nestedObject2),
-                'bar' => 2,
+                'bar'    => 2,
             ]
         ];
         $this->assertSame($expected, CM_Params::encode($object));
@@ -345,10 +345,10 @@ class CM_ParamsTest extends CMTest_TestCase {
             'bar'    => 2,
         ];
         $encodedObject = [
-            '_class' => $object->getClassName(),
-            'foo'    => 1,
+            '_class'  => $object->getClassName(),
+            'foo'     => 1,
             'nested1' => $encodedArrayConvertible,
-            'bar' => 1,
+            'bar'     => 1,
             'nested2' => $encodedJsonSerializable
         ];
         $fromArrayMethodObject = $object->mockStaticMethod('fromArray')->set(function ($encoded) use ($encodedJsonSerializable) {
@@ -537,8 +537,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         $params = new CM_Params(array('vector2' => $vector2));
         $value = $params->getGeometryVector2('vector2');
         $this->assertInstanceOf('CM_Geometry_Vector2', $value);
-        $this->assertSame(1.1, $value->getX());
-        $this->assertSame(2.2, $value->getY());
+        $this->assertEquals($value, $vector2);
 
         $exception = $this->catchException(function () {
             $params = new CM_Params(array('vector2' => 'foo'));
@@ -553,9 +552,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         $params = new CM_Params(array('vector3' => $vector3));
         $value = $params->getGeometryVector3('vector3');
         $this->assertInstanceOf('CM_Geometry_Vector3', $value);
-        $this->assertSame(1.1, $value->getX());
-        $this->assertSame(2.2, $value->getY());
-        $this->assertSame(3.3, $value->getZ());
+        $this->assertEquals($vector3, $value);
 
         $exception = $this->catchException(function () {
             $params = new CM_Params(array('vector3' => 'foo'));
@@ -592,5 +589,19 @@ class CM_ParamsTest extends CMTest_TestCase {
         });
         $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
         $this->assertSame('Invalid param type for session', $exception->getMessage());
+    }
+
+    public function testGetSiteSettings() {
+        $siteSettings1 = CM_Site_SiteSettings::create(1, 'Bar');
+        $siteSettings2 = CM_Site_SiteSettings::create(3, 'Baz', CM_Params::factory(['foo' => 'bar']));
+        $params = new CM_Params(['foo' => $siteSettings1, 'bar' => 'baz', 'baz' => $siteSettings2]);
+
+        $value1 = $params->getSiteSettings('foo');
+        $this->assertInstanceOf('CM_Site_SiteSettings', $value1);
+        $this->assertEquals($siteSettings1, $value1);
+
+        $value2 = $params->getSiteSettings('baz');
+        $this->assertInstanceOf('CM_Site_SiteSettings', $value2);
+        $this->assertEquals($siteSettings2, $value2);
     }
 }
