@@ -206,7 +206,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
     this.resetErrors();
     if (_.size(errorList)) {
-      var error = new CM_Exception_FormFieldValidation();
+      var error = new CM_Exception_FormFieldRequired();
       error.setErrorList(errorList);
       return Promise.reject(error);
     }
@@ -255,6 +255,13 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   _handleValidationError: function(error, actionName, displayErrors) {
     if (displayErrors) {
       this._displayValidationError(error);
+    }
+    var isRequired = error instanceof CM_Exception_FormFieldRequired;
+    if (isRequired) {
+      if (displayErrors) {
+        return;
+      }
+      throw error;
     }
     this._stopErrorPropagation = false;
     this.trigger('error error.' + actionName, error.message, error.name, error.isPublic);
