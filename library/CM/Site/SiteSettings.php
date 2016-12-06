@@ -5,33 +5,33 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
     /**
      * @return int
      */
-    public function getClassType() {
-        return $this->_get('classType');
+    public function getSiteId() {
+        return $this->_get('siteId');
     }
 
     /**
-     * @param int $classType
+     * @param int $siteId
      */
-    public function setClassType($classType) {
-        return $this->_set('classType', $classType);
+    public function setSiteId($siteId) {
+        return $this->_set('siteId', $siteId);
     }
 
     /**
      * @return CM_Params
      */
-    public function getSettings() {
-        if (!$this->_has('settings')) {
+    public function getConfiguration() {
+        if (!$this->_has('configuration')) {
             return CM_Params::factory();
         }
-        $paramsEncoded = CM_Params::jsonDecode($this->_get('settings'));
+        $paramsEncoded = CM_Params::jsonDecode($this->_get('configuration'));
         return CM_Params::factory($paramsEncoded, true);
     }
 
     /**
-     * @param CM_Params $settings
+     * @param CM_Params $configuration
      */
-    public function setSettings(CM_Params $settings) {
-        $this->_set('settings', CM_Params::jsonEncode($settings->getParamsEncoded()));
+    public function setConfiguration(CM_Params $configuration) {
+        $this->_set('configuration', CM_Params::jsonEncode($configuration->getParamsEncoded()));
     }
 
     /**
@@ -51,15 +51,15 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
     /**
      * @return null|string
      */
-    public function findClassName() {
-        return CM_Site_Abstract::findClassName($this->getClassType());
+    public function findSiteClassName() {
+        return CM_Site_Abstract::findClassName($this->getSiteId());
     }
 
     protected function _getSchema() {
         return new CM_Model_Schema_Definition([
-            'classType' => ['type' => 'int'],
-            'settings'  => ['type' => 'string'],
-            'name'      => ['type' => 'string'],
+            'siteId'        => ['type' => 'int'],
+            'configuration' => ['type' => 'string'],
+            'name'          => ['type' => 'string'],
         ]);
     }
 
@@ -70,20 +70,34 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
     }
 
     /**
-     * @param int       $classType
-     * @param CM_Params $settings
+     * @param int       $siteId
+     * @param CM_Params $configuration
      * @param string    $name
      * @return CM_Site_SiteSettings
      */
-    public static function create($classType, CM_Params $settings, $name) {
+    public static function create($siteId, CM_Params $configuration, $name) {
         $siteSettings = new self();
         $siteSettings->_set([
-            'classType' => (int) $classType,
-            'settings'  => CM_Params::jsonEncode($settings->getParamsEncoded()),
-            'name'      => (string) $name,
+            'siteId'        => (int) $siteId,
+            'configuration' => CM_Params::jsonEncode($configuration->getParamsEncoded()),
+            'name'          => (string) $name,
         ]);
         $siteSettings->commit();
         return $siteSettings;
+    }
+
+    /**
+     * @param int $siteId
+     * @return CM_Site_SiteSettings|null
+     */
+    public static function findBySiteId($siteId) {
+        /** @var CM_Model_StorageAdapter_Database $adapter */
+        $adapter = self::_getStorageAdapter(self::getPersistenceClass());
+        $id = $adapter->findByData(self::getTypeStatic(), ['siteId' => (int) $siteId]);
+        if (null === $id) {
+            return null;
+        }
+        return new self($id['id']);
     }
 
     public static function getPersistenceClass() {
