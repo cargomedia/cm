@@ -37,7 +37,7 @@ var CM_View_Abstract = Backbone.View.extend({
       this._bindAppEvents(this.appEvents);
     }
     this.on('all', function(eventName, data) {
-      cm.viewEvents.trigger(this, eventName, data);
+      cm.viewEvents.trigger.apply(cm.viewEvents, [this].concat(_.toArray(arguments)));
     });
   },
 
