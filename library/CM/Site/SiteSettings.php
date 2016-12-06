@@ -21,7 +21,7 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
      */
     public function getConfiguration() {
         if (!$this->_has('configuration')) {
-            return CM_Params::factory();
+            return CM_Params::factory([]);
         }
         $paramsEncoded = CM_Params::jsonDecode($this->_get('configuration'));
         return CM_Params::factory($paramsEncoded, true);
