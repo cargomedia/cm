@@ -30,6 +30,9 @@ abstract class CM_Service_AbstractDefinition {
     public function get(CM_Service_Manager $serviceManager) {
         if (null === $this->_instance) {
             $this->_instance = $this->createInstance($serviceManager);
+            if ($this->_instance instanceof CM_Service_ManagerAwareInterface) {
+                $this->_instance->setServiceManager($serviceManager);
+            }
             $this->trigger('create', $this->_instance);
         }
         return $this->_instance;

@@ -5,19 +5,11 @@ class CM_Service_Manager extends CM_Class_Abstract {
     /** @var CM_Service_AbstractDefinition[] */
     private $_definitions;
 
-    /** @var array */
-    private $_serviceInstanceList;
-
-    /** @var array */
-    private $_loadingServices;
-
     /** @var CM_Service_Manager */
     protected static $instance;
 
     public function __construct() {
         $this->_definitions = [];
-        $this->_serviceInstanceList = [];
-        $this->_loadingServices = [];
     }
 
     /**
@@ -25,7 +17,7 @@ class CM_Service_Manager extends CM_Class_Abstract {
      * @return bool
      */
     public function has($serviceName) {
-        return $this->_hasDefinition($serviceName) || $this->_hasInstance($serviceName);
+        return $this->_hasDefinition($serviceName);
     }
 
     /**
@@ -106,12 +98,8 @@ class CM_Service_Manager extends CM_Class_Abstract {
      * @return mixed
      */
     public function get($serviceName, $assertInstanceOf = null) {
-        if ($this->_hasInstance($serviceName)) {
-            $service = $this->_getInstance($serviceName);
-        } else {
-            $definition = $this->getDefinition($serviceName);
-            $service = $definition->get($this);
-        }
+        $definition = $this->getDefinition($serviceName);
+        $service = $definition->get($this);
         if (null !== $assertInstanceOf && !is_a($service, $assertInstanceOf, true)) {
             throw new CM_Exception_Invalid('Service has an invalid class.', null, [
                 'service'           => $serviceName,
@@ -132,17 +120,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
             throw new CM_Exception_Invalid('Service is already registered.', null, ['service' => $serviceName]);
         }
         $serviceName = (string) $serviceName;
-        if ($instance instanceof CM_Service_ManagerAwareInterface) {
-            $instance->setServiceManager($this);
-        }
-        $this->_serviceInstanceList[$serviceName] = $instance;
+        $this->_registerDefinition($serviceName, new CM_Service_InstanceWrapperDefinition($instance));
     }
-
+    
     public function resetServiceInstances() {
         foreach ($this->_definitions as $definition) {
             $definition->resetInstance();
         }
-        $this->_serviceInstanceList = [];
     }
 
     /**
@@ -162,7 +146,6 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public function unregister($serviceName) {
         unset($this->_definitions[$serviceName]);
-        unset($this->_serviceInstanceList[$serviceName]);
         return $this;
     }
 
@@ -302,18 +285,6 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $serviceName
-     * @return bool
-     */
-    protected function _hasInstance($serviceName) {
-        return array_key_exists($serviceName, $this->_serviceInstanceList);
-    }
-
-    protected function _getInstance($serviceName) {
-        return $this->_serviceInstanceList[$serviceName];
-    }
-
-    /**
      * @deprecated Instead make your class manager-aware (`CM_Service_ManagerAwareInterface`) and pass the manager.
      *
      * @return CM_Service_Manager
@@ -331,11 +302,4 @@ class CM_Service_Manager extends CM_Class_Abstract {
     public static function setInstance(CM_Service_Manager $serviceManager) {
         self::$instance = $serviceManager;
     }
-
-    function __clone() {
-        foreach ($this->_serviceInstanceList as &$instance) {
-            $instance = clone $instance;
-        }
-    }
-
 }
