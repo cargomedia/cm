@@ -44,12 +44,9 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 
   /**
    * @param {Object} [options]
-   * @param {Boolean} [removeOnClose=true]
+   * @param {Boolean} [removeOnClose]
    */
   popOut: function(options, removeOnClose) {
-    if (_.isUndefined(removeOnClose)) {
-      removeOnClose = true;
-    }
     this.repaint();
     //we don't use `this.$el.floatbox(options);` cause `this` component can be reloaded.
     var floatbox = new $.floatbox(options);
