@@ -22,7 +22,6 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         if (!$field instanceof CM_FormField_Hidden) {
             $content .= '<div class="messages"></div>';
             $content .= '<div class="formFieldFeedback formFieldFeedback-success"><span class="icon icon-verified"></span></div>';
-            $content .= '<div class="formFieldFeedback formFieldFeedback-error"><span class="icon icon-error"></span></div>';
         }
         $tagAttributes = [
             'id'    => $viewResponse->getAutoId(),
