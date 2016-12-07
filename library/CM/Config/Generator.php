@@ -50,20 +50,15 @@ class CM_Config_Generator extends CM_Class_Abstract {
     }
 
     /**
-     * @param boolean|null $useClassConstants
      * @return CM_Config_Node
      */
-    public function getConfigClassTypes($useClassConstants = null) {
+    public function getConfigClassTypes() {
         $this->generateClassTypes();
         $config = new CM_Config_Node();
         foreach ($this->getNamespaceTypes() as $namespaceClass => $typeList) {
-            if (true === $useClassConstants) {
-                $config->$namespaceClass->types = \Functional\map($typeList, function ($className) {
-                    return "$className::class";
-                });
-            } else {
-                $config->$namespaceClass->types = $typeList;
-            }
+            $config->$namespaceClass->types = \Functional\map($typeList, function ($className) {
+                return "$className::class";
+            });
         }
         $classTypes = $this->getClassTypes();
         foreach ($classTypes as $type => $class) {
