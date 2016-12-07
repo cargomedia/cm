@@ -117,21 +117,6 @@ class CM_Config_Node {
      * @param array $list
      * @return array
      */
-    private function _evaluateConstantsInKeys(array $list) {
-        $keys = array_keys($list);
-        $keys = \Functional\map($keys, function ($key) {
-            if (null !== ($value = $this->_evaluateClassConstant($key))) {
-                return $value;
-            }
-            return $key;
-        });
-        return array_combine($keys, array_values($list));
-    }
-
-    /**
-     * @param array $list
-     * @return array
-     */
     private function _evaluateConstantsInArray(array $list) {
         $constantEvaluator = function ($key) {
             if (is_scalar($key) && null !== ($value = $this->_evaluateClassConstant($key))) {
@@ -149,7 +134,9 @@ class CM_Config_Node {
      * @return mixed|null
      */
     private function _evaluateClassConstant($reference) {
-        if (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*::[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $reference)) {
+        if (preg_match('/^(\w+)::class$/', $reference, $matches) && class_exists($matches[1])) {
+            return $matches[1];
+        } elseif (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*::[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $reference)) {
             return @constant($reference);
         }
         return null;
