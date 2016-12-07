@@ -105,6 +105,7 @@
       if (this.$parent.length) {
         this.$parent.append($element);
       }
+      this.$floatbox.trigger('floatbox-close');
       $element.removeData('floatbox');
       this.$layer.remove();
       $viewport.children('.floatbox-layer:last').addClass('active');

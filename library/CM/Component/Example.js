@@ -45,6 +45,10 @@ var CM_Component_Example = CM_Component_Abstract.extend({
     this.message("Component ready, uname: " + this.uname);
   },
 
+  popOut: function() {
+    return CM_Component_Abstract.prototype.popOut.call(this, {}, false);
+  },
+
   multiLevelPopout: function() {
     var applyFloatbox = function($el) {
       var $popout = $el.children('.innerPopoutComponent');
