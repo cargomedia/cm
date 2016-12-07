@@ -202,12 +202,12 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   _submitOnly: function(actionName, disableUI) {
     var action = this._getAction(actionName);
     var data = this.getActionData(action.name);
-    var errorList = this._getErrorList(action.name, data);
+    var errorListRequired = this._getErrorListRequired(action.name, data);
 
     this.resetErrors();
-    if (_.size(errorList)) {
+    if (_.size(errorListRequired)) {
       var error = new CM_Exception_FormFieldRequired();
-      error.setErrorList(errorList);
+      error.setErrorList(errorListRequired);
       return Promise.reject(error);
     }
 
@@ -338,7 +338,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    * @param {Object} data
    * @returns {Array[]}
    */
-  _getErrorList: function(actionName, data) {
+  _getErrorListRequired: function(actionName, data) {
     var action = this._getAction(actionName);
     var errorList = [];
 
