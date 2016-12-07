@@ -70,12 +70,4 @@ class CM_Service_ConfigDefinition extends CM_Service_AbstractDefinition {
             ]);
         }
     }
-
-    public function serialize() {
-        return $this->_config;
-    }
-
-    public function unserialize($serialized) {
-        $this->_config = $serialized;
-    }
 }
