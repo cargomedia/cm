@@ -23,7 +23,7 @@ class CMTest_TestSuite {
         }
         $generator = new CM_Config_Generator();
         $config = new CM_Config_Node();
-        $config->extendWithConfig($generator->getConfigClassTypes(true));
+        $config->extendWithConfig($generator->getConfigClassTypes());
         $config->extendWithConfig($generator->getConfigActionVerbs());
         $config->extendWithConfig(CM_Config::get());
         CM_Config::set($config->export());
