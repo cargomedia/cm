@@ -95,6 +95,7 @@
       this._getFocusElement().focus();
       this.$floatbox.trap();
 
+      this.$layer.data('floatbox', this);
       $element.trigger('floatbox-open');
     },
     close: function() {
@@ -170,7 +171,6 @@
       } else {
         floatbox = new $.floatbox(methodOrOptions);
         floatbox.show($(this));
-        $(this).closest('.floatbox-layer').data('floatbox', floatbox);
       }
     });
   };
