@@ -2,28 +2,20 @@
 
 class CM_Service_Manager extends CM_Class_Abstract {
 
-    /** @var array */
-    private $_serviceConfigList;
-    
     /** @var CM_Service_AbstractDefinition[] */
     private $_definitions;
 
     /** @var array */
     private $_serviceInstanceList;
-    
+
     /** @var array */
     private $_loadingServices;
-    
-    /** @var array */
-    private $_subscriptions;
 
     /** @var CM_Service_Manager */
     protected static $instance;
 
     public function __construct() {
         $this->_definitions = [];
-        $this->_subscriptions = [];
-        $this->_serviceConfigList = [];
         $this->_serviceInstanceList = [];
         $this->_loadingServices = [];
     }
@@ -33,39 +25,7 @@ class CM_Service_Manager extends CM_Class_Abstract {
      * @return bool
      */
     public function has($serviceName) {
-        $hasConfig = array_key_exists($serviceName, $this->_serviceConfigList);
-        $hasInstance = array_key_exists($serviceName, $this->_serviceInstanceList);
-        return $hasConfig || $hasInstance;
-    }
-
-    /**
-     * @param string      $serviceName
-     * @param string|null $assertInstanceOf
-     * @throws CM_Exception_Invalid
-     * @return mixed
-     */
-    public function get($serviceName, $assertInstanceOf = null) {
-        if (!$this->_hasInstance($serviceName)) {
-            $this->_loadingServices[] = $serviceName;
-            $this->_serviceInstanceList[$serviceName] = $this->_instantiateService($serviceName);
-            $this->_loadingServices = array_diff($this->_loadingServices, [$serviceName]);
-        }
-        $service = $this->_serviceInstanceList[$serviceName];
-        if (null !== $assertInstanceOf && !is_a($service, $assertInstanceOf, true)) {
-            throw new CM_Exception_Invalid('Service has an invalid class.', null, [
-                'service'           => $serviceName,
-                'actualClassName'   => get_class($service),
-                'expectedClassName' => $assertInstanceOf,
-            ]);
-        }
-        if ($subscriptions = $this->_findSubscriptions($serviceName)) {
-            foreach ($subscriptions as $subscribedService) {
-                if (!in_array($subscribedService, $this->_loadingServices)) {
-                    $this->get($subscribedService);
-                }
-            }
-        }
-        return $service;
+        return $this->_hasDefinition($serviceName) || $this->_hasInstance($serviceName);
     }
 
     /**
@@ -77,15 +37,15 @@ class CM_Service_Manager extends CM_Class_Abstract {
      * @param null        $subscribe
      */
     public function register($serviceName, $className, array $arguments = null, $methodName = null, array $methodArguments = null, $subscribe = null) {
-        $config = array(
+        $config = [
             'class'     => $className,
             'arguments' => $arguments,
-        );
+        ];
         if (null !== $methodName) {
-            $config['method'] = array(
+            $config['method'] = [
                 'name'      => $methodName,
-                'arguments' => $methodArguments
-            );
+                'arguments' => $methodArguments,
+            ];
         }
         if (null !== $subscribe) {
             $config['subscribe'] = $subscribe;
@@ -102,20 +62,64 @@ class CM_Service_Manager extends CM_Class_Abstract {
         if (is_array($definition)) {
             $definition = new CM_Service_ConfigDefinition($definition);
         }
-        
+
         if ($definition instanceof CM_Service_AbstractDefinition) {
             $this->_registerDefinition($serviceName, $definition);
             return;
         }
-        
-        var_dump($definition);
-        die();
-        
         throw new CM_Exception_Invalid('Invalid definition');
     }
-    
+
+    /**
+     * @param string $serviceName
+     * @return CM_Service_AbstractDefinition
+     * @throws CM_Exception_Invalid
+     */
+    public function getDefinition($serviceName) {
+        if (!$this->_hasDefinition($serviceName)) {
+            throw new CM_Exception_Invalid("Service doesn't exist.", null, ['service' => $serviceName]);
+        }
+        return $this->_definitions[$serviceName];
+    }
+
+    /**
+     * @param string $serviceName
+     * @return bool
+     */
+    protected function _hasDefinition($serviceName) {
+        return array_key_exists($serviceName, $this->_definitions);
+    }
+
+    /**
+     * @param string                        $serviceName
+     * @param CM_Service_AbstractDefinition $definition
+     */
     protected function _registerDefinition($serviceName, CM_Service_AbstractDefinition $definition) {
         $this->_definitions[$serviceName] = $definition;
+        $definition->register($this);
+    }
+
+    /**
+     * @param string      $serviceName
+     * @param string|null $assertInstanceOf
+     * @throws CM_Exception_Invalid
+     * @return mixed
+     */
+    public function get($serviceName, $assertInstanceOf = null) {
+        if ($this->_hasInstance($serviceName)) {
+            $service = $this->_getInstance($serviceName);
+        } else {
+            $definition = $this->getDefinition($serviceName);
+            $service = $definition->get($this);
+        }
+        if (null !== $assertInstanceOf && !is_a($service, $assertInstanceOf, true)) {
+            throw new CM_Exception_Invalid('Service has an invalid class.', null, [
+                'service'           => $serviceName,
+                'actualClassName'   => get_class($service),
+                'expectedClassName' => $assertInstanceOf,
+            ]);
+        }
+        return $service;
     }
 
     /**
@@ -135,6 +139,9 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     public function resetServiceInstances() {
+        foreach ($this->_definitions as $definition) {
+            $definition->resetInstance();
+        }
         $this->_serviceInstanceList = [];
     }
 
@@ -154,7 +161,7 @@ class CM_Service_Manager extends CM_Class_Abstract {
      * @return $this
      */
     public function unregister($serviceName) {
-        unset($this->_serviceConfigList[$serviceName]);
+        unset($this->_definitions[$serviceName]);
         unset($this->_serviceInstanceList[$serviceName]);
         return $this;
     }
@@ -302,62 +309,8 @@ class CM_Service_Manager extends CM_Class_Abstract {
         return array_key_exists($serviceName, $this->_serviceInstanceList);
     }
 
-    /**
-     * @param string $serviceName
-     * @throws CM_Exception_Invalid
-     * @return mixed
-     */
-    protected function _instantiateService($serviceName) {
-        if (!array_key_exists($serviceName, $this->_definitions)) {
-            throw new CM_Exception_Invalid('Service has no definition.' . $serviceName, null, ['serviceName' => $serviceName]);
-        }
-        $definition = $this->_definitions[$serviceName];
-        return $definition->createInstance($this);
-    }
-
-    /**
-     * @param string $serviceName
-     * @param string $target
-     */
-    protected function _subscribe($serviceName, $target) {
-        if (!array_key_exists($target, $this->_subscriptions)) {
-            $this->_subscriptions[$target] = [];
-        }
-        $this->_subscriptions[$target][] = $serviceName;
-
-        if ($this->_hasInstance($target)) {
-            $this->get($serviceName);
-        }
-    }
-
-    /**
-     * @param string $serviceName
-     * @return array
-     */
-    protected function _findSubscriptions($serviceName) {
-        if (!array_key_exists($serviceName, $this->_subscriptions)) {
-            return [];
-        }
-        return $this->_subscriptions[$serviceName];
-    }
-
-    /**
-     * @param string           $serviceName
-     * @param ReflectionMethod $method
-     * @param array            $arguments
-     * @throws CM_Exception_Invalid
-     * @return array
-     */
-    protected function _matchNamedArgs($serviceName, ReflectionMethod $method, array $arguments) {
-        $namedArgs = new CM_Util_NamedArgs();
-        try {
-            return $namedArgs->matchNamedArgs($method, $arguments);
-        } catch (CM_Exception_Invalid $e) {
-            throw new CM_Exception_Invalid('Cannot match arguments for service', null, [
-                'serviceName'              => $serviceName,
-                'originalExceptionMessage' => $e->getMessage(),
-            ]);
-        }
+    protected function _getInstance($serviceName) {
+        return $this->_serviceInstanceList[$serviceName];
     }
 
     /**
