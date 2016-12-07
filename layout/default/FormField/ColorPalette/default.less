@@ -5,31 +5,49 @@
 }
 
 .palette-item {
-  align-items: center;
-  border: 3px solid white;
-  border-radius: 50%;
-  box-shadow: 0 0 4px 1px @colorFgBorderEmphasize3;
-  display: flex;
-  flex: 0 0 auto;
-  height: @sizeButton;
-  justify-content: center;
-  transform: scale(.8);
-  text-align: center;
-  transition: transform @transitionDuration cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  width: @sizeButton;
+  input[type=radio] {
+    + label {
+      align-items: center;
+      background-clip: content-box;
+      border: 1px solid @colorInputBorder;
+      border-radius: 50%;
+      display: flex;
+      flex: 0 0 auto;
+      height: @sizeButton;
+      justify-content: center;
+      margin: 0;
+      padding: 3px;
+      transform: scale(.85);
+      text-align: center;
+      transition: transform @transitionDuration cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      width: @sizeButton;
 
-  .icon-check {
-    color: white;
-    opacity: 0;
-    pointer-events: none;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, .3);
-  }
+      &::before {
+        display: none;
+      }
 
-  &.selected {
-    transform: scale(.95);
+      .icon-check {
+        color: white;
+        opacity: 0;
+        pointer-events: none;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, .3);
+      }
+    }
 
-    .icon-check {
-      opacity: 1;
+    &:checked {
+      + label {
+        transform: scale(.95);
+
+        .icon-check {
+          opacity: 1;
+        }
+      }
+    }
+
+    &:focus {
+      &:not(:disabled) + label {
+        .input_focus;
+      }
     }
   }
 }

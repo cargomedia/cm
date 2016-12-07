@@ -1,6 +1,6 @@
 <?php
 
-class CM_FormField_ColorPalette extends CM_FormField_Abstract {
+class CM_FormField_ColorPalette extends CM_FormField_Set_Select {
 
     /** @var CM_Color_RGB[] */
     private $_palette;

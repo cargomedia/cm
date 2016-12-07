@@ -1,10 +1,10 @@
-<input type="hidden" name="{$name}" id="{$inputId}" {if $color}value="#{$color->getHexString()}"{/if} readonly />
 <ul class="palette">
   {foreach $palette as $paletteColor}
-    <li>
-      <a href="javascript:;" class="setValueFromPalette palette-item {if $paletteColor->equals($color)}selected{/if}" data-value="#{$paletteColor->getHexString()}" style="background-color: #{$paletteColor->getHexString()}">
+    <li class="palette-item">
+      <input id="{$inputId}-{$paletteColor->getHexString()}" name="{$name}" type="radio" value="#{$paletteColor->getHexString()}" {if $paletteColor->equals($color)}checked{/if} />
+      <label for="{$inputId}-{$paletteColor->getHexString()}" style="background-color: #{$paletteColor->getHexString()}">
         <span class="icon icon-check"></span>
-      </a>
+      </label>
     </li>
   {/foreach}
 </ul>
