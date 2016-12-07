@@ -59,8 +59,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
             .then(function() {
               field.success();
             })
-            .catch(CM_Exception_FormFieldValidation, function(error) {
-              handler._handleValidationError(error, handler.autosave, true);
+            .catch(function(error) {
+              handler._handleSubmitError(error, handler.autosave, true);
             });
         }
       });
@@ -189,8 +189,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       .try(function() {
         return this._submitOnly(actionName, options.disableUI);
       })
-      .catch(CM_Exception_FormFieldValidation, function(error) {
-        this._handleValidationError(error, actionName, options.handleErrors);
+      .catch(function(error) {
+        this._handleSubmitError(error, actionName, options.handleErrors);
       });
   },
 
@@ -247,6 +247,23 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       });
   },
 
+  _handleSubmitError: function(error, actionName, displayErrors) {
+    if (error instanceof CM_Exception_FormFieldRequired) {
+      this._handleRequiredError(error, actionName, displayErrors);
+    } else if (error instanceof CM_Exception_FormFieldValidation) {
+      this._handleValidationError(error, actionName, displayErrors);
+    } else {
+      throw error;
+    }
+  },
+
+  _handleRequiredError: function(error, actionName, displayErrors) {
+    if (displayErrors) {
+      return this._displayValidationError(error);
+    }
+    throw error;
+  },
+
   /**
    * @param {CM_Exception_FormFieldValidation} error
    * @param {String} actionName
@@ -255,13 +272,6 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   _handleValidationError: function(error, actionName, displayErrors) {
     if (displayErrors) {
       this._displayValidationError(error);
-    }
-    var isRequired = error instanceof CM_Exception_FormFieldRequired;
-    if (isRequired) {
-      if (displayErrors) {
-        return;
-      }
-      throw error;
     }
     this._stopErrorPropagation = false;
     this.trigger('error error.' + actionName, error.message, error.name, error.isPublic);
