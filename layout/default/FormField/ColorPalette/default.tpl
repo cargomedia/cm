@@ -1,8 +1,8 @@
-<ul class="palette">
-  {foreach $palette as $paletteColor}
+<ul id="{$inputId}" class="palette">
+  {foreach $optionList as $itemValue}
     <li class="palette-item">
-      <input id="{$inputId}-{$paletteColor->getHexString()}" name="{$name}" type="radio" value="#{$paletteColor->getHexString()}" {if $paletteColor->equals($color)}checked{/if} />
-      <label for="{$inputId}-{$paletteColor->getHexString()}" style="background-color: #{$paletteColor->getHexString()}">
+      <input id="{$inputId}-{$itemValue}" name="{$name}" type="radio" value="{$itemValue}" {if $value && $value->getHexString() == $itemValue}checked{/if} />
+      <label for="{$inputId}-{$itemValue}" style="background-color: #{$itemValue}">
         <span class="icon icon-check"></span>
       </label>
     </li>
