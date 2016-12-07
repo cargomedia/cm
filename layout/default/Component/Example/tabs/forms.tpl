@@ -33,3 +33,14 @@
 {formField name='captcha' label="Captcha"}
 {formAction action='Submit' label='Submit'}
 {/form}
+
+<hr />
+<h3>Autosave</h3>
+{form name="CM_Form_ExampleAutosave" viewer=$viewer autosave="Submit"}
+{formField name='text' label="Text" placeholder="Placeholder"}
+{formField name='booleanSwitch' text="Bool Switch" display='switch'}
+{formField name='setSelect1' label="Set Select" display='radios'}
+{formField name='setSelect2' label="Set Select" placeholder=true}
+{formField name='setSelect3' label="Set Select with Prefix" labelPrefix="FooBar" placeholder=true}
+{formField name='treeselect' label="Tree select"}
+{/form}

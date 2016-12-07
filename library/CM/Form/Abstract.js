@@ -5,6 +5,9 @@
 var CM_Form_Abstract = CM_View_Abstract.extend({
   _class: 'CM_Form_Abstract',
 
+  /** @type String **/
+  autosave: null,
+
   /** @type Object **/
   _fields: {},
 
@@ -49,10 +52,24 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       });
     }, this);
 
-    this.$el.on('submit', function() {
-      handler.$el.find('input[type="submit"], button[type="submit"]').first().click();
-      return false;
-    });
+    if (this.autosave) {
+      this.on('change', function(field) {
+        if (field) {
+          handler._submitOnly(handler.autosave, false)
+            .then(function() {
+              field.success();
+            })
+            .catch(CM_Exception_FormFieldValidation, function(error) {
+              handler._handleValidationError(error, handler.autosave, true);
+            });
+        }
+      });
+    } else {
+      this.$el.on('submit', function() {
+        handler.$el.find('input[type="submit"], button[type="submit"]').first().click();
+        return false;
+      });
+    }
 
     this.$el.on('reset', function() {
       _.defer(function() {
@@ -70,7 +87,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     this._fields[field.getName()] = field;
 
     field.on('change', function() {
-      this.trigger('change');
+      this.trigger('change', field);
     }, this);
   },
 
@@ -167,30 +184,36 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       handleErrors: true,
       disableUI: true
     });
+
+    return this
+      .try(function() {
+        return this._submitOnly(actionName, options.disableUI);
+      })
+      .catch(CM_Exception_FormFieldValidation, function(error) {
+        this._handleValidationError(error, actionName, options.handleErrors);
+      });
+  },
+
+  /**
+   * @param {String} [actionName]
+   * @param {Boolean} [disableUI]
+   * @return Promise
+   */
+  _submitOnly: function(actionName, disableUI) {
     var action = this._getAction(actionName);
     var data = this.getActionData(action.name);
     var errorList = this._getErrorList(action.name, data);
 
-    if (options.handleErrors) {
-      _.each(this._fields, function(field, fieldName) {
-        if (errorList[fieldName]) {
-          field.error(errorList[fieldName]);
-        } else {
-          field.error(null);
-        }
-      }, this);
-    }
-
+    this.resetErrors();
     if (_.size(errorList)) {
-      if (!options.handleErrors) {
-        return Promise.reject(new CM_Exception_FormFieldValidation(errorList));
-      }
-      return Promise.resolve();
+      var error = new CM_Exception_FormFieldValidation();
+      error.setErrorList(errorList);
+      return Promise.reject(error);
     }
 
     return this
       .try(function() {
-        if (options.disableUI) {
+        if (disableUI) {
           this.disable();
         }
         this.trigger('submit', [data]);
@@ -198,17 +221,9 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       })
       .then(function(response) {
         if (response.errors) {
-          if (options.handleErrors) {
-            for (var i = response.errors.length - 1, error; error = response.errors[i]; i--) {
-              if (_.isArray(error)) {
-                this.getField(error[1]).error(error[0]);
-              } else {
-                this.error(error);
-              }
-            }
-          }
-
-          throw new CM_Exception_FormFieldValidation(response.errors);
+          var error = new CM_Exception_FormFieldValidation();
+          error.setErrorList(response.errors);
+          throw error;
         }
 
         if (response.exec) {
@@ -225,19 +240,41 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
         this.trigger('success success.' + action.name, response.data);
         return response.data;
       })
-      .catch(CM_Exception_FormFieldValidation, function(error) {
-        this._stopErrorPropagation = false;
-        this.trigger('error error.' + action.name, error.message, error.name, error.isPublic);
-        if (!this._stopErrorPropagation && !options.handleErrors) {
-          throw error;
-        }
-      })
       .finally(function() {
-        if (options.disableUI) {
+        if (disableUI) {
           this.enable();
         }
-        this.trigger('complete');
       });
+  },
+
+  /**
+   * @param {CM_Exception_FormFieldValidation} error
+   * @param {String} actionName
+   * @param {Boolean} displayErrors
+   */
+  _handleValidationError: function(error, actionName, displayErrors) {
+    if (displayErrors) {
+      this._displayValidationError(error);
+    }
+    this._stopErrorPropagation = false;
+    this.trigger('error error.' + actionName, error.message, error.name, error.isPublic);
+    if (!this._stopErrorPropagation && !displayErrors) {
+      throw error;
+    }
+  },
+
+  /**
+   * @param {CM_Exception_FormFieldValidation} validationError
+   */
+  _displayValidationError: function(validationError) {
+    var errorList = validationError.getErrorList();
+    for (var i = errorList.length - 1, error; error = errorList[i]; i--) {
+      if (_.isArray(error)) {
+        this.getField(error[1]).error(error[0]);
+      } else {
+        this.error(error);
+      }
+    }
   },
 
   stopErrorPropagation: function() {
@@ -292,11 +329,11 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   /**
    * @param {String} actionName
    * @param {Object} data
-   * @returns {Object}
+   * @returns {Array[]}
    */
   _getErrorList: function(actionName, data) {
     var action = this._getAction(actionName);
-    var errorList = {};
+    var errorList = [];
 
     _.each(action.fields, function(isRequired, fieldName) {
       if (isRequired) {
@@ -304,9 +341,9 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
         if (field.isEmpty(data[fieldName])) {
           var label = this._getFieldLabel(field);
           if (label) {
-            errorList[fieldName] = cm.language.get('{$label} is required.', {label: label});
+            errorList.push([cm.language.get('{$label} is required.', {label: label}), fieldName]);
           } else {
-            errorList[fieldName] = cm.language.get('Required');
+            errorList.push([cm.language.get('Required'), fieldName]);
           }
         }
       }
