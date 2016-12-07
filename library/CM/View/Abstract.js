@@ -200,18 +200,12 @@ var CM_View_Abstract = Backbone.View.extend({
     return _.contains(this.getClasses(), className);
   },
 
-  /**
-   * @param {Boolean} [skipDomRemoval]  Internal use only
-   */
-  remove: function(skipDomRemoval) {
+  remove: function() {
     this.trigger('destruct');
-
-    if (!skipDomRemoval) {
-      this.$el.detach();  // Detach from DOM to prevent reflows when removing children
-    }
+    this.$el.detach();  // Detach from DOM to prevent reflows when removing children
 
     _.each(_.clone(this.getChildren()), function(child) {
-      child.remove(skipDomRemoval);
+      child.remove();
     });
 
     if (this.getParent()) {
@@ -224,11 +218,7 @@ var CM_View_Abstract = Backbone.View.extend({
     }
 
     delete cm.views[this.getAutoId()];
-
-    if (!skipDomRemoval) {
-      this.$el.remove();
-    }
-
+    this.$el.remove();
     this.stopListening();
   },
 
@@ -236,8 +226,8 @@ var CM_View_Abstract = Backbone.View.extend({
    * @param {jQuery} $html
    */
   replaceWithHtml: function($html) {
-    this.remove(true);
     this.$el.replaceWith($html);
+    this.remove();
   },
 
   disable: function() {
