@@ -44,7 +44,7 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 
   popOut: function(options) {
     this.repaint();
-    this.$el.floatOut(options);
+    this.$el.floatbox(options);
     this.repaint();
 
     var self = this;
@@ -57,7 +57,7 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
   },
 
   popIn: function() {
-    this.$el.floatIn();
+    this.$el.floatbox('close');
   },
 
   /**

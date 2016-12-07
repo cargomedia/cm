@@ -94,9 +94,11 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
                 $this->_loadAssets(true);
                 $cache->save($type, $this->getIdRaw(), $this->_getData());
             }
-            $this->_onChange();
             $this->_changeContainingCacheables();
             $this->_onCreate();
+            if ($useReplace) {
+                $this->_onChange();
+            }
         }
         $this->_autoCommit = true;
     }
@@ -499,7 +501,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             $data = array();
         }
         $model = static::_createStatic($data);
-        $model->_onChange();
         $model->_changeContainingCacheables();
         $model->_onCreate();
         return $model;
