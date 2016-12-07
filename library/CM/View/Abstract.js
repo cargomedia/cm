@@ -236,8 +236,8 @@ var CM_View_Abstract = Backbone.View.extend({
    * @param {jQuery} $html
    */
   replaceWithHtml: function($html) {
-    this.remove(true);
     this.$el.replaceWith($html);
+    this.remove();
   },
 
   disable: function() {
