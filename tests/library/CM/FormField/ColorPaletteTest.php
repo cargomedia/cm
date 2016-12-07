@@ -40,8 +40,8 @@ class CM_FormField_ColorPaletteTest extends CMTest_TestCase {
 
         $html = $this->_renderFormField($field);
 
-        $this->assertSame('#00FF00', $html->find('input')->getAttribute('value'));
-        $this->assertSame(2, $html->find('.setValueFromPalette')->count());
+        $this->assertSame('#FF0000', $html->find('input')->getAttribute('value'));
+        $this->assertSame(2, $html->find('input')->count());
     }
 
 }
