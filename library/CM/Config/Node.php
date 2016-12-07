@@ -20,7 +20,7 @@ class CM_Config_Node {
                 $object->$key = $value->export();
             } else {
                 if (is_array($value)) {
-                    $value = $this->_evaluateConstantsInKeys($value);
+                    $value = $this->_evaluateConstantsInArray($value);
                 }
                 $object->$key = $value;
             }
@@ -126,6 +126,22 @@ class CM_Config_Node {
             return $key;
         });
         return array_combine($keys, array_values($list));
+    }
+
+    /**
+     * @param array $list
+     * @return array
+     */
+    private function _evaluateConstantsInArray(array $list) {
+        $constantEvaluator = function ($key) {
+            if (is_scalar($key) && null !== ($value = $this->_evaluateClassConstant($key))) {
+                return $value;
+            }
+            return $key;
+        };
+        $keys = \Functional\map(array_keys($list), $constantEvaluator);
+        $values = \Functional\map(array_values($list), $constantEvaluator);
+        return array_combine($keys, $values);
     }
 
     /**
