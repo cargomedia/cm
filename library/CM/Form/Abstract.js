@@ -165,7 +165,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    * @return Promise
    */
   _submitOnly: function(actionName, disableUI) {
-    var data = this._getData();
+    var data = this.getData();
     var errorListRequired = this._getErrorListRequired(data);
 
     this.resetErrors();
@@ -256,21 +256,6 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     _.each(this._fields, function(field) {
       field.error(null);
     });
-  },
-
-  /**
-   * @returns {{}}
-   */
-  _getData: function() {
-    var data = {};
-
-    _.each(this._fields, function(field) {
-      if (field.getEnabled()) {
-        data[field.getName()] = field.getValue();
-      }
-    }, this);
-
-    return data;
   },
 
   /**
