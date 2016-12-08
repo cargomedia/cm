@@ -172,13 +172,13 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String} [actionName]
+   * @param {String} actionName
    * @return Promise
    */
   submit: function(actionName) {
     return this
       .try(function() {
-        return this._submitOnly(actionName);
+        return this._submitOnly(actionName, true);
       })
       .catch(CM_Exception_FormFieldValidation, function(error) {
         this._displayValidationError(error);
@@ -186,10 +186,11 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String} [actionName]
+   * @param {String} actionName
+   * @param {Boolean} [disableUI]
    * @return Promise
    */
-  _submitOnly: function(actionName) {
+  _submitOnly: function(actionName, disableUI) {
     var action = this._getAction(actionName);
     var data = this.getActionData(action.name);
     var errorListRequired = this._getErrorListRequired(action.name, data);
@@ -203,6 +204,9 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
     return this
       .try(function() {
+        if (disableUI) {
+          this.disable();
+        }
         this.trigger('submit', [data]);
         return cm.ajax('form', {viewInfoList: this.getViewInfoList(), actionName: action.name, data: data})
       })
@@ -210,7 +214,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
         if (response.errors) {
           var error = new CM_Exception_FormFieldValidation();
           error.setErrorList(response.errors);
-          this.trigger('error error.' + actionName, error.message, error.name, error.isPublic);
+          this.trigger('error error.' + actionName, error);
           throw error;
         }
 
@@ -227,6 +231,11 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
         this.trigger('success success.' + action.name, response.data);
         return response.data;
+      })
+      .finally(function() {
+        if (disableUI) {
+          this.enable();
+        }
       });
   },
 
