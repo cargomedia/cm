@@ -163,20 +163,20 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
             ->at(0, function () use ($processMock) {
                 $processSuccess = $processMock->newInstance();
                 $processSuccess->mockMethod('waitForChildren')->set([
-                    (new CM_Process_WorkloadResult())->setResult(true),
-                    (new CM_Process_WorkloadResult())->setResult(true),
-                    (new CM_Process_WorkloadResult())->setResult(true),
-                    (new CM_Process_WorkloadResult())->setResult(true),
+                    new CM_Process_WorkloadResult(0),
+                    new CM_Process_WorkloadResult(0),
+                    new CM_Process_WorkloadResult(0),
+                    new CM_Process_WorkloadResult(0),
                 ]);
                 return $processSuccess;
             })
             ->at(1, function () use ($processMock) {
                 $processFailure = $processMock->newInstance();
                 $processFailure->mockMethod('waitForChildren')->set([
-                    (new CM_Process_WorkloadResult())->setResult(true),
-                    (new CM_Process_WorkloadResult())->setResult(false)->setException(new Exception('Workload failed')),
-                    (new CM_Process_WorkloadResult())->setResult(true),
-                    (new CM_Process_WorkloadResult())->setResult(true),
+                    new CM_Process_WorkloadResult(0),
+                    new CM_Process_WorkloadResult(1),
+                    new CM_Process_WorkloadResult(0),
+                    new CM_Process_WorkloadResult(0),
                 ]);
                 return $processFailure;
             });
