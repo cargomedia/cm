@@ -592,6 +592,27 @@ class CM_Util {
 
     /**
      * @param string $value
+     * @return bool
+     */
+    public static function jsonValidate($value) {
+        $regExp = '
+          /
+          (?(DEFINE)
+             (?<number>   -? (?= [1-9]|0(?!\d) ) \d+ (\.\d+)? ([eE] [+-]? \d+)? )    
+             (?<boolean>   true | false | null )
+             (?<string>    " ([^"\\\\]* | \\\\ ["\\\\bfnrt\/] | \\\\ u [0-9a-f]{4} )* " )
+             (?<array>     \[  (?:  (?&json)  (?: , (?&json)  )*  )?  \s* \] )
+             (?<pair>      \s* (?&string) \s* : (?&json)  )
+             (?<object>    \{  (?:  (?&pair)  (?: , (?&pair)  )*  )?  \s* \} )
+             (?<json>   \s* (?: (?&number) | (?&boolean) | (?&string) | (?&array) | (?&object) ) \s* )
+          )
+          \A (?&json) \Z
+          /six';
+        return (boolean) preg_match($regExp, (string) $value);
+    }
+
+    /**
+     * @param string $value
      * @return string
      */
     public static function sanitizeUtf($value) {
