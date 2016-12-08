@@ -187,7 +187,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
   /**
    * @param {String} actionName
-   * @param {Boolean} [disableUI]
+   * @param {Boolean} disableUI
    * @return Promise
    */
   _submitOnly: function(actionName, disableUI) {
