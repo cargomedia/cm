@@ -40,6 +40,10 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerAction(new CM_FormAction_Example_Submit($this));
     }
 
+    protected function _getRequiredFields() {
+        return ['text', 'money'];
+    }
+
     public function ajax_validate(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
         $data = $params->getArray('data');
         $result = [];

@@ -8,17 +8,19 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   /** @type String **/
   autosave: null,
 
-  /** @type Object **/
-  _fields: {},
+  /** @ype String[] */
+  requiredFieldNames: null,
+
+  /** @type String[] */
+  actionNames: null,
 
   /** @type Object **/
-  _actions: {},
+  _fields: {},
 
   initialize: function() {
     CM_View_Abstract.prototype.initialize.call(this);
 
     this._fields = {};
-    this._actions = {};
   },
 
   events: {
@@ -36,7 +38,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   _ready: function() {
     var handler = this;
 
-    _.each(this._actions, function(action, name) {
+    _.each(this.actionNames, function(name) {
       var $btn = $('#' + this.getAutoId() + '-' + name + '-button');
       var event = $btn.data('event');
       if (!event) {
@@ -86,14 +88,6 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     field.on('change', function() {
       this.trigger('change', field);
     }, this);
-  },
-
-  /**
-   * @param {String} name
-   * @param {Object} presentation
-   */
-  registerAction: function(name, presentation) {
-    this._actions[name] = presentation;
   },
 
   /**
@@ -153,26 +147,6 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
   /**
    * @param {String} actionName
-   * @returns {{}}
-   */
-  getActionData: function(actionName) {
-    var action = this._getAction(actionName);
-    var data = {};
-
-    _.each(action.fields, function(isRequired, fieldName) {
-      if (this.hasField(fieldName)) {
-        var field = this.getField(fieldName);
-        if (field.getEnabled()) {
-          data[field.getName()] = field.getValue();
-        }
-      }
-    }, this);
-
-    return data;
-  },
-
-  /**
-   * @param {String} actionName
    * @return Promise
    */
   submit: function(actionName) {
@@ -191,9 +165,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    * @return Promise
    */
   _submitOnly: function(actionName, disableUI) {
-    var action = this._getAction(actionName);
-    var data = this.getActionData(action.name);
-    var errorListRequired = this._getErrorListRequired(action.name, data);
+    var data = this._getData();
+    var errorListRequired = this._getErrorListRequired(data);
 
     this.resetErrors();
     if (_.size(errorListRequired)) {
@@ -208,7 +181,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
           this.disable();
         }
         this.trigger('submit', [data]);
-        return cm.ajax('form', {viewInfoList: this.getViewInfoList(), actionName: action.name, data: data})
+        return cm.ajax('form', {viewInfoList: this.getViewInfoList(), actionName: actionName, data: data})
       })
       .then(function(response) {
         if (response.errors) {
@@ -229,7 +202,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
           }
         }
 
-        this.trigger('success success.' + action.name, response.data);
+        this.trigger('success success.' + actionName, response.data);
         return response.data;
       })
       .finally(function() {
@@ -286,30 +259,38 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String} actionName
-   * @returns {Object}
+   * @returns {{}}
    */
-  _getAction: function(actionName) {
-    var action = this._actions[actionName];
-    if (!action) {
-      throw new CM_Exception('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
-    }
-    action.name = actionName;
-    return action;
+  _getData: function() {
+    var data = {};
+
+    _.each(this._fields, function(field) {
+      if (field.getEnabled()) {
+        data[field.getName()] = field.getValue();
+      }
+    }, this);
+
+    return data;
   },
 
   /**
-   * @param {String} actionName
+   * @param {String} name
+   * @returns {Boolean}
+   */
+  _isRequiredField: function(name) {
+    return this.requiredFieldNames.includes(name);
+  },
+
+  /**
    * @param {Object} data
    * @returns {Array[]}
    */
-  _getErrorListRequired: function(actionName, data) {
-    var action = this._getAction(actionName);
+  _getErrorListRequired: function(data) {
     var errorList = [];
 
-    _.each(action.fields, function(isRequired, fieldName) {
+    _.each(this._fields, function(field, fieldName) {
+      var isRequired = this._isRequiredField(fieldName);
       if (isRequired) {
-        var field = this.getField(fieldName);
         if (field.isEmpty(data[fieldName])) {
           var label = this._getFieldLabel(field);
           if (label) {

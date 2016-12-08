@@ -51,16 +51,6 @@ abstract class CM_FormAction_Abstract {
     }
 
     /**
-     * @return string
-     */
-    final public function js_presentation() {
-        $data = array();
-        $data['fields'] = (object) $this->getFieldList();
-
-        return json_encode($data);
-    }
-
-    /**
      * @param array                 $data
      * @param CM_Http_Response_View_Form $response
      * @param CM_Form_Abstract      $form
