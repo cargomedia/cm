@@ -131,7 +131,6 @@ class CM_Process {
                 if ($pid > 0 || !$this->isRunning($pid)) {
                     $forkHandler = $this->_getForkHandlerByPid($forkHandler->getPid());
                     unset($this->_forkHandlerList[$forkHandler->getIdentifier()]);
-                    $forkHandler->closeIpcStream();
                     if (!$this->_hasForks()) {
                         $this->unbind('exit', [$this, 'killChildren']);
                     }
@@ -197,29 +196,22 @@ class CM_Process {
         if (!$this->_hasForks()) {
             $this->bind('exit', [$this, 'killChildren']);
         }
-        $sockets = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
-        if (false === $sockets) {
-            throw new CM_Exception('Cannot open stream socket pair');
-        }
         $pid = pcntl_fork();
         if ($pid === -1) {
             throw new CM_Exception('Could not spawn child process');
         }
         if ($pid) {
             // parent
-            fclose($sockets[0]);
-            $forkHandler = $this->_getForkHandler($pid, $workload, $sockets[1], $identifier);
+            $forkHandler = $this->_getForkHandler($pid, $workload, $identifier);
             $this->_forkHandlerList[$identifier] = $forkHandler;
             return $forkHandler;
         } else {
             // child
             try {
-                fclose($sockets[1]);
                 $this->_reset();
                 CM_Service_Manager::getInstance()->resetServiceInstances();
-                $forkHandler = $this->_getForkHandler($this->getProcessId(), $workload, $sockets[0]);
-                $forkHandler->runAndSendWorkload();
-                $forkHandler->closeIpcStream();
+                $forkHandler = $this->_getForkHandler($this->getProcessId(), $workload);
+                $forkHandler->runWorkload();
             } catch (Exception $e) {
                 CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
             }
@@ -230,12 +222,11 @@ class CM_Process {
     /**
      * @param int      $pid
      * @param Closure  $workload
-     * @param resource $ipcStream
      * @param int|null $identifier
      * @return CM_Process_ForkHandler
      */
-    protected function _getForkHandler($pid, Closure $workload, $ipcStream, $identifier = null) {
-        return new CM_Process_ForkHandler($pid, $workload, $ipcStream, $identifier);
+    protected function _getForkHandler($pid, Closure $workload, $identifier = null) {
+        return new CM_Process_ForkHandler($pid, $workload, $identifier);
     }
 
     protected function _reset() {
@@ -266,9 +257,15 @@ class CM_Process {
                 }
                 if ($pid > 0 && ($forkHandler = $this->_findForkHandlerByPid($pid))) {
                     unset($this->_forkHandlerList[$forkHandler->getIdentifier()]);
-                    $workloadResult = $forkHandler->receiveWorkloadResult();
+                    $workloadResult = new CM_Process_WorkloadResult();
+                    if (pcntl_wifexited($status)) {
+                        $returnCode = pcntl_wexitstatus($status);
+                        $workloadResult->setReturnCode($returnCode);
+                    } else {
+                        $workloadResult->setReturnCode(null);
+                    }
+
                     $workloadResultList[$forkHandler->getIdentifier()] = $workloadResult;
-                    $forkHandler->closeIpcStream();
                     if (!$this->_hasForks()) {
                         $this->unbind('exit', [$this, 'killChildren']);
                     }

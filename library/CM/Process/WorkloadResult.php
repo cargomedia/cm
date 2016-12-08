@@ -2,41 +2,29 @@
 
 class CM_Process_WorkloadResult {
 
-    /** @var mixed */
-    private $_result;
-
-    /** @var CM_ExceptionHandling_SerializableException|null */
-    private $_exception;
+    /** @var int|null */
+    private $_returnCode;
 
     /**
-     * @return mixed
+     * @param int|null $returnCode
      */
-    public function getResult() {
-        return $this->_result;
+    public function __construct($returnCode = null) {
+        $this->setReturnCode($returnCode);
     }
 
     /**
-     * @param mixed $result
+     * @return int|null
+     */
+    public function getReturnCode() {
+        return $this->_returnCode;
+    }
+
+    /**
+     * @param int|null $code
      * @return $this
      */
-    public function setResult($result) {
-        $this->_result = $result;
-        return $this;
-    }
-
-    /**
-     * @return CM_ExceptionHandling_SerializableException|null
-     */
-    public function getException() {
-        return $this->_exception;
-    }
-
-    /**
-     * @param Exception $exception
-     * @return static
-     */
-    public function setException(Exception $exception) {
-        $this->_exception = new CM_ExceptionHandling_SerializableException($exception);
+    public function setReturnCode($code) {
+        $this->_returnCode = (null !== $code) ? (int) $code : null;
         return $this;
     }
 
@@ -44,6 +32,6 @@ class CM_Process_WorkloadResult {
      * @return bool
      */
     public function isSuccess() {
-        return null === $this->getException();
+        return 0 === $this->_returnCode;
     }
 }
