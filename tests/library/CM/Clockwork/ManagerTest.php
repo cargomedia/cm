@@ -47,7 +47,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
             $callbackCallCount++;
         });
 
-        $process->mockMethod('listenForChildren')->set([1 => new CM_Process_WorkloadResult()]);
+        $process->mockMethod('listenForChildren')->set([1 => new CM_Process_WorkloadResult(0)]);
         $manager->runEvents();
         $this->assertSame(1, $callbackCallCount);
         $this->assertNull($lastRuntimeActual);
@@ -55,7 +55,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         // check if we get the correct lastRuntime
         $expectedLastRuntime = clone $currently;
         $currently->modify('10 seconds');
-        $process->mockMethod('listenForChildren')->set([2 => new CM_Process_WorkloadResult()]);
+        $process->mockMethod('listenForChildren')->set([2 => new CM_Process_WorkloadResult(0)]);
         $manager->runEvents();
         $this->assertSame(2, $callbackCallCount);
         $this->assertSameTime($expectedLastRuntime, $lastRuntimeActual);
@@ -67,7 +67,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $expectedLastRuntime = clone $currently;
         $currently->modify('10 seconds');
         $secondCallbackCallCount = 0;
-        $process->mockMethod('listenForChildren')->set([3 => new CM_Process_WorkloadResult()]);
+        $process->mockMethod('listenForChildren')->set([3 => new CM_Process_WorkloadResult(0)]);
         $manager->runEvents();
         $this->assertSame(1, $secondCallbackCallCount);
         $this->assertSame(3, $callbackCallCount);
@@ -76,19 +76,17 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         // check if error in event callback will not update the lastRuntime
         $expectedLastRuntime = clone $currently;
         $currently->modify('10 seconds');
-        $workloadResult = new CM_Process_WorkloadResult();
-        $workloadResult->setException(new CM_Exception_Invalid());
-        $process->mockMethod('listenForChildren')->set([4 => $workloadResult]);
+        $process->mockMethod('listenForChildren')->set([4 => new CM_Process_WorkloadResult(1)]);
         $manager->runEvents();
         $this->assertSame(4, $callbackCallCount);
         $this->assertSameTime($expectedLastRuntime, $lastRuntimeActual);
 
-        $process->mockMethod('listenForChildren')->set([5 => new CM_Process_WorkloadResult()]);
+        $process->mockMethod('listenForChildren')->set([5 => new CM_Process_WorkloadResult(0)]);
         $manager->runEvents();
         $this->assertSame(5, $callbackCallCount);
         $this->assertSameTime($expectedLastRuntime, $lastRuntimeActual);
 
-        $process->mockMethod('listenForChildren')->set([6 => new CM_Process_WorkloadResult()]);
+        $process->mockMethod('listenForChildren')->set([6 => new CM_Process_WorkloadResult(0)]);
         $manager->runEvents();
         $this->assertSame(6, $callbackCallCount);
         $this->assertSameTime($currently, $lastRuntimeActual);
@@ -121,7 +119,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event2]));
 
         // event 2 finishes
-        $process->mockMethod('listenForChildren')->set([2 => new CM_Process_WorkloadResult()]);
+        $process->mockMethod('listenForChildren')->set([2 => new CM_Process_WorkloadResult(0)]);
         $manager->runEvents();
         $this->assertSame(2, $forkMock->getCallCount());
         $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event1]));
@@ -135,8 +133,8 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertTrue(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event2]));
 
         // both events finish, event 2 finishes with an error
-        $process->mockMethod('listenForChildren')->set([1 => new CM_Process_WorkloadResult(),
-                                                        3 => (new CM_Process_WorkloadResult())->setException(new CM_Exception())]);
+        $process->mockMethod('listenForChildren')->set([1 => new CM_Process_WorkloadResult(0),
+                                                        3 => new CM_Process_WorkloadResult(1)]);
         $manager->runEvents();
 
         $this->assertFalse(CMTest_TH::callProtectedMethod($manager, '_isRunning', [$event1]));
@@ -193,7 +191,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
         $currently->modify('1 second');
         $this->assertTrue($_shouldRun->invoke($manager, $event1));
-        $process->mockMethod('listenForChildren')->set([1 => new CM_Process_WorkloadResult(null, null)]);
+        $process->mockMethod('listenForChildren')->set([1 => new CM_Process_WorkloadResult(0)]);
         $manager->runEvents();
         $this->assertEquals($currently, $storage->getLastRuntime($event1));
         $this->assertFalse($_shouldRun->invoke($manager, $event1));
