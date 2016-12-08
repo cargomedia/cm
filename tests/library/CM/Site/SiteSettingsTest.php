@@ -32,4 +32,11 @@ class CM_Site_SiteSettingsTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Site_SiteSettings', $foundSiteSettings);
         $this->assertEquals($siteSettings, $foundSiteSettings);
     }
+
+    public function testGetConfigurationSize() {
+        $siteSettings = CM_Site_SiteSettings::create(4, 'quux');
+        $this->assertSame(0, $siteSettings->getConfigurationSize());
+        $siteSettings->setConfiguration(CM_Params::factory(['foo' => 'baz', 'baz' => 1, 'quux' => ['foobar', '3']]));
+        $this->assertSame(3, $siteSettings->getConfigurationSize());
+    }
 }

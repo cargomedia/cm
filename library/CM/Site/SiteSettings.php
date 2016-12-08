@@ -35,6 +35,13 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
     }
 
     /**
+     * @return int
+     */
+    public function getConfigurationSize() {
+        return count($this->getConfiguration()->getParamNames());
+    }
+
+    /**
      * @return string
      */
     public function getName() {
