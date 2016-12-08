@@ -136,7 +136,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     public function getWebFontLoaderConfig() {
         $config = $this->getConfig();
