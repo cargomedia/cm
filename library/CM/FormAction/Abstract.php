@@ -31,19 +31,6 @@ abstract class CM_FormAction_Abstract {
     }
 
     /**
-     * @return array [string => bool]
-     */
-    public function getFieldList() {
-        if (null === $this->_fieldList) {
-            $this->_fieldList = array();
-            foreach ($this->_form->getFields() as $fieldName => $field) {
-                $this->_fieldList[$fieldName] = in_array($fieldName, $this->_getRequiredFields());
-            }
-        }
-        return $this->_fieldList;
-    }
-
-    /**
      * @return CM_Form_Abstract
      */
     public function getForm() {
@@ -67,13 +54,6 @@ abstract class CM_FormAction_Abstract {
      */
     final public function process(array $data, CM_Http_Response_View_Form $response, CM_Form_Abstract $form) {
         return $this->_process(CM_Params::factory($data, false), $response, $form);
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function _getRequiredFields() {
-        return array();
     }
 
     /**
