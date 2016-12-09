@@ -25,6 +25,15 @@ class CM_Site_SiteSettingsTest extends CMTest_TestCase {
         $this->assertSame('Quux', $siteSettings->getName());
     }
 
+    public function testCreateEmpty() {
+        $siteSettings = CM_Site_SiteSettings::create();
+        $this->assertInstanceOf('CM_Site_SiteSettings', $siteSettings);
+
+        $this->assertNull($siteSettings->getSiteId());
+        $this->assertNull($siteSettings->getName());
+        $this->assertEquals(CM_Params::factory([]), $siteSettings->getConfiguration());
+    }
+
     public function testFindById() {
         $this->assertNull(CM_Site_SiteSettings::findBySiteId(5));
         $siteSettings = CM_Site_SiteSettings::create(5, 'quux', CM_Params::factory(['foo' => 'baz', 'baz' => 5]));

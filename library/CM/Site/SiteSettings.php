@@ -3,7 +3,7 @@
 class CM_Site_SiteSettings extends CM_Model_Abstract {
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getSiteId() {
         return $this->_get('siteId');
@@ -42,7 +42,7 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName() {
         return $this->_get('name');
@@ -64,9 +64,9 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
 
     protected function _getSchema() {
         return new CM_Model_Schema_Definition([
-            'siteId'        => ['type' => 'int'],
+            'siteId'        => ['type' => 'int', 'optional' => true],
+            'name'          => ['type' => 'string', 'optional' => true],
             'configuration' => ['type' => 'string'],
-            'name'          => ['type' => 'string'],
         ]);
     }
 
@@ -77,20 +77,26 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
     }
 
     /**
-     * @param int            $siteId
-     * @param string         $name
+     * @param int|null       $siteId
+     * @param string|null    $name
      * @param CM_Params|null $configuration
      * @return CM_Site_SiteSettings
      */
-    public static function create($siteId, $name, CM_Params $configuration = null) {
+    public static function create($siteId = null, $name = null, CM_Params $configuration = null) {
+        if (null !== $siteId) {
+            $siteId = (int) $siteId;
+        }
+        if (null !== $name) {
+            $name = (string) $name;
+        }
         if (null === $configuration) {
             $configuration = CM_Params::factory([]);
         }
         $siteSettings = new self();
         $siteSettings->_set([
-            'siteId'        => (int) $siteId,
+            'siteId'        => $siteId,
+            'name'          => $name,
             'configuration' => CM_Params::jsonEncode($configuration->getParamsEncoded()),
-            'name'          => (string) $name,
         ]);
         $siteSettings->commit();
         return $siteSettings;
