@@ -78,7 +78,7 @@ class CMService_Adagnit_ClientTest extends CMTest_TestCase {
     }
 
     public function testTrackSignIn() {
-        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
+        $site = $this->getMockSite(null, null, null, ['url' => 'http://www.my-website.net']);
         $user = CMTest_TH::createUser();
         $environment = new CM_Frontend_Environment($site, $user);
         $adagnit = new CMService_Adagnit_Client();
@@ -93,7 +93,7 @@ class CMService_Adagnit_ClientTest extends CMTest_TestCase {
     }
 
     public function testTrackSignUp() {
-        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
+        $site = $this->getMockSite(null, null, null, ['url' => 'http://www.my-website.net']);
         $user = CMTest_TH::createUser();
         $environment = new CM_Frontend_Environment($site, $user);
         $adagnit = new CMService_Adagnit_Client();
@@ -108,7 +108,7 @@ class CMService_Adagnit_ClientTest extends CMTest_TestCase {
     }
 
     public function testTrackSale() {
-        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
+        $site = $this->getMockSite(null, null, null, ['url' => 'http://www.my-website.net']);
         $user = CMTest_TH::createUser();
         $environment = new CM_Frontend_Environment($site, $user);
         $adagnit = new CMService_Adagnit_Client();
@@ -123,7 +123,7 @@ class CMService_Adagnit_ClientTest extends CMTest_TestCase {
     }
 
     public function testTtl() {
-        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
+        $site = $this->getMockSite(null, null, null, ['url' => 'http://www.my-website.net']);
         $user = CMTest_TH::createUser();
         $environment = new CM_Frontend_Environment($site, $user);
         $adagnit = new CMService_Adagnit_Client(1);
@@ -135,7 +135,7 @@ class CMService_Adagnit_ClientTest extends CMTest_TestCase {
     }
 
     public function testTtlExpired() {
-        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
+        $site = $this->getMockSite(null, null, null, ['url' => 'http://www.my-website.net']);
         $user = CMTest_TH::createUser();
         $environment = new CM_Frontend_Environment($site, $user);
         $adagnit = new CMService_Adagnit_Client(0);

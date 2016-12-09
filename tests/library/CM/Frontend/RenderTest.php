@@ -13,7 +13,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
     public function testGetSiteName() {
         $render = new CM_Frontend_Render();
-        $this->assertSame('Default', $render->getSiteName());
+        $this->assertSame('Default factory name', $render->getSiteName());
     }
 
     public function testGetUrl() {
@@ -53,11 +53,9 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $render = new CM_Frontend_Render();
         $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Foo_Bar_FooBar', false);
 
-        $site = $this->getMockSite(null, null, array(
-            'url'          => 'http://www.test.dev',
-            'urlCdn'       => 'http://cdn.test.dev',
-            'name'         => 'Test',
-            'emailAddress' => 'test@test.dev',
+        $site = $this->getMockSite(null, null, null, array(
+            'url'    => 'http://www.test.dev',
+            'urlCdn' => 'http://cdn.test.dev',
         ));
         $renderSite = new CM_Frontend_Render(new CM_Frontend_Environment($site));
 
@@ -137,7 +135,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
     public function testGetUrlResourceDifferentSite() {
         $render = new CM_Frontend_Render();
-        $site = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
+        $site = $this->getMockSite('CM_Site_Abstract', null, null, ['urlCdn' => 'http://cdn.other.com']);
         $siteType = $site->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('http://cdn.other.com/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg',
@@ -164,7 +162,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
     public function testGetUrlStaticDifferentSite() {
         $render = new CM_Frontend_Render();
-        $site = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
+        $site = $this->getMockSite('CM_Site_Abstract', null, null, ['urlCdn' => 'http://cdn.other.com']);
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('http://cdn.other.com/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg', $site));
     }

@@ -3,7 +3,7 @@
 class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
 
     public function testCreate() {
-        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
+        $site = $this->getMockSite(null, null, null, ['url' => 'http://www.my-website.net']);
         $googleAnalytics = new CMService_GoogleAnalytics_Client('key123');
         $environment = new CM_Frontend_Environment($site);
         $request = new CM_Http_Request_Get('/pseudo-request');
@@ -13,7 +13,7 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
     }
 
     public function testCreateWithUser() {
-        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-website.net']);
+        $site = $this->getMockSite(null, null, null, ['url' => 'http://www.my-website.net']);
         $viewer = CMTest_TH::createUser();
         $googleAnalytics = new CMService_GoogleAnalytics_Client('key123');
         $environment = new CM_Frontend_Environment($site, $viewer);

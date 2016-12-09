@@ -43,7 +43,7 @@ class CM_Mail_MailableTest extends CMTest_TestCase {
     }
 
     public function testRenderTranslated() {
-        $site = $this->getMockSite(null, null, [
+        $site = $this->getMockSite(null, null, null, [
             'url' => 'http://www.foo.com',
         ]);
         $recipient = $this->getMockUser(null, $site);

@@ -16,10 +16,11 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     /**
      * Default constructor to set CM module
+     * @param CM_Site_SiteSettings|null $settings
      */
-    public function __construct() {
+    public function __construct(CM_Site_SiteSettings $settings = null) {
         $this->_setModule('CM');
-        //        $this->_loadSettings();
+        $this->_siteSettings = $settings;
     }
 
     /**
@@ -37,10 +38,21 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
+     * @return CM_Site_SiteSettings
+     * @throws CM_Exception_Invalid
+     */
+    public function getSiteSettings() {
+        if (null === $this->_siteSettings) {
+            throw new CM_Exception_Invalid('Settings not defined');
+        }
+        return $this->_siteSettings;
+    }
+
+    /**
      * @return string
      */
     public function getEmailAddress() {
-        return self::_getConfig()->emailAddress;
+        return $this->getSiteSettings()->getConfiguration()->getString('emailAddress');
     }
 
     /**
@@ -93,7 +105,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return string
      */
     public function getName() {
-        return self::_getConfig()->name;
+        return $this->getSiteSettings()->getConfiguration()->getString('name');
     }
 
     /**
@@ -139,11 +151,11 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return array|null
      */
     public function getWebFontLoaderConfig() {
-        $config = $this->getConfig();
-        if (!isset($config->webFontLoaderConfig)) {
+        $configuration = $this->getSiteSettings()->getConfiguration();
+        if (!$configuration->has('webFontLoaderConfig')) {
             return null;
         }
-        return $config->webFontLoaderConfig;
+        return $configuration->getArray('webFontLoaderConfig');
     }
 
     /**
@@ -264,7 +276,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     private function _loadSettings() {
-        $this->_siteSettings = new CM_Site_SiteSettings($this->getId());
+        $this->_siteSettings = CM_Site_SiteSettings::findBySiteId($this->getId());
     }
 
     /**
@@ -272,24 +284,35 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      */
     public static function getAll() {
         $siteList = array();
-        foreach (CM_Config::get()->CM_Site_Abstract->types as $className) {
-            $siteList[] = new $className();
+        foreach (CM_Config::get()->CM_Site_Abstract->types as $type => $className) {
+            $siteList[] = new $className(CM_Site_SiteSettings::findBySiteId($type));
         }
         return $siteList;
     }
 
     /**
-     * @param int|null $type
+     * @param int|null                  $type
+     * @param CM_Site_SiteSettings|null $siteSettings
      * @return CM_Site_Abstract
      * @throws CM_Class_Exception_TypeNotConfiguredException
      */
-    public static function factory($type = null) {
+    public static function factory($type = null, CM_Site_SiteSettings $siteSettings = null) {
         try {
             $class = self::_getClassName($type);
         } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
             throw new CM_Class_Exception_TypeNotConfiguredException('Site with given type is not configured', CM_Exception::WARN, ['siteType' => $type]);
         }
-        return new $class();
+        if (null === $siteSettings) {
+            if ($type !== null) {
+                $siteSettings = CM_Site_SiteSettings::findBySiteId($type);
+            } else {
+                $siteSettings = CM_Site_SiteSettings::create(null, 'Default factory name', CM_Params::factory([
+                    'name'         => 'Default factory name',
+                    'emailAddress' => 'default@default.dev',
+                ])); //TODO fix
+            }
+        }
+        return new $class($siteSettings);
     }
 
     /**
