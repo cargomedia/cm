@@ -57,7 +57,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
               field.success();
             })
             .catch(CM_Exception_FormFieldValidation, function(error) {
-              this._displayValidationError(error);
+              handler._displayValidationError(error);
             });
         }
       });
