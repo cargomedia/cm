@@ -1,6 +1,6 @@
 <?php
 
-class CM_Process_WorkloadResult {
+class CM_Process_Result {
 
     /** @var int|null */
     private $_returnCode;

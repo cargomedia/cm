@@ -1,17 +1,17 @@
 <?php
 
-class CM_Process_WorkloadResultTest extends CMTest_TestCase {
+class CM_Process_ResultTest extends CMTest_TestCase {
 
     public function testConstructor() {
-        $result = new CM_Process_WorkloadResult();
+        $result = new CM_Process_Result();
         $this->assertSame(null, $result->getReturnCode());
 
-        $result = new CM_Process_WorkloadResult(0);
+        $result = new CM_Process_Result(0);
         $this->assertSame(0, $result->getReturnCode());
     }
 
     public function testSetReturnCode() {
-        $result = new CM_Process_WorkloadResult();
+        $result = new CM_Process_Result();
         $this->assertSame(null, $result->getReturnCode());
         $result->setReturnCode(0);
         $this->assertSame(0, $result->getReturnCode());
@@ -21,7 +21,7 @@ class CM_Process_WorkloadResultTest extends CMTest_TestCase {
     }
 
     public function testIsSuccess() {
-        $result = new CM_Process_WorkloadResult();
+        $result = new CM_Process_Result();
         $this->assertSame(false, $result->isSuccess());
 
         $result->setReturnCode(0);

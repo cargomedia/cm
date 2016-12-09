@@ -127,12 +127,12 @@ class CM_ProcessTest extends CMTest_TestCase {
         usleep(500000);
         $responses = $process->listenForChildren();
         $this->assertCount(1, $responses);
-        $this->assertContainsOnlyInstancesOf('CM_Process_WorkloadResult', $responses);
+        $this->assertContainsOnlyInstancesOf('CM_Process_Result', $responses);
         $this->assertSame([1 => true], \Functional\invoke($responses, 'isSuccess'));
         usleep(1000000);
         $responses = $process->listenForChildren();
         $this->assertCount(1, $responses);
-        $this->assertContainsOnlyInstancesOf('CM_Process_WorkloadResult', $responses);
+        $this->assertContainsOnlyInstancesOf('CM_Process_Result', $responses);
         $this->assertSame([2 => true], \Functional\invoke($responses, 'isSuccess'));
     }
 

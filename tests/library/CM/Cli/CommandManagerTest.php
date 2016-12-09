@@ -163,20 +163,20 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
             ->at(0, function () use ($processMock) {
                 $processSuccess = $processMock->newInstance();
                 $processSuccess->mockMethod('waitForChildren')->set([
-                    new CM_Process_WorkloadResult(0),
-                    new CM_Process_WorkloadResult(0),
-                    new CM_Process_WorkloadResult(0),
-                    new CM_Process_WorkloadResult(0),
+                    new CM_Process_Result(0),
+                    new CM_Process_Result(0),
+                    new CM_Process_Result(0),
+                    new CM_Process_Result(0),
                 ]);
                 return $processSuccess;
             })
             ->at(1, function () use ($processMock) {
                 $processFailure = $processMock->newInstance();
                 $processFailure->mockMethod('waitForChildren')->set([
-                    new CM_Process_WorkloadResult(0),
-                    new CM_Process_WorkloadResult(1),
-                    new CM_Process_WorkloadResult(0),
-                    new CM_Process_WorkloadResult(0),
+                    new CM_Process_Result(0),
+                    new CM_Process_Result(1),
+                    new CM_Process_Result(0),
+                    new CM_Process_Result(0),
                 ]);
                 return $processFailure;
             });
@@ -239,7 +239,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $mockBuilder->disableOriginalConstructor();
         $processMock = $mockBuilder->getMock();
         $processMock->expects($this->any())->method('fork')->will($this->returnCallback(function ($workload) {
-            $workload(new CM_Process_WorkloadResult());
+            $workload(new CM_Process_Result());
         }));
         $waitForChildrenMock = function ($keepAlive) {
             return array();

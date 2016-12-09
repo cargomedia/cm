@@ -141,7 +141,7 @@ class CM_Process {
 
     /**
      * @param boolean|null $keepAlive
-     * @return CM_Process_WorkloadResult[]
+     * @return CM_Process_Result[]
      * @throws CM_Exception
      */
     public function listenForChildren($keepAlive = null) {
@@ -150,7 +150,7 @@ class CM_Process {
 
     /**
      * @param bool|null $keepAlive
-     * @return CM_Process_WorkloadResult[]
+     * @return CM_Process_Result[]
      * @throws CM_Exception
      */
     public function waitForChildren($keepAlive = null) {
@@ -239,7 +239,7 @@ class CM_Process {
     /**
      * @param bool|null $keepAlive
      * @param boolean   $nohang
-     * @return CM_Process_WorkloadResult[]
+     * @return CM_Process_Result[]
      * @throws CM_Exception
      * @throws Exception
      * @internal param callable|null $terminationCallback
@@ -257,7 +257,7 @@ class CM_Process {
                 }
                 if ($pid > 0 && ($forkHandler = $this->_findForkHandlerByPid($pid))) {
                     unset($this->_forkHandlerList[$forkHandler->getIdentifier()]);
-                    $workloadResult = new CM_Process_WorkloadResult();
+                    $workloadResult = new CM_Process_Result();
                     if (pcntl_wifexited($status)) {
                         $returnCode = pcntl_wexitstatus($status);
                         $workloadResult->setReturnCode($returnCode);

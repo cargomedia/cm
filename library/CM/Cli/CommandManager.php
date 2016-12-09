@@ -179,7 +179,7 @@ class CM_Cli_CommandManager {
             if ($command->getSynchronized()) {
                 $this->unlockCommand($command);
             }
-            $failure = Functional\some($resultList, function (CM_Process_WorkloadResult $result) {
+            $failure = Functional\some($resultList, function (CM_Process_Result $result) {
                 return !$result->isSuccess();
             });
             if ($failure) {
