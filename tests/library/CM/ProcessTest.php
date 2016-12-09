@@ -44,12 +44,10 @@ class CM_ProcessTest extends CMTest_TestCase {
         $this->assertSame(0, $bindMock->getCallCount());
         $process->mockMethod('_hasForks')->set(true);
         $process->fork(function () {
-            return 0;
         });
         $this->assertSame(0, $bindMock->getCallCount());
         $process->mockMethod('_hasForks')->set(false);
         $process->fork(function () {
-            return 0;
         });
         $this->assertSame(1, $bindMock->getCallCount());
     }
