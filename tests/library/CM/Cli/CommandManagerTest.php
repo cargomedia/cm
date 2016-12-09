@@ -239,7 +239,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $mockBuilder->disableOriginalConstructor();
         $processMock = $mockBuilder->getMock();
         $processMock->expects($this->any())->method('fork')->will($this->returnCallback(function ($workload) {
-            $workload(new CM_Process_Result());
+            $workload();
         }));
         $waitForChildrenMock = function ($keepAlive) {
             return array();
