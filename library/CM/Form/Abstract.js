@@ -14,6 +14,17 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   /** @type Object **/
   _actions: {},
 
+  /** @type PromiseThrottled */
+  _autosaveSubmitThrottled: promiseThrottler(function(field) {
+    return this._submitOnly(this.autosave, false)
+      .then(function() {
+        field.success();
+      })
+      .catch(CM_Exception_FormFieldValidation, function(error) {
+        this._displayValidationError(error);
+      }.bind(this));
+  }, {cancelLeading: true}),
+
   initialize: function() {
     CM_View_Abstract.prototype.initialize.call(this);
 
@@ -52,13 +63,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     if (this.autosave) {
       this.on('change', function(field) {
         if (field) {
-          handler._submitOnly(handler.autosave, false)
-            .then(function() {
-              field.success();
-            })
-            .catch(CM_Exception_FormFieldValidation, function(error) {
-              handler._displayValidationError(error);
-            });
+          handler._autosaveSubmitThrottled(field);
         }
       });
     } else {
