@@ -6,7 +6,7 @@ var CM_FormField_Color = CM_FormField_Abstract.extend({
   _class: 'CM_FormField_Color',
 
   events: {
-    'change input': function() {
+    'input input': function() {
       this.trigger('change');
     }
   }
