@@ -78,6 +78,9 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 
     this._$input.on('select2-close', function() {
       field.trigger('close');
+      if (!_.isEmpty(prePopulate) && _.isEmpty(field.getValue())) {
+        field.trigger('change');
+      }
     });
 
     this.getForm().$el.bind("reset", function() {
