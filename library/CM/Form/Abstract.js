@@ -38,7 +38,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   _ready: function() {
     var handler = this;
 
-    _.each(this.actionNames, function(name) {
+    _.each(this.getActionNames(), function(name) {
       var $btn = $('#' + this.getAutoId() + '-' + name + '-button');
       var event = $btn.data('event');
       if (!event) {
@@ -130,6 +130,16 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    */
   getFields: function() {
     return _.values(this._fields);
+  },
+
+  /**
+   * @returns {String[]}
+   */
+  getActionNames: function() {
+    if (null === this.actionNames) {
+      throw new CM_Exception('Missing `actionNames` on form', false, {'form': this.getClass()});
+    }
+    return this.actionNames;
   },
 
   /**
