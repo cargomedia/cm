@@ -271,6 +271,19 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
+     * @param $type
+     * @return string|null
+     */
+    public static function findClassName($type) {
+        try {
+            $className = self::_getClassName((int) $type);
+        } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
+            $className = null;
+        }
+        return $className;
+    }
+
+    /**
      * @param int|null $type
      * @return CM_Site_Abstract
      * @throws CM_Class_Exception_TypeNotConfiguredException
