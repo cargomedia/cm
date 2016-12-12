@@ -72,11 +72,11 @@ class CM_Clockwork_Manager {
     }
 
     /**
-     * @param CM_Clockwork_Event        $event
-     * @param CM_Process_WorkloadResult $result
+     * @param CM_Clockwork_Event $event
+     * @param CM_Process_Result  $result
      * @throws CM_Exception_Invalid
      */
-    public function handleEventResult(CM_Clockwork_Event $event, CM_Process_WorkloadResult $result) {
+    public function handleEventResult(CM_Clockwork_Event $event, CM_Process_Result $result) {
         if ($result->isSuccess()) {
             $this->_markCompleted($event);
         }

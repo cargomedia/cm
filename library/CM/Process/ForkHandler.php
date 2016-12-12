@@ -8,22 +8,17 @@ class CM_Process_ForkHandler {
     /** @var Closure */
     private $_workload;
 
-    /** @var resource */
-    private $_ipcStream;
-
     /** @var int */
     private $_identifier;
 
     /**
      * @param int      $pid
      * @param Closure  $workload
-     * @param resource $ipcStream
      * @param int|null $identifier
      */
-    public function __construct($pid, Closure $workload, $ipcStream, $identifier = null) {
+    public function __construct($pid, Closure $workload, $identifier = null) {
         $this->_pid = (int) $pid;
         $this->_workload = $workload;
-        $this->_ipcStream = $ipcStream;
         if (null !== $identifier) {
             $identifier = (int) $identifier;
         }
@@ -45,17 +40,6 @@ class CM_Process_ForkHandler {
     }
 
     /**
-     * @return resource
-     */
-    public function getIpcStream() {
-        return $this->_ipcStream;
-    }
-
-    public function closeIpcStream() {
-        fclose($this->_ipcStream);
-    }
-
-    /**
      * @throws CM_Exception
      * @return int
      */
@@ -69,43 +53,12 @@ class CM_Process_ForkHandler {
     /**
      * @throws Exception
      */
-    public function runAndSendWorkload() {
+    public function runWorkload() {
         $workload = $this->_workload;
-        $result = new CM_Process_WorkloadResult();
         try {
-            $return = $workload($result);
-            $result->setResult($return);
+            call_user_func($workload);
         } catch (Exception $e) {
             CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
-            $result->setException($e);
         }
-
-        fwrite($this->_ipcStream, serialize($result));
-    }
-
-    /**
-     * @return CM_Process_WorkloadResult
-     */
-    public function receiveWorkloadResult() {
-        $ipcData = stream_get_contents($this->_ipcStream);
-        if (false === $ipcData) {
-            return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception('Failed to receive IPC data.'));
-        }
-        if ('' === $ipcData) {
-            return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception('Received no data from IPC stream.'));
-        }
-        try {
-            $workloadResult = unserialize($ipcData);
-        } catch (ErrorException $e) {
-            return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception('Received unserializable IPC data', null, [
-                'data' => $ipcData,
-            ]));
-        }
-        if (!$workloadResult instanceof CM_Process_WorkloadResult) {
-            return (new CM_Process_WorkloadResult())->setResult(null)->setException(new CM_Exception('Received unexpected IPC data', null, [
-                'data' => $ipcData,
-            ]));
-        }
-        return $workloadResult;
     }
 }

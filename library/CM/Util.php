@@ -594,7 +594,7 @@ class CM_Util {
      * @param string $value
      * @return bool
      */
-    public static function jsonValidate($value) {
+    public static function jsonIsValid($value) {
         $regExp = '
           /
           (?(DEFINE)

@@ -56,7 +56,7 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function findSiteClassName() {
         return CM_Site_Abstract::findClassName($this->getSiteId());

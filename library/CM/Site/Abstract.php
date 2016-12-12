@@ -275,10 +275,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         return $this;
     }
 
-    private function _loadSettings() {
-        $this->_siteSettings = CM_Site_SiteSettings::findBySiteId($this->getId());
-    }
-
     /**
      * @return CM_Site_Abstract[]
      */
@@ -288,6 +284,39 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
             $siteList[] = new $className(CM_Site_SiteSettings::findBySiteId($type));
         }
         return $siteList;
+    }
+
+    /**
+     * @param string $theme
+     * @return CM_Site_Abstract
+     */
+    protected function _addTheme($theme) {
+        array_unshift($this->_themes, (string) $theme);
+        return $this;
+    }
+
+    /**
+     * @return CM_Site_Abstract[]
+     */
+    public static function getAll() {
+        $siteList = array();
+        foreach (CM_Config::get()->CM_Site_Abstract->types as $className) {
+            $siteList[] = new $className();
+        }
+        return $siteList;
+    }
+
+    /**
+     * @param $type
+     * @return string|null
+     */
+    public static function findClassName($type) {
+        try {
+            $className = self::_getClassName((int) $type);
+        } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
+            $className = null;
+        }
+        return $className;
     }
 
     /**
@@ -316,16 +345,10 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @param $type
-     * @return null|string
+     * @return int Site id
      */
-    public static function findClassName($type) {
-        try {
-            $className = self::_getClassName((int) $type);
-        } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
-            $className = null;
-        }
-        return $className;
+    public function getId() {
+        return $this->getType();
     }
 
     public static function fromArray(array $array) {

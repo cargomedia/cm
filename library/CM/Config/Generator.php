@@ -2,7 +2,7 @@
 
 class CM_Config_Generator extends CM_Class_Abstract {
 
-    /** @var int  */
+    /** @var int */
     private $_typesMaxValue = 0;
 
     /** @var string[] */
@@ -56,7 +56,9 @@ class CM_Config_Generator extends CM_Class_Abstract {
         $this->generateClassTypes();
         $config = new CM_Config_Node();
         foreach ($this->getNamespaceTypes() as $namespaceClass => $typeList) {
-            $config->$namespaceClass->types = $typeList;
+            $config->$namespaceClass->types = \Functional\map($typeList, function ($className) {
+                return "$className::class";
+            });
         }
         $classTypes = $this->getClassTypes();
         foreach ($classTypes as $type => $class) {

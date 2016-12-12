@@ -322,11 +322,23 @@ input[type=checkbox].checkbox-switch {
 }
 
 .messages {
-  display: block;
-
   .formField-error {
     display: none;
     color: @colorError;
     padding: 2px;
   }
+}
+
+.formFieldFeedback-success {
+  color: @colorOk;
+  font-size: 1.2rem;
+  line-height: @heightInputText;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 0;
+  visibility: hidden;
+  width: @heightInputText;
 }
