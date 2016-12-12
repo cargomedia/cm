@@ -42,18 +42,23 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
     return $(selector, this.el);
   },
 
-  popOut: function(options) {
+  /**
+   * @param {Object} [options]
+   * @param {Boolean} [removeOnClose]
+   */
+  popOut: function(options, removeOnClose) {
     this.repaint();
-    this.$el.floatbox(options);
+    //we don't use `this.$el.floatbox(options);` cause `this` component can be reloaded.
+    var floatbox = new $.floatbox(options);
+    floatbox.show(this.$el);
     this.repaint();
 
-    var self = this;
-    this.$el.one('floatbox-close', function() {
-      if (cm.window.isHidden(self.el)) {
+    if (removeOnClose) {
+      var self = this;
+      floatbox.$floatbox.one('floatbox-close', function() {
         self.remove();
-      }
-      return false;
-    });
+      });
+    }
   },
 
   popIn: function() {

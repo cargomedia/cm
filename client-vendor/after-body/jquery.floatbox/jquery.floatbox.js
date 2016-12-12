@@ -95,6 +95,7 @@
       this._getFocusElement().focus();
       this.$floatbox.trap();
 
+      this.$layer.data('floatbox', this);
       $element.trigger('floatbox-open');
     },
     close: function() {
@@ -105,6 +106,7 @@
       if (this.$parent.length) {
         this.$parent.append($element);
       }
+      this.$floatbox.trigger('floatbox-close');
       $element.removeData('floatbox');
       this.$layer.remove();
       $viewport.children('.floatbox-layer:last').addClass('active');
@@ -169,7 +171,6 @@
       } else {
         floatbox = new $.floatbox(methodOrOptions);
         floatbox.show($(this));
-        $(this).closest('.floatbox-layer').data('floatbox', floatbox);
       }
     });
   };
