@@ -17,6 +17,7 @@
 {formField name='file' label="Upload Files"}
 {formField name='image' label="Upload Photos"}
 {formField name='color' label="Color"}
+{formField name='color2' label="Color (Palette)"}
 {formField name='date' label="Date"}
 {formField name='dateTimeInterval' label = "DateTimeInterval" placeholderStart='Starting Time' placeholderEnd='End'}
 {formField name='birthdate' label="Birth Date between 18 and 30"}
@@ -32,4 +33,15 @@
 {formField name='vector3' label="Vector 3D"}
 {formField name='captcha' label="Captcha"}
 {formAction action='Submit' label='Submit'}
+{/form}
+
+<hr />
+<h3>Autosave</h3>
+{form name="CM_Form_ExampleAutosave" viewer=$viewer autosave="Submit"}
+{formField name='text' label="Text" placeholder="Placeholder"}
+{formField name='booleanSwitch' text="Bool Switch" display='switch'}
+{formField name='setSelect1' label="Set Select" display='radios'}
+{formField name='setSelect2' label="Set Select" placeholder=true}
+{formField name='setSelect3' label="Set Select with Prefix" labelPrefix="FooBar" placeholder=true}
+{formField name='treeselect' label="Tree select"}
 {/form}

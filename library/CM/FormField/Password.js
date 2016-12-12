@@ -12,6 +12,7 @@ var CM_FormField_Password = CM_FormField_Text.extend({
   events: {
     'click .togglePasswordVisibility': function() {
       this.togglePasswordVisibility();
+      this.getInput().focus();
     }
   },
 
@@ -60,6 +61,6 @@ var CM_FormField_Password = CM_FormField_Text.extend({
    * @param {Boolean} state
    */
   _setInputTypeByState: function(state) {
-    this.getInput().attr('type', state ? 'text' : 'password').focus();
+    this.getInput().attr('type', state ? 'text' : 'password');
   }
 });
