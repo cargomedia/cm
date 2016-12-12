@@ -287,26 +287,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @param string $theme
-     * @return CM_Site_Abstract
-     */
-    protected function _addTheme($theme) {
-        array_unshift($this->_themes, (string) $theme);
-        return $this;
-    }
-
-    /**
-     * @return CM_Site_Abstract[]
-     */
-    public static function getAll() {
-        $siteList = array();
-        foreach (CM_Config::get()->CM_Site_Abstract->types as $className) {
-            $siteList[] = new $className();
-        }
-        return $siteList;
-    }
-
-    /**
      * @param $type
      * @return string|null
      */
@@ -342,13 +322,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
             }
         }
         return new $class($siteSettings);
-    }
-
-    /**
-     * @return int Site id
-     */
-    public function getId() {
-        return $this->getType();
     }
 
     public static function fromArray(array $array) {
