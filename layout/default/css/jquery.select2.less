@@ -42,7 +42,6 @@
 }
 
 .select2-drop {
-  position: absolute !important;
   border-color: @colorInputFocus;
 
   &.select2-drop-above {
@@ -107,5 +106,49 @@
   .select2-container .select2-choice abbr,
   .select2-container .select2-choice .select2-arrow b {
     background-image: image('select2/select2x2.png') !important;
+  }
+}
+
+/* Custom item */
+.select2-item {
+  position: relative;
+  min-height: 16px;
+  padding-left: 18px;
+
+  .select2-item-image {
+    height: 16px;
+    width: 16px;
+    position: absolute;
+    left: -2px;
+    top: 0;
+    vertical-align: top;
+    text-align: right;
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  }
+
+  .select2-item-name {
+    display: block;
+  }
+
+  .select2-item-description {
+    display: block;
+  }
+}
+
+.select2-choices {
+  .select2-item-image {
+    width: 16px;
+    display: inline-block;
+    margin-right: 6px;
+
+    img {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+    }
   }
 }
