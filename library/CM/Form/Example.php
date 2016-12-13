@@ -12,6 +12,7 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_Url(['name' => 'url']));
         $this->registerField(new CM_FormField_Integer(['name' => 'int']));
         $this->registerField(new CM_FormField_Slider(['name' => 'slider', 'min' => 0, 'max' => 2.5, 'step' => 0.1]));
+        $this->registerField(new CM_FormField_SliderRange(['name' => 'sliderRange', 'min' => 0, 'max' => 2.5, 'step' => 0.1]));
         $this->registerField(new CM_FormField_Distance(['name' => 'locationSlider']));
         $this->registerField(new CM_FormField_Location(['name' => 'location', 'fieldNameDistance' => 'locationSlider']));
         $this->registerField(new CM_FormField_File(['name' => 'file', 'cardinality' => 2]));
