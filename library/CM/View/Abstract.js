@@ -226,7 +226,9 @@ var CM_View_Abstract = Backbone.View.extend({
    * @param {jQuery} $html
    */
   replaceWithHtml: function($html) {
-    this.$el.replaceWith($html);
+    var $parent = this.$el.parent();
+    cm.window.appendHidden(this.$el);
+    $parent.append($html);
     this.remove();
   },
 
