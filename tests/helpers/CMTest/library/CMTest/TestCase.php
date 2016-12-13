@@ -10,17 +10,19 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     protected $backupGlobalsBlacklist = ['bootloader'];
 
     public function runBare() {
-        if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
+        if (!isset(CM_Config::get()->CM_Site_Abstract->defaultSettingConfiguration)) {
             $siteSettingsConfiguration = [
                 'name'         => 'Default',
                 'emailAddress' => 'default@default.dev',
             ];
-            $siteDefault = $this->getMockSite(null, null, CM_Params::factory($siteSettingsConfiguration), array(
+            CM_Config::get()->CM_Site_Abstract->defaultSettingConfiguration = $siteSettingsConfiguration;
+        }
+        if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
+            $siteDefault = $this->getMockSite(null, null, null, array(
                 'url'    => 'http://www.default.dev',
                 'urlCdn' => 'http://cdn.default.dev',
             ));
             CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
-            CM_Config::get()->CM_Site_Abstract->defaultSettingConfiguration = $siteSettingsConfiguration;
         }
 
         $this->setServiceManager(CMTest_TH::getServiceManager());
