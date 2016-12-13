@@ -11,15 +11,16 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     public function runBare() {
         if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
-            $siteSettingsConfiguration = CM_Params::factory([
+            $siteSettingsConfiguration = [
                 'name'         => 'Default',
                 'emailAddress' => 'default@default.dev',
-            ]);
-            $siteDefault = $this->getMockSite(null, null, $siteSettingsConfiguration, array(
+            ];
+            $siteDefault = $this->getMockSite(null, null, CM_Params::factory($siteSettingsConfiguration), array(
                 'url'    => 'http://www.default.dev',
                 'urlCdn' => 'http://cdn.default.dev',
             ));
             CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
+            CM_Config::get()->CM_Site_Abstract->defaultSettingConfiguration = $siteSettingsConfiguration;
         }
 
         $this->setServiceManager(CMTest_TH::getServiceManager());

@@ -13,7 +13,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
     public function testGetSiteName() {
         $render = new CM_Frontend_Render();
-        $this->assertSame('Default factory name', $render->getSiteName());
+        $this->assertSame('Default', $render->getSiteName());
     }
 
     public function testGetUrl() {
