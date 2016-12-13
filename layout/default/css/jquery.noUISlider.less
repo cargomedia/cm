@@ -3,9 +3,13 @@
   padding-right: 12px;
 }
 
+.noUi-base, .noUi-origin, .noUi-connect {
+  border-radius: 4px;
+}
+
 .noUi-target {
   border: 0;
-  background-color: @colorInputFocus;
+  background-color: @colorInputBorder;
 }
 
 .noUi-handle {
@@ -17,9 +21,8 @@
   }
 }
 
-.noUi-origin {
-  border-radius: 4px;
-  background-color: @colorInputBorder;
+.noUi-connect {
+  background-color: @colorInputFocus;
 }
 
 .noUi-handle:focus, .noUi-active {
@@ -29,7 +32,6 @@
 .noUi-horizontal {
   height: 8px;
   box-shadow: none;
-  background-color: @colorInputFocus;
 
   &[disabled] {
     opacity: 0.5;

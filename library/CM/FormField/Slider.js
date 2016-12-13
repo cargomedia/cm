@@ -22,7 +22,7 @@ var CM_FormField_Slider = CM_FormField_Abstract.extend({
       range: {min: field.getOption('min'), max: field.getOption('max')},
       start: $sliderValue.text(),
       step: field.getOption('step'),
-      handles: 1,
+      connect: [true, false],
       behaviour: 'tap'
     });
     this._$noUiHandle = $slider.find('.noUi-handle');
