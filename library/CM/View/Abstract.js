@@ -227,8 +227,13 @@ var CM_View_Abstract = Backbone.View.extend({
    */
   replaceWithHtml: function($html) {
     var $parent = this.$el.parent();
+    var $next = this.$el.next();
     cm.window.appendHidden(this.$el);
-    $parent.append($html);
+    if ($next.length) {
+      $next.before($html);
+    } else {
+      $parent.append($html);
+    }
     this.remove();
   },
 
