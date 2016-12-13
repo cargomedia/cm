@@ -9,7 +9,7 @@ class CMService_Inspectlet_Client implements CM_Service_Tracking_ClientInterface
     protected $_identity;
 
     /** @var array */
-    protected $_tagList;
+    protected $_tagList = [];
 
     /**
      * @param int $code
@@ -45,7 +45,7 @@ EOF;
         if (isset($this->_identity)) {
             $js .= "__insp.push(['identify', '{$this->_identity}']);";
         }
-        if (isset($this->_tagList)) {
+        if (!empty($this->_tagList)) {
             $tagList = CM_Util::jsonEncode($this->_tagList);
             $js .= "__insp.push(['tagSession', {$tagList}]);";
         }
@@ -77,7 +77,6 @@ EOF;
     protected function _addTag($name, $value) {
         $name = (string) $name;
         $value = (string) $value;
-        $this->_tagList = (array) $this->_tagList;
         $this->_tagList[$name] = $value;
         return $this;
     }
