@@ -18,7 +18,6 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
     this._$input.select2({
       width: 'off',
       tags: null,
-      dropdownCssClass: this.$el.attr('class'),
       allowClear: true,
       openOnEnter: false,
       maximumSelectionSize: cardinality,
@@ -117,17 +116,17 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
    * @return String
    */
   _formatItem: function(item) {
-    var cssClass = 'suggestItem';
+    var cssClass = 'select2-item';
     if (item.class) {
       cssClass += ' ' + _.escape(item.class);
     }
     var output = '<div class="' + cssClass + '">';
     if (item.img) {
-      output += '<div class="suggestItem-image"><img src="' + item.img + '" /></div>';
+      output += '<div class="select2-item-image"><img src="' + item.img + '" /></div>';
     }
-    output += '<span class="suggestItem-name">' + _.escape(item.name) + '</span>';
+    output += '<span class="select2-item-name">' + _.escape(item.name) + '</span>';
     if (item.description) {
-      output += '<small class="suggestItem-description">' + _.escape(item.description) + '</small>';
+      output += '<small class="select2-item-description">' + _.escape(item.description) + '</small>';
     }
     output += '</div>';
     return output;
@@ -140,7 +139,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
   _formatItemSelected: function(item) {
     var output = _.escape(item.name);
     if (item.img) {
-      output = '<div class="suggestItem-image"><img src="' + item.img + '" /></div>' + output;
+      output = '<div class="select2-item-image"><img src="' + item.img + '" /></div>' + output;
     }
     return output;
   }
