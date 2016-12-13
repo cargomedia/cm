@@ -8,9 +8,6 @@ abstract class CM_FormAction_Abstract {
     /** @var CM_Form_Abstract */
     private $_form;
 
-    /** @var CM_FormField_Abstract[]|null */
-    private $_fieldList = null;
-
     /**
      * @param CM_Form_Abstract $form
      * @throws CM_Exception
