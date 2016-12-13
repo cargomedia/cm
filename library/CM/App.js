@@ -658,13 +658,13 @@ var CM_App = CM_Class_Abstract.extend({
       $html.find('.box-body').text(question);
       $html.find('.box-footer').append($ok, $cancel);
 
-      $html.floatOut();
+      $html.floatbox();
       $ok.click(function() {
-        $html.floatIn();
+        $html.floatbox('close');
         callback.call(context);
       });
       $cancel.click(function() {
-        $html.floatIn();
+        $html.floatbox('close');
       });
       $ok.focus();
     }
@@ -1169,12 +1169,13 @@ var CM_App = CM_Class_Abstract.extend({
     /**
      * @param {CM_View_Abstract} view
      * @param {String} eventName
-     * @param {*} data
+     * @param {...*} data
      */
     trigger: function(view, eventName, data) {
       var parent = view;
+      var eventArguments = _.toArray(arguments).slice(2);
       while (parent = parent.getParent()) {
-        this._dispatcher.trigger(this._getEventName(parent, view.getClass(), eventName), view, data);
+        this._dispatcher.trigger.apply(this._dispatcher, [this._getEventName(parent, view.getClass(), eventName), view].concat(eventArguments));
       }
     }
   },

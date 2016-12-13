@@ -104,7 +104,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $layoutRendering = null;
         $layoutClass = $page->getLayout($this->getRender()->getEnvironment());
         if ($layoutClass !== $currentLayoutClass) {
-            $layout = new $layoutClass();
+            $layout = new $layoutClass(['page' => $page]);
             $layoutRendering = $this->_getComponentRendering($layout);
         }
 

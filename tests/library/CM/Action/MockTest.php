@@ -76,7 +76,7 @@ class CM_Action_Mock extends CM_Action_Abstract {
 
 class CM_Model_ActionLimit_Mock extends CM_Model_ActionLimit_Abstract {
 
-    public function getOvershootAllowed() {
+    public function getOvershootAllowed(CM_Action_Abstract $action) {
         return false;
     }
 
