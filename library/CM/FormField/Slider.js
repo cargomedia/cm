@@ -12,27 +12,46 @@ var CM_FormField_Slider = CM_FormField_Abstract.extend({
   /** @type {Element} */
   _slider: null,
 
+  /** @type {Array<Number>} */
+  sliderStart: null,
+
   ready: function() {
     var field = this;
     var $slider = this.$('.noUiSlider');
-    var $sliderValue = this.$('.noUiSlider-value');
-    this._slider = $slider[0];
+    var $label = this.$('.noUiSlider-label');
+    var slider = this._slider = $slider[0];
+
+    var connectHandles = [true, false];
+    for (var i = 0; i < this._getCardinality() - 1; i++) {
+      connectHandles.unshift(false);
+    }
 
     noUiSlider.create(this._slider, {
       range: {min: field.getOption('min'), max: field.getOption('max')},
-      start: $sliderValue.text(),
+      start: this.sliderStart,
       step: field.getOption('step'),
-      connect: [true, false],
-      behaviour: 'tap'
+      connect: connectHandles,
+      behaviour: 'tap',
+      format: {
+        to: function(value) {
+          return value;
+        },
+        from: function(value) {
+          return value;
+        }
+      }
     });
     this._$noUiHandle = $slider.find('.noUi-handle');
     this._$noUiHandle.attr('tabindex', '0');
 
-    this._slider.noUiSlider.on('update', function(values, handle) {
-      var val = parseFloat(values[handle]);
-      $sliderValue.html(val);
+    slider.noUiSlider.on('update', function(values, handle) {
+      var value = slider.noUiSlider.get();
+      if (!_.isArray(value)) {
+        value = [value];
+      }
+      $label.html(value.join('–'));
     });
-    this._slider.noUiSlider.on('change', function(values, handle) {
+    slider.noUiSlider.on('change', function(values, handle) {
       field._onChange();
     });
 
@@ -43,15 +62,19 @@ var CM_FormField_Slider = CM_FormField_Abstract.extend({
     return this.$('.noUiSlider');
   },
 
+  /**
+   * @returns {Number|Array<Number>|Null}
+   */
   getValue: function() {
+    var value = null;
     if (this._slider) {
-      return +this._slider.noUiSlider.get();
+      value = this._slider.noUiSlider.get();
     }
-    return null;
+    return value;
   },
 
   /**
-   * @param {Number} value
+   * @param {Number|Array<Number>} value
    */
   setValue: function(value) {
     this._slider.noUiSlider.set(value);
@@ -72,12 +95,19 @@ var CM_FormField_Slider = CM_FormField_Abstract.extend({
     }
   },
 
+  /**
+   * @return {Number}
+   */
+  _getCardinality: function() {
+    return this.getOption('cardinality');
+  },
+
   _onChange: function() {
     this.trigger('change');
   },
 
   _onKeyDown: function(event) {
-    if (this._$noUiHandle.is(':focus') && this.getEnabled()) {
+    if (this._$noUiHandle.is(':focus') && this.getEnabled() && 1 === this._getCardinality()) {
       if (event.which === cm.keyCode.LEFT || event.which === cm.keyCode.DOWN) {
         this.setValue(this.getValue() - this.getOption('step'));
         event.preventDefault();
@@ -86,7 +116,6 @@ var CM_FormField_Slider = CM_FormField_Abstract.extend({
         this.setValue(this.getValue() + this.getOption('step'));
         event.preventDefault();
       }
-
     }
   }
 });
