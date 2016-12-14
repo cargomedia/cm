@@ -663,6 +663,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @param bool|null $prettyPrint
      * @throws CM_Exception_Invalid
      * @return string
+     * @deprecated use CM_Util::jsonEncode()
      */
     public static function jsonEncode($value, $prettyPrint = null) {
         return CM_Util::jsonEncode($value, $prettyPrint);
@@ -672,6 +673,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @param string $value
      * @return mixed
      * @throws CM_Exception_Invalid
+     * @deprecated use CM_Util::jsonDecode()
      */
     public static function jsonDecode($value) {
         return CM_Util::jsonDecode($value);
