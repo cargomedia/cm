@@ -10,6 +10,10 @@ class CM_StreamChannel_ThumbnailTest extends CMTest_TestCase {
         $thumbnail = CM_StreamChannel_Thumbnail::create(1, 123);
         $this->assertSame(1, $thumbnail->getChannelId());
         $this->assertSame(123, $thumbnail->getCreateStamp());
+
+        $thumbnail->_change();
+        $this->assertSame(1, $thumbnail->getChannelId());
+        $this->assertSame(123, $thumbnail->getCreateStamp());
     }
 
     public function testGetHash() {

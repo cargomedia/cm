@@ -1,27 +1,28 @@
 .textinput {
   .appearance(none);
+  background: @colorInputBg;
+  border: 1px solid @colorInputBorder;
+  border-radius: @borderRadiusInput;
   box-sizing: border-box;
-  width: 100%;
+  display: block;
   height: @heightInputText;
   overflow: hidden;
   padding-left: 10px;
   padding-right: 10px;
-  border-radius: @borderRadiusInput;
-  background: @colorInputBg;
-  border: 1px solid @colorInputBorder;
   transition: border-color .1s;
+  width: 100%;
 }
 
 textarea.textinput {
   height: @heightInputTextarea;
-  padding-top: (@heightInputText - @fontSize*@fontLineHeight) / 2;
   overflow: auto;
+  padding-top: (@heightInputText - @fontSize*@fontLineHeight) / 2;
   resize: vertical;
 }
 
 .input_focus {
-  outline: none;
   border-color: @colorInputFocus;
+  outline: none;
 }
 
 .placeholder(@color) {
@@ -40,24 +41,24 @@ textarea.textinput {
 .placeholder(@colorInputPlaceholder);
 
 .button {
-  display: inline-block;
-  position: relative;
-  box-sizing: border-box;
-  width: auto;
-  height: @sizeButton;
-  min-width: @sizeButton;
-  max-width: 100%;
-  margin: 1px;
-  padding: 0 1em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   border-radius: @borderRadiusButton;
-  vertical-align: top;
-  letter-spacing: 1px;
+  box-sizing: border-box;
   cursor: pointer;
-  transition: background-color 200ms;
+  display: inline-block;
   font-size: @fontSizeButton;
+  height: @sizeButton;
+  letter-spacing: 1px;
+  margin: 1px;
+  max-width: 100%;
+  min-width: @sizeButton;
+  overflow: hidden;
+  padding: 0 1em;
+  position: relative;
+  text-overflow: ellipsis;
+  transition: background-color 200ms;
+  vertical-align: top;
+  white-space: nowrap;
+  width: auto;
 
   &:focus {
     .input_focus;
@@ -139,10 +140,10 @@ textarea.textinput {
 }
 
 .button-large {
+  border-radius: @sizeButtonLargeFactor*@borderRadiusButton;
+  font-size: @sizeButtonLargeFactor*@fontSizeButton;
   height: @sizeButtonLargeFactor*@sizeButton;
   min-width: @sizeButtonLargeFactor*@sizeButton;
-  font-size: @sizeButtonLargeFactor*@fontSizeButton;
-  border-radius: @sizeButtonLargeFactor*@borderRadiusButton;
 
   a& {
     line-height: @sizeButtonLargeFactor*@sizeButton - 2*@buttonBorderWidth;
@@ -160,31 +161,31 @@ input:focus, .textinput:focus, .textinput.focus, select:focus, textarea:focus {
 input[type=checkbox], input[type=radio] {
   .appearance(none);
   display: block;
-  position: absolute;
-  width: @sizeCheckbox;
   height: @sizeCheckbox;
   transform: scale(2);
   transform-origin: 0 0;
   opacity: 0;
+  position: absolute;
+  width: @sizeCheckbox;
 
   + label {
-    position: relative;
     cursor: pointer;
     margin-left: @sizeCheckbox+4px;
+    position: relative;
 
     &::before {
+      background-color: @colorInputBg;
+      border: 1px solid @colorInputBorder;
       box-sizing: border-box;
-      position: absolute;
       content: "";
       display: block;
-      width: @sizeCheckbox;
       height: @sizeCheckbox;
-      background-color: @colorInputBg;
-      top: 50%;
       left: -(@sizeCheckbox+4px);
       margin-top: -@sizeCheckbox/2;
-      border: 1px solid @colorInputBorder;
+      position: absolute;
+      top: 50%;
       transition: 100ms;
+      width: @sizeCheckbox;
     }
   }
 
@@ -236,32 +237,32 @@ input[type=checkbox].checkbox-switch {
     margin-left: 0;
 
     .handle {
-      box-sizing: border-box;
-      position: relative;
-      display: inline-block;
-      width: 1.6 * @sizeSwitch;
-      height: @sizeSwitch;
-      margin-right: 5px;
-      vertical-align: middle;
-      border: 1px solid @colorInputBorder;
       background-color: @colorInputBorder;
+      border: 1px solid @colorInputBorder;
       border-radius: .5 * @sizeSwitch;
       box-shadow: 0 .1em .1em rgba(0, 0, 0, 0.02) inset;
+      box-sizing: border-box;
+      display: inline-block;
+      height: @sizeSwitch;
+      margin-right: 5px;
+      position: relative;
+      vertical-align: middle;
+      width: 1.6 * @sizeSwitch;
 
       &::after {
-        box-sizing: border-box;
-        position: absolute;
-        top: 0;
-        left: 0;
-        content: '';
-        width: @sizeSwitch - 4px;
-        height: @sizeSwitch - 4px;
-        margin: 1px;
+        background-color: @colorInputBg;
         border: 1px solid @colorInputBg;
         border-radius: 50%;
-        background-color: @colorInputBg;
+        box-sizing: border-box;
+        content: '';
+        height: @sizeSwitch - 4px;
+        left: 0;
+        margin: 1px;
+        position: absolute;
+        top: 0;
         transform: translateX(0);
         transition: 200ms;
+        width: @sizeSwitch - 4px;
       }
     }
 
@@ -279,9 +280,9 @@ input[type=checkbox].checkbox-switch {
     border-color: @colorInputFocus;
 
     &::after {
-      transform: translateX(0.6 * @sizeSwitch);
       background-color: @colorInputBg;
       border-color: @colorInputBg;
+      transform: translateX(0.6 * @sizeSwitch);
     }
   }
 
@@ -291,17 +292,17 @@ input[type=checkbox].checkbox-switch {
 }
 
 .formField, .formAction {
-  padding-top: 5px;
   padding-bottom: 5px;
+  padding-top: 5px;
 }
 
 .formField {
   > label {
+    color: lighten(@colorInputFg, 20);
     display: block;
+    font-weight: bold;
     margin-bottom: 5px;
     padding-left: 2px;
-    color: lighten(@colorInputFg, 20);
-    font-weight: bold;
 
     &::after {
       content: ":";
@@ -322,11 +323,23 @@ input[type=checkbox].checkbox-switch {
 }
 
 .messages {
-  display: block;
-
   .formField-error {
-    display: none;
     color: @colorError;
+    display: none;
     padding: 2px;
   }
+}
+
+.formFieldFeedback-success {
+  color: @colorOk;
+  font-size: 1.2rem;
+  line-height: @heightInputText;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 0;
+  visibility: hidden;
+  width: @heightInputText;
 }

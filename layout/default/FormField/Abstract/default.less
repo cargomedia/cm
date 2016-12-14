@@ -1,7 +1,10 @@
-&.hasError {
-  .textinput, select + .button, input[type=checkbox] + label::before, input[type=radio] + label::before {
-    outline: 2px solid transparent;
-    outline-offset: -1px;
-    .animation(highlightErrorField, 1000ms, ease, 0s, 1);
+& {
+  position: relative;
+}
+
+&[data-formfield-success=true] {
+  .formFieldFeedback-success {
+    visibility: visible;
+    animation: formSuccess 2s ease 0s 1;
   }
 }

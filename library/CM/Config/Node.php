@@ -20,7 +20,7 @@ class CM_Config_Node {
                 $object->$key = $value->export();
             } else {
                 if (is_array($value)) {
-                    $value = $this->_evaluateConstantsInKeys($value);
+                    $value = $this->_evaluateConstantsInArray($value);
                 }
                 $object->$key = $value;
             }
@@ -59,7 +59,12 @@ class CM_Config_Node {
             if (!is_scalar($value)) {
                 $output .= $this->exportAsString($getFullKey($baseKey, $key), $value);
             } else {
-                $output .= $getFullKey($baseKey, $key) . " = " . var_export($value, true) . ";" . PHP_EOL;
+                if (preg_match('/^(\w+)::class$/', $value, $matches) && class_exists($matches[1])) {
+                    $configValue = $value;
+                } else {
+                    $configValue = var_export($value, true);
+                }
+                $output .= $getFullKey($baseKey, $key) . " = " . $configValue . ";" . PHP_EOL;
             }
         }
         return $output;
@@ -112,15 +117,16 @@ class CM_Config_Node {
      * @param array $list
      * @return array
      */
-    private function _evaluateConstantsInKeys(array $list) {
-        $keys = array_keys($list);
-        $keys = \Functional\map($keys, function ($key) {
-            if (null !== ($value = $this->_evaluateClassConstant($key))) {
+    private function _evaluateConstantsInArray(array $list) {
+        $constantEvaluator = function ($key) {
+            if (is_scalar($key) && null !== ($value = $this->_evaluateClassConstant($key))) {
                 return $value;
             }
             return $key;
-        });
-        return array_combine($keys, array_values($list));
+        };
+        $keys = \Functional\map(array_keys($list), $constantEvaluator);
+        $values = \Functional\map(array_values($list), $constantEvaluator);
+        return array_combine($keys, $values);
     }
 
     /**
@@ -128,7 +134,9 @@ class CM_Config_Node {
      * @return mixed|null
      */
     private function _evaluateClassConstant($reference) {
-        if (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*::[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $reference)) {
+        if (preg_match('/^(\w+)::class$/', $reference, $matches) && class_exists($matches[1])) {
+            return $matches[1];
+        } elseif (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*::[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $reference)) {
             return @constant($reference);
         }
         return null;
