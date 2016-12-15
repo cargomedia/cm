@@ -27,6 +27,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
         this._autosaveFields.forEach(function(field) {
           field.success();
         });
+      })
+      .finally(function() {
         this._autosaveFields = [];
       })
       .catch(CM_Exception_FormFieldValidation, function(error) {
@@ -72,7 +74,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     if (this.autosave) {
       this.on('change', function(field) {
         if (field) {
-          this._autosaveFields.push(field);
+          handler._autosaveFields.push(field);
           handler._autosaveSubmitThrottled();
         }
       });
