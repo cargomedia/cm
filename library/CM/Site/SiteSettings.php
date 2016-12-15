@@ -35,6 +35,21 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
     }
 
     /**
+     * @param string $key
+     * @param string $value
+     */
+    public function upsertConfigurationValue($key, $value) {
+        $key = (string) $key;
+        $value = (string) $value;
+        $configurationMap = $this->getConfiguration()->getParamsDecoded();
+        if (!is_numeric($value) && CM_Util::jsonIsValid($value)) { //big integers are valid JSON but can not be decoded properly
+            $value = CM_Util::jsonDecode($value);
+        }
+        $configurationMap[$key] = $value;
+        $this->setConfiguration(CM_Params::factory($configurationMap));
+    }
+
+    /**
      * @return int
      */
     public function getConfigurationSize() {

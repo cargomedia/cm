@@ -25,6 +25,27 @@ class CM_Site_SiteSettingsTest extends CMTest_TestCase {
         $this->assertSame('Quux', $siteSettings->getName());
     }
 
+    public function testUpsertConfigurationValue() {
+        $siteSettings = CM_Site_SiteSettings::create(4, 'Baz', CM_Params::factory(['foo' => 'bar', 'baz' => 4]));
+
+        $siteSettings->upsertConfigurationValue('bar', 'baz');
+        $siteSettings->_change();
+        $this->assertEquals(CM_Params::factory(['foo' => 'bar', 'baz' => 4, 'bar' => 'baz']), $siteSettings->getConfiguration());
+
+        $siteSettings->upsertConfigurationValue('baz', '{"fooBar" : {"quux" : 1, "bar" : "barBaz"} }');
+        $siteSettings->_change();
+        $this->assertEquals([
+            'foo' => 'bar',
+            'baz' => [
+                'fooBar' => [
+                    'quux' => 1,
+                    'bar'  => 'barBaz',
+                ],
+            ],
+            'bar' => 'baz',
+        ], $siteSettings->getConfiguration()->getParamsDecoded());
+    }
+
     public function testCreateEmpty() {
         $siteSettings = CM_Site_SiteSettings::create();
         $this->assertInstanceOf('CM_Site_SiteSettings', $siteSettings);
