@@ -27,11 +27,10 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
         this._autosaveFields.forEach(function(field) {
           field.success();
         });
-      })
-      .finally(function() {
         this._autosaveFields = [];
       })
       .catch(CM_Exception_FormFieldValidation, function(error) {
+        this._autosaveFields = [];
         this._displayValidationError(error);
       });
   }, {cancelLeading: true}),
