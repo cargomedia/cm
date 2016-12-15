@@ -18,6 +18,7 @@ class CM_Config {
             }
             $node->extend('default.php');
             $node->extend('local.php');
+            $node->extend('local.*.php');
             $node->extend('deploy.php');
             if (CM_Bootloader::getInstance()->isCli()) {
                 $node->extend('cli.php');
