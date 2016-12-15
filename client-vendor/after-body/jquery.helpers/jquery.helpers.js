@@ -80,6 +80,13 @@
 
     findAndSelf: function(selector) {
       return this.find(selector).add(this.filter(selector));
+    },
+
+    triggerReflow: function() {
+      return this.each(function() {
+        // Force reflow for CSS-animation
+        this.offsetWidth;
+      });
     }
   });
 })(jQuery);
