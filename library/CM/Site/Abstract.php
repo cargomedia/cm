@@ -311,12 +311,12 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
             throw new CM_Class_Exception_TypeNotConfiguredException('Site with given type is not configured', CM_Exception::WARN, ['siteType' => $type]);
         }
+        /** @type CM_Site_Abstract $class */
         if (null === $siteSettings) {
-            if ($type !== null) {
-                $siteSettings = CM_Site_SiteSettings::findBySiteId($type);
-            } else {
+            $siteSettings = CM_Site_SiteSettings::findBySiteId($class::getTypeStatic());
+            if (null === $siteSettings) {
                 $siteSettings = self::_getDefaultSettings();
-                 //TODO fix
+                //TODO fix
             }
         }
         return new $class($siteSettings);
