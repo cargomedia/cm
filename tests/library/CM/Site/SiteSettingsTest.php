@@ -58,6 +58,7 @@ class CM_Site_SiteSettingsTest extends CMTest_TestCase {
     public function testFindById() {
         $this->assertNull(CM_Site_SiteSettings::findBySiteId(5));
         $siteSettings = CM_Site_SiteSettings::create(5, 'quux', CM_Params::factory(['foo' => 'baz', 'baz' => 5]));
+        CM_Cache_Local::getInstance()->flush();
         $foundSiteSettings = CM_Site_SiteSettings::findBySiteId(5);
         $this->assertInstanceOf('CM_Site_SiteSettings', $foundSiteSettings);
         $this->assertEquals($siteSettings, $foundSiteSettings);
