@@ -122,9 +122,14 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
      * @return CM_Site_SiteSettings|null
      */
     public static function findBySiteId($siteId) {
-        /** @var CM_Model_StorageAdapter_Database $adapter */
-        $adapter = self::_getStorageAdapter(self::getPersistenceClass());
-        $id = $adapter->findByData(self::getTypeStatic(), ['siteId' => (int) $siteId]);
+        $siteId = (int) $siteId;
+        $cache = CM_Cache_Local::getInstance();
+
+        $id = $cache->get($cache->key(__METHOD__, $siteId), function () use ($siteId) {
+            /** @var CM_Model_StorageAdapter_Database $adapter */
+            $adapter = self::_getStorageAdapter(self::getPersistenceClass());
+            return $adapter->findByData(self::getTypeStatic(), ['siteId' => $siteId]);
+        });
         if (null === $id) {
             return null;
         }
