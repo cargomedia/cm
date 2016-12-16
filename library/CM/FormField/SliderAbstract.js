@@ -18,7 +18,6 @@ var CM_FormField_SliderAbstract = CM_FormField_Abstract.extend({
   ready: function() {
     var field = this;
     var $slider = this.$('.noUiSlider');
-    var $label = this.$('.noUiSlider-label');
     var slider = this._slider = $slider[0];
 
     var connectHandles = [true, false];
@@ -32,6 +31,7 @@ var CM_FormField_SliderAbstract = CM_FormField_Abstract.extend({
       step: field.getOption('step'),
       connect: connectHandles,
       behaviour: 'tap',
+      tooltips: true,
       format: {
         to: function(value) {
           return Math.round(value * 1000) / 1000;
@@ -44,13 +44,6 @@ var CM_FormField_SliderAbstract = CM_FormField_Abstract.extend({
     this._$noUiHandle = $slider.find('.noUi-handle');
     this._$noUiHandle.attr('tabindex', '0');
 
-    slider.noUiSlider.on('update', function(values, handle) {
-      var value = slider.noUiSlider.get();
-      if (!_.isArray(value)) {
-        value = [value];
-      }
-      $label.html(value.join('–'));
-    });
     slider.noUiSlider.on('change', function(values, handle) {
       field._onChange();
     });
