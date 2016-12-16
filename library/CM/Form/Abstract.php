@@ -16,6 +16,11 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 
     abstract protected function _initialize();
 
+    /**
+     * @return string[]
+     */
+    abstract protected function _getRequiredFields();
+
     public function __construct($params = null) {
         parent::__construct($params);
 
@@ -184,13 +189,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
             return null;
         }
         return $action->process($formData, $response, $this);
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function _getRequiredFields() {
-        return [];
     }
 
     /**

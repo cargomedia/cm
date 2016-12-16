@@ -13,4 +13,8 @@ class CM_Form_ExampleAutosave extends CM_Form_Abstract {
         $this->registerAction(new CM_FormAction_Example_Submit($this));
     }
 
+    protected function _getRequiredFields() {
+        return [];
+    }
+
 }

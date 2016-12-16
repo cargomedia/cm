@@ -12,6 +12,10 @@ class CM_Form_ExampleIcon extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_Integer(['name' => 'shadowBlur', 'min' => 0, 'max' => 20]));
     }
 
+    protected function _getRequiredFields() {
+        return [];
+    }
+
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $this->getField('sizeSlider')->setValue(18);
         $this->getField('shadowColor')->setValue(CM_Color_RGB::fromHexString('333333'));
