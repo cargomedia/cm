@@ -314,10 +314,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         /** @type CM_Site_Abstract $class */
         if (null === $siteSettings) {
             $siteSettings = CM_Site_SiteSettings::findBySiteId($class::getTypeStatic());
-            if (null === $siteSettings) {
-                $siteSettings = self::_getDefaultSettings();
-                //TODO fix
-            }
         }
         return new $class($siteSettings);
     }
@@ -325,14 +321,5 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     public static function fromArray(array $array) {
         $type = (int) $array['type'];
         return self::factory($type);
-    }
-
-    /**
-     * @return CM_Site_SiteSettings
-     */
-    protected static function _getDefaultSettings() {
-        $config = CM_Config::get();
-        $settingsConfiguration = $config->CM_Site_Abstract->defaultSettingConfiguration;
-        return CM_Site_SiteSettings::create(null, 'Default settings', CM_Params::factory($settingsConfiguration));
     }
 }

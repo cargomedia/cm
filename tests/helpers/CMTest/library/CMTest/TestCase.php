@@ -10,13 +10,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     protected $backupGlobalsBlacklist = ['bootloader'];
 
     public function runBare() {
-//        if (!isset(CM_Config::get()->CM_Site_Abstract->defaultSettingConfiguration)) {
-//            $siteSettingsConfiguration = [
-//                'name'         => 'Default',
-//                'emailAddress' => 'default@default.dev',
-//            ];
-//            CM_Config::get()->CM_Site_Abstract->defaultSettingConfiguration = $siteSettingsConfiguration;
-//        } TODO delete
         if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
             $siteDefault = $this->getMockSite(null, null, null, array(
                 'url'    => 'http://www.default.dev',
@@ -24,7 +17,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             ));
             CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
         }
-
         $this->setServiceManager(CMTest_TH::getServiceManager());
         parent::runBare();
     }
