@@ -512,8 +512,7 @@ var CM_App = CM_Class_Abstract.extend({
      */
     createAudio: function(sourceList, options) {
       sourceList = _.isString(sourceList) ? [sourceList] : sourceList;
-      var audio = new cm.lib.Media.Audio(options);
-      audio.setOptions(options);
+      var audio = new cm.lib.Media.Audio(null, options);
       audio.setSources(sourceList);
       return audio;
     }
