@@ -99,7 +99,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             $siteSettingsConfiguration = CM_Params::factory([]);
         }
         $siteSettingsMap = array_merge($defaultSiteSettings, $siteSettingsConfiguration->getParamsDecoded());
-        $siteSettings = CM_Site_SiteSettings::create($type, null, CM_Params::factory($siteSettingsMap));
+        $siteSettings = CM_Site_SiteSettings::create($type, 'Example settings', CM_Params::factory($siteSettingsMap));
 
         $site = $this->getMockForAbstractClass($classname, [$siteSettings], $siteClassName, true, true, true, $methods);
         return $site;
