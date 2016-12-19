@@ -283,13 +283,13 @@ class CM_Util {
      */
     public static function getResourceFiles($pathRelative) {
         $pathRelative = (string) $pathRelative;
-        $paths = array();
+        $paths = [];
         foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
-            $paths[] = CM_Util::getModulePath($moduleName) . 'resources/' . $pathRelative;
+            $paths = array_merge($paths, CM_Util::rglob($pathRelative, CM_Util::getModulePath($moduleName) . 'resources/'));
         }
-        $paths[] = DIR_ROOT . 'resources/' . $pathRelative;
+        $paths = array_merge($paths, CM_Util::rglob($pathRelative, DIR_ROOT . 'resources/'));
 
-        $files = array();
+        $files = [];
         foreach (array_unique($paths) as $path) {
             $file = new CM_File($path);
             if ($file->exists()) {
