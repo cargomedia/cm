@@ -80,7 +80,7 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
     protected function _getSchema() {
         return new CM_Model_Schema_Definition([
             'siteId'        => ['type' => 'int', 'optional' => true],
-            'name'          => ['type' => 'string', 'optional' => true],
+            'name'          => ['type' => 'string'],
             'configuration' => ['type' => 'string'],
         ]);
     }
