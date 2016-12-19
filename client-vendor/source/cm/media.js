@@ -12,14 +12,12 @@ var Media = Event.extend({
    * @param {Object} [options]
    * @param {Boolean} [options.loop=false]
    * @param {Boolean} [options.autoplay=false]
-   * @param {String} [options.crossOrigin='anonymous']
    */
   constructor: function(element, options) {
     this._element = element;
     this._options = _.defaults(options || {}, {
       loop: false,
-      autoplay: false,
-      crossOrigin: 'anonymous'
+      autoplay: false
     });
 
     this._sources = [];
