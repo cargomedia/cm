@@ -12,7 +12,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public static function setUpBeforeClass() {
-        self::$_defaultSiteSettings = CM_Site_SiteSettings::create(0, 'Default Settings', CM_Params::factory([
+        self::$_defaultSiteSettings = CM_Site_SiteSettings::create(null, 'Default Settings', CM_Params::factory([
             'name'         => 'Default',
             'emailAddress' => 'default@default.dev',
         ]));

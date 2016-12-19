@@ -16,7 +16,7 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
             'name'         => 'Foo',
             'emailAddress' => 'foo@foo.com',
         ]);
-        self::$_defaultSiteSettings = CM_Site_SiteSettings::create(123456, 'Default site', self::$_defaultSiteSettingsConfiguration);
+        self::$_defaultSiteSettings = CM_Site_SiteSettings::create(null, 'Default site', self::$_defaultSiteSettingsConfiguration);
     }
 
     public function testGetAll() {
