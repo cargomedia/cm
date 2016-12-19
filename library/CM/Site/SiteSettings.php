@@ -93,17 +93,15 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
 
     /**
      * @param int|null       $siteId
-     * @param string|null    $name
+     * @param string         $name
      * @param CM_Params|null $configuration
      * @return CM_Site_SiteSettings
      */
-    public static function create($siteId = null, $name = null, CM_Params $configuration = null) {
+    public static function create($siteId = null, $name, CM_Params $configuration = null) {
         if (null !== $siteId) {
             $siteId = (int) $siteId;
         }
-        if (null !== $name) {
-            $name = (string) $name;
-        }
+        $name = (string) $name;
         if (null === $configuration) {
             $configuration = CM_Params::factory([]);
         }
