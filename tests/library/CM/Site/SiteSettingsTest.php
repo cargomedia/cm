@@ -46,12 +46,11 @@ class CM_Site_SiteSettingsTest extends CMTest_TestCase {
         ], $siteSettings->getConfiguration()->getParamsDecoded());
     }
 
-    public function testCreateEmpty() {
-        $siteSettings = CM_Site_SiteSettings::create();
+    public function testCreateDefault() {
+        $siteSettings = CM_Site_SiteSettings::create(null, 'FooName');
         $this->assertInstanceOf('CM_Site_SiteSettings', $siteSettings);
 
         $this->assertNull($siteSettings->getSiteId());
-        $this->assertNull($siteSettings->getName());
         $this->assertEquals(CM_Params::factory([]), $siteSettings->getConfiguration());
     }
 
