@@ -1,16 +1,20 @@
+& {
+  display: inline-block;
+  padding-right: @sizeButton;
+}
+
 .set {
   display: flex;
   flex-wrap: wrap;
-  padding-right: @sizeButton;
 }
 
 .set-item {
   align-items: center;
   box-sizing: border-box;
   display: flex;
-  min-height: @sizeCheckbox + 12px;
+  min-height: @sizeButton;
   max-width: 100%;
-  padding: 4px 12px 4px 1px;
+  padding: 0 12px 0 1px;
 
   &.multiple {
     width: 100%;
