@@ -5,15 +5,15 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
     /**
      * @return int|null
      */
-    public function getSiteId() {
-        return $this->_get('siteId');
+    public function getSiteType() {
+        return $this->_get('siteType');
     }
 
     /**
-     * @param int $siteId
+     * @param int $siteType
      */
-    public function setSiteId($siteId) {
-        return $this->_set('siteId', $siteId);
+    public function setSiteType($siteType) {
+        return $this->_set('siteType', $siteType);
     }
 
     /**
@@ -74,12 +74,12 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
      * @return string|null
      */
     public function findSiteClassName() {
-        return CM_Site_Abstract::findClassName($this->getSiteId());
+        return CM_Site_Abstract::findClassName($this->getSiteType());
     }
 
     protected function _getSchema() {
         return new CM_Model_Schema_Definition([
-            'siteId'        => ['type' => 'int', 'optional' => true],
+            'siteType'      => ['type' => 'int', 'optional' => true],
             'name'          => ['type' => 'string'],
             'configuration' => ['type' => 'string'],
         ]);
@@ -92,14 +92,14 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
     }
 
     /**
-     * @param int|null       $siteId
+     * @param int|null       $siteType
      * @param string         $name
      * @param CM_Params|null $configuration
      * @return CM_Site_SiteSettings
      */
-    public static function create($siteId = null, $name, CM_Params $configuration = null) {
-        if (null !== $siteId) {
-            $siteId = (int) $siteId;
+    public static function create($siteType = null, $name, CM_Params $configuration = null) {
+        if (null !== $siteType) {
+            $siteType = (int) $siteType;
         }
         $name = (string) $name;
         if (null === $configuration) {
@@ -107,7 +107,7 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
         }
         $siteSettings = new self();
         $siteSettings->_set([
-            'siteId'        => $siteId,
+            'siteType'      => $siteType,
             'name'          => $name,
             'configuration' => CM_Util::jsonEncode($configuration->getParamsEncoded()),
         ]);
@@ -116,13 +116,13 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
     }
 
     /**
-     * @param int $siteId
+     * @param int $siteType
      * @return CM_Site_SiteSettings|null
      */
-    public static function findBySiteId($siteId) {
+    public static function findBySiteType($siteType) {
         /** @var CM_Model_StorageAdapter_Database $adapter */
         $adapter = self::_getStorageAdapter(self::getPersistenceClass());
-        $id = $adapter->findByData(self::getTypeStatic(), ['siteId' => (int) $siteId]);
+        $id = $adapter->findByData(self::getTypeStatic(), ['siteType' => (int) $siteType]);
         if (null === $id) {
             return null;
         }
