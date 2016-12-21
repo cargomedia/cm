@@ -161,16 +161,6 @@ class CM_UtilTest extends CMTest_TestCase {
         $this->assertSame('?.', CM_Util::sanitizeUtf(pack("H*", 'c32e')));
     }
 
-    public function testJsonIsValid() {
-        $this->assertSame(true, CM_Util::jsonIsValid("{\"foo\":1}"));
-        $this->assertSame(true, CM_Util::jsonIsValid("\"bar\""));
-        $this->assertSame(true, CM_Util::jsonIsValid("1"));
-        $this->assertSame(true, CM_Util::jsonIsValid("[true, false, 44, {\"a\": \"v\"}]"));
-        $this->assertSame(false, CM_Util::jsonIsValid("[}"));
-        $this->assertSame(false, CM_Util::jsonIsValid("bar"));
-        $this->assertSame(false, CM_Util::jsonIsValid("[{baz}]"));
-    }
-
     public function testApplyOffset() {
         $this->assertSame(5, CM_Util::applyOffset(7, 5, 0));
         $this->assertSame(0, CM_Util::applyOffset(7, 0, 0));
