@@ -32,18 +32,9 @@ class CM_Site_SiteSettingsTest extends CMTest_TestCase {
         $siteSettings->_change();
         $this->assertEquals(CM_Params::factory(['foo' => 'bar', 'baz' => 4, 'bar' => 'baz']), $siteSettings->getConfiguration());
 
-        $siteSettings->upsertConfigurationValue('baz', '{"fooBar" : {"quux" : 1, "bar" : "barBaz"} }');
+        $siteSettings->upsertConfigurationValue('baz', 'FooBar');
         $siteSettings->_change();
-        $this->assertEquals([
-            'foo' => 'bar',
-            'baz' => [
-                'fooBar' => [
-                    'quux' => 1,
-                    'bar'  => 'barBaz',
-                ],
-            ],
-            'bar' => 'baz',
-        ], $siteSettings->getConfiguration()->getParamsDecoded());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'FooBar', 'bar' => 'baz'], $siteSettings->getConfiguration()->getParamsDecoded());
     }
 
     public function testCreateDefault() {
