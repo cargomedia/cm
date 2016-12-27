@@ -73,7 +73,7 @@ class CM_Model_User extends CM_Model_Abstract {
     public function setOnline($state = true, $visible = true) {
         $visible = (bool) $visible;
         if ($state) {
-            CM_Db_Db::replace('cm_user_online', array('userId' => $this->getId(), 'visible' => $visible));
+            CM_Db_Db::replaceDelayed('cm_user_online', array('userId' => $this->getId(), 'visible' => $visible));
             $this->_set(array('online' => $this->getId(), 'visible' => $visible));
         } else {
             CM_Db_Db::delete('cm_user_online', array('userId' => $this->getId()));
@@ -152,7 +152,7 @@ class CM_Model_User extends CM_Model_Abstract {
         if (!$this->getOnline()) {
             throw new CM_Exception_Invalid('Must not modify visibility of a user that is offline');
         }
-        CM_Db_Db::replace('cm_user_online', array('userId' => $this->getId(), 'visible' => $state));
+        CM_Db_Db::replaceDelayed('cm_user_online', array('userId' => $this->getId(), 'visible' => $state));
         $this->_set(array('online' => $this->getId(), 'visible' => $state));
         return $this;
     }

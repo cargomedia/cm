@@ -542,7 +542,7 @@ CREATE TABLE `cm_user_online` (
   `visible` tinyint(3) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`userId`),
   KEY `visible` (`visible`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_user_preference`;
 
