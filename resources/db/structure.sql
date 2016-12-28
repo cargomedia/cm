@@ -242,10 +242,10 @@ CREATE TABLE `cm_model_location_zip` (
   KEY `name` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_model_migration`;
+DROP TABLE IF EXISTS `cm_migration`;
 
 
-CREATE TABLE `cm_model_migration` (
+CREATE TABLE `cm_migration` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `execStamp` int(10) unsigned DEFAULT NULL,

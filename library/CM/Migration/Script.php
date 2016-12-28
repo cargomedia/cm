@@ -1,10 +1,10 @@
 <?php
 
-abstract class CM_Provision_Script_Migration extends CM_Provision_Script_Abstract {
+abstract class CM_Migration_Script extends CM_Provision_Script_Abstract {
 
     use CM_Provision_Script_IsLoadedTrait;
 
-    /** @var CM_Model_Migration|null */
+    /** @var CM_Migration_Model|null */
     private $_record;
 
     public function __construct(CM_Service_Manager $serviceManager) {
@@ -35,7 +35,7 @@ abstract class CM_Provision_Script_Migration extends CM_Provision_Script_Abstrac
     }
 
     /**
-     * @return CM_Model_Migration
+     * @return CM_Migration_Model
      */
     protected function _getRecord() {
         if (!$this->_record) {
@@ -45,12 +45,12 @@ abstract class CM_Provision_Script_Migration extends CM_Provision_Script_Abstrac
     }
 
     /**
-     * @return CM_Model_Migration
+     * @return CM_Migration_Model
      */
     protected function _fetchRecord() {
-        $record = CM_Model_Migration::findByName($this->getName());
+        $record = CM_Migration_Model::findByName($this->getName());
         if (!$record) {
-            $record = CM_Model_Migration::create($this->getName());
+            $record = CM_Migration_Model::create($this->getName());
         }
         return $record;
     }

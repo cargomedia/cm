@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_Migration extends CM_Model_Abstract {
+class CM_Migration_Model extends CM_Model_Abstract {
 
     /**
      * @return string
@@ -50,7 +50,7 @@ class CM_Model_Migration extends CM_Model_Abstract {
 
     /**
      * @param string $name
-     * @return CM_Model_Migration
+     * @return CM_Migration_Model
      */
     static public function create($name) {
         $model = new self();
@@ -61,12 +61,12 @@ class CM_Model_Migration extends CM_Model_Abstract {
 
     /**
      * @param string $name
-     * @return CM_Model_Migration
+     * @return CM_Migration_Model
      */
     static public function findByName($name) {
         $cache = CM_Cache_Local::getInstance();
         if (false === ($migrationId = $cache->get($name))) {
-            $migrationId = CM_Db_Db::select('cm_model_migration', 'id', array('name' => $name))->fetchColumn();
+            $migrationId = CM_Db_Db::select(self::getTableName(), 'id', array('name' => $name))->fetchColumn();
             $cache->set($name, $migrationId);
         }
         if (!$migrationId) {
@@ -77,5 +77,9 @@ class CM_Model_Migration extends CM_Model_Abstract {
 
     public static function getPersistenceClass() {
         return 'CM_Model_StorageAdapter_Database';
+    }
+
+    public static function getTableName() {
+        return 'cm_migration';
     }
 }
