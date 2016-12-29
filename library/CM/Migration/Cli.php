@@ -3,7 +3,6 @@
 class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
 
     public function all() {
-        $this->_getStreamOutput()->writeln('Running migration scripts…');
         $loader = new CM_Migration_Loader($this->getServiceManager());
         foreach ($loader->getScriptList() as $script) {
             if ($script->shouldBeLoaded()) {
@@ -34,13 +33,16 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
      */
     protected function _loadScript(CM_Migration_Script $script) {
         $output = $this->_getStreamOutput();
-        $output->write(sprintf('- load "%s" update script…', $script->getName()));
+        $output->write(sprintf("- %s", $script->getName()));
+        if ($desc = $script->getDescription()) {
+            $output->write(sprintf(": %s", $desc));
+        }
         try {
             $script->load();
         } catch (Exception $e) {
-            $output->writeln('failed');
+            $output->write(" \e[31m×\e[0m\n");
             throw $e;
         }
-        $output->writeln('done');
+        $output->write(" \e[32m✓\e[0m\n");
     }
 }
