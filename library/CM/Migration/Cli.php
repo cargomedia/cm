@@ -24,14 +24,27 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
+     * @param string|null $namespace
+     * @param string|null $name
+     */
+    public function add($namespace = null, $name = null) {
+        if (null === $name) {
+            $name = CM_Util::exec('git rev-parse --abbrev-ref HEAD');
+        }
+        $generator = new CM_Migration_Generator($name, $namespace);
+        $this->_getStreamOutput()->writeln(sprintf('`%s` generated', $generator->getFile()->getPath()));
+        $generator->save();
+    }
+
+    /**
      * @param CM_Migration_Script $script
      * @throws Exception
      */
     protected function _loadScript(CM_Migration_Script $script) {
         $output = $this->_getStreamOutput();
-        $output->write(sprintf("- %s", $script->getName()));
+        $output->write(sprintf('- %s', $script->getName()));
         if ($desc = $script->getDescription()) {
-            $output->write(sprintf(": %s", $desc));
+            $output->write(sprintf(': %s', $desc));
         }
         try {
             $script->load();
