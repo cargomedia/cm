@@ -34,6 +34,10 @@ abstract class CM_Migration_Script extends CM_Provision_Script_Abstract {
         return null;
     }
 
+    public function getName() {
+        return str_replace('CM_Migration_Script_', '', parent::getName());
+    }
+
     protected function _isLoaded() {
         return $this->_getRecord()->hasExecStamp();
     }
