@@ -12,6 +12,8 @@ abstract class CM_Migration_Script extends CM_Provision_Script_Abstract {
         parent::__construct($serviceManager);
     }
 
+    abstract public function up();
+
     /**
      * @param CM_OutputStream_Interface|null $output
      */
@@ -20,7 +22,17 @@ abstract class CM_Migration_Script extends CM_Provision_Script_Abstract {
         $this->_getRecord()->setExecStamp((new DateTime())->setTimestamp(time()));
     }
 
-    abstract public function up();
+    /**
+     * @return string|null
+     */
+    public function getDescription() {
+        $reflector = new ReflectionClass(get_class($this));
+        $doc = $reflector->getMethod('up')->getDocComment();
+        if ($doc && preg_match('/\*[ ]+([\S ]+)/', $doc, $matches)) {
+            return $matches[1];
+        }
+        return null;
+    }
 
     protected function _isLoaded() {
         return $this->_getRecord()->hasExecStamp();
