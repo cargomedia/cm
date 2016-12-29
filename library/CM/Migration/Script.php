@@ -13,29 +13,11 @@ abstract class CM_Migration_Script extends CM_Provision_Script_Abstract {
     }
 
     /**
-     * @param CM_OutputStream_Interface $output
-     * @param boolean|null              $force
-     * @throws Exception
+     * @param CM_OutputStream_Interface|null $output
      */
-    public function load(CM_OutputStream_Interface $output, $force = null) {
-        $force = (bool) $force;
-        if ($force || $this->shouldBeLoaded()) {
-            if ($force && !$this->shouldBeLoaded()) {
-                $output->write(sprintf('- reload "%s" update script…', $this->getName()));
-            } else {
-                $output->write(sprintf('- load "%s" update script…', $this->getName()));
-            }
-            try {
-                $this->up();
-            } catch (Exception $e) {
-                $output->writeln('failed');
-                throw $e;
-            }
-            $output->writeln('done');
-            $this->_getRecord()->setExecStamp((new DateTime())->setTimestamp(time()));
-        } else {
-            $output->writeln(sprintf('- "%s" already loaded', $this->getName()));
-        }
+    public function load(CM_OutputStream_Interface $output = null) {
+        $this->up();
+        $this->_getRecord()->setExecStamp((new DateTime())->setTimestamp(time()));
     }
 
     abstract public function up();
