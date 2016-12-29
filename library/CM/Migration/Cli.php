@@ -23,10 +23,6 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
         }
     }
 
-    public static function getPackageName() {
-        return 'migrate';
-    }
-
     /**
      * @param CM_Migration_Script $script
      * @throws Exception
@@ -44,5 +40,9 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
             throw $e;
         }
         $output->write(" \e[32m✓\e[0m\n");
+    }
+
+    public static function getPackageName() {
+        return 'migrate';
     }
 }

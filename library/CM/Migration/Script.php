@@ -26,7 +26,7 @@ abstract class CM_Migration_Script extends CM_Provision_Script_Abstract {
      * @return string|null
      */
     public function getDescription() {
-        $reflector = new ReflectionClass(get_class($this));
+        $reflector = new ReflectionClass($this);
         $doc = $reflector->getMethod('up')->getDocComment();
         if ($doc && preg_match('/\*[ ]+([\S ]+)/', $doc, $matches)) {
             return $matches[1];
