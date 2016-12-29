@@ -19,24 +19,38 @@ class CM_Migration_ScriptTest extends CMTest_TestCase {
             ->getMock();
 
         $script
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('up');
         $output
-            ->expects($this->once())
-            ->method('write')
-            ->with($this->equalTo('- execute "CM_Migration_Script_123_foo" update script…'));
-        $output
             ->expects($this->exactly(2))
+            ->method('write')
+            ->withConsecutive(
+                [$this->equalTo('- load "CM_Migration_Script_123_foo" update script…')],
+                [$this->equalTo('- reload "CM_Migration_Script_123_foo" update script…')]
+            );
+        $output
+            ->expects($this->exactly(3))
             ->method('writeln')
             ->withConsecutive(
                 [$this->equalTo('done')],
-                [$this->equalTo('- "CM_Migration_Script_123_foo" already loaded')]
+                [$this->equalTo('- "CM_Migration_Script_123_foo" already loaded')],
+                [$this->equalTo('done')]
             );
 
         $time = CMTest_TH::time();
         $script->load($output);
         CMTest_TH::timeForward(10);
         $script->load($output);
+
+        $model = CM_Migration_Model::findByName('CM_Migration_Script_123_foo');
+        $this->assertInstanceOf('CM_Migration_Model', $model);
+        $this->assertTrue($model->hasExecStamp());
+        $this->assertSame($time, $model->getExecStamp()->getTimestamp());
+        $this->assertSame('CM_Migration_Script_123_foo', $model->getName());
+
+        CMTest_TH::timeForward(10);
+        $time = CMTest_TH::time();
+        $script->load($output, true);
 
         $model = CM_Migration_Model::findByName('CM_Migration_Script_123_foo');
         $this->assertInstanceOf('CM_Migration_Model', $model);

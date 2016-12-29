@@ -12,9 +12,19 @@ abstract class CM_Migration_Script extends CM_Provision_Script_Abstract {
         parent::__construct($serviceManager);
     }
 
-    public function load(CM_OutputStream_Interface $output) {
-        if ($this->shouldBeLoaded()) {
-            $output->write(sprintf('- execute "%s" update script…', $this->getName()));
+    /**
+     * @param CM_OutputStream_Interface $output
+     * @param boolean|null              $force
+     * @throws Exception
+     */
+    public function load(CM_OutputStream_Interface $output, $force = null) {
+        $force = (bool) $force;
+        if ($force || $this->shouldBeLoaded()) {
+            if ($force && !$this->shouldBeLoaded()) {
+                $output->write(sprintf('- reload "%s" update script…', $this->getName()));
+            } else {
+                $output->write(sprintf('- load "%s" update script…', $this->getName()));
+            }
             try {
                 $this->up();
             } catch (Exception $e) {
