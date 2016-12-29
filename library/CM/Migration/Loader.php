@@ -29,6 +29,7 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
      */
     public function getScriptList() {
         $scripts = CM_Util::getResourceFiles(self::MIGRATION_DIR . DIRECTORY_SEPARATOR . '*.php');
+        $this->_loadMigrationScripts($scripts);
         return new CM_Migration_ScriptIterator($scripts, function (CM_File $script) {
             return $this->_getMigrationScript($script);
         });
@@ -39,8 +40,16 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
      * @return CM_Migration_Script
      */
     protected function _getMigrationScript(CM_File $script) {
-        require $script->getPath();
         $className = sprintf('CM_Migration_Script_%s', $script->getFileNameWithoutExtension());
         return new $className($this->getServiceManager());
+    }
+
+    /**
+     * @param CM_File[] $scripts
+     */
+    protected function _loadMigrationScripts(array $scripts) {
+        foreach ($scripts as $script) {
+            require_once($script->getPath());
+        }
     }
 }
