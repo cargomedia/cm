@@ -14,8 +14,7 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * @param string      $name
-     * @param string|null $namespace
+     * @param string $name
      * @return CM_Migration_Script|null
      */
     public function findScript($name) {
