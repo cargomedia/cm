@@ -22,20 +22,20 @@ class CM_Migration_ScriptTest extends CMTest_TestCase {
         $time = CMTest_TH::time();
         $script->load();
 
-        $model = CM_Migration_Model::findByName('CM_Migration_Script_123_foo');
+        $model = CM_Migration_Model::findByName('123_foo');
         $this->assertInstanceOf('CM_Migration_Model', $model);
         $this->assertTrue($model->hasExecStamp());
         $this->assertSame($time, $model->getExecStamp()->getTimestamp());
-        $this->assertSame('CM_Migration_Script_123_foo', $model->getName());
+        $this->assertSame('123_foo', $model->getName());
 
         CMTest_TH::timeForward(10);
         $time = CMTest_TH::time();
         $script->load();
 
-        $model = CM_Migration_Model::findByName('CM_Migration_Script_123_foo');
+        $model = CM_Migration_Model::findByName('123_foo');
         $this->assertInstanceOf('CM_Migration_Model', $model);
         $this->assertTrue($model->hasExecStamp());
         $this->assertSame($time, $model->getExecStamp()->getTimestamp());
-        $this->assertSame('CM_Migration_Script_123_foo', $model->getName());
+        $this->assertSame('123_foo', $model->getName());
     }
 }
