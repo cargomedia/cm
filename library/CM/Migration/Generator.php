@@ -31,7 +31,8 @@ class CM_Migration_Generator {
     public function save($name) {
         $fileName = sprintf('%s_%s', time(), CM_Util::camelize(trim($name)));
         $className = sprintf('%s_%s', $this->_getParentClassName(), $fileName);
-        $file = new CM_File($fileName, $this->_getFilesystem());
+        $fileNameWithExtension = sprintf('%s.php', $fileName);
+        $file = new CM_File($fileNameWithExtension, $this->_getFilesystem());
         $fileBlock = new CodeGenerator\FileBlock();
         $fileBlock->addBlock($this->_getClassBlock($className));
         $file->ensureParentDirectory();
