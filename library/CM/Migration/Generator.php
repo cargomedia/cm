@@ -29,7 +29,7 @@ class CM_Migration_Generator {
      * @return CM_File
      */
     public function save($name) {
-        $fileName = sprintf('%s_%s', time(), CM_Util::camelize(trim($name)));
+        $fileName = sprintf('%s_%s', time(), $this->_sanitize($name));
         $className = sprintf('%s_%s', $this->_getParentClassName(), $fileName);
         $fileNameWithExtension = sprintf('%s.php', $fileName);
         $file = new CM_File($fileNameWithExtension, $this->_getFilesystem());
@@ -38,6 +38,21 @@ class CM_Migration_Generator {
         $file->ensureParentDirectory();
         $file->write($fileBlock->dump());
         return $file;
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     *
+     */
+    protected function _sanitize($name) {
+        $camelized = CM_Util::camelize(trim((string) $name));
+        if (!preg_match('/^[a-z0-9_]+$/i', $camelized)) {
+            throw new CM_Exception_Invalid('Invalid migration script name', null, [
+                'scriptName' => $name,
+            ]);
+        }
+        return $camelized;
     }
 
     /**
