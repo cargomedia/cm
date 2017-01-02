@@ -2,15 +2,18 @@
 
 class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
 
-    const MIGRATION_DIR = 'migration';
-
     use CM_Service_ManagerAwareTrait;
+
+    /**  @var CM_File[] */
+    private $_files;
 
     /**
      * @param CM_Service_Manager $serviceManager
+     * @param string[]           $paths
      */
-    public function __construct(CM_Service_Manager $serviceManager) {
+    public function __construct(CM_Service_Manager $serviceManager, array $paths) {
         $this->setServiceManager($serviceManager);
+        $this->_files = $this->_prepareFiles($paths);
     }
 
     /**
@@ -18,37 +21,48 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
      * @return CM_Migration_Script|null
      */
     public function findScript($name) {
-        return \Functional\first($this->getScriptList(), function (CM_Migration_Script $script) use ($name) {
-            return $name === $script->getName();
+        $file = \Functional\first($this->_getFiles(), function (CM_File $file) use ($name) {
+            return $name === $file->getFileNameWithoutExtension();
         });
+        return null !== $file ? $this->_prepareScript($file) : null;
     }
 
     /**
      * return Iterator
      */
     public function getScriptList() {
-        $scripts = CM_Util::getResourceFiles(self::MIGRATION_DIR . DIRECTORY_SEPARATOR . '*.php');
-        $this->_loadMigrationScripts($scripts);
-        foreach ($scripts as $script) {
-            yield $this->_getMigrationScript($script);
+        foreach ($this->_getFiles() as $file) {
+            yield $this->_prepareScript($file);
         }
     }
 
     /**
-     * @param CM_File $script
+     * @return CM_File[]
+     */
+    protected function _getFiles() {
+        return $this->_files;
+    }
+
+    /**
+     * @return CM_File[]
+     */
+    protected function _prepareFiles($paths) {
+        $files = [];
+        foreach ($paths as $path) {
+            foreach (CM_Util::rglob('*.php', $path) as $filePath) {
+                $files[] = new CM_File($filePath);
+            }
+        }
+        return $files;
+    }
+
+    /**
+     * @param CM_File $file
      * @return CM_Migration_Script
      */
-    protected function _getMigrationScript(CM_File $script) {
-        $className = sprintf('CM_Migration_Script_%s', $script->getFileNameWithoutExtension());
+    protected function _prepareScript(CM_File $file) {
+        require_once($file->getPath());
+        $className = sprintf('CM_Migration_Script_%s', $file->getFileNameWithoutExtension());
         return new $className($this->getServiceManager());
-    }
-
-    /**
-     * @param CM_File[] $scripts
-     */
-    protected function _loadMigrationScripts(array $scripts) {
-        foreach ($scripts as $script) {
-            require_once($script->getPath());
-        }
     }
 }
