@@ -24,14 +24,14 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * return CM_Migration_ScriptIterator
+     * return Iterator
      */
     public function getScriptList() {
         $scripts = CM_Util::getResourceFiles(self::MIGRATION_DIR . DIRECTORY_SEPARATOR . '*.php');
         $this->_loadMigrationScripts($scripts);
-        return new CM_Migration_ScriptIterator($scripts, function (CM_File $script) {
-            return $this->_getMigrationScript($script);
-        });
+        foreach ($scripts as $script) {
+            yield $this->_getMigrationScript($script);
+        }
     }
 
     /**
