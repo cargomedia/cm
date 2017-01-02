@@ -31,9 +31,11 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
         if (null === $name) {
             $name = CM_Util::exec('git rev-parse --abbrev-ref HEAD');
         }
-        $generator = new CM_Migration_Generator($name, $namespace);
-        $this->_getStreamOutput()->writeln(sprintf('`%s` generated', $generator->getFile()->getPath()));
-        $generator->save();
+        $adapter = new CM_File_Filesystem_Adapter_Local($this->_getMigrationPath($namespace));
+        $filesystem = new CM_File_Filesystem($adapter);
+        $generator = new CM_Migration_Generator($filesystem);
+        $file = $generator->save($name);
+        $this->_getStreamOutput()->writeln(sprintf('`%s` generated', $file->getPathOnLocalFilesystem()));
     }
 
     /**
@@ -53,6 +55,17 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
             throw $e;
         }
         $output->write(" \e[32m✓\e[0m\n");
+    }
+
+    /**
+     * @param string|null $namespace
+     * @return string
+     */
+    protected function _getMigrationPath($namespace = null) {
+        $modulePath = $namespace ? CM_Util::getModulePath($namespace) : DIR_ROOT;
+        return join(DIRECTORY_SEPARATOR, [
+            $modulePath, 'resources', CM_Migration_Loader::MIGRATION_DIR
+        ]);
     }
 
     public static function getPackageName() {

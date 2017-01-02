@@ -2,82 +2,64 @@
 
 class CM_Migration_Generator {
 
-    const MIGRATION_CLASSNAME = 'CM_Migration_Script';
-
     /** @var string */
-    private $_name;
+    private $_parentClassName;
 
-    /** @var string|null */
-    private $_namespace;
-
-    /** @var string */
-    private $_fileName;
-
-    /** @var CM_File */
-    private $_file;
+    /** @var CM_File_Filesystem */
+    private $_filesystem;
 
     /**
-     * @param string      $name
-     * @param string|null $namespace
+     * CM_Migration_Generator constructor.
+     * @param CM_File_Filesystem $filesystem
+     * @param null               $parentClassName
      */
-    public function __construct($name, $namespace = null) {
-        $this->_name = $name;
-        $this->_namespace = $namespace;
-        $this->_fileName = sprintf('%s_%s', time(), CM_Util::camelize(trim($name)));
-        $this->_file = new CM_File($this->_getPath());
+    public function __construct(CM_File_Filesystem $filesystem, $parentClassName = null) {
+        $parentClassName = null !== $parentClassName ? (string) $parentClassName : 'CM_Migration_Script';
+        if (!class_exists($parentClassName)) {
+            throw new CM_Exception_Invalid('Parent migration class does not exist', null, [
+                'parentClassName' => $parentClassName,
+            ]);
+        }
+        $this->_filesystem = $filesystem;
+        $this->_parentClassName = $parentClassName;
     }
 
-    public function save() {
-        $file = $this->getFile();
+    /**
+     * @param string $name
+     * @return CM_File
+     */
+    public function save($name) {
+        $fileName = sprintf('%s_%s', time(), CM_Util::camelize(trim($name)));
+        $className = sprintf('%s_%s', $this->_getParentClassName(), $fileName);
+        $file = new CM_File($fileName, $this->_getFilesystem());
         $fileBlock = new CodeGenerator\FileBlock();
-        $fileBlock->addBlock($this->_getClassBlock());
+        $fileBlock->addBlock($this->_getClassBlock($className));
         $file->ensureParentDirectory();
         $file->write($fileBlock->dump());
+        return $file;
     }
 
     /**
-     * return CM_File
+     * @return CM_File_Filesystem
      */
-    public function getFile() {
-        return $this->_file;
+    protected function _getFilesystem() {
+        return $this->_filesystem;
     }
 
     /**
      * @return string
      */
-    public function getFileName() {
-        return $this->_fileName;
+    protected function _getParentClassName() {
+        return $this->_parentClassName;
     }
 
     /**
-     * @return string
-     */
-    public function getClassName() {
-        return sprintf('%s_%s', self::MIGRATION_CLASSNAME, $this->getFileName());
-    }
-
-    /**
-     * @return string
-     */
-    protected function _getPath() {
-        $modulePath = $this->_namespace ? CM_Util::getModulePath($this->_namespace) : DIR_ROOT;
-        return join(DIRECTORY_SEPARATOR, [
-            $modulePath, 'resources', CM_Migration_Loader::MIGRATION_DIR, $this->getFileName() . '.php'
-        ]);
-    }
-
-    /**
+     * @param $className
      * @return \CodeGenerator\ClassBlock
-     * @throws CM_Exception_Invalid
      */
-    protected function _getClassBlock() {
-        $className = $this->getClassName();
-        if (class_exists($className)) {
-            throw new CM_Exception_Invalid('Class `' . $className . '` already exists');
-        }
-
-        $class = new CodeGenerator\ClassBlock($className, self::MIGRATION_CLASSNAME);
-        $reflection = new ReflectionClass(self::MIGRATION_CLASSNAME);
+    protected function _getClassBlock($className) {
+        $class = new CodeGenerator\ClassBlock($className, $this->_getParentClassName());
+        $reflection = new ReflectionClass($this->_getParentClassName());
         $method = CodeGenerator\MethodBlock::buildFromReflection($reflection->getMethod('up'));
         $method->setAbstract(false);
         $method->setDocBlock(join(PHP_EOL, [
