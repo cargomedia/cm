@@ -7,6 +7,9 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
     /**  @var CM_File[] */
     private $_files;
 
+    /**  @var array */
+    private $_loadedClasses;
+
     /**
      * @param CM_Service_Manager $serviceManager
      * @param string[]           $paths
@@ -14,6 +17,7 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
     public function __construct(CM_Service_Manager $serviceManager, array $paths) {
         $this->setServiceManager($serviceManager);
         $this->_files = $this->_prepareFiles($paths);
+        $this->_loadedClasses = [];
     }
 
     /**
@@ -62,7 +66,7 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
      * @throws CM_Exception_Invalid
      */
     protected function _prepareScript(CM_File $file) {
-        $className = $this->_requireScript($file->getPath());
+        $className = $this->_requireScript($file->getPathOnLocalFilesystem());
         $reflector = new ReflectionClass($className);
         if (!$reflector->isSubclassOf(CM_Migration_Script::class)) {
             throw new CM_Exception_Invalid('Migration script does not inherit from CM_Migration_Script', null, [
@@ -79,16 +83,19 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
      * @throws CM_Exception_Invalid
      */
     protected function _requireScript($filePath) {
-        $classesBefore = get_declared_classes();
-        require_once($filePath);
-        $classesAfter = get_declared_classes();
-        $diff = array_diff($classesAfter, $classesBefore);
-        if (count($diff) !== 1) {
-            throw new CM_Exception_Invalid('Migration script must declare only one class', null, [
-                'declaredClasses' => $diff,
-                'filePath'        => $filePath,
-            ]);
+        if (!isset($this->_loadedClasses[$filePath])) {
+            $classesBefore = get_declared_classes();
+            require_once($filePath);
+            $classesAfter = get_declared_classes();
+            $diff = array_diff($classesAfter, $classesBefore);
+            if (count($diff) !== 1) {
+                throw new CM_Exception_Invalid('Migration script must declare only one class', null, [
+                    'declaredClasses' => $diff,
+                    'filePath'        => $filePath,
+                ]);
+            }
+            $this->_loadedClasses[$filePath] = \Functional\first($diff);
         }
-        return \Functional\first($diff);
+        return $this->_loadedClasses[$filePath];
     }
 }
