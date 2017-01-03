@@ -75,18 +75,14 @@ class CM_Migration_Model extends CM_Model_Abstract {
      */
     public static function findByAttributes(array $data) {
         $cache = CM_Cache_Local::getInstance();
-        $cacheKey = CM_CacheConst::Migration_ByAttribute;
-        foreach ($data as $fieldName => $fieldValue) {
-            $cacheKey .= '_name:' . $fieldName . '_value:' . $fieldValue;
-        }
-        if (false === ($id = $cache->get($cacheKey))) {
+        $cacheKey = $cache->key(__METHOD__, $data);
+        $id = $cache->get($cacheKey, function () use ($data) {
             /** @var CM_Model_StorageAdapter_Database $persistence */
-            $persistence = self::_getStorageAdapter('CM_Model_StorageAdapter_Database');
+            $persistence = self::_getStorageAdapter(self:: getPersistenceClass());
             $type = self::getTypeStatic();
             $result = $persistence->findByData($type, $data);
-            $id = $result['id'];
-            $cache->set($cacheKey, $id);
-        }
+            return $result['id'];
+        });
         if (!$id) {
             return null;
         }

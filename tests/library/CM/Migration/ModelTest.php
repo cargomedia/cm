@@ -31,6 +31,9 @@ class CM_Migration_ModelTest extends CMTest_TestCase {
 
         CM_Migration_Model::create('foo');
 
+        $model = CM_Migration_Model::findByName('foo');
+        $this->assertNull($model);
+
         CMTest_TH::clearCache();
 
         $model = CM_Migration_Model::findByName('foo');
