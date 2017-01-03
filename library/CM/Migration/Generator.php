@@ -9,9 +9,9 @@ class CM_Migration_Generator {
     private $_filesystem;
 
     /**
-     * CM_Migration_Generator constructor.
      * @param CM_File_Filesystem $filesystem
-     * @param null               $parentClassName
+     * @param string|null        $parentClassName
+     * @throws CM_Exception_Invalid
      */
     public function __construct(CM_File_Filesystem $filesystem, $parentClassName = null) {
         $parentClassName = null !== $parentClassName ? (string) $parentClassName : 'CM_Migration_Script';
