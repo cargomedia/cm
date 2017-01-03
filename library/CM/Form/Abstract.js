@@ -289,7 +289,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    * @returns {Boolean}
    */
   _isRequiredField: function(name) {
-    return this.requiredFieldNames.includes(name);
+    return _.include(this.requiredFieldNames, name);
   },
 
   /**
