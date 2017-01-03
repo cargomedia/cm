@@ -10,7 +10,7 @@ class CM_Migration_ScriptTest extends CMTest_TestCase {
         $sm = $this->getServiceManager();
         /** @var PHPUnit_Framework_MockObject_MockObject|CM_Migration_Script $script */
         $script = $this->getMockBuilder('CM_Migration_Script')
-            ->setMethods(['up'])
+            ->setMethods(['up', 'getName'])
             ->setMockClassName('CM_Migration_Script_123_foo')
             ->setConstructorArgs([$sm])
             ->getMockForAbstractClass();
@@ -18,6 +18,10 @@ class CM_Migration_ScriptTest extends CMTest_TestCase {
         $script
             ->expects($this->once())
             ->method('up');
+        $script
+            ->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('123_foo'));
 
         $script->load();
 
