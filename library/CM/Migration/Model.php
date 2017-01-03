@@ -21,30 +21,30 @@ class CM_Migration_Model extends CM_Model_Abstract {
     /**
      * @return DateTime|null
      */
-    public function getExecStamp() {
-        return $this->_has('execStamp') ? $this->_get('execStamp') : null;
+    public function getExecutedAt() {
+        return $this->_has('executedAt') ? $this->_get('executedAt') : null;
     }
 
     /**
-     * @param DateTime $execStamp
+     * @param DateTime|null $executedAt
      * @return $this
      */
-    public function setExecStamp($execStamp) {
-        $this->_set('execStamp', $execStamp);
+    public function setExecutedAt(DateTime $executedAt = null) {
+        $this->_set('executedAt', $executedAt);
         return $this;
     }
 
     /**
      * @return bool
      */
-    public function hasExecStamp() {
-        return null !== $this->getExecStamp();
+    public function hasExecutedAt() {
+        return null !== $this->getExecutedAt();
     }
 
     protected function _getSchema() {
         return new CM_Model_Schema_Definition(array(
-            'name'      => ['type' => 'string'],
-            'execStamp' => ['type' => 'DateTime', 'optional' => true],
+            'name'       => ['type' => 'string'],
+            'executedAt' => ['type' => 'DateTime', 'optional' => true],
         ));
     }
 

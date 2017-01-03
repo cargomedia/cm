@@ -9,8 +9,8 @@ class CM_Migration_ModelTest extends CMTest_TestCase {
     public function testCreate() {
         $model = CM_Migration_Model::create('foo');
         $this->assertSame('foo', $model->getName());
-        $this->assertNull($model->getExecStamp());
-        $this->assertFalse($model->hasExecStamp());
+        $this->assertNull($model->getExecutedAt());
+        $this->assertFalse($model->hasExecutedAt());
 
         /** @var CM_Db_Exception $exception */
         $exception = $this->catchException(function () {
@@ -33,15 +33,15 @@ class CM_Migration_ModelTest extends CMTest_TestCase {
 
         $model = CM_Migration_Model::findByName('foo');
         $this->assertSame('foo', $model->getName());
-        $this->assertNull($model->getExecStamp());
-        $this->assertFalse($model->hasExecStamp());
+        $this->assertNull($model->getExecutedAt());
+        $this->assertFalse($model->hasExecutedAt());
 
         $date = new DateTime();
-        $model->setExecStamp($date);
+        $model->setExecutedAt($date);
 
         $model = CM_Migration_Model::findByName('foo');
         $this->assertSame('foo', $model->getName());
-        $this->assertEquals($date, $model->getExecStamp());
-        $this->assertTrue($model->hasExecStamp());
+        $this->assertEquals($date, $model->getExecutedAt());
+        $this->assertTrue($model->hasExecutedAt());
     }
 }

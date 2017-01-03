@@ -19,7 +19,7 @@ abstract class CM_Migration_Script extends CM_Provision_Script_Abstract {
      */
     public function load(CM_OutputStream_Interface $output = null) {
         $this->up();
-        $this->_getRecord()->setExecStamp((new DateTime())->setTimestamp(time()));
+        $this->_getRecord()->setExecutedAt(new DateTime());
     }
 
     /**
@@ -39,7 +39,7 @@ abstract class CM_Migration_Script extends CM_Provision_Script_Abstract {
     }
 
     protected function _isLoaded() {
-        return $this->_getRecord()->hasExecStamp();
+        return $this->_getRecord()->hasExecutedAt();
     }
 
     /**

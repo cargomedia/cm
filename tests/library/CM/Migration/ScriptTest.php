@@ -16,26 +16,15 @@ class CM_Migration_ScriptTest extends CMTest_TestCase {
             ->getMockForAbstractClass();
 
         $script
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('up');
 
-        $time = CMTest_TH::time();
         $script->load();
 
         $model = CM_Migration_Model::findByName('123_foo');
         $this->assertInstanceOf('CM_Migration_Model', $model);
-        $this->assertTrue($model->hasExecStamp());
-        $this->assertSame($time, $model->getExecStamp()->getTimestamp());
-        $this->assertSame('123_foo', $model->getName());
-
-        CMTest_TH::timeForward(10);
-        $time = CMTest_TH::time();
-        $script->load();
-
-        $model = CM_Migration_Model::findByName('123_foo');
-        $this->assertInstanceOf('CM_Migration_Model', $model);
-        $this->assertTrue($model->hasExecStamp());
-        $this->assertSame($time, $model->getExecStamp()->getTimestamp());
+        $this->assertTrue($model->hasExecutedAt());
+        $this->assertInstanceOf('DateTime', $model->getExecutedAt());
         $this->assertSame('123_foo', $model->getName());
     }
 }
