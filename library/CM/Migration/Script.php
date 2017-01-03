@@ -14,9 +14,6 @@ abstract class CM_Migration_Script extends CM_Provision_Script_Abstract {
 
     abstract public function up();
 
-    /**
-     * @param CM_OutputStream_Interface|null $output
-     */
     public function load(CM_OutputStream_Interface $output = null) {
         $this->up();
         $this->_getRecord()->setExecutedAt(new DateTime());
@@ -35,7 +32,9 @@ abstract class CM_Migration_Script extends CM_Provision_Script_Abstract {
     }
 
     public function getName() {
-        return str_replace('CM_Migration_Script_', '', parent::getName());
+        $reflector = new ReflectionClass($this);
+        $file = new CM_File($reflector->getFileName());
+        return $file->getFileNameWithoutExtension();
     }
 
     protected function _isLoaded() {

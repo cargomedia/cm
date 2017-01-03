@@ -59,10 +59,36 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
     /**
      * @param CM_File $file
      * @return CM_Migration_Script
+     * @throws CM_Exception_Invalid
      */
     protected function _prepareScript(CM_File $file) {
-        require_once($file->getPath());
-        $className = sprintf('CM_Migration_Script_%s', $file->getFileNameWithoutExtension());
+        $className = $this->_requireScript($file->getPath());
+        $reflector = new ReflectionClass($className);
+        if (!$reflector->isSubclassOf(CM_Migration_Script::class)) {
+            throw new CM_Exception_Invalid('Migration script does not inherit from CM_Migration_Script', null, [
+                'className' => $className,
+                'filePath'  => $file->getPath(),
+            ]);
+        }
         return new $className($this->getServiceManager());
+    }
+
+    /**
+     * @param string $filePath
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    protected function _requireScript($filePath) {
+        $classesBefore = get_declared_classes();
+        require_once($filePath);
+        $classesAfter = get_declared_classes();
+        $diff = array_diff($classesAfter, $classesBefore);
+        if (count($diff) !== 1) {
+            throw new CM_Exception_Invalid('Migration script must declare only one class', null, [
+                'declaredClasses' => $diff,
+                'filePath'        => $filePath,
+            ]);
+        }
+        return \Functional\first($diff);
     }
 }
