@@ -8,6 +8,9 @@ class CMService_Inspectlet_Client implements CM_Service_Tracking_ClientInterface
     /** @var string|null */
     protected $_identity;
 
+    /** @var array */
+    protected $_tagList = [];
+
     /**
      * @param int $code
      */
@@ -42,6 +45,10 @@ EOF;
         if (isset($this->_identity)) {
             $js .= "__insp.push(['identify', '{$this->_identity}']);";
         }
+        if (!empty($this->_tagList)) {
+            $tagList = CM_Util::jsonEncode($this->_tagList);
+            $js .= "__insp.push(['tagSession', {$tagList}]);";
+        }
         return $js;
     }
 
@@ -55,6 +62,23 @@ EOF;
     }
 
     public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
+        $splitTest = $variation->getSplittest();
+        $splitTestId = $splitTest->getId();
+        $splitTestName = $splitTest->getName();
+        $variationName = $variation->getName();
+        $this->_addTag('Split Test "' . $splitTestName . '" (' . $splitTestId . ')', $variationName);
+    }
+
+    /**
+     * @param string $name
+     * @param string $value
+     * @return $this
+     */
+    protected function _addTag($name, $value) {
+        $name = (string) $name;
+        $value = (string) $value;
+        $this->_tagList[$name] = $value;
+        return $this;
     }
 
     /**
