@@ -2,26 +2,26 @@
 
 class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
 
-    public function all() {
-        $paths = $this->_getMigrationPaths();
-        $loader = new CM_Migration_Loader($this->getServiceManager(), $paths);
-        foreach ($loader->getScriptList() as $script) {
-            if ($script->shouldBeLoaded()) {
-                $this->_loadScript($script);
-            }
-        }
-    }
-
     /**
-     * @param string $name
+     * @param string|null $name
      */
-    public function load($name) {
+    public function run($name = null) {
         $paths = $this->_getMigrationPaths();
         $loader = new CM_Migration_Loader($this->getServiceManager(), $paths);
-        if ($script = $loader->findScript($name)) {
-            $this->_loadScript($script);
+        if (null === $name) {
+            foreach ($loader->getScriptList() as $script) {
+                if ($script->shouldBeLoaded()) {
+                    $this->_loadScript($script);
+                }
+            }
         } else {
-            $this->_getStreamError()->writeln(sprintf('Migration script "%s" not found', $name));
+            if ($script = $loader->findScript($name)) {
+                $this->_loadScript($script);
+            } else {
+                throw new CM_Exception_Invalid('Migration script not found', null, [
+                    'scriptName' => $name,
+                ]);
+            }
         }
     }
 
@@ -53,10 +53,10 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
         try {
             $script->load();
         } catch (Exception $e) {
-            $output->write(" \e[31m×\e[0m\n");
+            $output->writeln(" ×");
             throw $e;
         }
-        $output->write(" \e[32m✓\e[0m\n");
+        $output->writeln(" ✓");
     }
 
     /**
@@ -80,6 +80,6 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public static function getPackageName() {
-        return 'migrate';
+        return 'migration';
     }
 }
