@@ -13,6 +13,13 @@ class CMTest_TestSuite {
         $this->generateInternalConfig();
         CMTest_TH::init();
         $comparatorFactory = SebastianBergmann\Comparator\Factory::getInstance();
+        $this->registerComparators($comparatorFactory);
+    }
+
+    /**
+     * @param SebastianBergmann\Comparator\Factory $comparatorFactory
+     */
+    public function registerComparators(SebastianBergmann\Comparator\Factory $comparatorFactory) {
         $comparatorFactory->register(new CMTest_Comparator_Comparable());
         $comparatorFactory->register(new CMTest_Comparator_BetterArrayComparator());
     }
