@@ -2,6 +2,7 @@
 <html {if $render->getLanguage()}lang="{$render->getLanguage()->getAbbreviation()}"{/if} class="{$viewResponse->getCssClasses()|implode:' '} {block name='html-class'}{/block}" id="{$viewResponse->getAutoId()}" {if isset($webFontLoaderConfig)}data-web-font-loader='{$webFontLoaderConfig}'{/if}>
   <head>
     <meta charset="utf-8">
+    {block name='head-top'}{/block}
     <meta http-equiv="X-UA-Compatible" content="IE=edge; requiresActiveX=true">
     {if isset($metaDescription)}<meta name="description" content="{$metaDescription|escape}">{/if}
     {if isset($metaKeywords)}<meta name="keywords" content="{$metaKeywords|escape}">{/if}
