@@ -80,7 +80,7 @@ class CM_Migration_Generator {
         $method->setAbstract(false);
         $method->setDocBlock(join(PHP_EOL, [
             '/**',
-            ' * Describe the migration script',
+            ' * TODO: Describe the migration script',
             ' */'
         ]));
         $method->setCode('// TODO: Implement the migration script');

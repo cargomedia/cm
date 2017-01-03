@@ -35,7 +35,7 @@ class CM_Migration_GeneratorTest extends CMTest_TestCase {
             sprintf('class CM_Migration_Script_%s_FooBarBaz extends \CM_Migration_Script {', $time),
             '',
             '    /**',
-            '     * Describe the migration script',
+            '     * TODO: Describe the migration script',
             '     */',
             '    public function up() {',
             '        // TODO: Implement the migration script',
