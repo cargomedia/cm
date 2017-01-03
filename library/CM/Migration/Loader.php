@@ -67,8 +67,7 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
      */
     protected function _prepareScript(CM_File $file) {
         $className = $this->_requireScript($file->getPathOnLocalFilesystem());
-        $reflector = new ReflectionClass($className);
-        if (!$reflector->isSubclassOf(CM_Migration_Script::class)) {
+        if (!is_subclass_of($className, CM_Migration_Script::class)) {
             throw new CM_Exception_Invalid('Migration script does not inherit from CM_Migration_Script', null, [
                 'className' => $className,
                 'filePath'  => $file->getPath(),
