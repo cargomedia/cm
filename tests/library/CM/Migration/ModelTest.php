@@ -37,15 +37,18 @@ class CM_Migration_ModelTest extends CMTest_TestCase {
         $this->assertSame('foo', $model->getName());
         $this->assertNull($model->getExecutedAt());
         $this->assertFalse($model->hasExecutedAt());
+    }
+
+    public function testSetExecutedAt() {
+        $model = CM_Migration_Model::create('foo');
 
         $date = new DateTime();
         $model->setExecutedAt($date);
-
-        CMTest_TH::clearCache();
-
-        $model = CM_Migration_Model::findByName('foo');
-        $this->assertSame('foo', $model->getName());
         $this->assertEquals($date, $model->getExecutedAt());
         $this->assertTrue($model->hasExecutedAt());
+
+        $model->setExecutedAt();
+        $this->assertNull($model->getExecutedAt());
+        $this->assertFalse($model->hasExecutedAt());
     }
 }
