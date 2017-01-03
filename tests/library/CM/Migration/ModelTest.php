@@ -31,6 +31,8 @@ class CM_Migration_ModelTest extends CMTest_TestCase {
 
         CM_Migration_Model::create('foo');
 
+        CMTest_TH::clearCache();
+
         $model = CM_Migration_Model::findByName('foo');
         $this->assertSame('foo', $model->getName());
         $this->assertNull($model->getExecutedAt());
@@ -38,6 +40,8 @@ class CM_Migration_ModelTest extends CMTest_TestCase {
 
         $date = new DateTime();
         $model->setExecutedAt($date);
+
+        CMTest_TH::clearCache();
 
         $model = CM_Migration_Model::findByName('foo');
         $this->assertSame('foo', $model->getName());

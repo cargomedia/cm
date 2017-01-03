@@ -21,6 +21,8 @@ class CM_Migration_ScriptTest extends CMTest_TestCase {
 
         $script->load();
 
+        CMTest_TH::clearCache();
+
         $model = CM_Migration_Model::findByName('123_foo');
         $this->assertInstanceOf('CM_Migration_Model', $model);
         $this->assertTrue($model->hasExecutedAt());

@@ -92,4 +92,7 @@ class CM_CacheConst {
 
     // _countryId:X
     const Currency_CountryId = 'Currency_CountryId';
+
+    // X_name:X_value:X
+    const Migration_ByAttribute = 'Migration_ByAttribute';
 }

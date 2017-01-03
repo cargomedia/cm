@@ -52,7 +52,7 @@ class CM_Migration_Model extends CM_Model_Abstract {
      * @param string $name
      * @return CM_Migration_Model
      */
-    static public function create($name) {
+    public static function create($name) {
         $model = new self();
         $model->setName($name);
         $model->commit();
@@ -61,18 +61,36 @@ class CM_Migration_Model extends CM_Model_Abstract {
 
     /**
      * @param string $name
-     * @return CM_Migration_Model
+     * @return static|null
      */
-    static public function findByName($name) {
+    public static function findByName($name) {
+        return static::findByAttributes([
+            'name' => $name,
+        ]);
+    }
+
+    /**
+     * @param array $data
+     * @return static|null
+     */
+    public static function findByAttributes(array $data) {
         $cache = CM_Cache_Local::getInstance();
-        if (false === ($migrationId = $cache->get($name))) {
-            $migrationId = CM_Db_Db::select(self::getTableName(), 'id', array('name' => $name))->fetchColumn();
-            $cache->set($name, $migrationId);
+        $cacheKey = CM_CacheConst::Migration_ByAttribute;
+        foreach ($data as $fieldName => $fieldValue) {
+            $cacheKey .= '_name:' . $fieldName . '_value:' . $fieldValue;
         }
-        if (!$migrationId) {
+        if (false === ($id = $cache->get($cacheKey))) {
+            /** @var CM_Model_StorageAdapter_Database $persistence */
+            $persistence = self::_getStorageAdapter('CM_Model_StorageAdapter_Database');
+            $type = self::getTypeStatic();
+            $result = $persistence->findByData($type, $data);
+            $id = $result['id'];
+            $cache->set($cacheKey, $id);
+        }
+        if (!$id) {
             return null;
         }
-        return new static($migrationId);
+        return new static($id);
     }
 
     public static function getPersistenceClass() {
