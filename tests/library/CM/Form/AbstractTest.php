@@ -97,13 +97,13 @@ class CM_Form_MockForm extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_Date(['name' => 'date']));
         $this->registerAction(new CM_FormAction_MockForm_TestExampleAction($this));
     }
-}
-
-class CM_FormAction_MockForm_TestExampleAction extends CM_FormAction_Abstract {
 
     protected function _getRequiredFields() {
         return array('must_check', 'text');
     }
+}
+
+class CM_FormAction_MockForm_TestExampleAction extends CM_FormAction_Abstract {
 
     protected function _process(CM_Params $params, CM_Http_Response_View_Form $response, CM_Form_Abstract $form) {
         CM_Form_AbstractTest::$formActionProcessCount++;

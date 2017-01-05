@@ -140,7 +140,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 
     if (message) {
       if ($container.length) {
-        el.offsetWidth;	// Force reflow for CSS-animation
+        this.$el.triggerReflow();
         el.dataset.formfieldError = true;
 
         if ($errorMessage.length) {
