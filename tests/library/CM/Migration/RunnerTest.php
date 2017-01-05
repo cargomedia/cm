@@ -1,6 +1,6 @@
 <?php
 
-class CM_Migration_ScriptTest extends CMTest_TestCase {
+class CM_Migration_RunnerTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
@@ -17,17 +17,17 @@ class CM_Migration_ScriptTest extends CMTest_TestCase {
             ->expects($this->once())
             ->method('up');
 
-        /** @var PHPUnit_Framework_MockObject_MockObject|CM_Migration_Script $script */
-        $script = $this->getMockBuilder('CM_Migration_Script')
+        /** @var PHPUnit_Framework_MockObject_MockObject|CM_Migration_Runner $runner */
+        $runner = $this->getMockBuilder('CM_Migration_Runner')
             ->setMethods(['getName'])
             ->setConstructorArgs([$migration, $sm])
             ->getMock();
-        $script
+        $runner
             ->expects($this->any())
             ->method('getName')
             ->will($this->returnValue('123_foo'));
 
-        $script->load();
+        $runner->load();
 
         CMTest_TH::clearCache();
 

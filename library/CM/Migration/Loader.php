@@ -22,21 +22,21 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
 
     /**
      * @param string $name
-     * @return CM_Migration_Script|null
+     * @return CM_Migration_Runner|null
      */
-    public function findScript($name) {
+    public function findRunner($name) {
         $file = \Functional\first($this->_getFiles(), function (CM_File $file) use ($name) {
             return $name === $file->getFileNameWithoutExtension();
         });
-        return null !== $file ? $this->_prepareScript($file) : null;
+        return null !== $file ? $this->_prepareRunner($file) : null;
     }
 
     /**
      * return Iterator
      */
-    public function getScriptList() {
+    public function getRunnerList() {
         foreach ($this->_getFiles() as $file) {
-            yield $this->_prepareScript($file);
+            yield $this->_prepareRunner($file);
         }
     }
 
@@ -62,10 +62,10 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
 
     /**
      * @param CM_File $file
-     * @return CM_Migration_Script
+     * @return CM_Migration_Runner
      * @throws CM_Exception_Invalid
      */
-    protected function _prepareScript(CM_File $file) {
+    protected function _prepareRunner(CM_File $file) {
         $serviceManager = $this->getServiceManager();
         $className = $this->_requireScript($file->getPathOnLocalFilesystem());
 
@@ -74,7 +74,7 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
         if ($script instanceof CM_Service_ManagerAwareInterface) {
             $script->setServiceManager($serviceManager);
         }
-        return new CM_Migration_Script($script, $serviceManager);
+        return new CM_Migration_Runner($script, $serviceManager);
     }
 
     /**

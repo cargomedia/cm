@@ -9,14 +9,14 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
         $paths = $this->_getMigrationPaths();
         $loader = new CM_Migration_Loader($this->getServiceManager(), $paths);
         if (null === $name) {
-            foreach ($loader->getScriptList() as $script) {
-                if ($script->shouldBeLoaded()) {
-                    $this->_loadScript($script);
+            foreach ($loader->getRunnerList() as $runner) {
+                if ($runner->shouldBeLoaded()) {
+                    $this->_load($runner);
                 }
             }
         } else {
-            if ($script = $loader->findScript($name)) {
-                $this->_loadScript($script);
+            if ($runner = $loader->findRunner($name)) {
+                $this->_load($runner);
             } else {
                 throw new CM_Exception_Invalid('Migration script not found', null, [
                     'scriptName' => $name,
@@ -41,17 +41,17 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param CM_Migration_Script $script
+     * @param CM_Migration_Runner $runner
      * @throws Exception
      */
-    protected function _loadScript(CM_Migration_Script $script) {
+    protected function _load(CM_Migration_Runner $runner) {
         $output = $this->_getStreamOutput();
-        $output->write(sprintf('- %s', $script->getName()));
-        if ($desc = $script->getDescription()) {
+        $output->write(sprintf('- %s', $runner->getName()));
+        if ($desc = $runner->getDescription()) {
             $output->write(sprintf(': %s', $desc));
         }
         try {
-            $script->load();
+            $runner->load();
         } catch (Exception $e) {
             $output->writeln(" ×");
             throw $e;

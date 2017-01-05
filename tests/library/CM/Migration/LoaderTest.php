@@ -34,23 +34,23 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
 
         $loader = new CM_Migration_Loader($this->getServiceManager(), [$tmp->getAdapter()->getPathPrefix()]);
 
-        $list = $loader->getScriptList();
+        $list = $loader->getRunnerList();
         $this->assertInstanceOf('Generator', $list);
 
         $list->rewind();
 
         $current = $list->current();
-        $this->assertRegExp('/Migration_[0-9]+_Baz/', $current->getClassName());
+        $this->assertRegExp('/Migration_[0-9]+_Baz/', $current->getScriptClassName());
         $this->assertSame('000-custom-name', $current->getName());
 
         $list->next();
         $current = $list->current();
-        $this->assertRegExp('/Migration_[0-9]+_Boo/', $current->getClassName());
+        $this->assertRegExp('/Migration_[0-9]+_Boo/', $current->getScriptClassName());
         $this->assertContains('_Boo', $current->getName());
 
         $list->next();
         $current = $list->current();
-        $this->assertRegExp('/Migration_[0-9]+_Abc/', $current->getClassName());
+        $this->assertRegExp('/Migration_[0-9]+_Abc/', $current->getScriptClassName());
         $this->assertContains('_Abc', $current->getName());
     }
 
@@ -68,17 +68,17 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
 
         $loader = new CM_Migration_Loader($this->getServiceManager(), [$tmp->getAdapter()->getPathPrefix()]);
 
-        $this->assertNull($loader->findScript('unknown'));
+        $this->assertNull($loader->findRunner('unknown'));
 
         $filename = sprintf('%s_Foo', $fooTime);
-        $foo = $loader->findScript($filename);
+        $foo = $loader->findRunner($filename);
         $this->assertNotNull($foo);
-        $this->assertRegExp('/Migration_[0-9]+_Foo/', $foo->getClassName());
+        $this->assertRegExp('/Migration_[0-9]+_Foo/', $foo->getScriptClassName());
         $this->assertSame($filename, $foo->getName());
 
-        $bar = $loader->findScript('custom-name');
+        $bar = $loader->findRunner('custom-name');
         $this->assertNotNull($bar);
-        $this->assertRegExp('/Migration_[0-9]+_Bar/', $bar->getClassName());
+        $this->assertRegExp('/Migration_[0-9]+_Bar/', $bar->getScriptClassName());
         $this->assertSame('custom-name', $bar->getName());
     }
 
@@ -146,8 +146,8 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
         $generator = new CM_Migration_Generator($tmp);
         $script = $generator->save('tata');
         $loader = new CM_Migration_Loader($this->getServiceManager(), [$tmp->getAdapter()->getPathPrefix()]);
-        $tata = CMTest_TH::callProtectedMethod($loader, '_prepareScript', [$script]);
-        $this->assertRegExp('/Migration_[0-9]+_Tata/', $tata->getClassName());
+        $tata = CMTest_TH::callProtectedMethod($loader, '_prepareRunner', [$script]);
+        $this->assertRegExp('/Migration_[0-9]+_Tata/', $tata->getScriptClassName());
         $this->assertSame(sprintf('%s_Tata', CMTest_TH::time()), $tata->getName());
     }
 }

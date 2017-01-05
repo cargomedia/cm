@@ -1,6 +1,6 @@
 <?php
 
-class CM_Migration_Script extends CM_Provision_Script_Abstract {
+class CM_Migration_Runner extends CM_Provision_Script_Abstract {
 
     use CM_Provision_Script_IsLoadedTrait;
 
@@ -21,11 +21,10 @@ class CM_Migration_Script extends CM_Provision_Script_Abstract {
         $this->_getRecord()->setExecutedAt(new DateTime());
     }
 
-    /**
-     * @return string
-     */
-    public function getClassName() {
-        return get_class($this->_getScript());
+    public function getName() {
+        $reflector = new ReflectionClass($this->_getScript());
+        $file = new CM_File($reflector->getFileName());
+        return $file->getFileNameWithoutExtension();
     }
 
     /**
@@ -40,10 +39,11 @@ class CM_Migration_Script extends CM_Provision_Script_Abstract {
         return null;
     }
 
-    public function getName() {
-        $reflector = new ReflectionClass($this->_getScript());
-        $file = new CM_File($reflector->getFileName());
-        return $file->getFileNameWithoutExtension();
+    /**
+     * @return string
+     */
+    public function getScriptClassName() {
+        return get_class($this->_getScript());
     }
 
     protected function _isLoaded() {
