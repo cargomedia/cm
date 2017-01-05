@@ -82,58 +82,68 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
 
     public function test_requireScript() {
         $tmp = $this->_tmp;
-        $generator = new CM_Migration_Generator($tmp);
-        $script = $generator->save('toto');
-        $wrongNoClass = new CM_File('wrong-no-class.php', $tmp);
-        $wrongNoClass->write(join(PHP_EOL, [
-            '<?php',
-            ''
-        ]));
-
-        // test
-
         $loader = new CM_Migration_Loader($this->getServiceManager(), [$tmp->getAdapter()->getPathPrefix()]);
 
-        $className = CMTest_TH::callProtectedMethod($loader, '_requireScript', [$script->getPathOnLocalFilesystem()]);
-        $this->assertRegExp('/CM_Migration_Script_[0-9]+_Toto/', $className);
-
-        $className = CMTest_TH::callProtectedMethod($loader, '_requireScript', [$script->getPathOnLocalFilesystem()]);
-        $this->assertRegExp('/CM_Migration_Script_[0-9]+_Toto/', $className);
-
-        /** @var CM_Exception_Invalid $exception */
-        $exception = $this->catchException(function () use ($loader, $wrongNoClass) {
-            CMTest_TH::callProtectedMethod($loader, '_requireScript', [$wrongNoClass->getPathOnLocalFilesystem()]);
-        });
-        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Migration script must declare only one class', $exception->getMessage());
-        $this->assertEmpty($exception->getMetaInfo()['declaredClasses']);
-        $this->assertContains('wrong-no-class.php', $exception->getMetaInfo()['filePath']);
-    }
-
-    public function test_prepareScript() {
-        $tmp = $this->_tmp;
         $generator = new CM_Migration_Generator($tmp);
-        $script = $generator->save('tata');
+        $script = $generator->save('toto');
+        $className = CMTest_TH::callProtectedMethod($loader, '_requireScript', [$script->getPathOnLocalFilesystem()]);
+        $this->assertRegExp('/CM_Migration_Script_[0-9]+_Toto/', $className);
+        $className = CMTest_TH::callProtectedMethod($loader, '_requireScript', [$script->getPathOnLocalFilesystem()]);
+        $this->assertRegExp('/CM_Migration_Script_[0-9]+_Toto/', $className);
+
         $wrong = new CM_File('wrong.php', $tmp);
         $wrong->write(join(PHP_EOL, [
             '<?php',
             'class Wrong_Migration_Script {}',
             ''
         ]));
+        /** @var CM_Exception_Invalid $exception */
+        $exception = $this->catchException(function () use ($loader, $wrong) {
+            CMTest_TH::callProtectedMethod($loader, '_requireScript', [$wrong->getPathOnLocalFilesystem()]);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Migration script must declare one and only one class inheriting from CM_Migration_Script', $exception->getMessage());
+        $this->assertEmpty($exception->getMetaInfo()['declaredClasses']);
+        $this->assertContains('wrong.php', $exception->getMetaInfo()['filePath']);
 
+        $wrongNoClass = new CM_File('wrong-no-class.php', $tmp);
+        $wrongNoClass->write(join(PHP_EOL, [
+            '<?php',
+            ''
+        ]));
+        /** @var CM_Exception_Invalid $exception */
+        $exception = $this->catchException(function () use ($loader, $wrongNoClass) {
+            CMTest_TH::callProtectedMethod($loader, '_requireScript', [$wrongNoClass->getPathOnLocalFilesystem()]);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Migration script must declare one and only one class inheriting from CM_Migration_Script', $exception->getMessage());
+        $this->assertEmpty($exception->getMetaInfo()['declaredClasses']);
+        $this->assertContains('wrong-no-class.php', $exception->getMetaInfo()['filePath']);
+
+        $wrongMultiClass = new CM_File('wrong-multi-class.php', $tmp);
+        $wrongMultiClass->write(join(PHP_EOL, [
+            '<?php',
+            'class Migration_Script_1 extends CM_Migration_Script { public function up() {} }',
+            'class Migration_Script_2 extends CM_Migration_Script { public function up() {} }',
+            ''
+        ]));
+        /** @var CM_Exception_Invalid $exception */
+        $exception = $this->catchException(function () use ($loader, $wrongMultiClass) {
+            CMTest_TH::callProtectedMethod($loader, '_requireScript', [$wrongMultiClass->getPathOnLocalFilesystem()]);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Migration script must declare one and only one class inheriting from CM_Migration_Script', $exception->getMessage());
+        $this->assertSame(['Migration_Script_1', 'Migration_Script_2'], $exception->getMetaInfo()['declaredClasses']);
+        $this->assertContains('wrong-multi-class.php', $exception->getMetaInfo()['filePath']);
+    }
+
+    public function test_prepareScript() {
+        $tmp = $this->_tmp;
+        $generator = new CM_Migration_Generator($tmp);
+        $script = $generator->save('tata');
         $loader = new CM_Migration_Loader($this->getServiceManager(), [$tmp->getAdapter()->getPathPrefix()]);
-
         $tata = CMTest_TH::callProtectedMethod($loader, '_prepareScript', [$script]);
         $this->assertRegExp('/CM_Migration_Script_[0-9]+_Tata/', get_class($tata));
         $this->assertSame(sprintf('%s_Tata', CMTest_TH::time()), $tata->getName());
-
-        /** @var CM_Exception_Invalid $exception */
-        $exception = $this->catchException(function () use ($loader, $wrong) {
-            CMTest_TH::callProtectedMethod($loader, '_prepareScript', [$wrong]);
-        });
-        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Migration script does not inherit from CM_Migration_Script', $exception->getMessage());
-        $this->assertSame('Wrong_Migration_Script', $exception->getMetaInfo()['className']);
-        $this->assertContains('wrong.php', $exception->getMetaInfo()['filePath']);
     }
 }
