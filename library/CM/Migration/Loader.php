@@ -66,8 +66,15 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
      * @throws CM_Exception_Invalid
      */
     protected function _prepareScript(CM_File $file) {
+        $serviceManager = $this->getServiceManager();
         $className = $this->_requireScript($file->getPathOnLocalFilesystem());
-        return new $className($this->getServiceManager());
+
+        /** @var CM_Migration_UpgradableInterface $script */
+        $script = new $className();
+        if ($script instanceof CM_Service_ManagerAwareInterface) {
+            $script->setServiceManager($serviceManager);
+        }
+        return new CM_Migration_Script($script, $serviceManager);
     }
 
     /**
@@ -80,16 +87,17 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
             $classesBefore = get_declared_classes();
             require_once($filePath);
             $classesAfter = get_declared_classes();
-            $diff = \Functional\filter(array_values(array_diff($classesAfter, $classesBefore)), function ($className) {
-                return is_subclass_of($className, CM_Migration_Script::class);
+            $classesDiff = array_values(array_diff($classesAfter, $classesBefore));
+            $classesUpgradable = \Functional\filter($classesDiff, function ($className) {
+                return in_array(CM_Migration_UpgradableInterface::class, class_implements($className));
             });
-            if (count($diff) !== 1) {
-                throw new CM_Exception_Invalid('Migration script must declare one and only one class inheriting from CM_Migration_Script', null, [
-                    'declaredClasses' => $diff,
+            if (count($classesUpgradable) !== 1) {
+                throw new CM_Exception_Invalid('Migration script must declare one and only one class implementing CM_Migration_UpgradableInterface', null, [
+                    'declaredClasses' => $classesDiff,
                     'filePath'        => $filePath,
                 ]);
             }
-            $this->_loadedClasses[$filePath] = \Functional\first($diff);
+            $this->_loadedClasses[$filePath] = \Functional\first($classesUpgradable);
         }
         return $this->_loadedClasses[$filePath];
     }

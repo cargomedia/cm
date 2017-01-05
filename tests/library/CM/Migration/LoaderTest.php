@@ -9,6 +9,8 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
         $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
         $adapter = new CM_File_Filesystem_Adapter_Local($dirTmp . self::class);
         $tmp = new CM_File_Filesystem($adapter);
+        $dir = new CM_File('.', $tmp);
+        $dir->ensureParentDirectory();
         $this->_tmp = $tmp;
     }
 
@@ -38,17 +40,17 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
         $list->rewind();
 
         $current = $list->current();
-        $this->assertRegExp('/CM_Migration_Script_[0-9]+_Baz/', get_class($current));
+        $this->assertRegExp('/Migration_[0-9]+_Baz/', $current->getClassName());
         $this->assertSame('000-custom-name', $current->getName());
 
         $list->next();
         $current = $list->current();
-        $this->assertRegExp('/CM_Migration_Script_[0-9]+_Boo/', get_class($current));
+        $this->assertRegExp('/Migration_[0-9]+_Boo/', $current->getClassName());
         $this->assertContains('_Boo', $current->getName());
 
         $list->next();
         $current = $list->current();
-        $this->assertRegExp('/CM_Migration_Script_[0-9]+_Abc/', get_class($current));
+        $this->assertRegExp('/Migration_[0-9]+_Abc/', $current->getClassName());
         $this->assertContains('_Abc', $current->getName());
     }
 
@@ -71,12 +73,12 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
         $filename = sprintf('%s_Foo', $fooTime);
         $foo = $loader->findScript($filename);
         $this->assertNotNull($foo);
-        $this->assertRegExp('/CM_Migration_Script_[0-9]+_Foo/', get_class($foo));
+        $this->assertRegExp('/Migration_[0-9]+_Foo/', $foo->getClassName());
         $this->assertSame($filename, $foo->getName());
 
         $bar = $loader->findScript('custom-name');
         $this->assertNotNull($bar);
-        $this->assertRegExp('/CM_Migration_Script_[0-9]+_Bar/', get_class($bar));
+        $this->assertRegExp('/Migration_[0-9]+_Bar/', $bar->getClassName());
         $this->assertSame('custom-name', $bar->getName());
     }
 
@@ -84,17 +86,19 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
         $tmp = $this->_tmp;
         $loader = new CM_Migration_Loader($this->getServiceManager(), [$tmp->getAdapter()->getPathPrefix()]);
 
-        $generator = new CM_Migration_Generator($tmp);
-        $script = $generator->save('toto');
-        $className = CMTest_TH::callProtectedMethod($loader, '_requireScript', [$script->getPathOnLocalFilesystem()]);
-        $this->assertRegExp('/CM_Migration_Script_[0-9]+_Toto/', $className);
-        $className = CMTest_TH::callProtectedMethod($loader, '_requireScript', [$script->getPathOnLocalFilesystem()]);
-        $this->assertRegExp('/CM_Migration_Script_[0-9]+_Toto/', $className);
+        $good = new CM_File('good.php', $tmp);
+        $good->write(join(PHP_EOL, [
+            '<?php',
+            'class Good_Migration implements CM_Migration_UpgradableInterface { public function up() {} }',
+            ''
+        ]));
+        $className = CMTest_TH::callProtectedMethod($loader, '_requireScript', [$good->getPathOnLocalFilesystem()]);
+        $this->assertSame('Good_Migration', $className);
 
         $wrong = new CM_File('wrong.php', $tmp);
         $wrong->write(join(PHP_EOL, [
             '<?php',
-            'class Wrong_Migration_Script {}',
+            'class Wrong_Migration {}',
             ''
         ]));
         /** @var CM_Exception_Invalid $exception */
@@ -102,8 +106,8 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
             CMTest_TH::callProtectedMethod($loader, '_requireScript', [$wrong->getPathOnLocalFilesystem()]);
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Migration script must declare one and only one class inheriting from CM_Migration_Script', $exception->getMessage());
-        $this->assertEmpty($exception->getMetaInfo()['declaredClasses']);
+        $this->assertSame('Migration script must declare one and only one class implementing CM_Migration_UpgradableInterface', $exception->getMessage());
+        $this->assertSame(['Wrong_Migration'], $exception->getMetaInfo()['declaredClasses']);
         $this->assertContains('wrong.php', $exception->getMetaInfo()['filePath']);
 
         $wrongNoClass = new CM_File('wrong-no-class.php', $tmp);
@@ -116,15 +120,15 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
             CMTest_TH::callProtectedMethod($loader, '_requireScript', [$wrongNoClass->getPathOnLocalFilesystem()]);
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Migration script must declare one and only one class inheriting from CM_Migration_Script', $exception->getMessage());
+        $this->assertSame('Migration script must declare one and only one class implementing CM_Migration_UpgradableInterface', $exception->getMessage());
         $this->assertEmpty($exception->getMetaInfo()['declaredClasses']);
         $this->assertContains('wrong-no-class.php', $exception->getMetaInfo()['filePath']);
 
         $wrongMultiClass = new CM_File('wrong-multi-class.php', $tmp);
         $wrongMultiClass->write(join(PHP_EOL, [
             '<?php',
-            'class Migration_Script_1 extends CM_Migration_Script { public function up() {} }',
-            'class Migration_Script_2 extends CM_Migration_Script { public function up() {} }',
+            'class Migration_1 implements CM_Migration_UpgradableInterface { public function up() {} }',
+            'class Migration_2 implements CM_Migration_UpgradableInterface { public function up() {} }',
             ''
         ]));
         /** @var CM_Exception_Invalid $exception */
@@ -132,8 +136,8 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
             CMTest_TH::callProtectedMethod($loader, '_requireScript', [$wrongMultiClass->getPathOnLocalFilesystem()]);
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Migration script must declare one and only one class inheriting from CM_Migration_Script', $exception->getMessage());
-        $this->assertSame(['Migration_Script_1', 'Migration_Script_2'], $exception->getMetaInfo()['declaredClasses']);
+        $this->assertSame('Migration script must declare one and only one class implementing CM_Migration_UpgradableInterface', $exception->getMessage());
+        $this->assertSame(['Migration_1', 'Migration_2'], $exception->getMetaInfo()['declaredClasses']);
         $this->assertContains('wrong-multi-class.php', $exception->getMetaInfo()['filePath']);
     }
 
@@ -143,7 +147,7 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
         $script = $generator->save('tata');
         $loader = new CM_Migration_Loader($this->getServiceManager(), [$tmp->getAdapter()->getPathPrefix()]);
         $tata = CMTest_TH::callProtectedMethod($loader, '_prepareScript', [$script]);
-        $this->assertRegExp('/CM_Migration_Script_[0-9]+_Tata/', get_class($tata));
+        $this->assertRegExp('/Migration_[0-9]+_Tata/', $tata->getClassName());
         $this->assertSame(sprintf('%s_Tata', CMTest_TH::time()), $tata->getName());
     }
 }

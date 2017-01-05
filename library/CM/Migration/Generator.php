@@ -3,25 +3,20 @@
 class CM_Migration_Generator {
 
     /** @var string */
-    private $_parentClassName;
+    private $_prefixClassName;
 
     /** @var CM_File_Filesystem */
     private $_filesystem;
 
     /**
      * @param CM_File_Filesystem $filesystem
-     * @param string|null        $parentClassName
+     * @param string|null        $prefixClassName
      * @throws CM_Exception_Invalid
      */
-    public function __construct(CM_File_Filesystem $filesystem, $parentClassName = null) {
-        $parentClassName = null !== $parentClassName ? (string) $parentClassName : 'CM_Migration_Script';
-        if (!class_exists($parentClassName)) {
-            throw new CM_Exception_Invalid('Parent migration class does not exist', null, [
-                'parentClassName' => $parentClassName,
-            ]);
-        }
+    public function __construct(CM_File_Filesystem $filesystem, $prefixClassName = null) {
+        $prefixClassName = null !== $prefixClassName ? (string) $prefixClassName : 'Migration_';
         $this->_filesystem = $filesystem;
-        $this->_parentClassName = $parentClassName;
+        $this->_prefixClassName = $prefixClassName;
     }
 
     /**
@@ -30,7 +25,7 @@ class CM_Migration_Generator {
      */
     public function save($name) {
         $fileName = sprintf('%s_%s', time(), $this->_sanitize($name));
-        $className = sprintf('%s_%s', $this->_getParentClassName(), $fileName);
+        $className = sprintf('%s%s', $this->_getPrefixClassName(), $fileName);
         $fileNameWithExtension = sprintf('%s.php', $fileName);
         $file = new CM_File($fileNameWithExtension, $this->_getFilesystem());
         $fileBlock = new CodeGenerator\FileBlock();
@@ -65,8 +60,8 @@ class CM_Migration_Generator {
     /**
      * @return string
      */
-    protected function _getParentClassName() {
-        return $this->_parentClassName;
+    protected function _getPrefixClassName() {
+        return $this->_prefixClassName;
     }
 
     /**
@@ -74,8 +69,8 @@ class CM_Migration_Generator {
      * @return \CodeGenerator\ClassBlock
      */
     protected function _getClassBlock($className) {
-        $class = new CodeGenerator\ClassBlock($className, $this->_getParentClassName());
-        $reflection = new ReflectionClass($this->_getParentClassName());
+        $class = new CodeGenerator\ClassBlock($className, null, [CM_Migration_UpgradableInterface::class]);
+        $reflection = new ReflectionClass(CM_Migration_UpgradableInterface::class);
         $method = CodeGenerator\MethodBlock::buildFromReflection($reflection->getMethod('up'));
         $method->setAbstract(false);
         $method->setDocBlock(join(PHP_EOL, [

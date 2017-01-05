@@ -1,29 +1,38 @@
 <?php
 
-abstract class CM_Migration_Script extends CM_Provision_Script_Abstract {
+class CM_Migration_Script extends CM_Provision_Script_Abstract {
 
     use CM_Provision_Script_IsLoadedTrait;
+
+    /** @var CM_Migration_UpgradableInterface */
+    private $_script;
 
     /** @var CM_Migration_Model|null */
     private $_record;
 
-    public function __construct(CM_Service_Manager $serviceManager) {
-        $this->_record = null;
+    public function __construct(CM_Migration_UpgradableInterface $script, CM_Service_Manager $serviceManager) {
         parent::__construct($serviceManager);
+        $this->_script = $script;
+        $this->_record = null;
     }
 
-    abstract public function up();
-
     public function load(CM_OutputStream_Interface $output = null) {
-        $this->up();
+        $this->_getScript()->up();
         $this->_getRecord()->setExecutedAt(new DateTime());
+    }
+
+    /**
+     * @return string
+     */
+    public function getClassName() {
+        return get_class($this->_getScript());
     }
 
     /**
      * @return string|null
      */
     public function getDescription() {
-        $reflector = new ReflectionClass($this);
+        $reflector = new ReflectionClass($this->_getScript());
         $doc = $reflector->getMethod('up')->getDocComment();
         if ($doc && preg_match('/\*[ ]+([\S ]+)/', $doc, $matches)) {
             return $matches[1];
@@ -32,13 +41,20 @@ abstract class CM_Migration_Script extends CM_Provision_Script_Abstract {
     }
 
     public function getName() {
-        $reflector = new ReflectionClass($this);
+        $reflector = new ReflectionClass($this->_getScript());
         $file = new CM_File($reflector->getFileName());
         return $file->getFileNameWithoutExtension();
     }
 
     protected function _isLoaded() {
         return $this->_getRecord()->hasExecutedAt();
+    }
+
+    /**
+     * @return CM_Migration_UpgradableInterface
+     */
+    protected function _getScript() {
+        return $this->_script;
     }
 
     /**
@@ -55,9 +71,10 @@ abstract class CM_Migration_Script extends CM_Provision_Script_Abstract {
      * @return CM_Migration_Model
      */
     protected function _fetchRecord() {
-        $record = CM_Migration_Model::findByName($this->getName());
+        $name = $this->getName();
+        $record = CM_Migration_Model::findByName($name);
         if (!$record) {
-            $record = CM_Migration_Model::create($this->getName());
+            $record = CM_Migration_Model::create($name);
         }
         return $record;
     }

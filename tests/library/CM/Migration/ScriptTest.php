@@ -8,16 +8,20 @@ class CM_Migration_ScriptTest extends CMTest_TestCase {
 
     public function testLoad() {
         $sm = $this->getServiceManager();
-        /** @var PHPUnit_Framework_MockObject_MockObject|CM_Migration_Script $script */
-        $script = $this->getMockBuilder('CM_Migration_Script')
-            ->setMethods(['up', 'getName'])
-            ->setMockClassName('CM_Migration_Script_123_foo')
-            ->setConstructorArgs([$sm])
-            ->getMockForAbstractClass();
-
-        $script
+        /** @var PHPUnit_Framework_MockObject_MockObject|CM_Migration_UpgradableInterface $migration */
+        $migration = $this->getMockBuilder('CM_Migration_UpgradableInterface')
+            ->setMethods(['up'])
+            ->setMockClassName('Migration_123_foo')
+            ->getMock();
+        $migration
             ->expects($this->once())
             ->method('up');
+
+        /** @var PHPUnit_Framework_MockObject_MockObject|CM_Migration_Script $script */
+        $script = $this->getMockBuilder('CM_Migration_Script')
+            ->setMethods(['getName'])
+            ->setConstructorArgs([$migration, $sm])
+            ->getMock();
         $script
             ->expects($this->any())
             ->method('getName')
