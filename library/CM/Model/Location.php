@@ -182,7 +182,7 @@ class CM_Model_Location extends CM_Model_Abstract {
                 $location = new CM_Model_Location_Zip($id);
                 break;
             default:
-                throw new CM_Exception_Invalid('Invalid location level', null, ['level' => $level]);
+                throw new CM_Location_InvalidLevelException('Invalid location level', null, ['level' => $level]);
         }
         $this->_locationList = array();
         $locationDataList = array();
