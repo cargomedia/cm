@@ -92,8 +92,15 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
             'class Good_Migration implements CM_Migration_UpgradableInterface { public function up() {} }',
             ''
         ]));
-        $className = CMTest_TH::callProtectedMethod($loader, '_requireScript', [$good->getPathOnLocalFilesystem()]);
-        $this->assertSame('Good_Migration', $className);
+        $this->assertSame('Good_Migration', CMTest_TH::callProtectedMethod($loader, '_requireScript', [$good->getPathOnLocalFilesystem()]));
+
+        $goodExtendsClass = new CM_File('good-extends-class.php', $tmp);
+        $goodExtendsClass->write(join(PHP_EOL, [
+            '<?php',
+            'class Migration_3 extends CMTest_Mock_MigrationScript {}',
+            ''
+        ]));
+        $this->assertSame('Migration_3', CMTest_TH::callProtectedMethod($loader, '_requireScript', [$goodExtendsClass->getPathOnLocalFilesystem()]));
 
         $wrong = new CM_File('wrong.php', $tmp);
         $wrong->write(join(PHP_EOL, [

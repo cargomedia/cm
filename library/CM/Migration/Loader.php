@@ -88,8 +88,10 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
             require_once($filePath);
             $classesAfter = get_declared_classes();
             $classesDiff = array_values(array_diff($classesAfter, $classesBefore));
-            $classesUpgradable = \Functional\filter($classesDiff, function ($className) {
-                return in_array(CM_Migration_UpgradableInterface::class, class_implements($className));
+            $classesUpgradable = \Functional\filter($classesDiff, function ($className) use ($filePath) {
+                $reflectionClass = new \ReflectionClass($className);
+                return false !== strpos($reflectionClass->getFileName(), $filePath)
+                    && $reflectionClass->implementsInterface(CM_Migration_UpgradableInterface::class);
             });
             if (count($classesUpgradable) !== 1) {
                 throw new CM_Exception_Invalid('Migration script must declare one and only one class implementing CM_Migration_UpgradableInterface', null, [
