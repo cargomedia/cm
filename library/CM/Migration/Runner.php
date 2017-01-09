@@ -1,8 +1,8 @@
 <?php
 
-class CM_Migration_Runner extends CM_Provision_Script_Abstract {
+class CM_Migration_Runner implements CM_Service_ManagerAwareInterface {
 
-    use CM_Provision_Script_IsLoadedTrait;
+    use CM_Service_ManagerAwareTrait;
 
     /** @var CM_Migration_UpgradableInterface */
     private $_script;
@@ -11,7 +11,7 @@ class CM_Migration_Runner extends CM_Provision_Script_Abstract {
     private $_record;
 
     public function __construct(CM_Migration_UpgradableInterface $script, CM_Service_Manager $serviceManager) {
-        parent::__construct($serviceManager);
+        $this->setServiceManager($serviceManager);
         $this->_script = $script;
         $this->_record = null;
     }
