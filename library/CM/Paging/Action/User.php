@@ -43,7 +43,7 @@ class CM_Paging_Action_User extends CM_Paging_Action_Abstract {
     }
 
     public function add(CM_Action_Abstract $action) {
-        CM_Db_Db::insertDelayed('cm_action',
+        CM_Db_Db::insert('cm_action',
             array('actorId' => $this->_user->getId(), 'verb' => $action->getVerb(), 'type' => $action->getType(), 'createStamp' => time()));
     }
 }
