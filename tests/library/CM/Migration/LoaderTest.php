@@ -92,7 +92,7 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
             'class Good_Migration implements CM_Migration_UpgradableInterface { public function up() {} }',
             ''
         ]));
-        $this->assertSame('Good_Migration', CMTest_TH::callProtectedMethod($loader, '_requireScript', [$good->getPathOnLocalFilesystem()]));
+        $this->assertSame('Good_Migration', CMTest_TH::callProtectedMethod($loader, '_requireScript', [$good]));
 
         $goodExtendsClass = new CM_File('good-extends-class.php', $tmp);
         $goodExtendsClass->write(join(PHP_EOL, [
@@ -100,7 +100,7 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
             'class Migration_3 extends CMTest_Mock_MigrationScript {}',
             ''
         ]));
-        $this->assertSame('Migration_3', CMTest_TH::callProtectedMethod($loader, '_requireScript', [$goodExtendsClass->getPathOnLocalFilesystem()]));
+        $this->assertSame('Migration_3', CMTest_TH::callProtectedMethod($loader, '_requireScript', [$goodExtendsClass]));
 
         $wrong = new CM_File('wrong.php', $tmp);
         $wrong->write(join(PHP_EOL, [
@@ -110,11 +110,11 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
         ]));
         /** @var CM_Exception_Invalid $exception */
         $exception = $this->catchException(function () use ($loader, $wrong) {
-            CMTest_TH::callProtectedMethod($loader, '_requireScript', [$wrong->getPathOnLocalFilesystem()]);
+            CMTest_TH::callProtectedMethod($loader, '_requireScript', [$wrong]);
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Migration script must declare one and only one class implementing CM_Migration_UpgradableInterface', $exception->getMessage());
-        $this->assertSame(['Wrong_Migration'], $exception->getMetaInfo()['declaredClasses']);
+        $this->assertSame('Migration script must implements CM_Migration_UpgradableInterface', $exception->getMessage());
+        $this->assertSame(['Wrong_Migration'], $exception->getMetaInfo()['classes']);
         $this->assertContains('wrong.php', $exception->getMetaInfo()['filePath']);
 
         $wrongNoClass = new CM_File('wrong-no-class.php', $tmp);
@@ -124,11 +124,11 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
         ]));
         /** @var CM_Exception_Invalid $exception */
         $exception = $this->catchException(function () use ($loader, $wrongNoClass) {
-            CMTest_TH::callProtectedMethod($loader, '_requireScript', [$wrongNoClass->getPathOnLocalFilesystem()]);
+            CMTest_TH::callProtectedMethod($loader, '_requireScript', [$wrongNoClass]);
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Migration script must declare one and only one class implementing CM_Migration_UpgradableInterface', $exception->getMessage());
-        $this->assertEmpty($exception->getMetaInfo()['declaredClasses']);
+        $this->assertSame('Migration script must declare one class and one class only', $exception->getMessage());
+        $this->assertEmpty($exception->getMetaInfo()['classes']);
         $this->assertContains('wrong-no-class.php', $exception->getMetaInfo()['filePath']);
 
         $wrongMultiClass = new CM_File('wrong-multi-class.php', $tmp);
@@ -140,11 +140,11 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
         ]));
         /** @var CM_Exception_Invalid $exception */
         $exception = $this->catchException(function () use ($loader, $wrongMultiClass) {
-            CMTest_TH::callProtectedMethod($loader, '_requireScript', [$wrongMultiClass->getPathOnLocalFilesystem()]);
+            CMTest_TH::callProtectedMethod($loader, '_requireScript', [$wrongMultiClass]);
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('Migration script must declare one and only one class implementing CM_Migration_UpgradableInterface', $exception->getMessage());
-        $this->assertSame(['Migration_1', 'Migration_2'], $exception->getMetaInfo()['declaredClasses']);
+        $this->assertSame('Migration script must declare one class and one class only', $exception->getMessage());
+        $this->assertSame(['Migration_1', 'Migration_2'], $exception->getMetaInfo()['classes']);
         $this->assertContains('wrong-multi-class.php', $exception->getMetaInfo()['filePath']);
     }
 

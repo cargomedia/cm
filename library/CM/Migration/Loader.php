@@ -67,7 +67,7 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
      */
     protected function _prepareRunner(CM_File $file) {
         $serviceManager = $this->getServiceManager();
-        $className = $this->_requireScript($file->getPathOnLocalFilesystem());
+        $className = $this->_requireScript($file);
 
         /** @var CM_Migration_UpgradableInterface $script */
         $script = new $className();
@@ -78,29 +78,49 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * @param string $filePath
+     * @param CM_File $file
      * @return string
      * @throws CM_Exception_Invalid
      */
-    protected function _requireScript($filePath) {
+    protected function _requireScript(CM_File $file) {
+        $filePath = $file->getPathOnLocalFilesystem();
         if (!isset($this->_loadedClasses[$filePath])) {
-            $classesBefore = get_declared_classes();
-            require_once($filePath);
-            $classesAfter = get_declared_classes();
-            $classesDiff = array_values(array_diff($classesAfter, $classesBefore));
-            $classesUpgradable = \Functional\filter($classesDiff, function ($className) use ($filePath) {
-                $reflectionClass = new \ReflectionClass($className);
-                return false !== strpos($reflectionClass->getFileName(), $filePath)
-                    && $reflectionClass->implementsInterface(CM_Migration_UpgradableInterface::class);
-            });
-            if (count($classesUpgradable) !== 1) {
-                throw new CM_Exception_Invalid('Migration script must declare one and only one class implementing CM_Migration_UpgradableInterface', null, [
-                    'declaredClasses' => $classesDiff,
-                    'filePath'        => $filePath,
+            $classes = $this->_getClassNameList($file->read());
+            if (count($classes) !== 1) {
+                throw new CM_Exception_Invalid('Migration script must declare one class and one class only', null, [
+                    'classes'  => $classes,
+                    'filePath' => $filePath,
                 ]);
             }
-            $this->_loadedClasses[$filePath] = \Functional\first($classesUpgradable);
+            require_once($filePath);
+            $className = \Functional\first($classes);
+            if (!in_array(CM_Migration_UpgradableInterface::class, class_implements($className))) {
+                throw new CM_Exception_Invalid('Migration script must implements CM_Migration_UpgradableInterface', null, [
+                    'classes'  => $classes,
+                    'filePath' => $filePath,
+                ]);
+            }
+            $this->_loadedClasses[$filePath] = $className;
         }
         return $this->_loadedClasses[$filePath];
+    }
+
+    /**
+     * @param string $phpCode
+     * @return string[]
+     */
+    protected function _getClassNameList($phpCode) {
+        $classes = array();
+        $tokens = token_get_all($phpCode);
+        $count = count($tokens);
+        for ($i = 2; $i < $count; $i++) {
+            if ($tokens[$i - 2][0] === T_CLASS
+                && $tokens[$i - 1][0] === T_WHITESPACE
+                && $tokens[$i][0] === T_STRING
+            ) {
+                $classes[] = $tokens[$i][1];
+            }
+        }
+        return $classes;
     }
 }
