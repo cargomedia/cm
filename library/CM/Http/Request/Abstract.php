@@ -64,13 +64,20 @@ abstract class CM_Http_Request_Abstract {
             $this->_server = array_change_key_case($server);
         }
         $uri = (string) $uri;
-        if (!mb_check_encoding($uri, 'UTF-8')) {
+        $originalUri = $uri;
+        $uri = CM_Util::sanitizeUtf($uri);
+
+        try {
+            CM_Util::jsonEncode($uri);
+        } catch (CM_Exception_Invalid $e) {
             $logger = CM_Service_Manager::getInstance()->getLogger();
             $context = new CM_Log_Context();
-            $context->setExtra(['originalUri' => unpack('H*', $uri)[1]]);
+            $context->setExtra([
+                'originalUri'  => unpack('H*', $originalUri)[1],
+                'sanitizedUri' => unpack('H*', $uri)[1],
+            ]);
             $logger->warning('Non utf-8 uri', $context);
         } // TODO remove after investigation
-        $uri = CM_Util::sanitizeUtf($uri);
         $this->setUri($uri);
 
         if ($sessionId = $this->getCookie('sessionId')) {
