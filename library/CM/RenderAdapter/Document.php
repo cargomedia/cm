@@ -99,9 +99,8 @@ class CM_RenderAdapter_Document extends CM_RenderAdapter_Abstract {
         $options['urlCdn'] = $this->getRender()->getSite()->getUrlCdn();
         $options['urlUserContentList'] = $serviceManager->getUserContent()->getUrlList();
         $options['urlServiceWorker'] = $this->getRender()->getUrlServiceWorker();
-        if ($this->getRender()->getLanguageRewrite()) {
-            $options['urlLanguage'] = $this->getRender()->getLanguage();
-        }
+        $options['urlLanguage'] = $this->getRender()->getLanguage();
+
         $options['debug'] = CM_Bootloader::getInstance()->isDebug();
         $options['stream'] = $serviceManager->getStreamMessage()->getClientOptions();
         if ($viewer = $this->getRender()->getViewer()) {
