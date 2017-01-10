@@ -268,7 +268,7 @@ class CM_Model_User extends CM_Model_Abstract {
 			SELECT `o`.`userId`
 			FROM `cm_user_online` `o`
 			LEFT JOIN `cm_user` `u` USING(`userId`)
-			WHERE `u`.`activityStamp` < ? OR `u`.`activityStamp` IS NULL OR `u`.`userId` IS NULL',
+			WHERE `u`.`activityStamp` IS NOT NULL AND `u`.`activityStamp` < ? OR `u`.`userId` IS NULL',
             array(time() - self::ONLINE_EXPIRATION));
         while ($userId = $res->fetchColumn()) {
             try {
