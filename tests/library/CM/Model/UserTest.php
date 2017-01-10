@@ -137,9 +137,6 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $user2 = CM_Model_User::createStatic();
         $user2->setOnline();
 
-        $this->assertSameTime($stampOffline, $user1->getLatestActivity());
-        $this->assertSameTime($stampOnline, $user2->getLatestActivity());
-
         CM_Model_User::offlineOld();
         CMTest_TH::reinstantiateModel($user1);
         CMTest_TH::reinstantiateModel($user2);
