@@ -68,25 +68,26 @@ require(["logger/vendor/src/logger", "logger/handlers/recorder"], function(Logge
   });
 
   QUnit.test("Recorder: recordMaxSize", function(assert) {
+    var records = null;
     var recorder = new Recorder({
       recordMaxSize: 2
     });
-
+    
     recorder.addRecord(['foo1'], {level: Logger.INFO});
 
-    var records = recorder.getRecords();
+    records = recorder.getRecords();
     assert.equal(1, records.length);
     assert.deepEqual(['foo1'], records[0].messages);
 
     recorder.addRecord(['foo2'], {level: Logger.INFO});
 
-    var records = recorder.getRecords();
+    records = recorder.getRecords();
     assert.equal(2, records.length);
     assert.deepEqual(['foo1'], records[0].messages);
     assert.deepEqual(['foo2'], records[1].messages);
 
     recorder.addRecord(['foo3'], {level: Logger.INFO});
-    var records = recorder.getRecords();
+    records = recorder.getRecords();
     assert.equal(2, records.length);
     assert.deepEqual(['foo2'], records[0].messages);
     assert.deepEqual(['foo3'], records[1].messages);
