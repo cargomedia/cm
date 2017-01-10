@@ -128,13 +128,13 @@ class CM_Model_UserTest extends CMTest_TestCase {
     }
 
     public function testOfflineOld() {
-        $stampOffline = time();
-        $user1 = CM_Model_User::createStatic();
+        $user1 = CMTest_TH::createUser();
+        $user1->updateLatestActivityThrottled();
         $user1->setOnline();
 
         CMTest_TH::timeForward(CM_Model_User::ONLINE_EXPIRATION + 1);
-        $stampOnline = time();
-        $user2 = CM_Model_User::createStatic();
+        $user2 = CMTest_TH::createUser();
+        $user2->updateLatestActivityThrottled();
         $user2->setOnline();
 
         CM_Model_User::offlineOld();
