@@ -20,9 +20,6 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
      * @return CM_Params
      */
     public function getConfiguration() {
-        if (!$this->_has('configuration')) {
-            return CM_Params::factory([]);
-        }
         $paramsEncoded = CM_Util::jsonDecode($this->_get('configuration'));
         return CM_Params::factory($paramsEncoded, true);
     }
@@ -96,11 +93,9 @@ class CM_Site_SiteSettings extends CM_Model_Abstract {
             $configuration = CM_Params::factory([]);
         }
         $siteSettings = new self();
-        $siteSettings->_set([
-            'siteType'      => $siteType,
-            'name'          => $name,
-            'configuration' => CM_Util::jsonEncode($configuration->getParamsEncoded()),
-        ]);
+        $siteSettings->setName($name);
+        $siteSettings->setSiteType($siteType);
+        $siteSettings->setConfiguration($configuration);
         $siteSettings->commit();
         return $siteSettings;
     }
