@@ -22,7 +22,7 @@ class CM_Paging_Useragent_User extends CM_Paging_Useragent_Abstract {
      */
     public function add($useragent) {
         $useragent = (string) $useragent;
-        CM_Db_Db::replaceDelayed('cm_useragent', array('userId' => $this->_user->getId(), 'useragent' => $useragent, 'createStamp' => time()));
+        CM_Db_Db::replace('cm_useragent', array('userId' => $this->_user->getId(), 'useragent' => $useragent, 'createStamp' => time()));
     }
 
     /**
