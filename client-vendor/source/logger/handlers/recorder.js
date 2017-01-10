@@ -62,7 +62,7 @@ Recorder.prototype = {
       });
     }
     if (recordMaxSize > 0 && this._records.length > recordMaxSize) {
-      this._records = this._records.splice(-recordMaxSize);
+      this._records = this._records.slice(-recordMaxSize);
     }
   },
 
