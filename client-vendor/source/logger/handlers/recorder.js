@@ -7,7 +7,8 @@ var util = require('util');
 var Recorder = function(options) {
   this._records = [];
   this._options = _.defaults(options || {}, {
-    retention: 300,
+    retention: 300,     // seconds
+    recordMaxSize: 200, // nb records
     jsonMaxSize: 50,
     format: '[{date} {level}] {message}'
   });
@@ -52,11 +53,16 @@ Recorder.prototype = {
    * @private
    */
   _cleanupRecords: function() {
-    if (this._options.retention) {
-      var retentionTime = this._getDate() - (this._options.retention * 1000);
+    var retention = this._options.retention;
+    var maxSize = this._options.recordMaxSize;
+    if (retention > 0) {
+      var retentionTime = this._getDate() - (retention * 1000);
       this._records = _.filter(this._records, function(record) {
         return record.date > retentionTime;
       });
+    }
+    if (maxSize > 0 && this._records.length > maxSize) {
+      this._records = this._records.splice(this._records.length - maxSize, maxSize);
     }
   },
 
