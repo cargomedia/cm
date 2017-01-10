@@ -43,7 +43,7 @@ class CM_Paging_Transgression_Ip extends CM_Paging_Transgression_Abstract {
 
     public function add(CM_Action_Abstract $action, $limitType) {
         $limitType = (int) $limitType;
-        CM_Db_Db::insertDelayed('cm_action', array('ip'              => $this->_ip, 'verb' => $action->getVerb(), 'type' => $action->getType(),
-                                                   'actionLimitType' => $limitType, 'createStamp' => time()));
+        CM_Db_Db::insert('cm_action', array('ip'              => $this->_ip, 'verb' => $action->getVerb(), 'type' => $action->getType(),
+                                            'actionLimitType' => $limitType, 'createStamp' => time()));
     }
 }

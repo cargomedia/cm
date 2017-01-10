@@ -50,9 +50,13 @@ abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract {
      * @param int $type
      * @param int $id
      * @return CM_Model_Entity_Abstract
+     * @throws CM_Entity_InvalidTypeException
      */
     final public static function factory($type, $id) {
         $className = self::_getClassName($type);
+        if (!is_subclass_of($className, static::class)) {
+            throw new CM_Entity_InvalidTypeException('Invalid type provided', null, ['type' => $type, 'typeClass' => $className, 'calledClass' => static::class]);
+        }
         return new $className($id);
     }
 

@@ -595,7 +595,9 @@ class CM_Util {
      * @return string
      */
     public static function sanitizeUtf($value) {
-        return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+        $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+        $value = iconv('UTF-8', 'UTF-8//IGNORE', $value);
+        return $value;
     }
 
     /**

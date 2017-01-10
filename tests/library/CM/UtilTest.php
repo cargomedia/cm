@@ -158,7 +158,13 @@ class CM_UtilTest extends CMTest_TestCase {
     }
 
     public function testSanitizeUtf() {
-        $this->assertSame('?.', CM_Util::sanitizeUtf(pack("H*", 'c32e')));
+        $string = pack("H*", 'c32e');
+        $this->assertSame('?.', CM_Util::sanitizeUtf($string));
+    }
+
+    public function testSanitizeUtf2() {
+        $string = pack('H*', 'e4bfa1e65faf');
+        $this->assertSame('信?_?', CM_Util::sanitizeUtf($string));
     }
 
     public function testApplyOffset() {

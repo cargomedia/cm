@@ -382,18 +382,31 @@ class CM_ParamsTest extends CMTest_TestCase {
 
     public function testGetLocation() {
         $location = CMTest_TH::createLocation();
-        $params = new CM_Params(['location'               => $location,
-                                 'locationParameters'     => ['id' => $location->getId(), 'level' => $location->getLevel()],
-                                 'insufficientParameters' => 1]);
+        $params = new CM_Params([
+            'location'               => $location,
+            'locationParameters'     => ['id' => $location->getId(), 'level' => $location->getLevel()],
+            'insufficientParameters' => 1,
+            'invalidLevel'           => ['id' => $location->getId(), 'level' => 9999],
+        ]);
         $this->assertEquals($location, $params->getLocation('location'));
         $this->assertEquals($location, $params->getLocation('locationParameters'));
-        try {
+
+        /** @var CM_Exception_InvalidParam  $exception */
+        $exception = $this->catchException(function () use ($params) {
             $params->getLocation('insufficientParameters');
             $this->fail('Instantiating location with insufficient parameters');
-        } catch (CM_Exception_InvalidParam $ex) {
-            $this->assertSame('Not enough parameters', $ex->getMessage());
-            $this->assertSame(['parameters' => 1, 'className' => 'CM_Model_Location'], $ex->getMetaInfo());
-        }
+        });
+        $this->assertInstanceOf(CM_Exception_InvalidParam::class, $exception);
+        $this->assertSame('Not enough parameters', $exception->getMessage());
+        $this->assertSame(['parameters' => 1, 'className' => 'CM_Model_Location'], $exception->getMetaInfo());
+
+        /** @var CM_Exception_InvalidParam $exception */
+        $exception = $this->catchException(function () use ($params) {
+            $params->getLocation('invalidLevel');
+        });
+        $this->assertInstanceOf(CM_Exception_InvalidParam::class, $exception);
+        $this->assertSame('Invalid location level', $exception->getMessage());
+        $this->assertSame(['level' => 9999], $exception->getMetaInfo());
     }
 
     public function testGetParamsDecoded() {

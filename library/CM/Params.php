@@ -352,9 +352,14 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     /**
      * @param string $key
      * @return CM_Model_Location
+     * @throws CM_Exception_InvalidParam
      */
     public function getLocation($key) {
-        return $this->getObject($key, 'CM_Model_Location');
+        try {
+            return $this->getObject($key, 'CM_Model_Location');
+        } catch (CM_Location_InvalidLevelException $e) {
+            throw new CM_Exception_InvalidParam($e->getMessage(), null, $e->getMetaInfo());
+        }
     }
 
     /**

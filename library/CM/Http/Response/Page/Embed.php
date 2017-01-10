@@ -26,10 +26,6 @@ class CM_Http_Response_Page_Embed extends CM_Http_Response_Page {
         return $renderAdapterPage->fetch();
     }
 
-    protected function _process() {
-        $this->_processContentOrRedirect();
-    }
-
     public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
         return null;
     }

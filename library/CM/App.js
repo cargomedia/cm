@@ -507,12 +507,11 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {Object} [options]
      * @param {Boolean} [options.loop=false]
      * @param {Boolean} [options.autoplay=false]
-     * @param {String} [options.crossOrigin='anonymous']
      * @return {Audio}
      */
     createAudio: function(sourceList, options) {
       sourceList = _.isString(sourceList) ? [sourceList] : sourceList;
-      var audio = new cm.lib.Media.Audio(options);
+      var audio = new cm.lib.Media.Audio();
       audio.setOptions(options);
       audio.setSources(sourceList);
       return audio;
