@@ -54,15 +54,15 @@ Recorder.prototype = {
    */
   _cleanupRecords: function() {
     var retention = this._options.retention;
-    var maxSize = this._options.recordMaxSize;
+    var recordMaxSize = this._options.recordMaxSize;
     if (retention > 0) {
       var retentionTime = this._getDate() - (retention * 1000);
       this._records = _.filter(this._records, function(record) {
         return record.date > retentionTime;
       });
     }
-    if (maxSize > 0 && this._records.length > maxSize) {
-      this._records = this._records.splice(this._records.length - maxSize, maxSize);
+    if (recordMaxSize > 0 && this._records.length > recordMaxSize) {
+      this._records = this._records.splice(-recordMaxSize);
     }
   },
 
