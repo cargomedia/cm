@@ -2,6 +2,10 @@
 
 class CM_Http_Response_Resource_LayoutTest extends CMTest_TestCase {
 
+    public function tearDown() {
+        CMTest_TH::clearEnv();
+    }
+
     public function testProcess() {
         $site = $this->getMockSite();
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));

@@ -485,6 +485,14 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     }
 
     /**
+     * @param $key
+     * @return CM_Site_SiteSettings
+     */
+    public function getSiteSettings($key) {
+        return $this->getObject($key, 'CM_Site_SiteSettings');
+    }
+
+    /**
      * @return mixed
      */
     public function shift() {

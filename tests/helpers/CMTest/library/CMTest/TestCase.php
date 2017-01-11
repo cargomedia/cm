@@ -11,15 +11,12 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     public function runBare() {
         if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
-            $siteDefault = $this->getMockSite(null, null, array(
-                'url'          => 'http://www.default.dev',
-                'urlCdn'       => 'http://cdn.default.dev',
-                'name'         => 'Default',
-                'emailAddress' => 'default@default.dev',
+            $siteDefault = $this->getMockSite(null, null, null, array(
+                'url'    => 'http://www.default.dev',
+                'urlCdn' => 'http://cdn.default.dev',
             ));
             CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
         }
-
         $this->setServiceManager(CMTest_TH::getServiceManager());
         parent::runBare();
     }
@@ -55,14 +52,15 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param string|null $classname
-     * @param int|null    $type
-     * @param array|null  $configuration
-     * @param array|null  $methods
-     * @throws CM_Exception_Invalid
+     * @param string|null    $classname
+     * @param int|null       $type
+     * @param CM_Params|null $siteSettingsConfiguration
+     * @param array|null     $configuration
+     * @param array|null     $methods
      * @return CM_Site_Abstract|PHPUnit_Framework_MockObject_MockObject
+     * @throws CM_Exception_Invalid
      */
-    public function getMockSite($classname = null, $type = null, array $configuration = null, array $methods = null) {
+    public function getMockSite($classname = null, $type = null, CM_Params $siteSettingsConfiguration = null, array $configuration = null, array $methods = null) {
         if (null === $classname) {
             $classname = 'CM_Site_Abstract';
         }
@@ -79,16 +77,16 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         }
         $methods = (array) $methods;
         $defaultConfiguration = array(
-            'url'          => 'http://www.example.com',
-            'urlCdn'       => null,
+            'url'    => 'http://www.example.com',
+            'urlCdn' => null,
+        );
+        $defaultSiteSettings = [
             'name'         => 'Example site',
             'emailAddress' => 'hello@example.com',
-        );
+        ];
         $configuration = array_merge($defaultConfiguration, (array) $configuration);
 
-        $mockClassname = $classname . '_Mock' . $type . '_' . uniqid();
-        $site = $this->getMockForAbstractClass($classname, array(), $mockClassname, true, true, true, $methods);
-        $siteClassName = get_class($site);
+        $siteClassName = $classname . '_Mock' . $type . '_' . uniqid();
         $config->CM_Site_Abstract->types[$type] = $siteClassName;
         $config->$siteClassName = new stdClass;
         $config->$siteClassName->type = $type;
@@ -97,6 +95,13 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         }
         $config->CM_Class_Abstract->typesMaxValue = $type;
 
+        if (null === $siteSettingsConfiguration) {
+            $siteSettingsConfiguration = CM_Params::factory([]);
+        }
+        $siteSettingsMap = array_merge($defaultSiteSettings, $siteSettingsConfiguration->getParamsDecoded());
+        $siteSettings = CM_Site_SiteSettings::create($type, 'Example settings', CM_Params::factory($siteSettingsMap));
+
+        $site = $this->getMockForAbstractClass($classname, [$siteSettings], $siteClassName, true, true, true, $methods);
         return $site;
     }
 

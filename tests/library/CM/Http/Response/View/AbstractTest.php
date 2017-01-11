@@ -7,9 +7,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPage() {
-        $site = $this->getMockSite(null, null, [
+        $site = $this->getMockSite(null, null, CM_Params::factory(['name' => 'My site']), [
             'url'  => 'http://my-site.com',
-            'name' => 'My site',
         ]);
         $page = new CM_Page_View_Ajax_Test_Mock();
         $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
@@ -38,9 +37,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageDifferentLayout() {
-        $site = $this->getMockSite(null, null, [
+        $site = $this->getMockSite(null, null, CM_Params::factory(['name' => 'My site']), [
             'url'  => 'http://my-site.com',
-            'name' => 'My site',
         ]);
         $page = new CM_Page_View_Ajax_Test_Mock();
         $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
@@ -71,7 +69,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageSiteWithPath() {
-        $site = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
+        $site = $this->getMockSite(null, null, null, ['url' => 'http://my-site.com/foo']);
         $page = new CM_Page_View_Ajax_Test_Mock();
         $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
         $params = [
@@ -124,7 +122,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageRedirectDifferentHost() {
-        $site = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
+        $site = $this->getMockSite(null, null, null, ['url' => 'http://my-site.com/foo']);
         $page = new CM_Page_View_Ajax_Test_Mock();
         $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
         $params = [
@@ -136,8 +134,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageRedirectDifferentSitePath() {
-        $site1 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
-        $site2 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/bar']);
+        $site1 = $this->getMockSite(null, null, null, ['url' => 'http://my-site.com/foo']);
+        $site2 = $this->getMockSite(null, null, null, ['url' => 'http://my-site.com/bar']);
         $page = new CM_Page_View_Ajax_Test_Mock();
         $env = new CM_Frontend_Environment($site1, CMTest_TH::createUser());
         $params = [
@@ -155,8 +153,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageRedirectDifferentSitePathRemove() {
-        $site1 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
-        $site2 = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
+        $site1 = $this->getMockSite(null, null, null, ['url' => 'http://my-site.com/foo']);
+        $site2 = $this->getMockSite(null, null, null, ['url' => 'http://my-site.com']);
 
         $page = new CM_Page_View_Ajax_Test_Mock();
         $env = new CM_Frontend_Environment($site1, CMTest_TH::createUser());
@@ -175,8 +173,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageRedirectDifferentSitePathAdd() {
-        $site1 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
-        $site2 = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
+        $site1 = $this->getMockSite(null, null, null, ['url' => 'http://my-site.com/foo']);
+        $site2 = $this->getMockSite(null, null, null, ['url' => 'http://my-site.com']);
 
         $page = new CM_Page_View_Ajax_Test_Mock();
         $env = new CM_Frontend_Environment($site2, CMTest_TH::createUser());
@@ -195,7 +193,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageRedirectLanguage() {
-        $site = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
+        $site = $this->getMockSite(null, null, null, ['url' => 'http://my-site.com']);
         CMTest_TH::createLanguage('en');
         $viewer = CMTest_TH::createUser();
         $page = new CM_Page_View_Ajax_Test_Mock();

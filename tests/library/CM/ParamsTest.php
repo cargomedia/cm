@@ -550,8 +550,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         $params = new CM_Params(array('vector2' => $vector2));
         $value = $params->getGeometryVector2('vector2');
         $this->assertInstanceOf('CM_Geometry_Vector2', $value);
-        $this->assertSame(1.1, $value->getX());
-        $this->assertSame(2.2, $value->getY());
+        $this->assertEquals($value, $vector2);
 
         $exception = $this->catchException(function () {
             $params = new CM_Params(array('vector2' => 'foo'));
@@ -566,9 +565,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         $params = new CM_Params(array('vector3' => $vector3));
         $value = $params->getGeometryVector3('vector3');
         $this->assertInstanceOf('CM_Geometry_Vector3', $value);
-        $this->assertSame(1.1, $value->getX());
-        $this->assertSame(2.2, $value->getY());
-        $this->assertSame(3.3, $value->getZ());
+        $this->assertEquals($vector3, $value);
 
         $exception = $this->catchException(function () {
             $params = new CM_Params(array('vector3' => 'foo'));
@@ -605,5 +602,19 @@ class CM_ParamsTest extends CMTest_TestCase {
         });
         $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
         $this->assertSame('Invalid param type for session', $exception->getMessage());
+    }
+
+    public function testGetSiteSettings() {
+        $siteSettings1 = CM_Site_SiteSettings::create(1, 'Bar');
+        $siteSettings2 = CM_Site_SiteSettings::create(3, 'Baz', CM_Params::factory(['foo' => 'bar']));
+        $params = new CM_Params(['foo' => $siteSettings1, 'bar' => 'baz', 'baz' => $siteSettings2]);
+
+        $value1 = $params->getSiteSettings('foo');
+        $this->assertInstanceOf('CM_Site_SiteSettings', $value1);
+        $this->assertEquals($siteSettings1, $value1);
+
+        $value2 = $params->getSiteSettings('baz');
+        $this->assertInstanceOf('CM_Site_SiteSettings', $value2);
+        $this->assertEquals($siteSettings2, $value2);
     }
 }

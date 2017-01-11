@@ -2,15 +2,25 @@
 
 class CM_Site_AbstractTest extends CMTest_TestCase {
 
+    /** @var CM_Params */
+    private static $_defaultSiteSettingsConfiguration;
+
+    /** @var CM_Site_SiteSettings */
+    private static $_defaultSiteSettings;
+
     public static function setUpBeforeClass() {
         CM_Config::get()->CM_Site_Abstract->url = 'http://www.foo.com';
         CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://www.cdn.com';
-        CM_Config::get()->CM_Site_Abstract->name = 'Foo';
-        CM_Config::get()->CM_Site_Abstract->emailAddress = 'foo@foo.com';
+
+        self::$_defaultSiteSettingsConfiguration = CM_Params::factory([
+            'name'         => 'Foo',
+            'emailAddress' => 'foo@foo.com',
+        ]);
+        self::$_defaultSiteSettings = CM_Site_SiteSettings::create(null, 'Default site', self::$_defaultSiteSettingsConfiguration);
     }
 
     public function testGetAll() {
-        $site = $this->getMockSite('CM_Site_Abstract', 12345);
+        $site = $this->getMockSite('CM_Site_Abstract', 12345, self::$_defaultSiteSettingsConfiguration);
         CM_Config::get()->CM_Site_Abstract->types = array(12345 => get_class($site));
         $this->assertEquals(array($site), CM_Site_Abstract::getAll());
     }
@@ -24,13 +34,13 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 
     public function testGetEmailAddress() {
         /** @var CM_Site_Abstract $site */
-        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
+        $site = $this->getMockForAbstractClass('CM_Site_Abstract', [self::$_defaultSiteSettings]);
         $this->assertEquals('foo@foo.com', $site->getEmailAddress());
     }
 
     public function testGetName() {
         /** @var CM_Site_Abstract $site */
-        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
+        $site = $this->getMockForAbstractClass('CM_Site_Abstract', [self::$_defaultSiteSettings]);
         $this->assertEquals('Foo', $site->getName());
     }
 
@@ -48,12 +58,12 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 
     public function testGetWebFontLoaderConfig() {
         /** @var CM_Site_Abstract $site */
-        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
+        $site = $this->getMockForAbstractClass('CM_Site_Abstract', [self::$_defaultSiteSettings]);
         $this->assertEquals(null, $site->getWebFontLoaderConfig());
     }
 
     public function testIsUrlMatch() {
-        $site = $this->getMockSite(null, null, [
+        $site = $this->getMockSite(null, null, null, [
             'url'    => 'http://www.my-site.com',
             'urlCdn' => 'http://cdn.my-site.com',
         ]);
@@ -67,7 +77,7 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
     }
 
     public function testIsUrlMatchWithPath() {
-        $site = $this->getMockSite(null, null, [
+        $site = $this->getMockSite(null, null, null, [
             'url' => 'http://www.my-site.com/foo',
         ]);
 
@@ -86,6 +96,10 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
             $this->assertSame('Site with given type is not configured', $ex->getMessage());
             $this->assertSame(['siteType' => 9999], $ex->getMetaInfo());
         }
+    }
+
+    public function testFindClassName() {
+        $this->assertNull(CM_Site_Abstract::findClassName(9999));
     }
 
     public function testEquals() {

@@ -11,22 +11,23 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     /** @var CM_EventHandler_EventHandler */
     protected $_eventHandler = null;
 
+    /** @var CM_Site_SiteSettings */
+    protected $_siteSettings;
+
     /**
      * Default constructor to set CM module
+     * @param CM_Site_SiteSettings|null $settings
      */
-    public function __construct() {
+    public function __construct(CM_Site_SiteSettings $settings = null) {
         $this->_setModule('CM');
+        $this->_siteSettings = $settings;
     }
 
     /**
-     * @return CM_Site_Abstract[]
+     * @return int Site id
      */
-    public static function getAll() {
-        $siteList = array();
-        foreach (CM_Config::get()->CM_Site_Abstract->types as $className) {
-            $siteList[] = new $className();
-        }
-        return $siteList;
+    public function getId() {
+        return $this->getType();
     }
 
     /**
@@ -37,10 +38,21 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
+     * @return CM_Site_SiteSettings
+     * @throws CM_Exception_Invalid
+     */
+    public function getSiteSettings() {
+        if (null === $this->_siteSettings) {
+            throw new CM_Exception_Invalid('Settings not defined');
+        }
+        return $this->_siteSettings;
+    }
+
+    /**
      * @return string
      */
     public function getEmailAddress() {
-        return self::_getConfig()->emailAddress;
+        return $this->getSiteSettings()->getConfiguration()->getString('emailAddress');
     }
 
     /**
@@ -93,7 +105,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return string
      */
     public function getName() {
-        return self::_getConfig()->name;
+        return $this->getSiteSettings()->getConfiguration()->getString('name');
     }
 
     /**
@@ -136,14 +148,14 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     public function getWebFontLoaderConfig() {
-        $config = $this->getConfig();
-        if (!isset($config->webFontLoaderConfig)) {
+        $configuration = $this->getSiteSettings()->getConfiguration();
+        if (!$configuration->has('webFontLoaderConfig')) {
             return null;
         }
-        return $config->webFontLoaderConfig;
+        return $configuration->getArray('webFontLoaderConfig');
     }
 
     /**
@@ -186,26 +198,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     public function toArray() {
         return array('type' => $this->getType());
-    }
-
-    /**
-     * @param string $theme
-     * @return CM_Site_Abstract
-     */
-    protected function _addTheme($theme) {
-        array_unshift($this->_themes, (string) $theme);
-        return $this;
-    }
-
-    /**
-     * @param string $name
-     * @return CM_Site_Abstract
-     */
-    protected function _setModule($name) {
-        array_unshift($this->_modules, (string) $name);
-        // Resets themes if new module is set
-        $this->_themes = array('default');
-        return $this;
     }
 
     /**
@@ -264,24 +256,66 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @param int|null $type
+     * @param string $theme
+     * @return CM_Site_Abstract
+     */
+    protected function _addTheme($theme) {
+        array_unshift($this->_themes, (string) $theme);
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return CM_Site_Abstract
+     */
+    protected function _setModule($name) {
+        array_unshift($this->_modules, (string) $name);
+        // Resets themes if new module is set
+        $this->_themes = array('default');
+        return $this;
+    }
+
+    /**
+     * @return CM_Site_Abstract[]
+     */
+    public static function getAll() {
+        $siteList = array();
+        foreach (CM_Config::get()->CM_Site_Abstract->types as $type => $className) {
+            $siteList[] = new $className(CM_Site_SiteSettings::findBySiteId($type));
+        }
+        return $siteList;
+    }
+
+    /**
+     * @param $type
+     * @return string|null
+     */
+    public static function findClassName($type) {
+        try {
+            $className = self::_getClassName((int) $type);
+        } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
+            $className = null;
+        }
+        return $className;
+    }
+
+    /**
+     * @param int|null                  $type
+     * @param CM_Site_SiteSettings|null $siteSettings
      * @return CM_Site_Abstract
      * @throws CM_Class_Exception_TypeNotConfiguredException
      */
-    public static function factory($type = null) {
+    public static function factory($type = null, CM_Site_SiteSettings $siteSettings = null) {
         try {
             $class = self::_getClassName($type);
         } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
             throw new CM_Class_Exception_TypeNotConfiguredException('Site with given type is not configured', CM_Exception::WARN, ['siteType' => $type]);
         }
-        return new $class();
-    }
-
-    /**
-     * @return int Site id
-     */
-    public function getId() {
-        return $this->getType();
+        /** @type CM_Site_Abstract $class */
+        if (null === $siteSettings) {
+            $siteSettings = CM_Site_SiteSettings::findBySiteId($class::getTypeStatic());
+        }
+        return new $class($siteSettings);
     }
 
     public static function fromArray(array $array) {
