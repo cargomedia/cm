@@ -3,9 +3,7 @@
 class CM_ExceptionHandling_Handler_Cli extends CM_ExceptionHandling_Handler_Abstract {
 
     protected function _printException(Exception $exception) {
-        if (!$output = $this->getOutput()) {
-            $output = new CM_OutputStream_Stream_StandardError();
-        }
+        $output = $this->getOutput();
         $formatter = new CM_ExceptionHandling_Formatter_Plain();
         $output->writeln($formatter->formatException($exception));
     }

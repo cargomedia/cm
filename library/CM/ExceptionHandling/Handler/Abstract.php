@@ -103,10 +103,10 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
     }
 
     /**
-     * @return CM_OutputStream_Interface|null
+     * @return CM_OutputStream_Interface
      */
     public function getOutput() {
-        return $this->_output;
+        return null === $this->_output ? new CM_OutputStream_Stream_Output() : $this->_output;
     }
 
     /**
