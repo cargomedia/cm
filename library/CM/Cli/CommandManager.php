@@ -61,6 +61,7 @@ class CM_Cli_CommandManager {
         if ($quiet) {
             $this->_setStreamOutput(new CM_OutputStream_Null());
             $this->_setStreamError(new CM_OutputStream_Null());
+            CM_Bootloader::getInstance()->getExceptionHandler()->setStderr(new CM_OutputStream_Null());
         }
         if ($quietWarnings) {
             CM_Bootloader::getInstance()->getExceptionHandler()->setPrintSeverityMin(CM_Exception::ERROR);
