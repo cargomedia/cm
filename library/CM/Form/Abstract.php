@@ -16,6 +16,11 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 
     abstract protected function _initialize();
 
+    /**
+     * @return string[]
+     */
+    abstract protected function _getRequiredFields();
+
     public function __construct($params = null) {
         parent::__construct($params);
 
@@ -31,6 +36,9 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     }
 
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
+        $viewResponse->getJs()->setProperty('requiredFieldNames', $this->_getRequiredFields());
+        $viewResponse->getJs()->setProperty('actionNames', array_keys($this->getActions()));
+
         $autosave = $this->_params->has('autosave') ? $this->_params->getString('autosave') : null;
         if (null !== $autosave) {
             $action = $this->getAction($autosave);
@@ -117,6 +125,15 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     }
 
     /**
+     * @param string $name
+     * @return bool
+     */
+    public function isRequiredField($name) {
+        $name = (string) $name;
+        return in_array($name, $this->_getRequiredFields(), true);
+    }
+
+    /**
      * @return bool
      */
     public function getAvoidPasswordManager() {
@@ -140,9 +157,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
         $action = $this->getAction($actionName);
 
         $formData = array();
-        foreach ($action->getFieldList() as $fieldName => $required) {
-            $field = $this->getField($fieldName);
-
+        foreach ($this->getFields() as $fieldName => $field) {
             $isEmpty = true;
             if (array_key_exists($fieldName, $data)) {
                 $fieldValue = $field->filterInput($data[$fieldName]);
@@ -159,7 +174,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
             }
 
             if ($isEmpty) {
-                if ($required) {
+                if ($this->isRequiredField($fieldName)) {
                     $response->addError($response->getRender()->getTranslation('Required'), $fieldName);
                 } else {
                     $formData[$fieldName] = null;

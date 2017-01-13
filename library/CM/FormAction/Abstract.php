@@ -8,9 +8,6 @@ abstract class CM_FormAction_Abstract {
     /** @var CM_Form_Abstract */
     private $_form;
 
-    /** @var CM_FormField_Abstract[]|null */
-    private $_fieldList = null;
-
     /**
      * @param CM_Form_Abstract $form
      * @throws CM_Exception
@@ -31,33 +28,10 @@ abstract class CM_FormAction_Abstract {
     }
 
     /**
-     * @return array [string => bool]
-     */
-    public function getFieldList() {
-        if (null === $this->_fieldList) {
-            $this->_fieldList = array();
-            foreach ($this->_form->getFields() as $fieldName => $field) {
-                $this->_fieldList[$fieldName] = in_array($fieldName, $this->_getRequiredFields());
-            }
-        }
-        return $this->_fieldList;
-    }
-
-    /**
      * @return CM_Form_Abstract
      */
     public function getForm() {
         return $this->_form;
-    }
-
-    /**
-     * @return string
-     */
-    final public function js_presentation() {
-        $data = array();
-        $data['fields'] = (object) $this->getFieldList();
-
-        return json_encode($data);
     }
 
     /**
@@ -77,13 +51,6 @@ abstract class CM_FormAction_Abstract {
      */
     final public function process(array $data, CM_Http_Response_View_Form $response, CM_Form_Abstract $form) {
         return $this->_process(CM_Params::factory($data, false), $response, $form);
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function _getRequiredFields() {
-        return array();
     }
 
     /**

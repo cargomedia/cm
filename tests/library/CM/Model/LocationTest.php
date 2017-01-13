@@ -75,12 +75,13 @@ class CM_Model_LocationTest extends CMTest_TestCase {
             }
         }
 
-        try {
+        /** @var CM_Location_InvalidLevelException $exception */
+        $exception = $this->catchException(function () {
             $location = new CM_Model_Location(-1, 1);
-            $this->fail('Can instantiate invalid level');
-        } catch (CM_Exception_Invalid $e) {
-            $this->assertTrue(true);
-        }
+        });
+        $this->assertInstanceOf(CM_Location_InvalidLevelException::class, $exception);
+        $this->assertSame('Invalid location level', $exception->getMessage());
+        $this->assertSame(['level' => -1], $exception->getMetaInfo());
     }
 
     public function testGetLevel() {

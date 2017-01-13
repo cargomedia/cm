@@ -119,7 +119,6 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
             $expireAt->add(new DateInterval('PT' . $this->_recordTtl . 'S'));
             $formattedRecord['expireAt'] = $expireAt;
         }
-        $formattedRecord = $this->_sanitizeRecord($formattedRecord); //TODO remove after investigation
         return $formattedRecord;
     }
 
