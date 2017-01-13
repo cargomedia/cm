@@ -16,7 +16,7 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
      */
     public function __construct(CM_Service_Manager $serviceManager, array $paths) {
         $this->setServiceManager($serviceManager);
-        $this->_files = $this->_prepareFiles($paths);
+        $this->_files = $this->_findFilesWithinDirectories($paths);
         $this->_loadedClasses = [];
     }
 
@@ -28,7 +28,7 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
         $file = \Functional\first($this->_getFiles(), function (CM_File $file) use ($name) {
             return $name === $file->getFileNameWithoutExtension();
         });
-        return null !== $file ? $this->_prepareRunner($file) : null;
+        return null !== $file ? $this->_instantiateRunner($file) : null;
     }
 
     /**
@@ -36,7 +36,7 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
      */
     public function getRunnerList() {
         foreach ($this->_getFiles() as $file) {
-            yield $this->_prepareRunner($file);
+            yield $this->_instantiateRunner($file);
         }
     }
 
@@ -50,7 +50,7 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
     /**
      * @return CM_File[]
      */
-    protected function _prepareFiles($paths) {
+    protected function _findFilesWithinDirectories($paths) {
         $files = [];
         foreach ($paths as $path) {
             foreach (CM_Util::rglob('*.php', $path) as $filePath) {
@@ -65,7 +65,7 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
      * @return CM_Migration_Runner
      * @throws CM_Exception_Invalid
      */
-    protected function _prepareRunner(CM_File $file) {
+    protected function _instantiateRunner(CM_File $file) {
         $serviceManager = $this->getServiceManager();
         $className = $this->_requireScript($file);
 

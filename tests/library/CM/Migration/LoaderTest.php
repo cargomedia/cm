@@ -153,7 +153,7 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
         $generator = new CM_Migration_Generator($tmp);
         $script = $generator->save('tata');
         $loader = new CM_Migration_Loader($this->getServiceManager(), [$tmp->getAdapter()->getPathPrefix()]);
-        $tata = CMTest_TH::callProtectedMethod($loader, '_prepareRunner', [$script]);
+        $tata = CMTest_TH::callProtectedMethod($loader, '_instantiateRunner', [$script]);
         $this->assertRegExp('/Migration_[0-9]+_Tata/', $tata->getScriptClassName());
         $this->assertSame(sprintf('%s_Tata', CMTest_TH::time()), $tata->getName());
     }
