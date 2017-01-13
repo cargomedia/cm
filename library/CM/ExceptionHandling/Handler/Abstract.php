@@ -8,7 +8,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
     private $_printSeverityMin;
 
     /** @var CM_OutputStream_Interface|null */
-    private $_output;
+    protected $_output;
 
     private $_errorCodes = array(
         E_ERROR             => 'E_ERROR',
@@ -100,13 +100,6 @@ abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_Manag
      */
     public function setOutput(CM_OutputStream_Interface $stream) {
         $this->_output = $stream;
-    }
-
-    /**
-     * @return CM_OutputStream_Interface
-     */
-    public function getOutput() {
-        return null === $this->_output ? new CM_OutputStream_Stream_Output() : $this->_output;
     }
 
     /**
