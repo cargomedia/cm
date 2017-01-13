@@ -194,7 +194,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertSame($site1->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['redirectExternal']);
     }
 
-    public function testLoadPageRedirectLanguage() {
+    public function testLoadPageNotRedirectLanguage() {
         $site = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
         CMTest_TH::createLanguage('en');
         $viewer = CMTest_TH::createUser();
@@ -211,7 +211,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
         $this->assertViewResponseSuccess($response);
         $responseDecoded = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame($site->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['url']);
+        $this->assertSame($site->getUrl() . '/en' . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['url']);
     }
 
     public function testLoadPageTracking() {
