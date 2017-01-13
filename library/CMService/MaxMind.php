@@ -824,7 +824,7 @@ class CMService_MaxMind extends CM_Class_Abstract implements CM_Service_ManagerA
     }
 
     /**
-     * @return string
+     * @return array [resource $stream, int $lineCount]
      * @throws CM_Exception_Invalid
      * @codeCoverageIgnore
      */
@@ -1069,8 +1069,10 @@ class CMService_MaxMind extends CM_Class_Abstract implements CM_Service_ManagerA
                             $name = $this->_regionListByCountry[$countryCode][$regionCode];
                             if (strlen($name)) {
                                 $this->_locationTree[$countryCode]['regions'][$regionCode]['location'] = array(
-                                    'name'    => $name,
-                                    'maxMind' => $maxMind,
+                                    'name'      => $name,
+                                    'latitude'  => $latitude,
+                                    'longitude' => $longitude,
+                                    'maxMind'   => $maxMind,
                                 );
                             }
                         }
@@ -1085,8 +1087,10 @@ class CMService_MaxMind extends CM_Class_Abstract implements CM_Service_ManagerA
                             $name = $this->_countryList[$countryCode];
                             if (strlen($name)) {
                                 $this->_locationTree[$countryCode]['location'] = array(
-                                    'name'    => $name,
-                                    'maxMind' => $maxMind,
+                                    'name'      => $name,
+                                    'latitude'  => $latitude,
+                                    'longitude' => $longitude,
+                                    'maxMind'   => $maxMind,
                                 );
                                 $this->_countryCodeListByMaxMind[$maxMind] = $countryCode;
                             }
@@ -1129,7 +1133,9 @@ class CMService_MaxMind extends CM_Class_Abstract implements CM_Service_ManagerA
         }
         unset($this->_countryListRenamed);
         foreach ($this->_countryListAdded as $countryCode => $countryName) {
-            $country = CM_Model_Location::createCountry($countryName, $countryCode);
+            $latitude = isset($this->_locationTree[$countryCode]['location']['latitude']) ? $this->_locationTree[$countryCode]['location']['latitude'] : null;
+            $longitude = isset($this->_locationTree[$countryCode]['location']['longitude']) ? $this->_locationTree[$countryCode]['location']['longitude'] : null;
+            $country = CM_Model_Location::createCountry($countryName, $countryCode, $latitude, $longitude);
             $countryId = $country->getId();
             $this->_countryIdList[$countryCode] = $countryId;
             $this->_printProgressCounter(++$item, $count);
@@ -1176,7 +1182,9 @@ class CMService_MaxMind extends CM_Class_Abstract implements CM_Service_ManagerA
             foreach ($regionListAdded as $regionCode => $regionName) {
                 $abbreviationRegion = ('US' === $countryCode) ? $regionCode : null;
                 $maxMindRegion = $countryCode . $regionCode;
-                $region = CM_Model_Location::createState($country, $regionName, $abbreviationRegion, $maxMindRegion);
+                $latitude = isset($this->_locationTree[$countryCode]['regions'][$regionCode]['location']['latitude']) ? $this->_locationTree[$countryCode]['regions'][$regionCode]['location']['latitude'] : null;
+                $longitude = isset($this->_locationTree[$countryCode]['regions'][$regionCode]['location']['longitude']) ? $this->_locationTree[$countryCode]['regions'][$regionCode]['location']['longitude'] : null;
+                $region = CM_Model_Location::createState($country, $regionName, $abbreviationRegion, $maxMindRegion, $latitude, $longitude);
                 $regionId = $region->getId();
                 $this->_regionIdListByCountry[$countryCode][$regionCode] = $regionId;
                 if (isset($this->_locationTree[$countryCode]['regions'][$regionCode]['location']['maxMind'])) {

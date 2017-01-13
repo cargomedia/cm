@@ -78,25 +78,34 @@ class CM_Model_Location extends CM_Model_Abstract {
     }
 
     /**
+     * @param int|null $levelMin
      * @return float[]|null
      */
-    public function getCoordinates() {
-        /** @var CM_Model_Location_Zip $location */
-        if ($location = $this->_getLocation(CM_Model_Location::LEVEL_ZIP)) {
-            return $location->getCoordinates();
-        }
-        /** @var CM_Model_Location_City $location */
-        if ($location = $this->_getLocation(CM_Model_Location::LEVEL_CITY)) {
-            return $location->getCoordinates();
+    public function getCoordinates($levelMin = null) {
+        $levelMin = (int) $levelMin;
+        $levelList = [
+            CM_Model_Location::LEVEL_ZIP,
+            CM_Model_Location::LEVEL_CITY,
+            CM_Model_Location::LEVEL_STATE,
+            CM_Model_Location::LEVEL_COUNTRY,
+        ];
+        $levelList = Functional\filter($levelList, function ($level) use ($levelMin) {
+            return $level >= $levelMin;
+        });
+        foreach ($levelList as $level) {
+            if ($location = $this->_getLocation($level)) {
+                return $location->getCoordinates();
+            }
         }
         return null;
     }
 
     /**
+     * @param int|null $levelMin
      * @return CM_Geo_Point|null
      */
-    public function getGeoPoint() {
-        $coordinates = $this->getCoordinates();
+    public function getGeoPoint($levelMin = null) {
+        $coordinates = $this->getCoordinates($levelMin);
         if (null === $coordinates) {
             return null;
         }
@@ -392,12 +401,14 @@ class CM_Model_Location extends CM_Model_Abstract {
     }
 
     /**
-     * @param string $name
-     * @param string $abbreviation
+     * @param string     $name
+     * @param string     $abbreviation
+     * @param float|null $latitude
+     * @param float|null $longitude
      * @return CM_Model_Location
      */
-    public static function createCountry($name, $abbreviation) {
-        $country = CM_Model_Location_Country::create($name, $abbreviation);
+    public static function createCountry($name, $abbreviation, $latitude = null, $longitude = null) {
+        $country = CM_Model_Location_Country::create($name, $abbreviation, $latitude, $longitude);
         return self::fromLocation($country);
     }
 
@@ -406,14 +417,16 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @param string            $name
      * @param string|null       $abbreviation
      * @param string|null       $maxMind
+     * @param float|null        $latitude
+     * @param float|null        $longitude
      * @throws CM_Exception_Invalid
      * @return CM_Model_Location
      */
-    public static function createState(CM_Model_Location $country, $name, $abbreviation = null, $maxMind = null) {
+    public static function createState(CM_Model_Location $country, $name, $abbreviation = null, $maxMind = null, $latitude = null, $longitude = null) {
         if (CM_Model_Location::LEVEL_COUNTRY !== $country->getLevel()) {
             throw new CM_Exception_Invalid('The parent location should be a country');
         }
-        $state = CM_Model_Location_State::create($country->_getLocation(), $name, $abbreviation, $maxMind);
+        $state = CM_Model_Location_State::create($country->_getLocation(), $name, $abbreviation, $maxMind, $latitude, $longitude);
         return self::fromLocation($state);
     }
 
