@@ -55,7 +55,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [],
             [],
@@ -76,7 +76,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => null, 'lon' => null],
             ],
             [],
             [],
@@ -124,10 +124,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [],
             [],
@@ -157,10 +158,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => null,
+                 'lon' => null],
             ],
             [],
             [],
@@ -186,7 +188,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [],
             [],
@@ -217,10 +219,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [],
             [],
@@ -250,10 +253,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -282,10 +286,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -324,10 +329,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -361,10 +367,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => null, 'lon' => null],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [],
             [],
@@ -393,10 +400,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -421,7 +429,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [],
             [
@@ -448,7 +456,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [],
             [
@@ -479,10 +487,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -511,10 +520,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -543,7 +553,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [],
             [
@@ -580,11 +590,13 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Provence-Alpes-Cote d\'Azur', '_maxmind' => 'FRB8', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => null,
+                 'lon' => null],
+                ['id'  => 2, 'countryId' => 1, 'name' => 'Provence-Alpes-Cote d\'Azur', '_maxmind' => 'FRB8', 'abbreviation' => null, 'lat' => null,
+                 'lon' => null],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -616,10 +628,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.4938, 'lon' => 0.1077, '_maxmind' => 384603],
@@ -647,7 +660,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [],
             [],
@@ -678,10 +691,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -735,13 +749,15 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
-                ['id' => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
-                ['id' => 3, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
+                ['id'  => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
+                ['id' => 3, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI', 'lat' => null, 'lon' => null],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -797,8 +813,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
-                ['id' => 2, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
+                ['id' => 2, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [],
             [],
@@ -832,11 +848,12 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [
                 ['id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'Marseille', 'lat' => 43.2854, 'lon' => 5.3761, '_maxmind' => 49739],
@@ -862,11 +879,12 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [
                 ['id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'Marseille', 'lat' => 43.2854, 'lon' => 5.3761, '_maxmind' => 49739],
@@ -902,7 +920,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'République Française'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'République Française', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [],
             [],
@@ -943,7 +961,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['436884', 'FR', 'A7', '', '', '49.4333', '1.0833'],
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
-                ['14550', 'US', 'HI', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HI', '', '', '21.3629', '-157.873'],
             ],
             [
                 ['68866048', '68866303', '2221'],
@@ -953,13 +971,15 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
-                ['id' => 3, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'],
+                ['id'  => 1, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
+                ['id'  => 2, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
+                ['id' => 3, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI', 'lat' => 21.3629, 'lon' => -157.873],
             ],
             [],
             [],
@@ -1018,14 +1038,18 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
-                ['id' => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
-                ['id' => 3, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA8', 'abbreviation' => null],
-                ['id' => 4, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCB', 'abbreviation' => 'CB'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
+                ['id'  => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
+                ['id'  => 3, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA8', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
+                ['id'  => 4, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCB', 'abbreviation' => 'CB', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => 2, 'countryId' => 2, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -1055,7 +1079,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'],
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
-                ['14550', 'US', 'HI', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HI', '', '', '21.3629', '-157.873'],
             ],
             [],
             []
@@ -1079,13 +1103,15 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
-                ['id' => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
-                ['id' => 3, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
+                ['id'  => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
+                ['id' => 3, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI', 'lat' => 21.3629, 'lon' => -157.873],
             ],
             [
                 ['id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -1117,11 +1143,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['436884', 'FR', '99', '', '', '49.1972', '-0.3268'],
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
-                ['5718', 'US', 'CA', 'Las Vegas', '', '36.175', '-115.1372'],
+                ['5718', 'US', 'CA', 'Las Vegas', '', '36.175', '-115.137'],
                 ['23653', 'US', 'CA', 'Long Beach', '', '33.767', '-118.1892'],
                 ['11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'],
                 ['11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'],
-                ['14550', 'US', 'HI', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HI', '', '', '21.3629', '-157.873'],
                 ['231', 'VN', '', '', '', '16', '106'],
                 ['46410', 'VN', '44', '', '', '21.033', '105.85'],
                 ['46418', 'VN', '44', 'Hanoi', '', '21.033', '105.85'],
@@ -1132,17 +1158,20 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
-                ['id' => 3, 'abbreviation' => 'VN', 'name' => 'Viet Nam'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
+                ['id' => 3, 'abbreviation' => 'VN', 'name' => 'Viet Nam', 'lat' => 16, 'lon' => 106],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Basse-Normandie', '_maxmind' => 'FR99', 'abbreviation' => null],
-                ['id' => 3, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
-                ['id' => 4, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'],
-                ['id' => 5, 'countryId' => 3, 'name' => 'Dac Lac', '_maxmind' => 'VN44', 'abbreviation' => null],
-                ['id' => 6, 'countryId' => 3, 'name' => 'Ha Noi', '_maxmind' => 'VN51', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
+                ['id'  => 2, 'countryId' => 1, 'name' => 'Basse-Normandie', '_maxmind' => 'FR99', 'abbreviation' => null, 'lat' => 49.1972,
+                 'lon' => -0.3268],
+                ['id'  => 3, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
+                ['id' => 4, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI', 'lat' => 21.3629, 'lon' => -157.873],
+                ['id' => 5, 'countryId' => 3, 'name' => 'Dac Lac', '_maxmind' => 'VN44', 'abbreviation' => null, 'lat' => 21.033, 'lon' => 105.85],
+                ['id' => 6, 'countryId' => 3, 'name' => 'Ha Noi', '_maxmind' => 'VN51', 'abbreviation' => null, 'lat' => 21.033, 'lon' => 105.85],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -1172,8 +1201,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['436884', 'FR', 'A7', '', '', '49.1972', '-0.3268'],
                 ['50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'],
                 ['223', 'US', '', '', '', '38', '-97'],
-                ['14550', 'US', 'CA', '', '', '21.3629', '-157.8727'],
-                ['8029', 'US', 'NV', '', '', '36.175', '-115.1372'],
+                ['14550', 'US', 'CA', '', '', '21.3629', '-157.873'],
+                ['8029', 'US', 'NV', '', '', '36.175', '-115.137'],
                 ['23653', 'US', 'NV', 'Very Long Beach', '', '33.767', '-118.1892'],
                 ['11532', 'US', '', 'Los Angeles', '', '34.0522', '-118.2437'],
                 ['11101', 'US', 'NV', 'San Francisco', '', '37.7749', '-122.4194'],
@@ -1189,15 +1218,16 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
-                ['id' => 3, 'abbreviation' => 'VN', 'name' => 'Viet Nam'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
+                ['id' => 3, 'abbreviation' => 'VN', 'name' => 'Viet Nam', 'lat' => 16, 'lon' => 106],
             ],
             [
-                ['id' => 2, 'countryId' => 1, 'name' => 'Basse-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
-                ['id' => 4, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
-                ['id' => 6, 'countryId' => 3, 'name' => 'Ha Noi', '_maxmind' => 'VN44', 'abbreviation' => null],
-                ['id' => 7, 'countryId' => 2, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'],
+                ['id'  => 2, 'countryId' => 1, 'name' => 'Basse-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.1972,
+                 'lon' => -0.3268],
+                ['id' => 4, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 21.3629, 'lon' => -157.873],
+                ['id' => 6, 'countryId' => 3, 'name' => 'Ha Noi', '_maxmind' => 'VN44', 'abbreviation' => null, 'lat' => 21.033, 'lon' => 105.85],
+                ['id' => 7, 'countryId' => 2, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV', 'lat' => 36.175, 'lon' => -115.137],
             ],
             [
                 ['id' => 1, 'stateId' => 2, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -1259,12 +1289,14 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRAA', 'abbreviation' => null],
-                ['id' => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCF', 'abbreviation' => 'CF'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRAA', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
+                ['id'  => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCF', 'abbreviation' => 'CF', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => 2, 'countryId' => 2, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11532],
@@ -1311,10 +1343,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id' => 1, 'countryId' => 1, 'name' => 'Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333, 'lon' => 1.0833],
             ],
             [],
             [],
@@ -1343,7 +1375,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         CM_Db_Db::update('cm_model_location_state', ['_maxmind' => 'US06']);
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
                 ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'US06', 'abbreviation' => 'CA'],
@@ -1371,7 +1403,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
                 ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'US06', 'abbreviation' => 'CA'],
@@ -1403,7 +1435,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         CM_Db_Db::update('cm_model_location_state', ['_maxmind' => 'US06']);
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
                 ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'US06', 'abbreviation' => 'CA'],
@@ -1431,7 +1463,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
                 ['id' => 1, 'countryId' => 1, 'name' => 'State of California', '_maxmind' => 'US06', 'abbreviation' => 'CA'],
@@ -1496,10 +1528,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -1548,10 +1581,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -1577,8 +1611,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
                 ['11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'],
-                ['8029', 'US', 'NV', '', '', '36.175', '-115.1372'],
-                ['5718', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.1372'],
+                ['8029', 'US', 'NV', '', '', '36.175', '-115.137'],
+                ['5718', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.137'],
             ],
             [
                 ['69089280', '69090303', '11532'],
@@ -1588,10 +1622,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
                 ['id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'],
             ],
             [
@@ -1616,8 +1651,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
                 ['11111', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'],
-                ['8029', 'US', 'NV', '', '', '36.175', '-115.1372'],
-                ['5555', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.1372'],
+                ['8029', 'US', 'NV', '', '', '36.175', '-115.137'],
+                ['5555', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.137'],
             ],
             [
                 ['69089280', '69090303', '11111'],
@@ -1629,10 +1664,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
                 ['id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'],
             ],
             [
@@ -1674,10 +1710,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -1720,10 +1757,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 23653],
@@ -1757,8 +1795,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
                 ['11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'],
-                ['8029', 'US', 'NV', '', '', '36.175', '-115.1372'],
-                ['5718', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.1372'],
+                ['8029', 'US', 'NV', '', '', '36.175', '-115.137'],
+                ['5718', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.137'],
             ],
             [
                 ['69089280', '69090303', '11532'],
@@ -1768,10 +1806,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
                 ['id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'],
             ],
             [
@@ -1796,8 +1835,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
                 ['5718', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'],
-                ['8029', 'US', 'NV', '', '', '36.175', '-115.1372'],
-                ['11532', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.1372'],
+                ['8029', 'US', 'NV', '', '', '36.175', '-115.137'],
+                ['11532', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.137'],
             ],
             [
                 ['69089280', '69090303', '5718'],
@@ -1809,10 +1848,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
                 ['id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'],
             ],
             [
@@ -1868,10 +1908,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -1921,10 +1962,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -1971,10 +2013,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Marseille', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -2020,10 +2063,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'San Pedro', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -2049,7 +2093,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
                 ['11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'],
-                ['14550', 'US', 'HI', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HI', '', '', '21.3629', '-157.873'],
             ],
             [
                 ['68444672', '68444735', '11101'],
@@ -2068,7 +2112,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             [
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
-                ['14550', 'US', 'HI', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HI', '', '', '21.3629', '-157.873'],
                 ['11101', 'US', 'HI', 'San Francisco', '', '37.7749', '-122.4194'],
             ],
             [
@@ -2079,11 +2123,12 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
+                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI', 'lat' => 21.3629, 'lon' => -157.873],
             ],
             [
                 ['id' => 1, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -2135,10 +2180,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -2190,10 +2236,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -2236,7 +2283,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             [
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
-                ['14550', 'US', 'HI', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HI', '', '', '21.3629', '-157.873'],
                 ['11101', 'US', 'HI', 'San Francisco', '', '37.7749', '-122.4194'],
             ],
             [
@@ -2247,11 +2294,12 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
+                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI', 'lat' => 21.3629, 'lon' => -157.873],
             ],
             [
                 ['id' => 1, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -2292,7 +2340,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ],
             [
                 ['223', 'US', '', '', '', '38', '-97'],
-                ['14550', 'US', 'HI', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HI', '', '', '21.3629', '-157.873'],
                 ['11101', 'US', 'HI', 'San Francisco', '', '37.7749', '-122.4194'],
             ],
             [
@@ -2303,11 +2351,12 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
+                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI', 'lat' => 21.3629, 'lon' => -157.873],
             ],
             [
                 ['id' => 1, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -2333,7 +2382,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
                 ['11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'],
-                ['14550', 'US', 'HI', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HI', '', '', '21.3629', '-157.873'],
             ],
             [
                 ['68444672', '68444735', '11101'],
@@ -2352,7 +2401,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             [
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
-                ['14550', 'US', 'HJ', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HJ', '', '', '21.3629', '-157.873'],
                 ['11101', 'US', 'HJ', 'San Francisco', '', '37.7749', '-122.4194'],
             ],
             [
@@ -2363,10 +2412,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
                 ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHJ', 'abbreviation' => 'HJ'],
             ],
             [
@@ -2393,7 +2443,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
                 ['11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'],
-                ['14550', 'US', 'HI', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HI', '', '', '21.3629', '-157.873'],
             ],
             [
                 ['68444672', '68444735', '11101'],
@@ -2412,7 +2462,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             [
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CB', '', '', '34.0522', '-118.243'],
-                ['14550', 'US', 'HI', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HI', '', '', '21.3629', '-157.873'],
                 ['11101', 'US', 'HI', 'San Francisco', '', '37.7749', '-122.4194'],
             ],
             [
@@ -2423,11 +2473,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
                 ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCB', 'abbreviation' => 'CB'],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'],
+                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI', 'lat' => 21.3629, 'lon' => -157.873],
             ],
             [
                 ['id' => 1, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -2453,7 +2503,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
                 ['11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'],
-                ['14550', 'US', 'HI', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HI', '', '', '21.3629', '-157.873'],
             ],
             [
                 ['68444672', '68444735', '11101'],
@@ -2472,7 +2522,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             [
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CB', '', '', '34.0522', '-118.243'],
-                ['14550', 'US', 'HJ', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HJ', '', '', '21.3629', '-157.873'],
                 ['11101', 'US', 'HJ', 'San Francisco', '', '37.7749', '-122.4194'],
             ],
             [
@@ -2483,7 +2533,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
                 ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCB', 'abbreviation' => 'CB'],
@@ -2513,7 +2563,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
                 ['11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'],
-                ['14550', 'US', 'HI', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HI', '', '', '21.3629', '-157.873'],
             ],
             [
                 ['68444672', '68444735', '11101'],
@@ -2532,7 +2582,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             [
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'HI', '', '', '34.0522', '-118.243'],
-                ['14550', 'US', 'CA', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'CA', '', '', '21.3629', '-157.873'],
                 ['11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'],
             ],
             [
@@ -2543,11 +2593,12 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USHI', 'abbreviation' => 'HI'],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USHI', 'abbreviation' => 'HI', 'lat' => 21.3629,
+                 'lon' => -157.873],
+                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522, 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -2574,7 +2625,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
                 ['11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'],
                 ['5718', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'],
-                ['14550', 'US', 'HI', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HI', '', '', '21.3629', '-157.873'],
                 ['11102', 'US', 'HI', 'San Francisco', '', '37.7749', '-122.4194'],
                 ['5719', 'US', 'HI', 'Los Angeles', '', '34.0522', '-118.2437'],
             ],
@@ -2590,11 +2641,12 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
+                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI', 'lat' => 21.3629, 'lon' => -157.873],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -2624,7 +2676,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['223', 'US', '', '', '', '38', '-97'],
                 ['2221', 'US', 'CA', '', '', '34.0522', '-118.243'],
                 ['5719', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'],
-                ['14550', 'US', 'HI', '', '', '21.3629', '-157.8727'],
+                ['14550', 'US', 'HI', '', '', '21.3629', '-157.873'],
                 ['11101', 'US', 'HI', 'San Francisco', '', '37.7749', '-122.4194'],
             ],
             [
@@ -2636,11 +2688,12 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
+                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI', 'lat' => 21.3629, 'lon' => -157.873],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -2680,10 +2733,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11102],
@@ -2716,10 +2770,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -2756,10 +2811,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11102],
@@ -2792,10 +2848,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11102],
@@ -2854,12 +2911,14 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
-                ['id' => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
+                ['id'  => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
                 ['id' => 3, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA8', 'abbreviation' => null],
                 ['id' => 4, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCB', 'abbreviation' => 'CB'],
             ],
@@ -2905,10 +2964,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -2941,10 +3001,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -3020,10 +3081,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221],
@@ -3060,8 +3122,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [],
             [],
@@ -3096,8 +3158,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [],
             [],
@@ -3133,8 +3195,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [],
             [],
@@ -3170,8 +3232,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 1, 'abbreviation' => 'FR', 'name' => 'France', 'lat' => 48.86, 'lon' => 2.35],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [],
             [],
@@ -3304,7 +3366,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         $this->_verify(
             [
                 ['id' => 1, 'abbreviation' => 'GB', 'name' => 'United Kingdom'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States'],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
                 ['id' => 1, 'countryId' => 1, 'name' => 'London', '_maxmind' => 'GBH9', 'abbreviation' => null],
@@ -3354,7 +3416,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         $ipBlocksReaderMock = $this->_getReaderMock($ipDataMock, "Copyright (c) 2011 MaxMind Inc.  All Rights Reserved.\nstartIpNum,endIpNum,locId\n");
         $locationReaderMock = $this->_getReaderMock($locationDataMock, "Copyright (c) 2012 MaxMind LLC.  All Rights Reserved.\nlocId,country,region,city,postalCode,latitude,longitude,metroCode,areaCode\n");
         $mockBuilder = $this->getMockBuilder('CMService_MaxMind');
-        $mockBuilder->setMethods(['_getCountryData', '_getRegionData', '_getLocationReader', '_getIpBlocksReader', '_getRegionListLegacy', '_updateSearchIndex']);
+        $mockBuilder->setMethods(['_getCountryData', '_getRegionData', '_getLocationReader', '_getIpBlocksReader', '_getRegionListLegacy',
+            '_updateSearchIndex']);
         $maxMindMock = $mockBuilder->getMock();
         $maxMindMock->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
         $maxMindMock->expects($this->any())->method('_getRegionData')->will($this->returnValue($regionDataMock));
