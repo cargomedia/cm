@@ -55,6 +55,10 @@ while (false !== ($row = fgetcsv($stream))) {
         $maxMind = (int) $maxMind;
         $latitude = (float) $latitude;
         $longitude = (float) $longitude;
+        if (0. === $latitude && 0. === $longitude) { // For US Armed Forces
+            $latitude = null;
+            $longitude = null;
+        }
         if (strlen($zipCode)) { // ZIP code record
         } elseif (strlen($cityName)) { // City record
         } elseif (strlen($regionCode)) { // Region record

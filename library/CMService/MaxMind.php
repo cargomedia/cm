@@ -994,6 +994,10 @@ class CMService_MaxMind extends CM_Class_Abstract implements CM_Service_ManagerA
                 $maxMind = (int) $maxMind;
                 $latitude = (float) $latitude;
                 $longitude = (float) $longitude;
+                if (0. === $latitude && 0. === $longitude) { // For US Armed Forces
+                    $latitude = null;
+                    $longitude = null;
+                }
                 if (strlen($regionCode) && !isset($this->_regionListByCountry[$countryCode][$regionCode])) {
                     if (isset($this->_regionListByCountryOld[$countryCode][$regionCode])) { // Keep missing regions
                         $this->_regionListByCountry[$countryCode][$regionCode] = $this->_regionListByCountryOld[$countryCode][$regionCode];
