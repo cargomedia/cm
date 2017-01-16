@@ -40,9 +40,10 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
 
   triggerChange: function() {
     var valueCurrent = this.getInput().val();
-    if (this._valueLast !== valueCurrent) {
+    var valueLast = this._valueLast;
+    if (valueLast !== valueCurrent) {
       this._valueLast = valueCurrent;
-      this.trigger('change');
+      this.trigger('change', {previous: valueLast, new: valueCurrent});
     }
   },
 
