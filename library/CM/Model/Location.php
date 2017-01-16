@@ -416,13 +416,13 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @param CM_Model_Location $country
      * @param string            $name
      * @param string|null       $abbreviation
-     * @param string|null       $maxMind
      * @param float|null        $latitude
      * @param float|null        $longitude
+     * @param string|null       $maxMind
      * @throws CM_Exception_Invalid
      * @return CM_Model_Location
      */
-    public static function createState(CM_Model_Location $country, $name, $abbreviation = null, $maxMind = null, $latitude = null, $longitude = null) {
+    public static function createState(CM_Model_Location $country, $name, $abbreviation = null, $latitude = null, $longitude = null, $maxMind = null) {
         if (CM_Model_Location::LEVEL_COUNTRY !== $country->getLevel()) {
             throw new CM_Exception_Invalid('The parent location should be a country');
         }

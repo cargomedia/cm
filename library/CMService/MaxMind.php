@@ -1188,7 +1188,7 @@ class CMService_MaxMind extends CM_Class_Abstract implements CM_Service_ManagerA
                 $maxMindRegion = $countryCode . $regionCode;
                 $latitude = isset($this->_locationTree[$countryCode]['regions'][$regionCode]['location']['latitude']) ? $this->_locationTree[$countryCode]['regions'][$regionCode]['location']['latitude'] : null;
                 $longitude = isset($this->_locationTree[$countryCode]['regions'][$regionCode]['location']['longitude']) ? $this->_locationTree[$countryCode]['regions'][$regionCode]['location']['longitude'] : null;
-                $region = CM_Model_Location::createState($country, $regionName, $abbreviationRegion, $maxMindRegion, $latitude, $longitude);
+                $region = CM_Model_Location::createState($country, $regionName, $abbreviationRegion, $latitude, $longitude, $maxMindRegion);
                 $regionId = $region->getId();
                 $this->_regionIdListByCountry[$countryCode][$regionCode] = $regionId;
                 if (isset($this->_locationTree[$countryCode]['regions'][$regionCode]['location']['maxMind'])) {
