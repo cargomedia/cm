@@ -205,8 +205,8 @@ var CM_App = CM_Class_Abstract.extend({
     if (type && path) {
       var urlParts = [];
       urlParts.push(type);
-      if (cm.options.urlLanguage) {
-        urlParts.push(cm.options.urlLanguage.abbreviation);
+      if (cm.options.language) {
+        urlParts.push(cm.options.language.abbreviation);
       }
       urlParts.push(cm.getSiteId());
       urlParts.push(cm.options.deployVersion);
@@ -246,8 +246,8 @@ var CM_App = CM_Class_Abstract.extend({
    */
   getUrlAjax: function(type) {
     var path = '/' + type;
-    if (cm.options.urlLanguage) {
-      path += '/' + cm.options.urlLanguage.abbreviation;
+    if (cm.options.language) {
+      path += '/' + cm.options.language.abbreviation;
     }
     return this.getUrl(path);
   },
