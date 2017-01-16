@@ -199,6 +199,8 @@ CREATE TABLE `cm_model_location_country` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `abbreviation` char(2) NOT NULL,
   `name` varchar(100) NOT NULL,
+  `lat` float DEFAULT NULL,
+  `lon` float DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -220,6 +222,8 @@ CREATE TABLE `cm_model_location_state` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `countryId` int(10) unsigned NOT NULL,
   `name` varchar(120) NOT NULL,
+  `lat` float DEFAULT NULL,
+  `lon` float DEFAULT NULL,
   `_maxmind` char(5) DEFAULT NULL,
   `abbreviation` char(2) DEFAULT NULL,
   PRIMARY KEY (`id`),
