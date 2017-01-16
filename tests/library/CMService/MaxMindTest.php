@@ -1378,7 +1378,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'US06', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'US06', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [],
             [],
@@ -1406,7 +1407,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'US06', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'US06', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [],
             [],
@@ -1438,7 +1440,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'US06', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'US06', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [],
             [],
@@ -1466,7 +1469,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'State of California', '_maxmind' => 'US06', 'abbreviation' => 'CA'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'State of California', '_maxmind' => 'US06', 'abbreviation' => 'CA', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [],
             [],
@@ -1627,7 +1631,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             [
                 ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
                  'lon' => -118.243],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'],
+                ['id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV', 'lat' => 36.175, 'lon' => -115.137],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11532],
@@ -1669,7 +1673,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             [
                 ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
                  'lon' => -118.243],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'],
+                ['id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV', 'lat' => 36.175, 'lon' => -115.137],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11111],
@@ -1811,7 +1815,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             [
                 ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
                  'lon' => -118.243],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'],
+                ['id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV', 'lat' => 36.175, 'lon' => -115.137],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11532],
@@ -1853,7 +1857,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             [
                 ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
                  'lon' => -118.243],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'],
+                ['id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV', 'lat' => 36.175, 'lon' => -115.137],
             ],
             [
                 ['id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 5718],
@@ -2417,7 +2421,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             [
                 ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
                  'lon' => -118.243],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHJ', 'abbreviation' => 'HJ'],
+                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHJ', 'abbreviation' => 'HJ', 'lat' => 21.3629, 'lon' => -157.873],
             ],
             [
                 ['id' => 1, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -2476,7 +2480,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCB', 'abbreviation' => 'CB'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCB', 'abbreviation' => 'CB', 'lat' => 34.0522,
+                 'lon' => -118.243],
                 ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI', 'lat' => 21.3629, 'lon' => -157.873],
             ],
             [
@@ -2536,8 +2541,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCB', 'abbreviation' => 'CB'],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHJ', 'abbreviation' => 'HJ'],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCB', 'abbreviation' => 'CB', 'lat' => 34.0522,
+                 'lon' => -118.243],
+                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHJ', 'abbreviation' => 'HJ', 'lat' => 21.3629, 'lon' => -157.873],
             ],
             [
                 ['id' => 1, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -2596,9 +2602,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 ['id' => 1, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
             ],
             [
-                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USHI', 'abbreviation' => 'HI', 'lat' => 21.3629,
+                ['id'  => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USHI', 'abbreviation' => 'HI', 'lat' => 34.0522,
+                 'lon' => -118.243],
+                ['id'  => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 21.3629,
                  'lon' => -157.873],
-                ['id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522, 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -2919,8 +2926,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                  'lon' => 1.0833],
                 ['id'  => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA', 'lat' => 34.0522,
                  'lon' => -118.243],
-                ['id' => 3, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA8', 'abbreviation' => null],
-                ['id' => 4, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCB', 'abbreviation' => 'CB'],
+                ['id'  => 3, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA8', 'abbreviation' => null, 'lat' => 49.4333,
+                 'lon' => 1.0833],
+                ['id'  => 4, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCB', 'abbreviation' => 'CB', 'lat' => 34.0522,
+                 'lon' => -118.243],
             ],
             [
                 ['id' => 1, 'stateId' => 4, 'countryId' => 2, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419, '_maxmind' => 11101],
@@ -3335,12 +3344,12 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'KP', 'name' => 'North Korea'],
-                ['id' => 2, 'abbreviation' => 'KR', 'name' => 'Korea'],
-                ['id' => 3, 'abbreviation' => 'VG', 'name' => 'British Virgin Islands'],
-                ['id' => 4, 'abbreviation' => 'VI', 'name' => 'Virgin Islands'],
-                ['id' => 5, 'abbreviation' => 'MF', 'name' => 'Saint Martin'],
-                ['id' => 6, 'abbreviation' => 'CD', 'name' => 'Congo'],
+                ['id' => 1, 'abbreviation' => 'KP', 'name' => 'North Korea', 'lat' => null, 'lon' => null],
+                ['id' => 2, 'abbreviation' => 'KR', 'name' => 'Korea', 'lat' => null, 'lon' => null],
+                ['id' => 3, 'abbreviation' => 'VG', 'name' => 'British Virgin Islands', 'lat' => null, 'lon' => null],
+                ['id' => 4, 'abbreviation' => 'VI', 'name' => 'Virgin Islands', 'lat' => null, 'lon' => null],
+                ['id' => 5, 'abbreviation' => 'MF', 'name' => 'Saint Martin', 'lat' => null, 'lon' => null],
+                ['id' => 6, 'abbreviation' => 'CD', 'name' => 'Congo', 'lat' => null, 'lon' => null],
             ],
             [],
             [],
@@ -3365,12 +3374,13 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'GB', 'name' => 'United Kingdom'],
-                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => 38, 'lon' => -97],
+                ['id' => 1, 'abbreviation' => 'GB', 'name' => 'United Kingdom', 'lat' => null, 'lon' => null],
+                ['id' => 2, 'abbreviation' => 'US', 'name' => 'United States', 'lat' => null, 'lon' => null],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'London', '_maxmind' => 'GBH9', 'abbreviation' => null],
-                ['id' => 2, 'countryId' => 2, 'name' => 'Armed Forces Europe, Middle East, & Canada', '_maxmind' => 'USAE', 'abbreviation' => 'AE'],
+                ['id' => 1, 'countryId' => 1, 'name' => 'London', '_maxmind' => 'GBH9', 'abbreviation' => null, 'lat' => null, 'lon' => null],
+                ['id'  => 2, 'countryId' => 2, 'name' => 'Armed Forces Europe, Middle East, & Canada', '_maxmind' => 'USAE', 'abbreviation' => 'AE',
+                 'lat' => null, 'lon' => null],
             ],
             [],
             [],
@@ -3399,12 +3409,13 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
         $this->_verify(
             [
-                ['id' => 1, 'abbreviation' => 'LT', 'name' => 'Lithuania'],
-                ['id' => 2, 'abbreviation' => 'TW', 'name' => 'Taiwan'],
+                ['id' => 1, 'abbreviation' => 'LT', 'name' => 'Lithuania', 'lat' => null, 'lon' => null],
+                ['id' => 2, 'abbreviation' => 'TW', 'name' => 'Taiwan', 'lat' => null, 'lon' => null],
             ],
             [
-                ['id' => 1, 'countryId' => 1, 'name' => 'Siauliu Apskritis', '_maxmind' => 'LT61', 'abbreviation' => null],
-                ['id' => 2, 'countryId' => 2, 'name' => 'T\'ai-wan', '_maxmind' => 'TW4', 'abbreviation' => null],
+                ['id'  => 1, 'countryId' => 1, 'name' => 'Siauliu Apskritis', '_maxmind' => 'LT61', 'abbreviation' => null, 'lat' => null,
+                 'lon' => null],
+                ['id' => 2, 'countryId' => 2, 'name' => 'T\'ai-wan', '_maxmind' => 'TW4', 'abbreviation' => null, 'lat' => null, 'lon' => null],
             ],
             [],
             [],
