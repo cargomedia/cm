@@ -12,10 +12,6 @@
   OpenerDropdown.prototype = {
     constructor: OpenerDropdown,
 
-    activate: function() {
-      this.$element.on('click' + selector, this.toggle);
-    },
-
     toggle: function() {
       var self = this;
       this.$element.find('> .openerDropdown-window').toggleModal(function() {
