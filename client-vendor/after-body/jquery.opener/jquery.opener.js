@@ -34,6 +34,9 @@
       var $this = $(this).closest(selector);
       var data = $this.data('openerDropdown');
       if (!data) {
+        if ('close' == action) {
+          return;
+        }
         $this.data('openerDropdown', (data = new OpenerDropdown($this)))
       }
       if ('string' === typeof action) {
