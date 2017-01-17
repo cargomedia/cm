@@ -31,34 +31,6 @@ class CM_Model_Location_City extends CM_Model_Location_Abstract {
     }
 
     /**
-     * @return float|null
-     */
-    public function getLat() {
-        return $this->_get('lat');
-    }
-
-    /**
-     * @param float|null $lat
-     */
-    public function setLat($lat) {
-        $this->_set('lat', $lat);
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getLon() {
-        return $this->_get('lon');
-    }
-
-    /**
-     * @param float|null $lon
-     */
-    public function setLon($lon) {
-        $this->_set('lon', $lon);
-    }
-
-    /**
      * @return int|null
      */
     public function getMaxMind() {
@@ -70,18 +42,6 @@ class CM_Model_Location_City extends CM_Model_Location_Abstract {
      */
     public function setMaxmind($maxMind) {
         $this->_set('_maxmind', $maxMind);
-    }
-
-    /**
-     * @return array|null
-     */
-    public function getCoordinates() {
-        $lat = $this->getLat();
-        $lon = $this->getLon();
-        if (null !== $lat && null !== $lon) {
-            return array('lat' => $lat, 'lon' => $lon);
-        }
-        return null;
     }
 
     public function getLevel() {
