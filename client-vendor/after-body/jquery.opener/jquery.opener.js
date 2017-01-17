@@ -6,26 +6,26 @@
   var selector = '.openerDropdown';
 
   var OpenerDropdown = function($element) {
-    this.element = $element;
+    this.$element = $element;
   };
 
   OpenerDropdown.prototype = {
     constructor: OpenerDropdown,
 
     activate: function() {
-      this.element.on('click' + selector, this.toggle);
+      this.$element.on('click' + selector, this.toggle);
     },
 
     toggle: function() {
       var self = this;
-      this.element.find('> .openerDropdown-window').toggleModal(function() {
+      this.$element.find('> .openerDropdown-window').toggleModal(function() {
         $(this).toggle();
-        self.element.toggleClass('open');
+        self.$element.toggleClass('open');
       });
     },
 
     close: function() {
-      this.element.find('> .openerDropdown-window').toggleModal('hide');
+      this.$element.find('> .openerDropdown-window').toggleModal('hide');
     }
   };
 
