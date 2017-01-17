@@ -3,7 +3,8 @@
  */
 (function($) {
 
-  var selector = '.openerDropdown';
+  var namespace = 'openerDropdown';
+  var selector = '.' + namespace;
 
   var OpenerDropdown = function($element) {
     this.$element = $element;
@@ -14,26 +15,26 @@
 
     toggle: function() {
       var self = this;
-      this.$element.find('> .openerDropdown-window').toggleModal(function() {
+      this.$element.find('> ' + selector + '-window').toggleModal(function() {
         $(this).toggle();
         self.$element.toggleClass('open');
       });
     },
 
     close: function() {
-      this.$element.find('> .openerDropdown-window').toggleModal('hide');
+      this.$element.find('> ' + selector + '-window').toggleModal('hide');
     }
   };
 
   $.fn.opener = function(action) {
     return this.each(function() {
       var $this = $(this).closest(selector);
-      var data = $this.data('openerDropdown');
+      var data = $this.data(namespace);
       if (!data) {
         if ('close' == action) {
           return;
         }
-        $this.data('openerDropdown', (data = new OpenerDropdown($this)))
+        $this.data(namespace, (data = new OpenerDropdown($this)))
       }
       if ('string' === typeof action) {
         data[action]()
@@ -42,7 +43,7 @@
   };
 
   $(function() {
-    $('body').on('click' + selector, selector + ' .openerDropdown-panel', function() {
+    $('body').on('click' + selector, selector + ' ' + selector + '-panel', function() {
       $(this).closest(selector).opener('toggle');
     });
   });
