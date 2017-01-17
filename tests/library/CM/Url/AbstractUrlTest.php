@@ -10,11 +10,12 @@ class CM_Url_AbstractUrlTest extends CMTest_TestCase {
         $url = CM_Url_MockUrl::createFromString('/bar?foobar=1');
         $baseUrl = AbsoluteUrl::createFromString('https://foz/baz?fozbaz=2');
 
-        $rebasedUrl = $url->getRebaseUrl($baseUrl);
-        $this->assertSame('https', $rebasedUrl->getScheme());
-        $this->assertSame('foz', $rebasedUrl->getHost());
-        $this->assertSame('/baz/bar', $rebasedUrl->getPath());
-        $this->assertSame('foobar=1', $rebasedUrl->getQuery());
+        $rebaseUrl = $url->getRebaseUrl($baseUrl);
+        $this->assertSame('https', $rebaseUrl->getScheme());
+        $this->assertSame('foz', $rebaseUrl->getHost());
+        $this->assertSame('/baz/bar', $rebaseUrl->getPath());
+        $this->assertSame('foobar=1', $rebaseUrl->getQuery());
+        $this->assertSame('https://foz/baz/bar?foobar=1', (string) $rebaseUrl);
     }
 }
 

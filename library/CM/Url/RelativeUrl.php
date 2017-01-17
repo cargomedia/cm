@@ -2,6 +2,9 @@
 
 namespace CM\Url;
 
+use CM\Url\AbsoluteUrl;
+use \League\Uri\Interfaces\HierarchicalPath;
+
 class RelativeUrl extends AbstractUrl {
 
     public function withEnvironment(\CM_Frontend_Environment $environment, array $options = null) {
@@ -15,7 +18,7 @@ class RelativeUrl extends AbstractUrl {
             $url = $site->getUrlCdn();
         }
         $urlPath = $this->_buildPath($environment);
-        return $url
+        return AbsoluteUrl::createFromString($url)
             ->withPath((string) $urlPath)
             ->withQuery($this->getQuery())
             ->withFragment($this->getFragment());
@@ -23,15 +26,12 @@ class RelativeUrl extends AbstractUrl {
 
     /**
      * @param \CM_Frontend_Environment $environment
-     * @return \League\Uri\Interfaces\HierarchicalPath
+     * @return HierarchicalPath
      */
     protected function _buildPath(\CM_Frontend_Environment $environment) {
         return $this->path;
     }
 
-    /**
-     * @inheritdoc
-     */
     protected function isValid() {
         return $this->isValidGenericUri()
             && $this->isValidRelativeUri();

@@ -7,21 +7,21 @@ class CM_Url_AbsoluteUrlTest extends CMTest_TestCase {
     public function testIsValid() {
         /** @var InvalidArgumentException $exception */
         $exception = $this->catchException(function () {
-            $url = AbsoluteUrl::createFromString();
+            AbsoluteUrl::createFromString();
         });
         $this->assertInstanceOf('InvalidArgumentException', $exception);
         $this->assertSame('The URI components will produce a `CM\Url\AbsoluteUrl` instance in invalid state', $exception->getMessage());
 
         /** @var InvalidArgumentException $exception */
         $exception = $this->catchException(function () {
-            $url = AbsoluteUrl::createFromString('/foo');
+            AbsoluteUrl::createFromString('/foo');
         });
         $this->assertInstanceOf('InvalidArgumentException', $exception);
         $this->assertSame('The URI components will produce a `CM\Url\AbsoluteUrl` instance in invalid state', $exception->getMessage());
 
         /** @var InvalidArgumentException $exception */
         $exception = $this->catchException(function () {
-            $url = AbsoluteUrl::createFromString('foo://bar');
+            AbsoluteUrl::createFromString('foo://bar');
         });
         $this->assertInstanceOf('InvalidArgumentException', $exception);
         $this->assertSame('The submitted scheme is unsupported by `CM\Url\AbsoluteUrl`', $exception->getMessage());
@@ -47,6 +47,7 @@ class CM_Url_AbsoluteUrlTest extends CMTest_TestCase {
         $this->assertSame('/bar', $relativeUrl->getPath());
         $this->assertSame('foo', $relativeUrl->getFragment());
         $this->assertSame('foobar=1', $relativeUrl->getQuery());
+        $this->assertSame('/bar?foobar=1#foo', (string) $relativeUrl);
     }
 
     public function testWithEnvironment() {
@@ -61,6 +62,7 @@ class CM_Url_AbsoluteUrlTest extends CMTest_TestCase {
         $this->assertSame('www.foo.com', $envUrl->getHost());
         $this->assertSame('/bar', $envUrl->getPath());
         $this->assertSame('foobar=1', $envUrl->getQuery());
+        $this->assertSame('http://www.foo.com/bar?foobar=1', (string) $envUrl);
 
         $siteCdn = $this->getMockSite(null, null, [
             'url'    => 'http://www.foo.com',
@@ -69,8 +71,10 @@ class CM_Url_AbsoluteUrlTest extends CMTest_TestCase {
         $envCdn = new CM_Frontend_Environment($siteCdn);
         $envCdnUrl = $url->withEnvironment($envCdn);
         $this->assertSame('cdn.foo.com', $envCdnUrl->getHost());
+        $this->assertSame('http://cdn.foo.com/bar?foobar=1', (string) $envCdnUrl);
 
         $envCdnSameOriginUrl = $url->withEnvironment($envCdn, ['sameOrigin' => true,]);
         $this->assertSame('www.foo.com', $envCdnSameOriginUrl->getHost());
+        $this->assertSame('http://www.foo.com/bar?foobar=1', (string) $envCdnSameOriginUrl);
     }
 }

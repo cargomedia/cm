@@ -8,14 +8,14 @@ class CM_Url_RelativeUrlTest extends CMTest_TestCase {
     public function testIsValid() {
         /** @var InvalidArgumentException $exception */
         $exception = $this->catchException(function () {
-            $url = RelativeUrl::createFromString('foo://bar');
+            RelativeUrl::createFromString('foo://bar');
         });
         $this->assertInstanceOf('InvalidArgumentException', $exception);
         $this->assertSame('The URI components will produce a `CM\Url\RelativeUrl` instance in invalid state', $exception->getMessage());
 
         /** @var InvalidArgumentException $exception */
         $exception = $this->catchException(function () {
-            $url = RelativeUrl::createFromString('foo:/');
+            RelativeUrl::createFromString('foo:/');
         });
         $this->assertInstanceOf('InvalidArgumentException', $exception);
         $this->assertSame('The URI components will produce a `CM\Url\RelativeUrl` instance in invalid state', $exception->getMessage());
@@ -47,6 +47,7 @@ class CM_Url_RelativeUrlTest extends CMTest_TestCase {
         $this->assertSame('www.foo.com', $envUrl->getHost());
         $this->assertSame('/bar', $envUrl->getPath());
         $this->assertSame('foobar=1', $envUrl->getQuery());
+        $this->assertSame('http://www.foo.com/bar?foobar=1', (string) $envUrl);
 
         $siteCdn = $this->getMockSite(null, null, [
             'url'    => 'http://www.foo.com',
@@ -55,8 +56,10 @@ class CM_Url_RelativeUrlTest extends CMTest_TestCase {
         $envCdn = new CM_Frontend_Environment($siteCdn);
         $envCdnUrl = $url->withEnvironment($envCdn);
         $this->assertSame('cdn.foo.com', $envCdnUrl->getHost());
+        $this->assertSame('http://cdn.foo.com/bar?foobar=1', (string) $envCdnUrl);
 
         $envCdnSameOriginUrl = $url->withEnvironment($envCdn, ['sameOrigin' => true,]);
         $this->assertSame('www.foo.com', $envCdnSameOriginUrl->getHost());
+        $this->assertSame('http://www.foo.com/bar?foobar=1', (string) $envCdnSameOriginUrl);
     }
 }

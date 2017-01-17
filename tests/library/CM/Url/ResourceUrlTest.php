@@ -25,7 +25,8 @@ class CM_Url_ResourceUrlTest extends CMTest_TestCase {
         $url = ResourceUrl::createFromString('bar?foobar=1#foo', 'resource-type');
         $env = new CM_Frontend_Environment($site);
         $envUrl = $url->withEnvironment($env);
-        $this->assertSame('http://www.foo.com/resource-type/42/1/bar?foobar=1#foo', (string) $envUrl);
+        $version = CM_App::getInstance()->getDeployVersion();
+        $this->assertSame(sprintf('http://www.foo.com/resource-type/42/%s/bar?foobar=1#foo', $version), (string) $envUrl);
     }
 
     public function testWithEnvironmentNoType() {
@@ -36,7 +37,8 @@ class CM_Url_ResourceUrlTest extends CMTest_TestCase {
         $url = ResourceUrl::createFromString('bar?foobar=1#foo');
         $env = new CM_Frontend_Environment($site);
         $envUrl = $url->withEnvironment($env);
-        $this->assertSame('http://www.foo.com/42/1/bar?foobar=1#foo', (string) $envUrl);
+        $version = CM_App::getInstance()->getDeployVersion();
+        $this->assertSame(sprintf('http://www.foo.com/42/%s/bar?foobar=1#foo', $version), (string) $envUrl);
     }
 
     public function testWithEnvironmentWithLanguage() {
@@ -47,6 +49,7 @@ class CM_Url_ResourceUrlTest extends CMTest_TestCase {
         $lang = CMTest_TH::createLanguage('de');
         $env = new CM_Frontend_Environment($site, null, $lang);
         $envUrl = $url->withEnvironment($env);
-        $this->assertSame('http://www.foo.com/resource-type/de/42/1/bar?foobar=1#foo', (string) $envUrl);
+        $version = CM_App::getInstance()->getDeployVersion();
+        $this->assertSame(sprintf('http://www.foo.com/resource-type/de/42/%s/bar?foobar=1#foo', $version), (string) $envUrl);
     }
 }

@@ -12,27 +12,17 @@ class AbsoluteUrl extends AbstractUrl {
      * @return RelativeUrl
      */
     public function getRelativeUrl() {
-        $relativeAsString = $this->getPath();
-        if ($query = $this->getQuery()) {
-            $relativeAsString .= '?' . $query;
-        }
-        if ($fragment = $this->getFragment()) {
-            $relativeAsString .= '#' . $fragment;
-        }
-        return RelativeUrl::createFromString($relativeAsString);
+        return RelativeUrl::createFromString(''
+            . $this->path->getUriComponent()
+            . $this->query->getUriComponent()
+            . $this->fragment->getUriComponent());
     }
 
-    /**
-     * @inheritdoc
-     */
     protected static $supportedSchemes = [
         'http'  => 80,
         'https' => 443,
     ];
 
-    /**
-     * @inheritdoc
-     */
     protected function isValid() {
         return $this->isValidGenericUri()
             && $this->isValidAbsoluteUri()
