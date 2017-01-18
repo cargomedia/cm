@@ -41,6 +41,6 @@ class RelativeUrl extends AbstractUrl {
      * @return bool
      */
     protected function isValidRelativeUri() {
-        return '' === $this->getScheme() && '' === $this->getHost();
+        return $this->isRelativeUrl();
     }
 }

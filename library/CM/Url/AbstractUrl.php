@@ -24,4 +24,11 @@ abstract class AbstractUrl extends AbstractHierarchicalUri implements UrlInterfa
             ->withQuery($uri->getQuery())
             ->withFragment($uri->getFragment());
     }
+
+    /**
+     * @return bool
+     */
+    public function isRelativeUrl() {
+        return '' === $this->getScheme() && '' === $this->getHost();
+    }
 }

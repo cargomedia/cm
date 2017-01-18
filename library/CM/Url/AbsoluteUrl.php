@@ -33,6 +33,6 @@ class AbsoluteUrl extends AbstractUrl {
      * @return bool
      */
     protected function isValidAbsoluteUri() {
-        return '' !== $this->getScheme() && '' !== $this->getHost();
+        return !$this->isRelativeUrl();
     }
 }
