@@ -43,7 +43,7 @@
   };
 
   $(function() {
-    $('body').on('click' + selector, selector + ' ' + selector + '-panel', function() {
+    $(document).on('click' + selector, selector + ' ' + selector + '-panel', function() {
       $(this).closest(selector).opener('toggle');
     });
   });
