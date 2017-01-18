@@ -471,7 +471,6 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('.toggleNext').toggleNext();
       $dom.find('.tabs').tabs();
       $dom.find('.openx-ad:visible').openx();
-      $dom.find('.epom-ad').epom();
       $dom.find('.fancySelect').fancySelect();
       this._setupContentPlaceholder($dom);
     },
