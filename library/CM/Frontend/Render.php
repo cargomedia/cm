@@ -10,9 +10,6 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     /** @var NumberFormatter */
     private $_formatterCurrency;
 
-    /** @var bool */
-    private $_languageRewrite;
-
     /** @var CM_Menu[] */
     private $_menuList = array();
 
@@ -24,15 +21,13 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
 
     /**
      * @param CM_Frontend_Environment|null $environment
-     * @param boolean|null                 $languageRewrite
      * @param CM_Service_Manager|null      $serviceManager
      */
-    public function __construct(CM_Frontend_Environment $environment = null, $languageRewrite = null, CM_Service_Manager $serviceManager = null) {
+    public function __construct(CM_Frontend_Environment $environment = null, CM_Service_Manager $serviceManager = null) {
         if (!$environment) {
             $environment = new CM_Frontend_Environment();
         }
         $this->_environment = $environment;
-        $this->_languageRewrite = (bool) $languageRewrite;
         if (null === $serviceManager) {
             $serviceManager = CM_Service_Manager::getInstance();
         }
@@ -228,11 +223,10 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         /** @var CM_Page_Abstract $pageClassName */
         $path = $pageClassName::getPath($params);
 
-        $languageRewrite = $this->getLanguageRewrite() || $language;
         if (!$language) {
             $language = $this->getLanguage();
         }
-        if ($languageRewrite && $language) {
+        if ($language) {
             $path = '/' . $language->getAbbreviation() . $path;
         }
         return $this->getUrl($path, $site);
@@ -343,29 +337,10 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
-     * @param bool|null $fallbackToDefault
      * @return CM_Model_Language|null
      */
-    public function getLanguage($fallbackToDefault = null) {
-        $language = $this->getEnvironment()->getLanguage();
-
-        if (null === $language && $fallbackToDefault) {
-            if ($viewer = $this->getViewer()) {
-                $language = $viewer->getLanguage();
-            }
-            if (null === $language) {
-                $language = CM_Model_Language::findDefault();
-            }
-        }
-
-        return $language;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getLanguageRewrite() {
-        return $this->_languageRewrite;
+    public function getLanguage() {
+        return $this->getEnvironment()->getLanguage();
     }
 
     /**
@@ -376,7 +351,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     public function getTranslation($key, array $params = null) {
         $params = (array) $params;
         $translation = $key;
-        if ($language = $this->getLanguage(true)) {
+        if ($language = $this->getLanguage()) {
             $translation = $language->getTranslation($key, array_keys($params));
         }
         $translation = $this->_parseVariables($translation, $params);
