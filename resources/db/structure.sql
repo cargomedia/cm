@@ -286,6 +286,18 @@ CREATE TABLE `cm_session` (
   KEY `expires` (`expires`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_site_setting`;
+
+
+CREATE TABLE `cm_site_settings` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `siteType` int(10) unsigned DEFAULT NULL,
+  `name` varchar(32) NOT NULL,
+  `configuration` varchar(21800) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `siteType` (`siteType`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `cm_splitfeature`;
 
 
