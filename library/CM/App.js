@@ -497,6 +497,7 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {jQuery} $dom
      */
     teardown: function($dom) {
+      $dom.find('.openerDropdown').opener('close');
       $dom.find('.timeago').timeago('dispose');
       $dom.find('textarea.autosize, .autosize textarea').trigger('autosize.destroy');
       $dom.find('img.lazy').trigger('destroy.unveil');
