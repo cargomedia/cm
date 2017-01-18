@@ -22,7 +22,6 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     /**
      * @param CM_Frontend_Environment|null $environment
      * @param CM_Service_Manager|null      $serviceManager
-     * @internal param bool|null $languageRewrite
      */
     public function __construct(CM_Frontend_Environment $environment = null, CM_Service_Manager $serviceManager = null) {
         if (!$environment) {
