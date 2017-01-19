@@ -43,9 +43,8 @@ class CM_Model_StorageAdapter_MongoDbTest extends CMTest_TestCase {
     public function testLoad_nonExistent() {
         $type = 99;
         $adapter = $this->_getAdapter();
-        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
 
-        $this->assertFalse($adapter->load($type, ['id' => $mongoDb->getObjectId()]));
+        $this->assertFalse($adapter->load($type, ['id' => CM_MongoDb_Client::getObjectId()]));
     }
 
     public function testSave() {
@@ -65,7 +64,7 @@ class CM_Model_StorageAdapter_MongoDbTest extends CMTest_TestCase {
         $adapter = $this->_getAdapter();
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $id1 = $adapter->create($type, ['foo' => 'foo1', 'bar' => 1]);
-        $adapter->save($type, ['id' => $mongoDb->getObjectId()], ['foo' => 'foo2', 'bar' => 2]);
+        $adapter->save($type, ['id' => CM_MongoDb_Client::getObjectId()], ['foo' => 'foo2', 'bar' => 2]);
 
         $this->assertSame(1, $mongoDb->count('mock_modelStorageAdapter'));
         $this->assertSame(1, $mongoDb->count('mock_modelStorageAdapter', ['foo' => 'foo1', 'bar' => 1]));

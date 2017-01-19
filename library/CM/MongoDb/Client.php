@@ -40,7 +40,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      */
     public function listCollectionNames() {
         return \Functional\reject(\Functional\invoke($this->_getDatabase()->listCollections(), 'getName'), function ($collectionName) {
-            return 0 === stripos($collectionName, 'system.'); // new driver does not filter out system collections
+            return 0 === stripos($collectionName, 'system.');
         });
     }
 
@@ -356,14 +356,6 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     }
 
     /**
-     * @param string|\MongoDB\BSON\ObjectID $id
-     * @return boolean
-     */
-    public function isValidObjectId($id) {
-        return (boolean) preg_match('/^[[:xdigit:]]{24}$/i', (string) $id);
-    }
-
-    /**
      * @param string     $collection
      * @param array|null $criteria
      * @param array      $update
@@ -450,14 +442,6 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     }
 
     /**
-     * @param string|null $id
-     * @return \MongoDB\BSON\ObjectID
-     */
-    public function getObjectId($id = null) {
-        return new \MongoDB\BSON\ObjectID($id);
-    }
-
-    /**
      * @param array|boolean|MongoDB\InsertOneResult|MongoDB\InsertManyResult|MongoDB\DeleteResult|MongoDB\UpdateResult $result
      * @throws CM_MongoDb_Exception
      */
@@ -523,5 +507,21 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     protected function _getCollection($collection) {
         $collection = (string) $collection;
         return $this->_getDatabase()->selectCollection($collection);
+    }
+
+    /**
+     * @param string|null $id
+     * @return \MongoDB\BSON\ObjectID
+     */
+    public static function getObjectId($id = null) {
+        return new \MongoDB\BSON\ObjectID($id);
+    }
+
+    /**
+     * @param string|\MongoDB\BSON\ObjectID $id
+     * @return boolean
+     */
+    public static function isValidObjectId($id) {
+        return (boolean) preg_match('/^[[:xdigit:]]{24}$/i', (string) $id);
     }
 }

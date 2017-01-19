@@ -15,11 +15,11 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
         $type = (int) $type;
         $id = (string) $id['id'];
         $collectionName = $this->_getCollectionName($type);
-        $mongoDb = $this->_getMongoDb();
-        if (!$mongoDb->isValidObjectId($id)) {
+        if (!CM_MongoDb_Client::isValidObjectId($id)) {
             return false;
         }
-        $data = $mongoDb->findOne($collectionName, ['_id' => $mongoDb->getObjectId($id)]);
+        $mongoDb = $this->_getMongoDb();
+        $data = $mongoDb->findOne($collectionName, ['_id' => CM_MongoDb_Client::getObjectId($id)]);
         if (null === $data) {
             return false;
         }
@@ -35,7 +35,7 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
             $type = (int) $idType['type'];
             $id = (string) $idType['id']['id'];
             $collectionName = $this->_getCollectionName($type);
-            $idListByCollection[$collectionName][] = $mongoDb->getObjectId($id);
+            $idListByCollection[$collectionName][] = CM_MongoDb_Client::getObjectId($id);
             $keyListById[$id][] = $key;
         }
         $resultSet = [];
@@ -57,7 +57,7 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
         $data = ['_type' => $type] + $data;
         $collectionName = $this->_getCollectionName($type);
         $mongoDb = $this->_getMongoDb();
-        $mongoDb->replaceOne($collectionName, ['_id' => $mongoDb->getObjectId($id)], $data);
+        $mongoDb->replaceOne($collectionName, ['_id' => CM_MongoDb_Client::getObjectId($id)], $data);
     }
 
     public function create($type, array $data) {
@@ -73,7 +73,7 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
         $id = (string) $id['id'];
         $collectionName = $this->_getCollectionName($type);
         $mongoDb = $this->_getMongoDb();
-        $mongoDb->deleteOne($collectionName, ['_id' => $mongoDb->getObjectId($id)]);
+        $mongoDb->deleteOne($collectionName, ['_id' => CM_MongoDb_Client::getObjectId($id)]);
     }
 
     /**

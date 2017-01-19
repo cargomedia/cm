@@ -175,13 +175,6 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $this->assertSame($doc2, $mongoDb->findOne($collectionName, ['_id' => 1], ['_id' => 0]));
     }
 
-    public function testGetNewId() {
-        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $id1 = $mongoDb->getObjectId();
-        $id2 = $mongoDb->getObjectId();
-        $this->assertNotSame((string) $id1, (string) $id2);
-    }
-
     public function testFind() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'find';
@@ -490,25 +483,24 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
     }
 
     public function testIsValidObjectId() {
-        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-
-        $this->assertTrue($mongoDb->isValidObjectId('1234567890abcdef12345678'));
-        $this->assertTrue($mongoDb->isValidObjectId(new \MongoDB\BSON\ObjectID('1234567890abcdef12345678')));
-        $this->assertFalse($mongoDb->isValidObjectId('1234567890abcdef123456789'));
-        $this->assertFalse($mongoDb->isValidObjectId('1234567890abcdef1234567'));
-        $this->assertFalse($mongoDb->isValidObjectId('1234567890abcdef1234567g'));
+        $this->assertTrue(CM_MongoDb_Client::isValidObjectId('1234567890abcdef12345678'));
+        $this->assertTrue(CM_MongoDb_Client::isValidObjectId(new \MongoDB\BSON\ObjectID('1234567890abcdef12345678')));
+        $this->assertFalse(CM_MongoDb_Client::isValidObjectId('1234567890abcdef123456789'));
+        $this->assertFalse(CM_MongoDb_Client::isValidObjectId('1234567890abcdef1234567'));
+        $this->assertFalse(CM_MongoDb_Client::isValidObjectId('1234567890abcdef1234567g'));
     }
 
     public function testGetObjectId() {
-        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-
-        $this->assertInstanceOf('\MongoDB\BSON\ObjectID', $mongoDb->getObjectId());
+        $this->assertInstanceOf('\MongoDB\BSON\ObjectID', CM_MongoDb_Client::getObjectId());
 
         $idString = '4cb4ab6d7addf98506010001';
-        $mongoId = $mongoDb->getObjectId($idString);
+        $id1 = CM_MongoDb_Client::getObjectId($idString);
 
-        $this->assertSame($idString, (string) $mongoId);
-        $this->assertEquals($mongoId, $mongoDb->getObjectId($mongoId));
+        $this->assertSame($idString, (string) $id1);
+        $this->assertEquals($id1, CM_MongoDb_Client::getObjectId($id1));
+
+        $id2 = CM_MongoDb_Client::getObjectId();
+        $this->assertNotSame((string) $id1, (string) $id2);
     }
 
     public function test_checkResultForErrors() {
