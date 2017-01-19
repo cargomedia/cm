@@ -16,6 +16,14 @@ class CM_Url_AbstractUrlTest extends CMTest_TestCase {
         $this->assertSame('/baz/bar', $rebaseUrl->getPath());
         $this->assertSame('foobar=1', $rebaseUrl->getQuery());
         $this->assertSame('https://foz/baz/bar?foobar=1', (string) $rebaseUrl);
+
+        $exception = $this->catchException(function () {
+            $url = CM_Url_MockUrl::createFromString('/foo');
+            $baseUrl = CM_Url_MockUrl::createFromString('/bar');
+            $url->getRebaseUrl($baseUrl);
+        });
+        $this->assertInstanceOf('InvalidArgumentException', $exception);
+        $this->assertSame('The URI components will produce a `CM\Url\AbsoluteUrl` instance in invalid state', $exception->getMessage());
     }
 }
 
