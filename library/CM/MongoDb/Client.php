@@ -189,7 +189,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @param array|null $projection
      * @param array|null $aggregation
      * @param array|null $options
-     * @return MongoDB\Driver\Cursor
+     * @return IteratorIterator
      *
      * When using aggregation, $criteria and $projection, if defined, automatically
      * function as `$match` and `$project` operator respectively at the front of the pipeline
@@ -222,7 +222,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
             }
             $resultCursor = $collection->find($criteria, $options);
         }
-        return $resultCursor;
+        return new IteratorIterator($resultCursor);
     }
 
     /**
@@ -273,9 +273,9 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
             }
             array_push($pipeline, ['$group' => ['_id' => null, 'count' => ['$sum' => 1]]]);
             array_push($pipeline, ['$project' => ['_id' => 0, 'count' => 1]]);
-            $result = $this->find($collection, null, null, $pipeline)->toArray();
-            if (!empty($result)) {
-                return $result[0]['count'];
+            $result = \Functional\first($this->find($collection, null, null, $pipeline));
+            if (null !== $result) {
+                return $result['count'];
             }
             return 0;
         } else {

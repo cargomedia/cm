@@ -203,27 +203,26 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
         // with projection
         $expected = [['name' => 'alice'], ['name' => 'steve'], ['name' => 'bob']];
-        $this->assertSame($expected, $mongoDb->find($collectionName, null, ['name' => 1, '_id' => 0])->toArray());
+        $this->assertEquals($expected, $mongoDb->find($collectionName, null, ['name' => 1, '_id' => 0]));
 
         // skip
         $expected = [$doc2, $doc3];
-        $this->assertSame($expected, $mongoDb->find($collectionName, null, ['_id' => 0], null, ['skip' => 1])->toArray());
+        $this->assertEquals($expected, $mongoDb->find($collectionName, null, ['_id' => 0], null, ['skip' => 1]));
 
         // limit
         $expected = [$doc1, $doc2];
-        $this->assertSame($expected, $mongoDb->find($collectionName, null, ['_id' => 0], null, ['limit' => 2])->toArray());
+        $this->assertEquals($expected, $mongoDb->find($collectionName, null, ['_id' => 0], null, ['limit' => 2]));
 
         // sort
         $expected = [$doc3, $doc1, $doc2];
-        $this->assertSame($expected, $mongoDb->find($collectionName, null, ['_id' => 0], null, ['sort' => ['groupId' => 1, 'userId'  => -1]])->toArray());
+        $this->assertEquals($expected, $mongoDb->find($collectionName, null, ['_id' => 0], null, ['sort' => ['groupId' => 1, 'userId'  => -1]]));
 
         // aggregation
         $result = $mongoDb->find($collectionName, ['groupId' => 1], ['_id' => 0, 'foo' => 1], [['$unwind' => '$foo']]);
-        $this->assertEquals([['foo' => 1], ['foo' => 1], ['foo' => 2], ['foo' => 3]], $result->toArray());
+        $this->assertEquals([['foo' => 1], ['foo' => 1], ['foo' => 2], ['foo' => 3]], $result);
     }
 
     public function testFindBatchSize() {
-        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = 'findBatchSize';
         CM_Config::get()->CM_MongoDb_Client->batchSize = null;
 
@@ -234,6 +233,7 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
         $mockFind = $collection->mockMethod('find')->set(function($criteria, $options) {
             $this->assertArrayNotHasKey('batchSize', $options);
+            return new ArrayIterator([]);
         });
         $mongoDb->find($collectionName);
         $this->assertSame(1, $mockFind->getCallCount());
@@ -241,12 +241,14 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         CM_Config::get()->CM_MongoDb_Client->batchSize = 10;
         $mockFind = $collection->mockMethod('find')->set(function($criteria, $options) {
             $this->assertSame(10, $options['batchSize']);
+            return new ArrayIterator([]);
         });
         $mongoDb->find($collectionName);
         $this->assertSame(2, $mockFind->getCallCount());
 
         $mockFind = $collection->mockMethod('find')->set(function($criteria, $options) {
             $this->assertSame(15, $options['batchSize']);
+            return new ArrayIterator([]);
         });
         $mongoDb->find($collectionName, null, null, null, ['batchSize' => 15]);
         $this->assertSame(3, $mockFind->getCallCount());
@@ -269,11 +271,11 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $this->assertSame(['userId' => 1, 'score' => 2], $mongoDb->findOne($collectionName, ['userId' => 1], ['_id' => 0]));
 
         $mongoDb->insert($collectionName, ['userId' => 2, 'score' => 3]);
-        $this->assertEquals([['userId' => 1, 'score' => 2], ['userId' => 2, 'score' => 3]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
+        $this->assertEquals([['userId' => 1, 'score' => 2], ['userId' => 2, 'score' => 3]], $mongoDb->find($collectionName, null, ['_id' => 0]));
 
         $result = $mongoDb->findOneAndUpdate($collectionName, null, ['$inc' => ['score' => 1]], ['_id' => 0], ['sort' => ['userId' => 1]]);
         $this->assertSame(['userId' => 1, 'score' => 2], $result);
-        $this->assertEquals([['userId' => 1, 'score' => 3], ['userId' => 2, 'score' => 3]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
+        $this->assertEquals([['userId' => 1, 'score' => 3], ['userId' => 2, 'score' => 3]], $mongoDb->find($collectionName, null, ['_id' => 0]));
     }
 
     public function testFindOneAndReplace() {
@@ -291,14 +293,14 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $result = $mongoDb->findOneAndReplace($collectionName, ['userId' => 1], ['userId' => 2, 'score' => 2]);
 
         $this->assertSame(['_id' => $result['_id'], 'userId' => 1, 'score' => 1], $result);
-        $this->assertSame([['userId' => 2, 'score' => 2]], $mongoDb->find($collectionName, ['userId' => 2], ['_id' => 0])->toArray());
+        $this->assertEquals([['userId' => 2, 'score' => 2]], $mongoDb->find($collectionName, ['userId' => 2], ['_id' => 0]));
 
         $mongoDb->insert($collectionName, ['userId' => 3, 'score' => 3]);
-        $this->assertEquals([['userId' => 2, 'score' => 2], ['userId' => 3, 'score' => 3]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
+        $this->assertEquals([['userId' => 2, 'score' => 2], ['userId' => 3, 'score' => 3]], $mongoDb->find($collectionName, null, ['_id' => 0]));
 
         $result = $mongoDb->findOneAndReplace($collectionName, null, ['userId' => 4, 'score' => 4], ['_id' => 0], ['sort' => ['userId' => 1]]);
         $this->assertSame(['userId' => 2, 'score' => 2], $result);
-        $this->assertEquals([['userId' => 4, 'score' => 4], ['userId' => 3, 'score' => 3]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
+        $this->assertEquals([['userId' => 4, 'score' => 4], ['userId' => 3, 'score' => 3]], $mongoDb->find($collectionName, null, ['_id' => 0]));
     }
 
     public function testFindOneAndDelete() {
@@ -317,14 +319,14 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
         $result = $mongoDb->findOneAndDelete($collectionName, ['score' => 1], null, ['sort' => ['userId' => -1]]);
         $this->assertSame(['_id' => $result['_id'], 'userId' => 2, 'score' => 1], $result);
-        $this->assertEquals([['userId' => 1, 'score' => 1]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
+        $this->assertEquals([['userId' => 1, 'score' => 1]], $mongoDb->find($collectionName, null, ['_id' => 0]));
 
         $mongoDb->insert($collectionName, ['userId' => 2, 'score' => 2]);
-        $this->assertEquals([['userId' => 1, 'score' => 1], ['userId' => 2, 'score' => 2]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
+        $this->assertEquals([['userId' => 1, 'score' => 1], ['userId' => 2, 'score' => 2]], $mongoDb->find($collectionName, null, ['_id' => 0]));
 
         $result = $mongoDb->findOneAndDelete($collectionName, null, ['_id' => 0], ['sort' => ['userId' => 1]]);
         $this->assertSame(['userId' => 1, 'score' => 1], $result);
-        $this->assertEquals([['userId' => 2, 'score' => 2]], $mongoDb->find($collectionName, null, ['_id' => 0])->toArray());
+        $this->assertEquals([['userId' => 2, 'score' => 2]], $mongoDb->find($collectionName, null, ['_id' => 0]));
     }
 
     public function testFindOne() {
@@ -382,14 +384,14 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
         $mongoDb->rename('source', 'target');
         $this->assertFalse($mongoDb->existsCollection('source'));
         $this->assertTrue($mongoDb->existsCollection('target'));
-        $this->assertEquals([$sourceDoc1], $mongoDb->find('target')->toArray());
+        $this->assertEquals([$sourceDoc1], $mongoDb->find('target'));
 
         $mongoDb->insert('source', ['foo' => 'origin']);
         $sourceDoc2 = $mongoDb->findOne('source');
 
         $mongoDb->rename('source', 'target', true);
         $this->assertFalse($mongoDb->existsCollection('source'));
-        $this->assertEquals([$sourceDoc2], $mongoDb->find('target')->toArray());
+        $this->assertEquals([$sourceDoc2], $mongoDb->find('target'));
     }
 
     public function testRenameThrows() {

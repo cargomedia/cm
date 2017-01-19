@@ -83,8 +83,8 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
                     $options['limit'] = ($count);
                 }
             }
-            $cursor = $mongoDb->find($this->_collection, $this->_criteria, $this->_projection, $aggregation, $options);
-            $items = $cursor->toArray();
+            $result = $mongoDb->find($this->_collection, $this->_criteria, $this->_projection, $aggregation, $options);
+            $items = iterator_to_array($result);
             $this->_cacheSet($cacheKey, $items);
         }
         return $items;
