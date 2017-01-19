@@ -1,8 +1,14 @@
 <?php
 
+namespace CM\Test\Url;
+
+use CM_App;
+use CM_Frontend_Environment;
+use CMTest_TH;
+use CMTest_TestCase;
 use CM\Url\ResourceUrl;
 
-class CM_Url_ResourceUrlTest extends CMTest_TestCase {
+class ResourceUrlTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();

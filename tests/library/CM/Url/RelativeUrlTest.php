@@ -1,9 +1,13 @@
 <?php
 
+namespace CM\Test\Url;
+
+use CM_Frontend_Environment;
+use CMTest_TestCase;
 use CM\Url\RelativeUrl;
 use CM\Url\AbsoluteUrl;
 
-class CM_Url_RelativeUrlTest extends CMTest_TestCase {
+class RelativeUrlTest extends CMTest_TestCase {
 
     public function testIsValid() {
         /** @var InvalidArgumentException $exception */
@@ -32,7 +36,7 @@ class CM_Url_RelativeUrlTest extends CMTest_TestCase {
         $this->assertSame('', $url->getHost());
         $this->assertSame('/bar', $url->getPath());
         $this->assertSame('foo', $url->getFragment());
-        $this->assertSame('foobar=1&barfoo', $url->getQuery());
+        $this->assertSame('barfoo&foobar=1', $url->getQuery());
     }
 
     public function testWithEnvironment() {

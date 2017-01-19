@@ -1,9 +1,12 @@
 <?php
 
+namespace CM\Test\Url;
+
+use CMTest_TestCase;
 use CM\Url\AbstractUrl;
 use CM\Url\AbsoluteUrl;
 
-class CM_Url_AbstractUrlTest extends CMTest_TestCase {
+class AbstractUrlTest extends CMTest_TestCase {
 
     public function testGetRebaseUrl() {
 
