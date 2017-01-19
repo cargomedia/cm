@@ -51,14 +51,8 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
         if ($desc = $runner->getDescription()) {
             $output->write(sprintf(': %s', $desc));
         }
-        $output->writeln("...");
-        try {
-            $runner->load($output);
-        } catch (Exception $e) {
-            $output->writeln("Failed.");
-            throw $e;
-        }
-        $output->writeln("Done.");
+        $output->writeln("…");
+        $runner->load($output);
     }
 
     /**
