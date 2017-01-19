@@ -28,6 +28,11 @@ class CM_Migration_Generator {
         $className = sprintf('%s%s', $this->_getPrefixClassName(), $fileName);
         $fileNameWithExtension = sprintf('%s.php', $fileName);
         $file = new CM_File($fileNameWithExtension, $this->_getFilesystem());
+        if ($file->exists()) {
+            throw new CM_Exception_Invalid('A migration script with the same name already exists.', null, [
+                'file' => $file->getPathOnLocalFilesystem(),
+            ]);
+        }
         $fileBlock = new CodeGenerator\FileBlock();
         $fileBlock->addBlock($this->_getClassBlock($className));
         $file->ensureParentDirectory();
