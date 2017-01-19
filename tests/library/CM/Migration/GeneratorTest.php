@@ -20,7 +20,6 @@ class CM_Migration_GeneratorTest extends CMTest_TestCase {
             '',
             sprintf('class Migration_%s_FooBarBaz implements \CM_Migration_UpgradableInterface {', $time),
             '',
-            '    ',
             '    public function up(\CM_OutputStream_Interface $output) {',
             '        // TODO: Implement the migration script',
             '    }',
