@@ -73,6 +73,7 @@ class CM_Migration_Generator {
         $reflection = new ReflectionClass(CM_Migration_UpgradableInterface::class);
         $method = CodeGenerator\MethodBlock::buildFromReflection($reflection->getMethod('up'));
         $method->setAbstract(false);
+        $method->setDocBlock('');
         $method->setCode('// TODO: Implement the migration script');
         $class->addMethod($method);
         return $class;
