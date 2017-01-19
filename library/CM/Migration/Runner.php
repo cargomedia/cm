@@ -10,17 +10,27 @@ class CM_Migration_Runner implements CM_Service_ManagerAwareInterface {
     /** @var CM_Migration_Model|null */
     private $_record;
 
+    /**
+     * @param CM_Migration_UpgradableInterface $script
+     * @param CM_Service_Manager               $serviceManager
+     */
     public function __construct(CM_Migration_UpgradableInterface $script, CM_Service_Manager $serviceManager) {
         $this->setServiceManager($serviceManager);
         $this->_script = $script;
         $this->_record = null;
     }
 
-    public function load(CM_OutputStream_Interface $output = null) {
-        $this->_getScript()->up();
+    /**
+     * @param CM_OutputStream_Interface $output
+     */
+    public function load(CM_OutputStream_Interface $output) {
+        $this->_getScript()->up($output);
         $this->_getRecord()->setExecutedAt(new DateTime());
     }
 
+    /**
+     * @return string
+     */
     public function getName() {
         $reflector = new ReflectionClass($this->_getScript());
         $file = new CM_File($reflector->getFileName());
@@ -46,6 +56,16 @@ class CM_Migration_Runner implements CM_Service_ManagerAwareInterface {
         return get_class($this->_getScript());
     }
 
+    /**
+     * @return bool
+     */
+    public function shouldBeLoaded() {
+        return !$this->_isLoaded();
+    }
+
+    /**
+     * @return bool
+     */
     protected function _isLoaded() {
         return $this->_getRecord()->hasExecutedAt();
     }

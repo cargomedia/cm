@@ -89,7 +89,7 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
         $good = new CM_File('good.php', $tmp);
         $good->write(join(PHP_EOL, [
             '<?php',
-            'class Good_Migration implements CM_Migration_UpgradableInterface { public function up() {} }',
+            'class Good_Migration implements CM_Migration_UpgradableInterface { public function up(CM_OutputStream_Interface $output) {} }',
             ''
         ]));
         $this->assertSame('Good_Migration', CMTest_TH::callProtectedMethod($loader, '_requireScript', [$good]));
@@ -134,8 +134,8 @@ class CM_Migration_LoaderTest extends CMTest_TestCase {
         $wrongMultiClass = new CM_File('wrong-multi-class.php', $tmp);
         $wrongMultiClass->write(join(PHP_EOL, [
             '<?php',
-            'class Migration_1 implements CM_Migration_UpgradableInterface { public function up() {} }',
-            'class Migration_2 implements CM_Migration_UpgradableInterface { public function up() {} }',
+            'class Migration_1 implements CM_Migration_UpgradableInterface { public function up(CM_OutputStream_Interface $output) {} }',
+            'class Migration_2 implements CM_Migration_UpgradableInterface { public function up(CM_OutputStream_Interface $output) {} }',
             ''
         ]));
         /** @var CM_Exception_Invalid $exception */

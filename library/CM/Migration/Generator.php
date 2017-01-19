@@ -38,7 +38,7 @@ class CM_Migration_Generator {
     /**
      * @param string $name
      * @return string
-     *
+     * @throws CM_Exception_Invalid
      */
     protected function _sanitize($name) {
         $camelized = CM_Util::camelize(trim((string) $name));
@@ -73,11 +73,6 @@ class CM_Migration_Generator {
         $reflection = new ReflectionClass(CM_Migration_UpgradableInterface::class);
         $method = CodeGenerator\MethodBlock::buildFromReflection($reflection->getMethod('up'));
         $method->setAbstract(false);
-        $method->setDocBlock(join(PHP_EOL, [
-            '/**',
-            ' * TODO: Describe the migration script',
-            ' */'
-        ]));
         $method->setCode('// TODO: Implement the migration script');
         $class->addMethod($method);
         return $class;

@@ -2,5 +2,9 @@
 
 interface CM_Migration_UpgradableInterface {
 
-    public function up();
+    /**
+     * @param CM_OutputStream_Interface $output
+     * @return mixed
+     */
+    public function up(CM_OutputStream_Interface $output);
 }

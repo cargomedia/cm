@@ -32,7 +32,7 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * return Iterator
+     * @return Generator|CM_Migration_Runner[]
      */
     public function getRunnerList() {
         foreach ($this->_getFiles() as $file) {

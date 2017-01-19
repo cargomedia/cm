@@ -27,7 +27,7 @@ class CM_Migration_RunnerTest extends CMTest_TestCase {
             ->method('getName')
             ->will($this->returnValue('123_foo'));
 
-        $runner->load();
+        $runner->load(new CM_OutputStream_Null());
 
         CMTest_TH::clearCache();
 
