@@ -21,7 +21,7 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
   },
 
   ready: function() {
-    this._valueLast = this.getInput().val();
+    this._valueLast = this.getValue();
   },
 
   /**
@@ -40,7 +40,7 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
   },
 
   triggerChange: function() {
-    var valueCurrent = this.getInput().val();
+    var valueCurrent = this.getValue();
     var valueLast = this._valueLast;
     if (valueLast !== valueCurrent) {
       this._valueLast = valueCurrent;
