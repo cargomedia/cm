@@ -67,7 +67,20 @@ abstract class CM_Http_Request_Abstract {
         $originalUri = $uri;
         $uri = CM_Util::sanitizeUtf($uri);
 
-        $this->setUri($uri, $originalUri);
+        $this->setUri($uri);
+
+        try {
+            CM_Util::jsonEncode($this->getPath());
+        } catch (CM_Exception_Invalid $e) {
+            $logger = CM_Service_Manager::getInstance()->getLogger();
+            $context = new CM_Log_Context();
+            $context->setExtra([
+                'path'         => unpack('H*', $this->getPath())[1],
+                'originalUri'  => unpack('H*', $originalUri)[1],
+                'sanitizedUri' => unpack('H*', $uri)[1],
+            ]);
+            $logger->warning('Non utf-8 uri path', $context);
+        } // TODO remove after investigation
 
         if ($sessionId = $this->getCookie('sessionId')) {
             $this->setSession(CM_Session::findById($sessionId));
@@ -309,12 +322,10 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
-     * @param string      $uri
-     * @param string|null $originalUri Temporary argument
+     * @param string $uri
      * @throws CM_Exception_Invalid
      */
-    public function setUri($uri, $originalUri = null) {
-        $originalUri = (string) $originalUri;
+    public function setUri($uri) {
         $uriWithHost = $uri;
         if ('/' === substr($uriWithHost, 0, 1)) {
             $uriWithHost = 'http://host' . $uri;
@@ -326,18 +337,6 @@ abstract class CM_Http_Request_Abstract {
         if (null === $path) {
             $path = '/';
         }
-        try {
-            CM_Util::jsonEncode($path);
-        } catch (CM_Exception_Invalid $e) {
-            $logger = CM_Service_Manager::getInstance()->getLogger();
-            $context = new CM_Log_Context();
-            $context->setExtra([
-                'path'         => unpack('H*', $path)[1],
-                'originalUri'  => unpack('H*', $originalUri)[1],
-                'sanitizedUri' => unpack('H*', $uri)[1],
-            ]);
-            $logger->warning('Non utf-8 uri path', $context);
-        } // TODO remove after investigation
 
         $this->setPath($path);
 
