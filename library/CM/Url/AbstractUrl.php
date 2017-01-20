@@ -2,6 +2,7 @@
 
 namespace CM\Url;
 
+use CM\Url\Components\PrefixedPath;
 use CM\Url\Modifiers\Sanitize;
 use League\Uri\Modifiers\Normalize;
 use League\Uri\Modifiers\Pipeline;
@@ -9,17 +10,22 @@ use League\Uri\Schemes\Http;
 
 abstract class AbstractUrl extends Http implements UrlInterface {
 
-    public function getRebaseUrl(UrlInterface $baseUrl) {
-        $baseUrl = AbsoluteUrl::createFromString((string) $baseUrl);
-        $rebasedPath = $this->path->prepend($baseUrl->path);
-        $rebasedUrl = $this->withPath((string) $rebasedPath);
-        return $baseUrl->withRelativeComponentsFrom($rebasedUrl);
+    public function withPathPrefix($prefix) {
+        return $this->withProperty('path', $this->_getPrefixedPathInstance()->withPrefix($prefix));
     }
 
-    /**
-     * @param UrlInterface $uri
-     * @return UrlInterface
-     */
+    public function withoutPathPrefix() {
+        return $this->withProperty('path', $this->_getPrefixedPathInstance()->withoutPrefix());
+    }
+
+    public function getPathPrefix() {
+        return (string) ($this->path instanceof PrefixedPath ? $this->path->getPrefix() : null);
+    }
+
+    public function hasPathPrefix() {
+        return $this->path instanceof PrefixedPath && $this->path->hasPrefix();
+    }
+
     public function withRelativeComponentsFrom(UrlInterface $uri) {
         return $this
             ->withPath($uri->getPath())
@@ -27,11 +33,29 @@ abstract class AbstractUrl extends Http implements UrlInterface {
             ->withFragment($uri->getFragment());
     }
 
-    /**
-     * @return bool
-     */
     public function isRelativeUrl() {
         return '' === $this->getScheme() && '' === $this->getHost();
+    }
+
+    protected function withProperty($property, $value) {
+        if ('path' === $property) {
+            if (!$value instanceof PrefixedPath) {
+                $value = new PrefixedPath($value, $this->getPathPrefix());
+            }
+            $url = clone $this;
+            $url->$property = $value;
+            $url->assertValidObject();
+            return $url;
+        } else {
+            return parent::withProperty($property, $value);
+        }
+    }
+
+    /**
+     * @return PrefixedPath
+     */
+    protected function _getPrefixedPathInstance() {
+        return $this->path instanceof PrefixedPath ? clone $this->path : new PrefixedPath($this->path);
     }
 
     /**
@@ -44,15 +68,36 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         ]);
     }
 
-    public static function createFromString($uri = '') {
-        return self::_getPipeline()->process(
-            parent::createFromString($uri)
+    /**
+     * @param string|null $uri
+     * @param string|null $pathPrefix
+     * @return UrlInterface
+     */
+    public static function createFromString($uri = null, $pathPrefix = null) {
+        /** @var AbstractUrl $url */
+        $url = self::_getPipeline()->process(
+            parent::createFromString((string) $uri)
         );
+        if (null !== $pathPrefix) {
+            $url = $url->withPathPrefix($pathPrefix);
+        }
+        return $url;
     }
 
+    /**
+     * @param array $components
+     * @return UrlInterface
+     */
     public static function createFromComponents(array $components) {
-        return self::_getPipeline()->process(
+        $pathPrefix = null;
+        if (isset($components['pathPrefix'])) {
+            $pathPrefix = $components['pathPrefix'];
+            unset($components['pathPrefix']);
+        }
+        /** @var AbstractUrl $url */
+        $url = self::_getPipeline()->process(
             parent::createFromComponents($components)
         );
+        return $url->withPathPrefix($pathPrefix);
     }
 }
