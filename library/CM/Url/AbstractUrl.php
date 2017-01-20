@@ -64,7 +64,6 @@ abstract class AbstractUrl extends Http implements UrlInterface {
     protected static function _getPipeline() {
         return new Pipeline([
             new Normalize(),
-            new Sanitize(),
         ]);
     }
 
