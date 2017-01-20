@@ -29,6 +29,7 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
    */
   setValue: function(value) {
     this.getInput().val(value);
+    this._valueLast = this.getValue();
   },
 
   /**
