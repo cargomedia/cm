@@ -67,11 +67,11 @@ abstract class AbstractUrl extends Http implements UrlInterface {
     }
 
     /**
-     * @param string|null $uri
+     * @param string      $uri
      * @param string|null $pathPrefix
      * @return UrlInterface
      */
-    public static function createFromString($uri = null, $pathPrefix = null) {
+    public static function createFromString($uri = '', $pathPrefix = null) {
         /** @var AbstractUrl $url */
         $url = self::_getPipeline()->process(
             parent::createFromString((string) $uri)

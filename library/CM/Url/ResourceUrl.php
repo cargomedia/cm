@@ -39,11 +39,11 @@ class ResourceUrl extends RelativeUrl {
     }
 
     /**
-     * @param string|null $uri
+     * @param string      $uri
      * @param string|null $type
      * @return ResourceUrl
      */
-    public static function createFromString($uri = null, $type = null) {
+    public static function createFromString($uri = '', $type = null) {
         /** @var ResourceUrl $resourceUrl */
         $resourceUrl = parent::createFromString((string) $uri);
         $resourceUrl->setType((string) $type);
