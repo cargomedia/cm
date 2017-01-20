@@ -21,9 +21,9 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $language = CM_Model_Language::create('English', 'en', true);
         $currency = CM_Model_Currency::create('978', 'EUR');
         $user = CM_Model_User::createStatic([
-            'site'          => $site,
-            'language'      => $language,
-            'currency'      => $currency,
+            'site'     => $site,
+            'language' => $language,
+            'currency' => $currency,
         ]);
         $this->assertNull($user->getLatestActivity());
         $this->assertInternalType('int', $user->getCreated());
@@ -143,5 +143,15 @@ class CM_Model_UserTest extends CMTest_TestCase {
 
         $this->assertFalse($user1->getOnline());
         $this->assertTrue($user2->getOnline());
+    }
+
+    public function testGetEnvironment() {
+        $user = CMTest_TH::createUser();
+        $this->assertNull($user->getEnvironment()->getLanguage());
+
+        $defaultLanguage = CMTest_TH::createLanguage('en');
+        $user = CMTest_TH::createUser();
+        $user->setLanguage($defaultLanguage);
+        $this->assertEquals($defaultLanguage, $user->getEnvironment()->getLanguage());
     }
 }

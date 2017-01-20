@@ -213,7 +213,11 @@ class CM_Model_User extends CM_Model_Abstract {
      * @return CM_Frontend_Environment
      */
     public function getEnvironment() {
-        return new CM_Frontend_Environment($this->getSite(), $this, $this->getLanguage(), null, null, null, $this->getCurrency());
+        $language = $this->getLanguage();
+        if (!$language) {
+            $language = CM_Model_Language::findDefault();
+        }
+        return new CM_Frontend_Environment($this->getSite(), $this, $language, null, null, null, $this->getCurrency());
     }
 
     public function updateLatestActivityThrottled() {
