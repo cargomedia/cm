@@ -24,11 +24,11 @@ addons:
 before_script:
   - phpenv config-rm xdebug.ini
   - tests/travis/install-php-timecop.sh
+  - tests/travis/install-pecl-gearman.sh
   - tests/travis/install-php-svm.sh
   - source tests/travis/install-phantomjs.sh
   - yes '' | travis_retry pecl install imagick
   - travis_retry pecl install stats-1.0.3
-  - travis_retry pecl install gearman-1.0.3
   - yes '' | travis_retry pecl install apcu-4.0.10
   - phpenv config-add tests/travis/php.ini
   - npm install -g autoprefixer@4.0.0
