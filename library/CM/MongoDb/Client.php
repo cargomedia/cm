@@ -189,7 +189,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @param array|null $projection
      * @param array|null $aggregation
      * @param array|null $options
-     * @return IteratorIterator
+     * @return Iterator
      *
      * When using aggregation, $criteria and $projection, if defined, automatically
      * function as `$match` and `$project` operator respectively at the front of the pipeline
