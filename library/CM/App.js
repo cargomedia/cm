@@ -205,8 +205,8 @@ var CM_App = CM_Class_Abstract.extend({
     if (type && path) {
       var urlParts = [];
       urlParts.push(type);
-      if (cm.options.urlLanguage) {
-        urlParts.push(cm.options.urlLanguage.abbreviation);
+      if (cm.options.language) {
+        urlParts.push(cm.options.language.abbreviation);
       }
       urlParts.push(cm.getSiteId());
       urlParts.push(cm.options.deployVersion);
@@ -246,8 +246,8 @@ var CM_App = CM_Class_Abstract.extend({
    */
   getUrlAjax: function(type) {
     var path = '/' + type;
-    if (cm.options.urlLanguage) {
-      path += '/' + cm.options.urlLanguage.abbreviation;
+    if (cm.options.language) {
+      path += '/' + cm.options.language.abbreviation;
     }
     return this.getUrl(path);
   },
@@ -471,7 +471,6 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('.toggleNext').toggleNext();
       $dom.find('.tabs').tabs();
       $dom.find('.openx-ad:visible').openx();
-      $dom.find('.epom-ad').epom();
       $dom.find('.fancySelect').fancySelect();
       this._setupContentPlaceholder($dom);
     },
@@ -497,6 +496,7 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {jQuery} $dom
      */
     teardown: function($dom) {
+      $dom.find('.openerDropdown').opener('close');
       $dom.find('.timeago').timeago('dispose');
       $dom.find('textarea.autosize, .autosize textarea').trigger('autosize.destroy');
       $dom.find('img.lazy').trigger('destroy.unveil');
@@ -507,12 +507,11 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {Object} [options]
      * @param {Boolean} [options.loop=false]
      * @param {Boolean} [options.autoplay=false]
-     * @param {String} [options.crossOrigin='anonymous']
      * @return {Audio}
      */
     createAudio: function(sourceList, options) {
       sourceList = _.isString(sourceList) ? [sourceList] : sourceList;
-      var audio = new cm.lib.Media.Audio(options);
+      var audio = new cm.lib.Media.Audio();
       audio.setOptions(options);
       audio.setSources(sourceList);
       return audio;
@@ -658,13 +657,13 @@ var CM_App = CM_Class_Abstract.extend({
       $html.find('.box-body').text(question);
       $html.find('.box-footer').append($ok, $cancel);
 
-      $html.floatOut();
+      $html.floatbox();
       $ok.click(function() {
-        $html.floatIn();
+        $html.floatbox('close');
         callback.call(context);
       });
       $cancel.click(function() {
-        $html.floatIn();
+        $html.floatbox('close');
       });
       $ok.focus();
     }
@@ -1169,12 +1168,13 @@ var CM_App = CM_Class_Abstract.extend({
     /**
      * @param {CM_View_Abstract} view
      * @param {String} eventName
-     * @param {*} data
+     * @param {...*} data
      */
     trigger: function(view, eventName, data) {
       var parent = view;
+      var eventArguments = _.toArray(arguments).slice(2);
       while (parent = parent.getParent()) {
-        this._dispatcher.trigger(this._getEventName(parent, view.getClass(), eventName), view, data);
+        this._dispatcher.trigger.apply(this._dispatcher, [this._getEventName(parent, view.getClass(), eventName), view].concat(eventArguments));
       }
     }
   },

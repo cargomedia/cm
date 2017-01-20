@@ -1,7 +1,8 @@
 <?php
 
 class CM_Paging_Location_SearchTextTest extends CMTest_TestCase {
-    /** @var CM_Elasticsearch_Client  */
+
+    /** @var CM_Elasticsearch_Client */
     private $_elasticsearchClient;
 
     public function setUp() {
@@ -48,6 +49,34 @@ class CM_Paging_Location_SearchTextTest extends CMTest_TestCase {
             $locationFar,
         );
         $this->assertEquals($expected, $paging->getItems());
+    }
+
+    public function testSearchScope() {
+        $country1 = CM_Model_Location::createCountry('United States', 'US');
+        $city1 = CM_Model_Location::createCity($country1, 'New York', 10, 10);
+        $country2 = CM_Model_Location::createCountry('United Kingdom', 'UK');
+        $city2 = CM_Model_Location::createCity($country2, 'York', 20, 20);
+        $country3 = CM_Model_Location::createCountry('Canada', 'CA');
+        $city3 = CM_Model_Location::createCity($country3, 'Montréal', 30, 30);
+        $this->_recreateLocationIndex();
+
+        $source = new CM_Paging_Location_SearchText('', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_CITY);
+        $this->assertEquals([$country1, $country2, $country3, $city1, $city2, $city3], $source->getItems());
+
+        $source = new CM_Paging_Location_SearchText('', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_CITY, null, $country3);
+        $this->assertEquals([$country3, $city3], $source->getItems());
+
+        $source = new CM_Paging_Location_SearchText('York', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_CITY);
+        $this->assertEquals([$city2, $city1], $source->getItems());
+
+        $source = new CM_Paging_Location_SearchText('York', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_CITY, null, $country1);
+        $this->assertEquals([$city1], $source->getItems());
+
+        $source = new CM_Paging_Location_SearchText('York', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_CITY, null, $country2);
+        $this->assertEquals([$city2], $source->getItems());
+
+        $source = new CM_Paging_Location_SearchText('York', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_CITY, null, $country3);
+        $this->assertEquals([], $source->getItems());
     }
 
     private function _recreateLocationIndex() {

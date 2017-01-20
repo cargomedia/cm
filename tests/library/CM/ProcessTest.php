@@ -52,8 +52,7 @@ class CM_ProcessTest extends CMTest_TestCase {
         $forkHandlerMock = $process->mockMethod('_getForkHandler');
         $forkHandlerMock->set(function () {
             $mockForkHandler = $this->mockClass('CM_Process_ForkHandler')->newInstanceWithoutConstructor();
-            $mockForkHandler->mockMethod('runAndSendWorkload');
-            $mockForkHandler->mockMethod('closeIpcStream');
+            $mockForkHandler->mockMethod('runWorkload');
             return $mockForkHandler;
         });
 
@@ -104,7 +103,8 @@ class CM_ProcessTest extends CMTest_TestCase {
         $parentOutput[] = 'Parent waiting for 250 ms...';
         usleep(250000);
         $parentOutput[] = 'Parent listening to children...';
-        $process->waitForChildren();
+        $workloadResultList = $process->waitForChildren();
+        $this->assertSame([1 => true, 2 => true, 3 => true, 4 => true, 5 => true], \Functional\invoke($workloadResultList, 'isSuccess'));
         $parentOutput[] = 'Parent terminated.';
         $childrenOutput = explode(PHP_EOL, $file->read());
 
@@ -135,79 +135,20 @@ class CM_ProcessTest extends CMTest_TestCase {
     public function testForkAndListenForChildren() {
         $process = CM_Process::getInstance();
         $process->fork(function () {
-            return 'foo';
         });
         $process->fork(function () {
             usleep(1000000);
-            return 'bar';
         });
         usleep(500000);
         $responses = $process->listenForChildren();
         $this->assertCount(1, $responses);
-        $this->assertContainsOnlyInstancesOf('CM_Process_WorkloadResult', $responses);
-        $this->assertSame([1 => 'foo'], \Functional\invoke($responses, 'getResult'));
+        $this->assertContainsOnlyInstancesOf('CM_Process_Result', $responses);
+        $this->assertSame([1 => true], \Functional\invoke($responses, 'isSuccess'));
         usleep(1000000);
         $responses = $process->listenForChildren();
         $this->assertCount(1, $responses);
-        $this->assertContainsOnlyInstancesOf('CM_Process_WorkloadResult', $responses);
-        $this->assertSame([2 => 'bar'], \Functional\invoke($responses, 'getResult'));
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function testForkAndWaitForChildrenWithResults() {
-        $bootloader = CM_Bootloader::getInstance();
-        $exceptionHandlerBackup = $bootloader->getExceptionHandler();
-
-        /**
-         * Increase print-severity to make sure "child 3"'s exception output doesn't disturb phpunit
-         */
-        $exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
-        $exceptionHandler->setPrintSeverityMin(CM_Exception::FATAL);
-        $exceptionHandler->setServiceManager($this->getServiceManager());
-
-        $bootloader->setExceptionHandler($exceptionHandler);
-
-        $process = CM_Process::getInstance();
-        $process->fork(function () {
-            usleep(100 * 1000);
-            return 'Child 1 finished';
-        });
-        $process->fork(function () {
-            usleep(50 * 1000);
-            return array('msg' => 'Child 2 finished');
-        });
-        $process->fork(function () {
-            usleep(150 * 1000);
-            throw new CM_Exception('Child 3 finished');
-        });
-        $process->fork(function (CM_Process_WorkloadResult $result) {
-            usleep(200 * 1000);
-            $result->setException(new CM_Exception('Child 4 finished'));
-        });
-
-        $workloadResultList = $process->waitForChildren();
-        $this->assertCount(4, $workloadResultList);
-
-        $this->assertSame('Child 1 finished', $workloadResultList[1]->getResult());
-        $this->assertSame(null, $workloadResultList[1]->getException());
-        $this->assertTrue($workloadResultList[1]->isSuccess());
-
-        $this->assertSame(array('msg' => 'Child 2 finished'), $workloadResultList[2]->getResult());
-        $this->assertSame(null, $workloadResultList[2]->getException());
-        $this->assertTrue($workloadResultList[2]->isSuccess());
-
-        $this->assertSame(null, $workloadResultList[3]->getResult());
-        $this->assertSame('Child 3 finished', $workloadResultList[3]->getException()->getMessage());
-        $this->assertFalse($workloadResultList[3]->isSuccess());
-
-        $this->assertSame(null, $workloadResultList[4]->getResult());
-        $this->assertSame('Child 4 finished', $workloadResultList[4]->getException()->getMessage());
-        $this->assertFalse($workloadResultList[4]->isSuccess());
-
-        $bootloader->setExceptionHandler($exceptionHandlerBackup);
+        $this->assertContainsOnlyInstancesOf('CM_Process_Result', $responses);
+        $this->assertSame([2 => true], \Functional\invoke($responses, 'isSuccess'));
     }
 
     /**
@@ -233,17 +174,17 @@ class CM_ProcessTest extends CMTest_TestCase {
         $workloadResultList = $process->waitForChildren();
         $this->assertCount(4, $workloadResultList);
 
-        $this->assertSame('Child 1 finished', $workloadResultList[1]->getResult());
-        $this->assertSame(null, $workloadResultList[1]->getException());
+        $this->assertSame(true, $workloadResultList[1]->isSuccess());
+        $this->assertSame(0, $workloadResultList[1]->getReturnCode());
 
-        $this->assertSame(null, $workloadResultList[2]->getResult());
-        $this->assertSame('Received no data from IPC stream.', $workloadResultList[2]->getException()->getMessage());
+        $this->assertSame(true, $workloadResultList[2]->isSuccess());
+        $this->assertSame(0, $workloadResultList[2]->getReturnCode());
 
-        $this->assertSame(null, $workloadResultList[3]->getResult());
-        $this->assertSame('Received no data from IPC stream.', $workloadResultList[3]->getException()->getMessage());
+        $this->assertSame(false, $workloadResultList[3]->isSuccess());
+        $this->assertSame(null, $workloadResultList[3]->getReturnCode());
 
-        $this->assertSame(null, $workloadResultList[4]->getResult());
-        $this->assertSame('Received no data from IPC stream.', $workloadResultList[4]->getException()->getMessage());
+        $this->assertSame(false, $workloadResultList[4]->isSuccess());
+        $this->assertSame(null, $workloadResultList[4]->getReturnCode());
     }
 
     /**

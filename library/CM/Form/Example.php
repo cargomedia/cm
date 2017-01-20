@@ -12,11 +12,17 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_Url(['name' => 'url']));
         $this->registerField(new CM_FormField_Integer(['name' => 'int']));
         $this->registerField(new CM_FormField_Slider(['name' => 'slider', 'min' => 0, 'max' => 2.5, 'step' => 0.1]));
+        $this->registerField(new CM_FormField_SliderRange(['name' => 'sliderRange', 'min' => 0, 'max' => 2.5, 'step' => 0.1]));
         $this->registerField(new CM_FormField_Distance(['name' => 'locationSlider']));
         $this->registerField(new CM_FormField_Location(['name' => 'location', 'fieldNameDistance' => 'locationSlider']));
         $this->registerField(new CM_FormField_File(['name' => 'file', 'cardinality' => 2]));
         $this->registerField(new CM_FormField_FileImage(['name' => 'image', 'cardinality' => 2]));
         $this->registerField(new CM_FormField_Color(['name' => 'color']));
+        $this->registerField(new CM_FormField_ColorPalette(['name' => 'color2', 'palette' => [
+            CM_Color_RGB::fromHexString('ff0000'),
+            CM_Color_RGB::fromHexString('00ff00'),
+            CM_Color_RGB::fromHexString('0000ff'),
+        ]]));
         $this->registerField(new CM_FormField_Date(['name' => 'date']));
         $this->registerField(new CM_FormField_DateTimeInterval(['name' => 'dateTimeInterval', 'yearFirst' => date('Y'), 'yearLast' => (int) date('Y') + 1]));
         $this->registerField(new CM_FormField_Birthdate(['name' => 'birthdate', 'minAge' => 18, 'maxAge' => 30]));
@@ -33,6 +39,10 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_Captcha(['name' => 'captcha']));
 
         $this->registerAction(new CM_FormAction_Example_Submit($this));
+    }
+
+    protected function _getRequiredFields() {
+        return ['text', 'money'];
     }
 
     public function ajax_validate(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {

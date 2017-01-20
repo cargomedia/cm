@@ -61,6 +61,7 @@ class CM_Cli_CommandManager {
         if ($quiet) {
             $this->_setStreamOutput(new CM_OutputStream_Null());
             $this->_setStreamError(new CM_OutputStream_Null());
+            CM_Bootloader::getInstance()->getExceptionHandler()->setOutput(new CM_OutputStream_Null());
         }
         if ($quietWarnings) {
             CM_Bootloader::getInstance()->getExceptionHandler()->setPrintSeverityMin(CM_Exception::ERROR);
@@ -179,7 +180,7 @@ class CM_Cli_CommandManager {
             if ($command->getSynchronized()) {
                 $this->unlockCommand($command);
             }
-            $failure = Functional\some($resultList, function (CM_Process_WorkloadResult $result) {
+            $failure = Functional\some($resultList, function (CM_Process_Result $result) {
                 return !$result->isSuccess();
             });
             if ($failure) {
@@ -280,7 +281,7 @@ class CM_Cli_CommandManager {
      * @return callable
      */
     protected function _getProcessWorkload($transactionName, CM_Cli_Command $command, CM_Cli_Arguments $arguments, CM_InputStream_Interface $streamInput, CM_OutputStream_Interface $streamOutput, CM_OutputStream_Interface $streamError) {
-        return function (CM_Process_WorkloadResult $result) use ($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError) {
+        return function () use ($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError) {
             try {
                 $parameters = $command->extractParameters($arguments);
                 $this->_checkUnusedArguments($arguments);
@@ -298,10 +299,8 @@ class CM_Cli_CommandManager {
                 } else {
                     $this->_outputError($this->getHelp());
                 }
-                $result->setException($ex);
             } catch (CM_Cli_Exception_Internal $ex) {
                 $this->_outputError('ERROR: ' . $ex->getMessage() . PHP_EOL);
-                $result->setException($ex);
             }
         };
     }

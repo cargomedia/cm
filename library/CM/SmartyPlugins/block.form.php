@@ -21,8 +21,10 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 
         $cssClasses = $viewResponse->getCssClasses();
         $cssClasses[] = $form->getName();
+        $autosave = isset($params['autosave']);
         $html = '<form id="' . $viewResponse->getAutoId() . '" class="' .
-            implode(' ', $cssClasses) . '" method="post" action="" onsubmit="return false;" novalidate >';
+            implode(' ', $cssClasses) . '" method="post" action="" onsubmit="return false;" novalidate ' .
+            ($autosave ? 'data-autosave="true"' : '') . ' >';
         if ($form->getAvoidPasswordManager()) {
             $html .= '<input style="display:none" type="text" name="fakeusernameremembered">';
             $html .= '<input style="display:none" type="password" name="fakepasswordremembered">';
@@ -35,9 +37,6 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
                 $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
                 $html .= $renderAdapter->fetch(CM_Params::factory());
             }
-        }
-        foreach ($form->getActions() as $actionName => $action) {
-            $viewResponse->getJs()->append("this.registerAction('{$actionName}', {$action->js_presentation()});");
         }
         $html .= '</form>';
 

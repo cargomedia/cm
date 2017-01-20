@@ -3,40 +3,38 @@
  */
 (function($) {
 
-  var selector = '.openerDropdown';
+  var namespace = 'openerDropdown';
+  var selector = '.' + namespace;
 
   var OpenerDropdown = function($element) {
-    this.element = $element;
+    this.$element = $element;
   };
 
   OpenerDropdown.prototype = {
     constructor: OpenerDropdown,
 
-    element: null,
-
-    activate: function() {
-      this.element.on('click.openerDropdown', this.toggle);
-    },
-
     toggle: function() {
       var self = this;
-      this.element.find('> .openerDropdown-window').toggleModal(function() {
+      this.$element.find('> ' + selector + '-window').toggleModal(function() {
         $(this).toggle();
-        self.element.toggleClass('open');
+        self.$element.toggleClass('open');
       });
     },
 
     close: function() {
-      this.element.find('> .openerDropdown-window').toggleModal('hide');
+      this.$element.find('> ' + selector + '-window').toggleModal('hide');
     }
   };
 
   $.fn.opener = function(action) {
     return this.each(function() {
-      var $this = $(this).closest('.openerDropdown');
-      var data = $this.data('openerDropdown');
+      var $this = $(this).closest(selector);
+      var data = $this.data(namespace);
       if (!data) {
-        $this.data('openerDropdown', (data = new OpenerDropdown($this)))
+        if ('close' == action) {
+          return;
+        }
+        $this.data(namespace, (data = new OpenerDropdown($this)))
       }
       if ('string' === typeof action) {
         data[action]()
@@ -45,8 +43,8 @@
   };
 
   $(function() {
-    $('body').on('click.openerDropdown', selector + ' .openerDropdown-panel', function() {
-      $(this).closest('.openerDropdown').opener('toggle');
+    $(document).on('click' + selector, selector + ' ' + selector + '-panel', function() {
+      $(this).closest(selector).opener('toggle');
     });
   });
 

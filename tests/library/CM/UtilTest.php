@@ -62,6 +62,18 @@ class CM_UtilTest extends CMTest_TestCase {
         }
     }
 
+    public function testGetResourceFilesGlob() {
+        $files = CM_Util::getResourceFiles('config/*.php');
+        if (!count($files)) {
+            $this->markTestSkipped('There are no files to test this functionality');
+        }
+        $defaultFile = \Functional\first($files, function ($file) {
+            return 'default.php' === $file->getFileName();
+        });
+        $this->assertNotNull($defaultFile);
+        $this->assertInstanceOf('CM_File', $defaultFile);
+    }
+
     public function testGetArrayTree() {
         $array = array(array('id' => 1, 'type' => 1, 'amount' => 1), array('id' => 2, 'type' => 1, 'amount' => 2),
             array('id' => 3, 'type' => 1, 'amount' => 3), array('id' => 4, 'type' => 1, 'amount' => 4));
@@ -146,7 +158,13 @@ class CM_UtilTest extends CMTest_TestCase {
     }
 
     public function testSanitizeUtf() {
-        $this->assertSame('?.', CM_Util::sanitizeUtf(pack("H*", 'c32e')));
+        $string = pack("H*", 'c32e');
+        $this->assertSame('?.', CM_Util::sanitizeUtf($string));
+    }
+
+    public function testSanitizeUtf2() {
+        $string = pack('H*', 'e4bfa1e65faf');
+        $this->assertSame('信?_?', CM_Util::sanitizeUtf($string));
     }
 
     public function testApplyOffset() {

@@ -1,7 +1,7 @@
-{$showColumns = $optionList|count > 4}
-<ul class="{$class} {if $showColumns}columns{/if}">
+{$showColumns = $optionList|count > 3}
+<ul class="set {$class}">
   {foreach $optionList as $itemValue => $itemLabel}
-    <li class="set-item {$name}-value-{$itemValue} {if $showColumns}column4{/if}">
+    <li class="set-item {if $showColumns}multiple{/if} {$name}-value-{$itemValue}">
       {if $translate}
         {$label = {{translate "{$translatePrefix}{$itemLabel}"}|escape}}
       {else}
