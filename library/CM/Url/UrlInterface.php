@@ -2,6 +2,7 @@
 
 namespace CM\Url;
 
+use CM_Frontend_Environment;
 use Psr\Http\Message\UriInterface;
 
 interface UrlInterface extends UriInterface {
@@ -22,6 +23,7 @@ interface UrlInterface extends UriInterface {
     public function getPathPrefix();
 
     /**
+     * @param string
      * @return UrlInterface
      */
     public function withPathPrefix($prefix);
@@ -38,11 +40,11 @@ interface UrlInterface extends UriInterface {
     public function withRelativeComponentsFrom(UrlInterface $uri);
 
     /**
-     * @param \CM_Frontend_Environment $environment
-     * @param array                    $options
+     * @param CM_Frontend_Environment $environment
+     * @param array                   $options
      * @return UrlInterface
      */
-    public function withEnvironment(\CM_Frontend_Environment $environment, array $options = null);
+    public function withEnvironment(CM_Frontend_Environment $environment, array $options = null);
 
     /**
      * @param string $path

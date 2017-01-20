@@ -117,6 +117,7 @@ class PrefixedPathTest extends CMTest_TestCase {
     public function testFilter() {
         $path = new PrefixedPath('/foo/fox/foy', 'bar');
         $segments = [];
+        /** @var PrefixedPath $path */
         $path = $path->filter(function ($segment) use (&$segments) {
             $segments[] = $segment;
             return 'fox' !== $segment;

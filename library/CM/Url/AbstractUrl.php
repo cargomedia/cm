@@ -3,7 +3,6 @@
 namespace CM\Url;
 
 use CM\Url\Components\PrefixedPath;
-use CM\Url\Modifiers\Sanitize;
 use League\Uri\Modifiers\Normalize;
 use League\Uri\Modifiers\Pipeline;
 use League\Uri\Schemes\Http;

@@ -2,10 +2,10 @@
 
 namespace CM\Test\Url;
 
+use InvalidArgumentException;
 use CM_Frontend_Environment;
 use CMTest_TestCase;
 use CM\Url\RelativeUrl;
-use CM\Url\AbsoluteUrl;
 
 class RelativeUrlTest extends CMTest_TestCase {
 

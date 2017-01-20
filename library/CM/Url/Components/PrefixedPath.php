@@ -72,6 +72,10 @@ class PrefixedPath extends HierarchicalPath {
         return $this->encodePath($front_delimiter . implode(static::$separator, $data));
     }
 
+    /**
+     * @param \League\Uri\Interfaces\HierarchicalComponent|string $component
+     * @return PrefixedPath
+     */
     public function prepend($component) {
         return $this
             ->createFromSegments(
@@ -82,10 +86,18 @@ class PrefixedPath extends HierarchicalPath {
             ->append($this);
     }
 
+    /**
+     * @param \League\Uri\Interfaces\HierarchicalComponent|string $component
+     * @return PrefixedPath
+     */
     public function append($component) {
         return new static((string) parent::append($component), $this->getPrefix());
     }
 
+    /**
+     * @param array $data
+     * @return PrefixedPath
+     */
     protected function newCollectionInstance(array $data) {
         return new static((string) parent::newCollectionInstance($data), $this->getPrefix());
     }

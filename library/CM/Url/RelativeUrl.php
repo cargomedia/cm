@@ -2,8 +2,8 @@
 
 namespace CM\Url;
 
-use CM\Url\AbsoluteUrl;
-use \League\Uri\Interfaces\HierarchicalPath;
+use CM_Frontend_Environment;
+use League\Uri\Interfaces\HierarchicalPath;
 
 class RelativeUrl extends AbstractUrl {
 
@@ -25,10 +25,10 @@ class RelativeUrl extends AbstractUrl {
     }
 
     /**
-     * @param \CM_Frontend_Environment $environment
+     * @param CM_Frontend_Environment $environment
      * @return HierarchicalPath
      */
-    protected function _buildPath(\CM_Frontend_Environment $environment) {
+    protected function _buildPath(CM_Frontend_Environment $environment) {
         return $this->path;
     }
 

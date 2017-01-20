@@ -2,6 +2,7 @@
 
 namespace CM\Test\Url;
 
+use InvalidArgumentException;
 use CM_Frontend_Environment;
 use CMTest_TestCase;
 use CM\Url\AbsoluteUrl;
@@ -43,6 +44,7 @@ class AbsoluteUrlTest extends CMTest_TestCase {
     }
 
     public function testGetRelativeUrl() {
+        /** @var AbsoluteUrl $url */
         $url = AbsoluteUrl::createFromString('http://foo/bar?foobar=1#foo');
         $relativeUrl = $url->getRelativeUrl();
         $this->assertInstanceOf('CM\Url\RelativeUrl', $relativeUrl);
@@ -55,6 +57,7 @@ class AbsoluteUrlTest extends CMTest_TestCase {
     }
 
     public function testWithEnvironment() {
+        /** @var AbsoluteUrl $url */
         $url = AbsoluteUrl::createFromString('http://foo/bar?foobar=1');
         $site = $this->getMockSite(null, null, [
             'url' => 'http://www.foo.com',

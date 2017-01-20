@@ -9,7 +9,7 @@ class AbsoluteUrl extends AbstractUrl {
     }
 
     /**
-     * @return RelativeUrl
+     * @return UrlInterface
      */
     public function getRelativeUrl() {
         return RelativeUrl::createFromString(''
