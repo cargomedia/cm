@@ -529,6 +529,7 @@ var CM_App = CM_Class_Abstract.extend({
   date: {
     ready: function() {
       $.timeago.settings.allowFuture = true;
+      $.timeago.settings.autoDispose = false;
       $.timeago.settings.strings = {
         prefixAgo: cm.language.get('.date.timeago.prefixAgo', {count: '%d'}),
         prefixFromNow: cm.language.get('.date.timeago.prefixFromNow', {count: '%d'}),
