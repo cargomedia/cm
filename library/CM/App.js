@@ -529,6 +529,7 @@ var CM_App = CM_Class_Abstract.extend({
   date: {
     ready: function() {
       $.timeago.settings.allowFuture = true;
+      $.timeago.settings.autoDispose = false;
       $.timeago.settings.strings = {
         prefixAgo: cm.language.get('.date.timeago.prefixAgo', {count: '%d'}),
         prefixFromNow: cm.language.get('.date.timeago.prefixFromNow', {count: '%d'}),
@@ -562,13 +563,6 @@ var CM_App = CM_Class_Abstract.extend({
      */
     iso8601: function(date) {
       return date.getUTCFullYear() + '-' + cm.string.padLeft(date.getUTCMonth() + 1, 2, '0') + '-' + cm.string.padLeft(date.getUTCDate(), 2, '0') + 'T' + cm.string.padLeft(date.getUTCHours(), 2, '0') + ':' + cm.string.padLeft(date.getUTCMinutes(), 2, '0') + ':' + cm.string.padLeft(date.getUTCSeconds(), 2, '0') + '.' + cm.string.padLeft(date.getUTCMilliseconds(), 3, '0') + 'Z';
-    },
-    /**
-     * @param {Number} [timestamp]
-     * @return {jQuery}
-     */
-    $timeago: function(timestamp) {
-      return $(this.timeago(timestamp)).timeago();
     },
     /**
      * @param {Number} [timestamp]
