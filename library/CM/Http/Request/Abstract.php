@@ -68,7 +68,6 @@ abstract class CM_Http_Request_Abstract {
         $uri = CM_Util::sanitizeUtf($uri);
 
         $this->setUri($uri);
-
         try {
             CM_Util::jsonEncode($this->getPath());
         } catch (CM_Exception_Invalid $e) {
@@ -337,7 +336,6 @@ abstract class CM_Http_Request_Abstract {
         if (null === $path) {
             $path = '/';
         }
-
         $this->setPath($path);
 
         if (false === ($queryString = parse_url($uriWithHost, PHP_URL_QUERY))) {
