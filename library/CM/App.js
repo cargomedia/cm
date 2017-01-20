@@ -566,13 +566,6 @@ var CM_App = CM_Class_Abstract.extend({
     },
     /**
      * @param {Number} [timestamp]
-     * @return {jQuery}
-     */
-    $timeago: function(timestamp) {
-      return $(this.timeago(timestamp)).timeago();
-    },
-    /**
-     * @param {Number} [timestamp]
      * @param {String} [cssClass]
      * @return {jQuery}
      */
