@@ -74,7 +74,12 @@ class CM_Migration_Generator {
      * @return \CodeGenerator\ClassBlock
      */
     protected function _getClassBlock($className) {
-        $class = new CodeGenerator\ClassBlock($className, null, [CM_Migration_UpgradableInterface::class]);
+        $class = new CodeGenerator\ClassBlock($className, null, [
+            CM_Migration_UpgradableInterface::class,
+            CM_Service_ManagerAwareInterface::class,
+        ]);
+        $class->addUse(new CodeGenerator\TraitBlock(CM_Service_ManagerAwareTrait::class));
+
         $reflection = new ReflectionClass(CM_Migration_UpgradableInterface::class);
         $method = CodeGenerator\MethodBlock::buildFromReflection($reflection->getMethod('up'));
         $method->setAbstract(false);
