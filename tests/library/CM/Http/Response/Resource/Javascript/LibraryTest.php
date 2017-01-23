@@ -20,8 +20,8 @@ class CM_Http_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
     }
 
     public function testProcessLibrary() {
-        $site = CM_Site_Abstract::factory();
-        $render = new CM_Frontend_Render(new CM_Frontend_Environment());
+        $site = $this->getDefaultSite();
+        $render = $this->getDefaultRender();
         $request = new CM_Http_Request_Get($render->getUrlResource('library-js', 'library.js'));
         $response = CM_Http_Response_Resource_Javascript_Library::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
@@ -32,8 +32,8 @@ class CM_Http_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
     }
 
     public function testProcessTranslations() {
-        $site = CM_Site_Abstract::factory();
-        $render = new CM_Frontend_Render(new CM_Frontend_Environment());
+        $site = $this->getDefaultSite();
+        $render = $this->getDefaultRender();
         $request = new CM_Http_Request_Get($render->getUrlResource('library-js', 'translations/123.js'));
         $response = CM_Http_Response_Resource_Javascript_Library::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
@@ -48,8 +48,8 @@ class CM_Http_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
         $languageKey = CM_Model_LanguageKey::create('Hello World');
         $this->assertSame(false, $languageKey->getJavascript());
 
-        $site = CM_Site_Abstract::factory();
-        $render = new CM_Frontend_Render(new CM_Frontend_Environment(null, null, $language));
+        $site = $this->getDefaultSite();
+        $render = new CM_Frontend_Render($this->getDefaultEnvironment(null, null, $language));
 
         // Check that key is *not* included in the JS translations list
         $versionJavascript = CM_Model_Language::getVersionJavascript();

@@ -9,7 +9,7 @@ class CM_Usertext_UsertextTest extends CMTest_TestCase {
 
     public function testProcessEmoticon() {
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $siteType = CM_Site_Abstract::factory()->getType();
+        $siteType = $this->getDefaultSite()->getType();
         $usertext = new CM_Usertext_Usertext();
 
         $expectedValuePlain = "<img src=\"http://cdn.default.dev/layout/" . $siteType . "/" . $deployVersion .
@@ -18,7 +18,7 @@ class CM_Usertext_UsertextTest extends CMTest_TestCase {
             "/img/emoticon/cold_sweat.png\" class=\"emoticon emoticon-cold_sweat\" title=\":cold_sweat:\" /></p>";
 
         $usertext->setMode('escape');
-        $render = new CM_Frontend_Render();
+        $render = $this->getDefaultRender();
         $this->assertSame('&lt;3', $usertext->transform('<3', $render));
 
         $usertext->setMode('oneline');

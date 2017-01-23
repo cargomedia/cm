@@ -11,7 +11,7 @@ class smarty_function_componentTest extends CMTest_TestCase {
 
     public function setUp() {
         $smarty = new Smarty();
-        $render = new CM_Frontend_Render();
+        $render = $this->getDefaultRender();
         $this->_template = $smarty->createTemplate('string:');
         $this->_template->assignGlobal('render', $render);
     }

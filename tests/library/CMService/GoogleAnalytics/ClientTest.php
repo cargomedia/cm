@@ -208,7 +208,7 @@ class CMService_GoogleAnalytics_ClientTest extends CMTest_TestCase {
 
     public function testAddPlugin() {
         $ga = new CMService_GoogleAnalytics_Client('');
-        $env = new CM_Frontend_Environment();
+        $env = $this->getDefaultEnvironment();
         $ga->addPlugin('Foo');
         $this->assertContains('ga("require", "Foo");', $ga->getHtml($env));
         $ga->addPlugin('Bar', 'tracker1');

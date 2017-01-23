@@ -361,7 +361,12 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      */
     public function getDefaultSite() {
         if (null === $this->_defaultSite) {
-            $this->_defaultSite = $this->getMockSite();
+            $this->_defaultSite = $this->getMockSite(null, null, [
+                'url'          => 'http://www.default.dev',
+                'urlCdn'       => 'http://cdn.default.dev',
+                'name'         => 'Default',
+                'emailAddress' => 'default@default.dev',
+            ]);
         }
         return $this->_defaultSite;
     }
@@ -382,7 +387,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @return CM_Dom_NodeList
      */
     protected function _renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
-        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, $viewer));
+        $render = new CM_Frontend_Render($this->getDefaultEnvironment($site, $viewer));
         $renderAdapter = new CM_RenderAdapter_Component($render, $component);
         $componentHtml = $renderAdapter->fetch();
         return new CM_Dom_NodeList($componentHtml, true);
@@ -396,7 +401,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      */
     protected function _renderFormField(CM_FormField_Abstract $formField, array $renderParams = null, CM_Frontend_Render $render = null) {
         if (null === $render) {
-            $render = new CM_Frontend_Render();
+            $render = $this->getDefaultRender();
         }
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
         $html = $renderAdapter->fetch(CM_Params::factory($renderParams, false));

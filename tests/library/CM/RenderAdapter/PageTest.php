@@ -4,7 +4,7 @@ class CM_RenderAdapter_PageTest extends CMTest_TestCase {
 
     public function testFetchDescriptionKeywordsTitleTrimming() {
         $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
-        $render = new CM_Frontend_Render();
+        $render = $this->getDefaultRender();
 
         $page = $this->getMockBuilder('CM_Page_Abstract')->getMockForAbstractClass();
         /** @var CM_Page_Abstract $page */
@@ -29,7 +29,8 @@ class CM_RenderAdapter_PageTest extends CMTest_TestCase {
     public function testFetchDescriptionKeywordsConsiderNamespaceWideLocation() {
         $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
 
-        $render = $this->getMockBuilder('CM_Frontend_Render')->setMethods(array('getTemplatePath', 'getLayoutPath'))->getMock();
+        $render = $this->getMockBuilder('CM_Frontend_Render')->setMethods(['getTemplatePath', 'getLayoutPath', 'getEnvironment'])->getMock();
+        $render->expects($this->any())->method('getEnvironment')->will($this->returnValue($this->getDefaultEnvironment()));
         $render->expects($this->any())->method('getTemplatePath')->will($this->returnValue(null));
         $render->expects($this->exactly(2))->method('getLayoutPath')->will($this->returnCallback(function ($templateName) use ($dirTmp) {
             $templateFile = new CM_File($dirTmp . $templateName);

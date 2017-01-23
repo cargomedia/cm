@@ -29,9 +29,8 @@ class CM_FormField_SetTest extends CMTest_TestCase {
         $data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
         $field = new CM_FormField_Set(['name' => 'foo', 'values' => $data, 'labelsInValues' => true]);
 
-        $environment = new CM_Frontend_Environment();
+        $environment = $this->getDefaultEnvironment();
         $userInputGood = array(32, 64, 128);
-        $response = $this->getMockForAbstractClass('CM_Http_Response_Abstract', array(), '', false);
         $validationResult = $field->validate($environment, $userInputGood);
         $this->assertSame($userInputGood, $validationResult);
 
@@ -41,7 +40,6 @@ class CM_FormField_SetTest extends CMTest_TestCase {
     }
 
     public function testRender() {
-        $render = new CM_Frontend_Render();
         $name = 'foo';
         $data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
         $field = new CM_FormField_Set(['name' => $name, 'values' => $data, 'labelsInValues' => true]);

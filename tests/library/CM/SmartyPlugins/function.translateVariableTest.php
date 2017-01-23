@@ -7,6 +7,7 @@ class smarty_function_translateVariableTest extends CMTest_TestCase {
     public function testTranslatePhrase() {
         /** @var CM_Frontend_Render|\Mocka\AbstractClassTrait $render */
         $render = $this->mockClass('CM_Frontend_Render')->newInstance();
+        $render->mockMethod('getEnvironment')->set($this->getDefaultEnvironment());
         $getTranslationMethod = $render->mockMethod('getTranslation')->set(function ($key, $params) {
             $this->assertSame('Bar value is {$bar}', $key);
             $this->assertSame(['bar' => 3], $params);

@@ -3,7 +3,7 @@
 class CM_Http_Response_Resource_Javascript_ServiceWorkerTest extends CMTest_TestCase {
 
     public function testProcess() {
-        $render = new CM_Frontend_Render(new CM_Frontend_Environment());
+        $render = $this->getDefaultRender();
         $url = $render->getUrlServiceWorker();
         $this->assertSame(1, substr_count(parse_url($url, PHP_URL_PATH), '/'));
 
