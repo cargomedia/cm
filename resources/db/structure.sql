@@ -199,6 +199,8 @@ CREATE TABLE `cm_model_location_country` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `abbreviation` char(2) NOT NULL,
   `name` varchar(100) NOT NULL,
+  `lat` float DEFAULT NULL,
+  `lon` float DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -220,6 +222,8 @@ CREATE TABLE `cm_model_location_state` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `countryId` int(10) unsigned NOT NULL,
   `name` varchar(120) NOT NULL,
+  `lat` float DEFAULT NULL,
+  `lon` float DEFAULT NULL,
   `_maxmind` char(5) DEFAULT NULL,
   `abbreviation` char(2) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -240,6 +244,17 @@ CREATE TABLE `cm_model_location_zip` (
   PRIMARY KEY (`id`),
   KEY `cityId` (`cityId`),
   KEY `name` (`name`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_migration`;
+
+
+CREATE TABLE `cm_migration` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `executedAt` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_option`;
@@ -523,7 +538,7 @@ DROP TABLE IF EXISTS `cm_user`;
 
 CREATE TABLE `cm_user` (
   `userId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `activityStamp` int(10) unsigned NOT NULL,
+  `activityStamp` int(10) unsigned DEFAULT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   `site` int(10) unsigned DEFAULT NULL,
   `languageId` int(10) unsigned DEFAULT NULL,

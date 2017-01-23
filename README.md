@@ -234,7 +234,7 @@ Commands:
  app deploy
  app fill-caches
  app generate-config-internal
- app set-deploy-version [--deploy-version=<value>]
+ app set-config <filename> <config-json> [--merge]
  app setup [--reload]
  cache clear
  console interactive
@@ -242,27 +242,29 @@ Commands:
  db file-to-db
  db run-update <version> [--namespace=<value>]
  db run-updates
+ frontend generate-favicon
+ frontend icon-refresh
  generator bootstrap-project [--project-name=<value>] [--domain=<value>] [--module-name=<value>]
  generator create-class <class-name>
  generator create-module <module-name> [--single-module-structure] [--module-path=<value>]
  generator create-site <class-name> <name> <domain>
  generator create-view <class-name>
- frontend icon-refresh
- frontend generate-favicon
  job-distribution start-worker
  location outdated [--verbose]
  location upgrade [--without-ip-blocks] [--verbose]
  maintenance start
  maintenance start-local
+ media-streams import-archive <stream-channel-media-id> <archive-source>
+ media-streams import-video-thumbnail <stream-channel-media-id> <thumbnail-source> <create-stamp>
  message-stream start-synchronization
+ migration add [--namespace=<value>] [--name=<value>]
+ migration run [--name=<value>]
  search-index create [--index-name=<value>] [--skip-if-exist]
  search-index delete [--index-name=<value>]
  search-index optimize
  search-index start-maintenance
  search-index update [--index-name=<value>]
- stream import-video-archive <stream-channel-id> <archive-source>
- stream import-video-thumbnail <stream-channel-id> <thumbnail-source>
-```
+ ```
 
 Deployment
 ----------

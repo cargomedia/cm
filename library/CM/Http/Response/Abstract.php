@@ -114,7 +114,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     public function createRender() {
         $languageRewrite = !$this->getViewer() && $this->getRequest()->getLanguageUrl();
         $environment = $this->getEnvironment();
-        return new CM_Frontend_Render($environment, $languageRewrite, $this->getServiceManager());
+        return new CM_Frontend_Render($environment, $this->getServiceManager());
     }
 
     /**

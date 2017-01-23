@@ -73,11 +73,6 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
             $this->redirectUrl($render->getUrl($path, $this->_site));
         }
-        if ($this->_request->getLanguageUrl() && $this->getViewer()) {
-            $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
-            $this->redirectUrl($render->getUrl($path, $this->_site));
-            $this->_request->setLanguageUrl(null);
-        }
         if (!$this->getRedirectUrl()) {
             $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);

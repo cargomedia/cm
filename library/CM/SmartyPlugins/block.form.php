@@ -38,9 +38,6 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
                 $html .= $renderAdapter->fetch(CM_Params::factory());
             }
         }
-        foreach ($form->getActions() as $actionName => $action) {
-            $viewResponse->getJs()->append("this.registerAction('{$actionName}', {$action->js_presentation()});");
-        }
         $html .= '</form>';
 
         $frontend->treeCollapse();

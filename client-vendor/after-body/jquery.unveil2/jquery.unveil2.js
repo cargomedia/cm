@@ -32,6 +32,11 @@
     var unveilString = 'unveil',
 
     /**
+     * jQuery event namespace
+     */
+        unveilNamespace = '.' + unveilString,
+
+    /**
      * Store the string 'src' in a variable to save some bytes
      */
         srcString = 'src',
@@ -65,9 +70,9 @@
                 throttle: 250,
                 debug: false,
                 attribute: srcString,
+                container: $window,
 
                 // Undocumented
-                container: $window,
                 retina: window.devicePixelRatio > 1,
 
                 // Deprecated
@@ -85,13 +90,13 @@
             return b.minWidth - a.minWidth;
         });
 
-        var containerContext = settings.container.data('unveil2');
+        var containerContext = settings.container.data(unveilString);
         if (!containerContext) {
             containerContext = {
                 images: $(),
                 initialized: false
             };
-            settings.container.data('unveil2', containerContext);
+            settings.container.data(unveilString, containerContext);
         }
 
         /**
@@ -102,7 +107,7 @@
         /**
          * This is the actual plugin logic, which determines the source attribute to use based on window width and presence of a retina screen, changes the source of the image, handles class name changes and triggers a callback if set. Once the image has been loaded, start the unveil lookup because the page layout could have changed.
          */
-        this.one(unveilString + '.' + unveilString, function () {
+        this.one(unveilString + unveilNamespace, function () {
             var i, $this = $(this), windowWidth = $window.width(),
                 attrib = settings.attribute, targetSrc, defaultSrc, retinaSrc;
 
@@ -144,10 +149,10 @@
                     settings.loading.call(this);
                 }
                 // ...and trigger custom event
-                $this.trigger('loading.unveil');
+                $this.trigger('loading' + unveilNamespace);
 
                 // When new source has loaded, do stuff
-                $this.one('load', function () {
+                $this.one('load' + unveilNamespace, function () {
 
                     // Change classes
                     classLoaded($this);
@@ -157,7 +162,7 @@
                         settings.loaded.call(this);
                     }
                     // ...and trigger custom event
-                    $this.trigger('loaded.unveil');
+                    $this.trigger('loaded' + unveilNamespace);
 
                     // Loading the image may have modified page layout,
                     // so unveil again
@@ -168,9 +173,9 @@
                 if (this.nodeName === 'IMG') {
                     $this.prop(srcString, targetSrc);
                 } else {
-                    $('<img/>').attr(srcString, targetSrc).one('load', function() {
+                    $('<img/>').attr(srcString, targetSrc).one('load' + unveilNamespace, function() {
                         $(this).remove();
-                        $this.css('backgroundImage', 'url(' + targetSrc + ')').trigger('load');
+                        $this.css('backgroundImage', 'url(' + targetSrc + ')').trigger('load' + unveilNamespace);
                     });
                 }
 
@@ -181,8 +186,8 @@
             }
         });
 
-        this.one('destroy.' + unveilString, function () {
-            $(this).off('.unveil');
+        this.one('destroy' + unveilNamespace, function () {
+            $(this).off(unveilNamespace);
             if (containerContext.images) {
                 containerContext.images = containerContext.images.not(this);
                 if (!containerContext.images.length) {
@@ -287,7 +292,7 @@
             if (containerContext.images) {
                 var batch = containerContext.images.filter(inview);
 
-                batch.trigger(unveilString + '.' + unveilString);
+                batch.trigger(unveilString + unveilNamespace);
                 containerContext.images = containerContext.images.not(batch);
 
                 if (batch.length) {
@@ -297,9 +302,9 @@
         }
 
         function destroyContainer() {
-            settings.container.off('.unveil');
-            containerContext.images.off('.unveil');
-            settings.container.data('unveil2', null);
+            settings.container.off(unveilNamespace);
+            containerContext.images.off(unveilNamespace);
+            settings.container.data(unveilString, null);
             containerContext.initialized = false;
             containerContext.images = null;
         }
@@ -333,7 +338,7 @@
 
                 // Set placeholder
                 $this
-                    .one('load', function () {
+                    .one('load' + unveilNamespace, function () {
                         var $this = $(this);
 
                         if ($this.hasClass(unveilString + '-loaded')) {
@@ -354,12 +359,11 @@
          * Bind global listeners
          */
         {if (!containerContext.initialized) {
-            settings.container.on({
-                'resize.unveil': throttle(resize),
-                'scroll.unveil': throttle(lookup),
-                'lookup.unveil': lookup,
-                'destroy.unveil': destroyContainer
-            });
+            settings.container
+                .on('resize' + unveilNamespace, throttle(resize))
+                .on('scroll' + unveilNamespace, throttle(lookup))
+                .on('lookup' + unveilNamespace, lookup)
+                .on('destroy' + unveilNamespace, destroyContainer);
             containerContext.initialized = true;
         }}
 

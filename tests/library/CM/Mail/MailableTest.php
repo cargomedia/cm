@@ -58,7 +58,7 @@ class CM_Mail_MailableTest extends CMTest_TestCase {
 
         $nodeLink = $nodeList->find('a');
         $this->assertSame(1, $nodeLink->count());
-        $this->assertSame('http://www.foo.com/example', $nodeLink->getAttribute('href'));
+        $this->assertSame('http://www.foo.com/foo/example', $nodeLink->getAttribute('href'));
         $this->assertSame('Example Page', $nodeLink->getText());
         $this->assertContains('border-style:solid;', $nodeLink->getAttribute('style'));
     }

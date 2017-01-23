@@ -205,8 +205,8 @@ var CM_App = CM_Class_Abstract.extend({
     if (type && path) {
       var urlParts = [];
       urlParts.push(type);
-      if (cm.options.urlLanguage) {
-        urlParts.push(cm.options.urlLanguage.abbreviation);
+      if (cm.options.language) {
+        urlParts.push(cm.options.language.abbreviation);
       }
       urlParts.push(cm.getSiteId());
       urlParts.push(cm.options.deployVersion);
@@ -246,8 +246,8 @@ var CM_App = CM_Class_Abstract.extend({
    */
   getUrlAjax: function(type) {
     var path = '/' + type;
-    if (cm.options.urlLanguage) {
-      path += '/' + cm.options.urlLanguage.abbreviation;
+    if (cm.options.language) {
+      path += '/' + cm.options.language.abbreviation;
     }
     return this.getUrl(path);
   },
@@ -471,7 +471,6 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('.toggleNext').toggleNext();
       $dom.find('.tabs').tabs();
       $dom.find('.openx-ad:visible').openx();
-      $dom.find('.epom-ad').epom();
       $dom.find('.fancySelect').fancySelect();
       this._setupContentPlaceholder($dom);
     },
@@ -497,6 +496,7 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {jQuery} $dom
      */
     teardown: function($dom) {
+      $dom.find('.openerDropdown').opener('close');
       $dom.find('.timeago').timeago('dispose');
       $dom.find('textarea.autosize, .autosize textarea').trigger('autosize.destroy');
       $dom.find('img.lazy').trigger('destroy.unveil');
@@ -507,12 +507,11 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {Object} [options]
      * @param {Boolean} [options.loop=false]
      * @param {Boolean} [options.autoplay=false]
-     * @param {String} [options.crossOrigin='anonymous']
      * @return {Audio}
      */
     createAudio: function(sourceList, options) {
       sourceList = _.isString(sourceList) ? [sourceList] : sourceList;
-      var audio = new cm.lib.Media.Audio(options);
+      var audio = new cm.lib.Media.Audio();
       audio.setOptions(options);
       audio.setSources(sourceList);
       return audio;
@@ -530,6 +529,7 @@ var CM_App = CM_Class_Abstract.extend({
   date: {
     ready: function() {
       $.timeago.settings.allowFuture = true;
+      $.timeago.settings.autoDispose = false;
       $.timeago.settings.strings = {
         prefixAgo: cm.language.get('.date.timeago.prefixAgo', {count: '%d'}),
         prefixFromNow: cm.language.get('.date.timeago.prefixFromNow', {count: '%d'}),
@@ -563,13 +563,6 @@ var CM_App = CM_Class_Abstract.extend({
      */
     iso8601: function(date) {
       return date.getUTCFullYear() + '-' + cm.string.padLeft(date.getUTCMonth() + 1, 2, '0') + '-' + cm.string.padLeft(date.getUTCDate(), 2, '0') + 'T' + cm.string.padLeft(date.getUTCHours(), 2, '0') + ':' + cm.string.padLeft(date.getUTCMinutes(), 2, '0') + ':' + cm.string.padLeft(date.getUTCSeconds(), 2, '0') + '.' + cm.string.padLeft(date.getUTCMilliseconds(), 3, '0') + 'Z';
-    },
-    /**
-     * @param {Number} [timestamp]
-     * @return {jQuery}
-     */
-    $timeago: function(timestamp) {
-      return $(this.timeago(timestamp)).timeago();
     },
     /**
      * @param {Number} [timestamp]
