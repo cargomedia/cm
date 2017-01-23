@@ -322,14 +322,15 @@ return function (CM_Config_Node $config) {
         ],
     ];
 
-    $config->services['job-manager'] = [
-        'class'  => 'CM_Gearman_Factory',
+    $config->services[CM_Jobdistribution_Queue::class] = [
+        'class'  => CM_Gearman_Factory::class,
         'method' => [
-            'name'      => 'createJobManager',
+            'name'      => 'createJobQueue',
             'arguments' => [
-                'servers' => [
+                'servers'        => [
                     ['host' => 'localhost', 'port' => 4730],
                 ],
+                'workerJobLimit' => 1000,
             ],
         ],
     ];
