@@ -19,7 +19,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
                     'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
                 ],
         ];
-        $config = array_merge($config, $defaults);
+        $config = array_merge($defaults, $config);
         $this->_config = $config;
     }
 
