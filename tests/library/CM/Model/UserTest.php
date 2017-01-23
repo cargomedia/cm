@@ -150,8 +150,10 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertNull($user->getEnvironment()->getLanguage());
 
         $defaultLanguage = CMTest_TH::createLanguage('en');
-        $user = CMTest_TH::createUser();
-        $user->setLanguage($defaultLanguage);
         $this->assertEquals($defaultLanguage, $user->getEnvironment()->getLanguage());
+
+        $otherLanguage = CMTest_TH::createLanguage('de');
+        $user->setLanguage($otherLanguage);
+        $this->assertEquals($otherLanguage, $user->getEnvironment()->getLanguage());
     }
 }
