@@ -2,13 +2,9 @@
 
 class CM_Frontend_RenderTest extends CMTest_TestCase {
 
-    /** @var CM_Model_Language */
-    private $_languageDefault;
-
     protected function setUp() {
         CM_Config::get()->CM_Site_Abstract->url = 'http://www.default.dev';
         CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://cdn.default.dev';
-        $this->_languageDefault = CMTest_TH::createLanguage('en');
     }
 
     public function tearDown() {
