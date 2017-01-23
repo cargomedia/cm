@@ -83,7 +83,7 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
     public function flush() {
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $criteria = $this->_getCriteria();
-        $mongoDb->remove(self::COLLECTION_NAME, $criteria, ['socketTimeoutMS' => 50000]);
+        $mongoDb->deleteMany(self::COLLECTION_NAME, $criteria, ['socketTimeoutMS' => 50000]);
         $this->_change();
     }
 
@@ -99,10 +99,10 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         $deleteOlderThan = time() - $age;
 
         $criteria = $this->_getCriteria();
-        $criteria['createdAt'] = ['$lt' => new MongoDate($deleteOlderThan)];
+        $criteria['createdAt'] = ['$lt' => new \MongoDB\BSON\UTCDateTime($deleteOlderThan * 1000)];
 
         $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
-        $mongoDb->remove(self::COLLECTION_NAME, $criteria, ['socketTimeoutMS' => 50000]);
+        $mongoDb->deleteMany(self::COLLECTION_NAME, $criteria, ['socketTimeoutMS' => 50000]);
         $this->_change();
     }
 
@@ -123,7 +123,7 @@ class CM_Paging_Log extends CM_Paging_Abstract implements CM_Typed {
         }
 
         if (null !== $this->_ageMax) {
-            $criteria['createdAt'] = ['$gt' => new MongoDate(time() - $this->_ageMax)];
+            $criteria['createdAt'] = ['$gt' => new \MongoDB\BSON\UTCDateTime((time() - $this->_ageMax) * 1000)];
         }
 
         return $criteria;
