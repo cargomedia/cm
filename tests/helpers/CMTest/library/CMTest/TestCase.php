@@ -9,6 +9,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
     protected $backupGlobalsBlacklist = ['bootloader'];
 
+    /** @var CM_Site_Abstract|PHPUnit_Framework_MockObject_MockObject|null */
+    protected $_defaultSite;
+
     public function runBare() {
         if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
             $siteDefault = $this->getMockSite(null, null, array(
@@ -319,6 +322,48 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $reflectionMethod = $reflectionClass->getMethod($methodName);
         $reflectionMethod->setAccessible(true);
         return $reflectionMethod->invokeArgs($context, $arguments);
+    }
+
+    /**
+     * @param CM_Site_Abstract|null     $site
+     * @param CM_Model_User|null        $viewer
+     * @param CM_Model_Language|null    $language
+     * @param DateTimeZone|null         $timeZone
+     * @param boolean|null              $debug
+     * @param CM_Model_Location|null    $location
+     * @param CM_Model_Currency|null    $currency
+     * @param CM_Http_ClientDevice|null $clientDevice
+     * @return CM_Frontend_Environment
+     */
+    public function getDefaultEnvironment(CM_Site_Abstract $site = null,
+                                          CM_Model_User $viewer = null,
+                                          CM_Model_Language $language = null,
+                                          DateTimeZone $timeZone = null,
+                                          $debug = null,
+                                          CM_Model_Location $location = null,
+                                          CM_Model_Currency $currency = null,
+                                          CM_Http_ClientDevice $clientDevice = null) {
+        if (null === $site) {
+            $site = $this->getDefaultSite();
+        }
+        return new CM_Frontend_Environment($site, $viewer, $language, $timeZone, $debug, $location, $currency, $clientDevice);
+    }
+
+    /**
+     * @return CM_Frontend_Render
+     */
+    public function getDefaultRender() {
+        return new CM_Frontend_Render($this->getDefaultEnvironment());
+    }
+
+    /**
+     * @return CM_Site_Abstract|PHPUnit_Framework_MockObject_MockObject
+     */
+    public function getDefaultSite() {
+        if (null === $this->_defaultSite) {
+            $this->_defaultSite = $this->getMockSite();
+        }
+        return $this->_defaultSite;
     }
 
     /**
