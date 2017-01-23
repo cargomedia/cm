@@ -12,25 +12,17 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @param array $config
      */
     public function __construct(array $config) {
-        $defaults = [
-            'options'       => [],
-            'driverOptions' =>
-                [
-                    'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
-                ],
-        ];
-        $config = array_merge($defaults, $config);
         $this->_config = $config;
     }
 
     /**
      * @param string $collection
-     * @param string $index
+     * @param array  $index
      * @return array
      * @throws CM_MongoDb_Exception
      */
-    public function deleteIndex($collection, $index) {
-        $result = $this->_getCollection($collection)->dropIndex($index);
+    public function deleteIndex($collection, array $index) {
+        $result = $this->_getCollection($collection)->deleteIndex($index);
         $this->_checkResultForErrors($result);
         return $result;
     }
@@ -39,9 +31,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @return string[]
      */
     public function listCollectionNames() {
-        return \Functional\reject(\Functional\invoke($this->_getDatabase()->listCollections(), 'getName'), function ($collectionName) {
-            return 0 === stripos($collectionName, 'system.');
-        });
+        return $this->_getDatabase()->getCollectionNames();
     }
 
     /**
@@ -54,9 +44,12 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     public function insert($collection, array $object, array $options = null) {
         $options = $options ?: [];
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Insert `{$collection}`: " . CM_Params::jsonEncode($object));
-        $result = $this->_getCollection($collection)->insertOne($object, $options);
+        $intermediary = &$object;
+        $data = $intermediary;
+        $result = $this->_getCollection($collection)->insert($data, $options);
         $this->_checkResultForErrors($result);
-        return $result->getInsertedId();
+        $id = $data['_id'];
+        return $id;
     }
 
     /**
@@ -72,18 +65,19 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
         $dataList = \Functional\map($objectList, function (array &$object) {
             return $object;
         });
-        $result = $this->_getCollection($collection)->insertMany($dataList, $options);
+        $result = $this->_getCollection($collection)->batchInsert($dataList, $options);
         $this->_checkResultForErrors($result);
-        return $result->getInsertedIds();
+        return \Functional\map($dataList, function (array $data) {
+            return $data['_id'];
+        });
     }
 
     /**
      * @param string $name
      * @param array  $options
-     * @return array
+     * @return MongoCollection
      */
     public function createCollection($name, array $options = null) {
-        $options = (array) $options;
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "create collection {$name}: " . CM_Params::jsonEncode($options));
         return $this->_getDatabase()->createCollection($name, $options);
     }
@@ -92,7 +86,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @param string $collection
      * @param array  $keys
      * @param array  $options
-     * @return string
+     * @return array
      * @throws CM_MongoDb_Exception
      */
     public function createIndex($collection, array $keys, array $options = null) {
@@ -100,6 +94,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "create index on {$collection}: " .
             CM_Params::jsonEncode($keys) . ' ' . CM_Params::jsonEncode($options));
         $result = $this->_getCollection($collection)->createIndex($keys, $options);
+        $this->_checkResultForErrors($result);
         return $result;
     }
 
@@ -111,49 +106,8 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @param array|null $options
      * @return array|null
      */
-    public function findOneAndUpdate($collection, array $criteria = null, array $update = null, array $projection = null, array $options = null) {
-        $criteria = (array) $criteria;
-        $options = (array) $options;
-        if (null !== $projection) {
-            $options['projection'] = $projection;
-        }
-        $result = $this->_getCollection($collection)->findOneAndUpdate($criteria, $update, $options);
-        return (null !== $result) ? (array) $result : null;
-    }
-
-    /**
-     * @param string     $collection
-     * @param array|null $criteria
-     * @param array|null $replace
-     * @param array|null $projection
-     * @param array|null $options
-     * @return array|null
-     */
-    public function findOneAndReplace($collection, array $criteria = null, array $replace = null, array $projection = null, array $options = null) {
-        $criteria = (array) $criteria;
-        $options = (array) $options;
-        if (null !== $projection) {
-            $options['projection'] = $projection;
-        }
-        $result = $this->_getCollection($collection)->findOneAndReplace($criteria, $replace, $options);
-        return (null !== $result) ? (array) $result : null;
-    }
-
-    /**
-     * @param string     $collection
-     * @param array|null $criteria
-     * @param array|null $projection
-     * @param array|null $options
-     * @return array|null
-     */
-    public function findOneAndDelete($collection, array $criteria = null, array $projection = null, array $options = null) {
-        $criteria = (array) $criteria;
-        $options = (array) $options;
-        if (null !== $projection) {
-            $options['projection'] = $projection;
-        }
-        $result = $this->_getCollection($collection)->findOneAndDelete($criteria, $options);
-        return (null !== $result) ? (array) $result : null;
+    public function findAndModify($collection, $criteria = null, $update = null, $projection = null, $options = null) {
+        return $this->_getCollection($collection)->findAndModify($criteria, $update, $projection, $options);
     }
 
     /**
@@ -161,21 +115,18 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @param array|null $criteria
      * @param array|null $projection
      * @param array|null $aggregation
-     * @param array|null $options
      * @return array|null
      */
-    public function findOne($collection, array $criteria = null, array $projection = null, array $aggregation = null, array $options = null) {
+    public function findOne($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
         $criteria = (array) $criteria;
-        $options = (array) $options;
+        $projection = (array) $projection;
         if ($aggregation) {
             array_push($aggregation, ['$limit' => 1]);
-            $resultSet = $this->find($collection, $criteria, $projection, $aggregation, ['limit' => 1]);
-            $result = \Functional\first($resultSet);
+            $resultSet = $this->find($collection, $criteria, $projection, $aggregation);
+            $resultSet->rewind();
+            $result = $resultSet->current();
         } else {
-            if ($projection) {
-                $options['projection'] = $projection;
-            }
-            $result = $this->_getCollection($collection)->findOne($criteria, $options);
+            $result = $this->_getCollection($collection)->findOne($criteria, $projection);
             CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "findOne `{$collection}`: " .
                 CM_Params::jsonEncode(['projection' => $projection, 'criteria' => $criteria]));
         }
@@ -188,20 +139,16 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @param array|null $criteria
      * @param array|null $projection
      * @param array|null $aggregation
-     * @param array|null $options
      * @return Iterator
      *
      * When using aggregation, $criteria and $projection, if defined, automatically
      * function as `$match` and `$project` operator respectively at the front of the pipeline
      */
-    public function find($collection, array $criteria = null, array $projection = null, array $aggregation = null, array $options = null) {
+    public function find($collection, array $criteria = null, array $projection = null, array $aggregation = null) {
         $batchSize = null;
-        $defaultOptions = [];
         if (isset(self::_getConfig()->batchSize)) {
             $batchSize = (int) self::_getConfig()->batchSize;
-            $defaultOptions = ['batchSize' => $batchSize];
         }
-        $options = array_merge($defaultOptions, (array) $options);
         $criteria = (array) $criteria;
         $projection = (array) $projection;
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "find `{$collection}`: " .
@@ -215,23 +162,28 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
             if ($criteria) {
                 array_unshift($pipeline, ['$match' => $criteria]);
             }
-            $resultCursor = $collection->aggregate($pipeline, $options);
-        } else {
-            if ($projection) {
-                $options['projection'] = $projection;
+            $options = [];
+            if (null !== $batchSize) {
+                $options['cursor'] = ['batchSize' => $batchSize];
             }
-            $resultCursor = $collection->find($criteria, $options);
+            $resultCursor = $collection->aggregateCursor($pipeline, $options);
+        } else {
+            $resultCursor = $collection->find($criteria, $projection);
         }
-        return new IteratorIterator($resultCursor);
+        if (null !== $batchSize) {
+            $resultCursor->batchSize($batchSize);
+        }
+        return $resultCursor;
     }
 
     /**
      * @param $collection
-     * @return \MongoDB\Model\IndexInfoIterator
+     * @return array
      */
     public function getIndexInfo($collection) {
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "indexInfo {$collection}");
-        return $this->_getCollection($collection)->listIndexes();
+        $indexInfo = $this->_getCollection($collection)->getIndexInfo();
+        return $indexInfo;
     }
 
     /**
@@ -241,8 +193,8 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      */
     public function hasIndex($collection, array $index) {
         $indexInfo = $this->getIndexInfo($collection);
-        return \Functional\some($indexInfo, function (\MongoDB\Model\IndexInfo $indexInfo) use ($index) {
-            return array_keys($index) === array_keys($indexInfo->getKey()) && $index == $indexInfo->getKey();
+        return \Functional\some($indexInfo, function ($indexInfo) use ($index) {
+            return array_keys($index) === array_keys($indexInfo['key']) && $index == $indexInfo['key'];
         });
     }
 
@@ -273,20 +225,20 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
             }
             array_push($pipeline, ['$group' => ['_id' => null, 'count' => ['$sum' => 1]]]);
             array_push($pipeline, ['$project' => ['_id' => 0, 'count' => 1]]);
-            $result = \Functional\first($this->find($collection, null, null, $pipeline));
-            if (null !== $result) {
-                return $result['count'];
+            $result = $this->_getCollection($collection)->aggregate($pipeline);
+            if (!empty($result['result'])) {
+                return $result['result'][0]['count'];
             }
             return 0;
         } else {
-            $options = [];
+            $count = $this->_getCollection($collection)->count($criteria);
             if ($offset) {
-                $options['skip'] = $offset;
+                $count -= $offset;
             }
             if ($limit) {
-                $options['limit'] = $limit;
+                $count = min($count, $limit);
             }
-            return $this->_getCollection($collection)->count($criteria, $options);
+            return max(0, $count);
         }
     }
 
@@ -294,6 +246,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @param string    $collectionSource
      * @param string    $collectionTarget
      * @param bool|null $dropTarget
+     * @return array
      * @throws CM_MongoDb_Exception
      */
     public function rename($collectionSource, $collectionTarget, $dropTarget = null) {
@@ -313,11 +266,13 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
                 'collectionTarget' => $collectionTarget,
             ]);
         }
-        $this->_getClient()->selectDatabase('admin')->command([
+        $result = $this->_getClient()->selectDB('admin')->command([
             'renameCollection' => $this->_getDatabaseName() . '.' . $collectionSource,
             'to'               => $this->_getDatabaseName() . '.' . $collectionTarget,
             'dropTarget'       => $dropTarget,
         ]);
+        $this->_checkResultForErrors($result);
+        return $result;
     }
 
     /**
@@ -356,123 +311,70 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     }
 
     /**
+     * @param string|MongoId $id
+     * @return boolean
+     */
+    public function isValidObjectId($id) {
+        return MongoId::isValid($id);
+    }
+
+    /**
      * @param string     $collection
-     * @param array|null $criteria
-     * @param array      $update
+     * @param array      $criteria
+     * @param array      $newObject
      * @param array|null $options
-     * @return int
+     * @return MongoCursor
      * @throws CM_MongoDb_Exception
      */
-    public function updateOne($collection, array $criteria = null, array $update, array $options = null) {
-        $criteria = (array) $criteria;
+    public function update($collection, array $criteria, array $newObject, array $options = null) {
         $options = (array) $options;
-        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "UpdateOne `{$collection}`: " .
-            CM_Params::jsonEncode(['criteria' => $criteria, 'newObject' => $update]));
-
-        $result = $this->_getCollection($collection)->updateOne($criteria, $update, $options);
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Update `{$collection}`: " .
+            CM_Params::jsonEncode(['criteria' => $criteria, 'newObject' => $newObject]));
+        $result = $this->_getCollection($collection)->update($criteria, $newObject, $options);
         $this->_checkResultForErrors($result);
-        return $result->getModifiedCount();
+        return is_array($result) ? $result['n'] : $result;
     }
 
     /**
      * @param string     $collection
      * @param array|null $criteria
-     * @param array      $update
      * @param array|null $options
-     * @return int
+     * @return mixed
      * @throws CM_MongoDb_Exception
      */
-    public function updateMany($collection, array $criteria = null, array $update, array $options = null) {
-        $criteria = (array) $criteria;
-        $options = (array) $options;
-        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "UpdateMany `{$collection}`: " .
-            CM_Params::jsonEncode(['criteria' => $criteria, 'newObject' => $update]));
-
-        $result = $this->_getCollection($collection)->updateMany($criteria, $update, $options);
+    public function remove($collection, array $criteria = null, array $options = null) {
+        $criteria = $criteria ?: array();
+        $options = $options ?: array();
+        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Remove `{$collection}`: " . CM_Params::jsonEncode($criteria));
+        $result = $this->_getCollection($collection)->remove($criteria, $options);
         $this->_checkResultForErrors($result);
-        return $result->getModifiedCount();
+        return is_array($result) ? $result['n'] : $result;
     }
 
     /**
-     * @param string     $collection
-     * @param array|null $criteria
-     * @param array      $replacement
-     * @param array|null $options
-     * @return int
+     * @param string|null $id
+     * @return MongoId
      */
-    public function replaceOne($collection, array $criteria = null, array $replacement, array $options = null) {
-        $criteria = (array) $criteria;
-        $options = (array) $options;
-        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Replace `{$collection}`: " .
-            CM_Params::jsonEncode(['criteria' => $criteria, 'newObject' => $replacement]));
-        $result = $this->_getCollection($collection)->replaceOne($criteria, $replacement, $options);
-        return $result->getModifiedCount();
+    public function getObjectId($id = null) {
+        return new MongoId($id);
     }
 
     /**
-     * @param string     $collection
-     * @param array|null $criteria
-     * @param array|null $options
-     * @return int
-     * @throws CM_MongoDb_Exception
-     */
-    public function deleteMany($collection, array $criteria = null, array $options = null) {
-        $criteria = (array) $criteria;
-        $options = (array) $options;
-        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "DeleteMany `{$collection}`: " . CM_Params::jsonEncode($criteria));
-        $result = $this->_getCollection($collection)->deleteMany($criteria, $options);
-        $this->_checkResultForErrors($result);
-        return $result->getDeletedCount();
-    }
-
-    /**
-     * @param string     $collection
-     * @param array|null $criteria
-     * @param array|null $options
-     * @return int
-     * @throws CM_MongoDb_Exception
-     */
-    public function deleteOne($collection, array $criteria = null, array $options = null) {
-        $criteria = (array) $criteria;
-        $options = (array) $options;
-        CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "DeleteOne `{$collection}`: " . CM_Params::jsonEncode($criteria));
-        $result = $this->_getCollection($collection)->deleteOne($criteria, $options);
-        $this->_checkResultForErrors($result);
-        return $result->getDeletedCount();
-    }
-
-    /**
-     * @param array|boolean|MongoDB\InsertOneResult|MongoDB\InsertManyResult|MongoDB\DeleteResult|MongoDB\UpdateResult $result
+     * @param array|boolean $result
      * @throws CM_MongoDb_Exception
      */
     protected function _checkResultForErrors($result) {
-        if ($result instanceof MongoDB\InsertOneResult) {
-            if (!$result->isAcknowledged()) {
-                throw new CM_MongoDb_Exception('Operation not acknowledged');
-            }
-        } elseif ($result instanceof MongoDB\InsertManyResult) {
-            if (!$result->isAcknowledged()) {
-                throw new CM_MongoDb_Exception('Operation not acknowledged');
-            }
-        } elseif ($result instanceof MongoDB\DeleteResult) {
-            if (!$result->isAcknowledged()) {
-                throw new CM_MongoDb_Exception('Operation not acknowledged');
-            }
-        } elseif ($result instanceof MongoDB\UpdateResult) {
-            if (!$result->isAcknowledged()) {
-                throw new CM_MongoDb_Exception('Operation not acknowledged');
-            }
-        } elseif (true !== $result && empty($result['ok'])) {
+        if (true !== $result && empty($result['ok'])) {
             throw new CM_MongoDb_Exception('Cannot perform mongodb operation', null, ['result' => $result]);
         }
     }
 
     /**
-     * @return MongoDB\Client
+     * @return MongoClient
      */
     protected function _getClient() {
         if (null === $this->_client) {
-            $this->_client = new MongoDB\Client($this->_config['server'], $this->_config['options'], $this->_config['driverOptions']);
+            $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
         }
         return $this->_client;
     }
@@ -481,8 +383,8 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * @return string[]
      */
     protected function _listDatabaseNames() {
-        $databases = $this->_getClient()->listDatabases();
-        return \Functional\invoke($databases, 'getName');
+        $databasesInfo = $this->_getClient()->listDBs();
+        return \Functional\pluck($databasesInfo['databases'], 'name');
     }
 
     /**
@@ -493,35 +395,19 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     }
 
     /**
-     * @return MongoDB\Database
+     * @return MongoDB
      * @throws CM_Exception_Nonexistent
      */
     protected function _getDatabase() {
-        return $this->_getClient()->selectDatabase($this->_getDatabaseName());
+        return $this->_getClient()->selectDB($this->_getDatabaseName());
     }
 
     /**
      * @param string $collection
-     * @return \MongoDB\Collection
+     * @return MongoCollection
      */
     protected function _getCollection($collection) {
         $collection = (string) $collection;
         return $this->_getDatabase()->selectCollection($collection);
-    }
-
-    /**
-     * @param string|null $id
-     * @return \MongoDB\BSON\ObjectID
-     */
-    public static function getObjectId($id = null) {
-        return new \MongoDB\BSON\ObjectID($id);
-    }
-
-    /**
-     * @param string|\MongoDB\BSON\ObjectID $id
-     * @return boolean
-     */
-    public static function isValidObjectId($id) {
-        return (boolean) preg_match('/^[[:xdigit:]]{24}$/i', (string) $id);
     }
 }

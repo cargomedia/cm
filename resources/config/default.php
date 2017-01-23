@@ -104,15 +104,16 @@ return function (CM_Config_Node $config) {
         'arguments' => [],
     ];
 
-    $config->services['MongoDb'] = [
+    $config->services['MongoDb'] = array(
         'class'     => 'CM_MongoDb_Client',
-        'arguments' => [
-            'config' => [
+        'arguments' => array(
+            'config' => array(
                 'db'      => 'cm',
                 'server'  => 'mongodb://localhost:27017',
-            ],
-        ],
-    ];
+                'options' => array('connect' => true),
+            ),
+        ),
+    );
 
     $config->services['redis'] = array(
         'class'     => 'CM_Redis_Client',
