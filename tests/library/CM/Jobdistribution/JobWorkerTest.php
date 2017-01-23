@@ -21,7 +21,7 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
         $mockBuilder->setMethods(['_getGearmanWorker', '_handleException']);
         $jobWorkerMock = $mockBuilder->getMock();
         $jobWorkerMock->expects($this->any())->method('_getGearmanWorker')->will($this->returnValue($gearmanWorkerMock));
-        /** @var CM_JobDistribution_JobWorker $jobWorkerMock */
+        /** @var CM_Gearman_JobWorker $jobWorkerMock */
         $serviceManager = new CM_Service_Manager();
         $jobWorkerMock->setServiceManager($serviceManager);
         /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
@@ -57,9 +57,9 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
         $workMethod = $gearmanWorker->mockMethod('work')->set(true);
 
         CM_Config::get()->CM_Jobdistribution_JobWorker->servers = [];
-        $worker = $this->mockClass(CM_Jobdistribution_JobWorker::class)->newInstance([5]);
+        $worker = $this->mockClass(CM_Gearman_JobWorker::class)->newInstance([5]);
         $worker->mockMethod('_getGearmanWorker')->set($gearmanWorker);
-        /** @var CM_Jobdistribution_JobWorker $worker */
+        /** @var CM_Gearman_JobWorker $worker */
         $worker->setServiceManager($serviceManager);
         $worker->run();
         $this->assertSame(5, $workMethod->getCallCount());
