@@ -57,10 +57,4 @@ class CM_Frontend_EnvironmentTest extends CMTest_TestCase {
         $environment = new CM_Frontend_Environment(null, CM_Model_User::createStatic());
         $this->assertTrue($environment->hasViewer());
     }
-
-    public function testDefaultLanguage() {
-        $language = CM_Model_Language::create('English', 'en', true);
-        $environment = new CM_Frontend_Environment();
-        $this->assertEquals($language, $environment->getLanguage());
-    }
 }
