@@ -267,6 +267,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @param int|null $type
      * @return CM_Site_Abstract
      * @throws CM_Class_Exception_TypeNotConfiguredException
+     * @deprecated use CM_Site_SiteFactory methods instead
      */
     public static function factory($type = null) {
         try {
@@ -286,6 +287,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     public static function fromArray(array $array) {
         $type = (int) $array['type'];
-        return self::factory($type);
+        return (new CM_Site_SiteFactory())->getSiteById($type);
     }
 }

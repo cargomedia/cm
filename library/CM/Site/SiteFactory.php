@@ -64,6 +64,20 @@ class CM_Site_SiteFactory {
     }
 
     /**
+     * @param int $id
+     * @return CM_Site_Abstract
+     * @throws CM_Exception_Invalid
+     */
+    public function getSiteById($id) {
+        $id = (int) $id;
+        $site = $this->findSiteById($id);
+        if (null === $site) {
+            throw new CM_Exception_Invalid('Site is not found', null, ['siteId' => $id]);
+        }
+        return $site;
+    }
+
+    /**
      * @return CM_Site_Abstract
      * @throws CM_Exception_Invalid
      */
@@ -74,7 +88,7 @@ class CM_Site_SiteFactory {
         if (null === $defaultSiteId) {
             throw new CM_Exception_Invalid('Default site is not set');
         }
-        return $this->findSiteById($defaultSiteId);
+        return $this->getSiteById($defaultSiteId);
     }
 
 }
