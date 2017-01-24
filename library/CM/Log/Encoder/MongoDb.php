@@ -8,7 +8,7 @@ class CM_Log_Encoder_MongoDb {
      */
     public function encode($value) {
         if ($value instanceof DateTime) {
-            return new \MongoDB\BSON\UTCDateTime($value->getTimestamp() * 1000);
+            return new MongoDate($value->getTimestamp());
         }
         if ($value instanceof CM_Model_Abstract) {
             return [

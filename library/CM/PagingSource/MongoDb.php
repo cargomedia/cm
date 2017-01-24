@@ -14,7 +14,7 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
     /** @var array */
     private $_aggregation;
 
-    /** @var array|null */
+    /** @var array|null  */
     private $_sort;
 
     /**
@@ -60,7 +60,6 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
         if (($items = $this->_cacheGet($cacheKey)) === false) {
             $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
             $aggregation = null;
-            $options = [];
             if ($this->_aggregation) {
                 $aggregation = $this->_aggregation;
                 if (null !== $this->_sort) {
@@ -72,19 +71,24 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
                 if (null !== $count) {
                     array_push($aggregation, ['$limit' => $count]);
                 }
-            } else {
+            }
+            $cursor = $mongoDb->find($this->_collection, $this->_criteria, $this->_projection, $aggregation);
+            if (null === $this->_aggregation) {
+                /** @var MongoCursor $cursor */
                 if (null !== $this->_sort) {
-                    $options['sort'] = $this->_sort;
+                    $cursor->sort($this->_sort);
                 }
                 if (null !== $offset) {
-                    $options['skip'] = $offset;
+                    $cursor->skip($offset);
                 }
                 if (null !== $count) {
-                    $options['limit'] = ($count);
+                    $cursor->limit($count);
                 }
             }
-            $result = $mongoDb->find($this->_collection, $this->_criteria, $this->_projection, $aggregation, $options);
-            $items = iterator_to_array($result);
+            $items = array();
+            foreach ($cursor as $item) {
+                $items[] = $item;
+            }
             $this->_cacheSet($cacheKey, $items);
         }
         return $items;

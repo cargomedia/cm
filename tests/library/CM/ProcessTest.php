@@ -4,21 +4,6 @@ require_once dirname(dirname(__DIR__)) . '/bootstrap.php'; // Bootstrap the test
 
 class CM_ProcessTest extends CMTest_TestCase {
 
-    /** @var CM_File */
-    private $_tmpFile;
-
-    public function setUp() {
-        $this->_tmpFile = CM_File::createTmp();
-    }
-
-    public function tearDown() {
-        $this->_tmpFile->delete();
-    }
-
-    public static function tearDownAfterClass() {
-        // To avoid issues that arise when forking a process with an established mongodb-connection. see https://jira.mongodb.org/browse/PHPC-433
-    }
-
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
@@ -72,7 +57,7 @@ class CM_ProcessTest extends CMTest_TestCase {
      * @preserveGlobalState disabled
      */
     public function testForkAndWaitForChildren() {
-        $file = $this->_tmpFile;
+        $file = CM_File::createTmp();
 
         // Previous fork, which should be ignored silently by CM_Process::_wait
         if (0 === pcntl_fork()) {
