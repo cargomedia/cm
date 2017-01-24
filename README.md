@@ -297,4 +297,42 @@ Once this is positive it will run `load`.
 
 Additionally provision scripts can implement `CM_Provision_Script_UnloadableInterface` with corresponding `unload` and `shouldBeUnloaded` methods.
 
+### Migration scripts
+Migration scripts are located in `[modulePath]/resources/migration` directories, they are executed in module 
+registration order (see `extra.cm-modules` in `composer.json`), then by script filename natural order.
 
+- script classes are [required][php-require-once] and instantiated on the fly
+- script classes name must be unique
+  - by convention, a timestamp is added in the class name to avoid conflicts
+- script classes must implement the `CM_Migration_UpgradableInterface` interface
+- script may optionally implement `CM_Service_ManagerAwareInterface` to gain access to the service manager
+- the `UpgradableInterface::up` PHP documentation block will be displayed during the script execution if available
+
+
+#### Execute migration scripts
+- `cm migration run`   
+  run all scripts not successfully executed yet
+- `cm migration run --name=<filename>`     
+  (re)run a specific script, by its filename without extension
+
+ie:
+```
+bin/cm migration run
+- 1485180420_Foo…
+- 1485180453_Bar: some description coming from PHP doc…
+```
+
+#### Generate a migration script
+- `cm migration add`   
+  generate a migration script, by default in `[root]/resources/migration` and with the current git branch name
+- `cm migration add --namespace=<module-name> --name=<script-name>`    
+  generate a migration script in a specific module / with a specific name
+
+ie:
+```
+bin/cm migration add --namespace=Foo --name=Bar
+`/home/vagrant/cm/library/Foo/resources/migration/1485180453_Bar.php` generated
+```
+  
+  
+  [php-require-once]: http://php.net/manual/en/function.require-once.php

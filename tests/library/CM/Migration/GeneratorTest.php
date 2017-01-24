@@ -18,7 +18,9 @@ class CM_Migration_GeneratorTest extends CMTest_TestCase {
         $this->assertSame(join(PHP_EOL, [
             '<?php',
             '',
-            sprintf('class Migration_%s_FooBarBaz implements \CM_Migration_UpgradableInterface {', $time),
+            sprintf('class Migration_%s_FooBarBaz implements \CM_Migration_UpgradableInterface, \CM_Service_ManagerAwareInterface {', $time),
+            '',
+            '    use CM_Service_ManagerAwareTrait;',
             '',
             '    public function up(\CM_OutputStream_Interface $output) {',
             '        // TODO: Implement the migration script',

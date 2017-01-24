@@ -114,16 +114,7 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
      * @return CM_Model_Language|null
      */
     public function getLanguage() {
-        $language = $this->_language;
-        if (null === $language) {
-            if ($viewer = $this->getViewer()) {
-                $language = $viewer->getLanguage();
-            }
-            if (null === $language) {
-                $language = CM_Model_Language::findDefault();
-            }
-        }
-        return $language;
+        return $this->_language;
     }
 
     /**
