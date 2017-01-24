@@ -12,7 +12,7 @@ class CM_Model_StorageAdapter_MongoDbTest extends CMTest_TestCase {
     }
 
     protected function tearDown() {
-        CMTest_TH::getMongoDb()->remove('mock_modelStorageAdapter');
+        CMTest_TH::getMongoDb()->deleteMany('mock_modelStorageAdapter');
     }
 
     public function testGetCollectionName() {
@@ -44,7 +44,7 @@ class CM_Model_StorageAdapter_MongoDbTest extends CMTest_TestCase {
         $type = 99;
         $adapter = $this->_getAdapter();
 
-        $this->assertFalse($adapter->load($type, ['id' => (string) new MongoId()]));
+        $this->assertFalse($adapter->load($type, ['id' => CM_MongoDb_Client::getObjectId()]));
     }
 
     public function testSave() {
@@ -62,11 +62,12 @@ class CM_Model_StorageAdapter_MongoDbTest extends CMTest_TestCase {
     public function testSave_nonExistent() {
         $type = 99;
         $adapter = $this->_getAdapter();
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $id1 = $adapter->create($type, ['foo' => 'foo1', 'bar' => 1]);
-        $adapter->save($type, ['id' => (string) new MongoId()], ['foo' => 'foo2', 'bar' => 2]);
+        $adapter->save($type, ['id' => CM_MongoDb_Client::getObjectId()], ['foo' => 'foo2', 'bar' => 2]);
 
-        $this->assertSame(1, CMTest_TH::getMongoDb()->count('mock_modelStorageAdapter'));
-        $this->assertSame(1, CMTest_TH::getMongoDb()->count('mock_modelStorageAdapter', ['foo' => 'foo1', 'bar' => 1]));
+        $this->assertSame(1, $mongoDb->count('mock_modelStorageAdapter'));
+        $this->assertSame(1, $mongoDb->count('mock_modelStorageAdapter', ['foo' => 'foo1', 'bar' => 1]));
     }
 
     public function testCreate() {

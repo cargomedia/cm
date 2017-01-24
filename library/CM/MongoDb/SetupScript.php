@@ -25,7 +25,7 @@ class CM_MongoDb_SetupScript extends CM_Provision_Script_Abstract implements CM_
     public function reload(CM_OutputStream_Interface $output) {
         $mongoDb = $this->getServiceManager()->getMongoDb();
         foreach ($mongoDb->listCollectionNames() as $collectionName) {
-            $mongoDb->remove($collectionName);
+            $mongoDb->deleteMany($collectionName);
         }
     }
 
