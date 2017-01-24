@@ -52,4 +52,29 @@ class CM_Site_SiteFactory {
         return $site;
     }
 
+    /**
+     * @param int $id
+     * @return CM_Site_Abstract|null
+     */
+    public function findSiteById($id) {
+        $id = (int) $id;
+        return \Functional\first($this->_siteList, function (CM_Site_Abstract $site) use ($id) {
+            return $site->getId() === $id;
+        });
+    }
+
+    /**
+     * @return CM_Site_Abstract
+     * @throws CM_Exception_Invalid
+     */
+    public function getDefaultSite() {
+        $serviceManager = CM_Service_Manager::getInstance();
+        $options = $serviceManager->getOptions();
+        $defaultSiteId = $options->get('cm.defaultSiteId');
+        if (null === $defaultSiteId) {
+            throw new CM_Exception_Invalid('Default site is not set');
+        }
+        return $this->findSiteById($defaultSiteId);
+    }
+
 }
