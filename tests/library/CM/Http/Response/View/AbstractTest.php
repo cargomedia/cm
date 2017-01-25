@@ -109,7 +109,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testProcessReturnDeployVersion() {
-        $site = $this->getMockSiteDefault();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $page = new CM_Page_View_Ajax_Test_Mock();
         $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
         $params = [
@@ -214,7 +214,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageTracking() {
-        $site = $this->getMockSiteDefault();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $page = new CM_Page_View_Ajax_Test_Mock();
         $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
         $params = [
@@ -232,7 +232,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageTrackingRedirect() {
-        $site = $this->getMockSiteDefault();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $page = new CM_Page_View_Ajax_Test_MockRedirectSelf();
         $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
         $params = [
@@ -256,7 +256,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
             'errorPage' => 'CM_Page_View_Ajax_Test_Mock',
         ];
 
-        $site = $this->getMockSiteDefault();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $page = new CM_Page_View_Ajax_Test_Mock();
         $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
         $params = [

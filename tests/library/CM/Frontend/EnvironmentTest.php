@@ -7,7 +7,7 @@ class CM_Frontend_EnvironmentTest extends CMTest_TestCase {
     }
 
     public function testGetters() {
-        $site = $this->getMockSiteDefault();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $user = CM_Model_User::createStatic();
         $language = CM_Model_Language::create('English', 'en', true);
         $timezone = new DateTimeZone('Europe/London');
@@ -31,7 +31,7 @@ class CM_Frontend_EnvironmentTest extends CMTest_TestCase {
     public function testSetNull() {
         $defaultCurrency = CM_Model_Currency::create('840', 'USD');
         $environment = new CM_Frontend_Environment();
-        $this->assertEquals($this->getMockSiteDefault(), $environment->getSite());
+        $this->assertEquals((new CM_Site_SiteFactory())->getDefaultSite(), $environment->getSite());
         $this->assertNull($environment->getViewer());
         $this->assertNull($environment->getLanguage());
         $this->assertSame('en', $environment->getLocale());
