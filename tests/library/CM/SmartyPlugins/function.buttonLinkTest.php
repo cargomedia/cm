@@ -12,7 +12,7 @@ class smarty_function_button_linkTest extends CMTest_TestCase {
 
     public function setUp() {
         $smarty = new Smarty();
-        $this->_render = $this->getDefaultRender();
+        $this->_render = new CM_Frontend_Render();
         $this->_template = $smarty->createTemplate('string:');
         $this->_template->assignGlobal('render', $this->_render);
     }

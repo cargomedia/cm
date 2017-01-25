@@ -4,7 +4,7 @@ class CM_RenderAdapter_PageTest extends CMTest_TestCase {
 
     public function testFetchDescriptionKeywordsTitleTrimming() {
         $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
 
         $page = $this->getMockBuilder('CM_Page_Abstract')->getMockForAbstractClass();
         /** @var CM_Page_Abstract $page */

@@ -10,7 +10,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
         $field = new CM_FormField_Text(['name' => 'foo']);
         $field->setValue('bar');
 
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $doc = $this->_renderFormField($field, null, $render);
         /** @var CM_Frontend_Render $render */
         $autoId = $render->getGlobalResponse()->getTreeRoot()->getValue()->getAutoId();
@@ -22,7 +22,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 
     public function testValidateMinLength() {
         $field = new CM_FormField_Text(['name' => 'foo', 'lengthMin' => 3]);
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $environment = $render->getEnvironment();
         try {
             $field->validate($environment, 'foo');
@@ -46,7 +46,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 
     public function testValidateMaxLength() {
         $field = new CM_FormField_Text(['name' => 'foo', 'lengthMax' => 3]);
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $environment = $render->getEnvironment();
         try {
             $field->validate($environment, 'foo');
@@ -70,7 +70,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     public function testValidateBadwords() {
         $badwordsList = new CM_Paging_ContentList_Badwords();
         $field = new CM_FormField_Text(['name' => 'foo', 'forbidBadwords' => true]);
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $environment = $render->getEnvironment();
         try {
             $field->validate($environment, 'foo');

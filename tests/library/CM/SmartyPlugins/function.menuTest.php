@@ -14,7 +14,7 @@ class smarty_function_menuTest extends CMTest_TestCase {
 
     public function setUp() {
         $smarty = new Smarty();
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $this->_template = $smarty->createTemplate('string:');
         $this->_template->assignGlobal('render', $render);
 

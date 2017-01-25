@@ -341,13 +341,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @return CM_Frontend_Render
-     */
-    public function getDefaultRender() {
-        return new CM_Frontend_Render($this->getDefaultEnvironment());
-    }
-
-    /**
      * @return CM_Site_Abstract|PHPUnit_Framework_MockObject_MockObject
      */
     public function getDefaultSite() {
@@ -397,7 +390,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      */
     protected function _renderFormField(CM_FormField_Abstract $formField, array $renderParams = null, CM_Frontend_Render $render = null) {
         if (null === $render) {
-            $render = $this->getDefaultRender();
+            $render = new CM_Frontend_Render();
         }
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
         $html = $renderAdapter->fetch(CM_Params::factory($renderParams, false));

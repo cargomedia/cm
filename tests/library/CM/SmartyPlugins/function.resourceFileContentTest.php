@@ -6,7 +6,7 @@ class smarty_function_resourceFileContentTest extends CMTest_TestCase {
 
     public function testRender() {
         $smarty = new Smarty();
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
 
         $template = $smarty->createTemplate('string:');
         $template->assignGlobal('render', $render);

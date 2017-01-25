@@ -4,7 +4,7 @@ class CM_Http_Response_Resource_Css_LibraryTest extends CMTest_TestCase {
 
     public function testProcess() {
         $site = $this->getDefaultSite();
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $request = new CM_Http_Request_Get($render->getUrlResource('library-css', 'all.css'));
         $response = CM_Http_Response_Resource_Css_Library::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();

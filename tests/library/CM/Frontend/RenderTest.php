@@ -12,19 +12,19 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
     }
 
     public function testGetSiteName() {
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $this->assertSame('Default', $render->getSiteName());
     }
 
     public function testGetUrl() {
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $this->assertSame('http://www.default.dev', $render->getUrl());
         $this->assertSame('http://www.default.dev/foo/bar', $render->getUrl('/foo/bar'));
         $this->assertSame('http://www.default.dev/0', $render->getUrl('/0'));
     }
 
     public function testGetUrlPage() {
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Foo_Bar_FooBar', false);
 
         $this->assertSame('http://www.default.dev/foo/bar/foo-bar',
@@ -38,7 +38,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
     }
 
     public function testGetUrlPageInvalidModule() {
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
 
         $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'INVALIDMODULE_Page_Test', false);
         try {
@@ -50,7 +50,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
     }
 
     public function testGetUrlPageDifferentSite() {
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Foo_Bar_FooBar', false);
 
         $site = $this->getMockSite(null, null, array(
@@ -81,7 +81,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
     }
 
     public function testGetUrlResource() {
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $siteType = $render->getEnvironment()->getSite()->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('http://cdn.default.dev', $render->getUrlResource());
@@ -94,7 +94,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
     }
 
     public function testGetUrlResourceSameOrigin() {
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $siteType = $render->getEnvironment()->getSite()->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame(
@@ -118,7 +118,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
     }
 
     public function testGetUrlResourceDifferentSite() {
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $site = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
         $siteType = $site->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
@@ -127,7 +127,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
     }
 
     public function testGetUrlStatic() {
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('http://cdn.default.dev/static', $render->getUrlStatic());
         $this->assertSame('http://cdn.default.dev/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
@@ -145,7 +145,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
     }
 
     public function testGetUrlStaticDifferentSite() {
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $site = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('http://cdn.other.com/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg', $site));
@@ -175,7 +175,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
     public function testParseTemplateContent() {
         $viewer = CM_Model_User::createStatic();
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $render->getEnvironment()->setViewer($viewer);
 
         $content = '{$viewer->getId()} {$foo} normal-text';
@@ -242,7 +242,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
     }
 
     public function testGetLayoutPath() {
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $this->assertSame(
             'layout/default/resource/img/favicon.svg',
             $render->getLayoutPath('resource/img/favicon.svg')

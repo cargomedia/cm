@@ -6,7 +6,7 @@ class smarty_function_imgTest extends CMTest_TestCase {
 
     public function testRender() {
         $smarty = new Smarty();
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
 
         $template = $smarty->createTemplate('string:');
         $template->assignGlobal('render', $render);
@@ -16,7 +16,7 @@ class smarty_function_imgTest extends CMTest_TestCase {
 
     public function testRenderCrossSite() {
         $smarty = new Smarty();
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
 
         $siteOther = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
         $renderOther = new CM_Frontend_Render(new CM_Frontend_Environment($siteOther));
@@ -29,7 +29,7 @@ class smarty_function_imgTest extends CMTest_TestCase {
 
     public function testAbsolutePath() {
         $smarty = new Smarty();
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
 
         $template = $smarty->createTemplate('string:');
         $template->assignGlobal('render', $render);
@@ -39,7 +39,7 @@ class smarty_function_imgTest extends CMTest_TestCase {
 
     public function testBackgroundImage() {
         $smarty = new Smarty();
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
 
         $template = $smarty->createTemplate('string:');
         $template->assignGlobal('render', $render);
@@ -54,7 +54,7 @@ class smarty_function_imgTest extends CMTest_TestCase {
 
     public function testBackgroundImageData() {
         $smarty = new Smarty();
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
 
         $template = $smarty->createTemplate('string:');
         $template->assignGlobal('render', $render);

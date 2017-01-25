@@ -3,7 +3,7 @@
 class smarty_function_numberDecimalTest extends CMTest_TestCase {
 
     public function testNumeric() {
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $this->assertSame("500,000.55", $render->parseTemplateContent('{numberDecimal value=500000.55}'));
         $this->assertSame("1", $render->parseTemplateContent('{numberDecimal value=1.00}'));
     }
@@ -13,7 +13,7 @@ class smarty_function_numberDecimalTest extends CMTest_TestCase {
      * @expectedExceptionMessage Invalid non-numeric value
      */
     public function testNonNumeric() {
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $render->parseTemplateContent('{numberDecimal value="foo"}');
     }
 

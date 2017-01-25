@@ -18,7 +18,7 @@ class CM_Usertext_UsertextTest extends CMTest_TestCase {
             "/img/emoticon/cold_sweat.png\" class=\"emoticon emoticon-cold_sweat\" title=\":cold_sweat:\" /></p>";
 
         $usertext->setMode('escape');
-        $render = $this->getDefaultRender();
+        $render = new CM_Frontend_Render();
         $this->assertSame('&lt;3', $usertext->transform('<3', $render));
 
         $usertext->setMode('oneline');
