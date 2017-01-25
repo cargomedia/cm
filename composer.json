@@ -16,7 +16,7 @@
     "nicmart/tree": "~0.2.0",
     "kissmetrics/kissmetrics-php": "~0.1.0",
     "elasticsearch/elasticsearch": "~2.0.0",
-    "guzzlehttp/guzzle": "~5.3.1",
+    "guzzlehttp/guzzle": "~6.0",
     "kickbox/kickbox": "~1.0.3",
     "tomaszdurka/codegenerator": "~0.5.0",
     "jenssegers/agent": "~2.3.1",
