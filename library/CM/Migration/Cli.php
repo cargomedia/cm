@@ -4,10 +4,12 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
      * @param string|null $name
+     * @throws CM_Exception_Invalid
      */
     public function run($name = null) {
-        $paths = $this->_getMigrationPaths();
-        $loader = new CM_Migration_Loader($this->getServiceManager(), $paths);
+        $modules = CM_Bootloader::getInstance()->getModules();
+        $manager = new CM_Migration_Manager($this->getServiceManager(), $modules);
+        $loader = $manager->getLoader();
         if (null === $name) {
             foreach ($loader->getRunnerList() as $runner) {
                 if ($runner->shouldBeLoaded()) {
@@ -53,26 +55,6 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
         }
         $output->writeln("…");
         $runner->load($output);
-    }
-
-    /**
-     * @return array
-     */
-    protected function _getMigrationPaths() {
-        $paths = [];
-        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
-            $paths[] = $this->_getMigrationPathByModule($moduleName);
-        }
-        return $paths;
-    }
-
-    /**
-     * @param string|null $moduleName
-     * @return string
-     */
-    protected function _getMigrationPathByModule($moduleName = null) {
-        $modulePath = null !== $moduleName ? CM_Util::getModulePath((string) $moduleName) : DIR_ROOT;
-        return join(DIRECTORY_SEPARATOR, [$modulePath, 'resources', 'migration']);
     }
 
     public static function getPackageName() {
