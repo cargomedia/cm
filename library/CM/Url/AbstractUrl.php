@@ -56,6 +56,8 @@ abstract class AbstractUrl extends Http implements UrlInterface {
                 'targetUrl' => (string) $this,
             ]);
         }
+
+        /** @var AbstractUrl $url */
         $url = $this
             ->withHost($baseUrl->getHost())
             ->withScheme($baseUrl->getScheme());
@@ -79,10 +81,15 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         if ($language = $environment->getLanguage()) {
             $url = $url->withLanguage($language);
         }
+        $baseUrl = $environment->getSite()->getUrlBase();
+        if (!$baseUrl instanceof UrlInterface) {
+            $baseUrl = $this->_create((string) $baseUrl);
+        }
+        return $url->withBaseUrl($baseUrl);
+    }
 
-        // TODO: remove `self:create` when site::getUrl() will return a UrlInterface instance...
-        $siteUrl = self::create($environment->getSite()->getUrl());
-        return $url->withBaseUrl($siteUrl);
+    protected function _ensureAbsolutePath() {
+        return $this->withProperty('path', (string) $this->path->withLeadingSlash());
     }
 
     /**
@@ -109,25 +116,17 @@ abstract class AbstractUrl extends Http implements UrlInterface {
     }
 
     /**
-     * @return Pipeline
-     */
-    public static function getPipeline() {
-        return new Pipeline([
-            new Normalize(),
-        ]);
-    }
-
-    /**
      * @param string                 $url
      * @param UrlInterface|null      $baseUrl
      * @param CM_Model_Language|null $language
-     * @return UrlInterface
+     * @return static
      */
-    public static function create($url, UrlInterface $baseUrl = null, CM_Model_Language $language = null) {
-        /** @var UrlInterface $url */
+    protected static function _create($url, UrlInterface $baseUrl = null, CM_Model_Language $language = null) {
+        /** @var AbstractUrl $url */
         $url = self::getPipeline()->process(
             parent::createFromString($url)
         );
+        $url = $url->_ensureAbsolutePath();
         if ($baseUrl) {
             $url = $url->withBaseUrl($baseUrl);
         }
@@ -135,5 +134,14 @@ abstract class AbstractUrl extends Http implements UrlInterface {
             $url = $url->withLanguage($language);
         }
         return $url;
+    }
+
+    /**
+     * @return Pipeline
+     */
+    public static function getPipeline() {
+        return new Pipeline([
+            new Normalize(),
+        ]);
     }
 }

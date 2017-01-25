@@ -2,12 +2,31 @@
 
 namespace CM\Url;
 
+use CM_Model_Language;
+use CM_Site_Abstract;
 use League\Uri\Components\HierarchicalPath;
 
-class ResourceUrl extends RelativeUrl {
+class ResourceUrl extends AssetUrl {
 
-    /** @var  string */
-    private $_type;
+    /** @var CM_Site_Abstract|null */
+    protected $_site;
+
+    /** @var string */
+    protected $_type;
+
+    /**
+     * @return CM_Site_Abstract|null
+     */
+    public function getSite() {
+        return $this->_site;
+    }
+
+    /**
+     * @param CM_Site_Abstract|null $site
+     */
+    public function setSite(CM_Site_Abstract $site = null) {
+        $this->_site = $site;
+    }
 
     /**
      * @return string
@@ -20,33 +39,49 @@ class ResourceUrl extends RelativeUrl {
      * @param string $type
      */
     public function setType($type) {
-        $this->_type = $type;
+        $this->_type = (string) $type;
     }
 
-    protected function _buildPath(\CM_Frontend_Environment $environment) {
-        $urlPath = new HierarchicalPath(sprintf('/%s', $this->getType()));
-        $site = $environment->getSite();
-        $language = $environment->getLanguage();
+    public function withSite(CM_Site_Abstract $site, $sameOrigin = null) {
+        /** @var ResourceUrl $url */
+        $url = parent::withSite($site, $sameOrigin);
+        $url->setSite($site);
+        return $url;
+    }
 
-        if ($language) {
-            $urlPath = $urlPath->append($language->getAbbreviation());
+    protected function _getUriRelativeComponents() {
+        $segments = [
+            $this->getType(),
+        ];
+        if ($language = $this->getLanguage()) {
+            $segments[] = $language->getAbbreviation();
         }
-
-        return $urlPath
-            ->append((string) $site->getId())
-            ->append((string) \CM_App::getInstance()->getDeployVersion())
-            ->append((string) $this->path);
+        if ($site = $this->getSite()) {
+            $segments[] = $site->getId();
+        }
+        if ($deployVersion = $this->getDeployVersion()) {
+            $segments[] = $deployVersion;
+        }
+        $path = $this->path->prepend(
+            HierarchicalPath::createFromSegments($segments, HierarchicalPath::IS_ABSOLUTE)
+        );
+        return ''
+            . $path->getUriComponent()
+            . $this->query->getUriComponent()
+            . $this->fragment->getUriComponent();
     }
 
     /**
-     * @param string      $uri
-     * @param string|null $type
+     * @param string                 $filename
+     * @param string                 $type
+     * @param CM_Model_Language|null $language
+     * @param string|null            $deployVersion
      * @return ResourceUrl
      */
-    public static function createFromString($uri = '', $type = null) {
-        /** @var ResourceUrl $resourceUrl */
-        $resourceUrl = parent::createFromString((string) $uri);
-        $resourceUrl->setType((string) $type);
-        return $resourceUrl;
+    public static function create($filename, $type, CM_Model_Language $language = null, $deployVersion = null) {
+        /** @var ResourceUrl $url */
+        $url = parent::_create($filename, null, $language, $deployVersion);
+        $url->setType($type);
+        return $url;
     }
 }

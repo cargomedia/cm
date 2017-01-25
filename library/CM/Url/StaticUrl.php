@@ -1,0 +1,38 @@
+<?php
+
+namespace CM\Url;
+
+use League\Uri\Components\HierarchicalPath;
+use League\Uri\Components\Query;
+
+class StaticUrl extends AssetUrl {
+
+    protected function _getUriRelativeComponents() {
+        $path = $this->path->prepend(
+            HierarchicalPath::createFromSegments(['static'], HierarchicalPath::IS_ABSOLUTE)
+        );
+        /** @var Query $query */
+        $query = $this->query;
+        if ($deployVersion = $this->getDeployVersion()) {
+            $pairs = $query->getPairs();
+            $pairs[(string) $deployVersion] = null;
+            $query = Query::createFromPairs($pairs);
+        }
+        return ''
+            . $path->getUriComponent()
+            . $query->getUriComponent()
+            . $this->fragment->getUriComponent();
+    }
+
+    /**
+     * @param string            $filename
+     * @param UrlInterface|null $baseUrl
+     * @param string|null       $deployVersion
+     * @return StaticUrl
+     */
+    public static function create($filename, UrlInterface $baseUrl = null, $deployVersion = null) {
+        /** @var StaticUrl $url */
+        $url = parent::_create($filename, $baseUrl, null, $deployVersion);
+        return $url;
+    }
+}
