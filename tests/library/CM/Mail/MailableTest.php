@@ -125,7 +125,7 @@ class CM_Mail_MailableTest extends CMTest_TestCase {
 
     public function testGetRenderDefault() {
         $mail = new CM_Mail_Mailable();
-        $this->assertEquals($this->getDefaultSite(), $mail->getRender()->getSite());
+        $this->assertEquals($this->getMockSiteDefault(), $mail->getRender()->getSite());
     }
 
     public function testGetSite() {
@@ -136,7 +136,7 @@ class CM_Mail_MailableTest extends CMTest_TestCase {
 
     public function testGetSiteDefault() {
         $mail = new CM_Mail_Mailable();
-        $this->assertEquals($this->getDefaultSite(), $mail->getSite());
+        $this->assertEquals($this->getMockSiteDefault(), $mail->getSite());
     }
 
     public function testGetSiteRecipient() {
