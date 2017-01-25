@@ -9,18 +9,18 @@ class CM_Gearman_Factory {
      */
     protected function createJobQueue(array $servers, $workerJobLimit) {
         $serializer = new CM_Serializer_ArrayConvertible();
-        $jobSerializer = new CM_Jobdistribution_Serializer($serializer);
+        $jobSerializer = new CM_Jobdistribution_JobSerializer($serializer);
         $publisher = $this->createPublisher($servers, $jobSerializer);
         $jobWorker = $this->createJobWorker($servers, $jobSerializer, $workerJobLimit);
         return new CM_Gearman_JobQueue($publisher, $jobWorker);
     }
 
     /**
-     * @param array                         $servers
-     * @param CM_Jobdistribution_Serializer $serializer
+     * @param array                            $servers
+     * @param CM_Jobdistribution_JobSerializer $serializer
      * @return CM_Gearman_Publisher
      */
-    protected function createPublisher(array $servers, CM_Jobdistribution_Serializer $serializer) {
+    protected function createPublisher(array $servers, CM_Jobdistribution_JobSerializer $serializer) {
         $client = $this->createGearmanClient($servers);
         return new CM_Gearman_Publisher($client, $serializer);
     }
@@ -42,12 +42,12 @@ class CM_Gearman_Factory {
     }
 
     /**
-     * @param array                         $servers
-     * @param CM_Jobdistribution_Serializer $serializer
-     * @param int                           $jobLimit
+     * @param array                            $servers
+     * @param CM_Jobdistribution_JobSerializer $serializer
+     * @param int                              $jobLimit
      * @return CM_Gearman_JobWorker
      */
-    public function createJobWorker(array $servers, CM_Jobdistribution_Serializer $serializer, $jobLimit) {
+    public function createJobWorker(array $servers, CM_Jobdistribution_JobSerializer $serializer, $jobLimit) {
         $worker = $this->createGearmanWorker($servers);
         return new CM_Gearman_JobWorker($worker, $serializer, $jobLimit);
     }
@@ -69,11 +69,11 @@ class CM_Gearman_Factory {
     }
 
     /**
-     * @return CM_Jobdistribution_Serializer
+     * @return CM_Jobdistribution_JobSerializer
      */
     public function createSerializer() {
         $serializer = new CM_Serializer_ArrayConvertible();
-        return new CM_Jobdistribution_Serializer($serializer);
+        return new CM_Jobdistribution_JobSerializer($serializer);
     }
 
 }
