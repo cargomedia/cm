@@ -84,7 +84,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      */
     protected function _getGuzzleClient() {
         if (!self::$_client) {
-            self::$_client = new \GuzzleHttp\Client(['base_url' => 'http://www.google-analytics.com']);
+            self::$_client = new \GuzzleHttp\Client(['base_uri' => 'http://www.google-analytics.com']);
         }
         return self::$_client;
     }
