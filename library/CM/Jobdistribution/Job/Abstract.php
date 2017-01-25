@@ -2,13 +2,13 @@
 
 abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 
-    /** @var  CM_Params */
+    /** @var CM_Params */
     private $_params;
 
     /**
-     * @param $params
+     * @param CM_Params $params
      */
-    public function __construct($params) {
+    public function __construct(CM_Params $params) {
         $this->_params = $params;
     }
 
