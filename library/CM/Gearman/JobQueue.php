@@ -1,6 +1,6 @@
 <?php
 
-class CM_Gearman_JobQueue implements CM_Jobdistribution_Queue {
+class CM_Gearman_JobQueue implements CM_Jobdistribution_QueueInterface {
     
     /** @var CM_Gearman_Publisher */
     private $_publisher;
