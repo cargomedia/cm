@@ -2,6 +2,7 @@
 
 namespace CM\Url;
 
+use CM_Model_Language;
 use CM_Frontend_Environment;
 use Psr\Http\Message\UriInterface;
 
@@ -10,34 +11,41 @@ interface UrlInterface extends UriInterface {
     /**
      * @return bool
      */
-    public function isRelativeUrl();
+    public function isAbsolute();
 
     /**
-     * @return bool
+     * @return CM_Model_Language|null
      */
-    public function hasPathPrefix();
+    public function getLanguage();
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPathPrefix();
+    public function getPrefix();
 
     /**
-     * @param string
+     * @param CM_Model_Language $language
      * @return UrlInterface
      */
-    public function withPathPrefix($prefix);
+    public function withLanguage(CM_Model_Language $language);
 
     /**
+     * @param string $prefix
      * @return UrlInterface
      */
-    public function withoutPathPrefix();
+    public function withPrefix($prefix);
 
     /**
-     * @param UrlInterface $uri
+     * @param UrlInterface $baseUrl
      * @return UrlInterface
      */
-    public function withRelativeComponentsFrom(UrlInterface $uri);
+    public function withBaseUrl(UrlInterface $baseUrl);
+
+    /**
+     * @param UrlInterface $url
+     * @return UrlInterface
+     */
+    public function withRelativeComponentsFrom(UrlInterface $url);
 
     /**
      * @param CM_Frontend_Environment $environment
