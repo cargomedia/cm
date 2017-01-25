@@ -178,10 +178,10 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_Jobdistribution_Queue
+     * @return CM_Jobdistribution_QueueInterface
      */
     public function getJobQueue() {
-        return $this->get(CM_Jobdistribution_Queue::class, CM_Jobdistribution_Queue::class);
+        return $this->get(CM_Jobdistribution_QueueInterface::class, CM_Jobdistribution_QueueInterface::class);
     }
 
     /**

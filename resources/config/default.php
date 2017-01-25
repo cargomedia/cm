@@ -322,7 +322,7 @@ return function (CM_Config_Node $config) {
         ],
     ];
 
-    $config->services[CM_Jobdistribution_Queue::class] = [
+    $config->services[CM_Jobdistribution_QueueInterface::class] = [
         'class'  => CM_Gearman_Factory::class,
         'method' => [
             'name'      => 'createJobQueue',

@@ -1,6 +1,6 @@
 <?php
 
-interface CM_Jobdistribution_Queue {
+interface CM_Jobdistribution_QueueInterface {
 
     public function publish(CM_Jobdistribution_Job_Abstract $job);
 
