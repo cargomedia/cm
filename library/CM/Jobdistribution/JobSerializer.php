@@ -1,6 +1,6 @@
 <?php
 
-class CM_Jobdistribution_Serializer {
+class CM_Jobdistribution_JobSerializer {
 
     /** @var CM_Serializer_SerializerInterface */
     private $_serializer;
@@ -28,6 +28,7 @@ class CM_Jobdistribution_Serializer {
     /**
      * @param mixed $data
      * @return CM_Jobdistribution_Job_Abstract
+     * @throws CM_Exception_Invalid
      * @throws CM_Exception_Nonexistent
      */
     public function unserialize($data) {
@@ -38,6 +39,9 @@ class CM_Jobdistribution_Serializer {
         }
         $jobClassName = $workloadParams['jobClassName'];
         $params = $workloadParams['jobParams'];
+        if (!is_subclass_of($jobClassName, CM_Jobdistribution_Job_Abstract::class, true)) {
+            throw new CM_Exception_Invalid('Not valid job class', null, ['className' => $jobClassName]);
+        }
         return new $jobClassName($params);
     }
 

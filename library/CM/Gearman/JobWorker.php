@@ -10,15 +10,15 @@ class CM_Gearman_JobWorker extends CM_Class_Abstract implements CM_Service_Manag
     /** @var int */
     private $_jobLimit;
     
-    /** @var CM_Jobdistribution_Serializer */
+    /** @var CM_Jobdistribution_JobSerializer */
     private $_serializer;
 
     /**
-     * @param GearmanWorker                 $worker
-     * @param CM_Jobdistribution_Serializer $serializer
-     * @param int                           $jobLimit
+     * @param GearmanWorker                    $worker
+     * @param CM_Jobdistribution_JobSerializer $serializer
+     * @param int                              $jobLimit
      */
-    public function __construct(GearmanWorker $worker, CM_Jobdistribution_Serializer $serializer, $jobLimit) {
+    public function __construct(GearmanWorker $worker, CM_Jobdistribution_JobSerializer $serializer, $jobLimit) {
         $this->_gearmanWorker = $worker;
         $this->_serializer = $serializer;
         $this->_jobLimit = (int) $jobLimit;

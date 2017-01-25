@@ -5,14 +5,14 @@ class CM_Gearman_Publisher {
     /** @var GearmanClient */
     private $_gearmanClient;
 
-    /** @var CM_Jobdistribution_Serializer */
+    /** @var CM_Jobdistribution_JobSerializer */
     private $_serializer;
 
     /**
-     * @param GearmanClient                 $gearmanClient
-     * @param CM_Jobdistribution_Serializer $serializer
+     * @param GearmanClient                    $gearmanClient
+     * @param CM_Jobdistribution_JobSerializer $serializer
      */
-    public function __construct(GearmanClient $gearmanClient, CM_Jobdistribution_Serializer $serializer) {
+    public function __construct(GearmanClient $gearmanClient, CM_Jobdistribution_JobSerializer $serializer) {
         $this->_gearmanClient = $gearmanClient;
         $this->_serializer = $serializer;
     }
