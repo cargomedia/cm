@@ -17,7 +17,7 @@ class CM_FormField_TimeTest extends CMTest_TestCase {
         $formField = new CM_FormField_Time();
         $formField->setValue($value);
 
-        $environment = $this->getDefaultEnvironment();
+        $environment = new CM_Frontend_Environment();
         $environment->setTimeZone(new DateTimeZone('Etc/GMT+2'));
         $render = new CM_Frontend_Render($environment);
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
@@ -31,7 +31,7 @@ class CM_FormField_TimeTest extends CMTest_TestCase {
         $formField = new CM_FormField_Time();
         $formField->setValue($value);
 
-        $environment = $this->getDefaultEnvironment();
+        $environment = new CM_Frontend_Environment();
         $environment->setTimeZone(new DateTimeZone('Etc/GMT+2'));
         $render = new CM_Frontend_Render($environment);
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);

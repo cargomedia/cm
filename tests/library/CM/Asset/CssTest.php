@@ -184,6 +184,6 @@ EOD;
      * @return CM_Frontend_Render
      */
     protected function _getRender($isDebug) {
-        return new CM_Frontend_Render($this->getDefaultEnvironment(null, null, null, null, $isDebug));
+        return new CM_Frontend_Render(new CM_Frontend_Environment(null, null, null, null, $isDebug));
     }
 }

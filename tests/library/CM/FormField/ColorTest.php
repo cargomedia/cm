@@ -4,7 +4,7 @@ class CM_FormField_ColorTest extends CMTest_TestCase {
 
     public function testValidate() {
         $field = new CM_FormField_Color(['name' => 'foo']);
-        $environment = $this->getDefaultEnvironment();
+        $environment = new CM_Frontend_Environment();
 
         $value = $field->validate($environment, '#00FF00');
         $this->assertSame('00FF00', $value->getHexString());
@@ -15,7 +15,7 @@ class CM_FormField_ColorTest extends CMTest_TestCase {
      */
     public function testValidateInvalid() {
         $field = new CM_FormField_Color(['name' => 'foo']);
-        $environment = $this->getDefaultEnvironment();
+        $environment = new CM_Frontend_Environment();
 
         $field->validate($environment, '#zzzzzzzzz');
     }

@@ -49,7 +49,7 @@ class CM_Http_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
         $this->assertSame(false, $languageKey->getJavascript());
 
         $site = $this->getDefaultSite();
-        $render = new CM_Frontend_Render($this->getDefaultEnvironment(null, null, $language));
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment(null, null, $language));
 
         // Check that key is *not* included in the JS translations list
         $versionJavascript = CM_Model_Language::getVersionJavascript();
