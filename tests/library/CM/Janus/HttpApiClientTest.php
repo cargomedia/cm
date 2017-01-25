@@ -12,7 +12,7 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
             $this->assertSame('http://cm-janus.dev:8080/stopStream?context={"key":"value"}', urldecode($request->getUri()));
             $this->assertSame('POST', $request->getMethod());
             $this->assertSame('streamId=foo', $request->getBody()->getContents());
-            $this->assertSame('bar', $request->getHeader('Server-Key'));
+            $this->assertSame('bar', $request->getHeaderLine('Server-Key'));
 
             return new \GuzzleHttp\Psr7\Response(200, [], '{"success":"Stream stopped"}');
         });
@@ -37,7 +37,7 @@ class CM_Janus_HttpApiClientTest extends CMTest_TestCase {
         $sendRequestMethod = $httpClient->mockMethod('send')->set(function (\GuzzleHttp\Psr7\Request $request) {
             $this->assertSame('http://cm-janus.dev:8080/status?context={"key":"value"}', urldecode($request->getUri()));
             $this->assertSame('GET', $request->getMethod());
-            $this->assertSame('bar', $request->getHeader('Server-Key'));
+            $this->assertSame('bar', $request->getHeaderLine('Server-Key'));
 
             return new \GuzzleHttp\Psr7\Response(200, [], '[{"id":"foo", "channelName":"bar"},{"id":"baz", "channelName":"quux"}]');
         });
