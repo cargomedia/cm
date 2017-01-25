@@ -12,9 +12,6 @@ class smarty_function_viewTemplateTest extends CMTest_TestCase {
         $componentViewResponse = new CM_Frontend_ViewResponse($component);
 
         $render = $this->mockObject('CM_Frontend_Render');
-        $render->mockMethod('getEnvironment')->set(function () {
-            return new CM_Frontend_Environment();
-        });
         $method = $render->mockMethod('fetchViewTemplate')
             ->at(0, function ($view, $templateName, $data) use ($component) {
                 $this->assertSame($component, $view);

@@ -21,7 +21,7 @@ class CM_Http_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
 
     public function testProcessLibrary() {
         $site = $this->getMockSiteDefault();
-        $render = new CM_Frontend_Render();
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment());
         $request = new CM_Http_Request_Get($render->getUrlResource('library-js', 'library.js'));
         $response = CM_Http_Response_Resource_Javascript_Library::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
@@ -33,7 +33,7 @@ class CM_Http_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
 
     public function testProcessTranslations() {
         $site = $this->getMockSiteDefault();
-        $render = new CM_Frontend_Render();
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment());
         $request = new CM_Http_Request_Get($render->getUrlResource('library-js', 'translations/123.js'));
         $response = CM_Http_Response_Resource_Javascript_Library::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();

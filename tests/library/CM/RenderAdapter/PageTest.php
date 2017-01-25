@@ -29,8 +29,7 @@ class CM_RenderAdapter_PageTest extends CMTest_TestCase {
     public function testFetchDescriptionKeywordsConsiderNamespaceWideLocation() {
         $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
 
-        $render = $this->getMockBuilder('CM_Frontend_Render')->setMethods(['getTemplatePath', 'getLayoutPath', 'getEnvironment'])->getMock();
-        $render->expects($this->any())->method('getEnvironment')->will($this->returnValue(new CM_Frontend_Environment()));
+        $render = $this->getMockBuilder('CM_Frontend_Render')->setMethods(['getTemplatePath', 'getLayoutPath'])->getMock();
         $render->expects($this->any())->method('getTemplatePath')->will($this->returnValue(null));
         $render->expects($this->exactly(2))->method('getLayoutPath')->will($this->returnCallback(function ($templateName) use ($dirTmp) {
             $templateFile = new CM_File($dirTmp . $templateName);

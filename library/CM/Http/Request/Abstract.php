@@ -275,7 +275,7 @@ abstract class CM_Http_Request_Abstract {
         $siteFactory = new CM_Site_SiteFactory();
         $site = $siteFactory->findSite($this);
         if (null === $site) {
-            $site = (new CM_Site_SiteFactory)->getDefaultSite();
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();
         }
 
         $sitePath = $site->getUrlParser()->getPath();

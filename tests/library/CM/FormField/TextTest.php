@@ -22,8 +22,8 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 
     public function testValidateMinLength() {
         $field = new CM_FormField_Text(['name' => 'foo', 'lengthMin' => 3]);
+        $environment = new CM_Frontend_Environment();
         $render = new CM_Frontend_Render();
-        $environment = $render->getEnvironment();
         try {
             $field->validate($environment, 'foo');
         } catch (CM_Exception_FormFieldValidation $ex) {
@@ -46,8 +46,8 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 
     public function testValidateMaxLength() {
         $field = new CM_FormField_Text(['name' => 'foo', 'lengthMax' => 3]);
+        $environment = new CM_Frontend_Environment();
         $render = new CM_Frontend_Render();
-        $environment = $render->getEnvironment();
         try {
             $field->validate($environment, 'foo');
         } catch (CM_Exception_FormFieldValidation $ex) {
@@ -70,8 +70,8 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     public function testValidateBadwords() {
         $badwordsList = new CM_Paging_ContentList_Badwords();
         $field = new CM_FormField_Text(['name' => 'foo', 'forbidBadwords' => true]);
+        $environment = new CM_Frontend_Environment();
         $render = new CM_Frontend_Render();
-        $environment = $render->getEnvironment();
         try {
             $field->validate($environment, 'foo');
         } catch (CM_Exception_FormFieldValidation $ex) {
