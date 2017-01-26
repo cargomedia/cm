@@ -11,8 +11,8 @@ class CM_Gearman_Factory {
         $serializer = new CM_Serializer_ArrayConvertible();
         $jobSerializer = new CM_Jobdistribution_JobSerializer($serializer);
         $client = $this->createClient($servers, $jobSerializer);
-        $jobWorker = $this->createJobWorker($servers, $jobSerializer, $workerJobLimit);
-        return new CM_Gearman_JobService($client, $jobWorker);
+        $worker = $this->createWorker($servers, $jobSerializer, $workerJobLimit);
+        return new CM_Gearman_JobService($client, $worker);
     }
 
     /**
@@ -45,11 +45,11 @@ class CM_Gearman_Factory {
      * @param array                            $servers
      * @param CM_Jobdistribution_JobSerializer $serializer
      * @param int                              $jobLimit
-     * @return CM_Gearman_JobWorker
+     * @return CM_Gearman_Worker
      */
-    public function createJobWorker(array $servers, CM_Jobdistribution_JobSerializer $serializer, $jobLimit) {
+    public function createWorker(array $servers, CM_Jobdistribution_JobSerializer $serializer, $jobLimit) {
         $worker = $this->createGearmanWorker($servers);
-        return new CM_Gearman_JobWorker($worker, $serializer, $jobLimit);
+        return new CM_Gearman_Worker($worker, $serializer, $jobLimit);
     }
 
     /**
