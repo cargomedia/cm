@@ -1,6 +1,6 @@
 <?php
 
-class CM_Gearman_JobWorker extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
+class CM_Gearman_Worker extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
 

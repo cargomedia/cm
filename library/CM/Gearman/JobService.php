@@ -5,14 +5,14 @@ class CM_Gearman_JobService implements CM_Jobdistribution_QueueInterface, CM_Job
     /** @var CM_Gearman_Client */
     private $_client;
     
-    /** @var CM_Gearman_JobWorker */
+    /** @var CM_Gearman_Worker */
     private $_worker;
 
     /**
-     * @param CM_Gearman_Client    $publisher
-     * @param CM_Gearman_JobWorker $worker
+     * @param CM_Gearman_Client $publisher
+     * @param CM_Gearman_Worker $worker
      */
-    public function __construct(CM_Gearman_Client $publisher, CM_Gearman_JobWorker $worker) {
+    public function __construct(CM_Gearman_Client $publisher, CM_Gearman_Worker $worker) {
         $this->_client = $publisher;
         $this->_worker = $worker;
     }
