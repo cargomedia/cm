@@ -25,6 +25,11 @@ interface UrlInterface extends UriInterface {
     public function getPrefix();
 
     /**
+     * @return string
+     */
+    public function getUriRelativeComponents();
+
+    /**
      * @param CM_Model_Language $language
      * @return UrlInterface
      */
@@ -48,10 +53,10 @@ interface UrlInterface extends UriInterface {
     public function withBaseUrl($baseUrl);
 
     /**
-     * @param UrlInterface $url
+     * @param UrlInterface|string $url
      * @return UrlInterface
      */
-    public function withRelativeComponentsFrom(UrlInterface $url);
+    public function withRelativeComponentsFrom($url);
 
     /**
      * @return UrlInterface

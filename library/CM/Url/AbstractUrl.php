@@ -6,9 +6,11 @@ use CM_Exception_Invalid;
 use CM_Frontend_Environment;
 use CM_Model_Language;
 use League\Uri\Components\HierarchicalPath;
+use League\Uri\Interfaces\Uri;
 use League\Uri\Modifiers\Normalize;
 use League\Uri\Modifiers\Pipeline;
 use League\Uri\Schemes\Http;
+use Psr\Http\Message\UriInterface;
 
 abstract class AbstractUrl extends Http implements UrlInterface {
 
@@ -80,7 +82,10 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         return $url;
     }
 
-    public function withRelativeComponentsFrom(UrlInterface $url) {
+    public function withRelativeComponentsFrom($url) {
+        if (!$url instanceof UriInterface) {
+            $url = Http::createFromString($url);
+        }
         return $this
             ->withPath($url->getPath())
             ->withQuery($url->getQuery())
@@ -88,10 +93,7 @@ abstract class AbstractUrl extends Http implements UrlInterface {
     }
 
     public function withoutRelativeComponents() {
-        return $this
-            ->withPath('/')
-            ->withQuery('')
-            ->withFragment('');
+        return $this->withRelativeComponentsFrom('/');
     }
 
     public function withEnvironment(CM_Frontend_Environment $environment, array $options = null) {
@@ -111,7 +113,7 @@ abstract class AbstractUrl extends Http implements UrlInterface {
     /**
      * @return string
      */
-    abstract protected function _getUriRelativeComponents();
+    abstract public function getUriRelativeComponents();
 
     protected function getSchemeSpecificPart() {
         $authority = $this->getAuthority();
@@ -128,7 +130,7 @@ abstract class AbstractUrl extends Http implements UrlInterface {
             $authority = '//' . $authority;
         }
 
-        return $authority . $this->_getUriRelativeComponents();
+        return $authority . $this->getUriRelativeComponents();
     }
 
     /**

@@ -7,7 +7,7 @@ use League\Uri\Components\Query;
 
 class StaticUrl extends AssetUrl {
 
-    protected function _getUriRelativeComponents() {
+    public function getUriRelativeComponents() {
         $path = $this->path->prepend(
             HierarchicalPath::createFromSegments(['static'], HierarchicalPath::IS_ABSOLUTE)
         );

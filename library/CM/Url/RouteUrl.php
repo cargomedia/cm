@@ -38,7 +38,7 @@ class RouteUrl extends AbstractUrl {
         return $url;
     }
 
-    protected function _getUriRelativeComponents() {
+    public function getUriRelativeComponents() {
         $path = $this->path;
         if ($prefix = $this->getPrefix()) {
             $path = $path->prepend($prefix);

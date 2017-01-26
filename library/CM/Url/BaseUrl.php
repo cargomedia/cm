@@ -11,7 +11,7 @@ use League\Uri\Schemes\Http;
 
 class BaseUrl extends AbstractUrl {
 
-    protected function _getUriRelativeComponents() {
+    public function getUriRelativeComponents() {
         $path = HierarchicalPath::createFromSegments([], HierarchicalPath::IS_ABSOLUTE);
         if ($prefix = $this->getPrefix()) {
             $path = $path->append($prefix);

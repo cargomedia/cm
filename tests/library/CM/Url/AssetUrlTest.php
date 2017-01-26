@@ -84,7 +84,7 @@ class AssetUrlTest extends CMTest_TestCase {
 
 class CM_Url_AssetMockUrl extends AssetUrl {
 
-    protected function _getUriRelativeComponents() {
+    public function getUriRelativeComponents() {
         $segments = [];
         if ($language = $this->getLanguage()) {
             $segments[] = $language->getAbbreviation();

@@ -9,7 +9,7 @@ use League\Uri\Components\HierarchicalPath;
 
 class PageUrl extends RouteUrl {
 
-    protected function _getUriRelativeComponents() {
+    public function getUriRelativeComponents() {
         $segments = [];
         if ($prefix = $this->getPrefix()) {
             $segments[] = $prefix;

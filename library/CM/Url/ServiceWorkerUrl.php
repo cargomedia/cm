@@ -41,7 +41,7 @@ class ServiceWorkerUrl extends AbstractUrl {
         $this->_deployVersion = $deployVersion;
     }
 
-    protected function _getUriRelativeComponents() {
+    public function getUriRelativeComponents() {
         $parts = [
             $this->getName(),
         ];

@@ -216,7 +216,7 @@ class AbstractUrlTest extends CMTest_TestCase {
 
 class CM_Url_AbstractMockUrl extends AbstractUrl {
 
-    protected function _getUriRelativeComponents() {
+    public function getUriRelativeComponents() {
         $path = $this->path;
         if ($prefix = $this->getPrefix()) {
             $path = $path->prepend($prefix);

@@ -49,7 +49,7 @@ class ResourceUrl extends AssetUrl {
         return $url;
     }
 
-    protected function _getUriRelativeComponents() {
+    public function getUriRelativeComponents() {
         $segments = [
             $this->getType(),
         ];
