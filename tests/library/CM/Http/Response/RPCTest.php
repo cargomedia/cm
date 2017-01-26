@@ -40,6 +40,7 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
             'type'     => 'CM_Exception_Invalid',
             'msg'      => 'bar',
             'isPublic' => true,
+            'metaInfo' => [],
         ], $responseData['error']);
 
         $request->mockMethod('getQuery')->set(function () {
@@ -53,7 +54,8 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
         $this->assertSame([
             'type'     => 'CM_Exception_Nonexistent',
             'msg'      => 'Internal server error',
-            'isPublic' => false
+            'isPublic' => false,
+            'metaInfo' => [],
         ], $responseData['error']);
     }
 
@@ -69,6 +71,7 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
             'type'     => 'CM_Exception_InvalidParam',
             'msg'      => 'Internal server error',
             'isPublic' => false,
+            'metaInfo' => [],
         ], $responseData['error']);
     }
 
@@ -84,6 +87,7 @@ class CM_Http_Response_RPCTest extends CMTest_TestCase {
             'type'     => 'CM_Exception_InvalidParam',
             'msg'      => 'Internal server error',
             'isPublic' => false,
+            'metaInfo' => [],
         ], $responseData['error']);
     }
 
