@@ -1,6 +1,6 @@
 <?php
 
-class CM_Gearman_Publisher {
+class CM_Gearman_Client {
 
     /** @var GearmanClient */
     private $_gearmanClient;
