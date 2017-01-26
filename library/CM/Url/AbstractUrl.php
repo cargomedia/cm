@@ -5,6 +5,7 @@ namespace CM\Url;
 use CM_Exception_Invalid;
 use CM_Frontend_Environment;
 use CM_Model_Language;
+use League\Uri\Components\HierarchicalPath;
 use League\Uri\Modifiers\Normalize;
 use League\Uri\Modifiers\Pipeline;
 use League\Uri\Schemes\Http;
@@ -19,7 +20,7 @@ abstract class AbstractUrl extends Http implements UrlInterface {
     /** @var CM_Model_Language|null */
     protected $_language = null;
 
-    /** @var string|null */
+    /** @var HierarchicalPath|null */
     protected $_prefix = null;
 
     public function isAbsolute() {
@@ -31,7 +32,10 @@ abstract class AbstractUrl extends Http implements UrlInterface {
     }
 
     public function getPrefix() {
-        return $this->_prefix;
+        if (null === $this->_prefix) {
+            return null;
+        }
+        return (string) $this->_prefix;
     }
 
     public function withLanguage(CM_Model_Language $language) {
@@ -41,9 +45,15 @@ abstract class AbstractUrl extends Http implements UrlInterface {
     }
 
     public function withPrefix($prefix) {
-        if (!$prefix) {
-            $prefix = null;
+        if (null !== $prefix) {
+            $prefix = new HierarchicalPath((string) $prefix);
+            $prefix = $prefix
+                ->withoutLeadingSlash()
+                ->withoutTrailingSlash()
+                ->withoutDotSegments()
+                ->withoutEmptySegments();
         }
+        $prefix = '' !== (string) $prefix ? $prefix : null;
         $url = clone $this;
         $url->_prefix = $prefix;
         return $url;
@@ -51,7 +61,7 @@ abstract class AbstractUrl extends Http implements UrlInterface {
 
     public function withBaseUrl(UrlInterface $baseUrl) {
         if (!$baseUrl->isAbsolute()) {
-            throw new CM_Exception_Invalid('baseUrl must be absolute', null, [
+            throw new CM_Exception_Invalid('withBaseUrl argument must be an absolute Url', null, [
                 'baseUrl'   => (string) $baseUrl,
                 'targetUrl' => (string) $this,
             ]);
@@ -73,6 +83,13 @@ abstract class AbstractUrl extends Http implements UrlInterface {
             ->withPath($url->getPath())
             ->withQuery($url->getQuery())
             ->withFragment($url->getFragment());
+    }
+
+    public function withoutRelativeComponents() {
+        return $this
+            ->withPath('/')
+            ->withQuery('')
+            ->withFragment('');
     }
 
     public function withEnvironment(CM_Frontend_Environment $environment, array $options = null) {

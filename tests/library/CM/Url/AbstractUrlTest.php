@@ -8,6 +8,7 @@ use CM_Model_Language;
 use CM_Frontend_Environment;
 use CM\Url\UrlInterface;
 use CM\Url\AbstractUrl;
+use League\Uri\Components\HierarchicalPath;
 
 class AbstractUrlTest extends CMTest_TestCase {
 
@@ -71,6 +72,47 @@ class AbstractUrlTest extends CMTest_TestCase {
         $this->assertSame('http://foo/prefix/bar/de?foobar=1', (string) $url);
     }
 
+    public function testWithPrefix() {
+        $url = CM_Url_AbstractMockUrl::create('/path?foo=1#bar');
+        $this->assertSame(null, $url->getPrefix());
+
+        $urlWithPrefix = $url->withPrefix('prefix');
+        $this->assertSame('prefix', $urlWithPrefix->getPrefix());
+        $this->assertSame('/prefix/path?foo=1#bar', (string) $urlWithPrefix);
+
+        $urlWithPrefix = $url->withPrefix('/prefix/');
+        $this->assertSame('prefix', $urlWithPrefix->getPrefix());
+        $this->assertSame('/prefix/path?foo=1#bar', (string) $urlWithPrefix);
+
+        $urlWithPrefix = $url->withPrefix('prefix/foo');
+        $this->assertSame('prefix/foo', $urlWithPrefix->getPrefix());
+        $this->assertSame('/prefix/foo/path?foo=1#bar', (string) $urlWithPrefix);
+
+        $urlWithPrefix = $url->withPrefix(new HierarchicalPath('prefix'));
+        $this->assertSame('prefix', $urlWithPrefix->getPrefix());
+        $this->assertSame('/prefix/path?foo=1#bar', (string) $urlWithPrefix);
+
+        $urlWithPrefix = $url->withPrefix(new HierarchicalPath('/'));
+        $this->assertSame(null, $urlWithPrefix->getPrefix());
+        $this->assertSame('/path?foo=1#bar', (string) $urlWithPrefix);
+
+        $urlWithPrefix = $url->withPrefix('/');
+        $this->assertSame(null, $urlWithPrefix->getPrefix());
+        $this->assertSame('/path?foo=1#bar', (string) $urlWithPrefix);
+
+        $urlWithPrefix = $url->withPrefix(new HierarchicalPath(''));
+        $this->assertSame(null, $urlWithPrefix->getPrefix());
+        $this->assertSame('/path?foo=1#bar', (string) $urlWithPrefix);
+
+        $urlWithPrefix = $url->withPrefix('');
+        $this->assertSame(null, $urlWithPrefix->getPrefix());
+        $this->assertSame('/path?foo=1#bar', (string) $urlWithPrefix);
+
+        $urlWithPrefix = $url->withPrefix(null);
+        $this->assertSame(null, $urlWithPrefix->getPrefix());
+        $this->assertSame('/path?foo=1#bar', (string) $urlWithPrefix);
+    }
+
     public function testWithLanguage() {
         $language = CMTest_TH::createLanguage('de');
         $url = CM_Url_AbstractMockUrl::create('/bar?foobar=1');
@@ -111,7 +153,7 @@ class AbstractUrlTest extends CMTest_TestCase {
             CM_Url_AbstractMockUrl::create('/bar?foobar=1', $baseUrl);
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
-        $this->assertSame('baseUrl must be absolute', $exception->getMessage());
+        $this->assertSame('withBaseUrl argument must be an absolute Url', $exception->getMessage());
         $this->assertSame([
             'baseUrl'   => '/path?param',
             'targetUrl' => '/bar?foobar=1',
@@ -154,6 +196,14 @@ class AbstractUrlTest extends CMTest_TestCase {
         $url2 = CM_Url_AbstractMockUrl::createFromString('http://bar/path?bar=1');
 
         $this->assertSame('http://foo/path?bar=1', (string) $url1->withRelativeComponentsFrom($url2));
+    }
+
+    public function testWithoutRelativeComponents() {
+        $url = CM_Url_AbstractMockUrl::createFromString('/path?foo=1');
+        $this->assertSame('/', (string) $url->withoutRelativeComponents());
+
+        $url = CM_Url_AbstractMockUrl::createFromString('http://foo/path?foo=1');
+        $this->assertSame('http://foo/', (string) $url->withoutRelativeComponents());
     }
 
     public function testIsAbsolute() {

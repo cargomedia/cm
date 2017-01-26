@@ -5,6 +5,7 @@ namespace CM\Url;
 use CM_Model_Language;
 use CM_Frontend_Environment;
 use Psr\Http\Message\UriInterface;
+use League\Uri\Interfaces\Path;
 
 interface UrlInterface extends UriInterface {
 
@@ -30,7 +31,7 @@ interface UrlInterface extends UriInterface {
     public function withLanguage(CM_Model_Language $language);
 
     /**
-     * @param string $prefix
+     * @param Path|string|null $prefix
      * @return UrlInterface
      */
     public function withPrefix($prefix);
@@ -46,6 +47,11 @@ interface UrlInterface extends UriInterface {
      * @return UrlInterface
      */
     public function withRelativeComponentsFrom(UrlInterface $url);
+
+    /**
+     * @return UrlInterface
+     */
+    public function withoutRelativeComponents();
 
     /**
      * @param CM_Frontend_Environment $environment
