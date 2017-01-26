@@ -59,14 +59,16 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         return $url;
     }
 
-    public function withBaseUrl(UrlInterface $baseUrl) {
-        if (!$baseUrl->isAbsolute()) {
-            throw new CM_Exception_Invalid('withBaseUrl argument must be an absolute Url', null, [
-                'baseUrl'   => (string) $baseUrl,
-                'targetUrl' => (string) $this,
-            ]);
-        }
+    public function withoutPrefix() {
+        $url = clone $this;
+        $url->_prefix = null;
+        return $url;
+    }
 
+    public function withBaseUrl($baseUrl) {
+        if (!$baseUrl instanceof BaseUrl) {
+            $baseUrl = BaseUrl::create((string) $baseUrl);
+        }
         /** @var AbstractUrl $url */
         $url = $this
             ->withHost($baseUrl->getHost())
@@ -94,15 +96,12 @@ abstract class AbstractUrl extends Http implements UrlInterface {
 
     public function withEnvironment(CM_Frontend_Environment $environment, array $options = null) {
         $url = clone $this;
-
         if ($language = $environment->getLanguage()) {
             $url = $url->withLanguage($language);
         }
-        $baseUrl = $environment->getSite()->getUrlBase();
-        if (!$baseUrl instanceof UrlInterface) {
-            $baseUrl = $this->_create((string) $baseUrl);
-        }
-        return $url->withBaseUrl($baseUrl);
+        return $url->withBaseUrl(
+            $environment->getSite()->getUrl()
+        );
     }
 
     protected function _ensureAbsolutePath() {

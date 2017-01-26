@@ -4,6 +4,7 @@ namespace CM\Test\Url;
 
 use CMTest_TH;
 use CMTest_TestCase;
+use CM\Url\BaseUrl;
 use CM\Url\PageUrl;
 
 class PageUrlTest extends CMTest_TestCase {
@@ -23,7 +24,7 @@ class PageUrlTest extends CMTest_TestCase {
         $url = PageUrl::create(\CM_Page_Example::class, ['foo' => 'bar']);
         $this->assertSame('/example?foo=bar', (string) $url);
 
-        $baseUrl = PageUrl::createFromString('http://host');
+        $baseUrl = BaseUrl::create('http://host');
         $url = PageUrl::create(\CM_Page_Example::class, ['foo' => 'bar'], $baseUrl);
         $this->assertSame('http://host/example?foo=bar', (string) $url);
 

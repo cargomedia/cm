@@ -4,6 +4,7 @@ namespace CM\Test\Url;
 
 use CMTest_TH;
 use CMTest_TestCase;
+use CM\Url\BaseUrl;
 use CM\Url\ServiceWorkerUrl;
 
 class ServiceWorkerUrlTest extends CMTest_TestCase {
@@ -19,7 +20,7 @@ class ServiceWorkerUrlTest extends CMTest_TestCase {
         $url = ServiceWorkerUrl::create('foo');
         $this->assertSame('/foo.js', (string) $url);
 
-        $baseUrl = ServiceWorkerUrl::createFromString('http://host');
+        $baseUrl = BaseUrl::create('http://host');
         $url = ServiceWorkerUrl::create('foo', $baseUrl);
         $this->assertSame('http://host/foo.js', (string) $url);
 

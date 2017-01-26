@@ -4,6 +4,7 @@ namespace CM\Test\Url;
 
 use CMTest_TH;
 use CMTest_TestCase;
+use CM\Url\BaseUrl;
 use CM\Url\StaticUrl;
 
 class StaticUrlTest extends CMTest_TestCase {
@@ -16,7 +17,7 @@ class StaticUrlTest extends CMTest_TestCase {
         $url = StaticUrl::create('file.ext');
         $this->assertSame('/static/file.ext', (string) $url);
 
-        $baseUrl = StaticUrl::createFromString('http://host');
+        $baseUrl = BaseUrl::create('http://host');
         $url = StaticUrl::create('file.ext', $baseUrl);
         $this->assertSame('http://host/static/file.ext', (string) $url);
 

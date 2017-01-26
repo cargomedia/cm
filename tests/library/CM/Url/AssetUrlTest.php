@@ -19,12 +19,12 @@ class AssetUrlTest extends CMTest_TestCase {
     public function testWithEnvironment() {
         $site = $this
             ->getMockBuilder('CM_Site_Abstract')
-            ->setMethods(['getUrlBase', 'getUrlCdn'])
+            ->setMethods(['getUrl', 'getUrlCdn'])
             ->getMockForAbstractClass();
 
         $site
             ->expects($this->any())
-            ->method('getUrlBase')
+            ->method('getUrl')
             ->will($this->returnValue('http://foo/path?param'));
 
         $site
@@ -59,12 +59,12 @@ class AssetUrlTest extends CMTest_TestCase {
         /** @var \PHPUnit_Framework_MockObject_MockObject|\CM_Site_Abstract $site */
         $site = $this
             ->getMockBuilder('CM_Site_Abstract')
-            ->setMethods(['getUrlBase', 'getUrlCdn'])
+            ->setMethods(['getUrl', 'getUrlCdn'])
             ->getMockForAbstractClass();
 
         $site
             ->expects($this->any())
-            ->method('getUrlBase')
+            ->method('getUrl')
             ->will($this->returnValue('http://foo/path?param'));
 
         $site

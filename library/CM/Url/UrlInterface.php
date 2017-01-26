@@ -37,10 +37,15 @@ interface UrlInterface extends UriInterface {
     public function withPrefix($prefix);
 
     /**
-     * @param UrlInterface $baseUrl
      * @return UrlInterface
      */
-    public function withBaseUrl(UrlInterface $baseUrl);
+    public function withoutPrefix();
+
+    /**
+     * @param UrlInterface|string $baseUrl
+     * @return UrlInterface
+     */
+    public function withBaseUrl($baseUrl);
 
     /**
      * @param UrlInterface $url

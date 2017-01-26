@@ -28,7 +28,7 @@ class ResourceUrlTest extends CMTest_TestCase {
         /** @var \PHPUnit_Framework_MockObject_MockObject|\CM_Site_Abstract $site */
         $site = $this
             ->getMockBuilder('CM_Site_Abstract')
-            ->setMethods(['getId', 'getUrlBase', 'getUrlCdn'])
+            ->setMethods(['getId', 'getUrl', 'getUrlCdn'])
             ->getMockForAbstractClass();
 
         $site
@@ -38,7 +38,7 @@ class ResourceUrlTest extends CMTest_TestCase {
 
         $site
             ->expects($this->any())
-            ->method('getUrlBase')
+            ->method('getUrl')
             ->will($this->returnValue('http://foo/path?param'));
 
         $site
