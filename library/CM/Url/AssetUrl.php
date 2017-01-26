@@ -44,12 +44,7 @@ abstract class AssetUrl extends AbstractUrl {
      * @return AssetUrl
      */
     public function withSite(CM_Site_Abstract $site, $sameOrigin = null) {
-        $sameOrigin = (bool) $sameOrigin;
-        $baseUrl = $site->getUrl();
-        if (!$sameOrigin && $cdnUrl = $site->getUrlCdn()) {
-            $baseUrl = $cdnUrl;
-        }
-        return $this->withBaseUrl($baseUrl);
+        return $this->withBaseUrl($sameOrigin ? $site->getUrl() : $site->getUrlCdn());
     }
 
     /**
