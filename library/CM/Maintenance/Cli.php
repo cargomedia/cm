@@ -18,18 +18,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
         $this->_clockworkManager->start();
     }
 
-    /**
-     * @keepalive
-     */
-    public function startLocal() {
-        $this->_clockworkManager = new CM_Clockwork_Manager();
-        $storage = new CM_Clockwork_Storage_FileSystem('app-maintenance-local');
-        $storage->setServiceManager(CM_Service_Manager::getInstance());
-        $this->_clockworkManager->setStorage($storage);
-        $this->_registerCallbacksLocal();
-        $this->_clockworkManager->start();
-    }
-
     protected function _registerCallbacks() {
         $this->_registerClockworkCallbacks('1 second', [
             'CM_Jobdistribution_DelayedQueue::queueOutstanding' => function () {
@@ -116,10 +104,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 },
             ));
         }
-    }
-
-    protected function _registerCallbacksLocal() {
-        $this->_registerClockworkCallbacks('1 minute', array());
     }
 
     public static function getPackageName() {

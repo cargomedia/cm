@@ -253,7 +253,6 @@ Commands:
  location outdated [--verbose]
  location upgrade [--without-ip-blocks] [--verbose]
  maintenance start
- maintenance start-local
  media-streams import-archive <stream-channel-media-id> <archive-source>
  media-streams import-video-thumbnail <stream-channel-media-id> <thumbnail-source> <create-stamp>
  message-stream start-synchronization
