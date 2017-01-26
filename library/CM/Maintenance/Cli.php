@@ -24,8 +24,11 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 $delayedQueue = $this->getServiceManager()->getDelayedJobQueue();
                 $delayedQueue->queueOutstanding();
             },
+            'CM_Elasticsearch_Index_Cli::update'                => function () {
+                (new CM_Elasticsearch_Index_Cli())->update();
+            }
         ]);
-        $this->_registerClockworkCallbacks('1 minute', array(
+        $this->_registerClockworkCallbacks('1 minute', [
             'CM_Model_User::offlineOld'                 => function () {
                 CM_Model_User::offlineOld();
             },
@@ -53,20 +56,25 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_MessageStream_Service::synchronize'     => function () {
                 CM_Service_Manager::getInstance()->getStreamMessage()->synchronize();
             },
-        ));
+        ]);
+        $this->_registerClockworkCallbacks('1 hour', [
+            'CM_Elasticsearch_Index_Cli::optimize' => function () {
+                (new CM_Elasticsearch_Index_Cli())->optimize();
+            }
+        ]);
 
         if ($this->getServiceManager()->has('janus')) {
-            $this->_registerClockworkCallbacks('1 minute', array(
+            $this->_registerClockworkCallbacks('1 minute', [
                 'CM_Janus_Service::synchronize'  => function () {
                     $this->getServiceManager()->getJanus('janus')->synchronize();
                 },
                 'CM_Janus_Service::checkStreams' => function () {
                     $this->getServiceManager()->getJanus('janus')->checkStreams();
                 },
-            ));
+            ]);
         }
 
-        $this->_registerClockworkCallbacks('15 minutes', array(
+        $this->_registerClockworkCallbacks('15 minutes', [
             'CM_Action_Abstract::aggregate'                 => function () {
                 CM_Action_Abstract::aggregate();
             },
@@ -82,9 +90,9 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 }
                 (new CM_Paging_Log($allLevelsList, false))->cleanUp(); //deletes all untyped records
             },
-        ));
+        ]);
         if ($this->getServiceManager()->has('maxmind')) {
-            $this->_registerClockworkCallbacks('8 days', array(
+            $this->_registerClockworkCallbacks('8 days', [
                 'CMService_MaxMind::upgrade' => function () {
                     try {
                         /** @var CMService_MaxMind $maxMind */
@@ -102,7 +110,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                         throw $exception;
                     }
                 },
-            ));
+            ]);
         }
     }
 

@@ -261,7 +261,6 @@ Commands:
  search-index create [--index-name=<value>] [--skip-if-exist]
  search-index delete [--index-name=<value>]
  search-index optimize
- search-index start-maintenance
  search-index update [--index-name=<value>]
  ```
 
