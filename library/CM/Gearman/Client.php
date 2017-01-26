@@ -32,26 +32,25 @@ class CM_Gearman_Client {
      * @throws CM_Exception
      */
     public function runMultiple(array $jobs) {
-        $gearmanClient = $this->_getGearmanClient();
-
+        
         $resultList = [];
-        $gearmanClient->setCompleteCallback(function (GearmanTask $task) use (&$resultList) {
-            $resultList[] = CM_Params::decode($task->data(), true);
+        $this->_gearmanClient->setCompleteCallback(function (GearmanTask $task) use (&$resultList) {
+            $resultList[] = $this->_serializer->unserializeJobResult($task->data());
         });
 
         $failureList = [];
-        $gearmanClient->setFailCallback(function (GearmanTask $task) use (&$failureList) {
+        $this->_gearmanClient->setFailCallback(function (GearmanTask $task) use (&$failureList) {
             $failureList[] = $task;
         });
 
-        \Functional\each($jobs, function (CM_Jobdistribution_Job_Abstract $job) use ($gearmanClient) {
-            $workload = CM_Params::encode($job->getParams(), true);
-            $task = $gearmanClient->addTaskHigh($job->getJobName(), $workload);
+        \Functional\each($jobs, function (CM_Jobdistribution_Job_Abstract $job)  {
+            $workload = $this->_serializer->serializeJob($job);
+            $task = $this->_gearmanClient->addTaskHigh($job->getJobName(), $workload);
             if (false === $task) {
                 throw new CM_Exception('Cannot add task', null, ['jobName' => $job->getJobName()]);
             }
         });
-        $gearmanClient->runTasks();
+        $this->_gearmanClient->runTasks();
 
         if (count($resultList) != count($jobs)) {
             throw new CM_Exception('Job failed. Invalid results', null, [
@@ -70,9 +69,9 @@ class CM_Gearman_Client {
      * @throws CM_Exception
      */
     public function queue(CM_Jobdistribution_Job_Abstract $job) {
-        $gearmanClient = $this->_getGearmanClient();
+        $gearmanClient = $this->_gearmanClient;
 
-        $workload = $this->_serializer->serialize($job);
+        $workload = $this->_serializer->serializeJob($job);
         $priority = $job->getPriority();
         switch ($priority) {
             case CM_Jobdistribution_Priority::HIGH:
@@ -87,12 +86,5 @@ class CM_Gearman_Client {
             default:
                 throw new CM_Exception('Invalid priority', null, ['priority' => (string) $priority]);
         }
-    }
-
-    /**
-     * @return GearmanClient
-     */
-    protected function _getGearmanClient() {
-        return $this->_gearmanClient;
     }
 }

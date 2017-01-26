@@ -16,7 +16,7 @@ class CM_Jobdistribution_JobSerializer {
      * @param CM_Jobdistribution_Job_Abstract $job
      * @return string
      */
-    public function serialize(CM_Jobdistribution_Job_Abstract $job) {
+    public function serializeJob(CM_Jobdistribution_Job_Abstract $job) {
         $this->_verifyParams($job->getParams()->getParamsDecoded());
         $workloadParams = [
             'jobClassName' => get_class($job),
@@ -31,7 +31,7 @@ class CM_Jobdistribution_JobSerializer {
      * @throws CM_Exception_Invalid
      * @throws CM_Exception_Nonexistent
      */
-    public function unserialize($data) {
+    public function unserializeJob($data) {
         try {
             $workloadParams = $this->_serializer->unserialize($data);
         } catch (CM_Exception_Nonexistent $ex) {
@@ -43,6 +43,22 @@ class CM_Jobdistribution_JobSerializer {
             throw new CM_Exception_Invalid('Not valid job class', null, ['className' => $jobClassName]);
         }
         return new $jobClassName($params);
+    }
+
+    /**
+     * @param mixed $result
+     * @return string
+     */
+    public function serializeJobResult($result) {
+        return $this->_serializer->serialize($result);
+    }
+
+    /**
+     * @param string $data
+     * @return mixed
+     */
+    public function unserializeJobResult($data) {
+        return $this->_serializer->unserialize($data);
     }
 
     /**
