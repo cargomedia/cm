@@ -53,26 +53,24 @@ class CM_Site_SiteFactory {
     }
 
     /**
-     * @param int $id
+     * @param string|int $id
      * @return CM_Site_Abstract|null
      */
     public function findSiteById($id) {
-        $id = (int) $id;
         return \Functional\first($this->_siteList, function (CM_Site_Abstract $site) use ($id) {
             return $site->getId() === $id;
         });
     }
 
     /**
-     * @param int $id
+     * @param string|int $id
      * @return CM_Site_Abstract
      * @throws CM_Exception_Invalid
      */
     public function getSiteById($id) {
-        $id = (int) $id;
         $site = $this->findSiteById($id);
         if (null === $site) {
-            throw new CM_Exception_Invalid('Site is not found', null, ['siteId' => $id]);
+            throw new CM_Exception_Invalid('Site is not found', null, ['siteId' => (string) $id]);
         }
         return $site;
     }
