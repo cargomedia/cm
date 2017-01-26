@@ -28,7 +28,7 @@ class CM_Gearman_Worker extends CM_Class_Abstract implements CM_Service_ManagerA
      * @param string $jobName
      */
     public function registerJob($jobName) {
-        $this->_getGearmanWorker()->addFunction($jobName, [$this, 'executeGearmanJob']);
+        $this->_gearmanWorker->addFunction($jobName, [$this, 'runJob']);
     }
 
     public function run() {
@@ -41,7 +41,7 @@ class CM_Gearman_Worker extends CM_Class_Abstract implements CM_Service_ManagerA
             try {
                 $jobsRun++;
                 CM_Cache_Storage_Runtime::getInstance()->flush();
-                $workFailed = !$this->_getGearmanWorker()->work();
+                $workFailed = !$this->_gearmanWorker->work();
             } catch (Exception $ex) {
                 $this->getServiceManager()->getLogger()->addMessage('Worker failed', CM_Log_Logger::exceptionToLevel($ex), (new CM_Log_Context())->setException($ex));
             }
@@ -55,42 +55,12 @@ class CM_Gearman_Worker extends CM_Class_Abstract implements CM_Service_ManagerA
      * @param GearmanJob $gearmanJob
      * @return string
      */
-    public function executeGearmanJob(GearmanJob $gearmanJob) {
+    public function runJob(GearmanJob $gearmanJob) {
         $job = $this->_convertGearmanJobToJob($gearmanJob);
-        $result = $this->execute($job);
-        return CM_Params::encode($result, true);
-    }
-
-    /**
-     * @param CM_Jobdistribution_Job_Abstract $job
-     * @return mixed
-     * @throws Exception
-     */
-    public function execute(CM_Jobdistribution_Job_Abstract $job) {
-        CM_Service_Manager::getInstance()->getNewrelic()->startTransaction('CM Job: ' . $this->_getClassName());
-        try {
-            $params = $job->getParams();
-            $returnValue = $job->execute($params);
-            CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
-            return $returnValue;
-        } catch (Exception $ex) {
-            CM_Service_Manager::getInstance()->getNewrelic()->endTransaction();
-            throw $ex;
-        }
-    }
-
-    /**
-     * @return GearmanWorker
-     * @throws CM_Exception
-     */
-    protected function _getGearmanWorker() {
-        if (!$this->_gearmanWorker) {
-            if (!extension_loaded('gearman')) {
-                throw new CM_Exception('Missing `gearman` extension');
-            }
-            $this->_gearmanWorker = new GearmanWorker();
-        }
-        return $this->_gearmanWorker;
+        $result = CM_Service_Manager::getInstance()->getNewrelic()->runAsTransaction('CM Job: ' . $this->_getClassName(), function() use ($job) {
+            return $job->execute();
+        });
+        return $this->_serializer->serializeJobResult($result);
     }
 
     /**
@@ -101,7 +71,7 @@ class CM_Gearman_Worker extends CM_Class_Abstract implements CM_Service_ManagerA
      */
     protected function _convertGearmanJobToJob(GearmanJob $gearmanJob) {
         $workload = $gearmanJob->workload();
-        $job = $this->_serializer->unserialize($workload);
+        $job = $this->_serializer->unserializeJob($workload);
         if ($job instanceof CM_Service_ManagerAwareInterface) {
             $job->setServiceManager($this->getServiceManager());
         }
