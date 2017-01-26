@@ -124,9 +124,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 $commandManager = new CM_Cli_CommandManager();
                 $commandManager->monitorSynchronizedCommands();
             },
-            'CM_SVM_Model::trainChanged'                         => function () {
-                CM_SVM_Model::trainChanged();
-            },
         ));
     }
 
