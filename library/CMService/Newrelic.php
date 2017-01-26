@@ -47,6 +47,24 @@ class CMService_Newrelic extends CM_Class_Abstract {
     }
 
     /**
+     * @param string  $name
+     * @param Closure $closure
+     * @return mixed
+     * @throws Exception
+     */
+    public function runAsTransaction($name, Closure $closure) {
+        $this->startTransaction($name);
+        try {
+            $returnValue = $closure();
+            $this->endTransaction();
+            return $returnValue;
+        } catch (Exception $ex) {
+            $this->endTransaction();
+            throw $ex;
+        }
+    }
+
+    /**
      * @param string $name
      */
     public function setNameTransaction($name) {
