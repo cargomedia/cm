@@ -5,24 +5,24 @@ class CM_Gearman_Factory {
     /**
      * @param array $servers
      * @param int   $workerJobLimit
-     * @return CM_Gearman_JobQueue
+     * @return CM_Gearman_JobService
      */
-    protected function createJobQueue(array $servers, $workerJobLimit) {
+    protected function createJobService(array $servers, $workerJobLimit) {
         $serializer = new CM_Serializer_ArrayConvertible();
         $jobSerializer = new CM_Jobdistribution_JobSerializer($serializer);
-        $publisher = $this->createPublisher($servers, $jobSerializer);
+        $client = $this->createClient($servers, $jobSerializer);
         $jobWorker = $this->createJobWorker($servers, $jobSerializer, $workerJobLimit);
-        return new CM_Gearman_JobQueue($publisher, $jobWorker);
+        return new CM_Gearman_JobService($client, $jobWorker);
     }
 
     /**
      * @param array                            $servers
      * @param CM_Jobdistribution_JobSerializer $serializer
-     * @return CM_Gearman_Publisher
+     * @return CM_Gearman_Client
      */
-    protected function createPublisher(array $servers, CM_Jobdistribution_JobSerializer $serializer) {
+    protected function createClient(array $servers, CM_Jobdistribution_JobSerializer $serializer) {
         $client = $this->createGearmanClient($servers);
-        return new CM_Gearman_Publisher($client, $serializer);
+        return new CM_Gearman_Client($client, $serializer);
     }
 
     /**
