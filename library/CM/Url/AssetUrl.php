@@ -53,16 +53,16 @@ abstract class AssetUrl extends AbstractUrl {
     }
 
     /**
-     * @param string                 $filename
+     * @param string                 $url
      * @param UrlInterface|null      $baseUrl
      * @param CM_Model_Language|null $language
      * @param string|null            $deployVersion
      * @return AssetUrl
      */
-    protected static function _create($filename, UrlInterface $baseUrl = null, CM_Model_Language $language = null, $deployVersion = null) {
-        /** @var AssetUrl $url */
-        $url = parent::_create($filename, $baseUrl, $language);
-        $url->setDeployVersion($deployVersion);
-        return $url;
+    protected static function _create($url, UrlInterface $baseUrl = null, CM_Model_Language $language = null, $deployVersion = null) {
+        /** @var AssetUrl $assetUrl */
+        $assetUrl = parent::_create($url, $baseUrl, $language);
+        $assetUrl->setDeployVersion($deployVersion);
+        return $assetUrl;
     }
 }

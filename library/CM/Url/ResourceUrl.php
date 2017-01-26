@@ -72,16 +72,16 @@ class ResourceUrl extends AssetUrl {
     }
 
     /**
-     * @param string                 $filename
+     * @param string                 $url
      * @param string                 $type
      * @param CM_Model_Language|null $language
      * @param string|null            $deployVersion
      * @return ResourceUrl
      */
-    public static function create($filename, $type, CM_Model_Language $language = null, $deployVersion = null) {
-        /** @var ResourceUrl $url */
-        $url = parent::_create($filename, null, $language, $deployVersion);
-        $url->setType($type);
-        return $url;
+    public static function create($url, $type, CM_Model_Language $language = null, $deployVersion = null) {
+        /** @var ResourceUrl $resourceUrl */
+        $resourceUrl = parent::_create($url, null, $language, $deployVersion);
+        $resourceUrl->setType($type);
+        return $resourceUrl;
     }
 }

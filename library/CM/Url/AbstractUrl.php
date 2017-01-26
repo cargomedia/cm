@@ -138,18 +138,18 @@ abstract class AbstractUrl extends Http implements UrlInterface {
      * @return static
      */
     protected static function _create($url, UrlInterface $baseUrl = null, CM_Model_Language $language = null) {
-        /** @var AbstractUrl $url */
-        $url = self::getPipeline()->process(
-            parent::createFromString($url)
+        /** @var AbstractUrl $abstractUrl */
+        $abstractUrl = self::getPipeline()->process(
+            self::createFromString($url)
         );
-        $url = $url->_ensureAbsolutePath();
+        $abstractUrl = $abstractUrl->_ensureAbsolutePath();
         if ($baseUrl) {
-            $url = $url->withBaseUrl($baseUrl);
+            $abstractUrl = $abstractUrl->withBaseUrl($baseUrl);
         }
         if ($language) {
-            $url = $url->withLanguage($language);
+            $abstractUrl = $abstractUrl->withLanguage($language);
         }
-        return $url;
+        return $abstractUrl;
     }
 
     /**

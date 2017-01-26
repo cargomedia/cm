@@ -25,14 +25,14 @@ class StaticUrl extends AssetUrl {
     }
 
     /**
-     * @param string            $filename
+     * @param string            $url
      * @param UrlInterface|null $baseUrl
      * @param string|null       $deployVersion
      * @return StaticUrl
      */
-    public static function create($filename, UrlInterface $baseUrl = null, $deployVersion = null) {
-        /** @var StaticUrl $url */
-        $url = parent::_create($filename, $baseUrl, null, $deployVersion);
-        return $url;
+    public static function create($url, UrlInterface $baseUrl = null, $deployVersion = null) {
+        /** @var StaticUrl $staticUrl */
+        $staticUrl = parent::_create($url, $baseUrl, null, $deployVersion);
+        return $staticUrl;
     }
 }
