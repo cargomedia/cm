@@ -144,18 +144,19 @@ abstract class AbstractUrl extends Http implements UrlInterface {
     }
 
     /**
-     * @param                              $url
+     * @param string                       $url
      * @param CM_Frontend_Environment|null $environment
+     * @param array|null                   $environmentOptions
      * @return AbstractUrl
      */
-    protected static function _create($url, CM_Frontend_Environment $environment = null) {
+    protected static function _create($url, CM_Frontend_Environment $environment = null, array $environmentOptions = null) {
         /** @var AbstractUrl $abstractUrl */
         $abstractUrl = self::getPipeline()->process(
             self::createFromString($url)
         );
         $abstractUrl = $abstractUrl->_ensureAbsolutePath();
         if ($environment) {
-            $abstractUrl = $abstractUrl->withEnvironment($environment);
+            $abstractUrl = $abstractUrl->withEnvironment($environment, $environmentOptions);
         }
         return $abstractUrl;
     }

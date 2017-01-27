@@ -46,12 +46,13 @@ abstract class AssetUrl extends AbstractUrl {
     /**
      * @param string                       $url
      * @param CM_Frontend_Environment|null $environment
+     * @param array|null                   $environmentOptions
      * @param string|null                  $deployVersion
      * @return AssetUrl
      */
-    protected static function _create($url, CM_Frontend_Environment $environment = null, $deployVersion = null) {
+    protected static function _create($url, CM_Frontend_Environment $environment = null, array $environmentOptions = null, $deployVersion = null) {
         /** @var AssetUrl $assetUrl */
-        $assetUrl = parent::_create($url, $environment);
+        $assetUrl = parent::_create($url, $environment, $environmentOptions);
         $assetUrl->setDeployVersion($deployVersion);
         return $assetUrl;
     }

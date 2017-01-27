@@ -20,8 +20,11 @@ class ResourceUrlTest extends CMTest_TestCase {
         $url = ResourceUrl::create('file.ext', 'resource-type', $environment);
         $this->assertSame('http://cdn.example.com/resource-type/de/999/file.ext', (string) $url);
 
-        $url = ResourceUrl::create('file.ext', 'resource-type', $environment, 1234);
+        $url = ResourceUrl::create('file.ext', 'resource-type', $environment, null, 1234);
         $this->assertSame('http://cdn.example.com/resource-type/de/999/1234/file.ext', (string) $url);
+
+        $url = ResourceUrl::create('file.ext', 'resource-type', $environment, ['sameOrigin' => true], 1234);
+        $this->assertSame('http://www.example.com/resource-type/de/999/1234/file.ext', (string) $url);
     }
 
     public function testWithSite() {
