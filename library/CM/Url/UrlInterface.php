@@ -2,6 +2,7 @@
 
 namespace CM\Url;
 
+use CM_Site_Abstract;
 use CM_Model_Language;
 use CM_Frontend_Environment;
 use Psr\Http\Message\UriInterface;
@@ -20,6 +21,11 @@ interface UrlInterface extends UriInterface {
     public function getLanguage();
 
     /**
+     * @return CM_Site_Abstract|null
+     */
+    public function getSite();
+
+    /**
      * @return string|null
      */
     public function getPrefix();
@@ -34,6 +40,13 @@ interface UrlInterface extends UriInterface {
      * @return UrlInterface
      */
     public function withLanguage(CM_Model_Language $language);
+
+    /**
+     * @param CM_Site_Abstract $site
+     * @param bool|null        $sameOrigin
+     * @return UrlInterface
+     */
+    public function withSite(CM_Site_Abstract $site, $sameOrigin = null);
 
     /**
      * @param Path|string|null $prefix

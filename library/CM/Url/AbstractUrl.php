@@ -2,6 +2,7 @@
 
 namespace CM\Url;
 
+use CM_Site_Abstract;
 use CM_Exception_Invalid;
 use CM_Frontend_Environment;
 use CM_Model_Language;
@@ -19,11 +20,14 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         'https' => 443,
     ];
 
+    /** @var HierarchicalPath|null */
+    protected $_prefix = null;
+
     /** @var CM_Model_Language|null */
     protected $_language = null;
 
-    /** @var HierarchicalPath|null */
-    protected $_prefix = null;
+    /** @var CM_Site_Abstract|null */
+    protected $_site = null;
 
     public function isAbsolute() {
         return !('' === $this->getScheme() && '' === $this->getHost());
@@ -33,11 +37,21 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         return $this->_language;
     }
 
+    public function getSite() {
+        return $this->_site;
+    }
+
     public function getPrefix() {
         if (null === $this->_prefix) {
             return null;
         }
         return (string) $this->_prefix;
+    }
+
+    public function withSite(CM_Site_Abstract $site, $sameOrigin = null) {
+        $url = clone $this;
+        $url->_site = $site;
+        return $url->withBaseUrl($site->getUrl());
     }
 
     public function withLanguage(CM_Model_Language $language) {
@@ -134,22 +148,18 @@ abstract class AbstractUrl extends Http implements UrlInterface {
     }
 
     /**
-     * @param string                 $url
-     * @param UrlInterface|null      $baseUrl
-     * @param CM_Model_Language|null $language
-     * @return static
+     * @param                              $url
+     * @param CM_Frontend_Environment|null $environment
+     * @return AbstractUrl
      */
-    protected static function _create($url, UrlInterface $baseUrl = null, CM_Model_Language $language = null) {
+    protected static function _create($url, CM_Frontend_Environment $environment = null) {
         /** @var AbstractUrl $abstractUrl */
         $abstractUrl = self::getPipeline()->process(
             self::createFromString($url)
         );
         $abstractUrl = $abstractUrl->_ensureAbsolutePath();
-        if ($baseUrl) {
-            $abstractUrl = $abstractUrl->withBaseUrl($baseUrl);
-        }
-        if ($language) {
-            $abstractUrl = $abstractUrl->withLanguage($language);
+        if ($environment) {
+            $abstractUrl = $abstractUrl->withEnvironment($environment);
         }
         return $abstractUrl;
     }

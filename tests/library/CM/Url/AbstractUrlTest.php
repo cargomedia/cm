@@ -49,26 +49,22 @@ class AbstractUrlTest extends CMTest_TestCase {
         $this->assertSame('http://xn--oy2b35ckwhba574atvuzkc.com/foo/bar', (string) $url);
 
         $baseUrl = BaseUrl::create('http://foo/?param');
-        $url = CM_Url_AbstractMockUrl::create('/bar?foobar=1', $baseUrl);
+        $environment = $this->_getEnvironment();
+        $url = CM_Url_AbstractMockUrl::create('/bar?foobar=1', $environment);
         $this->assertSame(null, $url->getPrefix());
         $this->assertSame(null, $url->getLanguage());
-        $this->assertSame('http://foo/bar?foobar=1', (string) $url);
+        $this->assertSame('http://host.com/bar?foobar=1', (string) $url);
 
-        $baseUrlWithPrefix = BaseUrl::create('http://foo/prefix?param');
-        $url = CM_Url_AbstractMockUrl::create('/bar?foobar=1', $baseUrlWithPrefix);
+        $environment = $this->_getEnvironment(null, 'http://foo/prefix?param');
+        $url = CM_Url_AbstractMockUrl::create('/bar?foobar=1', $environment);
         $this->assertSame('prefix', $url->getPrefix());
         $this->assertSame(null, $url->getLanguage());
         $this->assertSame('http://foo/prefix/bar?foobar=1', (string) $url);
 
-        $language = CMTest_TH::createLanguage('de');
-        $url = CM_Url_AbstractMockUrl::create('/bar?foobar=1', null, $language);
-        $this->assertSame(null, $url->getPrefix());
-        $this->assertSame($language, $url->getLanguage());
-        $this->assertSame('/bar/de?foobar=1', (string) $url);
-
-        $url = CM_Url_AbstractMockUrl::create('/bar?foobar=1', $baseUrlWithPrefix, $language);
+        $environment = $this->_getEnvironment('de', 'http://foo/prefix?param');
+        $url = CM_Url_AbstractMockUrl::create('/bar?foobar=1', $environment);
         $this->assertSame('prefix', $url->getPrefix());
-        $this->assertSame($language, $url->getLanguage());
+        $this->assertSame($environment->getLanguage(), $url->getLanguage());
         $this->assertSame('http://foo/prefix/bar/de?foobar=1', (string) $url);
     }
 
@@ -212,7 +208,37 @@ class AbstractUrlTest extends CMTest_TestCase {
         $url = CM_Url_AbstractMockUrl::createFromString('http://foo/bar?foobar=1');
         $this->assertSame(true, $url->isAbsolute());
     }
+
+    /**
+     * @param string|null $languageAbbreviation
+     * @param string|null $siteUrl
+     * @param string|null $siteUrlCdn
+     * @return CM_Frontend_Environment
+     */
+    protected function _getEnvironment($languageAbbreviation = null, $siteUrl = null, $siteUrlCdn = null) {
+        $site = $this
+            ->getMockBuilder('CM_Site_Abstract')
+            ->setMethods(['getUrl', 'getUrlCdn'])
+            ->getMockForAbstractClass();
+
+        $site
+            ->expects($this->any())
+            ->method('getUrl')
+            ->will($this->returnValue(BaseUrl::create($siteUrl ? $siteUrl : 'http://host.com')));
+
+        $site
+            ->expects($this->any())
+            ->method('getUrlCdn')
+            ->will($this->returnValue(BaseUrl::create($siteUrlCdn ? $siteUrlCdn : 'http://cdn.host.com')));
+
+        $language = null;
+        if ($languageAbbreviation) {
+            $language = CMTest_TH::createLanguage($languageAbbreviation);
+        }
+        return new CM_Frontend_Environment($site, null, $language);
+    }
 }
+
 
 class CM_Url_AbstractMockUrl extends AbstractUrl {
 
@@ -230,7 +256,7 @@ class CM_Url_AbstractMockUrl extends AbstractUrl {
             . $this->fragment->getUriComponent();
     }
 
-    public static function create($url, UrlInterface $baseUrl = null, CM_Model_Language $language = null) {
-        return parent::_create($url, $baseUrl, $language);
+    public static function create($url, CM_Frontend_Environment $environment = null) {
+        return parent::_create($url, $environment);
     }
 }
