@@ -16,8 +16,6 @@ return function (CM_Config_Node $config) {
 
     $config->timeZone = 'UTC';
 
-    $config->CM_Site_Abstract->class = null;
-
     $config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
     $config->CM_Cache_Local->lifetime = 86400;
 
