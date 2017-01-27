@@ -1,5 +1,8 @@
 <?php
 
+use CM\Url\Url;
+use League\Uri\Components\Query;
+
 abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract {
 
     /**
@@ -63,9 +66,9 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $count = 0;
         $fragments = [];
         do {
-            $fragment = CM_Util::link($request->getPath(), $request->getQuery());
+            $fragment = (string) Url::create($request->getPath())->withQuery((string) Query::createFromPairs($request->getQuery()));
             $fragments[] = $fragment;
-            $url = $this->getRender()->getSite()->getUrlBase() . $fragment;
+            $url = (string) Url::create($fragment)->withBaseUrl($this->getRender()->getSite()->getUrlBase());
             if ($count++ > 10) {
                 throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $fragments) . ').');
             }
