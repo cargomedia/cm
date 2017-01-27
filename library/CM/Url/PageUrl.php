@@ -2,12 +2,62 @@
 
 namespace CM\Url;
 
-use CM_Exception_Invalid;
 use CM_Frontend_Environment;
-use CM_Util;
-use League\Uri\Components\HierarchicalPath;
+use CM_Site_Abstract;
+use CM\Url\Components\PagePath;
+use League\Uri\Components\HierarchicalPath as Path;
+use League\Uri\Components\Fragment;
+use League\Uri\Components\Host;
+use League\Uri\Components\Pass;
+use League\Uri\Components\Port;
+use League\Uri\Components\Query;
+use League\Uri\Components\Scheme;
+use League\Uri\Components\User;
+use League\Uri\Components\UserInfo;
+use League\Uri\Interfaces\Fragment as FragmentInterface;
+use League\Uri\Interfaces\Host as HostInterface;
+use League\Uri\Interfaces\Port as PortInterface;
+use League\Uri\Interfaces\Query as QueryInterface;
+use League\Uri\Interfaces\Scheme as SchemeInterface;
+use League\Uri\Interfaces\UserInfo as UserInfoInterface;
 
 class PageUrl extends RouteUrl {
+
+    /** @var PagePath */
+    protected $path;
+
+    /**
+     * @param SchemeInterface   $scheme
+     * @param UserInfoInterface $userInfo
+     * @param HostInterface     $host
+     * @param PortInterface     $port
+     * @param PagePath          $path
+     * @param QueryInterface    $query
+     * @param FragmentInterface $fragment
+     */
+    public function __construct(
+        SchemeInterface $scheme,
+        UserInfoInterface $userInfo,
+        HostInterface $host,
+        PortInterface $port,
+        PagePath $path,
+        QueryInterface $query,
+        FragmentInterface $fragment
+    ) {
+        parent::__construct($scheme, $userInfo, $host, $port, $path, $query, $fragment);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPageClassName() {
+        return $this->path->getPageClassName();
+    }
+
+    public function withSite(CM_Site_Abstract $site, $sameOrigin = null) {
+        $this->path->assertSupportedSite($site);
+        return parent::withSite($site, $sameOrigin);
+    }
 
     public function getUriRelativeComponents() {
         $segments = [];
@@ -17,8 +67,9 @@ class PageUrl extends RouteUrl {
         if ($language = $this->getLanguage()) {
             $segments[] = $language->getAbbreviation();
         }
-        $path = $this->path->prepend(
-            HierarchicalPath::createFromSegments($segments, HierarchicalPath::IS_ABSOLUTE)
+        $path = new Path((string) $this->path);
+        $path = $path->prepend(
+            Path::createFromSegments($segments, Path::IS_ABSOLUTE)
         );
         return ''
             . $path->getUriComponent()
@@ -34,44 +85,23 @@ class PageUrl extends RouteUrl {
      */
     public static function create($pageClassName, array $params = null, CM_Frontend_Environment $environment = null) {
         /** @var PageUrl $url */
-        $url = parent::_create(self::_pageClassNameToPath($pageClassName), $environment);
+        $url = parent::_create($pageClassName, $environment);
         if (null !== $params) {
             $url = $url->withParams($params);
         }
         return $url;
     }
 
-    /**
-     * @param string $pageClassName
-     * @return string
-     * @throws CM_Exception_Invalid
-     */
-    protected static function _pageClassNameToPath($pageClassName) {
-        if (!class_exists($pageClassName)) {
-            throw new CM_Exception_Invalid('Failed to create PageUrl, page class does not exist', null, [
-                'pageClassName' => $pageClassName,
-            ]);
-        }
-
-        $list = explode('_', $pageClassName);
-
-        // Remove first parts
-        foreach ($list as $index => $entry) {
-            unset($list[$index]);
-            if ($entry == 'Page') {
-                break;
-            }
-        }
-
-        // Converts upper case letters to dashes: CodeOfHonor => code-of-honor
-        foreach ($list as $index => $entry) {
-            $list[$index] = CM_Util::uncamelize($entry);
-        }
-
-        $path = '/' . implode('/', $list);
-        if ($path == '/index') {
-            $path = '/';
-        }
-        return $path;
+    public static function createFromComponents(array $components) {
+        $components = self::normalizeUriHash($components);
+        return new static(
+            new Scheme($components['scheme']),
+            new UserInfo(new User($components['user']), new Pass($components['pass'])),
+            new Host($components['host']),
+            new Port($components['port']),
+            new PagePath($components['path']),
+            new Query($components['query']),
+            new Fragment($components['fragment'])
+        );
     }
 }
