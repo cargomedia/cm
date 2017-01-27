@@ -113,9 +113,7 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         if ($language = $environment->getLanguage()) {
             $url = $url->withLanguage($language);
         }
-        return $url->withBaseUrl(
-            $environment->getSite()->getUrl()
-        );
+        return $url->withSite($environment->getSite());
     }
 
     protected function _ensureAbsolutePath() {

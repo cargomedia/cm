@@ -162,15 +162,18 @@ class AbstractUrlTest extends CMTest_TestCase {
         $urlWithEnvironment = $url->withEnvironment($environment);
         $this->assertSame(null, $url->getLanguage());
         $this->assertSame('/bar?foobar=1', (string) $url);
+        $this->assertSame($environment->getSite(), $urlWithEnvironment->getSite());
         $this->assertSame(null, $urlWithEnvironment->getLanguage());
         $this->assertSame('http://www.example.com/bar?foobar=1', (string) $urlWithEnvironment);
 
         $environment = $this->createEnvironment(null, null, 'de');
         $urlWithEnvironmentAndLanguage = $url->withEnvironment($environment);
+        $this->assertSame($environment->getSite(), $urlWithEnvironmentAndLanguage->getSite());
         $this->assertSame($environment->getLanguage(), $urlWithEnvironmentAndLanguage->getLanguage());
         $this->assertSame('http://www.example.com/bar/de?foobar=1', (string) $urlWithEnvironmentAndLanguage);
 
         $urlWithEnvironmentPreserved = $urlWithEnvironmentAndLanguage->withPath('/baz');
+        $this->assertSame($environment->getSite(), $urlWithEnvironmentPreserved->getSite());
         $this->assertSame($environment->getLanguage(), $urlWithEnvironmentPreserved->getLanguage());
         $this->assertSame('http://www.example.com/baz/de?foobar=1', (string) $urlWithEnvironmentPreserved);
     }
