@@ -94,9 +94,9 @@ class CM_RenderAdapter_Document extends CM_RenderAdapter_Abstract {
         $options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
         $options['renderStamp'] = floor(microtime(true) * 1000);
         $options['site'] = CM_Params::encode($this->getRender()->getSite());
-        $options['url'] = $this->getRender()->getSite()->getUrl();
-        $options['urlBase'] = $this->getRender()->getSite()->getUrlBase();
-        $options['urlCdn'] = $this->getRender()->getSite()->getUrlCdn();
+        $options['url'] = (string) $this->getRender()->getSite()->getUrl();
+        $options['urlBase'] = (string) $this->getRender()->getSite()->getUrlBase();
+        $options['urlCdn'] = (string) $this->getRender()->getSite()->getUrlCdn();
         $options['urlUserContentList'] = $serviceManager->getUserContent()->getUrlList();
         $options['urlServiceWorker'] = $this->getRender()->getUrlServiceWorker();
         $options['language'] = $this->getRender()->getLanguage();
