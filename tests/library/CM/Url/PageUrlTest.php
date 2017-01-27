@@ -23,6 +23,11 @@ class PageUrlTest extends CMTest_TestCase {
         $this->assertSame('CM_Page_Example', $url->getPageClassName());
         $this->assertSame('/example', (string) $url);
 
+        $page = new \CM_Page_Example();
+        $url = PageUrl::create($page);
+        $this->assertSame('CM_Page_Example', $url->getPageClassName());
+        $this->assertSame('/example', (string) $url);
+
         $url = PageUrl::create(\CM_Page_Example::class, ['foo' => 'bar']);
         $this->assertSame('CM_Page_Example', $url->getPageClassName());
         $this->assertSame('/example?foo=bar', (string) $url);

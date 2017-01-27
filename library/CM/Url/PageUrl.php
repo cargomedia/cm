@@ -3,6 +3,7 @@
 namespace CM\Url;
 
 use CM_Frontend_Environment;
+use CM_Page_Abstract;
 use CM_Site_Abstract;
 use CM\Url\Components\PagePath;
 use League\Uri\Components\HierarchicalPath as Path;
@@ -78,12 +79,17 @@ class PageUrl extends RouteUrl {
     }
 
     /**
-     * @param string                       $pageClassName
+     * @param CM_Page_Abstract|string      $pageClassName
      * @param array|null                   $params
      * @param CM_Frontend_Environment|null $environment
      * @return PageUrl
      */
     public static function create($pageClassName, array $params = null, CM_Frontend_Environment $environment = null) {
+        if ($pageClassName instanceof CM_Page_Abstract) {
+            $pageClassName = get_class($pageClassName);
+        }
+        $pageClassName = (string) $pageClassName;
+
         /** @var PageUrl $url */
         $url = parent::_create($pageClassName, $environment);
         if (null !== $params) {
