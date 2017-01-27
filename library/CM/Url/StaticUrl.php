@@ -2,6 +2,7 @@
 
 namespace CM\Url;
 
+use CM_Frontend_Environment;
 use League\Uri\Components\HierarchicalPath;
 use League\Uri\Components\Query;
 
@@ -25,14 +26,14 @@ class StaticUrl extends AssetUrl {
     }
 
     /**
-     * @param string            $url
-     * @param UrlInterface|null $baseUrl
-     * @param string|null       $deployVersion
+     * @param string                       $url
+     * @param CM_Frontend_Environment|null $environment
+     * @param string|null                  $deployVersion
      * @return StaticUrl
      */
-    public static function create($url, UrlInterface $baseUrl = null, $deployVersion = null) {
+    public static function create($url, CM_Frontend_Environment $environment = null, $deployVersion = null) {
         /** @var StaticUrl $staticUrl */
-        $staticUrl = parent::_create($url, $baseUrl, null, $deployVersion);
+        $staticUrl = parent::_create($url, $environment, $deployVersion);
         return $staticUrl;
     }
 }

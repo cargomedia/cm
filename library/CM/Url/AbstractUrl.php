@@ -3,11 +3,9 @@
 namespace CM\Url;
 
 use CM_Site_Abstract;
-use CM_Exception_Invalid;
 use CM_Frontend_Environment;
 use CM_Model_Language;
 use League\Uri\Components\HierarchicalPath;
-use League\Uri\Interfaces\Uri;
 use League\Uri\Modifiers\Normalize;
 use League\Uri\Modifiers\Pipeline;
 use League\Uri\Schemes\Http;

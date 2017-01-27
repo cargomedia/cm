@@ -3,8 +3,8 @@
 namespace CM\Url;
 
 use CM_Exception_Invalid;
+use CM_Frontend_Environment;
 use CM_Util;
-use CM_Model_Language;
 use League\Uri\Components\HierarchicalPath;
 
 class PageUrl extends RouteUrl {
@@ -27,15 +27,14 @@ class PageUrl extends RouteUrl {
     }
 
     /**
-     * @param string                 $pageClassName
-     * @param array|null             $params
-     * @param UrlInterface|null      $baseUrl
-     * @param CM_Model_Language|null $language
+     * @param string                       $pageClassName
+     * @param array|null                   $params
+     * @param CM_Frontend_Environment|null $environment
      * @return PageUrl
      */
-    public static function create($pageClassName, array $params = null, UrlInterface $baseUrl = null, CM_Model_Language $language = null) {
+    public static function create($pageClassName, array $params = null, CM_Frontend_Environment $environment = null) {
         /** @var PageUrl $url */
-        $url = parent::_create(self::_pageClassNameToPath($pageClassName), $baseUrl, $language);
+        $url = parent::_create(self::_pageClassNameToPath($pageClassName), $environment);
         if (null !== $params) {
             $url = $url->withParams($params);
         }

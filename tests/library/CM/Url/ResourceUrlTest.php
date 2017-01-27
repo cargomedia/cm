@@ -16,12 +16,12 @@ class ResourceUrlTest extends CMTest_TestCase {
         $url = ResourceUrl::create('file.ext', 'resource-type');
         $this->assertSame('/resource-type/file.ext', (string) $url);
 
-        $language = CMTest_TH::createLanguage('de');
-        $url = ResourceUrl::create('file.ext', 'resource-type', $language);
-        $this->assertSame('/resource-type/de/file.ext', (string) $url);
+        $environment = $this->createEnvironment(['type' => 999], null, 'de');
+        $url = ResourceUrl::create('file.ext', 'resource-type', $environment);
+        $this->assertSame('http://cdn.example.com/resource-type/de/999/file.ext', (string) $url);
 
-        $url = ResourceUrl::create('file.ext', 'resource-type', $language, 1234);
-        $this->assertSame('/resource-type/de/1234/file.ext', (string) $url);
+        $url = ResourceUrl::create('file.ext', 'resource-type', $environment, 1234);
+        $this->assertSame('http://cdn.example.com/resource-type/de/999/1234/file.ext', (string) $url);
     }
 
     public function testWithSite() {
@@ -39,20 +39,19 @@ class ResourceUrlTest extends CMTest_TestCase {
         $site
             ->expects($this->any())
             ->method('getUrl')
-            ->will($this->returnValue('http://foo/path?param'));
+            ->will($this->returnValue('http://foo.com/path?param'));
 
         $site
             ->expects($this->any())
             ->method('getUrlCdn')
-            ->will($this->returnValue('http://cdn.foo/path?param'));
+            ->will($this->returnValue('http://cdn.foo.com/path?param'));
 
-        $language = CMTest_TH::createLanguage('de');
-        $url = ResourceUrl::create('file.ext', 'resource-type', $language, 1234);
+        $url = ResourceUrl::create('file.ext', 'resource-type');
 
         $urlWithSite = $url->withSite($site);
-        $this->assertSame('http://cdn.foo/resource-type/de/42/1234/file.ext', (string) $urlWithSite);
+        $this->assertSame('http://cdn.foo.com/resource-type/42/file.ext', (string) $urlWithSite);
 
         $urlWithSiteSameOrigin = $url->withSite($site, true);
-        $this->assertSame('http://foo/resource-type/de/42/1234/file.ext', (string) $urlWithSiteSameOrigin);
+        $this->assertSame('http://foo.com/resource-type/42/file.ext', (string) $urlWithSiteSameOrigin);
     }
 }

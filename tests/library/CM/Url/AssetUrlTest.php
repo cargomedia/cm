@@ -17,68 +17,37 @@ class AssetUrlTest extends CMTest_TestCase {
     }
 
     public function testWithEnvironment() {
-        $site = $this
-            ->getMockBuilder('CM_Site_Abstract')
-            ->setMethods(['getUrl', 'getUrlCdn'])
-            ->getMockForAbstractClass();
-
-        $site
-            ->expects($this->any())
-            ->method('getUrl')
-            ->will($this->returnValue('http://foo/path?param'));
-
-        $site
-            ->expects($this->any())
-            ->method('getUrlCdn')
-            ->will($this->returnValue('http://cdn.foo/path?param'));
-
         $url = CM_Url_AssetMockUrl::create('/bar?foobar=1');
 
-        $environment = new CM_Frontend_Environment($site, null, null);
+        $environment = $this->createEnvironment();
         $urlWithEnvironment = $url->withEnvironment($environment);
         $this->assertSame(null, $url->getLanguage());
         $this->assertSame('/bar?foobar=1', (string) $url);
         $this->assertSame(null, $urlWithEnvironment->getLanguage());
-        $this->assertSame('http://cdn.foo/bar?foobar=1', (string) $urlWithEnvironment);
+        $this->assertSame('http://cdn.example.com/bar?foobar=1', (string) $urlWithEnvironment);
 
-        $language = CMTest_TH::createLanguage('de');
-        $environment = new CM_Frontend_Environment($site, null, $language);
+        $environment = $this->createEnvironment(null, null, 'de');
         $urlWithEnvironmentAndLanguage = $url->withEnvironment($environment);
-        $this->assertSame($language, $urlWithEnvironmentAndLanguage->getLanguage());
-        $this->assertSame('http://cdn.foo/de/bar?foobar=1', (string) $urlWithEnvironmentAndLanguage);
+        $this->assertSame($environment->getLanguage(), $urlWithEnvironmentAndLanguage->getLanguage());
+        $this->assertSame('http://cdn.example.com/de/bar?foobar=1', (string) $urlWithEnvironmentAndLanguage);
 
         $urlWithEnvironmentPreserved = $urlWithEnvironmentAndLanguage->withPath('/baz');
-        $this->assertSame($language, $urlWithEnvironmentPreserved->getLanguage());
-        $this->assertSame('http://cdn.foo/de/baz?foobar=1', (string) $urlWithEnvironmentPreserved);
+        $this->assertSame($environment->getLanguage(), $urlWithEnvironmentPreserved->getLanguage());
+        $this->assertSame('http://cdn.example.com/de/baz?foobar=1', (string) $urlWithEnvironmentPreserved);
 
         $urlWithEnvironmentSameOrigin = $url->withEnvironment($environment, ['sameOrigin' => true]);
-        $this->assertSame('http://foo/de/bar?foobar=1', (string) $urlWithEnvironmentSameOrigin);
+        $this->assertSame('http://www.example.com/de/bar?foobar=1', (string) $urlWithEnvironmentSameOrigin);
     }
 
     public function testWithSite() {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|\CM_Site_Abstract $site */
-        $site = $this
-            ->getMockBuilder('CM_Site_Abstract')
-            ->setMethods(['getUrl', 'getUrlCdn'])
-            ->getMockForAbstractClass();
-
-        $site
-            ->expects($this->any())
-            ->method('getUrl')
-            ->will($this->returnValue('http://foo/path?param'));
-
-        $site
-            ->expects($this->any())
-            ->method('getUrlCdn')
-            ->will($this->returnValue('http://cdn.foo/path?param'));
+        $site = $this->getMockSite();
 
         $url = CM_Url_AssetMockUrl::create('/bar?foobar=1');
-
         $urlWithSite = $url->withSite($site);
-        $this->assertSame('http://cdn.foo/bar?foobar=1', (string) $urlWithSite);
+        $this->assertSame('http://cdn.example.com/bar?foobar=1', (string) $urlWithSite);
 
         $urlWithSiteSameOrigin = $url->withSite($site, true);
-        $this->assertSame('http://foo/bar?foobar=1', (string) $urlWithSiteSameOrigin);
+        $this->assertSame('http://www.example.com/bar?foobar=1', (string) $urlWithSiteSameOrigin);
     }
 }
 

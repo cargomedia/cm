@@ -32,12 +32,12 @@ class RouteUrlTest extends CMTest_TestCase {
         $url = RouteUrl::create('some-action', ['foo' => 'bar']);
         $this->assertSame('/some-action?foo=bar', (string) $url);
 
-        $baseUrl = BaseUrl::create('http://host');
-        $url = RouteUrl::create('some-action', ['foo' => 'bar'], $baseUrl);
-        $this->assertSame('http://host/some-action?foo=bar', (string) $url);
+        $environment = $this->createEnvironment();
+        $url = RouteUrl::create('some-action', ['foo' => 'bar'], $environment);
+        $this->assertSame('http://www.example.com/some-action?foo=bar', (string) $url);
 
-        $language = CMTest_TH::createLanguage('de');
-        $url = RouteUrl::create('some-action', ['foo' => 'bar'], $baseUrl, $language);
-        $this->assertSame('http://host/some-action/de?foo=bar', (string) $url);
+        $environment = $this->createEnvironment(null, null, 'de');
+        $url = RouteUrl::create('some-action', ['foo' => 'bar'], $environment);
+        $this->assertSame('http://www.example.com/some-action/de?foo=bar', (string) $url);
     }
 }

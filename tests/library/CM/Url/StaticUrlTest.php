@@ -17,18 +17,18 @@ class StaticUrlTest extends CMTest_TestCase {
         $url = StaticUrl::create('file.ext');
         $this->assertSame('/static/file.ext', (string) $url);
 
-        $baseUrl = BaseUrl::create('http://host');
-        $url = StaticUrl::create('file.ext', $baseUrl);
-        $this->assertSame('http://host/static/file.ext', (string) $url);
+        $environment = $this->createEnvironment();
+        $url = StaticUrl::create('file.ext', $environment);
+        $this->assertSame('http://cdn.example.com/static/file.ext', (string) $url);
 
-        $baseUrlWithPrefix = $baseUrl->withPrefix('prefix');
-        $url = StaticUrl::create('file.ext', $baseUrlWithPrefix);
-        $this->assertSame('http://host/static/file.ext', (string) $url);
+        $environment = $this->createEnvironment(['url' => 'http://www.example.com/prefix']);
+        $url = StaticUrl::create('file.ext', $environment);
+        $this->assertSame('http://cdn.example.com/static/file.ext', (string) $url);
 
-        $url = StaticUrl::create('file.ext', $baseUrl, 1234);
-        $this->assertSame('http://host/static/file.ext?1234', (string) $url);
+        $url = StaticUrl::create('file.ext', $environment, 1234);
+        $this->assertSame('http://cdn.example.com/static/file.ext?1234', (string) $url);
 
-        $url = StaticUrl::create('file.ext?foo=bar', $baseUrl, 1234);
-        $this->assertSame('http://host/static/file.ext?foo=bar&1234', (string) $url);
+        $url = StaticUrl::create('file.ext?foo=bar', $environment, 1234);
+        $this->assertSame('http://cdn.example.com/static/file.ext?foo=bar&1234', (string) $url);
     }
 }

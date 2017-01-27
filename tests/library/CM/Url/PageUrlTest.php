@@ -24,13 +24,13 @@ class PageUrlTest extends CMTest_TestCase {
         $url = PageUrl::create(\CM_Page_Example::class, ['foo' => 'bar']);
         $this->assertSame('/example?foo=bar', (string) $url);
 
-        $baseUrl = BaseUrl::create('http://host');
-        $url = PageUrl::create(\CM_Page_Example::class, ['foo' => 'bar'], $baseUrl);
-        $this->assertSame('http://host/example?foo=bar', (string) $url);
+        $environment = $this->createEnvironment();
+        $url = PageUrl::create(\CM_Page_Example::class, ['foo' => 'bar'], $environment);
+        $this->assertSame('http://www.example.com/example?foo=bar', (string) $url);
 
-        $language = CMTest_TH::createLanguage('de');
-        $url = PageUrl::create(\CM_Page_Example::class, ['foo' => 'bar'], $baseUrl, $language);
-        $this->assertSame('http://host/de/example?foo=bar', (string) $url);
+        $environment = $this->createEnvironment(null, null, 'de');
+        $url = PageUrl::create(\CM_Page_Example::class, ['foo' => 'bar'], $environment);
+        $this->assertSame('http://www.example.com/de/example?foo=bar', (string) $url);
 
         /** @var \CM_Exception_Invalid $exception */
         $exception = $this->catchException(function () {

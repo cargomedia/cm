@@ -2,7 +2,7 @@
 
 namespace CM\Url;
 
-use CM_Model_Language;
+use CM_Frontend_Environment;
 use League\Uri\Components\HierarchicalPath;
 
 class ServiceWorkerUrl extends AbstractUrl {
@@ -67,19 +67,18 @@ class ServiceWorkerUrl extends AbstractUrl {
     }
 
     /**
-     * @param string|null            $name
-     * @param UrlInterface|null      $baseUrl
-     * @param CM_Model_Language|null $language
-     * @param string|null            $deployVersion
+     * @param string|null                  $name
+     * @param CM_Frontend_Environment|null $environment
+     * @param string|null                  $deployVersion
      * @return ServiceWorkerUrl
      */
-    public static function create($name = null, UrlInterface $baseUrl = null, CM_Model_Language $language = null, $deployVersion = null) {
+    public static function create($name = null, CM_Frontend_Environment $environment = null, $deployVersion = null) {
         if (null === $name) {
             $name = 'serviceworker';
         }
 
         /** @var ServiceWorkerUrl $url */
-        $url = parent::_create('', $baseUrl, $language);
+        $url = parent::_create('', $environment);
         $url->setName($name);
         $url->setDeployVersion($deployVersion);
         return $url;

@@ -3,11 +3,7 @@
 namespace CM\Url;
 
 use CM_Exception_Invalid;
-use CM_Frontend_Environment;
-use CM_Model_Language;
-use CM_Site_Abstract;
 use League\Uri\Components\HierarchicalPath;
-use League\Uri\Schemes\Http;
 
 class BaseUrl extends AbstractUrl {
 

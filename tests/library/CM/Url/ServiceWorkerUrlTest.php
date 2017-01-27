@@ -20,19 +20,19 @@ class ServiceWorkerUrlTest extends CMTest_TestCase {
         $url = ServiceWorkerUrl::create('foo');
         $this->assertSame('/foo.js', (string) $url);
 
-        $baseUrl = BaseUrl::create('http://host');
-        $url = ServiceWorkerUrl::create('foo', $baseUrl);
-        $this->assertSame('http://host/foo.js', (string) $url);
+        $environment = $this->createEnvironment();
+        $url = ServiceWorkerUrl::create('foo', $environment);
+        $this->assertSame('http://www.example.com/foo.js', (string) $url);
 
-        $baseUrlWithPrefix = $baseUrl->withPrefix('prefix');
-        $url = ServiceWorkerUrl::create('foo', $baseUrlWithPrefix);
-        $this->assertSame('http://host/prefix/foo.js', (string) $url);
+        $environment = $this->createEnvironment(['url' => 'http://www.example.com/prefix']);
+        $url = ServiceWorkerUrl::create('foo', $environment);
+        $this->assertSame('http://www.example.com/prefix/foo.js', (string) $url);
 
-        $language = CMTest_TH::createLanguage('de');
-        $url = ServiceWorkerUrl::create('foo', $baseUrlWithPrefix, $language);
-        $this->assertSame('http://host/prefix/foo-de.js', (string) $url);
+        $environment = $this->createEnvironment(['url' => 'http://www.example.com/prefix'], null, 'de');
+        $url = ServiceWorkerUrl::create('foo', $environment);
+        $this->assertSame('http://www.example.com/prefix/foo-de.js', (string) $url);
 
-        $url = ServiceWorkerUrl::create('foo', $baseUrlWithPrefix, $language, 123);
-        $this->assertSame('http://host/prefix/foo-de-123.js', (string) $url);
+        $url = ServiceWorkerUrl::create('foo', $environment, 123);
+        $this->assertSame('http://www.example.com/prefix/foo-de-123.js', (string) $url);
     }
 }

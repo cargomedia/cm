@@ -3,7 +3,6 @@
 namespace CM\Url;
 
 use CM_Frontend_Environment;
-use CM_Model_Language;
 use CM_Site_Abstract;
 
 abstract class AssetUrl extends AbstractUrl {
@@ -38,25 +37,21 @@ abstract class AssetUrl extends AbstractUrl {
         return $url->withSite($site, $options['sameOrigin']);
     }
 
-    /**
-     * @param CM_Site_Abstract $site
-     * @param bool|null        $sameOrigin
-     * @return AssetUrl
-     */
     public function withSite(CM_Site_Abstract $site, $sameOrigin = null) {
-        return $this->withBaseUrl($sameOrigin ? $site->getUrl() : $site->getUrlCdn());
+        $url = clone $this;
+        $url->_site = $site;
+        return $url->withBaseUrl($sameOrigin ? $site->getUrl() : $site->getUrlCdn());
     }
 
     /**
-     * @param string                 $url
-     * @param UrlInterface|null      $baseUrl
-     * @param CM_Model_Language|null $language
-     * @param string|null            $deployVersion
+     * @param string                       $url
+     * @param CM_Frontend_Environment|null $environment
+     * @param string|null                  $deployVersion
      * @return AssetUrl
      */
-    protected static function _create($url, UrlInterface $baseUrl = null, CM_Model_Language $language = null, $deployVersion = null) {
+    protected static function _create($url, CM_Frontend_Environment $environment = null, $deployVersion = null) {
         /** @var AssetUrl $assetUrl */
-        $assetUrl = parent::_create($url, $baseUrl, $language);
+        $assetUrl = parent::_create($url, $environment);
         $assetUrl->setDeployVersion($deployVersion);
         return $assetUrl;
     }

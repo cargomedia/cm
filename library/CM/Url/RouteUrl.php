@@ -2,7 +2,7 @@
 
 namespace CM\Url;
 
-use CM_Model_Language;
+use CM_Frontend_Environment;
 use League\Uri\Components\Query;
 
 class RouteUrl extends AbstractUrl {
@@ -53,15 +53,14 @@ class RouteUrl extends AbstractUrl {
     }
 
     /**
-     * @param string                 $route
-     * @param array|null             $params
-     * @param UrlInterface|null      $baseUrl
-     * @param CM_Model_Language|null $language
+     * @param string                       $route
+     * @param array|null                   $params
+     * @param CM_Frontend_Environment|null $environment
      * @return RouteUrl
      */
-    public static function create($route, array $params = null, UrlInterface $baseUrl = null, CM_Model_Language $language = null) {
+    public static function create($route, array $params = null, CM_Frontend_Environment $environment = null) {
         /** @var RouteUrl $url */
-        $url = parent::_create($route, $baseUrl, $language);
+        $url = parent::_create($route, $environment);
         if (null !== $params) {
             $url = $url->withParams($params);
         }
