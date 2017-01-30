@@ -9,6 +9,9 @@ class Url extends AbstractUrl {
 
     public function getUriRelativeComponents() {
         $path = clone $this->path;
+        if ($language = $this->getLanguage()) {
+            $path = $path->prepend($language->getAbbreviation());
+        }
         if ($prefix = $this->getPrefix()) {
             $path = $path->prepend($prefix);
         }

@@ -35,8 +35,15 @@ class UrlTest extends CMTest_TestCase {
         $this->assertSame('prefix', $url->getPrefix());
         $this->assertSame('http://www.example.com/prefix/path/to/something?param=1#fragment', (string) $url);
 
+        $environment = $this->createEnvironment(['url' => 'http://www.example.com/prefix'], null, 'fr');
+        $url = Url::create('path/to/something?param=1#fragment', $environment);
+        $this->assertSame('/path/to/something', $url->getPath());
+        $this->assertSame('prefix', $url->getPrefix());
+        $this->assertSame('fr', $url->getLanguage()->getAbbreviation());
+        $this->assertSame('http://www.example.com/prefix/fr/path/to/something?param=1#fragment', (string) $url);
+
         $environment = $this->createEnvironment(['url' => 'http://www.example.com/foo']);
         $url = $url->withSite($environment->getSite());
-        $this->assertSame('http://www.example.com/foo/path/to/something?param=1#fragment', (string) $url);
+        $this->assertSame('http://www.example.com/foo/fr/path/to/something?param=1#fragment', (string) $url);
     }
 }
