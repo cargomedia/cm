@@ -120,14 +120,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @return CM_Http_UrlParser
-     * @deprecated
-     */
-    public function getUrlParser() {
-        return new CM_Http_UrlParser($this->getUrl());
-    }
-
-    /**
      * @return BaseUrl
      */
     public function getUrlCdn() {
@@ -236,10 +228,9 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         ];
 
         if ($this->getUrlCdn()) {
-            $urlCdn = new CM_Http_UrlParser($this->getUrlCdn());
             $matchList[] = [
-                'host' => $urlCdn->getHost(),
-                'path' => $urlCdn->getPath(),
+                'host' => $this->getUrlCdn()->getHost(),
+                'path' => $this->getUrlCdn()->getPath(),
             ];
         }
 

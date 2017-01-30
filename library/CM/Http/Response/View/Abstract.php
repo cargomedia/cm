@@ -288,12 +288,12 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      * @return bool
      */
     private function _isPageOnSameSite($url) {
-        $urlParser = new CM_Http_UrlParser($url);
-        if (!$this->_site->isUrlMatch($urlParser->getHost(), $urlParser->getPath())) {
+        $url = Url::createFromString($url);
+        if (!$this->_site->isUrlMatch($url->getHost(), $url->getPath())) {
             return false;
         }
 
-        $request = $this->_createGetRequestWithUrl($url);
+        $request = $this->_createGetRequestWithUrl((string) $url);
         $responseFactory = new CM_Http_ResponseFactory($this->getServiceManager());
         $response = $responseFactory->getResponse($request);
         return $response->getSite()->equals($this->getSite());
