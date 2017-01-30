@@ -1,6 +1,5 @@
 <?php
 
-return;
 //pt-online-schema-change doesn't work here
 
 if (!CM_Db_Db::existsColumn('cm_action', 'id')) {
