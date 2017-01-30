@@ -204,11 +204,10 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     public function getUrlPage($pageClassName, array $params = null, CM_Site_Abstract $site = null, CM_Model_Language $language = null) {
-        $environment = $this->getEnvironment();
-        $url = PageUrl::create($pageClassName, $params, $environment);
-        if ($site) {
-            $url = $url->withSite($site);
+        if (!$site) {
+            $site = $this->getSite();
         }
+        $url = CM_Page_UrlFactory::getUrl($pageClassName, $params, $site);
         if ($language) {
             $url = $url->withLanguage($language);
         }
