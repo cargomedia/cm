@@ -166,7 +166,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @throws CM_Exception
      */
     public function getUrlBase() {
-        // TODO: URL - check usages...
         return $this->getUrl()->withoutPrefix();
     }
 
