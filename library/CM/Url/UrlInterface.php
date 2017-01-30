@@ -33,6 +33,11 @@ interface UrlInterface extends UriInterface {
     /**
      * @return string
      */
+    public function getUriBaseComponents();
+
+    /**
+     * @return string
+     */
     public function getUriRelativeComponents();
 
     /**

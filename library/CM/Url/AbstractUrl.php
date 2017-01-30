@@ -116,14 +116,22 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         return $url->withSite($environment->getSite());
     }
 
-    protected function _ensureAbsolutePath() {
-        return $this->withProperty('path', (string) $this->path->withLeadingSlash());
+    public function getUriBaseComponents() {
+        $baseUrl = sprintf('%s://%s', $this->getScheme(), $this->getAuthority());
+        if ($prefix = $this->getPrefix()) {
+            $baseUrl = sprintf('%s/%s', $baseUrl, $prefix);
+        }
+        return $baseUrl;
     }
 
     /**
      * @return string
      */
     abstract public function getUriRelativeComponents();
+
+    protected function _ensureAbsolutePath() {
+        return $this->withProperty('path', (string) $this->path->withLeadingSlash());
+    }
 
     protected function getSchemeSpecificPart() {
         $authority = $this->getAuthority();
