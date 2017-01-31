@@ -22,6 +22,6 @@ abstract class CM_OutputStream_Abstract implements CM_OutputStream_Interface {
      * @param array  ...$params
      */
     public function writefln($format, ...$params) {
-        $this->writef(sprintf($format . PHP_EOL, ...$params));
+        $this->writef($format . PHP_EOL, ...$params);
     }
 }
