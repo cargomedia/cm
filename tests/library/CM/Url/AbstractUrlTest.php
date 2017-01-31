@@ -109,6 +109,25 @@ class AbstractUrlTest extends CMTest_TestCase {
         $this->assertSame('/path?foo=1#bar', (string) $urlWithPrefix);
     }
 
+    public function testWithParams() {
+        $url = CM_Url_AbstractMockUrl::createFromString('/foo');
+
+        $this->assertSame('/foo', (string) $url);
+        $this->assertSame(null, $url->getParams());
+
+        $url = $url->withParams(['foo', 123 => null, 'bar' => 'baz']);
+        $this->assertSame('/foo?0=foo&123&bar=baz', (string) $url);
+        $this->assertSame(['foo', 123 => null, 'bar' => 'baz'], $url->getParams());
+
+        $url = $url->withParams([]);
+        $this->assertSame('/foo', (string) $url);
+        $this->assertSame([], $url->getParams());
+
+        $url = $url->withQuery('0=foo&123&bar=baz');
+        $this->assertSame('/foo?0=foo&123&bar=baz', (string) $url);
+        $this->assertSame(['foo', 123 => null, 'bar' => 'baz'], $url->getParams());
+    }
+
     public function testWithLanguage() {
         $language = CMTest_TH::createLanguage('de');
         $url = CM_Url_AbstractMockUrl::create('/bar?foobar=1');

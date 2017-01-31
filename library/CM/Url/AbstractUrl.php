@@ -5,6 +5,7 @@ namespace CM\Url;
 use CM_Site_Abstract;
 use CM_Frontend_Environment;
 use CM_Model_Language;
+use League\Uri\Components\Query;
 use League\Uri\Components\HierarchicalPath;
 use League\Uri\Modifiers\Normalize;
 use League\Uri\Modifiers\Pipeline;
@@ -17,6 +18,9 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         'http'  => 80,
         'https' => 443,
     ];
+
+    /** @var array|null */
+    protected $_params = null;
 
     /** @var HierarchicalPath|null */
     protected $_prefix = null;
@@ -44,6 +48,10 @@ abstract class AbstractUrl extends Http implements UrlInterface {
             return null;
         }
         return (string) $this->_prefix;
+    }
+
+    public function getParams() {
+        return $this->_params;
     }
 
     public function withSite(CM_Site_Abstract $site, $sameOrigin = null) {
@@ -76,6 +84,19 @@ abstract class AbstractUrl extends Http implements UrlInterface {
     public function withoutPrefix() {
         $url = clone $this;
         $url->_prefix = null;
+        return $url;
+    }
+
+    public function withParams(array $params) {
+        $query = Query::createFromPairs($params);
+        return $this->withQuery((string) $query);
+    }
+
+    public function withQuery($queryString) {
+        $query = new Query($queryString);
+        $this->_params = $query->getPairs();
+        /** @var RouteUrl $url */
+        $url = parent::withQuery((string) $query);
         return $url;
     }
 

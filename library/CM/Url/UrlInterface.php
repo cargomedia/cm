@@ -31,6 +31,11 @@ interface UrlInterface extends UriInterface {
     public function getPrefix();
 
     /**
+     * @return array|null
+     */
+    public function getParams();
+
+    /**
      * @return string
      */
     public function getUriBaseComponents();
@@ -63,6 +68,12 @@ interface UrlInterface extends UriInterface {
      * @return UrlInterface
      */
     public function withoutPrefix();
+
+    /**
+     * @param array $params
+     * @return UrlInterface
+     */
+    public function withParams(array $params);
 
     /**
      * @param UrlInterface|string $baseUrl
