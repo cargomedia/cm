@@ -84,9 +84,6 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $render = new CM_Frontend_Render();
         $siteType = CM_Site_Abstract::factory()->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame('http://cdn.default.dev/', $render->getUrlResource());
-        $this->assertSame('http://cdn.default.dev/', $render->getUrlResource('layout'));
-        $this->assertSame('http://cdn.default.dev/', $render->getUrlResource(null, 'foo/bar.jpg'));
         $this->assertSame(
             'http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
         $this->assertSame('http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/0', $render->getUrlResource('layout', '0'));

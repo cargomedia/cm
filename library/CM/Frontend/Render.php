@@ -204,10 +204,14 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     public function getUrlPage($pageClassName, array $params = null, CM_Site_Abstract $site = null, CM_Model_Language $language = null) {
-        if (!$site) {
-            $site = $this->getSite();
+        if ($pageClassName instanceof CM_Page_Abstract) {
+            $pageClassName = get_class($pageClassName);
         }
-        $url = CM_Page_UrlFactory::getUrl($pageClassName, $params, $site);
+        $url = CM_Page_UrlFactory::getUrl($pageClassName, $params, $this->getEnvironment());
+        if ($site) {
+            CM_Page_UrlFactory::assertSupportedSite($pageClassName, $site);
+            $url = $url->withSite($site);
+        }
         if ($language) {
             $url = $url->withLanguage($language);
         }
@@ -215,17 +219,13 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
-     * @param string|null           $type
-     * @param string|null           $path
+     * @param string                $type
+     * @param string                $path
      * @param array|null            $options
      * @param CM_Site_Abstract|null $site
      * @return string
      */
-    public function getUrlResource($type = null, $path = null, array $options = null, CM_Site_Abstract $site = null) {
-        // TODO: strange smell here, verify usages...
-        if (null === $type || null === $path) {
-            return (string) $this->getEnvironment()->getSite()->getUrlCdn();
-        }
+    public function getUrlResource($type, $path, array $options = null, CM_Site_Abstract $site = null) {
         $environment = $this->getEnvironment();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $url = ResourceUrl::create($path, $type, $environment, $options, $deployVersion);

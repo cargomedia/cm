@@ -68,10 +68,10 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 
     /**
      * @param array|null $params
-     * @return array
+     * @return array|null
      */
     public static function getUrlComponents(array $params = null) {
-        return [];
+        return null;
     }
 
     /**
