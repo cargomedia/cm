@@ -2,6 +2,7 @@
 
 namespace CM\Url;
 
+use CM_Params;
 use CM_Site_Abstract;
 use CM_Frontend_Environment;
 use CM_Model_Language;
@@ -88,16 +89,17 @@ abstract class AbstractUrl extends Http implements UrlInterface {
     }
 
     public function withParams(array $params) {
-        $query = Query::createFromPairs($params);
-        return $this->withQuery((string) $query);
+        $this->_params = $params;
+        $params = CM_Params::encode($this->getParams());
+        $query = http_build_query($params);
+        return parent::withQuery($query);
     }
 
     public function withQuery($queryString) {
-        $query = new Query($queryString);
-        $this->_params = $query->getPairs();
-        /** @var RouteUrl $url */
-        $url = parent::withQuery((string) $query);
-        return $url;
+        $params = [];
+        parse_str($queryString, $params);
+        $this->_params = $params;
+        return parent::withQuery($queryString);
     }
 
     public function withBaseUrl($baseUrl) {
