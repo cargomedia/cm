@@ -80,7 +80,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $methods = (array) $methods;
         $defaultConfiguration = array(
             'url'          => 'http://www.example.com',
-            'urlCdn'       => null,
+            'urlCdn'       => 'http://cdn.example.com',
             'name'         => 'Example site',
             'emailAddress' => 'hello@example.com',
         );
@@ -98,6 +98,51 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $config->CM_Class_Abstract->typesMaxValue = $type;
 
         return $site;
+    }
+
+    /**
+     * @param array|null                $siteConfig
+     * @param CM_Model_User|null        $viewer
+     * @param string|null               $languageAbbreviation
+     * @param DateTimeZone|null         $timeZone
+     * @param bool|null                 $debug
+     * @param CM_Model_Location|null    $location
+     * @param CM_Model_Currency|null    $currency
+     * @param CM_Http_ClientDevice|null $clientDevice
+     * @return CM_Frontend_Environment
+     */
+    public function createEnvironment(
+        array $siteConfig = null,
+        CM_Model_User $viewer = null,
+        $languageAbbreviation = null,
+        DateTimeZone $timeZone = null,
+        $debug = null,
+        CM_Model_Location $location = null,
+        CM_Model_Currency $currency = null,
+        CM_Http_ClientDevice $clientDevice = null
+    ) {
+
+        $siteArgs = [
+            'classname' => null,
+            'type'      => null,
+            'methods'   => null,
+        ];
+        foreach ($siteArgs as $name => $value) {
+            if (isset($siteConfig[$name])) {
+                $siteArgs[$name] = $siteConfig[$name];
+                unset($siteConfig[$name]);
+            }
+        }
+        $site = $this->getMockSite($siteArgs['classname'], $siteArgs['type'], (array) $siteConfig, $siteArgs['methods']);
+
+        $language = null;
+        if ($languageAbbreviation) {
+            $language = CM_Model_Language::findByAbbreviation($languageAbbreviation);
+            if (!$language) {
+                $language = CMTest_TH::createLanguage($languageAbbreviation);
+            }
+        }
+        return new CM_Frontend_Environment($site, $viewer, $language, $timeZone, $debug, $location, $currency, $clientDevice);
     }
 
     /**
