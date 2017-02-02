@@ -16,7 +16,7 @@
     "nicmart/tree": "~0.2.0",
     "kissmetrics/kissmetrics-php": "~0.1.0",
     "elasticsearch/elasticsearch": "~2.0.0",
-    "guzzlehttp/guzzle": "~5.3.1",
+    "guzzlehttp/guzzle": "~6.0",
     "kickbox/kickbox": "~1.0.3",
     "tomaszdurka/codegenerator": "~0.5.0",
     "jenssegers/agent": "~2.3.1",
@@ -25,7 +25,8 @@
     "danielstjules/stringy": "~2.3",
     "swiftmailer/swiftmailer": "~5.4.3",
     "ramsey/uuid": "~3.5.0",
-    "mischiefcollective/colorjizz": "dev-master#361b8a8727d13b67cb593a936a715ad2204ececb"
+    "mischiefcollective/colorjizz": "~1.0.0",
+    "league/uri": "^4.2"
   },
   "require-dev": {
     "phpunit/phpunit": "~5.5.0",
@@ -35,11 +36,21 @@
     "psr-0": {
       "CM_": "library/",
       "CMService_": "library/"
+    },
+    "psr-4": {
+      "CM\\": "library/CM/",
+      "CMService\\": "library/CMService/"
+
     }
   },
   "autoload-dev": {
     "psr-0": {
       "CMTest_": "tests/helpers/CMTest/library/"
+    },
+    "psr-4": {
+      "CM\\Test\\": "tests/library/CM/",
+      "CMService\\Test\\": "tests/library/CMService/",
+      "CMTest\\": "tests/helpers/CMTest/library/CMTest/"
     }
   },
   "bin": [

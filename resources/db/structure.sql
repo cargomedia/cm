@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS `cm_action`;
 
 
 CREATE TABLE `cm_action` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `actorId` int(10) unsigned DEFAULT NULL,
   `ip` int(10) unsigned DEFAULT NULL,
   `verb` tinyint(3) DEFAULT NULL,
@@ -12,6 +13,7 @@ CREATE TABLE `cm_action` (
   `createStamp` int(10) unsigned NOT NULL,
   `count` int(10) unsigned DEFAULT '1',
   `interval` int(10) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
   KEY `actorId` (`actorId`),
   KEY `ip` (`ip`),
   KEY `action` (`verb`),

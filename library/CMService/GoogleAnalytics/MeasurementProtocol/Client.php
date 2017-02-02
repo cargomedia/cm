@@ -76,7 +76,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      * @param array $parameterList
      */
     protected function _submitRequest(array $parameterList) {
-        $this->_getGuzzleClient()->post('/collect', ['body' => $parameterList]);
+        $this->_getGuzzleClient()->post('/collect', ['form_params' => $parameterList]);
     }
 
     /**
@@ -84,7 +84,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      */
     protected function _getGuzzleClient() {
         if (!self::$_client) {
-            self::$_client = new \GuzzleHttp\Client(['base_url' => 'http://www.google-analytics.com']);
+            self::$_client = new \GuzzleHttp\Client(['base_uri' => 'http://www.google-analytics.com']);
         }
         return self::$_client;
     }

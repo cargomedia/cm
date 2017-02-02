@@ -114,8 +114,9 @@ class CMService_XVerify_ClientTest extends CMTest_TestCase {
         $mockBuilder = $this->getMockBuilder('CMService_XVerify_Client');
         $mockBuilder->setMethods(['_getResponse', '_handleException']);
         $mockBuilder->setConstructorArgs(['', '']);
+        /** @var PHPUnit_Framework_MockObject_MockObject|CMService_XVerify_Client $xVerifyMock */
         $xVerifyMock = $mockBuilder->getMock();
-        $responseMock = new \GuzzleHttp\Message\Response($statusCode, $headerList, \GuzzleHttp\Stream\Stream::factory($responseBody));
+        $responseMock = new \GuzzleHttp\Psr7\Response($statusCode, $headerList, \GuzzleHttp\Stream\Stream::factory($responseBody));
         $xVerifyMock->expects($this->once())->method('_getResponse')->will($this->returnValue($responseMock));
         if ($exceptionExpected) {
             $xVerifyMock->expects($this->once())->method('_handleException')->with($exceptionExpected);
