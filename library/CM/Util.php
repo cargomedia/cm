@@ -54,21 +54,7 @@ class CM_Util {
     public static function rglobLibraries($pattern, CM_Site_Abstract $site) {
         $paths = array();
         foreach ($site->getModules() as $moduleName) {
-            $libraryPath = CM_Util::getModulePath($moduleName) . 'library/' . $moduleName . '/';
-            $paths = array_merge($paths, CM_Util::rglob($pattern, $libraryPath));
-        }
-        return $paths;
-    }
-
-    /**
-     * @param string           $pattern
-     * @param CM_Site_Abstract $site
-     * @return string[]
-     */
-    public static function rglobServiceLibraries($pattern, CM_Site_Abstract $site) {
-        $paths = array();
-        foreach ($site->getModules() as $moduleName) {
-            $libraryPath = CM_Util::getModulePath($moduleName) . 'library/' . $moduleName . 'Service/';
+            $libraryPath = CM_Util::getModulePath($moduleName) . 'library/*/';
             $paths = array_merge($paths, CM_Util::rglob($pattern, $libraryPath));
         }
         return $paths;
