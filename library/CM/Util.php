@@ -61,6 +61,20 @@ class CM_Util {
     }
 
     /**
+     * @param string           $pattern
+     * @param CM_Site_Abstract $site
+     * @return string[]
+     */
+    public static function rglobServiceLibraries($pattern, CM_Site_Abstract $site) {
+        $paths = array();
+        foreach ($site->getModules() as $moduleName) {
+            $libraryPath = CM_Util::getModulePath($moduleName) . 'library/' . $moduleName . 'Service/';
+            $paths = array_merge($paths, CM_Util::rglob($pattern, $libraryPath));
+        }
+        return $paths;
+    }
+
+    /**
      * @param array $array
      * @param mixed $value
      * @return array

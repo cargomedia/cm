@@ -22,7 +22,10 @@ class CM_Asset_Javascript_Library extends CM_Asset_Javascript_Abstract {
      * @return string[]
      */
     public static function getIncludedPaths(CM_Site_Abstract $site) {
-        $pathsUnsorted = CM_Util::rglobLibraries('*.js', $site);
+        $pathsUnsorted = array_merge(
+            CM_Util::rglobLibraries('*.js', $site),
+            CM_Util::rglobServiceLibraries('*.js', $site)
+        );
         return array_keys(CM_Util::getClasses($pathsUnsorted));
     }
 }
