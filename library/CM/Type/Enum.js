@@ -13,9 +13,17 @@ var CM_Type_Enum = CM_Class_Abstract.extend({
    * @param {{value: *}|*} data
    */
   constructor: function(data) {
+    var classProperties = this.constructor;
+    if (0 === classProperties.getConstantList().length) {
+      throw new Error('Enum values are not defined for ' + this._class + ' enum class');
+    }
+
     var value = _.isObject(data) && 'value' in data ? data.value : data;
+    if (_.isUndefined(value)) {
+      value = classProperties.getDefaultValue();
+    }
     if (!this._isValidValue(value)) {
-      throw new Error('Invalid enum value `' + value + '` for ' + this._class);
+      throw new Error('Invalid value `' + value + '` for ' + this._class + ' enum class');
     }
     this._value = value;
   },
@@ -52,5 +60,12 @@ var CM_Type_Enum = CM_Class_Abstract.extend({
         return !_.isObject(classProperties[key]) && !_.isFunction(classProperties[key]);
       })
       .value();
+  },
+
+  /**
+   * @returns {*}
+   */
+  getDefaultValue: function() {
+    throw new Error('Default value in not defined for ' + this.prototype._class + ' enum class');
   }
 });
