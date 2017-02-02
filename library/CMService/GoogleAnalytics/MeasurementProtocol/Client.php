@@ -76,7 +76,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      * @param array $parameterList
      */
     protected function _submitRequest(array $parameterList) {
-        $this->_getGuzzleClient()->post('/collect', ['body' => $parameterList]);
+        $this->_getGuzzleClient()->post('/collect', ['form_params' => $parameterList]);
     }
 
     /**
