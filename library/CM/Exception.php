@@ -91,7 +91,7 @@ class CM_Exception extends Exception {
     /**
      * @param CM_I18n_Phrase $messagePublic
      */
-    private function _setMessagePublic(CM_I18n_Phrase $messagePublic) {
+    protected function _setMessagePublic(CM_I18n_Phrase $messagePublic) {
         $this->_messagePublic = $messagePublic;
     }
 }
