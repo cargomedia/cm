@@ -253,7 +253,6 @@ Commands:
  location outdated [--verbose]
  location upgrade [--without-ip-blocks] [--verbose]
  maintenance start
- maintenance start-local
  media-streams import-archive <stream-channel-media-id> <archive-source>
  media-streams import-video-thumbnail <stream-channel-media-id> <thumbnail-source> <create-stamp>
  message-stream start-synchronization
@@ -262,7 +261,6 @@ Commands:
  search-index create [--index-name=<value>] [--skip-if-exist]
  search-index delete [--index-name=<value>]
  search-index optimize
- search-index start-maintenance
  search-index update [--index-name=<value>]
  ```
 
