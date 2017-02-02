@@ -28,7 +28,7 @@ class CM_Migration_Manager implements CM_Service_ManagerAwareInterface {
      */
     protected function _getMigrationPaths() {
         $paths = [
-            $this->_getMigrationPathByModule(),
+            self::getMigrationPathByModule(),
         ];
         foreach ($this->_modules as $moduleName) {
             $paths[] = self::getMigrationPathByModule($moduleName);
