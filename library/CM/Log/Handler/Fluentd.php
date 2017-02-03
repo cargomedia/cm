@@ -13,6 +13,9 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
     /** @var string */
     protected $_tag;
 
+    /** @var string|null */
+    protected $_errorMessage;
+
     /**
      * @param FluentLogger                      $fluentdLogger
      * @param CM_Log_ContextFormatter_Interface $contextFormatter
@@ -24,6 +27,9 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
         $this->_fluentdLogger = $fluentdLogger;
         $this->_contextFormatter = $contextFormatter;
         $this->_tag = (string) $tag;
+        $fluentdLogger->registerErrorHandler(function (FluentLogger $fluent, \Fluent\Logger\Entity $entity, $error) {
+            $this->_errorMessage = $error;
+        });
     }
 
     /**
@@ -41,9 +47,11 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
         $formattedRecord = $this->_formatRecord($record);
         $sanitizedRecord = $this->_sanitizeRecord($formattedRecord);
         $encodedRecord = $this->_encodeRecord($sanitizedRecord);
+        $this->_errorMessage = null;
         $res = $this->_getFluentd()->post($this->_tag, $encodedRecord);
         if (false === $res) {
-            throw new CM_Exception_Invalid('Could not write to fluentd');
+            $metaInfo = $this->_errorMessage ? ['originalExceptionMessage' => (string) $this->_errorMessage] : null;
+            throw new CM_Exception_Invalid('Could not write to fluentd', null, $metaInfo);
         }
     }
 
