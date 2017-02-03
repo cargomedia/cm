@@ -430,17 +430,22 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   debug: {
+
     /**
-     * @param {CM_View_Abstract} [view]
-     * @param {Number} [indentation]
+     * @param {CM_View_Abstract|String} [view]
      */
-    viewTree: function(view, indentation) {
-      view = view || cm.findView();
-      indentation = indentation || 0;
-      cm.logger.info(new Array(indentation + 1).join("  ") + view.getClass() + " (", view.el, ")");
+    viewTree: function(view) {
+      if (!(view instanceof CM_View_Abstract)) {
+        view = cm.findView(view ? String(view) : view);
+      }
+      if (!view) {
+        throw new Error('View not found');
+      }
+      console.group(view.getClass(), view.el);
       _.each(view.getChildren(), function(child) {
-        cm.debug.viewTree(child, indentation + 1);
+        cm.debug.viewTree(child);
       });
+      console.groupEnd();
     },
 
     /**
