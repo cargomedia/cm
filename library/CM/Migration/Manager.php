@@ -28,10 +28,10 @@ class CM_Migration_Manager implements CM_Service_ManagerAwareInterface {
      */
     protected function _getMigrationPaths() {
         $paths = [
-            $this->_getMigrationPathByModule(),
+            self::getMigrationPathByModule(),
         ];
         foreach ($this->_modules as $moduleName) {
-            $paths[] = $this->_getMigrationPathByModule($moduleName);
+            $paths[] = self::getMigrationPathByModule($moduleName);
         }
         return $paths;
     }
@@ -40,7 +40,7 @@ class CM_Migration_Manager implements CM_Service_ManagerAwareInterface {
      * @param string|null $moduleName
      * @return string
      */
-    protected function _getMigrationPathByModule($moduleName = null) {
+    public static function getMigrationPathByModule($moduleName = null) {
         $modulePath = null !== $moduleName ? CM_Util::getModulePath((string) $moduleName) : DIR_ROOT;
         return join(DIRECTORY_SEPARATOR, [$modulePath, 'resources', 'migration']);
     }

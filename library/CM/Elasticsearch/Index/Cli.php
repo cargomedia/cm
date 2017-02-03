@@ -46,23 +46,6 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @keepalive
-     */
-    public function startMaintenance() {
-        $clockwork = new CM_Clockwork_Manager();
-        $storage = new CM_Clockwork_Storage_FileSystem('search-maintenance');
-        $storage->setServiceManager(CM_Service_Manager::getInstance());
-        $clockwork->setStorage($storage);
-        $clockwork->registerCallback('search-index-update', '1 second', function () {
-            $this->update();
-        });
-        $clockwork->registerCallback('search-index-optimize', '1 hour', function () {
-            $this->optimize();
-        });
-        $clockwork->start();
-    }
-
-    /**
      * @param string|null $filterIndexName
      * @throws CM_Exception_Invalid
      * @return CM_Elasticsearch_Type_Abstract[]

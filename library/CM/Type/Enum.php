@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Type_Enum {
+abstract class CM_Type_Enum implements JsonSerializable {
 
     /** @var string */
     private $_currentValue;
@@ -29,6 +29,12 @@ abstract class CM_Type_Enum {
             }
             $this->_currentValue = $value;
         }
+    }
+
+    function jsonSerialize() {
+        return [
+            'value' => (string) $this,
+        ];
     }
 
     final public function __toString() {

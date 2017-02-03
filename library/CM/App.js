@@ -942,7 +942,7 @@ var CM_App = CM_Class_Abstract.extend({
             cm.router.forceReload();
           }
           if (response.error) {
-            reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
+            reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic, response.error.metaInfo));
           } else {
             resolve(cm.factory.create(response.success));
           }

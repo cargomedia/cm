@@ -52,12 +52,12 @@ class CMService_XVerify_Client implements CM_Service_EmailVerification_ClientInt
 
     /**
      * @param string $email
-     * @return \GuzzleHttp\Message\ResponseInterface
+     * @return \Psr\Http\Message\ResponseInterface
      * @throws Exception
      */
     protected function _getResponse($email) {
         $email = (string) $email;
-        $client = new \GuzzleHttp\Client(['base_url' => 'http://www.xverify.com']);
+        $client = new \GuzzleHttp\Client(['base_uri' => 'http://www.xverify.com']);
         $parameterList = array('email' => $email, 'type' => 'json', 'domain' => $this->_getDomain(), 'apikey' => $this->_getCode());
         $url = '/services/emails/verify/?' . http_build_query($parameterList, '', '&', PHP_QUERY_RFC3986);
         return $client->get($url);
