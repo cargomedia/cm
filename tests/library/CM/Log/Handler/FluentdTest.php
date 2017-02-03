@@ -2,10 +2,6 @@
 
 class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
 
-    protected function tearDown() {
-        CMTest_TH::clearEnv();
-    }
-
     public function testConstructor() {
         $fluentd = $this->mockClass('\Fluent\Logger\FluentLogger')->newInstanceWithoutConstructor();
         /** @var \Fluent\Logger\FluentLogger $fluentd */
