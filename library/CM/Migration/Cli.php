@@ -33,10 +33,10 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function add($namespace = null, $name = null) {
         if (null === $name) {
-            $defaultName = CM_Util::exec('git rev-parse --abbrev-ref HEAD');
+            $defaultName = trim(CM_Util::exec('git rev-parse --abbrev-ref HEAD'));
             $name = $this->_getStreamInput()->read(sprintf('Migration script name [%s]:', $defaultName), $defaultName);
         }
-        $adapter = new CM_File_Filesystem_Adapter_Local($this->_getMigrationPathByModule($namespace));
+        $adapter = new CM_File_Filesystem_Adapter_Local(CM_Migration_Manager::getMigrationPathByModule($namespace));
         $filesystem = new CM_File_Filesystem($adapter);
         $generator = new CM_Migration_Generator($filesystem);
         $file = $generator->save($name);
