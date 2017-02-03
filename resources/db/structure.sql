@@ -466,27 +466,6 @@ CREATE TABLE `cm_string` (
   KEY `type` (`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_svm`;
-
-
-CREATE TABLE `cm_svm` (
-  `id` int(11) NOT NULL,
-  `updateStamp` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_svmtraining`;
-
-
-CREATE TABLE `cm_svmtraining` (
-  `svmId` int(11) NOT NULL,
-  `class` int(11) NOT NULL,
-  `values` blob NOT NULL,
-  `createStamp` int(10) unsigned NOT NULL,
-  KEY `svmId` (`svmId`),
-  KEY `createStamp` (`createStamp`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
 DROP TABLE IF EXISTS `cm_tmp_classType`;
 
 
