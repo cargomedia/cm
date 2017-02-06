@@ -105,7 +105,7 @@ class CM_Util {
     public static function getContents($url, array $params = null, $methodPost = null, $timeout = null) {
         $url = (string) $url;
         if (!empty($params)) {
-            $params = http_build_query($params);
+            $params = self::http_build_query($params);
         }
         if (null === $timeout) {
             $timeout = 10;
@@ -180,7 +180,7 @@ class CM_Util {
 
         if (!empty($params)) {
             $params = CM_Params::encode($params);
-            $query = http_build_query($params);
+            $query = self::http_build_query($params);
             if (strlen($query) > 0) {
                 $link .= '?' . $query;
             }
@@ -201,6 +201,17 @@ class CM_Util {
      */
     public static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8') {
         return htmlspecialchars($string, $quote_style, $charset);
+    }
+
+    /**
+     * @param array  $query_data
+     * @param string $numeric_prefix
+     * @param string $arg_separator
+     * @param int    $enc_type
+     * @return string
+     */
+    public static function http_build_query($query_data, $numeric_prefix = '', $arg_separator = '&', $enc_type = PHP_QUERY_RFC3986) {
+        return http_build_query($query_data, $numeric_prefix, $arg_separator, $enc_type);
     }
 
     /**

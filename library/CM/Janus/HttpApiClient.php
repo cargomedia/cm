@@ -51,10 +51,10 @@ class CM_Janus_HttpApiClient {
         $appContext = $this->_contextFormatter->formatAppContext($context);
 
         $query = ['context' => CM_Util::jsonEncode($appContext)];
-        $url = $server->getHttpAddress() . $path . '?' . http_build_query($query);
+        $url = $server->getHttpAddress() . $path . '?' . CM_Util::http_build_query($query);
         $body = (array) $body;
         $headers = ['Server-Key' => $server->getKey()];
-        $request = new \GuzzleHttp\Psr7\Request($method, $url, $headers, http_build_query($body));
+        $request = new \GuzzleHttp\Psr7\Request($method, $url, $headers, CM_Util::http_build_query($body));
         try {
             $response = $this->_httpClient->send($request);
         } catch (GuzzleHttp\Exception\TransferException $e) {

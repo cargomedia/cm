@@ -414,7 +414,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             $site = CM_Site_Abstract::factory();
         }
         $host = parse_url($site->getUrl(), PHP_URL_HOST);
-        $request = new CM_Http_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), ['host' => $host], null, $viewer);
+        $request = new CM_Http_Request_Get('?' . CM_Util::http_build_query($page->getParams()->getParamsEncoded()), ['host' => $host], null, $viewer);
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
         $page->prepareResponse($response->getRender()->getEnvironment(), $response);
         $renderAdapter = new CM_RenderAdapter_Page($response->getRender(), $page);
