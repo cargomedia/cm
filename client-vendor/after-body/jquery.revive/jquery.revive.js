@@ -26,7 +26,7 @@
         'hitType': 'event',
         'eventCategory': category,
         'eventAction': action,
-        'eventLabel': label,
+        'eventLabel': label
       });
     }
   }
