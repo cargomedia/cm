@@ -1,6 +1,6 @@
 <?php
 
-class CM_AdproviderAdapter_Openx extends CM_AdproviderAdapter_Abstract {
+class CM_AdproviderAdapter_Revive extends CM_AdproviderAdapter_Abstract {
 
     /**
      * @return string
@@ -15,7 +15,7 @@ class CM_AdproviderAdapter_Openx extends CM_AdproviderAdapter_Abstract {
         }
         $zoneId = $zoneData['zoneId'];
         $host = $this->_getHost();
-        $html = '<div class="openx-ad" data-zone-id="' . CM_Util::htmlspecialchars($zoneId) . '" data-host="' . CM_Util::htmlspecialchars($host) .
+        $html = '<div class="revive-ad" data-zone-id="' . CM_Util::htmlspecialchars($zoneId) . '" data-host="' . CM_Util::htmlspecialchars($host) .
             '" data-variables="' . CM_Util::htmlspecialchars(json_encode($variables, JSON_FORCE_OBJECT)) . '"></div>';
         return $html;
     }
