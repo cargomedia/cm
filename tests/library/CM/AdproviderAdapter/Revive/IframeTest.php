@@ -1,0 +1,22 @@
+<?php
+
+class CM_AdproviderAdapter_Revive_IframeTest extends CMTest_TestCase {
+
+    public function testGetHtml() {
+        $provider = new CM_AdproviderAdapter_Revive_Iframe();
+        mt_srand(0);
+
+        $html = $provider->getHtml('zoneName1', [
+            'zoneId' => 1,
+            'host'   => 'example.com',
+            'width'  => '100%',
+            'height' => 100,
+        ], [
+            'foo' => 'bar',
+        ]);
+
+        $this->assertSame(
+            '<iframe src="//example.com/delivery/ajs-proxy.php?foo=bar&amp;zoneId=1&amp;cb=963932192" width="100%" height="100" class="advertisement-hasContent" data-variables="{}" frameborder="0" scrolling="no"></iframe>'
+            , $html);
+    }
+}
