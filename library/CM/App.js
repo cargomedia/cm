@@ -169,7 +169,14 @@ var CM_App = CM_Class_Abstract.extend({
    * @return {String}
    */
   getUrlStatic: function(path) {
-    var url = cm.options.urlCdn + '/static';
+    var url = '';
+    if (cm.options.urlCdn) {
+      url = cm.options.urlCdn + url;
+    } else {
+      url = cm.options.urlBase + url;
+    }
+
+    url += '/static';
     if (path) {
       url += path + '?' + cm.options.deployVersion;
     }
@@ -180,10 +187,21 @@ var CM_App = CM_Class_Abstract.extend({
   /**
    * @param {String} type
    * @param {String} path
+   * @param {Object} [options]
    * @return {String}
    */
-  getUrlResource: function(type, path) {
-    var url = cm.options.urlCdn;
+  getUrlResource: function(type, path, options) {
+    options = _.defaults(options || {}, {
+      'sameOrigin': false
+    });
+
+    var url = '';
+    if (!options['sameOrigin'] && cm.options.urlCdn) {
+      url = cm.options.urlCdn + url;
+    } else {
+      url = cm.options.urlBase + url;
+    }
+
     if (type && path) {
       var urlParts = [];
       urlParts.push(type);

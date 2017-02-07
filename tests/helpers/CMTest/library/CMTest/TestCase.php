@@ -1,7 +1,5 @@
 <?php
 
-use CM\Url\RouteUrl;
-
 abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_Service_ManagerAwareInterface {
 
     use \Mocka\MockaTrait;
@@ -228,9 +226,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $headers = [
             'host' => $site->getHost(),
         ];
-        $environment = new CM_Frontend_Environment($site);
-        $url = (string) RouteUrl::create('form', null, $environment);
-        return $this->createRequest($url, $query, $headers, $scopeView, $scopeComponent);
+        return $this->createRequest($site->getUrl() . '/form', $query, $headers, $scopeView, $scopeComponent);
     }
 
     /**
@@ -277,9 +273,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $headers = [
             'host' => $site->getHost(),
         ];
-        $environment = new CM_Frontend_Environment($site);
-        $url = (string) RouteUrl::create('ajax', null, $environment);
-        return $this->createRequest($url, $query, $headers, $viewResponse, $componentResponse);
+        return $this->createRequest($site->getUrl() . '/ajax', $query, $headers, $viewResponse, $componentResponse);
     }
 
     /**
@@ -419,7 +413,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         if (null === $site) {
             $site = CM_Site_Abstract::factory();
         }
-        $host = $site->getUrl()->getHost();
+        $host = parse_url($site->getUrl(), PHP_URL_HOST);
         $request = new CM_Http_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), ['host' => $host], null, $viewer);
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
         $page->prepareResponse($response->getRender()->getEnvironment(), $response);

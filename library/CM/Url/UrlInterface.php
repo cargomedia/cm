@@ -31,16 +31,6 @@ interface UrlInterface extends UriInterface {
     public function getPrefix();
 
     /**
-     * @return array|null
-     */
-    public function getParams();
-
-    /**
-     * @return string
-     */
-    public function getUriBaseComponents();
-
-    /**
      * @return string
      */
     public function getUriRelativeComponents();
@@ -53,9 +43,10 @@ interface UrlInterface extends UriInterface {
 
     /**
      * @param CM_Site_Abstract $site
+     * @param bool|null        $sameOrigin
      * @return UrlInterface
      */
-    public function withSite(CM_Site_Abstract $site);
+    public function withSite(CM_Site_Abstract $site, $sameOrigin = null);
 
     /**
      * @param Path|string|null $prefix
@@ -67,12 +58,6 @@ interface UrlInterface extends UriInterface {
      * @return UrlInterface
      */
     public function withoutPrefix();
-
-    /**
-     * @param array $params
-     * @return UrlInterface
-     */
-    public function withParams(array $params);
 
     /**
      * @param UrlInterface|string $baseUrl
@@ -93,9 +78,10 @@ interface UrlInterface extends UriInterface {
 
     /**
      * @param CM_Frontend_Environment $environment
+     * @param array                   $options
      * @return UrlInterface
      */
-    public function withEnvironment(CM_Frontend_Environment $environment);
+    public function withEnvironment(CM_Frontend_Environment $environment, array $options = null);
 
     /**
      * @param string $path

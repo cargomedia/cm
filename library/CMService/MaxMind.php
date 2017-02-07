@@ -1,8 +1,5 @@
 <?php
 
-use League\Uri\Schemes\Http as HttpUri;
-use League\Uri\Components\Query;
-
 class CMService_MaxMind extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
@@ -1452,17 +1449,15 @@ class CMService_MaxMind extends CM_Class_Abstract implements CM_Service_ManagerA
                 $this->_streamOutput->writeln('Downloading GeoLite database…');
                 $this->_download($this->_geoIpFile, self::GEO_LITE_CITY_URL);
             } else {
-                $url = HttpUri::createFromString(self::GEO_IP_URL);
-                $url = $url->withQuery(
-                    (string) Query::createFromPairs([
-                        'edition_id'  => 134,
-                        'suffix'      => 'zip',
-                        'license_key' => $licenseKey,
-                    ])
-                );
+                $parameterList = [
+                    'edition_id'  => 134,
+                    'suffix'      => 'zip',
+                    'license_key' => $licenseKey,
+                ];
+                $geoIpUrl = CM_Util::link(self::GEO_IP_URL, $parameterList);
                 $this->_geoIpFile = $this->_getFileTmp('GeoIP-134.zip');
                 $this->_streamOutput->writeln('Downloading GeoIP database…');
-                $this->_download($this->_geoIpFile, (string) $url);
+                $this->_download($this->_geoIpFile, $geoIpUrl);
             }
         }
         return $this->_geoIpFile;
