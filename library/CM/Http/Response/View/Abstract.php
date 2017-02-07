@@ -1,8 +1,5 @@
 <?php
 
-use CM\Url\Url;
-use League\Uri\Components\Query;
-
 abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract {
 
     /**
@@ -65,18 +62,18 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
 
         $count = 0;
         $fragments = [];
-        $baseUrl = $this->getRender()->getSite()->getUrl()->withoutPrefix();
         do {
-            $fragment = (string) Url::create($request->getPath())->withQuery((string) Query::createFromPairs($request->getQuery()));
+            $fragment = CM_Util::link($request->getPath(), $request->getQuery());
             $fragments[] = $fragment;
-            $url = (string) Url::create($fragment)->withBaseUrl($baseUrl);
+            $url = $this->getRender()->getSite()->getUrlBase() . $fragment;
             if ($count++ > 10) {
                 throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $fragments) . ').');
             }
 
             $responsePage = $responseFactory->getResponse($request);
             if (!$responsePage->getSite()->equals($this->getSite())) {
-                return array('redirectExternal' => (string) $responsePage->getUrl());
+                $redirectExternalFragment = CM_Util::link($responsePage->getRequest()->getPath(), $responsePage->getRequest()->getQuery());
+                return array('redirectExternal' => $responsePage->getRender()->getUrl($redirectExternalFragment));
             }
 
             $responseEmbed = new CM_Http_Response_Page_Embed($responsePage->getRequest(), $responsePage->getSite(), $this->getServiceManager());
@@ -288,12 +285,12 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      * @return bool
      */
     private function _isPageOnSameSite($url) {
-        $url = Url::createFromString($url);
-        if (!$this->_site->isUrlMatch($url->getHost(), $url->getPath())) {
+        $urlParser = new CM_Http_UrlParser($url);
+        if (!$this->_site->isUrlMatch($urlParser->getHost(), $urlParser->getPath())) {
             return false;
         }
 
-        $request = $this->_createGetRequestWithUrl((string) $url);
+        $request = $this->_createGetRequestWithUrl($url);
         $responseFactory = new CM_Http_ResponseFactory($this->getServiceManager());
         $response = $responseFactory->getResponse($request);
         return $response->getSite()->equals($this->getSite());

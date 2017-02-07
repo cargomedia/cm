@@ -1,8 +1,5 @@
 <?php
 
-use CM\Url\Url;
-use League\Uri\Components\Query;
-
 class CM_Http_Response_Page extends CM_Http_Response_Abstract {
 
     /** @var CM_Page_Abstract|null */
@@ -71,8 +68,10 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     }
 
     protected function _processContentOrRedirect() {
-        if ($this->getSite()->getUrl()->getHost() !== $this->getRequest()->getHost()) {
-            $this->redirectUrl((string) $this->getUrl()->withSite($this->getSite()));
+        $render = $this->getRender();
+        if ($this->_site->getHost() !== $this->_request->getHost()) {
+            $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
+            $this->redirectUrl($render->getUrl($path, $this->_site));
         }
         if (!$this->getRedirectUrl()) {
             $html = $this->_processPageLoop($this->getRequest());
@@ -110,10 +109,8 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
      */
     private function _processPage(CM_Http_Request_Abstract $request, CM_Http_Response_Page_ProcessingResult $result) {
         return $this->_runWithCatching(function () use ($request, $result) {
-            $query = Query::createFromPairs($request->getQuery());
-            $url = Url::create($request->getPath())
-                ->withQuery((string) $query);
-            $result->addPath($url->getUriRelativeComponents());
+            $path = CM_Util::link($request->getPath(), $request->getQuery());
+            $result->addPath($path);
 
             $this->getSite()->rewrite($request);
             $pageParams = CM_Params::factory($request->getQuery(), true);

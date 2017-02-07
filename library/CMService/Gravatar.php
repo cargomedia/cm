@@ -1,9 +1,5 @@
 <?php
 
-use League\Uri\Schemes\Http as HttpUri;
-use League\Uri\Components\HierarchicalPath as Path;
-use League\Uri\Components\Query;
-
 class CMService_Gravatar extends CM_Class_Abstract {
 
     /**
@@ -25,27 +21,17 @@ class CMService_Gravatar extends CM_Class_Abstract {
         if ((null === $email) && (null !== $default)) {
             return $default;
         }
-
-        $path = new Path('/avatar');
-        $query = new Query();
-
+        $url = 'https://secure.gravatar.com/avatar';
         if (null !== $email) {
-            $path = $path->append(
-                md5(strtolower(trim($email)))
-            );
+            $url .= '/' . md5(strtolower(trim($email)));
         }
+        $params = array();
         if (null !== $size) {
-            $query = $query->merge(
-                Query::createFromPairs(['s' => $size])
-            );
+            $params['s'] = $size;
         }
         if (null !== $default) {
-            $query = $query->merge(
-                Query::createFromPairs(['d' => $default])
-            );
+            $params['d'] = $default;
         }
-        return (string) HttpUri::createFromString('https://secure.gravatar.com')
-            ->withPath((string) $path)
-            ->withQuery((string) $query);
+        return CM_Util::link($url, $params);
     }
 }

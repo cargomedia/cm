@@ -1,7 +1,5 @@
 <?php
 
-use CM\Url\BaseUrl;
-
 abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed, CM_Comparable {
 
     /** @var string[] */
@@ -113,17 +111,24 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @return BaseUrl
+     * @return string
      */
     public function getUrl() {
-        return BaseUrl::create(self::_getConfig()->url);
+        return (string) self::_getConfig()->url;
     }
 
     /**
-     * @return BaseUrl
+     * @return CM_Http_UrlParser
+     */
+    public function getUrlParser() {
+        return new CM_Http_UrlParser($this->getUrl());
+    }
+
+    /**
+     * @return string
      */
     public function getUrlCdn() {
-        return BaseUrl::create(self::_getConfig()->urlCdn);
+        return (string) self::_getConfig()->urlCdn;
     }
 
     /**
@@ -139,18 +144,25 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     /**
      * @return string
-     * @deprecated use getUrl() directly
      */
     public function getHost() {
-        return $this->getUrl()->getHost();
+        return $this->getUrlParser()->getHost();
     }
 
     /**
      * @return string
-     * @deprecated
      */
     public function getPath() {
-        return $this->getUrl()->getUriRelativeComponents();
+        return $this->getUrlParser()->getPath();
+    }
+
+    /**
+     * @return string
+     * @throws CM_Exception
+     */
+    public function getUrlBase() {
+        $urlParser = $this->getUrlParser();
+        return $urlParser->getScheme() . '://' . $urlParser->getHost();
     }
 
     /**
@@ -220,9 +232,10 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         ];
 
         if ($this->getUrlCdn()) {
+            $urlCdn = new CM_Http_UrlParser($this->getUrlCdn());
             $matchList[] = [
-                'host' => $this->getUrlCdn()->getHost(),
-                'path' => $this->getUrlCdn()->getPath(),
+                'host' => $urlCdn->getHost(),
+                'path' => $urlCdn->getPath(),
             ];
         }
 
@@ -243,7 +256,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         if (get_class($other) !== get_class($this)) {
             return false;
         }
-        return (string) $this->getUrl() === (string) $other->getUrl();
+        return $this->getUrl() === $other->getUrl();
     }
 
     /**

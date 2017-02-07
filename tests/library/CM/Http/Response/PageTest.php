@@ -1,7 +1,5 @@
 <?php
 
-use CM\Url\Url;
-
 class CM_Http_Response_PageTest extends CMTest_TestCase {
 
     public function tearDown() {
@@ -14,7 +12,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
 
         $response->process();
-        $this->assertContains('Location: ' . Url::create('/mock11?count=2')->withSite($response->getSite()), $response->getHeaders());
+        $this->assertContains('Location: ' . $response->getSite()->getUrl() . '/mock11?count=2', $response->getHeaders());
     }
 
     public function testProcessLanguageNoRedirect() {
@@ -58,7 +56,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
 
-        $this->assertContains('Location: ' . Url::create('/mock5?foo=bar')->withSite($response->getSite()), $response->getHeaders());
+        $this->assertContains('Location: ' . $site->getUrl() . '/mock5?foo=bar', $response->getHeaders());
     }
 
     public function testProcessHostWithoutWww() {
@@ -67,13 +65,13 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
 
-        $this->assertContains('Location: ' . Url::create('/mock5?foo=bar')->withSite($response->getSite()), $response->getHeaders());
+        $this->assertContains('Location: ' . $site->getUrl() . '/mock5?foo=bar', $response->getHeaders());
     }
 
     public function testProcessSiteMatchingByPath() {
-        $site1 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo', 'urlCdn' => 'http://cdn-foo.my-site.com']);
-        $site2 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/bar', 'urlCdn' => 'http://cdn-bar.my-site.com']);
-        $site3 = $this->getMockSite(null, null, ['url' => 'http://my-site.com', 'urlCdn' => 'http://cdn.my-site.com']);
+        $site1 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
+        $site2 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/bar']);
+        $site3 = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
 
         $expectedList = [
             '/foo/mock5?foo=bar' => $site1,

@@ -1,17 +1,14 @@
 <?php
 
-use League\Uri\Schemes\Ws as WsUri;
-use League\Uri\Schemes\Http as HttpUri;
-
 class CM_Janus_Server implements JsonSerializable {
 
     /** @var int */
     protected $_id;
 
-    /** @var HttpUri */
+    /** @var string */
     protected $_httpAddress;
 
-    /** @var WsUri */
+    /** @var string */
     protected $_webSocketAddress;
 
     /** @var string */
@@ -41,8 +38,8 @@ class CM_Janus_Server implements JsonSerializable {
         }
         $this->_id = (int) $serverId;
         $this->_key = (string) $key;
-        $this->_httpAddress = HttpUri::createFromString((string) $httpAddress);
-        $this->_webSocketAddress = WsUri::createFromString((string) $webSocketAddress);
+        $this->_httpAddress = (string) $httpAddress;
+        $this->_webSocketAddress = (string) $webSocketAddress;
         $this->_pluginList = array_map(function ($plugin) {
             return (string) $plugin;
         }, $pluginList);
@@ -68,21 +65,21 @@ class CM_Janus_Server implements JsonSerializable {
      * @return string
      */
     public function getHttpAddress() {
-        return (string) $this->_httpAddress;
+        return $this->_httpAddress;
     }
 
     /**
      * @return string
      */
     public function getWebSocketAddress() {
-        return (string) $this->_webSocketAddress;
+        return $this->_webSocketAddress;
     }
 
     /**
      * @return string
      */
     public function getWebSocketAddressSubscribeOnly() {
-        return (string) $this->_webSocketAddress->withQuery('subscribeOnly=1');
+        return CM_Util::link($this->getWebSocketAddress(), ['subscribeOnly' => 1]);
     }
 
     /**

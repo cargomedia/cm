@@ -63,15 +63,27 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
      * @return string
      */
     public static function getPath(array $params = null) {
-        return CM_Page_UrlFactory::getUrl(static::class, $params)->getUriRelativeComponents();
-    }
+        $pageClassName = get_called_class();
+        $list = explode('_', $pageClassName);
 
-    /**
-     * @param array|null $params
-     * @return array|null
-     */
-    public static function getUrlComponents(array $params = null) {
-        return null;
+        // Remove first parts
+        foreach ($list as $index => $entry) {
+            unset($list[$index]);
+            if ($entry == 'Page') {
+                break;
+            }
+        }
+
+        // Converts upper case letters to dashes: CodeOfHonor => code-of-honor
+        foreach ($list as $index => $entry) {
+            $list[$index] = CM_Util::uncamelize($entry);
+        }
+
+        $path = '/' . implode('/', $list);
+        if ($path == '/index') {
+            $path = '/';
+        }
+        return CM_Util::link($path, $params);
     }
 
     /**
