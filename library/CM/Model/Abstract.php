@@ -1,5 +1,7 @@
 <?php
 
+use CM\Transactions\Transaction;
+
 abstract class CM_Model_Abstract extends CM_Class_Abstract
     implements CM_Comparable, CM_ArrayConvertible, JsonSerializable, CM_Cacheable, Serializable, CM_Typed, CM_Debug_DebugInfoInterface {
 
@@ -53,9 +55,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
     /**
      * @param bool|null $useReplace
      * @throws CM_Exception_Invalid
-     * @throws CM_Exception_InvalidParam
-     * @throws CM_Exception_Nonexistent
-     * @throws CM_Exception_NotImplemented
+     * @throws Exception
      */
     public function commit($useReplace = null) {
         $useReplace = (boolean) $useReplace;
@@ -71,37 +71,49 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             if (!empty($dataSchema)) {
                 $persistence->save($type, $this->getIdRaw(), $dataSchema);
             }
-
             if ($cache = $this->_getCache()) {
                 $cache->save($type, $this->getIdRaw(), $this->_getData());
             }
             $this->_onChange();
         } else {
-            $this->_validateFields($this->_getData(), true);
-            if ($useReplace) {
-                if (!$persistence instanceof CM_Model_StorageAdapter_ReplaceableInterface) {
-                    $adapterName = get_class($persistence);
-                    throw new CM_Exception_NotImplemented('Param `useReplace` is not allowed with adapter', null, ['adapterName' => $adapterName]);
+            $transaction = new Transaction();
+            try {
+                $this->_validateFields($this->_getData(), true);
+                if ($useReplace) {
+                    if (!$persistence instanceof CM_Model_StorageAdapter_ReplaceableInterface) {
+                        $adapterName = get_class($persistence);
+                        throw new CM_Exception_NotImplemented('Param `useReplace` is not allowed with adapter', null, ['adapterName' => $adapterName]);
+                    }
+                    $idRaw = $persistence->replace($type, $dataSchema);
+                } else {
+                    $idRaw = $persistence->create($type, $dataSchema);
+                    $transaction->addRollback(function () use ($persistence, $type, $idRaw) {
+                        $persistence->delete($type, $idRaw);
+                    });
                 }
-                $idRaw = $persistence->replace($type, $dataSchema);
-            } else {
-                $idRaw = $persistence->create($type, $dataSchema);
-            }
 
-            $this->_id = self::_castIdRaw($idRaw);
+                $this->_id = self::_castIdRaw($idRaw);
 
-            if ($cache = $this->_getCache()) {
-                $this->_loadAssets(true);
-                $cache->save($type, $this->getIdRaw(), $this->_getData());
-            }
-            $this->_changeContainingCacheables();
-            $this->_onCreate();
-            if ($useReplace) {
-                $this->_onChange();
+                if ($cache = $this->_getCache()) {
+                    $this->_loadAssets(true);
+                    $cache->save($type, $this->getIdRaw(), $this->_getData());
+                    $transaction->addRollback(function () use ($cache, $type) {
+                        $cache->delete($type, $this->getIdRaw());
+                    });
+                }
+                $this->_changeContainingCacheables();
+                $this->_onCreate();
+                if ($useReplace) {
+                    $this->_onChange();
+                }
+            } catch (Exception $e) {
+                $transaction->rollback();
+                throw $e;
             }
         }
         $this->_autoCommit = true;
     }
+
 
     public function delete() {
         $containingCacheables = $this->_getContainingCacheables();
@@ -495,15 +507,25 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
     /**
      * @param array|null $data
      * @return static
+     * @throws Exception
      */
     final public static function createStatic(array $data = null) {
-        if ($data === null) {
-            $data = array();
+        $transaction = new Transaction();
+        try {
+            if ($data === null) {
+                $data = [];
+            }
+            $model = static::_createStatic($data);
+            $transaction->addRollback(function() use ($model) {
+                $model->delete();
+            });
+            $model->_changeContainingCacheables();
+            $model->_onCreate();
+            return $model;
+        } catch (Exception $e) {
+            $transaction->rollback();
+            throw $e;
         }
-        $model = static::_createStatic($data);
-        $model->_changeContainingCacheables();
-        $model->_onCreate();
-        return $model;
     }
 
     /**
