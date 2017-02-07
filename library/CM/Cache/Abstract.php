@@ -5,7 +5,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
     /** @var CM_Cache_Storage_Abstract */
     protected $_storage;
 
-    /** @var int */
+    /** @var int|null */
     protected $_lifetime;
 
     /**
@@ -17,7 +17,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
         if (null === $storage) {
             $storageClassName = static::_getConfig()->storage;
             if (!is_subclass_of($storageClassName, 'CM_Cache_Storage_Abstract')) {
-                throw new CM_Exception('Invalid cache storage: `' . $storageClassName . '`');
+                throw new CM_Exception('Invalid cache storage', null, ['storageClassName' => $storageClassName]);
             }
             $storage = new $storageClassName();
         }
@@ -26,7 +26,8 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
         if (null === $lifetime) {
             $lifetime = static::_getConfig()->lifetime;
         }
-        $this->_lifetime = (int) $lifetime;
+
+        $this->_lifetime = $lifetime ? (int) $lifetime : null;
     }
 
     /**

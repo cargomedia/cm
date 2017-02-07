@@ -58,17 +58,20 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
     }
 
     /**
-     * @param string $userInput
+     * @param mixed $userInput
      * @return bool
      */
     public function isEmpty($userInput) {
-        if (is_array($userInput) && !empty($userInput)) {
+        if (is_null($userInput)) {
+            return true;
+        }
+        if (is_array($userInput)) {
+            return empty($userInput);
+        }
+        if (is_bool($userInput)) {
             return false;
         }
-        if (is_scalar($userInput) && strlen(trim($userInput)) > 0) {
-            return false;
-        }
-        return true;
+        return 0 === strlen(trim($userInput));
     }
 
     /**

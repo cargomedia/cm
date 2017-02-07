@@ -1,6 +1,8 @@
 <?php
 
-class CM_Redis_Client extends CM_Class_Abstract {
+class CM_Redis_Client extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var Predis\Client */
     private $_redis = null;
@@ -64,7 +66,11 @@ class CM_Redis_Client extends CM_Class_Abstract {
                 'timeout'            => (float) $timeout,
             ], ['profile' => '2.4']);
         } catch (Predis\Connection\ConnectionException $e) {
-            throw new CM_Exception('Cannot connect to redis server `' . $host . '` on port `' . $port . '`: ' . $e->getMessage());
+            throw new CM_Exception('Cannot connect to redis server', null, [
+                'host'                     => $host,
+                'port'                     => $port,
+                'originalExceptionMessage' => $e->getMessage(),
+            ]);
         }
         if (null !== $database) {
             $client->select($database);
@@ -125,7 +131,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
         try {
             $this->_redis->lPush($key, $value);
         } catch (Predis\Response\ServerException $e) {
-            throw new CM_Exception_Invalid('Cannot push to list `' . $key . '`.');
+            throw new CM_Exception_Invalid('Cannot push key to list.', null, ['key' => $key]);
         }
     }
 
@@ -140,7 +146,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
         try {
             $this->_redis->rPush($key, $value);
         } catch (Predis\Response\ServerException $e) {
-            throw new CM_Exception_Invalid('Cannot push to list `' . $key . '`.');
+            throw new CM_Exception_Invalid('Cannot push key to list.', null, ['key' => $key]);
         }
     }
 
@@ -181,7 +187,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
         try {
             $length = $this->_redis->lLen($key);
         } catch (Predis\Response\ServerException $e) {
-            throw new CM_Exception_Invalid('Key `' . $key . '` does not contain a list');
+            throw new CM_Exception_Invalid('Key does not contain a list', null, ['key' => $key]);
         }
         return $length;
     }
@@ -196,7 +202,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
         try {
             $this->_redis->lTrim($key, $start, $stop);
         } catch (Predis\Response\ServerException $e) {
-            throw new CM_Exception_Invalid('Key `' . $key . '` does not contain a list');
+            throw new CM_Exception_Invalid('Key does not contain a list', null, ['key' => $key]);
         }
     }
 
@@ -343,7 +349,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
                     $response = $callback($message->channel, $message->payload);
                 }
             } catch (Exception $e) {
-                CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
+                $this->getServiceManager()->getLogger()->addMessage('Redis message callback failed', CM_Log_Logger::exceptionToLevel($e), (new CM_Log_Context())->setException($e));
             }
             if (!is_null($response)) {
                 break;
@@ -367,7 +373,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
     protected function _select($database) {
         $database = (int) $database;
         if ('OK' !== $this->_redis->select($database)) {
-            throw new CM_Exception('Cannot select database `' . $database . '`.');
+            throw new CM_Exception('Cannot select database.', null, ['database' => $database]);
         }
     }
 }

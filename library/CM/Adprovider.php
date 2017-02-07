@@ -21,9 +21,12 @@ class CM_Adprovider extends CM_Class_Abstract {
         if (!$this->_getEnabled()) {
             return '';
         }
-        $zoneData = $this->_getZone($site, $zoneName);
+        $zoneData = $this->_getZoneData($site, $zoneName);
+        if (null === $zoneData) {
+            throw new CM_Exception_Invalid('Zone not configured.', null, ['zoneName' => $zoneName]);
+        }
         if (!array_key_exists('adapter', $zoneData)) {
-            throw new CM_Exception_Invalid('Zone `' . $zoneName . '` has no adapter configured.');
+            throw new CM_Exception_Invalid('Zone has no adapter configured.', null, ['zoneName' => $zoneName]);
         }
         $adapterClassName = (string) $zoneData['adapter'];
         unset($zoneData['adapter']);
@@ -33,10 +36,20 @@ class CM_Adprovider extends CM_Class_Abstract {
     /**
      * @param CM_Site_Abstract $site
      * @param string           $zoneName
-     * @return mixed
+     * @return bool
+     */
+    public function hasZone(CM_Site_Abstract $site, $zoneName) {
+        $zoneData = $this->_getZoneData($site, $zoneName);
+        return (null !== $zoneData);
+    }
+
+    /**
+     * @param CM_Site_Abstract $site
+     * @param string           $zoneName
+     * @return array
      * @throws CM_Exception_Invalid
      */
-    protected function _getZone(CM_Site_Abstract $site, $zoneName) {
+    protected function _getZoneData(CM_Site_Abstract $site, $zoneName) {
         $cacheKey = CM_CacheConst::AdproviderZones . '_siteId:' . $site->getId();
         $cache = CM_Cache_Local::getInstance();
         if (false === ($zones = $cache->get($cacheKey))) {
@@ -47,7 +60,7 @@ class CM_Adprovider extends CM_Class_Abstract {
             $cache->set($cacheKey, $zones);
         }
         if (!array_key_exists($zoneName, $zones)) {
-            throw new CM_Exception_Invalid('Zone `' . $zoneName . '` not configured.');
+            return null;
         }
         return $zones[$zoneName];
     }
@@ -61,7 +74,7 @@ class CM_Adprovider extends CM_Class_Abstract {
         /** @var string $className */
         $className = (string) $className;
         if (!class_exists($className) || !is_subclass_of($className, 'CM_AdproviderAdapter_Abstract')) {
-            throw new CM_Exception_Invalid('Invalid ad adapter `' . $className . '`');
+            throw new CM_Exception_Invalid('Invalid ad adapter', null, ['className' => $className]);
         }
         if (!array_key_exists($className, $this->_adapters)) {
             $this->_adapters[$className] = new $className();

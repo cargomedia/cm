@@ -25,12 +25,12 @@ class CM_Log_Record {
         $message = (string) $message;
 
         if (!CM_Log_Logger::hasLevel($level)) {
-            throw new CM_Exception_Invalid('Log level `' . $level . '` does not exist.');
+            throw new CM_Exception_Invalid('Log level does not exist.', null, ['level' => $level]);
         }
         $this->_level = $level;
         $this->_message = $message;
         $this->_context = $context;
-        $this->_createdAt = new DateTime();
+        $this->_createdAt = CM_Util::createDateTimeWithMillis();
     }
 
     /**

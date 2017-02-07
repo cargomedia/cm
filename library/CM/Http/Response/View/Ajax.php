@@ -9,7 +9,7 @@ class CM_Http_Response_View_Ajax extends CM_Http_Response_View_Abstract {
             throw new CM_Exception_Invalid('No method specified', CM_Exception::WARN);
         }
         if (!preg_match('/^[\w_]+$/i', $query['method'])) {
-            throw new CM_Exception_Invalid('Illegal method: `' . $query['method'] . '`', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('Illegal method', CM_Exception::WARN, ['method' => $query['method']]);
         }
         if (!isset($query['params']) || !is_array($query['params'])) {
             throw new CM_Exception_Invalid('Illegal params', CM_Exception::WARN);
@@ -28,7 +28,7 @@ class CM_Http_Response_View_Ajax extends CM_Http_Response_View_Abstract {
         $this->_setStringRepresentation(get_class($view) . '::' . $ajaxMethodName);
 
         if (!method_exists($view, $ajaxMethodName)) {
-            throw new CM_Exception_Invalid('Method not found: `' . $ajaxMethodName . '`', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('Method not found', CM_Exception::WARN, ['method' => $ajaxMethodName]);
         }
         $data = $view->$ajaxMethodName($params, $componentHandler, $this);
         $success['data'] = CM_Params::encode($data);
@@ -44,7 +44,14 @@ class CM_Http_Response_View_Ajax extends CM_Http_Response_View_Abstract {
         return $output;
     }
 
-    public static function match(CM_Http_Request_Abstract $request) {
-        return $request->getPathPart(0) === 'ajax';
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
+        if ($request->getPathPart(0) === 'ajax') {
+            $request = clone $request;
+            $request->popPathPart(0);
+            $request->popPathLanguage();
+            return new self($request, $site, $serviceManager);
+        }
+        return null;
     }
+
 }

@@ -20,7 +20,7 @@
   $document.on('keydown.floatbox', function(e) {
     if (e.which == 27) { // Escape
       if ($viewport && $viewport.children().length) {
-        $viewport.children('.floatbox-layer:last').floatIn();
+        $viewport.children('.floatbox-layer:last').find('.floatbox').floatbox('close');
       }
     }
   });
@@ -33,6 +33,15 @@
     $parent: null,
     $layer: null,
     $floatbox: null,
+    setOptions: function(value) {
+      if (_.isObject(value)) {
+        //`value` as object to rewrite options
+        _.extend(this.options, value);
+        this.repaint();
+      } else {
+        throw new Error('Invalid param to floatbox.setOptions');
+      }
+    },
     show: function($element) {
       var $floatboxConfig = $element.find('.floatbox-config:first');
       this.options.fullscreen = $floatboxConfig.data('fullscreen') || this.options.fullscreen;
@@ -97,12 +106,13 @@
       if (this.$parent.length) {
         this.$parent.append($element);
       }
-      this.$layer.removeData('floatbox');
+      this.$floatbox.trigger('floatbox-close');
       this.$layer.remove();
       $viewport.children('.floatbox-layer:last').addClass('active');
       if (lastFocusedElement) {
         lastFocusedElement.focus();
       }
+      lastFocusedElement = null;
       if (!$viewport.children().length) {
         $viewport.remove();
         $viewport = null;
@@ -113,6 +123,10 @@
       }
       $(window).off('resize.floatbox', this.windowResizeCallback);
       $element.trigger('floatbox-close');
+
+      this.$parent = null;
+      this.$floatbox = null;
+      this.$layer = null;
     },
     repaint: function() {
       if (this.options.fullscreen) {
@@ -139,19 +153,27 @@
     }
   });
 
-  $.fn.floatOut = function(options) {
+  /**
+   * @param {String} methodOrOptions
+   * @param {...*} args
+   * @returns {jQuery}
+   */
+  $.fn.floatbox = function(methodOrOptions, args) {
+    var method;
+    if (methodOrOptions && _.isString(methodOrOptions)) {
+      method = methodOrOptions;
+      args = [].slice.call(arguments, 1);
+    }
     return this.each(function() {
-      if (!$(this).parents('.floatbox-layer').addBack().data('floatbox')) {
-        var floatbox = new $.floatbox(options);
+      var floatbox;
+      if (method) {
+        floatbox = $(this).closest('.floatbox-layer').data('floatbox');
+        if (floatbox && _.isFunction(floatbox[method])) {
+          floatbox[method].apply(floatbox, args);
+        }
+      } else {
+        floatbox = new $.floatbox(methodOrOptions);
         floatbox.show($(this));
-      }
-    });
-  };
-  $.fn.floatIn = function() {
-    return this.each(function() {
-      var floatbox = $(this).parents('.floatbox-layer').addBack().data('floatbox');
-      if (floatbox) {
-        floatbox.close();
       }
     });
   };

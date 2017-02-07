@@ -52,12 +52,12 @@ class CMService_XVerify_Client implements CM_Service_EmailVerification_ClientInt
 
     /**
      * @param string $email
-     * @return \GuzzleHttp\Message\ResponseInterface
+     * @return \Psr\Http\Message\ResponseInterface
      * @throws Exception
      */
     protected function _getResponse($email) {
         $email = (string) $email;
-        $client = new \GuzzleHttp\Client(['base_url' => 'http://www.xverify.com']);
+        $client = new \GuzzleHttp\Client(['base_uri' => 'http://www.xverify.com']);
         $parameterList = array('email' => $email, 'type' => 'json', 'domain' => $this->_getDomain(), 'apikey' => $this->_getCode());
         $url = '/services/emails/verify/?' . http_build_query($parameterList, '', '&', PHP_QUERY_RFC3986);
         return $client->get($url);
@@ -88,7 +88,7 @@ class CMService_XVerify_Client implements CM_Service_EmailVerification_ClientInt
                 ]);
             }
         } catch (Exception $exception) {
-            $this->_logException($exception);
+            $this->_handleException($exception);
             return null;
         }
         return $body['email'];
@@ -97,7 +97,10 @@ class CMService_XVerify_Client implements CM_Service_EmailVerification_ClientInt
     /**
      * @param Exception $exception
      */
-    protected function _logException(Exception $exception) {
-        CM_Bootloader::getInstance()->getExceptionHandler()->logException($exception);
+    protected function _handleException(Exception $exception) {
+        $logLevel = CM_Log_Logger::exceptionToLevel($exception);
+        $context = new CM_Log_Context();
+        $context->setException($exception);
+        CM_Service_Manager::getInstance()->getLogger()->addMessage('XVerify client error', $logLevel, $context);
     }
 }

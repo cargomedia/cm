@@ -27,7 +27,7 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
             CM_Model_Stream_Subscribe::createStatic($data);
             $this->fail('Should not be able to create duplicate key instance');
         } catch (CM_Exception $e) {
-            $this->assertContains('Duplicate entry', $e->getMessage());
+            $this->assertContains('Duplicate entry', $e->getMetaInfo()['originalExceptionMessage']);
         }
         $data['streamChannel'] = CMTest_TH::createStreamChannel();
         CM_Model_Stream_Subscribe::createStatic($data);
@@ -45,11 +45,46 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
         $user = CMTest_TH::createUser();
         $streamChannel = CMTest_TH::createStreamChannel();
         $this->assertEquals(0, $streamChannel->getStreamSubscribes()->getCount());
-        $videoStream = CM_Model_Stream_Subscribe::createStatic(array('user'          => $user, 'start' => 123123,
-                                                                     'streamChannel' => $streamChannel, 'key' => '123123_2'));
-        $this->assertRow('cm_stream_subscribe', array('id'        => $videoStream->getId(), 'userId' => $user->getId(), 'start' => 123123,
-                                                      'channelId' => $streamChannel->getId(), 'key' => '123123_2'));
+        $subscriber = CM_Model_Stream_Subscribe::createStatic(array('user'          => $user, 'start' => 123123,
+                                                                    'streamChannel' => $streamChannel, 'key' => '123123_2'));
+        $this->assertEquals($user, $subscriber->getUser());
+        $this->assertSame(123123, $subscriber->getStart());
+        $this->assertEquals($streamChannel, $subscriber->getStreamChannel());
+        $this->assertSame('123123_2', $subscriber->getKey());
+        $this->assertNull($subscriber->getAllowedUntil());
         $this->assertEquals(1, $streamChannel->getStreamSubscribes()->getCount());
+    }
+
+    public function testCreateDisallowInterface() {
+        $streamChannel = CMTest_TH::createStreamChannel();
+        $viewer = CMTest_TH::createUser();
+        /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $streamChannel */
+        $streamChannel = $this->mockClass(get_class($streamChannel), ['CM_StreamChannel_DisallowInterface'])->newInstance([$streamChannel->getId()]);
+        $streamChannel->mockMethod('isValid')->set(true);
+        $streamChannel->mockMethod('canSubscribe')->set(function (CM_Model_User $user = null, $allowedUntil) use ($viewer) {
+            $this->assertEquals($viewer, $user);
+            return $allowedUntil + 100;
+        });
+        $subscriber = CMTest_TH::createStreamSubscribe($viewer, $streamChannel);
+        $this->assertSame(time() + 100, $subscriber->getAllowedUntil());
+
+        // not allowed
+        $streamChannel->mockMethod('canSubscribe')->set(function (CM_Model_User $user = null, $allowedUntil) use ($viewer) {
+            return $allowedUntil;
+        });
+        $exception = $this->catchException(function () use ($streamChannel, $viewer) {
+            CMTest_TH::createStreamSubscribe($viewer, $streamChannel);
+        });
+        $this->assertInstanceOf('CM_Exception_NotAllowed', $exception);
+        $this->assertSame('Not allowed to subscribe', $exception->getMessage());
+
+        // streamchannel invalid
+        $streamChannel->mockMethod('isValid')->set(false);
+        $exception = $this->catchException(function () use ($streamChannel, $viewer) {
+            CMTest_TH::createStreamSubscribe($viewer, $streamChannel);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Stream channel not valid', $exception->getMessage());
     }
 
     public function testCreateWithoutUser() {
@@ -141,24 +176,11 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
         $this->assertNull($streamSubscribe->getUser());
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage not valid
-     */
-    public function testCreateInvalidStreamChannel() {
-        $user = CMTest_TH::createUser();
-        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')->setMethods(array('isValid'))->getMock();
-        $streamChannel->expects($this->any())->method('isValid')->will($this->returnValue(false));
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
-
-        CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(), 'key' => 'foo'));
-    }
-
     public function testDeleteOnUnsubscribe() {
         $streamSubscribe = $this->getMockBuilder('CM_Model_Stream_Subscribe')
             ->setMethods(array('getStreamChannel', 'getId'))->getMock();
 
-        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')
+        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Media')
             ->setMethods(array('isValid', 'onUnsubscribe'))->getMock();
 
         $streamSubscribe->expects($this->any())->method('getStreamChannel')->will($this->returnValue($streamChannel));
@@ -166,7 +188,7 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
         $streamChannel->expects($this->any())->method('isValid')->will($this->returnValue(true));
         $streamChannel->expects($this->once())->method('onUnsubscribe')->with($streamSubscribe);
 
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         /** @var CM_Model_Stream_Subscribe $streamSubscribe */
 
         $onDeleteBefore = CMTest_TH::getProtectedMethod('CM_Model_Stream_Subscribe', '_onDeleteBefore');
@@ -179,7 +201,7 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
         $streamSubscribe = $this->getMockBuilder('CM_Model_Stream_Subscribe')
             ->setMethods(array('getStreamChannel', 'getId'))->getMock();
 
-        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')
+        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Media')
             ->setMethods(array('isValid', 'onUnsubscribe'))->getMock();
 
         $streamSubscribe->expects($this->any())->method('getStreamChannel')->will($this->returnValue($streamChannel));
@@ -187,7 +209,7 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
         $streamChannel->expects($this->any())->method('isValid')->will($this->returnValue(false));
         $streamChannel->expects($this->never())->method('onUnsubscribe');
 
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         /** @var CM_Model_Stream_Subscribe $streamSubscribe */
 
         $onDelete = CMTest_TH::getProtectedMethod('CM_Model_Stream_Subscribe', '_onDelete');

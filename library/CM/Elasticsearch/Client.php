@@ -61,7 +61,6 @@ class CM_Elasticsearch_Client {
      * @param CM_Elasticsearch_Query|null $query
      * @return int
      * @throws CM_Exception_Invalid
-     * @throws \Elasticsearch\Common\Exceptions\ServerErrorResponseException
      */
     public function count($indexName, $typeName, CM_Elasticsearch_Query $query = null) {
         $requestParams = [
@@ -72,21 +71,13 @@ class CM_Elasticsearch_Client {
             $requestParams['body']['query'] = $query->getQuery();
         }
 
-        try {
-            $responseCount = $this->_getClient()->count($requestParams);
-        } catch (\Elasticsearch\Common\Exceptions\ServerErrorResponseException $e) {
-            //attempt to call 'count' on just index without type (before at least 1 document was added)
-            //leads to 503 response code but correct response body
-            $parsedErrorBody = json_decode($e->getMessage(), true);
-            if (JSON_ERROR_NONE === json_last_error() && isset($parsedErrorBody['count'])) {
-                return (int) $parsedErrorBody['count'];
-            } else { //rethrow
-                throw $e;
-            }
-        }
+        $responseCount = $this->_getClient()->count($requestParams);
 
         if (!isset($responseCount['count'])) {
-            throw new CM_Exception_Invalid('Count query to `' . $indexName . '`:`' . $typeName . '` returned invalid value');
+            throw new CM_Exception_Invalid('Count query to index returned invalid value', null, [
+                'indexName' => $indexName,
+                'typeName'  => $typeName,
+            ]);
         }
 
         return (int) $responseCount['count'];
@@ -275,6 +266,12 @@ class CM_Elasticsearch_Client {
         return $this->_getClient()->search($params);
     }
 
+    public function awaitReady() {
+        $this->_client->cluster()->health([
+            'wait_for_status' => 'yellow'
+        ]);
+    }
+
     /**
      * @param array $response
      * @throws CM_Exception_Invalid
@@ -286,12 +283,19 @@ class CM_Elasticsearch_Client {
                 throw new CM_Exception_Invalid('Unknown error in one or more bulk request actions');
             }
             $message = '';
+            $i = 0;
             foreach ($response['items'] as $item) {
                 list($operation, $description) = each($item);
                 $message .= 'Operator `' . $operation . '` ' . $description['error'] . PHP_EOL;
+                if (++$i > 2) {
+                    break;
+                }
             }
 
-            throw new CM_Exception_Invalid('Error in one or more bulk request actions' . PHP_EOL . $message);
+            throw new CM_Exception_Invalid('Error(s) in bulk request action(s)', null, [
+                'errorsCount' => count($response['items']),
+                'message'     => $message
+            ]);
         }
     }
 

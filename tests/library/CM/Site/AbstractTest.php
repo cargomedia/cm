@@ -46,29 +46,36 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertEquals('http://www.cdn.com', $site->getUrlCdn());
     }
 
-    public function testMatch() {
-        $siteClassMatchFoo = $this->getMockBuilder('CM_Site_Abstract')
-            ->setMethods(array('getUrl'))
-            ->setMockClassName('CM_Site_MockFoo')
-            ->getMockForAbstractClass();
-        $siteClassMatchFoo->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.com'));
-        /** @var CM_Site_Abstract $siteClassMatchFoo */
+    public function testGetWebFontLoaderConfig() {
+        /** @var CM_Site_Abstract $site */
+        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
+        $this->assertEquals(null, $site->getWebFontLoaderConfig());
+    }
 
-        $siteClassMatchBar = $this->getMockBuilder('CM_Site_Abstract')
-            ->setMethods(array('getUrl'))
-            ->setMockClassName('CM_Site_MockBar')
-            ->getMockForAbstractClass();
-        $siteClassMatchBar->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.xxx'));
-        /** @var CM_Site_Abstract $siteClassMatchBar */
+    public function testIsUrlMatch() {
+        $site = $this->getMockSite(null, null, [
+            'url'    => 'http://www.my-site.com',
+            'urlCdn' => 'http://cdn.my-site.com',
+        ]);
 
-        $requestCom = new CM_Http_Request_Get('/', array('host' => 'www.example.com'));
-        $this->assertTrue($siteClassMatchFoo->match($requestCom));
+        $this->assertSame(true, $site->isUrlMatch('my-site.com', '/'));
+        $this->assertSame(true, $site->isUrlMatch('my-site.com', '/foo'));
+        $this->assertSame(true, $site->isUrlMatch('www.my-site.com', '/foo'));
+        $this->assertSame(true, $site->isUrlMatch('cdn.my-site.com', '/foo'));
+        $this->assertSame(false, $site->isUrlMatch('something.my-site.com', '/foo'));
+        $this->assertSame(false, $site->isUrlMatch('something.com', '/foo'));
+    }
 
-        $requestXxx = new CM_Http_Request_Get('/', array('host' => 'www.example.xxx'));
-        $this->assertTrue($siteClassMatchBar->match($requestXxx));
+    public function testIsUrlMatchWithPath() {
+        $site = $this->getMockSite(null, null, [
+            'url' => 'http://www.my-site.com/foo',
+        ]);
 
-        $requestNot = new CM_Http_Request_Get('/', array('host' => 'www.example.foo'));
-        $this->assertFalse($siteClassMatchBar->match($requestNot));
+        $this->assertSame(false, $site->isUrlMatch('my-site.com', '/'));
+        $this->assertSame(true, $site->isUrlMatch('my-site.com', '/foo'));
+        $this->assertSame(true, $site->isUrlMatch('my-site.com', '/foo/bar'));
+        $this->assertSame(true, $site->isUrlMatch('www.my-site.com', '/foo'));
+        $this->assertSame(false, $site->isUrlMatch('something.my-site.com', '/foo'));
     }
 
     public function testFactory() {
@@ -76,7 +83,41 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
             CM_Site_Abstract::factory(9999);
             $this->fail('Factory returned non-configured site');
         } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
-            $this->assertContains('Site with type `9999` not configured', $ex->getMessage());
+            $this->assertSame('Site with given type is not configured', $ex->getMessage());
+            $this->assertSame(['siteType' => 9999], $ex->getMetaInfo());
         }
+    }
+
+    public function testEquals() {
+        $siteFoo = $this->mockClass('CM_Site_Abstract');
+        /** @var CM_Site_Abstract $siteFoo1 */
+        $siteFoo1 = $siteFoo->newInstance();
+        /** @var CM_Site_Abstract $siteFoo2 */
+        $siteFoo2 = $siteFoo->newInstance();
+
+        $siteBar = $this->mockClass('CM_Site_Abstract');
+        /** @var CM_Site_Abstract $siteBar1 */
+        $siteBar1 = $siteBar->newInstance();
+
+        $this->assertSame(true, $siteFoo2->equals($siteFoo1));
+        $this->assertSame(true, $siteFoo1->equals($siteFoo2));
+        $this->assertSame(false, $siteFoo1->equals(null));
+
+        $this->assertSame(false, $siteFoo1->equals($siteBar1));
+        $this->assertSame(false, $siteBar1->equals($siteFoo1));
+    }
+
+    public function testEqualsDifferentUrl() {
+        $siteClass = $this->mockClass('CM_Site_Abstract');
+
+        /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $site1 */
+        $site1 = $siteClass->newInstance();
+        $site1->mockMethod('getUrl')->set('http://my-site1.com');
+
+        /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $site2 */
+        $site2 = $siteClass->newInstance();
+        $site2->mockMethod('getUrl')->set('http://my-site2.com');
+
+        $this->assertSame(false, $site1->equals($site2));
     }
 }

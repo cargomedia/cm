@@ -73,10 +73,11 @@ class CM_Model_Language extends CM_Model_Abstract {
     }
 
     /**
-     * @return CM_Paging_Translation_Language
+     * @param boolean|null $javascriptOnly
+     * @return CM_Paging_Translation_Language_All
      */
-    public function getTranslations() {
-        return new CM_Paging_Translation_Language($this);
+    public function getTranslations($javascriptOnly = null) {
+        return new CM_Paging_Translation_Language_All($this, $javascriptOnly);
     }
 
     /**
@@ -133,8 +134,8 @@ class CM_Model_Language extends CM_Model_Abstract {
         $this->getTranslations()->set($phrase, $value, $variables);
     }
 
-    public function toArray() {
-        $array = parent::toArray();
+    public function jsonSerialize() {
+        $array = parent::jsonSerialize();
         $array['abbreviation'] = $this->getAbbreviation();
         return $array;
     }
@@ -233,7 +234,7 @@ class CM_Model_Language extends CM_Model_Abstract {
     public static function rpc_requestTranslationJs($phrase) {
         $languageKey = CM_Model_LanguageKey::findByName($phrase);
         if (!$languageKey) {
-            throw new CM_Exception_Invalid('Language key `' . $phrase . '` not found');
+            throw new CM_Exception_Invalid('Language key not found', null, ['phrase' => $phrase]);
         }
         if (!$languageKey->getJavascript()) {
             $languageKey->enableJavascript();

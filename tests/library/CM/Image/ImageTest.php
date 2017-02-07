@@ -2,29 +2,51 @@
 
 class CM_Image_ImageTest extends CMTest_TestCase {
 
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot load Imagick instance
-     */
-    public function testConstructCorruptHeader() {
-        $imageFile = new CM_File(DIR_TEST_DATA . 'img/corrupt-header.jpg');
-        new CM_Image_Image($imageFile->read());
+    public function testConstructor() {
+        $exception = $this->catchException(function () {
+            new CM_Image_Image('');
+        });
+        $this->assertInstanceOf('CM_Exception', $exception);
+        $this->assertRegExp('/^Cannot load image blob/', $exception->getMessage());
+
+        $exception = $this->catchException(function () {
+            $imageFile = new CM_File(DIR_TEST_DATA . 'img/corrupt-header.jpg');
+            new CM_Image_Image($imageFile->read());
+        });
+        $this->assertInstanceOf('CM_Exception', $exception);
+        $this->assertRegExp('/^Cannot load image blob/', $exception->getMessage());
+
+        $exception = $this->catchException(function () {
+            new CM_Image_Image('foobar');
+        });
+        $this->assertInstanceOf('CM_Exception', $exception);
+        $this->assertRegExp('/^Cannot load image blob/', $exception->getMessage());
+
+        $exception = $this->catchException(function () {
+            new CM_Image_Image(new Imagick());
+        });
+        $this->assertInstanceOf('CM_Exception', $exception);
+        $this->assertRegExp('/^\$imagick does not contain any image/', $exception->getMessage());
+
+        $imagick = new Imagick();
+        $imagick->newPseudoImage(100, 100, 'canvas:black');
+        $image = new CM_Image_Image($imagick);
+        $this->assertInstanceOf('CM_Image_Image', $image);
+        $this->assertSame(100, $image->getHeight());
+        $this->assertSame(100, $image->getWidth());
     }
 
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot load Imagick instance
-     */
-    public function testConstructEmptyData() {
-        new CM_Image_Image('');
-    }
+    public function testCreateFromSvg() {
+        $svgFile = new CM_File(DIR_TEST_DATA . 'img/favicon.svg');
+        $svgImage = CM_Image_Image::createFromSVG($svgFile->read(), 200, 200, '#0000FF');
+        $this->assertInstanceOf('CM_Image_Image', $svgImage);
+        $this->assertTrue($svgImage->getHeight() > 200);
+        $this->assertTrue($svgImage->getWidth() > 200);
 
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot load Imagick instance
-     */
-    public function testConstructInvalidData() {
-        new CM_Image_Image('foobar');
+        $imageColor = $this->_getImagickObject($svgImage)->getImagePixelColor(1, 1)->getColor();
+        $this->assertSame(0, $imageColor['r']);
+        $this->assertSame(0, $imageColor['g']);
+        $this->assertSame(255, $imageColor['b']);
     }
 
     public function testCrop() {
@@ -128,6 +150,9 @@ class CM_Image_ImageTest extends CMTest_TestCase {
             $image = new CM_Image_Image($imageFile->read());
             $this->assertSame($format, $image->getFormat());
         }
+
+        $svgImage = CM_Image_Image::createFromSVG((new CM_File(DIR_TEST_DATA . 'img/favicon.svg'))->read(), 100, 100);
+        $this->assertSame(CM_Image_Image::FORMAT_SVG, $svgImage->getFormat());
     }
 
     /**
@@ -193,15 +218,18 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $image->setCompressionQuality(-188);
     }
 
-    public function testSetFormat() {
-        $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
-        $image = new CM_Image_Image($imageFile->read());
-        $this->assertSame(CM_Image_Image::FORMAT_JPEG, $image->getFormat());
-        $image->setFormat(CM_Image_Image::FORMAT_GIF);
-        $this->assertSame(CM_Image_Image::FORMAT_GIF, $image->getFormat());
+    public function testSetCompressionQualityDefault() {
+        $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/nature.jpg');
+        $image = new CM_Image_Image($imageFileOriginal->read());
+        $qualityDefault = 80;
+
+        $blobOriginal = $image->getClone()->getBlob();
+        $blobModified = $image->getClone()->setCompressionQuality($qualityDefault)->getBlob();
+
+        $this->assertEquals(strlen($blobModified), strlen($blobOriginal));
     }
 
-    public function testConvertJpegCompression() {
+    public function testSetCompressionQualityDefaultJpegFileSize() {
         $qualityList = array(
             1   => 4056,
             30  => 6439,
@@ -221,6 +249,14 @@ class CM_Image_ImageTest extends CMTest_TestCase {
             $fileSizeDelta = $expectedFileSize * 0.05;
             $this->assertEquals($expectedFileSize, $imageFile->getSize(), 'File size mismatch for quality `' . $quality . '`', $fileSizeDelta);
         }
+    }
+
+    public function testSetFormat() {
+        $imageFile = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $image = new CM_Image_Image($imageFile->read());
+        $this->assertSame(CM_Image_Image::FORMAT_JPEG, $image->getFormat());
+        $image->setFormat(CM_Image_Image::FORMAT_GIF);
+        $this->assertSame(CM_Image_Image::FORMAT_GIF, $image->getFormat());
     }
 
     public function testResize() {
@@ -262,7 +298,7 @@ class CM_Image_ImageTest extends CMTest_TestCase {
                 $this->assertSame(150, $height);
             });
         $cropMethod = $image->mockMethod('crop')
-            ->set(function($width, $height, $offsetX = null, $offsetY = null) {
+            ->set(function ($width, $height, $offsetX = null, $offsetY = null) {
                 $this->assertSame(150, $width);
                 $this->assertSame(150, $height);
                 $this->assertSame(null, $offsetX);
@@ -285,7 +321,7 @@ class CM_Image_ImageTest extends CMTest_TestCase {
                 $this->assertSame(150, $height);
             });
         $cropMethod = $image->mockMethod('crop')
-            ->set(function($width, $height, $offsetX = null, $offsetY = null) {
+            ->set(function ($width, $height, $offsetX = null, $offsetY = null) {
                 $this->assertSame(150, $width);
                 $this->assertSame(150, $height);
                 $this->assertSame(null, $offsetX);
@@ -308,13 +344,12 @@ class CM_Image_ImageTest extends CMTest_TestCase {
                 $this->assertSame(150, $height);
             });
         $cropMethod = $image->mockMethod('crop')
-            ->set(function($width, $height, $offsetX = null, $offsetY = null) {
+            ->set(function ($width, $height, $offsetX = null, $offsetY = null) {
             });
         /** @var CM_Image_Image $image */
         $image->resize(500, 400, true);
         $this->assertSame(1, $resizeSpecificMethod->getCallCount());
         $this->assertSame(0, $cropMethod->getCallCount());
-
     }
 
     public function testResizeSquareNoBlowup() {
@@ -359,14 +394,14 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $this->assertSame('image/jpeg', $imageFile->getMimeType());
         $this->assertSame(50, $image->getWidth());
         $this->assertSame(50, $image->getHeight());
-        $this->assertEquals(1682, $imageFile->getSize(), '', 100);
+        $this->assertEquals(1173, $imageFile->getSize(), '', 100);
     }
 
     public function testResizeSpecific() {
         $imageFileOriginal = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
         $image = new CM_Image_Image($imageFileOriginal->read());
 
-        $image->resizeSpecific(50, 50, 20, 20);
+        $image->resizeSpecific(50, 50);
         $this->assertSame(50, $image->getWidth());
         $this->assertSame(50, $image->getHeight());
     }
@@ -395,24 +430,49 @@ class CM_Image_ImageTest extends CMTest_TestCase {
     }
 
     public function testCalculateDimensions() {
-        $dimensions = CM_Image_Image::calculateDimensions( 2000, 1600, 500, 600, false );
+        $dimensions = CM_Image_Image::calculateDimensions(2000, 1600, 500, 600, false);
 
-        $this->assertEquals( 500, $dimensions['width']);
-        $this->assertEquals( 400, $dimensions['height']);
+        $this->assertEquals(500, $dimensions['width']);
+        $this->assertEquals(400, $dimensions['height']);
     }
 
     public function testCalculateDimensionsSquare() {
-        $dimensions = CM_Image_Image::calculateDimensions( 2000, 1600, 500, 500, true );
+        $dimensions = CM_Image_Image::calculateDimensions(2000, 1600, 500, 500, true);
 
-        $this->assertEquals( 500, $dimensions['width']);
-        $this->assertEquals( 500, $dimensions['height']);
+        $this->assertEquals(500, $dimensions['width']);
+        $this->assertEquals(500, $dimensions['height']);
     }
 
     public function testCalculateDimensionsLower() {
-        $dimensions = CM_Image_Image::calculateDimensions( 100, 200, 1000, 500, false );
+        $dimensions = CM_Image_Image::calculateDimensions(100, 200, 1000, 500, false);
 
-        $this->assertEquals( 100, $dimensions['width']);
-        $this->assertEquals( 200, $dimensions['height']);
+        $this->assertEquals(100, $dimensions['width']);
+        $this->assertEquals(200, $dimensions['height']);
+    }
+
+    public function testCompositeImage() {
+        $backgroundColor = '#0000FF';
+        $background = new \Imagick();
+        $background->newPseudoImage(100, 100, 'canvas:' . $backgroundColor);
+        $backgroundImage = new CM_Image_Image($background);
+
+        $foregroundColor = '#FF0000';
+        $foreground = new \Imagick();
+        $foreground->newPseudoImage(30, 30, 'canvas:' . $foregroundColor);
+        $foregroundImage = new CM_Image_Image($foreground);
+
+        $backgroundImage->compositeImage($foregroundImage, 10, 10);
+
+        $backgroundImagick = $this->_getImagickObject($backgroundImage);
+        $colorBackground = $backgroundImagick->getImagePixelColor(9, 9)->getColor();
+        $this->assertSame(0, $colorBackground['r']);
+        $this->assertSame(0, $colorBackground['g']);
+        $this->assertSame(255, $colorBackground['b']);
+
+        $colorForeground = $backgroundImagick->getImagePixelColor(10, 10)->getColor();
+        $this->assertSame(255, $colorForeground['r']);
+        $this->assertSame(0, $colorForeground['g']);
+        $this->assertSame(0, $colorForeground['b']);
     }
 
     /**
@@ -424,4 +484,4 @@ class CM_Image_ImageTest extends CMTest_TestCase {
         $reflectionProperty->setAccessible(true);
         return $reflectionProperty->getValue($image);
     }
- }
+}

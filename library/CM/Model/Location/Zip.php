@@ -17,43 +17,14 @@ class CM_Model_Location_Zip extends CM_Model_Location_Abstract {
     }
 
     /**
-     * @return float|null
-     */
-    public function getLat() {
-        return $this->_get('lat');
-    }
-
-    /**
-     * @param float|null $lat
-     */
-    public function setLat($lat) {
-        $this->_set('lat', $lat);
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getLon() {
-        return $this->_get('lon');
-    }
-
-    /**
-     * @param float|null $lon
-     */
-    public function setLon($lon) {
-        $this->_set('lon', $lon);
-    }
-
-    /**
      * @return array|null
      */
     public function getCoordinates() {
-        $lat = $this->getLat();
-        $lon = $this->getLon();
-        if (null !== $lat && null !== $lon) {
-            return array('lat' => $lat, 'lon' => $lon);
+        $coordinates = parent::getCoordinates();
+        if (null === $coordinates) {
+            $coordinates = $this->getCity()->getCoordinates();
         }
-        return $this->getCity()->getCoordinates();
+        return $coordinates;
     }
 
     public function getLevel() {
@@ -75,7 +46,7 @@ class CM_Model_Location_Zip extends CM_Model_Location_Abstract {
             case CM_Model_Location::LEVEL_ZIP:
                 return $this;
         }
-        throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
+        throw new CM_Exception_Invalid('Invalid location level', null, ['level' => $level]);
     }
 
     public function _getSchema() {

@@ -150,6 +150,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @param string|array|null $values Column-value OR Column-values array OR Multiple Column-values array(array)
      * @param array|null        $onDuplicateKeyValues
      * @return string|null
+     * @deprecated Removed from MySQL 5.7
      */
     public static function insertDelayed($table, $fields, $values = null, array $onDuplicateKeyValues = null) {
         $statement = (self::_getConfig()->delayedEnabled) ? 'INSERT DELAYED' : 'INSERT';
@@ -171,10 +172,24 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @param string|array      $fields Column-name OR Column-names array OR associative field=>value pair
      * @param string|array|null $values Column-value OR Column-values array OR Multiple Column-values array(array)
      * @return string|null
+     * @deprecated Removed from MySQL 5.7
      */
     public static function replaceDelayed($table, $fields, $values = null) {
         $statement = (self::_getConfig()->delayedEnabled) ? 'REPLACE DELAYED' : 'REPLACE';
         return self::insert($table, $fields, $values, null, $statement);
+    }
+
+    /**
+     * @param string $table
+     * @param string $replacement
+     */
+    public static function replaceTable($table, $replacement) {
+        $client = self::getClient();
+        $tableQuoted = $client->quoteIdentifier($table);
+        $replacementQuoted = $client->quoteIdentifier($replacement);
+        $temporaryTableQuoted = $client->quoteIdentifier(uniqid($table . '_'));
+        self::exec("RENAME TABLE {$tableQuoted} TO {$temporaryTableQuoted}, {$replacementQuoted} TO {$tableQuoted}");
+        self::exec("DROP TABLE {$temporaryTableQuoted}");
     }
 
     /**

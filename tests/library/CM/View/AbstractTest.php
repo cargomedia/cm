@@ -15,6 +15,7 @@ class CM_View_AbstractTest extends CMTest_TestCase {
     public function testAjax_loadComponent() {
         /** @var CM_View_Abstract $view */
         $view = $this->getMockForAbstractClass('CM_View_Abstract');
+        $site = $this->getMockSite();
         $request = $this->createRequestAjax($view, 'someMethod', ['foo' => 'bar']);
 
         $mockClassResponse = $this->mockClass('CM_Http_Response_View_Ajax');
@@ -24,7 +25,7 @@ class CM_View_AbstractTest extends CMTest_TestCase {
             $this->assertEquals([], $params->getParamsDecoded());
         });
         /** @var CM_Http_Response_View_Ajax|\Mocka\AbstractClassTrait $mockResponse */
-        $mockResponse = $mockClassResponse->newInstance(['request' => $request, 'serviceManager' => $this->getServiceManager()]);
+        $mockResponse = $mockClassResponse->newInstance([$request, $site, $this->getServiceManager()]);
         $componentHandler = new CM_Frontend_JavascriptContainer_View();
 
         $view->ajax_loadComponent(new CM_Params(['className' => 'CM_Component_Abstract']), $componentHandler, $mockResponse);
@@ -32,17 +33,16 @@ class CM_View_AbstractTest extends CMTest_TestCase {
         $this->assertSame(1, $mockLoadComponentMethod->getCallCount());
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Class not found: `absentClassName`
-     */
     public function testAjax_loadComponentBadClass() {
         /** @var CM_View_Abstract $view */
         $view = $this->getMockForAbstractClass('CM_View_Abstract');
-        $request = $this->createRequestAjax($view, 'someMethod', ['foo' => 'bar']);
-        $response = new CM_Http_Response_View_Ajax($request, $this->getServiceManager());
-        $componentHandler = new CM_Frontend_JavascriptContainer_View();
+        $exception = $this->catchException(function () use ($view) {
+            $this->getResponseAjax($view, 'loadComponent', ['className' => 'absentClassName']);
+        });
 
-        $view->ajax_loadComponent(new CM_Params(['className' => 'absentClassName']), $componentHandler, $response);
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Class not found', $exception->getMessage());
+        $this->assertSame(['className' => 'absentClassName'], $exception->getMetaInfo());
     }
 }

@@ -71,7 +71,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         /** @var CM_Action_Abstract|\Mocka\AbstractClassTrait $action */
         $action = $this->mockObject('CM_Action_Abstract', ['foo', CMTest_TH::createUser()]);
         $action->mockMethod('getType')->set(12);
-        $isAllowed = $action->mockMethod('_isAllowed')->set(function($arg1) {
+        $isAllowed = $action->mockMethod('_isAllowed')->set(function ($arg1) {
             $this->assertSame('myArg', $arg1);
             return true;
         });
@@ -89,7 +89,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         /** @var CM_Action_Abstract|\Mocka\AbstractClassTrait $action */
         $action = $this->mockObject('CM_Action_Abstract', ['foo', CMTest_TH::createUser()]);
         $action->mockMethod('getType')->set(12);
-        $isAllowedOrDisallowed = $action->mockMethod('_isAllowed')->set(function($arg1) {
+        $isAllowedOrDisallowed = $action->mockMethod('_isAllowed')->set(function ($arg1) {
             $this->assertSame('myArg', $arg1);
             return false;
         });
@@ -101,7 +101,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         try {
             $action->prepare('myArg');
             $this->fail('Prepare should throw');
-        } catch(CM_Exception_NotAllowed $e) {
+        } catch (CM_Exception_NotAllowed $e) {
             $this->assertSame('Action not allowed', $e->getMessage());
         }
         $this->assertSame(1, $isAllowedOrDisallowed->getCallCount());
@@ -112,7 +112,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         /** @var CM_Action_Abstract|\Mocka\AbstractClassTrait $action */
         $action = $this->mockObject('CM_Action_Abstract', ['foo', CMTest_TH::createUser()]);
         $action->mockMethod('getType')->set(12);
-        $isAllowedOrDisallowed = $action->mockMethod('_isAllowed')->set(function($arg1) {
+        $isAllowedOrDisallowed = $action->mockMethod('_isAllowed')->set(function ($arg1) {
             $this->assertSame('myArg', $arg1);
             return null;
         });
@@ -124,7 +124,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         try {
             $action->prepare('myArg');
             $this->fail('Prepare should throw');
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->assertSame('my overshoot', $e->getMessage());
         }
         $this->assertSame(1, $isAllowedOrDisallowed->getCallCount());
@@ -182,14 +182,16 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
             $action->prepare();
             $this->fail('Action breached hard limit.');
         } catch (CM_Exception_NotAllowed $ex) {
-            $this->assertContains('ActionLimit `' . $hardLimit->getType() . '` breached', $ex->getMessage());
+            $this->assertSame('ActionLimit breached.', $ex->getMessage());
+            $this->assertSame(['actionLimitType' => $hardLimit->getType()], $ex->getMetaInfo());
         }
         // hard limit reached, transgression not logged
         try {
             $action->prepare();
             $this->fail('Action breached hard limit.');
         } catch (CM_Exception_NotAllowed $ex) {
-            $this->assertContains('ActionLimit `' . $hardLimit->getType() . '` breached', $ex->getMessage());
+            $this->assertSame('ActionLimit breached.', $ex->getMessage());
+            $this->assertSame(['actionLimitType' => $hardLimit->getType()], $ex->getMetaInfo());
         }
         CMTest_TH::timeForward(30);
         $action->prepare();
@@ -225,13 +227,15 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
             $action->prepare();
             $this->fail('Action breached hard limit.');
         } catch (CM_Exception_NotAllowed $ex) {
-            $this->assertContains('ActionLimit `' . $hardLimit->getType() . '` breached', $ex->getMessage());
+            $this->assertSame('ActionLimit breached.', $ex->getMessage());
+            $this->assertSame(['actionLimitType' => $hardLimit->getType()], $ex->getMetaInfo());
         }
         try {
             $action->prepare();
             $this->fail('Action breached hard limit.');
         } catch (CM_Exception_NotAllowed $ex) {
-            $this->assertContains('ActionLimit `' . $hardLimit->getType() . '` breached', $ex->getMessage());
+            $this->assertSame('ActionLimit breached.', $ex->getMessage());
+            $this->assertSame(['actionLimitType' => $hardLimit->getType()], $ex->getMetaInfo());
         }
         CMTest_TH::timeForward(10);
         $action->prepare();
@@ -320,7 +324,14 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
             CM_Action_Abstract::aggregate(array(array('interval' => 5, 'limit' => 10), array('interval' => 11, 'limit' => 20)));
             $this->fail('Invalid intervals were not detected');
         } catch (CM_Exception_Invalid $e) {
-            $this->assertContains('`11` is not a multiple of `5`', $e->getMessage());
+            $this->assertSame('Interval is not a multiple of last value.', $e->getMessage());
+            $this->assertSame(
+                [
+                    'interval'          => 11,
+                    'intervalValueLast' => 5,
+                ],
+                $e->getMetaInfo()
+            );
         }
 
         try {
@@ -328,7 +339,14 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
                 array('interval' => 21, 'limit' => 30)));
             $this->fail('Invalid intervals were not detected');
         } catch (CM_Exception_Invalid $e) {
-            $this->assertContains('`21` is not a multiple of `10`', $e->getMessage());
+            $this->assertSame('Interval is not a multiple of last value.', $e->getMessage());
+            $this->assertSame(
+                [
+                    'interval'          => 21,
+                    'intervalValueLast' => 10,
+                ],
+                $e->getMetaInfo()
+            );
         }
     }
 
@@ -359,7 +377,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
     }
 
     public function testGetLabel() {
-        $userMock = $this->getMock('CM_Model_User');
+        $userMock = $this->getMockBuilder('CM_Model_User')->getMock();
         $argumentList = array(CM_Action_Abstract::VIEW, $userMock);
         $actionMock = $this->getMockForAbstractClass('CM_Action_Abstract', $argumentList, 'CM_Action_EmailNotification_Reminder');
         /** @var CM_Action_Abstract $actionMock */

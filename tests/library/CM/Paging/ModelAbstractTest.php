@@ -27,12 +27,7 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
         $this->assertCount(3, $modelPaging);
         $this->assertEquals($model2, $modelPaging->getItem(0));
         $this->assertEquals($model1, $modelPaging->getItem(1));
-        try {
-            $modelPaging->getItem(2);
-            $this->fail('Can access nonexistent item.');
-        } catch (CM_Exception_Nonexistent $ex) {
-            $this->assertContains('Model itemRaw: `2000` has no data', $ex->getMessage());
-        }
+        $this->assertNull($modelPaging->getItem(2));
     }
 
     public function testPagingVariableType() {
@@ -51,15 +46,36 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
         $this->assertCount(3, $modelPaging);
         $this->assertEquals($model1, $modelPaging->getItem(0));
         $this->assertEquals($model2, $modelPaging->getItem(1));
-        try {
-            $modelPaging->getItem(2);
-            $this->fail('Can access nonexistent item.');
-        } catch (CM_Exception_Nonexistent $ex) {
-            $this->assertContains('Model itemRaw: `Array', $ex->getMessage());
-            $this->assertContains('[type] => ' . $model1->getType(), $ex->getMessage());
-            $this->assertContains('[id] => 9999', $ex->getMessage());
-            $this->assertContains('` has no data', $ex->getMessage());
-        }
+        $this->assertNull($modelPaging->getItem(2));
+    }
+
+    public function testModelListInvalidation() {
+        CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock::getTypeStatic()] = 'CM_Paging_ModelAbstractTest_ModelMock';
+        CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock2::getTypeStatic()] = 'CM_Paging_ModelAbstractTest_ModelMock2';
+        $model1 = CM_Paging_ModelAbstractTest_ModelMock::create('foo');
+        $model2 = CM_Paging_ModelAbstractTest_ModelMock2::create('bar');
+        $model3 = CM_Paging_ModelAbstractTest_ModelMock::create('baz');
+        $model4 = CM_Paging_ModelAbstractTest_ModelMock::create('quux');
+        $model5 = CM_Paging_ModelAbstractTest_ModelMock::create('foobar');
+
+        $source = new CM_PagingSource_Array(array(
+            array('type' => $model1->getType(), 'id' => $model1->getId()),
+            array('type' => $model2->getType(), 'id' => $model2->getId()),
+            array('type' => $model3->getType(), 'id' => $model3->getId()),
+            array('type' => $model4->getType(), 'id' => $model4->getId()),
+            array('type' => $model5->getType(), 'id' => $model5->getId()),
+            array('type' => $model1->getType(), 'id' => 9999)
+        ));
+        $modelPaging = $this->getMockBuilder('CM_Paging_ModelAbstract')->setConstructorArgs(array($source))
+            ->getMockForAbstractClass();
+        /** @var CM_Paging_ModelAbstract $modelPaging */
+
+        $modelPaging->setPage(1, 2);
+        $this->assertEquals($model1, $modelPaging->getItem(0));
+        $this->assertEquals($model2, $modelPaging->getItem(1));
+        $modelPaging->setPage(2, 2);
+        $this->assertEquals($model3, $modelPaging->getItem(0));
+        $this->assertEquals($model4, $modelPaging->getItem(1));
     }
 }
 

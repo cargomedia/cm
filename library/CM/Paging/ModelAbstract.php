@@ -2,8 +2,18 @@
 
 abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
 
-    /** @var array */
-    protected $_modelList = array();
+    /** @var array|null */
+    protected $_modelList = null;
+
+    public function _change() {
+        parent::_change();
+        $this->_modelList = null;
+    }
+
+    protected function _clearItems() {
+        parent::_clearItems();
+        $this->_modelList = null;
+    }
 
     /**
      * @return int|null
@@ -15,19 +25,19 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
         return null;
     }
 
-    protected function _onLoadItemsRaw(array $itemsRaw) {
+    protected function _populateModelList(array $itemsRaw) {
         $modelList = CM_Model_Abstract::factoryGenericMultiple($itemsRaw, $this->_getModelType());
-        $this->_modelList = array();
+        $this->_modelList = [];
         foreach ($itemsRaw as $index => $itemRaw) {
             $this->_modelList[serialize($itemRaw)] = $modelList[$index];
         }
     }
 
     protected function _processItem($itemRaw) {
-        $index = serialize($itemRaw);
-        if (null === ($model = $this->_modelList[$index])) {
-            throw new CM_Exception_Nonexistent('Model itemRaw: `' . CM_Util::var_line($itemRaw) . '` has no data');
+        if (null === $this->_modelList) {
+            $this->_populateModelList($this->_getItemsRaw());
         }
-        return $model;
+        $index = serialize($itemRaw);
+        return isset($this->_modelList[$index]) ? $this->_modelList[$index] : null;
     }
 }

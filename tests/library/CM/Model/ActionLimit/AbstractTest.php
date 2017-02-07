@@ -74,6 +74,11 @@ class CM_Model_ActionLimit_AbstractTest extends CMTest_TestCase {
     public function testGetAll() {
         $this->assertInstanceOf('CM_Paging_ActionLimit_All', CM_Model_ActionLimit_Abstract::getAll(1));
     }
+
+    public function testJsonSerialize() {
+        $actionLimit = new CM_Model_ActionLimit_AbstractMock($this->_actionType, $this->_actionVerb);
+        $this->assertEquals(['actionType' => $this->_actionType, 'actionVerb' => $this->_actionVerb], $actionLimit->jsonSerialize());
+    }
 }
 
 class CM_Model_ActionLimit_AbstractMock extends CM_Model_ActionLimit_Abstract {
@@ -82,7 +87,7 @@ class CM_Model_ActionLimit_AbstractMock extends CM_Model_ActionLimit_Abstract {
         throw new CM_Exception_ActionLimit('Mock overshoot');
     }
 
-    public function getOvershootAllowed() {
+    public function getOvershootAllowed(CM_Action_Abstract $action) {
         return false;
     }
 

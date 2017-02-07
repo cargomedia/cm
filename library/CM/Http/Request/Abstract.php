@@ -39,25 +39,49 @@ abstract class CM_Http_Request_Abstract {
     private static $_instance;
 
     /**
+     * @return string
+     */
+    abstract public function getMethodName();
+
+    /**
      * @param string             $uri
      * @param array|null         $headers OPTIONAL
      * @param array|null         $server
      * @param CM_Model_User|null $viewer
+     * @throws CM_Exception
+     * @throws CM_Exception_Invalid
      */
     public function __construct($uri, array $headers = null, array $server = null, CM_Model_User $viewer = null) {
         if (null !== $headers) {
             $this->_headers = array_change_key_case($headers);
         }
         if (null !== $server) {
+            foreach ($server as &$serverValue) {
+                if (is_string($serverValue)) {
+                    $serverValue = CM_Util::sanitizeUtf($serverValue);
+                }
+            }
             $this->_server = array_change_key_case($server);
         }
+        $uri = (string) $uri;
+        $originalUri = $uri;
+        $uri = CM_Util::sanitizeUtf($uri);
 
+        try {
+            CM_Util::jsonEncode($uri);
+        } catch (CM_Exception_Invalid $e) {
+            $logger = CM_Service_Manager::getInstance()->getLogger();
+            $context = new CM_Log_Context();
+            $context->setExtra([
+                'originalUri'  => unpack('H*', $originalUri)[1],
+                'sanitizedUri' => unpack('H*', $uri)[1],
+            ]);
+            $logger->warning('Non utf-8 uri', $context);
+        } // TODO remove after investigation
         $this->setUri($uri);
 
         if ($sessionId = $this->getCookie('sessionId')) {
-            if ($this->_session = CM_Session::findById($sessionId)) {
-                $this->_session->start();
-            }
+            $this->setSession(CM_Session::findById($sessionId));
         }
 
         if ($viewer) {
@@ -89,7 +113,7 @@ abstract class CM_Http_Request_Abstract {
     public final function getHeader($name) {
         $name = strtolower($name);
         if (!$this->hasHeader($name)) {
-            throw new CM_Exception_Invalid('Header `' . $name . '` not set.');
+            throw new CM_Exception_Invalid('Header is not set.', null, ['headerName' => $name]);
         }
         return (string) $this->_headers[$name];
     }
@@ -173,18 +197,48 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @param string $prefix
+     * @return bool
+     */
+    public function hasPathPrefix($prefix) {
+        $prefix = (string) $prefix;
+        $path = new Stringy\Stringy($this->getPath());
+        return $path->startsWith($prefix);
+    }
+
+    /**
      * @param int|null $position
      * @return string
-     * @throws CM_Exception_Invalid
+     * @throws CM_Exception
      */
     public function popPathPart($position = null) {
         $position = (int) $position;
         if (!array_key_exists($position, $this->getPathParts())) {
-            throw new CM_Exception_Invalid('Cannot find request\'s path part at position `' . $position . '`.');
+            throw new CM_Exception('Cannot pop request\'s path by position.', null, [
+                'path'     => $this->getPath(),
+                'position' => $position,
+            ]);
         }
         $value = array_splice($this->_pathParts, $position, 1);
         $this->setPathParts($this->_pathParts);
         return current($value);
+    }
+
+    /**
+     * @param string $prefix
+     * @throws CM_Exception
+     */
+    public function popPathPrefix($prefix) {
+        $path = new Stringy\Stringy($this->getPath());
+        if (!$path->startsWith($prefix)) {
+            throw new CM_Exception('Cannot pop request\'s path by prefix.', null, [
+                'path'   => $this->getPath(),
+                'prefix' => $prefix,
+            ]);
+        }
+        $path = $path->removeLeft($prefix);
+        $path = $path->ensureLeft('/');
+        $this->setPath((string) $path);
     }
 
     /**
@@ -214,10 +268,38 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @return CM_Site_Abstract
+     */
+    public function popPathSiteByMatch() {
+        $siteFactory = new CM_Site_SiteFactory();
+        $site = $siteFactory->findSite($this);
+        if (null === $site) {
+            $site = CM_Site_Abstract::factory();
+        }
+
+        $sitePath = $site->getUrlParser()->getPath();
+        if ($this->hasPathPrefix($sitePath)) {
+            $this->popPathPrefix($sitePath);
+        }
+        return $site;
+    }
+
+    /**
      * @return array
      */
     public function getQuery() {
         return $this->_query;
+    }
+
+    /**
+     * @return array
+     */
+    public function findQuery() {
+        try {
+            return $this->getQuery();
+        } catch (CM_Exception_Invalid $e) {
+            return [];
+        }
     }
 
     /**
@@ -248,7 +330,7 @@ abstract class CM_Http_Request_Abstract {
         }
 
         if (false === ($path = parse_url($uriWithHost, PHP_URL_PATH))) {
-            throw new CM_Exception_Invalid('Cannot detect path from `' . $uriWithHost . '`.');
+            throw new CM_Exception_Invalid('Cannot detect path from url.', null, ['url' => $uriWithHost]);
         }
         if (null === $path) {
             $path = '/';
@@ -256,10 +338,28 @@ abstract class CM_Http_Request_Abstract {
         $this->setPath($path);
 
         if (false === ($queryString = parse_url($uriWithHost, PHP_URL_QUERY))) {
-            throw new CM_Exception_Invalid('Cannot detect query from `' . $uriWithHost . '`.');
+            throw new CM_Exception_Invalid('Cannot detect query from url.', null, ['url' => $uriWithHost]);
         }
-        parse_str($queryString, $query);
-        $this->setQuery($query);
+        mb_parse_str($queryString, $query);
+
+        $querySanitized = [];
+        foreach ($query as $key => $value) {
+            $key = CM_Util::sanitizeUtf($key);
+
+            if (is_array($value)) {
+                array_walk_recursive($value, function (&$innerValue) {
+                    if (is_string($innerValue)) {
+                        $innerValue = CM_Util::sanitizeUtf($innerValue);
+                    }
+                });
+            } else {
+                $value = CM_Util::sanitizeUtf($value);
+            }
+
+            $querySanitized[$key] = $value;
+        }
+
+        $this->setQuery($querySanitized);
 
         $this->setLanguageUrl(null);
 
@@ -284,7 +384,7 @@ abstract class CM_Http_Request_Abstract {
             if ($this->hasHeader('cookie')) {
                 $header = $this->getHeader('cookie');
                 if (false === preg_match_all('/([^=;\s]+)\s*=\s*([^=;\s]+)/', $header, $matches, PREG_SET_ORDER)) {
-                    throw new CM_Exception('Cannot parse Cookie-header `' . $header . '`');
+                    throw new CM_Exception('Cannot parse Cookie-header', null, ['header' => $header]);
                 }
                 foreach ($matches as $match) {
                     $this->_cookies[urldecode($match[1])] = urldecode($match[2]);
@@ -309,6 +409,18 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @param CM_Session|null $session
+     */
+    public function setSession(CM_Session $session = null) {
+        if (null !== $session) {
+            $session->setRequest($this);
+            $session->start();
+        }
+        $this->_session = $session;
+        $this->resetViewer();
+    }
+
+    /**
      * @return boolean
      */
     public function hasSession() {
@@ -330,14 +442,15 @@ abstract class CM_Http_Request_Abstract {
      * @throws CM_Exception_AuthRequired
      */
     public function getViewer($needed = false) {
-        if ($this->_viewer === false) {
-            $this->_viewer = $this->getSession()->getUser();
-        }
-        if (!$this->_viewer) {
-            if ($needed) {
-                throw new CM_Exception_AuthRequired();
+        if (false === $this->_viewer) {
+            $this->_viewer = null;
+            if ($this->hasSession()) {
+                $this->_viewer = $this->getSession()->getUser();
             }
-            return null;
+        }
+
+        if ($needed && null === $this->_viewer) {
+            throw new CM_Exception_AuthRequired();
         }
         return $this->_viewer;
     }
@@ -415,13 +528,31 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @return DateTimeZone|null
+     */
+    public function getTimeZone() {
+        $timeZone = $this->_getTimeZoneFromCookie();
+        if (null === $timeZone && $location = $this->getLocation()) {
+            $timeZone = $location->getTimeZone();
+        }
+        return $timeZone;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUserAgent() {
+        if (!$this->hasHeader('user-agent')) {
+            return '';
+        }
+        return $this->getHeader('user-agent');
+    }
+
+    /**
      * @return bool
      */
     public function isBotCrawler() {
-        if (!$this->hasHeader('user-agent')) {
-            return false;
-        }
-        $useragent = $this->getHeader('user-agent');
+        $useragent = $this->getUserAgent();
         $useragentMatches = array(
             'Googlebot',
             'bingbot',
@@ -443,10 +574,10 @@ abstract class CM_Http_Request_Abstract {
      * @return bool
      */
     public function isSupported() {
-        if (!$this->hasHeader('user-agent')) {
-            return true;
+        $userAgent = $this->getUserAgent();
+        if (preg_match('#UCWEB|UCBrowser#', $userAgent)) {
+            return false;
         }
-        $userAgent = $this->getHeader('user-agent');
         if (preg_match('#Opera Mini#', $userAgent)) {
             return false;
         }
@@ -482,6 +613,30 @@ abstract class CM_Http_Request_Abstract {
                 if ($language = $languagePaging->findByAbbreviation($locale[0])) {
                     return $language;
                 }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return DateTimeZone|null
+     */
+    private function _getTimeZoneFromCookie() {
+        if ($timeZoneOffset = $this->getCookie('timezoneOffset')) {
+            //timezoneOffset is seconds behind UTC
+            $timeZoneOffset = (int) $timeZoneOffset;
+            if ($timeZoneOffset < -50400 || $timeZoneOffset > 43200) { //UTC+14 UTC-12
+                return null;
+            }
+            $timeZoneAbs = abs($timeZoneOffset);
+            $offsetHours = floor($timeZoneAbs / 3600);
+            $offsetMinutes = floor($timeZoneAbs % 3600 / 60);
+            if ($timeZoneOffset > 0) {
+                $offsetHours *= -1;
+            }
+            $dateTime = DateTime::createFromFormat('O', sprintf("%+03d%02d", $offsetHours, $offsetMinutes));
+            if (false !== $dateTime) {
+                return $dateTime->getTimezone();
             }
         }
         return null;
@@ -530,7 +685,7 @@ abstract class CM_Http_Request_Abstract {
         if ($method === 'options') {
             return new CM_Http_Request_Options($uri, $headers, $server);
         }
-        throw new CM_Exception_Invalid('Invalid request method `' . $method . '`');
+        throw new CM_Exception_Invalid('Invalid request method', CM_Exception::WARN, ['method' => $method]);
     }
 
     /**

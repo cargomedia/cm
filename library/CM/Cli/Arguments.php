@@ -165,7 +165,7 @@ class CM_Cli_Arguments {
                 $paramString = '--' . CM_Util::uncamelize($paramName);
 
                 $value = 'value';
-                if (preg_match('/\*\s+@param\s+([^\$]*)\s*\$' . preg_quote($paramName) . '\s*([^@\*]*)/', $method->getDocComment(), $matches)) {
+                if (preg_match('/\*\s+@param\s+([^\$]*)\s+\$' . preg_quote($paramName) . '\s+([^@\*]*)/', $method->getDocComment(), $matches)) {
                     if ($commentValue = trim($matches[2])) {
                         $value = $commentValue;
                     }

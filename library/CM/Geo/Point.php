@@ -1,6 +1,6 @@
 <?php
 
-class CM_Geo_Point implements CM_Comparable {
+class CM_Geo_Point implements CM_Comparable, CM_ArrayConvertible {
 
     /** @var float */
     private $_latitude;
@@ -32,7 +32,7 @@ class CM_Geo_Point implements CM_Comparable {
     public function setLatitude($latitude) {
         $latitude = (float) $latitude;
         if ($latitude > 90 || $latitude < -90) {
-            throw new CM_Exception_Invalid('Latitude `' . $latitude . '` out of range');
+            throw new CM_Exception_Invalid('Latitude is out of range', null, ['latitude' => $latitude]);
         }
         $this->_latitude = $latitude;
     }
@@ -51,7 +51,7 @@ class CM_Geo_Point implements CM_Comparable {
     public function setLongitude($longitude) {
         $longitude = (float) $longitude;
         if ($longitude > 180 || $longitude < -180) {
-            throw new CM_Exception_Invalid('Longitude `' . $longitude . '` out of range');
+            throw new CM_Exception_Invalid('Longitude is out of range', null, ['longitude' => $longitude]);
         }
         $this->_longitude = $longitude;
     }
@@ -68,5 +68,39 @@ class CM_Geo_Point implements CM_Comparable {
         return (get_class($this) === get_class($other)
             && $this->getLatitude() === $other->getLatitude()
             && $this->getLongitude() === $other->getLongitude());
+    }
+
+    /**
+     * @param CM_Geo_Point $pointTo
+     * @return float
+     */
+    public function calculateDistanceTo(CM_Geo_Point $pointTo) {
+        $pi180 = M_PI / 180;
+        $currentRadianLatitude = $this->getLatitude() * $pi180;
+        $currentRadianLongitude = $this->getLongitude() * $pi180;
+        $againstRadianLatitude = $pointTo->getLatitude() * $pi180;
+        $againstRadianLongitude = $pointTo->getLongitude() * $pi180;
+
+        $arcCosine = acos(
+            sin($currentRadianLatitude) * sin($againstRadianLatitude) +
+            cos($currentRadianLatitude) * cos($againstRadianLatitude) * cos($currentRadianLongitude - $againstRadianLongitude)
+        );
+
+        return CM_Model_Location::EARTH_RADIUS * $arcCosine;
+    }
+
+    public function toArray() {
+        return [
+            'latitude'  => $this->_latitude,
+            'longitude' => $this->_longitude,
+        ];
+    }
+
+    /**
+     * @param array $data
+     * @return CM_Geo_Point
+     */
+    public static function fromArray(array $data) {
+        return new self($data['latitude'], $data['longitude']);
     }
 }

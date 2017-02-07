@@ -76,7 +76,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      * @param array $parameterList
      */
     protected function _submitRequest(array $parameterList) {
-        $this->_getGuzzleClient()->post('/collect', ['body' => $parameterList]);
+        $this->_getGuzzleClient()->post('/collect', ['form_params' => $parameterList]);
     }
 
     /**
@@ -84,7 +84,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      */
     protected function _getGuzzleClient() {
         if (!self::$_client) {
-            self::$_client = new \GuzzleHttp\Client(['base_url' => 'http://www.google-analytics.com']);
+            self::$_client = new \GuzzleHttp\Client(['base_uri' => 'http://www.google-analytics.com']);
         }
         return self::$_client;
     }
@@ -179,15 +179,21 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
         $hitType = (string) $parameterList['t'];
         foreach ($parameterList as $name => $value) {
             if (!isset($parameterDefinition[$name])) {
-                throw new CM_Exception('Unknown parameter `' . $name . '`.');
+                throw new CM_Exception('Unknown parameter', null, ['name' => $name]);
             }
             $definition = $parameterDefinition[$name];
             if (isset($definition['hitTypeList']) && !in_array($hitType, $definition['hitTypeList'], true)) {
-                throw new CM_Exception('Unexpected parameter `' . $name . '` for hitType `' . $hitType . '`.');
+                throw new CM_Exception('Unexpected parameter for the hitType.', null, [
+                    'name'    => $name,
+                    'hitType' => $hitType,
+                ]);
             }
             if (isset($definition['validator'])) {
                 if (true !== $definition['validator']($value)) {
-                    throw new CM_Exception('Value `' . $value . '` for parameter `' . $name . '` did not pass validation');
+                    throw new CM_Exception('Value for the parameter did not pass validation', null, [
+                        'value'     => $value,
+                        'parameter' => $name,
+                    ]);
                 }
             }
         }

@@ -2,20 +2,16 @@
 
 class CMService_Adagnit_Client implements CM_Service_Tracking_ClientInterface {
 
+    use CM_Service_Tracking_QueueTrait;
+
     /** @var array */
     protected $_eventList = array(), $_pageViewList = array();
-
-    /** @var int */
-    protected $_ttl;
 
     /**
      * @param int|null $ttl
      */
     public function __construct($ttl = null) {
-        if (null === $ttl) {
-            $ttl = 86400;
-        }
-        $this->_ttl = (int) $ttl;
+        $this->_setTrackingQueueTtl($ttl);
     }
 
     /**
@@ -32,7 +28,7 @@ class CMService_Adagnit_Client implements CM_Service_Tracking_ClientInterface {
             'signup',
         ];
         if (!in_array($eventType, $eventTypeList, true)) {
-            throw new CM_Exception_Invalid('Unknown event type `' . $eventType . '`');
+            throw new CM_Exception_Invalid('Unknown event type', null, ['eventType' => $eventType]);
         }
         $this->_eventList[] = array(
             'eventType' => $eventType,
@@ -89,9 +85,6 @@ EOD;
     public function trackAction(CM_Action_Abstract $action) {
     }
 
-    public function trackAffiliate($requestClientId, $affiliateName) {
-    }
-
     public function trackPageView(CM_Frontend_Environment $environment, $path = null) {
         $this->setPageView($path);
         if ($viewer = $environment->getViewer()) {
@@ -133,18 +126,9 @@ EOD;
      * @param CM_Model_User $user
      */
     protected function _flushTrackingQueue(CM_Model_User $user) {
-        $trackingQueue = $this->_getTrackingQueue($user);
-        while ($tracking = $trackingQueue->pop()) {
-            $this->addEvent($tracking['eventType'], $tracking['data']);
+        while ($trackingData = $this->_popTrackingData($user)) {
+            $this->addEvent($trackingData['eventType'], $trackingData['data']);
         }
-    }
-
-    /**
-     * @param CM_Model_User $user
-     * @return CM_Queue
-     */
-    protected function _getTrackingQueue(CM_Model_User $user) {
-        return new CM_Queue(__METHOD__ . ':' . $user->getId());
     }
 
     /**
@@ -153,8 +137,6 @@ EOD;
      * @param array|null    $data
      */
     protected function _pushEvent(CM_Model_User $user, $eventType, array $data = null) {
-        $trackingQueue = $this->_getTrackingQueue($user);
-        $trackingQueue->push(['eventType' => $eventType, 'data' => $data]);
-        $trackingQueue->setTtl($this->_ttl);
+        $this->_pushTrackingData($user, ['eventType' => $eventType, 'data' => $data]);
     }
 }

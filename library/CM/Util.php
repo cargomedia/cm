@@ -54,7 +54,7 @@ class CM_Util {
     public static function rglobLibraries($pattern, CM_Site_Abstract $site) {
         $paths = array();
         foreach ($site->getModules() as $moduleName) {
-            $libraryPath = CM_Util::getModulePath($moduleName) . 'library/' . $moduleName . '/';
+            $libraryPath = CM_Util::getModulePath($moduleName) . 'library/*/';
             $paths = array_merge($paths, CM_Util::rglob($pattern, $libraryPath));
         }
         return $paths;
@@ -89,7 +89,7 @@ class CM_Util {
             if ($ignoreInvalid) {
                 return null;
             }
-            throw new CM_Exception_Invalid('Could not detect namespace of `' . $className . '`.');
+            throw new CM_Exception_Invalid('Could not detect namespace of class.', null, ['className' => $className]);
         }
         return $namespace;
     }
@@ -142,8 +142,10 @@ class CM_Util {
 
         curl_close($curlConnection);
         if ($curlError) {
-            $curlError = 'Fetching contents from `' . $url . '` failed: `' . $curlError;
-            throw new CM_Exception_Invalid($curlError);
+            throw new CM_Exception_Invalid('Fetching contents failed', null, [
+                'url'       => $url,
+                'curlError' => $curlError,
+            ]);
         }
         return $contents;
     }
@@ -211,7 +213,7 @@ class CM_Util {
         foreach ($paths as $path) {
             $file = CM_File::factory($path);
             if (!$file instanceof CM_File_ClassInterface) {
-                throw new CM_Exception_Invalid('Can only accept Class files. `' . $path . '` is not one.');
+                throw new CM_Exception_Invalid('Can only accept Class files. Given path is not one.', null, ['path' => $path]);
             }
             $meta = $file->getClassDeclaration();
             $classes[$meta['class']] = array('parent' => $meta['parent'], 'path' => $path);
@@ -281,13 +283,13 @@ class CM_Util {
      */
     public static function getResourceFiles($pathRelative) {
         $pathRelative = (string) $pathRelative;
-        $paths = array();
+        $paths = [];
         foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
-            $paths[] = CM_Util::getModulePath($moduleName) . 'resources/' . $pathRelative;
+            $paths = array_merge($paths, CM_Util::rglob($pathRelative, CM_Util::getModulePath($moduleName) . 'resources/'));
         }
-        $paths[] = DIR_ROOT . 'resources/' . $pathRelative;
+        $paths = array_merge($paths, CM_Util::rglob($pathRelative, DIR_ROOT . 'resources/'));
 
-        $files = array();
+        $files = [];
         foreach (array_unique($paths) as $path) {
             $file = new CM_File($path);
             if ($file->exists()) {
@@ -302,10 +304,11 @@ class CM_Util {
      * @param array|null  $args
      * @param string|null $input
      * @param string|null $inputPath
+     * @param array|null  $env
      * @throws CM_Exception
      * @return string Output
      */
-    public static function exec($command, array $args = null, $input = null, $inputPath = null) {
+    public static function exec($command, array $args = null, $input = null, $inputPath = null, array $env = null) {
         if (null === $args) {
             $args = array();
         }
@@ -318,20 +321,21 @@ class CM_Util {
         if ($inputPath) {
             $command .= ' <' . escapeshellarg($inputPath);
         }
-        return self::_exec($command, $input);
+        return self::_exec($command, $input, $env);
     }
 
     /**
-     * @param string $command
-     * @param string $stdin
+     * @param string     $command
+     * @param string     $stdin
+     * @param array|null $env
      * @return string
      * @throws CM_Exception
      */
-    private static function _exec($command, $stdin) {
+    private static function _exec($command, $stdin, array $env = null) {
         $descriptorSpec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w"));
-        $process = proc_open($command, $descriptorSpec, $pipes);
+        $process = proc_open($command, $descriptorSpec, $pipes, null, $env);
         if (!is_resource($process)) {
-            throw new CM_Exception('Cannot open command file pointer to `' . $command . '`');
+            throw new CM_Exception('Cannot open command file pointer to command', null, ['command' => $command]);
         }
 
         if ($stdin) {
@@ -347,7 +351,11 @@ class CM_Util {
 
         $returnStatus = proc_close($process);
         if ($returnStatus != 0) {
-            throw new CM_Exception('Command `' . $command . '` failed. STDERR: `' . trim($stderr) . '` STDOUT: `' . trim($stdout) . '`.');
+            throw new CM_Exception('Command failed.', null, [
+                'command' => $command,
+                'STDERR'  => trim($stderr),
+                'STDOUT'  => trim($stdout),
+            ]);
         }
         return $stdout;
     }
@@ -479,14 +487,16 @@ class CM_Util {
         $result = array();
         foreach ($items as $item) {
             if (!is_array($item) || count($item) < ($level + 1)) {
-                throw new CM_Exception_Invalid('Item is not an array or has less than `' . ($level + 1) . '` elements.');
+                throw new CM_Exception_Invalid('Item is not an array or has less elements elements than needed.', null, [
+                    'levelsNeeded' => $level + 1,
+                ]);
             }
             $resultEntry = &$result;
             for ($i = 0; $i < $level; $i++) {
                 if (isset($keyNames[$i])) {
                     $keyName = $keyNames[$i];
                     if (!array_key_exists($keyName, $item)) {
-                        throw new CM_Exception_Invalid('Item has no key `' . $keyName . '`.');
+                        throw new CM_Exception_Invalid('Item has no key.', null, ['key' => $keyName]);
                     }
                     $value = $item[$keyName];
                     unset($item[$keyName]);
@@ -522,5 +532,106 @@ class CM_Util {
             }
         }
         return null;
+    }
+
+    /**
+     * @param mixed     $value
+     * @param bool|null $prettyPrint
+     * @return string
+     * @throws CM_Exception_Invalid
+     */
+    public static function jsonEncode($value, $prettyPrint = null) {
+        $options = 0;
+        if ($prettyPrint) {
+            $options = $options | JSON_PRETTY_PRINT;
+        }
+        $result = '';
+        $errorMessage = null;
+        try {
+            $result = json_encode($value, $options);
+        } catch (ErrorException $e) {
+            $errorMessage = $e->getMessage();
+        }
+        if (null === $errorMessage && $jsonError = json_last_error()) {
+            $errorMessage = 'json error code: `' . $jsonError . '`';
+        }
+        if (null !== $errorMessage) {
+            throw new CM_Exception_Invalid('Cannot json_encode value.', null, [
+                'value'     => $value,
+                'jsonError' => $errorMessage,
+            ]);
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $value
+     * @return mixed
+     * @throws CM_Exception_Invalid
+     */
+    public static function jsonDecode($value) {
+        $valueString = (string) $value;
+        $result = '';
+        $errorMessage = null;
+        try {
+            $result = json_decode($valueString, true);
+        } catch (ErrorException $e) {
+            $errorMessage = $e->getMessage();
+        }
+        if (null === $errorMessage && $jsonError = json_last_error()) {
+            $errorMessage = 'json error code: `' . $jsonError . '`';
+        }
+        if (null !== $errorMessage) {
+            throw new CM_Exception_Invalid('Cannot json_decode value.', null, [
+                'value'     => $valueString,
+                'jsonError' => $errorMessage,
+            ]);
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    public static function sanitizeUtf($value) {
+        $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+        $value = iconv('UTF-8', 'UTF-8//IGNORE', $value);
+        return $value;
+    }
+
+    /**
+     * @param int $count
+     * @param int $position
+     * @param int $offset
+     * @return int
+     * @throws CM_Exception_Invalid
+     */
+    public static function applyOffset($count, $position, $offset) {
+        $count = (int) $count;
+        $position = (int) $position;
+        $offset = (int) $offset;
+        if ($position > $count - 1 || $position < 0) {
+            throw new CM_Exception_Invalid('Initial position is invalid', null, [
+                'position' => $position,
+                'count'    => $count,
+            ]);
+        }
+        if (0 === $offset) {
+            $newPosition = $position;
+        } elseif ($offset > 0) {
+            $newPosition = ($position + $offset) % $count;
+        } else {
+            $newPosition = ($count - 1) - ($count - 1 - $position - $offset) % $count;
+        }
+        return $newPosition;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public static function createDateTimeWithMillis() {
+        $timeStruct = gettimeofday();
+        return DateTime::createFromFormat('U.u', $timeStruct['sec'] . '.' . $timeStruct['usec']);
     }
 }

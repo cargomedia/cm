@@ -3,7 +3,8 @@
 class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implements
     CM_File_Filesystem_Adapter_ChecksumCalculatorInterface,
     CM_File_Filesystem_Adapter_SizeCalculatorInterface,
-    CM_File_Filesystem_Adapter_AppendInterface {
+    CM_File_Filesystem_Adapter_AppendInterface,
+    CM_File_Filesystem_Adapter_StreamInterface {
 
     /** @var int */
     private $_mode;
@@ -20,11 +21,29 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         $this->_mode = (int) $mode;
     }
 
+    public function getStreamRead($path) {
+        $pathAbsolute = $this->_getAbsolutePath($path);
+        $stream = @fopen($pathAbsolute, 'r');
+        if (false === $stream) {
+            throw new CM_Exception('Cannot open read stream', null, ['path' => $pathAbsolute]);
+        }
+        return $stream;
+    }
+
+    public function getStreamWrite($path) {
+        $pathAbsolute = $this->_getAbsolutePath($path);
+        $stream = @fopen($pathAbsolute, 'w');
+        if (false === $stream) {
+            throw new CM_Exception('Cannot open write stream', null, ['path' => $pathAbsolute]);
+        }
+        return $stream;
+    }
+
     public function read($path) {
         $pathAbsolute = $this->_getAbsolutePath($path);
         $content = @file_get_contents($pathAbsolute);
         if ($content === false) {
-            throw new CM_Exception('Cannot read contents of `' . $pathAbsolute . '`.');
+            throw new CM_Exception('Cannot read contents', null, ['path' => $pathAbsolute]);
         }
         return $content;
     }
@@ -32,9 +51,20 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
     public function write($path, $content) {
         $pathAbsolute = $this->_getAbsolutePath($path);
         if (false === @file_put_contents($pathAbsolute, $content)) {
-            throw new CM_Exception('Cannot write ' . strlen($content) . ' bytes to `' . $pathAbsolute . '`');
+            throw new CM_Exception('Cannot write content', null, [
+                'length' => strlen($content),
+                'path'   => $pathAbsolute
+            ]);
         }
         clearstatcache(false, $pathAbsolute);
+    }
+
+    public function writeStream($path, $stream) {
+        $streamDestination = $this->getStreamWrite($path);
+        stream_copy_to_stream($stream, $streamDestination);
+        if (!@fclose($streamDestination)) {
+            throw new CM_Exception('Could not close stream', null, ['path' => $path]);
+        }
     }
 
     public function exists($path) {
@@ -46,7 +76,7 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         $pathAbsolute = $this->_getAbsolutePath($path);
         $modified = @filemtime($pathAbsolute);
         if (false === $modified) {
-            throw new CM_Exception_Invalid('Cannot get modified time of `' . $pathAbsolute . '`');
+            throw new CM_Exception_Invalid('Cannot get modified time', null, ['path' => $pathAbsolute]);
         }
         return $modified;
     }
@@ -55,11 +85,11 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         $pathAbsolute = $this->_getAbsolutePath($path);
         if ($this->isDirectory($path) && !$this->_isLink($path)) {
             if (false === @rmdir($pathAbsolute)) {
-                throw new CM_Exception('Cannot delete directory `' . $pathAbsolute . '`');
+                throw new CM_Exception('Cannot delete directory', null, ['path' => $pathAbsolute]);
             }
         } elseif ($this->_isLink($path) || $this->exists($path)) {
             if (false === @unlink($pathAbsolute)) {
-                throw new CM_Exception_Invalid('Cannot delete file `' . $pathAbsolute . '`');
+                throw new CM_Exception_Invalid('Cannot delete file', null, ['path' => $pathAbsolute]);
             }
         }
     }
@@ -78,7 +108,10 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         $sourcePathAbsolute = $this->_getAbsolutePath($sourcePath);
         $targetPathAbsolute = $this->_getAbsolutePath($targetPath);
         if (false === @rename($sourcePathAbsolute, $targetPathAbsolute)) {
-            throw new CM_Exception('Cannot rename `' . $sourcePathAbsolute . '` to `' . $targetPathAbsolute . '`.');
+            throw new CM_Exception('Cannot rename', null, [
+                'sourcePath' => $sourcePathAbsolute,
+                'targetPath' => $targetPathAbsolute,
+            ]);
         }
     }
 
@@ -86,7 +119,10 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         $sourcePathAbsolute = $this->_getAbsolutePath($sourcePath);
         $targetPathAbsolute = $this->_getAbsolutePath($targetPath);
         if (false === @copy($sourcePathAbsolute, $targetPathAbsolute)) {
-            throw new CM_Exception('Cannot copy `' . $sourcePathAbsolute . '` to `' . $targetPathAbsolute . '`.');
+            throw new CM_Exception('Cannot copy', null, [
+                'sourcePath' => $sourcePathAbsolute,
+                'targetPath' => $targetPathAbsolute,
+            ]);
         }
     }
 
@@ -99,24 +135,27 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         $pathAbsolute = $this->_getAbsolutePath($path);
         $md5 = @md5_file($pathAbsolute);
         if (false === $md5) {
-            throw new CM_Exception('Cannot get md5 for `' . $pathAbsolute . '`.');
+            throw new CM_Exception('Cannot get md5', null, ['path' => $path]);
         }
         return $md5;
     }
 
     public function getSize($path) {
         $pathAbsolute = $this->_getAbsolutePath($path);
-        $filesize = @filesize($pathAbsolute);
-        if (false === $filesize) {
-            throw new CM_Exception('Cannot get size for `' . $pathAbsolute . '`.');
+        $fileSize = @filesize($pathAbsolute);
+        if (false === $fileSize) {
+            throw new CM_Exception('Cannot get size', null, ['path' => $pathAbsolute]);
         }
-        return $filesize;
+        return $fileSize;
     }
 
     public function append($path, $content) {
         $pathAbsolute = $this->_getAbsolutePath($path);
         if (false === @file_put_contents($pathAbsolute, $content, FILE_APPEND | LOCK_EX)) {
-            throw new CM_Exception('Cannot append ' . strlen($content) . ' bytes to `' . $pathAbsolute . '`');
+            throw new CM_Exception('Cannot append content', null, [
+                'length' => strlen($content),
+                'path'   => $pathAbsolute,
+            ]);
         }
     }
 
@@ -124,11 +163,11 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         $pathAbsolute = $this->_getAbsolutePath($path);
         if (!$this->isDirectory($path)) {
             if ($this->exists($path)) {
-                throw new CM_Exception('Path exists but is not a directory: `' . $pathAbsolute . '`.');
+                throw new CM_Exception('Path exists but is not a directory', null, ['path' => $pathAbsolute]);
             } else {
                 if (false === @mkdir($pathAbsolute, $this->_mode, true)) {
                     if (!$this->isDirectory($path)) { // Might have been created in the meantime
-                        throw new CM_Exception('Cannot mkdir `' . $pathAbsolute . '`.');
+                        throw new CM_Exception('Cannot mkdir', null, ['path' => $pathAbsolute]);
                     }
                 }
             }
@@ -154,7 +193,7 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         $pathPrefixAbsolute = $this->_getAbsolutePath($pathPrefix);
         $filenameList = @scandir($pathPrefixAbsolute);
         if (false === $filenameList) {
-            throw new CM_Exception('Cannot scan directory `' . $pathPrefixAbsolute . '`.');
+            throw new CM_Exception('Cannot scan directory', null, ['path' => $pathPrefixAbsolute]);
         }
         $filenameList = array_diff($filenameList, array('.', '..'));
         $fileListLocal = array();

@@ -7,25 +7,90 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPage() {
-        $viewer = CMTest_TH::createUser();
-        $environment = new CM_Frontend_Environment(null, $viewer);
-        $component = new CM_Page_View_Ajax_Test_Mock();
-        $response = $this->getResponseAjax($component, 'loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath()], $environment);
+        $site = $this->getMockSite(null, null, [
+            'url'  => 'http://my-site.com',
+            'name' => 'My site',
+        ]);
+        $page = new CM_Page_View_Ajax_Test_Mock();
+        $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
+        $params = [
+            'path'          => $page::getPath(),
+            'currentLayout' => $page->getLayout($env),
+        ];
+        $request = $this->createRequestAjax($page, 'loadPage', $params, null, null, $site);
+        /** @var CM_Http_Response_View_Abstract $response */
+        $response = $this->processRequest($request);
 
         $this->assertViewResponseSuccess($response);
         $responseContent = CM_Params::decode($response->getContent(), true);
-        $this->assertArrayHasKey('js', $responseContent['success']['data']);
-        $this->assertArrayHasKey('html', $responseContent['success']['data']);
-        $this->assertArrayHasKey('autoId', $responseContent['success']['data']);
-        $this->assertSame(array(), $responseContent['success']['data']['menuEntryHashList']);
-        $this->assertSame('', $responseContent['success']['data']['title']);
+        $data = $responseContent['success']['data'];
+        $pageRendering = $data['pageRendering'];
+        $layoutRendering = $data['layoutRendering'];
+
+        $this->assertNull($layoutRendering);
+        $this->assertArrayHasKey('js', $pageRendering);
+        $this->assertArrayHasKey('html', $pageRendering);
+        $this->assertArrayHasKey('autoId', $pageRendering);
+        $this->assertSame(array(), $data['menuEntryHashList']);
+        $this->assertSame('My site', $data['title']);
+        $this->assertSame($response->getRender()->getUrlPage('CM_Page_View_Ajax_Test_Mock'), $data['url']);
+        $this->assertSame('', $data['jsTracking']);
+    }
+
+    public function testLoadPageDifferentLayout() {
+        $site = $this->getMockSite(null, null, [
+            'url'  => 'http://my-site.com',
+            'name' => 'My site',
+        ]);
+        $page = new CM_Page_View_Ajax_Test_Mock();
+        $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
+        $params = [
+            'path'          => $page::getPath(),
+            'currentLayout' => 'CM_Layout_Default',
+        ];
+        $request = $this->createRequestAjax($page, 'loadPage', $params, null, null, $site);
+        /** @var CM_Http_Response_View_Abstract $response */
+        $response = $this->processRequest($request);
+
+        $this->assertViewResponseSuccess($response);
+        $responseContent = CM_Params::decode($response->getContent(), true);
+        $data = $responseContent['success']['data'];
+        $pageRendering = $data['pageRendering'];
+        $layoutRendering = $data['layoutRendering'];
+
+        $this->assertArrayHasKey('js', $layoutRendering);
+        $this->assertArrayHasKey('html', $layoutRendering);
+        $this->assertArrayHasKey('autoId', $layoutRendering);
+        $this->assertArrayHasKey('js', $pageRendering);
+        $this->assertArrayHasKey('html', $pageRendering);
+        $this->assertArrayHasKey('autoId', $pageRendering);
+        $this->assertSame(array(), $data['menuEntryHashList']);
+        $this->assertSame('My site', $data['title']);
+        $this->assertSame($response->getRender()->getUrlPage('CM_Page_View_Ajax_Test_Mock'), $data['url']);
+        $this->assertSame('', $data['jsTracking']);
+    }
+
+    public function testLoadPageSiteWithPath() {
+        $site = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
+        $page = new CM_Page_View_Ajax_Test_Mock();
+        $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
+        $params = [
+            'path'          => '/foo' . $page::getPath(),
+            'currentLayout' => $page->getLayout($env),
+        ];
+        $request = $this->createRequestAjax($page, 'loadPage', $params, null, null, $site);
+        /** @var CM_Http_Response_View_Abstract $response */
+        $response = $this->processRequest($request);
+
+        $this->assertViewResponseSuccess($response);
+        $responseContent = CM_Params::decode($response->getContent(), true);
         $this->assertSame($response->getRender()->getUrlPage('CM_Page_View_Ajax_Test_Mock'), $responseContent['success']['data']['url']);
-        $this->assertSame('CM_Layout_Mock1', $responseContent['success']['data']['layoutClass']);
     }
 
     public function testProcessExceptionCatching() {
         CM_Config::get()->CM_Http_Response_View_Abstract->catchPublicExceptions = true;
         CM_Config::get()->CM_Http_Response_View_Abstract->exceptionsToCatch = ['CM_Exception_Nonexistent' => []];
+        /** @var CM_Http_Response_View_Abstract|\Mocka\AbstractClassTrait $response */
         $response = $this->mockClass('CM_Http_Response_View_Abstract')->newInstanceWithoutConstructor();
         $response->mockMethod('_processView')->set(function () {
             throw new CM_Exception_Invalid('foo', null, null, [
@@ -33,7 +98,6 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
             ]);
         });
         $response->mockMethod('getRender')->set(new CM_Frontend_Render());
-        /** @var CM_Http_Response_View_Abstract $response */
         CMTest_TH::callProtectedMethod($response, '_process');
         $this->assertViewResponseError($response, 'CM_Exception_Invalid', 'bar', true);
 
@@ -46,48 +110,120 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testProcessReturnDeployVersion() {
-        $response = $this->getResponseAjax(new CM_Page_View_Ajax_Test_Mock(), 'loadPage', ['path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()]);
+        $site = CM_Site_Abstract::factory();
+        $page = new CM_Page_View_Ajax_Test_Mock();
+        $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
+        $params = [
+            'path'          => CM_Page_View_Ajax_Test_MockRedirect::getPath(),
+            'currentLayout' => $page->getLayout($env),
+        ];
+        $response = $this->getResponseAjax($page, 'loadPage', $params);
         $responseDecoded = CM_Params::jsonDecode($response->getContent());
         $this->assertArrayHasKey('deployVersion', $responseDecoded);
         $this->assertSame(CM_App::getInstance()->getDeployVersion(), $responseDecoded['deployVersion']);
     }
 
-    public function testLoadPageRedirectExternal() {
-        $response = $this->getResponseAjax(new CM_Page_View_Ajax_Test_Mock(), 'loadPage', ['path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()]);
+    public function testLoadPageRedirectDifferentHost() {
+        $site = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
+        $page = new CM_Page_View_Ajax_Test_Mock();
+        $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
+        $params = [
+            'path'          => CM_Page_View_Ajax_Test_MockRedirect::getPath(),
+            'currentLayout' => $page->getLayout($env),
+        ];
+        $response = $this->getResponseAjax($page, 'loadPage', $params);
         $this->assertViewResponseSuccess($response, array('redirectExternal' => 'http://www.foo.bar'));
     }
 
-    public function testLoadPageRedirectHost() {
-        $siteRequest = CM_Site_Abstract::factory();
-        $siteEnvironment = $this->getMockSite(null, null, ['url' => 'http://www.example.com']);
-        CMTest_TH::createLanguage('en');
-        $viewer = CMTest_TH::createUser();
-        $environment = new CM_Frontend_Environment($siteEnvironment, $viewer);
-        $component = new CM_Page_View_Ajax_Test_Mock();
-        $response = $this->getResponseAjax($component, 'loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath()], $environment);
+    public function testLoadPageRedirectDifferentSitePath() {
+        $site1 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
+        $site2 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/bar']);
+        $page = new CM_Page_View_Ajax_Test_Mock();
+        $env = new CM_Frontend_Environment($site1, CMTest_TH::createUser());
+        $params = [
+            'path'          => '/bar' . $page::getPath(),
+            'currentLayout' => $page->getLayout($env),
+        ];
+        $request = $this->createRequestAjax($page, 'loadPage', $params, null, null, $site1);
+        /** @var CM_Http_Response_View_Abstract $response */
+        $response = $this->processRequest($request);
 
+        $this->assertInstanceOf('CM_Http_Response_View_Abstract', $response);
         $this->assertViewResponseSuccess($response);
         $responseDecoded = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame($siteRequest->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['url']);
+        $this->assertSame($site2->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['redirectExternal']);
     }
 
-    public function testLoadPageRedirectLanguage() {
-        $site = CM_Site_Abstract::factory();
+    public function testLoadPageRedirectDifferentSitePathRemove() {
+        $site1 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
+        $site2 = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
+
+        $page = new CM_Page_View_Ajax_Test_Mock();
+        $env = new CM_Frontend_Environment($site1, CMTest_TH::createUser());
+        $params = [
+            'path'          => $page::getPath(),
+            'currentLayout' => $page->getLayout($env),
+        ];
+        $request = $this->createRequestAjax($page, 'loadPage', $params, null, null, $site1);
+        /** @var CM_Http_Response_View_Abstract $response */
+        $response = $this->processRequest($request);
+
+        $this->assertInstanceOf('CM_Http_Response_View_Abstract', $response);
+        $this->assertViewResponseSuccess($response);
+        $responseDecoded = CM_Params::jsonDecode($response->getContent());
+        $this->assertSame($site2->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['redirectExternal']);
+    }
+
+    public function testLoadPageRedirectDifferentSitePathAdd() {
+        $site1 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo']);
+        $site2 = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
+
+        $page = new CM_Page_View_Ajax_Test_Mock();
+        $env = new CM_Frontend_Environment($site2, CMTest_TH::createUser());
+        $params = [
+            'path'          => '/foo' . $page::getPath(),
+            'currentLayout' => $page->getLayout($env),
+        ];
+        $request = $this->createRequestAjax($page, 'loadPage', $params, null, null, $site2);
+        /** @var CM_Http_Response_View_Abstract $response */
+        $response = $this->processRequest($request);
+
+        $this->assertInstanceOf('CM_Http_Response_View_Abstract', $response);
+        $this->assertViewResponseSuccess($response);
+        $responseDecoded = CM_Params::jsonDecode($response->getContent());
+        $this->assertSame($site1->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['redirectExternal']);
+    }
+
+    public function testLoadPageNotRedirectLanguage() {
+        $site = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
         CMTest_TH::createLanguage('en');
         $viewer = CMTest_TH::createUser();
-        $environment = new CM_Frontend_Environment(null, $viewer);
-        $component = new CM_Page_View_Ajax_Test_Mock();
-        $response = $this->getResponseAjax($component, 'loadPage', ['path' => '/en' . CM_Page_View_Ajax_Test_Mock::getPath()], $environment);
+        $page = new CM_Page_View_Ajax_Test_Mock();
+        $env = new CM_Frontend_Environment($site, $viewer);
+        $params = [
+            'path'          => '/en' . $page::getPath(),
+            'currentLayout' => $page->getLayout($env),
+        ];
+        $request = $this->createRequestAjax($page, 'loadPage', $params, null, null, $site);
+        $request->mockMethod('getViewer')->set($viewer);
+        /** @var CM_Http_Response_View_Abstract $response */
+        $response = $this->processRequest($request);
 
         $this->assertViewResponseSuccess($response);
         $responseDecoded = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame($site->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['url']);
+        $this->assertSame($site->getUrl() . '/en' . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['url']);
     }
 
     public function testLoadPageTracking() {
+        $site = CM_Site_Abstract::factory();
         $page = new CM_Page_View_Ajax_Test_Mock();
-        $request = $this->createRequestAjax($page, 'loadPage', ['path' => $page::getPath()]);
-        $response = new CM_Http_Response_View_Ajax($request, $this->_getServiceManagerWithGA('ga123'));
+        $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
+        $params = [
+            'path'          => $page::getPath(),
+            'currentLayout' => $page->getLayout($env),
+        ];
+        $request = $this->createRequestAjax($page, 'loadPage', $params);
+        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $site, $this->_getServiceManagerWithGA('ga123'));
         $response->process();
 
         $this->assertViewResponseSuccess($response);
@@ -97,9 +233,15 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageTrackingRedirect() {
+        $site = CM_Site_Abstract::factory();
         $page = new CM_Page_View_Ajax_Test_MockRedirectSelf();
-        $request = $this->createRequestAjax($page, 'loadPage', ['path' => $page::getPath() . '?count=3']);
-        $response = new CM_Http_Response_View_Ajax($request, $this->_getServiceManagerWithGA('ga123'));
+        $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
+        $params = [
+            'path'          => $page::getPath() . '?count=3',
+            'currentLayout' => $page->getLayout($env),
+        ];
+        $request = $this->createRequestAjax($page, 'loadPage', $params);
+        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $site, $this->_getServiceManagerWithGA('ga123'));
         $response->process();
 
         $this->assertViewResponseSuccess($response);
@@ -115,15 +257,21 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
             'errorPage' => 'CM_Page_View_Ajax_Test_Mock',
         ];
 
+        $site = CM_Site_Abstract::factory();
         $page = new CM_Page_View_Ajax_Test_Mock();
-        $request = $this->createRequestAjax($page, 'loadPage', ['path' => '/iwhdfkjlsh']);
-        $response = new CM_Http_Response_View_Ajax($request, $this->_getServiceManagerWithGA('ga123'));
+        $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
+        $params = [
+            'path'          => '/iwhdfkjlsh',
+            'currentLayout' => $page->getLayout($env),
+        ];
+        $request = $this->createRequestAjax($page, 'loadPage', $params);
+        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $site, $this->_getServiceManagerWithGA('ga123'));
         $response->process();
 
         $this->assertViewResponseSuccess($response);
         $responseContent = CM_Params::decode($response->getContent(), true);
         $jsTracking = $responseContent['success']['data']['jsTracking'];
-        $html = $responseContent['success']['data']['html'];
+        $html = $responseContent['success']['data']['pageRendering']['html'];
 
         $this->assertSame(1, substr_count($jsTracking, 'ga("send", "pageview"'));
         $this->assertContains('ga("send", "pageview", "\/iwhdfkjlsh")', $jsTracking);
@@ -170,7 +318,7 @@ EOL;
 
         $expected = <<<EOL
 cm.window.appendHidden("<div id=\\"$newAutoId\\" class=\\"CM_Component_Mock CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\\">Sorry, this page was not found. It has been removed or never existed.\\n<\/div>");
-cm.views["$newAutoId"] = new CM_Component_Mock({el:$("#$newAutoId").get(0),params:{"entity":{"_type":123,"_id":{"id":"1"},"id":1,"path":null,"_class":"CM_Model_Entity_Mock2"}}});
+cm.views["$newAutoId"] = new CM_Component_Mock({el:$("#$newAutoId").get(0),params:{"entity":{"_class":"CM_Model_Entity_Mock2","_type":123,"_id":{"id":"1"},"id":1,"path":null}}});
 cm.views["$oldAutoId"].getParent().registerChild(cm.views["$newAutoId"]);
 cm.views["$oldAutoId"].replaceWithHtml(cm.views["$newAutoId"].\$el);
 cm.views["$newAutoId"]._ready();
@@ -199,6 +347,9 @@ EOL;
         $serviceManager = new CM_Service_Manager();
         $serviceManager->registerInstance('googleanalytics', new CMService_GoogleAnalytics_Client($code));
         $serviceManager->registerInstance('trackings', new CM_Service_Trackings(['googleanalytics']));
+        $serviceManager->registerInstance('logger', $this->getServiceManager()->getLogger());
+        $serviceManager->registerInstance('newrelic', $this->getServiceManager()->getNewrelic());
+
         return $serviceManager;
     }
 }
@@ -212,8 +363,8 @@ class CM_Page_View_Ajax_Test_MockRedirect extends CM_Page_Abstract {
 
 class CM_Page_View_Ajax_Test_Mock extends CM_Page_Abstract {
 
-    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
-        return new CM_Layout_Mock1();
+    public function getLayout(CM_Frontend_Environment $environment) {
+        return CM_Layout_Mock1::class;
     }
 }
 
@@ -226,8 +377,8 @@ class CM_Page_View_Ajax_Test_MockRedirectSelf extends CM_Page_Abstract {
         }
     }
 
-    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
-        return new CM_Layout_Mock1();
+    public function getLayout(CM_Frontend_Environment $environment) {
+        return CM_Layout_Mock1::class;
     }
 }
 

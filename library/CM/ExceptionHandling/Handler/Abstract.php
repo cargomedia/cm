@@ -1,9 +1,14 @@
 <?php
 
-abstract class CM_ExceptionHandling_Handler_Abstract {
+abstract class CM_ExceptionHandling_Handler_Abstract implements CM_Service_ManagerAwareInterface {
 
-    /** @var int|null */
+    use CM_Service_ManagerAwareTrait;
+
+    /** @var  int|null */
     private $_printSeverityMin;
+
+    /** @var CM_OutputStream_Interface|null */
+    protected $_output;
 
     private $_errorCodes = array(
         E_ERROR             => 'E_ERROR',
@@ -37,7 +42,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
                 $message = $this->_errorCodes[$code] . ': ' . $message;
             }
             $exception = new ErrorException($message, 0, $code, $file, $line);
-            $this->handleException($exception);
+            $this->handleExceptionWithSeverity($exception, CM_Exception::FATAL);
         }
     }
 
@@ -63,50 +68,24 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
      * @param Exception $exception
      */
     public function handleException(Exception $exception) {
-        $printException = true;
-        if ($exception instanceof CM_Exception) {
-            $printException = $exception->getSeverity() >= $this->_getPrintSeverityMin();
-        }
-
-        try {
-            $this->logException($exception);
-        } catch (Exception $e) {
-            $printException = true;
-        }
-
-        if ($printException) {
-            $this->_printException($exception);
-        }
-
-        if (!$exception instanceof CM_Exception || $exception->getSeverity() >= CM_Exception::ERROR) {
-            CM_Service_Manager::getInstance()->getNewrelic()->setNoticeError($exception);
-        }
+        $severity = $exception instanceof CM_Exception ? $exception->getSeverity() : null;
+        $this->handleExceptionWithSeverity($exception, $severity);
     }
 
     /**
      * @param Exception $exception
+     * @param int|null  $severity
      */
-    public function logException(Exception $exception) {
-        $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
-        try {
-            if ($exception instanceof CM_Exception) {
-                $log = $exception->getLog();
-                $metaInfo = $exception->getMetaInfo();
-            } else {
-                $log = new CM_Paging_Log_Error();
-                $metaInfo = null;
-            }
-            $log->add($formatter->formatException($exception), $metaInfo);
-        } catch (Exception $loggerException) {
-            $logEntry = '[' . date('d.m.Y - H:i:s', time()) . ']' . PHP_EOL;
-            $logEntry .= '### Cannot log error: ' . PHP_EOL;
-            $logEntry .= $formatter->formatException($loggerException);
-            $logEntry .= '### Original Exception: ' . PHP_EOL;
-            $logEntry .= $formatter->formatException($exception) . PHP_EOL;
-            $logFile = $this->_getLogFile();
-            $logFile->ensureParentDirectory();
-            $logFile->append($logEntry);
+    public function handleExceptionWithSeverity(Exception $exception, $severity) {
+        $printException = true;
+        if ($exception instanceof CM_Exception) {
+            $printException = $severity >= $this->_getPrintSeverityMin();
         }
+        if ($printException) {
+            $this->_printException($exception);
+        }
+        $logLevel = CM_Log_Logger::severityToLevel($severity);
+        $this->getServiceManager()->getLogger()->addMessage('Application error', $logLevel, (new CM_Log_Context())->setException($exception));
     }
 
     /**
@@ -117,17 +96,16 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
     }
 
     /**
+     * @param CM_OutputStream_Interface $stream
+     */
+    public function setOutput(CM_OutputStream_Interface $stream) {
+        $this->_output = $stream;
+    }
+
+    /**
      * @param Exception $exception
      */
     abstract protected function _printException(Exception $exception);
-
-    /**
-     * @return CM_File
-     */
-    protected function _getLogFile() {
-        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getData();
-        return new CM_File('logs/error.log', $filesystem);
-    }
 
     /**
      * @return int|null

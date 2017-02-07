@@ -30,20 +30,21 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
 
     /**
      * @param CM_Http_Request_Abstract $request
+     * @param CM_Site_Abstract         $site
      * @param CM_Service_Manager       $serviceManager
      */
-    public function __construct(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
-        $this->_request = clone $request;
-        $responseType = $this->_request->popPathPart();
-        $language = $this->_request->popPathLanguage();
-        $this->_site = $this->_request->popPathSite();
-
+    public function __construct(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
         $this->setServiceManager($serviceManager);
+        $this->_request = $request;
+        $this->_site = $site;
     }
 
     abstract protected function _process();
 
     public function process() {
+        $this->getServiceManager()->getLogger()->getContext()->setUserWithClosure(function () {
+            return $this->getViewer();
+        });
         $this->_process();
 
         if ($this->getRequest()->hasSession()) {
@@ -64,7 +65,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
         }
 
         $name = $this->_getStringRepresentation();
-        CM_Service_Manager::getInstance()->getNewrelic()->setNameTransaction($name);
+        $this->getServiceManager()->getNewrelic()->setNameTransaction($name);
     }
 
     /**
@@ -87,7 +88,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      * @throws CM_Exception_AuthRequired
      */
     public function getViewer($needed = false) {
-        return $this->_request->getViewer($needed);
+        return $this->getRequest()->getViewer($needed);
     }
 
     /**
@@ -102,11 +103,16 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      */
     public function getRender() {
         if (!$this->_render) {
-            $languageRewrite = !$this->getViewer() && $this->getRequest()->getLanguageUrl();
-            $environment = $this->getEnvironment();
-            $this->_render = new CM_Frontend_Render($environment, $languageRewrite, $this->getServiceManager());
+            $this->_render = $this->createRender();
         }
         return $this->_render;
+    }
+
+    /**
+     * @return CM_Frontend_Render
+     */
+    public function createRender() {
+        return new CM_Frontend_Render($this->getEnvironment(), $this->getServiceManager());
     }
 
     /**
@@ -114,9 +120,18 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      * @throws CM_Exception_AuthRequired
      */
     public function getEnvironment() {
-        $location = $this->getRequest()->getLocation();
-        $currency = (null !== $location) ? CM_Model_Currency::findByLocation($location) : null;
-        return new CM_Frontend_Environment($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), null, null, $location, $currency);
+        $request = $this->getRequest();
+        $location = $request->getLocation();
+        $viewer = $request->getViewer();
+        $currency = null;
+        if (null === $currency && null !== $viewer) {
+            $currency = $viewer->getCurrency();
+        }
+        if (null === $currency && null !== $location) {
+            $currency = CM_Model_Currency::findByLocation($location);
+        }
+        $clientDevice = new CM_Http_ClientDevice($request);
+        return new CM_Frontend_Environment($this->getSite(), $viewer, $request->getLanguage(), $request->getTimeZone(), null, $location, $currency, $clientDevice);
     }
 
     /**
@@ -152,6 +167,20 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      */
     public function setHeaderNotfound() {
         $this->addHeaderRaw('HTTP/1.0 404 Not Found');
+    }
+
+    public function setHeaderDisableCache() {
+        # Via http://stackoverflow.com/questions/49547/making-sure-a-web-page-is-not-cached-across-all-browsers/5493543#5493543
+        $this->setHeader('Cache-Control', 'no-store, must-revalidate');
+    }
+
+    /**
+     * @param int $maxAge
+     */
+    public function setHeaderExpires($maxAge) {
+        $maxAge = (int) $maxAge;
+        $this->setHeader('Cache-Control', 'max-age=' . $maxAge);
+        $this->setHeader('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + $maxAge));
     }
 
     /**
@@ -239,8 +268,8 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
     }
 
     /**
-     * @param callable $regularCode
-     * @param callable $errorCode
+     * @param Closure $regularCode
+     * @param Closure $errorCode
      * @return mixed
      * @throws CM_Exception
      */
@@ -252,16 +281,18 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
             $exceptionsToCatch = $config->exceptionsToCatch;
             $catchPublicExceptions = !empty($config->catchPublicExceptions);
             $errorOptions = \Functional\first($exceptionsToCatch, function ($options, $exceptionClass) use ($ex) {
-                return is_a($ex, $exceptionClass) ;
+                return is_a($ex, $exceptionClass);
             });
             $catchException = null !== $errorOptions;
-            if ($catchException) {
-                if (isset($errorOptions['log'])) {
-                    $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
-                    /** @var CM_Paging_Log_Abstract $log */
-                    $log = new $errorOptions['log']();
-                    $log->add($formatter->formatException($ex), $ex->getMetaInfo());
+            if ($catchException && isset($errorOptions['log']) && true === $errorOptions['log']) {
+                $logLevel = isset($errorOptions['level']) ? $errorOptions['level'] : null;
+                if (null === $logLevel) {
+                    $logLevel = CM_Log_Logger::exceptionToLevel($ex);
                 }
+                $context = new CM_Log_Context();
+                $context->setUser($this->getViewer());
+                $context->setException($ex);
+                $this->getServiceManager()->getLogger()->addMessage('Response processing error', $logLevel, $context);
             }
             if (!$catchException && ($catchPublicExceptions && $ex->isPublic())) {
                 $errorOptions = [];
@@ -276,33 +307,19 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
 
     /**
      * @param CM_Http_Request_Abstract $request
-     * @return CM_Http_Response_Abstract|string
-     */
-    public static function getResponseClassName(CM_Http_Request_Abstract $request) {
-        /** @var $responseClass CM_Http_Response_Abstract */
-        foreach (array_reverse(self::getClassChildren()) as $responseClass) {
-            if ($responseClass::match($request)) {
-                return $responseClass;
-            }
-        }
-        return 'CM_Http_Response_Page';
-    }
-
-    /**
-     * @param CM_Http_Request_Abstract $request
+     * @param CM_Site_Abstract         $site
      * @param CM_Service_Manager       $serviceManager
-     * @return CM_Http_Response_Abstract
+     * @return CM_Http_Response_Abstract|null
      */
-    public static function factory(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
-        $className = self::getResponseClassName($request);
-        return new $className($request, $serviceManager);
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
+        return null;
     }
 
     /**
-     * @param CM_Http_Request_Abstract $request
      * @return bool
      */
-    public static function match(CM_Http_Request_Abstract $request) {
+    public static function catchAll() {
         return false;
     }
+
 }

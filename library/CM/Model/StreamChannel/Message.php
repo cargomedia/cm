@@ -31,7 +31,7 @@ class CM_Model_StreamChannel_Message extends CM_Model_StreamChannel_Abstract {
     public static function extractStatusChannelData($channel) {
         $channelParts = explode(':', $channel);
         if (count($channelParts) !== 2) {
-            throw new CM_Exception_Invalid('Cannot extract key, type from channel `' . $channel . '`');
+            throw new CM_Exception_Invalid('Cannot extract key, type from channel', null, ['channel' => $channel]);
         }
         return array('key' => $channelParts[0], 'type' => (int) $channelParts[1]);
     }

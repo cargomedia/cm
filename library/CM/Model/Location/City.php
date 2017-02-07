@@ -31,57 +31,17 @@ class CM_Model_Location_City extends CM_Model_Location_Abstract {
     }
 
     /**
-     * @return float|null
-     */
-    public function getLat() {
-        return $this->_get('lat');
-    }
-
-    /**
-     * @param float|null $lat
-     */
-    public function setLat($lat) {
-        $this->_set('lat', $lat);
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getLon() {
-        return $this->_get('lon');
-    }
-
-    /**
-     * @param float|null $lon
-     */
-    public function setLon($lon) {
-        $this->_set('lon', $lon);
-    }
-
-    /**
-     * @return string|null
+     * @return int|null
      */
     public function getMaxMind() {
         return $this->_get('_maxmind');
     }
 
     /**
-     * @param string|null $maxMind
+     * @param int|null $maxMind
      */
     public function setMaxmind($maxMind) {
         $this->_set('_maxmind', $maxMind);
-    }
-
-    /**
-     * @return array|null
-     */
-    public function getCoordinates() {
-        $lat = $this->getLat();
-        $lon = $this->getLon();
-        if (null !== $lat && null !== $lon) {
-            return array('lat' => $lat, 'lon' => $lon);
-        }
-        return null;
     }
 
     public function getLevel() {
@@ -104,9 +64,9 @@ class CM_Model_Location_City extends CM_Model_Location_Abstract {
             case CM_Model_Location::LEVEL_CITY:
                 return $this;
             case CM_Model_Location::LEVEL_ZIP:
-                throw new CM_Exception_Invalid('Invalid parent location level `' . $level . '` for a city');
+                throw new CM_Exception_Invalid('Invalid parent location level for a city', null, ['level' => $level]);
         }
-        throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
+        throw new CM_Exception_Invalid('Invalid location level', null, ['level' => $level]);
     }
 
     public function _getSchema() {

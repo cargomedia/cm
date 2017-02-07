@@ -12,6 +12,7 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
         if (!$params instanceof CM_Params) {
             $params = CM_Params::factory($params, false);
         }
+        /** @var CM_Params $params */
         $this->_params = $params;
     }
 
@@ -26,7 +27,7 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
         $className = $params->getString('className');
         $params->remove('className');
         if (!class_exists($className)) {
-            throw new CM_Exception_Invalid('Class not found: `' . $className . '`', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('Class not found', CM_Exception::WARN, ['className' => $className]);
         }
         return $response->loadComponent($className, $params);
     }
@@ -53,7 +54,7 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
      */
     public static function factory($className, $params = null) {
         if (!class_exists($className) || !is_a($className, get_called_class(), true)) {
-            throw new CM_Exception_Invalid('Cannot find valid class definition for view `' . $className . '`.');
+            throw new CM_Exception_Invalid('Cannot find valid class definition for view.', null, ['viewClassName' => $className]);
         }
         $view = new $className($params);
         return $view;

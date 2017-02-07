@@ -3,24 +3,6 @@
 abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 
     /**
-     * @param CM_Model_User|null $user
-     * @param int                $allowedUntil
-     * @return int
-     */
-    public function canPublish(CM_Model_User $user = null, $allowedUntil) {
-        return $allowedUntil + 1000;
-    }
-
-    /**
-     * @param CM_Model_User|null $user
-     * @param int                $allowedUntil
-     * @return int
-     */
-    public function canSubscribe(CM_Model_User $user = null, $allowedUntil) {
-        return $allowedUntil + 1000;
-    }
-
-    /**
      * @param CM_Model_Stream_Publish $streamPublish
      */
     abstract public function onPublish(CM_Model_Stream_Publish $streamPublish);
@@ -39,6 +21,13 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
      * @param CM_Model_Stream_Subscribe $streamSubscribe
      */
     abstract public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe);
+
+    /**
+     * @return int
+     */
+    public function getCreateStamp() {
+        return (int) $this->_get('createStamp');
+    }
 
     /**
      * @return string
@@ -136,18 +125,29 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
     }
 
     /**
-     * @return bool
+     * @return CM_StreamChannel_Definition
      */
-    public function isValid() {
-        return true;
+    public function getDefinition() {
+        return new CM_StreamChannel_Definition($this->getKey(), $this->getType(), $this->getAdapterType());
+    }
+
+    public function jsonSerialize() {
+        $array = parent::jsonSerialize();
+        $array['key'] = $this->getKey();
+        $array['type'] = $this->getType();
+        return $array;
     }
 
     protected function _loadData() {
-        $data = CM_Db_Db::select('cm_streamChannel', array('key', 'type', 'adapterType'), array('id' => $this->getId()))->fetch();
+        $data = CM_Db_Db::select('cm_streamChannel', array('key', 'type', 'createStamp', 'adapterType'), array('id' => $this->getId()))->fetch();
         if (false !== $data) {
             $type = (int) $data['type'];
             if ($this->getType() !== $type) {
-                throw new CM_Exception_Invalid('Invalid type `' . $type . '` for `' . get_class($this) . '` (type: `' . $this->getType() . '`)');
+                throw new CM_Exception_Invalid('Invalid loaded type', null, [
+                    'loadedType' => $type,
+                    'className'  => get_class($this),
+                    'classType'  => $this->getType(),
+                ]);
             }
         }
         return $data;
@@ -167,14 +167,6 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
     }
 
     /**
-     * @param string $encryptionKey
-     * @return string Data
-     */
-    protected function _decryptKey($encryptionKey) {
-        return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $encryptionKey, base64_decode($this->getKey()), MCRYPT_MODE_ECB), "\0");
-    }
-
-    /**
      * @param int      $id
      * @param int|null $type
      * @throws CM_Exception_Invalid|CM_Exception_Nonexistent
@@ -187,7 +179,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
             if (false === ($type = $cache->get($cacheKey))) {
                 $type = CM_Db_Db::select('cm_streamChannel', 'type', array('id' => $id))->fetchColumn();
                 if (false === $type) {
-                    throw new CM_Exception_Nonexistent('No record found in `cm_streamChannel` for id `' . $id . '`');
+                    throw new CM_Exception_Nonexistent('No record found in `cm_streamChannel`', null, ['id' => $id]);
                 }
                 $cache->set($cacheKey, $type);
             }
@@ -195,7 +187,10 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
         $class = self::_getClassName($type);
         $instance = new $class($id);
         if (!$instance instanceof static) {
-            throw new CM_Exception_Invalid('Unexpected instance of `' . $class . '`. Expected `' . get_called_class() . '`.');
+            throw new CM_Exception_Invalid('Unexpected instance', null, [
+                'actualClass'   => $class,
+                'expectedClass' => get_called_class()
+            ]);
         }
         return $instance;
     }
@@ -222,7 +217,22 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
         if (!$result) {
             return null;
         }
-        return self::factory($result['id'], $result['type']);
+        try {
+            $streamChannel = self::factory($result['id'], $result['type']);
+        } catch (CM_Exception_Nonexistent $ex) {
+            $cache->delete($cacheKey);
+            return null;
+        }
+        return $streamChannel;
+    }
+
+    /**
+     * @param string $streamChannelKey
+     * @param string $encryptionKey
+     * @return string Data
+     */
+    protected static function _decryptKey($streamChannelKey, $encryptionKey) {
+        return (new CM_Util_Encryption())->decrypt($streamChannelKey, $encryptionKey);
     }
 
     /**
@@ -231,13 +241,18 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
      * @return string Channel-key
      */
     protected static function _encryptKey($data, $encryptionKey) {
-        return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $encryptionKey, $data, MCRYPT_MODE_ECB));
+        return (new CM_Util_Encryption())->encrypt($data, $encryptionKey);
     }
 
     protected static function _createStatic(array $data) {
         $key = (string) $data ['key'];
         $adapterType = (int) $data['adapterType'];
-        $id = CM_Db_Db::insert('cm_streamChannel', array('key' => $key, 'type' => static::getTypeStatic(), 'adapterType' => $adapterType));
+        $id = CM_Db_Db::insert('cm_streamChannel', array(
+            'key'         => $key,
+            'createStamp' => time(),
+            'type'        => static::getTypeStatic(),
+            'adapterType' => $adapterType,
+        ), null, ['id' => ['literal' => 'LAST_INSERT_ID(id)']]);
         $cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
         CM_Cache_Shared::getInstance()->delete($cacheKey);
         return new static($id);

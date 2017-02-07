@@ -31,7 +31,6 @@ class CM_MessageStream_Adapter_SocketRedisTest extends CMTest_TestCase {
         $this->assertNotNull($streamSubscribe);
         $this->assertSame(1, $streamChannel->getStreamSubscribes()->getCount());
         $this->assertSameTime($timeStarted, $streamSubscribe->getStart());
-        $this->assertSameTime($streamChannel->canSubscribe(null, time()), $streamSubscribe->getAllowedUntil());
         $this->assertNull($streamSubscribe->getUser());
 
         CMTest_TH::timeForward(CM_MessageStream_Adapter_SocketRedis::SYNCHRONIZE_DELAY);
@@ -41,7 +40,6 @@ class CM_MessageStream_Adapter_SocketRedisTest extends CMTest_TestCase {
         $this->assertSame(1, $streamChannel->getStreamSubscribes()->getCount());
         CMTest_TH::reinstantiateModel($streamSubscribe);
         $this->assertSameTime($timeStarted, $streamSubscribe->getStart());
-        $this->assertSameTime($streamChannel->canSubscribe(null, $timeStarted), $streamSubscribe->getAllowedUntil());
     }
 
     public function testOnRedisMessageSubscribeUser() {
@@ -143,12 +141,28 @@ class CM_MessageStream_Adapter_SocketRedisTest extends CMTest_TestCase {
 
         $adapter = $this->mockClass('CM_MessageStream_Adapter_SocketRedis')->newInstanceWithoutConstructor();
         $adapter->mockMethod('_fetchStatus')->set($status);
-        $handleExceptionMethod = $adapter->mockMethod('_handleException')->set(function (Exception $exception) {
-            $this->assertSame('Type `0` not configured for class `CM_Model_StreamChannel_Message`.', $exception->getMessage());
+        /** @var CM_MessageStream_Adapter_SocketRedis $adapter */
+        $serviceManager = new CM_Service_Manager();
+        $adapter->setServiceManager($serviceManager);
+        /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
+        $logger = $this->mockObject('CM_Log_Logger');
+        $serviceManager->registerInstance('logger', $logger);
+        $warningMock = $logger->mockMethod('warning')->set(function ($message, CM_Log_Context $context = null) {
+            $this->assertSame('Error synchronizing socket redis status', $message);
+            $exception = $context->getException();
+            $this->assertInstanceOf('CM_Exception', $exception);
+            $this->assertSame('Type is not configured for class.', $exception->getMessage());
+            /** @var CM_Exception $exception */
+            $this->assertSame(
+                [
+                    'type'      => 0,
+                    'className' => 'CM_Model_StreamChannel_Message',
+                ],
+                $exception->getMetaInfo()
+            );
         });
-        /** @var $adapter CM_MessageStream_Adapter_SocketRedis */
         $adapter->synchronize();
-        $this->assertSame(1, $handleExceptionMethod->getCallCount());
+        $this->assertSame(1, $warningMock->getCallCount());
     }
 
     /**
@@ -176,7 +190,6 @@ class CM_MessageStream_Adapter_SocketRedisTest extends CMTest_TestCase {
                 $subscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel($clientKey, $streamChannel);
                 $this->assertInstanceOf('CM_Model_Stream_Subscribe', $subscribe);
                 $this->assertSameTime(time() - CM_MessageStream_Adapter_SocketRedis::SYNCHRONIZE_DELAY - 1, $subscribe->getStart());
-                $this->assertSameTime($streamChannel->canSubscribe(null, time()), $subscribe->getAllowedUntil());
             }
         }
     }

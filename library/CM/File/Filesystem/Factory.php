@@ -27,10 +27,11 @@ class CM_File_Filesystem_Factory {
                     $clientParams['region'] = $options['region'];
                 }
                 $client = \Aws\S3\S3Client::factory($clientParams);
+                $client->registerStreamWrapper();
                 return new CM_File_Filesystem_Adapter_AwsS3($client, $options['bucket'], $acl, $pathPrefix);
                 break;
             default:
-                throw new CM_Exception('Unsupported adapter class `' . $className . '`.');
+                throw new CM_Exception('Unsupported adapter class.', null, ['className' => $className]);
         }
     }
 

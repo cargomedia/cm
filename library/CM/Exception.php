@@ -34,6 +34,19 @@ class CM_Exception extends Exception {
 
     /**
      * @param CM_Frontend_Render $render
+     * @return array
+     */
+    public function getClientData(CM_Frontend_Render $render) {
+        return [
+            'type'     => get_class($this),
+            'msg'      => $this->getMessagePublic($render),
+            'isPublic' => $this->isPublic(),
+            'metaInfo' => [],
+        ];
+    }
+
+    /**
+     * @param CM_Frontend_Render $render
      * @return string
      */
     public function getMessagePublic(CM_Frontend_Render $render) {
@@ -63,9 +76,9 @@ class CM_Exception extends Exception {
      */
     public function setSeverity($severity) {
         if (!in_array($severity, array(self::WARN, self::ERROR, self::FATAL), true)) {
-            throw new CM_Exception_Invalid('Invalid severity `' . $severity . '`');
+            throw new CM_Exception_Invalid('Invalid severity', null, ['severity' => $severity]);
         }
-        $this->_severity = $severity;
+        $this->_severity = (int) $severity;
     }
 
     /**
@@ -76,27 +89,9 @@ class CM_Exception extends Exception {
     }
 
     /**
-     * @return CM_Paging_Log_Error|CM_Paging_Log_Fatal|CM_Paging_Log_Warn
-     */
-    public function getLog() {
-        switch ($this->getSeverity()) {
-            case self::WARN:
-                return new CM_Paging_Log_Warn();
-                break;
-            case self::ERROR:
-                return new CM_Paging_Log_Error();
-                break;
-            case self::FATAL:
-            default:
-                return new CM_Paging_Log_Fatal();
-                break;
-        }
-    }
-
-    /**
      * @param CM_I18n_Phrase $messagePublic
      */
-    private function _setMessagePublic(CM_I18n_Phrase $messagePublic) {
+    protected function _setMessagePublic(CM_I18n_Phrase $messagePublic) {
         $this->_messagePublic = $messagePublic;
     }
 }

@@ -5,6 +5,7 @@ class CMTest_TH {
     private static $_timeStart;
     private static $timeDelta = 0;
     private static $_configBackup;
+    private static $_serviceManagerBackup;
 
     public static function init() {
         $output = new CM_OutputStream_Null();
@@ -13,6 +14,8 @@ class CMTest_TH {
         $loader->load($output);
 
         self::$_configBackup = serialize(CM_Config::get());
+        $serviceManager = CM_Service_Manager::getInstance();
+        self::$_serviceManagerBackup = clone $serviceManager;
 
         // Reset environment
         self::clearEnv();
@@ -21,11 +24,11 @@ class CMTest_TH {
     }
 
     public static function clearEnv() {
+        CM_Service_Manager::setInstance(clone self::$_serviceManagerBackup);
         self::clearDb();
         self::clearCache();
         self::timeReset();
         self::clearFilesystem();
-        CM_Service_Manager::getInstance()->resetServiceInstances();
         CM_Config::set(unserialize(self::$_configBackup));
     }
 
@@ -43,6 +46,9 @@ class CMTest_TH {
         if (!isset(self::$_timeStart)) {
             runkit_function_copy('time', 'time_original');
             runkit_function_redefine('time', '', 'return CMTest_TH::time();');
+
+            runkit_function_copy('gettimeofday', 'gettimeofday_original');
+            runkit_function_redefine('gettimeofday', '$returnFloat = null', 'return CMTest_TH::gettimeofday($returnFloat);');
         }
         self::$_timeStart = time_original();
         self::$timeDelta = 0;
@@ -52,9 +58,19 @@ class CMTest_TH {
         return self::$_timeStart + self::$timeDelta;
     }
 
+    public static function gettimeofday($returnFloat = null) {
+        $pseudoTime = self::time();
+        if ($returnFloat) {
+            return $pseudoTime + 0.1234;
+        }
+        $dateStruct = gettimeofday_original();
+        $dateStruct['sec'] = $pseudoTime;
+        $dateStruct['usec'] = 123456;
+        return $dateStruct;
+    }
+
     public static function timeForward($sec) {
         self::$timeDelta += $sec;
-        self::clearCache();
     }
 
     public static function timeDaysForward($days) {
@@ -63,7 +79,6 @@ class CMTest_TH {
 
     public static function timeReset() {
         self::$timeDelta = 0;
-        self::clearCache();
     }
 
     public static function timeDelta() {
@@ -127,44 +142,51 @@ class CMTest_TH {
     }
 
     /**
-     * @param int|null $type
-     * @param int|null $adapterType
+     * @param int|null    $type
+     * @param int|null    $adapterType
+     * @param string|null $mediaId
      * @return CM_Model_StreamChannel_Abstract
      */
-    public static function createStreamChannel($type = null, $adapterType = null) {
+    public static function createStreamChannel($type = null, $adapterType = null, $mediaId = null) {
         if (null === $type) {
-            $type = CM_Model_StreamChannel_Video::getTypeStatic();
+            $type = CM_Model_StreamChannel_Media::getTypeStatic();
         }
 
         if (null === $adapterType) {
-            $adapterType = CM_Stream_Adapter_Video_Wowza::getTypeStatic();
+            $adapterType = CM_Janus_Service::getTypeStatic();
         }
 
         $data = array('key' => rand(1, 10000) . '_' . rand(1, 100));
-        if (CM_Model_StreamChannel_Video::getTypeStatic() == $type) {
+        $className = CM_Model_Abstract::getClassName($type);
+        if ('CM_Model_StreamChannel_Media' === $className || is_subclass_of($className, 'CM_Model_StreamChannel_Media')) {
+            $mediaId = (null !== $mediaId) ? (string) $mediaId : null;
             $data['width'] = 480;
             $data['height'] = 720;
             $data['serverId'] = 1;
-            $data['thumbnailCount'] = 0;
             $data['adapterType'] = $adapterType;
+            $data['mediaId'] = $mediaId;
         }
         return CM_Model_StreamChannel_Abstract::createType($type, $data);
     }
 
     /**
-     * @param CM_Model_StreamChannel_Video|null $streamChannel
+     * @param CM_Model_StreamChannel_Media|null $streamChannel
      * @param CM_Model_User|null                $user
-     * @return CM_Model_StreamChannelArchive_Video
+     * @param string|null                       $filename
+     * @return CM_Model_StreamChannelArchive_Media
      */
-    public static function createStreamChannelVideoArchive(CM_Model_StreamChannel_Video $streamChannel = null, CM_Model_User $user = null) {
+    public static function createStreamChannelVideoArchive(CM_Model_StreamChannel_Media $streamChannel = null, CM_Model_User $user = null, $filename = null) {
         if (is_null($streamChannel)) {
-            $streamChannel = self::createStreamChannel();
-            self::createStreamPublish($user, $streamChannel);
+            $streamChannel = static::createStreamChannel();
+            static::createStreamPublish($user, $streamChannel);
         }
         if (!$streamChannel->hasStreamPublish()) {
-            self::createStreamPublish($user, $streamChannel);
+            static::createStreamPublish($user, $streamChannel);
         }
-        return CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
+        if (null !== $filename) {
+            $filename = (string) $filename;
+        }
+        return CM_Model_StreamChannelArchive_Media::createStatic(array('streamChannel' => $streamChannel, 'file' => $filename));
     }
 
     /**
@@ -181,7 +203,8 @@ class CMTest_TH {
         }
         return CM_Model_Stream_Publish::createStatic(array(
             'streamChannel' => $streamChannel,
-            'user'          => $user, 'start' => time(),
+            'user'          => $user,
+            'start'         => time(),
             'key'           => rand(1, 10000) . '_' . rand(1, 100),
         ));
     }
@@ -201,32 +224,22 @@ class CMTest_TH {
 
     /**
      * @param string             $uri
-     * @param array|null         $headers
      * @param CM_Model_User|null $viewer
      * @return CM_Http_Response_Page
+     * @throws CM_Class_Exception_TypeNotConfiguredException
      */
-    public static function createResponsePage($uri, array $headers = null, CM_Model_User $viewer = null) {
-        if (!$headers) {
-            $site = CM_Site_Abstract::factory();
-            $headers = array('host' => $site->getHost());
-        }
+    public static function createResponsePage($uri, CM_Model_User $viewer = null) {
+        $site = CM_Site_Abstract::factory();
+        $headers = array('host' => $site->getHost());
         $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
-        return new CM_Http_Response_Page($request, self::getServiceManager());
+        return CM_Http_Response_Page::createFromRequest($request, $site, self::getServiceManager());
     }
 
     /**
-     * @param string             $uri
-     * @param array|null         $headers
-     * @param CM_Model_User|null $viewer
-     * @return CM_Http_Response_Page
+     * @return CM_Geo_Point
      */
-    public static function createResponsePageEmbed($uri, array $headers = null, CM_Model_User $viewer = null) {
-        if (!$headers) {
-            $site = CM_Site_Abstract::factory();
-            $headers = array('host' => $site->getHost());
-        }
-        $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
-        return new CM_Http_Response_Page_Embed($request, self::getServiceManager());
+    public static function createGeoPoint() {
+        return new CM_Geo_Point(rand(-90, 90), rand(-180, 180));
     }
 
     /**
@@ -318,6 +331,21 @@ class CMTest_TH {
         $reflectionMethod = new ReflectionMethod($objectOrClassName, $methodName);
         $reflectionMethod->setAccessible(true);
         return $reflectionMethod->invokeArgs($context, $args);
+    }
+
+    /**
+     * @return float
+     * @throws CM_Exception
+     */
+    public static function getVersionICU() {
+        $ext = new ReflectionExtension('intl');
+        ob_start();
+        $ext->info();
+        $info = ob_get_clean();
+        if (!preg_match('#^ICU version => ([\d\.]+)$#um', $info, $matches)) {
+            throw new CM_Exception('Cannot detect ICU version', null, ['info' => $info]);
+        }
+        return (float) $matches[1];
     }
 
     /**

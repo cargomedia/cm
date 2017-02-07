@@ -3,7 +3,7 @@
 class CM_Model_User extends CM_Model_Abstract {
 
     const ONLINE_EXPIRATION = 1800;
-    const OFFLINE_DELAY = 10;
+    const OFFLINE_DELAY = 5;
     const ACTIVITY_EXPIRATION = 60;
 
     /**
@@ -53,10 +53,11 @@ class CM_Model_User extends CM_Model_Abstract {
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getLatestActivity() {
-        return (int) $this->_get('activityStamp');
+        $activityStamp = $this->_get('activityStamp');
+        return null !== $activityStamp ? (int) $activityStamp : null;
     }
 
     /**
@@ -73,32 +74,12 @@ class CM_Model_User extends CM_Model_Abstract {
     public function setOnline($state = true, $visible = true) {
         $visible = (bool) $visible;
         if ($state) {
-            CM_Db_Db::replaceDelayed('cm_user_online', array('userId' => $this->getId(), 'visible' => $visible));
+            CM_Db_Db::replace('cm_user_online', array('userId' => $this->getId(), 'visible' => $visible));
             $this->_set(array('online' => $this->getId(), 'visible' => $visible));
         } else {
             CM_Db_Db::delete('cm_user_online', array('userId' => $this->getId()));
             $this->_set(array('online' => null, 'visible' => null));
         }
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getOfflineStamp() {
-        $offlineStamp = $this->_get('offlineStamp');
-        if (null !== $offlineStamp) {
-            $offlineStamp = (int) $offlineStamp;
-        }
-        return $offlineStamp;
-    }
-
-    /**
-     * @param int|null $offlineStamp
-     */
-    public function setOfflineStamp($offlineStamp) {
-        $offlineStamp = null !== $offlineStamp ? (int) $offlineStamp : $offlineStamp;
-        CM_Db_Db::update('cm_user_online', ['offlineStamp' => $offlineStamp], ['userId' => $this->getId()]);
-        $this->_set('offlineStamp', $offlineStamp);
     }
 
     /**
@@ -156,13 +137,6 @@ class CM_Model_User extends CM_Model_Abstract {
     }
 
     /**
-     * @return CM_Paging_StreamChannelArchiveVideo_User
-     */
-    public function getStreamChannelArchiveVideoList() {
-        return new CM_Paging_StreamChannelArchiveVideo_User($this);
-    }
-
-    /**
      * @return boolean
      */
     public function getVisible() {
@@ -179,7 +153,7 @@ class CM_Model_User extends CM_Model_Abstract {
         if (!$this->getOnline()) {
             throw new CM_Exception_Invalid('Must not modify visibility of a user that is offline');
         }
-        CM_Db_Db::replaceDelayed('cm_user_online', array('userId' => $this->getId(), 'visible' => $state));
+        CM_Db_Db::replace('cm_user_online', array('userId' => $this->getId(), 'visible' => $state));
         $this->_set(array('online' => $this->getId(), 'visible' => $state));
         return $this;
     }
@@ -239,11 +213,16 @@ class CM_Model_User extends CM_Model_Abstract {
      * @return CM_Frontend_Environment
      */
     public function getEnvironment() {
-        return new CM_Frontend_Environment($this->getSite(), $this, $this->getLanguage(), null, null, null, $this->getCurrency());
+        $language = $this->getLanguage();
+        if (!$language) {
+            $language = CM_Model_Language::findDefault();
+        }
+        return new CM_Frontend_Environment($this->getSite(), $this, $language, null, null, null, $this->getCurrency());
     }
 
     public function updateLatestActivityThrottled() {
-        if ($this->getLatestActivity() < time() - self::ACTIVITY_EXPIRATION) {
+        $activityStamp = $this->getLatestActivity();
+        if (null === $activityStamp || $activityStamp < time() - self::ACTIVITY_EXPIRATION) {
             $this->_updateLatestActivity();
         }
     }
@@ -260,7 +239,7 @@ class CM_Model_User extends CM_Model_Abstract {
 
     protected function _loadData() {
         return CM_Db_Db::exec('
-			SELECT `main`.*, `online`.`userId` AS `online`, `online`.`visible`, `online`.`offlineStamp`
+			SELECT `main`.*, `online`.`userId` AS `online`, `online`.`visible`
 			FROM `cm_user` AS `main`
 			LEFT JOIN `cm_user_online` AS `online` USING (`userId`)
 			WHERE `main`.`userId`=?',
@@ -288,24 +267,12 @@ class CM_Model_User extends CM_Model_Abstract {
         return new $className($id);
     }
 
-    public static function offlineDelayed() {
-        $result = CM_Db_Db::exec('SELECT `userId` FROM `cm_user_online` WHERE `offlineStamp` < ?', [time() - self::OFFLINE_DELAY]);
-        while ($userId = $result->fetchColumn()) {
-            try {
-                $user = CM_Model_User::factory($userId);
-                $user->setOnline(false);
-            } catch (CM_Exception_Nonexistent $e) {
-                CM_Db_Db::delete('cm_user_online', array('userId' => $userId));
-            }
-        }
-    }
-
     public static function offlineOld() {
         $res = CM_Db_Db::exec('
 			SELECT `o`.`userId`
 			FROM `cm_user_online` `o`
 			LEFT JOIN `cm_user` `u` USING(`userId`)
-			WHERE `u`.`activityStamp` < ? OR `u`.`userId` IS NULL',
+			WHERE `u`.`activityStamp` IS NOT NULL AND `u`.`activityStamp` < ? OR `u`.`userId` IS NULL',
             array(time() - self::ONLINE_EXPIRATION));
         while ($userId = $res->fetchColumn()) {
             try {
@@ -342,7 +309,6 @@ class CM_Model_User extends CM_Model_Abstract {
         }
         $userId = CM_Db_Db::insert('cm_user', array(
             'createStamp'   => time(),
-            'activityStamp' => time(),
             'site'          => $siteType,
             'languageId'    => $languageId,
             'currencyId'    => $currencyId,
@@ -367,8 +333,8 @@ class CM_Model_User extends CM_Model_Abstract {
         CM_Db_Db::delete('cm_user', array('userId' => $this->getId()));
     }
 
-    public function toArray() {
-        $array = parent::toArray();
+    public function jsonSerialize() {
+        $array = parent::jsonSerialize();
         $array['displayName'] = $this->getDisplayName();
         $array['visible'] = $this->getVisible();
         return $array;

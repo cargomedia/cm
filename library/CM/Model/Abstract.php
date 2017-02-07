@@ -1,7 +1,7 @@
 <?php
 
 abstract class CM_Model_Abstract extends CM_Class_Abstract
-    implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable, CM_Typed, CM_Debug_DebugInfoInterface {
+    implements CM_Comparable, CM_ArrayConvertible, JsonSerializable, CM_Cacheable, Serializable, CM_Typed, CM_Debug_DebugInfoInterface {
 
     /** @var array|null */
     protected $_id;
@@ -81,7 +81,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             if ($useReplace) {
                 if (!$persistence instanceof CM_Model_StorageAdapter_ReplaceableInterface) {
                     $adapterName = get_class($persistence);
-                    throw new CM_Exception_NotImplemented("Param `useReplace` is not allowed with {$adapterName}");
+                    throw new CM_Exception_NotImplemented('Param `useReplace` is not allowed with adapter', null, ['adapterName' => $adapterName]);
                 }
                 $idRaw = $persistence->replace($type, $dataSchema);
             } else {
@@ -94,14 +94,16 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
                 $this->_loadAssets(true);
                 $cache->save($type, $this->getIdRaw(), $this->_getData());
             }
-            $this->_onChange();
             $this->_changeContainingCacheables();
             $this->_onCreate();
+            if ($useReplace) {
+                $this->_onChange();
+            }
         }
         $this->_autoCommit = true;
     }
 
-    final public function delete() {
+    public function delete() {
         $containingCacheables = $this->_getContainingCacheables();
         $this->_onDeleteBefore();
         foreach ($this->_assets as $asset) {
@@ -162,7 +164,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
      * @param CM_Comparable|null $model
      * @return boolean
      */
-    final public function equals(CM_Comparable $model = null) {
+    public function equals(CM_Comparable $model = null) {
         if (empty($model)) {
             return false;
         }
@@ -213,7 +215,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         $field = (string) $field;
         $data = $this->_getData();
         if (!array_key_exists($field, $data)) {
-            throw new CM_Exception('Model has no field `' . $field . '`');
+            throw new CM_Exception('Model has no field', null, ['field' => $field]);
         }
         if (!array_key_exists($field, $this->_dataDecoded)) {
             if ($schema = $this->_getSchema()) {
@@ -301,7 +303,10 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
                     }
                 }
                 if (null === $this->_data) {
-                    throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->getIdRaw(), true) . '` has no data.');
+                    throw new CM_Exception_Nonexistent('Model has no data', null, [
+                        'className' => get_called_class(),
+                        'rawId'     => CM_Util::var_line($this->getIdRaw()),
+                    ]);
                 }
 
                 if ($cache) {
@@ -368,7 +373,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         $key = (string) $key;
         $idRaw = $this->getIdRaw();
         if (!$this->_hasIdKey($key)) {
-            throw new CM_Exception_Invalid('Id-array has no field `' . $key . '`.');
+            throw new CM_Exception_Invalid('Id-array has no field.', null, ['key' => $key]);
         }
         return $idRaw[$key];
     }
@@ -399,7 +404,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
      */
     final protected function _getAsset($className) {
         if (!$this->_hasAsset($className)) {
-            throw new CM_Exception('No such asset `' . $className . '`');
+            throw new CM_Exception('No such asset', null, ['assetClassName' => $className]);
         }
         return $this->_assets[$className];
     }
@@ -496,7 +501,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             $data = array();
         }
         $model = static::_createStatic($data);
-        $model->_onChange();
         $model->_changeContainingCacheables();
         $model->_onCreate();
         return $model;
@@ -572,7 +576,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             return null;
         }
         if (!class_exists($className) || !is_subclass_of($className, 'CM_Model_StorageAdapter_AbstractAdapter')) {
-            throw new CM_Exception_Invalid('Invalid storage adapter class `' . $className . '`');
+            throw new CM_Exception_Invalid('Invalid storage adapter class', null, ['storageAdapterClass' => $className]);
         }
         return new $className();
     }
@@ -620,7 +624,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         foreach ($idTypeList as $originalKey => $idType) {
             if (null === $modelType) {
                 if (!is_array($idType)) {
-                    throw new CM_Exception_Invalid('`idType` should be an array if `modelType` is not defined: `' . CM_Util::var_line($idType) . '`');
+                    throw new CM_Exception_Invalid('`idType` should be an array if `modelType` is not defined', null, ['idType' => CM_Util::var_line($idType)]);
                 }
                 $type = (int) $idType['type'];
                 $id = $idType['id'];
@@ -690,11 +694,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
     }
 
     public function toArray() {
-        $array = array('_type' => $this->getType(), '_id' => $this->getIdRaw());
-        if ($this->hasId()) {
-            $array['id'] = $this->getId();
-        }
-        return $array;
+        return array('_type' => $this->getType(), '_id' => $this->getIdRaw());
+    }
+
+    public function jsonSerialize() {
+        return [
+            'id' => $this->getId(),
+        ];
     }
 
     public static function fromArray(array $data) {

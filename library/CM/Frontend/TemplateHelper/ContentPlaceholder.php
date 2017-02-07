@@ -38,7 +38,7 @@ class CM_Frontend_TemplateHelper_ContentPlaceholder {
         return $cache->get($cache->key(__CLASS__, $width, $height), function () use ($width, $height) {
             $image = imagecreate($width, $height);
             ob_start();
-            imagecolorallocate($image, 255, 255, 255);
+            imagecolorallocatealpha($image, 255, 255, 255, 127);
             imagepng($image);
             $imageData = ob_get_contents();
             ob_end_clean();

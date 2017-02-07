@@ -39,7 +39,7 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
      * @return bool
      */
     private function _isValidViewClass($className) {
-        $invalidClassNameList = array('CM_Mail');
+        $invalidClassNameList = array('CM_Mail_Mailable');
         foreach ($invalidClassNameList as $invalidClassName) {
             if ($className === $invalidClassName || is_subclass_of($className, $invalidClassName)) {
                 return false;

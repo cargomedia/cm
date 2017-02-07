@@ -13,6 +13,7 @@ var CM_Component_Example = CM_Component_Abstract.extend({
     'click .reloadComponent': 'reloadChinese',
     'click .popoutComponent': 'popOut',
     'click .popinComponent': 'popIn',
+    'click .multiLevelPopoutComponent': 'multiLevelPopout',
     'click .loadComponent': 'loadExample',
     'click .loadComponent_callback': 'loadExampleInline',
     'click .removeComponent': 'myRemove',
@@ -42,6 +43,41 @@ var CM_Component_Example = CM_Component_Abstract.extend({
 
   ready: function() {
     this.message("Component ready, uname: " + this.uname);
+  },
+
+  multiLevelPopout: function() {
+    var applyFloatbox = function($el) {
+      var $popout = $el.children('.innerPopoutComponent');
+      var $popin = $el.children('.innerPopinComponent');
+      var $subpopup = $el.children('.innerPopup');
+
+      $el.hide();
+      $subpopup.hide();
+
+      $popout.on('click', function() {
+        applyFloatbox($subpopup);
+        $subpopup.floatbox();
+      });
+      $popin.on('click', function() {
+        $el.floatbox('close');
+      });
+
+      $el.on('floatbox-open', function(event) {
+        event.stopPropagation();
+        $el.show();
+      });
+      $el.on('floatbox-close', function(event) {
+        event.stopPropagation();
+        $popout.off('click');
+        $popin.off('click');
+        $el.off('floatbox-open floatbox-close');
+        $el.hide();
+      });
+    };
+
+    var $popup = this.$('.innerPopup.first').clone();
+    applyFloatbox($popup);
+    $popup.floatbox();
   },
 
   /**

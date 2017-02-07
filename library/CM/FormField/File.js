@@ -25,15 +25,15 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
     }
 
     // remove attr multiple on iPhone, iPod, iPad to allow upload photos via camera
-    if (navigator.userAgent.match(/iP(ad|hone|od)/i)) {
+    var iOS = navigator.userAgent.match(/iP(ad|hone|od)/i);
+    if (iOS || field.getOption("cardinality") == 1) {
       $input.removeAttr('multiple');
     }
 
     $input.fileupload({
       dataType: 'json',
-      url: cm.getUrl('/upload/' + cm.getSiteId() + '/', {'field': field.getClass()}, true),
+      url: cm.getUrl('/upload', {'field': field.getClass()}, true),
       dropZone: this.$el,
-      acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
       formData: function(form) {
         return $input;
       },
@@ -52,18 +52,23 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
         data.files = _.reject(data.files, function(file) {
           return file.error;
         });
-        if (_.isEmpty(data.files)) {
+        var cardinality = field.getOption("cardinality");
+        var tooManyFiles = cardinality && cardinality <= field.$('.previews .preview').length;
+        if (tooManyFiles) {
+          field.error(cm.language.get('You can only select {$cardinality} items.', {cardinality: cardinality}));
+        }
+        if (_.isEmpty(data.files) || tooManyFiles) {
           data.skipFailMessage = true;
           return false;
         }
-        data.$preview = $('<li class="preview"><div class="template"><span class="spinner spinner-expanded"></span></div></li>');
+        data.$preview = $('<li class="preview"></li>');
         field.$('.previews').append(data.$preview);
+
+        field.$('.uploadButton').attr('data-progress', '');
+
       },
       done: function(e, data) {
         if (data.result.success) {
-          while (field.getOption("cardinality") && field.getOption("cardinality") < field.getCountUploaded()) {
-            field.$('.previews .preview').first().remove();
-          }
           data.$preview.html(data.result.success.preview + '<input type="hidden" name="' + field.getName() + '[]" value="' + data.result.success.id + '"/>');
         } else if (data.result.error) {
           data.$preview.remove();
@@ -80,8 +85,11 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
       },
       always: function(e, data) {
         inProgressCount--;
-        if (inProgressCount === 0 && field.getCountUploaded() > 0) {
-          field.trigger("uploadComplete", data.files);
+        if (inProgressCount === 0) {
+          if (field.getValue().length > 0) {
+            field.trigger("uploadComplete", data.files);
+          }
+          field.$('.uploadButton').removeAttr('data-progress');
         }
       }
     });
@@ -102,22 +110,15 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
   },
 
   getValue: function() {
-    var array = this.$('input:not([disabled])[name="' + this.options.params.name + '[]"]').map(function() {
+    var value = this.$('input[name="' + this.options.params.name + '[]"]').map(function() {
       return $(this).val();
     }).get();
-    var value = _.compact(array);
-    return value.length ? value : null;
+    value = _.compact(value);
+    return value;
   },
 
   setValue: function(value) {
     throw new CM_Exception('Not implemented');
-  },
-
-  /**
-   * @returns {Number}
-   */
-  getCountUploaded: function() {
-    return this.$('.previews .preview').length;
   },
 
   reset: function() {

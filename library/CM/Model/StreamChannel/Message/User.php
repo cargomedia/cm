@@ -8,15 +8,24 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
     }
 
     public function onSubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
+        if ($this->hasUser()) {
+            $user = $streamSubscribe->getUser();
+            if ($user && !$user->getOnline()) {
+                $user->setOnline(true);
+            }
+        }
     }
 
     public function onUnpublish(CM_Model_Stream_Publish $streamPublish) {
     }
 
     public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
-        $unsubscriber = $streamSubscribe->getUser();
-        if ($unsubscriber && !$this->isSubscriber($unsubscriber, $streamSubscribe)) {
-            $unsubscriber->setOfflineStamp(time());
+        if ($this->hasUser()) {
+            $user = $streamSubscribe->getUser();
+            if ($user && !$this->isSubscriber($user, $streamSubscribe)) {
+                $delayedJobQueue = CM_Service_Manager::getInstance()->getDelayedJobQueue();
+                $delayedJobQueue->addJob(new CM_User_OfflineJob(), ['user' => $user], CM_Model_User::OFFLINE_DELAY);
+            }
         }
     }
 
@@ -29,10 +38,18 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
     }
 
     /**
+     * @param CM_Model_User $user
+     * @return CM_Model_StreamChannel_Abstract|null
+     */
+    public static function findByUser(CM_Model_User $user) {
+        return self::findByKey(self::getKeyByUser($user));
+    }
+
+    /**
      * @return CM_Model_User
      */
     public function getUser() {
-        $userId = $this->_decryptKey(self::SALT);
+        $userId = self::_decryptKey($this->getKey(), self::SALT);
         return CM_Model_User::factory($userId);
     }
 
@@ -46,13 +63,6 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
         } catch (CM_Exception_Nonexistent $e) {
             return false;
         }
-    }
-
-    /**
-     * @return bool
-     */
-    public function isValid() {
-        return $this->hasUser();
     }
 
     /**

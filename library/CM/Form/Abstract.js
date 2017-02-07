@@ -5,20 +5,43 @@
 var CM_Form_Abstract = CM_View_Abstract.extend({
   _class: 'CM_Form_Abstract',
 
+  /** @type String **/
+  autosave: null,
+
+  /** @ype String[] */
+  requiredFieldNames: null,
+
+  /** @type String[] */
+  actionNames: null,
+
   /** @type Object **/
   _fields: {},
 
-  /** @type Object **/
-  _actions: {},
+  /** @type Array **/
+  _autosaveFields: [],
 
-  /** @type Boolean **/
-  _stopErrorPropagation: false,
+  /** @type PromiseThrottled */
+  _autosaveSubmitThrottled: promiseThrottler(function() {
+    return this
+      .try(function() {
+        return this._submitOnly(this.autosave, false);
+      })
+      .then(function() {
+        this._autosaveFields.forEach(function(field) {
+          field.success();
+        });
+        this._autosaveFields = [];
+      })
+      .catch(CM_Exception_FormFieldValidation, function(error) {
+        this._autosaveFields = [];
+        this._displayValidationError(error);
+      });
+  }, {cancelLeading: true}),
 
   initialize: function() {
     CM_View_Abstract.prototype.initialize.call(this);
 
     this._fields = {};
-    this._actions = {};
   },
 
   events: {
@@ -36,7 +59,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   _ready: function() {
     var handler = this;
 
-    _.each(this._actions, function(action, name) {
+    _.each(this.getActionNames(), function(name) {
       var $btn = $('#' + this.getAutoId() + '-' + name + '-button');
       var event = $btn.data('event');
       if (!event) {
@@ -45,15 +68,28 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       $btn.on(event, {action: name}, function(event) {
         event.preventDefault();
         event.stopPropagation();
-        return handler.submit(event.data.action).catch(CM_Exception_FormFieldValidation, function(error) {
-          // this error type is already handled and displayed in `submit`
-        });
+        return handler.submit(event.data.action);
       });
     }, this);
 
-    this.$el.on('submit', function() {
-      handler.$el.find('input[type="submit"], button[type="submit"]').first().click();
-      return false;
+    if (this.autosave) {
+      this.on('change', function(field) {
+        if (field) {
+          handler._autosaveFields.push(field);
+          handler._autosaveSubmitThrottled();
+        }
+      });
+    } else {
+      this.$el.on('submit', function() {
+        handler.$el.find('input[type="submit"], button[type="submit"]').first().click();
+        return false;
+      });
+    }
+
+    this.$el.on('reset', function() {
+      _.defer(function() {
+        handler.trigger('reset');
+      });
     });
 
     CM_View_Abstract.prototype._ready.call(this);
@@ -66,16 +102,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     this._fields[field.getName()] = field;
 
     field.on('change', function() {
-      this.trigger('change');
+      this.trigger('change', field);
     }, this);
-  },
-
-  /**
-   * @param {String} name
-   * @param {Object} presentation
-   */
-  registerAction: function(name, presentation) {
-    this._actions[name] = presentation;
   },
 
   /**
@@ -107,6 +135,30 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
+   * @returns {String[]}
+   */
+  getFieldNames: function() {
+    return _.keys(this._fields);
+  },
+
+  /**
+   * @returns {CM_FormField_Abstract[]}
+   */
+  getFields: function() {
+    return _.values(this._fields);
+  },
+
+  /**
+   * @returns {String[]}
+   */
+  getActionNames: function() {
+    if (null === this.actionNames) {
+      throw new CM_Exception('Missing `actionNames` on form', false, {'form': this.getClass()});
+    }
+    return this.actionNames;
+  },
+
+  /**
    * @returns {{}}
    */
   getData: function() {
@@ -121,105 +173,83 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
   /**
    * @param {String} actionName
-   * @returns {{}}
+   * @return Promise
    */
-  getActionData: function(actionName) {
-    var action = this._getAction(actionName);
-    var data = {};
-
-    _.each(action.fields, function(isRequired, fieldName) {
-      if (this.hasField(fieldName)) {
-        var field = this.getField(fieldName);
-        if (field.getEnabled()) {
-          data[field.getName()] = field.getValue();
-        }
-      }
-    }, this);
-
-    return data;
+  submit: function(actionName) {
+    return this
+      .try(function() {
+        return this._submitOnly(actionName, true);
+      })
+      .catch(CM_Exception_FormFieldValidation, function(error) {
+        this._displayValidationError(error);
+      });
   },
 
   /**
-   * @param {String} [actionName]
-   * @param {Object} [options]
+   * @param {String} actionName
+   * @param {Boolean} disableUI
    * @return Promise
    */
-  submit: function(actionName, options) {
-    options = _.defaults(options || {}, {
-      handleErrors: true,
-      disableUI: true
-    });
-    var action = this._getAction(actionName);
-    var data = this.getActionData(action.name);
-    var errorList = this._getErrorList(action.name, data);
+  _submitOnly: function(actionName, disableUI) {
+    var data = this.getData();
+    var errorListRequired = this._getErrorListRequired(data);
 
-    if (options.handleErrors) {
-      _.each(this._fields, function(field, fieldName) {
-        if (errorList[fieldName]) {
-          field.error(errorList[fieldName]);
-        } else {
-          field.error(null);
+    this.resetErrors();
+    if (_.size(errorListRequired)) {
+      var error = new CM_Exception_FormFieldValidation();
+      error.setErrorList(errorListRequired);
+      return Promise.reject(error);
+    }
+
+    return this
+      .try(function() {
+        if (disableUI) {
+          this.disable();
         }
-      }, this);
-    }
+        this.trigger('submit', [data]);
+        return cm.ajax('form', {viewInfoList: this.getViewInfoList(), actionName: actionName, data: data})
+      })
+      .then(function(response) {
+        if (response.errors) {
+          var error = new CM_Exception_FormFieldValidation();
+          error.setErrorList(response.errors);
+          this.trigger('error error.' + actionName, error);
+          throw error;
+        }
 
-    if (_.size(errorList)) {
-      return Promise.reject(new CM_Exception_FormFieldValidation(errorList));
-    } else {
-      if (options.disableUI) {
-        this.disable();
-      }
-      this.trigger('submit', [data]);
+        if (response.exec) {
+          this.evaluation = new Function(response.exec);
+          this.evaluation();
+        }
 
-      var handler = this;
-      return cm.ajax('form', {viewInfoList: this.getViewInfoList(), actionName: action.name, data: data})
-        .then(function(response) {
-          if (response.errors) {
-            if (options.handleErrors) {
-              for (var i = response.errors.length - 1, error; error = response.errors[i]; i--) {
-                if (_.isArray(error)) {
-                  handler.getField(error[1]).error(error[0]);
-                } else {
-                  handler.error(error);
-                }
-              }
-            }
-
-            throw new CM_Exception_FormFieldValidation(response.errors);
+        if (response.messages) {
+          for (var i = 0, msg; msg = response.messages[i]; i++) {
+            this.message(msg);
           }
+        }
 
-          if (response.exec) {
-            handler.evaluation = new Function(response.exec);
-            handler.evaluation();
-          }
-
-          if (response.messages) {
-            for (var i = 0, msg; msg = response.messages[i]; i++) {
-              handler.message(msg);
-            }
-          }
-
-          handler.trigger('success success.' + action.name, response.data);
-          return response.data;
-        })
-        .catch(CM_Exception_FormFieldValidation, function(error) {
-          handler._stopErrorPropagation = false;
-          handler.trigger('error error.' + action.name, error.message, error.name, error.isPublic);
-          if (!handler._stopErrorPropagation) {
-            throw error;
-          }
-        })
-        .finally(function() {
-          if (options.disableUI) {
-            handler.enable();
-          }
-          handler.trigger('complete');
-        });
-    }
+        this.trigger('success success.' + actionName, response.data);
+        return response.data;
+      })
+      .finally(function() {
+        if (disableUI) {
+          this.enable();
+        }
+      });
   },
 
-  stopErrorPropagation: function() {
-    this._stopErrorPropagation = true;
+  /**
+   * @param {CM_Exception_FormFieldValidation} validationError
+   */
+  _displayValidationError: function(validationError) {
+    var errorList = validationError.getErrorList();
+    for (var i = errorList.length - 1, error; error = errorList[i]; i--) {
+      if (_.isArray(error)) {
+        this.getField(error[1]).error(error[0]);
+      } else {
+        this.error(error);
+      }
+    }
   },
 
   reset: function() {
@@ -255,36 +285,29 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String} actionName
-   * @returns {Object}
+   * @param {String} name
+   * @returns {Boolean}
    */
-  _getAction: function(actionName) {
-    var action = this._actions[actionName];
-    if (!action) {
-      throw new CM_Exception('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
-    }
-    action.name = actionName;
-    return action;
+  _isRequiredField: function(name) {
+    return _.include(this.requiredFieldNames, name);
   },
 
   /**
-   * @param {String} actionName
    * @param {Object} data
-   * @returns {Object}
+   * @returns {Array[]}
    */
-  _getErrorList: function(actionName, data) {
-    var action = this._getAction(actionName);
-    var errorList = {};
+  _getErrorListRequired: function(data) {
+    var errorList = [];
 
-    _.each(action.fields, function(isRequired, fieldName) {
+    _.each(this._fields, function(field, fieldName) {
+      var isRequired = this._isRequiredField(fieldName);
       if (isRequired) {
-        var field = this.getField(fieldName);
         if (field.isEmpty(data[fieldName])) {
           var label = this._getFieldLabel(field);
           if (label) {
-            errorList[fieldName] = cm.language.get('{$label} is required.', {label: label});
+            errorList.push([cm.language.get('{$label} is required.', {label: label}), fieldName]);
           } else {
-            errorList[fieldName] = cm.language.get('Required');
+            errorList.push([cm.language.get('Required'), fieldName]);
           }
         }
       }

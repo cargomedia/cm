@@ -36,25 +36,47 @@ class CM_App implements CM_Service_ManagerAwareInterface {
     public function fillCaches() {
         /** @var CM_Asset_Javascript_Abstract[] $assetList */
         $assetList = array();
+
+        $debug = CM_Bootloader::getInstance()->isDebug();
+        $siteList = CM_Site_Abstract::getAll();
         $languageList = new CM_Paging_Language_Enabled();
-        foreach (CM_Site_Abstract::getAll() as $site) {
-            $assetList[] = new CM_Asset_Javascript_Internal($site);
-            $assetList[] = new CM_Asset_Javascript_Library($site);
-            $assetList[] = new CM_Asset_Javascript_VendorAfterBody($site);
-            $assetList[] = new CM_Asset_Javascript_VendorBeforeBody($site);
+
+        foreach ($siteList as $site) {
+            $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
+            $assetList[] = new CM_Asset_Javascript_Internal($site, $debug);
+            $assetList[] = new CM_Asset_Javascript_Library($site, $debug);
+            $assetList[] = new CM_Asset_Javascript_Vendor_BeforeBody($site, $debug);
+            $assetList[] = new CM_Asset_Javascript_Vendor_AfterBody($site, $debug);
+            $assetList[] = new CM_Asset_Css_Vendor($render, $debug);
+            $assetList[] = new CM_Asset_Css_Library($render, $debug);
+            /** @var CM_Model_Language $language */
             foreach ($languageList as $language) {
-                $render = new CM_Frontend_Render(new CM_Frontend_Environment($site, null, $language));
-                $assetList[] = new CM_Asset_Css_Vendor($render);
-                $assetList[] = new CM_Asset_Css_Library($render);
+                $assetList[] = new CM_Asset_Javascript_Translations($site, $debug, $language);
             }
         }
+
+        /** @var CM_Model_Language $language */
         foreach ($languageList as $language) {
-            $assetList[] = new CM_Asset_Javascript_Translations($language);
+            $language->getTranslations()->getItemsRaw();
+            $language->getTranslations(true)->getItemsRaw();
         }
+
         foreach ($assetList as $asset) {
-            $asset->get(true);
+            $asset->get();
         }
         CM_Bootloader::getInstance()->getModules();
+    }
+
+    /**
+     * @throws CM_Exception_Invalid
+     * @return string
+     */
+    public function getName() {
+        $config = CM_Bootloader::getInstance()->getConfig()->get();
+        if (!isset($config->installationName)) {
+            throw new CM_Exception_Invalid('The `installationName` config property is required.');
+        }
+        return $config->installationName;
     }
 
     /**
@@ -108,7 +130,7 @@ class CM_App implements CM_Service_ManagerAwareInterface {
 
     /**
      * @param Closure|null $callbackBefore fn($version)
-     * @param Closure|null $callbackAfter fn($version)
+     * @param Closure|null $callbackAfter  fn($version)
      * @return int Number of version bumps
      */
     public function runUpdateScripts(Closure $callbackBefore = null, Closure $callbackAfter = null) {
@@ -126,10 +148,6 @@ class CM_App implements CM_Service_ManagerAwareInterface {
                 $this->setVersion($version, $namespace);
             }
             $versionBumps += ($version - $versionStart);
-        }
-        if ($versionBumps > 0) {
-            $db = $this->getServiceManager()->getDatabases()->getMaster()->getDatabaseName();
-            CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
         }
         return $versionBumps;
     }
@@ -177,7 +195,10 @@ class CM_App implements CM_Service_ManagerAwareInterface {
         }
         $file = new CM_File($path . 'resources/db/update/' . $version . '.php');
         if (!$file->exists()) {
-            throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $moduleName . '` namespace.');
+            throw new CM_Exception_Invalid('Update script does not exist', null, [
+                'version'    => $version,
+                'moduleName' => $moduleName,
+            ]);
         }
         return $file->getPath();
     }

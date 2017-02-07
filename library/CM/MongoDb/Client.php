@@ -62,7 +62,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
     public function batchInsert($collection, array $objectList, array $options = null) {
         $options = $options ?: [];
         CM_Service_Manager::getInstance()->getDebug()->incStats('mongo', "Batch Insert `{$collection}`: " . CM_Params::jsonEncode($objectList));
-        $dataList = \Functional\map($objectList, function (array $object) {
+        $dataList = \Functional\map($objectList, function (array &$object) {
             return $object;
         });
         $result = $this->_getCollection($collection)->batchInsert($dataList, $options);
@@ -240,6 +240,39 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
             }
             return max(0, $count);
         }
+    }
+
+    /**
+     * @param string    $collectionSource
+     * @param string    $collectionTarget
+     * @param bool|null $dropTarget
+     * @return array
+     * @throws CM_MongoDb_Exception
+     */
+    public function rename($collectionSource, $collectionTarget, $dropTarget = null) {
+        $collectionSource = (string) $collectionSource;
+        $collectionTarget = (string) $collectionTarget;
+
+        $dropTarget = (bool) $dropTarget;
+        if (!$this->existsCollection($collectionSource)) {
+            throw new CM_MongoDb_Exception('Source collection does not exist', null, [
+                'collectionSource' => $collectionSource,
+                'collectionTarget' => $collectionTarget,
+            ]);
+        }
+        if (!$dropTarget && $this->existsCollection($collectionTarget)) {
+            throw new CM_MongoDb_Exception('Target collection already exists', null, [
+                'collectionSource' => $collectionSource,
+                'collectionTarget' => $collectionTarget,
+            ]);
+        }
+        $result = $this->_getClient()->selectDB('admin')->command([
+            'renameCollection' => $this->_getDatabaseName() . '.' . $collectionSource,
+            'to'               => $this->_getDatabaseName() . '.' . $collectionTarget,
+            'dropTarget'       => $dropTarget,
+        ]);
+        $this->_checkResultForErrors($result);
+        return $result;
     }
 
     /**

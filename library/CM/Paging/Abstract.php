@@ -172,7 +172,10 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
             $itemsRaw = $this->_source->getItems(null, null);
             foreach ($itemsRaw as $itemRaw) {
                 if (!array_key_exists($field, $itemRaw)) {
-                    throw new CM_Exception_Invalid(get_called_class() . ' has no field `' . $field . '`.');
+                    throw new CM_Exception_Invalid('Class has no requested field.', null, [
+                        'className' => get_called_class(),
+                        'field'     => $field,
+                    ]);
                 }
                 $sum += $itemRaw[$field];
             }
@@ -299,6 +302,14 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
         return ($this->_getStalenessChance() != 0);
     }
 
+    protected function _clearItems() {
+        $this->_items = array();
+        $this->_itemsRaw = null;
+        $this->_itemsRawTree = null;
+        $this->_iteratorPosition = 0;
+        $this->_iteratorItems = null;
+    }
+
     /**
      * @return int Multiple of items per page to load from CM_PagingSource_Abstract
      */
@@ -317,18 +328,34 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
     }
 
     /**
-     * @param array $itemsRaw
-     */
-    protected function _onLoadItemsRaw(array $itemsRaw) {
-    }
-
-    /**
      * @param mixed $itemRaw
      * @return mixed Processed item
      * @throws CM_Exception_Nonexistent
      */
     protected function _processItem($itemRaw) {
         return $itemRaw;
+    }
+
+    /**
+     * @return array Raw items (might contain more than $this->_pageSize)
+     */
+    protected function _getItemsRaw() {
+        if ($this->_itemsRaw === null) {
+            $this->_itemsRaw = array();
+            if ($this->_source) {
+                $count = ($this->_pageSize === null) ? null : (int) ceil($this->_pageSize * $this->_getPageFillRate());
+                $itemsRaw = $this->_source->getItems($this->_getItemOffset(), $count);
+                foreach ($itemsRaw as &$itemRaw) {
+                    if ($this->_flattenItems) {
+                        if (is_array($itemRaw) && count($itemRaw) == 1) {
+                            $itemRaw = reset($itemRaw);
+                        }
+                    }
+                    $this->_itemsRaw[] = $itemRaw;
+                }
+            }
+        }
+        return $this->_itemsRaw;
     }
 
     /**
@@ -352,29 +379,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
     }
 
     /**
-     * @return array Raw items (might contain more than $this->_pageSize)
-     */
-    private function _getItemsRaw() {
-        if ($this->_itemsRaw === null) {
-            $this->_itemsRaw = array();
-            if ($this->_source) {
-                $count = ($this->_pageSize === null) ? null : (int) ceil($this->_pageSize * $this->_getPageFillRate());
-                $itemsRaw = $this->_source->getItems($this->_getItemOffset(), $count);
-                foreach ($itemsRaw as &$itemRaw) {
-                    if ($this->_flattenItems) {
-                        if (is_array($itemRaw) && count($itemRaw) == 1) {
-                            $itemRaw = reset($itemRaw);
-                        }
-                    }
-                    $this->_itemsRaw[] = $itemRaw;
-                }
-            }
-            $this->_onLoadItemsRaw($this->_itemsRaw);
-        }
-        return $this->_itemsRaw;
-    }
-
-    /**
      * @return int OR null if no pageSize set
      */
     private function _getItemOffset() {
@@ -382,14 +386,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
             return null;
         }
         return (int) $this->_pageOffset * $this->_pageSize;
-    }
-
-    private function _clearItems() {
-        $this->_items = array();
-        $this->_itemsRaw = null;
-        $this->_itemsRawTree = null;
-        $this->_iteratorPosition = 0;
-        $this->_iteratorItems = null;
     }
 
     private function _clearCount() {

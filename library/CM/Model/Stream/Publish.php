@@ -23,15 +23,16 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
         return CM_Db_Db::select('cm_stream_publish', '*', array('id' => $this->getId()))->fetch();
     }
 
-    protected function _onDeleteBefore() {
-        $streamChannel = $this->getStreamChannel();
-        if ($streamChannel->isValid()) {
-            $streamChannel->onUnpublish($this);
-        }
+    protected function _onCreate() {
+        $this->getStreamChannel()->onPublish($this);
     }
 
     protected function _onDelete() {
         CM_Db_Db::delete('cm_stream_publish', array('id' => $this->getId()));
+    }
+
+    protected function _onDeleteAfter() {
+        $this->getStreamChannel()->onUnpublish($this);
     }
 
     /**
@@ -54,13 +55,16 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
         $streamChannel = $data['streamChannel'];
         $start = (int) $data['start'];
 
-        if (!$streamChannel->isValid()) {
-            throw new CM_Exception_Invalid('Stream channel not valid', CM_Exception::WARN);
-        }
-
-        $allowedUntil = $streamChannel->canPublish($user, time());
-        if ($allowedUntil <= time()) {
-            throw new CM_Exception_NotAllowed('Not allowed to publish');
+        $allowedUntil = null;
+        if ($streamChannel instanceof CM_StreamChannel_DisallowInterface) {
+            /** @var CM_StreamChannel_DisallowInterface $streamChannel */
+            if (!$streamChannel->isValid()) {
+                throw new CM_Exception_Invalid('Stream channel not valid', CM_Exception::WARN);
+            }
+            $allowedUntil = $streamChannel->canPublish($user, time());
+            if ($allowedUntil <= time()) {
+                throw new CM_Exception_NotAllowed('Not allowed to publish');
+            }
         }
 
         $key = (string) $data['key'];
@@ -72,7 +76,6 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
             'channelId'    => $streamChannel->getId(),
         ));
         $streamPublish = new self($id);
-        $streamChannel->onPublish($streamPublish);
         return $streamPublish;
     }
 }

@@ -3,22 +3,33 @@
  * @extends CM_Class_Abstract
  */
 var CM_App = CM_Class_Abstract.extend({
-  /** @type Object **/
+  /** @type {Object} **/
   views: {},
+
+  /** @type {Logger} **/
+  logger: (cm.logger || null),
+
+  /** @type {Object} **/
+  lib: (cm.lib || {}),
 
   /** @type {Object|Null} **/
   viewer: null,
 
-  /** @type Object **/
+  /** @type {Object} **/
   options: {},
 
   ready: function() {
+    this.logger.configure({
+      dev: cm.options.debug
+    });
+    this.promise.ready();
     this.error.ready();
     this.dom.ready();
     this.window.ready();
     this.date.ready();
     this.template.ready();
     this.router.ready();
+    this.stream.ready();
   },
 
   /**
@@ -50,8 +61,8 @@ var CM_App = CM_Class_Abstract.extend({
       return view;
     }
     return _.find(this.views, function(view) {
-      return view.hasClass(className);
-    }) || null;
+        return view.hasClass(className);
+      }) || null;
   },
 
   /**
@@ -76,6 +87,17 @@ var CM_App = CM_Class_Abstract.extend({
       throw new CM_Exception('Cannot find layout');
     }
     return layout;
+  },
+
+  /**
+   * @returns {CM_View_Document}
+   */
+  getDocument: function() {
+    var document = this.findView('CM_View_Document');
+    if (!document) {
+      throw new CM_Exception('Cannot find document');
+    }
+    return document;
   },
 
   /**
@@ -151,7 +173,7 @@ var CM_App = CM_Class_Abstract.extend({
     if (cm.options.urlCdn) {
       url = cm.options.urlCdn + url;
     } else {
-      url = cm.options.url + url;
+      url = cm.options.urlBase + url;
     }
 
     url += '/static';
@@ -170,15 +192,14 @@ var CM_App = CM_Class_Abstract.extend({
    */
   getUrlResource: function(type, path, options) {
     options = _.defaults(options || {}, {
-      'sameOrigin': false,
-      'root': false
+      'sameOrigin': false
     });
 
     var url = '';
     if (!options['sameOrigin'] && cm.options.urlCdn) {
       url = cm.options.urlCdn + url;
     } else {
-      url = cm.options.url + url;
+      url = cm.options.urlBase + url;
     }
 
     if (type && path) {
@@ -191,14 +212,17 @@ var CM_App = CM_Class_Abstract.extend({
       urlParts.push(cm.options.deployVersion);
       urlParts = urlParts.concat(path.split('/'));
 
-      if (options['root']) {
-        url += '/resource-' + urlParts.join('--');
-      } else {
-        url += '/' + urlParts.join('/');
-      }
+      url += '/' + urlParts.join('/');
     }
 
     return url;
+  },
+
+  /**
+   * @returns {string}
+   */
+  getUrlServiceWorker: function() {
+    return cm.options.urlServiceWorker;
   },
 
   /**
@@ -225,86 +249,221 @@ var CM_App = CM_Class_Abstract.extend({
     if (cm.options.language) {
       path += '/' + cm.options.language.abbreviation;
     }
-    path += '/' + this.getSiteId();
-    return this.getUrl(path, null, true);
+    return this.getUrl(path);
+  },
+
+  /**
+   * @returns {String}
+   */
+  getClientId: function() {
+    return $.cookie('clientId');
+  },
+
+  /**
+   * @returns {Object}
+   */
+  getContext: function() {
+    var context = {};
+    context[cm.options.name] = {
+      client: cm.getClientId(),
+      browserWindow: cm.window.getId()
+    };
+    if (cm.viewer) {
+      context[cm.options.name].user = cm.viewer.id;
+    }
+    return context;
+  },
+
+  factory: {
+
+    /**
+     * @param {*} data
+     * @returns {*|CM_Model_Abstract}
+     */
+    create: function(data) {
+      return this._create(data);
+    },
+
+    /**
+     * @param {*} data
+     * @returns {*|CM_Model_Abstract}
+     */
+    _create: function(data) {
+      if ($.isPlainObject(data) || _.isArray(data)) {
+        _.each(data, function(value, key) {
+          data[key] = this._create(value);
+        }.bind(this));
+      }
+      if (this._isCmObject(data)) {
+        return this._toCmObject(data);
+      }
+      return data;
+    },
+
+    /**
+     * @param {*} data
+     * @returns {Boolean}
+     */
+    _isCmObject: function(data) {
+      var className = data && data['_class'];
+      var isClass = className && window[className];
+      var isBackbone = data instanceof Backbone.Model || data instanceof Backbone.Collection;
+      return isClass && !isBackbone;
+    },
+
+    /**
+     * @param {Object} data
+     * @returns {CM_Model_Abstract}
+     */
+    _toCmObject: function(data) {
+      return new window[data['_class']](data);
+    }
+  },
+
+  promise: {
+    ready: function() {
+      var promiseConfig = {};
+      if (cm.options.debug) {
+        promiseConfig['warnings'] = {
+          wForgottenReturn: false
+        };
+      } else {
+        promiseConfig['warnings'] = false;
+      }
+      Promise.config(promiseConfig);
+    }
   },
 
   error: {
-    _callbacks: {_all: []},
+    _handlers: [],
 
     ready: function() {
       $(window).on('unhandledrejection', function(e) {
         e.preventDefault();
-        var error = e.originalEvent.detail.reason;
+        var event = e.originalEvent;
+        var error = null;
+        if (event.detail && event.detail.reason) {
+          error = event.detail.reason;
+        } else if (event.reason) {
+          error = event.reason;
+        } else {
+          error = new Error('Unhandled promise rejection without reason.');
+        }
         if (!(error instanceof Promise.CancellationError)) {
-          cm.error._globalHandler(error);
+          cm.error.handle(error);
         }
       });
     },
 
     /**
-     * @param {Function} fn
+     * @param {{String:Function}} handlers
+     * @param {*} [context]
      */
-    setGlobalHandler: function(fn) {
-      cm.error._globalHandler = fn;
+    registerHandlers: function(handlers, context) {
+      _.each(handlers, function(callback, errorName) {
+        cm.error.registerHandler(errorName, callback, context);
+      });
+    },
+
+    /**
+     * @param {String} errorName
+     * @param {Function} callback
+     * @param {*} [context]
+     */
+    registerHandler: function(errorName, callback, context) {
+      context = context || window;
+      cm.error._handlers.push({
+        errorName: errorName,
+        callback: callback,
+        context: context
+      });
+    },
+
+    /**
+     * @param {String} errorName
+     * @param {Function} [callback]
+     * @param {*} [context]
+     */
+    unregisterHandler: function(errorName, callback, context) {
+      cm.error._handlers = _.reject(cm.error._handlers, function(handler) {
+        return (
+          errorName === handler.errorName &&
+          (_.isFunction(callback) ? callback === handler.callback : true) &&
+          (!_.isUndefined(context) ? context === handler.context : true)
+        );
+      });
+    },
+
+    /**
+     * @param {Error} error
+     */
+    log: function(error) {
+      _.defer(function() {
+        cm.logger.addRecordError(error);
+        throw error;
+      });
     },
 
     /**
      * @param {Error} error
      * @throws Error
      */
-    _globalHandler: function(error) {
+    handle: function(error) {
+      var throwError = true;
       if (error instanceof CM_Exception) {
-        cm.window.hint(error.message);
+        var handlers = _.filter(cm.error._handlers, function(handler) {
+          return handler.errorName === error.name;
+        });
+        if (0 !== handlers.length) {
+          throwError = false;
+          _.every(handlers, function(handler) {
+            return false !== handler.callback.call(handler.context, error);
+          });
+        } else {
+          cm.window.hint(error.message);
+        }
       }
-      throw error;
+      if (throwError) {
+        throw error;
+      }
     }
   },
 
   debug: {
+
     /**
-     * @param {CM_View_Abstract} [view]
-     * @param {Number} [indentation]
+     * @param {CM_View_Abstract|String} [view]
      */
-    viewTree: function(view, indentation) {
-      view = view || cm.findView();
-      indentation = indentation || 0;
-      console.log(new Array(indentation + 1).join("  ") + view.getClass() + " (", view.el, ")");
+    viewTree: function(view) {
+      if (!(view instanceof CM_View_Abstract)) {
+        view = cm.findView(view ? String(view) : view);
+      }
+      if (!view) {
+        throw new Error('View not found');
+      }
+      console.group(view.getClass(), view.el);
       _.each(view.getChildren(), function(child) {
-        cm.debug.viewTree(child, indentation + 1);
+        cm.debug.viewTree(child);
       });
+      console.groupEnd();
     },
 
     /**
-     * @param message
-     * @param [message2]
-     * @param [message3]
+     * @param {*...} messages
      */
-    log: function(message, message2, message3) {
-      if (!cm.options.debug) {
-        return;
-      }
-      var messages = _.toArray(arguments);
-      messages.unshift('[CM]');
-      if (window.console && window.console.log) {
-        var log = window.console.log;
-        if (typeof log == "object" && Function.prototype.bind) {
-          log = Function.prototype.bind.call(console.log, console);
-        }
-        log.apply(console, messages);
-      }
+    log: function(messages) {
+      var args = _.toArray(arguments);
+      var message = args.shift();
+      var time = (Date.now() - performance.timing.navigationStart) / 1000;
+      var timeFormatted = time.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false});
+      var prefix = '[CM ' + timeFormatted + (performance.timing.isPolyfilled ? '!' : '') + ']';
+      cm.logger.debug.apply(cm.logger, [prefix + ' ' + message].concat(args));
     }
   },
 
   dom: {
     _swfId: 0,
     ready: function() {
-      if (window.addEventListener) {
-        window.addEventListener('load', function() {
-          new FastClick(document.body);
-        }, false);
-      }
-
       window.viewportUnitsBuggyfill.init();
     },
     /**
@@ -316,7 +475,6 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('.toggleNext').toggleNext();
       $dom.find('.tabs').tabs();
       $dom.find('.openx-ad:visible').openx();
-      $dom.find('.epom-ad').epom();
       $dom.find('.fancySelect').fancySelect();
       this._setupContentPlaceholder($dom);
     },
@@ -342,45 +500,24 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {jQuery} $dom
      */
     teardown: function($dom) {
+      $dom.find('.openerDropdown').opener('close');
       $dom.find('.timeago').timeago('dispose');
+      $dom.find('img.lazy').trigger('destroy.unveil');
     },
-    /**
-     * @param {jQuery} $element
-     * @param {Function} [success] fn(MediaElement, Element)
-     * @param {Boolean} [preferPlugins]
-     */
-    setupVideo: function($element, success, preferPlugins) {
-      var mode = 'auto';
-      if (preferPlugins) {
-        mode = 'auto_plugin';
-      }
 
-      $element.mediaelementplayer({
-        flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
-        silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
-        videoWidth: '100%',
-        videoHeight: '100%',
-        defaultVideoWidth: '100%',
-        defaultVideoHeight: '100%',
-        mode: mode,
-        success: function(mediaElement, domObject) {
-          var mediaElementMuted = cm.storage.get('mediaElement-muted');
-          var mediaElementVolume = cm.storage.get('mediaElement-volume');
-          if (null !== mediaElementMuted) {
-            mediaElement.setMuted(mediaElementMuted);
-          }
-          if (null !== mediaElementVolume) {
-            mediaElement.setVolume(mediaElementVolume);
-          }
-          mediaElement.addEventListener("volumechange", function() {
-            cm.storage.set('mediaElement-volume', mediaElement.volume);
-            cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
-          });
-          if (success) {
-            success(mediaElement, domObject);
-          }
-        }
-      });
+    /**
+     * @param {String|String[]} sourceList
+     * @param {Object} [options]
+     * @param {Boolean} [options.loop=false]
+     * @param {Boolean} [options.autoplay=false]
+     * @return {Audio}
+     */
+    createAudio: function(sourceList, options) {
+      sourceList = _.isString(sourceList) ? [sourceList] : sourceList;
+      var audio = new cm.lib.Media.Audio();
+      audio.setOptions(options);
+      audio.setSources(sourceList);
+      return audio;
     }
   },
 
@@ -395,6 +532,7 @@ var CM_App = CM_Class_Abstract.extend({
   date: {
     ready: function() {
       $.timeago.settings.allowFuture = true;
+      $.timeago.settings.autoDispose = false;
       $.timeago.settings.strings = {
         prefixAgo: cm.language.get('.date.timeago.prefixAgo', {count: '%d'}),
         prefixFromNow: cm.language.get('.date.timeago.prefixFromNow', {count: '%d'}),
@@ -414,6 +552,7 @@ var CM_App = CM_Class_Abstract.extend({
         wordSeparator: " ",
         numbers: []
       };
+      $.cookie('timezoneOffset', (new Date()).getTimezoneOffset() * 60);
     },
     /**
      * @return {Number} Unix-timestamp
@@ -427,13 +566,6 @@ var CM_App = CM_Class_Abstract.extend({
      */
     iso8601: function(date) {
       return date.getUTCFullYear() + '-' + cm.string.padLeft(date.getUTCMonth() + 1, 2, '0') + '-' + cm.string.padLeft(date.getUTCDate(), 2, '0') + 'T' + cm.string.padLeft(date.getUTCHours(), 2, '0') + ':' + cm.string.padLeft(date.getUTCMinutes(), 2, '0') + ':' + cm.string.padLeft(date.getUTCSeconds(), 2, '0') + '.' + cm.string.padLeft(date.getUTCMilliseconds(), 3, '0') + 'Z';
-    },
-    /**
-     * @param {Number} [timestamp]
-     * @return {jQuery}
-     */
-    $timeago: function(timestamp) {
-      return $(this.timeago(timestamp)).timeago();
     },
     /**
      * @param {Number} [timestamp]
@@ -522,13 +654,13 @@ var CM_App = CM_Class_Abstract.extend({
       $html.find('.box-body').text(question);
       $html.find('.box-footer').append($ok, $cancel);
 
-      $html.floatOut();
+      $html.floatbox();
       $ok.click(function() {
-        $html.floatIn();
+        $html.floatbox('close');
         callback.call(context);
       });
       $cancel.click(function() {
-        $html.floatIn();
+        $html.floatbox('close');
       });
       $ok.focus();
     }
@@ -753,34 +885,40 @@ var CM_App = CM_Class_Abstract.extend({
   storage: {
     /**
      * @param {String} key
-     * @param {Object} value
+     * @param {*} value
      */
     set: function(key, value) {
-      try {
-        localStorage.setItem(cm.getSiteId() + ':' + key, JSON.stringify(value));
-      } catch (e) {
-        // iOS5 Private Browsing mode which throws QUOTA_EXCEEDED_ERR: DOM Exception 22
-      }
+      this._getPersistentStorage().set(key, value);
     },
 
     /**
      * @param {String} key
-     * @return {*|Null}
+     * @return {*|null}
      */
     get: function(key) {
-      var value = localStorage.getItem(cm.getSiteId() + ':' + key);
-      if (value === null) {
-        // See: https://code.google.com/p/android/issues/detail?id=11973
-        return null;
-      }
-      return JSON.parse(value);
+      var value = this._getPersistentStorage().get(key);
+      return !_.isUndefined(value) ? value : null;
     },
 
     /**
      * @param {String} key
      */
     del: function(key) {
-      localStorage.removeItem(cm.getSiteId() + ':' + key);
+      this._getPersistentStorage().del(key);
+    },
+
+    /** @type {PersistentStorage|null} **/
+    _data: null,
+
+    /**
+     * @returns {PersistentStorage}
+     * @private
+     */
+    _getPersistentStorage: function() {
+      if (!this._data) {
+        this._data = new cm.lib.PersistentStorage(cm.options.name + ':' + cm.getSiteId(), localStorage, cm.logger);
+      }
+      return this._data;
     }
   },
 
@@ -791,10 +929,9 @@ var CM_App = CM_Class_Abstract.extend({
    */
   ajax: function(type, data) {
     var url = this.getUrlAjax(type);
-    var self = this;
     var jqXHR;
 
-    return new Promise(function(resolve, reject) {
+    var ajaxPromise = new Promise(function(resolve, reject, onCancel) {
       jqXHR = $.ajax(url, {
         data: JSON.stringify(data),
         type: 'POST',
@@ -808,33 +945,33 @@ var CM_App = CM_Class_Abstract.extend({
             cm.router.forceReload();
           }
           if (response.error) {
-            reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic));
+            reject(new (CM_Exception.factory(response.error.type))(response.error.msg, response.error.isPublic, response.error.metaInfo));
           } else {
-            resolve(response.success);
+            resolve(cm.factory.create(response.success));
           }
         })
         .fail(function(xhr, textStatus) {
           if (xhr.status === 0) {
             if (window.navigator.onLine) {
-              reject(Promise.CancellationError());
+              ajaxPromise.cancel();
             } else {
               reject(new CM_Exception_RequestFailed(cm.language.get('No Internet connection')));
             }
+          } else {
+            var msg = cm.language.get('An unexpected connection problem occurred.');
+            if (cm.options.debug) {
+              msg = xhr.responseText || textStatus;
+            }
+            reject(new CM_Exception(msg));
           }
-
-          var msg = cm.language.get('An unexpected connection problem occurred.');
-          if (cm.options.debug) {
-            msg = xhr.responseText || textStatus;
-          }
-          reject(new CM_Exception(msg));
         });
-    }).cancellable()
-      .catch(Promise.CancellationError, function(error) {
+      onCancel(function() {
         if (jqXHR) {
           jqXHR.abort();
         }
-        throw error;
       });
+    });
+    return ajaxPromise;
   },
 
   /**
@@ -858,6 +995,19 @@ var CM_App = CM_Class_Abstract.extend({
 
     /** @type {Object} */
     _channelDispatchers: {},
+
+    ready: function() {
+      if (!cm.options.stream.enabled) {
+        return;
+      }
+      if (!cm.options.stream.channel) {
+        return;
+      }
+      if (cm.options.stream.channel.key && cm.options.stream.channel.type) {
+        var channel = cm.options.stream.channel.key + ':' + cm.options.stream.channel.type;
+        this._subscribe(channel);
+      }
+    },
 
     /**
      * @param {String} channelKey
@@ -954,11 +1104,12 @@ var CM_App = CM_Class_Abstract.extend({
       this._channelDispatchers[channel] = _.clone(Backbone.Events);
       this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(event, data) {
         if (handler._channelDispatchers[channel]) {
+          data = cm.factory.create(data);
+          cm.debug.log('Stream channel (`%s): event `%s`: %o', channel, event, data);
           handler._channelDispatchers[channel].trigger(event, data);
-          cm.debug.log('Stream channel (' + channel + '): event `' + event + '`: ', data);
         }
       });
-      cm.debug.log('Stream channel (' + channel + '): subscribe');
+      cm.debug.log('Stream channel (`%s`): subscribe', channel);
     },
 
     /**
@@ -969,7 +1120,7 @@ var CM_App = CM_Class_Abstract.extend({
         delete this._channelDispatchers[channel];
       }
       this._adapter.unsubscribe(channel);
-      cm.debug.log('Stream channel (' + channel + '): unsubscribe');
+      cm.debug.log('Stream channel (`%s`): unsubscribe', channel);
     }
   },
 
@@ -1014,12 +1165,13 @@ var CM_App = CM_Class_Abstract.extend({
     /**
      * @param {CM_View_Abstract} view
      * @param {String} eventName
-     * @param {*} data
+     * @param {...*} data
      */
     trigger: function(view, eventName, data) {
       var parent = view;
+      var eventArguments = _.toArray(arguments).slice(2);
       while (parent = parent.getParent()) {
-        this._dispatcher.trigger(this._getEventName(parent, view.getClass(), eventName), view, data);
+        this._dispatcher.trigger.apply(this._dispatcher, [this._getEventName(parent, view.getClass(), eventName), view].concat(eventArguments));
       }
     }
   },
@@ -1143,15 +1295,15 @@ var CM_App = CM_Class_Abstract.extend({
           return;
         }
         router.hrefInitialIgnore = null;
-        router._handleLocationChange(router._getFragment());
+        router._handleLocationChange(location.href);
       });
 
-      var urlBase = cm.getUrl();
+      var urlSite = cm.getUrl();
       $(document).on('click', 'a[href]:not([data-router-disabled=true])', function(event) {
         var metaPressed = (event.ctrlKey || event.metaKey);
-        var partOfUrlBase = 0 === this.href.indexOf(urlBase);
-        if (!metaPressed && partOfUrlBase) {
-          var fragment = this.href.substr(urlBase.length);
+        var partOfUrlSite = 0 === this.href.indexOf(urlSite);
+        if (!metaPressed && partOfUrlSite) {
+          var fragment = this.href.substr(urlSite.length);
           var forceReload = $(this).data('force-reload');
           router.route(fragment, forceReload);
           event.preventDefault();
@@ -1172,14 +1324,12 @@ var CM_App = CM_Class_Abstract.extend({
     route: function(url, forceReload, replaceState) {
       forceReload = this._shouldReload || forceReload || false;
       replaceState = replaceState || false;
-      var urlBase = cm.getUrl();
-      var fragment = url;
+      var urlSite = cm.getUrl();
       if ('/' == url.charAt(0)) {
-        url = urlBase + fragment;
-      } else {
-        fragment = url.substr(urlBase.length);
+        url = urlSite + url;
       }
-      if (forceReload || 0 !== url.indexOf(urlBase)) {
+      var fragment = this._getFragmentByUrl(url);
+      if (forceReload || 0 !== url.indexOf(urlSite)) {
         window.location.assign(url);
         return Promise.resolve();
       }
@@ -1190,7 +1340,7 @@ var CM_App = CM_Class_Abstract.extend({
           this.pushState(fragment);
         }
       }
-      return this._handleLocationChange(fragment);
+      return this._handleLocationChange(url);
     },
 
     /**
@@ -1213,33 +1363,48 @@ var CM_App = CM_Class_Abstract.extend({
      * @returns string
      */
     _getFragment: function() {
-      var location = window.location;
-      return location.pathname + location.search + location.hash;
+      return this._getFragmentByLocation(window.location);
     },
 
     /**
-     * @param {String} fragment
+     * @param {String} url
      * @returns Location
      */
-    _getLocationByFragment: function(fragment) {
+    _getLocationByUrl: function(url) {
       var location = document.createElement('a');
-      if (fragment) {
-        location.href = fragment;
+      if (url) {
+        location.href = url;
       }
       return location;
     },
 
     /**
-     * @param {String} fragment
+     * @param {Location} location
+     * @returns string
+     */
+    _getFragmentByLocation: function(location) {
+      return location.pathname + location.search + location.hash;
+    },
+
+    /**
+     * @param {String} url
+     * @returns string
+     */
+    _getFragmentByUrl: function(url) {
+      return this._getFragmentByLocation(this._getLocationByUrl(url));
+    },
+
+    /**
+     * @param {String} url
      * @returns {Promise}
      */
-    _handleLocationChange: function(fragment) {
+    _handleLocationChange: function(url) {
       var paramsStateNext = null;
       var pageCurrent = cm.getLayout().findPage();
 
       if (pageCurrent && pageCurrent.hasStateParams()) {
-        var locationCurrent = this._getLocationByFragment(pageCurrent.getFragment());
-        var locationNext = this._getLocationByFragment(fragment);
+        var locationCurrent = this._getLocationByUrl(pageCurrent.getUrl());
+        var locationNext = this._getLocationByUrl(url);
 
         if (locationCurrent.pathname === locationNext.pathname) {
           var paramsCurrent = cm.request.parseQueryParams(locationCurrent.search);
@@ -1257,11 +1422,20 @@ var CM_App = CM_Class_Abstract.extend({
       }
 
       if (paramsStateNext) {
-        if (false !== cm.getLayout().getPage().routeToState(paramsStateNext, fragment)) {
+        if (false !== cm.getLayout().getPage().routeToState(paramsStateNext, url)) {
           return Promise.resolve();
         }
       }
-      return cm.getLayout().loadPage(fragment);
+
+      var urlSite = cm.getUrl();
+      var urlBase = cm.options.urlBase;
+      if (0 === url.indexOf(urlSite)) {
+        var path = url.substr(urlBase.length);
+        return cm.getDocument().loadPage(path);
+      } else {
+        window.location.assign(url);
+        return Promise.resolve();
+      }
     }
   },
 
@@ -1288,5 +1462,9 @@ var CM_App = CM_Class_Abstract.extend({
       });
       return params;
     }
-  }
+  },
+
+  userAgent: (function(ua) {
+    return window.UserAgentParser.parse(ua);
+  })(navigator.userAgent || '')
 });

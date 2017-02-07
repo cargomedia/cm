@@ -3,7 +3,7 @@
 class CM_Asset_CssTest extends CMTest_TestCase {
 
     public function testAdd() {
-        $render = new CM_Frontend_Render();
+        $render = $this->_getRender(true);
         $css = new CM_Asset_Css($render, 'font-size: 12;', [
             'prefix' => '#foo',
         ]);
@@ -29,7 +29,7 @@ EOD;
     }
 
     public function testImage() {
-        $render = new CM_Frontend_Render();
+        $render = $this->_getRender(true);
         $css = new CM_Asset_Css($render, "body { background: image('icon/mailbox_read.png') no-repeat 66px 7px; }");
         $url = $render->getUrlResource('layout', 'img/icon/mailbox_read.png');
         $expected = <<<EOD
@@ -40,8 +40,36 @@ EOD;
         $this->assertEquals(trim($expected), $css->get());
     }
 
+    public function testImageInline() {
+        $render = $this->_getRender(true);
+        $css = new CM_Asset_Css($render, "body { background: image-inline('logo.png') no-repeat 200px 95px; }");
+
+        $encodedImageBeginning = preg_quote('R0lGODlhyABfAPEAADw8Oz+0/wAAAAAAACH5BAEAAAIALAAAAADIAF8AAAL+lI+py+0Po5y02ouz3rz7D4biSJbmiabqyrbuC', '/');
+        $encodedImageEnding = preg_quote('mW6WCddrhkk7dyWqiqbFLZIp7gwohcZpM9OKhd6q7LbrvuvgtvvPLOS68tBQAAOw==', '/');
+        $expectedRegex = <<<EOD
+/^body {
+  background: url\('data\:image\/gif;base64,$encodedImageBeginning.+?$encodedImageEnding'\) no-repeat 200px 95px;
+}$/
+EOD;
+        $this->assertRegExp($expectedRegex, $css->get());
+    }
+
+    public function testImageInlineResize() {
+        $render = $this->_getRender(true);
+        $css = new CM_Asset_Css($render, "body { background: image-inline('logo.png', 100) no-repeat 100px 47px; }");
+
+        $encodedImageBeginning = preg_quote('R0lGODlhZAAvAPEAADw8Oz+0/wAAAAAAACH5BAEAAAIALAAAAABkAC8AAAL+lI+py+0Po5y02ouz3rz7D4ZKEIxlQorqRbZHm', '/');
+        $encodedImageEnding = preg_quote('GQMJEuI8fSVFnoSWUuOxdjD3Sctm8107iMx8bnugkILCpErXrbOoK6rUqVQ9FQAAOw==', '/');
+        $expectedRegex = <<<EOD
+/^body {
+  background: url\('data\:image\/gif;base64,$encodedImageBeginning.+?$encodedImageEnding'\) no-repeat 100px 47px;
+}$/
+EOD;
+        $this->assertRegExp($expectedRegex, $css->get());
+    }
+
     public function testBackgroundImage() {
-        $render = new CM_Frontend_Render();
+        $render = $this->_getRender(true);
         $css = new CM_Asset_Css($render, "body { background-image: image('icon/mailbox_read.png'); }");
         $url = $render->getUrlResource('layout', 'img/icon/mailbox_read.png');
         $expected = <<<EOD
@@ -53,7 +81,7 @@ EOD;
     }
 
     public function testUrlFont() {
-        $render = new CM_Frontend_Render();
+        $render = $this->_getRender(true);
         $css = new CM_Asset_Css($render, "body { src: url(urlFont('file.eot')); }");
         $url = $render->getUrlStatic('/font/file.eot');
         $expected = <<<EOD
@@ -65,7 +93,7 @@ EOD;
     }
 
     public function testMixin() {
-        $render = new CM_Frontend_Render();
+        $render = $this->_getRender(true);
         $css = <<<'EOD'
 .mixin() {
 	font-size:5;
@@ -94,7 +122,7 @@ EOD;
     }
 
     public function testAutoprefixer() {
-        $render = new CM_Frontend_Render();
+        $render = $this->_getRender(true);
         $css = <<<'EOD'
 .foo {
 	transition: transform 1s;
@@ -113,7 +141,7 @@ EOD;
     }
 
     public function testMedia() {
-        $render = new CM_Frontend_Render();
+        $render = $this->_getRender(true);
         $css = <<<'EOD'
 .foo {
 	color: blue;
@@ -138,7 +166,7 @@ EOD;
     }
 
     public function testCompress() {
-        $render = new CM_Frontend_Render();
+        $render = $this->_getRender(false);
         $css = <<<'EOD'
 .foo {
 	color: red;
@@ -148,6 +176,14 @@ EOD;
         $css = new CM_Asset_Css($render, $css, [
             'autoprefixerBrowsers' => 'Chrome 30',
         ]);
-        $this->assertSame(trim($expected), $css->get(true));
+        $this->assertSame(trim($expected), $css->get());
+    }
+
+    /**
+     * @param bool $isDebug
+     * @return CM_Frontend_Render
+     */
+    protected function _getRender($isDebug) {
+        return new CM_Frontend_Render(new CM_Frontend_Environment(null, null, null, null, $isDebug));
     }
 }

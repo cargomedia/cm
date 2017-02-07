@@ -60,15 +60,17 @@ class CM_Model_Location_State extends CM_Model_Location_Abstract {
                 return $this;
             case CM_Model_Location::LEVEL_CITY:
             case CM_Model_Location::LEVEL_ZIP:
-                throw new CM_Exception_Invalid('Invalid parent location level `' . $level . '` for a state');
+                throw new CM_Exception_Invalid('Invalid parent location level for a state', null, ['level' => $level]);
         }
-        throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
+        throw new CM_Exception_Invalid('Invalid location level', null, ['level' => $level]);
     }
 
     public function _getSchema() {
         return new CM_Model_Schema_Definition(array(
             'countryId'    => array('type' => 'CM_Model_Location_Country'),
             'name'         => array('type' => 'string'),
+            'lat'          => array('type' => 'float', 'optional' => true),
+            'lon'          => array('type' => 'float', 'optional' => true),
             'abbreviation' => array('type' => 'string', 'optional' => true),
             '_maxmind'     => array('type' => 'string', 'optional' => true),
         ));
@@ -79,14 +81,18 @@ class CM_Model_Location_State extends CM_Model_Location_Abstract {
      * @param string                    $name
      * @param string|null               $abbreviation
      * @param string|null               $maxMind
+     * @param float|null                $latitude
+     * @param float|null                $longitude
      * @return CM_Model_Location_State
      */
-    public static function create(CM_Model_Location_Country $country, $name, $abbreviation = null, $maxMind = null) {
+    public static function create(CM_Model_Location_Country $country, $name, $abbreviation = null, $maxMind = null, $latitude = null, $longitude = null) {
         $state = new self();
         $state->_set(array(
-            'name'         => $name,
-            'abbreviation' => $abbreviation,
             'countryId'    => $country,
+            'name'         => $name,
+            'lat'          => $latitude,
+            'lon'          => $longitude,
+            'abbreviation' => $abbreviation,
             '_maxmind'     => $maxMind,
         ));
         $state->commit();

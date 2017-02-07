@@ -23,16 +23,16 @@ class CM_Session implements CM_Comparable {
     private $_isPersistent = false;
 
     /**
-     * @param string|null              $id
+     * @param string|null                   $id
      * @param CM_Http_Request_Abstract|null $request
-     * @throws CM_Exception_Nonexistent
+     * @throws CM_Exception_UnknownSessionId
      */
     public function __construct($id = null, CM_Http_Request_Abstract $request = null) {
         if (null !== $id) {
             $this->_id = (string) $id;
             $data = self::_findDataById($this->getId());
             if (null === $data) {
-                throw new CM_Exception_Nonexistent('Session `' . $this->getId() . '` does not exist.');
+                throw new CM_Exception_UnknownSessionId('Session does not exist.', null, ['sessionId' => $this->getId()]);
             }
             $this->_isPersistent = true;
             $expires = (int) $data['expires'];
@@ -71,6 +71,11 @@ class CM_Session implements CM_Comparable {
             $this->delete('userId');
             $this->regenerateId();
         }
+    }
+
+    public function logoutUser() {
+        $this->deleteUser();
+        $this->setLifetime(null);
     }
 
     /**
@@ -137,6 +142,13 @@ class CM_Session implements CM_Comparable {
     }
 
     /**
+     * @param CM_Http_Request_Abstract $request
+     */
+    public function setRequest(CM_Http_Request_Abstract $request) {
+        $this->_request = $request;
+    }
+
+    /**
      * @param bool|null $needed
      * @throws CM_Exception_AuthRequired
      * @return CM_Model_User|null
@@ -164,6 +176,7 @@ class CM_Session implements CM_Comparable {
         $this->regenerateId();
         if ($request = $this->getRequest()) {
             CM_Splittest_Fixture::setUserForRequestClient($request, $user);
+            $user->getUseragents()->addFromRequest($request);
         }
     }
 
@@ -220,9 +233,9 @@ class CM_Session implements CM_Comparable {
             $user->updateLatestActivityThrottled();
             if (!$user->getOnline()) {
                 $user->setOnline(true);
-            }
-            if (null !== $user->getOfflineStamp()) {
-                $user->setOfflineStamp(null);
+                if ($request = $this->getRequest()) {
+                    $user->getUseragents()->addFromRequest($request);
+                }
             }
         }
     }

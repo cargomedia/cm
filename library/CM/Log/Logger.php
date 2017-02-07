@@ -11,139 +11,143 @@ class CM_Log_Logger {
     /**
      * @var array $levels Logging levels
      */
-    protected static $_levels = array(
+    protected static $_levels = [
         self::DEBUG    => 'DEBUG',
         self::INFO     => 'INFO',
         self::WARNING  => 'WARNING',
         self::ERROR    => 'ERROR',
         self::CRITICAL => 'CRITICAL',
-    );
+    ];
 
-    /** @var CM_Log_Handler_HandlerInterface[] */
-    private $_handlerList;
+    /** @var  CM_Log_Handler_HandlerInterface */
+    private $_handler;
 
     /** @var CM_Log_Context */
-    private $_contextGlobal;
+    private $_context;
 
     /**
-     * @param CM_Log_Context                         $contextGlobal
-     * @param CM_Log_Handler_HandlerInterface[]|null $handlerList
+     * @param CM_Log_Context|null                  $context
+     * @param CM_Log_Handler_HandlerInterface|null $handler
+     * @throws CM_Exception_Invalid
      */
-    public function __construct(CM_Log_Context $contextGlobal, array $handlerList = null) {
-        if (null === $handlerList) {
-            $handlerList = [];
+    public function __construct(CM_Log_Context $context = null, CM_Log_Handler_HandlerInterface $handler = null) {
+        if (null !== $context) {
+            $this->setContext($context);
         }
-        $this->_handlerList = [];
-        $this->_contextGlobal = $contextGlobal;
-
-        $this->addHandlers($handlerList);
-    }
-
-    /**
-     * @param CM_Log_Record $record
-     * @throws CM_Log_HandlingException
-     */
-    public function addRecord(CM_Log_Record $record) {
-        $exceptionList = [];
-        foreach ($this->_handlerList as $handler) {
-            try {
-                $handler->handleRecord($record);
-            } catch (Exception $e) {
-                $exceptionList[] = $e;
-            }
-        }
-        if (!empty($exceptionList)) {
-            $exceptionMessage = count($exceptionList) . ' handler(s) failed to process a record.';
-            throw new CM_Log_HandlingException($exceptionMessage, $exceptionList);
-        }
-    }
-
-    /**
-     * @param string              $message
-     * @param int                 $level
-     * @param CM_Log_Context|null $context
-     */
-    public function addMessage($message, $level, CM_Log_Context $context = null) {
-        $message = (string) $message;
-        $level = (int) $level;
-        $context = $this->_mergeWithGlobalContext($context);
-        $this->addRecord(new CM_Log_Record($level, $message, $context));
-    }
-
-    /**
-     * @param Exception           $exception
-     * @param CM_Log_Context|null $context
-     */
-    public function addException(Exception $exception, CM_Log_Context $context = null) {
-        $context = $this->_mergeWithGlobalContext($context);
-        $this->addRecord(new CM_Log_Record_Exception($exception, $context));
-    }
-
-    /**
-     * @param CM_Log_Handler_HandlerInterface[] $handlerList
-     */
-    public function addHandlers(array $handlerList) {
-        foreach ($handlerList as $handler) {
-            $this->addHandler($handler);
+        if (null !== $handler) {
+            $this->setHandler($handler);
         }
     }
 
     /**
      * @param CM_Log_Handler_HandlerInterface $handler
      */
-    public function addHandler(CM_Log_Handler_HandlerInterface $handler) {
-        $this->_handlerList[] = $handler;
+    public function setHandler($handler) {
+        $this->_handler = $handler;
+    }
+
+    /**
+     * @return CM_Log_Handler_HandlerInterface
+     * @throws CM_Exception
+     */
+    public function getHandler() {
+        if (null === $this->_handler) {
+            throw new CM_Exception('Handler not set');
+        }
+        return $this->_handler;
+    }
+
+    /**
+     * @param CM_Log_Context $context
+     */
+    public function setContext($context) {
+        $this->_context = $context;
+    }
+
+    /**
+     * @return CM_Log_Context
+     * @throws CM_Exception
+     */
+    public function getContext() {
+        if (null === $this->_context) {
+            throw new CM_Exception('Context not set');
+        }
+        return $this->_context;
+    }
+
+    /**
+     * @param string              $message
+     * @param int                 $level
+     * @param CM_Log_Context|null $context
+     * @return CM_Log_Logger
+     */
+    public function addMessage($message, $level, CM_Log_Context $context = null) {
+        $message = (string) $message;
+        $level = (int) $level;
+
+        if ($this->_context) {
+            $recordContext = clone $this->_context;
+        } else {
+            $recordContext = new CM_Log_Context();
+        }
+        if ($context) {
+            $recordContext->merge($context);
+        }
+        return $this->_addRecord(new CM_Log_Record($level, $message, $recordContext));
     }
 
     /**
      * @param string              $message
      * @param CM_Log_Context|null $context
+     * @return CM_Log_Logger
      */
     public function debug($message, CM_Log_Context $context = null) {
-        $this->addMessage($message, self::DEBUG, $context);
+        return $this->addMessage($message, self::DEBUG, $context);
     }
 
     /**
      * @param string              $message
      * @param CM_Log_Context|null $context
+     * @return CM_Log_Logger
      */
     public function info($message, CM_Log_Context $context = null) {
-        $this->addMessage($message, self::INFO, $context);
+        return $this->addMessage($message, self::INFO, $context);
     }
 
     /**
      * @param string              $message
      * @param CM_Log_Context|null $context
+     * @return CM_Log_Logger
      */
     public function warning($message, CM_Log_Context $context = null) {
-        $this->addMessage($message, self::WARNING, $context);
+        return $this->addMessage($message, self::WARNING, $context);
     }
 
     /**
      * @param string              $message
      * @param CM_Log_Context|null $context
+     * @return CM_Log_Logger
      */
     public function error($message, CM_Log_Context $context = null) {
-        $this->addMessage($message, self::ERROR, $context);
+        return $this->addMessage($message, self::ERROR, $context);
     }
 
     /**
      * @param string              $message
      * @param CM_Log_Context|null $context
+     * @return CM_Log_Logger
      */
     public function critical($message, CM_Log_Context $context = null) {
-        $this->addMessage($message, self::CRITICAL, $context);
+        return $this->addMessage($message, self::CRITICAL, $context);
     }
 
     /**
-     * @param CM_Log_Context|null $context
-     * @return CM_Log_Context
+     * @param CM_Log_Record $record
+     * @return CM_Log_Logger
      */
-    protected function _mergeWithGlobalContext(CM_Log_Context $context = null) {
-        if (null === $context) {
-            $context = new CM_Log_Context();
-        }
-        return $this->_contextGlobal->merge($context);
+    protected function _addRecord(CM_Log_Record $record) {
+        $this->getHandler()->handleRecord($record);
+        return $this;
     }
 
     /**
@@ -165,7 +169,10 @@ class CM_Log_Logger {
     public static function getLevelName($level) {
         $level = (int) $level;
         if (!isset(self::$_levels[$level])) {
-            throw new CM_Exception_Invalid('Level `' . $level . '` is not defined, use one of: ' . implode(', ', array_keys(self::$_levels)));
+            throw new CM_Exception_Invalid('Level is not defined', null, [
+                'level'           => $level,
+                'availableLevels' => implode(', ', array_keys(self::$_levels)),
+            ]);
         }
         return self::$_levels[$level];
     }
@@ -177,5 +184,30 @@ class CM_Log_Logger {
     public static function hasLevel($level) {
         $level = (int) $level;
         return isset(self::$_levels[$level]);
+    }
+
+    /**
+     * @param Exception $exception
+     * @return int
+     */
+    public static function exceptionToLevel(Exception $exception) {
+        $severity = $exception instanceof CM_Exception ? $exception->getSeverity() : null;
+        return self::severityToLevel($severity);
+    }
+
+    /**
+     * @param int|null $severity
+     * @return int
+     */
+    public static function severityToLevel($severity = null) {
+        if (null !== $severity) {
+            $severity = (int) $severity;
+        }
+        $map = [
+            CM_Exception::WARN  => CM_Log_Logger::WARNING,
+            CM_Exception::ERROR => CM_Log_Logger::ERROR,
+            CM_Exception::FATAL => CM_Log_Logger::CRITICAL,
+        ];
+        return isset($map[$severity]) ? $map[$severity] : CM_Log_Logger::ERROR;
     }
 }

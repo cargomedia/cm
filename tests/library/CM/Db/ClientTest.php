@@ -25,7 +25,7 @@ class CM_Db_ClientTest extends CMTest_TestCase {
             $client->connect();
             $this->fail('Could select nonexistent DB');
         } catch (CM_Db_Exception $e) {
-            $this->assertContains('nonexistent', $e->getMessage());
+            $this->assertContains('nonexistent', $e->getMetaInfo()['originalExceptionMessage']);
         }
     }
 

@@ -1,6 +1,8 @@
 <?php
 
-class CM_MessageStream_Factory {
+class CM_MessageStream_Factory implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /**
      * @param string     $adapterClass
@@ -23,8 +25,13 @@ class CM_MessageStream_Factory {
         $adapterArguments = (array) $adapterArguments;
         $reflectionClass = new ReflectionClass($adapterClass);
         if (!$reflectionClass->isSubclassOf('CM_MessageStream_Adapter_Abstract')) {
-            throw new CM_Exception_Invalid("`{$adapterClass}` is not valid stream message adapter");
+            throw new CM_Exception_Invalid('Adapter class is not valid stream message adapter', null, ['adapterClass' => $adapterClass]);
         }
-        return $reflectionClass->newInstanceArgs($adapterArguments);
+        /** @var CM_MessageStream_Adapter_Abstract $adapter */
+        $adapter = $reflectionClass->newInstanceArgs($adapterArguments);
+        if ($adapter instanceof CM_Service_ManagerAwareInterface) {
+            $adapter->setServiceManager($this->getServiceManager());
+        }
+        return $adapter;
     }
 }

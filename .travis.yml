@@ -1,8 +1,7 @@
 language: php
 
 php:
-  - 5.4
-  - 5.5
+  - 5.6
 
 services:
   - mysql
@@ -16,27 +15,28 @@ addons:
       - mongodb-upstart
     packages:
       - libgearman-dev
-      - libsvm-dev
       - mongodb-org-server
       - re2c
 
 before_script:
+  - phpenv config-rm xdebug.ini
   - tests/travis/install-php-runkit.sh
-  - tests/travis/install-php-svm.sh
+  - source tests/travis/install-phantomjs.sh
   - yes '' | travis_retry pecl install imagick
-  - travis_retry pecl install stats
+  - travis_retry pecl install stats-1.0.3
   - travis_retry pecl install gearman-1.0.3
-  - if [ `php-config --vernum` -ge 50500 ]; then yes '' | travis_retry pecl install apcu-beta; fi
+  - yes '' | travis_retry pecl install apcu-4.0.10
   - phpenv config-add tests/travis/php.ini
-  - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
   - npm install -g autoprefixer@4.0.0
   - npm install -g uglify-js@2.4.13
-
+  - npm install -g browserify@11.2.0
   - composer install
   - cp tests/travis/config.php resources/config/local.php
-  - bin/cm app set-deploy-version
+  - bin/cm app set-config deploy '{"deployVersion":'$(date +"%s")'}'
 
-script: bin/phpunit
+script:
+  - bin/phpunit
+  - bin/qunit
 
 sudo: false
 

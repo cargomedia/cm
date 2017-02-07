@@ -8,12 +8,11 @@ class CM_Model_UserTest extends CMTest_TestCase {
 
     public function testCreate() {
         $user = CM_Model_User::createStatic();
+        $this->assertNull($user->getLatestActivity());
         $this->assertEquals(time(), $user->getCreated());
-        $this->assertEquals(time(), $user->getLatestActivity());
         $this->assertEquals(CM_Site_Abstract::factory(), $user->getSite());
         $this->assertSame(null, $user->getLanguage());
         $this->assertSame(null, $user->getCurrency());
-        $this->assertSame(null, $user->getOfflineStamp());
     }
 
     public function testCreateAllData() {
@@ -24,11 +23,11 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $user = CM_Model_User::createStatic([
             'site'     => $site,
             'language' => $language,
-            'currency'  => $currency,
+            'currency' => $currency,
         ]);
+        $this->assertNull($user->getLatestActivity());
         $this->assertInternalType('int', $user->getCreated());
         $this->assertEquals(time(), $user->getCreated());
-        $this->assertEquals(time(), $user->getLatestActivity());
         $this->assertEquals($site, $user->getSite());
         $this->assertEquals($language, $user->getLanguage());
         $this->assertEquals($currency, $user->getCurrency());
@@ -41,15 +40,6 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertTrue($user->getOnline());
         $user->setOnline(false);
         $this->assertFalse($user->getOnline());
-    }
-
-    public function testGetSetOfflineStamp() {
-        $user = CMTest_TH::createUser();
-        $this->assertNull($user->getOfflineStamp());
-        $user->setOfflineStamp(time());
-        $this->assertSame(time(), $user->getOfflineStamp());
-        $user->setOfflineStamp(null);
-        $this->assertNull($user->getOfflineStamp());
     }
 
     public function testGetPreferences() {
@@ -108,10 +98,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $user = CMTest_TH::createUser();
         $this->assertEquals($siteDefault, $user->getSite());
 
-        $type = $siteDefault->getType() + 1;
-        $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getType'))->getMock();
-        $site->expects($this->any())->method('getType')->will($this->returnValue($type));
-        CM_Config::get()->CM_Site_Abstract->types[$type] = get_class($site);
+        $site = $this->getMockSite();
         $user->setSite($site);
         $this->assertEquals($site, $user->getSite());
     }
@@ -126,6 +113,9 @@ class CM_Model_UserTest extends CMTest_TestCase {
 
     public function testUpdateLatestActivityThrottled() {
         $user = CMTest_TH::createUser();
+        $this->assertNull($user->getLatestActivity());
+        $user->updateLatestActivityThrottled();
+
         $activityStamp1 = time();
         $this->assertSameTime($activityStamp1, $user->getLatestActivity());
         CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2);
@@ -137,30 +127,33 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $this->assertSameTime($activityStamp2, $user->getLatestActivity());
     }
 
-    public function testOfflineDelayed() {
+    public function testOfflineOld() {
         $user1 = CMTest_TH::createUser();
-        $user2 = CMTest_TH::createUser();
-        $user3 = CMTest_TH::createUser();
+        $user1->updateLatestActivityThrottled();
         $user1->setOnline();
-        $user2->setOnline();
-        $user3->setOnline();
 
-        $user1->setOfflineStamp(time());
-        $user2->setOfflineStamp(time());
-        CMTest_TH::timeForward(CM_Model_User::OFFLINE_DELAY);
-        $user3->setOfflineStamp(time());
+        CMTest_TH::timeForward(CM_Model_User::ONLINE_EXPIRATION + 1);
+        $user2 = CMTest_TH::createUser();
+        $user2->updateLatestActivityThrottled();
         $user2->setOnline();
 
-        $userOnlinePaging = new CM_Paging_User_Online();
-        $this->assertEquals([$user1, $user2, $user3], $userOnlinePaging);
+        CM_Model_User::offlineOld();
+        CMTest_TH::reinstantiateModel($user1);
+        CMTest_TH::reinstantiateModel($user2);
 
-        CM_Model_User::offlineDelayed();
-        $userOnlinePaging = new CM_Paging_User_Online();
-        $this->assertEquals([$user1, $user2, $user3], $userOnlinePaging);
+        $this->assertFalse($user1->getOnline());
+        $this->assertTrue($user2->getOnline());
+    }
 
-        CMTest_TH::timeForward(1);
-        CM_Model_User::offlineDelayed();
-        $userOnlinePaging = new CM_Paging_User_Online();
-        $this->assertEquals([$user2, $user3], $userOnlinePaging);
+    public function testGetEnvironment() {
+        $user = CMTest_TH::createUser();
+        $this->assertNull($user->getEnvironment()->getLanguage());
+
+        $defaultLanguage = CMTest_TH::createLanguage('en');
+        $this->assertEquals($defaultLanguage, $user->getEnvironment()->getLanguage());
+
+        $otherLanguage = CMTest_TH::createLanguage('de');
+        $user->setLanguage($otherLanguage);
+        $this->assertEquals($otherLanguage, $user->getEnvironment()->getLanguage());
     }
 }

@@ -1,15 +1,27 @@
 <?php
 
-class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
+class CM_Jobdistribution_JobWorker extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /** @var GearmanWorker */
     private $_gearmanWorker;
 
-    public function __construct() {
-        $worker = $this->_getGearmanWorker();
+    /** @var int */
+    private $_jobLimit;
+
+    /**
+     * @param int $jobLimit
+     */
+    public function __construct($jobLimit) {
+        $this->_jobLimit = (int) $jobLimit;
+
         $config = self::_getConfig();
-        foreach ($config->servers as $server) {
-            $worker->addServer($server['host'], $server['port']);
+        if ($config->servers) {
+            $worker = $this->_getGearmanWorker();
+            foreach ($config->servers as $server) {
+                $worker->addServer($server['host'], $server['port']);
+            }
         }
     }
 
@@ -17,28 +29,27 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
      * @param CM_Jobdistribution_Job_Abstract $job
      */
     public function registerJob(CM_Jobdistribution_Job_Abstract $job) {
-        $this->_gearmanWorker->addFunction(get_class($job), array($job, '__executeGearman'));
+        $this->_gearmanWorker->addFunction(get_class($job), [$job, '__executeGearman']);
     }
 
     public function run() {
+        $jobsRun = 0;
         while (true) {
+            if ($jobsRun >= $this->_jobLimit) {
+                return;
+            }
             $workFailed = false;
             try {
+                $jobsRun++;
+                CM_Cache_Storage_Runtime::getInstance()->flush();
                 $workFailed = !$this->_getGearmanWorker()->work();
             } catch (Exception $ex) {
-                $this->_handleException($ex);
+                $this->getServiceManager()->getLogger()->addMessage('Worker failed', CM_Log_Logger::exceptionToLevel($ex), (new CM_Log_Context())->setException($ex));
             }
             if ($workFailed) {
                 throw new CM_Exception_Invalid('Worker failed');
             }
         }
-    }
-
-    /**
-     * @param Exception $exception
-     */
-    protected function _handleException(Exception $exception) {
-        CM_Bootloader::getInstance()->getExceptionHandler()->handleException($exception);
     }
 
     /**

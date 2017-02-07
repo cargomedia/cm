@@ -59,10 +59,12 @@ class CM_Bootloader {
     public function getExceptionHandler() {
         if (!$this->_exceptionHandler) {
             if ($this->isCli()) {
-                $this->_exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
+                $exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
             } else {
-                $this->_exceptionHandler = new CM_ExceptionHandling_Handler_Http();
+                $exceptionHandler = new CM_ExceptionHandling_Handler_Http();
             }
+            $exceptionHandler->setServiceManager(CM_Service_Manager::getInstance());
+            $this->_exceptionHandler = $exceptionHandler;
         }
         return $this->_exceptionHandler;
     }
@@ -140,7 +142,7 @@ class CM_Bootloader {
     public function getModulePath($name) {
         $namespacePaths = $this->_getModulePaths();
         if (!array_key_exists($name, $namespacePaths)) {
-            throw new CM_Exception_Invalid('`' . $name . '`, not found within module paths');
+            throw new CM_Exception_Invalid('Module not found within module paths', null, ['moduleName' => $name]);
         }
         return $namespacePaths[$name];
     }
@@ -150,6 +152,20 @@ class CM_Bootloader {
      */
     public function getTimeZone() {
         return new DateTimeZone(CM_Config::get()->timeZone);
+    }
+
+    /**
+     * @param Closure $code
+     * @return int
+     */
+    public function execute(Closure $code) {
+        try {
+            $code();
+            return 0;
+        } catch (Exception $e) {
+            $this->getExceptionHandler()->handleException($e);
+            return 1;
+        }
     }
 
     protected function _constants() {
@@ -166,14 +182,13 @@ class CM_Bootloader {
     protected function _exceptionHandler() {
         $errorHandler = $this->getExceptionHandler();
         set_exception_handler(function (Exception $exception) use ($errorHandler) {
-            $errorHandler->handleException($exception);
+            $errorHandler->handleExceptionWithSeverity($exception, CM_Exception::FATAL);
             exit(1);
         });
     }
 
     protected function _registerServices() {
         $serviceManager = CM_Service_Manager::getInstance();
-
         $serviceManager->register('debug', 'CM_Debug', ['enabled' => $this->isDebug()]);
         $serviceManager->register('filesystems', 'CM_Service_Filesystems');
         $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', [

@@ -197,42 +197,6 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
         $process = CM_Process::getInstance();
         $process->fork(function () {
             $redisClient = CM_Service_Manager::getInstance()->getRedis();
-            return $redisClient->subscribe('foo', function ($channel, $message) {
-                if ($message === 'test') {
-                    return null;
-                }
-                return [$channel, $message];
-            });
-        });
-
-        $clientCount = 0;
-        // use a timeout because there's no easy way to know when the forked process will subscribe to the channel...
-        for ($loopCount = 0; 0 === $clientCount; $loopCount++) {
-            $clientCount = $this->_client->publish('foo', 'test');
-            if ($loopCount > 40) {
-                $process->killChildren();
-                $this->fail('Failed to publish on a Redis subpub channel.');
-            }
-            usleep(50 * 1000);
-        }
-
-        $this->_client->publish('foo', 'bar');
-        $resultList = $process->waitForChildren();
-        $this->assertCount(1, $resultList);
-
-        foreach ($resultList as $result) {
-            $this->assertSame(['foo', 'bar'], $result->getResult());
-        }
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function testPubSubMultiple() {
-        $process = CM_Process::getInstance();
-        $process->fork(function () {
-            $redisClient = CM_Service_Manager::getInstance()->getRedis();
             $clientCallCount = 0;
             while (1 >= $clientCallCount) {
                 if (0 != $redisClient->publish('foo', 'bar' . $clientCallCount)) {
@@ -252,6 +216,7 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
             return null;
         });
         $this->assertSame(['foo', ['bar0', 'bar1']], $response);
+        $process->waitForChildren();
     }
 
     /**
@@ -278,5 +243,6 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
             }
         });
         $this->assertSame(['foo', 'test', 'bar'], $response);
+        $process->waitForChildren();
     }
 }

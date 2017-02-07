@@ -5,7 +5,7 @@ class CM_Db_DbTest extends CMTest_TestCase {
     public function setUp() {
         CM_Db_Db::exec('
 			CREATE TABLE `test` (
-				`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
+				`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 				`foo` VARCHAR(100) NULL,
 				`bar` VARCHAR(100) NULL,
 				`sequence` INT UNSIGNED NOT NULL,
@@ -51,7 +51,7 @@ class CM_Db_DbTest extends CMTest_TestCase {
     public function testDescribeColumn() {
         CM_Db_Db::exec('
 			CREATE TABLE `test2` (
-				`id` int(12) unsigned NOT NULL AUTO_INCREMENT,
+				`id` INT(12) UNSIGNED NOT NULL AUTO_INCREMENT,
 				PRIMARY KEY (`id`)
 			)');
         $column = CM_Db_Db::describeColumn('test2', 'id');
@@ -68,7 +68,7 @@ class CM_Db_DbTest extends CMTest_TestCase {
     public function testDescribeColumnThrowsException() {
         CM_Db_Db::exec('
 			CREATE TABLE `test2` (
-				`id` int(12) unsigned NOT NULL AUTO_INCREMENT,
+				`id` INT(12) UNSIGNED NOT NULL AUTO_INCREMENT,
 				PRIMARY KEY (`id`)
 			)');
         try {
@@ -76,14 +76,15 @@ class CM_Db_DbTest extends CMTest_TestCase {
             CM_Db_Db::describeColumn('test2', 'id1');
             $this->fail('Column doesn\'t exist');
         } catch (CM_Db_Exception $e) {
-            $this->assertContains('`id1`', $e->getMessage());
+            $this->assertSame('Column not found', $e->getMessage());
+            $this->assertSame(['column' => 'id1'], $e->getMetaInfo());
         }
 
         try {
             CM_Db_Db::describeColumn('test_', 'id');
             $this->fail('Table doesn\'t exist');
         } catch (CM_Db_Exception $e) {
-            $this->assertContains('`id`', $e->getMessage());
+            $this->assertContains('`id`', $e->getMetaInfo()['query']);
         }
         CM_Db_Db::exec('DROP TABLE `test2`');
     }
@@ -175,7 +176,7 @@ class CM_Db_DbTest extends CMTest_TestCase {
         try {
             CM_Db_Db::getRandId('test', 'id');
             $this->fail();
-        } catch (CM_DB_Exception $e) {
+        } catch (CM_Db_Exception $e) {
             $this->assertContains('Cannot find random id', $e->getMessage());
         }
     }
@@ -204,5 +205,16 @@ class CM_Db_DbTest extends CMTest_TestCase {
         $counter = CM_Db_Db::incrementAndFetchColumn('test', 'foo');
         $this->assertSame(3, $counter);
         $this->assertSame(3, (int) CM_Db_Db::select('test', array('foo'))->fetchColumn('foo'));
+    }
+
+    public function testReplaceTable() {
+        $this->assertInstanceOf('CM_Db_Exception', $this->catchException(function () {
+            CM_Db_Db::replaceTable('test', 'test_new');
+        }));
+        CM_Db_Db::exec('CREATE TABLE `test_new` (`id` INT(10) UNSIGNED NOT NULL)');
+        CM_Db_Db::insert('test_new', ['id' => 123]);
+        CM_Db_Db::replaceTable('test', 'test_new');
+        $this->assertSame([['id' => '123']], CM_Db_Db::select('test', '*')->fetchAll());
+        $this->assertSame(false, CM_Db_Db::existsTable('test_new'));
     }
 }

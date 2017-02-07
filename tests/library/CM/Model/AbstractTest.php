@@ -129,10 +129,12 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
             $this->assertSame(true, $checkMissingFields);
         });
         $modelMock->mockMethod('_getPersistence')->set(function () {
-            return new CM_Model_StorageAdapter_Database();
+            $persistence = $this->mockObject('CM_Model_StorageAdapter_AbstractAdapter');
+            $persistence->mockMethod('create')->set([rand()]);
+            return $persistence;
         });
         $modelMock->mockMethod('getType')->set(function () {
-            return 12;
+            return rand();
         });
         $modelMock->mockMethod('_getSchema')->set(function () {
             return new CM_Model_Schema_Definition([]);
@@ -142,10 +144,6 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $this->assertSame(1, $methodValidateFields->getCallCount());
     }
 
-    /**
-     * @expectedException CM_Model_Exception_Validation
-     * @expectedExceptionMessage Field `foo` is mandatory
-     */
     public function testCreateMissingField() {
         $modelMock = $this->mockObject('CM_Model_Abstract');
         $modelMock->mockMethod('_getPersistence')->set(function () {
@@ -158,7 +156,14 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
             return new CM_Model_Schema_Definition(['foo' => ['type' => 'int']]);
         });
         /** @var CM_Model_Abstract $modelMock */
-        $modelMock->commit();
+        $exception = $this->catchException(function () use ($modelMock) {
+            $modelMock->commit();
+        });
+
+        $this->assertInstanceOf('CM_Model_Exception_Validation', $exception);
+        /** @var CM_Model_Exception_Validation $exception */
+        $this->assertSame('Field is mandatory', $exception->getMessage());
+        $this->assertSame(['key' => 'foo'], $exception->getMetaInfo());
     }
 
     public function testCommit() {
@@ -170,14 +175,15 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('create', 'save'))
             ->getMockForAbstractClass();
         $persistence->expects($this->once())->method('create')->with($type, $data)->will($this->returnValue($idRaw));
-        $persistence->expects($this->once())->method('save')->with($type, $idRaw, $data);
         /** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
 
-        $model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType', '_getSchema', '_getPersistence'))
+        $model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType', '_getSchema', '_getPersistence', '_onCreate', '_onChange'))
             ->disableOriginalConstructor()->getMockForAbstractClass();
         $model->expects($this->any())->method('getType')->will($this->returnValue($type));
         $model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
         $model->expects($this->any())->method('_getPersistence')->will($this->returnValue($persistence));
+        $model->expects($this->once())->method('_onCreate');
+        $model->expects($this->never())->method('_onChange');
         /** @var CM_Model_Abstract $model */
 
         $model->__construct(null, null);
@@ -189,7 +195,6 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $model->commit();
 
         $this->assertSame($idRaw, $model->getIdRaw());
-        $model->_set($data);
     }
 
     public function testCommitMultipleSaves() {
@@ -249,8 +254,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $idRaw = array('id' => '1');
         $schema = new CM_Model_Schema_Definition(array('foo' => array(), 'bar' => array()));
 
-        $cacheable = $this->getMock('CM_Cacheable');
-        $cacheable->expects($this->once())->method('_change');
+        $cacheableMock = $this->getMockBuilder('CM_Cacheable')->getMock();
+        $cacheableMock->expects($this->once())->method('_change');
 
         $assetClassHierarchy = array('CM_ModelAsset_Abstract', 'CM_ModelAsset_Concrete');
         $asset = $this->getMockBuilder('CM_ModelAsset_Abstract')->setMethods(array('getClassHierarchy', '_loadAsset'))
@@ -274,9 +279,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $model->expects($this->once())->method('_getPersistence')->will($this->returnValue($persistence));
         $model->expects($this->once())->method('_getCache')->will($this->returnValue($cache));
         $model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
-        $model->expects($this->once())->method('_getContainingCacheables')->will($this->returnValue(array($cacheable)));
+        $model->expects($this->once())->method('_getContainingCacheables')->will($this->returnValue(array($cacheableMock)));
         $model->expects($this->once())->method('_getAssets')->will($this->returnValue(array($asset)));
-        $model->expects($this->once())->method('_onChange');
+        $model->expects($this->never())->method('_onChange');
         $model->expects($this->once())->method('_onCreate');
         /** @var CM_Model_Abstract $model */
 
@@ -321,7 +326,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $model->expects($this->any())->method('getType')->will($this->returnValue($type));
         $model->expects($this->any())->method('_getPersistence')->will($this->returnValue($persistence));
         $model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
-        $model->expects($this->exactly(2))->method('_onChange');
+        $model->expects($this->never())->method('_onChange');
         $model->expects($this->exactly(2))->method('_onCreate');
         /** @var CM_Model_Abstract $model */
 
@@ -1146,18 +1151,39 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
     }
 
     public function testCommitWithReplace() {
-        CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::getTypeStatic()] = 'CM_ModelMock3';
-        $dbModel = new CM_ModelMock3();
-        $dbModel->_set('foo', 'bar1');
-        $dbModel->commit(true);
+        $schema = new CM_Model_Schema_Definition(array('foo' => array()));
+        $idRaw = array('id' => '909');
+        $type = 12;
+        $data = array('foo' => 12);
+        $persistence = $this->mockClass(CM_Model_StorageAdapter_AbstractAdapter::class, [CM_Model_StorageAdapter_ReplaceableInterface::class])->newInstance();
+        $persistence->mockMethod('replace')->set($idRaw);
+        $modelClass = $this->mockClass(CM_Model_Abstract::class);
+        $modelClass->mockMethod('_getPersistence')->set($persistence);
+        $modelClass->mockMethod('_getSchema')->set($schema);
+        $modelClass->mockMethod('getType')->set($type);
+        $mockOnCreate = $modelClass->mockMethod('_onCreate');
+        $mockOnChange = $modelClass->mockMethod('_onChange');
 
-        $cacheModel = new CM_ModelMock4();
-        $cacheModel->_set('bar', 5);
-        $exception = $this->catchException(function () use ($cacheModel) {
-            $cacheModel->commit(true);
+        /** @var CM_Model_Abstract $model */
+        $model = $modelClass->newInstance();
+        $model->_set($data);
+        $model->commit(true);
+        $this->assertSame(1, $mockOnCreate->getCallCount());
+        $this->assertSame(1, $mockOnChange->getCallCount());
+
+        $persistence = $this->mockClass(CM_Model_StorageAdapter_AbstractAdapter::class)->newInstance();
+        $modelClass->mockMethod('_getPersistence')->set($persistence);
+
+        /** @var CM_Model_Abstract $model */
+        $model = $modelClass->newInstance();
+        $model->_set($data);
+        $exception = $this->catchException(function () use ($model) {
+            $model->commit(true);
         });
-        $this->isInstanceOf('CM_Exception_NotImplemented', $exception);
-        $this->assertSame('Param `useReplace` is not allowed with ' . CM_ModelMock4::getPersistenceClass(), $exception->getMessage());
+        $this->assertInstanceOf('CM_Exception_NotImplemented', $exception);
+        /** @var CM_Exception_NotImplemented $exception */
+        $this->assertSame('Param `useReplace` is not allowed with adapter', $exception->getMessage());
+        $this->assertSame(['adapterName' => get_class($persistence)], $exception->getMetaInfo());
     }
 }
 

@@ -9,7 +9,7 @@ class CM_SessionTest extends CMTest_TestCase {
         try {
             new CM_Session('nonexistent');
             $this->fail('Can instantiate nonexistent session.');
-        } catch (CM_Exception_Nonexistent $ex) {
+        } catch (CM_Exception_UnknownSessionId $ex) {
             $this->assertTrue(true);
         }
     }
@@ -35,7 +35,7 @@ class CM_SessionTest extends CMTest_TestCase {
         try {
             new CM_Session($sessionId);
             $this->fail('Empty Session stored in db.');
-        } catch (CM_Exception_Nonexistent $ex) {
+        } catch (CM_Exception_UnknownSessionId $ex) {
             $this->assertTrue(true);
         }
         $session = new CM_Session();
@@ -54,7 +54,7 @@ class CM_SessionTest extends CMTest_TestCase {
         try {
             $session = new CM_Session($sessionId);
             $this->assertTrue(true);
-        } catch (CM_Exception_Nonexistent $ex) {
+        } catch (CM_Exception_UnknownSessionId $ex) {
             $this->fail('Session not persistent.');
         }
         $this->assertEquals('bar', $session->get('foo'));
@@ -91,7 +91,7 @@ class CM_SessionTest extends CMTest_TestCase {
         try {
             $session = new CM_Session($sessionId);
             $this->fail('Session not deleted.');
-        } catch (CM_Exception_Nonexistent $ex) {
+        } catch (CM_Exception_UnknownSessionId $ex) {
             $this->assertTrue(true);
         }
     }
@@ -109,7 +109,7 @@ class CM_SessionTest extends CMTest_TestCase {
         try {
             new CM_Session($oldSessionId);
             $this->fail('Db entry not updated.');
-        } catch (CM_Exception_Nonexistent $ex) {
+        } catch (CM_Exception_UnknownSessionId $ex) {
             $this->assertTrue(true);
         }
         try {
@@ -130,12 +130,12 @@ class CM_SessionTest extends CMTest_TestCase {
         try {
             new CM_Session($sessionId);
             $this->fail('Expired Session was not deleted.');
-        } catch (CM_Exception_Nonexistent $ex) {
+        } catch (CM_Exception_UnknownSessionId $ex) {
             $this->assertTrue(true);
         }
     }
 
-    public function testLogin() {
+    public function testSetUser() {
         $user = CM_Model_User::createStatic();
         $session = new CM_Session();
 
@@ -144,7 +144,17 @@ class CM_SessionTest extends CMTest_TestCase {
         $this->assertTrue($session->getUser(true)->getOnline());
     }
 
-    public function testLogout() {
+    public function testSetUserWithRequest() {
+        $user = CM_Model_User::createStatic();
+        $request = new CM_Http_Request_Get('/', ['user-agent' => 'Chrome']);
+        $session = new CM_Session(null, $request);
+
+        $session->setUser($user);
+        $userAgentList = $user->getUseragents();
+        $this->assertSame([['useragent' => 'Chrome', 'createStamp' => time()]], $userAgentList->getItems());
+    }
+
+    public function testDeleteUser() {
         $session = new CM_Session();
         $session->setUser(CM_Model_User::createStatic());
         $user = $session->getUser(true);
@@ -153,6 +163,18 @@ class CM_SessionTest extends CMTest_TestCase {
         $this->assertNull($session->getUser());
         $user->_change();
         $this->assertFalse($user->getOnline());
+    }
+
+    public function testLogoutUser() {
+        $session = new CM_Session();
+        $session->setUser(CM_Model_User::createStatic());
+        $session->setLifetime(123);
+        $this->assertNotNull($session->getUser());
+        $this->assertTrue($session->hasLifetime());
+
+        $session->logoutUser();
+        $this->assertNull($session->getUser());
+        $this->assertFalse($session->hasLifetime());
     }
 
     public function testGetViewer() {
@@ -174,7 +196,7 @@ class CM_SessionTest extends CMTest_TestCase {
     public function testStart() {
         /** @var CM_Model_User $user */
         $user = CM_Model_User::createStatic();
-
+        $user->updateLatestActivityThrottled();
         $activityStamp1 = time();
         $session = new CM_Session();
         $session->setUser($user);
@@ -209,18 +231,71 @@ class CM_SessionTest extends CMTest_TestCase {
         $this->assertEquals('bar', $session->get('foo'));
     }
 
-    public function testStartResetOfflineStamp() {
-        $user = CMTest_TH::createUser();
-        $offlineStamp = time();
-        $user->setOfflineStamp($offlineStamp);
-        $session = new CM_Session();
+    public function testStartUpdateUserAgents() {
+        $userClassMock = $this->mockClass('CM_Model_User');
+        /** @var CM_Model_User|\Mocka\AbstractClassTrait $user */
+        $user = $userClassMock->newInstance([CMTest_TH::createUser()->getId()]);
+
+        $sessionClassMock = $this->mockClass('CM_Session');
+        $sessionClassMock->mockMethod('getUser')->set($user);
+
+        /** @var CM_Paging_Useragent_User|\Mocka\AbstractClassTrait $userAgents */
+        $userAgents = $this->mockClass('CM_Paging_Useragent_User')->newInstance([$user]);
+        $uaAddMethod = $userAgents->mockMethod('addFromRequest');
+        $uaAddMethod
+            ->at(0, function (CM_Http_Request_Abstract $request) {
+                $this->assertSame('Chrome', $request->getUserAgent());
+            })
+            ->at(1, function (CM_Http_Request_Abstract $request) {
+                $this->assertSame('Chrome', $request->getUserAgent());
+            })
+            ->at(2, function (CM_Http_Request_Abstract $request) {
+                $this->assertSame('Chrome Foo', $request->getUserAgent());
+            });
+
+        $userClassMock->mockMethod('getUseragents')->set($userAgents);
+
+        // tests
+
+        $request = new CM_Http_Request_Get('/', ['user-agent' => 'Chrome']);
+        /** @var CM_Session|\Mocka\AbstractClassTrait $session */
+        $session = $sessionClassMock->newInstance([null, $request]);
+
+        $this->assertSame(0, $uaAddMethod->getCallCount());
         $session->setUser($user);
-        $this->assertSame($offlineStamp, $user->getOfflineStamp());
-
+        $this->assertSame(1, $uaAddMethod->getCallCount());
         $session->start();
-        CMTest_TH::reinstantiateModel($user);
-        $this->assertSame(null, $user->getOfflineStamp());
+        $this->assertSame(1, $uaAddMethod->getCallCount());
 
+        $sessionId = $session->getId();
+        unset($session);
+        $request = new CM_Http_Request_Get('/', ['user-agent' => 'Chrome']);
+        /** @var CM_Session|\Mocka\AbstractClassTrait $session */
+        $session = $sessionClassMock->newInstance([$sessionId, $request]);
+
+        $this->assertSame(1, $uaAddMethod->getCallCount());
+        $session->start();
+        $this->assertSame(1, $uaAddMethod->getCallCount());
+
+        unset($session);
+        $request = new CM_Http_Request_Get('/', ['user-agent' => 'Chrome']);
+        /** @var CM_Session|\Mocka\AbstractClassTrait $session */
+        $session = $sessionClassMock->newInstance([$sessionId, $request]);
+        $user->setOnline(false);
+
+        $this->assertSame(1, $uaAddMethod->getCallCount());
+        $session->start();
+        $this->assertSame(2, $uaAddMethod->getCallCount());
+
+        unset($session);
+        $request = new CM_Http_Request_Get('/', ['user-agent' => 'Chrome Foo']);
+        /** @var CM_Session|\Mocka\AbstractClassTrait $session */
+        $session = $sessionClassMock->newInstance([$sessionId, $request]);
+        $user->setOnline(false);
+
+        $this->assertSame(2, $uaAddMethod->getCallCount());
+        $session->start();
+        $this->assertSame(3, $uaAddMethod->getCallCount());
     }
 
     public function testExpiration() {

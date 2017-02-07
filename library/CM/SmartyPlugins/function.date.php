@@ -5,11 +5,25 @@ function smarty_function_date($params, Smarty_Internal_Template $template) {
     $render = $template->smarty->getTemplateVars('render');
 
     $time = (int) $params['time'];
+    $timeZone = isset($params['timeZone']) ? $params['timeZone'] : null;
     $showTime = !empty($params['showTime']);
-    if ($showTime) {
-        $formatter = $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
-    } else {
-        $formatter = $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
+    $showWeekday = !empty($params['showWeekday']);
+
+    if (is_string($timeZone)) {
+        $timeZone = new \DateTimeZone($timeZone);
     }
-    return $formatter->format($time);
+
+    if ($showTime) {
+        $formatter = $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::SHORT, null, $timeZone);
+    } else {
+        $formatter = $render->getFormatterDate(IntlDateFormatter::SHORT, IntlDateFormatter::NONE, null, $timeZone);
+    }
+    $stringDate = $formatter->format($time);
+
+    if ($showWeekday) {
+        $formatterWeekday = $render->getFormatterDate(IntlDateFormatter::NONE, IntlDateFormatter::NONE, 'eee', $timeZone);
+        $stringDate = $formatterWeekday->format($time) . ' ' . $stringDate;
+    }
+
+    return $stringDate;
 }

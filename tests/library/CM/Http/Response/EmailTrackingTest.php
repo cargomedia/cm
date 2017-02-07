@@ -7,14 +7,13 @@ class CM_Http_Response_EmailTrackingTest extends CMTest_TestCase {
     }
 
     public function testProcess() {
-        $user = CMTest_TH::createUser();
-        $mail = new CM_Mail_Welcome($user);
+        $user = $this->getMockUser();
+        $mail = new CM_Mail_ExampleMailable($user);
 
         $site = CM_Site_Abstract::factory();
-        $headers = array('host' => $site->getHost());
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-        $request = new CM_Http_Request_Get($render->getUrlEmailTracking($mail), $headers);
-        $response = new CM_Http_Response_EmailTracking($request, $this->getServiceManager());
+        $request = new CM_Http_Request_Get($render->getUrlEmailTracking($mail), ['host' => $site->getHost()]);
+        $response = CM_Http_Response_EmailTracking::createFromRequest($request, $site, $this->getServiceManager());
 
         $response->process();
 
@@ -23,14 +22,13 @@ class CM_Http_Response_EmailTrackingTest extends CMTest_TestCase {
     }
 
     public function testProcessNonexistentUser() {
-        $user = CMTest_TH::createUser();
-        $mail = new CM_Mail_Welcome($user);
+        $user = $this->getMockUser();
+        $mail = new CM_Mail_ExampleMailable($user);
 
         $site = CM_Site_Abstract::factory();
-        $headers = array('host' => $site->getHost());
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-        $request = new CM_Http_Request_Get($render->getUrlEmailTracking($mail), $headers);
-        $response = new CM_Http_Response_EmailTracking($request, $this->getServiceManager());
+        $request = new CM_Http_Request_Get($render->getUrlEmailTracking($mail), ['host' => $site->getHost()]);
+        $response = CM_Http_Response_EmailTracking::createFromRequest($request, $site, $this->getServiceManager());
 
         $user->delete();
         try {
@@ -43,9 +41,8 @@ class CM_Http_Response_EmailTrackingTest extends CMTest_TestCase {
 
     public function testProcessMissingParameter() {
         $site = CM_Site_Abstract::factory();
-        $headers = array('host' => $site->getHost());
-        $request = new CM_Http_Request_Get('/emailtracking/' . $site->getId(), $headers);
-        $response = new CM_Http_Response_EmailTracking($request, $this->getServiceManager());
+        $request = new CM_Http_Request_Get('/emailtracking', ['host' => $site->getHost()]);
+        $response = CM_Http_Response_EmailTracking::createFromRequest($request, $site, $this->getServiceManager());
 
         try {
             $response->process();
@@ -53,5 +50,22 @@ class CM_Http_Response_EmailTrackingTest extends CMTest_TestCase {
         } catch (CM_Exception_InvalidParam $e) {
             $this->assertSame(CM_Exception::WARN, $e->getSeverity());
         }
+    }
+
+    /**
+     * @param string|null           $email
+     * @param CM_Site_Abstract|null $site
+     * @return CM_Model_User|\Mocka\AbstractClassTrait
+     */
+    public function getMockUser($email = null, CM_Site_Abstract $site = null) {
+        $email = null === $email ? 'foo@example.com' : $email;
+        $site = null === $site ? $this->getMockSite() : $site;
+        $mockBuilder = $this->getMockBuilder('CM_Model_User');
+        $mockBuilder->setMethods(['getEmail', 'getSite']);
+        $mockBuilder->setConstructorArgs([CMTest_TH::createUser()->getId()]);
+        $userMock = $mockBuilder->getMock();
+        $userMock->expects($this->any())->method('getEmail')->will($this->returnValue($email));
+        $userMock->expects($this->any())->method('getSite')->will($this->returnValue($site));
+        return $userMock;
     }
 }

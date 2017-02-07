@@ -7,6 +7,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     use CM_Service_ManagerAwareTrait;
     use CM_ExceptionHandling_CatcherTrait;
 
+    protected $backupGlobalsBlacklist = ['bootloader'];
+
     public function runBare() {
         if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
             $siteDefault = $this->getMockSite(null, null, array(
@@ -19,7 +21,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         }
 
         $this->setServiceManager(CMTest_TH::getServiceManager());
-
         parent::runBare();
     }
 
@@ -27,11 +28,28 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         CMTest_TH::clearEnv();
     }
 
+    protected function onNotSuccessfulTest($e) {
+        if ($e instanceof CM_Exception) {
+            $e = new CMTest_ExceptionWrapper($e);
+        }
+        parent::onNotSuccessfulTest($e);
+    }
+
+    /**
+     * @param mixed      $object
+     * @param string     $methodName
+     * @param array|null $arguments
+     * @return mixed
+     */
+    public function callProtectedMethod($object, $methodName, array $arguments = null) {
+        return CMTest_TH::callProtectedMethod($object, $methodName, $arguments);
+    }
+
     /**
      * @return CM_Form_Abstract
      */
     public function getMockForm() {
-        $formMock = $this->getMockForAbstractClass('CM_Form_Abstract');
+        $formMock = $this->getMockForAbstractClass('CM_Form_Abstract', [], '', true, true, true, ['getName'], false);
         $formMock->expects($this->any())->method('getName')->will($this->returnValue('formName'));
         return $formMock;
     }
@@ -61,10 +79,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         }
         $methods = (array) $methods;
         $defaultConfiguration = array(
-            'url'          => null,
-            'urlCdn'       => null,
-            'name'         => null,
-            'emailAddress' => null,
+            'url'          => 'http://www.example.com',
+            'urlCdn'       => 'http://cdn.example.com',
+            'name'         => 'Example site',
+            'emailAddress' => 'hello@example.com',
         );
         $configuration = array_merge($defaultConfiguration, (array) $configuration);
 
@@ -80,6 +98,51 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $config->CM_Class_Abstract->typesMaxValue = $type;
 
         return $site;
+    }
+
+    /**
+     * @param array|null                $siteConfig
+     * @param CM_Model_User|null        $viewer
+     * @param string|null               $languageAbbreviation
+     * @param DateTimeZone|null         $timeZone
+     * @param bool|null                 $debug
+     * @param CM_Model_Location|null    $location
+     * @param CM_Model_Currency|null    $currency
+     * @param CM_Http_ClientDevice|null $clientDevice
+     * @return CM_Frontend_Environment
+     */
+    public function createEnvironment(
+        array $siteConfig = null,
+        CM_Model_User $viewer = null,
+        $languageAbbreviation = null,
+        DateTimeZone $timeZone = null,
+        $debug = null,
+        CM_Model_Location $location = null,
+        CM_Model_Currency $currency = null,
+        CM_Http_ClientDevice $clientDevice = null
+    ) {
+
+        $siteArgs = [
+            'classname' => null,
+            'type'      => null,
+            'methods'   => null,
+        ];
+        foreach ($siteArgs as $name => $value) {
+            if (isset($siteConfig[$name])) {
+                $siteArgs[$name] = $siteConfig[$name];
+                unset($siteConfig[$name]);
+            }
+        }
+        $site = $this->getMockSite($siteArgs['classname'], $siteArgs['type'], (array) $siteConfig, $siteArgs['methods']);
+
+        $language = null;
+        if ($languageAbbreviation) {
+            $language = CM_Model_Language::findByAbbreviation($languageAbbreviation);
+            if (!$language) {
+                $language = CMTest_TH::createLanguage($languageAbbreviation);
+            }
+        }
+        return new CM_Frontend_Environment($site, $viewer, $language, $timeZone, $debug, $location, $currency, $clientDevice);
     }
 
     /**
@@ -135,10 +198,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @param array|null                    $data
      * @param CM_Frontend_ViewResponse|null $scopeView
      * @param CM_Frontend_ViewResponse|null $scopeComponent
-     * @throws CM_Exception_Invalid
+     * @param CM_Site_Abstract|null         $site
      * @return CM_Http_Request_Post|\Mocka\AbstractClassTrait
+     * @throws CM_Exception_Invalid
      */
-    public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+    public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeView = null, CM_Frontend_ViewResponse $scopeComponent = null, CM_Site_Abstract $site = null) {
         $actionName = $action->getName();
         $form = $action->getForm();
         if (null === $scopeView) {
@@ -148,6 +212,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             throw new CM_Exception_Invalid('Action\'s form and ViewResponse\'s view must match');
         }
         if (null === $scopeComponent) {
+            /** @var CM_Component_Abstract $component */
             $component = $this->mockClass('CM_Component_Abstract')->newInstance();
             $scopeComponent = new CM_Frontend_ViewResponse($component);
         }
@@ -155,7 +220,13 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             'data'       => (array) $data,
             'actionName' => $actionName,
         );
-        return $this->createRequest('/form/null', $query, null, $scopeView, $scopeComponent);
+        if (null === $site) {
+            $site = CM_Site_Abstract::factory();
+        }
+        $headers = [
+            'host' => $site->getHost(),
+        ];
+        return $this->createRequest($site->getUrl() . '/form', $query, $headers, $scopeView, $scopeComponent);
     }
 
     /**
@@ -164,10 +235,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @param array|null                    $params
      * @param CM_Frontend_ViewResponse|null $viewResponse
      * @param CM_Frontend_ViewResponse|null $componentResponse
-     * @throws CM_Exception_Invalid
+     * @param CM_Site_Abstract|null         $site
      * @return CM_Http_Request_Post|\Mocka\AbstractClassTrait
+     * @throws CM_Exception_Invalid
      */
-    public function createRequestAjax(CM_View_Abstract $view, $methodName, array $params = null, CM_Frontend_ViewResponse $viewResponse = null, CM_Frontend_ViewResponse $componentResponse = null) {
+    public function createRequestAjax(CM_View_Abstract $view, $methodName, array $params = null, CM_Frontend_ViewResponse $viewResponse = null, CM_Frontend_ViewResponse $componentResponse = null, CM_Site_Abstract $site = null) {
         if (null === $viewResponse) {
             $viewResponse = new CM_Frontend_ViewResponse($view);
         } else {
@@ -194,7 +266,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             'method' => (string) $methodName,
             'params' => (array) $params,
         );
-        return $this->createRequest('/ajax/null', $query, null, $viewResponse, $componentResponse);
+
+        if (null === $site) {
+            $site = CM_Site_Abstract::factory();
+        }
+        $headers = [
+            'host' => $site->getHost(),
+        ];
+        return $this->createRequest($site->getUrl() . '/ajax', $query, $headers, $viewResponse, $componentResponse);
     }
 
     /**
@@ -202,18 +281,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @return CM_Http_Response_Abstract|\Mocka\AbstractClassTrait
      */
     public function getResponse(CM_Http_Request_Abstract $request) {
-        $className = CM_Http_Response_Abstract::getResponseClassName($request);
-        $serviceManager = self::getServiceManager();
-        return $this->mockClass($className)->newInstance([$request, $serviceManager]);
-    }
-
-    /**
-     * @param string $path
-     * @return CM_Http_Response_Abstract|\Mocka\AbstractClassTrait
-     */
-    public function getResponseResourceLayout($path) {
-        $request = $this->createRequest('/layout/null/' . time() . '/' . $path);
-        return $this->processRequest($request);
+        $responseFactory = new CM_Http_ResponseFactory(self::getServiceManager());
+        $response = $responseFactory->getResponse($request);
+        return $this->mockClass(get_class($response))
+            ->newInstance([$response->getRequest(), $response->getSite(), $response->getServiceManager()]);
     }
 
     /**
@@ -234,13 +305,16 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @return CM_Http_Response_View_Ajax
      */
     public function getResponseAjax(CM_View_Abstract $view, $methodName, array $params = null, CM_Frontend_Environment $environment = null) {
-        $request = $this->createRequestAjax($view, $methodName, $params);
+        $site = CM_Site_Abstract::factory();
+        $request = $this->createRequestAjax($view, $methodName, $params, null, null, $site);
         if ($environment) {
             $request->mockMethod('getViewer')->set(function () use ($environment) {
                 return $environment->getViewer();
             });
         }
-        return $this->processRequest($request);
+        $response = CM_Http_Response_View_Ajax::createFromRequest($request, $site, $this->getServiceManager());
+        $response->process();
+        return $response;
     }
 
     /**
@@ -250,8 +324,28 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @return CM_Http_Response_View_Form
      */
     public function getResponseFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeComponent = null) {
+        $site = CM_Site_Abstract::factory();
         $request = $this->createRequestFormAction($action, $data, $scopeComponent);
-        return $this->processRequest($request);
+        $response = CM_Http_Response_View_Form::createFromRequest($request, $site, $this->getServiceManager());
+        $response->process();
+        return $response;
+    }
+
+    /**
+     * @param string             $path
+     * @param CM_Model_User|null $viewer
+     * @param CM_Site_Abstract   $site
+     * @return CM_Http_Response_Page
+     * @throws CM_Exception
+     * @throws CM_Exception_Invalid
+     */
+    public function getResponsePage($path, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
+        if (null === $site) {
+            $site = CM_Site_Abstract::factory();
+        }
+        $request = new CM_Http_Request_Get($path, ['host' => $site->getHost()], null, $viewer);
+        $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
+        return $response;
     }
 
     /**
@@ -320,8 +414,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             $site = CM_Site_Abstract::factory();
         }
         $host = parse_url($site->getUrl(), PHP_URL_HOST);
-        $request = new CM_Http_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), array('host' => $host), null, $viewer);
-        $response = new CM_Http_Response_Page($request, $this->getServiceManager());
+        $request = new CM_Http_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), ['host' => $host], null, $viewer);
+        $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
         $page->prepareResponse($response->getRender()->getEnvironment(), $response);
         $renderAdapter = new CM_RenderAdapter_Page($response->getRender(), $page);
         $html = $renderAdapter->fetch();
@@ -537,18 +631,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         if ($actual instanceof CM_Paging_Abstract) {
             $actual = $actual->getItems();
         }
-        if (is_array($expected) && is_array($actual)) {
-            self::assertSame(array_keys($expected), array_keys($actual), $message);
-            foreach ($expected as $expectedKey => $expectedValue) {
-                self::assertEquals($expectedValue, $actual[$expectedKey], $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
-            }
-            return;
-        }
-        if ($expected instanceof CM_Comparable) {
-            self::assertTrue($expected->equals($actual), 'Comparables differ');
-        } else {
-            parent::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
-        }
+        parent::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
     }
 
     public static function assertNotEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false) {

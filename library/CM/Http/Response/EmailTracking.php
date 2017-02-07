@@ -10,7 +10,7 @@ class CM_Http_Response_EmailTracking extends CM_Http_Response_Abstract {
 
             $action = new CM_Action_Email(CM_Action_Abstract::VIEW, $user, $mailType);
             $action->prepare();
-            $action->notify($user, $mailType);
+            $action->notify($user);
         } catch (CM_Exception $e) {
             if (in_array(get_class($e), [
                 'CM_Exception_Nonexistent',
@@ -25,7 +25,14 @@ class CM_Http_Response_EmailTracking extends CM_Http_Response_Abstract {
         $this->_setContent(base64_decode('R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='));
     }
 
-    public static function match(CM_Http_Request_Abstract $request) {
-        return $request->getPathPart(0) === 'emailtracking';
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
+        if ($request->getPathPart(0) === 'emailtracking') {
+            $request = clone $request;
+            $request->popPathPart(0);
+            $request->popPathLanguage();
+            return new self($request, $site, $serviceManager);
+        }
+        return null;
     }
+
 }

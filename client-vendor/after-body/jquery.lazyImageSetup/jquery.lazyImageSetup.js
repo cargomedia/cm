@@ -11,14 +11,14 @@
   $.fn.lazyImageSetup = function(lazyLoadOptions) {
     return this.each(function() {
       var options = _.defaults(lazyLoadOptions || {}, {
-        threshold: 600,
-        failure_limit: 10
+        offset: 600,
+        attribute: 'original'
       });
       var $this = $(this);
-      if ($this.hasClass('scrollable')) {
-        options.container = $this;
+      if ($this.closest('.scrollable').length) {
+        options.container = $this.closest('.scrollable');
       }
-      $this.find('img.lazy').lazyload(options);
+      $this.find('img.lazy').unveil(options);
     });
   };
 

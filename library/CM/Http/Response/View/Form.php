@@ -38,12 +38,19 @@ class CM_Http_Response_View_Form extends CM_Http_Response_View_Abstract {
         return (bool) count($this->errors);
     }
 
+    /**
+     * @return string[]
+     */
+    public function getErrors() {
+        return $this->errors;
+    }
+
     protected function _processView(array $output) {
         $success = array();
         $form = $this->_getView();
         $className = get_class($form);
         if (!$form instanceof CM_Form_Abstract) {
-            throw new CM_Exception_Invalid('`' . $className . '`is not `CM_Form_Abstract` instance');
+            throw new CM_Exception_Invalid('ClassName is not `CM_Form_Abstract` instance', null, ['className' => $className]);
         }
 
         $query = $this->_request->getQuery();
@@ -69,8 +76,15 @@ class CM_Http_Response_View_Form extends CM_Http_Response_View_Abstract {
         return $output;
     }
 
-    public static function match(CM_Http_Request_Abstract $request) {
-        return $request->getPathPart(0) === 'form';
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
+        if ($request->getPathPart(0) === 'form') {
+            $request = clone $request;
+            $request->popPathPart(0);
+            $request->popPathLanguage();
+            return new self($request, $site, $serviceManager);
+        }
+        return null;
     }
+
 }
 

@@ -21,7 +21,7 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
             CM_Model_Stream_Publish::createStatic($data);
             $this->fail('Should not be able to create duplicate key instance');
         } catch (CM_Exception $e) {
-            $this->assertContains('Duplicate entry', $e->getMessage());
+            $this->assertContains('Duplicate entry', $e->getMetaInfo()['originalExceptionMessage']);
         }
         $data['streamChannel'] = CMTest_TH::createStreamChannel();
         CM_Model_Stream_Publish::createStatic($data);
@@ -39,11 +39,46 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
         $user = CMTest_TH::createUser();
         $streamChannel = CMTest_TH::createStreamChannel();
         $this->assertEquals(0, $streamChannel->getStreamPublishs()->getCount());
-        $videoStream = CM_Model_Stream_Publish::createStatic(array('user'          => $user, 'start' => 123123, 'key' => '123123_2',
+        $publisher = CM_Model_Stream_Publish::createStatic(array('user'          => $user, 'start' => 123123, 'key' => '123123_2',
                                                                    'streamChannel' => $streamChannel));
-        $this->assertRow('cm_stream_publish', array('userId'    => $user->getId(), 'start' => 123123, 'key' => '123123_2',
-                                                    'channelId' => $streamChannel->getId()));
+        $this->assertEquals($user, $publisher->getUser());
+        $this->assertSame(123123, $publisher->getStart());
+        $this->assertSame('123123_2', $publisher->getKey());
+        $this->assertEquals($streamChannel, $publisher->getStreamChannel());
+        $this->assertNull($publisher->getAllowedUntil());
         $this->assertEquals(1, $streamChannel->getStreamPublishs()->getCount());
+    }
+
+    public function testCreateDisallowInterface() {
+        $streamChannel = CMTest_TH::createStreamChannel();
+        $viewer = CMTest_TH::createUser();
+        /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $streamChannel */
+        $streamChannel = $this->mockClass(get_class($streamChannel), ['CM_StreamChannel_DisallowInterface'])->newInstance([$streamChannel->getId()]);
+        $streamChannel->mockMethod('isValid')->set(true);
+        $streamChannel->mockMethod('canPublish')->set(function (CM_Model_User $user = null, $allowedUntil) use ($viewer) {
+            $this->assertEquals($viewer, $user);
+            return $allowedUntil + 100;
+        });
+        $publisher = CMTest_TH::createStreamPublish($viewer, $streamChannel);
+        $this->assertSame(time() + 100, $publisher->getAllowedUntil());
+
+        // not allowed
+        $streamChannel->mockMethod('canPublish')->set(function (CM_Model_User $user = null, $allowedUntil) use ($viewer) {
+            return $allowedUntil;
+        });
+        $exception = $this->catchException(function () use ($streamChannel, $viewer) {
+            CMTest_TH::createStreamPublish($viewer, $streamChannel);
+        });
+        $this->assertInstanceOf('CM_Exception_NotAllowed', $exception);
+        $this->assertSame('Not allowed to publish', $exception->getMessage());
+
+        // streamchannel invalid
+        $streamChannel->mockMethod('isValid')->set(false);
+        $exception = $this->catchException(function () use ($streamChannel, $viewer) {
+            CMTest_TH::createStreamPublish($viewer, $streamChannel);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Stream channel not valid', $exception->getMessage());
     }
 
     public function testDelete() {
@@ -108,24 +143,11 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
         $this->assertNull($streamPublish->getUser());
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage not valid
-     */
-    public function testCreateInvalidStreamChannel() {
-        $user = CMTest_TH::createUser();
-        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')->setMethods(array('isValid'))->getMock();
-        $streamChannel->expects($this->any())->method('isValid')->will($this->returnValue(false));
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
-
-        CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(), 'key' => 'foo'));
-    }
-
     public function testDeleteOnUnpublish() {
         $streamPublish = $this->getMockBuilder('CM_Model_Stream_Publish')
             ->setMethods(array('getStreamChannel', 'getId'))->getMock();
 
-        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')
+        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Media')
             ->setMethods(array('isValid', 'onUnpublish'))->getMock();
 
         $streamPublish->expects($this->any())->method('getStreamChannel')->will($this->returnValue($streamChannel));
@@ -133,20 +155,18 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
         $streamChannel->expects($this->any())->method('isValid')->will($this->returnValue(true));
         $streamChannel->expects($this->once())->method('onUnpublish')->with($streamPublish);
 
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         /** @var CM_Model_Stream_Publish $streamPublish */
 
-        $onDeleteBefore = CMTest_TH::getProtectedMethod('CM_Model_Stream_Publish', '_onDeleteBefore');
-        $onDeleteBefore->invoke($streamPublish);
-        $onDelete = CMTest_TH::getProtectedMethod('CM_Model_Stream_Publish', '_onDelete');
-        $onDelete->invoke($streamPublish);
+        $onDeleteAfter = CMTest_TH::getProtectedMethod('CM_Model_Stream_Publish', '_onDeleteAfter');
+        $onDeleteAfter->invoke($streamPublish);
     }
 
     public function testDeleteOnUnpublishInvalid() {
         $streamPublish = $this->getMockBuilder('CM_Model_Stream_Publish')
             ->setMethods(array('getStreamChannel', 'getId'))->getMock();
 
-        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')
+        $streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Media')
             ->setMethods(array('isValid', 'onUnpublish'))->getMock();
 
         $streamPublish->expects($this->any())->method('getStreamChannel')->will($this->returnValue($streamChannel));
@@ -154,7 +174,7 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
         $streamChannel->expects($this->any())->method('isValid')->will($this->returnValue(false));
         $streamChannel->expects($this->never())->method('onUnpublish');
 
-        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        /** @var CM_Model_StreamChannel_Media $streamChannel */
         /** @var CM_Model_Stream_Publish $streamPublish */
 
         $onDelete = CMTest_TH::getProtectedMethod('CM_Model_Stream_Publish', '_onDelete');

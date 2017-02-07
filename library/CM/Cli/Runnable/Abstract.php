@@ -61,6 +61,6 @@ abstract class CM_Cli_Runnable_Abstract implements CM_Service_ManagerAwareInterf
      * @return string
      */
     public static function getPackageName() {
-        throw new CM_Exception_NotImplemented('Package `' . get_called_class() . '` has no `getPackageName` implemented.');
+        throw new CM_Exception_NotImplemented('Package has no `getPackageName` implemented.', null, ['packageName' => get_called_class()]);
     }
 }

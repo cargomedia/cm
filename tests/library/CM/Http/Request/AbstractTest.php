@@ -30,10 +30,14 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
 
         $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
         $this->assertEquals($user, $mock->getViewer(true));
+    }
 
-        $user2 = CMTest_TH::createUser();
-        $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers, null, $user2));
-        $this->assertEquals($user2, $mock->getViewer(true));
+    public function testGetViewerDoesntCreateSession() {
+        $request = new CM_Http_Request_Get('/');
+        $this->assertFalse($request->hasSession());
+
+        $request->getViewer();
+        $this->assertFalse($request->hasSession());
     }
 
     public function testGetCookie() {
@@ -72,18 +76,6 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertEquals($request->getLanguage(), $defaultLanguage);
     }
 
-    public function testGetLanguageByUrl() {
-        $request = $this->_prepareRequest('/de/home');
-        CM_Http_Response_Abstract::factory($request, $this->getServiceManager());
-        $this->assertNull($request->getLanguage());
-
-        CMTest_TH::createLanguage('en'); // default language
-        $urlLanguage = CMTest_TH::createLanguage('de');
-        $request = $this->_prepareRequest('/de/home');
-        $response = CM_Http_Response_Abstract::factory($request, $this->getServiceManager());
-        $this->assertEquals($response->getRequest()->getLanguage(), $urlLanguage);
-    }
-
     public function testGetLanguageByBrowser() {
         $defaultLanguage = CMTest_TH::createLanguage('en');
         $browserLanguage = CMTest_TH::createLanguage('de');
@@ -118,6 +110,43 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertSame(array('foo' => 'bar'), $mock->getQuery());
         $this->assertNull($mock->getLanguageUrl());
         $this->assertSame('/foo1/bar1?foo=bar', $mock->getUri());
+    }
+
+    public function testFindQuery() {
+        $uri = '/foo/bar?foo1=bar1';
+        $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
+        /** @var CM_Http_Request_Abstract $mock */
+        $requestMockClass = $this->mockClass('CM_Http_Request_Abstract');
+        /** @var \Mocka\AbstractClassTrait|CM_Http_Request_Abstract $requestMock */
+        $requestMock = $requestMockClass->newInstance([$uri, $headers]);
+
+        $this->assertSame(['foo1' => 'bar1'], $requestMock->findQuery());
+        $requestMock->mockMethod('getQuery')->set(function () {
+            throw new CM_Exception_Invalid('error');
+        });
+        $this->assertSame([], $requestMock->findQuery());
+    }
+
+    public function testSetUriNonUtf() {
+        $uri = '/foo/bar?%%aff%%=quux&bar=%%AFF%%&baz[]=%%aff%%&baz[]=%%aff%%';
+        $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
+        /** @var CM_Http_Request_Abstract $mock */
+        $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
+
+        $this->assertSame('/foo/bar', $mock->getPath());
+        $this->assertSame(array('foo', 'bar'), $mock->getPathParts());
+        $this->assertSame(
+            array(
+                '%?f%%' => 'quux',
+                'bar'   => '%?F%%',
+                'baz'   => [
+                    '%?f%%',
+                    '%?f%%',
+                ]
+            ),
+            $mock->getQuery()
+        );
+        $this->assertSame($uri, $mock->getUri());
     }
 
     public function testSetUriRelativeAndColon() {
@@ -176,10 +205,21 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
     public function testGetClientIdSetCookie() {
         $request = new CM_Http_Request_Post('/foo/null/');
         $clientId = $request->getClientId();
-        /** @var CM_Http_Response_Abstract $response */
-        $response = $this->getMock('CM_Http_Response_Abstract', array('_process', 'setCookie'), array($request, $this->getServiceManager()));
-        $response->expects($this->once())->method('setCookie')->with('clientId', (string) $clientId);
-        $response->process();
+        $site = $this->getMockSite();
+        /** @var CM_Http_Response_Abstract $responseMock */
+        $mockBuilder = $this->getMockBuilder('CM_Http_Response_Abstract');
+        $mockBuilder->setMethods(['_process', 'setCookie']);
+        $mockBuilder->setConstructorArgs([$request, $site, $this->getServiceManager()]);
+        $responseMock = $mockBuilder->getMock();
+        $responseMock->expects($this->once())->method('setCookie')->with('clientId', (string) $clientId);
+        $responseMock->process();
+    }
+
+    public function testGetUserAgent() {
+        $request = new CM_Http_Request_Get('/foo');
+        $this->assertSame('', $request->getUserAgent());
+        $request = new CM_Http_Request_Get('/foo', ['user-agent' => 'Mozilla/5.0']);
+        $this->assertSame('Mozilla/5.0', $request->getUserAgent());
     }
 
     public function testIsBotCrawler() {
@@ -238,6 +278,114 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
     public function testIsSupportedWithoutUserAgent() {
         $request = new CM_Http_Request_Get('/', []);
         $this->assertSame(true, $request->isSupported());
+    }
+
+    public function testSetSession() {
+        $user = CMTest_TH::createUser();
+        $session = new CM_Session();
+        $request = new CM_Http_Request_Get('/');
+
+        $session->setUser($user);
+        $request->setSession($session);
+        $this->assertEquals($session, $request->getSession());
+        $this->assertEquals($user, $request->getViewer());
+
+        $session->deleteUser();
+        $request->setSession($session);
+        $this->assertEquals($session, $request->getSession());
+        $this->assertSame(null, $request->getViewer());
+    }
+
+    public function testSetSessionFromCookie() {
+        $requestFoo = new CM_Http_Request_Get('/foo');
+        $sessionFoo = new CM_Session(null, $requestFoo);
+        $sessionFoo->set('foo', 'bar');
+        $sessionFoo->write();
+        $sessionFooId = $sessionFoo->getId();
+
+        $requestBar = new CM_Http_Request_Get('/bar', ['cookie' => 'sessionId=' . $sessionFooId . ';']);
+        $sessionBar = $requestBar->getSession();
+
+        $this->assertEquals($sessionFooId, $sessionBar->getId());
+        $this->assertEquals('bar', $sessionBar->get('foo'));
+        $this->assertEquals($requestBar, $sessionBar->getRequest());
+    }
+
+    public function testGetTimeZoneFromCookie() {
+        $request = new CM_Http_Request_Get('/foo/bar/', ['cookie' => 'timezoneOffset=9000; clientId=7']);
+        $timeZone = $request->getTimeZone();
+        $this->assertInstanceOf('DateTimeZone', $timeZone);
+        $this->assertSame('-02:30', $timeZone->getName());
+
+        $request = new CM_Http_Request_Get('/foo/bar/', ['cookie' => 'timezoneOffset=-9000; clientId=7']);
+        $timeZone = $request->getTimeZone();
+        $this->assertInstanceOf('DateTimeZone', $timeZone);
+        $this->assertSame('+02:30', $timeZone->getName());
+
+        $request = new CM_Http_Request_Post('/foo/bar/', ['cookie' => 'timezoneOffset=3600']);
+        $timeZone = $request->getTimeZone();
+        $this->assertInstanceOf('DateTimeZone', $timeZone);
+        $this->assertSame('-01:00', $timeZone->getName());
+
+        $request = new CM_Http_Request_Post('/foo/bar/', ['cookie' => 'timezoneOffset=50400']);
+        $timeZone = $request->getTimeZone();
+        $this->assertNull($timeZone);
+
+        $request = new CM_Http_Request_Post('/foo/bar/', ['cookie' => 'timezoneOffset=-62400']);
+        $timeZone = $request->getTimeZone();
+        $this->assertNull($timeZone);
+
+        $request = new CM_Http_Request_Get('/foo/baz/');
+        $timeZone = $request->getTimeZone();
+        $this->assertNull($timeZone);
+    }
+
+    public function testSanitize() {
+        $malformedString = pack("H*", 'c32e');
+        $malformedUri = 'http://foo.bar/' . $malformedString;
+        $this->assertFalse(mb_check_encoding($malformedUri, 'UTF-8'));
+        $exception = $this->catchException(function () use ($malformedUri) {
+            CM_Util::jsonEncode($malformedUri);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Cannot json_encode value.', $exception->getMessage());
+
+        $request = new CM_Http_Request_Get($malformedUri, null, ['baz' => pack("H*", 'c32e')]);
+        $this->assertInstanceOf('CM_Http_Request_Get', $request);
+        $this->assertTrue(mb_check_encoding($request->getUri(), 'UTF-8'));
+        $this->assertTrue(mb_check_encoding($request->getServer()['baz'], 'UTF-8'));
+        $this->assertNotEmpty(CM_Util::jsonEncode($request->getUri()));
+    }
+
+    public function testPopPathPart() {
+        $request = new CM_Http_Request_Get('/part0/part1/part2');
+        $this->assertSame('part1', $request->popPathPart(1));
+        $this->assertSame('part0', $request->popPathPart(0));
+        $this->assertSame('/part2', $request->getPath());
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot pop
+     */
+    public function testPopPathPartNoMatch() {
+        $request = new CM_Http_Request_Get('/part0/part1/part2');
+        $request->popPathPart(5);
+    }
+
+    public function testPopPathPrefix() {
+        $request = new CM_Http_Request_Get('/part0/part1/part2');
+        $request->popPathPrefix('/part0/part1/');
+        $this->assertSame('/part2', $request->getPath());
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot pop
+     */
+    public function testPopPathPrefixNoMatch() {
+        $request = new CM_Http_Request_Get('/part0/part1/part2');
+        $request->popPathPrefix('/foo');
     }
 
     /**

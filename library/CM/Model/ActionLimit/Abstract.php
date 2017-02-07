@@ -23,9 +23,10 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
     abstract public function overshoot(CM_Action_Abstract $action, $role, $first);
 
     /**
+     * @param CM_Action_Abstract $action
      * @return boolean
      */
-    abstract public function getOvershootAllowed();
+    abstract public function getOvershootAllowed(CM_Action_Abstract $action);
 
     /**
      * @return int
@@ -175,6 +176,13 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
         $this->setLimit($role, $limit);
         $this->setPeriod($role, $period);
         return $this;
+    }
+
+    public function jsonSerialize() {
+        return [
+            'actionType' => $this->getActionType(),
+            'actionVerb' => $this->getActionVerb(),
+        ];
     }
 
     protected function _loadData() {

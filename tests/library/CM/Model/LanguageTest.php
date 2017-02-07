@@ -63,7 +63,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
             CM_Model_Language::create('Another one', $language->getAbbreviation(), true);
             $this->fail('Could create language with duplicate abbreviation');
         } catch (CM_Exception $e) {
-            $this->assertContains('Duplicate entry', $e->getMessage());
+            $this->assertContains('Duplicate entry', $e->getMetaInfo()['originalExceptionMessage']);
         }
     }
 
@@ -83,7 +83,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
             CM_Model_Language::create('Another', 'pl', true);
             $this->fail('Could set language with duplicate abbreviation');
         } catch (CM_Exception $e) {
-            $this->assertContains('Duplicate entry', $e->getMessage());
+            $this->assertContains('Duplicate entry', $e->getMetaInfo()['originalExceptionMessage']);
         }
     }
 
@@ -138,11 +138,14 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
         $this->assertTrue($languageKey->getJavascript());
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Language key `foo` not found
-     */
     public function testRpcRequestTranslationJsNonExistentKey() {
-        CM_Model_Language::rpc_requestTranslationJs('foo');
+        $exception = $this->catchException(function () {
+            CM_Model_Language::rpc_requestTranslationJs('foo');
+        });
+
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        /** @var CM_Exception_Invalid $exception */
+        $this->assertSame('Language key not found', $exception->getMessage());
+        $this->assertSame(['phrase' => 'foo'], $exception->getMetaInfo());
     }
 }

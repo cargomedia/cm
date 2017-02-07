@@ -187,11 +187,27 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
                     $datetime = new DateTime($date, new DateTimeZone($timezone));
                     break;
                 default:
-                    throw new CM_Exception_InvalidParam('Invalid timezone type `' . $timezoneType . '`');
+                    throw new CM_Exception_InvalidParam('Invalid timezone type', null, ['timezoneType' => $timezoneType]);
             }
             return $datetime;
         }
         return $this->getObject($key, 'DateTime');
+    }
+
+    /**
+     * @param string $key
+     * @return DateInterval
+     */
+    public function getDateInterval($key) {
+        return $this->getObject($key, 'DateInterval');
+    }
+
+    /**
+     * @param string $key
+     * @return DateTimeZone
+     */
+    public function getDateTimeZone($key) {
+        return $this->getObject($key, 'DateTimeZone');
     }
 
     /**
@@ -229,7 +245,10 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
                     try {
                         $arguments = $namedArgs->matchNamedArgs($constructor, $arguments);
                     } catch (CM_Exception_Invalid $ex) {
-                        throw new CM_Exception_InvalidParam("Not enough parameters", null, ['parameters' => $param, 'class' => $className]);
+                        throw new CM_Exception_InvalidParam('Not enough parameters', null, [
+                            'parameters' => $param,
+                            'className'  => $className,
+                        ]);
                     }
                 }
 
@@ -315,12 +334,12 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
                 try {
                     $array = CM_Params::decode($json, true);
                 } catch (CM_Exception_Invalid $e) {
-                    throw new CM_Exception_InvalidParam('Cannot decode input: ' . $e->getMessage());
+                    throw new CM_Exception_InvalidParam('Cannot decode input', null, ['message' => $e->getMessage()]);
                 }
             } elseif (is_array($param)) {
                 $array = $param;
             } else {
-                throw new CM_Exception_InvalidParam('Unexpected input of type `' . gettype($param) . '` to create CM_Params');
+                throw new CM_Exception_InvalidParam('Unexpected type of arguments', null, ['type' => gettype($param)]);
             }
             return CM_Params::factory($array, false);
         });
@@ -333,9 +352,14 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     /**
      * @param string $key
      * @return CM_Model_Location
+     * @throws CM_Exception_InvalidParam
      */
     public function getLocation($key) {
-        return $this->getObject($key, 'CM_Model_Location');
+        try {
+            return $this->getObject($key, 'CM_Model_Location');
+        } catch (CM_Location_InvalidLevelException $e) {
+            throw new CM_Exception_InvalidParam($e->getMessage(), null, $e->getMetaInfo());
+        }
     }
 
     /**
@@ -390,10 +414,34 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
 
     /**
      * @param string $key
-     * @return CM_Model_StreamChannel_Video
+     * @return CM_Model_StreamChannel_Abstract
      */
-    public function getStreamChannelVideo($key) {
-        return $this->getObject($key, 'CM_Model_StreamChannel_Video');
+    public function getStreamChannel($key) {
+        return $this->getObject($key, 'CM_Model_StreamChannel_Abstract');
+    }
+
+    /**
+     * @param string $key
+     * @return CM_Model_StreamChannel_Media
+     */
+    public function getStreamChannelMedia($key) {
+        return $this->getObject($key, 'CM_Model_StreamChannel_Media');
+    }
+
+    /**
+     * @param string $key
+     * @return CM_Janus_StreamChannel
+     */
+    public function getStreamChannelJanus($key) {
+        return $this->getObject($key, 'CM_Janus_StreamChannel');
+    }
+
+    /**
+     * @param string $key
+     * @return CM_StreamChannel_Definition
+     */
+    public function getStreamChannelDefinition($key) {
+        return $this->getObject($key, 'CM_StreamChannel_Definition');
     }
 
     /**
@@ -410,6 +458,30 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      */
     public function getGeoPoint($key) {
         return $this->getObject($key, 'CM_Geo_Point');
+    }
+
+    /**
+     * @param string $key
+     * @return CM_Geometry_Vector2
+     */
+    public function getGeometryVector2($key) {
+        return $this->getObject($key, 'CM_Geometry_Vector2');
+    }
+
+    /**
+     * @param string $key
+     * @return CM_Geometry_Vector3
+     */
+    public function getGeometryVector3($key) {
+        return $this->getObject($key, 'CM_Geometry_Vector3');
+    }
+
+    /**
+     * @param $key
+     * @return CM_Mail_Message
+     */
+    public function getMailMessage($key) {
+        return $this->getObject($key, 'CM_Mail_Message');
     }
 
     /**
@@ -441,13 +513,32 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
 
     /**
      * @param string $key
+     * @return CM_Session
+     * @throws CM_Exception_InvalidParam
+     */
+    public function getSession($key) {
+        $key = (string) $key;
+        return $this->getObject($key, 'CM_Session', null, function ($className, $param) use ($key) {
+            if (is_string($param)) {
+                try {
+                    return new CM_Session($param);
+                } catch (CM_Exception_UnknownSessionId $e) {
+                    throw new CM_Exception_InvalidParam('Session is not found', null, ['key' => $key]);
+                }
+            }
+            throw new CM_Exception_InvalidParam('Invalid param type for session', null, ['key' => $key]);
+        });
+    }
+
+    /**
+     * @param string $key
      * @param mixed  $default
      * @throws CM_Exception_InvalidParam
      * @return mixed
      */
     protected function _get($key, $default = null) {
         if (!$this->has($key) && $default === null) {
-            throw new CM_Exception_InvalidParam("Param `$key` not set");
+            throw new CM_Exception_InvalidParam('Param not set', null, ['key' => $key]);
         }
         if (!$this->has($key) && $default !== null) {
             return $default;
@@ -504,42 +595,64 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @param mixed        $value
      * @param boolean|null $json
      * @throws CM_Exception_Invalid
-     * @return string
+     * @return array|string
      */
     public static function encode($value, $json = null) {
         if (is_array($value)) {
-            $value = array_map('self::encode', $value);
+            $result = array_map('self::encode', $value);
+        } elseif ($value instanceof CM_ArrayConvertible || $value instanceof JsonSerializable) {
+            $result = ['_class' => get_class($value)];
+            if ($value instanceof CM_ArrayConvertible) {
+                $array = $value->toArray();
+                $result = array_merge($result, self::encode($array));
+            }
+            if ($value instanceof JsonSerializable) {
+                $array = $value->jsonSerialize();
+                if (is_array($array)) {
+                    $result = array_merge($result, self::encode($array));
+                }
+            }
+        } else {
+            $result = $value;
         }
-        if ($value instanceof CM_ArrayConvertible) {
-            $array = $value->toArray();
-            $array = array_map('self::encode', $array);
-            $value = array_merge($array, array('_class' => get_class($value)));
-        }
+
         if ($json) {
-            if (is_object($value)) {
-                $value = 'null';
+            if (is_object($result)) {
+                $result = 'null';
             } else {
-                $value = self::jsonEncode($value);
+                $result = CM_Util::jsonEncode($result);
             }
         }
-        return $value;
+        return $result;
+    }
+
+    /**
+     * @param CM_ArrayConvertible $object
+     * @return string JSON
+     */
+    public static function encodeObjectId(CM_ArrayConvertible $object) {
+        $array = $object->toArray();
+        $value = array_merge($array, array('_class' => get_class($object)));
+        return CM_Util::jsonEncode($value);
     }
 
     /**
      * @param string       $value
      * @param boolean|null $json
-     * @throws CM_Exception_Invalid
      * @return mixed|false
      */
     public static function decode($value, $json = null) {
         if ($json) {
-            $value = self::jsonDecode($value);
+            $value = CM_Util::jsonDecode($value);
         }
-        if (is_array($value) && isset($value['_class'])) {
-            // CM_ArrayConvertible
+        if (is_array($value) && isset($value['_class']) && is_subclass_of($value['_class'], 'CM_ArrayConvertible')) {
             $className = (string) $value['_class'];
             unset($value['_class']);
-            $value = call_user_func(array($className, 'fromArray'), $value);
+            if (!empty($value)) {
+                $value = self::decode($value);
+            }
+            /** @var CM_ArrayConvertible $className */
+            $value = $className::fromArray($value);
             if (!$value) {
                 return false;
             }
@@ -555,31 +668,20 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @param bool|null $prettyPrint
      * @throws CM_Exception_Invalid
      * @return string
+     * @deprecated use CM_Util::jsonEncode()
      */
     public static function jsonEncode($value, $prettyPrint = null) {
-        $options = 0;
-        if ($prettyPrint) {
-            $options = $options | JSON_PRETTY_PRINT;
-        }
-        $value = json_encode($value, $options);
-        if (json_last_error() > 0) {
-            throw new CM_Exception_Invalid('Cannot json_encode value `' . CM_Util::var_line($value) . '`.');
-        }
-        return $value;
+        return CM_Util::jsonEncode($value, $prettyPrint);
     }
 
     /**
      * @param string $value
      * @return mixed
      * @throws CM_Exception_Invalid
+     * @deprecated use CM_Util::jsonDecode()
      */
     public static function jsonDecode($value) {
-        $valueString = (string) $value;
-        $value = json_decode($valueString, true);
-        if (json_last_error() > 0) {
-            throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString . '`.');
-        }
-        return $value;
+        return CM_Util::jsonDecode($value);
     }
 
     /**

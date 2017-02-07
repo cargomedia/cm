@@ -13,6 +13,11 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertFalse($params->has('6'));
     }
 
+    public function testGetWithInvalidEncodedData() {
+        $params = new CM_Params(['foo' => ['_class' => 'Some_Nonexistent_Class', '_id' => 123]]);
+        $this->assertSame(['_class' => 'Some_Nonexistent_Class', '_id' => 123], $params->get('foo'));
+    }
+
     public function testGetString() {
         $text = "Foo Bar, Bar Foo";
         $notText = new stdClass();
@@ -145,7 +150,8 @@ class CM_ParamsTest extends CMTest_TestCase {
             $params->getLanguage('no-object-param');
             $this->fail('getObject should fail and throw exception');
         } catch (CM_Exception $e) {
-            $this->assertContains(get_class($language), $e->getMessage());
+            $this->assertSame('Model has no data', $e->getMessage());
+            $this->assertContains(get_class($language), $e->getMetaInfo());
         }
     }
 
@@ -187,30 +193,175 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testDecodeArrayConvertible() {
-        $arrayConvertibleClass = $this->mockInterface('CM_ArrayConvertible');
-        $fromArrayMethod = $arrayConvertibleClass->mockStaticMethod('fromArray')->set(function ($encoded) {
+        $object = $this->mockInterface('CM_ArrayConvertible');
+        $fromArrayMethod = $object->mockStaticMethod('fromArray')->set(function ($encoded) {
             $this->assertSame(['foo' => 1], $encoded);
             return $encoded['foo'];
         });
         $encodedArrayConvertible = [
             'foo'    => 1,
-            '_class' => get_class($arrayConvertibleClass->newInstance()),
+            '_class' => get_class($object->newInstance()),
         ];
         $this->assertEquals(1, CM_Params::decode($encodedArrayConvertible));
         $this->assertSame(1, $fromArrayMethod->getCallCount());
     }
 
+    public function testDecodeArrayConvertibleRecursive() {
+        $objectOuter = $this->mockInterface('CM_ArrayConvertible');
+        $fromArrayMethodOuter = $objectOuter->mockStaticMethod('fromArray')->set(function ($encoded) {
+            $this->assertSame(['foo' => 1, 'object' => 2], $encoded);
+            return (int) $encoded['foo'] . $encoded['object'];
+        });
+        $objectInner = $this->mockInterface('CM_ArrayConvertible');
+        $fromArrayMethodInner = $objectInner->mockStaticMethod('fromArray')->set(function ($encoded) {
+            $this->assertSame(['bar' => 2], $encoded);
+            return $encoded['bar'];
+        });
+
+        $encodedArrayConvertible = [
+            'foo'    => 1,
+            '_class' => get_class($objectOuter->newInstance()),
+            'object' => [
+                'bar'    => 2,
+                '_class' => get_class($objectInner->newInstance()),
+            ]
+        ];
+        $this->assertEquals(12, CM_Params::decode($encodedArrayConvertible));
+        $this->assertSame(1, $fromArrayMethodInner->getCallCount());
+        $this->assertSame(1, $fromArrayMethodOuter->getCallCount());
+    }
+
     public function testEncodeArrayConvertible() {
-        $arrayConvertible = $this->mockInterface('CM_ArrayConvertible')->newInstance();
-        $toArrayMethod = $arrayConvertible->mockMethod('toArray')->set([
+        $object = $this->mockInterface('CM_ArrayConvertible')->newInstance();
+        $toArrayMethod = $object->mockMethod('toArray')->set([
+            'myId' => 1
+        ]);
+        $expectedEncoded = array(
+            'myId'   => 1,
+            '_class' => get_class($object),
+        );
+        $this->assertEquals($expectedEncoded, CM_Params::encode($object));
+        $this->assertSame(1, $toArrayMethod->getCallCount());
+    }
+
+    public function testEncodeObjectId() {
+        /** @var CM_ArrayConvertible|\Mocka\AbstractClassTrait $object */
+        $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable'])->newInstance();
+        $toArrayMethod = $object->mockMethod('toArray')->set([
+            'myId' => 1
+        ]);
+        $jsonSerializeMethod = $object->mockMethod('jsonSerialize')->set([
+            'myData' => 1
+        ]);
+        $expectedEncoded = array(
+            'myId'   => 1,
+            '_class' => get_class($object),
+        );
+        $this->assertEquals(json_encode($expectedEncoded), CM_Params::encodeObjectId($object));
+        $this->assertSame(1, $toArrayMethod->getCallCount());
+        $this->assertSame(0, $jsonSerializeMethod->getCallCount());
+    }
+
+    public function testEncodeJsonSerializable() {
+        $object = $this->mockInterface('JsonSerializable')->newInstance();
+        $toArrayMethod = $object->mockMethod('jsonSerialize')->set([
             'foo' => 1
         ]);
         $expectedEncoded = array(
             'foo'    => 1,
-            '_class' => get_class($arrayConvertible),
+            '_class' => get_class($object),
         );
-        $this->assertEquals($expectedEncoded, CM_Params::encode($arrayConvertible));
+        $this->assertEquals($expectedEncoded, CM_Params::encode($object));
         $this->assertSame(1, $toArrayMethod->getCallCount());
+    }
+
+    public function testDecodeJsonSerializable() {
+        $object = $this->mockInterface('JsonSerializable');
+        $encodedJsonSerializable = [
+            'foo'    => 1,
+            '_class' => get_class($object->newInstance()),
+        ];
+        $this->assertEquals($encodedJsonSerializable, CM_Params::decode($encodedJsonSerializable));
+    }
+
+    public function testEncodeArrayConvertibleAndJsonSerializable() {
+        $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable'])->newInstance();
+        $toArrayMethod = $object->mockMethod('toArray')->set([
+            'foo' => 1
+        ]);
+        $jsonSerializeMethod = $object->mockMethod('jsonSerialize')->set([
+            'bar' => 1
+        ]);
+        $expectedEncoded = array(
+            'foo'    => 1,
+            'bar'    => 1,
+            '_class' => get_class($object),
+        );
+        $this->assertEquals($expectedEncoded, CM_Params::encode($object));
+        $this->assertSame(1, $toArrayMethod->getCallCount());
+        $this->assertSame(1, $jsonSerializeMethod->getCallCount());
+    }
+
+    public function testEncodeRecursive() {
+        $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable'])->newInstance();
+        $nestedObject1 = $this->mockClass(null, ['CM_ArrayConvertible'])->newInstance();
+        $nestedObject2 = $this->mockClass(null, ['JsonSerializable'])->newInstance();
+        $object->mockMethod('toArray')->set([
+            'foo'     => 1,
+            'nested1' => $nestedObject1,
+        ]);
+        $object->mockMethod('jsonSerialize')->set([
+            'bar'     => 1,
+            'nested2' => $nestedObject2
+        ]);
+        $nestedObject1->mockMethod('toArray')->set(['foo' => 2]);
+        $nestedObject2->mockMethod('jsonSerialize')->set(['bar' => 2]);
+        $expected = [
+            '_class'  => get_class($object),
+            'foo'     => 1,
+            'nested1' => [
+                '_class' => get_class($nestedObject1),
+                'foo'    => 2,
+            ],
+            'bar'     => 1,
+            'nested2' => [
+                '_class' => get_class($nestedObject2),
+                'bar'    => 2,
+            ]
+        ];
+        $this->assertSame($expected, CM_Params::encode($object));
+    }
+
+    public function testDecodeRecursive() {
+        $object = $this->mockClass(null, ['CM_ArrayConvertible', 'JsonSerializable']);
+        $nestedArrayConvertible = $this->mockClass(null, ['CM_ArrayConvertible']);
+        $nestedJsonSerializable = $this->mockClass(null, ['JsonSerializable']);
+        $encodedArrayConvertible = [
+            '_class' => $nestedArrayConvertible->getClassName(),
+            'foo'    => 2,
+        ];
+        $encodedJsonSerializable = [
+            '_class' => $nestedJsonSerializable->getClassName(),
+            'bar'    => 2,
+        ];
+        $encodedObject = [
+            '_class'  => $object->getClassName(),
+            'foo'     => 1,
+            'nested1' => $encodedArrayConvertible,
+            'bar'     => 1,
+            'nested2' => $encodedJsonSerializable
+        ];
+        $fromArrayMethodObject = $object->mockStaticMethod('fromArray')->set(function ($encoded) use ($encodedJsonSerializable) {
+            $this->assertSame(['foo' => 1, 'nested1' => 2, 'bar' => 1, 'nested2' => $encodedJsonSerializable], $encoded);
+            return [$encoded['foo'], $encoded['nested1']];
+        });
+        $fromArrayMethodNestedObject = $nestedArrayConvertible->mockStaticMethod('fromArray')->set(function ($encoded) {
+            $this->assertSame(['foo' => 2], $encoded);
+            return $encoded['foo'];
+        });
+        $this->assertEquals([1, 2], CM_Params::decode($encodedObject));
+        $this->assertSame(1, $fromArrayMethodNestedObject->getCallCount());
+        $this->assertSame(1, $fromArrayMethodObject->getCallCount());
     }
 
     public function testGetDateTime() {
@@ -231,16 +382,31 @@ class CM_ParamsTest extends CMTest_TestCase {
 
     public function testGetLocation() {
         $location = CMTest_TH::createLocation();
-        $params = new CM_Params(['location' => $location, 'locationParameters' => ['id' => $location->getId(), 'level' => $location->getLevel()], 'insufficientParameters' => 1]);
+        $params = new CM_Params([
+            'location'               => $location,
+            'locationParameters'     => ['id' => $location->getId(), 'level' => $location->getLevel()],
+            'insufficientParameters' => 1,
+            'invalidLevel'           => ['id' => $location->getId(), 'level' => 9999],
+        ]);
         $this->assertEquals($location, $params->getLocation('location'));
         $this->assertEquals($location, $params->getLocation('locationParameters'));
-        try {
+
+        /** @var CM_Exception_InvalidParam  $exception */
+        $exception = $this->catchException(function () use ($params) {
             $params->getLocation('insufficientParameters');
             $this->fail('Instantiating location with insufficient parameters');
-        } catch (CM_Exception_InvalidParam $ex) {
-            $this->assertSame('Not enough parameters', $ex->getMessage());
-            $this->assertSame(['parameters' => 1, 'class' => 'CM_Model_Location'], $ex->getMetaInfo());
-        }
+        });
+        $this->assertInstanceOf(CM_Exception_InvalidParam::class, $exception);
+        $this->assertSame('Not enough parameters', $exception->getMessage());
+        $this->assertSame(['parameters' => 1, 'className' => 'CM_Model_Location'], $exception->getMetaInfo());
+
+        /** @var CM_Exception_InvalidParam $exception */
+        $exception = $this->catchException(function () use ($params) {
+            $params->getLocation('invalidLevel');
+        });
+        $this->assertInstanceOf(CM_Exception_InvalidParam::class, $exception);
+        $this->assertSame('Invalid location level', $exception->getMessage());
+        $this->assertSame(['level' => 9999], $exception->getMetaInfo());
     }
 
     public function testGetParamsDecoded() {
@@ -320,13 +486,16 @@ class CM_ParamsTest extends CMTest_TestCase {
         $params->getParams('foo');
     }
 
-    /**
-     * @expectedException CM_Exception_InvalidParam
-     * @expectedExceptionMessage Unexpected input of type `integer`
-     */
     public function testGetParamsInvalidInt() {
         $params = new CM_Params(array('foo' => 12));
-        $params->getParams('foo');
+        $exception = $this->catchException(function () use ($params) {
+            $params->getParams('foo');
+        });
+
+        $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
+        /** @var CM_Exception_InvalidParam $exception */
+        $this->assertSame('Unexpected type of arguments', $exception->getMessage());
+        $this->assertSame(['type' => 'integer'], $exception->getMetaInfo());
     }
 
     /**
@@ -338,24 +507,6 @@ class CM_ParamsTest extends CMTest_TestCase {
         $params->getParams('foo');
     }
 
-    public function testJsonEncode() {
-        $actual = CM_Params::jsonEncode(['foo' => 'bar']);
-        $this->assertSame('{"foo":"bar"}', $actual);
-    }
-
-    public function testJsonEncodePrettyPrint() {
-        $actual = CM_Params::jsonEncode(['foo' => 'bar'], true);
-        $this->assertSame('{' . "\n" . '    "foo": "bar"' . "\n" . '}', $actual);
-    }
-
-    /**
-     * @expectedException Exception
-     */
-    public function testJsonEncodeInvalid() {
-        $resource = fopen(sys_get_temp_dir(), 'r');
-        CM_Params::jsonEncode(['foo' => $resource]);
-    }
-
     public function testDebugInfo() {
         $params = new CM_Params(['foo' => 12, 'bar' => [1, 2]]);
         $this->assertSame("['foo' => 12, 'bar' => [0 => 1, 1 => 2]]", $params->getDebugInfo());
@@ -364,9 +515,95 @@ class CM_ParamsTest extends CMTest_TestCase {
     public function testDebugInfoWithException() {
         /** @var CM_Params|\Mocka\AbstractClassTrait $params */
         $params = $this->mockObject('CM_Params');
-        $params->mockMethod('getParamsDecoded')->set(function() {
+        $params->mockMethod('getParamsDecoded')->set(function () {
             throw new Exception('foo');
         });
         $this->assertSame('[Cannot dump params: `foo`]', $params->getDebugInfo());
+    }
+
+    public function testGetStreamChannel() {
+        $streamChannel = CMTest_TH::createStreamChannel();
+        $params = new CM_Params(['channel' => $streamChannel]);
+        $this->assertEquals($streamChannel, $params->getStreamChannel('channel'));
+    }
+
+    public function testGetStreamChannelMedia() {
+        $streamChannel = CMTest_TH::createStreamChannel(CM_Model_StreamChannel_Media::getTypeStatic());
+        $params = new CM_Params(['channel' => $streamChannel]);
+        $this->assertEquals($streamChannel, $params->getStreamChannelMedia('channel'));
+    }
+
+    public function testGetStreamChannelJanus() {
+        $streamChannel = CMTest_TH::createStreamChannel(CM_Janus_StreamChannel::getTypeStatic());
+        $params = new CM_Params(['channel' => $streamChannel]);
+        $this->assertEquals($streamChannel, $params->getStreamChannelJanus('channel'));
+    }
+
+    public function testGetStreamChannelDefinition() {
+        $definition = new CM_StreamChannel_Definition('foo', 12);
+        $params = new CM_Params(['def' => $definition]);
+        $this->assertEquals($definition, $params->getStreamChannelDefinition('def'));
+    }
+
+    public function testGetGeometryVector2() {
+        $vector2 = new CM_Geometry_Vector2(1.1, 2.2);
+        $params = new CM_Params(array('vector2' => $vector2));
+        $value = $params->getGeometryVector2('vector2');
+        $this->assertInstanceOf('CM_Geometry_Vector2', $value);
+        $this->assertSame(1.1, $value->getX());
+        $this->assertSame(2.2, $value->getY());
+
+        $exception = $this->catchException(function () {
+            $params = new CM_Params(array('vector2' => 'foo'));
+            $params->getGeometryVector2('vector2');
+        });
+        $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
+        $this->assertSame('Not enough parameters', $exception->getMessage());
+    }
+
+    public function testGetGeometryVector3() {
+        $vector3 = new CM_Geometry_Vector3(1.1, 2.2, 3.3);
+        $params = new CM_Params(array('vector3' => $vector3));
+        $value = $params->getGeometryVector3('vector3');
+        $this->assertInstanceOf('CM_Geometry_Vector3', $value);
+        $this->assertSame(1.1, $value->getX());
+        $this->assertSame(2.2, $value->getY());
+        $this->assertSame(3.3, $value->getZ());
+
+        $exception = $this->catchException(function () {
+            $params = new CM_Params(array('vector3' => 'foo'));
+            $params->getGeometryVector3('vector3');
+        });
+        $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
+        $this->assertSame('Not enough parameters', $exception->getMessage());
+    }
+
+    public function testGetSession() {
+        $session1 = CMTest_TH::createSession();
+        $sessionId1 = $session1->getId();
+        $session2 = CMTest_TH::createSession();
+        $sessionId2 = $session2->getId();
+
+        $params = new CM_Params(['foo' => $sessionId1, 'bar' => 'baz', 'baz' => $session2, 'quux' => 5]);
+
+        $session1 = $params->getSession('foo');
+        $this->assertInstanceOf('CM_Session', $session1);
+        $this->assertSame($sessionId1, $session1->getId());
+
+        $exception = $this->catchException(function () use ($params) {
+            $params->getSession('bar');
+        });
+        $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
+        $this->assertSame('Session is not found', $exception->getMessage());
+
+        $session2 = $params->getSession('baz');
+        $this->assertInstanceOf('CM_Session', $session2);
+        $this->assertSame($sessionId2, $session2->getId());
+
+        $exception = $this->catchException(function () use ($params) {
+            $params->getSession('quux');
+        });
+        $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
+        $this->assertSame('Invalid param type for session', $exception->getMessage());
     }
 }

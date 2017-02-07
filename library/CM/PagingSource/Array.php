@@ -48,6 +48,7 @@ class CM_PagingSource_Array extends CM_PagingSource_Abstract {
     }
 
     public function clearCache() {
+        unset($this->_data);
         if ($this->_source) {
             $this->_source->clearCache();
         } else {
@@ -61,6 +62,13 @@ class CM_PagingSource_Array extends CM_PagingSource_Abstract {
 
     public function getItems($offset = null, $count = null) {
         return array_slice($this->_getData(), $offset, $count);
+    }
+
+    public function getStalenessChance() {
+        if ($this->_source) {
+            return $this->_source->getStalenessChance();
+        }
+        return 0;
     }
 
     protected function _cacheKeyBase() {

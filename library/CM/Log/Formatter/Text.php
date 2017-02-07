@@ -2,13 +2,6 @@
 
 class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
 
-    public function _getDefaults() {
-        return [
-            'formatMessage' => '[{datetime} - {fqdn} - php {phpVersion} - {levelname}] {message}',
-            'formatDate'    => 'c',
-        ];
-    }
-
     public function renderMessage(CM_Log_Record $record) {
         return $this->_format($this->_formatMessage, $this->_getRecordInfo($record));
     }
@@ -31,41 +24,24 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
             $server = $httpRequest->getServer();
             $httpRequestText = '{type} {path} {proto}, host: {host}, ip: {ip}, referer: {referer}, user-agent: {agent}';
             $data['httpRequest'] = $this->_format($httpRequestText, [
-                'type'    => $server['REQUEST_METHOD'],
+                'type'    => isset($server['REQUEST_METHOD']) ? $server['REQUEST_METHOD'] : '',
                 'path'    => $httpRequest->getPath(),
-                'proto'   => $server['SERVER_PROTOCOL'],
+                'proto'   => isset($server['SERVER_PROTOCOL']) ? $server['SERVER_PROTOCOL'] : '',
                 'host'    => $httpRequest->getHost(),
                 'ip'      => $httpRequest->getIp(),
-                'referer' => $httpRequest->getHeader('referer'),
-                'agent'   => $httpRequest->getHeader('user-agent'),
+                'referer' => $httpRequest->hasHeader('referer') ? $httpRequest->getHeader('referer') : '',
+                'agent'   => $httpRequest->getUserAgent(),
             ]);
         }
         if (!empty($extra)) {
-            $extraText = [];
-            foreach ($extra as $key => $value) {
-                $extraText[] = sprintf('%s: %s', $key, $value);
-            }
-            $data['extra'] = implode(', ', $extraText);
+            $data['extra'] = json_encode($extra, JSON_PRETTY_PRINT);
         }
-
-        return empty($data) ? null : $this->_formatArrayToLines(' - %s: %s', $data);
-    }
-
-    public function renderException( CM_Log_Record_Exception $record) {
-        $exception = $record->getException();
-
-        $traceData = [];
-        $traceCount = 0;
-        foreach ($exception->getTrace() as $trace) {
-            $traceData[] = sprintf('     %02d. %s %s:%s', $traceCount++, $trace['code'], $trace['file'], $trace['line']);
+        if ($exception = $record->getContext()->getException()) {
+            $serializableException = new CM_ExceptionHandling_SerializableException($exception);
+            $data['exception'] = $this->_renderException($serializableException);
         }
-        $traceText = implode(PHP_EOL, $traceData);
-
-        return ' - exception:' . PHP_EOL . $this->_formatArrayToLines('   - %s: %s', [
-            'message'    => $exception->getMessage(),
-            'type'       => $exception->getClass(),
-            'stacktrace' => PHP_EOL . $traceText,
-        ]);
+        $output = empty($data) ? null : $this->_formatArrayToLines(' - %s: %s', $data);
+        return $output;
     }
 
     /**
@@ -80,5 +56,31 @@ class CM_Log_Formatter_Text extends CM_Log_Formatter_Abstract {
             $dataText[] = sprintf($format, $key, $value);
         }
         return implode(PHP_EOL, $dataText);
+    }
+
+    /**
+     * @param CM_ExceptionHandling_SerializableException $exception
+     * @return string
+     */
+    protected function _renderException(CM_ExceptionHandling_SerializableException $exception) {
+        $traceData = [];
+        $traceCount = 0;
+        foreach ($exception->getTrace() as $trace) {
+            $traceData[] = sprintf('     %02d. %s %s:%s', $traceCount++, $trace['code'], $trace['file'], $trace['line']);
+        }
+        $traceText = implode(PHP_EOL, $traceData);
+
+        return PHP_EOL . $this->_formatArrayToLines('   - %s: %s', [
+            'message'    => $exception->getMessage(),
+            'type'       => $exception->getClass(),
+            'stacktrace' => PHP_EOL . $traceText,
+        ]);
+    }
+
+    protected function _getDefaults() {
+        return [
+            'formatMessage' => '[{datetime} - {fqdn} - php {phpVersion} - {levelname}] {message}',
+            'formatDate'    => 'c',
+        ];
     }
 }

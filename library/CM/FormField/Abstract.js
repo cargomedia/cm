@@ -18,25 +18,27 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
   },
 
   validate: function() {
-    var value = this.getValue();
-    if (this.isEmpty(value)) {
-      this.error(null);
-      return;
-    }
-    var self = this;
-    this.ajax('validate', {'userInput': value, 'form': this.getForm().getClass(), 'fieldName': this.getName()})
-      .then(function() {
-        if (value == self.getValue()) {
-          self.error();
-        }
-      })
-      .catch(CM_Exception, function(error) {
-        if (error instanceof CM_Exception_FormFieldValidation) {
-          self.error(error.message);
-        } else if (value == self.getValue()) {
-          throw error;
-        }
-      });
+    return this.try(function(){
+      var value = this.getValue();
+      if (this.isEmpty(value)) {
+        this.error(null);
+        return;
+      }
+      var self = this;
+      return this.ajax('validate', {'userInput': value, 'form': this.getForm().getClass(), 'fieldName': this.getName()})
+        .then(function() {
+          if (value == self.getValue()) {
+            self.error();
+          }
+        })
+        .catch(CM_Exception, function(error) {
+          if (error instanceof CM_Exception_FormFieldValidation) {
+            self.error(error.message);
+          } else if (value == self.getValue()) {
+            throw error;
+          }
+        });
+    });
   },
 
   reset: function() {
@@ -121,18 +123,25 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
     this.getInput().focus();
   },
 
+  success: function() {
+    this.error(null);
+    this.$el[0].dataset.formfieldSuccess = true;
+  },
+
   /**
    * @param {String|Null} [message]
    */
   error: function(message) {
     var $container = this.$('.messages');
     var $errorMessage = $container.find('.formField-error');
-    this.$el.removeClass('hasError');
+    var el = this.$el[0];
+    delete el.dataset.formfieldError;
+    delete el.dataset.formfieldSuccess;
 
     if (message) {
       if ($container.length) {
-        this.$el[0].offsetWidth;	// Force reflow for CSS-animation
-        this.$el.addClass('hasError');
+        this.$el.triggerReflow();
+        el.dataset.formfieldError = true;
 
         if ($errorMessage.length) {
           $errorMessage.html(message);
@@ -141,8 +150,6 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
           $errorMessage.html(message);
           $errorMessage.slideDown('fast');
         }
-        this.setFocus();
-
       } else {
         throw new CM_Exception('FormField `' + this.getName() + '`: ' + message);
       }
@@ -156,6 +163,15 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
    * @returns {Boolean}
    */
   isEmpty: function(value) {
-    return _.isEmpty(value);
+    if (_.isNull(value)) {
+      return true;
+    }
+    if (_.isArray(value)) {
+      return 0 === value.length;
+    }
+    if (_.isBoolean(value)) {
+      return false;
+    }
+    return 0 === String(value).trim().length;
   }
 });

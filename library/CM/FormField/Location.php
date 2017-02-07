@@ -13,15 +13,20 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         parent::_initialize();
     }
 
+    /**
+     * @param CM_Model_Location  $location
+     * @param CM_Frontend_Render $render
+     * @return array list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img, 'class' => string])
+     */
     public function getSuggestion($location, CM_Frontend_Render $render) {
         $names = array();
         for ($level = $location->getLevel(); $level >= CM_Model_Location::LEVEL_COUNTRY; $level--) {
             $names[] = $location->getName($level);
         }
         return array(
-            'id'    => $location->toArray(),
-            'name'  => implode(', ', array_filter($names)),
-            'img'   => $render->getUrlResource('layout',
+            'id'   => $location->toArray(),
+            'name' => implode(', ', array_filter($names)),
+            'img'  => $render->getUrlResource('layout',
                 'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),
         );
     }
@@ -62,7 +67,10 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         $location = $this->_squashLocationInConstraints($location);
 
         if (!$location) {
-            throw new CM_Exception('Cannot find a location by coordinates `' . $lat . '` / `' . $lon . '`.');
+            throw new CM_Exception('Cannot find a location by coordinates.', CM_Exception::WARN, [
+                'lat' => $lat,
+                'lon' => $lon,
+            ]);
         }
 
         return $this->getSuggestion($location, $response->getRender());

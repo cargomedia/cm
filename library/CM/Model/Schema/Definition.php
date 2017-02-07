@@ -14,7 +14,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      * @return mixed
      * @throws CM_Exception_Invalid
      * @throws CM_Model_Exception_Validation
@@ -36,6 +36,7 @@ class CM_Model_Schema_Definition {
                             $value = (float) $value;
                             break;
                         case 'string':
+                            $value = (string) $value;
                             break;
                         case 'boolean':
                         case 'bool':
@@ -48,19 +49,33 @@ class CM_Model_Schema_Definition {
                             $value = $value->getTimestamp();
                             break;
                         default:
-                            if (!(class_exists($type) && is_subclass_of($type, 'CM_Model_Abstract'))) {
-                                throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a valid model');
+                            if (!class_exists($type)) {
+                                throw new CM_Model_Exception_Validation('Field type is not a valid class', null, ['type' => $type]);
                             }
-                            if (!$value instanceof $type) {
-                                throw new CM_Model_Exception_Validation(
-                                    'Value `' . CM_Util::var_line($value) . '` is not an instance of `' . $type . '`');
+                            $className = $type;
+                            if (!$value instanceof $className) {
+                                throw new CM_Model_Exception_Validation('Value is not an instance of the class', null, [
+                                    'value'     => CM_Util::var_line($value),
+                                    'className' => $className,
+                                ]);
                             }
-                            /** @var CM_Model_Abstract $value */
-                            $id = $value->getIdRaw();
-                            if (count($id) == 1) {
-                                $value = $value->getId();
+
+                            if (is_a($className, 'CM_Model_Abstract', true)) {
+                                /** @var CM_Model_Abstract $value */
+                                $id = $value->getIdRaw();
+                                if (count($id) == 1) {
+                                    $value = $value->getId();
+                                } else {
+                                    $value = CM_Util::jsonEncode($id);
+                                }
+                            } elseif (is_subclass_of($className, 'CM_ArrayConvertible', true)) {
+                                /** @var CM_ArrayConvertible $value */
+                                $value = $value->toArray();
+                                $value = CM_Util::jsonEncode($value);
                             } else {
-                                $value = CM_Params::jsonEncode($id);
+                                throw new CM_Model_Exception_Validation('Class is neither CM_Model_Abstract nor CM_ArrayConvertible', null, [
+                                    'className' => $className
+                                ]);
                             }
                     }
                 }
@@ -71,7 +86,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      * @return mixed
      * @throws CM_Exception_Invalid
      * @throws CM_Model_Exception_Validation
@@ -93,6 +108,7 @@ class CM_Model_Schema_Definition {
                             $value = (float) $value;
                             break;
                         case 'string':
+                            $value = (string) $value;
                             break;
                         case 'boolean':
                         case 'bool':
@@ -104,15 +120,37 @@ class CM_Model_Schema_Definition {
                             $value = DateTime::createFromFormat('U', $value);
                             break;
                         default:
-                            if ($this->_isJson($value)) {
-                                $value = CM_Params::jsonDecode($value);
+                            if (!class_exists($type)) {
+                                throw new CM_Model_Exception_Validation('Field type is not a valid class/interface', null, ['type' => $type]);
                             }
-                            $id = $value;
+                            $className = $type;
+                            if (is_a($className, 'CM_Model_Abstract', true)) {
+                                /** @var CM_Model_Abstract $type */
+                                if ($this->_isJson($value)) {
+                                    $value = CM_Util::jsonDecode($value);
+                                }
+                                $id = $value;
 
-                            if (!is_array($id)) {
-                                $id = array('id' => $id);
+                                if (!is_array($id)) {
+                                    $id = ['id' => $id];
+                                }
+                                $value = CM_Model_Abstract::factoryGeneric($type::getTypeStatic(), $id);
+                            } elseif (is_subclass_of($className, 'CM_ArrayConvertible', true)) {
+                                /** @var CM_ArrayConvertible $className */
+                                $value = CM_Util::jsonDecode($value);
+                                $value = $className::fromArray($value);
+                            } else {
+                                throw new CM_Model_Exception_Validation('Class is neither CM_Model_Abstract nor CM_ArrayConvertible', null, [
+                                    'className' => $className,
+                                ]);
                             }
-                            $value = CM_Model_Abstract::factoryGeneric($type::getTypeStatic(), $id);
+
+                            if (!$value instanceof $className) {
+                                throw new CM_Model_Exception_Validation('Value is not an instance of the class', null, [
+                                    'value'     => CM_Util::var_line($value),
+                                    'className' => $className,
+                                ]);
+                            }
                     }
                 }
             }
@@ -147,7 +185,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      * @return mixed
      * @throws CM_Exception_Invalid
      * @throws CM_Model_Exception_Validation
@@ -160,7 +198,7 @@ class CM_Model_Schema_Definition {
             $optional = !empty($schemaField['optional']);
 
             if (!$optional && null === $value) {
-                throw new CM_Model_Exception_Validation('Field `' . $key . '` is mandatory');
+                throw new CM_Model_Exception_Validation('Field is mandatory', null, ['key' => $key]);
             }
 
             if (null !== $value) {
@@ -170,43 +208,49 @@ class CM_Model_Schema_Definition {
                         case 'integer':
                         case 'int':
                             if (!$this->_isInt($value)) {
-                                throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an integer');
+                                throw new CM_Model_Exception_Validation('Field is not an integer', null, ['key' => $key]);
                             }
                             break;
                         case 'float':
                             if (!$this->_isFloat($value)) {
-                                throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a float');
+                                throw new CM_Model_Exception_Validation('Field is not a float', null, ['key' => $key]);
                             }
                             break;
                         case 'string':
                             if (!$this->_isString($value)) {
-                                throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a string');
+                                throw new CM_Model_Exception_Validation('Field is not a string', null, ['key' => $key]);
                             }
                             break;
                         case 'boolean':
                         case 'bool':
                             if (!$this->_isBoolean($value)) {
-                                throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a boolean');
+                                throw new CM_Model_Exception_Validation('Field is not a boolean', null, ['key' => $key]);
                             }
                             break;
                         case 'array':
                             if (!$this->_isArray($value)) {
-                                throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an array');
+                                throw new CM_Model_Exception_Validation('Field is not an array', null, ['key' => $key]);
                             }
                             break;
                         case 'DateTime':
                             if (!$this->_isInt($value)) {
-                                throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a valid timestamp');
+                                throw new CM_Model_Exception_Validation('Field is not a valid timestamp', null, ['key' => $key]);
                             }
                             break;
                         default:
-                            if (class_exists($type) && is_subclass_of($type, 'CM_Model_Abstract')) {
+                            if (is_subclass_of($type, 'CM_Model_Abstract')) {
                                 if (!$this->_isModel($value)) {
-                                    throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a valid model');
+                                    throw new CM_Model_Exception_Validation('Field is not a valid model', null, ['key' => $key]);
                                 }
                                 break;
                             }
-                            throw new CM_Exception_Invalid('Invalid type `' . $type . '`');
+                            if (is_subclass_of($type, 'CM_ArrayConvertible')) {
+                                if (!$this->_isJson($value)) {
+                                    throw new CM_Model_Exception_Validation('Field is not a valid json', null, ['key' => $key]);
+                                }
+                                break;
+                            }
+                            throw new CM_Exception_Invalid('Invalid type', null, ['type' => $type]);
                     }
                 }
             }

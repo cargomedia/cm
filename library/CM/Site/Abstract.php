@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed {
+abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed, CM_Comparable {
 
     /** @var string[] */
     protected $_themes = array();
@@ -75,9 +75,17 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
+     * @return string
+     */
+    public function getDocument() {
+        return CM_View_Document::class;
+    }
+
+    /**
+     * @param CM_Frontend_Environment $environment
      * @return CM_Menu[]
      */
-    public function getMenus() {
+    public function getMenus(CM_Frontend_Environment $environment) {
         return array();
     }
 
@@ -92,7 +100,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return string Theme
      */
     public function getTheme() {
-        return $this->_themes[0];
+        return $this->getThemes()[0];
     }
 
     /**
@@ -110,26 +118,51 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @return string|null
+     * @return CM_Http_UrlParser
      */
-    public function getUrlCdn() {
-        $config = self::_getConfig();
-        if (!isset($config->urlCdn)) {
-            return null;
-        }
-        return (string) $config->urlCdn;
+    public function getUrlParser() {
+        return new CM_Http_UrlParser($this->getUrl());
     }
 
     /**
      * @return string
-     * @throws CM_Exception_Invalid
+     */
+    public function getUrlCdn() {
+        return (string) self::_getConfig()->urlCdn;
+    }
+
+    /**
+     * @return array
+     */
+    public function getWebFontLoaderConfig() {
+        $config = $this->getConfig();
+        if (!isset($config->webFontLoaderConfig)) {
+            return null;
+        }
+        return $config->webFontLoaderConfig;
+    }
+
+    /**
+     * @return string
      */
     public function getHost() {
-        $siteHost = parse_url($this->getUrl(), PHP_URL_HOST);
-        if (false === $siteHost || null === $siteHost) {
-            throw new CM_Exception_Invalid('Cannot detect host from `' . $this->getUrl() . '`.');
-        }
-        return $siteHost;
+        return $this->getUrlParser()->getHost();
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath() {
+        return $this->getUrlParser()->getPath();
+    }
+
+    /**
+     * @return string
+     * @throws CM_Exception
+     */
+    public function getUrlBase() {
+        $urlParser = $this->getUrlParser();
+        return $urlParser->getScheme() . '://' . $urlParser->getHost();
     }
 
     /**
@@ -173,12 +206,57 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     /**
      * @param CM_Http_Request_Abstract $request
-     * @return boolean
+     * @return bool
+     * @throws CM_Exception
      */
     public function match(CM_Http_Request_Abstract $request) {
-        $urlRequest = $request->getHost();
-        $urlSite = $this->getHost();
-        return 0 === strpos(preg_replace('/^www\./', '', $urlRequest), preg_replace('/^www\./', '', $urlSite));
+        return $this->isUrlMatch($request->getHost(), $request->getPath());
+    }
+
+    /**
+     * @param string $host
+     * @param string $path
+     * @return bool
+     * @throws CM_Exception
+     */
+    public function isUrlMatch($host, $path) {
+        $matchList = [
+            [
+                'host' => $this->getHost(),
+                'path' => $this->getPath(),
+            ],
+            [
+                'host' => preg_replace('/^www\./', '', $this->getHost()),
+                'path' => $this->getPath(),
+            ],
+        ];
+
+        if ($this->getUrlCdn()) {
+            $urlCdn = new CM_Http_UrlParser($this->getUrlCdn());
+            $matchList[] = [
+                'host' => $urlCdn->getHost(),
+                'path' => $urlCdn->getPath(),
+            ];
+        }
+
+        $path = new Stringy\Stringy($path);
+        return Functional\some($matchList, function ($match) use ($host, $path) {
+            return ($host === $match['host'] && $path->startsWith($match['path']));
+        });
+    }
+
+    /**
+     * @param CM_Site_Abstract $other
+     * @return boolean
+     */
+    public function equals(CM_Comparable $other = null) {
+        if (null === $other) {
+            return false;
+        }
+        if (get_class($other) !== get_class($this)) {
+            return false;
+        }
+        return $this->getUrl() === $other->getUrl();
     }
 
     /**
@@ -190,7 +268,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         try {
             $class = self::_getClassName($type);
         } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
-            throw new CM_Class_Exception_TypeNotConfiguredException('Site with type `' . $type . '` not configured', CM_Exception::WARN);
+            throw new CM_Class_Exception_TypeNotConfiguredException('Site with given type is not configured', CM_Exception::WARN, ['siteType' => $type]);
         }
         return new $class();
     }
@@ -200,22 +278,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      */
     public function getId() {
         return $this->getType();
-    }
-
-    /**
-     * @param CM_Http_Request_Abstract $request
-     * @return CM_Site_Abstract
-     * @throws CM_Exception_Invalid
-     */
-    public static function findByRequest(CM_Http_Request_Abstract $request) {
-        foreach (array_reverse(static::getClassChildren()) as $className) {
-            /** @var CM_Site_Abstract $site */
-            $site = new $className();
-            if ($site->match($request)) {
-                return $site;
-            }
-        }
-        return self::factory();
     }
 
     public static function fromArray(array $array) {

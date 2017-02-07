@@ -44,7 +44,7 @@ class CM_Dom_NodeList implements Iterator, Countable, ArrayAccess {
             if (!empty($errors)) {
                 libxml_clear_errors();
                 if (!$ignoreErrors) {
-                    $errorMessages = array_map(function (libXMLError $error) {
+                    $errorMessages = array_map(function (LibXMLError $error) {
                         return trim($error->message);
                     }, $errors);
                     throw new CM_Exception_Invalid('Cannot load html: ' . implode(', ', $errorMessages));
@@ -181,7 +181,7 @@ class CM_Dom_NodeList implements Iterator, Countable, ArrayAccess {
         foreach ($this->_elementList as $element) {
             foreach ($this->_getXPath()->query($xpath, $element) as $resultElement) {
                 if (!$resultElement instanceof DOMElement) {
-                    throw new CM_Exception_Invalid('Xpath query returns `' . get_class($resultElement) . '` instead of DOMElement');
+                    throw new CM_Exception_Invalid('Xpath query returns invalid value instead of DOMElement', null, ['className' => get_class($resultElement)]);
                 }
                 $nodes[] = $resultElement;
             }

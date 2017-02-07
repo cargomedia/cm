@@ -33,7 +33,8 @@ class CM_UtilTest extends CMTest_TestCase {
             CM_Util::getNamespace('NoNamespace', false);
             $this->fail('Namespace detected in a className without namespace.');
         } catch (CM_Exception_Invalid $ex) {
-            $this->assertContains('Could not detect namespace of `NoNamespace`.', $ex->getMessage());
+            $this->assertContains('Could not detect namespace', $ex->getMessage());
+            $this->assertSame(['className' => 'NoNamespace'], $ex->getMetaInfo());
         }
     }
 
@@ -61,6 +62,18 @@ class CM_UtilTest extends CMTest_TestCase {
         }
     }
 
+    public function testGetResourceFilesGlob() {
+        $files = CM_Util::getResourceFiles('config/*.php');
+        if (!count($files)) {
+            $this->markTestSkipped('There are no files to test this functionality');
+        }
+        $defaultFile = \Functional\first($files, function ($file) {
+            return 'default.php' === $file->getFileName();
+        });
+        $this->assertNotNull($defaultFile);
+        $this->assertInstanceOf('CM_File', $defaultFile);
+    }
+
     public function testGetArrayTree() {
         $array = array(array('id' => 1, 'type' => 1, 'amount' => 1), array('id' => 2, 'type' => 1, 'amount' => 2),
             array('id' => 3, 'type' => 1, 'amount' => 3), array('id' => 4, 'type' => 1, 'amount' => 4));
@@ -78,21 +91,23 @@ class CM_UtilTest extends CMTest_TestCase {
             CM_Util::getArrayTree($array, 1, true, 'foo');
             $this->fail('Item has key `foo`.');
         } catch (CM_Exception_Invalid $ex) {
-            $this->assertContains('Item has no key `foo`.', $ex->getMessage());
+            $this->assertContains('Item has no key.', $ex->getMessage());
+            $this->assertSame(['key' => 'foo'], $ex->getMetaInfo());
         }
 
         try {
             CM_Util::getArrayTree(array(1, 2));
             $this->fail('Item is not an array.');
         } catch (CM_Exception_Invalid $ex) {
-            $this->assertContains('Item is not an array or has less than `2` elements.', $ex->getMessage());
+            $this->assertContains('Item is not an array or has less elements elements than needed.', $ex->getMessage());
+            $this->assertSame(['levelsNeeded' => 2], $ex->getMetaInfo());
         }
 
         try {
             CM_Util::getArrayTree(array(array(1), array(2)));
             $this->fail('Item has less than two elements.');
         } catch (CM_Exception_Invalid $ex) {
-            $this->assertContains('Item is not an array or has less than `2` elements.', $ex->getMessage());
+            $this->assertContains('Item is not an array or has less elements elements than needed.', $ex->getMessage());
         }
     }
 
@@ -117,5 +132,62 @@ class CM_UtilTest extends CMTest_TestCase {
         }
     }
 
+    public function testJsonEncode() {
+        $actual = CM_Util::jsonEncode(['foo' => 'bar']);
+        $this->assertSame('{"foo":"bar"}', $actual);
+    }
 
+    public function testJsonEncodePrettyPrint() {
+        $actual = CM_Util::jsonEncode(['foo' => 'bar'], true);
+        $this->assertSame('{' . "\n" . '    "foo": "bar"' . "\n" . '}', $actual);
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     */
+    public function testJsonEncodeInvalid() {
+        $resource = fopen(sys_get_temp_dir(), 'r');
+        CM_Util::jsonEncode(['foo' => $resource]);
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     */
+    public function testJsonDecodeInvalid() {
+        CM_Util::jsonDecode('{[foo:bar)}');
+    }
+
+    public function testSanitizeUtf() {
+        $string = pack("H*", 'c32e');
+        $this->assertSame('?.', CM_Util::sanitizeUtf($string));
+    }
+
+    public function testSanitizeUtf2() {
+        $string = pack('H*', 'e4bfa1e65faf');
+        $this->assertSame('信?_?', CM_Util::sanitizeUtf($string));
+    }
+
+    public function testApplyOffset() {
+        $this->assertSame(5, CM_Util::applyOffset(7, 5, 0));
+        $this->assertSame(0, CM_Util::applyOffset(7, 0, 0));
+        $this->assertSame(4, CM_Util::applyOffset(7, 2, 2));
+        $this->assertSame(5, CM_Util::applyOffset(7, 6, -1));
+        $this->assertSame(0, CM_Util::applyOffset(7, 1, 20));
+        $this->assertSame(2, CM_Util::applyOffset(7, 5, -31));
+        $exception = $this->catchException(function () {
+            CM_Util::applyOffset(7, 7, 2);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Initial position is invalid', $exception->getMessage());
+        $exception = $this->catchException(function () {
+            CM_Util::applyOffset(5, -1, 3);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Initial position is invalid', $exception->getMessage());
+    }
+
+    public function testCreateDateTimeWithMillis() {
+        $dateTime = CM_Util::createDateTimeWithMillis();
+        $this->assertInstanceOf('DateTime', $dateTime);
+    }
 }

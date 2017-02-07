@@ -44,17 +44,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      */
     public function loadComponent($className, CM_Params $params) {
         $component = CM_Component_Abstract::factory($className, $params);
-        $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
-        $html = $renderAdapter->fetch();
-
-        $frontend = $this->getRender()->getGlobalResponse();
-        $data = array(
-            'autoId' => $frontend->getTreeRoot()->getValue()->getAutoId(),
-            'html'   => $html,
-            'js'     => $frontend->getJs(),
-        );
-        $frontend->clear();
-        return $data;
+        return $this->_getComponentRendering($component);
     }
 
     /**
@@ -64,59 +54,94 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      * @return array
      */
     public function loadPage(CM_Params $params, CM_Http_Response_View_Ajax $response) {
-        $request = new CM_Http_Request_Get($params->getString('path'), $this->getRequest()->getHeaders(), $this->getRequest()->getServer(), $this->getRequest()->getViewer());
+        $path = $params->getString('path');
+        $currentLayoutClass = $params->getString('currentLayout');
+
+        $request = $this->_createGetRequestWithUrl($path);
+        $responseFactory = new CM_Http_ResponseFactory($this->getServiceManager());
 
         $count = 0;
-        $paths = array($request->getPath());
+        $fragments = [];
         do {
-            $url = $this->getRender()->getUrl(CM_Util::link($request->getPath(), $request->getQuery()));
+            $fragment = CM_Util::link($request->getPath(), $request->getQuery());
+            $fragments[] = $fragment;
+            $url = $this->getRender()->getSite()->getUrlBase() . $fragment;
             if ($count++ > 10) {
-                throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $paths) . ').');
+                throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $fragments) . ').');
             }
-            $responsePage = new CM_Http_Response_Page_Embed($request, $this->getServiceManager());
-            $responsePage->process();
-            $request = $responsePage->getRequest();
 
-            $paths[] = $request->getPath();
+            $responsePage = $responseFactory->getResponse($request);
+            if (!$responsePage->getSite()->equals($this->getSite())) {
+                $redirectExternalFragment = CM_Util::link($responsePage->getRequest()->getPath(), $responsePage->getRequest()->getQuery());
+                return array('redirectExternal' => $responsePage->getRender()->getUrl($redirectExternalFragment));
+            }
 
-            if ($redirectUrl = $responsePage->getRedirectUrl()) {
-                $redirectExternal = (0 !== mb_stripos($redirectUrl, $this->getRender()->getUrl()));
-                if ($redirectExternal) {
+            $responseEmbed = new CM_Http_Response_Page_Embed($responsePage->getRequest(), $responsePage->getSite(), $this->getServiceManager());
+            $responseEmbed->process();
+            $request = $responseEmbed->getRequest();
+
+            if ($redirectUrl = $responseEmbed->getRedirectUrl()) {
+                if (!$this->_isPageOnSameSite($redirectUrl)) {
                     return array('redirectExternal' => $redirectUrl);
                 }
             }
         } while ($redirectUrl);
 
-        foreach ($responsePage->getCookies() as $name => $cookieParameters) {
+        foreach ($responseEmbed->getCookies() as $name => $cookieParameters) {
             $response->setCookie($name, $cookieParameters['value'], $cookieParameters['expire'], $cookieParameters['path']);
         }
-        $page = $responsePage->getPage();
+        $page = $responseEmbed->getPage();
 
         $this->_setStringRepresentation(get_class($page));
 
-        $frontend = $responsePage->getRender()->getGlobalResponse();
-        $html = $responsePage->getContent();
+        $frontend = $responseEmbed->getRender()->getGlobalResponse();
+        $html = $responseEmbed->getContent();
         $js = $frontend->getJs();
         $autoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
         $frontend->clear();
 
-        $title = $responsePage->getTitle();
-        $layoutClass = get_class($page->getLayout($this->getRender()->getEnvironment()));
-        $menuList = array_merge($this->getSite()->getMenus(), $responsePage->getRender()->getMenuList());
-        $menuEntryHashList = $this->_getMenuEntryHashList($menuList, get_class($page), $page->getParams());
-        $jsTracking = $responsePage->getRender()->getServiceManager()->getTrackings()->getJs();
+        $layoutRendering = null;
+        $layoutClass = $page->getLayout($this->getRender()->getEnvironment());
+        if ($layoutClass !== $currentLayoutClass) {
+            $layout = new $layoutClass();
+            $layoutRendering = $this->_getComponentRendering($layout);
+        }
 
-        return array(
-            'autoId'            => $autoId,
-            'html'              => $html,
-            'js'                => $js,
+        $title = $responseEmbed->getTitle();
+        $menuList = array_merge($this->getSite()->getMenus($this->getRender()->getEnvironment()), $responseEmbed->getRender()->getMenuList());
+        $menuEntryHashList = $this->_getMenuEntryHashList($menuList, get_class($page), $page->getParams());
+        $jsTracking = $responseEmbed->getRender()->getServiceManager()->getTrackings()->getJs();
+
+        return [
+            'pageRendering'     => [
+                'js'     => $js,
+                'html'   => $html,
+                'autoId' => $autoId,
+            ],
+            'layoutRendering'   => $layoutRendering,
             'title'             => $title,
             'url'               => $url,
-            'layoutClass'       => $layoutClass,
             'menuEntryHashList' => $menuEntryHashList,
             'jsTracking'        => $jsTracking,
-        );
+        ];
+    }
+
+    /**
+     * @param CM_Component_Abstract $component
+     * @return array
+     */
+    protected function _getComponentRendering(CM_Component_Abstract $component) {
+        $render = $this->createRender();
+        $renderAdapter = CM_RenderAdapter_Component::factory($render, $component);
+        $html = $renderAdapter->fetch();
+
+        $globalResponse = $render->getGlobalResponse();
+        return [
+            'js'     => $globalResponse->getJs(),
+            'html'   => $html,
+            'autoId' => $globalResponse->getTreeRoot()->getValue()->getAutoId(),
+        ];
     }
 
     public function popinComponent() {
@@ -159,7 +184,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $this->_runWithCatching(function () use (&$output) {
             $output = $this->_processView($output);
         }, function (CM_Exception $e, array $errorOptions) use (&$output) {
-            $output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());
+            $output['error'] = $e->getClientData($this->getRender());
         });
         $output['deployVersion'] = CM_App::getInstance()->getDeployVersion();
 
@@ -195,20 +220,23 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         }
         $viewInfoList = $query['viewInfoList'];
         if (!array_key_exists($className, $viewInfoList)) {
-            throw new CM_Exception_Invalid('View `' . $className . '` not set.', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View not set.', CM_Exception::WARN, ['viewClassName' => $className]);
         }
         $viewInfo = $viewInfoList[$className];
         if (!is_array($viewInfo)) {
-            throw new CM_Exception_Invalid('View `' . $className . '` is not an array', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View is not an array', CM_Exception::WARN, ['viewClassName' => $className]);
         }
         if (!isset($viewInfo['id'])) {
-            throw new CM_Exception_Invalid('View id `' . $className . '` not set.', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View id not set.', CM_Exception::WARN, ['viewClassName' => $className]);
         }
         if (!isset($viewInfo['className']) || !class_exists($viewInfo['className']) || !is_a($viewInfo['className'], 'CM_View_Abstract', true)) {
-            throw new CM_Exception_Invalid('View className `' . $className . '` is illegal: `' . $viewInfo['className'] . '`.', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View className  is illegal.', CM_Exception::WARN, [
+                'viewClassName'     => $className,
+                'viewInfoClassName' => $viewInfo['className'],
+            ]);
         }
         if (!isset($viewInfo['params'])) {
-            throw new CM_Exception_Invalid('View params `' . $className . '` not set.', CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View params not set.', CM_Exception::WARN, ['viewClassName' => $className]);
         }
         if (!isset($viewInfo['parentId'])) {
             $viewInfo['parentId'] = null;
@@ -242,4 +270,30 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         }
         return $menuEntryHashList;
     }
+
+    /**
+     * @param string $url
+     * @return CM_Http_Request_Get
+     */
+    private function _createGetRequestWithUrl($url) {
+        $request = $this->getRequest();
+        return new CM_Http_Request_Get($url, $request->getHeaders(), $request->getServer(), $request->getViewer());
+    }
+
+    /**
+     * @param string $url
+     * @return bool
+     */
+    private function _isPageOnSameSite($url) {
+        $urlParser = new CM_Http_UrlParser($url);
+        if (!$this->_site->isUrlMatch($urlParser->getHost(), $urlParser->getPath())) {
+            return false;
+        }
+
+        $request = $this->_createGetRequestWithUrl($url);
+        $responseFactory = new CM_Http_ResponseFactory($this->getServiceManager());
+        $response = $responseFactory->getResponse($request);
+        return $response->getSite()->equals($this->getSite());
+    }
+
 }

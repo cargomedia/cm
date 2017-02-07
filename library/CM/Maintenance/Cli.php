@@ -18,25 +18,17 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
         $this->_clockworkManager->start();
     }
 
-    /**
-     * @keepalive
-     */
-    public function startLocal() {
-        $this->_clockworkManager = new CM_Clockwork_Manager();
-        $storage = new CM_Clockwork_Storage_FileSystem('app-maintenance-local');
-        $storage->setServiceManager(CM_Service_Manager::getInstance());
-        $this->_clockworkManager->setStorage($storage);
-        $this->_registerCallbacksLocal();
-        $this->_clockworkManager->start();
-    }
-
     protected function _registerCallbacks() {
-        $this->_registerClockworkCallbacks('10 seconds', array(
-            'CM_Model_User::offlineDelayed' => function () {
-                CM_Model_User::offlineDelayed();
+        $this->_registerClockworkCallbacks('1 second', [
+            'CM_Jobdistribution_DelayedQueue::queueOutstanding' => function () {
+                $delayedQueue = $this->getServiceManager()->getDelayedJobQueue();
+                $delayedQueue->queueOutstanding();
+            },
+            'CM_Elasticsearch_Index_Cli::update'                => function () {
+                (new CM_Elasticsearch_Index_Cli())->update();
             }
-        ));
-        $this->_registerClockworkCallbacks('1 minute', array(
+        ]);
+        $this->_registerClockworkCallbacks('1 minute', [
             'CM_Model_User::offlineOld'                 => function () {
                 CM_Model_User::offlineOld();
             },
@@ -49,9 +41,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_File_UserContent_Temp::deleteOlder'     => function () {
                 CM_File_UserContent_Temp::deleteOlder(86400);
             },
-            'CM_SVM_Model::deleteOldTrainings'          => function () {
-                CM_SVM_Model::deleteOldTrainings(3000);
-            },
             'CM_Paging_Ip_Blocked::deleteOlder'         => function () {
                 CM_Paging_Ip_Blocked::deleteOld();
             },
@@ -61,36 +50,46 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_Session::deleteExpired'                 => function () {
                 CM_Session::deleteExpired();
             },
-            'CM_Stream_Video::synchronize'              => function () {
-                CM_Stream_Video::getInstance()->synchronize();
-            },
-            'CM_Stream_Video::checkStreams'             => function () {
-                CM_Stream_Video::getInstance()->checkStreams();
-            },
             'CM_MessageStream_Service::synchronize'     => function () {
                 CM_Service_Manager::getInstance()->getStreamMessage()->synchronize();
-            }
-        ));
-        $this->_registerClockworkCallbacks('15 minutes', array(
-            'CM_Mail::processQueue'                         => function () {
-                CM_Mail::processQueue(500);
             },
+        ]);
+        $this->_registerClockworkCallbacks('1 hour', [
+            'CM_Elasticsearch_Index_Cli::optimize' => function () {
+                (new CM_Elasticsearch_Index_Cli())->optimize();
+            }
+        ]);
+
+        if ($this->getServiceManager()->has('janus')) {
+            $this->_registerClockworkCallbacks('1 minute', [
+                'CM_Janus_Service::synchronize'  => function () {
+                    $this->getServiceManager()->getJanus('janus')->synchronize();
+                },
+                'CM_Janus_Service::checkStreams' => function () {
+                    $this->getServiceManager()->getJanus('janus')->checkStreams();
+                },
+            ]);
+        }
+
+        $this->_registerClockworkCallbacks('15 minutes', [
             'CM_Action_Abstract::aggregate'                 => function () {
                 CM_Action_Abstract::aggregate();
             },
             'CM_Action_Abstract::deleteTransgressionsOlder' => function () {
                 CM_Action_Abstract::deleteTransgressionsOlder(3 * 31 * 86400);
             },
-            'CM_Paging_Log_Abstract::cleanup'               => function () {
-                foreach (CM_Paging_Log_Abstract::getClassChildren() as $logClass) {
-                    /** @var CM_Paging_Log_Abstract $log */
-                    $log = new $logClass();
+            'CM_Paging_Log::cleanup'                        => function () {
+                $allLevelsList = array_values(CM_Log_Logger::getLevels());
+                foreach (CM_Paging_Log::getClassChildren() as $pagingLogClass) {
+                    /** @type CM_Paging_Log $log */
+                    $log = new $pagingLogClass($allLevelsList);
                     $log->cleanUp();
                 }
-            }
-        ));
+                (new CM_Paging_Log($allLevelsList, false))->cleanUp(); //deletes all untyped records
+            },
+        ]);
         if ($this->getServiceManager()->has('maxmind')) {
-            $this->_registerClockworkCallbacks('8 days', array(
+            $this->_registerClockworkCallbacks('8 days', [
                 'CMService_MaxMind::upgrade' => function () {
                     try {
                         /** @var CMService_MaxMind $maxMind */
@@ -107,21 +106,9 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                         $exception->setSeverity(CM_Exception::FATAL);
                         throw $exception;
                     }
-                }
-            ));
+                },
+            ]);
         }
-    }
-
-    protected function _registerCallbacksLocal() {
-        $this->_registerClockworkCallbacks('1 minute', array(
-            'CM_Cli_CommandManager::monitorSynchronizedCommands' => function () {
-                $commandManager = new CM_Cli_CommandManager();
-                $commandManager->monitorSynchronizedCommands();
-            },
-            'CM_SVM_Model::trainChanged'                         => function () {
-                CM_SVM_Model::trainChanged();
-            },
-        ));
     }
 
     public static function getPackageName() {

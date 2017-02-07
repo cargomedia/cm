@@ -1,0 +1,21 @@
+{
+  "classPrefix" : "",
+  "options": [
+    "addTest",
+    "setClasses",
+    "html5printshiv"
+  ],
+  "feature-detects": [
+    "audio",
+    "video",
+    "css/objectfit",
+    "event/deviceorientation-motion",
+    "forms/fileinput",
+    "fullscreen-api",
+    "dom/classlist",
+    "requestanimationframe",
+    "css/transforms3d",
+    "touchevents",
+    "webrtc/peerconnection"
+  ]
+}

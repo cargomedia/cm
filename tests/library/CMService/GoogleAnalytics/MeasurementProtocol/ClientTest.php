@@ -72,66 +72,96 @@ class CMService_GoogleAnalytics_MeasurementProtocol_ClientTest extends CMTest_Te
         $this->assertSame(1, $submitRequestMock->getCallCount());
     }
 
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Unknown parameter `foo`
-     */
     public function testTrackEventInvalidParam() {
         $clientMock = $this->mockClass('CMService_GoogleAnalytics_MeasurementProtocol_Client');
         /** @var CMService_GoogleAnalytics_MeasurementProtocol_Client $client */
         $client = $clientMock->newInstance(['prop1']);
 
-        $client->trackEvent([
-            'foo' => 12,
-        ]);
+        $exception = $this->catchException(function () use ($client) {
+            $client->trackEvent([
+                'foo' => 12,
+            ]);
+        });
+
+        $this->assertInstanceOf('CM_Exception', $exception);
+        /** @var CM_Exception $exception */
+        $this->assertSame('Unknown parameter', $exception->getMessage());
+        $this->assertSame(['name' => 'foo'], $exception->getMetaInfo());
     }
 
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Value `12.23` for parameter `ev` did not pass validation
-     */
     public function testTrackEventFloatValue() {
         $clientMock = $this->mockClass('CMService_GoogleAnalytics_MeasurementProtocol_Client');
         /** @var CMService_GoogleAnalytics_MeasurementProtocol_Client $client */
         $client = $clientMock->newInstance(['prop1']);
 
-        $client->trackEvent([
-            'eventCategory' => 'MyCategory',
-            'eventAction'   => 'MyAction',
-            'eventLabel'    => 'MyLabel',
-            'eventValue'    => 12.23,
-        ]);
+        $exception = $this->catchException(function () use ($client) {
+            $client->trackEvent([
+                'eventCategory' => 'MyCategory',
+                'eventAction'   => 'MyAction',
+                'eventLabel'    => 'MyLabel',
+                'eventValue'    => 12.23,
+            ]);
+        });
+
+        $this->assertInstanceOf('CM_Exception', $exception);
+        /** @var CM_Exception $exception */
+        $this->assertSame('Value for the parameter did not pass validation', $exception->getMessage());
+        $this->assertSame(
+            [
+                'value'     => 12.23,
+                'parameter' => 'ev'
+            ],
+            $exception->getMetaInfo()
+        );
     }
 
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Value `-12` for parameter `ev` did not pass validation
-     */
     public function testTrackEventNegativeValue() {
         $clientMock = $this->mockClass('CMService_GoogleAnalytics_MeasurementProtocol_Client');
         /** @var CMService_GoogleAnalytics_MeasurementProtocol_Client $client */
         $client = $clientMock->newInstance(['prop1']);
 
-        $client->trackEvent([
-            'eventCategory' => 'MyCategory',
-            'eventAction'   => 'MyAction',
-            'eventLabel'    => 'MyLabel',
-            'eventValue'    => -12,
-        ]);
+        $exception = $this->catchException(function () use ($client) {
+            $client->trackEvent([
+                'eventCategory' => 'MyCategory',
+                'eventAction'   => 'MyAction',
+                'eventLabel'    => 'MyLabel',
+                'eventValue'    => -12,
+            ]);
+        });
+
+        $this->assertInstanceOf('CM_Exception', $exception);
+        /** @var CM_Exception $exception */
+        $this->assertSame('Value for the parameter did not pass validation', $exception->getMessage());
+        $this->assertSame(
+            [
+                'value'     => -12,
+                'parameter' => 'ev',
+            ],
+            $exception->getMetaInfo()
+        );
     }
 
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Unexpected parameter `exd` for hitType `event`
-     */
     public function testTrackEventParamForWrongHitType() {
         $clientMock = $this->mockClass('CMService_GoogleAnalytics_MeasurementProtocol_Client');
         /** @var CMService_GoogleAnalytics_MeasurementProtocol_Client $client */
         $client = $clientMock->newInstance(['prop1']);
 
-        $client->trackEvent([
-            'exd' => 'My exception',
-        ]);
+        $exception = $this->catchException(function () use ($client) {
+            $client->trackEvent([
+                'exd' => 'My exception',
+            ]);
+        });
+
+        $this->assertInstanceOf('CM_Exception', $exception);
+        /** @var CM_Exception $exception */
+        $this->assertSame('Unexpected parameter for the hitType.', $exception->getMessage());
+        $this->assertSame(
+            [
+                'name'    => 'exd',
+                'hitType' => 'event',
+            ],
+            $exception->getMetaInfo()
+        );
     }
 
     public function testGetRandomClientId() {

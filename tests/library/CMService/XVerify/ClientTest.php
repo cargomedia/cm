@@ -3,7 +3,10 @@
 class CMService_XVerify_ClientTest extends CMTest_TestCase {
 
     public function testMalformedEmailAddress() {
-        $xVerifyMock = $this->getMock('CMService_XVerify_Client', array('_getResponseBody'), array('', ''));
+        $mockBuilder = $this->getMockBuilder('CMService_XVerify_Client');
+        $mockBuilder->setMethods(['_getResponseBody']);
+        $mockBuilder->setConstructorArgs(['', '']);
+        $xVerifyMock = $mockBuilder->getMock();
         $xVerifyMock->expects($this->never())->method('_getResponseBody');
         /** @var CMService_XVerify_Client $xVerifyMock */
         $this->assertFalse($xVerifyMock->isValid('invalid email@example.com'));
@@ -83,10 +86,13 @@ class CMService_XVerify_ClientTest extends CMTest_TestCase {
     }
 
     public function testHandleException() {
-        $xVerifyMock = $this->getMock('CMService_XVerify_Client', array('_getResponse', '_logException'), array('', ''));
+        $mockBuilder = $this->getMockBuilder('CMService_XVerify_Client');
+        $mockBuilder->setMethods(['_getResponse', '_handleException']);
+        $mockBuilder->setConstructorArgs(['', '']);
+        $xVerifyMock = $mockBuilder->getMock();
         $exception = new Exception('No credits');
         $xVerifyMock->expects($this->once())->method('_getResponse')->will($this->throwException($exception));
-        $xVerifyMock->expects($this->once())->method('_logException')->with($exception);
+        $xVerifyMock->expects($this->once())->method('_handleException')->with($exception);
         /** @var CMService_XVerify_Client $xVerifyMock */
         $xVerifyMock->isValid('testHandleException@example.com');
     }
@@ -105,13 +111,17 @@ class CMService_XVerify_ClientTest extends CMTest_TestCase {
         if (null === $headerList) {
             $headerList = array();
         }
-        $xVerifyMock = $this->getMock('CMService_XVerify_Client', array('_getResponse', '_logException'), array('', ''));
-        $responseMock = new \GuzzleHttp\Message\Response($statusCode, $headerList, \GuzzleHttp\Stream\Stream::factory($responseBody));
+        $mockBuilder = $this->getMockBuilder('CMService_XVerify_Client');
+        $mockBuilder->setMethods(['_getResponse', '_handleException']);
+        $mockBuilder->setConstructorArgs(['', '']);
+        /** @var PHPUnit_Framework_MockObject_MockObject|CMService_XVerify_Client $xVerifyMock */
+        $xVerifyMock = $mockBuilder->getMock();
+        $responseMock = new \GuzzleHttp\Psr7\Response($statusCode, $headerList, \GuzzleHttp\Stream\Stream::factory($responseBody));
         $xVerifyMock->expects($this->once())->method('_getResponse')->will($this->returnValue($responseMock));
         if ($exceptionExpected) {
-            $xVerifyMock->expects($this->once())->method('_logException')->with($exceptionExpected);
+            $xVerifyMock->expects($this->once())->method('_handleException')->with($exceptionExpected);
         } else {
-            $xVerifyMock->expects($this->never())->method('_logException');
+            $xVerifyMock->expects($this->never())->method('_handleException');
         }
         return $xVerifyMock;
     }

@@ -16,12 +16,17 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 
     abstract protected function _initialize();
 
+    /**
+     * @return string[]
+     */
+    abstract protected function _getRequiredFields();
+
     public function __construct($params = null) {
         parent::__construct($params);
 
         $className = get_class($this);
         if (!preg_match('/^\w+_Form_(.+)$/', $className, $matches)) {
-            throw new CM_Exception("Cannot detect namespace from form's class-name: `{$className}`");
+            throw new CM_Exception('Cannot detect namespace from form\'s classname', null, ['className' => $className]);
         }
         $name = lcfirst($matches[1]);
         $name = preg_replace('/([A-Z])/', '_\1', $name);
@@ -31,6 +36,14 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     }
 
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
+        $viewResponse->getJs()->setProperty('requiredFieldNames', $this->_getRequiredFields());
+        $viewResponse->getJs()->setProperty('actionNames', array_keys($this->getActions()));
+
+        $autosave = $this->_params->has('autosave') ? $this->_params->getString('autosave') : null;
+        if (null !== $autosave) {
+            $action = $this->getAction($autosave);
+            $viewResponse->getJs()->setProperty('autosave', $action->getName());
+        }
     }
 
     /**
@@ -40,7 +53,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     protected function registerField(CM_FormField_Abstract $field) {
         $fieldName = $field->getName();
         if ($this->hasField($fieldName)) {
-            throw new CM_Exception_Invalid('Form field `' . $fieldName . '` is already registered.');
+            throw new CM_Exception_Invalid('Form field is already registered.', null, ['fieldName' => $fieldName]);
         }
 
         $this->_fields[$fieldName] = $field;
@@ -53,7 +66,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     protected function registerAction(CM_FormAction_Abstract $action) {
         $actionName = $action->getName();
         if (isset($this->_actions[$actionName])) {
-            throw new CM_Exception_Invalid('Form action `' . $actionName . '` is already registered.');
+            throw new CM_Exception_Invalid('Form action is already registered.', null, ['actionName' => $actionName]);
         }
         $this->_actions[$actionName] = $action;
     }
@@ -79,7 +92,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
      */
     public function getAction($name) {
         if (!isset($this->_actions[$name])) {
-            throw new CM_Exception_Invalid('Unrecognized action `' . $name . '`.');
+            throw new CM_Exception_Invalid('Unrecognized action.', null, ['actionName' => $name]);
         }
         return $this->_actions[$name];
     }
@@ -98,7 +111,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
      */
     public function getField($fieldName) {
         if (!$this->hasField($fieldName)) {
-            throw new CM_Exception_Invalid('Unrecognized field `' . $fieldName . '`.');
+            throw new CM_Exception_Invalid('Unrecognized field.', null, ['fieldName' => $fieldName]);
         }
         return $this->_fields[$fieldName];
     }
@@ -109,6 +122,15 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
      */
     public function hasField($name) {
         return array_key_exists($name, $this->_fields);
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function isRequiredField($name) {
+        $name = (string) $name;
+        return in_array($name, $this->_getRequiredFields(), true);
     }
 
     /**
@@ -126,8 +148,8 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     }
 
     /**
-     * @param array                 $data
-     * @param string                $actionName
+     * @param array                      $data
+     * @param string                     $actionName
      * @param CM_Http_Response_View_Form $response
      * @return mixed
      */
@@ -135,9 +157,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
         $action = $this->getAction($actionName);
 
         $formData = array();
-        foreach ($action->getFieldList() as $fieldName => $required) {
-            $field = $this->getField($fieldName);
-
+        foreach ($this->getFields() as $fieldName => $field) {
             $isEmpty = true;
             if (array_key_exists($fieldName, $data)) {
                 $fieldValue = $field->filterInput($data[$fieldName]);
@@ -154,7 +174,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
             }
 
             if ($isEmpty) {
-                if ($required) {
+                if ($this->isRequiredField($fieldName)) {
                     $response->addError($response->getRender()->getTranslation('Required'), $fieldName);
                 } else {
                     $formData[$fieldName] = null;

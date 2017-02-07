@@ -8,14 +8,6 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     /** @var string|null */
     private $_redirectUrl;
 
-    public function __construct(CM_Http_Request_Abstract $request, CM_Service_Manager $serviceManager) {
-        $this->_request = clone $request;
-        $this->_site = CM_Site_Abstract::findByRequest($this->_request);
-        $this->_request->popPathLanguage();
-
-        $this->setServiceManager($serviceManager);
-    }
-
     /**
      * @throws CM_Exception_Invalid
      * @return CM_Page_Abstract
@@ -62,11 +54,12 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
      * @return string
      */
     protected function _renderPage(CM_Page_Abstract $page) {
-        $renderAdapterLayout = new CM_RenderAdapter_Layout($this->getRender(), $page);
-        return $renderAdapterLayout->fetch();
+        $renderAdapterDocument = new CM_RenderAdapter_Document($this->getRender(), $page);
+        return $renderAdapterDocument->fetch();
     }
 
     protected function _process() {
+        $this->setHeaderDisableCache();
         $this->_site->preprocessPageResponse($this);
         $this->_processContentOrRedirect();
         if ($redirectUrl = $this->getRedirectUrl()) {
@@ -79,11 +72,6 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
         if ($this->_site->getHost() !== $this->_request->getHost()) {
             $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
             $this->redirectUrl($render->getUrl($path, $this->_site));
-        }
-        if ($this->_request->getLanguageUrl() && $this->getViewer()) {
-            $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
-            $this->redirectUrl($render->getUrl($path, $this->_site));
-            $this->_request->setLanguageUrl(null);
         }
         if (!$this->getRedirectUrl()) {
             $html = $this->_processPageLoop($this->getRequest());
@@ -101,7 +89,9 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
         $count = 0;
         while (false === $this->_processPage($request, $processingResult)) {
             if ($count++ > 10) {
-                throw new CM_Exception_Invalid('Page dispatch loop detected (' . implode(' -> ', $processingResult->getPathList()) . ').');
+                throw new CM_Exception_Invalid('Page dispatch loop detected.', null, [
+                    'processingRequestList' => implode(' -> ', $processingResult->getPathList()),
+                ]);
             }
         }
 
@@ -129,7 +119,10 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
                 $className = CM_Page_Abstract::getClassnameByPath($this->getRender(), $request->getPath());
                 $page = CM_Page_Abstract::factory($className, $pageParams);
             } catch (CM_Exception $ex) {
-                throw new CM_Exception_Nonexistent('Cannot load page `' . $request->getPath() . '`: ' . $ex->getMessage());
+                throw new CM_Exception_Nonexistent('Cannot load page', null, [
+                    'requestPath'              => $request->getPath(),
+                    'originalExceptionMessage' => $ex->getMessage(),
+                ]);
             }
             $result->addPage($page);
 
@@ -153,4 +146,15 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             return false;
         });
     }
+
+    public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
+        $request = clone $request;
+        $request->popPathLanguage();
+        return new self($request, $site, $serviceManager);
+    }
+
+    public static function catchAll() {
+        return true;
+    }
+
 }

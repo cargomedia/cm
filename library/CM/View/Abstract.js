@@ -37,7 +37,7 @@ var CM_View_Abstract = Backbone.View.extend({
       this._bindAppEvents(this.appEvents);
     }
     this.on('all', function(eventName, data) {
-      cm.viewEvents.trigger(this, eventName, data);
+      cm.viewEvents.trigger.apply(cm.viewEvents, [this].concat(_.toArray(arguments)));
     });
   },
 
@@ -93,6 +93,18 @@ var CM_View_Abstract = Backbone.View.extend({
     return _.find(this.getChildren(), function(child) {
       return child.hasClass(className);
     }) || null;
+  },
+
+  /**
+   * @param {String} className
+   * @returns {CM_View_Abstract}
+   */
+  getChild: function(className) {
+    var child = this.findChild(className);
+    if (!child) {
+      throw new Error('Failed to retrieve `' + className + '` child view of `' + this.getClass() + '`.');
+    }
+    return child;
   },
 
   /**
@@ -188,18 +200,12 @@ var CM_View_Abstract = Backbone.View.extend({
     return _.contains(this.getClasses(), className);
   },
 
-  /**
-   * @param {Boolean} [skipDomRemoval]  Internal use only
-   */
-  remove: function(skipDomRemoval) {
+  remove: function() {
     this.trigger('destruct');
-
-    if (!skipDomRemoval) {
-      this.$el.detach();  // Detach from DOM to prevent reflows when removing children
-    }
+    this.$el.detach();  // Detach from DOM to prevent reflows when removing children
 
     _.each(_.clone(this.getChildren()), function(child) {
-      child.remove(skipDomRemoval);
+      child.remove();
     });
 
     if (this.getParent()) {
@@ -212,11 +218,7 @@ var CM_View_Abstract = Backbone.View.extend({
     }
 
     delete cm.views[this.getAutoId()];
-
-    if (!skipDomRemoval) {
-      this.$el.remove();
-    }
-
+    this.$el.remove();
     this.stopListening();
   },
 
@@ -224,8 +226,9 @@ var CM_View_Abstract = Backbone.View.extend({
    * @param {jQuery} $html
    */
   replaceWithHtml: function($html) {
-    this.remove(true);
-    this.$el.replaceWith($html);
+    var parent = this.el.parentNode;
+    parent.replaceChild($html[0], this.el);
+    this.remove();
   },
 
   disable: function() {
@@ -329,7 +332,7 @@ var CM_View_Abstract = Backbone.View.extend({
   popOutComponent: function(className, params, options) {
     return this.prepareComponent(className, params, options)
       .then(function(component) {
-        component.popOut();
+        component.popOut({}, true);
         return component;
       });
   },
@@ -470,84 +473,6 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
-   * @param {String} mp3Path
-   * @param {Object} [params]
-   * @return {MediaElement}
-   */
-  createAudioPlayer: function(mp3Path, params) {
-    params = _.extend({loop: false, autoplay: false}, params);
-
-    var $element = $('<audio />');
-    $element.wrap('<div />');	// MediaElement needs a parent to show error msgs
-    $element.attr('src', cm.getUrlResource('layout', 'audio/' + mp3Path));
-    $element.attr('autoplay', params.autoplay);
-
-    var error = false;
-    var mediaElement = new MediaElement($element.get(0), {
-      startVolume: 1,
-      flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
-      silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
-      error: function() {
-        error = true;
-      },
-      success: function(mediaElement, domObject) {
-        if (params.loop) {
-          mediaElement.addEventListener('ended', function() {
-            mediaElement.load();
-          });
-        }
-      }
-    });
-    if (error) {
-      mediaElement.play = new Function();
-      mediaElement.pause = new Function();
-    }
-
-    return mediaElement;
-  },
-
-  /**
-   * @param {jQuery} $element
-   * @param {String} url
-   * @param {Object} [flashvars]
-   * @param {Object} [flashparams]
-   * @param {Function} [callbackSuccess]
-   * @param {Function} [callbackFailure]
-   */
-  createFlash: function($element, url, flashvars, flashparams, callbackSuccess, callbackFailure) {
-    var eventCallbackName = this.createGlobalFunction(function(event) {
-      event = JSON.parse(event);
-      this.trigger(event.type, event.data);
-    });
-    flashvars = _.extend({'debug': cm.options.debug, 'eventCallback': eventCallbackName}, flashvars);
-    _.each(flashvars, function(value, key) {
-      flashvars[key] = window.encodeURIComponent(value);
-    });
-    flashparams = _.extend({'allowscriptaccess': 'sameDomain', 'allowfullscreen': 'true', 'wmode': 'transparent'}, flashparams);
-    callbackSuccess = callbackSuccess || new Function();
-    callbackFailure = callbackFailure || new Function();
-    var id = $element.attr('id');
-    if (!id) {
-      id = 'swf-' + cm.getUuid();
-      $element.attr('id', id);
-    }
-    var idSwf = id + '-object', attributes = {
-      id: idSwf,
-      name: idSwf
-    };
-
-    var self = this;
-    swfobject.embedSWF(url, id, "100%", "100%", "11.0.0", cm.getUrlResource('layout', 'swf/expressInstall.swf'), flashvars, flashparams, attributes, function(event) {
-      if (event.success) {
-        callbackSuccess.call(self, event.ref);
-      } else {
-        $element.html('<a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" /></a>');
-        callbackFailure.call(self);
-      }
-    });
-  },
-
-  /**
    * @param {String} key
    * @param {*} value
    */
@@ -593,6 +518,62 @@ var CM_View_Abstract = Backbone.View.extend({
       return $template.html();
     });
     return cm.template.render(template, variables);
+  },
+
+
+  /**
+   * @param {Function} callback
+   * @returns {Promise}
+   */
+  try: function(callback) {
+    return Promise.try(callback.bind(this)).bind(this);
+  },
+
+  /**
+   * @param {Number} milliseconds
+   * @returns {Promise}
+   */
+  delay: function(milliseconds) {
+    return Promise.delay(milliseconds).bind(this);
+  },
+
+  /**
+   * @param {String} eventName
+   * @param {*} [obj]
+   * @returns {Promise}
+   */
+  wait: function(eventName, obj) {
+    var observer = new cm.lib.Observer();
+    var target = obj || this;
+    var promise = new Promise(function(resolve) {
+      observer.listenTo(target, eventName, resolve);
+    });
+    return promise.finally(function() {
+      observer.stopListening();
+      observer = null;
+    });
+  },
+
+  /**
+   * @param {Function} callback
+   * @param {String} eventName
+   * @param {*} [obj]
+   */
+  cancellable: function(callback, eventName, obj) {
+    var target = obj || this;
+    var observer = new cm.lib.Observer();
+    var promise = null;
+    observer.listenTo(target, eventName, function() {
+      if (promise) {
+        promise.cancel();
+      }
+    });
+    promise = callback.apply(this);
+
+    return promise.finally(function() {
+      observer.stopListening();
+      observer = null;
+    });
   },
 
   /**

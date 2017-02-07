@@ -78,18 +78,38 @@ class CM_Model_Location extends CM_Model_Abstract {
     }
 
     /**
+     * @param int|null $levelMin
      * @return float[]|null
      */
-    public function getCoordinates() {
-        /** @var CM_Model_Location_Zip $location */
-        if ($location = $this->_getLocation(CM_Model_Location::LEVEL_ZIP)) {
-            return $location->getCoordinates();
-        }
-        /** @var CM_Model_Location_City $location */
-        if ($location = $this->_getLocation(CM_Model_Location::LEVEL_CITY)) {
-            return $location->getCoordinates();
+    public function getCoordinates($levelMin = null) {
+        $levelMin = (int) $levelMin;
+        $levelList = [
+            CM_Model_Location::LEVEL_ZIP,
+            CM_Model_Location::LEVEL_CITY,
+            CM_Model_Location::LEVEL_STATE,
+            CM_Model_Location::LEVEL_COUNTRY,
+        ];
+        $levelList = Functional\filter($levelList, function ($level) use ($levelMin) {
+            return $level >= $levelMin;
+        });
+        foreach ($levelList as $level) {
+            if ($location = $this->_getLocation($level)) {
+                return $location->getCoordinates();
+            }
         }
         return null;
+    }
+
+    /**
+     * @param int|null $levelMin
+     * @return CM_Geo_Point|null
+     */
+    public function getGeoPoint($levelMin = null) {
+        $coordinates = $this->getCoordinates($levelMin);
+        if (null === $coordinates) {
+            return null;
+        }
+        return new CM_Geo_Point($coordinates['lat'], $coordinates['lon']);
     }
 
     /**
@@ -97,25 +117,38 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @return int|null
      */
     public function getDistance(CM_Model_Location $location) {
-        $currentCoordinates = $this->getCoordinates();
-        $againstCoordinates = $location->getCoordinates();
-
-        if (!$currentCoordinates || !$againstCoordinates) {
+        $pointCurrent = $this->getGeoPoint();
+        $pointAgainst = $location->getGeoPoint();
+        if (!$pointCurrent || !$pointAgainst) {
             return null;
         }
+        return (int) round($pointCurrent->calculateDistanceTo($pointAgainst));
+    }
 
-        $pi180 = M_PI / 180;
-        $currentCoordinates['lat'] *= $pi180;
-        $currentCoordinates['lon'] *= $pi180;
-        $againstCoordinates['lat'] *= $pi180;
-        $againstCoordinates['lon'] *= $pi180;
+    /**
+     * @return DateTimeZone|null
+     */
+    public function getTimeZone() {
+        $pointCurrent = $this->getGeoPoint();
+        if (null === $pointCurrent) {
+            return null;
+        }
+        $timezoneNameList = \Functional\reject(DateTimeZone::listIdentifiers(), function ($timeZoneName) {
+            return null === IntlTimeZone::fromDateTimeZone(new DateTimeZone($timeZoneName));
+        });
 
-        $arcCosine = acos(
-            sin($currentCoordinates['lat']) * sin($againstCoordinates['lat'])
-            + cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon'])
-        );
-
-        return (int) round(self::EARTH_RADIUS * $arcCosine);
+        $distanceList = Functional\map($timezoneNameList, function ($timezoneName) use ($pointCurrent) {
+            $timezoneLocation = (new DateTimeZone($timezoneName))->getLocation();
+            $pointTimeZone = new CM_Geo_Point($timezoneLocation['latitude'], $timezoneLocation['longitude']);
+            return [
+                'timezoneName' => $timezoneName,
+                'distance'     => $pointCurrent->calculateDistanceTo($pointTimeZone),
+            ];
+        });
+        $closestDistance = Functional\reduce_left($distanceList, function (array $current, $index, $collection, array $minimal) {
+            return $current['distance'] < $minimal['distance'] ? $current : $minimal;
+        }, $distanceList[0]);
+        return new DateTimeZone($closestDistance['timezoneName']);
     }
 
     /**
@@ -158,7 +191,7 @@ class CM_Model_Location extends CM_Model_Abstract {
                 $location = new CM_Model_Location_Zip($id);
                 break;
             default:
-                throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
+                throw new CM_Location_InvalidLevelException('Invalid location level', null, ['level' => $level]);
         }
         $this->_locationList = array();
         $locationDataList = array();
@@ -304,7 +337,7 @@ class CM_Model_Location extends CM_Model_Abstract {
             self::LEVEL_ZIP     => CM_Model_Location_Zip::getTypeStatic(),
         );
         if (!isset($typeList[$level])) {
-            throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
+            throw new CM_Exception_Invalid('Invalid location level', null, ['level' => $level]);
         }
         return $typeList[$level];
     }
@@ -313,9 +346,23 @@ class CM_Model_Location extends CM_Model_Abstract {
         return 'CM_Model_StorageAdapter_CacheLocal';
     }
 
+    /**
+     * @param CM_Db_Client $db
+     * @return bool
+     */
+    public static function getCreateAggregationInProgress(CM_Db_Client $db) {
+        foreach (['cm_tmp_location_new', 'cm_tmp_location_coordinates_new'] as $table) {
+            if (CM_Db_Db::exec('SHOW TABLES LIKE ?', [$table], null, $db)->getAffectedRows()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static function createAggregation() {
-        CM_Db_Db::truncate('cm_tmp_location');
-        CM_Db_Db::exec('INSERT INTO `cm_tmp_location` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `nameFull`, `lat`,`lon`)
+        CM_Db_Db::exec('DROP TABLE IF EXISTS `cm_tmp_location_new`');
+        CM_Db_Db::exec('CREATE TABLE `cm_tmp_location_new` LIKE `cm_tmp_location`');
+        CM_Db_Db::exec('INSERT INTO `cm_tmp_location_new` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `nameFull`, `lat`,`lon`)
 			SELECT 1, `1`.`id`, `1`.`id`, NULL, NULL, NULL,
 					`1`.`name`, `1`.`abbreviation`, CONCAT_WS(" ", `1`.`name`, `1`.`abbreviation`), NULL, NULL
 			FROM `cm_model_location_country` AS `1`
@@ -338,8 +385,9 @@ class CM_Model_Location extends CM_Model_Abstract {
 			LEFT JOIN `cm_model_location_state` AS `2` ON(`3`.`stateId`=`2`.`id`)
 			LEFT JOIN `cm_model_location_country` AS `1` ON(`3`.`countryId`=`1`.`id`)');
 
-        CM_Db_Db::truncate('cm_tmp_location_coordinates');
-        CM_Db_Db::exec('INSERT INTO `cm_tmp_location_coordinates` (`level`,`id`,`coordinates`)
+        CM_Db_Db::exec('DROP TABLE IF EXISTS `cm_tmp_location_coordinates_new`');
+        CM_Db_Db::exec('CREATE TABLE `cm_tmp_location_coordinates_new` LIKE `cm_tmp_location_coordinates`');
+        CM_Db_Db::exec('INSERT INTO `cm_tmp_location_coordinates_new` (`level`,`id`,`coordinates`)
 			SELECT 3, `id`, POINT(lat, lon)
 			FROM `cm_model_location_city`
 			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL
@@ -347,15 +395,20 @@ class CM_Model_Location extends CM_Model_Abstract {
 			SELECT 4, `id`, POINT(lat, lon)
 			FROM `cm_model_location_zip`
 			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL');
+
+        CM_Db_Db::replaceTable('cm_tmp_location', 'cm_tmp_location_new');
+        CM_Db_Db::replaceTable('cm_tmp_location_coordinates', 'cm_tmp_location_coordinates_new');
     }
 
     /**
-     * @param string $name
-     * @param string $abbreviation
+     * @param string     $name
+     * @param string     $abbreviation
+     * @param float|null $latitude
+     * @param float|null $longitude
      * @return CM_Model_Location
      */
-    public static function createCountry($name, $abbreviation) {
-        $country = CM_Model_Location_Country::create($name, $abbreviation);
+    public static function createCountry($name, $abbreviation, $latitude = null, $longitude = null) {
+        $country = CM_Model_Location_Country::create($name, $abbreviation, $latitude, $longitude);
         return self::fromLocation($country);
     }
 
@@ -363,15 +416,17 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @param CM_Model_Location $country
      * @param string            $name
      * @param string|null       $abbreviation
+     * @param float|null        $latitude
+     * @param float|null        $longitude
      * @param string|null       $maxMind
      * @throws CM_Exception_Invalid
      * @return CM_Model_Location
      */
-    public static function createState(CM_Model_Location $country, $name, $abbreviation = null, $maxMind = null) {
+    public static function createState(CM_Model_Location $country, $name, $abbreviation = null, $latitude = null, $longitude = null, $maxMind = null) {
         if (CM_Model_Location::LEVEL_COUNTRY !== $country->getLevel()) {
             throw new CM_Exception_Invalid('The parent location should be a country');
         }
-        $state = CM_Model_Location_State::create($country->_getLocation(), $name, $abbreviation, $maxMind);
+        $state = CM_Model_Location_State::create($country->_getLocation(), $name, $abbreviation, $maxMind, $latitude, $longitude);
         return self::fromLocation($state);
     }
 
@@ -380,7 +435,7 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @param string            $name
      * @param float             $latitude
      * @param float             $longitude
-     * @param string|null       $_maxmind
+     * @param int|null          $_maxmind
      * @throws CM_Exception_Invalid
      * @return CM_Model_Location
      */

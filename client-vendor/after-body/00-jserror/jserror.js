@@ -2,74 +2,97 @@
  * @author cargomedia.ch
  */
 (function() {
-	if (jserror) {
-		return;
-	}
-	var jserror = {
-		/** @type Function|Null */
-		onerrorBackup: null,
+  if (jserror) {
+    return;
+  }
 
-		/** @type String */
-		logUrl: null,
+  var jserror = {
 
-		/** @type Number */
-		counter: 0,
+    /** @type {String} */
+    _uid: null,
 
-		/**
-		 * @param {String} logUrl
-		 * @param {Number} [counterMax]
-		 * @param {Boolean} [suppressErrors]
-		 * @param {Boolean} [suppressWithoutDetails]
-		 */
-		install: function(logUrl, counterMax, suppressErrors, suppressWithoutDetails) {
-			this.logUrl = logUrl;
-			if (window.onerror) {
-				this.onerrorBackup = window.onerror;
-			}
-			window.onerror = function(message, fileUrl, fileLine) {
-				jserror.counter++;
-				var originatesFromLogging = (fileUrl.indexOf(jserror.logUrl) >= 0);
-				var detailsUnavailable = (0 === fileLine);
-				var counterMaxReached = (counterMax && jserror.counter > counterMax);
-				var suppressLogging = originatesFromLogging || (suppressWithoutDetails && detailsUnavailable) || counterMaxReached;
-				if (!suppressLogging) {
-					jserror.log(message, fileUrl, fileLine);
-				}
-				if (jserror.onerrorBackup) {
-					jserror.onerrorBackup(message, fileUrl, fileLine);
-				}
-				if (suppressErrors) {
-					return true;
-				}
-			}
-		},
+    /** @type {Function|Null} */
+    _onerrorBackup: null,
 
-		/**
-		 * @param {String} message
-		 * @param {String} fileUrl
-		 * @param {Number} fileLine
-		 */
-		log: function(message, fileUrl, fileLine) {
-			var src = this.logUrl;
-			src += '?counter=' + this.counter;
-			src += "&url=" + encodeURIComponent(document.location.href);
-			src += "&message=" + encodeURIComponent(message.trim().substr(0, 10000));
-			src += "&fileUrl=" + encodeURIComponent(fileUrl);
-			src += "&fileLine=" + fileLine;
-			this._appendScript(src);
-		},
+    /** @type {String} */
+    _url: null,
 
-		/**
-		 * @param {String} src
-		 */
-		_appendScript: function(src) {
-			var script = document.createElement('script');
-			script.src = src;
-			script.type = 'text/javascript';
-			document.getElementsByTagName('head')[0].appendChild(script);
-		}
-	};
+    /** @type {Number} */
+    _counter: null,
 
-	jserror.install('/jserror/null', 10, false, false);
+    /**
+     * @param {String} url
+     * @param {Number} [counterMax]
+     * @param {Boolean} [suppressErrors]
+     * @param {Boolean} [suppressWithoutDetails]
+     */
+    install: function(url, counterMax, suppressErrors, suppressWithoutDetails) {
+      this._url = url;
+      this._counter = 0;
+      this._uid = (Math.random() + 1).toString(36).substring(7);
+
+      if ('function' == typeof window.onerror) {
+        this._onerrorBackup = window.onerror;
+      }
+
+      /**
+       * @param {String} message
+       * @param {String} sourceUrl
+       * @param {Number} line
+       *@param {Number} col
+       * @param {Error} error
+       * @returns {Boolean}
+       */
+      window.onerror = function(message, sourceUrl, line, col, error) {
+        error = error ? error : {};
+        jserror._counter++;
+        var originatesFromLogging = (sourceUrl.indexOf(jserror._url) >= 0);
+        var detailsUnavailable = (0 === line);
+        var counterMaxReached = (counterMax && jserror._counter > counterMax);
+        var suppressLogging = originatesFromLogging || (suppressWithoutDetails && detailsUnavailable) || counterMaxReached;
+        if (!suppressLogging) {
+          var previousLog = null;
+          if (cm && cm.logger) {
+            previousLog = cm.logger.getFormattedRecords();
+          }
+          jserror.report({
+            uid: jserror._uid,
+            counter: jserror._counter,
+            previousLog: previousLog,
+            url: document.location.href,
+            error: {
+              message: error.message || message,
+              type: error.name || null,
+              stack: error.stack || null,
+              metaInfo: error.metaInfo || null,
+              source: {
+                'url': sourceUrl,
+                'line': line,
+                'col': col
+              }
+            }
+          });
+        }
+        if (jserror._onerrorBackup) {
+          jserror._onerrorBackup(message, sourceUrl, line, col, error);
+        }
+        if (suppressErrors) {
+          return true;
+        }
+      }
+    },
+
+    /**
+     * @param {Object} data
+     */
+    report: function(data) {
+      var req = new XMLHttpRequest();
+      req.open("POST", jserror._url);
+      req.setRequestHeader("Content-Type", "application/json");
+      req.send(JSON.stringify(data));
+    }
+  };
+
+  jserror.install('/jserror', 10, false, false);
 
 }).call(this);

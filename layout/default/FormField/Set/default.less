@@ -1,8 +1,26 @@
-.set-item {
+& {
   display: inline-block;
-  line-height: @sizeCheckbox + 12px;
-  .nowrap;
+  padding-right: @sizeButton;
+}
+
+.set {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.set-item {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  min-height: @sizeButton;
   max-width: 100%;
-  padding: 0 5px 0 1px;
-  vertical-align: top;
+  padding: 0 12px 0 1px;
+
+  &.multiple {
+    width: 100%;
+
+    @media (min-width: @breakpointMini) {
+      width: 50%;
+    }
+  }
 }

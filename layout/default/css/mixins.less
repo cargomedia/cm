@@ -1,3 +1,13 @@
+.font-webFontLoader(@fontFamily) {
+  font-family: @fontFamily;
+  transition: opacity @transitionDuration;
+  opacity: 0;
+
+  html.wf-active &, html.wf-inactive & {
+    opacity: 1;
+  }
+}
+
 .clearfix {
   &::after {
     content: "";
@@ -141,19 +151,6 @@
     margin-top: -(@size + @borderSize);
     margin-bottom: -(@size + @borderSize);
     border-left-color: @colorBorder;
-  }
-}
-
-.clipper(@height: 20px, @colorBg: @colorBg) {
-  &::after {
-    pointer-events: none;
-    position: absolute;
-    content: "";
-    width: 100%;
-    height: @height;
-    bottom: 0;
-    left: 0;
-    background-image: linear-gradient(to bottom, fadeout(@colorBg, 100) 0, @colorBg 80%);
   }
 }
 

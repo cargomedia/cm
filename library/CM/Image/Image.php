@@ -5,6 +5,7 @@ class CM_Image_Image {
     const FORMAT_JPEG = 1;
     const FORMAT_GIF = 2;
     const FORMAT_PNG = 3;
+    const FORMAT_SVG = 4;
 
     /** @var Imagick|null */
     private $_imagick;
@@ -12,15 +13,31 @@ class CM_Image_Image {
     /** @var bool|null */
     private $_animated;
 
+    /** @var int */
+    private $_compressionQuality = 80;
+
     /**
-     * @param string $imageBlob
+     * @param string|Imagick $imageContainer
      * @throws CM_Exception
      */
-    public function __construct($imageBlob) {
-        $imageBlob = (string) $imageBlob;
-        try {
+    public function __construct($imageContainer) {
+        if (!is_a($imageContainer, 'Imagick')) {
+            $imageContainer = (string) $imageContainer;
             $imagick = new Imagick();
-            $imagick->readImageBlob($imageBlob);
+            try {
+                $imagick->readImageBlob($imageContainer);
+            } catch (ImagickException $e) {
+                throw new CM_Exception_Invalid('Cannot load image blob', null, ['originalExceptionMessage' => $e->getMessage()]);
+            }
+        } else {
+            $imagick = $imageContainer;
+            try {
+                $imagick->valid(); //seems to be the only method to check if it contains an image
+            } catch (ImagickException $e) {
+                throw new CM_Exception_Invalid('$imagick does not contain any image', null, ['originalExceptionMessage' => $e->getMessage()]);
+            }
+        }
+        try {
             if ($imagick->getIteratorIndex() > 0) {
                 $this->_animated = true;
                 $imagick = $imagick->coalesceImages();
@@ -28,7 +45,7 @@ class CM_Image_Image {
                 $this->_animated = false;
             }
         } catch (ImagickException $e) {
-            throw new CM_Exception('Cannot load Imagick instance ' . $e->getMessage());
+            throw new CM_Exception('Cannot process image', null, ['originalExceptionMessage' => $e->getMessage()]);
         }
         $this->_imagick = $imagick;
     }
@@ -98,6 +115,7 @@ class CM_Image_Image {
      * @throws CM_Exception
      */
     public function getBlob() {
+        $this->_imagick->setImageCompressionQuality($this->getCompressionQuality());
         try {
             if ($this->_getAnimationRequired($this->getFormat())) {
                 $imageBlob = $this->_imagick->getImagesBlob();
@@ -105,7 +123,7 @@ class CM_Image_Image {
                 $imageBlob = $this->_imagick->getImageBlob();
             }
         } catch (ImagickException $e) {
-            throw new CM_Exception('Cannot get image blob: ' . $e->getMessage());
+            throw new CM_Exception('Cannot get image blob', null, ['originalExceptionMessage' => $e->getMessage()]);
         }
         return $imageBlob;
     }
@@ -130,9 +148,20 @@ class CM_Image_Image {
                 return self::FORMAT_GIF;
             case'PNG':
                 return self::FORMAT_PNG;
+            case'SVG':
+                return self::FORMAT_SVG;
             default:
-                throw new CM_Exception_Invalid('Unsupported format `' . $imagickFormat . '`.');
+                throw new CM_Exception_Invalid('Unsupported format', null, ['format' => $imagickFormat]);
         }
+    }
+
+    /**
+     * @param CM_Image_Image $image
+     * @param int            $x
+     * @param int            $y
+     */
+    public function compositeImage(CM_Image_Image $image, $x, $y) {
+        $this->_imagick->compositeImage($image->_imagick, Imagick::COMPOSITE_DEFAULT, (int) $x, (int) $y);
     }
 
     /**
@@ -142,7 +171,7 @@ class CM_Image_Image {
      */
     public function setFormat($format) {
         if (true !== $this->_imagick->setImageFormat($this->_getImagickFormat($format))) {
-            throw new CM_Exception('Cannot set image format `' . $format . '`');
+            throw new CM_Exception('Cannot set image format', null, ['format' => $format]);
         }
         $this->_animated = $this->_getAnimationRequired($format);
         return $this;
@@ -156,7 +185,7 @@ class CM_Image_Image {
         try {
             return $this->_imagick->getImageHeight();
         } catch (ImagickException $e) {
-            throw new CM_Exception('Cannot detect image height: ' . $e->getMessage());
+            throw new CM_Exception('Cannot detect image height', null, ['originalExceptionMessage' => $e->getMessage()]);
         }
     }
 
@@ -168,7 +197,7 @@ class CM_Image_Image {
         try {
             return $this->_imagick->getImageWidth();
         } catch (ImagickException $e) {
-            throw new CM_Exception('Cannot detect image width: ' . $e->getMessage());
+            throw new CM_Exception('Cannot detect image width', null, ['originalExceptionMessage' => $e->getMessage()]);
         }
     }
 
@@ -220,7 +249,7 @@ class CM_Image_Image {
                 $frame->resizeImage($widthResize, $heightResize, Imagick::FILTER_CATROM, 1);
             });
         } catch (ImagickException $e) {
-            throw new CM_Exception('Error when resizing image: ' . $e->getMessage());
+            throw new CM_Exception('Error when resizing image', null, ['originalExceptionMessage' => $e->getMessage()]);
         }
         return $this;
     }
@@ -234,7 +263,7 @@ class CM_Image_Image {
 
         $this->_invokeOnEveryFrame(function (Imagick $frame) use ($angle) {
             if (true !== $frame->rotateImage(new ImagickPixel('#00000000'), $angle)) {
-                throw new CM_Exception('Cannot rotate image by `' . $angle . '` degrees');
+                throw new CM_Exception('Cannot rotate image by given angle', null, ['angleDegrees' => $angle]);
             }
         });
         return $this;
@@ -248,10 +277,17 @@ class CM_Image_Image {
     public function setCompressionQuality($quality) {
         $quality = (int) $quality;
         if ($quality < 1 || $quality > 100) {
-            throw new CM_Exception_Invalid('Invalid compression quality `' . $quality . '`, should be between 1-100.');
+            throw new CM_Exception_Invalid('Invalid compression quality. It should be between 1-100.', null, ['quality' => $quality]);
         }
-        $this->_imagick->setImageCompressionQuality($quality);
+        $this->_compressionQuality = $quality;
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCompressionQuality() {
+        return $this->_compressionQuality;
     }
 
     /**
@@ -296,7 +332,7 @@ class CM_Image_Image {
             case self::FORMAT_PNG:
                 return 'PNG';
             default:
-                throw new CM_Exception_Invalid('Invalid format `' . $format . '`.');
+                throw new CM_Exception_Invalid('Invalid format', null, ['format' => $format]);
         }
     }
 
@@ -364,7 +400,50 @@ class CM_Image_Image {
             case self::FORMAT_PNG:
                 return 'png';
             default:
-                throw new CM_Exception_Invalid('Invalid format `' . $format . '`.');
+                throw new CM_Exception_Invalid('Invalid format', null, ['format' => $format]);
         }
+    }
+
+    /**
+     * @param string      $imageBlob
+     * @param float       $resolutionX
+     * @param float       $resolutionY
+     * @param string|null $backgroundColor
+     * @return CM_Image_Image
+     * @throws CM_Exception_Invalid
+     */
+    public static function createFromSVG($imageBlob, $resolutionX, $resolutionY, $backgroundColor = null) {
+        $imageBlob = (string) $imageBlob;
+        if ('<?xml' !== substr($imageBlob, 0, 5)) {
+            $imageBlob = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' . $imageBlob;
+        }
+        $imagick = new Imagick();
+        $imagick->setResolution((float) $resolutionX, (float) $resolutionY);
+        if (null !== $backgroundColor) {
+            $backgroundColor = (string) $backgroundColor;
+        } else {
+            $backgroundColor = new ImagickPixel('transparent');
+        }
+        $imagick->setBackgroundColor($backgroundColor);
+        try {
+            $imagick->readImageBlob($imageBlob);
+        } catch (ImagickException $e) {
+            throw new CM_Exception_Invalid('Cannot load Imagick instance', null, ['originalExceptionMessage' => $e->getMessage()]);
+        }
+        return new self($imagick);
+    }
+
+    /**
+     * @param string      $imageBlob
+     * @param int         $width
+     * @param int         $height
+     * @param string|null $backgroundColor
+     * @return CM_Image_Image
+     */
+    public static function createFromSVGWithSize($imageBlob, $width, $height, $backgroundColor = null) {
+        $image = self::createFromSVG($imageBlob, 72, 72);
+        $scale = max([$width / $image->getWidth(), $height / $image->getHeight()]);
+        $image = self::createFromSVG($imageBlob, 72 * $scale, 72 * $scale, $backgroundColor);
+        return $image;
     }
 }

@@ -25,6 +25,14 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
   },
 
   /**
+   * @param {String} value
+   */
+  setValue: function(value) {
+    this.getInput().val(value);
+    this._valueLast = this.getValue();
+  },
+
+  /**
    * @return {Boolean}
    */
   hasFocus: function() {
@@ -33,14 +41,14 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
 
   triggerChange: function() {
     var valueCurrent = this.getValue();
-    if (this._valueLast !== valueCurrent) {
+    var valueLast = this._valueLast;
+    if (valueLast !== valueCurrent) {
       this._valueLast = valueCurrent;
-      this.trigger('change');
+      this.trigger('change', {previous: valueLast, new: valueCurrent});
     }
   },
 
   enableTriggerChangeOnInput: function() {
-    // `propertychange` and `keyup` needed for IE9
-    this.getInput().on('input propertychange paste keyup', _.bind(this.triggerChange, this));
+    this.getInput().on('input', _.bind(this.triggerChange, this));
   }
 });

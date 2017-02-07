@@ -22,7 +22,7 @@ class CM_Options implements CM_Service_ManagerAwareInterface {
         }
         $value = unserialize($options[$key]);
         if (false === $value) {
-            throw new CM_Exception_Invalid('Cannot unserialize option `' . $key . '`.');
+            throw new CM_Exception_Invalid('Cannot unserialize option.', null, ['key' => $key]);
         }
         return $value;
     }

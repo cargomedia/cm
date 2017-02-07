@@ -6,15 +6,16 @@
   min-width: @spinnerSize;
 
   &::before {
+    display: block;
     box-sizing: border-box;
     content: '';
     position: absolute;
     width: @spinnerSize;
     height: @spinnerSize;
-    border: 1px solid @colorFgSubtle;
+    border: 1px solid currentColor;
     border-left-color: transparent;
     border-radius: 50%;
-    .animation(spinner, 1s, linear, 0s, infinite);
+    animation: spinner 1s linear 0s infinite;
   }
 }
 
