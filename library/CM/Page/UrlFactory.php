@@ -27,6 +27,7 @@ class CM_Page_UrlFactory {
      * @return array
      */
     protected static function _getUrlComponents($pageClassName, array $params = null) {
+        /** @var CM_Page_Abstract $pageClassName */
         $pageComponents = $pageClassName::getUrlComponents($params);
         if (null === $pageComponents) {
             $pageComponents = [
