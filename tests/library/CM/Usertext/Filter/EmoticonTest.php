@@ -61,7 +61,7 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
         $siteType = $this->_mockSite->getId();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
 
-        $url = ResourceUrl::create('img/emoticon/' . $emoticon->getFileName(), 'layout', null, null, $deployVersion)
+        $url = ResourceUrl::create('img/emoticon/' . $emoticon->getFileName(), 'layout', null, $deployVersion)
             ->withSite($this->_mockSite);
         $heightAttribute = $height ? ' height="' . $height . '"' : '';
         return '<img src="' . $url . '" class="emoticon emoticon-' . $emoticon->getName() . '" title="' . $emoticon->getDefaultCode() . '"' .
