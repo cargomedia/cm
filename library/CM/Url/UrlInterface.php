@@ -53,10 +53,9 @@ interface UrlInterface extends UriInterface {
 
     /**
      * @param CM_Site_Abstract $site
-     * @param bool|null        $sameOrigin
      * @return UrlInterface
      */
-    public function withSite(CM_Site_Abstract $site, $sameOrigin = null);
+    public function withSite(CM_Site_Abstract $site);
 
     /**
      * @param Path|string|null $prefix
@@ -94,10 +93,9 @@ interface UrlInterface extends UriInterface {
 
     /**
      * @param CM_Frontend_Environment $environment
-     * @param array                   $options
      * @return UrlInterface
      */
-    public function withEnvironment(CM_Frontend_Environment $environment, array $options = null);
+    public function withEnvironment(CM_Frontend_Environment $environment);
 
     /**
      * @param string $path

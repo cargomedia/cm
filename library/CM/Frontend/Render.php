@@ -221,14 +221,13 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     /**
      * @param string                $type
      * @param string                $path
-     * @param array|null            $options
      * @param CM_Site_Abstract|null $site
      * @return string
      */
-    public function getUrlResource($type, $path, array $options = null, CM_Site_Abstract $site = null) {
+    public function getUrlResource($type, $path, CM_Site_Abstract $site = null) {
         $environment = $this->getEnvironment();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $url = ResourceUrl::create($path, $type, $environment, $options, $deployVersion);
+        $url = ResourceUrl::create($path, $type, $environment, $deployVersion);
         if ($site) {
             $url = $url->withSite($site);
         }
@@ -273,7 +272,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         if (null !== $path) {
             $deployVersion = CM_App::getInstance()->getDeployVersion();
         }
-        $url = StaticUrl::create((string) $path, $environment, null, $deployVersion);
+        $url = StaticUrl::create((string) $path, $environment, $deployVersion);
         if ($site) {
             $url = $url->withSite($site);
         }

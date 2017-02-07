@@ -12,7 +12,7 @@ function smarty_function_img(array $params, Smarty_Internal_Template $template) 
     } elseif (!empty($params['static'])) {
         $url = $render->getUrlStatic('/img/' . $path, $params['site']);
     } else {
-        $url = $render->getUrlResource('layout', 'img/' . $path, null, $params['site']);
+        $url = $render->getUrlResource('layout', 'img/' . $path, $params['site']);
     }
     $html = '<img src="' . $url . '"';
 
@@ -23,7 +23,7 @@ function smarty_function_img(array $params, Smarty_Internal_Template $template) 
         } elseif (!empty($params['static'])) {
             $backgroundImageUrl = $render->getUrlStatic('/img/' . $backgroundImage, $params['site']);
         } else {
-            $backgroundImageUrl = $render->getUrlResource('layout', 'img/' . $backgroundImage, null, $params['site']);
+            $backgroundImageUrl = $render->getUrlResource('layout', 'img/' . $backgroundImage, $params['site']);
         }
         $html .= ' style="background-image: url(' . CM_Util::htmlspecialchars($backgroundImageUrl) . ')"';
 

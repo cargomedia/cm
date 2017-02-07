@@ -34,9 +34,6 @@ class AssetUrlTest extends CMTest_TestCase {
         $urlWithEnvironmentPreserved = $urlWithEnvironmentAndLanguage->withPath('/baz');
         $this->assertSame($environment->getLanguage(), $urlWithEnvironmentPreserved->getLanguage());
         $this->assertSame('http://cdn.example.com/de/baz?foobar=1', (string) $urlWithEnvironmentPreserved);
-
-        $urlWithEnvironmentSameOrigin = $url->withEnvironment($environment, ['sameOrigin' => true]);
-        $this->assertSame('http://www.example.com/de/bar?foobar=1', (string) $urlWithEnvironmentSameOrigin);
     }
 
     public function testWithSite() {
@@ -45,9 +42,6 @@ class AssetUrlTest extends CMTest_TestCase {
         $url = CM_Url_AssetMockUrl::create('/bar?foobar=1');
         $urlWithSite = $url->withSite($site);
         $this->assertSame('http://cdn.example.com/bar?foobar=1', (string) $urlWithSite);
-
-        $urlWithSiteSameOrigin = $url->withSite($site, true);
-        $this->assertSame('http://www.example.com/bar?foobar=1', (string) $urlWithSiteSameOrigin);
     }
 }
 

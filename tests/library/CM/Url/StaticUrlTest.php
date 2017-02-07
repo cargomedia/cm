@@ -25,13 +25,10 @@ class StaticUrlTest extends CMTest_TestCase {
         $url = StaticUrl::create('file.ext', $environment);
         $this->assertSame('http://cdn.example.com/static/file.ext', (string) $url);
 
-        $url = StaticUrl::create('file.ext', $environment, null, 1234);
+        $url = StaticUrl::create('file.ext', $environment, 1234);
         $this->assertSame('http://cdn.example.com/static/file.ext?1234', (string) $url);
 
-        $url = StaticUrl::create('file.ext?foo=bar', $environment, null, 1234);
+        $url = StaticUrl::create('file.ext?foo=bar', $environment, 1234);
         $this->assertSame('http://cdn.example.com/static/file.ext?foo=bar&1234', (string) $url);
-
-        $url = StaticUrl::create('file.ext?foo=bar', $environment, ['sameOrigin' => true], 1234);
-        $this->assertSame('http://www.example.com/static/file.ext?foo=bar&1234', (string) $url);
     }
 }
