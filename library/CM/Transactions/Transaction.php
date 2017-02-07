@@ -2,29 +2,31 @@
 
 namespace CM\Transactions;
 
+use CM\Functional\FunctionSequence;
+
 class Transaction {
 
-    /** @var Rollback */
-    private $_rollback;
+    /** @var FunctionSequence */
+    private $_rollbacks;
 
     /**
-     * @param Rollback|null $rollback
+     * @param FunctionSequence|null $rollbacks
      */
-    public function __construct(Rollback $rollback = null) {
-        if (null === $rollback) {
-            $rollback = new Rollback();
+    public function __construct(FunctionSequence $rollbacks = null) {
+        if (null === $rollbacks) {
+            $rollbacks = new FunctionSequence();
         }
-        $this->_rollback = $rollback;
+        $this->_rollbacks = $rollbacks;
     }
 
     /**
      * @param callable $rollback
      */
     public function addRollback(callable $rollback) {
-        $this->_rollback->add($rollback);
+        $this->_rollbacks->add($rollback);
     }
 
     public function rollback() {
-        $this->_rollback->run();
+        $this->_rollbacks->runInReverse();
     }
 }
