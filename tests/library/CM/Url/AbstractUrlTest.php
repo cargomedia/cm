@@ -24,10 +24,6 @@ class AbstractUrlTest extends CMTest_TestCase {
         $this->assertSame(null, $url->getPrefix());
         $this->assertSame(null, $url->getLanguage());
         $this->assertSame('/bar?foobar=1', (string) $url);
-
-        $url = CM_Url_AbstractMockUrl::createFromString('http://스타벅스코리아.com/path/../foo/./bar');
-        $this->assertInstanceOf('CM\Url\AbstractUrl', $url);
-        $this->assertSame('http://스타벅스코리아.com/path/../foo/./bar', (string) $url);
     }
 
     public function testCreate() {
@@ -42,12 +38,6 @@ class AbstractUrlTest extends CMTest_TestCase {
         $this->assertSame(null, $url->getPrefix());
         $this->assertSame(null, $url->getLanguage());
         $this->assertSame('/bar?foobar=1', (string) $url);
-
-        $url = CM_Url_AbstractMockUrl::create('http://스타벅스코리아.com/path/../foo/./bar');
-        $this->assertInstanceOf('CM\Url\AbstractUrl', $url);
-        $this->assertSame(null, $url->getPrefix());
-        $this->assertSame(null, $url->getLanguage());
-        $this->assertSame('http://xn--oy2b35ckwhba574atvuzkc.com/foo/bar', (string) $url);
 
         $baseUrl = BaseUrl::create('http://foo/?param');
         $environment = $this->createEnvironment();
