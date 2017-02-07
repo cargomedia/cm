@@ -531,8 +531,6 @@ var CM_App = CM_Class_Abstract.extend({
           var newNode = document.createElement('span');
           newNode.innerHTML = text;
           window.getSelection().getRangeAt(0).insertNode(newNode);
-        } else {
-          document.selection.createRange().pasteHTML(text);
         }
       }
     }
