@@ -21,9 +21,4 @@
       return false;
     }
   });
-  Modernizr.addTest('contenteditable-plaintext', function() {
-    var div = document.createElement('div');
-    div.setAttribute('contenteditable', 'plaintext-only');
-    return div.contentEditable === 'plaintext-only';
-  });
 })();
