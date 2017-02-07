@@ -1,5 +1,12 @@
 <?php
 
+use CM\Url\Url;
+use CM\Url\RouteUrl;
+use CM\Url\PageUrl;
+use CM\Url\ServiceWorkerUrl;
+use CM\Url\ResourceUrl;
+use CM\Url\StaticUrl;
+
 class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
@@ -180,14 +187,12 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     public function getUrl($path = null, CM_Site_Abstract $site = null) {
-        if (null === $path) {
-            $path = '';
+        $environment = $this->getEnvironment();
+        $url = Url::create((string) $path, $environment);
+        if ($site) {
+            $url = $url->withSite($site);
         }
-        if (null === $site) {
-            $site = $this->getSite();
-        }
-        $path = (string) $path;
-        return $site->getUrl() . $path;
+        return (string) $url;
     }
 
     /**
@@ -199,90 +204,43 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     public function getUrlPage($pageClassName, array $params = null, CM_Site_Abstract $site = null, CM_Model_Language $language = null) {
-        if (null === $site) {
-            $site = $this->getSite();
-        }
         if ($pageClassName instanceof CM_Page_Abstract) {
             $pageClassName = get_class($pageClassName);
         }
-        $pageClassName = (string) $pageClassName;
-
-        if (!class_exists($pageClassName) || !is_subclass_of($pageClassName, 'CM_Page_Abstract')) {
-            throw new CM_Exception_Invalid('Cannot find valid class definition for page class name', null, ['pageClassName' => $pageClassName]);
-        }
-        if (!preg_match('/^([A-Za-z]+)_/', $pageClassName, $matches)) {
-            throw new CM_Exception_Invalid('Cannot find namespace of page class name', null, ['pageClassName' => $pageClassName]);
-        }
-        $namespace = $matches[1];
-        if (!in_array($namespace, $site->getModules())) {
-            throw new CM_Exception_Invalid('Site does not contain namespace', null, [
-                'site'      => get_class($site),
-                'namespace' => $namespace,
-            ]);
-        }
-        /** @var CM_Page_Abstract $pageClassName */
-        $path = $pageClassName::getPath($params);
-
-        if (!$language) {
-            $language = $this->getLanguage();
+        $url = CM_Page_UrlFactory::getUrl($pageClassName, $params, $this->getEnvironment());
+        if ($site) {
+            CM_Page_UrlFactory::assertSupportedSite($pageClassName, $site);
+            $url = $url->withSite($site);
         }
         if ($language) {
-            $path = '/' . $language->getAbbreviation() . $path;
+            $url = $url->withLanguage($language);
         }
-        return $this->getUrl($path, $site);
+        return (string) $url;
     }
 
     /**
-     * @param string|null           $type
-     * @param string|null           $path
-     * @param array|null            $options
+     * @param string                $type
+     * @param string                $path
      * @param CM_Site_Abstract|null $site
      * @return string
      */
-    public function getUrlResource($type = null, $path = null, array $options = null, CM_Site_Abstract $site = null) {
-        $options = array_merge([
-            'sameOrigin' => false,
-        ], (array) $options);
-        if (null === $site) {
-            $site = $this->getSite();
+    public function getUrlResource($type, $path, CM_Site_Abstract $site = null) {
+        $environment = $this->getEnvironment();
+        $deployVersion = CM_App::getInstance()->getDeployVersion();
+        $url = ResourceUrl::create($path, $type, $environment, $deployVersion);
+        if ($site) {
+            $url = $url->withSite($site);
         }
-
-        if (!$options['sameOrigin'] && $this->getSite()->getUrlCdn()) {
-            $url = $site->getUrlCdn();
-        } else {
-            $url = $site->getUrlBase();
-        }
-
-        if (!is_null($type) && !is_null($path)) {
-            $pathParts = [];
-            $pathParts[] = (string) $type;
-            if ($this->getLanguage()) {
-                $pathParts[] = $this->getLanguage()->getAbbreviation();
-            }
-            $pathParts[] = $site->getId();
-            $pathParts[] = CM_App::getInstance()->getDeployVersion();
-            $pathParts = array_merge($pathParts, explode('/', $path));
-
-            $url .= '/' . implode('/', $pathParts);
-        }
-
-        return $url;
+        return (string) $url;
     }
 
     /**
      * @return string
      */
     public function getUrlServiceWorker() {
-        $pathParts = [];
-        $pathParts[] = 'serviceworker';
-        if ($this->getLanguage()) {
-            $pathParts[] = $this->getLanguage()->getAbbreviation();
-        }
-        $pathParts[] = CM_App::getInstance()->getDeployVersion();
-
-        $path = '/' . implode('-', $pathParts) . '.js';
-
-        return $this->getUrl($path);
+        $environment = $this->getEnvironment();
+        $deployVersion = CM_App::getInstance()->getDeployVersion();
+        return (string) ServiceWorkerUrl::create('serviceworker', $environment, $deployVersion);
     }
 
     /**
@@ -294,8 +252,13 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         if (!$mail->getRecipient()) {
             throw new CM_Exception_Invalid('Needs user');
         }
-        $params = array('user' => $mail->getRecipient()->getId(), 'mailType' => $mail->getType());
-        return CM_Util::link($this->getSite()->getUrl() . '/emailtracking', $params);
+        $environment = $this->getEnvironment();
+        $params = [
+            'user'     => $mail->getRecipient()->getId(),
+            'mailType' => $mail->getType(),
+        ];
+        $url = RouteUrl::create('emailtracking', $params, $environment);
+        return (string) $url;
     }
 
     /**
@@ -304,21 +267,16 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     public function getUrlStatic($path = null, CM_Site_Abstract $site = null) {
-        if (null === $site) {
-            $site = $this->getSite();
-        }
-        if ($this->getSite()->getUrlCdn()) {
-            $url = $site->getUrlCdn();
-        } else {
-            $url = $site->getUrlBase();
-        }
-
-        $url .= '/static';
+        $environment = $this->getEnvironment();
+        $deployVersion = null;
         if (null !== $path) {
-            $url .= $path . '?' . CM_App::getInstance()->getDeployVersion();
+            $deployVersion = CM_App::getInstance()->getDeployVersion();
         }
-
-        return $url;
+        $url = StaticUrl::create((string) $path, $environment, $deployVersion);
+        if ($site) {
+            $url = $url->withSite($site);
+        }
+        return (string) $url;
     }
 
     /**

@@ -2,9 +2,11 @@
 
 namespace CM\Url;
 
+use CM_Params;
 use CM_Site_Abstract;
 use CM_Frontend_Environment;
 use CM_Model_Language;
+use League\Uri\Components\Query;
 use League\Uri\Components\HierarchicalPath;
 use League\Uri\Modifiers\Normalize;
 use League\Uri\Modifiers\Pipeline;
@@ -17,6 +19,9 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         'http'  => 80,
         'https' => 443,
     ];
+
+    /** @var array|null */
+    protected $_params = null;
 
     /** @var HierarchicalPath|null */
     protected $_prefix = null;
@@ -46,7 +51,11 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         return (string) $this->_prefix;
     }
 
-    public function withSite(CM_Site_Abstract $site, $sameOrigin = null) {
+    public function getParams() {
+        return $this->_params;
+    }
+
+    public function withSite(CM_Site_Abstract $site) {
         $url = clone $this;
         $url->_site = $site;
         return $url->withBaseUrl($site->getUrl());
@@ -79,6 +88,20 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         return $url;
     }
 
+    public function withParams(array $params) {
+        $this->_params = $params;
+        $params = CM_Params::encode($this->getParams());
+        $query = http_build_query($params);
+        return parent::withQuery($query);
+    }
+
+    public function withQuery($queryString) {
+        $params = [];
+        parse_str($queryString, $params);
+        $this->_params = $params;
+        return parent::withQuery($queryString);
+    }
+
     public function withBaseUrl($baseUrl) {
         if (!$baseUrl instanceof BaseUrl) {
             $baseUrl = BaseUrl::create((string) $baseUrl);
@@ -108,7 +131,7 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         return $this->withRelativeComponentsFrom('/');
     }
 
-    public function withEnvironment(CM_Frontend_Environment $environment, array $options = null) {
+    public function withEnvironment(CM_Frontend_Environment $environment) {
         $url = clone $this;
         if ($language = $environment->getLanguage()) {
             $url = $url->withLanguage($language);
@@ -116,14 +139,22 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         return $url->withSite($environment->getSite());
     }
 
-    protected function _ensureAbsolutePath() {
-        return $this->withProperty('path', (string) $this->path->withLeadingSlash());
+    public function getUriBaseComponents() {
+        $baseUrl = sprintf('%s://%s', $this->getScheme(), $this->getAuthority());
+        if ($prefix = $this->getPrefix()) {
+            $baseUrl = sprintf('%s/%s', $baseUrl, $prefix);
+        }
+        return $baseUrl;
     }
 
     /**
      * @return string
      */
     abstract public function getUriRelativeComponents();
+
+    protected function _ensureAbsolutePath() {
+        return $this->withProperty('path', (string) $this->path->withLeadingSlash());
+    }
 
     protected function getSchemeSpecificPart() {
         $authority = $this->getAuthority();
@@ -146,17 +177,16 @@ abstract class AbstractUrl extends Http implements UrlInterface {
     /**
      * @param string                       $url
      * @param CM_Frontend_Environment|null $environment
-     * @param array|null                   $environmentOptions
      * @return AbstractUrl
      */
-    protected static function _create($url, CM_Frontend_Environment $environment = null, array $environmentOptions = null) {
+    protected static function _create($url, CM_Frontend_Environment $environment = null) {
         /** @var AbstractUrl $abstractUrl */
         $abstractUrl = self::getPipeline()->process(
             self::createFromString($url)
         );
         $abstractUrl = $abstractUrl->_ensureAbsolutePath();
         if ($environment) {
-            $abstractUrl = $abstractUrl->withEnvironment($environment, $environmentOptions);
+            $abstractUrl = $abstractUrl->withEnvironment($environment);
         }
         return $abstractUrl;
     }

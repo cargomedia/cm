@@ -13,18 +13,6 @@ class RouteUrlTest extends CMTest_TestCase {
         CMTest_TH::clearEnv();
     }
 
-    public function testWithParams() {
-        $url = RouteUrl::createFromString('/foo');
-
-        $this->assertSame('/foo', (string) $url);
-        $this->assertSame(null, $url->getParams());
-
-        $url = $url->withParams(['foo', 123 => null, 'bar' => 'baz']);
-
-        $this->assertSame('/foo?0=foo&123&bar=baz', (string) $url);
-        $this->assertSame(['foo', 123 => null, 'bar' => 'baz'], $url->getParams());
-    }
-
     public function testCreate() {
         $url = RouteUrl::create('some-action');
         $this->assertSame('/some-action', (string) $url);

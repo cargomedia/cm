@@ -1,5 +1,7 @@
 <?php
 
+use CM\Url\BaseUrl;
+
 class CM_Site_AbstractTest extends CMTest_TestCase {
 
     public static function setUpBeforeClass() {
@@ -37,13 +39,13 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
     public function testGetUrl() {
         /** @var CM_Site_Abstract $site */
         $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $this->assertEquals('http://www.foo.com', $site->getUrl());
+        $this->assertEquals('http://www.foo.com/', (string) $site->getUrl());
     }
 
     public function testGetUrlCdn() {
         /** @var CM_Site_Abstract $site */
         $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $this->assertEquals('http://www.cdn.com', $site->getUrlCdn());
+        $this->assertEquals('http://www.cdn.com/', (string) $site->getUrlCdn());
     }
 
     public function testGetWebFontLoaderConfig() {
@@ -112,11 +114,11 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 
         /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $site1 */
         $site1 = $siteClass->newInstance();
-        $site1->mockMethod('getUrl')->set('http://my-site1.com');
+        $site1->mockMethod('getUrl')->set(BaseUrl::create('http://my-site1.com'));
 
         /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $site2 */
         $site2 = $siteClass->newInstance();
-        $site2->mockMethod('getUrl')->set('http://my-site2.com');
+        $site2->mockMethod('getUrl')->set(BaseUrl::create('http://my-site2.com'));
 
         $this->assertSame(false, $site1->equals($site2));
     }

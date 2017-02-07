@@ -191,17 +191,7 @@ var CM_App = CM_Class_Abstract.extend({
    * @return {String}
    */
   getUrlResource: function(type, path, options) {
-    options = _.defaults(options || {}, {
-      'sameOrigin': false
-    });
-
-    var url = '';
-    if (!options['sameOrigin'] && cm.options.urlCdn) {
-      url = cm.options.urlCdn + url;
-    } else {
-      url = cm.options.urlBase + url;
-    }
-
+    var url = cm.options.urlCdn;
     if (type && path) {
       var urlParts = [];
       urlParts.push(type);
