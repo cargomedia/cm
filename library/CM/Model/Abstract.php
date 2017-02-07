@@ -507,15 +507,25 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
     /**
      * @param array|null $data
      * @return static
+     * @throws Exception
      */
     final public static function createStatic(array $data = null) {
-        if ($data === null) {
-            $data = array();
+        $transaction = new Transaction();
+        try {
+            if ($data === null) {
+                $data = [];
+            }
+            $model = static::_createStatic($data);
+            $transaction->addRollback(function() use ($model) {
+                $model->delete();
+            });
+            $model->_changeContainingCacheables();
+            $model->_onCreate();
+            return $model;
+        } catch (Exception $e) {
+            $transaction->rollback();
+            throw $e;
         }
-        $model = static::_createStatic($data);
-        $model->_changeContainingCacheables();
-        $model->_onCreate();
-        return $model;
     }
 
     /**
