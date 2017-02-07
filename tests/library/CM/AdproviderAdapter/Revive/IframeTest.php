@@ -16,7 +16,7 @@ class CM_AdproviderAdapter_Revive_IframeTest extends CMTest_TestCase {
         ]);
 
         $this->assertSame(
-            '<iframe src="//example.com/delivery/ajs-proxy.php?foo=bar&amp;zoneId=1&amp;cb=963932192" width="100%" height="100" class="advertisement-hasContent" data-variables="{}" frameborder="0" scrolling="no"></iframe>'
+            '<iframe src="//example.com/delivery/afr.php?foo=bar&amp;zoneId=1&amp;cb=963932192" width="100%" height="100" class="advertisement-hasContent" data-variables="{}" frameborder="0" scrolling="no"></iframe>'
             , $html);
     }
 }

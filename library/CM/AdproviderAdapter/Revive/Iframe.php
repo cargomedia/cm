@@ -11,7 +11,7 @@ class CM_AdproviderAdapter_Revive_Iframe extends CM_AdproviderAdapter_Iframe {
             throw new CM_Exception_Invalid('Revive `host` missing');
         }
         $host = $zoneData['host'];
-        $zoneData['src'] = '//' . $host . '/delivery/ajs-proxy.php';
+        $zoneData['src'] = '//' . $host . '/delivery/afr.php';
         $query = array_merge($variables, [
             'zoneId' => $zoneId,
             'cb'     => mt_rand(),
