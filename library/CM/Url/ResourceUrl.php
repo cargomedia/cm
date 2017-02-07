@@ -50,13 +50,12 @@ class ResourceUrl extends AssetUrl {
      * @param string                       $url
      * @param string                       $type
      * @param CM_Frontend_Environment|null $environment
-     * @param array|null                   $environmentOptions
      * @param string|null                  $deployVersion
      * @return ResourceUrl
      */
-    public static function create($url, $type, CM_Frontend_Environment $environment = null, array $environmentOptions = null, $deployVersion = null) {
+    public static function create($url, $type, CM_Frontend_Environment $environment = null, $deployVersion = null) {
         /** @var ResourceUrl $resourceUrl */
-        $resourceUrl = parent::_create($url, $environment, $environmentOptions, $deployVersion);
+        $resourceUrl = parent::_create($url, $environment, $deployVersion);
         $resourceUrl->setType($type);
         return $resourceUrl;
     }
