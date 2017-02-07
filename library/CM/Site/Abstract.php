@@ -154,14 +154,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @return BaseUrl
-     * @throws CM_Exception
-     */
-    public function getUrlBase() {
-        return $this->getUrl()->withoutPrefix();
-    }
-
-    /**
      * @param CM_Http_Response_Page $response
      */
     public function preprocessPageResponse(CM_Http_Response_Page $response) {

@@ -71,7 +71,6 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     }
 
     protected function _processContentOrRedirect() {
-        $render = $this->getRender();
         if ($this->getSite()->getUrl()->getHost() !== $this->getRequest()->getHost()) {
             $this->redirectUrl((string) $this->getUrl()->withSite($this->getSite()));
         }

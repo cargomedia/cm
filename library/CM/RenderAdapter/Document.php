@@ -96,7 +96,7 @@ class CM_RenderAdapter_Document extends CM_RenderAdapter_Abstract {
         $options['renderStamp'] = floor(microtime(true) * 1000);
         $options['site'] = CM_Params::encode($site);
         $options['url'] = $site->getUrl()->getUriBaseComponents();
-        $options['urlBase'] = $site->getUrlBase()->getUriBaseComponents();
+        $options['urlBase'] = $site->getUrl()->withoutPrefix()->getUriBaseComponents();
         $options['urlCdn'] = $site->getUrlCdn()->getUriBaseComponents();
         $options['urlUserContentList'] = $serviceManager->getUserContent()->getUrlList();
         $options['urlServiceWorker'] = $this->getRender()->getUrlServiceWorker();

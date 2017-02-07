@@ -65,10 +65,11 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
 
         $count = 0;
         $fragments = [];
+        $baseUrl = $this->getRender()->getSite()->getUrl()->withoutPrefix();
         do {
             $fragment = (string) Url::create($request->getPath())->withQuery((string) Query::createFromPairs($request->getQuery()));
             $fragments[] = $fragment;
-            $url = (string) Url::create($fragment)->withBaseUrl($this->getRender()->getSite()->getUrlBase());
+            $url = (string) Url::create($fragment)->withBaseUrl($baseUrl);
             if ($count++ > 10) {
                 throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $fragments) . ').');
             }
