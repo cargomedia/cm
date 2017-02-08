@@ -14,6 +14,21 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
     },
     'change [contenteditable]': function() {
       this.triggerChange();
+    },
+    'keydown [contenteditable]': function(event) {
+      if (this.getOptions().lengthMax > 0) {
+        var isRemovalKey = _.contains([cm.keyCode.DELETE, cm.keyCode.BACKSPACE, cm.keyCode.INSERT], event.which);
+        var isControl = event.altKey || event.ctrlKey || event.metaKey || event.shiftKey;
+        var isExceeded = this.getValue().length > this.getOptions().lengthMax;
+        if (!isRemovalKey && !isControl && isExceeded) {
+          event.preventDefault();
+        }
+        if (isExceeded) {
+          this.error(cm.language.get('Too long'));
+        } else {
+          this.error(null);
+        }
+      }
     }
   },
 
