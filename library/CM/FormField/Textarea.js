@@ -55,6 +55,15 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
       var clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
       var text = clipboardData.getData('text/plain');
       cm.dom.pasteTextAtCursor(text);
+
+      //scroll to cursor if it goes out of scope
+      var selection = window.getSelection();
+      var range = selection && selection.getRangeAt(0);
+      var textCoords = range && range.getClientRects()[0];
+      var textareaCoords = this.getBoundingClientRect();
+      if (textCoords && textCoords.bottom > textareaCoords.bottom || textCoords.bottom < textareaCoords.top) {
+        $(this).scrollTop($(this).scrollTop() + (textCoords.bottom - textareaCoords.top));
+      }
     });
   }
 });
