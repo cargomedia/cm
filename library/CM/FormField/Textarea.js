@@ -43,7 +43,15 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   },
 
   getValue: function() {
-    return this.getInput().html();
+    var $input = this.getInput().clone();
+    $input.find('div').replaceWith(function() {
+      return '\n' + this.innerHTML;
+    });
+    $input.find('p').replaceWith(function() {
+      return this.innerHTML + '\n';
+    });
+    $input.find('br').replaceWith('\n');
+    return $input.html();
   },
 
   setValue: function(value) {
