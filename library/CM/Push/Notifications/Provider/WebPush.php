@@ -10,15 +10,8 @@ class CM_Push_Notification_Provider_WebPush extends CM_Push_Notification_Provide
     public function sendNotifications(array $subscriptionList, array $messageData, DateTime $expireAt) {
         $ttl = max(0, $expireAt->getTimestamp() - (new DateTime())->getTimestamp());
 
-        $messageFactory = new \GuzzleHttp\Message\MessageFactory();
-        $requests = Functional\map($subscriptionList, function (CM_Push_Subscription $subscription) use ($messageFactory, $ttl) {
-            $headers = [
-                'TTL' => $ttl,
-            ];
-            return $messageFactory->createRequest('POST', $subscription->getEndpoint(), [
-                'headers'    => $headers,
-                'exceptions' => true,
-            ]);
+        $requests = Functional\map($subscriptionList, function (CM_Push_Subscription $subscription) use ($ttl) {
+            return new \GuzzleHttp\Psr7\Request('POST', $subscription->getEndpoint(), ['TTL' => $ttl]);
         });
         $this->_sendRequests($requests);
     }
@@ -31,27 +24,25 @@ class CM_Push_Notification_Provider_WebPush extends CM_Push_Notification_Provide
     }
 
     /**
-     * @param \GuzzleHttp\Message\Request[] $requests
+     * @param \GuzzleHttp\Psr7\Request[] $requests
      * @throws CM_Exception
      */
     protected function _sendRequests(array $requests) {
         $guzzle = $this->_getGuzzleClient();
-        /** @var \GuzzleHttp\Event\ErrorEvent[] $errorEvents */
-        $errorEvents = [];
+        $errorList = [];
         $pool = new \GuzzleHttp\Pool($guzzle, $requests, [
-            'pool_size' => 100,
-            'error'     => function (\GuzzleHttp\Event\ErrorEvent $errorEvent) use (&$errorEvents) {
-                $errorEvents[] = $errorEvent;
+            'concurrency' => 100,
+            'rejected'    => function ($reason, $index) use (&$errorList, $requests) {
+                $errorList[] = [
+                    'url'     => $requests[$index]->getUri(),
+                    'message' => $reason,
+                ];
             },
         ]);
-        $pool->wait();
-        if (!empty($errorEvents)) {
-            /** @var \GuzzleHttp\Event\ErrorEvent $firstError */
-            $firstError = Functional\first($errorEvents);
-            throw new CM_Exception(count($errorEvents) . '/' . count($requests) . ' requests failed.', null, [
-                'url'     => $firstError->getRequest()->getUrl(),
-                'message' => $firstError->getException()->getMessage(),
-            ]);
+        $pool->promise()->wait();
+        if (!empty($errorList)) {
+            $firstError = Functional\first($errorList);
+            throw new CM_Exception(count($errorList) . '/' . count($requests) . ' requests failed.', null, $firstError);
         }
     }
 }
