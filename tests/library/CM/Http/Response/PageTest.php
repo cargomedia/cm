@@ -15,33 +15,6 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $this->assertContains('Location: ' . $response->getSite()->getUrl() . '/mock11?count=2', $response->getHeaders());
     }
 
-    public function testProcessLanguageRedirect() {
-        CMTest_TH::createLanguage('en');
-        $viewer = CMTest_TH::createUser();
-        $site = CM_Site_Abstract::factory();
-        $request = new CM_Http_Request_Get('/en/mock5', ['host' => $site->getHost()], null, $viewer);
-        $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
-
-        $response->process();
-        $this->assertContains('Location: ' . $site->getUrl() . '/mock5', $response->getHeaders());
-    }
-
-    public function testProcessLanguageRedirect_parameter() {
-        CMTest_TH::createLanguage('en');
-        $viewer = CMTest_TH::createUser();
-        $location = CMTest_TH::createLocation();
-        $locationEncoded = CM_Params::encode($location, true);
-        $query = http_build_query(['location' => $locationEncoded]);
-
-        $site = CM_Site_Abstract::factory();
-        $request = new CM_Http_Request_Get('/en/mock5?' . $query, ['host' => $site->getHost()], null, $viewer);
-        $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
-
-        $response->process();
-        $siteUrl = $response->getSite()->getUrl();
-        $this->assertContains('Location: ' . $siteUrl . '/mock5?' . $query, $response->getHeaders());
-    }
-
     public function testProcessLanguageNoRedirect() {
         $language = CMTest_TH::createLanguage('en');
         $site = CM_Site_Abstract::factory();

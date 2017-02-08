@@ -53,10 +53,11 @@ class CM_Model_User extends CM_Model_Abstract {
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getLatestActivity() {
-        return (int) $this->_get('activityStamp');
+        $activityStamp = $this->_get('activityStamp');
+        return null !== $activityStamp ? (int) $activityStamp : null;
     }
 
     /**
@@ -212,11 +213,16 @@ class CM_Model_User extends CM_Model_Abstract {
      * @return CM_Frontend_Environment
      */
     public function getEnvironment() {
-        return new CM_Frontend_Environment($this->getSite(), $this, $this->getLanguage(), null, null, null, $this->getCurrency());
+        $language = $this->getLanguage();
+        if (!$language) {
+            $language = CM_Model_Language::findDefault();
+        }
+        return new CM_Frontend_Environment($this->getSite(), $this, $language, null, null, null, $this->getCurrency());
     }
 
     public function updateLatestActivityThrottled() {
-        if ($this->getLatestActivity() < time() - self::ACTIVITY_EXPIRATION) {
+        $activityStamp = $this->getLatestActivity();
+        if (null === $activityStamp || $activityStamp < time() - self::ACTIVITY_EXPIRATION) {
             $this->_updateLatestActivity();
         }
     }
@@ -266,7 +272,7 @@ class CM_Model_User extends CM_Model_Abstract {
 			SELECT `o`.`userId`
 			FROM `cm_user_online` `o`
 			LEFT JOIN `cm_user` `u` USING(`userId`)
-			WHERE `u`.`activityStamp` < ? OR `u`.`userId` IS NULL',
+			WHERE `u`.`activityStamp` IS NOT NULL AND `u`.`activityStamp` < ? OR `u`.`userId` IS NULL',
             array(time() - self::ONLINE_EXPIRATION));
         while ($userId = $res->fetchColumn()) {
             try {
@@ -303,7 +309,6 @@ class CM_Model_User extends CM_Model_Abstract {
         }
         $userId = CM_Db_Db::insert('cm_user', array(
             'createStamp'   => time(),
-            'activityStamp' => time(),
             'site'          => $siteType,
             'languageId'    => $languageId,
             'currencyId'    => $currencyId,

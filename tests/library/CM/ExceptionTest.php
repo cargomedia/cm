@@ -4,7 +4,7 @@ class CM_ExceptionTest extends CMTest_TestCase {
 
     public function testConstructor() {
         $user = CMTest_TH::createUser();
-        $metaInfo = array('meta' => 'foo', 'user' => $user);
+        $metaInfo = ['meta' => 'foo', 'user' => $user];
         $severity = CM_Exception::ERROR;
         $exception = new CM_Exception('foo', $severity, $metaInfo, [
             'messagePublic' => new CM_I18n_Phrase('foo {$bar}', ['bar' => 'foo']),
@@ -43,5 +43,21 @@ class CM_ExceptionTest extends CMTest_TestCase {
             $this->assertSame('Invalid severity', $e->getMessage());
             $this->assertSame(['severity' => '1'], $e->getMetaInfo());
         }
+    }
+
+    public function testGetClientData() {
+        $render = new CM_Frontend_Render();
+        $exception = new CM_Exception('foo', null, ['foo' => 'bar'], [
+            'messagePublic' => new CM_I18n_Phrase('foo {$bar}', ['bar' => 'foo']),
+        ]);
+
+        $expectedData = [
+            'type'     => get_class($exception),
+            'msg'      => $exception->getMessagePublic($render),
+            'isPublic' => $exception->isPublic(),
+            'metaInfo' => [],
+        ];
+
+        $this->assertSame($expectedData, $exception->getClientData($render));
     }
 }

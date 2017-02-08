@@ -2,6 +2,7 @@
 
 class CM_Frontend_EnvironmentTest extends CMTest_TestCase {
 
+
     public function tearDown() {
         CMTest_TH::clearEnv();
     }

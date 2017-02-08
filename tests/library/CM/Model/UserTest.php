@@ -8,8 +8,8 @@ class CM_Model_UserTest extends CMTest_TestCase {
 
     public function testCreate() {
         $user = CM_Model_User::createStatic();
+        $this->assertNull($user->getLatestActivity());
         $this->assertEquals(time(), $user->getCreated());
-        $this->assertEquals(time(), $user->getLatestActivity());
         $this->assertEquals(CM_Site_Abstract::factory(), $user->getSite());
         $this->assertSame(null, $user->getLanguage());
         $this->assertSame(null, $user->getCurrency());
@@ -23,11 +23,11 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $user = CM_Model_User::createStatic([
             'site'     => $site,
             'language' => $language,
-            'currency'  => $currency,
+            'currency' => $currency,
         ]);
+        $this->assertNull($user->getLatestActivity());
         $this->assertInternalType('int', $user->getCreated());
         $this->assertEquals(time(), $user->getCreated());
-        $this->assertEquals(time(), $user->getLatestActivity());
         $this->assertEquals($site, $user->getSite());
         $this->assertEquals($language, $user->getLanguage());
         $this->assertEquals($currency, $user->getCurrency());
@@ -113,6 +113,9 @@ class CM_Model_UserTest extends CMTest_TestCase {
 
     public function testUpdateLatestActivityThrottled() {
         $user = CMTest_TH::createUser();
+        $this->assertNull($user->getLatestActivity());
+        $user->updateLatestActivityThrottled();
+
         $activityStamp1 = time();
         $this->assertSameTime($activityStamp1, $user->getLatestActivity());
         CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2);
@@ -122,5 +125,35 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $activityStamp2 = time();
         $user->updateLatestActivityThrottled();
         $this->assertSameTime($activityStamp2, $user->getLatestActivity());
+    }
+
+    public function testOfflineOld() {
+        $user1 = CMTest_TH::createUser();
+        $user1->updateLatestActivityThrottled();
+        $user1->setOnline();
+
+        CMTest_TH::timeForward(CM_Model_User::ONLINE_EXPIRATION + 1);
+        $user2 = CMTest_TH::createUser();
+        $user2->updateLatestActivityThrottled();
+        $user2->setOnline();
+
+        CM_Model_User::offlineOld();
+        CMTest_TH::reinstantiateModel($user1);
+        CMTest_TH::reinstantiateModel($user2);
+
+        $this->assertFalse($user1->getOnline());
+        $this->assertTrue($user2->getOnline());
+    }
+
+    public function testGetEnvironment() {
+        $user = CMTest_TH::createUser();
+        $this->assertNull($user->getEnvironment()->getLanguage());
+
+        $defaultLanguage = CMTest_TH::createLanguage('en');
+        $this->assertEquals($defaultLanguage, $user->getEnvironment()->getLanguage());
+
+        $otherLanguage = CMTest_TH::createLanguage('de');
+        $user->setLanguage($otherLanguage);
+        $this->assertEquals($otherLanguage, $user->getEnvironment()->getLanguage());
     }
 }

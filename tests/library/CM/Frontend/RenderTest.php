@@ -80,24 +80,6 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
             $renderSite->getUrlPage($page, array('userId' => 15, 'foo' => 'bar')));
     }
 
-    public function testGetUrlPageLanguageRewrite() {
-        $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Test', false);
-        $baseUrl = 'http://www.default.dev';
-
-        $render = new CM_Frontend_Render();
-        $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
-        $render = new CM_Frontend_Render(null, true); // This should never happen in application, but lets test it
-        $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
-
-        $language = CMTest_TH::createLanguage('en');
-
-        $environment = new CM_Frontend_Environment(null, null, $language);
-        $render = new CM_Frontend_Render($environment);
-        $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
-        $render = new CM_Frontend_Render($environment, true);
-        $this->assertSame($baseUrl . '/en/test', $render->getUrlPage($page));
-    }
-
     public function testGetUrlResource() {
         $render = new CM_Frontend_Render();
         $siteType = CM_Site_Abstract::factory()->getType();
@@ -121,20 +103,6 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         );
     }
 
-    public function testGetUrlResourceWithoutCdn() {
-        $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getType', 'getUrlCdn'))->getMockForAbstractClass();
-        $site->expects($this->any())->method('getType')->will($this->returnValue(12));
-        $site->expects($this->any())->method('getUrlCdn')->will($this->returnValue(null));
-        /** @var CM_Site_Abstract $site */
-
-        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-        $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame(
-            'http://www.default.dev/layout/' . $site->getType() . '/' . $deployVersion .
-            '/foo.jpg', $render->getUrlResource('layout', 'foo.jpg')
-        );
-    }
-
     public function testGetUrlResourceDifferentSite() {
         $render = new CM_Frontend_Render();
         $site = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
@@ -152,56 +120,11 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $this->assertSame('http://cdn.default.dev/static/0?' . $deployVersion, $render->getUrlStatic('/0'));
     }
 
-    public function testGetUrlStaticWithoutCdn() {
-        $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getUrlCdn'))->getMockForAbstractClass();
-        $site->expects($this->any())->method('getUrlCdn')->will($this->returnValue(null));
-        /** @var CM_Site_Abstract $site */
-
-        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-        $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame('http://www.default.dev/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
-    }
-
     public function testGetUrlStaticDifferentSite() {
         $render = new CM_Frontend_Render();
         $site = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('http://cdn.other.com/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg', $site));
-    }
-
-    public function testGetLanguage() {
-        $render = new CM_Frontend_Render();
-
-        $this->assertNull($render->getLanguage());
-        $this->assertNull($render->getLanguage(true));
-    }
-
-    public function testGetLanguageFromDefaultLanguage() {
-        $language = CM_Model_Language::create('Test language', 'foo', true);
-        $render = new CM_Frontend_Render();
-
-        $this->assertNull($render->getLanguage());
-        $this->assertEquals($language, $render->getLanguage(true));
-    }
-
-    public function testGetLanguageEnvironmentHasLanguage() {
-        $language = CM_Model_Language::create('Test language', 'foo', true);
-        $environment = new CM_Frontend_Environment(null, null, $language);
-        $render = new CM_Frontend_Render($environment);
-
-        $this->assertSame($language, $render->getLanguage());
-        $this->assertSame($language, $render->getLanguage(true));
-    }
-
-    public function testGetLanguageViewerHasLanguage() {
-        $language = CM_Model_Language::create('Test language', 'foo', true);
-        $viewer = CMTest_TH::createUser();
-        $viewer->setLanguage($language);
-        $environment = new CM_Frontend_Environment(null, $viewer);
-        $render = new CM_Frontend_Render($environment);
-
-        $this->assertNull($render->getLanguage());
-        $this->assertEquals($language, $render->getLanguage(true));
     }
 
     public function testGetTranslation() {

@@ -685,7 +685,7 @@ abstract class CM_Http_Request_Abstract {
         if ($method === 'options') {
             return new CM_Http_Request_Options($uri, $headers, $server);
         }
-        throw new CM_Exception_Invalid('Invalid request method', null, ['method' => $method]);
+        throw new CM_Exception_Invalid('Invalid request method', CM_Exception::WARN, ['method' => $method]);
     }
 
     /**

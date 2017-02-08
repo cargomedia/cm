@@ -149,10 +149,6 @@ class CM_App implements CM_Service_ManagerAwareInterface {
             }
             $versionBumps += ($version - $versionStart);
         }
-        if ($versionBumps > 0) {
-            $db = $this->getServiceManager()->getDatabases()->getMaster()->getDatabaseName();
-            CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
-        }
         return $versionBumps;
     }
 

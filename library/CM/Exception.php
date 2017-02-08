@@ -34,6 +34,19 @@ class CM_Exception extends Exception {
 
     /**
      * @param CM_Frontend_Render $render
+     * @return array
+     */
+    public function getClientData(CM_Frontend_Render $render) {
+        return [
+            'type'     => get_class($this),
+            'msg'      => $this->getMessagePublic($render),
+            'isPublic' => $this->isPublic(),
+            'metaInfo' => [],
+        ];
+    }
+
+    /**
+     * @param CM_Frontend_Render $render
      * @return string
      */
     public function getMessagePublic(CM_Frontend_Render $render) {
@@ -78,7 +91,7 @@ class CM_Exception extends Exception {
     /**
      * @param CM_I18n_Phrase $messagePublic
      */
-    private function _setMessagePublic(CM_I18n_Phrase $messagePublic) {
+    protected function _setMessagePublic(CM_I18n_Phrase $messagePublic) {
         $this->_messagePublic = $messagePublic;
     }
 }

@@ -9,8 +9,11 @@ function smarty_function_user_activity(array $params, Smarty_Internal_Template $
     $user = $params['user'];
 
     $activityStamp = $user->getLatestActivity();
+    if (null === $activityStamp) {
+        return '';
+    }
     $activityDelta = time() - $activityStamp;
-    if (!$forceDisplay && $activityDelta > 10 * 86400) {
+    if (!$forceDisplay && $activityDelta > 14 * 86400) {
         return '';
     }
 
@@ -21,10 +24,17 @@ function smarty_function_user_activity(array $params, Smarty_Internal_Template $
     }
 
     $html = '<span class="' . $class . '">';
-    $html .= $render->getTranslation('Online');
+
+    if ($user->getVisible() || $forceDisplay) {
+        $html .= $render->getTranslation('Online');
+    }
 
     if (!$user->getVisible()) {
-        $html .= ': ' . smarty_function_date_timeago(array('time' => $activityStamp), $template);
+        if ($forceDisplay) {
+            $html .= ': ' . smarty_function_date_timeago(array('time' => $activityStamp), $template);
+        } else {
+            $html .= 'Recently online';
+        }
     }
 
     $html .= '</span>';

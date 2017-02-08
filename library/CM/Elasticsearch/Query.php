@@ -174,11 +174,12 @@ class CM_Elasticsearch_Query {
      * @param int               $distance
      */
     public function filterGeoDistance($field, CM_Model_Location $location, $distance) {
-        if (!$location->getCoordinates()) {
+        $coordinates = $location->getCoordinates(CM_Model_Location::LEVEL_CITY);
+        if (!$coordinates) {
             return;
         }
         $distance = ($distance / 1000) . 'km';
-        $this->_filter(array('geo_distance' => array($field => $location->getCoordinates(), 'distance' => $distance, 'distance_type' => 'plane',)));
+        $this->_filter(array('geo_distance' => array($field => $coordinates, 'distance' => $distance, 'distance_type' => 'plane',)));
     }
 
     /**
@@ -186,10 +187,11 @@ class CM_Elasticsearch_Query {
      * @param CM_Model_Location $location
      */
     public function sortGeoDistance($field, CM_Model_Location $location) {
-        if (!$location->getCoordinates()) {
+        $coordinates = $location->getCoordinates();
+        if (!$coordinates) {
             return;
         }
-        $this->_sort(array('_geo_distance' => array($field => $location->getCoordinates())));
+        $this->_sort(array('_geo_distance' => array($field => $coordinates)));
     }
 
     public function sortScore() {
