@@ -54,6 +54,10 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
     return true;
   },
 
+  reset: function() {
+    this.setValue('');
+  },
+
   _initPlaceholder: function() {
     this.getInput().focusout(function() {
       var $this = $(this);
