@@ -12,7 +12,7 @@ class CM_AdproviderAdapter_Revive_Iframe extends CM_AdproviderAdapter_Iframe {
         }
         $host = $zoneData['host'];
         $variables = (array) $variables;
-        $variables['zoneId'] = $zoneId;
+        $variables['zoneid'] = $zoneId;
         $variables['cb'] = mt_rand();
         $zoneData['src'] = CM_Util::link('//' . $host . '/delivery/afr.php', $variables);
         return parent::getHtml($zoneName, $zoneData);
