@@ -76,21 +76,25 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   },
 
   _initPlaintextonly: function() {
+    var self = this;
     this.getInput().on('paste', function(e) {
       e.stopPropagation();
       e.preventDefault();
       var clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
       var text = clipboardData.getData('text/plain');
       cm.dom.pasteTextAtCursor(text);
-
-      //scroll to cursor if it goes out of scope
-      var selection = window.getSelection();
-      var range = selection && selection.getRangeAt(0);
-      var textCoords = range && range.getClientRects()[0];
-      var textareaCoords = this.getBoundingClientRect();
-      if (textCoords && textCoords.bottom > textareaCoords.bottom || textCoords.bottom < textareaCoords.top) {
-        $(this).scrollTop($(this).scrollTop() + (textCoords.bottom - textareaCoords.top));
-      }
+      self._scrollToCursor();
     });
+  },
+
+  _scrollToCursor: function() {
+    var selection = window.getSelection();
+    var range = selection && selection.getRangeAt(0);
+    var textCoords = range && range.getClientRects()[0];
+    var $input = this.getInput();
+    var textareaCoords = $input[0].getBoundingClientRect();
+    if (textCoords && textCoords.bottom > textareaCoords.bottom || textCoords.bottom < textareaCoords.top) {
+      $input.scrollTop($input.scrollTop() + (textCoords.bottom - textareaCoords.top));
+    }
   }
 });
