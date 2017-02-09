@@ -23,11 +23,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
         if (!isRemovalKey && !isControl && isExceeded) {
           event.preventDefault();
         }
-        if (isExceeded) {
-          this.error(cm.language.get('Too long'));
-        } else {
-          this.error(null);
-        }
+        this._checkLengthMax();
       }
     }
   },
@@ -83,8 +79,17 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
       var clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
       var text = clipboardData.getData('text/plain');
       cm.dom.pasteTextAtCursor(text);
+      self._checkLengthMax();
       self._scrollToCursor();
     });
+  },
+
+  _checkLengthMax: function() {
+    if (this.getValue().length > this.getOptions().lengthMax) {
+      this.error(cm.language.get('Too long'));
+    } else {
+      this.error(null);
+    }
   },
 
   _scrollToCursor: function() {
