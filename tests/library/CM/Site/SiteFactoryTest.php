@@ -42,19 +42,20 @@ class CM_Site_SiteFactoryTest extends CMTest_TestCase {
     }
 
     public function testGetDefaultSite() {
+        $config = CM_Config::get();
         $site1 = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
         $site2 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/hello']);
         $site3 = $this->getMockSite(null, null, ['url' => 'http://your-site.com']);
 
         $siteList = [$site1, $site2, $site3];
         $siteFactory = new CM_Site_SiteFactory($siteList);
-        $this->getServiceManager()->getOptions()->delete('cm.defaultSiteId');
+        $config->CM_Site_Abstract->class = null;
         $exception = $this->catchException(function () use ($siteFactory) {
             $siteFactory->getDefaultSite();
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertSame('Default site is not set', $exception->getMessage());
-        $this->getServiceManager()->getOptions()->set('cm.defaultSiteId', $site2->getId());
+        $config->CM_Site_Abstract->class = get_class($site2);
         $this->assertEquals($site2, $siteFactory->getDefaultSite());
     }
 

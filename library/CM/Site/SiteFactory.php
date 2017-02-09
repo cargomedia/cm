@@ -82,13 +82,13 @@ class CM_Site_SiteFactory {
      * @throws CM_Exception_Invalid
      */
     public function getDefaultSite() {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $options = $serviceManager->getOptions();
-        $defaultSiteId = $options->get('cm.defaultSiteId');
-        if (null === $defaultSiteId) {
+        $config = CM_Config::get();
+        if (empty($config->CM_Site_Abstract->class) || !is_subclass_of($config->CM_Site_Abstract->class, 'CM_Site_Abstract', true)) {
             throw new CM_Exception_Invalid('Default site is not set');
         }
-        return $this->getSiteById($defaultSiteId);
+        /** @type CM_Site_Abstract $siteClassName */
+        $siteClassName = $config->CM_Site_Abstract->class;
+        return $this->getSiteById($siteClassName::getTypeStatic());
     }
 
 }

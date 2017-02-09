@@ -358,13 +358,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     protected function _createMockSiteDefault() {
+        $config = CM_Config::get();
         $defaultSite = $this->getMockSite(null, null, [
             'url'          => 'http://www.default.dev',
             'urlCdn'       => 'http://cdn.default.dev',
             'name'         => 'Default',
             'emailAddress' => 'default@default.dev',
         ]);
-        $this->getServiceManager()->getOptions()->set('cm.defaultSiteId', $defaultSite->getId());
+        $config->CM_Site_Abstract->class = get_class($defaultSite);
     }
 
     /**
