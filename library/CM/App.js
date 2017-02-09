@@ -475,7 +475,7 @@ var CM_App = CM_Class_Abstract.extend({
       $dom.find('.clipSlide').clipSlide();
       $dom.find('.toggleNext').toggleNext();
       $dom.find('.tabs').tabs();
-      $dom.find('.openx-ad:visible').openx();
+      $dom.find('.revive-ad:visible').revive();
       $dom.find('.fancySelect').fancySelect();
       this._setupContentPlaceholder($dom);
     },

@@ -26,12 +26,12 @@
         'hitType': 'event',
         'eventCategory': category,
         'eventAction': action,
-        'eventLabel': label,
+        'eventLabel': label
       });
     }
   }
 
-  $.fn.openx = function() {
+  $.fn.revive = function() {
     return this.each(function() {
       var zoneId = $(this).data('zone-id');
       var host = $(this).data('host');
@@ -74,7 +74,7 @@
       var loadCallback = function(html) {
         $element.html(html);
         var hasContent = ($element.children(':not([id*=beacon])').length > 0);
-        $element.trigger('openx-loaded', {hasContent: hasContent});
+        $element.trigger('revive-loaded', {hasContent: hasContent});
 
         if (hasContent) {
           $element.addClass('advertisement-hasContent');
