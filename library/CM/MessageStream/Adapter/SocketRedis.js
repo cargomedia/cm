@@ -9,6 +9,7 @@ var CM_MessageStream_Adapter_SocketRedis = CM_MessageStream_Adapter_Abstract.ext
 
   initialize: function(options) {
     this._socketRedis = new SocketRedis(options.sockjsUrl);
+    this._socketRedis.open();
   },
 
   subscribe: function(channel, data, onmessage) {
