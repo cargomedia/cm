@@ -93,10 +93,11 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   },
 
   _scrollToCursor: function() {
+    var $input = this.getInput();
     var selection = window.getSelection();
     var range = selection && selection.getRangeAt(0);
     var textCoords = range && range.getClientRects()[0];
-    var $input = this.getInput();
+    textCoords = textCoords || {bottom: $input.height()};
     var textareaCoords = $input[0].getBoundingClientRect();
     if (textCoords && textCoords.bottom > textareaCoords.bottom || textCoords.bottom < textareaCoords.top) {
       $input.scrollTop($input.scrollTop() + (textCoords.bottom - textareaCoords.top));
