@@ -14,25 +14,21 @@ class CM_Clockwork_Manager {
     /** @var DateTimeZone */
     private $_timeZone;
 
-    /** @var array */
-    private $_eventsRunning = [];
+    /** @var CM_EventHandler_EventHandlerInterface */
+    private $_eventHandler;
 
-    public function __construct() {
+    /** @var CM_Clockwork_Event_Status[] */
+    private $_statusList = [];
+
+    /**
+     * @param CM_EventHandler_EventHandlerInterface $eventHandler
+     */
+    public function __construct(CM_EventHandler_EventHandlerInterface $eventHandler) {
         $this->_events = array();
         $this->_storage = new CM_Clockwork_Storage_Memory();
         $this->_timeZone = CM_Bootloader::getInstance()->getTimeZone();
         $this->_startTime = $this->_getCurrentDateTimeUTC();
-    }
-
-    /**
-     * @param string   $name
-     * @param string   $dateTimeString
-     * @param callable $callback
-     */
-    public function registerCallback($name, $dateTimeString, $callback) {
-        $event = new CM_Clockwork_Event($name, $dateTimeString);
-        $event->registerCallback($callback);
-        $this->registerEvent($event);
+        $this->_eventHandler = $eventHandler;
     }
 
     /**
@@ -41,10 +37,7 @@ class CM_Clockwork_Manager {
      */
     public function registerEvent(CM_Clockwork_Event $event) {
         $eventName = $event->getName();
-        $duplicateEventName = \Functional\some($this->_events, function (CM_Clockwork_Event $event) use ($eventName) {
-            return $event->getName() == $eventName;
-        });
-        if ($duplicateEventName) {
+        if ($this->_eventExists($eventName)) {
             throw new CM_Exception('Duplicate event-name', null, ['eventName' => $eventName]);
         }
         $this->_events[] = $event;
@@ -52,35 +45,34 @@ class CM_Clockwork_Manager {
 
     public function runEvents() {
         foreach ($this->_events as $event) {
-            if (!$this->_isRunning($event)) {
-                if ($this->_shouldRun($event)) {
-                    $this->_runEvent($event);
-                } elseif (null === $this->_storage->getLastRuntime($event) && $this->_isIntervalEvent($event)) {
-                    $this->_storage->setRuntime($event, $this->_startTime);
+            $status = $this->_getStatus($event);
+
+            // TODO: remove debug-code
+            $time = (new DateTime())->format('H:i:s');
+            echo "{$time} event: {$event->getName()} {$status}\n";
+
+            if (!$status->isRunning()) {
+                if ($this->_shouldRun($event, $status)) {
+                    $this->_runEvent($event, $status);
+                } elseif (null === $status->getLastRuntime() && $this->_isIntervalEvent($event)) {
+                    $status->setLastRuntime($this->_startTime);
+                    $this->_storage->setStatus($event, $status);
                 }
             }
-        }
-        $this->handleCompletedEvents();
-    }
-
-    public function handleCompletedEvents() {
-        $resultList = $this->_getProcess()->listenForChildren();
-        foreach ($resultList as $identifier => $result) {
-            $event = $this->_getRunningEvent($identifier);
-            $this->handleEventResult($event, $result);
         }
     }
 
     /**
-     * @param CM_Clockwork_Event $event
-     * @param CM_Process_Result  $result
-     * @throws CM_Exception_Invalid
+     * @param CM_Clockwork_Event        $event
+     * @param CM_Clockwork_Event_Result $result
      */
-    public function handleEventResult(CM_Clockwork_Event $event, CM_Process_Result $result) {
-        if ($result->isSuccess()) {
-            $this->_markCompleted($event);
+    public function handleEventResult(CM_Clockwork_Event $event, CM_Clockwork_Event_Result $result) {
+        $this->_checkEventExists($event->getName());
+        if ($result->isSuccessful()) {
+            $this->setCompleted($event);
+        } else {
+            $this->setStopped($event);
         }
-        $this->_markStopped($event);
     }
 
     /**
@@ -97,33 +89,13 @@ class CM_Clockwork_Manager {
         $this->_timeZone = $timeZone;
     }
 
-    public function start() {
-        while (true) {
-            $this->runEvents();
-            sleep(1);
-            $this->_getProcess()->handleSignals();
-        }
-    }
-
     /**
-     * @param int $identifier
-     * @return CM_Clockwork_Event
-     * @throws CM_Exception
-     */
-    protected function _getRunningEvent($identifier) {
-        $eventName = array_search($identifier, \Functional\pluck($this->_eventsRunning, 'identifier'));
-        if (false === $eventName) {
-            throw new CM_Exception('Could not find event', null, ['identifier' => $identifier]);
-        }
-        return $this->_eventsRunning[$eventName]['event'];
-    }
-
-    /**
-     * @param CM_Clockwork_Event $event
+     * @param CM_Clockwork_Event        $event
+     * @param CM_Clockwork_Event_Status $status
      * @return boolean
      */
-    protected function _shouldRun(CM_Clockwork_Event $event) {
-        $lastRuntime = $this->_storage->getLastRuntime($event);
+    protected function _shouldRun(CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) {
+        $lastRuntime = $status->getLastRuntime();
         $base = $lastRuntime ?: clone $this->_startTime;
         $dateTimeString = $event->getDateTimeString();
         if (!$this->_isIntervalEvent($event)) {     // do not set timezone for interval-based events due to buggy behaviour with timezones that use
@@ -147,7 +119,6 @@ class CM_Clockwork_Manager {
 
     /**
      * @return DateTime
-     * @return DateTime
      */
     protected function _getCurrentDateTime() {
         return $this->_getCurrentDateTimeUTC()->setTimezone($this->_timeZone);
@@ -158,10 +129,13 @@ class CM_Clockwork_Manager {
     }
 
     /**
-     * @return CM_Process
+     * @param string $eventName
+     * @throws CM_Exception_Invalid
      */
-    protected function _getProcess() {
-        return CM_Process::getInstance();
+    protected function _checkEventExists($eventName) {
+        if (!$this->_eventExists($eventName)) {
+            throw new CM_Exception_Invalid('Event does not exist', null, ['event' => $eventName]);
+        }
     }
 
     /**
@@ -178,54 +152,81 @@ class CM_Clockwork_Manager {
 
     /**
      * @param CM_Clockwork_Event $event
-     * @return boolean
-     */
-    protected function _isRunning(CM_Clockwork_Event $event) {
-        return array_key_exists($event->getName(), $this->_eventsRunning);
-    }
-
-    /**
-     * @param CM_Clockwork_Event $event
-     * @param int                $identifier
      * @param DateTime           $startTime
      * @throws CM_Exception_Invalid
      */
-    protected function _markRunning(CM_Clockwork_Event $event, $identifier, DateTime $startTime) {
-        if ($this->_isRunning($event)) {
-            throw new CM_Exception_Invalid('Event is already running', null, ['eventName' => $event->getName()]);
+    public function setRunning(CM_Clockwork_Event $event, DateTime $startTime) {
+        $eventName = $event->getName();
+        $this->_checkEventExists($eventName);
+        $status = $this->_getStatus($event);
+        if ($status->isRunning()) {
+            throw new CM_Exception_Invalid('Event is already running', null, ['eventName' => $eventName]);
         }
-        $this->_eventsRunning[$event->getName()] = ['event' => $event, 'identifier' => $identifier, 'startTime' => $startTime];
+        $status->setRunning(true)->setLastStartTime($startTime);
+        $this->_storage->setStatus($event, $status);
     }
 
     /**
      * @param CM_Clockwork_Event $event
      * @throws CM_Exception_Invalid
      */
-    protected function _markStopped(CM_Clockwork_Event $event) {
-        if (!$this->_isRunning($event)) {
-            throw new CM_Exception_Invalid('Cannot stop event. Event is already running', null, ['eventName' => $event->getName()]);
+    public function setStopped(CM_Clockwork_Event $event) {
+        $eventName = $event->getName();
+        $this->_checkEventExists($eventName);
+        $status = $this->_getStatus($event);
+        if (!$status->isRunning()) {
+            throw new CM_Exception_Invalid('Cannot stop event. Event is not running.', null, ['eventName' => $event->getName()]);
         }
-        unset($this->_eventsRunning[$event->getName()]);
+        $status->setRunning(false);
+        $this->_storage->setStatus($event, $status);
     }
 
     /**
      * @param CM_Clockwork_Event $event
+     * @throws CM_Exception_Invalid
      */
-    protected function _markCompleted(CM_Clockwork_Event $event) {
-        $startTime = $this->_eventsRunning[$event->getName()]['startTime'];
-        $this->_storage->setRuntime($event, $startTime);
+    public function setCompleted(CM_Clockwork_Event $event) {
+        $eventName = $event->getName();
+        $this->_checkEventExists($eventName);
+        $status = $this->_getStatus($event);
+        $status->setRunning(false)->setLastRuntime($status->getLastStartTime());
+        $this->_storage->setStatus($event, $status);
     }
 
     /**
-     * @param CM_Clockwork_Event $event
+     * @param CM_Clockwork_Event        $event
+     * @param CM_Clockwork_Event_Status $status
      */
-    protected function _runEvent(CM_Clockwork_Event $event) {
-        $process = $this->_getProcess();
-        $lastRuntime = $this->_storage->getLastRuntime($event);
+    protected function _runEvent(CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) {
         $startTime = $this->_getCurrentDateTime();
-        $forkHandler = $process->fork(function () use ($event, $lastRuntime) {
-            $event->run($lastRuntime);
-        });
-        $this->_markRunning($event, $forkHandler->getIdentifier(), $startTime);
+        $status->setRunning(true)->setLastStartTime($startTime);
+        $this->_storage->setStatus($event, $status);
+        $this->_eventHandler->trigger($event->getName(), $event, $status, $this);
     }
+
+    /**
+     * @param $eventName
+     * @return bool
+     */
+    protected function _eventExists($eventName) {
+        $duplicateEventName = \Functional\some($this->_events, function (CM_Clockwork_Event $event) use ($eventName) {
+            return $event->getName() == $eventName;
+        });
+        return $duplicateEventName;
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     * @return CM_Clockwork_Event_Status
+     */
+    protected function _getStatus(CM_Clockwork_Event $event) {
+        $status = $this->_storage->getStatus($event);
+        if (!array_key_exists($event->getName(), $this->_statusList)) {
+            $status->setRunning(false);
+            $this->_storage->setStatus($event, $status);
+            $this->_statusList[$event->getName()] = $status;
+        }
+        return $status;
+    }
+
 }

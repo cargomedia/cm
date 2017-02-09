@@ -1,6 +1,6 @@
 <?php
 
-final class CM_EventHandler_EventHandler {
+final class CM_EventHandler_EventHandler implements CM_EventHandler_EventHandlerInterface {
 
     use CM_EventHandler_EventHandlerTrait;
 
