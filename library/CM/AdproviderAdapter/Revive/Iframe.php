@@ -11,11 +11,10 @@ class CM_AdproviderAdapter_Revive_Iframe extends CM_AdproviderAdapter_Iframe {
             throw new CM_Exception_Invalid('Revive `host` missing');
         }
         $host = $zoneData['host'];
-        $zoneData['src'] = '//' . $host . '/delivery/afr.php';
         $variables = (array) $variables;
         $variables['zoneId'] = $zoneId;
         $variables['cb'] = mt_rand();
-        $zoneData['src'] .= '?' . CM_Util::http_build_query($variables);
+        $zoneData['src'] = CM_Util::link('//' . $host . '/delivery/afr.php', $variables);
         return parent::getHtml($zoneName, $zoneData);
     }
 }
