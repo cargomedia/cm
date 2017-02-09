@@ -99,10 +99,11 @@ class CM_Util {
      * @param array|null   $params
      * @param boolean|null $methodPost
      * @param int|null     $timeout
+     * @param array|null   $header
      * @throws CM_Exception_Invalid
      * @return string
      */
-    public static function getContents($url, array $params = null, $methodPost = null, $timeout = null) {
+    public static function getContents($url, array $params = null, $methodPost = null, $timeout = null, array $header = null) {
         $url = (string) $url;
         if (!empty($params)) {
             $params = http_build_query($params);
@@ -126,6 +127,9 @@ class CM_Util {
             if (!empty($params)) {
                 $url .= '?' . $params;
             }
+        }
+        if (null !== $header) {
+            curl_setopt($curlConnection, CURLOPT_HTTPHEADER, $header);
         }
         curl_setopt($curlConnection, CURLOPT_URL, $url);
 
