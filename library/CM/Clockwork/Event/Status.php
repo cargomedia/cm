@@ -19,10 +19,10 @@ class CM_Clockwork_Event_Status {
     }
 
     /**
-     * @param DateTime $lastRuntime
+     * @param DateTime|null $lastRuntime
      * @return CM_Clockwork_Event_Status
      */
-    public function setLastRuntime(DateTime $lastRuntime) {
+    public function setLastRuntime(DateTime $lastRuntime = null) {
         $this->_lastRuntime = $lastRuntime;
         return $this;
     }
@@ -35,10 +35,10 @@ class CM_Clockwork_Event_Status {
     }
 
     /**
-     * @param DateTime $lastStartTime
+     * @param DateTime|null $lastStartTime
      * @return CM_Clockwork_Event_Status
      */
-    public function setLastStartTime(DateTime $lastStartTime) {
+    public function setLastStartTime(DateTime $lastStartTime = null) {
         $this->_lastStartTime = $lastStartTime;
         return $this;
     }

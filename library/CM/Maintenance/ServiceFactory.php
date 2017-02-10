@@ -9,7 +9,6 @@ class CM_Maintenance_ServiceFactory implements CM_Service_ManagerAwareInterface 
 
     /**
      * @param CM_Maintenance_ServiceFactory|null $serviceFactory
-     * @throws CM_Exception_Invalid
      */
     public function __construct(CM_Maintenance_ServiceFactory $serviceFactory = null) {
         $this->_serviceFactory = $serviceFactory;

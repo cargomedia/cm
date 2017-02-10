@@ -94,7 +94,7 @@ class CM_Maintenance_Service implements CM_Service_ManagerAwareInterface {
     private function _registerClockworkEvents() {
         foreach ($this->_eventList as $event) {
             $this->_clockworkManager->registerEvent($event->getClockworkEvent());
-            $this->_eventHandler->bind($event->getName(), function (CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status, CM_Clockwork_Manager $clockwork) {
+            $this->_eventHandler->bind($event->getName(), function (CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) {
                 $job = new CM_Maintenance_RunEventJob();
                 $job->setServiceManager($this->getServiceManager());
                 $lastRuntime = $status->getLastRuntime();

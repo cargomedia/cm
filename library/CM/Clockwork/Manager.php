@@ -48,7 +48,7 @@ class CM_Clockwork_Manager {
             $status = $this->_getStatus($event);
 
             // TODO: remove debug-code
-            $time = (new DateTime())->format('H:i:s');
+            $time = $this->_getCurrentDateTimeUTC()->format('H:i:s');
             echo "{$time} event: {$event->getName()} {$status}\n";
 
             if (!$status->isRunning()) {
@@ -201,7 +201,7 @@ class CM_Clockwork_Manager {
         $startTime = $this->_getCurrentDateTime();
         $status->setRunning(true)->setLastStartTime($startTime);
         $this->_storage->setStatus($event, $status);
-        $this->_eventHandler->trigger($event->getName(), $event, $status, $this);
+        $this->_eventHandler->trigger($event->getName(), $event, $status);
     }
 
     /**
