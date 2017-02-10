@@ -278,6 +278,30 @@ class CM_Util {
     }
 
     /**
+     * @return string[]
+     */
+    public static function getMigrationPaths() {
+        $paths = [
+            CM_Util::getMigrationPathByModule(),
+        ];
+        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
+            $paths[] = CM_Util::getMigrationPathByModule($moduleName);
+        }
+        return array_unique($paths);
+    }
+
+    /**
+     * @param string|null $moduleName
+     * @return string
+     */
+    public static function getMigrationPathByModule($moduleName = null) {
+        $modulePath = null !== $moduleName ? CM_Util::getModulePath((string) $moduleName) : DIR_ROOT;
+        return CM_File_Filesystem::normalizePath(
+            join(DIRECTORY_SEPARATOR, [$modulePath, 'resources', 'migration'])
+        );
+    }
+
+    /**
      * @param string $pathRelative
      * @return CM_File[]
      */
