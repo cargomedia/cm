@@ -198,7 +198,7 @@ class CM_Clockwork_Manager {
      * @param CM_Clockwork_Event_Status $status
      */
     protected function _runEvent(CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) {
-        $startTime = $this->_getCurrentDateTime();
+        $startTime = $this->_getCurrentDateTimeUTC();
         $status->setRunning(true)->setLastStartTime($startTime);
         $this->_storage->setStatus($event, $status);
         $this->_eventHandler->trigger($event->getName(), $event, $status);
