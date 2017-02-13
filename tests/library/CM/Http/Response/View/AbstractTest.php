@@ -303,9 +303,9 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $config->CM_Model_Entity_Mock2 = new stdClass();
         $config->CM_Model_Entity_Mock2->type = CM_Model_Entity_Mock2::getTypeStatic();
 
-        $component = new CM_Component_Mock();
+        $component = new CM_Component_Mock(['entity' => $entity, 'foo' => 'bar', 'foz' => 'baz']);
         $viewResponse = new CM_Frontend_ViewResponse($component);
-        $request = $this->createRequestAjax($component, 'reloadComponent', ['entity' => $entity], $viewResponse);
+        $request = $this->createRequestAjax($component, 'reloadComponent', ['foz' => 'toto'], $viewResponse);
         /** @var CM_Http_Response_View_Abstract $response */
         $response = $this->processRequest($request);
         $this->assertViewResponseSuccess($response);
@@ -314,7 +314,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
         // can't get the autoId from the globalResponse because of https://github.com/cargomedia/cm/blob/master/library/CM/Http/Response/View/Abstract.php#L135
         $autoId = $jsonResponse['success']['data']['autoId'];
-        $js = sprintf('cm.views["%s"] = new CM_Component_Mock({el:$("#%s").get(0),params:{"entity":{"id":1,"path":null}}});', $autoId, $autoId);
+        $js = sprintf('cm.views["%s"] = new CM_Component_Mock({el:$("#%s").get(0),params:{"foz":"toto","entity":{"_class":"CM_Model_Entity_Mock2","_type":123,"_id":{"id":"1"},"id":1,"path":null},"foo":"bar"}});', $autoId, $autoId);
         $html = sprintf("<div id=\"%s\" class=\"CM_Component_Mock CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\">Sorry, this page was not found. It has been removed or never existed.\n</div>", $autoId);
         $this->assertSame($js, $jsonResponse['success']['data']['js']);
         $this->assertSame($html, $jsonResponse['success']['data']['html']);
