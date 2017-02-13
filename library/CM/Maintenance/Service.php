@@ -72,7 +72,7 @@ class CM_Maintenance_Service implements CM_Service_ManagerAwareInterface {
         $lastTime = $lastRuntime ? $lastRuntime->format('H:i:s') : 'never';
         (new CM_File(DIR_ROOT . '/log.txt'))->appendLine($timeStart . ' running: ' . $eventName . ' last run: ' . $lastTime);
 
-        $event->runCallback($lastRuntime, $this->getServiceManager());
+        $event->runCallback($lastRuntime);
 
         // TODO: remove debug-code
         $timeEnd = (new DateTime())->format('H:i:s');

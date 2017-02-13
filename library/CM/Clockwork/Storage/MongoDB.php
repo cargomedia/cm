@@ -40,13 +40,6 @@ class CM_Clockwork_Storage_MongoDB extends CM_Clockwork_Storage_Abstract {
         // TODO: remove debug-code
         (new CM_File(DIR_ROOT . '/storage-log.txt'))->appendLine("Saving event: {$event->getName()} {$status}");
 
-        $eventData = [
-            'name'          => $event->getName(),
-            'lastRuntime'   => $lastRuntime,
-            'lastStartTime' => $lastStartTime,
-            'running'       => $status->isRunning(),
-        ];
-
         $updated = (boolean) $mongoClient->update('cm_clockwork',
             [
                 'context'     => $this->_context,
@@ -65,7 +58,12 @@ class CM_Clockwork_Storage_MongoDB extends CM_Clockwork_Storage_Abstract {
                     'context' => $this->_context,
                 ], [
                     '$push' => [
-                        'events' => $eventData,
+                        'events' => [
+                            'name'          => $event->getName(),
+                            'lastRuntime'   => $lastRuntime,
+                            'lastStartTime' => $lastStartTime,
+                            'running'       => $status->isRunning(),
+                        ],
                     ],
                 ], [
                     'upsert' => true,

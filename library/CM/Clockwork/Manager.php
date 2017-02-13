@@ -205,12 +205,13 @@ class CM_Clockwork_Manager {
     }
 
     /**
-     * @param $eventName
-     * @return bool
+     * @param string $eventName
+     * @return boolean
      */
     protected function _eventExists($eventName) {
+        $eventName = (string) $eventName;
         $duplicateEventName = \Functional\some($this->_events, function (CM_Clockwork_Event $event) use ($eventName) {
-            return $event->getName() == $eventName;
+            return $event->getName() === $eventName;
         });
         return $duplicateEventName;
     }

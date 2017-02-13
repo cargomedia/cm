@@ -38,10 +38,9 @@ class CM_Maintenance_Event {
     }
 
     /**
-     * @param DateTime|null      $lastRuntime
-     * @param CM_Service_Manager $serviceManager
+     * @param DateTime|null $lastRuntime
      */
-    public function runCallback(DateTime $lastRuntime = null, CM_Service_Manager $serviceManager) {
-        call_user_func($this->_callback, $lastRuntime, $serviceManager);
+    public function runCallback(DateTime $lastRuntime = null) {
+        call_user_func($this->_callback, $lastRuntime);
     }
 }

@@ -28,6 +28,10 @@ class CM_Clockwork_Storage_Memory extends CM_Clockwork_Storage_Abstract {
         $this->_data[$event->getName()] = $this->_cloneStatus($status);
     }
 
+    /**
+     * @param CM_Clockwork_Event_Status $status
+     * @return CM_Clockwork_Event_Status
+     */
     protected function _cloneStatus(CM_Clockwork_Event_Status $status) {
         $clone = new CM_Clockwork_Event_Status();
         $clone->setRunning($status->isRunning());
