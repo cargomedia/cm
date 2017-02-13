@@ -23,10 +23,6 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
         return $this->_params;
     }
 
-    public function ajax_reloadComponent(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
-        return $response->loadComponent(static::class, $this->getParams()->merge($params));
-    }
-
     public function ajax_loadComponent(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Http_Response_View_Ajax $response) {
         $className = $params->getString('className');
         $params->remove('className');

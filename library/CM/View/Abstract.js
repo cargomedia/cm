@@ -297,26 +297,6 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
-   * @param {Object} [params]
-   * @param {Object} [options]
-   * @return Promise
-   */
-  reloadComponent: function(params, options) {
-    options = _.defaults(options || {}, {
-      'modal': true,
-      'method': 'reloadComponent'
-    });
-    params = params || {};
-    return this
-      .try(function() {
-        return this.ajax(options.method, params, options);
-      })
-      .then(function(response) {
-        return this._replaceView(response);
-      });
-  },
-
-  /**
    * @param {String} className
    * @param {Object} [params]
    * @param {Object} [options]
