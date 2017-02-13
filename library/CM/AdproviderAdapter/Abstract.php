@@ -11,10 +11,10 @@ abstract class CM_AdproviderAdapter_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param string   $zoneName
-     * @param array    $zoneData
-     * @param string[] $variables
+     * @param string        $zoneName
+     * @param array         $zoneData
+     * @param string[]|null $variables
      * @return string
      */
-    abstract public function getHtml($zoneName, $zoneData, array $variables);
+    abstract public function getHtml($zoneName, array $zoneData, array $variables = null);
 }

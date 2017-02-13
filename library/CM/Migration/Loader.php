@@ -48,6 +48,7 @@ class CM_Migration_Loader implements CM_Service_ManagerAwareInterface {
     }
 
     /**
+     * @param string[] $paths
      * @return CM_File[]
      */
     protected function _findFilesWithinDirectories($paths) {
