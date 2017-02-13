@@ -282,21 +282,18 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $component = new CM_Component_Notfound([]);
         $viewResponse = new CM_Frontend_ViewResponse($component);
         $request = $this->createRequestAjax($component, 'reloadComponent', ['foo' => 'bar'], $viewResponse);
+        /** @var CM_Http_Response_View_Abstract $response */
         $response = $this->processRequest($request);
         $this->assertViewResponseSuccess($response);
 
-        $frontend = $response->getRender()->getGlobalResponse();
-        $oldAutoId = $viewResponse->getAutoId();
-        $newAutoId = $frontend->getTreeRoot()->getValue()->getAutoId();
+        $jsonResponse = CM_Util::jsonDecode($response->getContent());
 
-        $expected = <<<EOL
-cm.window.appendHidden("<div id=\\"$newAutoId\\" class=\\"CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\\">Sorry, this page was not found. It has been removed or never existed.\\n<\/div>");
-cm.views["$newAutoId"] = new CM_Component_Notfound({el:$("#$newAutoId").get(0),params:{"foo":"bar"}});
-cm.views["$oldAutoId"].getParent().registerChild(cm.views["$newAutoId"]);
-cm.views["$oldAutoId"].replaceWithHtml(cm.views["$newAutoId"].\$el);
-cm.views["$newAutoId"]._ready();
-EOL;
-        $this->assertSame($expected, $frontend->getJs());
+        // can't get the autoId from the globalResponse because of https://github.com/cargomedia/cm/blob/master/library/CM/Http/Response/View/Abstract.php#L135
+        $autoId = $jsonResponse['success']['data']['autoId'];
+        $js = sprintf('cm.views["%s"] = new CM_Component_Notfound({el:$("#%s").get(0),params:{"foo":"bar"}});', $autoId, $autoId);
+        $html = sprintf("<div id=\"%s\" class=\"CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\">Sorry, this page was not found. It has been removed or never existed.\n</div>", $autoId);
+        $this->assertSame($js, $jsonResponse['success']['data']['js']);
+        $this->assertSame($html, $jsonResponse['success']['data']['html']);
     }
 
     public function testReloadComponentAdditionalParams() {
@@ -309,21 +306,18 @@ EOL;
         $component = new CM_Component_Mock();
         $viewResponse = new CM_Frontend_ViewResponse($component);
         $request = $this->createRequestAjax($component, 'reloadComponent', ['entity' => $entity], $viewResponse);
+        /** @var CM_Http_Response_View_Abstract $response */
         $response = $this->processRequest($request);
-
         $this->assertViewResponseSuccess($response);
-        $frontend = $response->getRender()->getGlobalResponse();
-        $oldAutoId = $viewResponse->getAutoId();
-        $newAutoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
-        $expected = <<<EOL
-cm.window.appendHidden("<div id=\\"$newAutoId\\" class=\\"CM_Component_Mock CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\\">Sorry, this page was not found. It has been removed or never existed.\\n<\/div>");
-cm.views["$newAutoId"] = new CM_Component_Mock({el:$("#$newAutoId").get(0),params:{"entity":{"_class":"CM_Model_Entity_Mock2","_type":123,"_id":{"id":"1"},"id":1,"path":null}}});
-cm.views["$oldAutoId"].getParent().registerChild(cm.views["$newAutoId"]);
-cm.views["$oldAutoId"].replaceWithHtml(cm.views["$newAutoId"].\$el);
-cm.views["$newAutoId"]._ready();
-EOL;
-        $this->assertSame($expected, $frontend->getJs());
+        $jsonResponse = CM_Util::jsonDecode($response->getContent());
+
+        // can't get the autoId from the globalResponse because of https://github.com/cargomedia/cm/blob/master/library/CM/Http/Response/View/Abstract.php#L135
+        $autoId = $jsonResponse['success']['data']['autoId'];
+        $js = sprintf('cm.views["%s"] = new CM_Component_Mock({el:$("#%s").get(0),params:{"entity":{"id":1,"path":null}}});', $autoId, $autoId);
+        $html = sprintf("<div id=\"%s\" class=\"CM_Component_Mock CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\">Sorry, this page was not found. It has been removed or never existed.\n</div>", $autoId);
+        $this->assertSame($js, $jsonResponse['success']['data']['js']);
+        $this->assertSame($html, $jsonResponse['success']['data']['html']);
     }
 
     public function testLoadComponent() {
