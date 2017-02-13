@@ -83,7 +83,7 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
    * @return Promise
    */
   reload: function(params) {
-    return this.ajaxModal('reloadComponent', params);
+    return this.reloadComponent(params);
   },
 
   /**
