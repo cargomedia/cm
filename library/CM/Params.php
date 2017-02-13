@@ -49,6 +49,21 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     }
 
     /**
+     * @param CM_Params $params
+     * @return CM_Params
+     */
+    public function merge(CM_Params $params) {
+        $new = static::factory([]);
+        foreach ($this->getParamsDecoded() as $key => $value) {
+            $new->set($key, $value);
+        }
+        foreach ($params->getParamsDecoded() as $key => $value) {
+            $new->set($key, $value);
+        }
+        return $new;
+    }
+
+    /**
      * @return array
      */
     public function getParamsDecoded() {

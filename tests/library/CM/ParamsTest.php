@@ -2,6 +2,44 @@
 
 class CM_ParamsTest extends CMTest_TestCase {
 
+    public function testMerge() {
+        $text = "Foo Bar, Bar Foo";
+        $notText = new stdClass();
+
+        $object1 = $this->mockInterface('CM_ArrayConvertible')->newInstance();
+        $toArrayMethod = $object1->mockMethod('toArray')->set([
+            'val' => 1,
+        ]);
+        $object2 = $this->mockInterface('CM_ArrayConvertible')->newInstance();
+        $toArrayMethod = $object2->mockMethod('toArray')->set([
+            'val' => 2,
+        ]);
+
+        $params1 = new CM_Params(['foo' => 1, 'bar' => 'text', 'object1' => $object1]);
+        $params2 = new CM_Params(['foz' => 2, 'bar' => 'other', 'object2' => $object2]);
+
+        $this->assertEquals([
+            'foo'     => 1,
+            'bar'     => 'other',
+            'foz'     => 2,
+            'object1' => [
+                '_class' => get_class($object1),
+                'val'    => 1,
+            ],
+            'object2' => [
+                '_class' => get_class($object2),
+                'val'    => 2,
+            ],
+        ], $params1->merge($params2)->getParamsEncoded());
+        $this->assertEquals([
+            'foo'     => 1,
+            'bar'     => 'other',
+            'foz'     => 2,
+            'object1' => $object1,
+            'object2' => $object2,
+        ], $params1->merge($params2)->getParamsDecoded());
+    }
+
     public function testHas() {
         $params = new CM_Params(array('1' => 0, '2' => 'ababa', '3' => new stdClass(), '4' => null, '5' => false));
 
@@ -391,7 +429,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertEquals($location, $params->getLocation('location'));
         $this->assertEquals($location, $params->getLocation('locationParameters'));
 
-        /** @var CM_Exception_InvalidParam  $exception */
+        /** @var CM_Exception_InvalidParam $exception */
         $exception = $this->catchException(function () use ($params) {
             $params->getLocation('insufficientParameters');
             $this->fail('Instantiating location with insufficient parameters');
