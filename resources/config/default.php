@@ -312,7 +312,10 @@ return function (CM_Config_Node $config) {
         'class'     => CM_Maintenance_ServiceFactory::class,
         'arguments' => [],
         'method'    => [
-            'name' => 'createService',
+            'name'      => 'createService',
+            'arguments' => [
+                'clockworkStorage' => new CM_Clockwork_Storage_MongoDB('maintenance'),
+            ]
         ],
     ];
 };
