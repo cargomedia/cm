@@ -4,7 +4,7 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
 
     public function testRead() {
         $result = new Guzzle\Common\Collection(array('Body' => 'hello'));
-        $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()
+        $clientMock = $this->getMockBuilder(Aws\S3\S3Client::class)->disableOriginalConstructor()
             ->setMethods(array('getObject'))->getMock();
         $clientMock->expects($this->once())->method('getObject')->with(array(
             'ACL'    => 'private',
@@ -152,7 +152,7 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
     }
 
     public function testRename() {
-        $adapter = $this->getMockBuilder('CM_File_Filesystem_Adapter_AwsS3')->disableOriginalConstructor()
+        $adapter = $this->getMockBuilder(CM_File_Filesystem_Adapter_AwsS3::class)->disableOriginalConstructor()
             ->setMethods(array('copy', 'delete'))->getMock();
         $adapter->expects($this->once())->method('copy')->with('/foo', '/foobar');
         $adapter->expects($this->once())->method('delete')->with('/foo');
@@ -163,7 +163,7 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
 
     public function testIsDirectory() {
         $result = new Guzzle\Common\Collection(array('Contents' => array('something')));
-        $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()
+        $clientMock = $this->getMockBuilder(Aws\S3\S3Client::class)->disableOriginalConstructor()
             ->setMethods(array('listObjects'))->getMock();
         $clientMock->expects($this->once())->method('listObjects')->with(array(
             'Bucket'  => 'bucket',
