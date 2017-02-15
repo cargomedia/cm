@@ -184,7 +184,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $this->_runWithCatching(function () use (&$output) {
             $output = $this->_processView($output);
         }, function (CM_Exception $e, array $errorOptions) use (&$output) {
-            $output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());
+            $output['error'] = $e->getClientData($this->getRender());
         });
         $output['deployVersion'] = CM_App::getInstance()->getDeployVersion();
 

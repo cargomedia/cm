@@ -15,6 +15,7 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
             CM_Db_Db::runDump($databaseName, $dump);
         }
         $this->_setInitialVersion();
+        $this->_setInitialMigrationScripts();
     }
 
     public function unload(CM_OutputStream_Interface $output) {
@@ -53,6 +54,19 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
                 return max($initial, (int) $filename);
             }, 0);
             $app->setVersion($version, $namespace);
+        }
+    }
+
+    private function _setInitialMigrationScripts() {
+        $migrationPaths = CM_Util::getMigrationPaths();
+        $loader = new CM_Migration_Loader($this->getServiceManager(), $migrationPaths);
+        foreach ($loader->getRunnerList() as $runner) {
+            $name = $runner->getName();
+            $record = CM_Migration_Model::findByName($name);
+            if (!$record) {
+                $record = CM_Migration_Model::create($name);
+            }
+            $record->setExecutedAt(new DateTime());
         }
     }
 }

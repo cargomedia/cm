@@ -46,21 +46,34 @@ class CM_Mail_MailableTest extends CMTest_TestCase {
         $site = $this->getMockSite(null, null, [
             'url' => 'http://www.foo.com',
         ]);
-        $recipient = $this->getMockUser(null, $site);
-        $mail = new CM_Mail_ExampleMailable($recipient);
-        $language = CM_Model_Language::create('Test language', 'foo', true);
-        $language->setTranslation('Welcome to {$siteName}!', 'foo');
+        $language = CM_Model_Language::create('Test language', 'en', true);
+        $language->setTranslation('Welcome to {$siteName}!', 'This is the English translation.');
 
+        $recipient = $this->getMockUser(null, $site);
+        $recipient->setLanguage($language);
+
+        $mail = new CM_Mail_ExampleMailable($recipient);
         list($subject, $html, $text) = $mail->render();
         $nodeList = new CM_Dom_NodeList($html);
 
-        $this->assertContains('foo', $nodeList->getText());
+        $this->assertContains('This is the English translation.', $nodeList->getText());
+    }
 
-        $nodeLink = $nodeList->find('a');
-        $this->assertSame(1, $nodeLink->count());
-        $this->assertSame('http://www.foo.com/foo/example', $nodeLink->getAttribute('href'));
-        $this->assertSame('Example Page', $nodeLink->getText());
-        $this->assertContains('border-style:solid;', $nodeLink->getAttribute('style'));
+    public function testRenderTranslatedDefaultLanguage() {
+        $site = $this->getMockSite(null, null, [
+            'url' => 'http://www.foo.com',
+        ]);
+        $language = CM_Model_Language::create('Default language', 'en', true);
+        $language->setTranslation('Welcome to {$siteName}!', 'This is the English translation.');
+
+        $recipient = $this->getMockUser(null, $site);
+        $this->assertNull($recipient->getLanguage());
+
+        $mail = new CM_Mail_ExampleMailable($recipient);
+        list($subject, $html, $text) = $mail->render();
+        $nodeList = new CM_Dom_NodeList($html);
+
+        $this->assertContains('This is the English translation.', $nodeList->getText());
     }
 
     public function testSend() {

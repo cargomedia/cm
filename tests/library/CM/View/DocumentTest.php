@@ -100,7 +100,7 @@ class CM_View_DocumentTest extends CMTest_TestCase {
         $renderAdapter = new CM_RenderAdapter_Document($render, $page);
         $html = $renderAdapter->fetch();
 
-        $this->assertContains('<link rel="alternate" href="http://www.example.com/en/example" hreflang="x-default">', $html);
+        $this->assertContains('<link rel="alternate" href="http://www.example.com/example" hreflang="x-default">', $html);
         $this->assertContains('<link rel="alternate" href="http://www.example.com/fr/example" hreflang="fr">', $html);
         $this->assertContains('<link rel="alternate" href="http://www.example.com/de/example" hreflang="de">', $html);
     }

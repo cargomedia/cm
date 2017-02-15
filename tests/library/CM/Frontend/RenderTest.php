@@ -2,13 +2,9 @@
 
 class CM_Frontend_RenderTest extends CMTest_TestCase {
 
-    /** @var CM_Model_Language */
-    private $_languageDefault;
-
     protected function setUp() {
         CM_Config::get()->CM_Site_Abstract->url = 'http://www.default.dev';
         CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://cdn.default.dev';
-        $this->_languageDefault = CMTest_TH::createLanguage('en');
     }
 
     public function tearDown() {
@@ -31,13 +27,13 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $render = new CM_Frontend_Render();
         $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Foo_Bar_FooBar', false);
 
-        $this->assertSame('http://www.default.dev/en/foo/bar/foo-bar',
+        $this->assertSame('http://www.default.dev/foo/bar/foo-bar',
             $render->getUrlPage('CM_Page_Foo_Bar_FooBar'));
-        $this->assertSame('http://www.default.dev/en/foo/bar/foo-bar',
+        $this->assertSame('http://www.default.dev/foo/bar/foo-bar',
             $render->getUrlPage($page));
-        $this->assertSame('http://www.default.dev/en/foo/bar/foo-bar?userId=15&foo=bar',
+        $this->assertSame('http://www.default.dev/foo/bar/foo-bar?userId=15&foo=bar',
             $render->getUrlPage('CM_Page_Foo_Bar_FooBar', array('userId' => 15, 'foo' => 'bar')));
-        $this->assertSame('http://www.default.dev/en/foo/bar/foo-bar?userId=15&foo=bar',
+        $this->assertSame('http://www.default.dev/foo/bar/foo-bar?userId=15&foo=bar',
             $render->getUrlPage($page, array('userId' => 15, 'foo' => 'bar')));
     }
 
@@ -65,22 +61,22 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         ));
         $renderSite = new CM_Frontend_Render(new CM_Frontend_Environment($site));
 
-        $this->assertSame('http://www.test.dev/en/foo/bar/foo-bar',
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
             $render->getUrlPage('CM_Page_Foo_Bar_FooBar', null, $site));
-        $this->assertSame('http://www.test.dev/en/foo/bar/foo-bar',
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
             $render->getUrlPage($page, null, $site));
-        $this->assertSame('http://www.test.dev/en/foo/bar/foo-bar?userId=15&foo=bar',
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar?userId=15&foo=bar',
             $render->getUrlPage('CM_Page_Foo_Bar_FooBar', array('userId' => 15, 'foo' => 'bar'), $site));
-        $this->assertSame('http://www.test.dev/en/foo/bar/foo-bar?userId=15&foo=bar',
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar?userId=15&foo=bar',
             $render->getUrlPage($page, array('userId' => 15, 'foo' => 'bar'), $site));
 
-        $this->assertSame('http://www.test.dev/en/foo/bar/foo-bar',
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
             $renderSite->getUrlPage('CM_Page_Foo_Bar_FooBar'));
-        $this->assertSame('http://www.test.dev/en/foo/bar/foo-bar',
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
             $renderSite->getUrlPage($page));
-        $this->assertSame('http://www.test.dev/en/foo/bar/foo-bar?userId=15&foo=bar',
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar?userId=15&foo=bar',
             $renderSite->getUrlPage('CM_Page_Foo_Bar_FooBar', array('userId' => 15, 'foo' => 'bar')));
-        $this->assertSame('http://www.test.dev/en/foo/bar/foo-bar?userId=15&foo=bar',
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar?userId=15&foo=bar',
             $renderSite->getUrlPage($page, array('userId' => 15, 'foo' => 'bar')));
     }
 
@@ -92,10 +88,9 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $this->assertSame('http://cdn.default.dev', $render->getUrlResource('layout'));
         $this->assertSame('http://cdn.default.dev', $render->getUrlResource(null, 'foo/bar.jpg'));
         $this->assertSame(
-            'http://cdn.default.dev/layout/en/' . $siteType . '/' . $deployVersion .
-            '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
-        $this->assertSame('http://cdn.default.dev/layout/en/' . $siteType . '/' . $deployVersion . '/0', $render->getUrlResource('layout', '0'));
-        $this->assertSame('http://cdn.default.dev/0/en/' . $siteType . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('0', 'foo.jpg'));
+            'http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
+        $this->assertSame('http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/0', $render->getUrlResource('layout', '0'));
+        $this->assertSame('http://cdn.default.dev/0/' . $siteType . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('0', 'foo.jpg'));
     }
 
     public function testGetUrlResourceSameOrigin() {
@@ -103,22 +98,8 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $siteType = CM_Site_Abstract::factory()->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame(
-            'http://www.default.dev/layout/en/' . $siteType . '/' . $deployVersion . '/foo.jpg',
+            'http://www.default.dev/layout/' . $siteType . '/' . $deployVersion . '/foo.jpg',
             $render->getUrlResource('layout', 'foo.jpg', ['sameOrigin' => true])
-        );
-    }
-
-    public function testGetUrlResourceWithoutCdn() {
-        $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getType', 'getUrlCdn'))->getMockForAbstractClass();
-        $site->expects($this->any())->method('getType')->will($this->returnValue(12));
-        $site->expects($this->any())->method('getUrlCdn')->will($this->returnValue(null));
-        /** @var CM_Site_Abstract $site */
-
-        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-        $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame(
-            'http://www.default.dev/layout/en/' . $site->getType() . '/' . $deployVersion .
-            '/foo.jpg', $render->getUrlResource('layout', 'foo.jpg')
         );
     }
 
@@ -127,7 +108,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $site = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
         $siteType = $site->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame('http://cdn.other.com/layout/en/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg',
+        $this->assertSame('http://cdn.other.com/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg',
             $render->getUrlResource('layout', 'foo/bar.jpg', null, $site));
     }
 
@@ -139,51 +120,11 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $this->assertSame('http://cdn.default.dev/static/0?' . $deployVersion, $render->getUrlStatic('/0'));
     }
 
-    public function testGetUrlStaticWithoutCdn() {
-        $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getUrlCdn'))->getMockForAbstractClass();
-        $site->expects($this->any())->method('getUrlCdn')->will($this->returnValue(null));
-        /** @var CM_Site_Abstract $site */
-
-        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-        $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame('http://www.default.dev/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
-    }
-
     public function testGetUrlStaticDifferentSite() {
         $render = new CM_Frontend_Render();
         $site = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('http://cdn.other.com/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg', $site));
-    }
-
-    public function testGetLanguage() {
-        $render = new CM_Frontend_Render();
-        $this->assertEquals($this->_languageDefault, $render->getLanguage());
-    }
-
-    public function testGetLanguageFromDefaultLanguage() {
-        $language = CM_Model_Language::create('Test language', 'foo', true);
-        $render = new CM_Frontend_Render();
-
-        $this->assertEquals($this->_languageDefault, $render->getLanguage());
-    }
-
-    public function testGetLanguageEnvironmentHasLanguage() {
-        $language = CM_Model_Language::create('Test language', 'foo', true);
-        $environment = new CM_Frontend_Environment(null, null, $language);
-        $render = new CM_Frontend_Render($environment);
-
-        $this->assertSame($language, $render->getLanguage());
-    }
-
-    public function testGetLanguageViewerHasLanguage() {
-        $language = CM_Model_Language::create('Test language', 'foo', true);
-        $viewer = CMTest_TH::createUser();
-        $viewer->setLanguage($language);
-        $environment = new CM_Frontend_Environment(null, $viewer);
-        $render = new CM_Frontend_Render($environment);
-
-        $this->assertEquals($language, $render->getLanguage());
     }
 
     public function testGetTranslation() {

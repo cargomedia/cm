@@ -11,14 +11,16 @@ class smarty_function_date_rangeTest extends CMTest_TestCase {
     private $_template;
 
     public function setUp() {
-        $smarty = new Smarty();
-        $this->_render = new CM_Frontend_Render();
-        $this->_template = $smarty->createTemplate('string:');
-        $this->_template->assignGlobal('render', $this->_render);
         $language = CMTest_TH::createLanguage();
         $language->setTranslation('.date.period.years', '{$count} years', ['count']);
         $language->setTranslation('.date.period.hour', '1 hour');
         $language->setTranslation('.date.period.day', '1 day');
+
+        $smarty = new Smarty();
+        $environment = new CM_Frontend_Environment(null, null, $language);
+        $this->_render = new CM_Frontend_Render($environment);
+        $this->_template = $smarty->createTemplate('string:');
+        $this->_template->assignGlobal('render', $this->_render);
     }
 
     public function testRender() {

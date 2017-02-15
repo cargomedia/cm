@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS `cm_action`;
 
 
 CREATE TABLE `cm_action` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `actorId` int(10) unsigned DEFAULT NULL,
   `ip` int(10) unsigned DEFAULT NULL,
   `verb` tinyint(3) DEFAULT NULL,
@@ -12,6 +13,7 @@ CREATE TABLE `cm_action` (
   `createStamp` int(10) unsigned NOT NULL,
   `count` int(10) unsigned DEFAULT '1',
   `interval` int(10) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
   KEY `actorId` (`actorId`),
   KEY `ip` (`ip`),
   KEY `action` (`verb`),
@@ -123,6 +125,17 @@ CREATE TABLE `cm_mail` (
   `customHeaders` text,
   PRIMARY KEY (`id`),
   KEY `createStamp` (`createStamp`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_migration`;
+
+
+CREATE TABLE `cm_migration` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `executedAt` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_model_currency`;
@@ -451,27 +464,6 @@ CREATE TABLE `cm_string` (
   `string` varchar(100) NOT NULL,
   PRIMARY KEY (`type`,`string`),
   KEY `type` (`type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_svm`;
-
-
-CREATE TABLE `cm_svm` (
-  `id` int(11) NOT NULL,
-  `updateStamp` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_svmtraining`;
-
-
-CREATE TABLE `cm_svmtraining` (
-  `svmId` int(11) NOT NULL,
-  `class` int(11) NOT NULL,
-  `values` blob NOT NULL,
-  `createStamp` int(10) unsigned NOT NULL,
-  KEY `svmId` (`svmId`),
-  KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_tmp_classType`;

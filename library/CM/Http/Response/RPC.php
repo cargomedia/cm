@@ -3,7 +3,7 @@
 class CM_Http_Response_RPC extends CM_Http_Response_Abstract {
 
     protected function _process() {
-        $output = array();
+        $output = [];
         $this->_runWithCatching(function () use (&$output) {
             $query = CM_Params::factory($this->_request->getQuery());
 
@@ -15,9 +15,9 @@ class CM_Http_Response_RPC extends CM_Http_Response_Abstract {
             $function = $matches['function'];
             $params = $query->getArray('params');
 
-            $output['success'] = array('result' => call_user_func_array(array($class, 'rpc_' . $function), $params));
+            $output['success'] = ['result' => call_user_func_array([$class, 'rpc_' . $function], $params)];
         }, function (CM_Exception $e) use (&$output) {
-            $output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());
+            $output['error'] = $e->getClientData($this->getRender());
         });
 
         $output['deployVersion'] = CM_App::getInstance()->getDeployVersion();

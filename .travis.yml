@@ -17,7 +17,6 @@ addons:
       - mongodb-upstart
     packages:
       - libgearman-dev
-      - libsvm-dev
       - mongodb-org-server
       - re2c
 
@@ -25,7 +24,6 @@ before_script:
   - phpenv config-rm xdebug.ini
   - tests/travis/install-php-timecop.sh
   - tests/travis/install-pecl-gearman.sh
-  - tests/travis/install-php-svm.sh
   - source tests/travis/install-phantomjs.sh
   - yes '' | travis_retry pecl install imagick
   - travis_retry pecl install stats-1.0.3

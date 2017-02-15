@@ -54,7 +54,7 @@ class CM_Util {
     public static function rglobLibraries($pattern, CM_Site_Abstract $site) {
         $paths = array();
         foreach ($site->getModules() as $moduleName) {
-            $libraryPath = CM_Util::getModulePath($moduleName) . 'library/' . $moduleName . '/';
+            $libraryPath = CM_Util::getModulePath($moduleName) . 'library/*/';
             $paths = array_merge($paths, CM_Util::rglob($pattern, $libraryPath));
         }
         return $paths;
@@ -275,6 +275,30 @@ class CM_Util {
             $path = DIR_ROOT . $path;
         }
         return $path;
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getMigrationPaths() {
+        $paths = [
+            CM_Util::getMigrationPathByModule(),
+        ];
+        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
+            $paths[] = CM_Util::getMigrationPathByModule($moduleName);
+        }
+        return array_unique($paths);
+    }
+
+    /**
+     * @param string|null $moduleName
+     * @return string
+     */
+    public static function getMigrationPathByModule($moduleName = null) {
+        $modulePath = null !== $moduleName ? CM_Util::getModulePath((string) $moduleName) : DIR_ROOT;
+        return CM_File_Filesystem::normalizePath(
+            join(DIRECTORY_SEPARATOR, [$modulePath, 'resources', 'migration'])
+        );
     }
 
     /**
