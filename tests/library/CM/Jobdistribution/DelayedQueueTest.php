@@ -11,13 +11,20 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
         $job = $this->mockObject('CM_Jobdistribution_Job_Abstract');
         $params1 = ['foo' => 12, 'bar' => 13];
         $params2 = ['foo' => 12, 'bar' => CMTest_TH::createUser()];
+        $params3 = [];
+        $userDeleted = CMTest_TH::createUser();
+        $params4 = ['bar' => $userDeleted];
+        $params4Expected = CM_Params::encode($params4);
         /** @var \Mocka\FunctionMock $queueMethod */
         $queueMethod = $job->mockMethod('queue')
             ->at(0, function (array $params) use ($params1) {
                 $this->assertEquals($params1, $params);
             })
             ->at(1, function (array $params) use ($params2) {
-                $this->assertEquals($params2, $params);
+                $this->assertEquals(CM_Params::encode($params2), $params);
+            })
+            ->at(2, function (array $params) use ($params4Expected) {
+                $this->assertEquals($params4Expected, $params);
             });
 
         /** @var CM_Jobdistribution_DelayedQueue|\Mocka\AbstractClassTrait $delayedQueue */
@@ -32,12 +39,18 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
                 $this->assertSame(get_class($job), $className);
                 return $job;
             })
-            ->at(2, null);
+            ->at(2, null)
+            ->at(3, function ($className) use ($job) {
+                $this->assertSame(get_class($job), $className);
+                return $job;
+            });
 
         $delayedQueue->addJob($job, $params2, 3);
         $delayedQueue->addJob($job, $params1, 2);
-        $delayedQueue->addJob($job, [], 4);
+        $delayedQueue->addJob($job, $params3, 4);
+        $delayedQueue->addJob($job, $params4, 4);
 
+        $userDeleted->delete();
         $delayedQueue->queueOutstanding();
         $this->assertSame(0, $queueMethod->getCallCount());
 
@@ -47,9 +60,9 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
 
         CMTest_TH::timeForward(2);
         $delayedQueue->queueOutstanding();
-        $this->assertSame(2, $queueMethod->getCallCount());
+        $this->assertSame(3, $queueMethod->getCallCount());
 
-        $this->assertSame(3, $instantiateMethod->getCallCount());
+        $this->assertSame(4, $instantiateMethod->getCallCount());
     }
 
     public function testCancelJob() {
@@ -62,7 +75,7 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
         $params2 = ['foo' => 2, 'bar' => $user];
 
         $queueExecMethod = $jobToExec->mockMethod('queue')->set(function (array $params) use ($params1) {
-            $this->assertEquals($params1, $params);
+            $this->assertEquals(CM_Params::encode($params1), $params);
         });
         $queueCancelMethod = $jobToCancel->mockMethod('queue');
         /** @var CM_Jobdistribution_DelayedQueue|\Mocka\AbstractClassTrait $delayedQueue */
