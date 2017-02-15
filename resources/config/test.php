@@ -74,6 +74,7 @@ return function (CM_Config_Node $config) {
         ),
     );
 
+    $config->CMService_AwsS3Versioning_ClientTest->version = '2006-03-01';
     $config->CMService_AwsS3Versioning_ClientTest->region = 'eu-west-1';
     $config->CMService_AwsS3Versioning_ClientTest->key = null;
     $config->CMService_AwsS3Versioning_ClientTest->secret = null;
