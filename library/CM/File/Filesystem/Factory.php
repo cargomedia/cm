@@ -19,14 +19,13 @@ class CM_File_Filesystem_Factory {
             case 'CM_File_Filesystem_Adapter_AwsS3':
                 $acl = isset($options['acl']) ? $options['acl'] : null;
                 $pathPrefix = isset($options['pathPrefix']) ? $options['pathPrefix'] : null;
-                $clientParams = array(
-                    'key'    => $options['key'],
-                    'secret' => $options['secret'],
-                );
-                if (isset($options['region'])) {
-                    $clientParams['region'] = $options['region'];
-                }
-                $client = \Aws\S3\S3Client::factory($clientParams);
+                $clientParams = [
+                    'version' => $options['version'],
+                    'region'  => $options['region'],
+                    'key'     => $options['key'],
+                    'secret'  => $options['secret'],
+                ];
+                $client = new \Aws\S3\S3Client($clientParams);
                 $client->registerStreamWrapper();
                 return new CM_File_Filesystem_Adapter_AwsS3($client, $options['bucket'], $acl, $pathPrefix);
                 break;
