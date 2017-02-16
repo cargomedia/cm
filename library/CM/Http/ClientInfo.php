@@ -10,6 +10,9 @@ class CM_Http_ClientInfo {
     /** @var array */
     protected $_headerList;
 
+    /** @var array */
+    protected $_server;
+
     /**
      * @param CM_Http_Request_Abstract $request
      */
@@ -22,6 +25,14 @@ class CM_Http_ClientInfo {
         }
         $this->_parser = new Agent($headerList);
         $this->_headerList = $headerList;
+        $this->_server = $request->getServer();
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getIp() {
+        return isset($this->_server['remote_addr']) ? $this->_server['remote_addr'] : null;
     }
 
     /**
