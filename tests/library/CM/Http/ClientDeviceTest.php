@@ -1,6 +1,6 @@
 <?php
 
-class CM_Http_ClientInfoTest extends CMTest_TestCase {
+class CM_Http_ClientDeviceTest extends CMTest_TestCase {
 
     /** @var array */
     private $_mobileHeaders;
@@ -42,23 +42,23 @@ class CM_Http_ClientInfoTest extends CMTest_TestCase {
     }
 
     public function testIsMobile() {
-        $clientInfo = new CM_Http_ClientInfo(CM_Http_Request_Abstract::factory('get', '/foo', $this->_nonMobileHeaders));
+        $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('get', '/foo', $this->_nonMobileHeaders));
 
-        $this->assertInstanceOf('CM_Http_ClientInfo', $clientInfo);
-        $this->assertFalse($clientInfo->isMobile());
+        $this->assertInstanceOf('CM_Http_ClientDevice', $clientDeviceDetector);
+        $this->assertFalse($clientDeviceDetector->isMobile());
 
-        $clientInfo = new CM_Http_ClientInfo(CM_Http_Request_Abstract::factory('post', '/bar', $this->_mobileHeaders));
-        $this->assertTrue($clientInfo->isMobile());
+        $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('post', '/bar', $this->_mobileHeaders));
+        $this->assertTrue($clientDeviceDetector->isMobile());
     }
 
     public function testGetVersion() {
-        $clientInfo = new CM_Http_ClientInfo(CM_Http_Request_Abstract::factory('get', '/foo', $this->_nonMobileHeaders));
+        $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('get', '/foo', $this->_nonMobileHeaders));
 
-        $this->assertInstanceOf('CM_Http_ClientInfo', $clientInfo);
-        $this->assertFalse($clientInfo->getVersion('Android'));
+        $this->assertInstanceOf('CM_Http_ClientDevice', $clientDeviceDetector);
+        $this->assertFalse($clientDeviceDetector->getVersion('Android'));
 
-        $clientInfo = new CM_Http_ClientInfo(CM_Http_Request_Abstract::factory('post', '/bar', $this->_mobileHeaders));
-        $this->assertSame('5.0.2', $clientInfo->getVersion('Android'));
+        $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('post', '/bar', $this->_mobileHeaders));
+        $this->assertSame('5.0.2', $clientDeviceDetector->getVersion('Android'));
     }
 
     public function testGetIP() {

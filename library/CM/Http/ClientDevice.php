@@ -2,7 +2,7 @@
 
 use Jenssegers\Agent\Agent;
 
-class CM_Http_ClientInfo {
+class CM_Http_ClientDevice {
 
     /** @var Agent */
     protected $_parser;

@@ -101,14 +101,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
-     * @param array|null              $siteConfig
-     * @param CM_Model_User|null      $viewer
-     * @param string|null             $languageAbbreviation
-     * @param DateTimeZone|null       $timeZone
-     * @param bool|null               $debug
-     * @param CM_Model_Location|null  $location
-     * @param CM_Model_Currency|null  $currency
-     * @param CM_Http_ClientInfo|null $clientInfo
+     * @param array|null                $siteConfig
+     * @param CM_Model_User|null        $viewer
+     * @param string|null               $languageAbbreviation
+     * @param DateTimeZone|null         $timeZone
+     * @param bool|null                 $debug
+     * @param CM_Model_Location|null    $location
+     * @param CM_Model_Currency|null    $currency
+     * @param CM_Http_ClientDevice|null $clientDevice
      * @return CM_Frontend_Environment
      */
     public function createEnvironment(
@@ -119,7 +119,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $debug = null,
         CM_Model_Location $location = null,
         CM_Model_Currency $currency = null,
-        CM_Http_ClientInfo $clientInfo = null
+        CM_Http_ClientDevice $clientDevice = null
     ) {
 
         $siteArgs = [
@@ -142,7 +142,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
                 $language = CMTest_TH::createLanguage($languageAbbreviation);
             }
         }
-        return new CM_Frontend_Environment($site, $viewer, $language, $timeZone, $debug, $location, $currency, $clientInfo);
+        return new CM_Frontend_Environment($site, $viewer, $language, $timeZone, $debug, $location, $currency, $clientDevice);
     }
 
     /**
