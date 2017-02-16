@@ -1,8 +1,10 @@
 <?php
 
+use Jenssegers\Agent\Agent;
+
 class CM_Http_ClientDevice {
 
-    /** @var \Jenssegers\Agent\Agent */
+    /** @var Agent */
     protected $_parser;
 
     /** @var array */
@@ -12,15 +14,13 @@ class CM_Http_ClientDevice {
      * @param CM_Http_Request_Abstract $request
      */
     public function __construct(CM_Http_Request_Abstract $request) {
-        $this->_request = $request;
-
         $headerList = [];
         foreach ($request->getHeaders() as $key => $header) {
             if (substr($key, 0, 8) !== 'content-') {
                 $headerList['HTTP_' . str_replace('-', '_', strtoupper($key))] = $header;
             }
         }
-        $this->_parser = new Jenssegers\Agent\Agent($headerList);
+        $this->_parser = new Agent($headerList);
         $this->_headerList = $headerList;
     }
 
