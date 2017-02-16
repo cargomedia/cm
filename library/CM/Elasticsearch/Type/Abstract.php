@@ -284,10 +284,10 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
             return;
         }
         $job = new CM_Elasticsearch_UpdateDocumentJob();
-        $job->queue(array(
+        $job->queue(CM_Params::factory([
             'indexClassName' => get_called_class(),
             'id'             => static::getIdForItem($item),
-        ));
+        ], false));
     }
 
     /**

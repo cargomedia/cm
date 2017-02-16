@@ -69,7 +69,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      */
     protected function _queueHit(array $parameterList) {
         $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob();
-        $job->queue($parameterList);
+        $job->queue(CM_Params::factory($parameterList, false));
     }
 
     /**

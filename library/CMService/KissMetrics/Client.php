@@ -89,12 +89,12 @@ EOF;
             $this->setUserId($actor->getId());
         }
         $trackEventJob = new CMService_KissMetrics_TrackEventJob();
-        $trackEventJob->queue(array(
+        $trackEventJob->queue(CM_Params::factory([
             'code'         => $this->_getCode(),
             'identityList' => $this->_getIdentityList(),
             'eventName'    => $action->getLabel(),
             'propertyList' => $action->getTrackingPropertyList(),
-        ));
+        ], false));
     }
 
     /**
@@ -156,11 +156,11 @@ EOF;
                 break;
         }
         $trackEventJob = new CMService_KissMetrics_TrackPropertyListJob();
-        $trackEventJob->queue(array(
+        $trackEventJob->queue(CM_Params::factory([
             'code'         => $this->_getCode(),
             'identityList' => $this->_getIdentityList(),
-            'propertyList' => array('Splittest ' . $nameSplittest => $nameVariation),
-        ));
+            'propertyList' => ['Splittest ' . $nameSplittest => $nameVariation],
+        ]), false);
     }
 
     /**

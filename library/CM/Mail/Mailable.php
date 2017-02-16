@@ -87,7 +87,7 @@ class CM_Mail_Mailable extends CM_View_Abstract implements CM_Typed {
             $params['recipient'] = $recipient;
             $params['mailType'] = $this->getType();
         }
-        $job->queue($params);
+        $job->queue(CM_Params::factory($params, false));
     }
 
     /**

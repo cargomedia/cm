@@ -13,12 +13,12 @@ class CM_User_OfflineJobTest extends CMTest_TestCase {
 
         $job = new CM_User_OfflineJob();
         $this->assertSame(true, $user->getOnline());
-        $job->run(['user' => $user]);
+        $job->run(CM_Params::factory(['user' => $user], false));
         CMTest_TH::reinstantiateModel($user);
         $this->assertSame(true, $user->getOnline());
 
         $userChannel->delete();
-        $job->run(['user' => $user]);
+        $job->run(CM_Params::factory(['user' => $user], false));
         CMTest_TH::reinstantiateModel($user);
         $this->assertSame(false, $user->getOnline());
     }

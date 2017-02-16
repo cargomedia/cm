@@ -15,7 +15,7 @@ final class CM_EventHandler_EventHandler {
         $this->bind($event, function (array $jobParams = null) use ($job, $defaultJobParams) {
             $jobParams = (array) $jobParams;
             $jobParams = array_merge($defaultJobParams, $jobParams);
-            $job->queue($jobParams);
+            $job->queue(CM_Params::factory($jobParams), false);
         });
     }
 }

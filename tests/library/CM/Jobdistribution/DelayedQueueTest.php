@@ -17,14 +17,14 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
         $params4Expected = CM_Params::encode($params4);
         /** @var \Mocka\FunctionMock $queueMethod */
         $queueMethod = $job->mockMethod('queue')
-            ->at(0, function (array $params) use ($params1) {
-                $this->assertEquals($params1, $params);
+            ->at(0, function (CM_Params $params) use ($params1) {
+                $this->assertEquals($params1, $params->getParamsDecoded());
             })
-            ->at(1, function (array $params) use ($params2) {
-                $this->assertEquals(CM_Params::encode($params2), $params);
+            ->at(1, function (CM_Params $params) use ($params2) {
+                $this->assertEquals($params2, $params->getParamsDecoded());
             })
-            ->at(2, function (array $params) use ($params4Expected) {
-                $this->assertEquals($params4Expected, $params);
+            ->at(2, function (CM_Params $params) use ($params4Expected) {
+                $this->assertEquals($params4Expected, $params->getParamsEncoded());
             });
 
         /** @var CM_Jobdistribution_DelayedQueue|\Mocka\AbstractClassTrait $delayedQueue */
@@ -74,8 +74,8 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
         $params1 = ['foo' => 1, 'bar' => $user];
         $params2 = ['foo' => 2, 'bar' => $user];
 
-        $queueExecMethod = $jobToExec->mockMethod('queue')->set(function (array $params) use ($params1) {
-            $this->assertEquals(CM_Params::encode($params1), $params);
+        $queueExecMethod = $jobToExec->mockMethod('queue')->set(function (CM_Params $params) use ($params1) {
+            $this->assertEquals(CM_Params::encode($params1), $params->getParamsEncoded());
         });
         $queueCancelMethod = $jobToCancel->mockMethod('queue');
         /** @var CM_Jobdistribution_DelayedQueue|\Mocka\AbstractClassTrait $delayedQueue */

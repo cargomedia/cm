@@ -43,7 +43,7 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
         while ($row = $result->fetch()) {
             $job = $this->_instantiateJob($row['className']);
             if ($job) {
-                $job->queue(CM_Util::jsonDecode($row['params']));
+                $job->queue(CM_Params::factory(CM_Util::jsonDecode($row['params']), true));
             }
         }
         CM_Db_Db::delete('cm_jobdistribution_delayedqueue', '`executeAt` <= ' . $executeAtMax);
