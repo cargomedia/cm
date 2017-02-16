@@ -15,6 +15,7 @@ addons:
   apt:
     sources:
       - mongodb-upstart
+      - sourceline: 'ppa:gearman-developers/ppa'
     packages:
       - libgearman-dev
       - mongodb-org-server
