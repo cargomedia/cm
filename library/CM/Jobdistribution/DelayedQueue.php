@@ -60,7 +60,7 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
                 $paramsEncoded = $row['params'];
                 try {
                     $params = CM_Params::decode($paramsEncoded, true);
-                } catch (CM_Exception $ex) {
+                } catch (Exception $ex) {
                     $context = new CM_Log_Context();
                     $context->setException($ex);
                     $context->setExtra(['job' => $jobName, 'paramsEncoded' => $paramsEncoded]);
