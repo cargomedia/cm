@@ -23,6 +23,15 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     }
 
     /**
+     * @return boolean
+     */
+    public function isFullyEncoded() {
+        return \Functional\none($this->_params, function($param) {
+            return null === $param['encoded'];
+        });
+    }
+
+    /**
      * @param string     $key
      * @param mixed|null $default
      * @return mixed

@@ -28,15 +28,16 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         $gearmanClientMock->expects($this->exactly(1))->method('setFailCallback');
         /** @var GearmanClient $gearmanClientMock */
 
-        $job = $this->getMockBuilder('CM_Jobdistribution_Job_Abstract')->setMethods(array('_getGearmanClient', '_addTask'))->getMockForAbstractClass();
+        $job = $this->getMockBuilder('CM_Jobdistribution_Job_Abstract')->setMethods(array('_getGearmanClient',
+            '_addTask'))->getMockForAbstractClass();
         $job->expects($this->any())->method('_getGearmanClient')->will($this->returnValue($gearmanClientMock));
         $job->expects($this->exactly(2))->method('_addTask')->will($this->returnValue(true));
         /** @var CM_Jobdistribution_Job_Abstract $job */
 
-        $result = $job->runMultiple(array(
-            array('foo1' => 'bar1'),
-            array('foo2' => 'bar2'),
-        ));
+        $result = $job->runMultiple([
+            CM_Params::factory(['foo1' => 'bar1'], false),
+            CM_Params::factory(['foo2' => 'bar2'], false),
+        ]);
 
         $this->assertSame(array(
             array('bar1' => 'foo1'),
@@ -61,25 +62,25 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         $job->mockMethod('_getGearmanClient')->set($gearmanClient);
 
         // standard priority
-        $job->queue([['foo' => 'bar']]);
+        $job->queue(CM_Params::factory(['foo' => 'bar'], false));
         $this->assertSame(1, $mockDoBackground->getCallCount());
 
         // normal priority
         $priorityMock = $job->mockMethod('getPriority');
         $priorityMock->set(new CM_Jobdistribution_Priority('normal'));
-        $job->queue([['foo' => 'bar']]);
+        $job->queue(CM_Params::factory(['foo' => 'bar'], false));
         $this->assertSame(2, $mockDoBackground->getCallCount());
 
         // high priority
         $priorityMock = $job->mockMethod('getPriority');
         $priorityMock->set(new CM_Jobdistribution_Priority('high'));
-        $job->queue([['foo' => 'bar']]);
+        $job->queue(CM_Params::factory(['foo' => 'bar'], false));
         $this->assertSame(1, $mockDoHighBackground->getCallCount());
 
         // low priority
         $priorityMock = $job->mockMethod('getPriority');
         $priorityMock->set(new CM_Jobdistribution_Priority('low'));
-        $job->queue([['foo' => 'bar']]);
+        $job->queue(CM_Params::factory(['foo' => 'bar'], false));
         $this->assertSame(1, $mockDoLowBackground->getCallCount());
     }
 
@@ -111,10 +112,10 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         /** @var CM_Jobdistribution_Job_Abstract $job */
 
         $exception = $this->catchException(function () use ($job) {
-            $job->runMultiple(array(
-                array('foo1' => 'bar1'),
-                array('foo2' => 'bar2'),
-            ));
+            $job->runMultiple([
+                CM_Params::factory(['foo1' => 'bar1'], false),
+                CM_Params::factory(['foo2' => 'bar2'], false),
+            ]);
         });
 
         $this->assertInstanceOf('CM_Exception', $exception);
@@ -133,13 +134,13 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
     public function testRun() {
         $job = $this->getMockBuilder('CM_Jobdistribution_Job_Abstract')->setMethods(array('runMultiple'))->getMockForAbstractClass();
         $job->expects($this->once())->method('runMultiple')->will($this->returnCallback(function (array $paramsList) {
-            return Functional\map($paramsList, function ($params) {
-                return array_flip($params);
+            return Functional\map($paramsList, function (CM_Params $params) {
+                return array_flip($params->getParamsDecoded());
             });
         }));
         /** @var CM_Jobdistribution_Job_Abstract $job */
 
-        $result = $job->run(array('foo' => 'bar'));
+        $result = $job->run(CM_Params::factory(['foo' => 'bar'], false));
         $this->assertSame(array('bar' => 'foo'), $result);
     }
 
@@ -152,10 +153,10 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
         }));
 
         /** @var CM_Jobdistribution_Job_Abstract $job */
-        $result = $job->run(array('foo' => 'bar'));
+        $result = $job->run(CM_Params::factory(['foo' => 'bar'], false));
         $this->assertSame(array('bar' => 'foo'), $result);
 
-        $job->queue(array('foo' => 'bar'));
+        $job->queue(CM_Params::factory(['foo' => 'bar'], false));
     }
 
     public function testRunGearmanDisabledThrows() {
@@ -168,7 +169,7 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
 
         /** @var CM_Jobdistribution_Job_Abstract $job */
         try {
-            $job->run(array('foo' => 'bar'));
+            $job->run(CM_Params::factory(['foo' => 'bar'], false));
             $this->fail('Job should have thrown an exception');
         } catch (Exception $ex) {
             $this->assertSame('Job failed', $ex->getMessage());
@@ -180,7 +181,7 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
 
         /** @var CM_Jobdistribution_Job_Abstract $job */
         try {
-            $job->run(array('foo' => 'foo', 'bar' => new stdClass()));
+            $job->run(CM_Params::factory(['foo' => 'foo', 'bar' => new stdClass()], false));
             $this->fail('Job should have thrown an exception');
         } catch (CM_Exception_InvalidParam $ex) {
             $this->assertSame('Object is not an instance of CM_ArrayConvertible', $ex->getMessage());
@@ -189,7 +190,7 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
 
         /** @var CM_Jobdistribution_Job_Abstract $job */
         try {
-            $job->queue(array('foo' => 'foo', 'bar' => ['bar' => new stdClass()]));
+            $job->queue(CM_Params::factory(['foo' => 'foo', 'bar' => ['bar' => new stdClass()]], false));
             $this->fail('Job should have thrown an exception');
         } catch (CM_Exception_InvalidParam $ex) {
             $this->assertSame('Object is not an instance of CM_ArrayConvertible', $ex->getMessage());

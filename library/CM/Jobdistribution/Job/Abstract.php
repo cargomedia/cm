@@ -16,25 +16,25 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param array|null $params
+     * @param CM_Params|null $params
      * @return mixed
      * @throws CM_Exception
      */
-    public function run(array $params = null) {
-        if (null === $params) {
-            $params = array();
-        }
+    public function run(CM_Params $params = null) {
+        $params = $params ?: CM_Params::factory();
         $resultList = $this->runMultiple(array($params));
         return reset($resultList);
     }
 
     /**
-     * @param array[] $paramsList
+     * @param CM_Params[] $paramsList
      * @return mixed[]
      * @throws CM_Exception
      */
     public function runMultiple(array $paramsList) {
-        $this->_verifyParams($paramsList);
+        foreach ($paramsList as $params) {
+            $this->_verifyParams($params);
+        }
         if (!$this->_getGearmanEnabled()) {
             return $this->_runMultipleWithoutGearman($paramsList);
         }
@@ -52,7 +52,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
         });
 
         foreach ($paramsList as $params) {
-            $workload = CM_Params::encode($params, true);
+            $workload = CM_Util::jsonEncode($params->getParamsEncoded());
             $task = $this->_addTask($workload, $gearmanClient);
             if (false === $task) {
                 throw new CM_Exception('Cannot add task', null, ['jobName' => $this->_getJobName()]);
@@ -71,19 +71,18 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param array|null $params
+     * @param CM_Params|null $params
+     * @throws CM_Exception
      */
-    public function queue(array $params = null) {
-        if (null === $params) {
-            $params = array();
-        }
+    public function queue(CM_Params $params = null) {
+        $params = $params ?: CM_Params::factory();
         $this->_verifyParams($params);
         if (!$this->_getGearmanEnabled()) {
             $this->_runMultipleWithoutGearman(array($params));
             return;
         }
 
-        $workload = CM_Params::encode($params, true);
+        $workload = CM_Util::jsonEncode($params->getParamsEncoded());
         $gearmanClient = $this->_getGearmanClient();
         $priority = $this->getPriority();
         switch ($priority) {
@@ -136,13 +135,13 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param array[] $paramsList
+     * @param CM_Params[] $paramsList
      * @return mixed[]
      */
     protected function _runMultipleWithoutGearman(array $paramsList) {
         $resultList = array();
         foreach ($paramsList as $params) {
-            $resultList[] = $this->_executeJob(CM_Params::factory($params, true));
+            $resultList[] = $this->_executeJob($params);
         }
         return $resultList;
     }
@@ -188,12 +187,24 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     }
 
     /**
+     * @param CM_Params $params
+     */
+    protected static function _verifyParams(CM_Params $params) {
+        if ($params->isFullyEncoded()) {
+            return;
+        }
+        foreach ($params->getParamsDecoded() as $value) {
+            self::_verifyParam($value);
+        }
+    }
+
+    /**
      * @param mixed $value
      * @throws CM_Exception_InvalidParam
      */
-    protected static function _verifyParams($value) {
+    protected static function _verifyParam($value) {
         if (is_array($value)) {
-            $value = array_map('self::_verifyParams', $value);
+            $value = array_map('self::_verifyParam', $value);
         }
         if (is_object($value) && false === $value instanceof CM_ArrayConvertible) {
             throw new CM_Exception_InvalidParam('Object is not an instance of CM_ArrayConvertible', null, ['className' => get_class($value)]);
