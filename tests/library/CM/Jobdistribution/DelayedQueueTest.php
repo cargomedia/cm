@@ -124,11 +124,7 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
         $this->assertSame(2, $delayedQueue->countJob($job, ['foo' => 2]));
 
         CMTest_TH::timeForward(1);
-        $this->assertSame(1, $delayedQueue->countJob($job, []));
-        $this->assertSame(1, $delayedQueue->countJob($job, ['foo' => 1]));
-        $this->assertSame(2, $delayedQueue->countJob($job, ['foo' => 2]));
-
-        CMTest_TH::timeForward(1);
+        $delayedQueue->queueOutstanding();
         $this->assertSame(0, $delayedQueue->countJob($job, []));
         $this->assertSame(0, $delayedQueue->countJob($job, ['foo' => 1]));
         $this->assertSame(1, $delayedQueue->countJob($job, ['foo' => 2]));

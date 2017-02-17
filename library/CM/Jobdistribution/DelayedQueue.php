@@ -43,8 +43,10 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
      * @return int
      */
     public function countJob(CM_Jobdistribution_Job_Abstract $job, array $params) {
-        $where = sprintf("`className` = '%s' AND `params` = '%s' AND executeAt >= %s", get_class($job), CM_Params::encode($params, true), time());
-        return CM_Db_Db::count('cm_jobdistribution_delayedqueue', $where);
+        return CM_Db_Db::count('cm_jobdistribution_delayedqueue', [
+            'className' => get_class($job),
+            'params'    => CM_Params::encode($params, true),
+        ]);
     }
 
     public function queueOutstanding() {
