@@ -10,8 +10,8 @@ class CM_Http_ClientDevice {
     /** @var array */
     protected $_headerList;
 
-    /** @var array */
-    protected $_server;
+    /** @var CM_Http_Request_Abstract */
+    protected $_request;
 
     /**
      * @param CM_Http_Request_Abstract $request
@@ -25,14 +25,15 @@ class CM_Http_ClientDevice {
         }
         $this->_parser = new Agent($headerList);
         $this->_headerList = $headerList;
-        $this->_server = $request->getServer();
+        $this->_request = $request;
     }
 
     /**
+     * @param bool $dotNotation
      * @return string|null
      */
-    public function getIp() {
-        return isset($this->_server['remote_addr']) ? $this->_server['remote_addr'] : null;
+    public function getIp($dotNotation = null) {
+        return $this->_request->getIp($dotNotation);
     }
 
     /**
