@@ -53,9 +53,21 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
         $executeAtMax = time();
         $result = CM_Db_Db::select('cm_jobdistribution_delayedqueue', '*', '`executeAt` <= ' . $executeAtMax, '`executeAt` ASC');
         while ($row = $result->fetch()) {
-            $job = $this->_instantiateJob($row['className']);
+            $jobName = $row['className'];
+            $job = $this->_instantiateJob($jobName);
             if ($job) {
-                $job->queue(CM_Params::decode($row['params'], true));
+                $params = null;
+                $paramsEncoded = $row['params'];
+                try {
+                    $params = CM_Params::decode($paramsEncoded, true);
+                } catch (CM_Exception $ex) {
+                    $context = new CM_Log_Context();
+                    $context->setException($ex);
+                    $context->setExtra(['job' => $jobName, 'paramsEncoded' => $paramsEncoded]);
+                    $this->getServiceManager()->getLogger()->warning('Job-params could not be decoded', $context);
+                    continue;
+                }
+                $job->queue($params);
             }
         }
         CM_Db_Db::delete('cm_jobdistribution_delayedqueue', '`executeAt` <= ' . $executeAtMax);
