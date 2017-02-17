@@ -460,18 +460,23 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @param bool|null $dotNotation
      * @return string|null    very long number (string used)
      */
-    public function getIp() {
+    public function getIp($dotNotation = null) {
+        $dotNotation = (bool) $dotNotation;
         if (!isset($this->_server['remote_addr'])) {
             return null;
         }
         $ip = $this->_server['remote_addr'];
-        $long = sprintf('%u', ip2long($ip));
-        if (0 == $long) {
+        $ipLong = sprintf('%u', ip2long($ip));
+        if (0 == $ipLong) {
             return null;
         }
-        return $long;
+        if ($dotNotation) {
+            return $ip;
+        }
+        return $ipLong;
     }
 
     /**
