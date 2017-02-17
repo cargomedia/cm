@@ -225,8 +225,12 @@ class CM_MessageStream_Adapter_SocketRedis extends CM_MessageStream_Adapter_Abst
     protected function _fetchStatus() {
         $statusData = array();
         foreach ($this->_servers as $server) {
+            $headers = null;
+            if (isset($server['httpSecret'])) {
+                $headers[] = 'Authorization: token ' . $server['httpSecret'];
+            }
             $statusData = array_merge_recursive($statusData, CM_Params::jsonDecode(CM_Util::getContents(
-                'http://' . $server['httpHost'] . ':' . $server['httpPort'], null, null, null, ['Authorization: token ' . $server['httpSecret']])));
+                'http://' . $server['httpHost'] . ':' . $server['httpPort'], null, null, null, $headers)));
         }
         return $statusData;
     }
