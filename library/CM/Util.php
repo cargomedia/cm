@@ -128,7 +128,7 @@ class CM_Util {
                 $url .= '?' . $params;
             }
         }
-        if (null !== $headers) {
+        if ($headers) {
             curl_setopt($curlConnection, CURLOPT_HTTPHEADER, $headers);
         }
         curl_setopt($curlConnection, CURLOPT_URL, $url);
