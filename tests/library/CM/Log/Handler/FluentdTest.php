@@ -68,7 +68,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
     }
 
     public function testSanitizeRecord() {
-        $mock = $this->mockClass('CM_Log_Handler_Fluentd')->newInstanceWithoutConstructor();
+        $mockHandler = $this->mockClass('CM_Log_Handler_Fluentd')->newInstanceWithoutConstructor();
 
         $record = [
             'foo'  => [
@@ -77,7 +77,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
             ],
             'foo2' => 2,
         ];
-        $sanitizedRecord = $this->callProtectedMethod($mock, '_sanitizeRecord', [$record]);
+        $sanitizedRecord = $this->callProtectedMethod($mockHandler, '_sanitizeRecord', [$record]);
 
         $this->assertSame([
             'foo'  => [
@@ -89,10 +89,10 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
     }
 
     public function test_encodeRecord() {
-        /** @var CM_Log_Handler_Fluentd|\Mocka\AbstractClassTrait $mock */
-        $mock = $this->mockClass('CM_Log_Handler_Fluentd')->newInstanceWithoutConstructor();
+        /** @var CM_Log_Handler_Fluentd|\Mocka\AbstractClassTrait $mockHandler */
+        $mockHandler = $this->mockClass('CM_Log_Handler_Fluentd')->newInstanceWithoutConstructor();
 
-        $this->assertSame([], CMTest_TH::callProtectedMethod($mock, '_encodeRecord', [[]]));
+        $this->assertSame([], CMTest_TH::callProtectedMethod($mockHandler, '_encodeRecord', [[]]));
 
         $record = [
             'foo' => [
@@ -114,7 +114,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
                     'id'    => '42',
                 ],
             ],
-        ], CMTest_TH::callProtectedMethod($mock, '_encodeRecord', [$record]));
+        ], CMTest_TH::callProtectedMethod($mockHandler, '_encodeRecord', [$record]));
     }
 }
 
