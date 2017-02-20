@@ -68,9 +68,7 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
     }
 
     public function testSanitizeRecord() {
-        $fluentd = $this->mockClass('\Fluent\Logger\FluentLogger')->newInstanceWithoutConstructor();
-        $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
-        $mock = $this->mockClass('CM_Log_Handler_Fluentd')->newInstance([$fluentd, $contextFormatter, 'tag']);
+        $mock = $this->mockClass('CM_Log_Handler_Fluentd')->newInstanceWithoutConstructor();
 
         $record = [
             'foo'  => [
@@ -91,10 +89,8 @@ class CM_Log_Handler_FluentdTest extends CMTest_TestCase {
     }
 
     public function test_encodeRecord() {
-        $fluentd = $this->mockClass('\Fluent\Logger\FluentLogger')->newInstanceWithoutConstructor();
-        $contextFormatter = $this->mockInterface('CM_Log_ContextFormatter_Interface')->newInstanceWithoutConstructor();
         /** @var CM_Log_Handler_Fluentd|\Mocka\AbstractClassTrait $mock */
-        $mock = $this->mockClass('CM_Log_Handler_Fluentd')->newInstance([$fluentd, $contextFormatter, 'tag']);
+        $mock = $this->mockClass('CM_Log_Handler_Fluentd')->newInstanceWithoutConstructor();
 
         $this->assertSame([], CMTest_TH::callProtectedMethod($mock, '_encodeRecord', [[]]));
 
