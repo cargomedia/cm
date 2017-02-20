@@ -12,6 +12,8 @@ abstract class CM_Clockwork_Storage_Abstract {
         $this->_context = (string) $context;
     }
 
+    abstract public function fetchData();
+
     /**
      * @param CM_Clockwork_Event $event
      * @return CM_Clockwork_Event_Status

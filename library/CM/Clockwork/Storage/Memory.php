@@ -12,6 +12,9 @@ class CM_Clockwork_Storage_Memory extends CM_Clockwork_Storage_Abstract {
         parent::__construct($context);
     }
 
+    public function fetchData() {
+    }
+
     /**
      * @param CM_Clockwork_Event $event
      * @return CM_Clockwork_Event_Status

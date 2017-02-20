@@ -44,6 +44,7 @@ class CM_Clockwork_Manager {
     }
 
     public function runEvents() {
+        $this->_storage->fetchData();
         foreach ($this->_events as $event) {
             $status = $this->_getStatus($event);
 
@@ -158,7 +159,8 @@ class CM_Clockwork_Manager {
     public function setRunning(CM_Clockwork_Event $event, DateTime $startTime) {
         $eventName = $event->getName();
         $this->_checkEventExists($eventName);
-        $status = $this->_getStatus($event);
+        $this->_storage->fetchData();
+        $status = $this->_storage->getStatus($event);
         if ($status->isRunning()) {
             throw new CM_Exception_Invalid('Event is already running', null, ['eventName' => $eventName]);
         }
@@ -173,7 +175,8 @@ class CM_Clockwork_Manager {
     public function setStopped(CM_Clockwork_Event $event) {
         $eventName = $event->getName();
         $this->_checkEventExists($eventName);
-        $status = $this->_getStatus($event);
+        $this->_storage->fetchData();
+        $status = $this->_storage->getStatus($event);
         if (!$status->isRunning()) {
             throw new CM_Exception_Invalid('Cannot stop event. Event is not running.', null, ['eventName' => $event->getName()]);
         }
@@ -188,7 +191,8 @@ class CM_Clockwork_Manager {
     public function setCompleted(CM_Clockwork_Event $event) {
         $eventName = $event->getName();
         $this->_checkEventExists($eventName);
-        $status = $this->_getStatus($event);
+        $this->_storage->fetchData();
+        $status = $this->_storage->getStatus($event);
         $status->setRunning(false)->setLastRuntime($status->getLastStartTime());
         $this->_storage->setStatus($event, $status);
     }
@@ -223,8 +227,10 @@ class CM_Clockwork_Manager {
     protected function _getStatus(CM_Clockwork_Event $event) {
         $status = $this->_storage->getStatus($event);
         if (!array_key_exists($event->getName(), $this->_statusList)) {
-            $status->setRunning(false);
-            $this->_storage->setStatus($event, $status);
+            if ($status->isRunning()) {
+                $status->setRunning(false);
+                $this->_storage->setStatus($event, $status);
+            }
             $this->_statusList[$event->getName()] = $status;
         }
         return $status;
