@@ -27,9 +27,13 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
         $this->_fluentdLogger = $fluentdLogger;
         $this->_contextFormatter = $contextFormatter;
         $this->_tag = (string) $tag;
-        $fluentdLogger->registerErrorHandler(function (FluentLogger $fluent, \Fluent\Logger\Entity $entity, $error) {
+        $this->_fluentdLogger->registerErrorHandler(function (FluentLogger $fluent, \Fluent\Logger\Entity $entity, $error) {
             $this->_errorMessage = $error;
         });
+    }
+
+    public function __destruct() {
+        $this->_fluentdLogger->unregisterErrorHandler();
     }
 
     /**
