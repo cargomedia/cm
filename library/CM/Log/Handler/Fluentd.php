@@ -33,7 +33,7 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
     }
 
     public function __destruct() {
-        $this->_fluentdLogger->unregisterErrorHandler();
+        $this->_getFluentd()->unregisterErrorHandler();
     }
 
     /**
