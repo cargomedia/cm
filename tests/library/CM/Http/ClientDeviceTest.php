@@ -60,4 +60,13 @@ class CM_Http_ClientDeviceTest extends CMTest_TestCase {
         $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('post', '/bar', $this->_mobileHeaders));
         $this->assertSame('5.0.2', $clientDeviceDetector->getVersion('Android'));
     }
+
+    public function testGetIP() {
+        $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('get', '/foo', null, []));
+        $this->assertNull($clientDeviceDetector->getIp());
+
+        $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('get', '/foo', null, ['remote_addr' => '42.42.42.42']));
+        $this->assertSame('707406378', $clientDeviceDetector->getIp());
+        $this->assertSame('42.42.42.42', $clientDeviceDetector->getIp(true));
+    }
 }
