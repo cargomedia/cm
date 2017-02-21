@@ -54,7 +54,29 @@ class CMService_AwsS3Versioning_ClientTest extends CMTest_TestCase {
                     'VersionId' => $version->getId(),
                 ]);
             }
-            $this->_client->deleteBucket(array('Bucket' => $this->_bucket));
+            $this->_client->deleteBucket(['Bucket' => $this->_bucket]);
+
+            $testBucketPrefix = strtolower(str_replace('_', '-', 'test-' . __CLASS__));
+            $result = $this->_client->listBuckets();
+            foreach ($result->get('Buckets') as $bucket) {
+                $bucketName = $bucket['Name'];
+                if (0 === strpos($bucketName, $testBucketPrefix)) {
+                    $this->_client->putBucketVersioning([
+                        'Bucket'                  => $bucketName,
+                        'VersioningConfiguration' => [
+                            'Status' => 'Enabled',
+                        ]]);
+                    $restore = new CMService_AwsS3Versioning_Client($this->_client, $bucketName, new CM_OutputStream_Null());
+                    foreach ($restore->getVersions('') as $version) {
+                        $this->_client->deleteObject([
+                            'Bucket'    => $bucketName,
+                            'Key'       => $version->getKey(),
+                            'VersionId' => $version->getId(),
+                        ]);
+                    }
+                    $this->_client->deleteBucket(['Bucket' => $bucketName]);
+                }
+            }
         }
     }
 
