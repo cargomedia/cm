@@ -47,11 +47,11 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
             $errorMessage = $error;
         });
         $res = $this->_getFluentd()->post($this->_tag, $encodedRecord);
+        $this->_getFluentd()->unregisterErrorHandler();
         if (false === $res) {
             $metaInfo = $errorMessage ? ['originalExceptionMessage' => (string) $errorMessage] : null;
             throw new CM_Exception_Invalid('Could not write to fluentd', null, $metaInfo);
         }
-        $this->_getFluentd()->unregisterErrorHandler();
     }
 
     /**
