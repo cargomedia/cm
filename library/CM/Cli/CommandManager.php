@@ -299,8 +299,14 @@ class CM_Cli_CommandManager {
                 } else {
                     $this->_outputError($this->getHelp());
                 }
+                exit(1);
             } catch (CM_Cli_Exception_Internal $ex) {
                 $this->_outputError('ERROR: ' . $ex->getMessage() . PHP_EOL);
+                exit(1);
+            } catch (Exception $exception) {
+                $formatter = new CM_ExceptionHandling_Formatter_Plain();
+                echo $formatter->formatException($exception);
+                exit(1);
             }
         };
     }
