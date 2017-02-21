@@ -15,7 +15,6 @@ addons:
       - mongodb-upstart
     packages:
       - libgearman-dev
-      - libsvm-dev
       - mongodb-org-server
       - re2c
 

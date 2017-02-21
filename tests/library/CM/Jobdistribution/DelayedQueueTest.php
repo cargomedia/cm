@@ -99,6 +99,37 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
         $this->assertSame(0, $queueCancelMethod->getCallCount());
     }
 
+    public function testCountJob() {
+        /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait $job */
+        $job = $this->mockObject('CM_Jobdistribution_Job_Abstract');
+        /** @var CM_Jobdistribution_DelayedQueue|\Mocka\AbstractClassTrait $delayedQueue */
+        $delayedQueue = $this->mockObject('CM_Jobdistribution_DelayedQueue', [$this->getServiceManager()]);
+
+        $this->assertSame(0, $delayedQueue->countJob($job, []));
+        $this->assertSame(0, $delayedQueue->countJob($job, ['foo' => 1]));
+
+        $delayedQueue->addJob($job, [], 1);
+        $this->assertSame(1, $delayedQueue->countJob($job, []));
+        $this->assertSame(0, $delayedQueue->countJob($job, ['foo' => 1]));
+
+        $delayedQueue->addJob($job, ['foo' => 1], 1);
+        $this->assertSame(1, $delayedQueue->countJob($job, []));
+        $this->assertSame(1, $delayedQueue->countJob($job, ['foo' => 1]));
+        $this->assertSame(0, $delayedQueue->countJob($job, ['foo' => 2]));
+
+        $delayedQueue->addJob($job, ['foo' => 2], 1);
+        $delayedQueue->addJob($job, ['foo' => 2], 2);
+        $this->assertSame(1, $delayedQueue->countJob($job, []));
+        $this->assertSame(1, $delayedQueue->countJob($job, ['foo' => 1]));
+        $this->assertSame(2, $delayedQueue->countJob($job, ['foo' => 2]));
+
+        CMTest_TH::timeForward(1);
+        $delayedQueue->queueOutstanding();
+        $this->assertSame(0, $delayedQueue->countJob($job, []));
+        $this->assertSame(0, $delayedQueue->countJob($job, ['foo' => 1]));
+        $this->assertSame(1, $delayedQueue->countJob($job, ['foo' => 2]));
+    }
+
     public function test_instantiateJobSetServiceManager() {
         /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait|CM_Service_ManagerAwareInterface $job */
         $job = $this->mockClass('CM_Jobdistribution_Job_Abstract', ['CM_Service_ManagerAwareInterface'], ['CM_Service_ManagerAwareTrait'])->newInstance();

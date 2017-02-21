@@ -41,9 +41,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_File_UserContent_Temp::deleteOlder'     => function () {
                 CM_File_UserContent_Temp::deleteOlder(86400);
             },
-            'CM_SVM_Model::deleteOldTrainings'          => function () {
-                CM_SVM_Model::deleteOldTrainings(3000);
-            },
             'CM_Paging_Ip_Blocked::deleteOlder'         => function () {
                 CM_Paging_Ip_Blocked::deleteOld();
             },
