@@ -20,10 +20,12 @@ class CM_File_Filesystem_Factory {
                 $acl = isset($options['acl']) ? $options['acl'] : null;
                 $pathPrefix = isset($options['pathPrefix']) ? $options['pathPrefix'] : null;
                 $clientParams = [
-                    'version' => $options['version'],
-                    'region'  => $options['region'],
-                    'key'     => $options['key'],
-                    'secret'  => $options['secret'],
+                    'version'     => $options['version'],
+                    'region'      => $options['region'],
+                    'credentials' => [
+                        'key'    => $options['key'],
+                        'secret' => $options['secret'],
+                    ]
                 ];
                 $client = new \Aws\S3\S3Client($clientParams);
                 $client->registerStreamWrapper();
