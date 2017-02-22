@@ -305,7 +305,7 @@ class CM_Cli_CommandManager {
                 exit(1);
             } catch (Exception $exception) {
                 $formatter = new CM_ExceptionHandling_Formatter_Plain();
-                echo $formatter->formatException($exception);
+                $this->_outputError($formatter->formatException($exception));
                 exit(1);
             }
         };
