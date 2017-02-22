@@ -7,9 +7,6 @@ class CM_Cli_CommandManager {
     /** @var CM_Cli_Command[]|null */
     private $_commands = null;
 
-    /** @var int */
-    private $_forks = null;
-
     /** @var CM_InputStream_Interface */
     private $_streamInput;
 
@@ -54,10 +51,8 @@ class CM_Cli_CommandManager {
      * @param boolean|null $quiet
      * @param boolean|null $quietWarnings
      * @param boolean|null $nonInteractive
-     * @param int|null     $forks
      */
-    public function configure($quiet = null, $quietWarnings = null, $nonInteractive = null, $forks = null) {
-        $forks = (int) $forks;
+    public function configure($quiet = null, $quietWarnings = null, $nonInteractive = null) {
         if ($quiet) {
             $this->_setStreamOutput(new CM_OutputStream_Null());
             $this->_setStreamError(new CM_OutputStream_Null());
@@ -68,9 +63,6 @@ class CM_Cli_CommandManager {
         }
         if ($nonInteractive) {
             $this->_setStreamInput(new CM_InputStream_Null());
-        }
-        if ($forks > 1) {
-            $this->_forks = $forks;
         }
     }
 
@@ -153,37 +145,20 @@ class CM_Cli_CommandManager {
                 $this->_outputError($this->getHelp($packageName));
                 return 1;
             }
-            $process = $this->_getProcess();
             $command = $this->_getCommand($packageName, $methodName);
 
             if ($command->getSynchronized()) {
                 $this->monitorSynchronizedCommands();
                 $this->_checkLock($command);
                 $this->_lockCommand($command);
-                $process->bind('exit', function () use ($command) {
-                    $this->unlockCommand($command);
-                });
             }
 
-            $transactionName = 'cm ' . $packageName . ' ' . $methodName;
-            $streamInput = $this->_streamInput;
-            $streamOutput = $this->_streamOutput;
-            $streamError = $this->_streamError;
+            $success = $this->_executeCommand($command, $arguments, $this->_streamInput, $this->_streamOutput, $this->_streamError);
 
-            $workload = $this->_getProcessWorkload($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError);
-
-            $forks = max($this->_forks, 1);
-            for ($i = 0; $i < $forks; $i++) {
-                $process->fork($workload);
-            }
-            $resultList = $process->waitForChildren($command->getKeepalive());
             if ($command->getSynchronized()) {
                 $this->unlockCommand($command);
             }
-            $failure = Functional\some($resultList, function (CM_Process_Result $result) {
-                return !$result->isSuccess();
-            });
-            if ($failure) {
+            if (!$success) {
                 return 1;
             }
             return 0;
@@ -272,37 +247,32 @@ class CM_Cli_CommandManager {
     }
 
     /**
-     * @param string                    $transactionName
      * @param CM_Cli_Command            $command
      * @param CM_Cli_Arguments          $arguments
      * @param CM_InputStream_Interface  $streamInput
      * @param CM_OutputStream_Interface $streamOutput
      * @param CM_OutputStream_Interface $streamError
-     * @return callable
+     * @return boolean
      */
-    protected function _getProcessWorkload($transactionName, CM_Cli_Command $command, CM_Cli_Arguments $arguments, CM_InputStream_Interface $streamInput, CM_OutputStream_Interface $streamOutput, CM_OutputStream_Interface $streamError) {
-        return function () use ($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError) {
-            try {
-                $parameters = $command->extractParameters($arguments);
-                $this->_checkUnusedArguments($arguments);
-                if ($command->getKeepalive()) {
-                    CM_Service_Manager::getInstance()->getNewrelic()->ignoreTransaction();
-                } else {
-                    CM_Service_Manager::getInstance()->getNewrelic()->startTransaction($transactionName);
-                }
+    protected function _executeCommand(CM_Cli_Command $command, CM_Cli_Arguments $arguments, CM_InputStream_Interface $streamInput, CM_OutputStream_Interface $streamOutput, CM_OutputStream_Interface $streamError) {
+        try {
+            $parameters = $command->extractParameters($arguments);
+            $this->_checkUnusedArguments($arguments);
 
-                $command->run($parameters, $streamInput, $streamOutput, $streamError);
-            } catch (CM_Cli_Exception_InvalidArguments $ex) {
-                $this->_outputError('ERROR: ' . $ex->getMessage() . PHP_EOL);
-                if (isset($command)) {
-                    $this->_outputError('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
-                } else {
-                    $this->_outputError($this->getHelp());
-                }
-            } catch (CM_Cli_Exception_Internal $ex) {
-                $this->_outputError('ERROR: ' . $ex->getMessage() . PHP_EOL);
+            $command->run($parameters, $streamInput, $streamOutput, $streamError);
+            return true;
+        } catch (CM_Cli_Exception_InvalidArguments $ex) {
+            $this->_outputError('ERROR: ' . $ex->getMessage() . PHP_EOL);
+            if (isset($command)) {
+                $this->_outputError('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
+            } else {
+                $this->_outputError($this->getHelp());
             }
-        };
+            return false;
+        } catch (CM_Cli_Exception_Internal $ex) {
+            $this->_outputError('ERROR: ' . $ex->getMessage() . PHP_EOL);
+            return false;
+        }
     }
 
     /**
@@ -310,9 +280,8 @@ class CM_Cli_CommandManager {
      */
     protected function _lockCommand(CM_Cli_Command $command) {
         $commandName = $command->getName();
-        $process = $this->_getProcess();
         $machineId = $this->_getMachineId();
-        $processId = $process->getProcessId();
+        $processId = $this->_getProcess()->getProcessId();
         $timeoutStamp = time() + self::TIMEOUT;
         CM_Db_Db::insert('cm_cli_command_manager_process', [
             'commandName'  => $commandName,
