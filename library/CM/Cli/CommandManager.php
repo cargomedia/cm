@@ -269,7 +269,7 @@ class CM_Cli_CommandManager {
                 $this->_outputError($this->getHelp());
             }
             return false;
-        } catch (CM_Cli_Exception_Internal $ex) {
+        } catch (Exception $ex) {
             $this->_outputError('ERROR: ' . $ex->getMessage() . PHP_EOL);
             return false;
         }
