@@ -28,13 +28,12 @@ class StaticUrl extends AssetUrl {
     /**
      * @param string                       $url
      * @param CM_Frontend_Environment|null $environment
-     * @param array|null                   $environmentOptions
      * @param string|null                  $deployVersion
      * @return StaticUrl
      */
-    public static function create($url, CM_Frontend_Environment $environment = null, array $environmentOptions = null, $deployVersion = null) {
+    public static function create($url, CM_Frontend_Environment $environment = null, $deployVersion = null) {
         /** @var StaticUrl $staticUrl */
-        $staticUrl = parent::_create($url, $environment, $environmentOptions, $deployVersion);
+        $staticUrl = parent::_create($url, $environment, $deployVersion);
         return $staticUrl;
     }
 }

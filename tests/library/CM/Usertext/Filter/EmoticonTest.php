@@ -1,5 +1,7 @@
 <?php
 
+use CM\Url\ResourceUrl;
+
 class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
 
     /** @var CM_Site_Abstract */
@@ -53,13 +55,16 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
     protected function _getEmoticonImg($emoticonCode, $height = null) {
         $emoticon = CM_Emoticon::findByCode($emoticonCode);
         if (!$emoticon) {
-            throw new CM_Exception_Invalid('Cannot find emoticon for code `' . $emoticonCode  . '`.');
+            throw new CM_Exception_Invalid('Cannot find emoticon for code `' . $emoticonCode . '`.');
         }
         $urlCdn = $this->_mockSite->getUrlCdn();
         $siteType = $this->_mockSite->getId();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
+
+        $url = ResourceUrl::create('img/emoticon/' . $emoticon->getFileName(), 'layout', null, $deployVersion)
+            ->withSite($this->_mockSite);
         $heightAttribute = $height ? ' height="' . $height . '"' : '';
-        return '<img src="' . $urlCdn . '/layout/' . $siteType . '/' . $deployVersion . '/img/emoticon/' . $emoticon->getFileName() .
-        '" class="emoticon emoticon-' . $emoticon->getName() . '" title="' . $emoticon->getDefaultCode() . '"' . $heightAttribute . ' />';
+        return '<img src="' . $url . '" class="emoticon emoticon-' . $emoticon->getName() . '" title="' . $emoticon->getDefaultCode() . '"' .
+            $heightAttribute . ' />';
     }
 }

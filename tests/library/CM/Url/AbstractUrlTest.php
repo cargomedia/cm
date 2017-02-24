@@ -10,6 +10,7 @@ use CM\Url\UrlInterface;
 use CM\Url\BaseUrl;
 use CM\Url\AbstractUrl;
 use League\Uri\Components\HierarchicalPath;
+use JsonSerializable;
 
 class AbstractUrlTest extends CMTest_TestCase {
 
@@ -107,6 +108,38 @@ class AbstractUrlTest extends CMTest_TestCase {
         $urlWithPrefix = $url->withPrefix(null);
         $this->assertSame(null, $urlWithPrefix->getPrefix());
         $this->assertSame('/path?foo=1#bar', (string) $urlWithPrefix);
+    }
+
+    public function testWithParams() {
+        $url = CM_Url_AbstractMockUrl::createFromString('/foo');
+        $object = new CM_UrlAbstractMockSerializable();
+
+        $this->assertSame('/foo', (string) $url);
+        $this->assertSame(null, $url->getParams());
+
+        $urlWithParams = $url->withParams(['foo', 'foz' => null, 'bar' => 'baz', 'val' => 1, 'obj' => $object]);
+        $this->assertSame('/foo?0=foo&bar=baz&val=1&obj[_class]=CM\Test\Url\CM_UrlAbstractMockSerializable&obj[foo]=bar', urldecode((string) $urlWithParams));
+        $this->assertEquals(['foo', 'foz' => null, 'bar' => 'baz', 'val' => 1, 'obj' => $object], $urlWithParams->getParams());
+
+        $urlWithParams = $url->withParams(['foo' => ['bar' => ['val' => 1], 'baz' => ['a', 'b', 'c']]]);
+        $this->assertSame('/foo?foo[bar][val]=1&foo[baz][0]=a&foo[baz][1]=b&foo[baz][2]=c', urldecode((string) $urlWithParams));
+        $this->assertSame(['foo' => ['bar' => ['val' => 1], 'baz' => ['a', 'b', 'c']]], $urlWithParams->getParams());
+
+        $urlWithQuery = $url->withQuery('');
+        $this->assertSame('/foo', (string) $urlWithQuery);
+        $this->assertSame([], $urlWithQuery->getParams());
+
+        $urlWithQuery = $url->withQuery('0=foo&123&bar=baz&val=1');
+        $this->assertSame('/foo?0=foo&123&bar=baz&val=1', (string) $urlWithQuery);
+        $this->assertSame(['foo', 123 => '', 'bar' => 'baz', 'val' => '1'], $urlWithQuery->getParams());
+
+        $urlModified = $url->withQuery('foo[bar][val]=1&foo[baz][]=a&foo[baz][]=b&foo[baz][]=c');
+        $this->assertSame('/foo?foo[bar][val]=1&foo[baz][]=a&foo[baz][]=b&foo[baz][]=c', urldecode((string) $urlModified));
+        $this->assertSame(['foo' => ['bar' => ['val' => '1'], 'baz' => ['a', 'b', 'c']]], $urlModified->getParams());
+
+        $urlModified = $url->withParams(['foo' => 1])->withQuery('bar=1');
+        $this->assertSame('/foo?bar=1', (string) $urlModified);
+        $this->assertSame(['bar' => '1'], $urlModified->getParams());
     }
 
     public function testWithLanguage() {
@@ -220,5 +253,12 @@ class CM_Url_AbstractMockUrl extends AbstractUrl {
 
     public static function create($url, CM_Frontend_Environment $environment = null) {
         return parent::_create($url, $environment);
+    }
+}
+
+class CM_UrlAbstractMockSerializable implements JsonSerializable {
+
+    public function jsonSerialize() {
+        return ['foo' => 'bar'];
     }
 }

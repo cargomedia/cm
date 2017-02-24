@@ -7,37 +7,6 @@ use League\Uri\Components\Query;
 
 class RouteUrl extends AbstractUrl {
 
-    /** @var array|null */
-    protected $_params = null;
-
-    /**
-     * @return array|null
-     */
-    public function getParams() {
-        return $this->_params;
-    }
-
-    /**
-     * @param array $params
-     * @return static
-     */
-    public function withParams(array $params) {
-        $query = Query::createFromPairs($params);
-        return $this->withQuery((string) $query);
-    }
-
-    /**
-     * @param $queryString
-     * @return RouteUrl
-     */
-    public function withQuery($queryString) {
-        $query = new Query($queryString);
-        $this->_params = $query->getPairs();
-        /** @var RouteUrl $url */
-        $url = parent::withQuery((string) $query);
-        return $url;
-    }
-
     public function getUriRelativeComponents() {
         $path = $this->path;
         if ($prefix = $this->getPrefix()) {

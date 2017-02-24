@@ -18,7 +18,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
     public function testGetUrl() {
         $render = new CM_Frontend_Render();
-        $this->assertSame('http://www.default.dev', $render->getUrl());
+        $this->assertSame('http://www.default.dev/', $render->getUrl());
         $this->assertSame('http://www.default.dev/foo/bar', $render->getUrl('/foo/bar'));
         $this->assertSame('http://www.default.dev/0', $render->getUrl('/0'));
     }
@@ -84,23 +84,10 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $render = new CM_Frontend_Render();
         $siteType = CM_Site_Abstract::factory()->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame('http://cdn.default.dev', $render->getUrlResource());
-        $this->assertSame('http://cdn.default.dev', $render->getUrlResource('layout'));
-        $this->assertSame('http://cdn.default.dev', $render->getUrlResource(null, 'foo/bar.jpg'));
         $this->assertSame(
             'http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
         $this->assertSame('http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/0', $render->getUrlResource('layout', '0'));
         $this->assertSame('http://cdn.default.dev/0/' . $siteType . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('0', 'foo.jpg'));
-    }
-
-    public function testGetUrlResourceSameOrigin() {
-        $render = new CM_Frontend_Render();
-        $siteType = CM_Site_Abstract::factory()->getType();
-        $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame(
-            'http://www.default.dev/layout/' . $siteType . '/' . $deployVersion . '/foo.jpg',
-            $render->getUrlResource('layout', 'foo.jpg', ['sameOrigin' => true])
-        );
     }
 
     public function testGetUrlResourceDifferentSite() {
@@ -109,13 +96,13 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $siteType = $site->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('http://cdn.other.com/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg',
-            $render->getUrlResource('layout', 'foo/bar.jpg', null, $site));
+            $render->getUrlResource('layout', 'foo/bar.jpg', $site));
     }
 
     public function testGetUrlStatic() {
         $render = new CM_Frontend_Render();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame('http://cdn.default.dev/static', $render->getUrlStatic());
+        $this->assertSame('http://cdn.default.dev/static/', $render->getUrlStatic());
         $this->assertSame('http://cdn.default.dev/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
         $this->assertSame('http://cdn.default.dev/static/0?' . $deployVersion, $render->getUrlStatic('/0'));
     }
