@@ -153,17 +153,28 @@ class CM_Cli_CommandManager {
                 $this->_lockCommand($command);
             }
 
-            $success = $this->_executeCommand($command, $arguments, $this->_streamInput, $this->_streamOutput, $this->_streamError);
+            $parameters = $command->extractParameters($arguments);
+            $this->_checkUnusedArguments($arguments);
+
+            $command->run($parameters, $this->_streamInput, $this->_streamOutput, $this->_streamError);
 
             if ($command->getSynchronized()) {
                 $this->unlockCommand($command);
             }
-            if (!$success) {
-                return 1;
-            }
             return 0;
+        } catch (CM_Cli_Exception_InvalidArguments $e) {
+            $this->_outputError('ERROR: ' . $e->getMessage() . PHP_EOL);
+            if (isset($command)) {
+                $this->_outputError('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
+            } else {
+                $this->_outputError($this->getHelp());
+            }
+            return 1;
         } catch (CM_Cli_Exception_Internal $e) {
             $this->_outputError('ERROR: ' . $e->getMessage() . PHP_EOL);
+            return 1;
+        } catch (Exception $e) {
+            $this->_outputError((new CM_ExceptionHandling_Formatter_Plain())->formatException($e) . PHP_EOL);
             return 1;
         }
     }
@@ -244,35 +255,6 @@ class CM_Cli_CommandManager {
      */
     protected function _getProcess() {
         return CM_Process::getInstance();
-    }
-
-    /**
-     * @param CM_Cli_Command            $command
-     * @param CM_Cli_Arguments          $arguments
-     * @param CM_InputStream_Interface  $streamInput
-     * @param CM_OutputStream_Interface $streamOutput
-     * @param CM_OutputStream_Interface $streamError
-     * @return boolean
-     */
-    protected function _executeCommand(CM_Cli_Command $command, CM_Cli_Arguments $arguments, CM_InputStream_Interface $streamInput, CM_OutputStream_Interface $streamOutput, CM_OutputStream_Interface $streamError) {
-        try {
-            $parameters = $command->extractParameters($arguments);
-            $this->_checkUnusedArguments($arguments);
-
-            $command->run($parameters, $streamInput, $streamOutput, $streamError);
-            return true;
-        } catch (CM_Cli_Exception_InvalidArguments $ex) {
-            $this->_outputError('ERROR: ' . $ex->getMessage() . PHP_EOL);
-            if (isset($command)) {
-                $this->_outputError('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
-            } else {
-                $this->_outputError($this->getHelp());
-            }
-            return false;
-        } catch (Exception $ex) {
-            $this->_outputError('ERROR: ' . $ex->getMessage() . PHP_EOL);
-            return false;
-        }
     }
 
     /**

@@ -78,7 +78,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManager = $this->mockObject('CM_Cli_CommandManager');
         $commandManager->mockMethod('_getCommand')->set($command);
         $mockOutputError = $commandManager->mockMethod('_outputError')->at(0, function ($message) {
-            $this->assertSame('ERROR: Big Fucking Error' . PHP_EOL, $message);
+            $this->assertStringStartsWith('Exception: Big Fucking Error', $message);
         });
 
         /** @var CM_Cli_CommandManager $commandManager */
