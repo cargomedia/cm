@@ -6,24 +6,27 @@ use CM_Params;
 use CM_Site_Abstract;
 use CM_Frontend_Environment;
 use CM_Model_Language;
-use League\Uri\Components\Query;
-use League\Uri\Components\HierarchicalPath;
-use League\Uri\Modifiers\Normalize;
-use League\Uri\Modifiers\Pipeline;
-use League\Uri\Schemes\Http;
-use Psr\Http\Message\UriInterface;
 
-abstract class AbstractUrl extends Http implements UrlInterface {
+use Psr\Http\Message\UriInterface;
+use CM\Url\Vendor\Uri;
+
+abstract class AbstractUrl extends Uri implements UrlInterface {
 
     protected static $supportedSchemes = [
         'http'  => 80,
         'https' => 443,
     ];
 
+    public function __construct($uri = '') {
+        parent::__construct($uri);
+        $this->_ensureAbsolutePath();
+        $this->path = self::removeDotSegments($this->path);
+    }
+
     /** @var array|null */
     protected $_params = null;
 
-    /** @var HierarchicalPath|null */
+    /** @var string|null */
     protected $_prefix = null;
 
     /** @var CM_Model_Language|null */
@@ -69,12 +72,7 @@ abstract class AbstractUrl extends Http implements UrlInterface {
 
     public function withPrefix($prefix) {
         if (null !== $prefix) {
-            $prefix = new HierarchicalPath((string) $prefix);
-            $prefix = $prefix
-                ->withoutLeadingSlash()
-                ->withoutTrailingSlash()
-                ->withoutDotSegments()
-                ->withoutEmptySegments();
+            $prefix = trim($this->filterPath(self::removeDotSegments($prefix)), '/');
         }
         $prefix = '' !== (string) $prefix ? $prefix : null;
         $url = clone $this;
@@ -119,7 +117,7 @@ abstract class AbstractUrl extends Http implements UrlInterface {
 
     public function withRelativeComponentsFrom($url) {
         if (!$url instanceof UriInterface) {
-            $url = Http::createFromString($url);
+            $url = new Uri($url);
         }
         return $this
             ->withPath($url->getPath())
@@ -147,30 +145,50 @@ abstract class AbstractUrl extends Http implements UrlInterface {
         return $baseUrl;
     }
 
+    public function __toString() {
+        return $this->getSchemeSpecificPart();
+    }
+
+    /**
+     * @return array
+     */
+    public function getPathSegments() {
+        return array_filter(explode('/', $this->path));
+    }
+
+    /**
+     * @return string
+     */
+    public function getQueryComponent() {
+        $query = (string) $this->query;
+        return $query ? '?' . $query : $query;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFragmentComponent() {
+        $fragment = (string) $this->fragment;
+        return $fragment ? '#' . $fragment : $fragment;
+    }
+
     /**
      * @return string
      */
     abstract public function getUriRelativeComponents();
 
     protected function _ensureAbsolutePath() {
-        return $this->withProperty('path', (string) $this->path->withLeadingSlash());
+        $path = $this->getPath();
+        if ('' === $path || '/' !== mb_substr($path, 0, 1, 'UTF-8')) {
+            $this->path = '/' . $path;
+        }
     }
 
     protected function getSchemeSpecificPart() {
         $authority = $this->getAuthority();
-
-        $res = array_filter([
-            $this->userInfo->getContent(),
-            $this->host->getContent(),
-            $this->port->getContent(),
-        ], function ($value) {
-            return null !== $value;
-        });
-
-        if (!empty($res)) {
-            $authority = '//' . $authority;
+        if (!empty($authority)) {
+            $authority = $this->scheme . '://' . $authority;
         }
-
         return $authority . $this->getUriRelativeComponents();
     }
 
@@ -180,23 +198,11 @@ abstract class AbstractUrl extends Http implements UrlInterface {
      * @return AbstractUrl
      */
     protected static function _create($url, CM_Frontend_Environment $environment = null) {
-        /** @var AbstractUrl $abstractUrl */
-        $abstractUrl = self::getPipeline()->process(
-            self::createFromString($url)
-        );
-        $abstractUrl = $abstractUrl->_ensureAbsolutePath();
+        /** @var AbstractUrl $url */
+        $url = new static($url);
         if ($environment) {
-            $abstractUrl = $abstractUrl->withEnvironment($environment);
+            $url = $url->withEnvironment($environment);
         }
-        return $abstractUrl;
-    }
-
-    /**
-     * @return Pipeline
-     */
-    public static function getPipeline() {
-        return new Pipeline([
-            new Normalize(),
-        ]);
+        return $url;
     }
 }

@@ -4,12 +4,9 @@ namespace CM\Test\Url;
 
 use CMTest_TH;
 use CMTest_TestCase;
-use CM_Model_Language;
 use CM_Frontend_Environment;
-use CM\Url\UrlInterface;
 use CM\Url\BaseUrl;
 use CM\Url\AbstractUrl;
-use League\Uri\Components\HierarchicalPath;
 use JsonSerializable;
 
 class AbstractUrlTest extends CMTest_TestCase {
@@ -19,15 +16,15 @@ class AbstractUrlTest extends CMTest_TestCase {
     }
 
     public function testCreateFromString() {
-        $url = CM_Url_AbstractMockUrl::createFromString('/bar?foobar=1');
+        $url = new CM_Url_AbstractMockUrl('/bar?foobar=1');
         $this->assertInstanceOf('CM\Url\AbstractUrl', $url);
         $this->assertSame(null, $url->getPrefix());
         $this->assertSame(null, $url->getLanguage());
         $this->assertSame('/bar?foobar=1', (string) $url);
 
-        $url = CM_Url_AbstractMockUrl::createFromString('http://스타벅스코리아.com/path/../foo/./bar');
+        $url = new CM_Url_AbstractMockUrl('http://스타벅스코리아.com/path/../foo/./bar');
         $this->assertInstanceOf('CM\Url\AbstractUrl', $url);
-        $this->assertSame('http://스타벅스코리아.com/path/../foo/./bar', (string) $url);
+        $this->assertSame('http://스타벅스코리아.com/foo/bar', (string) $url);
     }
 
     public function testCreate() {
@@ -43,13 +40,6 @@ class AbstractUrlTest extends CMTest_TestCase {
         $this->assertSame(null, $url->getLanguage());
         $this->assertSame('/bar?foobar=1', (string) $url);
 
-        $url = CM_Url_AbstractMockUrl::create('http://스타벅스코리아.com/path/../foo/./bar');
-        $this->assertInstanceOf('CM\Url\AbstractUrl', $url);
-        $this->assertSame(null, $url->getPrefix());
-        $this->assertSame(null, $url->getLanguage());
-        $this->assertSame('http://xn--oy2b35ckwhba574atvuzkc.com/foo/bar', (string) $url);
-
-        $baseUrl = BaseUrl::create('http://foo/?param');
         $environment = $this->createEnvironment();
         $url = CM_Url_AbstractMockUrl::create('/bar?foobar=1', $environment);
         $this->assertSame(null, $url->getPrefix());
@@ -70,7 +60,7 @@ class AbstractUrlTest extends CMTest_TestCase {
     }
 
     public function testWithPrefix() {
-        $url = CM_Url_AbstractMockUrl::create('/path?foo=1#bar');
+        $url = new CM_Url_AbstractMockUrl('/path?foo=1#bar');
         $this->assertSame(null, $url->getPrefix());
 
         $urlWithPrefix = $url->withPrefix('prefix');
@@ -85,19 +75,7 @@ class AbstractUrlTest extends CMTest_TestCase {
         $this->assertSame('prefix/foo', $urlWithPrefix->getPrefix());
         $this->assertSame('/prefix/foo/path?foo=1#bar', (string) $urlWithPrefix);
 
-        $urlWithPrefix = $url->withPrefix(new HierarchicalPath('prefix'));
-        $this->assertSame('prefix', $urlWithPrefix->getPrefix());
-        $this->assertSame('/prefix/path?foo=1#bar', (string) $urlWithPrefix);
-
-        $urlWithPrefix = $url->withPrefix(new HierarchicalPath('/'));
-        $this->assertSame(null, $urlWithPrefix->getPrefix());
-        $this->assertSame('/path?foo=1#bar', (string) $urlWithPrefix);
-
         $urlWithPrefix = $url->withPrefix('/');
-        $this->assertSame(null, $urlWithPrefix->getPrefix());
-        $this->assertSame('/path?foo=1#bar', (string) $urlWithPrefix);
-
-        $urlWithPrefix = $url->withPrefix(new HierarchicalPath(''));
         $this->assertSame(null, $urlWithPrefix->getPrefix());
         $this->assertSame('/path?foo=1#bar', (string) $urlWithPrefix);
 
@@ -111,7 +89,7 @@ class AbstractUrlTest extends CMTest_TestCase {
     }
 
     public function testWithParams() {
-        $url = CM_Url_AbstractMockUrl::createFromString('/foo');
+        $url = new CM_Url_AbstractMockUrl('/foo');
         $object = new CM_UrlAbstractMockSerializable();
 
         $this->assertSame('/foo', (string) $url);
@@ -144,7 +122,7 @@ class AbstractUrlTest extends CMTest_TestCase {
 
     public function testWithLanguage() {
         $language = CMTest_TH::createLanguage('de');
-        $url = CM_Url_AbstractMockUrl::create('/bar?foobar=1');
+        $url = new CM_Url_AbstractMockUrl('/bar?foobar=1');
         $urlWithLanguage = $url->withLanguage($language);
 
         $this->assertNotEquals($url, $urlWithLanguage);
@@ -155,8 +133,8 @@ class AbstractUrlTest extends CMTest_TestCase {
     }
 
     public function testWithBaseUrl() {
-        $baseUrl = BaseUrl::create('http://foo/?param');
-        $url = CM_Url_AbstractMockUrl::create('/bar?foobar=1');
+        $baseUrl = new BaseUrl('http://foo/?param');
+        $url = new CM_Url_AbstractMockUrl('/bar?foobar=1');
         $urlWithBaseUrl = $url->withBaseUrl($baseUrl);
 
         $this->assertSame(null, $url->getPrefix());
@@ -178,8 +156,8 @@ class AbstractUrlTest extends CMTest_TestCase {
 
         /** @var \CM_Exception_Invalid $exception */
         $exception = $this->catchException(function () {
-            $baseUrl = BaseUrl::create('/path?param');
-            CM_Url_AbstractMockUrl::create('/bar?foobar=1', $baseUrl);
+            $baseUrl = new BaseUrl('/path?param');
+            new CM_Url_AbstractMockUrl('/bar?foobar=1', $baseUrl);
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertSame('BaseUrl::create argument must be an absolute Url', $exception->getMessage());
@@ -189,7 +167,7 @@ class AbstractUrlTest extends CMTest_TestCase {
     }
 
     public function testWithEnvironment() {
-        $url = CM_Url_AbstractMockUrl::create('/bar?foobar=1');
+        $url = new CM_Url_AbstractMockUrl('/bar?foobar=1');
 
         $environment = $this->createEnvironment();
         $urlWithEnvironment = $url->withEnvironment($environment);
@@ -212,25 +190,25 @@ class AbstractUrlTest extends CMTest_TestCase {
     }
 
     public function testWithRelativeComponentsFrom() {
-        $url1 = CM_Url_AbstractMockUrl::createFromString('http://foo/path?foo=1');
-        $url2 = CM_Url_AbstractMockUrl::createFromString('http://bar/path?bar=1');
+        $url1 = new CM_Url_AbstractMockUrl('http://foo/path?foo=1');
+        $url2 = new CM_Url_AbstractMockUrl('http://bar/path?bar=1');
 
         $this->assertSame('http://foo/path?bar=1', (string) $url1->withRelativeComponentsFrom($url2));
     }
 
     public function testWithoutRelativeComponents() {
-        $url = CM_Url_AbstractMockUrl::createFromString('/path?foo=1');
+        $url = new CM_Url_AbstractMockUrl('/path?foo=1');
         $this->assertSame('/', (string) $url->withoutRelativeComponents());
 
-        $url = CM_Url_AbstractMockUrl::createFromString('http://foo/path?foo=1');
+        $url = new CM_Url_AbstractMockUrl('http://foo/path?foo=1');
         $this->assertSame('http://foo/', (string) $url->withoutRelativeComponents());
     }
 
     public function testIsAbsolute() {
-        $url = CM_Url_AbstractMockUrl::createFromString('/bar?foobar=1');
+        $url = new CM_Url_AbstractMockUrl('/bar?foobar=1');
         $this->assertSame(false, $url->isAbsolute());
 
-        $url = CM_Url_AbstractMockUrl::createFromString('http://foo/bar?foobar=1');
+        $url = new CM_Url_AbstractMockUrl('http://foo/bar?foobar=1');
         $this->assertSame(true, $url->isAbsolute());
     }
 }
@@ -238,17 +216,14 @@ class AbstractUrlTest extends CMTest_TestCase {
 class CM_Url_AbstractMockUrl extends AbstractUrl {
 
     public function getUriRelativeComponents() {
-        $path = $this->path;
+        $segments = $this->getPathSegments();
         if ($prefix = $this->getPrefix()) {
-            $path = $path->prepend($prefix);
+            $segments = array_merge([$prefix], $segments);
         }
         if ($language = $this->getLanguage()) {
-            $path = $path->append($language->getAbbreviation());
+            $segments[] = $language->getAbbreviation();
         }
-        return ''
-            . $path->getUriComponent()
-            . $this->query->getUriComponent()
-            . $this->fragment->getUriComponent();
+        return '/' . implode('/', $segments) . $this->getQueryComponent() . $this->getFragmentComponent();
     }
 
     public static function create($url, CM_Frontend_Environment $environment = null) {
