@@ -52,13 +52,13 @@ class UrlTest extends CMTest_TestCase {
         $this->assertSame(null, $url->getParams());
         $this->assertSame('', $url->getQuery());
         $this->assertSame('', $url->getFragment());
-        $this->assertSame('', (string) $url);
+        $this->assertSame('/', (string) $url);
 
         $url = Url::createWithParams('', []);
         $this->assertSame([], $url->getParams());
         $this->assertSame('', $url->getQuery());
         $this->assertSame('', $url->getFragment());
-        $this->assertSame('', (string) $url);
+        $this->assertSame('/', (string) $url);
 
         $url = Url::createWithParams('/', ['foo' => 1]);
         $this->assertSame(['foo' => 1], $url->getParams());

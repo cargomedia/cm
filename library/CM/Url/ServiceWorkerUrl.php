@@ -3,7 +3,6 @@
 namespace CM\Url;
 
 use CM_Frontend_Environment;
-use League\Uri\Components\HierarchicalPath;
 
 class ServiceWorkerUrl extends AbstractUrl {
 
@@ -12,6 +11,14 @@ class ServiceWorkerUrl extends AbstractUrl {
 
     /** @var string|null */
     protected $_deployVersion = null;
+
+    public function __construct($name = null) {
+        parent::__construct('');
+        if (null === $name) {
+            $name = 'serviceworker';
+        }
+        $this->setName($name);
+    }
 
     /**
      * @return string
@@ -52,18 +59,12 @@ class ServiceWorkerUrl extends AbstractUrl {
             $parts[] = $deployVersion;
         }
 
-        $path = HierarchicalPath::createFromSegments([
-            sprintf('%s.js', implode('-', $parts)),
-        ], HierarchicalPath::IS_ABSOLUTE);
-
+        $segments = [];
         if ($prefix = $this->getPrefix()) {
-            $path = $path->prepend($prefix);
+            $segments[] = $prefix;
         }
-
-        return ''
-            . $path->getUriComponent()
-            . $this->query->getUriComponent()
-            . $this->fragment->getUriComponent();
+        $segments[] = sprintf('%s.js', implode('-', $parts));
+        return '/' . implode('/', $segments) . $this->getQueryComponent() . $this->getFragmentComponent();
     }
 
     /**
@@ -73,13 +74,8 @@ class ServiceWorkerUrl extends AbstractUrl {
      * @return ServiceWorkerUrl
      */
     public static function create($name = null, CM_Frontend_Environment $environment = null, $deployVersion = null) {
-        if (null === $name) {
-            $name = 'serviceworker';
-        }
-
         /** @var ServiceWorkerUrl $url */
-        $url = parent::_create('', $environment);
-        $url->setName($name);
+        $url = parent::_create($name, $environment);
         $url->setDeployVersion($deployVersion);
         return $url;
     }

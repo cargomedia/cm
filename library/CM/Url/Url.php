@@ -7,17 +7,14 @@ use CM_Frontend_Environment;
 class Url extends AbstractUrl {
 
     public function getUriRelativeComponents() {
-        $path = clone $this->path;
+        $segments = $this->getPathSegments();
         if ($language = $this->getLanguage()) {
-            $path = $path->prepend($language->getAbbreviation());
+            $segments = array_merge([$language->getAbbreviation()], $segments);
         }
         if ($prefix = $this->getPrefix()) {
-            $path = $path->prepend($prefix);
+            $segments = array_merge([$prefix], $segments);
         }
-        return ''
-            . $path->getUriComponent()
-            . $this->query->getUriComponent()
-            . $this->fragment->getUriComponent();
+        return '/' . implode('/', $segments) . $this->getQueryComponent() . $this->getFragmentComponent();
     }
 
     /**
@@ -36,7 +33,8 @@ class Url extends AbstractUrl {
      * @return static
      */
     public static function createWithParams($uri, array $params = null, $fragment = null) {
-        $url = self::createFromString($uri);
+        /** @var Url $url */
+        $url = new static($uri);
         if (null !== $params) {
             $url = $url->withParams($params);
         }

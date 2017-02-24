@@ -3,22 +3,18 @@
 namespace CM\Url;
 
 use CM_Frontend_Environment;
-use League\Uri\Components\Query;
 
 class RouteUrl extends AbstractUrl {
 
     public function getUriRelativeComponents() {
-        $path = $this->path;
+        $segments = $this->getPathSegments();
         if ($prefix = $this->getPrefix()) {
-            $path = $path->prepend($prefix);
+            $segments = array_merge([$prefix], $segments);
         }
         if ($language = $this->getLanguage()) {
-            $path = $path->append($language->getAbbreviation());
+            $segments[] = $language->getAbbreviation();
         }
-        return ''
-            . $path->getUriComponent()
-            . $this->query->getUriComponent()
-            . $this->fragment->getUriComponent();
+        return '/' . implode('/', $segments) . $this->getQueryComponent() . $this->getFragmentComponent();
     }
 
     /**
