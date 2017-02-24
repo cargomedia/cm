@@ -1,7 +1,6 @@
 <?php
 
 use CM\Url\Url;
-use League\Uri\Components\Query;
 
 abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
 
@@ -92,9 +91,7 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
         $request = $this->getRequest();
         $url = Url::create($request->getPath(), $this->getRender()->getEnvironment());
         /** @var Url $url */
-        $url = $url->withQuery(
-            (string) Query::createFromPairs($request->getQuery())
-        );
+        $url = $url->withParams($request->getQuery());
         return $url;
     }
 

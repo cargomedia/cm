@@ -3,7 +3,6 @@
 namespace CM\Url;
 
 use CM_Frontend_Environment;
-use League\Uri\Components\HierarchicalPath;
 
 class ResourceUrl extends AssetUrl {
 

@@ -1,7 +1,6 @@
 <?php
 
 use CM\Url\Url;
-use League\Uri\Components\Query;
 
 class CM_Http_Response_Page extends CM_Http_Response_Abstract {
 
@@ -110,9 +109,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
      */
     private function _processPage(CM_Http_Request_Abstract $request, CM_Http_Response_Page_ProcessingResult $result) {
         return $this->_runWithCatching(function () use ($request, $result) {
-            $query = Query::createFromPairs($request->getQuery());
-            $url = Url::create($request->getPath())
-                ->withQuery((string) $query);
+            $url = Url::createWithParams($request->getPath(), $request->getQuery());
             $result->addPath($url->getUriRelativeComponents());
 
             $this->getSite()->rewrite($request);

@@ -1,6 +1,6 @@
 <?php
 
-use League\Uri\Components\Query;
+use CM\Url\Url;
 
 class CM_Page_UrlFactoryTest extends CMTest_TestCase {
 
@@ -105,10 +105,11 @@ class CM_Page_UrlFactoryTest extends CMTest_TestCase {
 
 class CM_Page_UrlFactory_Mock extends CM_Page_Abstract {
 
-    public static function getUrlComponents(array $params = null) {
+    public static function getUrlParts(array $params = null) {
+        $url = Url::createWithParams('', array_merge($params, ['mock' => 1]));
         return [
             'path'     => '/foo',
-            'query'    => (string) Query::createFromPairs(array_merge($params, ['mock' => 1])),
+            'query'    => $url->getQuery(),
             'fragment' => 'bar'
         ];
     }

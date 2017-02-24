@@ -1,7 +1,6 @@
 <?php
 
 use CM\Url\Url;
-use League\Uri\Components\Query;
 
 class CM_Page_UrlFactory {
 
@@ -13,7 +12,7 @@ class CM_Page_UrlFactory {
      */
     public static function getUrl($pageClassName, array $params = null, CM_Frontend_Environment $environment = null) {
         self::assertPage($pageClassName);
-        $url = Url::createFromComponents(self::_getUrlComponents($pageClassName, $params));
+        $url = Url::createFromParts(self::_getParts($pageClassName, $params));
         if ($environment) {
             self::assertSupportedSite($pageClassName, $environment->getSite());
             $url = $url->withEnvironment($environment);
@@ -26,18 +25,19 @@ class CM_Page_UrlFactory {
      * @param array|null $params
      * @return array
      */
-    protected static function _getUrlComponents($pageClassName, array $params = null) {
+    protected static function _getParts($pageClassName, array $params = null) {
         /** @var CM_Page_Abstract $pageClassName */
-        $pageComponents = $pageClassName::getUrlComponents($params);
-        if (null === $pageComponents) {
-            $pageComponents = [
+        $pageParts = $pageClassName::getUrlParts($params);
+        if (null === $pageParts) {
+            $pageParts = [
                 'path' => self::_getPathDefault($pageClassName),
             ];
             if (null !== $params && count($params) > 0) {
-                $pageComponents['query'] = (string) Query::createFromPairs(CM_Params::encode($params));
+                $url = Url::createWithParams('', $params);
+                $pageParts['query'] = $url->getQuery();
             }
         }
-        return $pageComponents;
+        return $pageParts;
     }
 
     /**

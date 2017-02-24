@@ -1,17 +1,17 @@
 <?php
 
-use League\Uri\Schemes\Ws as WsUri;
-use League\Uri\Schemes\Http as HttpUri;
+use CM\Url\Url;
+use CM\Url\WsUrl;
 
 class CM_Janus_Server implements JsonSerializable {
 
     /** @var int */
     protected $_id;
 
-    /** @var HttpUri */
+    /** @var Url */
     protected $_httpAddress;
 
-    /** @var WsUri */
+    /** @var WsUrL */
     protected $_webSocketAddress;
 
     /** @var string */
@@ -41,8 +41,8 @@ class CM_Janus_Server implements JsonSerializable {
         }
         $this->_id = (int) $serverId;
         $this->_key = (string) $key;
-        $this->_httpAddress = HttpUri::createFromString((string) $httpAddress);
-        $this->_webSocketAddress = WsUri::createFromString((string) $webSocketAddress);
+        $this->_httpAddress = Url::create((string) $httpAddress);
+        $this->_webSocketAddress = WsUrl::create((string) $webSocketAddress);
         $this->_pluginList = array_map(function ($plugin) {
             return (string) $plugin;
         }, $pluginList);

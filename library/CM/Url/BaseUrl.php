@@ -3,7 +3,6 @@
 namespace CM\Url;
 
 use CM_Exception_Invalid;
-use League\Uri\Components\HierarchicalPath;
 
 class BaseUrl extends AbstractUrl {
 

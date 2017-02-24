@@ -1,7 +1,6 @@
 <?php
 
 use CM\Url\Url;
-use League\Uri\Components\Query;
 
 abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract {
 
@@ -67,7 +66,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $fragments = [];
         $baseUrl = $this->getRender()->getSite()->getUrl()->withoutPrefix();
         do {
-            $fragment = (string) Url::create($request->getPath())->withQuery((string) Query::createFromPairs($request->getQuery()));
+            $fragment = (string) Url::create($request->getPath())->withParams($request->getQuery());
             $fragments[] = $fragment;
             $url = (string) Url::create($fragment)->withBaseUrl($baseUrl);
             if ($count++ > 10) {
@@ -288,7 +287,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      * @return bool
      */
     private function _isPageOnSameSite($url) {
-        $url = Url::createFromString($url);
+        $url = Url::create($url);
         if (!$this->_site->isUrlMatch($url->getHost(), $url->getPath())) {
             return false;
         }

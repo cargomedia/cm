@@ -6,7 +6,6 @@ use CM_Site_Abstract;
 use CM_Model_Language;
 use CM_Frontend_Environment;
 use Psr\Http\Message\UriInterface;
-use League\Uri\Interfaces\Path;
 
 interface UrlInterface extends UriInterface {
 
@@ -58,7 +57,7 @@ interface UrlInterface extends UriInterface {
     public function withSite(CM_Site_Abstract $site);
 
     /**
-     * @param Path|string|null $prefix
+     * @param string|null $prefix
      * @return UrlInterface
      */
     public function withPrefix($prefix);

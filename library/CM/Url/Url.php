@@ -43,4 +43,14 @@ class Url extends AbstractUrl {
         }
         return $url;
     }
+
+    /**
+     * @param array $parts
+     * @return static
+     */
+    public static function createFromParts(array $parts) {
+        $url = new static();
+        $url->applyParts($parts);
+        return $url;
+    }
 }
