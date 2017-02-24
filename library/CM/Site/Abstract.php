@@ -4,6 +4,12 @@ use CM\Url\BaseUrl;
 
 abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed, CM_Comparable {
 
+    /** @var BaseUrl|null */
+    protected $_url = null;
+
+    /** @var BaseUrl|null */
+    protected $_urlCdn = null;
+
     /** @var string[] */
     protected $_themes = array();
 
@@ -116,14 +122,20 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return BaseUrl
      */
     public function getUrl() {
-        return BaseUrl::create(self::_getConfig()->url);
+        if (null === $this->_url) {
+            $this->_url = BaseUrl::create(self::_getConfig()->url);
+        }
+        return $this->_url;
     }
 
     /**
      * @return BaseUrl
      */
     public function getUrlCdn() {
-        return BaseUrl::create(self::_getConfig()->urlCdn);
+        if (null === $this->_urlCdn) {
+            $this->_urlCdn = BaseUrl::create(self::_getConfig()->urlCdn);
+        }
+        return $this->_urlCdn;
     }
 
     /**
