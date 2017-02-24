@@ -22,6 +22,10 @@ class AbstractUrlTest extends CMTest_TestCase {
         $this->assertSame(null, $url->getLanguage());
         $this->assertSame('/bar?foobar=1', (string) $url);
 
+        $url = new CM_Url_AbstractMockUrl('//example.com');
+        $this->assertInstanceOf('CM\Url\AbstractUrl', $url);
+        $this->assertSame('//example.com/', (string) $url);
+
         $url = new CM_Url_AbstractMockUrl('http://스타벅스코리아.com/path/../foo/./bar');
         $this->assertInstanceOf('CM\Url\AbstractUrl', $url);
         $this->assertSame('http://스타벅스코리아.com/foo/bar', (string) $url);

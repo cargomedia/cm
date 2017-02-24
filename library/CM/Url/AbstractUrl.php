@@ -126,7 +126,11 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
     }
 
     public function withoutRelativeComponents() {
-        return $this->withRelativeComponentsFrom('/');
+        $url = $this;
+        $url->path = null;
+        $url->query = null;
+        $url->fragment = null;
+        return $url;
     }
 
     public function withEnvironment(CM_Frontend_Environment $environment) {
@@ -185,9 +189,10 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
     }
 
     protected function getSchemeSpecificPart() {
+        $scheme = $this->scheme;
         $authority = $this->getAuthority();
         if (!empty($authority)) {
-            $authority = $this->scheme . '://' . $authority;
+            $authority = (!empty($scheme) ? $scheme . ':' : '') . '//' . $authority;
         }
         return $authority . $this->getUriRelativeComponents();
     }
