@@ -4,7 +4,6 @@ namespace CM\Test\Url;
 
 use CMTest_TH;
 use CMTest_TestCase;
-use CM\Url\BaseUrl;
 use CM\Url\StaticUrl;
 
 class StaticUrlTest extends CMTest_TestCase {

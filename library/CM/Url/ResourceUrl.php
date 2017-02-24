@@ -37,13 +37,8 @@ class ResourceUrl extends AssetUrl {
         if ($deployVersion = $this->getDeployVersion()) {
             $segments[] = $deployVersion;
         }
-        $path = $this->path->prepend(
-            HierarchicalPath::createFromSegments($segments, HierarchicalPath::IS_ABSOLUTE)
-        );
-        return ''
-            . $path->getUriComponent()
-            . $this->query->getUriComponent()
-            . $this->fragment->getUriComponent();
+        $segments = array_merge($segments, $this->getPathSegments());
+        return '/' . implode('/', $segments) . $this->getQueryComponent() . $this->getFragmentComponent();
     }
 
     /**

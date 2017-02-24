@@ -161,7 +161,7 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
      */
     public function getQueryComponent() {
         $query = (string) $this->query;
-        return $query ? '?' . $query : $query;
+        return !empty($query) ? '?' . $query : $query;
     }
 
     /**
@@ -169,7 +169,7 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
      */
     public function getFragmentComponent() {
         $fragment = (string) $this->fragment;
-        return $fragment ? '#' . $fragment : $fragment;
+        return !empty($fragment) ? '#' . $fragment : $fragment;
     }
 
     /**

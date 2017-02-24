@@ -3,26 +3,16 @@
 namespace CM\Url;
 
 use CM_Frontend_Environment;
-use League\Uri\Components\HierarchicalPath;
-use League\Uri\Components\Query;
 
 class StaticUrl extends AssetUrl {
 
     public function getUriRelativeComponents() {
-        $path = $this->path->prepend(
-            HierarchicalPath::createFromSegments(['static'], HierarchicalPath::IS_ABSOLUTE)
-        );
-        /** @var Query $query */
-        $query = $this->query;
+        $query = $this->getQueryComponent();
         if ($deployVersion = $this->getDeployVersion()) {
-            $pairs = $query->getPairs();
-            $pairs[(string) $deployVersion] = null;
-            $query = Query::createFromPairs($pairs);
+            $query .= (!empty($query) ? '&' : '?') . $this->getDeployVersion();
         }
-        return ''
-            . $path->getUriComponent()
-            . $query->getUriComponent()
-            . $this->fragment->getUriComponent();
+        $segments = array_merge(['static'], $this->getPathSegments());
+        return '/' . implode('/', $segments) . $query . $this->getFragmentComponent();
     }
 
     /**

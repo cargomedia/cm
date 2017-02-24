@@ -4,11 +4,7 @@ namespace CM\Test\Url;
 
 use CMTest_TH;
 use CMTest_TestCase;
-use CM_Model_Language;
-use CM_Frontend_Environment;
-use CM\Url\UrlInterface;
 use CM\Url\AssetUrl;
-use League\Uri\Components\HierarchicalPath;
 
 class AssetUrlTest extends CMTest_TestCase {
 
@@ -55,16 +51,11 @@ class CM_Url_AssetMockUrl extends AssetUrl {
         if ($deployVersion = $this->getDeployVersion()) {
             $segments[] = $deployVersion;
         }
-        $path = $this->path->prepend(
-            HierarchicalPath::createFromSegments($segments, HierarchicalPath::IS_ABSOLUTE)
-        );
-        return ''
-            . $path->getUriComponent()
-            . $this->query->getUriComponent()
-            . $this->fragment->getUriComponent();
+        $segments = array_merge($segments, $this->getPathSegments());
+        return '/' . implode('/', $segments) . $this->getQueryComponent() . $this->getFragmentComponent();
     }
 
-    public static function create($url, UrlInterface $baseUrl = null, CM_Model_Language $language = null) {
-        return parent::_create($url, $baseUrl, $language);
+    public static function create($url) {
+        return parent::_create($url);
     }
 }
