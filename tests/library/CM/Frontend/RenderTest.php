@@ -102,7 +102,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
     public function testGetUrlStatic() {
         $render = new CM_Frontend_Render();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame('http://cdn.default.dev/static/', $render->getUrlStatic());
+        $this->assertSame('http://cdn.default.dev/static', $render->getUrlStatic());
         $this->assertSame('http://cdn.default.dev/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
         $this->assertSame('http://cdn.default.dev/static/0?' . $deployVersion, $render->getUrlStatic('/0'));
     }

@@ -20,7 +20,7 @@ class BaseUrl extends AbstractUrl {
         if ($prefix = $this->getPrefix()) {
             $segments = array_merge([$prefix], $segments);
         }
-        return '/' . implode('/', $segments);
+        return $this->getPathFromSegments($segments);
     }
 
     /**

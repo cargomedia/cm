@@ -12,7 +12,7 @@ class StaticUrl extends AssetUrl {
             $query .= (!empty($query) ? '&' : '?') . $this->getDeployVersion();
         }
         $segments = array_merge(['static'], $this->getPathSegments());
-        return '/' . implode('/', $segments) . $query . $this->getFragmentComponent();
+        return $this->getPathFromSegments($segments) . $query . $this->getFragmentComponent();
     }
 
     /**

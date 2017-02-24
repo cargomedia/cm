@@ -14,7 +14,7 @@ class RouteUrl extends AbstractUrl {
         if ($language = $this->getLanguage()) {
             $segments[] = $language->getAbbreviation();
         }
-        return '/' . implode('/', $segments) . $this->getQueryComponent() . $this->getFragmentComponent();
+        return $this->getPathFromSegments($segments) . $this->getQueryComponent() . $this->getFragmentComponent();
     }
 
     /**

@@ -157,7 +157,7 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
      * @return array
      */
     public function getPathSegments() {
-        return array_filter(explode('/', $this->path));
+        return $this->filterPathSegments(explode('/', $this->path));
     }
 
     /**
@@ -174,6 +174,25 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
     public function getFragmentComponent() {
         $fragment = (string) $this->fragment;
         return !empty($fragment) ? '#' . $fragment : $fragment;
+    }
+
+    /**
+     * @param array|null $segments
+     * @return string
+     */
+    public function getPathFromSegments(array $segments = null) {
+        $segments = $this->filterPathSegments($segments);
+        return '/' . implode('/', $segments);
+    }
+
+    /**
+     * @param array|null $segments
+     * @return array
+     */
+    public function filterPathSegments(array $segments = null) {
+        return array_filter((array) $segments, function ($value) {
+            return null !== $value && '' !== $value;
+        });
     }
 
     /**

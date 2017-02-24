@@ -14,7 +14,7 @@ class Url extends AbstractUrl {
         if ($prefix = $this->getPrefix()) {
             $segments = array_merge([$prefix], $segments);
         }
-        return '/' . implode('/', $segments) . $this->getQueryComponent() . $this->getFragmentComponent();
+        return $this->getPathFromSegments($segments) . $this->getQueryComponent() . $this->getFragmentComponent();
     }
 
     /**

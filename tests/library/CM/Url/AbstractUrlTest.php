@@ -26,6 +26,10 @@ class AbstractUrlTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM\Url\AbstractUrl', $url);
         $this->assertSame('//example.com/', (string) $url);
 
+        $url = new CM_Url_AbstractMockUrl('http://example.com/0');
+        $this->assertInstanceOf('CM\Url\AbstractUrl', $url);
+        $this->assertSame('http://example.com/0', (string) $url);
+
         $url = new CM_Url_AbstractMockUrl('http://스타벅스코리아.com/path/../foo/./bar');
         $this->assertInstanceOf('CM\Url\AbstractUrl', $url);
         $this->assertSame('http://스타벅스코리아.com/foo/bar', (string) $url);
@@ -227,7 +231,7 @@ class CM_Url_AbstractMockUrl extends AbstractUrl {
         if ($language = $this->getLanguage()) {
             $segments[] = $language->getAbbreviation();
         }
-        return '/' . implode('/', $segments) . $this->getQueryComponent() . $this->getFragmentComponent();
+        return $this->getPathFromSegments($segments) . $this->getQueryComponent() . $this->getFragmentComponent();
     }
 
     public static function create($url, CM_Frontend_Environment $environment = null) {
