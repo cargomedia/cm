@@ -2,9 +2,6 @@
 
 class CM_Jobdistribution_Cli extends CM_Cli_Runnable_Abstract {
 
-    /**
-     * @keepalive
-     */
     public function startWorker() {
         $worker = new CM_Jobdistribution_JobWorker(1000);
         $worker->setServiceManager($this->getServiceManager());
