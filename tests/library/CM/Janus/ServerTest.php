@@ -15,8 +15,8 @@ class CM_Janus_ServerTest extends CMTest_TestCase {
 
         $this->assertSame($serverId, $server->getId());
         $this->assertSame($key, $server->getKey());
-        $this->assertSame($httpAddress, $server->getHttpAddress());
-        $this->assertSame($webSocketAddress, $server->getWebSocketAddress());
+        $this->assertSame($httpAddress, (string) $server->getHttpAddress());
+        $this->assertSame($webSocketAddress, (string) $server->getWebSocketAddress());
         $this->assertSame($pluginList, $server->getPluginList());
         $this->assertSame($location, $server->getLocation());
         $this->assertSame($iceServerList, $server->getIceServerList());
@@ -32,6 +32,6 @@ class CM_Janus_ServerTest extends CMTest_TestCase {
 
         $server = new CM_Janus_Server($serverId, $key, $httpAddress, $webSocketAddress, $pluginList, $location);
 
-        $this->assertSame('ws://connect:8810/?subscribeOnly=1', $server->getWebSocketAddressSubscribeOnly());
+        $this->assertSame('ws://connect:8810/?subscribeOnly=1', (string) $server->getWebSocketAddressSubscribeOnly());
     }
 }

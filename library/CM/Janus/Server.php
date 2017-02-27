@@ -65,17 +65,17 @@ class CM_Janus_Server implements JsonSerializable {
     }
 
     /**
-     * @return string
+     * @return Url
      */
     public function getHttpAddress() {
-        return (string) $this->_httpAddress;
+        return $this->_httpAddress;
     }
 
     /**
-     * @return string
+     * @return WsUrl
      */
     public function getWebSocketAddress() {
-        return (string) $this->_webSocketAddress;
+        return $this->_webSocketAddress;
     }
 
     /**
