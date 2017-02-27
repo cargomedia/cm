@@ -8,7 +8,23 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->never())->method('_findLock');
         $commandManagerMock->expects($this->never())->method('_lockCommand');
         $commandManagerMock->expects($this->never())->method('unlockCommand');
-        $this->_runCommandManagerMock($commandManagerMock);
+        $this->assertSame(0, $this->_runCommandManagerMock($commandManagerMock));
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testCommandThrowingError() {
+        $process = CM_Process::getInstance();
+        $commandMock = $this->_getCommandMock(false, false, null, function () {
+            throw new Exception('foo');
+        });
+        $commandManagerMock = $this->_getCommandManagerMock($commandMock, 'Exception: foo', $process);
+        $commandManagerMock->expects($this->never())->method('_findLock');
+        $commandManagerMock->expects($this->never())->method('_lockCommand');
+        $commandManagerMock->expects($this->never())->method('unlockCommand');
+        $this->assertSame(1, $this->_runCommandManagerMock($commandManagerMock));
     }
 
     public function testKeepAlive() {
@@ -17,7 +33,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->never())->method('_findLock');
         $commandManagerMock->expects($this->never())->method('_lockCommand');
         $commandManagerMock->expects($this->never())->method('unlockCommand');
-        $this->_runCommandManagerMock($commandManagerMock);
+        $this->assertSame(0, $this->_runCommandManagerMock($commandManagerMock));
     }
 
     public function testFork() {
@@ -26,7 +42,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->never())->method('_findLock');
         $commandManagerMock->expects($this->never())->method('_lockCommand');
         $commandManagerMock->expects($this->never())->method('unlockCommand');
-        $this->_runCommandManagerMock($commandManagerMock, 5);
+        $this->assertSame(0, $this->_runCommandManagerMock($commandManagerMock, 5));
     }
 
     public function testForkAndKeepAlive() {
@@ -35,7 +51,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->never())->method('_findLock');
         $commandManagerMock->expects($this->never())->method('_lockCommand');
         $commandManagerMock->expects($this->never())->method('unlockCommand');
-        $this->_runCommandManagerMock($commandManagerMock, 5);
+        $this->assertSame(0, $this->_runCommandManagerMock($commandManagerMock, 5));
     }
 
     public function testSingleThreadSynchronized() {
@@ -44,7 +60,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->once())->method('_findLock')->with($commandMock)->will($this->returnValue(null));
         $commandManagerMock->expects($this->once())->method('_lockCommand')->with($commandMock);
         $commandManagerMock->expects($this->once())->method('unlockCommand')->with($commandMock);
-        $this->_runCommandManagerMock($commandManagerMock);
+        $this->assertSame(0, $this->_runCommandManagerMock($commandManagerMock));
     }
 
     public function testSingleThreadSynchronizedLocked() {
@@ -54,7 +70,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->once())->method('_findLock')->with($commandMock)->will($this->returnValue($lock));
         $commandManagerMock->expects($this->never())->method('_lockCommand');
         $commandManagerMock->expects($this->never())->method('unlockCommand');
-        $this->_runCommandManagerMock($commandManagerMock);
+        $this->assertSame(1, $this->_runCommandManagerMock($commandManagerMock));
     }
 
     public function testKeepAliveSynchronized() {
@@ -63,7 +79,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->once())->method('_findLock')->with($commandMock)->will($this->returnValue(null));
         $commandManagerMock->expects($this->once())->method('_lockCommand')->with($commandMock);
         $commandManagerMock->expects($this->once())->method('unlockCommand')->with($commandMock);
-        $this->_runCommandManagerMock($commandManagerMock);
+        $this->assertSame(0, $this->_runCommandManagerMock($commandManagerMock));
     }
 
     public function testKeepAliveSynchronizedLocked() {
@@ -73,7 +89,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->once())->method('_findLock')->with($commandMock)->will($this->returnValue($lock));
         $commandManagerMock->expects($this->never())->method('_lockCommand');
         $commandManagerMock->expects($this->never())->method('unlockCommand');
-        $this->_runCommandManagerMock($commandManagerMock);
+        $this->assertSame(1, $this->_runCommandManagerMock($commandManagerMock));
     }
 
     public function testForkSynchronized() {
@@ -82,7 +98,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->once())->method('_findLock')->with($commandMock)->will($this->returnValue(null));
         $commandManagerMock->expects($this->once())->method('_lockCommand')->with($commandMock);
         $commandManagerMock->expects($this->once())->method('unlockCommand')->with($commandMock);
-        $this->_runCommandManagerMock($commandManagerMock, 5);
+        $this->assertSame(0, $this->_runCommandManagerMock($commandManagerMock, 5));
     }
 
     public function testForkSynchronizedLocked() {
@@ -92,7 +108,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->once())->method('_findLock')->with($commandMock)->will($this->returnValue($lock));
         $commandManagerMock->expects($this->never())->method('_lockCommand');
         $commandManagerMock->expects($this->never())->method('unlockCommand');
-        $this->_runCommandManagerMock($commandManagerMock, 5);
+        $this->assertSame(1, $this->_runCommandManagerMock($commandManagerMock, 5));
     }
 
     public function testForkAndKeepAliveSynchronized() {
@@ -101,7 +117,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->once())->method('_findLock')->with($commandMock)->will($this->returnValue(null));
         $commandManagerMock->expects($this->once())->method('_lockCommand')->with($commandMock);
         $commandManagerMock->expects($this->once())->method('unlockCommand')->with($commandMock);
-        $this->_runCommandManagerMock($commandManagerMock, 5);
+        $this->assertSame(0, $this->_runCommandManagerMock($commandManagerMock, 5));
     }
 
     public function testForkAndKeepAliveSynchronizedLocked() {
@@ -111,7 +127,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->once())->method('_findLock')->with($commandMock)->will($this->returnValue($lock));
         $commandManagerMock->expects($this->never())->method('_lockCommand');
         $commandManagerMock->expects($this->never())->method('unlockCommand');
-        $this->_runCommandManagerMock($commandManagerMock, 5);
+        $this->assertSame(1, $this->_runCommandManagerMock($commandManagerMock, 5));
     }
 
     public function testMonitorSynchronizedCommands() {
@@ -187,34 +203,54 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
     }
 
     /**
-     * @param CM_Cli_Command $commandMock
-     * @param string|null    $errorMessageExpected
+     * @param CM_Cli_Command  $commandMock
+     * @param string|null     $errorMessageExpected
+     * @param CM_Process|null $process
      * @return PHPUnit_Framework_MockObject_MockObject
      */
-    protected function _getCommandManagerMock($commandMock, $errorMessageExpected = null) {
+    protected function _getCommandManagerMock($commandMock, $errorMessageExpected = null, CM_Process $process = null) {
         $keepAliveExpected = $commandMock->getKeepalive();
-        $processMock = $this->_getProcessMock($keepAliveExpected);
+        if (null === $process) {
+            $process = $this->_getProcessMock($keepAliveExpected);
+        }
         $mockBuilder = $this->getMockBuilder('CM_Cli_CommandManager');
-        $mockBuilder->setMethods(['getCommands', '_getProcess', '_findLock', '_lockCommand', 'unlockCommand', '_outputError', '_checkUnusedArguments']);
+        $mockBuilder->setMethods(['getCommands', '_getProcess', '_findLock', '_lockCommand', 'unlockCommand', '_outputError',
+            '_checkUnusedArguments']);
         $commandManagerMock = $mockBuilder->getMock();
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         if (null === $errorMessageExpected) {
             $commandManagerMock->expects($this->never())->method('_outputError');
         } else {
-            $commandManagerMock->expects($this->once())->method('_outputError')->with($errorMessageExpected);
+            $commandManagerMock
+                ->expects($this->any())
+                ->method('_outputError')
+                ->with($this->callback(function ($errorMessage) use ($errorMessageExpected) {
+                    return false !== strpos($errorMessage, $errorMessageExpected);
+                }));
         }
-        $commandManagerMock->expects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
+        $commandManagerMock->expects($this->any())->method('_getProcess')->will($this->returnValue($process));
         $commandManagerMock->expects($this->any())->method('_checkUnusedArguments');
         return $commandManagerMock;
     }
 
     /**
-     * @param bool $synchronized
-     * @param bool $keepAlive
-     * @param int  $expectedRuns
-     * @return CM_Cli_Command
+     * @param bool          $synchronized
+     * @param bool          $keepAlive
+     * @param int           $expectedRuns
+     * @param callable|null $run
+     * @return CM_Cli_Command|PHPUnit_Framework_MockObject_MockObject
      */
-    protected function _getCommandMock($synchronized, $keepAlive, $expectedRuns) {
+    protected function _getCommandMock($synchronized, $keepAlive, $expectedRuns, callable $run = null) {
+        if (null === $run) {
+            $run = function () {
+            };
+        }
+        if (null === $expectedRuns) {
+            $expectedRuns = $this->any();
+        } else {
+            $expectedRuns = $this->exactly($expectedRuns);
+        }
+
         $mockBuilder = $this->getMockBuilder('CM_Cli_Command');
         $mockBuilder->setMethods(['getPackageName', '_getMethodName', 'isAbstract', 'getSynchronized', 'getKeepalive', 'run', 'extractParameters']);
         $mockBuilder->disableOriginalConstructor();
@@ -225,13 +261,13 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandMock->expects($this->any())->method('getSynchronized')->will($this->returnValue($synchronized));
         $commandMock->expects($this->any())->method('getKeepalive')->will($this->returnValue($keepAlive));
         $commandMock->expects($this->any())->method('extractParameters')->will($this->returnValue([]));
-        $commandMock->expects($this->exactly($expectedRuns))->method('run');
+        $commandMock->expects($expectedRuns)->method('run')->willReturnCallback($run);
         return $commandMock;
     }
 
     /**
      * @param bool $keepAliveExpected
-     * @return CM_Process
+     * @return CM_Process|PHPUnit_Framework_MockObject_MockObject
      */
     protected function _getProcessMock($keepAliveExpected) {
         $mockBuilder = $this->getMockBuilder('CM_Process');
@@ -251,10 +287,11 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
     /**
      * @param PHPUnit_Framework_MockObject_MockObject $commandManagerMock
      * @param int|null                                $forks
+     * @return int
      */
     protected function _runCommandManagerMock(PHPUnit_Framework_MockObject_MockObject $commandManagerMock, $forks = null) {
         $forksArgument = isset($forks) ? '--forks=' . $forks : null;
         /** @var CM_Cli_CommandManager $commandManagerMock */
-        $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock', $forksArgument)));
+        return $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock', $forksArgument)));
     }
 }
