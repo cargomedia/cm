@@ -52,6 +52,28 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
         $this->assertSame(3, $instantiateMethod->getCallCount());
     }
 
+    public function testQueueOutstandingUndecodableParam() {
+        $job = $this->mockObject(CM_Jobdistribution_Job_Abstract::class);
+        $delayedQueue = new CM_Jobdistribution_DelayedQueue($this->getServiceManager());
+        $user = CMTest_TH::createUser();
+        $jobParams = ['user' => $user];
+        $delayedQueue->addJob($job, $jobParams, 0);
+        $paramsEncoded = CM_Util::jsonEncode(CM_Params::encode($jobParams));
+        $user->delete();
+        $logger = $this->mockObject(CM_Log_Logger::class);
+        $this->getServiceManager()->replaceInstance('logger', $logger);
+        $jobName = get_class($job);
+
+        $addMessageMock = $logger->mockMethod('addMessage')->set(function ($message, $level, CM_Log_Context $context = null) use ($jobName, $paramsEncoded) {
+            $this->assertSame('Job-params could not be decoded', $message);
+            $this->assertSame(CM_Log_Logger::WARNING, $level);
+            $this->assertEquals(['job' => $jobName, 'paramsEncoded' => $paramsEncoded], $context->getExtra());
+            $this->assertInstanceOf(CM_Exception_Nonexistent::class, $context->getException());
+        });
+        $delayedQueue->queueOutstanding();
+        $this->assertSame(1, $addMessageMock->getCallCount());
+    }
+
     public function testCancelJob() {
         /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait $job */
         $jobToExec = $this->mockObject('CM_Jobdistribution_Job_Abstract');
@@ -97,6 +119,37 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
         $this->assertSame(1, $instantiateMethod->getCallCount());
         $this->assertSame(1, $queueExecMethod->getCallCount());
         $this->assertSame(0, $queueCancelMethod->getCallCount());
+    }
+
+    public function testCountJob() {
+        /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait $job */
+        $job = $this->mockObject('CM_Jobdistribution_Job_Abstract');
+        /** @var CM_Jobdistribution_DelayedQueue|\Mocka\AbstractClassTrait $delayedQueue */
+        $delayedQueue = $this->mockObject('CM_Jobdistribution_DelayedQueue', [$this->getServiceManager()]);
+
+        $this->assertSame(0, $delayedQueue->countJob($job, []));
+        $this->assertSame(0, $delayedQueue->countJob($job, ['foo' => 1]));
+
+        $delayedQueue->addJob($job, [], 1);
+        $this->assertSame(1, $delayedQueue->countJob($job, []));
+        $this->assertSame(0, $delayedQueue->countJob($job, ['foo' => 1]));
+
+        $delayedQueue->addJob($job, ['foo' => 1], 1);
+        $this->assertSame(1, $delayedQueue->countJob($job, []));
+        $this->assertSame(1, $delayedQueue->countJob($job, ['foo' => 1]));
+        $this->assertSame(0, $delayedQueue->countJob($job, ['foo' => 2]));
+
+        $delayedQueue->addJob($job, ['foo' => 2], 1);
+        $delayedQueue->addJob($job, ['foo' => 2], 2);
+        $this->assertSame(1, $delayedQueue->countJob($job, []));
+        $this->assertSame(1, $delayedQueue->countJob($job, ['foo' => 1]));
+        $this->assertSame(2, $delayedQueue->countJob($job, ['foo' => 2]));
+
+        CMTest_TH::timeForward(1);
+        $delayedQueue->queueOutstanding();
+        $this->assertSame(0, $delayedQueue->countJob($job, []));
+        $this->assertSame(0, $delayedQueue->countJob($job, ['foo' => 1]));
+        $this->assertSame(1, $delayedQueue->countJob($job, ['foo' => 2]));
     }
 
     public function test_instantiateJobSetServiceManager() {

@@ -70,8 +70,7 @@ return function (CM_Config_Node $config) {
     $config->CM_Adprovider->enabled = true;
     $config->CM_Adprovider->zones = array();
 
-    $config->CM_AdproviderAdapter_Abstract->class = 'CM_AdproviderAdapter_Openx';
-    $config->CM_AdproviderAdapter_Openx->host = 'www.example.dev';
+    $config->CM_AdproviderAdapter_Abstract->class = CM_AdproviderAdapter_Revive::class;
 
     $config->CM_Jobdistribution_JobWorker->servers = array(array('host' => 'localhost', 'port' => 4730));
 

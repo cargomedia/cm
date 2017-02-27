@@ -99,10 +99,11 @@ class CM_Util {
      * @param array|null   $params
      * @param boolean|null $methodPost
      * @param int|null     $timeout
+     * @param array|null   $header
      * @throws CM_Exception_Invalid
      * @return string
      */
-    public static function getContents($url, array $params = null, $methodPost = null, $timeout = null) {
+    public static function getContents($url, array $params = null, $methodPost = null, $timeout = null, array $headers = null) {
         $url = (string) $url;
         if (!empty($params)) {
             $params = http_build_query($params);
@@ -126,6 +127,9 @@ class CM_Util {
             if (!empty($params)) {
                 $url .= '?' . $params;
             }
+        }
+        if ($headers) {
+            curl_setopt($curlConnection, CURLOPT_HTTPHEADER, $headers);
         }
         curl_setopt($curlConnection, CURLOPT_URL, $url);
 
@@ -275,6 +279,30 @@ class CM_Util {
             $path = DIR_ROOT . $path;
         }
         return $path;
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getMigrationPaths() {
+        $paths = [
+            CM_Util::getMigrationPathByModule(),
+        ];
+        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
+            $paths[] = CM_Util::getMigrationPathByModule($moduleName);
+        }
+        return array_unique($paths);
+    }
+
+    /**
+     * @param string|null $moduleName
+     * @return string
+     */
+    public static function getMigrationPathByModule($moduleName = null) {
+        $modulePath = null !== $moduleName ? CM_Util::getModulePath((string) $moduleName) : DIR_ROOT;
+        return CM_File_Filesystem::normalizePath(
+            join(DIRECTORY_SEPARATOR, [$modulePath, 'resources', 'migration'])
+        );
     }
 
     /**
