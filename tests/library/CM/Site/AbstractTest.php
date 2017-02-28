@@ -80,16 +80,6 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertSame(false, $site->isUrlMatch('something.my-site.com', '/foo'));
     }
 
-    public function testFactory() {
-        try {
-            CM_Site_Abstract::factory(9999);
-            $this->fail('Factory returned non-configured site');
-        } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
-            $this->assertSame('Site with given type is not configured', $ex->getMessage());
-            $this->assertSame(['siteType' => 9999], $ex->getMetaInfo());
-        }
-    }
-
     public function testEquals() {
         $siteFoo = $this->mockClass('CM_Site_Abstract');
         /** @var CM_Site_Abstract $siteFoo1 */

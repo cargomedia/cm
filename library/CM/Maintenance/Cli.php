@@ -7,7 +7,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
      * @synchronized
-     * @keepalive
      */
     public function start() {
         $this->_clockworkManager = new CM_Clockwork_Manager();

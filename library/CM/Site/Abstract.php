@@ -259,20 +259,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @param int|null $type
-     * @return CM_Site_Abstract
-     * @throws CM_Class_Exception_TypeNotConfiguredException
-     */
-    public static function factory($type = null) {
-        try {
-            $class = self::_getClassName($type);
-        } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
-            throw new CM_Class_Exception_TypeNotConfiguredException('Site with given type is not configured', CM_Exception::WARN, ['siteType' => $type]);
-        }
-        return new $class();
-    }
-
-    /**
      * @return int Site id
      */
     public function getId() {
@@ -281,6 +267,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     public static function fromArray(array $array) {
         $type = (int) $array['type'];
-        return self::factory($type);
+        return (new CM_Site_SiteFactory())->getSiteById($type);
     }
 }

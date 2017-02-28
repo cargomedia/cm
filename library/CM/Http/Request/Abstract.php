@@ -262,10 +262,11 @@ abstract class CM_Http_Request_Abstract {
      */
     public function popPathSite() {
         $siteId = $this->popPathPart();
+        $siteFactory = new CM_Site_SiteFactory();
         if ('null' === $siteId) {
-            $siteId = null;
+            return $siteFactory->getDefaultSite();
         }
-        return CM_Site_Abstract::factory($siteId);
+        return $siteFactory->getSiteById($siteId);
     }
 
     /**
@@ -275,7 +276,7 @@ abstract class CM_Http_Request_Abstract {
         $siteFactory = new CM_Site_SiteFactory();
         $site = $siteFactory->findSite($this);
         if (null === $site) {
-            $site = CM_Site_Abstract::factory();
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();
         }
 
         $sitePath = $site->getUrl()->getUriRelativeComponents();
