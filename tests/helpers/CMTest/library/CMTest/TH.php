@@ -229,7 +229,7 @@ class CMTest_TH {
      * @throws CM_Class_Exception_TypeNotConfiguredException
      */
     public static function createResponsePage($uri, CM_Model_User $viewer = null) {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $headers = array('host' => $site->getHost());
         $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
         return CM_Http_Response_Page::createFromRequest($request, $site, self::getServiceManager());

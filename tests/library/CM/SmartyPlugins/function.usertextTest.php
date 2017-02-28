@@ -76,7 +76,7 @@ class smarty_function_usertextTest extends CMTest_TestCase {
 
     public function testIsMail() {
         $emoticon = CM_Emoticon::findByCode(':-)');
-        $siteDefault = CM_Site_Abstract::factory();
+        $siteDefault = (new CM_Site_SiteFactory())->getDefaultSite();
         $this->_assertSame(
             '<span class="usertext oneline">foo <img src="http://cdn.default.dev/layout/' . $siteDefault->getId() . '/' .
             CM_App::getInstance()->getDeployVersion() .

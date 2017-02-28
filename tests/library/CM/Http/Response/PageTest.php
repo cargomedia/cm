@@ -7,7 +7,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessRedirect() {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $request = new CM_Http_Request_Get('/mock11?count=3', ['host' => $site->getHost()]);
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
 
@@ -17,7 +17,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
 
     public function testProcessLanguageNoRedirect() {
         $language = CMTest_TH::createLanguage('en');
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
 
         $request = new CM_Http_Request_Get('/en/mock5', ['host' => $site->getHost()]);
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
@@ -40,7 +40,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessHostNoRedirect() {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $request = new CM_Http_Request_Get('/mock5', ['host' => $site->getHost()]);
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
 
@@ -51,7 +51,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessHostUnknownRedirect() {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $request = new CM_Http_Request_Get('/mock5?foo=bar', ['host' => 'unknown-host.org']);
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
@@ -92,7 +92,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessTrackingDisabled() {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $request = new CM_Http_Request_Get('/mock5', ['host' => $site->getHost()]);
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
 
@@ -104,7 +104,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessTrackingCanNotTrackPageView() {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $request = new CM_Http_Request_Get('/mock8', ['host' => $site->getHost()]);
         $serviceManager = $this->_getServiceManager('ga123', 'km123');
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $serviceManager);
@@ -117,7 +117,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessTrackingVirtualPageView() {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $request = new CM_Http_Request_Get('/mock9', ['host' => $site->getHost()]);
         $serviceManager = $this->_getServiceManager('ga123', 'km123');
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $serviceManager);
@@ -139,7 +139,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         ];
         $this->getMockClass('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
 
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $request = new CM_Http_Request_Get('/mock10', ['host' => $site->getHost()]);
         $serviceManager = $this->_getServiceManager('ga123', 'km123');
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $serviceManager);
@@ -156,7 +156,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessTrackingGuest() {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $request = new CM_Http_Request_Get('/mock5', ['host' => $site->getHost()]);
         $serviceManager = $this->_getServiceManager('ga123', 'km123');
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $serviceManager);
@@ -181,7 +181,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $viewerMock->expects($this->any())->method('getLanguage')->will($this->returnValue(null));
         $viewerMock->expects($this->any())->method('getCurrency')->will($this->returnValue(null));
 
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $request = new CM_Http_Request_Get('/mock5', ['host' => $site->getHost()], null, $viewerMock);
         $serviceManager = $this->_getServiceManager('ga123', 'km123');
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $serviceManager);
@@ -204,7 +204,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         ];
         $this->getMockClass('CM_Layout_Abstract', null, [], 'CM_Layout_Default');
 
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $request = new CM_Http_Request_Get('/example', ['host' => $site->getHost()]);
         /** @var CM_Http_Response_Page|\Mocka\AbstractClassTrait $response */
         $response = $this->mockObject('CM_Http_Response_Page', [$request, $site, $this->getServiceManager()]);
