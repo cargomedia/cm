@@ -11,7 +11,7 @@ class CM_Maintenance_Service implements CM_Service_ManagerAwareInterface {
     private $_clockworkStorage;
 
     /** @var CM_Maintenance_Event[] */
-    private $_eventList = [];
+    private $_eventMap = [];
 
     /** @var CM_EventHandler_EventHandler */
     private $_eventHandler;
@@ -50,13 +50,10 @@ class CM_Maintenance_Service implements CM_Service_ManagerAwareInterface {
         $name = (string) $name;
         $dateTimeString = (string) $dateTimeString;
 
-        $duplicateEventName = \Functional\some($this->_eventList, function (CM_Maintenance_Event $event) use ($name) {
-            return $event->getName() == $name;
-        });
-        if ($duplicateEventName) {
+        if ($this->_eventExists($name)) {
             throw new CM_Exception_Invalid('Duplicate event-name', null, ['event' => $name]);
         }
-        $this->_eventList[] = new CM_Maintenance_Event($name, $dateTimeString, $callback);
+        $this->_eventMap[$name] = new CM_Maintenance_Event($name, $dateTimeString, $callback);
     }
 
     /**
@@ -82,7 +79,7 @@ class CM_Maintenance_Service implements CM_Service_ManagerAwareInterface {
     /**
      * @return CM_Clockwork_Manager
      */
-    private function _getClockworkManager() {
+    protected function _getClockworkManager() {
         if (!$this->_clockworkManager) {
             $this->_clockworkManager = new CM_Clockwork_Manager($this->_eventHandler);
             $this->_clockworkManager->setStorage($this->_clockworkStorage);
@@ -91,8 +88,16 @@ class CM_Maintenance_Service implements CM_Service_ManagerAwareInterface {
         return $this->_clockworkManager;
     }
 
+    /**
+     * @param string $eventName
+     * @return boolean
+     */
+    private function _eventExists($eventName) {
+        return (array_key_exists((string) $eventName, $this->_eventMap));
+    }
+
     private function _registerClockworkEvents() {
-        foreach ($this->_eventList as $event) {
+        foreach ($this->_eventMap as $name => $event) {
             $this->_clockworkManager->registerEvent($event->getClockworkEvent());
             $this->_eventHandler->bind($event->getName(), function (CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) {
                 $job = new CM_Maintenance_RunEventJob();
@@ -113,13 +118,10 @@ class CM_Maintenance_Service implements CM_Service_ManagerAwareInterface {
      */
     private function _getEvent($eventName) {
         $eventName = (string) $eventName;
-        $event = \Functional\first($this->_eventList, function (CM_Maintenance_Event $event) use ($eventName) {
-            return $event->getName() === $eventName;
-        });
-        if (null === $event) {
+        if (!$this->_eventExists($eventName)) {
             throw new CM_Exception_Invalid('Event not found', null, ['event' => $eventName]);
         }
-        return $event;
+        return $this->_eventMap[$eventName];
     }
 
 }

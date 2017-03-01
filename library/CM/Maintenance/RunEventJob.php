@@ -16,7 +16,7 @@ class CM_Maintenance_RunEventJob extends CM_Jobdistribution_Job_Abstract impleme
         try {
             $maintenance->runEvent($eventName, $lastRuntime);
             $result->setSuccess();
-        } catch (CM_Exception $e) {
+        } catch (Exception $e) {
             $result->setFailure();
             throw $e;
         } finally {

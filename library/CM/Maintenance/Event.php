@@ -2,7 +2,7 @@
 
 class CM_Maintenance_Event {
 
-    /** @var callable */
+    /** @var Closure */
     private $_callback;
 
     /**

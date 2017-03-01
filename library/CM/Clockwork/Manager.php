@@ -24,7 +24,7 @@ class CM_Clockwork_Manager {
      * @param CM_EventHandler_EventHandlerInterface $eventHandler
      */
     public function __construct(CM_EventHandler_EventHandlerInterface $eventHandler) {
-        $this->_events = array();
+        $this->_events = [];
         $this->_storage = new CM_Clockwork_Storage_Memory();
         $this->_timeZone = CM_Bootloader::getInstance()->getTimeZone();
         $this->_startTime = $this->_getCurrentDateTimeUTC();
@@ -40,12 +40,12 @@ class CM_Clockwork_Manager {
         if ($this->_eventExists($eventName)) {
             throw new CM_Exception('Duplicate event-name', null, ['eventName' => $eventName]);
         }
-        $this->_events[] = $event;
+        $this->_events[$eventName] = $event;
     }
 
     public function runEvents() {
         $this->_storage->fetchData();
-        foreach ($this->_events as $event) {
+        foreach ($this->_events as $name => $event) {
             $status = $this->_getStatus($event);
 
             // TODO: remove debug-code
@@ -126,7 +126,7 @@ class CM_Clockwork_Manager {
     }
 
     protected function _getCurrentDateTimeUTC() {
-        return new DateTime('now', new DateTimeZone('UTC'));
+        return DateTime::createFromFormat('U', time(), new DateTimeZone('UTC'));
     }
 
     /**
@@ -213,11 +213,7 @@ class CM_Clockwork_Manager {
      * @return boolean
      */
     protected function _eventExists($eventName) {
-        $eventName = (string) $eventName;
-        $duplicateEventName = \Functional\some($this->_events, function (CM_Clockwork_Event $event) use ($eventName) {
-            return $event->getName() === $eventName;
-        });
-        return $duplicateEventName;
+        return (array_key_exists((string) $eventName, $this->_events));
     }
 
     /**
