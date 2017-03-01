@@ -232,7 +232,7 @@ class CM_ParamsTest extends CMTest_TestCase {
 
     public function testDecodeArrayConvertible() {
         $object = $this->mockInterface('CM_ArrayConvertible');
-        $fromArrayMethod = $object->mockStaticMethod('fromArray')->set(function ($encoded) {
+        $fromArrayMethod = $object->mockMethod('fromArray')->set(function ($encoded) {
             $this->assertSame(['foo' => 1], $encoded);
             return $encoded['foo'];
         });
@@ -246,12 +246,12 @@ class CM_ParamsTest extends CMTest_TestCase {
 
     public function testDecodeArrayConvertibleRecursive() {
         $objectOuter = $this->mockInterface('CM_ArrayConvertible');
-        $fromArrayMethodOuter = $objectOuter->mockStaticMethod('fromArray')->set(function ($encoded) {
+        $fromArrayMethodOuter = $objectOuter->mockMethod('fromArray')->set(function ($encoded) {
             $this->assertSame(['foo' => 1, 'object' => 2], $encoded);
             return (int) $encoded['foo'] . $encoded['object'];
         });
         $objectInner = $this->mockInterface('CM_ArrayConvertible');
-        $fromArrayMethodInner = $objectInner->mockStaticMethod('fromArray')->set(function ($encoded) {
+        $fromArrayMethodInner = $objectInner->mockMethod('fromArray')->set(function ($encoded) {
             $this->assertSame(['bar' => 2], $encoded);
             return $encoded['bar'];
         });
@@ -389,11 +389,11 @@ class CM_ParamsTest extends CMTest_TestCase {
             'bar'     => 1,
             'nested2' => $encodedJsonSerializable
         ];
-        $fromArrayMethodObject = $object->mockStaticMethod('fromArray')->set(function ($encoded) use ($encodedJsonSerializable) {
+        $fromArrayMethodObject = $object->mockMethod('fromArray')->set(function ($encoded) use ($encodedJsonSerializable) {
             $this->assertSame(['foo' => 1, 'nested1' => 2, 'bar' => 1, 'nested2' => $encodedJsonSerializable], $encoded);
             return [$encoded['foo'], $encoded['nested1']];
         });
-        $fromArrayMethodNestedObject = $nestedArrayConvertible->mockStaticMethod('fromArray')->set(function ($encoded) {
+        $fromArrayMethodNestedObject = $nestedArrayConvertible->mockMethod('fromArray')->set(function ($encoded) {
             $this->assertSame(['foo' => 2], $encoded);
             return $encoded['foo'];
         });
@@ -453,7 +453,7 @@ class CM_ParamsTest extends CMTest_TestCase {
             'bar' => 'bar',
         ];
         $paramsClass = $this->mockClass('CM_Params');
-        $decodeMethod = $paramsClass->mockStaticMethod('decode')
+        $decodeMethod = $paramsClass->mockMethod('decode')
             ->at(0, function ($value) {
                 $this->assertSame('foo', $value);
                 return $value . '-decoded';
@@ -484,7 +484,7 @@ class CM_ParamsTest extends CMTest_TestCase {
             'bar' => 'bar',
         ];
         $paramsClass = $this->mockClass('CM_Params');
-        $encodeMethod = $paramsClass->mockStaticMethod('encode')
+        $encodeMethod = $paramsClass->mockMethod('encode')
             ->at(0, function ($value) {
                 $this->assertSame('foo', $value);
                 return $value . '-encoded';

@@ -96,7 +96,7 @@ class CM_Log_LoggerTest extends CMTest_TestCase {
         foreach ($levels as $label => $code) {
             $methodName = strtolower($label);
             $logger->$methodName($message, $context);
-            $this->assertSame([$message, $code, $context], $addMessage->getLastCall()->getArguments());
+            $this->assertSame([$message, $code, $context], $addMessage->getCalls()->getLast()->getArguments());
         }
     }
 

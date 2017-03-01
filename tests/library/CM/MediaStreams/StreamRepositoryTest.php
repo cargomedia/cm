@@ -29,9 +29,9 @@ class CM_MediaStreams_StreamRepositoryTest extends CMTest_TestCase {
     }
 
     public function testRemoveStreamChannel() {
-        $streamSubscribe = $this->mockObject();
+        $streamSubscribe = $this->mockClass(CM_Model_Stream_Subscribe::class)->newInstanceWithoutConstructor();
         $streamSubscribe->mockMethod('delete');
-        $streamPublish = $this->mockObject();
+        $streamPublish = $this->mockClass(CM_Model_Stream_Publish::class)->newInstanceWithoutConstructor();
         $streamPublish->mockMethod('delete');
 
         $pagingSubscribes = $this->mockClass('CM_Paging_StreamSubscribe_StreamChannel')->newInstanceWithoutConstructor();
@@ -39,7 +39,6 @@ class CM_MediaStreams_StreamRepositoryTest extends CMTest_TestCase {
         $pagingPublishs = $this->mockClass('CM_Paging_StreamPublish_StreamChannel')->newInstanceWithoutConstructor();
         $pagingPublishs->mockMethod('getItems')->set([$streamPublish]);
 
-        /** @var CM_Model_StreamChannel_Abstract|\Mocka\AbstractClassTrait $streamChannel */
         $streamChannel = $this->mockClass('CM_Model_StreamChannel_Abstract')->newInstanceWithoutConstructor();
         $streamChannel->mockMethod('delete');
         $streamChannel->mockMethod('getStreamSubscribes')->set($pagingSubscribes);
@@ -48,8 +47,8 @@ class CM_MediaStreams_StreamRepositoryTest extends CMTest_TestCase {
         $streamRepository = new CM_MediaStreams_StreamRepository(1);
         $streamRepository->removeStreamChannel($streamChannel);
 
-        $this->assertSame(1, $streamSubscribe->mockMethod('delete')->getCallCount());
-        $this->assertSame(1, $streamPublish->mockMethod('delete')->getCallCount());
-        $this->assertSame(1, $streamChannel->mockMethod('delete')->getCallCount());
+        $this->assertSame(1, $streamSubscribe->getOverrides()->get('delete')->getCallCount());
+        $this->assertSame(1, $streamPublish->getOverrides()->get('delete')->getCallCount());
+        $this->assertSame(1, $streamChannel->getOverrides()->get('delete')->getCallCount());
     }
 }

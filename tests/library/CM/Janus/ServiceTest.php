@@ -46,7 +46,7 @@ class CM_Janus_ServiceTest extends CMTest_TestCase {
     }
 
     public function testStopStream() {
-        $streamChannel = $this->mockClass('CM_Model_StreamChannel_Abstract')->newInstanceWithoutConstructor();
+        $streamChannel = $this->mockClass('CM_Model_StreamChannel_Media')->newInstanceWithoutConstructor();
         $streamChannel->mockMethod('getServerId')->set(1);
 
         $stream = $this->mockClass('CM_Model_Stream_Abstract')->newInstanceWithoutConstructor();
