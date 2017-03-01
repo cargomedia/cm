@@ -18,16 +18,18 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $eventHandler = new CM_EventHandler_EventHandler();
         $clockwork = new CM_Clockwork_Manager($eventHandler);
         $event = new CM_Clockwork_Event('foo', '1 second');
-        $eventCounter = $this->_registerEvent($clockwork, $eventHandler, $event, function (CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) {
+        $currently = DateTime::createFromFormat('U', time());
+        $lastRuntime = DateTime::createFromFormat('U', time() - 1);
+        $eventCounter = $this->_registerEvent($clockwork, $eventHandler, $event, function (CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) use ($currently, $lastRuntime) {
             $this->assertSame('foo', $event->getName());
             $this->assertSame(true, $status->isRunning());
-            $this->assertEquals(new DateTime('1 second ago'), $status->getLastRuntime());
-            $this->assertEquals(new DateTime('now'), $status->getLastStartTime());
+            $this->assertEquals($lastRuntime, $status->getLastRuntime());
+            $this->assertEquals($currently, $status->getLastStartTime());
         });
         $storage = new CM_Clockwork_Storage_Memory();
         $clockwork->setStorage($storage);
 
-        $storage->setStatus($event, (new CM_Clockwork_Event_Status())->setLastRuntime(new DateTime('1 second ago')));
+        $storage->setStatus($event, (new CM_Clockwork_Event_Status())->setLastRuntime($lastRuntime));
         $clockwork->runEvents();
         $this->assertSame(1, $eventCounter->getCallCount());
     }
