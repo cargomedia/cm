@@ -32,6 +32,19 @@ class CM_Clockwork_Manager {
     }
 
     /**
+     * @param CM_Clockwork_Event        $event
+     * @param CM_Clockwork_Event_Result $result
+     */
+    public function handleEventResult(CM_Clockwork_Event $event, CM_Clockwork_Event_Result $result) {
+        $this->_checkEventExists($event->getName());
+        if ($result->isSuccessful()) {
+            $this->setCompleted($event);
+        } else {
+            $this->setStopped($event);
+        }
+    }
+
+    /**
      * @param CM_Clockwork_Event $event
      * @throws CM_Exception
      */
@@ -64,16 +77,49 @@ class CM_Clockwork_Manager {
     }
 
     /**
-     * @param CM_Clockwork_Event        $event
-     * @param CM_Clockwork_Event_Result $result
+     * @param CM_Clockwork_Event $event
+     * @throws CM_Exception_Invalid
      */
-    public function handleEventResult(CM_Clockwork_Event $event, CM_Clockwork_Event_Result $result) {
-        $this->_checkEventExists($event->getName());
-        if ($result->isSuccessful()) {
-            $this->setCompleted($event);
-        } else {
-            $this->setStopped($event);
+    public function setCompleted(CM_Clockwork_Event $event) {
+        $eventName = $event->getName();
+        $this->_checkEventExists($eventName);
+        $this->_storage->fetchData();
+        $status = $this->_storage->getStatus($event);
+        $status->setRunning(false)->setLastRuntime($status->getLastStartTime());
+        $this->_storage->setStatus($event, $status);
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     * @param DateTime           $startTime
+     * @throws CM_Exception_Invalid
+     */
+    public function setRunning(CM_Clockwork_Event $event, DateTime $startTime) {
+        $eventName = $event->getName();
+        $this->_checkEventExists($eventName);
+        $this->_storage->fetchData();
+        $status = $this->_storage->getStatus($event);
+        if ($status->isRunning()) {
+            throw new CM_Exception_Invalid('Event is already running', null, ['eventName' => $eventName]);
         }
+        $status->setRunning(true)->setLastStartTime($startTime);
+        $this->_storage->setStatus($event, $status);
+    }
+
+    /**
+     * @param CM_Clockwork_Event $event
+     * @throws CM_Exception_Invalid
+     */
+    public function setStopped(CM_Clockwork_Event $event) {
+        $eventName = $event->getName();
+        $this->_checkEventExists($eventName);
+        $this->_storage->fetchData();
+        $status = $this->_storage->getStatus($event);
+        if (!$status->isRunning()) {
+            throw new CM_Exception_Invalid('Cannot stop event. Event is not running.', null, ['eventName' => $event->getName()]);
+        }
+        $status->setRunning(false);
+        $this->_storage->setStatus($event, $status);
     }
 
     /**
@@ -149,52 +195,6 @@ class CM_Clockwork_Manager {
         $dateModified = new DateTime();
         $dateModified->modify($dateTimeString);
         return $date->modify($dateTimeString) != $dateModified->modify($dateTimeString);
-    }
-
-    /**
-     * @param CM_Clockwork_Event $event
-     * @param DateTime           $startTime
-     * @throws CM_Exception_Invalid
-     */
-    public function setRunning(CM_Clockwork_Event $event, DateTime $startTime) {
-        $eventName = $event->getName();
-        $this->_checkEventExists($eventName);
-        $this->_storage->fetchData();
-        $status = $this->_storage->getStatus($event);
-        if ($status->isRunning()) {
-            throw new CM_Exception_Invalid('Event is already running', null, ['eventName' => $eventName]);
-        }
-        $status->setRunning(true)->setLastStartTime($startTime);
-        $this->_storage->setStatus($event, $status);
-    }
-
-    /**
-     * @param CM_Clockwork_Event $event
-     * @throws CM_Exception_Invalid
-     */
-    public function setStopped(CM_Clockwork_Event $event) {
-        $eventName = $event->getName();
-        $this->_checkEventExists($eventName);
-        $this->_storage->fetchData();
-        $status = $this->_storage->getStatus($event);
-        if (!$status->isRunning()) {
-            throw new CM_Exception_Invalid('Cannot stop event. Event is not running.', null, ['eventName' => $event->getName()]);
-        }
-        $status->setRunning(false);
-        $this->_storage->setStatus($event, $status);
-    }
-
-    /**
-     * @param CM_Clockwork_Event $event
-     * @throws CM_Exception_Invalid
-     */
-    public function setCompleted(CM_Clockwork_Event $event) {
-        $eventName = $event->getName();
-        $this->_checkEventExists($eventName);
-        $this->_storage->fetchData();
-        $status = $this->_storage->getStatus($event);
-        $status->setRunning(false)->setLastRuntime($status->getLastStartTime());
-        $this->_storage->setStatus($event, $status);
     }
 
     /**
