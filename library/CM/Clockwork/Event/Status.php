@@ -59,14 +59,6 @@ class CM_Clockwork_Event_Status {
         return $this;
     }
 
-    public function __toString() {
-        // TODO: remove debug-code
-        $lastRun = $this->getLastRuntime() ? $this->getLastRuntime()->format('H:i:s') : 'NULL';
-        $lastStart = $this->getLastStartTime() ? $this->getLastStartTime()->format('H:i:s') : 'NULL';
-        $isRunning = $this->isRunning() ? 'true' : 'false';
-        return "lastRun: {$lastRun} lastStart: {$lastStart} running: {$isRunning}";
-    }
-
     function __clone() {
         if ($this->_lastRuntime) {
             $this->_lastRuntime = clone $this->_lastRuntime;

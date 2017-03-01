@@ -60,11 +60,6 @@ class CM_Clockwork_Manager {
         $this->_storage->fetchData();
         foreach ($this->_events as $name => $event) {
             $status = $this->_getStatus($event);
-
-            // TODO: remove debug-code
-            $time = $this->_getCurrentDateTimeUTC()->format('H:i:s');
-            echo "{$time} event: {$event->getName()} {$status}\n";
-
             if (!$status->isRunning()) {
                 if ($this->_shouldRun($event, $status)) {
                     $this->_runEvent($event, $status);

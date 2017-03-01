@@ -13,11 +13,6 @@ class CM_Clockwork_Storage_MongoDB extends CM_Clockwork_Storage_Abstract {
             $this->_eventList[$event->getName()] = new CM_Clockwork_Event_Status();
         }
         $status = $this->_eventList[$event->getName()];
-
-        // TODO: remove debug-code// TODO: remove debug-code
-        $time = (new DateTime())->format('H:i:s');
-        (new CM_File(DIR_ROOT . '/storage-log.txt'))->appendLine("{$time} Loading event: {$event->getName()} {$status}");
-
         return $status;
     }
 
@@ -28,10 +23,6 @@ class CM_Clockwork_Storage_MongoDB extends CM_Clockwork_Storage_Abstract {
         $lastRuntime = (null !== $lastRuntime) ? new MongoDate($lastRuntime->getTimestamp()) : null;
         $lastStartTime = $status->getLastStartTime();
         $lastStartTime = (null !== $lastStartTime) ? new MongoDate($lastStartTime->getTimestamp()) : null;
-
-        // TODO: remove debug-code
-        $time = (new DateTime())->format('H:i:s');
-        (new CM_File(DIR_ROOT . '/storage-log.txt'))->appendLine("{$time} Saving event: {$event->getName()} {$status}");
 
         $updated = (boolean) $mongoClient->update('cm_clockwork',
             [
