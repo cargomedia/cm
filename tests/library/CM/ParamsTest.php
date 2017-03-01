@@ -11,20 +11,25 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testMerge() {
-        $text = "Foo Bar, Bar Foo";
-        $notText = new stdClass();
-
-        $object1 = $this->mockInterface('CM_ArrayConvertible')->newInstance();
+        $object1Class = $this->mockInterface('CM_ArrayConvertible');
+        $object1 = $object1Class->newInstance();
+        $object1Class->mockStaticMethod('fromArray')->set(function() use ($object1) {
+            return $object1;
+        });
         $toArrayMethod = $object1->mockMethod('toArray')->set([
             'val' => 1,
         ]);
-        $object2 = $this->mockInterface('CM_ArrayConvertible')->newInstance();
+        $object2Class = $this->mockInterface('CM_ArrayConvertible');
+        $object2 = $object2Class->newInstance();
+        $object2Class->mockStaticMethod('fromArray')->set(function() use ($object2) {
+            return $object2;
+        });
         $toArrayMethod = $object2->mockMethod('toArray')->set([
             'val' => 2,
         ]);
 
         $params1 = new CM_Params(['foo' => 1, 'bar' => 'text', 'object1' => $object1], false);
-        $params2 = new CM_Params(['foz' => 2, 'bar' => 'other', 'object2' => $object2], false);
+        $params2 = new CM_Params(['foz' => 2, 'bar' => 'other', 'object2' => CM_Params::encode($object2)], true);
 
         $this->assertEquals([
             'foo'     => 1,
@@ -49,11 +54,16 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testHas() {
-        $params = new CM_Params(array('1' => 0, '2' => 'ababa', '3' => new stdClass(), '4' => null, '5' => false), false);
+        $params = new CM_Params(['1' => 0, '2' => 'ababa', '3' => new stdClass(), '4' => null, '5' => false], false);
 
         $this->assertTrue($params->has('1'));
         $this->assertTrue($params->has('2'));
         $this->assertTrue($params->has('3'));
+        $this->assertFalse($params->has('4'));
+        $this->assertTrue($params->has('5'));
+        $this->assertFalse($params->has('6'));
+
+        $params = new CM_Params(['4' => null, '5' => false], true);
         $this->assertFalse($params->has('4'));
         $this->assertTrue($params->has('5'));
         $this->assertFalse($params->has('6'));
@@ -67,7 +77,7 @@ class CM_ParamsTest extends CMTest_TestCase {
     public function testGetString() {
         $text = "Foo Bar, Bar Foo";
         $notText = new stdClass();
-        $params = new CM_Params(array('text1' => CM_Params::encode($text), 'text2' => $text, 'text3' => $notText), false);
+        $params = new CM_Params(array('text1' => CM_Params::encode($text), 'text2' => $text, 'text3' => $notText), true);
 
         $this->assertEquals($text, $params->getString('text1'));
         $this->assertEquals($text, $params->getString('text2'));
@@ -104,7 +114,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         $number1 = 12345678;
         $number2 = '12345678';
         $number3 = 'foo';
-        $params = new CM_Params(array('number1' => $number1, 'number2' => CM_Params::encode($number2), 'number3' => $number3), false);
+        $params = new CM_Params(array('number1' => $number1, 'number2' => CM_Params::encode($number2), 'number3' => $number3), true);
 
         $this->assertEquals($number1, $params->getInt('number1'));
         $this->assertEquals($number2, $params->getInt('number2'));

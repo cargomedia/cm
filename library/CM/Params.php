@@ -11,7 +11,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @throws CM_Exception_Invalid
      */
     public function __construct(array $params = null, $encoded = null) {
-        $params = $params ?: array();
+        $params = (null !== $params) ? $params : [];
         if (null === $encoded) {
             if (!empty($params)) {
                 throw new CM_Exception_Invalid('Params must be declared encoded or decoded');
