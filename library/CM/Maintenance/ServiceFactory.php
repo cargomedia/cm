@@ -4,35 +4,14 @@ class CM_Maintenance_ServiceFactory implements CM_Service_ManagerAwareInterface 
 
     use CM_Service_ManagerAwareTrait;
 
-    /** @var CM_Maintenance_ServiceFactory|null */
-    private $_serviceFactory = null;
-
-    /**
-     * @param CM_Maintenance_ServiceFactory|null $serviceFactory
-     */
-    public function __construct(CM_Maintenance_ServiceFactory $serviceFactory = null) {
-        $this->_serviceFactory = $serviceFactory;
-    }
-
     /**
      * @param CM_Clockwork_Storage_Abstract|null $clockworkStorage
      * @return CM_Maintenance_Service
      */
     public function createService(CM_Clockwork_Storage_Abstract $clockworkStorage = null) {
         $maintenance = new CM_Maintenance_Service($clockworkStorage);
-        $this->registerCallbacks($maintenance);
-        return $maintenance;
-    }
-
-    /**
-     * @param CM_Maintenance_Service $maintenance
-     */
-    public function registerCallbacks(CM_Maintenance_Service $maintenance) {
-        if ($this->_serviceFactory) {
-            $this->_serviceFactory->setServiceManager($this->getServiceManager());
-            $this->_serviceFactory->registerCallbacks($maintenance);
-        }
         $this->_registerCallbacks($maintenance);
+        return $maintenance;
     }
 
     /**
