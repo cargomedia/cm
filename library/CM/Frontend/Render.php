@@ -2,7 +2,6 @@
 
 use CM\Url\Url;
 use CM\Url\RouteUrl;
-use CM\Url\PageUrl;
 use CM\Url\ServiceWorkerUrl;
 use CM\Url\ResourceUrl;
 use CM\Url\StaticUrl;
@@ -187,12 +186,11 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     public function getUrl($path = null, CM_Site_Abstract $site = null) {
-        $environment = $this->getEnvironment();
-        $url = Url::create((string) $path, $environment);
-        if ($site) {
-            $url = $url->withSite($site);
+        $environment = clone $this->getEnvironment();
+        if (null !== $site) {
+            $environment->setSite($site);
         }
-        return (string) $url;
+        return (string) Url::create((string) $path, $environment);
     }
 
     /**
@@ -207,15 +205,14 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         if ($pageClassName instanceof CM_Page_Abstract) {
             $pageClassName = get_class($pageClassName);
         }
-        $url = CM_Page_UrlFactory::getUrl($pageClassName, $params, $this->getEnvironment());
-        if ($site) {
-            CM_Page_UrlFactory::assertSupportedSite($pageClassName, $site);
-            $url = $url->withSite($site);
+        $environment = clone $this->getEnvironment();
+        if (null !== $site) {
+            $environment->setSite($site);
         }
-        if ($language) {
-            $url = $url->withLanguage($language);
+        if (null !== $language) {
+            $environment->setLanguage($language);
         }
-        return (string) $url;
+        return (string) CM_Page_UrlFactory::getUrl($pageClassName, $params, $environment);
     }
 
     /**
@@ -225,13 +222,12 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     public function getUrlResource($type, $path, CM_Site_Abstract $site = null) {
-        $environment = $this->getEnvironment();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $url = ResourceUrl::create($path, $type, $environment, $deployVersion);
-        if ($site) {
-            $url = $url->withSite($site);
+        $environment = clone $this->getEnvironment();
+        if (null !== $site) {
+            $environment->setSite($site);
         }
-        return (string) $url;
+        return (string) ResourceUrl::create($path, $type, $environment, $deployVersion);
     }
 
     /**
@@ -267,16 +263,15 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     public function getUrlStatic($path = null, CM_Site_Abstract $site = null) {
-        $environment = $this->getEnvironment();
         $deployVersion = null;
         if (null !== $path) {
             $deployVersion = CM_App::getInstance()->getDeployVersion();
         }
-        $url = StaticUrl::create((string) $path, $environment, $deployVersion);
-        if ($site) {
-            $url = $url->withSite($site);
+        $environment = clone $this->getEnvironment();
+        if (null !== $site) {
+            $environment->setSite($site);
         }
-        return (string) $url;
+        return (string) StaticUrl::create((string) $path, $environment, $deployVersion);
     }
 
     /**
