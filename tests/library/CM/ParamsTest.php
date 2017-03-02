@@ -2,18 +2,24 @@
 
 class CM_ParamsTest extends CMTest_TestCase {
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Params must be declared encoded or decoded
-     */
     public function testConstructMissingDecodedFlag() {
-        $params = new CM_Params(['foo' => 'bar']);
+        $exception = $this->catchException(function () {
+            $params = new CM_Params([], null);
+        });
+        $this->assertInstanceOf(CM_Exception_Invalid::class, $exception);
+        $this->assertSame('Params must be declared encoded or decoded', $exception->getMessage());
+
+        $exception = $this->catchException(function () {
+            $params = new CM_Params(['foo' => 'bar']);
+        });
+        $this->assertInstanceOf(CM_Exception_Invalid::class, $exception);
+        $this->assertSame('Params must be declared encoded or decoded', $exception->getMessage());
     }
 
     public function testMerge() {
         $object1Class = $this->mockInterface('CM_ArrayConvertible');
         $object1 = $object1Class->newInstance();
-        $object1Class->mockStaticMethod('fromArray')->set(function() use ($object1) {
+        $object1Class->mockStaticMethod('fromArray')->set(function () use ($object1) {
             return $object1;
         });
         $toArrayMethod = $object1->mockMethod('toArray')->set([
@@ -21,7 +27,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         ]);
         $object2Class = $this->mockInterface('CM_ArrayConvertible');
         $object2 = $object2Class->newInstance();
-        $object2Class->mockStaticMethod('fromArray')->set(function() use ($object2) {
+        $object2Class->mockStaticMethod('fromArray')->set(function () use ($object2) {
             return $object2;
         });
         $toArrayMethod = $object2->mockMethod('toArray')->set([

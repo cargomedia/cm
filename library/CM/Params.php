@@ -11,11 +11,10 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @throws CM_Exception_Invalid
      */
     public function __construct(array $params = null, $encoded = null) {
-        $params = (null !== $params) ? $params : [];
-        if (null === $encoded) {
-            if (!empty($params)) {
-                throw new CM_Exception_Invalid('Params must be declared encoded or decoded');
-            }
+        if (null === $params) {
+            $params = [];
+        } elseif (null === $encoded) {
+            throw new CM_Exception_Invalid('Params must be declared encoded or decoded');
         }
         $encoded = (boolean) $encoded;
         $this->_params = \Functional\map($params, function ($value) use ($encoded) {
