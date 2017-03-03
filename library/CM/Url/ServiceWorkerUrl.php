@@ -65,7 +65,7 @@ class ServiceWorkerUrl extends AbstractUrl {
             $segments[] = $prefix;
         }
         $segments[] = sprintf('%s.js', implode('-', $parts));
-        return $this->getPathFromSegments($segments) . $this->getQueryComponent() . $this->getFragmentComponent();
+        return $this->_getPathFromSegments($segments) . $this->_getQueryComponent() . $this->_getFragmentComponent();
     }
 
     /**

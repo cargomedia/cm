@@ -12,18 +12,6 @@ use CM\Url\Vendor\Uri;
 
 abstract class AbstractUrl extends Uri implements UrlInterface {
 
-    protected static $supportedSchemes = [
-        'http'  => 80,
-        'https' => 443,
-    ];
-
-    public function __construct($uri = '') {
-        parent::__construct($uri);
-        $this->_ensureAbsolutePath();
-        $this->path = self::removeDotSegments($this->path);
-        $this->_trailingSlash = '/' === substr($this->path, -1);
-    }
-
     /** @var array|null */
     protected $_params = null;
 
@@ -38,6 +26,13 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
 
     /** @var bool|null */
     protected $_trailingSlash = null;
+
+    public function __construct($uri = '') {
+        parent::__construct($uri);
+        $this->_ensureAbsolutePath();
+        $this->path = self::removeDotSegments($this->path);
+        $this->_trailingSlash = '/' === substr($this->path, -1);
+    }
 
     public function isAbsolute() {
         return !('' === $this->getScheme() && '' === $this->getHost());
@@ -186,6 +181,8 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
         return $baseUrl;
     }
 
+    abstract public function getUriRelativeComponents();
+
     public function __toString() {
         return $this->getSchemeSpecificPart();
     }
@@ -193,14 +190,14 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
     /**
      * @return array
      */
-    public function getPathSegments() {
-        return $this->filterPathSegments(explode('/', $this->path));
+    protected function _getPathSegments() {
+        return $this->_filterPathSegments(explode('/', $this->path));
     }
 
     /**
      * @return string
      */
-    public function getQueryComponent() {
+    protected function _getQueryComponent() {
         $query = (string) $this->query;
         return !empty($query) ? '?' . $query : $query;
     }
@@ -208,7 +205,7 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
     /**
      * @return string
      */
-    public function getFragmentComponent() {
+    protected function _getFragmentComponent() {
         $fragment = (string) $this->fragment;
         return !empty($fragment) ? '#' . $fragment : $fragment;
     }
@@ -217,8 +214,8 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
      * @param array|null $segments
      * @return string
      */
-    public function getPathFromSegments(array $segments = null) {
-        $segments = $this->filterPathSegments($segments);
+    protected function _getPathFromSegments(array $segments = null) {
+        $segments = $this->_filterPathSegments($segments);
         $path = '/' . implode('/', $segments);
         if ($this->hasTrailingSlash() && '/' !== $path) {
             $path .= '/';
@@ -230,16 +227,11 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
      * @param array|null $segments
      * @return array
      */
-    public function filterPathSegments(array $segments = null) {
+    protected function _filterPathSegments(array $segments = null) {
         return array_filter((array) $segments, function ($value) {
             return null !== $value && '' !== $value;
         });
     }
-
-    /**
-     * @return string
-     */
-    abstract public function getUriRelativeComponents();
 
     protected function _ensureAbsolutePath() {
         $path = $this->getPath();
@@ -248,6 +240,9 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
         }
     }
 
+    /**
+     * @return string
+     */
     protected function getSchemeSpecificPart() {
         $scheme = $this->scheme;
         $authority = $this->getAuthority();

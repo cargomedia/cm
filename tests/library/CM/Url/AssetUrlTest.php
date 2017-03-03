@@ -51,8 +51,8 @@ class CM_Url_AssetMockUrl extends AssetUrl {
         if ($deployVersion = $this->getDeployVersion()) {
             $segments[] = $deployVersion;
         }
-        $segments = array_merge($segments, $this->getPathSegments());
-        return '/' . implode('/', $segments) . $this->getQueryComponent() . $this->getFragmentComponent();
+        $segments = array_merge($segments, $this->_getPathSegments());
+        return '/' . implode('/', $segments) . $this->_getQueryComponent() . $this->_getFragmentComponent();
     }
 
     public static function create($url) {

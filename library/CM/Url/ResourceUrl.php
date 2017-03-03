@@ -36,8 +36,8 @@ class ResourceUrl extends AssetUrl {
         if ($deployVersion = $this->getDeployVersion()) {
             $segments[] = $deployVersion;
         }
-        $segments = array_merge($segments, $this->getPathSegments());
-        return $this->getPathFromSegments($segments) . $this->getQueryComponent() . $this->getFragmentComponent();
+        $segments = array_merge($segments, $this->_getPathSegments());
+        return $this->_getPathFromSegments($segments) . $this->_getQueryComponent() . $this->_getFragmentComponent();
     }
 
     /**

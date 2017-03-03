@@ -7,12 +7,12 @@ use CM_Frontend_Environment;
 class StaticUrl extends AssetUrl {
 
     public function getUriRelativeComponents() {
-        $query = $this->getQueryComponent();
+        $query = $this->_getQueryComponent();
         if ($deployVersion = $this->getDeployVersion()) {
             $query .= (!empty($query) ? '&' : '?') . $this->getDeployVersion();
         }
-        $segments = array_merge(['static'], $this->getPathSegments());
-        return $this->getPathFromSegments($segments) . $query . $this->getFragmentComponent();
+        $segments = array_merge(['static'], $this->_getPathSegments());
+        return $this->_getPathFromSegments($segments) . $query . $this->_getFragmentComponent();
     }
 
     /**

@@ -243,14 +243,14 @@ class AbstractUrlTest extends CMTest_TestCase {
 class CM_Url_AbstractMockUrl extends AbstractUrl {
 
     public function getUriRelativeComponents() {
-        $segments = $this->getPathSegments();
+        $segments = $this->_getPathSegments();
         if ($prefix = $this->getPrefix()) {
             $segments = array_merge([$prefix], $segments);
         }
         if ($language = $this->getLanguage()) {
             $segments[] = $language->getAbbreviation();
         }
-        return $this->getPathFromSegments($segments) . $this->getQueryComponent() . $this->getFragmentComponent();
+        return $this->_getPathFromSegments($segments) . $this->_getQueryComponent() . $this->_getFragmentComponent();
     }
 
     public static function create($url, CM_Frontend_Environment $environment = null) {

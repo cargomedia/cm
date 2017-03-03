@@ -7,14 +7,14 @@ use CM_Frontend_Environment;
 class RouteUrl extends AbstractUrl {
 
     public function getUriRelativeComponents() {
-        $segments = $this->getPathSegments();
+        $segments = $this->_getPathSegments();
         if ($prefix = $this->getPrefix()) {
             $segments = array_merge([$prefix], $segments);
         }
         if ($language = $this->getLanguage()) {
             $segments[] = $language->getAbbreviation();
         }
-        return $this->getPathFromSegments($segments) . $this->getQueryComponent() . $this->getFragmentComponent();
+        return $this->_getPathFromSegments($segments) . $this->_getQueryComponent() . $this->_getFragmentComponent();
     }
 
     /**
