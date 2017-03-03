@@ -10,6 +10,9 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     /** @var BaseUrl|null */
     protected $_urlCdn = null;
 
+    /** @var int */
+    protected $_urlLength = null;
+
     /** @var string[] */
     protected $_themes = array();
 
@@ -48,7 +51,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return string
      */
     public function getEmailAddress() {
-        return self::_getConfig()->emailAddress;
+        return $this->getConfig()->emailAddress;
     }
 
     /**
@@ -101,7 +104,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return string
      */
     public function getName() {
-        return self::_getConfig()->name;
+        return $this->getConfig()->name;
     }
 
     /**
@@ -123,7 +126,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      */
     public function getUrl() {
         if (null === $this->_url) {
-            $this->_url = BaseUrl::create(self::_getConfig()->url);
+            $this->_url = BaseUrl::create($this->getConfig()->url);
         }
         return $this->_url;
     }
@@ -133,9 +136,19 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      */
     public function getUrlCdn() {
         if (null === $this->_urlCdn) {
-            $this->_urlCdn = BaseUrl::create(self::_getConfig()->urlCdn);
+            $this->_urlCdn = BaseUrl::create($this->getConfig()->urlCdn);
         }
         return $this->_urlCdn;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUrlLength() {
+        if (null === $this->_urlLength) {
+            $this->_urlLength = mb_strlen($this->getConfig()->url);
+        }
+        return $this->_urlLength;
     }
 
     /**

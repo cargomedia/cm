@@ -14,8 +14,8 @@ class CM_Site_SiteFactory {
         }
 
         usort($siteList, function (CM_Site_Abstract $site1, CM_Site_Abstract $site2) {
-            $length1 = mb_strlen((string) $site1->getUrl());
-            $length2 = mb_strlen((string) $site2->getUrl());
+            $length1 = $site1->getUrlLength();
+            $length2 = $site2->getUrlLength();
             if ($length1 == $length2) {
                 return 0;
             }
