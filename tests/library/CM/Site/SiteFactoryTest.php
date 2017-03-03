@@ -15,7 +15,11 @@ class CM_Site_SiteFactoryTest extends CMTest_TestCase {
             $unsorted[ord($char)] = $sorted[] = $this->getMockSite(null, null, ['url' => 'http://your-site-' . $repeatedStr . '.com']);
         }
         ksort($unsorted);
+
+        $start = microtime(true);
         $siteFactory = new CM_Site_SiteFactory($unsorted);
+        $end = microtime(true);
+        printf('testSiteListSorted sorting duration: %sms', round(($end - $start) * 1000, 2));
 
         $reflection = new ReflectionClass($siteFactory);
         $property = $reflection->getProperty('_siteList');
