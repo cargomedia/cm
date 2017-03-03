@@ -21,6 +21,7 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
         parent::__construct($uri);
         $this->_ensureAbsolutePath();
         $this->path = self::removeDotSegments($this->path);
+        $this->_trailingSlash = '/' === substr($this->path, -1);
     }
 
     /** @var array|null */
@@ -34,6 +35,9 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
 
     /** @var CM_Site_Abstract|null */
     protected $_site = null;
+
+    /** @var bool|null */
+    protected $_trailingSlash = null;
 
     public function isAbsolute() {
         return !('' === $this->getScheme() && '' === $this->getHost());
@@ -56,6 +60,39 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
 
     public function getParams() {
         return $this->_params;
+    }
+
+    public function hasTrailingSlash() {
+        return $this->_trailingSlash;
+    }
+
+    public function withTrailingSlash() {
+        $new = clone $this;
+        $new->_trailingSlash = true;
+        if ('/' !== substr($new->path, -1)) {
+            $new->path .= '/';
+        }
+        return $new;
+    }
+
+    public function withoutTrailingSlash() {
+        $new = clone $this;
+        $new->_trailingSlash = false;
+        if ('/' === substr($new->path, -1)) {
+            $new->path = rtrim($new->path, '/');
+        }
+        return $new;
+    }
+
+    public function withPath($path) {
+        $path = $this->filterPath($path);
+        if ($this->path === $path) {
+            return $this;
+        }
+        $new = clone $this;
+        $new->path = self::removeDotSegments($path);
+        $new->_trailingSlash = '/' === substr($new->path, -1);
+        return $new;
     }
 
     public function withSite(CM_Site_Abstract $site) {
@@ -182,7 +219,11 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
      */
     public function getPathFromSegments(array $segments = null) {
         $segments = $this->filterPathSegments($segments);
-        return '/' . implode('/', $segments);
+        $path = '/' . implode('/', $segments);
+        if ($this->hasTrailingSlash() && '/' !== $path) {
+            $path .= '/';
+        }
+        return $path;
     }
 
     /**

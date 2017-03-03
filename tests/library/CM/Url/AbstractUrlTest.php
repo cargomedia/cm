@@ -67,6 +67,25 @@ class AbstractUrlTest extends CMTest_TestCase {
         $this->assertSame('http://www.example.com/prefix/bar/de?foobar=1', (string) $url);
     }
 
+    public function testTrailingSlash() {
+        $url = new CM_Url_AbstractMockUrl('/path?bar=1');
+        $this->assertFalse($url->hasTrailingSlash());
+        $this->assertSame('/path', $url->getPath());
+        $this->assertSame('/path?bar=1', (string) $url);
+        $url = $url->withPath('/foo/');
+        $this->assertTrue($url->hasTrailingSlash());
+        $this->assertSame('/foo/', $url->getPath());
+        $this->assertSame('/foo/?bar=1', (string) $url);
+        $url = $url->withoutTrailingSlash();
+        $this->assertFalse($url->hasTrailingSlash());
+        $this->assertSame('/foo', $url->getPath());
+        $this->assertSame('/foo?bar=1', (string) $url);
+        $url = $url->withTrailingSlash();
+        $this->assertTrue($url->hasTrailingSlash());
+        $this->assertSame('/foo/', $url->getPath());
+        $this->assertSame('/foo/?bar=1', (string) $url);
+    }
+
     public function testWithPrefix() {
         $url = new CM_Url_AbstractMockUrl('/path?foo=1#bar');
         $this->assertSame(null, $url->getPrefix());
@@ -154,7 +173,7 @@ class AbstractUrlTest extends CMTest_TestCase {
         $urlWithBaseUrlAndPrefix = $url->withBaseUrl($baseUrlWithPrefix);
 
         $this->assertSame('prefix', $baseUrlWithPrefix->getPrefix());
-        $this->assertSame('http://foo/prefix', (string) $baseUrlWithPrefix);
+        $this->assertSame('http://foo/prefix/', (string) $baseUrlWithPrefix);
         $this->assertSame('prefix', $urlWithBaseUrlAndPrefix->getPrefix());
         $this->assertSame('http://foo/prefix/bar?foobar=1', (string) $urlWithBaseUrlAndPrefix);
 

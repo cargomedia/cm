@@ -45,6 +45,21 @@ interface UrlInterface extends UriInterface {
     public function getUriRelativeComponents();
 
     /**
+     * @return bool
+     */
+    public function hasTrailingSlash();
+
+    /**
+     * @return UrlInterface
+     */
+    public function withTrailingSlash();
+
+    /**
+     * @return UrlInterface
+     */
+    public function withoutTrailingSlash();
+
+    /**
      * @param CM_Model_Language $language
      * @return UrlInterface
      */

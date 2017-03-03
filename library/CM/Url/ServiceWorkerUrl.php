@@ -18,6 +18,7 @@ class ServiceWorkerUrl extends AbstractUrl {
             $name = 'serviceworker';
         }
         $this->setName($name);
+        $this->_trailingSlash = false;
     }
 
     /**
