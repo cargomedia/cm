@@ -27,13 +27,6 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
     /** @var bool|null */
     protected $_trailingSlash = null;
 
-    public function __construct($uri = '') {
-        parent::__construct($uri);
-        $this->_ensureAbsolutePath();
-        $this->path = self::removeDotSegments($this->path);
-        $this->_trailingSlash = '/' === substr($this->path, -1);
-    }
-
     public function isAbsolute() {
         return !('' === $this->getScheme() && '' === $this->getHost());
     }
@@ -187,6 +180,13 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
         return $this->getSchemeSpecificPart();
     }
 
+    protected function applyParts(array $parts) {
+        parent::applyParts($parts);
+        $this->_ensureAbsolutePath();
+        $this->path = self::removeDotSegments($this->path);
+        $this->_trailingSlash = '/' === substr($this->path, -1);
+    }
+
     /**
      * @return array
      */
@@ -215,6 +215,10 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
      * @return string
      */
     protected function _getPathFromSegments(array $segments = null) {
+        $segments = (array) $segments;
+        if (0 === count($segments) && '' === $this->path) {
+            return '';
+        }
         $segments = $this->_filterPathSegments($segments);
         $path = '/' . implode('/', $segments);
         if ($this->hasTrailingSlash() && '/' !== $path) {

@@ -14,9 +14,9 @@ class UrlTest extends CMTest_TestCase {
 
     public function testCreate() {
         $url = Url::create('');
-        $this->assertSame('/', $url->getPath());
+        $this->assertSame('', $url->getPath());
         $this->assertSame(null, $url->getPrefix());
-        $this->assertSame('/', (string) $url);
+        $this->assertSame('', (string) $url);
 
         $url = Url::create('http://host');
         $this->assertSame('/', $url->getPath());
@@ -52,13 +52,13 @@ class UrlTest extends CMTest_TestCase {
         $this->assertSame(null, $url->getParams());
         $this->assertSame('', $url->getQuery());
         $this->assertSame('', $url->getFragment());
-        $this->assertSame('/', (string) $url);
+        $this->assertSame('', (string) $url);
 
         $url = Url::createWithParams('', []);
         $this->assertSame([], $url->getParams());
         $this->assertSame('', $url->getQuery());
         $this->assertSame('', $url->getFragment());
-        $this->assertSame('/', (string) $url);
+        $this->assertSame('', (string) $url);
 
         $url = Url::createWithParams('/', ['foo' => 1]);
         $this->assertSame(['foo' => 1], $url->getParams());

@@ -18,7 +18,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
     public function testGetUrl() {
         $render = new CM_Frontend_Render();
-        $this->assertSame('http://www.default.dev/', $render->getUrl());
+        $this->assertSame('http://www.default.dev', $render->getUrl());
         $this->assertSame('http://www.default.dev/foo/bar', $render->getUrl('/foo/bar'));
         $this->assertSame('http://www.default.dev/0', $render->getUrl('/0'));
     }
