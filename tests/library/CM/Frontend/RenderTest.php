@@ -82,7 +82,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
     public function testGetUrlPageDifferentSiteThrows() {
         $render = new CM_Frontend_Render();
-        $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'FOO_Page_Test', false);
+        $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'FOO_Page_Test123', false);
 
         /** @var CM_Exception_Invalid $exception */
         $exception = $this->catchException(function () use ($render, $page) {
@@ -102,8 +102,8 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
         $renderSite = new CM_Frontend_Render(new CM_Frontend_Environment($site));
 
-        $this->assertSame('http://www.test.dev/test', $renderSite->getUrlPage($page));
-        $this->assertSame('http://www.test.dev/test', $render->getUrlPage($page, null, $site));
+        $this->assertSame('http://www.test.dev/test123', $renderSite->getUrlPage($page));
+        $this->assertSame('http://www.test.dev/test123', $render->getUrlPage($page, null, $site));
     }
 
     public function testGetUrlResource() {
