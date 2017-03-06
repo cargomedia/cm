@@ -21,10 +21,6 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         CM_App::getInstance()->fillCaches();
     }
 
-    public function deploy() {
-        $this->setup();
-    }
-
     public function generateConfigInternal() {
         $indentation = '    ';
         $indent = function ($content) use ($indentation) {
