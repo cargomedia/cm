@@ -231,7 +231,6 @@ Options:
  --forks=<value>
 
 Commands:
- app deploy
  app fill-caches
  app generate-config-internal
  app set-config <filename> <config-json> [--merge]
