@@ -80,31 +80,6 @@ class CM_App implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * @param string|null $namespace
-     * @return int
-     */
-    public function getVersion($namespace = null) {
-        $namespace = (string) $namespace;
-        if ($namespace) {
-            $namespace = '.' . $namespace;
-        }
-        return (int) $this->getServiceManager()->getOptions()->get('app.version' . $namespace);
-    }
-
-    /**
-     * @param int         $version
-     * @param string|null $namespace
-     */
-    public function setVersion($version, $namespace = null) {
-        $version = (int) $version;
-        $namespace = (string) $namespace;
-        if ($namespace) {
-            $namespace = '.' . $namespace;
-        }
-        $this->getServiceManager()->getOptions()->set('app.version' . $namespace, $version);
-    }
-
-    /**
      * @return int
      */
     public function getDeployVersion() {
@@ -112,94 +87,9 @@ class CM_App implements CM_Service_ManagerAwareInterface {
     }
 
     /**
-     * @return string[]
-     */
-    public function getUpdateScriptPaths() {
-        $paths = array();
-        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
-            $paths[$moduleName] = CM_Util::getModulePath($moduleName) . 'resources/db/update/';
-        }
-
-        $rootPath = DIR_ROOT . 'resources/db/update/';
-        if (!in_array($rootPath, $paths)) {
-            $paths[null] = $rootPath;
-        }
-
-        return $paths;
-    }
-
-    /**
-     * @param Closure|null $callbackBefore fn($version)
-     * @param Closure|null $callbackAfter  fn($version)
-     * @return int Number of version bumps
-     */
-    public function runUpdateScripts(Closure $callbackBefore = null, Closure $callbackAfter = null) {
-        CM_Cache_Shared::getInstance()->flush();
-        CM_Cache_Local::getInstance()->flush();
-        $versionBumps = 0;
-        foreach ($this->getUpdateScriptPaths() as $namespace => $path) {
-            $version = $versionStart = $this->getVersion($namespace);
-            while (true) {
-                $version++;
-                if (!$this->runUpdateScript($namespace, $version, $callbackBefore, $callbackAfter)) {
-                    $version--;
-                    break;
-                }
-                $this->setVersion($version, $namespace);
-            }
-            $versionBumps += ($version - $versionStart);
-        }
-        return $versionBumps;
-    }
-
-    /**
-     * @param string       $namespace
-     * @param int          $version
-     * @param Closure|null $callbackBefore
-     * @param Closure|null $callbackAfter
-     * @return int
-     */
-    public function runUpdateScript($namespace, $version, Closure $callbackBefore = null, Closure $callbackAfter = null) {
-        try {
-            $updateScript = $this->_getUpdateScriptPath($version, $namespace);
-        } catch (CM_Exception_Invalid $e) {
-            return 0;
-        }
-        if ($callbackBefore) {
-            $callbackBefore($version);
-        }
-        require $updateScript;
-        if ($callbackAfter) {
-            $callbackAfter($version);
-        }
-        return 1;
-    }
-
-    /**
      * @return CM_Http_Handler
      */
     public function getHttpHandler() {
         return new CM_Http_Handler(CM_Service_Manager::getInstance());
-    }
-
-    /**
-     * @param int         $version
-     * @param string|null $moduleName
-     * @return string
-     * @throws CM_Exception_Invalid
-     */
-    public function _getUpdateScriptPath($version, $moduleName = null) {
-        $path = DIR_ROOT;
-        if ($moduleName) {
-            $path = CM_Util::getModulePath($moduleName);
-        }
-        $file = new CM_File($path . 'resources/db/update/' . $version . '.php');
-        if (!$file->exists()) {
-            throw new CM_Exception_Invalid('Update script does not exist', null, [
-                'version'    => $version,
-                'moduleName' => $moduleName,
-            ]);
-        }
-        return $file->getPath();
     }
 }

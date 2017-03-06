@@ -14,7 +14,6 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
         foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
             CM_Db_Db::runDump($databaseName, $dump);
         }
-        $this->_setInitialVersion();
         $this->_setInitialMigrationScripts();
     }
 
@@ -32,7 +31,6 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
             CM_Db_Db::delete($table);
         }
         CM_Db_Db::exec('SET foreign_key_checks = 1;');
-        $this->_setInitialVersion();
     }
 
     public function getRunLevel() {
@@ -43,18 +41,6 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
         $mysqlDbClient = $this->getServiceManager()->getDatabases()->getMaster();
         $mysqlClient = $mysqlDbClient->getClientWithoutDatabase();
         return (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($mysqlDbClient->getDatabaseName()))->fetch();
-    }
-
-    private function _setInitialVersion() {
-        $app = CM_App::getInstance();
-        foreach (CM_App::getInstance()->getUpdateScriptPaths() as $namespace => $path) {
-            $updateFiles = CM_Util::rglob('*.php', $path);
-            $version = array_reduce($updateFiles, function ($initial, $path) {
-                $filename = basename($path);
-                return max($initial, (int) $filename);
-            }, 0);
-            $app->setVersion($version, $namespace);
-        }
     }
 
     private function _setInitialMigrationScripts() {
