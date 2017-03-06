@@ -240,8 +240,6 @@ Commands:
  console interactive
  db db-to-file <namespace>
  db file-to-db
- db run-update <version> [--namespace=<value>]
- db run-updates
  frontend generate-favicon
  frontend icon-refresh
  generator bootstrap-project [--project-name=<value>] [--domain=<value>] [--module-name=<value>]
