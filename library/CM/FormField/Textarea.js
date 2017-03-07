@@ -78,7 +78,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
       e.preventDefault();
       var clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
       var text = clipboardData.getData('text/plain');
-      cm.dom.pasteTextAtCursor(text);
+      self._pasteTextAtCursor(text);
       self._checkLengthMax();
       self._scrollToCursor();
     });
@@ -101,6 +101,21 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
     var textareaCoords = $input[0].getBoundingClientRect();
     if (textCoords && textCoords.bottom > textareaCoords.bottom || textCoords.bottom < textareaCoords.top) {
       $input.scrollTop($input.scrollTop() + (textCoords.bottom - textareaCoords.top));
+    }
+  },
+
+  /**
+   * @param {String} text
+   */
+  _pasteTextAtCursor: function(text) {
+    if (!_.isEmpty(text)) {
+      if (document.execCommand) {
+        document.execCommand('insertText', false, text);
+      } else if (window.getSelection) {
+        var newNode = document.createElement('span');
+        newNode.innerHTML = text;
+        window.getSelection().getRangeAt(0).insertNode(newNode);
+      }
     }
   }
 });

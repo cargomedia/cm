@@ -518,21 +518,6 @@ var CM_App = CM_Class_Abstract.extend({
       audio.setOptions(options);
       audio.setSources(sourceList);
       return audio;
-    },
-
-    /**
-     * @param {String} text
-     */
-    pasteTextAtCursor: function(text) {
-      if (!_.isEmpty(text)) {
-        if (document.execCommand) {
-          document.execCommand('insertText', false, text);
-        } else if (window.getSelection) {
-          var newNode = document.createElement('span');
-          newNode.innerHTML = text;
-          window.getSelection().getRangeAt(0).insertNode(newNode);
-        }
-      }
     }
   },
 
