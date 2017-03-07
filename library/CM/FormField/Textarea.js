@@ -85,7 +85,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   },
 
   _checkLengthMax: function() {
-    if (this.getValue().length > this.getOptions().lengthMax) {
+    if (this.getOptions().lengthMax && this.getValue().length > this.getOptions().lengthMax) {
       this.error(cm.language.get('Too long'));
     } else {
       this.error(null);
