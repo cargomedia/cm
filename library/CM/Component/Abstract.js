@@ -80,10 +80,23 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
   },
 
   /**
+   * @param {Object} [params]
+   * @param {Object} [options]
    * @return Promise
    */
-  reload: function(params) {
-    return this.ajaxModal('reloadComponent', params);
+  reload: function(params, options) {
+    options = _.defaults(options || {}, {
+      'modal': true,
+      'method': 'reloadComponent'
+    });
+    params = params || {};
+    return this
+      .try(function() {
+        return this.ajax(options.method, params, options);
+      })
+      .then(function(response) {
+        return this._replaceView(response);
+      });
   },
 
   /**

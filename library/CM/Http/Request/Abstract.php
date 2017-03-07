@@ -67,18 +67,19 @@ abstract class CM_Http_Request_Abstract {
         $originalUri = $uri;
         $uri = CM_Util::sanitizeUtf($uri);
 
+        $this->setUri($uri);
         try {
-            CM_Util::jsonEncode($uri);
+            CM_Util::jsonEncode($this->getPath());
         } catch (CM_Exception_Invalid $e) {
             $logger = CM_Service_Manager::getInstance()->getLogger();
             $context = new CM_Log_Context();
             $context->setExtra([
+                'path'         => unpack('H*', $this->getPath())[1],
                 'originalUri'  => unpack('H*', $originalUri)[1],
                 'sanitizedUri' => unpack('H*', $uri)[1],
             ]);
-            $logger->warning('Non utf-8 uri', $context);
+            $logger->warning('Non utf-8 uri path', $context);
         } // TODO remove after investigation
-        $this->setUri($uri);
 
         if ($sessionId = $this->getCookie('sessionId')) {
             $this->setSession(CM_Session::findById($sessionId));
@@ -261,10 +262,11 @@ abstract class CM_Http_Request_Abstract {
      */
     public function popPathSite() {
         $siteId = $this->popPathPart();
+        $siteFactory = new CM_Site_SiteFactory();
         if ('null' === $siteId) {
-            $siteId = null;
+            return $siteFactory->getDefaultSite();
         }
-        return CM_Site_Abstract::factory($siteId);
+        return $siteFactory->getSiteById($siteId);
     }
 
     /**
@@ -274,7 +276,7 @@ abstract class CM_Http_Request_Abstract {
         $siteFactory = new CM_Site_SiteFactory();
         $site = $siteFactory->findSite($this);
         if (null === $site) {
-            $site = CM_Site_Abstract::factory();
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();
         }
 
         $sitePath = $site->getUrlParser()->getPath();
@@ -460,18 +462,23 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @param bool|null $dotNotation
      * @return string|null    very long number (string used)
      */
-    public function getIp() {
+    public function getIp($dotNotation = null) {
+        $dotNotation = (bool) $dotNotation;
         if (!isset($this->_server['remote_addr'])) {
             return null;
         }
         $ip = $this->_server['remote_addr'];
-        $long = sprintf('%u', ip2long($ip));
-        if (0 == $long) {
+        $ipLong = sprintf('%u', ip2long($ip));
+        if (0 == $ipLong) {
             return null;
         }
-        return $long;
+        if ($dotNotation) {
+            return $ip;
+        }
+        return $ipLong;
     }
 
     /**

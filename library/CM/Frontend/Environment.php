@@ -69,7 +69,7 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     public function getSite() {
         $site = $this->_site;
         if (null === $site) {
-            $site = CM_Site_Abstract::factory();
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();
         }
         return $site;
     }

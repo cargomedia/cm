@@ -1185,6 +1185,37 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $this->assertSame('Param `useReplace` is not allowed with adapter', $exception->getMessage());
         $this->assertSame(['adapterName' => get_class($persistence)], $exception->getMetaInfo());
     }
+
+    public function testCommitCreateTransactionRollback() {
+        $model = $this->mockClass(CM_Model_Abstract::class)->newInstanceWithoutConstructor();
+        $model->mockMethod('_getSchemaData')->set([]);
+        $model->mockMethod('getType')->set(1);
+        $model->mockMethod('_validateFields');
+        $model->mockMethod('_getData')->set([]);
+        
+        $persistence = $this->mockObject(CM_Model_StorageAdapter_AbstractAdapter::class);
+        $persistence->mockMethod('create')->set([]);
+        $persistenceDelete = $persistence->mockMethod('delete');
+        $model->mockMethod('_getPersistence')->set($persistence);
+        
+        $cache = $this->mockObject(CM_Model_StorageAdapter_AbstractAdapter::class);
+        $cacheDelete = $cache->mockMethod('delete');
+        $model->mockMethod('_getCache')->set($cache);
+        
+        $exception = new Exception('Cannot perform on create callback');
+        $model->mockMethod('_onCreate')->set(function() use ($exception) {
+            throw $exception;
+        });
+        
+        try {
+            /** @var CM_Model_Abstract $model */
+            $model->commit();
+        } catch (Exception $e) {
+            $this->assertSame($e, $exception);
+            $this->assertSame(1, $persistenceDelete->getCallCount());
+            $this->assertSame(1, $cacheDelete->getCallCount());
+        }
+    }
 }
 
 class CM_ModelMock extends CM_Model_Abstract {
