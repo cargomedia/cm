@@ -109,26 +109,14 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
             // Favicon & Apple Touch Icons
             'square-16.png'                       => ['width' => 16, 'height' => 16],
             'square-32.png'                       => ['width' => 32, 'height' => 32],
-            'square-76.png'                       => ['width' => 76, 'height' => 76],
-            'square-96.png'                       => ['width' => 96, 'height' => 96],
-            'square-120.png'                      => ['width' => 120, 'height' => 120],
-            'square-144.png'                      => ['width' => 144, 'height' => 144],
-            'square-144-transparent.png'          => ['width' => 144, 'height' => 144, 'transparent' => true],
-            'square-152.png'                      => ['width' => 152, 'height' => 152],
-            'square-167.png'                      => ['width' => 167, 'height' => 167],
             'square-180.png'                      => ['width' => 180, 'height' => 180],
 
             // Android Chrome
             'square-192.png'                      => ['width' => 192, 'height' => 192],
-            'square-256.png'                      => ['width' => 256, 'height' => 256],
-            'square-384.png'                      => ['width' => 384, 'height' => 384],
             'square-512.png'                      => ['width' => 512, 'height' => 512],
 
             // MS Tiles
-            'tile-small-128x128-transparent.png'  => ['width' => 128, 'height' => 128, 'transparent' => true, 'iconSize' => 0.5],
             'tile-medium-270x270-transparent.png' => ['width' => 270, 'height' => 270, 'transparent' => true, 'iconSize' => 0.5],
-            'tile-large-558x558-transparent.png'  => ['width' => 558, 'height' => 558, 'transparent' => true, 'iconSize' => 0.5],
-            'tile-wide-558x270-transparent.png'   => ['width' => 558, 'height' => 270, 'transparent' => true, 'iconSize' => 0.5],
 
             // Push Notification
             'push-notification-icon.png'          => ['width' => 192, 'height' => 192],

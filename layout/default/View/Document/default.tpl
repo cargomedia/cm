@@ -11,22 +11,11 @@
     <meta name="apple-mobile-web-app-title" content="{$render->getSite()->getName()|escape}">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="msapplication-tap-highlight" content="no">
-    <meta name="msapplication-TileColor" content="{block name='tileColor'}{lessVariable name='colorBrand'}{/block}">
-    <meta name="msapplication-TileImage" content="{resourceUrl path='img/meta/square-144-transparent.png' type='layout'}">
     <meta name="msapplication-config" content="{resourceUrl path='browserconfig.xml' type='layout'}">
-    <meta name="theme-color" content="{block name='themeColor'}{lessVariable name='colorBrand'}{/block}">
 
-    {**
-     * See https://developer.apple.com/library/prerelease/ios/documentation/UserExperience/Conceptual/MobileHIG/IconMatrix.html
-     *}
-    <link rel="apple-touch-icon" sizes="76x76" href="{resourceUrl path='img/meta/square-76.png' type='layout'}">
-    <link rel="apple-touch-icon" sizes="120x120" href="{resourceUrl path='img/meta/square-120.png' type='layout'}">
-    <link rel="apple-touch-icon" sizes="152x152" href="{resourceUrl path='img/meta/square-152.png' type='layout'}">
-    <link rel="apple-touch-icon" sizes="167x167" href="{resourceUrl path='img/meta/square-167.png' type='layout'}">
     <link rel="apple-touch-icon" sizes="180x180" href="{resourceUrl path='img/meta/square-180.png' type='layout'}">
 
     <link rel="icon" type="image/png" href="{resourceUrl path='img/meta/square-32.png' type='layout'}" sizes="32x32">
-    <link rel="icon" type="image/png" href="{resourceUrl path='img/meta/square-96.png' type='layout'}" sizes="96x96">
     <link rel="icon" type="image/png" href="{resourceUrl path='img/meta/square-16.png' type='layout'}" sizes="16x16">
 
     <link rel="manifest" href="{resourceUrl path='manifest.json' type='layout' sameOrigin=true}">
