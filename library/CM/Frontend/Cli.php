@@ -3,7 +3,7 @@
 class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
 
     const FAVICON_SVG_FILENAME = 'favicon.svg';
-    const FAVICON_BACKGROUND_LESS_VARIABLE = 'colorBrand';
+    const FAVICON_BACKGROUND_LESS_VARIABLE = 'colorFaviconBg';
 
     public function iconRefresh() {
         /** @var CM_File[] $svgFileList */
