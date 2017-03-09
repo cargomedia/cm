@@ -17,7 +17,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $componentInfo = $this->_getViewInfo('CM_Component_Abstract');
         $componentId = $componentInfo['id'];
         $componentClassName = $componentInfo['className'];
-        $componentParams = CM_Params::factory($componentInfo['params']);
+        $componentParams = CM_Params::factory($componentInfo['params'], true);
 
         if ($additionalParams) {
             foreach ($additionalParams as $key => $value) {
