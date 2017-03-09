@@ -2,21 +2,40 @@
 
 class CM_ParamsTest extends CMTest_TestCase {
 
-    public function testMerge() {
-        $text = "Foo Bar, Bar Foo";
-        $notText = new stdClass();
+    public function testConstructMissingDecodedFlag() {
+        $exception = $this->catchException(function () {
+            $params = new CM_Params([], null);
+        });
+        $this->assertInstanceOf(CM_Exception_Invalid::class, $exception);
+        $this->assertSame('Params must be declared encoded or decoded', $exception->getMessage());
 
-        $object1 = $this->mockInterface('CM_ArrayConvertible')->newInstance();
+        $exception = $this->catchException(function () {
+            $params = new CM_Params(['foo' => 'bar']);
+        });
+        $this->assertInstanceOf(CM_Exception_Invalid::class, $exception);
+        $this->assertSame('Params must be declared encoded or decoded', $exception->getMessage());
+    }
+
+    public function testMerge() {
+        $object1Class = $this->mockInterface('CM_ArrayConvertible');
+        $object1 = $object1Class->newInstance();
+        $object1Class->mockStaticMethod('fromArray')->set(function () use ($object1) {
+            return $object1;
+        });
         $toArrayMethod = $object1->mockMethod('toArray')->set([
             'val' => 1,
         ]);
-        $object2 = $this->mockInterface('CM_ArrayConvertible')->newInstance();
+        $object2Class = $this->mockInterface('CM_ArrayConvertible');
+        $object2 = $object2Class->newInstance();
+        $object2Class->mockStaticMethod('fromArray')->set(function () use ($object2) {
+            return $object2;
+        });
         $toArrayMethod = $object2->mockMethod('toArray')->set([
             'val' => 2,
         ]);
 
-        $params1 = new CM_Params(['foo' => 1, 'bar' => 'text', 'object1' => $object1]);
-        $params2 = new CM_Params(['foz' => 2, 'bar' => 'other', 'object2' => $object2]);
+        $params1 = new CM_Params(['foo' => 1, 'bar' => 'text', 'object1' => $object1], false);
+        $params2 = new CM_Params(['foz' => 2, 'bar' => 'other', 'object2' => CM_Params::encode($object2)], true);
 
         $this->assertEquals([
             'foo'     => 1,
@@ -41,7 +60,7 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testHas() {
-        $params = new CM_Params(array('1' => 0, '2' => 'ababa', '3' => new stdClass(), '4' => null, '5' => false));
+        $params = new CM_Params(['1' => 0, '2' => 'ababa', '3' => new stdClass(), '4' => null, '5' => false], false);
 
         $this->assertTrue($params->has('1'));
         $this->assertTrue($params->has('2'));
@@ -49,17 +68,22 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertFalse($params->has('4'));
         $this->assertTrue($params->has('5'));
         $this->assertFalse($params->has('6'));
+
+        $params = new CM_Params(['4' => null, '5' => false], true);
+        $this->assertFalse($params->has('4'));
+        $this->assertTrue($params->has('5'));
+        $this->assertFalse($params->has('6'));
     }
 
     public function testGetWithInvalidEncodedData() {
-        $params = new CM_Params(['foo' => ['_class' => 'Some_Nonexistent_Class', '_id' => 123]]);
+        $params = new CM_Params(['foo' => ['_class' => 'Some_Nonexistent_Class', '_id' => 123]], true);
         $this->assertSame(['_class' => 'Some_Nonexistent_Class', '_id' => 123], $params->get('foo'));
     }
 
     public function testGetString() {
         $text = "Foo Bar, Bar Foo";
         $notText = new stdClass();
-        $params = new CM_Params(array('text1' => CM_Params::encode($text), 'text2' => $text, 'text3' => $notText));
+        $params = new CM_Params(array('text1' => CM_Params::encode($text), 'text2' => $text, 'text3' => $notText), true);
 
         $this->assertEquals($text, $params->getString('text1'));
         $this->assertEquals($text, $params->getString('text2'));
@@ -73,8 +97,7 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testGetStringArray() {
-
-        $params = new CM_Params(array('k1' => 9, 'k2' => array(99, '121', '72', 0x3f), 'k3' => array('4', '8' . '3', '43', 'pong')));
+        $params = new CM_Params(array('k1' => 9, 'k2' => array(99, '121', '72', 0x3f), 'k3' => array('4', '8' . '3', '43', 'pong')), false);
 
         $this->assertSame(array('4', '83', '43', 'pong'), $params->getStringArray('k3'));
 
@@ -97,7 +120,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         $number1 = 12345678;
         $number2 = '12345678';
         $number3 = 'foo';
-        $params = new CM_Params(array('number1' => $number1, 'number2' => CM_Params::encode($number2), 'number3' => $number3));
+        $params = new CM_Params(array('number1' => $number1, 'number2' => CM_Params::encode($number2), 'number3' => $number3), true);
 
         $this->assertEquals($number1, $params->getInt('number1'));
         $this->assertEquals($number2, $params->getInt('number2'));
@@ -111,8 +134,7 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testGetIntArray() {
-
-        $params = new CM_Params(array('k1' => '7', 'k2' => array('99', '121', 72, 0x3f), 'k3' => array(4, 88, '43', 'pong')));
+        $params = new CM_Params(array('k1' => '7', 'k2' => array('99', '121', 72, 0x3f), 'k3' => array(4, 88, '43', 'pong')), false);
 
         $this->assertSame(array(99, 121, 72, 63), $params->getIntArray('k2'));
 
@@ -163,13 +185,13 @@ class CM_ParamsTest extends CMTest_TestCase {
         foreach ($testDataList as $testData) {
             $expected = $testData[0];
             $userInput = $testData[1];
-            $params = new CM_Params(array('userInput' => $userInput));
+            $params = new CM_Params(array('userInput' => $userInput), false);
             $this->assertSame($expected, $params->getFloat('userInput'));
         }
         $userInputInvalidList = array('', '-', '.', '-.', '1.2.3', '12 ', ' 12', '12,345', false, true, array('1'), new stdClass(),
             fopen(__FILE__, 'r'));
         foreach ($userInputInvalidList as $userInputInvalid) {
-            $params = new CM_Params(array('userInput' => $userInputInvalid));
+            $params = new CM_Params(array('userInput' => $userInputInvalid), false);
             try {
                 $params->getFloat('userInput');
                 $this->fail('User input is not a float');
@@ -181,7 +203,7 @@ class CM_ParamsTest extends CMTest_TestCase {
 
     public function testGetLanguage() {
         $language = CM_Model_Language::create('English', 'en', true);
-        $params = new CM_Params(array('language' => $language, 'languageId' => $language->getId(), 'no-object-param' => 'xyz'));
+        $params = new CM_Params(array('language' => $language, 'languageId' => $language->getId(), 'no-object-param' => 'xyz'), false);
         $this->assertEquals($language, $params->getLanguage('language'));
         $this->assertEquals($language, $params->getLanguage('languageId'));
         try {
@@ -195,20 +217,20 @@ class CM_ParamsTest extends CMTest_TestCase {
 
     public function testGetFile() {
         $file = new CM_File(CM_Bootloader::getInstance()->getDirTmp() . 'foo');
-        $params = new CM_Params(array('file' => $file, 'filename' => $file->getPath()));
+        $params = new CM_Params(array('file' => $file, 'filename' => $file->getPath()), false);
         $this->assertEquals($file, $params->getFile('file'));
         $this->assertEquals($file, $params->getFile('filename'));
     }
 
     public function testGetFileNonexistent() {
         $fileNonexistent = new CM_File('foo/bar');
-        $params = new CM_Params(array('nonexistent' => $fileNonexistent->getPath()));
+        $params = new CM_Params(array('nonexistent' => $fileNonexistent->getPath()), false);
         $this->assertEquals($fileNonexistent, $params->getFile('nonexistent'));
     }
 
     public function testGetFileGeoPoint() {
         $point = new CM_Geo_Point(1, 2);
-        $params = new CM_Params(array('point' => $point));
+        $params = new CM_Params(array('point' => $point), false);
         $value = $params->getGeoPoint('point');
         $this->assertInstanceOf('CM_Geo_Point', $value);
         $this->assertSame(1.0, $value->getLatitude());
@@ -220,7 +242,7 @@ class CM_ParamsTest extends CMTest_TestCase {
      * @expectedExceptionMessage Not enough parameters
      */
     public function testGetGeoPointException() {
-        $params = new CM_Params(array('point' => 'foo'));
+        $params = new CM_Params(array('point' => 'foo'), false);
         $params->getGeoPoint('point');
     }
 
@@ -413,7 +435,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         );
         foreach ($dateTimeList as $dateTime) {
             $paramsArray = json_decode(json_encode(array('date' => $dateTime)), true);
-            $params = new CM_Params($paramsArray, true);
+            $params = new CM_Params($paramsArray, false);
             $this->assertEquals($params->getDateTime('date'), $dateTime);
         }
     }
@@ -425,7 +447,7 @@ class CM_ParamsTest extends CMTest_TestCase {
             'locationParameters'     => ['id' => $location->getId(), 'level' => $location->getLevel()],
             'insufficientParameters' => 1,
             'invalidLevel'           => ['id' => $location->getId(), 'level' => 9999],
-        ]);
+        ], false);
         $this->assertEquals($location, $params->getLocation('location'));
         $this->assertEquals($location, $params->getLocation('locationParameters'));
 
@@ -452,7 +474,7 @@ class CM_ParamsTest extends CMTest_TestCase {
             'foo' => 'foo',
             'bar' => 'bar',
         ];
-        $paramsClass = $this->mockClass('CM_Params');
+        $paramsClass = $this->mockClass(CM_Params::class);
         $decodeMethod = $paramsClass->mockStaticMethod('decode')
             ->at(0, function ($value) {
                 $this->assertSame('foo', $value);
@@ -462,7 +484,7 @@ class CM_ParamsTest extends CMTest_TestCase {
                 $this->assertSame('bar', $value);
                 return $value . '-decoded';
             });
-        $params = $paramsClass->newInstance([$paramsArray]);
+        $params = $paramsClass->newInstance([$paramsArray, true]);
         /** @var CM_Params $params */
 
         $expected = [
@@ -472,10 +494,10 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame(0, $decodeMethod->getCallCount());
 
         $this->assertSame($expected, $params->getParamsDecoded());
-        $this->assertSame(count($paramsArray), $decodeMethod->getCallCount());
+        $this->assertSame(2, $decodeMethod->getCallCount());
 
         $this->assertSame($expected, $params->getParamsDecoded());
-        $this->assertSame(count($paramsArray), $decodeMethod->getCallCount());
+        $this->assertSame(2, $decodeMethod->getCallCount());
     }
 
     public function testGetParamsEncoded() {
@@ -510,7 +532,7 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testGetParamNames() {
-        $params = new CM_Params(['foo' => 'bar']);
+        $params = new CM_Params(['foo' => 'bar'], false);
         $this->assertSame(['foo'], $params->getParamNames());
         $params->set('bar', 'foo');
         $this->assertSame(['foo', 'bar'], $params->getParamNames());
@@ -520,12 +542,12 @@ class CM_ParamsTest extends CMTest_TestCase {
      * @expectedException CM_Exception_InvalidParam
      */
     public function testGetParamsInvalidObject() {
-        $params = new CM_Params(array('foo' => new stdClass()));
+        $params = new CM_Params(array('foo' => new stdClass()), false);
         $params->getParams('foo');
     }
 
     public function testGetParamsInvalidInt() {
-        $params = new CM_Params(array('foo' => 12));
+        $params = new CM_Params(array('foo' => 12), false);
         $exception = $this->catchException(function () use ($params) {
             $params->getParams('foo');
         });
@@ -541,18 +563,18 @@ class CM_ParamsTest extends CMTest_TestCase {
      * @expectedExceptionMessage Cannot decode input
      */
     public function testGetParamsInvalidString() {
-        $params = new CM_Params(array('foo' => 'hello'));
+        $params = new CM_Params(array('foo' => 'hello'), false);
         $params->getParams('foo');
     }
 
     public function testDebugInfo() {
-        $params = new CM_Params(['foo' => 12, 'bar' => [1, 2]]);
+        $params = new CM_Params(['foo' => 12, 'bar' => [1, 2]], false);
         $this->assertSame("['foo' => 12, 'bar' => [0 => 1, 1 => 2]]", $params->getDebugInfo());
     }
 
     public function testDebugInfoWithException() {
         /** @var CM_Params|\Mocka\AbstractClassTrait $params */
-        $params = $this->mockObject('CM_Params');
+        $params = $this->mockClass(CM_Params::class)->newInstanceWithoutConstructor();
         $params->mockMethod('getParamsDecoded')->set(function () {
             throw new Exception('foo');
         });
@@ -561,38 +583,38 @@ class CM_ParamsTest extends CMTest_TestCase {
 
     public function testGetStreamChannel() {
         $streamChannel = CMTest_TH::createStreamChannel();
-        $params = new CM_Params(['channel' => $streamChannel]);
+        $params = new CM_Params(['channel' => $streamChannel], false);
         $this->assertEquals($streamChannel, $params->getStreamChannel('channel'));
     }
 
     public function testGetStreamChannelMedia() {
         $streamChannel = CMTest_TH::createStreamChannel(CM_Model_StreamChannel_Media::getTypeStatic());
-        $params = new CM_Params(['channel' => $streamChannel]);
+        $params = new CM_Params(['channel' => $streamChannel], false);
         $this->assertEquals($streamChannel, $params->getStreamChannelMedia('channel'));
     }
 
     public function testGetStreamChannelJanus() {
         $streamChannel = CMTest_TH::createStreamChannel(CM_Janus_StreamChannel::getTypeStatic());
-        $params = new CM_Params(['channel' => $streamChannel]);
+        $params = new CM_Params(['channel' => $streamChannel], false);
         $this->assertEquals($streamChannel, $params->getStreamChannelJanus('channel'));
     }
 
     public function testGetStreamChannelDefinition() {
         $definition = new CM_StreamChannel_Definition('foo', 12);
-        $params = new CM_Params(['def' => $definition]);
+        $params = new CM_Params(['def' => $definition], false);
         $this->assertEquals($definition, $params->getStreamChannelDefinition('def'));
     }
 
     public function testGetGeometryVector2() {
         $vector2 = new CM_Geometry_Vector2(1.1, 2.2);
-        $params = new CM_Params(array('vector2' => $vector2));
+        $params = new CM_Params(array('vector2' => $vector2), false);
         $value = $params->getGeometryVector2('vector2');
         $this->assertInstanceOf('CM_Geometry_Vector2', $value);
         $this->assertSame(1.1, $value->getX());
         $this->assertSame(2.2, $value->getY());
 
         $exception = $this->catchException(function () {
-            $params = new CM_Params(array('vector2' => 'foo'));
+            $params = new CM_Params(array('vector2' => 'foo'), false);
             $params->getGeometryVector2('vector2');
         });
         $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
@@ -601,7 +623,7 @@ class CM_ParamsTest extends CMTest_TestCase {
 
     public function testGetGeometryVector3() {
         $vector3 = new CM_Geometry_Vector3(1.1, 2.2, 3.3);
-        $params = new CM_Params(array('vector3' => $vector3));
+        $params = new CM_Params(array('vector3' => $vector3), false);
         $value = $params->getGeometryVector3('vector3');
         $this->assertInstanceOf('CM_Geometry_Vector3', $value);
         $this->assertSame(1.1, $value->getX());
@@ -609,7 +631,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame(3.3, $value->getZ());
 
         $exception = $this->catchException(function () {
-            $params = new CM_Params(array('vector3' => 'foo'));
+            $params = new CM_Params(array('vector3' => 'foo'), false);
             $params->getGeometryVector3('vector3');
         });
         $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
@@ -622,7 +644,7 @@ class CM_ParamsTest extends CMTest_TestCase {
         $session2 = CMTest_TH::createSession();
         $sessionId2 = $session2->getId();
 
-        $params = new CM_Params(['foo' => $sessionId1, 'bar' => 'baz', 'baz' => $session2, 'quux' => 5]);
+        $params = new CM_Params(['foo' => $sessionId1, 'bar' => 'baz', 'baz' => $session2, 'quux' => 5], false);
 
         $session1 = $params->getSession('foo');
         $this->assertInstanceOf('CM_Session', $session1);

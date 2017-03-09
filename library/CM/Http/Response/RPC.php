@@ -5,7 +5,7 @@ class CM_Http_Response_RPC extends CM_Http_Response_Abstract {
     protected function _process() {
         $output = [];
         $this->_runWithCatching(function () use (&$output) {
-            $query = CM_Params::factory($this->_request->getQuery());
+            $query = CM_Params::factory($this->_request->getQuery(), true);
 
             $method = $query->getString('method');
             if (!preg_match('/^(?<class>[\w_]+)\.(?<function>[\w_]+)$/', $method, $matches)) {
