@@ -27,8 +27,8 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
     /** @var bool|null */
     protected $_trailingSlash = null;
 
-    public function isAbsolute() {
-        return !('' === $this->getScheme() && '' === $this->getHost());
+    public function isRelative() {
+        return '' === $this->getScheme() && '' === $this->getHost();
     }
 
     public function getLanguage() {

@@ -12,7 +12,7 @@ interface UrlInterface extends UriInterface {
     /**
      * @return bool
      */
-    public function isAbsolute();
+    public function isRelative();
 
     /**
      * @return CM_Model_Language|null

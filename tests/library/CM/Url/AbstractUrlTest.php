@@ -233,10 +233,10 @@ class AbstractUrlTest extends CMTest_TestCase {
 
     public function testIsAbsolute() {
         $url = new CM_Url_AbstractMockUrl('/bar?foobar=1');
-        $this->assertSame(false, $url->isAbsolute());
+        $this->assertSame(true, $url->isRelative());
 
         $url = new CM_Url_AbstractMockUrl('http://foo/bar?foobar=1');
-        $this->assertSame(true, $url->isAbsolute());
+        $this->assertSame(false, $url->isRelative());
     }
 }
 

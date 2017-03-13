@@ -8,7 +8,7 @@ class BaseUrl extends AbstractUrl {
 
     public function __construct($uri = '') {
         parent::__construct($uri);
-        if (!$this->isAbsolute()) {
+        if ($this->isRelative()) {
             throw new CM_Exception_Invalid('BaseUrl::create argument must be an absolute Url', null, [
                 'url' => $uri,
             ]);
