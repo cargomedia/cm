@@ -11,6 +11,17 @@ class CM_Http_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
         $this->_configInternalFile = new CM_File(DIR_ROOT . 'resources/config/js/internal.js');
         $this->_configInternalFile->ensureParentDirectory();
         $this->_configInternalFile->write('console.log("hello world")');
+
+        $mockBundler = $this->mockClass('CM_Frontend_Bundler_Client');
+        $mockBundler->mockMethod('_sendRequest')->set(function ($data) {
+            return CM_Util::jsonEncode($data);
+        });
+        $mockBundler->mockMethod('_parseResponse')->set(function ($rawResponse) {
+            return $rawResponse;
+        });
+
+        $bundler = $mockBundler->newInstanceWithoutConstructor();
+        $this->getServiceManager()->replaceInstance('cm-bundler', $bundler);
     }
 
     protected function tearDown() {
@@ -25,10 +36,10 @@ class CM_Http_Response_Resource_Javascript_LibraryTest extends CMTest_TestCase {
         $request = new CM_Http_Request_Get($render->getUrlResource('library-js', 'library.js'));
         $response = CM_Http_Response_Resource_Javascript_Library::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
-
         $this->assertContains('Cache-Control: max-age=31536000', $response->getHeaders());
         $this->assertContains('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 31536000), $response->getHeaders());
-        $this->assertContains('function()', $response->getContent());
+        $this->assertContains('"name":"Default\/library.js"', $response->getContent());
+        $this->assertRegExp('/"library\\\\\/CM\\\\\/.*?\.js"/', $response->getContent());
     }
 
     public function testProcessTranslations() {

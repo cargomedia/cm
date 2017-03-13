@@ -272,6 +272,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Frontend_Bundler_Abstract
+     */
+    public function getBundler() {
+        return $this->get('cm-bundler', 'CM_Frontend_Bundler_Abstract');
+    }
+
+    /**
      * @param string $serviceName
      * @throws CM_Exception_Invalid
      * @return mixed

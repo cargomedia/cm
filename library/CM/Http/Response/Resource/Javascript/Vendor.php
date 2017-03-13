@@ -3,28 +3,18 @@
 class CM_Http_Response_Resource_Javascript_Vendor extends CM_Http_Response_Resource_Javascript_Abstract {
 
     protected function _process() {
-        $debug = $this->getEnvironment()->isDebug();
         $site = $this->getSite();
+
+        if ($this->_withSourceMaps) {
+            $this->setHeader('X-SourceMap', $this->_getSourceMapsUrl('vendor'));
+        }
 
         switch ($this->getRequest()->getPath()) {
             case '/before-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_Vendor_BeforeBody($site, $debug));
+                $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_BeforeBody($site, $this->_isSourceMaps));
                 break;
             case '/after-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_Vendor_AfterBody($site, $debug));
-                break;
-
-            case '/dist-before-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_Vendor_BeforeBody($site, $debug, 'dist'));
-                break;
-            case '/dist-after-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_Vendor_AfterBody($site, $debug, 'dist'));
-                break;
-            case '/source-before-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_Vendor_BeforeBody($site, $debug, 'source'));
-                break;
-            case '/source-after-body.js':
-                $this->_setAsset(new CM_Asset_Javascript_Vendor_AfterBody($site, $debug, 'source'));
+                $this->_setAsset(new CM_Asset_Javascript_Bundle_Vendor_AfterBody($site, $this->_isSourceMaps));
                 break;
             default:
                 throw new CM_Exception_Invalid('Invalid path provided', CM_Exception::WARN, ['path' => $this->getRequest()->getPath()]);

@@ -3,7 +3,7 @@
 class CM_Cache_Persistent extends CM_Cache_Abstract {
 
     /**
-     * @return CM_Cache_Local
+     * @return CM_Cache_Persistent
      */
     public static function getInstance() {
         static $instance;

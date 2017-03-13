@@ -11,15 +11,9 @@ function smarty_function_resourceJs(array $params, Smarty_Internal_Template $tem
     if (!in_array($type, array('vendor', 'library'))) {
         throw new CM_Exception_Invalid('Invalid type provided', null, ['type' => $type]);
     }
-    $scripts = [];
-    if ($debug && 'vendor' == $type) {
-        $scripts[] = $render->getUrlResource($type . '-js', 'dist-' . $file);
-        $scripts[] = $render->getUrlResource($type . '-js', 'source-' . $file);
-    } else {
-        $scripts[] = $render->getUrlResource($type . '-js', $file);
+    if ($debug) {
+        $file = 'with-sourcemaps/' . $file;
     }
-
-    return \Functional\reduce_left($scripts, function ($url, $index, $collection, $reduction) {
-        return $reduction . PHP_EOL . '<script type="text/javascript" src="' . $url . '" crossorigin="anonymous"></script>';
-    }, '');
+    $url = $render->getUrlResource($type . '-js', $file);
+    return '<script type="text/javascript" src="' . $url . '" crossorigin="anonymous"></script>';
 }

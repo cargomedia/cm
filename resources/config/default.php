@@ -276,10 +276,10 @@ return function (CM_Config_Node $config) {
         'method' => [
             'name'      => 'createMongoDbHandler',
             'arguments' => [
-            'collection'    => 'cm_log',
-            'recordTtl'     => null,
-            'insertOptions' => null,
-            'minLevel'      => CM_Log_Logger::DEBUG,
+                'collection'    => 'cm_log',
+                'recordTtl'     => null,
+                'insertOptions' => null,
+                'minLevel'      => CM_Log_Logger::DEBUG,
             ],
         ]
     ];
@@ -306,5 +306,16 @@ return function (CM_Config_Node $config) {
                 ],
             ],
         ]
+    ];
+
+    $config->services['cm-bundler'] = [
+        'class'  => 'CM_Frontend_Bundler_Factory',
+        'method' => [
+            'name'      => 'createBundler',
+            'arguments' => [
+                'socketUrl'    => 'tcp://127.0.0.1:6644',
+                'cacheEnabled' => true,
+            ],
+        ],
     ];
 };
