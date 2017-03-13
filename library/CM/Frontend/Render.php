@@ -236,7 +236,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     public function getUrlServiceWorker() {
         $environment = $this->getEnvironment();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        return (string) ServiceWorkerUrl::create('serviceworker', $environment, $deployVersion);
+        return (string) ServiceWorkerUrl::create($environment, $deployVersion);
     }
 
     /**
