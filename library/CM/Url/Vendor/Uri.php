@@ -1,6 +1,7 @@
 <?php
 namespace CM\Url\Vendor;
 
+use GuzzleHttp\Psr7\UriResolver;
 use Psr\Http\Message\UriInterface;
 
 /**
