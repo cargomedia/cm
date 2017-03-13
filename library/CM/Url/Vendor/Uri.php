@@ -24,7 +24,7 @@ class Uri implements UriInterface {
      */
     const HTTP_DEFAULT_HOST = 'localhost';
 
-    private static $defaultPorts = [
+    protected static $defaultPorts = [
         'http'   => 80,
         'https'  => 443,
         'ftp'    => 21,
@@ -38,30 +38,30 @@ class Uri implements UriInterface {
         'ldap'   => 389,
     ];
 
-    private static $charUnreserved = 'a-zA-Z0-9_\-\.~';
-    private static $charSubDelims = '!\$&\'\(\)\*\+,;=';
-    private static $replaceQuery = ['=' => '%3D', '&' => '%26'];
+    protected static $charUnreserved = 'a-zA-Z0-9_\-\.~';
+    protected static $charSubDelims = '!\$&\'\(\)\*\+,;=';
+    protected static $replaceQuery = ['=' => '%3D', '&' => '%26'];
 
     /** @var string Uri scheme. */
-    private $scheme = '';
+    protected $scheme = '';
 
     /** @var string Uri user info. */
-    private $userInfo = '';
+    protected $userInfo = '';
 
     /** @var string Uri host. */
-    private $host = '';
+    protected $host = '';
 
     /** @var int|null Uri port. */
-    private $port;
+    protected $port;
 
     /** @var string Uri path. */
-    private $path = '';
+    protected $path = '';
 
     /** @var string Uri query string. */
-    private $query = '';
+    protected $query = '';
 
     /** @var string Uri fragment. */
-    private $fragment = '';
+    protected $fragment = '';
 
     /**
      * @param string $uri URI to parse
@@ -523,7 +523,7 @@ class Uri implements UriInterface {
      *
      * @param array $parts Array of parse_url parts to apply.
      */
-    private function applyParts(array $parts) {
+    protected function applyParts(array $parts) {
         $this->scheme = isset($parts['scheme'])
             ? $this->filterScheme($parts['scheme'])
             : '';
@@ -557,7 +557,7 @@ class Uri implements UriInterface {
      *
      * @throws \InvalidArgumentException If the scheme is invalid.
      */
-    private function filterScheme($scheme) {
+    protected function filterScheme($scheme) {
         if (!is_string($scheme)) {
             throw new \InvalidArgumentException('Scheme must be a string');
         }
@@ -572,7 +572,7 @@ class Uri implements UriInterface {
      *
      * @throws \InvalidArgumentException If the host is invalid.
      */
-    private function filterHost($host) {
+    protected function filterHost($host) {
         if (!is_string($host)) {
             throw new \InvalidArgumentException('Host must be a string');
         }
@@ -587,7 +587,7 @@ class Uri implements UriInterface {
      *
      * @throws \InvalidArgumentException If the port is invalid.
      */
-    private function filterPort($port) {
+    protected function filterPort($port) {
         if ($port === null) {
             return null;
         }
@@ -602,7 +602,7 @@ class Uri implements UriInterface {
         return $port;
     }
 
-    private function removeDefaultPort() {
+    protected function removeDefaultPort() {
         if ($this->port !== null && self::isDefaultPort($this)) {
             $this->port = null;
         }
@@ -617,7 +617,7 @@ class Uri implements UriInterface {
      *
      * @throws \InvalidArgumentException If the path is invalid.
      */
-    private function filterPath($path) {
+    protected function filterPath($path) {
         if (!is_string($path)) {
             throw new \InvalidArgumentException('Path must be a string');
         }
@@ -638,7 +638,7 @@ class Uri implements UriInterface {
      *
      * @throws \InvalidArgumentException If the query or fragment is invalid.
      */
-    private function filterQueryAndFragment($str) {
+    protected function filterQueryAndFragment($str) {
         if (!is_string($str)) {
             throw new \InvalidArgumentException('Query and fragment must be a string');
         }
@@ -650,11 +650,11 @@ class Uri implements UriInterface {
         );
     }
 
-    private function rawurlencodeMatchZero(array $match) {
+    protected function rawurlencodeMatchZero(array $match) {
         return rawurlencode($match[0]);
     }
 
-    private function validateState() {
+    protected function validateState() {
         if ($this->host === '' && ($this->scheme === 'http' || $this->scheme === 'https')) {
             $this->host = self::HTTP_DEFAULT_HOST;
         }
