@@ -33,7 +33,7 @@ EOD
 
     public function testTrackPageView() {
         $viewer = CMTest_TH::createUser();
-        $environment = new CM_Frontend_Environment(CM_Site_Abstract::factory(), $viewer);
+        $environment = new CM_Frontend_Environment(null, $viewer);
         $client = new CMService_AdWords_Client();
         $pushConversion = new ReflectionMethod($client, '_pushConversion');
         $pushConversion->setAccessible(true);

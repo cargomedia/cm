@@ -93,8 +93,12 @@ class CM_Model_User extends CM_Model_Abstract {
      * @return CM_Site_Abstract
      */
     public function getSite() {
+        $siteFactory = new CM_Site_SiteFactory();
         $siteType = $this->_get('site');
-        return CM_Site_Abstract::factory($siteType);
+        if (null === $siteType) {
+            return $siteFactory->getDefaultSite();
+        }
+        return $siteFactory->getSiteById($siteType);
     }
 
     /**
@@ -308,10 +312,10 @@ class CM_Model_User extends CM_Model_Abstract {
             $currencyId = $currency->getId();
         }
         $userId = CM_Db_Db::insert('cm_user', array(
-            'createStamp'   => time(),
-            'site'          => $siteType,
-            'languageId'    => $languageId,
-            'currencyId'    => $currencyId,
+            'createStamp' => time(),
+            'site'        => $siteType,
+            'languageId'  => $languageId,
+            'currencyId'  => $currencyId,
         ));
         return new static($userId);
     }

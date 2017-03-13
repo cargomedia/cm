@@ -10,7 +10,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
         $user = CM_Model_User::createStatic();
         $this->assertNull($user->getLatestActivity());
         $this->assertEquals(time(), $user->getCreated());
-        $this->assertEquals(CM_Site_Abstract::factory(), $user->getSite());
+        $this->assertEquals((new CM_Site_SiteFactory())->getDefaultSite(), $user->getSite());
         $this->assertSame(null, $user->getLanguage());
         $this->assertSame(null, $user->getCurrency());
     }
@@ -69,7 +69,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
     }
 
     public function testCreateWithSite() {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         /** @var CM_Model_User $user */
         $user = CM_Model_User::createStatic(array('site' => $site));
         $this->assertEquals($site, $user->getSite());
@@ -94,7 +94,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
     }
 
     public function testSetSite() {
-        $siteDefault = CM_Site_Abstract::factory();
+        $siteDefault = (new CM_Site_SiteFactory())->getDefaultSite();
         $user = CMTest_TH::createUser();
         $this->assertEquals($siteDefault, $user->getSite());
 

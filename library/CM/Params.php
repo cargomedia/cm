@@ -2,17 +2,21 @@
 
 class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface {
 
+    /** @var array */
     private $_params;
 
     /**
-     * @param array|null $params
-     * @param bool|null  $encoded Defaults to true
+     * @param array|null   $params
+     * @param boolean|null $encoded
+     * @throws CM_Exception_Invalid
      */
     public function __construct(array $params = null, $encoded = null) {
-        $params = $params ?: array();
-        if (null === $encoded) {
-            $encoded = true;
+        if (null === $params) {
+            $params = [];
+        } elseif (null === $encoded) {
+            throw new CM_Exception_Invalid('Params must be declared encoded or decoded');
         }
+        $encoded = (boolean) $encoded;
         $this->_params = \Functional\map($params, function ($value) use ($encoded) {
             if ($encoded) {
                 return ['encoded' => $value, 'decoded' => null];
@@ -46,6 +50,18 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     public function has($key) {
         return array_key_exists($key, $this->_params)
         && (null !== $this->_params[$key]['decoded'] || null !== $this->_params[$key]['encoded']);
+    }
+
+    /**
+     * @param CM_Params $params
+     * @return CM_Params
+     */
+    public function merge(CM_Params $params) {
+        $new = static::factory($this->getParamsDecoded(), false);
+        foreach ($params->getParamsDecoded() as $key => $value) {
+            $new->set($key, $value);
+        }
+        return $new;
     }
 
     /**
@@ -388,7 +404,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     public function getSite($key, $default = null) {
         $param = $this->_get($key, $default);
         if (ctype_digit($param) || is_int($param)) {
-            return CM_Site_Abstract::factory($param);
+            return (new CM_Site_SiteFactory())->getSiteById($param);
         }
         if (!($param instanceof CM_Site_Abstract)) {
             throw new CM_Exception_InvalidParam('Not a CM_Site_Abstract');
@@ -690,7 +706,6 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @return static
      */
     public static function factory(array $params = null, $encoded = null) {
-        $params = (array) $params;
         $className = self::_getClassName();
         return new $className($params, $encoded);
     }

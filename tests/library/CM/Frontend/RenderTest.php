@@ -82,7 +82,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
     public function testGetUrlResource() {
         $render = new CM_Frontend_Render();
-        $siteType = CM_Site_Abstract::factory()->getType();
+        $siteType = (new CM_Site_SiteFactory())->getDefaultSite()->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('http://cdn.default.dev', $render->getUrlResource());
         $this->assertSame('http://cdn.default.dev', $render->getUrlResource('layout'));
@@ -95,7 +95,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
     public function testGetUrlResourceSameOrigin() {
         $render = new CM_Frontend_Render();
-        $siteType = CM_Site_Abstract::factory()->getType();
+        $siteType = (new CM_Site_SiteFactory())->getDefaultSite()->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame(
             'http://www.default.dev/layout/' . $siteType . '/' . $deployVersion . '/foo.jpg',

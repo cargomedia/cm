@@ -191,7 +191,7 @@ class CM_Frontend_GlobalResponse {
         $view = $viewResponse->getView();
         $code = $reference . ' = new ' . get_class($view) . '({';
         $code .= 'el:$("#' . $viewResponse->getAutoId() . '").get(0),';
-        $code .= 'params:' . CM_Params::jsonEncode($view->getParams()->getParamsEncoded());
+        $code .= 'params:' . CM_Util::jsonEncode($view->getParams()->getParamsEncoded());
         if (!$node->isRoot()) {
             $code .= ',parent: cm.views["' . $node->getParent()->getValue()->getAutoId() . '"]';
         }

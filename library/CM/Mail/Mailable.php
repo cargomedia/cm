@@ -62,7 +62,7 @@ class CM_Mail_Mailable extends CM_View_Abstract implements CM_Typed {
             $site = $this->_recipient->getSite();
         }
         if (!$site) {
-            $site = CM_Site_Abstract::factory();
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();
         }
         $this->_site = $site;
 

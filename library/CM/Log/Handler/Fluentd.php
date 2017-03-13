@@ -35,12 +35,23 @@ class CM_Log_Handler_Fluentd extends CM_Log_Handler_Abstract {
 
     /**
      * @param CM_Log_Record $record
+     * @throws CM_Exception_Invalid
      */
     protected function _writeRecord(CM_Log_Record $record) {
         $formattedRecord = $this->_formatRecord($record);
         $sanitizedRecord = $this->_sanitizeRecord($formattedRecord);
         $encodedRecord = $this->_encodeRecord($sanitizedRecord);
-        $this->_getFluentd()->post($this->_tag, $encodedRecord);
+
+        $errorMessage = null;
+        $this->_getFluentd()->registerErrorHandler(function (FluentLogger $fluent, \Fluent\Logger\Entity $entity, $error) use (&$errorMessage) {
+            $errorMessage = $error;
+        });
+        $res = $this->_getFluentd()->post($this->_tag, $encodedRecord);
+        $this->_getFluentd()->unregisterErrorHandler();
+        if (false === $res) {
+            $metaInfo = $errorMessage ? ['originalExceptionMessage' => (string) $errorMessage] : null;
+            throw new CM_Exception_Invalid('Could not write to fluentd', null, $metaInfo);
+        }
     }
 
     /**

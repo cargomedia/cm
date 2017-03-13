@@ -52,4 +52,43 @@ class CM_Site_SiteFactory {
         return $site;
     }
 
+    /**
+     * @param int $id
+     * @return CM_Site_Abstract|null
+     */
+    public function findSiteById($id) {
+        $id = (int) $id;
+        return \Functional\first($this->_siteList, function (CM_Site_Abstract $site) use ($id) {
+            return $site->getId() === $id;
+        });
+    }
+
+    /**
+     * @param int $id
+     * @return CM_Site_Abstract
+     * @throws CM_Exception_Invalid
+     */
+    public function getSiteById($id) {
+        $id = (int) $id;
+        $site = $this->findSiteById($id);
+        if (null === $site) {
+            throw new CM_Exception_Invalid('Site is not found', null, ['siteId' => $id]);
+        }
+        return $site;
+    }
+
+    /**
+     * @return CM_Site_Abstract
+     * @throws CM_Exception_Invalid
+     */
+    public function getDefaultSite() {
+        $config = CM_Config::get();
+        if (empty($config->CM_Site_Abstract->class) || !is_subclass_of($config->CM_Site_Abstract->class, 'CM_Site_Abstract', true)) {
+            throw new CM_Exception_Invalid('Default site is not set');
+        }
+        /** @type CM_Site_Abstract $siteClassName */
+        $siteClassName = $config->CM_Site_Abstract->class;
+        return $this->getSiteById($siteClassName::getTypeStatic());
+    }
+
 }
