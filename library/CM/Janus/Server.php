@@ -82,7 +82,9 @@ class CM_Janus_Server implements JsonSerializable {
      * @return string
      */
     public function getWebSocketAddressSubscribeOnly() {
-        return (string) $this->_webSocketAddress->withQuery('subscribeOnly=1');
+        return (string) $this->_webSocketAddress->withParams([
+            'subscribeOnly' => 1,
+        ]);
     }
 
     /**
