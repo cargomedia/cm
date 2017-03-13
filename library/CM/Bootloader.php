@@ -195,7 +195,7 @@ class CM_Bootloader {
             'adapter' => new CM_File_Filesystem_Adapter_Local($this->getDirTmp())
         ]);
         foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
-            $serviceManager->registerWithArray($serviceKey, $serviceDefinition);
+            $serviceManager->registerDefinition($serviceKey, $serviceDefinition);
         }
     }
 
