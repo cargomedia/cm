@@ -4,7 +4,7 @@ namespace CM\Url;
 
 class WsUrl extends Url {
 
-    protected static $schemes = [
+    protected static $defaultPorts = [
         'ws'  => 80,
         'wss' => 443,
     ];
