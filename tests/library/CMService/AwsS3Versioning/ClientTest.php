@@ -17,35 +17,81 @@ class CMService_AwsS3Versioning_ClientTest extends CMTest_TestCase {
     public function setUp() {
         $config = CM_Config::get();
         $className = __CLASS__;
+        $version = (string) $config->$className->version;
+        $region = (string) $config->$className->region;
         $key = (string) $config->$className->key;
         $secret = (string) $config->$className->secret;
-        $region = (string) $config->$className->region;
         if (empty($key) || empty($secret)) {
             $this->markTestSkipped('Missing `key` or `secret` config.');
         }
 
-        $this->_client = \Aws\S3\S3Client::factory(array('key' => $key, 'secret' => $secret));
-        $this->_client->getConfig()->set('curl.options', array('body_as_string' => true)); // https://github.com/aws/aws-sdk-php/issues/140#issuecomment-25117635
+        $this->_client = new \Aws\S3\S3Client([
+            'version'     => $version,
+            'region'      => $region,
+            'credentials' => [
+                'key'    => $key,
+                'secret' => $secret,
+            ]]);
         $this->_bucket = strtolower(str_replace('_', '-', 'test-' . __CLASS__ . uniqid()));
         $this->_filesystem = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_AwsS3($this->_client, $this->_bucket));
 
         $this->_client->createBucket(array('Bucket' => $this->_bucket, 'LocationConstraint' => $region));
-        $this->_client->waitUntilBucketExists(array('Bucket' => $this->_bucket));
-        $this->_client->putBucketVersioning(array('Bucket' => $this->_bucket, 'Status' => 'Enabled'));
+        $this->_client->putBucketVersioning([
+            'Bucket'                  => $this->_bucket,
+            'VersioningConfiguration' => [
+                'Status' => 'Enabled',
+            ]]);
 
         $this->_restore = new CMService_AwsS3Versioning_Client($this->_client, $this->_bucket, new CM_OutputStream_Null());
     }
 
     public function tearDown() {
-        $clear = new Aws\S3\Model\ClearBucket($this->_client, $this->_bucket);
-        $clear->clear();
-        $this->_client->deleteBucket(array('Bucket' => $this->_bucket));
+        if ($this->_client) {
+            foreach ($this->_restore->getVersions('') as $version) {
+                $this->_client->deleteObject([
+                    'Bucket'    => $this->_bucket,
+                    'Key'       => $version->getKey(),
+                    'VersionId' => $version->getId(),
+                ]);
+            }
+            $this->_client->deleteBucket(['Bucket' => $this->_bucket]);
+
+            $testBucketPrefix = strtolower(str_replace('_', '-', 'test-' . __CLASS__));
+            $result = $this->_client->listBuckets();
+            foreach ($result->get('Buckets') as $bucket) {
+                $bucketName = $bucket['Name'];
+                if (0 === strpos($bucketName, $testBucketPrefix)) {
+                    $this->_client->putBucketVersioning([
+                        'Bucket'                  => $bucketName,
+                        'VersioningConfiguration' => [
+                            'Status' => 'Enabled',
+                        ]]);
+                    $restore = new CMService_AwsS3Versioning_Client($this->_client, $bucketName, new CM_OutputStream_Null());
+                    foreach ($restore->getVersions('') as $version) {
+                        $this->_client->deleteObject([
+                            'Bucket'    => $bucketName,
+                            'Key'       => $version->getKey(),
+                            'VersionId' => $version->getId(),
+                        ]);
+                    }
+                    $this->_client->deleteBucket(['Bucket' => $bucketName]);
+                }
+            }
+        }
     }
 
     public function testGetVersioningEnabled() {
-        $this->_client->putBucketVersioning(array('Bucket' => $this->_bucket, 'Status' => 'Enabled'));
+        $this->_client->putBucketVersioning([
+            'Bucket'                  => $this->_bucket,
+            'VersioningConfiguration' => [
+                'Status' => 'Enabled',
+            ]]);
         $this->assertSame(true, $this->_restore->getVersioningEnabled());
-        $this->_client->putBucketVersioning(array('Bucket' => $this->_bucket, 'Status' => 'Suspended'));
+        $this->_client->putBucketVersioning([
+            'Bucket'                  => $this->_bucket,
+            'VersioningConfiguration' => [
+                'Status' => 'Suspended',
+            ]]);
         $this->assertSame(false, $this->_restore->getVersioningEnabled());
     }
 
