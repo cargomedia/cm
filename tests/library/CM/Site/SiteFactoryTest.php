@@ -59,6 +59,27 @@ class CM_Site_SiteFactoryTest extends CMTest_TestCase {
         $this->assertEquals($site3, $siteFactory->getSiteById($site3->getId()));
     }
 
+    public function testFindGetSiteByType() {
+        $site1 = $this->getMockSite();
+        $site2 = $this->getMockSite();
+        $site3 = $this->getMockSite();
+
+        $siteList = [$site1, $site2, $site3];
+        $siteFactory = new CM_Site_SiteFactory($siteList);
+
+        $this->assertEquals($site1, $siteFactory->findSiteByType($site1->getType()));
+        $this->assertEquals($site3, $siteFactory->findSiteByType($site3->getType()));
+        $this->assertNull($siteFactory->findSiteByType(9999));
+
+        $this->assertEquals($site2, $siteFactory->getSiteByType($site2->getType()));
+        $exception = $this->catchException(function () use ($siteFactory) {
+            $siteFactory->getSiteByType(9999);
+        });
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Site is not found', $exception->getMessage());
+        $this->assertEquals($site3, $siteFactory->getSiteByType($site3->getType()));
+    }
+
     public function testGetDefaultSite() {
         $site1 = $this->getMockSite(null, ['url' => 'http://my-site.com']);
         $site2 = $this->getMockSite(null, ['url' => 'http://my-site.com/hello']);

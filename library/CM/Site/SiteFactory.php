@@ -78,6 +78,36 @@ class CM_Site_SiteFactory {
     }
 
     /**
+     * These 2 method were temporary added till we resolve ambiguity related to splitting siteId and type
+     * especially for models where type is currently stored.
+     *
+     * @param int $type
+     * @return CM_Site_Abstract|null
+     * @deprecated use binding by id, type generally can be not unique
+     */
+    public function findSiteByType($type) {
+        $type = (int) $type;
+        return \Functional\first($this->_siteList, function (CM_Site_Abstract $site) use ($type) {
+            return $site->getType() === $type;
+        });
+    }
+
+    /**
+     * @param int $type
+     * @return CM_Site_Abstract
+     * @throws CM_Exception_Invalid
+     * @deprecated use binding by id, type generally can be not unique
+     */
+    public function getSiteByType($type) {
+        $type = (int) $type;
+        $site = $this->findSiteByType($type);
+        if (null === $site) {
+            throw new CM_Exception_Invalid('Site is not found', null, ['siteType' => $type]);
+        }
+        return $site;
+    }
+
+    /**
      * @return CM_Site_Abstract
      * @throws CM_Exception_Invalid
      */
