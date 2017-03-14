@@ -57,10 +57,7 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
         if (!$emoticon) {
             throw new CM_Exception_Invalid('Cannot find emoticon for code `' . $emoticonCode . '`.');
         }
-        $urlCdn = $this->_mockSite->getUrlCdn();
-        $siteType = $this->_mockSite->getId();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-
         $url = ResourceUrl::create('img/emoticon/' . $emoticon->getFileName(), 'layout', null, $deployVersion)
             ->withSite($this->_mockSite);
         $heightAttribute = $height ? ' height="' . $height . '"' : '';

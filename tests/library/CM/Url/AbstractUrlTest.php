@@ -72,6 +72,7 @@ class AbstractUrlTest extends CMTest_TestCase {
         $this->assertFalse($url->hasTrailingSlash());
         $this->assertSame('/path', $url->getPath());
         $this->assertSame('/path?bar=1', (string) $url);
+        /** @var CM_Url_AbstractMockUrl $url */
         $url = $url->withPath('/foo/');
         $this->assertTrue($url->hasTrailingSlash());
         $this->assertSame('/foo/', $url->getPath());
