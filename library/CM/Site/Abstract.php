@@ -305,8 +305,8 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
 
     //TODO type or ID
     public static function fromArray(array $array) {
-        $type = (string) $array['id'];
-        return (new CM_Site_SiteFactory())->getSiteById($type);
+        $id = (string) $array['id'];
+        return (new CM_Site_SiteFactory())->getSiteById($id);
     }
 
     /**

@@ -56,10 +56,10 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
             throw new CM_Exception_Invalid('Cannot find emoticon for code `' . $emoticonCode . '`.');
         }
         $urlCdn = $this->_mockSite->getUrlCdn();
-        $siteType = $this->_mockSite->getType();
+        $siteId = $this->_mockSite->getId();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $heightAttribute = $height ? ' height="' . $height . '"' : '';
-        return '<img src="' . $urlCdn . '/layout/' . $siteType . '/' . $deployVersion . '/img/emoticon/' . $emoticon->getFileName() .
+        return '<img src="' . $urlCdn . '/layout/' . $siteId . '/' . $deployVersion . '/img/emoticon/' . $emoticon->getFileName() .
         '" class="emoticon emoticon-' . $emoticon->getName() . '" title="' . $emoticon->getDefaultCode() . '"' . $heightAttribute . ' />';
     }
 }

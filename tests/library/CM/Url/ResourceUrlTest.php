@@ -17,29 +17,31 @@ class ResourceUrlTest extends CMTest_TestCase {
         $this->assertSame('/resource-type/file.ext', (string) $url);
 
         $environment = $this->createEnvironment(null, null, 'de');
-        $siteType = $environment->getSite()->getType();
+        $siteId = $environment->getSite()->getId();
 
         $url = ResourceUrl::create('file.ext', 'resource-type', $environment);
-        $this->assertSame('http://cdn.example.com/resource-type/de/' . $siteType . '/file.ext', (string) $url);
+        $this->assertSame('http://cdn.example.com/resource-type/de/' . $siteId . '/file.ext', (string) $url);
 
         $url = ResourceUrl::create('file.ext', 'resource-type', $environment, null, 1234);
-        $this->assertSame('http://cdn.example.com/resource-type/de/' . $siteType . '/1234/file.ext', (string) $url);
+        $this->assertSame('http://cdn.example.com/resource-type/de/' . $siteId . '/1234/file.ext', (string) $url);
 
         $url = ResourceUrl::create('file.ext', 'resource-type', $environment, ['sameOrigin' => true], 1234);
-        $this->assertSame('http://www.example.com/resource-type/de/' . $siteType . '/1234/file.ext', (string) $url);
+        $this->assertSame('http://www.example.com/resource-type/de/' . $siteId . '/1234/file.ext', (string) $url);
     }
 
     public function testWithSite() {
+        $siteId = '58c7cb50837959bb398b4567';
+
         /** @var \PHPUnit_Framework_MockObject_MockObject|\CM_Site_Abstract $site */
         $site = $this
             ->getMockBuilder('CM_Site_Abstract')
-            ->setMethods(['getType', 'getUrl', 'getUrlCdn'])
+            ->setMethods(['getId', 'getUrl', 'getUrlCdn'])
             ->getMockForAbstractClass();
 
         $site
             ->expects($this->any())
-            ->method('getType')
-            ->will($this->returnValue(42));
+            ->method('getId')
+            ->will($this->returnValue($siteId));
 
         $site
             ->expects($this->any())
@@ -54,9 +56,9 @@ class ResourceUrlTest extends CMTest_TestCase {
         $url = ResourceUrl::create('file.ext', 'resource-type');
 
         $urlWithSite = $url->withSite($site);
-        $this->assertSame('http://cdn.foo.com/resource-type/42/file.ext', (string) $urlWithSite);
+        $this->assertSame('http://cdn.foo.com/resource-type/' . $siteId . '/file.ext', (string) $urlWithSite);
 
         $urlWithSiteSameOrigin = $url->withSite($site, true);
-        $this->assertSame('http://foo.com/resource-type/42/file.ext', (string) $urlWithSiteSameOrigin);
+        $this->assertSame('http://foo.com/resource-type/' . $siteId . '/file.ext', (string) $urlWithSiteSameOrigin);
     }
 }

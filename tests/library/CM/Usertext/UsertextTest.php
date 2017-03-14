@@ -9,12 +9,12 @@ class CM_Usertext_UsertextTest extends CMTest_TestCase {
 
     public function testProcessEmoticon() {
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $siteType = (new CM_Site_SiteFactory())->getDefaultSite()->getType();
+        $siteId = (new CM_Site_SiteFactory())->getDefaultSite()->getId();
         $usertext = new CM_Usertext_Usertext();
 
-        $expectedValuePlain = "<img src=\"http://cdn.default.dev/layout/" . $siteType . "/" . $deployVersion .
+        $expectedValuePlain = "<img src=\"http://cdn.default.dev/layout/" . $siteId . "/" . $deployVersion .
             "/img/emoticon/cold_sweat.png\" class=\"emoticon emoticon-cold_sweat\" title=\":cold_sweat:\" />";
-        $expectedValueMarkdown = "<p><img src=\"http://cdn.default.dev/layout/" . $siteType . "/" . $deployVersion .
+        $expectedValueMarkdown = "<p><img src=\"http://cdn.default.dev/layout/" . $siteId . "/" . $deployVersion .
             "/img/emoticon/cold_sweat.png\" class=\"emoticon emoticon-cold_sweat\" title=\":cold_sweat:\" /></p>";
 
         $usertext->setMode('escape');

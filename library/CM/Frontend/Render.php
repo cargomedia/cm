@@ -259,7 +259,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             if ($this->getLanguage()) {
                 $pathParts[] = $this->getLanguage()->getAbbreviation();
             }
-            $pathParts[] = $site->getType();
+            $pathParts[] = $site->getId();
             $pathParts[] = CM_App::getInstance()->getDeployVersion();
             $pathParts = array_merge($pathParts, explode('/', $path));
 
