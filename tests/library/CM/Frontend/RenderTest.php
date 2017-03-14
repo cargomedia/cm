@@ -2,11 +2,6 @@
 
 class CM_Frontend_RenderTest extends CMTest_TestCase {
 
-    protected function setUp() {
-        CM_Config::get()->CM_Site_Abstract->url = 'http://www.default.dev';
-        CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://cdn.default.dev';
-    }
-
     public function tearDown() {
         CMTest_TH::clearEnv();
     }
