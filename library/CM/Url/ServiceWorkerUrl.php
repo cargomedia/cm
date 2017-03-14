@@ -12,7 +12,6 @@ class ServiceWorkerUrl extends AbstractUrl {
 
     public function __construct() {
         parent::__construct('');
-        $this->_trailingSlash = false;
     }
 
     /**

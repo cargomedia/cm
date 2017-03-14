@@ -24,9 +24,6 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
     /** @var CM_Site_Abstract|null */
     protected $_site = null;
 
-    /** @var bool|null */
-    protected $_trailingSlash = null;
-
     public function isRelative() {
         return '' === $this->getScheme() && '' === $this->getHost();
     }
@@ -51,13 +48,12 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
     }
 
     public function hasTrailingSlash() {
-        return $this->_trailingSlash;
+        return '/' === substr($this->getPath(), -1);
     }
 
     public function withTrailingSlash() {
         $new = clone $this;
-        $new->_trailingSlash = true;
-        if ('/' !== substr($new->path, -1)) {
+        if (!$new->hasTrailingSlash()) {
             $new->path .= '/';
         }
         return $new;
@@ -65,8 +61,7 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
 
     public function withoutTrailingSlash() {
         $new = clone $this;
-        $new->_trailingSlash = false;
-        if ('/' === substr($new->path, -1)) {
+        if ($new->hasTrailingSlash()) {
             $new->path = rtrim($new->path, '/');
         }
         return $new;
@@ -79,7 +74,6 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
         }
         $new = clone $this;
         $new->path = self::removeDotSegments($path);
-        $new->_trailingSlash = '/' === substr($new->path, -1);
         return $new;
     }
 
@@ -184,7 +178,6 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
         parent::applyParts($parts);
         $this->_ensureAbsolutePath();
         $this->path = self::removeDotSegments($this->path);
-        $this->_trailingSlash = '/' === substr($this->path, -1);
     }
 
     /**
