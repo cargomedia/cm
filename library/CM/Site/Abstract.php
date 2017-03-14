@@ -2,7 +2,7 @@
 
 use CM\Url\BaseUrl;
 
-abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed, CM_Comparable {
+abstract class CM_Site_Abstract extends CM_Model_Abstract {
 
     /** @var BaseUrl|null */
     protected $_url = null;
@@ -19,22 +19,16 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     /** @var CM_EventHandler_EventHandler */
     protected $_eventHandler = null;
 
-    /**
-     * Default constructor to set CM module
-     */
-    public function __construct() {
+    public function __construct($id = null) {
+        parent::__construct($id);
         $this->_setModule('CM');
     }
 
     /**
-     * @return CM_Site_Abstract[]
+     * @return string
      */
-    public static function getAll() {
-        $siteList = array();
-        foreach (CM_Config::get()->CM_Site_Abstract->types as $className) {
-            $siteList[] = new $className();
-        }
-        return $siteList;
+    public function getId() {
+        return (string) $this->_getIdKey('id'); //mongoDB
     }
 
     /**
@@ -42,13 +36,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      */
     public function getConfig() {
         return self::_getConfig();
-    }
-
-    /**
-     * @return string
-     */
-    public function getEmailAddress() {
-        return $this->getConfig()->emailAddress;
     }
 
     /**
@@ -101,7 +88,51 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return string
      */
     public function getName() {
-        return $this->getConfig()->name;
+        return $this->_get('name');
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmailAddress() {
+        return $this->_get('emailAddress');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDefault() {
+        //TODO invent method to avoid cache
+        $mongo = CM_Service_Manager::getInstance()->getMongoDb();
+        return null !== $mongo->findOne(self::getTableName(), [
+            '_id'     => new MongoId($this->getId()),
+            'default' => true,
+        ]);
+    }
+
+    /**
+     * @param string $emailAddress
+     */
+    public function setEmailAddress($emailAddress) {
+        $this->_set('emailAddress', $emailAddress);
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name) {
+        $this->_set('name', $name);
+    }
+
+    /**
+     * @param boolean $isDefault
+     */
+    public function setDefault($isDefault) {
+        $mongo = CM_Service_Manager::getInstance()->getMongoDb();
+        $mongo->update(self::getTableName(), [], ['$unset' => ['default' => 1]], ['multiple' => true]);
+        if (true === $isDefault) {
+            $this->_set('default', true);
+        }
     }
 
     /**
@@ -153,6 +184,13 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
+     * @return CM_Http_UrlParser
+     */
+    public function getUrlParser() {
+        return new CM_Http_UrlParser($this->getUrl());
+    }
+
+    /**
      * @return array
      */
     public function getWebFontLoaderConfig() {
@@ -195,27 +233,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     public function toArray() {
-        return array('type' => $this->getType());
-    }
-
-    /**
-     * @param string $theme
-     * @return CM_Site_Abstract
-     */
-    protected function _addTheme($theme) {
-        array_unshift($this->_themes, (string) $theme);
-        return $this;
-    }
-
-    /**
-     * @param string $name
-     * @return CM_Site_Abstract
-     */
-    protected function _setModule($name) {
-        array_unshift($this->_modules, (string) $name);
-        // Resets themes if new module is set
-        $this->_themes = array('default');
-        return $this;
+        return ['id' => $this->getId()];
     }
 
     /**
@@ -259,7 +277,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @param CM_Site_Abstract $other
+     * @param CM_Comparable $other
      * @return boolean
      */
     public function equals(CM_Comparable $other = null) {
@@ -269,18 +287,83 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         if (get_class($other) !== get_class($this)) {
             return false;
         }
+        /** @var $other CM_Site_Abstract */
         return (string) $this->getUrl() === (string) $other->getUrl();
     }
 
-    /**
-     * @return int Site id
-     */
-    public function getId() {
-        return $this->getType();
+    protected function _getSchema() {
+        return new CM_Model_Schema_Definition([
+            'name'         => ['type' => 'string'],
+            'emailAddress' => ['type' => 'string'],
+            'default'      => ['type' => 'bool', 'optional' => true],
+        ]);
     }
 
+    /**
+     * @param string $theme
+     * @return CM_Site_Abstract
+     */
+    protected function _addTheme($theme) {
+        array_unshift($this->_themes, (string) $theme);
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return CM_Site_Abstract
+     */
+    protected function _setModule($name) {
+        array_unshift($this->_modules, (string) $name);
+        // Resets themes if new module is set
+        $this->_themes = array('default');
+        return $this;
+    }
+
+    protected function _getContainingCacheables() {
+        return [new CM_Paging_Site_All()];
+    }
+
+    //TODO type or ID
     public static function fromArray(array $array) {
-        $type = (int) $array['type'];
+        $type = (string) $array['id'];
         return (new CM_Site_SiteFactory())->getSiteById($type);
+    }
+
+    /**
+     * @param string $id
+     * @param int    $type
+     * @return CM_Site_Abstract
+     */
+    public static function factoryFromType($id, $type) {
+        $id = (string) $id;
+        $type = (int) $type;
+        $siteClassName = self::_getClassName($type);
+        /** @type CM_Site_Abstract $siteClassName */
+        return new $siteClassName($id);
+    }
+
+    public static function getPersistenceClass() {
+        return 'CM_Model_StorageAdapter_MongoDb';
+    }
+
+    public static function getTableName() {
+        return 'cm_site_settings';
+    }
+
+    /**
+     * @param string $name
+     * @param string $emailAddress
+     * @return static
+     */
+    public static function create($name, $emailAddress) {
+        $type = static::getTypeStatic();
+        $site = new static();
+        $site->_set([
+            'name'         => (string) $name,
+            'emailAddress' => (string) $emailAddress,
+            'siteType'     => $type,
+        ]);
+        $site->commit();
+        return $site;
     }
 }
