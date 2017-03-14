@@ -6,10 +6,10 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
     protected $_mockSite;
 
     public function setUp() {
-        $this->_mockSite = $this->getMockSite(null, 24, array(
+        $this->_mockSite = $this->getMockSite(null, [
             'url'    => 'http://www.default.dev',
             'urlCdn' => 'http://cdn.default.dev',
-        ));
+        ]);
     }
 
     public function tearDown() {
@@ -53,7 +53,7 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
     protected function _getEmoticonImg($emoticonCode, $height = null) {
         $emoticon = CM_Emoticon::findByCode($emoticonCode);
         if (!$emoticon) {
-            throw new CM_Exception_Invalid('Cannot find emoticon for code `' . $emoticonCode  . '`.');
+            throw new CM_Exception_Invalid('Cannot find emoticon for code `' . $emoticonCode . '`.');
         }
         $urlCdn = $this->_mockSite->getUrlCdn();
         $siteType = $this->_mockSite->getId();

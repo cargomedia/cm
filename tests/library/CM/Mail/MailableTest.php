@@ -43,7 +43,7 @@ class CM_Mail_MailableTest extends CMTest_TestCase {
     }
 
     public function testRenderTranslated() {
-        $site = $this->getMockSite(null, null, [
+        $site = $this->getMockSite(null, [
             'url' => 'http://www.foo.com',
         ]);
         $language = CM_Model_Language::create('Test language', 'en', true);
@@ -60,7 +60,7 @@ class CM_Mail_MailableTest extends CMTest_TestCase {
     }
 
     public function testRenderTranslatedDefaultLanguage() {
-        $site = $this->getMockSite(null, null, [
+        $site = $this->getMockSite(null, [
             'url' => 'http://www.foo.com',
         ]);
         $language = CM_Model_Language::create('Default language', 'en', true);
