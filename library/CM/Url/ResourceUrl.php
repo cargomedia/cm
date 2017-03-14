@@ -32,7 +32,7 @@ class ResourceUrl extends AssetUrl {
             $segments[] = $language->getAbbreviation();
         }
         if ($site = $this->getSite()) {
-            $segments[] = $site->getId();
+            $segments[] = $site->getType();
         }
         if ($deployVersion = $this->getDeployVersion()) {
             $segments[] = $deployVersion;

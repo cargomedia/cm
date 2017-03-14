@@ -20,9 +20,7 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
     }
 
     public function testGetConfig() {
-        $configExpected = CM_Config::get()->CM_Site_Abstract;
         $config = $this->_site->getConfig();
-        $this->assertSame($configExpected->class, $config->class);
         $this->assertSame('http://www.foo.com', $config->url);
         $this->assertSame('http://www.cdn.com', $config->urlCdn);
     }

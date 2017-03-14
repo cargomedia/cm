@@ -16,27 +16,29 @@ class ResourceUrlTest extends CMTest_TestCase {
         $url = ResourceUrl::create('file.ext', 'resource-type');
         $this->assertSame('/resource-type/file.ext', (string) $url);
 
-        $environment = $this->createEnvironment(['type' => 999], null, 'de');
+        $environment = $this->createEnvironment(null, null, 'de');
+        $siteType = $environment->getSite()->getType();
+
         $url = ResourceUrl::create('file.ext', 'resource-type', $environment);
-        $this->assertSame('http://cdn.example.com/resource-type/de/999/file.ext', (string) $url);
+        $this->assertSame('http://cdn.example.com/resource-type/de/' . $siteType . '/file.ext', (string) $url);
 
         $url = ResourceUrl::create('file.ext', 'resource-type', $environment, null, 1234);
-        $this->assertSame('http://cdn.example.com/resource-type/de/999/1234/file.ext', (string) $url);
+        $this->assertSame('http://cdn.example.com/resource-type/de/' . $siteType . '/1234/file.ext', (string) $url);
 
         $url = ResourceUrl::create('file.ext', 'resource-type', $environment, ['sameOrigin' => true], 1234);
-        $this->assertSame('http://www.example.com/resource-type/de/999/1234/file.ext', (string) $url);
+        $this->assertSame('http://www.example.com/resource-type/de/' . $siteType . '/1234/file.ext', (string) $url);
     }
 
     public function testWithSite() {
         /** @var \PHPUnit_Framework_MockObject_MockObject|\CM_Site_Abstract $site */
         $site = $this
             ->getMockBuilder('CM_Site_Abstract')
-            ->setMethods(['getId', 'getUrl', 'getUrlCdn'])
+            ->setMethods(['getType', 'getUrl', 'getUrlCdn'])
             ->getMockForAbstractClass();
 
         $site
             ->expects($this->any())
-            ->method('getId')
+            ->method('getType')
             ->will($this->returnValue(42));
 
         $site

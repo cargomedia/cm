@@ -133,7 +133,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
         $siteArgs = [
             'classname' => null,
-            'type'      => null,
             'methods'   => null,
         ];
         foreach ($siteArgs as $name => $value) {
@@ -142,7 +141,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
                 unset($siteConfig[$name]);
             }
         }
-        $site = $this->getMockSite($siteArgs['classname'], $siteArgs['type'], (array) $siteConfig, $siteArgs['methods']);
+        $site = $this->getMockSite($siteArgs['classname'], (array) $siteConfig, null, $siteArgs['methods']);
 
         $language = null;
         if ($languageAbbreviation) {
