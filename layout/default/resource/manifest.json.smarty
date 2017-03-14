@@ -6,23 +6,8 @@
 	"theme_color": "{lessVariable name='colorBrand'}",
 	"icons": [
 		{
-			"src": "{resourceUrl path='img/meta/square-144.png' type='layout'}",
-			"sizes": "144x144",
-			"type": "image/png"
-		},
-		{
 			"src": "{resourceUrl path='img/meta/square-192.png' type='layout'}",
 			"sizes": "192x192",
-			"type": "image/png"
-		},
-		{
-			"src": "{resourceUrl path='img/meta/square-256.png' type='layout'}",
-			"sizes": "256x256",
-			"type": "image/png"
-		},
-		{
-			"src": "{resourceUrl path='img/meta/square-384.png' type='layout'}",
-			"sizes": "384x384",
 			"type": "image/png"
 		},
 		{

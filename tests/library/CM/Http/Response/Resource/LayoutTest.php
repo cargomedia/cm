@@ -39,7 +39,7 @@ class CM_Http_Response_Resource_LayoutTest extends CMTest_TestCase {
         $this->assertContains('Content-Type: application/xml', $response->getHeaders());
         $this->assertContains('Cache-Control: max-age=31536000', $response->getHeaders());
         $this->assertContains('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 31536000), $response->getHeaders());
-        $imgUrl = $render->getUrlResource('layout', 'img/meta/tile-small-128x128-transparent.png');
+        $imgUrl = $render->getUrlResource('layout', 'img/meta/tile-medium-270x270-transparent.png');
         $this->assertContains("src=\"{$imgUrl}\"", $response->getContent());
 
         $exception = $this->catchException(function () use ($render) {

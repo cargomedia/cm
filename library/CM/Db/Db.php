@@ -342,7 +342,8 @@ class CM_Db_Db extends CM_Class_Abstract {
             }
         }
 
-        $dump = 'SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";' . PHP_EOL;
+        $dump = 'SET FOREIGN_KEY_CHECKS=0;' . PHP_EOL;
+        $dump .= 'SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";' . PHP_EOL;
         $dump .= '/*!40101 SET NAMES utf8 */;' . PHP_EOL;
         if (array() !== $tables) {
             $queries = CM_Util::exec('mysqldump', $args);
@@ -350,7 +351,7 @@ class CM_Db_Db extends CM_Class_Abstract {
             $queries = preg_replace('#/\*.*?\*/;#', '', $queries);
             $dump .= $queries;
         }
-
+        $dump .= 'SET FOREIGN_KEY_CHECKS=1;' . PHP_EOL;
         return $dump;
     }
 
