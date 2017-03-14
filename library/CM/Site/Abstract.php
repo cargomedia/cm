@@ -10,9 +10,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     /** @var BaseUrl|null */
     protected $_urlCdn = null;
 
-    /** @var int */
-    protected $_urlLength = null;
-
     /** @var string[] */
     protected $_themes = array();
 
@@ -126,7 +123,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      */
     public function getUrl() {
         if (null === $this->_url) {
-            $this->_url = BaseUrl::create($this->getConfig()->url);
+            $this->_url = BaseUrl::create($this->getUrlString());
         }
         return $this->_url;
     }
@@ -136,19 +133,23 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      */
     public function getUrlCdn() {
         if (null === $this->_urlCdn) {
-            $this->_urlCdn = BaseUrl::create($this->getConfig()->urlCdn);
+            $this->_urlCdn = BaseUrl::create($this->getUrlCdnString());
         }
         return $this->_urlCdn;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getUrlLength() {
-        if (null === $this->_urlLength) {
-            $this->_urlLength = mb_strlen($this->getConfig()->url);
-        }
-        return $this->_urlLength;
+    public function getUrlString() {
+        return $this->getConfig()->url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlCdnString() {
+        return $this->getConfig()->urlCdn;
     }
 
     /**
