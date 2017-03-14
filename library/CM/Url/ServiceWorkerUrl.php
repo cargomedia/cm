@@ -7,33 +7,12 @@ use CM_Frontend_Environment;
 
 class ServiceWorkerUrl extends AbstractUrl {
 
-    /** @var string */
-    protected $_name;
-
     /** @var string|null */
     protected $_deployVersion = null;
 
-    /**
-     * @param string $name
-     */
-    public function __construct($name) {
+    public function __construct() {
         parent::__construct('');
-        $this->setName($name);
         $this->_trailingSlash = false;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName() {
-        return $this->_name;
-    }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name) {
-        $this->_name = (string) $name;
     }
 
     /**
@@ -52,7 +31,7 @@ class ServiceWorkerUrl extends AbstractUrl {
 
     public function getUriRelativeComponents() {
         $parts = [
-            $this->getName(),
+            HttpResponseServiceWorker::PATH_PREFIX_FILENAME,
         ];
         if ($language = $this->getLanguage()) {
             $parts[] = $language->getAbbreviation();
@@ -76,7 +55,7 @@ class ServiceWorkerUrl extends AbstractUrl {
      */
     public static function create(CM_Frontend_Environment $environment = null, $deployVersion = null) {
         /** @var ServiceWorkerUrl $url */
-        $url = parent::_create(HttpResponseServiceWorker::PATH_PREFIX_FILENAME, $environment);
+        $url = parent::_create('', $environment);
         $url->setDeployVersion($deployVersion);
         return $url;
     }
