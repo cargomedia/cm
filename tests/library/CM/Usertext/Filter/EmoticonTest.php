@@ -8,10 +8,10 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
     protected $_mockSite;
 
     public function setUp() {
-        $this->_mockSite = $this->getMockSite(null, 24, array(
+        $this->_mockSite = $this->getMockSite(null, [
             'url'    => 'http://www.default.dev',
             'urlCdn' => 'http://cdn.default.dev',
-        ));
+        ]);
     }
 
     public function tearDown() {
