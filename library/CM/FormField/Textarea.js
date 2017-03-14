@@ -1,4 +1,4 @@
-/**
+/**selectionCoords
  * @class CM_FormField_Textarea
  * @extends CM_FormField_Text
  */
@@ -96,11 +96,11 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
     var $input = this.getInput();
     var selection = window.getSelection();
     var range = selection && selection.getRangeAt(0);
-    var textCoords = range && range.getClientRects()[0];
-    textCoords = textCoords || {bottom: $input.height()};
+    var selectionCoords = range && range.getClientRects()[0];
+    selectionCoords = selectionCoords || {bottom: $input.height()};
     var textareaCoords = $input[0].getBoundingClientRect();
-    if (textCoords && textCoords.bottom > textareaCoords.bottom || textCoords.bottom < textareaCoords.top) {
-      $input.scrollTop($input.scrollTop() + (textCoords.bottom - textareaCoords.top));
+    if (selectionCoords && selectionCoords.bottom > textareaCoords.bottom || selectionCoords.bottom < textareaCoords.top) {
+      $input.scrollTop($input.scrollTop() + (selectionCoords.bottom - textareaCoords.top));
     }
   },
 
