@@ -88,19 +88,14 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
     }
 
     public function writeStream($path, $stream) {
-        /** @var \Aws\S3\Model\MultipartUpload\UploadBuilder $uploader */
-        $uploadBuilder = \Aws\S3\Model\MultipartUpload\UploadBuilder::newInstance();
-        $uploadBuilder->setClient($this->_client);
-        $uploadBuilder->setSource($stream);
-        $uploadBuilder->setBucket($this->_bucket);
-        $uploadBuilder->setKey($this->_getAbsolutePath($path));
-        /** @var \Aws\Common\Model\MultipartUpload\TransferInterface $uploader */
-        $uploader = $uploadBuilder->build();
+        $uploader = new \Aws\S3\MultipartUploader($this->_client, $stream, [
+            'bucket' => $this->_bucket,
+            'key'    => $this->_getAbsolutePath($path),
+        ]);
 
         try {
             $uploader->upload();
-        } catch (\Aws\Common\Exception\MultipartUploadException $exception) {
-            $uploader->abort();
+        } catch (\Aws\Exception\MultipartUploadException $exception) {
             throw new CM_Exception('AWS S3 Upload to path failed', null, [
                 'path'                     => $path,
                 'originalExceptionMessage' => $exception->getMessage(),
