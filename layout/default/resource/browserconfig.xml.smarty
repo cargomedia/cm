@@ -2,10 +2,7 @@
 <browserconfig>
   <msapplication>
     <tile>
-      <square70x70logo src="{resourceUrl path='img/meta/tile-small-128x128-transparent.png' type='layout'}"/>
       <square150x150logo src="{resourceUrl path='img/meta/tile-medium-270x270-transparent.png' type='layout'}"/>
-      <square310x310logo src="{resourceUrl path='img/meta/tile-large-558x558-transparent.png' type='layout'}"/>
-      <wide310x150logo src="{resourceUrl path='img/meta/tile-wide-558x270-transparent.png' type='layout'}"/>
       <TileColor>{block name='tileColor'}{lessVariable name='colorBrand'}{/block}</TileColor>
     </tile>
   </msapplication>
