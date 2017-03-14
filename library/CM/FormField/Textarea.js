@@ -28,12 +28,20 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
         }
         this._checkLengthMax();
       }
+    },
+    'paste [contenteditable]': function(event) {
+      event.stopPropagation();
+      event.preventDefault();
+      var clipboardData = (event.originalEvent || event).clipboardData || window.clipboardData;
+      var text = clipboardData.getData('text/plain');
+      this._pasteTextAtCursor(text);
+      this._checkLengthMax();
+      this._scrollToCursor();
     }
   },
 
   ready: function() {
     this._initPlaceholder();
-    this._initPlaintextonly();
     this.enableTriggerChangeOnInput();
   },
 
@@ -70,19 +78,6 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
     if (!$this.text().trim().length) {
       $this.empty();
     }
-  },
-
-  _initPlaintextonly: function() {
-    var self = this;
-    this.getInput().on('paste', function(e) {
-      e.stopPropagation();
-      e.preventDefault();
-      var clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
-      var text = clipboardData.getData('text/plain');
-      self._pasteTextAtCursor(text);
-      self._checkLengthMax();
-      self._scrollToCursor();
-    });
   },
 
   _checkLengthMax: function() {
