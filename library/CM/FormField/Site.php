@@ -2,6 +2,7 @@
 
 class CM_FormField_Site extends CM_FormField_Set_Select {
 
+    //TODO fix method
     protected function _initialize() {
         $valuesSet = array();
         foreach (CM_Site_Abstract::getAll() as $site) {

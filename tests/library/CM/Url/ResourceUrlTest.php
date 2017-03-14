@@ -17,26 +17,28 @@ class ResourceUrlTest extends CMTest_TestCase {
         $this->assertSame('/resource-type/file.ext', (string) $url);
 
         $environment = $this->createEnvironment(null, null, 'de');
-        $siteType = $environment->getSite()->getType();
+        $siteId = $environment->getSite()->getId();
 
         $url = ResourceUrl::create('file.ext', 'resource-type', $environment);
-        $this->assertSame('http://cdn.example.com/resource-type/de/' . $siteType . '/file.ext', (string) $url);
+        $this->assertSame('http://cdn.example.com/resource-type/de/' . $siteId . '/file.ext', (string) $url);
 
         $url = ResourceUrl::create('file.ext', 'resource-type', $environment, 1234);
         $this->assertSame('http://cdn.example.com/resource-type/de/999/1234/file.ext', (string) $url);
     }
 
     public function testWithSite() {
+        $siteId = '58c7cb50837959bb398b4567';
+
         /** @var \PHPUnit_Framework_MockObject_MockObject|\CM_Site_Abstract $site */
         $site = $this
             ->getMockBuilder('CM_Site_Abstract')
-            ->setMethods(['getType', 'getUrl', 'getUrlCdn'])
+            ->setMethods(['getId', 'getUrl', 'getUrlCdn'])
             ->getMockForAbstractClass();
 
         $site
             ->expects($this->any())
-            ->method('getType')
-            ->will($this->returnValue(42));
+            ->method('getId')
+            ->will($this->returnValue($siteId));
 
         $site
             ->expects($this->any())
