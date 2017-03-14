@@ -8,6 +8,7 @@ use CM_Frontend_Environment;
 use CM_Model_Language;
 
 use Psr\Http\Message\UriInterface;
+use GuzzleHttp\Psr7\UriResolver;
 use CM\Url\Vendor\Uri;
 
 abstract class AbstractUrl extends Uri implements UrlInterface {
@@ -73,7 +74,7 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
             return $this;
         }
         $new = clone $this;
-        $new->path = self::removeDotSegments($path);
+        $new->path = UriResolver::removeDotSegments($path);
         return $new;
     }
 
@@ -91,7 +92,7 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
 
     public function withPrefix($prefix) {
         if (null !== $prefix) {
-            $prefix = trim($this->filterPath(self::removeDotSegments($prefix)), '/');
+            $prefix = trim($this->filterPath(UriResolver::removeDotSegments($prefix)), '/');
         }
         $prefix = '' !== (string) $prefix ? $prefix : null;
         $url = clone $this;
@@ -177,7 +178,7 @@ abstract class AbstractUrl extends Uri implements UrlInterface {
     protected function applyParts(array $parts) {
         parent::applyParts($parts);
         $this->_ensureAbsolutePath();
-        $this->path = self::removeDotSegments($this->path);
+        $this->path = UriResolver::removeDotSegments($this->path);
     }
 
     /**
