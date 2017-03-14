@@ -25,7 +25,7 @@ class CM_Http_ResponseFactoryTest extends CMTest_TestCase {
         }
     }
 
-    public function testGetResponseResouce() {
+    public function testGetResponseResource() {
         $responses = array();
         $responses['/library-css'] = 'CM_Http_Response_Resource_Css_Library';
         $responses['/vendor-css'] = 'CM_Http_Response_Resource_Css_Vendor';
