@@ -2,62 +2,48 @@
 
 class CM_Site_AbstractTest extends CMTest_TestCase {
 
-    public static function setUpBeforeClass() {
-        CM_Config::get()->CM_Site_Abstract->url = 'http://www.foo.com';
-        CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://www.cdn.com';
-        CM_Config::get()->CM_Site_Abstract->name = 'Foo';
-        CM_Config::get()->CM_Site_Abstract->emailAddress = 'foo@foo.com';
+    /** @var CM_Site_Abstract */
+    private $_site;
+
+    public function setUp() {
+        $this->_site = $this->getMockSite(null, [
+            'url'    => 'http://www.foo.com',
+            'urlCdn' => 'http://www.cdn.com',
+        ], [
+            'name'         => 'Foo',
+            'emailAddress' => 'foo@foo.com',
+        ]);
     }
 
-    public function testGetAll() {
-        $site = $this->getMockSite('CM_Site_Abstract', 12345);
-        CM_Config::get()->CM_Site_Abstract->types = array(12345 => get_class($site));
-        $this->assertEquals(array($site), CM_Site_Abstract::getAll());
+    public function tearDown() {
+        CMTest_TH::clearEnv();
     }
 
     public function testGetConfig() {
-        /** @var CM_Site_Abstract $site */
-        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $config = CM_Config::get()->CM_Site_Abstract;
-        $this->assertEquals($config, $site->getConfig());
-    }
-
-    public function testGetEmailAddress() {
-        /** @var CM_Site_Abstract $site */
-        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $this->assertEquals('foo@foo.com', $site->getEmailAddress());
-    }
-
-    public function testGetName() {
-        /** @var CM_Site_Abstract $site */
-        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $this->assertEquals('Foo', $site->getName());
+        $configExpected = CM_Config::get()->CM_Site_Abstract;
+        $config = $this->_site->getConfig();
+        $this->assertSame($configExpected->class, $config->class);
+        $this->assertSame('http://www.foo.com', $config->url);
+        $this->assertSame('http://www.cdn.com', $config->urlCdn);
     }
 
     public function testGetUrl() {
-        /** @var CM_Site_Abstract $site */
-        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $this->assertEquals('http://www.foo.com', $site->getUrl());
+        $this->assertSame('http://www.foo.com', $this->_site->getUrl());
     }
 
     public function testGetUrlCdn() {
-        /** @var CM_Site_Abstract $site */
-        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $this->assertEquals('http://www.cdn.com', $site->getUrlCdn());
+        $this->assertSame('http://www.cdn.com', $this->_site->getUrlCdn());
     }
 
     public function testGetWebFontLoaderConfig() {
-        /** @var CM_Site_Abstract $site */
-        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $this->assertEquals(null, $site->getWebFontLoaderConfig());
+        $this->assertSame(null, $this->_site->getWebFontLoaderConfig());
     }
 
     public function testIsUrlMatch() {
-        $site = $this->getMockSite(null, null, [
+        $site = $this->getMockSite(null, [
             'url'    => 'http://www.my-site.com',
             'urlCdn' => 'http://cdn.my-site.com',
         ]);
-
         $this->assertSame(true, $site->isUrlMatch('my-site.com', '/'));
         $this->assertSame(true, $site->isUrlMatch('my-site.com', '/foo'));
         $this->assertSame(true, $site->isUrlMatch('www.my-site.com', '/foo'));
@@ -67,10 +53,9 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
     }
 
     public function testIsUrlMatchWithPath() {
-        $site = $this->getMockSite(null, null, [
+        $site = $this->getMockSite(null, [
             'url' => 'http://www.my-site.com/foo',
         ]);
-
         $this->assertSame(false, $site->isUrlMatch('my-site.com', '/'));
         $this->assertSame(true, $site->isUrlMatch('my-site.com', '/foo'));
         $this->assertSame(true, $site->isUrlMatch('my-site.com', '/foo/bar'));
@@ -80,12 +65,14 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 
     public function testEquals() {
         $siteFoo = $this->mockClass('CM_Site_Abstract');
+        $siteFoo->mockMethod('getUrl')->set('http://foo.com');
         /** @var CM_Site_Abstract $siteFoo1 */
         $siteFoo1 = $siteFoo->newInstance();
         /** @var CM_Site_Abstract $siteFoo2 */
         $siteFoo2 = $siteFoo->newInstance();
 
         $siteBar = $this->mockClass('CM_Site_Abstract');
+        $siteBar->mockMethod('getUrl')->set('http://foo.com');
         /** @var CM_Site_Abstract $siteBar1 */
         $siteBar1 = $siteBar->newInstance();
 
@@ -109,5 +96,30 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $site2->mockMethod('getUrl')->set('http://my-site2.com');
 
         $this->assertSame(false, $site1->equals($site2));
+    }
+
+    public function testModelGettersSetters() {
+        $site = $this->_site;
+        $this->assertSame('foo@foo.com', $site->getEmailAddress());
+        $this->assertSame('Foo', $site->getName());
+
+        $site->setEmailAddress('bar@bar.com');
+        $site->setName('Bar');
+        $this->assertSame('bar@bar.com', $site->getEmailAddress());
+        $this->assertSame('Bar', $site->getName());
+    }
+
+    public function testDefault() {
+        $site = $this->_site;
+        $this->assertSame(false, $site->getDefault());
+        $site->setDefault(true);
+        $this->assertSame(true, $site->getDefault());
+
+        $site2 = $this->getMockSite();
+        $site2->setDefault(true);
+        $site2 = $this->getMockSite();
+        $site2->setDefault(true);
+        $this->assertSame(false, $site->getDefault());
+        $this->assertSame(true, $site2->getDefault());
     }
 }
