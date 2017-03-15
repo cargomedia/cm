@@ -12,7 +12,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
     'focus [contenteditable]': function() {
       this.trigger('focus');
     },
-    'focusout [contenteditable]': function() {
+    'input [contenteditable]': function() {
       this._cleanEmptyWhiteSpace();
     },
     'change [contenteditable]': function() {
@@ -29,11 +29,15 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
         this._checkLengthMax();
       }
     },
+    'keyup [contenteditable]': function() {
+      console.log('VALUE', JSON.stringify(this.getValue()));
+    },
     'paste [contenteditable]': function(event) {
       event.stopPropagation();
       event.preventDefault();
       var clipboardData = (event.originalEvent || event).clipboardData || window.clipboardData;
       var text = clipboardData.getData('text/plain');
+      console.log('pasting...', JSON.stringify(text));
       this._pasteTextAtCursor(text);
       this._checkLengthMax();
       this._scrollToCursor();
@@ -41,7 +45,9 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   },
 
   ready: function() {
-    this.enableTriggerChangeOnInput();
+    if (Modernizr.plaintextonly) {
+      this.getInput().attr('contenteditable', 'plaintext-only');
+    }
   },
 
   getInput: function() {
@@ -49,15 +55,22 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   },
 
   getValue: function() {
-    var $input = this.getInput().clone();
-    $input.find('div').replaceWith(function() {
-      return '\n' + this.innerHTML;
-    });
-    $input.find('p').replaceWith(function() {
-      return this.innerHTML + '\n';
-    });
-    $input.find('br').replaceWith('\n');
-    return $input.html();
+    var $input = this.getInput();
+    var value;
+    if ('plaintext-only' === $input.attr('contenteditable')) {
+      // Chrome, Safari, Edge
+      value = $input.text();
+    } else {
+      // Firefox (see https://bugzilla.mozilla.org/show_bug.cgi?id=1291467)
+      $input = $input.clone();
+      $input.find('br').replaceWith('\n');
+      value = $input.text();
+    }
+
+    // Browsers add an additional newline to the end of "contenteditable" content
+    value = value.replace(/\r?\n$/, '');
+
+    return value;
   },
 
   setValue: function(value) {
@@ -73,9 +86,9 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   },
 
   _cleanEmptyWhiteSpace: function() {
-    var $this = this.getInput();
-    if (!$this.text().trim().length) {
-      $this.empty();
+    if ('' === this.getValue()) {
+      // Getting rid of the extra newline added by browsers to the end of the "contenteditable"
+      this.getInput().empty();
     }
   },
 
@@ -104,13 +117,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
    */
   _pasteTextAtCursor: function(text) {
     if (!_.isEmpty(text)) {
-      if (document.execCommand) {
-        document.execCommand('insertText', false, text);
-      } else if (window.getSelection) {
-        var newNode = document.createElement('span');
-        newNode.innerHTML = text;
-        window.getSelection().getRangeAt(0).insertNode(newNode);
-      }
+      document.execCommand('insertText', false, text);
     }
   }
 });
