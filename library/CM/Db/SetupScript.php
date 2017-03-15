@@ -31,6 +31,7 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
             CM_Db_Db::delete($table);
         }
         CM_Db_Db::exec('SET foreign_key_checks = 1;');
+        $this->_setInitialMigrationScripts();
     }
 
     public function getRunLevel() {
@@ -43,10 +44,19 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
         return (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($mysqlDbClient->getDatabaseName()))->fetch();
     }
 
+    /**
+     * @return CM_Migration_Loader
+     */
+    private function _getMigrationLoader() {
+        static $loader = null;
+        if (null === $loader) {
+            $loader = new CM_Migration_Loader($this->getServiceManager(), CM_Util::getMigrationPaths());
+        }
+        return $loader;
+    }
+
     private function _setInitialMigrationScripts() {
-        $migrationPaths = CM_Util::getMigrationPaths();
-        $loader = new CM_Migration_Loader($this->getServiceManager(), $migrationPaths);
-        foreach ($loader->getRunnerList() as $runner) {
+        foreach ($this->_getMigrationLoader()->getRunnerList() as $runner) {
             $name = $runner->getName();
             $record = CM_Migration_Model::findByName($name);
             if (!$record) {
