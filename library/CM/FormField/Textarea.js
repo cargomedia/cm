@@ -13,7 +13,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
       this.trigger('focus');
     },
     'focusout [contenteditable]': function() {
-      this._initPlaceholder();
+      this._cleanEmptyWhiteSpace();
     },
     'change [contenteditable]': function() {
       this.triggerChange();
@@ -41,7 +41,6 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   },
 
   ready: function() {
-    this._initPlaceholder();
     this.enableTriggerChangeOnInput();
   },
 
@@ -73,7 +72,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
     this.setValue('');
   },
 
-  _initPlaceholder: function() {
+  _cleanEmptyWhiteSpace: function() {
     var $this = this.getInput();
     if (!$this.text().trim().length) {
       $this.empty();
