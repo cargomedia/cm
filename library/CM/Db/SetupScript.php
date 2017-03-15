@@ -58,11 +58,9 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
     private function _setInitialMigrationScripts() {
         foreach ($this->_getMigrationLoader()->getRunnerList() as $runner) {
             $name = $runner->getName();
-            $record = CM_Migration_Model::findByName($name);
-            if (!$record) {
-                $record = CM_Migration_Model::create($name);
+            if (0 === CM_Db_Db::count(CM_Migration_Model::getTableName(), ['name' => $name])) {
+                CM_Db_Db::insert(CM_Migration_Model::getTableName(), ['name' => $name, 'executedAt' => time()]);
             }
-            $record->setExecutedAt(new DateTime());
         }
     }
 }
