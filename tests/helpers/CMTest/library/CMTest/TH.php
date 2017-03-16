@@ -24,12 +24,18 @@ class CMTest_TH {
     }
 
     public static function clearEnv() {
-        CM_Service_Manager::setInstance(clone self::$_serviceManagerBackup);
+        self::restoreServiceManager();
         self::clearDb();
         self::clearCache();
         self::timeReset();
         self::clearFilesystem();
         CM_Config::set(unserialize(self::$_configBackup));
+    }
+
+    public static function restoreServiceManager() {
+        if (self::$_serviceManagerBackup) {
+            CM_Service_Manager::setInstance(clone self::$_serviceManagerBackup);
+        }
     }
 
     public static function clearFilesystem() {
