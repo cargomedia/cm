@@ -186,6 +186,40 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->assertSame(2, $eventCounter->getCallCount());
     }
 
+    public function testSchedulingFixedTimeMode_FirstExecutionFailedRetryImmediatelyAfterManagerRestart() {
+        $timeZone = CM_Bootloader::getInstance()->getTimeZone();
+        $managerMock = $this->mockClass('CM_Clockwork_Manager');
+        $currently = new DateTime('July 1st midnight', $timeZone);
+        $managerMock->mockMethod('_getCurrentDateTimeUTC')->set(function () use (&$currently) {
+            return clone $currently;
+        });
+        $storage = new CM_Clockwork_Storage_Memory();
+        $eventHandler = new CM_EventHandler_EventHandler();
+        /** @var CM_Clockwork_Manager $manager */
+        $manager = $managerMock->newInstance([$eventHandler]);
+        $manager->setStorage($storage);
+        $manager->setTimeZone($timeZone);
+        $event = new CM_Clockwork_Event('event', 'first day of midnight');
+        $eventCounter = $this->_registerEvent($manager, $eventHandler, $event, function (CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) use ($manager) {
+            $manager->setStopped($event);
+        });
+
+        $this->assertSame(0, $eventCounter->getCallCount());
+        $manager->runEvents();
+        $this->assertSame(1, $eventCounter->getCallCount());
+
+        $currently->modify('1 second');
+        $manager = $managerMock->newInstance([$eventHandler]);
+        $manager->setStorage($storage);
+        $manager->setTimeZone($timeZone);
+        $eventCounter = $this->_registerEvent($manager, $eventHandler, $event, function (CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) use ($manager) {
+            $manager->setCompleted($event);
+        });
+        $this->assertSame(0, $eventCounter->getCallCount());
+        $manager->runEvents();
+        $this->assertSame(1, $eventCounter->getCallCount());
+    }
+
     public function testSchedulingIntervalMode() {
         $timeZone = new DateTimeZone('UTC');
         $managerMock = $this->mockClass('CM_Clockwork_Manager');
@@ -252,7 +286,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager = $managerMock->newInstance([$eventHandler]);
         $manager->setTimeZone($timeZone);
         $event = new CM_Clockwork_Event('event', '02:10:00');
-        $eventCounter = $this->_registerEvent($manager, $eventHandler, $event, function(CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) use ($manager) {
+        $eventCounter = $this->_registerEvent($manager, $eventHandler, $event, function (CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) use ($manager) {
             $manager->setCompleted($event);
         });
 
@@ -293,7 +327,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager = $managerMock->newInstance([$eventHandler]);
         $manager->setTimeZone($timeZone);
         $event = new CM_Clockwork_Event('event', '02:10:00');
-        $eventCounter = $this->_registerEvent($manager, $eventHandler, $event, function(CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) use ($manager) {
+        $eventCounter = $this->_registerEvent($manager, $eventHandler, $event, function (CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) use ($manager) {
             $manager->setCompleted($event);
         });
 
@@ -328,7 +362,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager = $managerMock->newInstance([$eventHandler]);
         $manager->setTimeZone($timeZone);
         $event = new CM_Clockwork_Event('event', '01:10:00');
-        $eventCounter = $this->_registerEvent($manager, $eventHandler, $event, function(CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) use ($manager) {
+        $eventCounter = $this->_registerEvent($manager, $eventHandler, $event, function (CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) use ($manager) {
             $manager->setCompleted($event);
         });
 
@@ -364,7 +398,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $manager->setStorage($storage);
         $manager->setTimeZone($timeZone);
         $event = new CM_Clockwork_Event('event', '02:10:00');
-        $eventCounter = $this->_registerEvent($manager, $eventHandler, $event, function(CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) use ($manager) {
+        $eventCounter = $this->_registerEvent($manager, $eventHandler, $event, function (CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) use ($manager) {
             $manager->setCompleted($event);
         });
 
