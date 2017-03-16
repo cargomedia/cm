@@ -31,18 +31,11 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
     }
 
     public function testMonitorSynchronizedCommands() {
-        $mockBuilder = $this->getMockBuilder('CM_Process');
-        $mockBuilder->setMethods(['isRunning']);
-        $mockBuilder->disableOriginalConstructor();
-        $processMock = $mockBuilder->getMock();
-        $processMock->expects($this->any())->method('isRunning')->will($this->returnCallback(function ($processId) {
-            return $processId !== 3;
-        }));
-        $mockBuilder = $this->getMockBuilder('CM_Cli_CommandManager');
-        $mockBuilder->setMethods(['_getProcess', '_getMachineId']);
-        $commandManagerMock = $mockBuilder->getMock();
-        $commandManagerMock->expects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
-        $commandManagerMock->expects($this->any())->method('_getMachineId')->will($this->returnValue('my-machine-1'));
+        $commandManagerMock = $this->mockObject(CM_Cli_CommandManager::class);
+        $commandManagerMock->mockMethod('_isRunning')->set(function($pid) {
+            return $pid !== 3;
+        });
+        $commandManagerMock->mockMethod('_getMachineId')->set('my-machine-1');
         CM_Db_Db::insert('cm_cli_command_manager_process',
             array('commandName' => 'command-mock1', 'machineId' => 'my-machine-1', 'processId' => 1, 'timeoutStamp' => time() + 60));
         CM_Db_Db::insert('cm_cli_command_manager_process',

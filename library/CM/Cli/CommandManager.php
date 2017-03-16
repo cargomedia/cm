@@ -108,14 +108,13 @@ class CM_Cli_CommandManager {
     public function monitorSynchronizedCommands() {
         $time = time();
         $timeoutStamp = $time + self::TIMEOUT;
-        $process = $this->_getProcess();
         $machineId = $this->_getMachineId();
         $result = CM_Db_Db::select('cm_cli_command_manager_process', ['commandName', 'processId'], ['machineId' => $machineId]);
         foreach ($result->fetchAll() as $row) {
             $commandName = $row['commandName'];
             $processId = (int) $row['processId'];
             $where = ['machineId' => $machineId, 'commandName' => $commandName];
-            if ($process->isRunning($processId)) {
+            if ($this->_isRunning($processId)) {
                 CM_Db_Db::update('cm_cli_command_manager_process', ['timeoutStamp' => $timeoutStamp], $where);
             } else {
                 CM_Db_Db::delete('cm_cli_command_manager_process', $where);
@@ -185,7 +184,7 @@ class CM_Cli_CommandManager {
     public function unlockCommand(CM_Cli_Command $command) {
         $commandName = $command->getName();
         $machineId = $this->_getMachineId();
-        $processId = $this->_getProcess()->getProcessId();
+        $processId = $this->_getProcessId();;
 
         CM_Db_Db::delete('cm_cli_command_manager_process', [
             'commandName' => $commandName,
@@ -251,19 +250,12 @@ class CM_Cli_CommandManager {
     }
 
     /**
-     * @return CM_Process
-     */
-    protected function _getProcess() {
-        return CM_Process::getInstance();
-    }
-
-    /**
      * @param CM_Cli_Command $command
      */
     protected function _lockCommand(CM_Cli_Command $command) {
         $commandName = $command->getName();
         $machineId = $this->_getMachineId();
-        $processId = $this->_getProcess()->getProcessId();
+        $processId = $this->_getProcessId();
         $timeoutStamp = time() + self::TIMEOUT;
         CM_Db_Db::insert('cm_cli_command_manager_process', [
             'commandName'  => $commandName,
@@ -298,6 +290,21 @@ class CM_Cli_CommandManager {
         }
 
         return trim($file->read());
+    }
+
+    /**
+     * @return int
+     */
+    protected function _getProcessId() {
+        return posix_getpid();
+    }
+
+    /**
+     * @param int $processId
+     * @return boolean
+     */
+    protected function _isRunning($processId) {
+        return false !== posix_getsid((int) $processId);
     }
 
     /**
