@@ -44,7 +44,6 @@ var CM_View_Document = CM_View_Abstract.extend({
         layout.removePagePlaceholder(view.$el);
         view._ready();
 
-        cm.event.trigger('navigate:end', {page: view, path: path});
         return view;
       })
       .catch(function(error) {
@@ -68,8 +67,6 @@ var CM_View_Document = CM_View_Abstract.extend({
    * @returns {Promise}
    */
   loadPage: function(path) {
-    cm.event.trigger('navigate', path); // deprecated
-    cm.event.trigger('navigate:start', {path: path});
     return this._loadPageThrottled(path);
   },
 
