@@ -1,7 +1,5 @@
 <?php
 
-use CM\Url\Url;
-
 abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
@@ -82,17 +80,6 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      */
     public function getSite() {
         return $this->_site;
-    }
-
-    /**
-     * @return Url
-     */
-    public function getUrl() {
-        $request = $this->getRequest();
-        $url = Url::create($request->getPath(), $this->getRender()->getEnvironment());
-        /** @var Url $url */
-        $url = $url->withParams($request->getQuery());
-        return $url;
     }
 
     /**
