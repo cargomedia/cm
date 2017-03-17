@@ -1,7 +1,5 @@
 <?php
 
-use CM\Url\Url;
-
 abstract class CM_Http_Request_Abstract {
 
     /** @var string */
@@ -375,13 +373,6 @@ abstract class CM_Http_Request_Abstract {
      */
     public function getUri() {
         return $this->_uri;
-    }
-
-    /**
-     * @return Url
-     */
-    public function getUrl() {
-        return Url::createWithParams($this->getPath(), $this->getQuery());
     }
 
     /**

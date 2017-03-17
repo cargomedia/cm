@@ -75,8 +75,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
 
             $responsePage = $responseFactory->getResponse($request);
             if (!$responsePage->getSite()->equals($this->getSite())) {
-                $redirectUrl = $responsePage->getRequest()->getUrl()->withEnvironment($responsePage->getEnvironment());
-                return array('redirectExternal' => (string) $redirectUrl);
+                return array('redirectExternal' => (string) $responsePage->getUrl());
             }
 
             $responseEmbed = new CM_Http_Response_Page_Embed($responsePage->getRequest(), $responsePage->getSite(), $this->getServiceManager());

@@ -70,14 +70,11 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
     }
 
     protected function _processContentOrRedirect() {
-        $site = $this->getSite();
-        $request = $this->getRequest();
-        if ($site->getUrl()->getHost() !== $request->getHost()) {
-            $redirectUrl = $request->getUrl()->withEnvironment($this->getEnvironment())->withSite($site);
-            $this->redirectUrl((string) $redirectUrl);
+        if ($this->getSite()->getUrl()->getHost() !== $this->getRequest()->getHost()) {
+            $this->redirectUrl((string) $this->getUrl()->withSite($this->getSite()));
         }
         if (!$this->getRedirectUrl()) {
-            $html = $this->_processPageLoop($request);
+            $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);
         }
     }
