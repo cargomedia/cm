@@ -142,14 +142,14 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return string
      */
     public function getUrlString() {
-        return $this->getConfig()->url;
+        return (string) $this->getConfig()->url;
     }
 
     /**
      * @return string
      */
     public function getUrlCdnString() {
-        return $this->getConfig()->urlCdn;
+        return (string) $this->getConfig()->urlCdn;
     }
 
     /**
