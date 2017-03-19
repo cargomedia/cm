@@ -82,7 +82,10 @@
       $(window).on('resize.floatbox', this.windowResizeCallback);
       this.repaint();
 
-      self.$floatbox.addClass('fadeIn');
+      _.defer(function() {
+        self.$floatbox.addClass('fadeIn');
+      });
+      
       $floatboxContainer.add($floatboxOverlay).addClass('fadeIn').on('click.floatbox', function(e) {
         if (this === e.target) {
           self.close.apply(self);
