@@ -1279,7 +1279,7 @@ var CM_App = CM_Class_Abstract.extend({
           return;
         }
         router.hrefInitialIgnore = null;
-        router._handleLocationChange(location.href);
+        router._navigateToUrl(location.href);
       });
 
       var urlSite = cm.getUrl();
@@ -1324,7 +1324,7 @@ var CM_App = CM_Class_Abstract.extend({
           this.pushState(fragment);
         }
       }
-      return this._handleLocationChange(url);
+      return this._navigateToUrl(url);
     },
 
     /**
@@ -1376,6 +1376,23 @@ var CM_App = CM_Class_Abstract.extend({
      */
     _getFragmentByUrl: function(url) {
       return this._getFragmentByLocation(this._getLocationByUrl(url));
+    },
+
+    /**
+     * @param {String} url
+     * @returns {Promise}
+     */
+    _navigateToUrl: function(url) {
+      Promise
+        .try(function() {
+          cm.event.trigger('navigate:start', {url: url});
+        })
+        .then(function() {
+          return this._handleLocationChange(url)
+        }.bind(this))
+        .then(function() {
+          cm.event.trigger('navigate:end', {url: url});
+        });
     },
 
     /**

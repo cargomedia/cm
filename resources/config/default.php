@@ -276,10 +276,10 @@ return function (CM_Config_Node $config) {
         'method' => [
             'name'      => 'createMongoDbHandler',
             'arguments' => [
-            'collection'    => 'cm_log',
-            'recordTtl'     => null,
-            'insertOptions' => null,
-            'minLevel'      => CM_Log_Logger::DEBUG,
+                'collection'    => 'cm_log',
+                'recordTtl'     => null,
+                'insertOptions' => null,
+                'minLevel'      => CM_Log_Logger::DEBUG,
             ],
         ]
     ];
@@ -306,5 +306,16 @@ return function (CM_Config_Node $config) {
                 ],
             ],
         ]
+    ];
+
+    $config->services['maintenance'] = [
+        'class'     => CM_Maintenance_ServiceFactory::class,
+        'arguments' => [],
+        'method'    => [
+            'name'      => 'createService',
+            'arguments' => [
+                'clockworkStorage' => new CM_Clockwork_Storage_MongoDB('maintenance'),
+            ]
+        ],
     ];
 };
