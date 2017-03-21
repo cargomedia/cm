@@ -76,8 +76,8 @@ class CM_Janus_FactoryTest extends CMTest_TestCase {
         $this->assertCount(2, $servers);
         $this->assertSame(5, $servers[0]->getId());
         $this->assertSame('foo-bar', $servers[0]->getKey());
-        $this->assertSame('http://cm-janus.dev:8080', $servers[0]->getHttpAddress());
-        $this->assertSame('ws://cm-janus.dev:8188', $servers[0]->getWebSocketAddress());
+        $this->assertSame('http://cm-janus.dev:8080/', (string) $servers[0]->getHttpAddress());
+        $this->assertSame('ws://cm-janus.dev:8188/', (string) $servers[0]->getWebSocketAddress());
         $this->assertSame($serversConfig[5]['pluginList'], $servers[0]->getPluginList());
         $this->assertSame(51.51, $servers[0]->getLocation()->getLatitude());
         $this->assertSame(-0.13, $servers[0]->getLocation()->getLongitude());
@@ -85,8 +85,8 @@ class CM_Janus_FactoryTest extends CMTest_TestCase {
 
         $this->assertSame(6, $servers[1]->getId());
         $this->assertSame('foo-bar-baz', $servers[1]->getKey());
-        $this->assertSame('http://cm-janus.dev:8081', $servers[1]->getHttpAddress());
-        $this->assertSame('ws://cm-janus.dev:8189', $servers[1]->getWebSocketAddress());
+        $this->assertSame('http://cm-janus.dev:8081/', (string) $servers[1]->getHttpAddress());
+        $this->assertSame('ws://cm-janus.dev:8189/', (string) $servers[1]->getWebSocketAddress());
         $this->assertSame($serversConfig[6]['pluginList'], $servers[1]->getPluginList());
         $this->assertSame(53.43, $servers[1]->getLocation()->getLatitude());
         $this->assertSame(14.53, $servers[1]->getLocation()->getLongitude());

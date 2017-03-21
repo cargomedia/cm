@@ -1,14 +1,17 @@
 <?php
 
+use CM\Url\Url;
+use CM\Url\WsUrl;
+
 class CM_Janus_Server implements JsonSerializable {
 
     /** @var int */
     protected $_id;
 
-    /** @var string */
+    /** @var Url */
     protected $_httpAddress;
 
-    /** @var string */
+    /** @var WsUrL */
     protected $_webSocketAddress;
 
     /** @var string */
@@ -38,8 +41,8 @@ class CM_Janus_Server implements JsonSerializable {
         }
         $this->_id = (int) $serverId;
         $this->_key = (string) $key;
-        $this->_httpAddress = (string) $httpAddress;
-        $this->_webSocketAddress = (string) $webSocketAddress;
+        $this->_httpAddress = Url::create((string) $httpAddress);
+        $this->_webSocketAddress = WsUrl::create((string) $webSocketAddress);
         $this->_pluginList = array_map(function ($plugin) {
             return (string) $plugin;
         }, $pluginList);
@@ -62,14 +65,14 @@ class CM_Janus_Server implements JsonSerializable {
     }
 
     /**
-     * @return string
+     * @return Url
      */
     public function getHttpAddress() {
         return $this->_httpAddress;
     }
 
     /**
-     * @return string
+     * @return WsUrl
      */
     public function getWebSocketAddress() {
         return $this->_webSocketAddress;
@@ -79,7 +82,9 @@ class CM_Janus_Server implements JsonSerializable {
      * @return string
      */
     public function getWebSocketAddressSubscribeOnly() {
-        return CM_Util::link($this->getWebSocketAddress(), ['subscribeOnly' => 1]);
+        return (string) $this->_webSocketAddress->withParams([
+            'subscribeOnly' => 1,
+        ]);
     }
 
     /**

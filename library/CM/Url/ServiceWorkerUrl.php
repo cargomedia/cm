@@ -2,29 +2,16 @@
 
 namespace CM\Url;
 
+use CM_Http_Response_Resource_Javascript_ServiceWorker as HttpResponseServiceWorker;
 use CM_Frontend_Environment;
-use League\Uri\Components\HierarchicalPath;
 
 class ServiceWorkerUrl extends AbstractUrl {
-
-    /** @var string */
-    protected $_name;
 
     /** @var string|null */
     protected $_deployVersion = null;
 
-    /**
-     * @return string
-     */
-    public function getName() {
-        return $this->_name;
-    }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name) {
-        $this->_name = (string) $name;
+    public function __construct() {
+        parent::__construct('');
     }
 
     /**
@@ -43,7 +30,7 @@ class ServiceWorkerUrl extends AbstractUrl {
 
     public function getUriRelativeComponents() {
         $parts = [
-            $this->getName(),
+            HttpResponseServiceWorker::PATH_PREFIX_FILENAME,
         ];
         if ($language = $this->getLanguage()) {
             $parts[] = $language->getAbbreviation();
@@ -52,34 +39,22 @@ class ServiceWorkerUrl extends AbstractUrl {
             $parts[] = $deployVersion;
         }
 
-        $path = HierarchicalPath::createFromSegments([
-            sprintf('%s.js', implode('-', $parts)),
-        ], HierarchicalPath::IS_ABSOLUTE);
-
+        $segments = [];
         if ($prefix = $this->getPrefix()) {
-            $path = $path->prepend($prefix);
+            $segments[] = $prefix;
         }
-
-        return ''
-            . $path->getUriComponent()
-            . $this->query->getUriComponent()
-            . $this->fragment->getUriComponent();
+        $segments[] = sprintf('%s.js', implode('-', $parts));
+        return $this->_getPathFromSegments($segments) . $this->_getQueryComponent() . $this->_getFragmentComponent();
     }
 
     /**
-     * @param string|null                  $name
      * @param CM_Frontend_Environment|null $environment
      * @param string|null                  $deployVersion
      * @return ServiceWorkerUrl
      */
-    public static function create($name = null, CM_Frontend_Environment $environment = null, $deployVersion = null) {
-        if (null === $name) {
-            $name = 'serviceworker';
-        }
-
+    public static function create(CM_Frontend_Environment $environment = null, $deployVersion = null) {
         /** @var ServiceWorkerUrl $url */
         $url = parent::_create('', $environment);
-        $url->setName($name);
         $url->setDeployVersion($deployVersion);
         return $url;
     }

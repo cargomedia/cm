@@ -279,7 +279,7 @@ abstract class CM_Http_Request_Abstract {
             $site = (new CM_Site_SiteFactory())->getDefaultSite();
         }
 
-        $sitePath = $site->getUrlParser()->getPath();
+        $sitePath = $site->getUrl()->getUriRelativeComponents();
         if ($this->hasPathPrefix($sitePath)) {
             $this->popPathPrefix($sitePath);
         }

@@ -3,19 +3,18 @@
 namespace CM\Url;
 
 use CM_Frontend_Environment;
-use League\Uri\Components\HierarchicalPath;
 
 class Url extends AbstractUrl {
 
     public function getUriRelativeComponents() {
-        $path = clone $this->path;
-        if ($prefix = $this->getPrefix()) {
-            $path = $path->prepend($prefix);
+        $segments = $this->_getPathSegments();
+        if ($language = $this->getLanguage()) {
+            $segments = array_merge([$language->getAbbreviation()], $segments);
         }
-        return ''
-            . $path->getUriComponent()
-            . $this->query->getUriComponent()
-            . $this->fragment->getUriComponent();
+        if ($prefix = $this->getPrefix()) {
+            $segments = array_merge([$prefix], $segments);
+        }
+        return $this->_getPathFromSegments($segments) . $this->_getQueryComponent() . $this->_getFragmentComponent();
     }
 
     /**
@@ -25,5 +24,33 @@ class Url extends AbstractUrl {
      */
     public static function create($url, CM_Frontend_Environment $environment = null) {
         return parent::_create($url, $environment);
+    }
+
+    /**
+     * @param string      $uri
+     * @param array|null  $params
+     * @param string|null $fragment
+     * @return static
+     */
+    public static function createWithParams($uri, array $params = null, $fragment = null) {
+        /** @var Url $url */
+        $url = new static($uri);
+        if (null !== $params) {
+            $url = $url->withParams($params);
+        }
+        if (null !== $fragment) {
+            $url = $url->withFragment($fragment);
+        }
+        return $url;
+    }
+
+    /**
+     * @param array $parts
+     * @return static
+     */
+    public static function createFromParts(array $parts) {
+        $url = new static();
+        $url->applyParts($parts);
+        return $url;
     }
 }

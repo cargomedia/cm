@@ -6,14 +6,13 @@ use CM_Site_Abstract;
 use CM_Model_Language;
 use CM_Frontend_Environment;
 use Psr\Http\Message\UriInterface;
-use League\Uri\Interfaces\Path;
 
 interface UrlInterface extends UriInterface {
 
     /**
      * @return bool
      */
-    public function isAbsolute();
+    public function isRelative();
 
     /**
      * @return CM_Model_Language|null
@@ -31,9 +30,34 @@ interface UrlInterface extends UriInterface {
     public function getPrefix();
 
     /**
+     * @return array|null
+     */
+    public function getParams();
+
+    /**
+     * @return string
+     */
+    public function getUriBaseComponents();
+
+    /**
      * @return string
      */
     public function getUriRelativeComponents();
+
+    /**
+     * @return bool
+     */
+    public function hasTrailingSlash();
+
+    /**
+     * @return UrlInterface
+     */
+    public function withTrailingSlash();
+
+    /**
+     * @return UrlInterface
+     */
+    public function withoutTrailingSlash();
 
     /**
      * @param CM_Model_Language $language
@@ -43,13 +67,12 @@ interface UrlInterface extends UriInterface {
 
     /**
      * @param CM_Site_Abstract $site
-     * @param bool|null        $sameOrigin
      * @return UrlInterface
      */
-    public function withSite(CM_Site_Abstract $site, $sameOrigin = null);
+    public function withSite(CM_Site_Abstract $site);
 
     /**
-     * @param Path|string|null $prefix
+     * @param string|null $prefix
      * @return UrlInterface
      */
     public function withPrefix($prefix);
@@ -58,6 +81,12 @@ interface UrlInterface extends UriInterface {
      * @return UrlInterface
      */
     public function withoutPrefix();
+
+    /**
+     * @param array $params
+     * @return UrlInterface
+     */
+    public function withParams(array $params);
 
     /**
      * @param UrlInterface|string $baseUrl
@@ -78,10 +107,9 @@ interface UrlInterface extends UriInterface {
 
     /**
      * @param CM_Frontend_Environment $environment
-     * @param array                   $options
      * @return UrlInterface
      */
-    public function withEnvironment(CM_Frontend_Environment $environment, array $options = null);
+    public function withEnvironment(CM_Frontend_Environment $environment);
 
     /**
      * @param string $path

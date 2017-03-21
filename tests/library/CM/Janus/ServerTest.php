@@ -5,8 +5,8 @@ class CM_Janus_ServerTest extends CMTest_TestCase {
     public function testConstructorAndBasicGetters() {
         $serverId = 1;
         $key = 'server-key';
-        $httpAddress = 'http://api';
-        $webSocketAddress = 'ws://connect:8810';
+        $httpAddress = 'http://api/';
+        $webSocketAddress = 'ws://connect:8810/';
         $pluginList = ['my-plugin'];
         $location = CMTest_TH::createGeoPoint();
         $iceServerList = ['ice-server'];
@@ -15,17 +15,23 @@ class CM_Janus_ServerTest extends CMTest_TestCase {
 
         $this->assertSame($serverId, $server->getId());
         $this->assertSame($key, $server->getKey());
-        $this->assertSame($httpAddress, $server->getHttpAddress());
-        $this->assertSame($webSocketAddress, $server->getWebSocketAddress());
+        $this->assertSame($httpAddress, (string) $server->getHttpAddress());
+        $this->assertSame($webSocketAddress, (string) $server->getWebSocketAddress());
         $this->assertSame($pluginList, $server->getPluginList());
         $this->assertSame($location, $server->getLocation());
         $this->assertSame($iceServerList, $server->getIceServerList());
     }
 
     public function testGetWebSocketAddressSubscribeOnly() {
-        $server = $this->mockClass('CM_Janus_Server')->newInstanceWithoutConstructor();
-        $server->mockMethod('getWebSocketAddress')->set('ws://connect:8810');
-        /** @var CM_Janus_Server $server */
-        $this->assertSame('ws://connect:8810?subscribeOnly=1', $server->getWebSocketAddressSubscribeOnly());
+        $serverId = 1;
+        $key = 'server-key';
+        $httpAddress = 'http://api/';
+        $webSocketAddress = 'ws://connect:8810/';
+        $pluginList = ['my-plugin'];
+        $location = CMTest_TH::createGeoPoint();
+
+        $server = new CM_Janus_Server($serverId, $key, $httpAddress, $webSocketAddress, $pluginList, $location);
+
+        $this->assertSame('ws://connect:8810/?subscribeOnly=1', (string) $server->getWebSocketAddressSubscribeOnly());
     }
 }
