@@ -186,11 +186,10 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     public function getUrl($path = null, CM_Site_Abstract $site = null) {
-        $environment = clone $this->getEnvironment();
-        if (null !== $site) {
-            $environment->setSite($site);
+        if (null === $site) {
+            $site = $this->getEnvironment()->getSite();
         }
-        return (string) Url::create((string) $path, $environment);
+        return (string) Url::create((string) $path)->withSite($site);
     }
 
     /**

@@ -21,6 +21,18 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $this->assertSame('http://www.default.dev', $render->getUrl());
         $this->assertSame('http://www.default.dev/foo/bar', $render->getUrl('/foo/bar'));
         $this->assertSame('http://www.default.dev/0', $render->getUrl('/0'));
+
+        $language = CM_Model_Language::create('Test language', 'test', true);
+        $render->getEnvironment()->setLanguage($language);
+        $this->assertSame('http://www.default.dev/foo/bar', $render->getUrl('/foo/bar'));
+
+        $site = $this->getMockSite(null, null, array(
+            'url'          => 'http://www.test.dev',
+            'urlCdn'       => 'http://cdn.test.dev',
+            'name'         => 'Test',
+            'emailAddress' => 'test@test.dev',
+        ));
+        $this->assertSame('http://www.test.dev/foo/bar', $render->getUrl('/foo/bar', $site));
     }
 
     public function testGetUrlPage() {
