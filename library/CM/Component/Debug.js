@@ -28,7 +28,7 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
       }
       if (event.which === 68) { // d Key
         var tagName = event.target.tagName.toLowerCase();
-        if (tagName === 'input' || tagName === 'textarea') {
+        if (tagName === 'input' || tagName === 'textarea' || !!event.target.getAttribute('contenteditable')) {
           return;
         }
         self.toggleDebugBar();
