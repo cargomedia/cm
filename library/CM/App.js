@@ -506,8 +506,20 @@ var CM_App = CM_Class_Abstract.extend({
      * @param {String} text
      */
     insertTextAtCursor: function(text) {
-      if (!_.isEmpty(text)) {
-        document.execCommand('insertText', false, text);
+      var html = text.replace(/\r?\n/g, '<br>');
+      this.insertHtmlAtCursor(html);
+    },
+
+    /**
+     * @param {String} html
+     */
+    insertHtmlAtCursor: function(html) {
+      if (!_.isEmpty(html)) {
+        if (document.queryCommandSupported('insertHTML')) {
+          document.execCommand('insertHTML', false, html);
+        } else {
+          document.execCommand('paste', false, html);
+        }
       }
     }
 
