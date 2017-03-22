@@ -500,7 +500,17 @@ var CM_App = CM_Class_Abstract.extend({
       audio.setOptions(options);
       audio.setSources(sourceList);
       return audio;
+    },
+
+    /**
+     * @param {String} text
+     */
+    insertTextAtCursor: function(text) {
+      if (!_.isEmpty(text)) {
+        document.execCommand('insertText', false, text);
+      }
     }
+
   },
 
   string: {

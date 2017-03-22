@@ -38,7 +38,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
       var clipboardData = (event.originalEvent || event).clipboardData || window.clipboardData;
       var text = clipboardData.getData('text/plain');
       console.log('pasting...', JSON.stringify(text));
-      this._pasteTextAtCursor(text);
+      cm.dom.insertTextAtCursor(text);
       this._checkLengthMax();
       this._scrollToCursor();
     }
@@ -109,15 +109,6 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
     var textareaCoords = $input[0].getBoundingClientRect();
     if (selectionCoords && selectionCoords.bottom > textareaCoords.bottom || selectionCoords.bottom < textareaCoords.top) {
       $input.scrollTop($input.scrollTop() + (selectionCoords.bottom - textareaCoords.top));
-    }
-  },
-
-  /**
-   * @param {String} text
-   */
-  _pasteTextAtCursor: function(text) {
-    if (!_.isEmpty(text)) {
-      document.execCommand('insertText', false, text);
     }
   }
 });
