@@ -9,15 +9,20 @@
   overflow: hidden;
   padding-left: 10px;
   padding-right: 10px;
+  text-align: left;
   transition: border-color .1s;
   width: 100%;
 }
 
-textarea.textinput {
-  height: @heightInputTextarea;
-  overflow: auto;
+.textarea.textinput {
+  height: auto;
+  min-height: @heightInputText;
+  max-height: @maxHeightInputTextarea;
   padding-top: (@heightInputText - @fontSize*@fontLineHeight) / 2;
+  padding-bottom: (@heightInputText - @fontSize*@fontLineHeight) / 2;
+  overflow: auto;
   resize: vertical;
+  word-break: break-all;
 }
 
 .input_focus {
