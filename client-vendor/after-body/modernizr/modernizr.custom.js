@@ -21,4 +21,16 @@
       return false;
     }
   });
+  /**
+   * See http://stackoverflow.com/questions/10672081/how-to-detect-if-browser-supports-plaintext-only-value-in-contenteditable-para/10672378#10672378
+   */
+  Modernizr.addTest('plaintextonly', function(){
+    var d = document.createElement("div");
+    try {
+      d.contentEditable="PLAINtext-onLY";
+    } catch(e) {
+      return false;
+    }
+    return d.contentEditable=="plaintext-only";
+  });
 })();
