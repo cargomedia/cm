@@ -215,7 +215,7 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=clientId=' . $id . ';');
         /** @var CM_Http_Request_Abstract $mock */
         $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
-        $this->assertFalse($mock->hasClientId());
+        $this->assertTrue($mock->hasClientId());
         $this->assertSame($id, $mock->getClientId());
         $this->assertTrue($mock->hasClientId());
     }
