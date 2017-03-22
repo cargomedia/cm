@@ -79,10 +79,10 @@ class CM_Janus_Server implements JsonSerializable {
     }
 
     /**
-     * @return string
+     * @return WsUrl
      */
     public function getWebSocketAddressSubscribeOnly() {
-        return (string) $this->_webSocketAddress->withParams([
+        return $this->getWebSocketAddress()->withParams([
             'subscribeOnly' => 1,
         ]);
     }
@@ -111,8 +111,8 @@ class CM_Janus_Server implements JsonSerializable {
     public function jsonSerialize() {
         return [
             'id'                            => $this->_id,
-            'webSocketAddress'              => $this->getWebSocketAddress(),
-            'webSocketAddressSubscribeOnly' => $this->getWebSocketAddressSubscribeOnly(),
+            'webSocketAddress'              => (string) $this->getWebSocketAddress(),
+            'webSocketAddressSubscribeOnly' => (string) $this->getWebSocketAddressSubscribeOnly(),
             'iceServerList'                 => $this->getIceServerList(),
         ];
     }
