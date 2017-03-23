@@ -138,6 +138,10 @@ class CM_Clockwork_Manager {
      */
     protected function _shouldRun(CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) {
         $lastRuntime = $status->getLastRuntime();
+        $lastStartTime = $status->getLastStartTime();
+        if ($lastStartTime && !$lastRuntime) {
+            return true;
+        }
         $base = $lastRuntime ?: clone $this->_startTime;
         $dateTimeString = $event->getDateTimeString();
         if (!$this->_isIntervalEvent($event)) {     // do not set timezone for interval-based events due to buggy behaviour with timezones that use
