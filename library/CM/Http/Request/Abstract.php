@@ -32,7 +32,7 @@ abstract class CM_Http_Request_Abstract {
     /** @var CM_Model_Language|null */
     private $_languageUrl;
 
-    /** @var int */
+    /** @var int|null */
     private $_clientId;
 
     /** @var CM_Http_Request_Abstract */
@@ -83,6 +83,10 @@ abstract class CM_Http_Request_Abstract {
 
         if ($sessionId = $this->getCookie('sessionId')) {
             $this->setSession(CM_Session::findById($sessionId));
+        }
+
+        if ($clientId = (int) $this->getCookie('clientId')) {
+            $this->_clientId = $clientId;
         }
 
         if ($viewer) {
@@ -140,12 +144,9 @@ abstract class CM_Http_Request_Abstract {
      * @return int
      */
     public function getClientId() {
-        if (!$this->hasClientId()) {
-            if (!$this->_clientId = (int) $this->getCookie('clientId')) {
-                $this->_clientId = CM_Db_Db::incrementAndFetchColumn('cm_requestClientCounter', 'counter');
-            }
+        if (null === $this->_clientId) {
+            $this->_clientId = CM_Db_Db::incrementAndFetchColumn('cm_requestClientCounter', 'counter');
         }
-
         return $this->_clientId;
     }
 

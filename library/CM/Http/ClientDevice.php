@@ -29,22 +29,18 @@ class CM_Http_ClientDevice {
     }
 
     /**
+     * @return int
+     */
+    public function getId() {
+        return $this->_request->getClientId();
+    }
+
+    /**
      * @param bool $dotNotation
      * @return string|null
      */
     public function getIp($dotNotation = null) {
         return $this->_request->getIp($dotNotation);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isMobile() {
-        $cache = CM_Cache_Local::getInstance();
-
-        return $cache->get($cache->key(__METHOD__, $this->_headerList), function () {
-            return $this->_parser->isMobile();
-        });
     }
 
     /**
@@ -57,6 +53,24 @@ class CM_Http_ClientDevice {
 
         return $cache->get($cache->key(__METHOD__, $this->_headerList, $property), function () use ($property) {
             return $this->_parser->version($property);
+        });
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasId() {
+        return $this->_request->hasClientId();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMobile() {
+        $cache = CM_Cache_Local::getInstance();
+
+        return $cache->get($cache->key(__METHOD__, $this->_headerList), function () {
+            return $this->_parser->isMobile();
         });
     }
 }
