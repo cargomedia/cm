@@ -36,8 +36,8 @@ class CMService_GoogleTagManager_ClientTest extends CMTest_TestCase {
         $js = $gtm->getJs();
         $this->assertContains('"//www.googletagmanager.com/ns.html?id=GTM-123456"', $html);
         $this->assertContains('(window,document,\'script\',\'dataLayer\',\'GTM-123456\')', $html);
-        $this->assertNotContains('dataLayer.push(', $html);
-        $this->assertSame('', $js);
+        $this->assertContains('dataLayer.push({"event":"Page View"});', $html);
+        $this->assertSame('dataLayer.push({"event":"Page View"});', $js);
     }
 
     public function testTrackPageViewWithUser() {
@@ -50,8 +50,8 @@ class CMService_GoogleTagManager_ClientTest extends CMTest_TestCase {
         $js = $gtm->getJs();
         $this->assertContains('"//www.googletagmanager.com/ns.html?id=GTM-123456"', $html);
         $this->assertContains('(window,document,\'script\',\'dataLayer\',\'GTM-123456\')', $html);
-        $this->assertNotContains('dataLayer.push(', $html);
-        $this->assertSame('', $js);
+        $this->assertContains('dataLayer.push({"event":"Page View"});', $html);
+        $this->assertSame('dataLayer.push({"event":"Page View"});', $js);
     }
 
     public function testTrackPageViewWithSplittest() {
@@ -68,8 +68,8 @@ class CMService_GoogleTagManager_ClientTest extends CMTest_TestCase {
         $js = $gtm->getJs();
         $this->assertContains('"//www.googletagmanager.com/ns.html?id=GTM-123456"', $html);
         $this->assertContains('(window,document,\'script\',\'dataLayer\',\'GTM-123456\')', $html);
-        $this->assertContains('dataLayer.push({"Splittest foo1":"bar1"});', $html);
-        $this->assertSame('dataLayer.push({"Splittest foo1":"bar1"});', $js);
+        $this->assertContains('dataLayer.push({"event":"Page View","Splittest foo1":"bar1"});', $html);
+        $this->assertSame('dataLayer.push({"event":"Page View","Splittest foo1":"bar1"});', $js);
     }
 
     public function testTrackPageViewWithUserAndSplittest() {
@@ -85,8 +85,8 @@ class CMService_GoogleTagManager_ClientTest extends CMTest_TestCase {
         $js = $gtm->getJs();
         $this->assertContains('"//www.googletagmanager.com/ns.html?id=GTM-123456"', $html);
         $this->assertContains('(window,document,\'script\',\'dataLayer\',\'GTM-123456\')', $html);
-        $this->assertContains('dataLayer.push({"Splittest foo3":"bar3"});', $html);
-        $this->assertSame('dataLayer.push({"Splittest foo3":"bar3"});', $js);
+        $this->assertContains('dataLayer.push({"event":"Page View","Splittest foo3":"bar3"});', $html);
+        $this->assertSame('dataLayer.push({"event":"Page View","Splittest foo3":"bar3"});', $js);
     }
 
     public function testTrackPageViewWithUserAndSeveralSplittests() {
@@ -103,8 +103,8 @@ class CMService_GoogleTagManager_ClientTest extends CMTest_TestCase {
         $js = $gtm->getJs();
         $this->assertContains('"//www.googletagmanager.com/ns.html?id=GTM-123456"', $html);
         $this->assertContains('(window,document,\'script\',\'dataLayer\',\'GTM-123456\')', $html);
-        $this->assertContains('dataLayer.push({"Splittest foo5":"bar5","Splittest foo6":"bar6"});', $html);
-        $this->assertSame('dataLayer.push({"Splittest foo5":"bar5","Splittest foo6":"bar6"});', $js);
+        $this->assertContains('dataLayer.push({"event":"Page View","Splittest foo5":"bar5","Splittest foo6":"bar6"});', $html);
+        $this->assertSame('dataLayer.push({"event":"Page View","Splittest foo5":"bar5","Splittest foo6":"bar6"});', $js);
     }
 
 }

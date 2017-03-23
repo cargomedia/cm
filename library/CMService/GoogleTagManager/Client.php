@@ -36,6 +36,7 @@ EOF;
     }
 
     public function trackPageView(CM_Frontend_Environment $environment, $path) {
+        $this->_setDataLayerVariable('event', 'Page View');
         if ($environment->hasViewer()) {
             $fixture = new CM_Splittest_Fixture($environment->getViewer());
         } elseif (($clientDevice = $environment->getClientDevice()) && $clientDevice->hasId()) {
