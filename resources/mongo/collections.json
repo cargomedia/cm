@@ -1,4 +1,23 @@
 {
+    "cm_clockwork": [
+        {
+            "key": {
+                "_id": 1
+            },
+            "options": {
+                "name": "_id_"
+            }
+        },
+        {
+            "key": {
+                "context": 1
+            },
+            "options": {
+                "unique": true,
+                "name": "context_1"
+            }
+        }
+    ],
     "cm_log": [
         {
             "key": {

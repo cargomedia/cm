@@ -45,9 +45,17 @@ class CMService_AwsS3Versioning_Client {
             'Bucket' => $this->_bucket,
             'Prefix' => (string) $prefix,
         );
-        $versionList = array();
-        foreach ($this->_client->getListObjectVersionsIterator($options) as $data) {
-            $versionList[] = new CMService_AwsS3Versioning_Response_Version($data);
+        $versionList = [];
+        $objectVersions = $this->_client->listObjectVersions($options);
+        if (isset($objectVersions['Versions'])) {
+            foreach ($objectVersions['Versions'] as $data) {
+                $versionList[] = new CMService_AwsS3Versioning_Response_Version($data);
+            }
+        }
+        if (isset($objectVersions['DeleteMarkers'])) {
+            foreach ($objectVersions['DeleteMarkers'] as $data) {
+                $versionList[] = new CMService_AwsS3Versioning_Response_Version($data);
+            }
         }
         usort($versionList, function (CMService_AwsS3Versioning_Response_Version $a, CMService_AwsS3Versioning_Response_Version $b) {
             if ($a->getLastModified() == $b->getLastModified()) {
@@ -74,10 +82,12 @@ class CMService_AwsS3Versioning_Client {
             $objectsData = Functional\map($versionsToDelete, function (CMService_AwsS3Versioning_Response_Version $version) {
                 return array('Key' => $version->getKey(), 'VersionId' => $version->getId());
             });
-            $this->_client->deleteObjects(array(
-                'Bucket'  => $this->_bucket,
-                'Objects' => $objectsData,
-            ));
+            $this->_client->deleteObjects([
+                'Bucket' => $this->_bucket,
+                'Delete' => [
+                    'Objects' => $objectsData,
+                ],
+            ]);
         }
     }
 

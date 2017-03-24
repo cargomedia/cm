@@ -24,11 +24,20 @@ class CMTest_TH {
     }
 
     public static function clearEnv() {
-        CM_Service_Manager::setInstance(clone self::$_serviceManagerBackup);
+        self::clearServices();
         self::clearDb();
         self::clearCache();
         self::timeReset();
         self::clearFilesystem();
+        self::clearConfig();
+    }
+
+    public static function clearCache() {
+        CM_Cache_Shared::getInstance()->flush();
+        CM_Cache_Local::getInstance()->flush();
+    }
+
+    public static function clearConfig() {
         CM_Config::set(unserialize(self::$_configBackup));
     }
 
@@ -37,9 +46,8 @@ class CMTest_TH {
         $script->unload(new CM_OutputStream_Null());
     }
 
-    public static function clearCache() {
-        CM_Cache_Shared::getInstance()->flush();
-        CM_Cache_Local::getInstance()->flush();
+    public static function clearServices() {
+        CM_Service_Manager::setInstance(clone self::$_serviceManagerBackup);
     }
 
     public static function timeInit() {

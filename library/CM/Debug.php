@@ -60,9 +60,10 @@ class CM_Debug {
     }
 
     /**
-     * @param string $message
+     * @param string     $message
+     * @param array|null $extra
      */
-    public static function log($message) {
+    public static function log($message, array $extra = null) {
         $message = (string) $message;
         $trace = debug_backtrace();
         $className = 'none';
@@ -71,6 +72,10 @@ class CM_Debug {
             $className = isset($trace[1]['class']) ? $trace[1]['class'] : $className;
             $functionName = isset($trace[1]['function']) ? $trace[1]['function'] : $functionName;
         }
-        CM_Service_Manager::getInstance()->getLogger()->debug(sprintf('%s:%s - %s', $className, $functionName, $message));
+        $context = new CM_Log_Context();
+        if (null !== $extra) {
+            $context->setExtra($extra);
+        }
+        CM_Service_Manager::getInstance()->getLogger()->debug(sprintf('%s:%s - %s', $className, $functionName, $message), $context);
     }
 }

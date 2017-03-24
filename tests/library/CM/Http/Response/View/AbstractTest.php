@@ -1,5 +1,7 @@
 <?php
 
+use CM\Url\Url;
+
 class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
     public function tearDown() {
@@ -7,10 +9,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPage() {
-        $site = $this->getMockSite(null, null, [
-            'url'  => 'http://my-site.com',
-            'name' => 'My site',
-        ]);
+        $site = $this->getMockSite(null, ['url' => 'http://my-site.com'], ['name' => 'My site']);
         $page = new CM_Page_View_Ajax_Test_Mock();
         $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
         $params = [
@@ -147,7 +146,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Http_Response_View_Abstract', $response);
         $this->assertViewResponseSuccess($response);
         $responseDecoded = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame($site2->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['redirectExternal']);
+        $url = Url::create(CM_Page_View_Ajax_Test_Mock::getPath())->withBaseUrl($site2->getUrl());
+        $this->assertSame((string) $url, $responseDecoded['success']['data']['redirectExternal']);
     }
 
     public function testLoadPageRedirectDifferentSitePathRemove() {
@@ -167,7 +167,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Http_Response_View_Abstract', $response);
         $this->assertViewResponseSuccess($response);
         $responseDecoded = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame($site2->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['redirectExternal']);
+        $url = Url::create(CM_Page_View_Ajax_Test_Mock::getPath())->withBaseUrl($site2->getUrl());
+        $this->assertSame((string) $url, $responseDecoded['success']['data']['redirectExternal']);
     }
 
     public function testLoadPageRedirectDifferentSitePathAdd() {
@@ -187,7 +188,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Http_Response_View_Abstract', $response);
         $this->assertViewResponseSuccess($response);
         $responseDecoded = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame($site1->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['redirectExternal']);
+        $url = Url::create(CM_Page_View_Ajax_Test_Mock::getPath())->withBaseUrl($site1->getUrl());
+        $this->assertSame((string) $url, $responseDecoded['success']['data']['redirectExternal']);
     }
 
     public function testLoadPageNotRedirectLanguage() {
@@ -207,7 +209,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
         $this->assertViewResponseSuccess($response);
         $responseDecoded = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame($site->getUrl() . '/en' . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['url']);
+        $url = Url::create('/en' . CM_Page_View_Ajax_Test_Mock::getPath())->withBaseUrl($site->getUrl());
+        $this->assertSame((string) $url, $responseDecoded['success']['data']['url']);
     }
 
     public function testLoadPageTracking() {

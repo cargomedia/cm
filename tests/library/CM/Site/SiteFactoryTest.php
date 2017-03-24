@@ -6,6 +6,24 @@ class CM_Site_SiteFactoryTest extends CMTest_TestCase {
         CMTest_TH::clearEnv();
     }
 
+    public function testSiteListSorted() {
+        $ordering = '[(W7oZtOhV1KJ^znaCr@9+k/=cYipF3.&`m5NfEDxGLwjBS4?uT]PU;s<2e#Ib%v>RqX8!_dl6:-)"AM*$Qgy0,H';
+        $sorted = [];
+        $unsorted = [];
+        foreach (str_split($ordering) as $index => $char) {
+            $repeatedStr = str_repeat('a', mb_strlen($ordering) - $index);
+            $unsorted[ord($char)] = $sorted[] = $this->getMockSite(null, ['url' => 'http://your-site-' . $repeatedStr . '.com']);
+        }
+        ksort($unsorted);
+
+        $siteFactory = new CM_Site_SiteFactory($unsorted);
+
+        $reflection = new ReflectionClass($siteFactory);
+        $property = $reflection->getProperty('_siteList');
+        $property->setAccessible(true);
+        $this->assertEquals($sorted, $property->getValue($siteFactory));
+    }
+
     public function testFindSite() {
         $site1 = $this->getMockSite(null, ['url' => 'http://my-site.com']);
         $site2 = $this->getMockSite(null, ['url' => 'http://my-site.com/hello']);

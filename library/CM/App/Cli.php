@@ -21,14 +21,6 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         CM_App::getInstance()->fillCaches();
     }
 
-    public function deploy() {
-        $this->setup();
-        $this->setDeployVersion();
-
-        $dbCli = new CM_Db_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
-        $dbCli->runUpdates();
-    }
-
     public function generateConfigInternal() {
         $indentation = '    ';
         $indent = function ($content) use ($indentation) {

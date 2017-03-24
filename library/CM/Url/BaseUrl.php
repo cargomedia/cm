@@ -3,16 +3,24 @@
 namespace CM\Url;
 
 use CM_Exception_Invalid;
-use League\Uri\Components\HierarchicalPath;
 
 class BaseUrl extends AbstractUrl {
 
-    public function getUriRelativeComponents() {
-        $path = HierarchicalPath::createFromSegments([], HierarchicalPath::IS_ABSOLUTE);
-        if ($prefix = $this->getPrefix()) {
-            $path = $path->append($prefix);
+    public function __construct($uri = '') {
+        parent::__construct($uri);
+        if ($this->isRelative()) {
+            throw new CM_Exception_Invalid('BaseUrl::create argument must be an absolute Url', null, [
+                'url' => $uri,
+            ]);
         }
-        return $path->getUriComponent();
+    }
+
+    public function getUriRelativeComponents() {
+        $segments = [];
+        if ($prefix = $this->getPrefix()) {
+            $segments = array_merge([$prefix], $segments);
+        }
+        return $this->_getPathFromSegments($segments);
     }
 
     /**
@@ -21,16 +29,11 @@ class BaseUrl extends AbstractUrl {
      * @throws CM_Exception_Invalid
      */
     public static function create($url) {
-        /** @var BaseUrl $baseUrl */
         $baseUrl = parent::_create($url);
-        if (!$baseUrl->isAbsolute()) {
-            throw new CM_Exception_Invalid('BaseUrl::create argument must be an absolute Url', null, [
-                'url' => $url,
-            ]);
-        }
-        $path = $baseUrl->getPath();
-        return $baseUrl
-            ->withPrefix($path)
+        /** @var BaseUrl $baseUrl */
+        $baseUrl = $baseUrl
+            ->withPrefix($baseUrl->getPath())
             ->withoutRelativeComponents();
+        return $baseUrl;
     }
 }

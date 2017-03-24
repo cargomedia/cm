@@ -1,6 +1,14 @@
 <?php
 
+use CM\Url\BaseUrl;
+
 abstract class CM_Site_Abstract extends CM_Model_Abstract {
+
+    /** @var BaseUrl|null */
+    protected $_url = null;
+
+    /** @var BaseUrl|null */
+    protected $_urlCdn = null;
 
     /** @var string[] */
     protected $_themes = array();
@@ -142,24 +150,37 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
     }
 
     /**
-     * @return string
+     * @return BaseUrl
      */
     public function getUrl() {
-        return (string) self::_getConfig()->url;
+        if (null === $this->_url) {
+            $this->_url = BaseUrl::create($this->getUrlString());
+        }
+        return $this->_url;
+    }
+
+    /**
+     * @return BaseUrl
+     */
+    public function getUrlCdn() {
+        if (null === $this->_urlCdn) {
+            $this->_urlCdn = BaseUrl::create($this->getUrlCdnString());
+        }
+        return $this->_urlCdn;
     }
 
     /**
      * @return string
      */
-    public function getUrlCdn() {
-        return (string) self::_getConfig()->urlCdn;
+    public function getUrlString() {
+        return (string) $this->getConfig()->url;
     }
 
     /**
-     * @return CM_Http_UrlParser
+     * @return string
      */
-    public function getUrlParser() {
-        return new CM_Http_UrlParser($this->getUrl());
+    public function getUrlCdnString() {
+        return (string) $this->getConfig()->urlCdn;
     }
 
     /**
@@ -175,25 +196,18 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
 
     /**
      * @return string
+     * @deprecated use getUrl() directly
      */
     public function getHost() {
-        return $this->getUrlParser()->getHost();
+        return $this->getUrl()->getHost();
     }
 
     /**
      * @return string
+     * @deprecated
      */
     public function getPath() {
-        return $this->getUrlParser()->getPath();
-    }
-
-    /**
-     * @return string
-     * @throws CM_Exception
-     */
-    public function getUrlBase() {
-        $urlParser = $this->getUrlParser();
-        return $urlParser->getScheme() . '://' . $urlParser->getHost();
+        return $this->getUrl()->getUriRelativeComponents();
     }
 
     /**
@@ -243,10 +257,9 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
         ];
 
         if ($this->getUrlCdn()) {
-            $urlCdn = new CM_Http_UrlParser($this->getUrlCdn());
             $matchList[] = [
-                'host' => $urlCdn->getHost(),
-                'path' => $urlCdn->getPath(),
+                'host' => $this->getUrlCdn()->getHost(),
+                'path' => $this->getUrlCdn()->getPath(),
             ];
         }
 
@@ -268,7 +281,7 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
             return false;
         }
         /** @var $other CM_Site_Abstract */
-        return $this->getUrl() === $other->getUrl();
+        return (string) $this->getUrl() === (string) $other->getUrl();
     }
 
     protected function _getSchema() {

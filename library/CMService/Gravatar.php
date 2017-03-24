@@ -1,5 +1,7 @@
 <?php
 
+use CM\Url\Url;
+
 class CMService_Gravatar extends CM_Class_Abstract {
 
     /**
@@ -21,17 +23,23 @@ class CMService_Gravatar extends CM_Class_Abstract {
         if ((null === $email) && (null !== $default)) {
             return $default;
         }
-        $url = 'https://secure.gravatar.com/avatar';
+
+        $path = '/avatar';
+        $query = [];
+
         if (null !== $email) {
-            $url .= '/' . md5(strtolower(trim($email)));
+            $path .= '/' . (
+                md5(strtolower(trim($email)))
+            );
         }
-        $params = array();
         if (null !== $size) {
-            $params['s'] = $size;
+            $query['s'] = $size;
         }
         if (null !== $default) {
-            $params['d'] = $default;
+            $query['d'] = $default;
         }
-        return CM_Util::link($url, $params);
+        return (string) Url::create('https://secure.gravatar.com')
+            ->withPath((string) $path)
+            ->withParams((array) $query);
     }
 }

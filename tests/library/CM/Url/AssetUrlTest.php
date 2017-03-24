@@ -4,11 +4,7 @@ namespace CM\Test\Url;
 
 use CMTest_TH;
 use CMTest_TestCase;
-use CM_Model_Language;
-use CM_Frontend_Environment;
-use CM\Url\UrlInterface;
 use CM\Url\AssetUrl;
-use League\Uri\Components\HierarchicalPath;
 
 class AssetUrlTest extends CMTest_TestCase {
 
@@ -34,9 +30,6 @@ class AssetUrlTest extends CMTest_TestCase {
         $urlWithEnvironmentPreserved = $urlWithEnvironmentAndLanguage->withPath('/baz');
         $this->assertSame($environment->getLanguage(), $urlWithEnvironmentPreserved->getLanguage());
         $this->assertSame('http://cdn.example.com/de/baz?foobar=1', (string) $urlWithEnvironmentPreserved);
-
-        $urlWithEnvironmentSameOrigin = $url->withEnvironment($environment, ['sameOrigin' => true]);
-        $this->assertSame('http://www.example.com/de/bar?foobar=1', (string) $urlWithEnvironmentSameOrigin);
     }
 
     public function testWithSite() {
@@ -45,9 +38,6 @@ class AssetUrlTest extends CMTest_TestCase {
         $url = CM_Url_AssetMockUrl::create('/bar?foobar=1');
         $urlWithSite = $url->withSite($site);
         $this->assertSame('http://cdn.example.com/bar?foobar=1', (string) $urlWithSite);
-
-        $urlWithSiteSameOrigin = $url->withSite($site, true);
-        $this->assertSame('http://www.example.com/bar?foobar=1', (string) $urlWithSiteSameOrigin);
     }
 }
 
@@ -61,16 +51,11 @@ class CM_Url_AssetMockUrl extends AssetUrl {
         if ($deployVersion = $this->getDeployVersion()) {
             $segments[] = $deployVersion;
         }
-        $path = $this->path->prepend(
-            HierarchicalPath::createFromSegments($segments, HierarchicalPath::IS_ABSOLUTE)
-        );
-        return ''
-            . $path->getUriComponent()
-            . $this->query->getUriComponent()
-            . $this->fragment->getUriComponent();
+        $segments = array_merge($segments, $this->_getPathSegments());
+        return '/' . implode('/', $segments) . $this->_getQueryComponent() . $this->_getFragmentComponent();
     }
 
-    public static function create($url, UrlInterface $baseUrl = null, CM_Model_Language $language = null) {
-        return parent::_create($url, $baseUrl, $language);
+    public static function create($url) {
+        return parent::_create($url);
     }
 }
