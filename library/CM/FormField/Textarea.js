@@ -13,7 +13,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
       this.trigger('focus');
     },
     'input [contenteditable]': function() {
-      this._cleanEmptyWhiteSpace();
+      this.triggerChange();
     },
     'change [contenteditable]': function() {
       this.triggerChange();
@@ -29,23 +29,33 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
         this._checkLengthMax();
       }
     },
-    'keyup [contenteditable]': function() {
-      console.log('VALUE', JSON.stringify(this.getValue()));
-    },
     'paste [contenteditable]': function(event) {
-      event.stopPropagation();
-      event.preventDefault();
-      var clipboardData = (event.originalEvent || event).clipboardData || window.clipboardData;
-      var text = clipboardData.getData('text/plain');
-      console.log('pasting...', JSON.stringify(text));
-      cm.dom.insertTextAtCursor(text);
-      this._checkLengthMax();
-      this._scrollToCursor();
+      var $input = this.getInput();
+      if ('plaintext-only' !== $input.attr('contenteditable')) {
+        event.stopPropagation();
+        event.preventDefault();
+        var clipboardData = (event.originalEvent || event).clipboardData || window.clipboardData;
+        var text = clipboardData.getData('text/plain');
+        var html = this._convertTextToHtml(text);
+        document.execCommand('insertHTML', false, html);
+        this._checkLengthMax();
+      }
     }
   },
 
   ready: function() {
+    CM_FormField_SuggestOne.prototype.ready.call(this);
+
+    this.on('change', function() {
+      this._cleanEmptyWhiteSpace();
+    });
+
     if (Modernizr.plaintextonly) {
+      /**
+       * Use "plaintext-only" attribute where available.
+       * It's currently not available on Firefox (see https://bugzilla.mozilla.org/show_bug.cgi?id=1291467).
+       * For iOS this is needed to prevent "styling" options to be displayed in the context menu.
+       */
       this.getInput().attr('contenteditable', 'plaintext-only');
     }
   },
@@ -55,17 +65,8 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   },
 
   getValue: function() {
-    var $input = this.getInput();
-    var value;
-    if ('plaintext-only' === $input.attr('contenteditable')) {
-      // Chrome, Safari, Edge
-      value = $input.text();
-    } else {
-      // Firefox (see https://bugzilla.mozilla.org/show_bug.cgi?id=1291467)
-      $input = $input.clone();
-      $input.find('br').replaceWith('\n');
-      value = $input.text();
-    }
+    var input = this.getInput().get(0);
+    var value = input.innerText;
 
     // Browsers add an additional newline to the end of "contenteditable" content
     value = value.replace(/\r?\n$/, '');
@@ -74,7 +75,8 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   },
 
   setValue: function(value) {
-    this.getInput().html(value);
+    var html = this._convertTextToHtml(value);
+    this.getInput().html(html);
   },
 
   getEnabled: function() {
@@ -83,6 +85,17 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
 
   reset: function() {
     this.setValue('');
+  },
+
+  /**
+   * @param {String} text
+   * @returns {string}
+   * @private
+   */
+  _convertTextToHtml: function(text) {
+    var html = _.escape(text);
+    html = html.replace(/\r?\n/g, '<br>');
+    return '<div>' + html + '</div>';
   },
 
   _cleanEmptyWhiteSpace: function() {
@@ -97,18 +110,6 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
       this.error(cm.language.get('Too long'));
     } else {
       this.error(null);
-    }
-  },
-
-  _scrollToCursor: function() {
-    var $input = this.getInput();
-    var selection = window.getSelection();
-    var range = selection && selection.getRangeAt(0);
-    var selectionCoords = range && range.getClientRects()[0];
-    selectionCoords = selectionCoords || {bottom: $input.height()};
-    var textareaCoords = $input[0].getBoundingClientRect();
-    if (selectionCoords && selectionCoords.bottom > textareaCoords.bottom || selectionCoords.bottom < textareaCoords.top) {
-      $input.scrollTop($input.scrollTop() + (selectionCoords.bottom - textareaCoords.top));
     }
   }
 });

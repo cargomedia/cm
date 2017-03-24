@@ -500,29 +500,7 @@ var CM_App = CM_Class_Abstract.extend({
       audio.setOptions(options);
       audio.setSources(sourceList);
       return audio;
-    },
-
-    /**
-     * @param {String} text
-     */
-    insertTextAtCursor: function(text) {
-      var html = text.replace(/\r?\n/g, '<br>');
-      this.insertHtmlAtCursor(html);
-    },
-
-    /**
-     * @param {String} html
-     */
-    insertHtmlAtCursor: function(html) {
-      if (!_.isEmpty(html)) {
-        if (document.queryCommandSupported('insertHTML')) {
-          document.execCommand('insertHTML', false, html);
-        } else {
-          document.execCommand('paste', false, html);
-        }
-      }
     }
-
   },
 
   string: {
