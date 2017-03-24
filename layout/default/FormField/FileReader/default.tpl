@@ -1,8 +1,10 @@
-<div class="button button-{$buttonTheme} button-upload uploadButton">
+<div class="button button-{$buttonTheme} button-select">
   <input type="file" name="{$name}-file" multiple />
-  <span class="icon icon-{block name="button-icon"}upload{/block}"></span>
+  <span class="icon icon-{block name="button-icon"}attach{/block}"></span>
   <span class="label">{if $text}{$text}{else}{block name="button-text"}{translate 'Read Files'}{/block}{/if}</span>
+  <div class="spinner spinner-expanded"></div>
 </div>
+{button_link class='button-upload uploadFiles' theme='highlight' icon='upload' label={translate 'Upload Files'}}
 
 <div class="dropInfo"><span class="icon icon-download"></span><span>{translate 'Drop files here.'}</span></div>
 
@@ -22,6 +24,7 @@
       [[ } else { ]]
       {button_link class='button-remove removeFile' theme='transparent' icon='close' title='Remove'}
       [[ } ]]
+      <div class="spinner spinner-expanded"></div>
     </div>
   </li>
 </script>

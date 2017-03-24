@@ -17,7 +17,7 @@
 {formField name='locationSlider' label="Radius"}
 {formField name='file' label="Upload Files"}
 {formField name='image' label="Upload Photos"}
-{formField name='imageReader' label="Read Photos"}
+{formField name='imageReader' label="Read Files" cardinality=2}
 {formField name='color' label="Color"}
 {formField name='color2' label="Color (Palette)"}
 {formField name='date' label="Date"}
