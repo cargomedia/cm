@@ -17,6 +17,9 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
     },
     'change input': function() {
       this.triggerChange();
+    },
+    'input input': function() {
+      this.triggerChange();
     }
   },
 
@@ -48,7 +51,9 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
     }
   },
 
+  /**
+   * @deprecated No need to call this function anymore. Text field always triggers "change".
+   */
   enableTriggerChangeOnInput: function() {
-    this.getInput().on('input', _.bind(this.triggerChange, this));
   }
 });
