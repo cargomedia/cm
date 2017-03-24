@@ -26,8 +26,9 @@ var CM_FormField_FileReader = CM_FormField_Abstract.extend({
     var self = this;
     var field = this;
     var $input = this.getInput();
+    var cardinality = field.getOption('cardinality');
 
-    if (field.getOption("cardinality") == 1) {
+    if (cardinality == 1) {
       $input.removeAttr('multiple');
     }
 
@@ -41,13 +42,17 @@ var CM_FormField_FileReader = CM_FormField_Abstract.extend({
             isImage: file.type.match(/image/)
           };
 
-          self.files.push(fileData);
+          if (cardinality > self.files.length) {
+            self.files.push(fileData);
 
-          if (!self.skipPreviews) {
-            self._renderPreview(fileData);
+            if (!self.skipPreviews) {
+              self._renderPreview(fileData);
+            }
+
+            // self.trigger('change');
+          } else {
+            field.error(cm.language.get('You can only select {$cardinality} items.', {cardinality: cardinality}));
           }
-
-          // self.trigger('change');
         },
         error: function(e, file) {
           self.error(cm.language.get('Unable to read {$file}', {'file': file.name}));
