@@ -106,6 +106,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
                 if ($useReplace) {
                     $this->_onChange();
                 }
+                (new CM_ModelEvents_Trigger())->triggerModelCreated(CM_Service_Manager::getInstance()->getEventHandler(), $this);
             } catch (Exception $e) {
                 $transaction->rollback();
                 throw $e;
@@ -129,6 +130,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         foreach ($containingCacheables as $cacheable) {
             $cacheable->_change();
         }
+        (new CM_ModelEvents_Trigger())->triggerModelDeleted(CM_Service_Manager::getInstance()->getEventHandler(), $this);
+
         $this->_data = null;
         $this->_dataDecoded = array();
     }
@@ -257,7 +260,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         if (!is_array($data)) {
             $data = array($data => $value);
         }
-        $this->_getData(); // Make sure data is loaded
+        $originalData = $this->_getData(); // Make sure data is loaded
         $schema = $this->_getSchema();
 
         foreach ($data as $key => $value) {
@@ -279,6 +282,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
                 }
                 if ($schema->hasField(array_keys($data))) {
                     $persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
+                    $eventTrigger = new CM_ModelEvents_Trigger();
+                    $eventHandler = CM_Service_Manager::getInstance()->getEventHandler();
+                    $eventTrigger->triggerModelChanged($eventHandler, $this);
+                    foreach ($this->_getSchemaData($data) as $field => $value) {
+                        $valueOld = $originalData[$field];
+                        $eventTrigger->triggerModelChanged($eventHandler, $this, $field, $value, $valueOld);
+                    }
                 }
             }
             $this->_onChange();
@@ -516,11 +526,12 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
                 $data = [];
             }
             $model = static::_createStatic($data);
-            $transaction->addRollback(function() use ($model) {
+            $transaction->addRollback(function () use ($model) {
                 $model->delete();
             });
             $model->_changeContainingCacheables();
             $model->_onCreate();
+            (new CM_ModelEvents_Trigger())->triggerModelCreated(CM_Service_Manager::getInstance()->getEventHandler(), $model);
             return $model;
         } catch (Exception $e) {
             $transaction->rollback();
