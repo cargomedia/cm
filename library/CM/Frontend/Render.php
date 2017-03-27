@@ -189,7 +189,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         if (null === $site) {
             $site = $this->getEnvironment()->getSite();
         }
-        $cache = $this->_getCacheUrl();
+        $cache = $this->_getCache();
         $cacheKey = $this->_getCacheUrlKey($path, null, [get_class($site)]);
         return $cache->get($cacheKey, function () use ($path, $site) {
             return (string) Url::create((string) $path)->withSite($site);
@@ -216,7 +216,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             $environment->setLanguage($language);
         }
 
-        $cache = $this->_getCacheUrl();
+        $cache = $this->_getCache();
         $cacheKey = $this->_getCacheUrlKey($pageClassName, $environment, $params);
         return $cache->get($cacheKey, function () use ($pageClassName, $params, $environment) {
             return (string) CM_Page_UrlFactory::getUrl($pageClassName, $params, $environment);
@@ -236,7 +236,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             $environment->setSite($site);
         }
 
-        $cache = $this->_getCacheUrl();
+        $cache = $this->_getCache();
         $cacheKey = $this->_getCacheUrlKey($path, $environment, [$type, $deployVersion]);
         return $cache->get($cacheKey, function () use ($path, $type, $environment, $deployVersion) {
             return (string) ResourceUrl::create($path, $type, $environment, $deployVersion);
@@ -250,7 +250,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         $environment = $this->getEnvironment();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
 
-        $cache = $this->_getCacheUrl();
+        $cache = $this->_getCache();
         $cacheKey = $this->_getCacheUrlKey('serviceworker', $environment, [$deployVersion]);
         return $cache->get($cacheKey, function () use ($environment, $deployVersion) {
             return (string) ServiceWorkerUrl::create($environment, $deployVersion);
@@ -272,7 +272,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             'mailType' => $mail->getType(),
         ];
 
-        $cache = $this->_getCacheUrl();
+        $cache = $this->_getCache();
         $cacheKey = $this->_getCacheUrlKey('emailtracking', $environment, $params);
         return $cache->get($cacheKey, function () use ($params, $environment) {
             return (string) RouteUrl::create('emailtracking', $params, $environment);
@@ -294,7 +294,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             $environment->setSite($site);
         }
 
-        $cache = $this->_getCacheUrl();
+        $cache = $this->_getCache();
         $cacheKey = $this->_getCacheUrlKey($path, $environment, [$deployVersion]);
         return $cache->get($cacheKey, function () use ($path, $environment, $deployVersion) {
             return (string) StaticUrl::create((string) $path, $environment, $deployVersion);
@@ -496,12 +496,12 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     }
 
     /**
-     * @return CM_Cache_Shared
+     * @return CM_Cache_Local
      */
-    protected function _getCacheUrl() {
+    protected function _getCache() {
         static $cache = null;
         if (null === $cache) {
-            $cache = new CM_Cache_Shared();
+            $cache = new CM_Cache_Local();
         }
         return $cache;
     }
@@ -513,7 +513,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     protected function _getCacheUrlKey($url, CM_Frontend_Environment $environment = null, array $extra = null) {
-        $cache = $this->_getCacheUrl();
+        $cache = $this->_getCache();
         $parts = [$url];
         if (null !== $environment) {
             $parts[] = get_class($environment->getSite());
