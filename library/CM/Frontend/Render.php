@@ -478,7 +478,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     public function getLessVariable($variableName) {
         $variableName = (string) $variableName;
 
-        $cache = new CM_Cache_Local();
+        $cache = $this->_getCache();
         return $cache->get($cache->key(__METHOD__, $this->getSite()->getTheme(), $variableName), function () use ($variableName) {
             $assetCss = new CM_Asset_Css($this);
             $assetCss->addVariables();
