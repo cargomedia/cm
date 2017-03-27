@@ -325,4 +325,8 @@ return function (CM_Config_Node $config) {
             ]
         ],
     ];
+
+    $config->services['events-global'] = [
+        'class' => CM_EventHandler_EventHandler::class,
+    ];
 };

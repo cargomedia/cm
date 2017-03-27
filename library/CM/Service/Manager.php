@@ -167,6 +167,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_EventHandler_EventHandlerInterface
+     */
+    public function getEventHandler() {
+        return $this->get('events-global', CM_EventHandler_EventHandlerInterface::class);
+    }
+
+    /**
      * @param string|null $serviceName
      * @return CM_Maintenance_Service
      */
