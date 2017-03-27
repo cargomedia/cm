@@ -189,7 +189,11 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         if (null === $site) {
             $site = $this->getEnvironment()->getSite();
         }
-        return (string) Url::create((string) $path)->withSite($site);
+        $cache = $this->_getCacheUrl();
+        $cacheKey = $this->_getCacheUrlKey($path, null, [get_class($site)]);
+        return $cache->get($cacheKey, function () use ($path, $site) {
+            return (string) Url::create((string) $path)->withSite($site);
+        });
     }
 
     /**
@@ -211,7 +215,12 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         if (null !== $language) {
             $environment->setLanguage($language);
         }
-        return (string) CM_Page_UrlFactory::getUrl($pageClassName, $params, $environment);
+
+        $cache = $this->_getCacheUrl();
+        $cacheKey = $this->_getCacheUrlKey($pageClassName, $environment, $params);
+        return $cache->get($cacheKey, function () use ($pageClassName, $params, $environment) {
+            return (string) CM_Page_UrlFactory::getUrl($pageClassName, $params, $environment);
+        });
     }
 
     /**
@@ -226,7 +235,12 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         if (null !== $site) {
             $environment->setSite($site);
         }
-        return (string) ResourceUrl::create($path, $type, $environment, $deployVersion);
+
+        $cache = $this->_getCacheUrl();
+        $cacheKey = $this->_getCacheUrlKey($path, $environment, [$type, $deployVersion]);
+        return $cache->get($cacheKey, function () use ($path, $type, $environment, $deployVersion) {
+            return (string) ResourceUrl::create($path, $type, $environment, $deployVersion);
+        });
     }
 
     /**
@@ -235,7 +249,12 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
     public function getUrlServiceWorker() {
         $environment = $this->getEnvironment();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        return (string) ServiceWorkerUrl::create($environment, $deployVersion);
+
+        $cache = $this->_getCacheUrl();
+        $cacheKey = $this->_getCacheUrlKey('serviceworker', $environment, [$deployVersion]);
+        return $cache->get($cacheKey, function () use ($environment, $deployVersion) {
+            return (string) ServiceWorkerUrl::create($environment, $deployVersion);
+        });
     }
 
     /**
@@ -252,8 +271,12 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             'user'     => $mail->getRecipient()->getId(),
             'mailType' => $mail->getType(),
         ];
-        $url = RouteUrl::create('emailtracking', $params, $environment);
-        return (string) $url;
+
+        $cache = $this->_getCacheUrl();
+        $cacheKey = $this->_getCacheUrlKey('emailtracking', $environment, $params);
+        return $cache->get($cacheKey, function () use ($params, $environment) {
+            return (string) RouteUrl::create('emailtracking', $params, $environment);
+        });
     }
 
     /**
@@ -270,7 +293,12 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         if (null !== $site) {
             $environment->setSite($site);
         }
-        return (string) StaticUrl::create((string) $path, $environment, $deployVersion);
+
+        $cache = $this->_getCacheUrl();
+        $cacheKey = $this->_getCacheUrlKey($path, $environment, [$deployVersion]);
+        return $cache->get($cacheKey, function () use ($path, $environment, $deployVersion) {
+            return (string) StaticUrl::create((string) $path, $environment, $deployVersion);
+        });
     }
 
     /**
@@ -465,6 +493,36 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             }
             return (string) $matches[1];
         });
+    }
+
+    /**
+     * @return CM_Cache_Shared
+     */
+    protected function _getCacheUrl() {
+        static $cache = null;
+        if (null === $cache) {
+            $cache = new CM_Cache_Shared();
+        }
+        return $cache;
+    }
+
+    /**
+     * @param string                       $url
+     * @param CM_Frontend_Environment|null $environment
+     * @param array|null                   $extra
+     * @return string
+     */
+    protected function _getCacheUrlKey($url, CM_Frontend_Environment $environment = null, array $extra = null) {
+        $cache = $this->_getCacheUrl();
+        $parts = [$url];
+        if (null !== $environment) {
+            $parts[] = get_class($environment->getSite());
+            if ($language = $environment->getLanguage()) {
+                $parts[] = $language->getAbbreviation();
+            }
+        }
+        $parts = array_merge($parts, (array) $extra);
+        return call_user_func_array([$cache, 'key'], $parts);
     }
 
     /**
