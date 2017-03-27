@@ -16,10 +16,11 @@
 
 .textarea.textinput {
   height: auto;
+  line-height: @fontSize*@fontLineHeight;
   min-height: @heightInputText;
   max-height: @maxHeightInputTextarea;
-  padding-top: (@heightInputText - @fontSize*@fontLineHeight) / 2;
-  padding-bottom: (@heightInputText - @fontSize*@fontLineHeight) / 2;
+  padding-bottom: ((@heightInputText - @fontSize*@fontLineHeight) / 2) - 1px;
+  padding-top: ((@heightInputText - @fontSize*@fontLineHeight) / 2) - 1px;
   overflow: auto;
   resize: vertical;
   word-break: break-all;
