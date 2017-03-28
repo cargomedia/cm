@@ -6,9 +6,6 @@ var CM_FormField_FileReader = CM_FormField_Abstract.extend({
   _class: 'CM_FormField_FileReader',
 
   /** @type {Boolean} */
-  instantUpload: null,
-
-  /** @type {Boolean} */
   skipPreviews: null,
 
   /** @type {Array} */
@@ -19,10 +16,6 @@ var CM_FormField_FileReader = CM_FormField_Abstract.extend({
       var $item = $(e.currentTarget).closest('.preview');
       this.files.splice($item.index(), 1);
       $item.remove();
-      this._handleUpload();
-    },
-    'click .uploadFiles': function() {
-      this._handleUpload(true)
     }
   },
 
@@ -30,6 +23,7 @@ var CM_FormField_FileReader = CM_FormField_Abstract.extend({
     var field = this;
     var $input = this.getInput();
     var cardinality = field.getOption('cardinality');
+    var allowedExtensions = field.getOption('allowedExtensions');
 
     if (cardinality == 1) {
       $input.removeAttr('multiple');
@@ -38,12 +32,20 @@ var CM_FormField_FileReader = CM_FormField_Abstract.extend({
     var options = {
       on: {
         load: function(e, file) {
+          field.error(null);
+
           var fileData = {
             type: file.type,
+            extension: file.extra.extension,
             name: file.name,
             data: e.target.result,
-            isImage: file.type.match(/image/)
+            isImage: /image/.test(file.type)
           };
+
+          if (!_.contains(allowedExtensions, fileData.extension)) {
+            field.error(cm.language.get('File type not supported. Allowed file extensions: {$allowedExtensions}.', {'allowedExtensions': allowedExtensions.join(', ')}));
+            return;
+          }
 
           if (cardinality > field.files.length) {
             field.files.push(fileData);
@@ -52,12 +54,10 @@ var CM_FormField_FileReader = CM_FormField_Abstract.extend({
               field._renderPreview(fileData);
             }
 
-            // field.trigger('change');
+            field.trigger('change');
           } else {
             field.error(cm.language.get('You can only select {$cardinality} items.', {cardinality: cardinality}));
           }
-
-          field._handleUpload(this.instantUpload);
         },
         error: function(e, file) {
           field.error(cm.language.get('Unable to read {$file}', {'file': file.name}));
@@ -75,7 +75,7 @@ var CM_FormField_FileReader = CM_FormField_Abstract.extend({
   },
 
   getValue: function() {
-    return _.compact(this.files);
+    return window.btoa(JSON.stringify(_.compact((this.files))));
   },
 
   setValue: function(value) {
@@ -85,7 +85,6 @@ var CM_FormField_FileReader = CM_FormField_Abstract.extend({
   reset: function() {
     this.files = [];
     this.$('.previews').empty();
-    this._toggleUploadReady(false);
   },
 
   /**
@@ -95,37 +94,5 @@ var CM_FormField_FileReader = CM_FormField_Abstract.extend({
   _renderPreview: function(renderParams) {
     var $preview = this.renderTemplate('tpl-preview', renderParams);
     this.$('.previews').append($preview);
-  },
-
-  /**
-   * @param {Boolean|null} upload
-   * @private
-   */
-  _handleUpload: function(upload) {
-    if (this.files.length > 0) {
-      if (upload) {
-        this._processUpload();
-      } else {
-        this._toggleUploadReady(true);
-      }
-    } else {
-      this.reset()
-    }
-  },
-
-  /**
-   * @param {Boolean} state
-   * @private
-   */
-  _toggleUploadReady: function(state) {
-    this.$el.attr('data-upload-ready', state ? '' : null);
-  },
-
-  /**
-   * @private
-   */
-  _processUpload: function() {
-    this.$el.attr('data-upload-process', '');
-    //todo upload
   }
 });
