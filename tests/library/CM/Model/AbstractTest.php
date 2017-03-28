@@ -259,7 +259,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $modelClass->mockMethod('_getPersistence')->set($persistence);
         $modelClass->mockMethod('_getSchema')->set(new CM_Model_Schema_Definition(['foo' => ['type' => 'string']]));
 
-        /** @var CM_Model_Abstract $model */
+        /** @var CM_Model_Abstract|\Mocka\AbstractClassTrait $model */
         $model = $modelClass->newInstance();
         $mockClassname = get_class($model);
 
@@ -379,6 +379,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $counter = 0;
         $binding->bindModelCreated($eventHandler, CM_ModelMock::class, function(CM_Model_Abstract $object, array $data) use (&$counter) {
             $this->assertInstanceOf(CM_ModelMock::class, $object);
+            $this->assertSame([], $data);
             $counter++;
         });
         $this->getServiceManager()->replaceInstance('events-global', $eventHandler);
@@ -1091,6 +1092,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
             ]
         ));
 
+        /** @var CM_Model_Abstract|\Mocka\AbstractClassTrait $model */
         $model = $modelClass->newInstance([1]);
         $mockClassname = get_class($model);
 

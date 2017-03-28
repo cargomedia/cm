@@ -3,9 +3,11 @@
 class CM_ModelEvents_TriggerTest extends CMTest_TestCase {
 
     public function testTriggerModelCreated() {
+        /** @var CM_Model_Abstract|\Mocka\AbstractClassTrait $model */
         $model = $this->mockObject(CM_Model_Abstract::class);
         $model->mockMethod('getId')->set(10);
 
+        /** @var CM_EventHandler_EventHandlerInterface|\Mocka\AbstractClassTrait $eventHandler */
         $eventHandler = $this->mockInterface(CM_EventHandler_EventHandlerInterface::class)->newInstanceWithoutConstructor();
         $mockTrigger = $eventHandler->mockMethod('trigger')->set(function ($event, $param1 = null, $param2 = null) use ($model) {
             $mockClassname = get_class($model);
@@ -20,9 +22,11 @@ class CM_ModelEvents_TriggerTest extends CMTest_TestCase {
     }
 
     public function testTriggerModelChanged() {
+        /** @var CM_Model_Abstract|\Mocka\AbstractClassTrait $model */
         $model = $this->mockObject(CM_Model_Abstract::class);
         $model->mockMethod('getId')->set(10);
 
+        /** @var CM_EventHandler_EventHandlerInterface|\Mocka\AbstractClassTrait $eventHandler */
         $eventHandler = $this->mockInterface(CM_EventHandler_EventHandlerInterface::class)->newInstanceWithoutConstructor();
         $mockTrigger = $eventHandler->mockMethod('trigger')->set(function ($event, $param1 = null, $param2 = null) use ($model) {
             $mockClassname = get_class($model);
@@ -37,9 +41,11 @@ class CM_ModelEvents_TriggerTest extends CMTest_TestCase {
     }
 
     public function testTriggerModelChangedProperty() {
+        /** @var CM_Model_Abstract|\Mocka\AbstractClassTrait $model */
         $model = $this->mockObject(CM_Model_Abstract::class);
         $model->mockMethod('getId')->set(10);
 
+        /** @var CM_EventHandler_EventHandlerInterface|\Mocka\AbstractClassTrait $eventHandler */
         $eventHandler = $this->mockInterface(CM_EventHandler_EventHandlerInterface::class)->newInstanceWithoutConstructor();
         $mockTrigger = $eventHandler->mockMethod('trigger')->set(function ($event, $param1 = null, $param2 = null) use ($model) {
             $mockClassname = get_class($model);
@@ -60,9 +66,11 @@ class CM_ModelEvents_TriggerTest extends CMTest_TestCase {
     }
 
     public function testTriggerModelDeleted() {
+        /** @var CM_Model_Abstract|\Mocka\AbstractClassTrait $model */
         $model = $this->mockObject(CM_Model_Abstract::class);
         $model->mockMethod('getId')->set(10);
 
+        /** @var CM_EventHandler_EventHandlerInterface|\Mocka\AbstractClassTrait $eventHandler */
         $eventHandler = $this->mockInterface(CM_EventHandler_EventHandlerInterface::class)->newInstanceWithoutConstructor();
         $mockTrigger = $eventHandler->mockMethod('trigger')->set(function ($event, $param1 = null, $param2 = null) use ($model) {
             $mockClassname = get_class($model);
