@@ -286,7 +286,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
                     'flushStamp' => $this->getCreated(),
                 ];
                 $cacheKey = self::_getCacheKeyFixture($fixture);
-                $cache = CM_Cache_Local::getInstance();
+                $cache = CM_Cache_Shared::getInstance();
                 $cache->set($cacheKey, $variationDataList);
                 $this->getServiceManager()->getTrackings()->trackSplittest($fixture, $variation);
             } catch (CM_Db_Exception $exception) {
@@ -420,7 +420,7 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
         $updateCache = (bool) $updateCache;
 
         $cacheKey = self::_getCacheKeyFixture($fixture);
-        $cache = CM_Cache_Local::getInstance();
+        $cache = CM_Cache_Shared::getInstance();
         if ($updateCache || (($variationListFixture = $cache->get($cacheKey)) === false)) {
             $variationListFixture = CM_Db_Db::exec('
 				SELECT `variation`.`splittestId`, `variation`.`name` AS `variation`, `splittest`.`name` AS `splittest`, `splittest`.`createStamp` AS `flushStamp`
