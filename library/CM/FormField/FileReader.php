@@ -48,8 +48,10 @@ class CM_FormField_FileReader extends CM_FormField_Abstract {
      * @return CM_File
      */
     public function createFile(array $fileData) {
-        $fileRaw = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $fileData['data']));
-        $file = new CM_File(); //todo make possible to create file without path
+        $fileRaw = base64_decode(preg_replace('#^data:.*;base64,#i', '', $fileData['data']));
+        //todo make possible to create file without path
+        // file_put_contents('/tmp/image.png', $fileRaw);
+        $file = new CM_File();
         return $file;
     }
 

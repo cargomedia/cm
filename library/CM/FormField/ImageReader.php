@@ -7,10 +7,19 @@ class CM_FormField_ImageReader extends CM_FormField_FileReader {
 
     public function __construct($params = null) {
         parent::__construct($params);
-        $this->_minWidth = $this->_params->getInt('minWidth', 1);
-        $this->_minHeight = $this->_params->getInt('minHeight', 1);
-        $this->_maxWidth = $this->_params->getInt('maxWidth', PHP_INT_MAX);
-        $this->_maxHeight = $this->_params->getInt('maxHeight', PHP_INT_MAX);
+        $this->_minWidth = $this->_params->getInt('minWidth', 300);
+        $this->_minHeight = $this->_params->getInt('minHeight', 300);
+        $this->_maxWidth = $this->_params->getInt('maxWidth', 4096);
+        $this->_maxHeight = $this->_params->getInt('maxHeight', 4096);
+    }
+
+    public function prepare(CM_Params $renderParams, CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
+        parent::prepare($renderParams, $environment, $viewResponse);
+
+        $viewResponse->getJs()->setProperty('_minWidth', $this->_minWidth);
+        $viewResponse->getJs()->setProperty('_minHeight', $this->_minHeight);
+        $viewResponse->getJs()->setProperty('_maxWidth', $this->_maxWidth);
+        $viewResponse->getJs()->setProperty('_maxHeight', $this->_maxHeight);
     }
 
     public function createFile(array $fileData) {
