@@ -89,7 +89,7 @@ var CM_FormField_FileReader = CM_FormField_Abstract.extend({
   },
 
   setValue: function(value) {
-    throw new CM_Exception('Not implemented');
+    this.files = value;
   },
 
   reset: function() {
