@@ -179,7 +179,7 @@ DROP TABLE IF EXISTS `cm_model_languagekey`;
 CREATE TABLE `cm_model_languagekey` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `variables` text CHARACTER SET utf8 COLLATE utf8_bin,
+  `variables` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `updateCountResetVersion` int(10) unsigned DEFAULT NULL,
   `updateCount` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `javascript` tinyint(3) unsigned NOT NULL,
