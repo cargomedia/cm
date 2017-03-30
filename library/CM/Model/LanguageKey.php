@@ -23,9 +23,6 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      * @return string[]
      */
     public function getVariables() {
-        if (!$this->_has('variables')) {
-            return array();
-        }
         $variablesEncoded = $this->_get('variables');
         return CM_Params::jsonDecode($variablesEncoded);
     }
@@ -97,7 +94,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     protected function _getSchema() {
         return new CM_Model_Schema_Definition(array(
             'name'                    => array('type' => 'string'),
-            'variables'               => array('type' => 'string', 'optional' => true),
+            'variables'               => array('type' => 'string'),
             'updateCountResetVersion' => array('type' => 'int', 'optional' => true),
             'updateCount'             => array('type' => 'int'),
             'javascript'              => array('type' => 'bool'),
@@ -127,13 +124,14 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      */
     public static function create($name, array $variables = null) {
         $languageKey = new self();
+        $variables = (array) $variables;
         $languageKey->_set([
             'name'                    => $name,
             'updateCount'             => 0,
             'updateCountResetVersion' => 0,
             'javascript'              => false,
+            'variables'               => CM_Util::jsonEncode($variables),
         ]);
-        $languageKey->setVariables($variables);
         $languageKey->commit();
 
         $languageKey = self::_replaceWithExisting($languageKey);

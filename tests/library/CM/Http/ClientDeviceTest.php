@@ -3,10 +3,7 @@
 class CM_Http_ClientDeviceTest extends CMTest_TestCase {
 
     /** @var array */
-    private $_mobileHeaders;
-
-    /** @var array */
-    private $_nonMobileHeaders;
+    private $_nonMobileHeaders, $_mobileHeaders, $_mobileHeadersWithClientId;
 
     public function setUp() {
         $this->_nonMobileHeaders = [
@@ -35,6 +32,20 @@ class CM_Http_ClientDeviceTest extends CMTest_TestCase {
             'accept-encoding'           => 'gzip, deflate, sdch',
             'accept-language'           => 'en-US,en;q=0.8,de-CH;q=0.6,de;q=0.4,fr;q=0.2,it;q=0.2,pt;q=0.2,es;q=0.2',
         ];
+
+        $this->_mobileHeadersWithClientId = [
+            'content-type'              => '',
+            'content-length'            => '',
+            'host'                      => 'dev.cm',
+            'connection'                => 'keep-alive',
+            'cache-control'             => 'max-age=0',
+            'accept'                    => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'upgrade-insecure-requests' => '1',
+            'user-agent'                => 'Mozilla/5.0 (Linux; Android 5.0.2; SAMSUNG SM-G925F Build/LRX22G) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/3.0 Chrome/38.0.2125.102 Mobile Safari/537.36',
+            'accept-encoding'           => 'gzip, deflate, sdch',
+            'accept-language'           => 'en-US,en;q=0.8,de-CH;q=0.6,de;q=0.4,fr;q=0.2,it;q=0.2,pt;q=0.2,es;q=0.2',
+            'cookie'                    => 'clientId=12345;',
+        ];
     }
 
     public function tearDown() {
@@ -61,12 +72,36 @@ class CM_Http_ClientDeviceTest extends CMTest_TestCase {
         $this->assertSame('5.0.2', $clientDeviceDetector->getVersion('Android'));
     }
 
-    public function testGetIP() {
+    public function testGetIp() {
         $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('get', '/foo', null, []));
         $this->assertNull($clientDeviceDetector->getIp());
 
         $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('get', '/foo', null, ['remote_addr' => '42.42.42.42']));
         $this->assertSame('707406378', $clientDeviceDetector->getIp());
         $this->assertSame('42.42.42.42', $clientDeviceDetector->getIp(true));
+    }
+
+    public function testHasId() {
+        $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('get', '/foo', null));
+        $this->assertFalse($clientDeviceDetector->hasId());
+
+        $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('get', '/foo', $this->_mobileHeaders));
+        $this->assertFalse($clientDeviceDetector->hasId());
+
+        $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('get', '/foo', $this->_mobileHeadersWithClientId));
+        $this->assertTrue($clientDeviceDetector->hasId());
+    }
+
+    public function testGetId() {
+        $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('get', '/foo', null));
+        $this->assertInternalType('integer', $clientDeviceDetector->getId());
+        $this->assertSame(1, $clientDeviceDetector->getId());
+
+        $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('get', '/foo', $this->_mobileHeaders));
+        $this->assertInternalType('integer', $clientDeviceDetector->getId());
+        $this->assertSame(2, $clientDeviceDetector->getId());
+
+        $clientDeviceDetector = new CM_Http_ClientDevice(CM_Http_Request_Abstract::factory('get', '/foo', $this->_mobileHeadersWithClientId));
+        $this->assertSame(12345, $clientDeviceDetector->getId());
     }
 }
