@@ -300,6 +300,36 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
     }
 
     /**
+     * @param CM_Splittest_Fixture        $fixture
+     * @param CM_Model_SplittestVariation $variation
+     */
+    protected function _setVariationFixture(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
+        $variationName = $variation->getName();
+        $variationNameOld = $this->_findVariationNameFixture($fixture);
+        if ($variationName === $variationNameOld) {
+            return;
+        }
+        $columnId = $fixture->getColumnId();
+        $fixtureId = $fixture->getId();
+        if (null === $variationNameOld) {
+            CM_Db_Db::insert('cm_splittestVariation_fixture',
+                ['splittestId' => $this->getId(), $columnId => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()]);
+        } else {
+            CM_Db_Db::update('cm_splittestVariation_fixture',
+                ['variationId' => $variation->getId()], ['splittestId' => $this->getId(), $columnId => $fixtureId]);
+        }
+        $variationDataList = self::getVariationDataListFixture($fixture);
+        $variationDataList[$this->getId()] = [
+            'variation'  => $variationName,
+            'splittest'  => $this->getName(),
+            'flushStamp' => $this->getCreated(),
+        ];
+        $cacheKey = self::_getCacheKeyFixture($fixture);
+        $cache = CM_Cache_Shared::getInstance();
+        $cache->set($cacheKey, $variationDataList);
+    }
+
+    /**
      * @throws CM_Exception_Invalid
      * @return CM_Model_SplittestVariation
      */

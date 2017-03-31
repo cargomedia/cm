@@ -160,6 +160,24 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $this->assertFalse($test->isVariationFixture($fixture, 'noVariation'));
     }
 
+    public function testSetVariationFixture() {
+        $user = CMTest_TH::createUser();
+        $fixture = new CM_Splittest_Fixture($user);
+
+        /** @var CM_Model_Splittest_Mock $test */
+        $test = CM_Model_Splittest_Mock::create('foo1', ['v1', 'v2']);
+        $variation1 = $test->getVariations()->findByName('v1');
+        $variation2 = $test->getVariations()->findByName('v2');
+
+        $test->setVariationFixture($fixture, $variation1);
+        $this->assertTrue($test->isVariationFixture($fixture, 'v1'));
+        $this->assertFalse($test->isVariationFixture($fixture, 'v2'));
+
+        $test->setVariationFixture($fixture, $variation2);
+        $this->assertFalse($test->isVariationFixture($fixture, 'v1'));
+        $this->assertTrue($test->isVariationFixture($fixture, 'v2'));
+    }
+
     public function testGetVariationDataListFixture() {
         $user = CMTest_TH::createUser();
         $fixture = new CM_Splittest_Fixture($user);
@@ -424,6 +442,15 @@ class CM_Model_Splittest_Mock extends CM_Model_Splittest {
      */
     public function getVariationFixture(CM_Splittest_Fixture $fixture) {
         return $this->_getVariationFixture($fixture);
+    }
+
+    /**
+     * @param CM_Splittest_Fixture        $fixture
+     * @param CM_Model_SplittestVariation $variation
+     * @return bool
+     */
+    public function setVariationFixture(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
+        return $this->_setVariationFixture($fixture, $variation);
     }
 
     /**
