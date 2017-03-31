@@ -22,7 +22,7 @@ class CM_Migration_Model extends CM_Model_Abstract {
      * @return DateTime|null
      */
     public function getExecutedAt() {
-        return $this->_has('executedAt') ? $this->_get('executedAt') : null;
+        return $this->_get('executedAt');
     }
 
     /**
@@ -55,6 +55,7 @@ class CM_Migration_Model extends CM_Model_Abstract {
     public static function create($name) {
         $model = new self();
         $model->setName($name);
+        $model->setExecutedAt(null);
         $model->commit();
         return $model;
     }

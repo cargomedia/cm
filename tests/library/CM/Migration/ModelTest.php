@@ -10,7 +10,6 @@ class CM_Migration_ModelTest extends CMTest_TestCase {
         $model = CM_Migration_Model::create('foo');
         $this->assertSame('foo', $model->getName());
         $this->assertNull($model->getExecutedAt());
-        $this->assertFalse($model->hasExecutedAt());
 
         /** @var CM_Db_Exception $exception */
         $exception = $this->catchException(function () {
@@ -21,7 +20,7 @@ class CM_Migration_ModelTest extends CMTest_TestCase {
         $this->assertSame([
             'tries'                    => 0,
             'originalExceptionMessage' => "SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'foo' for key 'name'",
-            'query'                    => 'INSERT INTO `cm_migration` (`name`) VALUES (?)',
+            'query'                    => 'INSERT INTO `cm_migration` (`name`,`executedAt`) VALUES (?,NULL)',
         ], $exception->getMetaInfo());
     }
 
