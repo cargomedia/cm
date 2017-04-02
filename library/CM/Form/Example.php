@@ -17,6 +17,7 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_Location(['name' => 'location', 'fieldNameDistance' => 'locationSlider']));
         $this->registerField(new CM_FormField_File(['name' => 'file', 'cardinality' => 2]));
         $this->registerField(new CM_FormField_FileImage(['name' => 'image', 'cardinality' => 2]));
+        $this->registerField(new CM_FormField_FileReader(['name' => 'imageReader', 'cardinality' => 2]));
         $this->registerField(new CM_FormField_Color(['name' => 'color']));
         $this->registerField(new CM_FormField_ColorPalette(['name' => 'color2', 'palette' => [
             CM_Color_RGB::fromHexString('ff0000'),
