@@ -20,11 +20,11 @@ class CM_Clockwork_Storage_MongoDB extends CM_Clockwork_Storage_Abstract {
         $this->_eventList[$event->getName()] = $status;
         $mongoClient = CM_Service_Manager::getInstance()->getMongoDb();
         $lastRuntime = $status->getLastRuntime();
-        $lastRuntime = (null !== $lastRuntime) ? new MongoDate($lastRuntime->getTimestamp()) : null;
+        $lastRuntime = (null !== $lastRuntime) ? new MongoDB\BSON\UTCDateTime($lastRuntime->getTimestamp() * 1000) : null;
         $lastStartTime = $status->getLastStartTime();
-        $lastStartTime = (null !== $lastStartTime) ? new MongoDate($lastStartTime->getTimestamp()) : null;
+        $lastStartTime = (null !== $lastStartTime) ? new MongoDB\BSON\UTCDateTime($lastStartTime->getTimestamp() * 1000) : null;
 
-        $updated = (boolean) $mongoClient->update('cm_clockwork',
+        $updated = (boolean) $mongoClient->updateOne('cm_clockwork',
             [
                 'context'     => $this->_context,
                 'events.name' => $event->getName(),
@@ -37,7 +37,7 @@ class CM_Clockwork_Storage_MongoDB extends CM_Clockwork_Storage_Abstract {
             ]
         );
         if (!$updated) {
-            $mongoClient->update('cm_clockwork',
+            $mongoClient->updateOne('cm_clockwork',
                 [
                     'context' => $this->_context,
                 ], [
@@ -68,12 +68,12 @@ class CM_Clockwork_Storage_MongoDB extends CM_Clockwork_Storage_Abstract {
             $eventData = $result['events'];
             $eventName = $eventData['name'];
             $status = new CM_Clockwork_Event_Status();
-            /** @var MongoDate|null $lastRuntime */
+            /** @var MongoDB\BSON\UTCDateTime|null $lastRuntime */
             $lastRuntime = $eventData['lastRuntime'];
             if (null !== $lastRuntime) {
                 $status->setLastRuntime($lastRuntime->toDateTime());
             }
-            /** @var MongoDate $lastStartTime */
+            /** @var MongoDB\BSON\UTCDateTime $lastStartTime */
             $lastStartTime = $eventData['lastStartTime'];
             if (null !== $lastStartTime) {
                 $status->setLastStartTime($lastStartTime->toDateTime());
