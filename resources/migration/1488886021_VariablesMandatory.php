@@ -1,6 +1,6 @@
 <?php
 
-class Migration_1490782573_VariablesMandatory implements \CM_Migration_UpgradableInterface, \CM_Service_ManagerAwareInterface {
+class Migration_1488886021_VariablesMandatory implements \CM_Migration_UpgradableInterface, \CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
 
