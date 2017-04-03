@@ -9,13 +9,16 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
   _valueLast: null,
 
   events: {
-    'blur input, textarea': function() {
+    'blur input': function() {
       this.trigger('blur');
     },
-    'focus input, textarea': function() {
+    'focus input': function() {
       this.trigger('focus');
     },
-    'change input, textarea': function() {
+    'change input': function() {
+      this.triggerChange();
+    },
+    'input input': function() {
       this.triggerChange();
     }
   },
@@ -48,7 +51,9 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
     }
   },
 
+  /**
+   * @deprecated No need to call this function anymore. Text field always triggers "change".
+   */
   enableTriggerChangeOnInput: function() {
-    this.getInput().on('input', _.bind(this.triggerChange, this));
   }
 });
