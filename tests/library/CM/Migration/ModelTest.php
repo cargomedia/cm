@@ -21,6 +21,7 @@ class CM_Migration_ModelTest extends CMTest_TestCase {
             'tries'                    => 0,
             'originalExceptionMessage' => "SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'foo' for key 'name'",
             'query'                    => 'INSERT INTO `cm_migration` (`name`,`executedAt`) VALUES (?,NULL)',
+            'parameters'               => ['foo'],
         ], $exception->getMetaInfo());
     }
 
