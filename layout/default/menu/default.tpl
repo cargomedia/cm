@@ -5,7 +5,7 @@
         <li class="{$entry->getClass()} {if $entry->isActive($activePath, $activeParams)}active{/if} {if $entry->getIcon()}hasIcon{/if}" data-menu-entry-hash="{$entry->getHash()}">
           <a href="{linkUrl page=$entry->getPageName() params=$entry->getParams()}" class="clickFeedback">
             {if null !== $entry->getIndication()}<span class="indication">{$entry->getIndication()}</span>{/if}
-            {if null !== $entry->getIcon()}<span class="icon icon-{$entry->getIcon()}"></span>{/if}
+            {if null !== $entry->getIcon()}{icon icon=$entry->getIcon()}{/if}
             <span class="label">{translate $entry->getLabel()}</span>
           </a>
         </li>
