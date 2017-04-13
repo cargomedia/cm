@@ -1,15 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
-<g id="Layer_1">
-	<path id="STAR_2_" fill-rule="evenodd" clip-rule="evenodd" d="M477.1,225.5L477.1,225.5l-116.2,84.7L407.1,450
-		c0.7,2.1,1.1,4.4,1.1,6.7c0,11.9-9.6,21.5-21.5,21.5c-4.7,0-9-1.5-12.6-4.1l0,0l-118-88.1l-119.6,87.8l0,0
-		c-3.5,2.6-7.9,4.1-12.6,4.1c-11.9,0-21.5-9.6-21.5-21.5c0-2.3,0.4-4.6,1.1-6.7l47.8-139.5L34.9,225.5l0,0
-		c-5.4-3.9-8.9-10.2-8.9-17.4c0-11.9,9.6-21.5,21.5-21.5l0,0h143.9L235.6,49c2.7-8.8,10.9-15.2,20.5-15.2c9.7,0,17.8,6.4,20.5,15.2
-		l44.2,137.6h143.7l0,0c11.9,0,21.5,9.6,21.5,21.5C486,215.2,482.5,221.6,477.1,225.5z"/>
-</g>
-<g id="Layer_2">
-</g>
+<svg class="icon icon-star" height="16" viewBox="0 0 16 16" version="1.1" aria-hidden="true">
+    <path
+      d="M15.69,6.94h0l-4,2.95,1.61,4.86a.75.75,0,0,1-1.15.84h0L8,12.52,3.84,15.58h0a.75.75,0,0,1-1.15-.84L4.36,9.89.31,6.94h0A.75.75,0,0,1,.75,5.59h5L7.29.8A.75.75,0,0,1,8.72.8l1.54,4.79h5a.75.75,0,0,1,.44,1.35Z"/>
 </svg>
