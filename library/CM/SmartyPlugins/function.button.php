@@ -1,4 +1,5 @@
 <?php
+require_once 'function.icon.php';
 
 function smarty_function_button(array $params, Smarty_Internal_Template $template) {
     /** @var CM_Frontend_Render $render */
@@ -70,10 +71,10 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
     $html .= '>';
     if ($icon) {
         if ($iconConfirm) {
-            $html .= '<span class="icon icon-' . $icon . ' confirmClick-state-inactive"></span>'
-                . '<span class="icon icon-' . $iconConfirm . ' confirmClick-state-active"></span>';
+            $html .= '<span class="confirmClick-state-inactive">' . smarty_function_icon(['icon' => $icon], $template) . '</span>'
+                . '<span class="confirmClick-state-active">' . smarty_function_icon(['icon' => $iconConfirm], $template) . '</span>';
         } else {
-            $html .= '<span class="icon icon-' . $icon . '"></span>';
+            $html .= smarty_function_icon(['icon' => $icon], $template);
         }
     }
     if ($label) {

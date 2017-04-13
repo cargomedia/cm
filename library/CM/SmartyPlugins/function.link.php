@@ -1,6 +1,7 @@
 <?php
 require_once 'function.linkUrl.php';
 require_once 'function.tag.php';
+require_once 'function.icon.php';
 
 function smarty_function_link(array $params, Smarty_Internal_Template $template) {
     $label = '';
@@ -67,7 +68,7 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 
     $iconMarkup = null;
     if (null !== $icon) {
-        $iconMarkup = '<span class="icon icon-' . $icon . '"></span>';
+        $iconMarkup = smarty_function_icon(['icon' => $icon], $template);
     }
 
     $html = '';
