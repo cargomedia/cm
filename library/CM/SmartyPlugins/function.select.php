@@ -1,4 +1,5 @@
 <?php
+require_once 'function.icon.php';
 
 function smarty_function_select(array $params, Smarty_Internal_Template $template) {
     /** @var CM_Frontend_Render $render */
@@ -81,7 +82,7 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
     if ($labelPrefix) {
         $html .= '<span class="labelPrefix">' . CM_Util::htmlspecialchars($labelPrefix) . '</span>';
     }
-    $html .= '<span class="label">' . $selectedLabel . '</span><span class="icon icon-select"></span>';
+    $html .= '<span class="label">' . $selectedLabel . '</span>' . smarty_function_icon(['icon' => 'select'], $template);
     $html .= '</div>';
 
     return '<div class="fancySelect">' . $html . '</div>';
