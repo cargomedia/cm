@@ -36,7 +36,7 @@
     {$render->getServiceManager()->getTrackings()->getHtml($render->getEnvironment())}
     {if CM_Http_Request_Abstract::hasInstance() && !CM_Http_Request_Abstract::getInstance()->isSupported()}
       <div id="browserNotSupported">
-        <h2><span class="icon-warning"></span> {translate 'Your browser is no longer supported.'}</h2>
+        <h2>{icon icon='warning'} {translate 'Your browser is no longer supported.'}</h2>
         <p>{translate 'We recommend upgrading to the latest Internet Explorer, Google Chrome, Firefox, or Opera. Click here for <a href="{$url}">more information</a>.' url='http://whatbrowser.org'}
       </div>
     {/if}

@@ -36,12 +36,16 @@
     padding: 4px;
     position: relative;
 
-    .icon-arrow-right {
+    .arrow {
       position: absolute;
       display: none;
       left: -10px;
       top: 4px;
-      font-size: .8em;
+      transition: transform @transitionDuration;
+
+      .icon {
+        height: .8em;
+      }
     }
 
     .node {
@@ -65,11 +69,11 @@
   }
 
   li.hasChildren {
-    > .icon-arrow-right, > .node .count {
+    > .arrow, > .node .count {
       display: inline-block;
     }
 
-    .icon-arrow-right {
+    .arrow {
       cursor: pointer;
     }
   }
@@ -79,7 +83,7 @@
       display: block;
     }
 
-    > .icon-arrow-right {
+    > .arrow {
       transform: rotate(90deg);
       color: @fontColorHeading;
     }

@@ -1,6 +1,6 @@
 {function renderNode node=null}
   <li {if $node->hasNodes()}class="hasChildren"{/if}>
-    <span class="icon icon-arrow-right toggleSubtree"></span>
+    <span class="toggleSubtree arrow">{icon icon='arrow-right'}</span>
     <div class="node selectNode" data-id="{$node->getId()|escape}" data-path="{$node->getPath()|escape}">
       {$node->getName()}
       <span class="count">({$node->getNodes()|count})</span>
