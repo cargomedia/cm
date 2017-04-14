@@ -61,8 +61,12 @@
   };
 
   ClipSlide.prototype.enable = function() {
+    var handleIcon = '<svg class="icon icon-arrow-down" height="16" viewBox="0 0 16 16" version="1.1" aria-hidden="true">';
+    handleIcon += '<path d="M16,3.69a.8.8,0,0,1-.19.51L8.63,12.82a.8.8,0,0,1-1.23,0L.19,4.26a.8.8,0,1,1,1.22-1L8,11.07l6.57-7.89A.8.8,0,0,1,16,3.69Z"/>';
+    handleIcon += '</svg>';
+
     this.$elem.addClass('clipSlide-enabled');
-    this.$handle = $('<a href="javascript:;" class="clipSlide-handle"><div class="icon icon-arrow-down"></div></a>').appendTo(this.$elem);
+    this.$handle = $('<a href="javascript:;" class="clipSlide-handle"></a>').append(handleIcon).appendTo(this.$elem);
     var self = this;
     this.$handle.on('click.clipSlide', function() {
       self.toggle(true);
