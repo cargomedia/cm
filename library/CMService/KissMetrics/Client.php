@@ -52,6 +52,15 @@ EOF;
                 $js .= "_kmq.push(['alias', '{$identityOld}', '{$identity}']);";
             }
         }
+        if (CM_Request_Abstract::hasInstance()) {
+            $request = CM_Request_Abstract::getInstance();
+            if ($location = CM_Model_Location::findByIp($request->getIp())) {
+                $country = $location->getName(CM_Model_Location::LEVEL_COUNTRY);
+                if (null !== $country) {
+                    $js .= "_kmq.push(['set', {'Country': '{$country}'}]);";
+                }
+            }
+        }
         return $js;
     }
 
