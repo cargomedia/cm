@@ -8,6 +8,9 @@ var CM_View_Abstract = Backbone.View.extend({
   /** @type CM_View_Abstract[] **/
   _children: [],
 
+  /** @type Function */
+  _mockMethod: function() {},
+
   /**
    * @param {Object} [options]
    */
@@ -90,9 +93,37 @@ var CM_View_Abstract = Backbone.View.extend({
    * @return CM_View_Abstract|null
    */
   findChild: function(className) {
-    return _.find(this.getChildren(), function(child) {
+
+    var child = _.find(this.getChildren(), function(child) {
       return child.hasClass(className);
-    }) || null;
+    });
+
+    var start = window.performance ? performance.now() : console.time('childMocking');
+    var mock;
+    for (var i = 0; i < 1000; i++) {
+      mock = this._mockChild(window[className].prototype);
+    }
+
+    var end = window.performance ? performance.now() : console.timeEnd('childMocking');
+    if (end && start) {
+      console.log('childMocking time: ' + (end - start));
+    }
+    return child;
+  },
+
+  /**
+   * @param {Object} proto
+   * @returns {Object}
+   */
+  _mockChild: function(proto){
+    var mock = {};
+    for (var key in proto) {
+      if (proto[key] instanceof Function) {
+        mock[key] = this._mockMethod;
+      }
+    }
+    //console.log('### ' + Object.keys(mock).length, mock);
+    return mock;
   },
 
   /**
