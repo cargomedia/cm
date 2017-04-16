@@ -113,7 +113,7 @@ class CM_Model_Language extends CM_Model_Abstract {
         }
 
         if ($writeCache && !$skipCacheLocal) {
-            $cache->set($cacheKey, $translations);
+            $cache->set($cacheKey, $translations, $this->_getConfig()->cacheLifetime);
         }
 
         if (!isset($translations[$phrase]['value'])) {
@@ -221,6 +221,18 @@ class CM_Model_Language extends CM_Model_Abstract {
      */
     public static function getVersionJavascript() {
         return (int) CM_Service_Manager::getInstance()->getOptions()->get('language.javascript.version');
+    }
+
+    public static function refreshCaches() {
+        $cache = CM_Cache_Local::getInstance();
+        /** @var CM_Model_Language $language */
+        foreach (new CM_Paging_Language_All() as $language) {
+            $cacheKey = CM_CacheConst::Language_Translations . '_languageId:' . $language->getId();
+            $translations = $language->getTranslations();
+            $translations->_change();
+            $cache->set($cacheKey, $translations->getAssociativeArray(), $language->_getConfig()->cacheLifetime);
+        }
+        $language->getTranslations(true)->_change();
     }
 
     public static function updateVersionJavascript() {

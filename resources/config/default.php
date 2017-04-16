@@ -29,6 +29,8 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Paging_Ip_Blocked->maxAge = (7 * 86400);
 
+    $config->CM_Model_Language->cacheLifetime = 3600;
+
     $config->classConfigCacheEnabled = true;
 
     $config->CM_Db_Db->delayedEnabled = true;
