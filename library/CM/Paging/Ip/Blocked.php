@@ -13,11 +13,9 @@ class CM_Paging_Ip_Blocked extends CM_Paging_Ip_Abstract {
      */
     public function add($ip) {
         $ip = (int) $ip;
-        CM_Db_Db::replace('cm_ipBlocked', [
-            'ip'              => $ip,
-            'createStamp'     => time(),
-            'expirationStamp' => (time() + $this->_getMaxAge()),
-        ]);
+        CM_Db_Db::exec('INSERT INTO `cm_ipBlocked` (`ip`, `createStamp`, `expirationStamp`) VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE `expirationStamp` = GREATEST(?, `expirationStamp` + ?)',
+            [$ip, time(), time() + $this->_getMaxAge(), time() + $this->_getMaxAge(), $this->_getMaxAge()]);
     }
 
     /**
