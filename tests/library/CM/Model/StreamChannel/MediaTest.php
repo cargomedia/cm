@@ -37,6 +37,32 @@ class CM_Model_StreamChannel_MediaTest extends CMTest_TestCase {
         $this->assertSame(null, $channel3->getMediaId());
     }
 
+    public function testCreateWithExistingArchiveMedia() {
+        $channel1 = CM_Model_StreamChannel_Media::createStatic(array(
+            'key'            => 'foo',
+            'serverId'       => 1,
+            'thumbnailCount' => 2,
+            'adapterType'    => 1,
+            'mediaId'        => 'foo',
+        ));
+        $archive = CM_Model_StreamChannelArchive_Media::createStatic(['streamChannel' => $channel1]);
+        $this->assertInstanceOf('CM_Model_StreamChannelArchive_Media', $archive);
+        $this->assertSame($channel1->getMediaId(), $archive->getMediaId());
+
+        $exception = $this->catchException(function () {
+            CM_Model_StreamChannel_Media::createStatic(array(
+                'key'            => 'baz',
+                'serverId'       => 1,
+                'thumbnailCount' => 3,
+                'adapterType'    => 1,
+                'mediaId'        => 'foo',
+            ));
+        });
+
+        $this->assertInstanceOf('CM_Exception_Invalid', $exception);
+        $this->assertSame('Channel archive with given mediaId already exists', $exception->getMessage());
+    }
+
     public function testCreateWithoutServerId() {
         try {
             CM_Model_StreamChannel_Media::createStatic(array(
