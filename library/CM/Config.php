@@ -26,6 +26,7 @@ class CM_Config {
             if (CM_Bootloader::getInstance() instanceof CM_Bootloader_Testing) {
                 $node->extend('test.php');
             }
+            $node->extend('override.php');
             $config = $node->export();
             $cache->set($cacheKey, $config);
         }
