@@ -109,7 +109,6 @@ return function (CM_Config_Node $config) {
             'config' => [
                 'db'      => 'cm',
                 'server'  => 'mongodb://localhost:27017',
-                'options' => ['connect' => true],
             ],
         ],
     ];
