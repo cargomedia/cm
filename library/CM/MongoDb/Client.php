@@ -371,7 +371,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
 
         $result = $this->_getCollection($collection)->updateOne($criteria, $update, $options);
         $this->_checkResultForErrors($result);
-        return $result->getModifiedCount();
+        return $result->getMatchedCount();
     }
 
     /**
@@ -390,7 +390,7 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
 
         $result = $this->_getCollection($collection)->updateMany($criteria, $update, $options);
         $this->_checkResultForErrors($result);
-        return $result->getModifiedCount();
+        return $result->getMatchedCount();
     }
 
     /**

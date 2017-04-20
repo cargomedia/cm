@@ -113,6 +113,8 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
         $result = $mongoDb->updateOne($collectionName, ['groupId' => 1, 'name' => 'Alice'], ['$set' => ['groupId' => 4]]);
         $this->assertSame(1, $result);
+        $result = $mongoDb->updateOne($collectionName, ['groupId' => 4, 'name' => 'Alice'], ['$set' => ['groupId' => 4]]);
+        $this->assertSame(1, $result);
         $this->assertSame(['_id' => 2, 'name' => 'Alice', 'groupId' => 4], $mongoDb->findOne($collectionName, ['_id' => 2]));
 
         $result = $mongoDb->updateOne($collectionName, ['groupId' => 1], ['$set' => ['groupId' => 4]]);
@@ -148,6 +150,9 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
         $result = $mongoDb->updateMany($collectionName, ['groupId' => 1], ['$set' => ['groupId' => 4]]);
         $this->assertSame(0, $result);
+
+        $result = $mongoDb->updateMany($collectionName, null, ['$set' => ['groupId' => 5]]);
+        $this->assertSame(3, $result);
 
         $result = $mongoDb->updateMany($collectionName, null, ['$set' => ['groupId' => 5]]);
         $this->assertSame(3, $result);
