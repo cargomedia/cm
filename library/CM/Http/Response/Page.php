@@ -132,6 +132,13 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
                 $request->setUri($this->getRedirectUrl());
                 return true;
             }
+            if ($this instanceof CM_Http_Response_Page_Embed) {
+                if ($this->_layoutContext && get_class($this->_layoutContext) !== get_class($page->getLayout($environment))) {
+                    $this->_forceReload();
+                    $this->redirectUrl($this->getRender()->getUrl($request->getPath()));
+                    return true;
+                }
+            }
             if ($page->getCanTrackPageView()) {
                 $this->getRender()->getServiceManager()->getTrackings()->trackPageView($environment, $result->getPathTracking());
             }
