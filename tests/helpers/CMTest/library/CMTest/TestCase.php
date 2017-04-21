@@ -79,9 +79,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         );
         $configuration = array_merge($defaultConfiguration, (array) $configuration);
 
-        $mockClassname = $classname . '_Mock' . $type . '_' . uniqid();
-        $site = $this->getMockForAbstractClass($classname, array(), $mockClassname, true, true, true, $methods);
-        $siteClassName = get_class($site);
+        $siteClassName = $classname . '_Mock' . $type . '_' . uniqid();
+
         $config->CM_Site_Abstract->types[$type] = $siteClassName;
         $config->$siteClassName = new stdClass;
         $config->$siteClassName->type = $type;
@@ -90,6 +89,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         }
         $config->CM_Class_Abstract->typesMaxValue = $type;
 
+        $site = $this->getMockForAbstractClass($classname, array(), $siteClassName, true, true, true, $methods);
         return $site;
     }
 
