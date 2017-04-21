@@ -2,9 +2,12 @@
 
 class CM_Clockwork_Storage_MongoDBTest extends CMTest_TestCase {
 
+    public function tearDown() {
+        CMTest_TH::clearEnv();
+    }
+
     public function testDataStorage() {
         $defaultTimeZoneBackup = date_default_timezone_get();
-        $this->getServiceManager()->getMongoDb()->createCollection('clockwork');
 
         $storage = new CM_Clockwork_Storage_MongoDB('example');
         $event1 = new CM_Clockwork_Event('foo', '1sec');
@@ -33,8 +36,25 @@ class CM_Clockwork_Storage_MongoDBTest extends CMTest_TestCase {
         date_default_timezone_set($defaultTimeZoneBackup);
     }
 
+    public function testMongoClientUpdateRegression() {
+        $storage = new CM_Clockwork_Storage_MongoDB('example');
+        $event = new CM_Clockwork_Event('foo', '1sec');
+        $this->_assertSameStatus(new CM_Clockwork_Event_Status(), $storage->getStatus($event));
+        $status1 = (new CM_Clockwork_Event_Status())->setLastStartTime(DateTime::createFromFormat('U', time()));
+        $storage->setStatus($event, $status1);
+        $storage->setStatus($event, $status1);
+        $storage->fetchData();
+        $this->_assertSameStatus($status1, $storage->getStatus($event));
+        $status2 = (new CM_Clockwork_Event_Status())->setLastStartTime(DateTime::createFromFormat('U', time() + 1000));
+        $storage->setStatus($event, $status2);
+        $storage->fetchData();
+        $actual = $storage->getStatus($event);
+        $this->_assertSameStatus($status2, $actual);
+    }
+
     protected function _assertSameStatus(CM_Clockwork_Event_Status $expected, CM_Clockwork_Event_Status $actual) {
         $this->assertEquals($expected->getLastRuntime(), $actual->getLastRuntime());
+        $this->assertEquals($expected->getLastStartTime(), $actual->getLastStartTime());
         $this->assertSame($expected->isRunning(), $actual->isRunning());
     }
 }
