@@ -40,12 +40,15 @@ class CM_Clockwork_Storage_MongoDBTest extends CMTest_TestCase {
         $storage = new CM_Clockwork_Storage_MongoDB('example');
         $event = new CM_Clockwork_Event('foo', '1sec');
         $this->_assertSameStatus(new CM_Clockwork_Event_Status(), $storage->getStatus($event));
-        $status1 = (new CM_Clockwork_Event_Status())->setLastStartTime(DateTime::createFromFormat('U', time()));
+        $lastStartTime = DateTime::createFromFormat('U', time());
+        $status1 = (new CM_Clockwork_Event_Status())->setLastStartTime($lastStartTime);
         $storage->setStatus($event, $status1);
         $storage->setStatus($event, $status1);
         $storage->fetchData();
         $this->_assertSameStatus($status1, $storage->getStatus($event));
-        $status2 = (new CM_Clockwork_Event_Status())->setLastStartTime(DateTime::createFromFormat('U', time() + 1000));
+
+        $lastStartTime->modify('1000 seconds');
+        $status2 = (new CM_Clockwork_Event_Status())->setLastStartTime($lastStartTime);
         $storage->setStatus($event, $status2);
         $storage->fetchData();
         $actual = $storage->getStatus($event);
