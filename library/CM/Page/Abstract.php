@@ -47,7 +47,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
     public static final function getClassnameByPath(CM_Frontend_Render $render, $path) {
         $path = (string) $path;
 
-        $path = preg_replace('!//!', '/', $path);
+        $path = preg_replace('!/+!', '/', $path);
         $pathTokens = explode('/', $path);
         array_shift($pathTokens);
 

@@ -27,14 +27,14 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
         $this->assertEquals('Foo_Page_Test', CM_Page_Abstract::getClassnameByPath($render, '/test'));
     }
 
-    public function testGetClassnamebyPathWithDoubleSlashes() {
+    public function testGetClassnamebyPathWithMultipleSlashes() {
         /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $site */
         $site = $this->mockObject(CM_Site_Abstract::class);
         $site->mockMethod('getModules')->set(['Foo']);
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
 
-        $this->getMockForAbstractClass(CM_Page_Abstract::class, array(), 'Foo_Page_Bar_Test', false);
-        $this->assertEquals('Foo_Page_Bar_Test', CM_Page_Abstract::getClassnameByPath($render, '/bar//test'));
+        new \Mocka\ClassMock('Foo_Page_Foo_Bar_Test', CM_Page_Abstract::class);
+        $this->assertEquals('Foo_Page_Foo_Bar_Test', CM_Page_Abstract::getClassnameByPath($render, '//foo///bar///////test'));
     }
 
     /**
