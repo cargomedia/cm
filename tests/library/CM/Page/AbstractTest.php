@@ -27,6 +27,16 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
         $this->assertEquals('Foo_Page_Test', CM_Page_Abstract::getClassnameByPath($render, '/test'));
     }
 
+    public function testGetClassnamebyPathWithDoubleSlashes() {
+        /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $site */
+        $site = $this->mockObject(CM_Site_Abstract::class);
+        $site->mockMethod('getModules')->set(['Foo']);
+        $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
+
+        $this->getMockForAbstractClass(CM_Page_Abstract::class, array(), 'Foo_Page_Bar_Test', false);
+        $this->assertEquals('Foo_Page_Bar_Test', CM_Page_Abstract::getClassnameByPath($render, '/bar//test'));
+    }
+
     /**
      * @expectedException CM_Exception_Invalid
      * @expectedExceptionMessage The class was not found in any namespace.
