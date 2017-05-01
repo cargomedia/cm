@@ -9,15 +9,21 @@
   overflow: hidden;
   padding-left: 10px;
   padding-right: 10px;
+  text-align: left;
   transition: border-color .1s;
   width: 100%;
 }
 
-textarea.textinput {
-  height: @heightInputTextarea;
+.textarea.textinput {
+  height: auto;
+  line-height: @fontSize*@fontLineHeight;
+  min-height: @heightInputText;
+  max-height: @maxHeightInputTextarea;
+  padding-bottom: ((@heightInputText - @fontSize*@fontLineHeight) / 2) - 1px;
+  padding-top: ((@heightInputText - @fontSize*@fontLineHeight) / 2) - 1px;
   overflow: auto;
-  padding-top: (@heightInputText - @fontSize*@fontLineHeight) / 2;
   resize: vertical;
+  word-break: break-all;
 }
 
 .input_focus {

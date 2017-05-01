@@ -48,6 +48,7 @@ class CM_Db_Statement {
                     'tries'                    => $try,
                     'originalExceptionMessage' => $e->getMessage(),
                     'query'                    => $this->_pdoStatement->queryString,
+                    'parameters'               => $parameters,
                 ]);
             }
         }

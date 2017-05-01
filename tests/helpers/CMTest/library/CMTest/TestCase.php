@@ -639,6 +639,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         if ($actual instanceof CM_Paging_Abstract) {
             $actual = $actual->getItems();
         }
+        if ($actual instanceof Traversable) {
+            $actual = iterator_to_array(new IteratorIterator($actual));
+        }
         parent::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
     }
 
