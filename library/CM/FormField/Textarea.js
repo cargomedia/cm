@@ -11,6 +11,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
       this.trigger('blur');
     },
     'focus [contenteditable]': function() {
+      this._setCaretToEnd();
       this.trigger('focus');
     },
     'input [contenteditable]': function() {
@@ -111,6 +112,18 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
       this.error(cm.language.get('Too long'));
     } else {
       this.error(null);
+    }
+  },
+
+  _setCaretToEnd: function() {
+    var range, selection;
+    if (document.createRange) {
+      range = document.createRange();
+      range.selectNodeContents(this.getInput().get(0));
+      range.collapse(false);
+      selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
     }
   }
 });
