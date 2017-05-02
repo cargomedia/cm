@@ -68,18 +68,6 @@ abstract class CM_Http_Request_Abstract {
         $uri = CM_Util::sanitizeUtf($uri);
 
         $this->setUri($uri);
-        try {
-            CM_Util::jsonEncode($this->getPath());
-        } catch (CM_Exception_Invalid $e) {
-            $logger = CM_Service_Manager::getInstance()->getLogger();
-            $context = new CM_Log_Context();
-            $context->setExtra([
-                'path'         => unpack('H*', $this->getPath())[1],
-                'originalUri'  => unpack('H*', $originalUri)[1],
-                'sanitizedUri' => unpack('H*', $uri)[1],
-            ]);
-            $logger->warning('Non utf-8 uri path', $context);
-        } // TODO remove after investigation
 
         if ($sessionId = $this->getCookie('sessionId')) {
             $this->setSession(CM_Session::findById($sessionId));
