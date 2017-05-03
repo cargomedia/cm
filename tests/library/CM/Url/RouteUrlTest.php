@@ -22,10 +22,10 @@ class RouteUrlTest extends CMTest_TestCase {
 
         $environment = $this->createEnvironment();
         $url = RouteUrl::create('some-action', ['foo' => 'bar'], $environment);
-        $this->assertSame('http://www.example.com/some-action?foo=bar', (string) $url);
+        $this->assertSame('http://www.example.com/site-42/some-action?foo=bar', (string) $url);
 
         $environment = $this->createEnvironment(null, null, 'de');
         $url = RouteUrl::create('some-action', ['foo' => 'bar'], $environment);
-        $this->assertSame('http://www.example.com/some-action/de?foo=bar', (string) $url);
+        $this->assertSame('http://www.example.com/language-de/site-43/some-action?foo=bar', (string) $url);
     }
 }

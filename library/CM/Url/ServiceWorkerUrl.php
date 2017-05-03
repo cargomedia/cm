@@ -5,30 +5,13 @@ namespace CM\Url;
 use CM_Http_Response_Resource_Javascript_ServiceWorker as HttpResponseServiceWorker;
 use CM_Frontend_Environment;
 
-class ServiceWorkerUrl extends AbstractUrl {
-
-    /** @var string|null */
-    protected $_deployVersion = null;
+class ServiceWorkerUrl extends Url {
 
     public function __construct() {
         parent::__construct('');
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDeployVersion() {
-        return $this->_deployVersion;
-    }
-
-    /**
-     * @param string|null $deployVersion
-     */
-    public function setDeployVersion($deployVersion) {
-        $this->_deployVersion = $deployVersion;
-    }
-
-    public function getUriRelativeComponents() {
+    public function _getSegments() {
         $parts = [
             HttpResponseServiceWorker::PATH_PREFIX_FILENAME,
         ];
@@ -44,7 +27,7 @@ class ServiceWorkerUrl extends AbstractUrl {
             $segments[] = $prefix;
         }
         $segments[] = sprintf('%s.js', implode('-', $parts));
-        return $this->_getPathFromSegments($segments) . $this->_getQueryComponent() . $this->_getFragmentComponent();
+        return $segments;
     }
 
     /**
@@ -54,8 +37,7 @@ class ServiceWorkerUrl extends AbstractUrl {
      */
     public static function create(CM_Frontend_Environment $environment = null, $deployVersion = null) {
         /** @var ServiceWorkerUrl $url */
-        $url = parent::_create('', $environment);
-        $url->setDeployVersion($deployVersion);
+        $url = parent::createWithEnvironment('', $environment, $deployVersion);
         return $url;
     }
 }

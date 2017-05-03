@@ -2,17 +2,27 @@
 
 namespace CM\Url;
 
+use CM_Site_Abstract;
 use CM_Frontend_Environment;
 
-class StaticUrl extends AssetUrl {
+class StaticUrl extends Url {
+
+    public function withSite(CM_Site_Abstract $site) {
+        $url = clone $this;
+        $url->_site = $site;
+        return $url->withBaseUrl($site->getUrlCdn());
+    }
 
     public function getUriRelativeComponents() {
         $query = $this->_getQueryComponent();
         if ($deployVersion = $this->getDeployVersion()) {
             $query .= (!empty($query) ? '&' : '?') . $this->getDeployVersion();
         }
-        $segments = array_merge(['static'], $this->_getPathSegments());
-        return $this->_getPathFromSegments($segments) . $query . $this->_getFragmentComponent();
+        return $this->_getPathFromSegments() . $query . $this->_getFragmentComponent();
+    }
+
+    protected function _getParameterSegments() {
+        return ['static'];
     }
 
     /**
@@ -22,8 +32,8 @@ class StaticUrl extends AssetUrl {
      * @return StaticUrl
      */
     public static function create($url, CM_Frontend_Environment $environment = null, $deployVersion = null) {
-        /** @var StaticUrl $staticUrl */
-        $staticUrl = parent::_create($url, $environment, $deployVersion);
-        return $staticUrl;
+        /** @var StaticUrl $url */
+        $url = parent::createWithEnvironment($url, $environment, $deployVersion);
+        return $url;
     }
 }
