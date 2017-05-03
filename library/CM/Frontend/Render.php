@@ -192,7 +192,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         $cache = $this->_getCache();
         $cacheKey = $this->_getCacheUrlKey($path, null, [get_class($site)]);
         return $cache->get($cacheKey, function () use ($path, $site) {
-            return (string) Url::create((string) $path)->withSite($site);
+            return (string) Url::createWithEnvironment((string) $path)->withSite($site);
         });
     }
 
