@@ -43,6 +43,7 @@ class CMService_GoogleTagManager_ClientTest extends CMTest_TestCase {
     public function testTrackPageViewWithUser() {
         $gtm = new CMService_GoogleTagManager_Client('GTM-123456');
         $viewer = CMTest_TH::createUser();
+        $userId = $viewer->getId();
         $environment = new CM_Frontend_Environment(null, $viewer);
         $gtm->trackPageView($environment, '/');
 
@@ -50,8 +51,8 @@ class CMService_GoogleTagManager_ClientTest extends CMTest_TestCase {
         $js = $gtm->getJs();
         $this->assertContains('"//www.googletagmanager.com/ns.html?id=GTM-123456"', $html);
         $this->assertContains('(window,document,\'script\',\'dataLayer\',\'GTM-123456\')', $html);
-        $this->assertContains('dataLayer.push({"event":"Page View"});', $html);
-        $this->assertSame('dataLayer.push({"event":"Page View"});', $js);
+        $this->assertContains('dataLayer.push({"event":"Page View","username":"user' . $userId . '"});', $html);
+        $this->assertSame('dataLayer.push({"event":"Page View","username":"user' . $userId . '"});', $js);
     }
 
     public function testTrackPageViewWithSplittest() {
@@ -75,6 +76,7 @@ class CMService_GoogleTagManager_ClientTest extends CMTest_TestCase {
     public function testTrackPageViewWithUserAndSplittest() {
         $gtm = new CMService_GoogleTagManager_Client('GTM-123456');
         $viewer = CMTest_TH::createUser();
+        $userId = $viewer->getId();
         $environment = new CM_Frontend_Environment(null, $viewer);
         $splittest = CM_Model_Splittest_User::create('foo3', ['bar3']);
         $splittest->isVariationFixture($viewer, 'bar3');
@@ -85,13 +87,14 @@ class CMService_GoogleTagManager_ClientTest extends CMTest_TestCase {
         $js = $gtm->getJs();
         $this->assertContains('"//www.googletagmanager.com/ns.html?id=GTM-123456"', $html);
         $this->assertContains('(window,document,\'script\',\'dataLayer\',\'GTM-123456\')', $html);
-        $this->assertContains('dataLayer.push({"event":"Page View","Splittest foo3":"bar3"});', $html);
-        $this->assertSame('dataLayer.push({"event":"Page View","Splittest foo3":"bar3"});', $js);
+        $this->assertContains('dataLayer.push({"event":"Page View","Splittest foo3":"bar3","username":"user' . $userId . '"});', $html);
+        $this->assertSame('dataLayer.push({"event":"Page View","Splittest foo3":"bar3","username":"user' . $userId . '"});', $js);
     }
 
     public function testTrackPageViewWithUserAndSeveralSplittests() {
         $gtm = new CMService_GoogleTagManager_Client('GTM-123456');
         $viewer = CMTest_TH::createUser();
+        $userId = $viewer->getId();
         $environment = new CM_Frontend_Environment(null, $viewer);
         $splittest = CM_Model_Splittest_User::create('foo5', ['bar5']);
         $splittest->isVariationFixture($viewer, 'bar5');
@@ -103,8 +106,10 @@ class CMService_GoogleTagManager_ClientTest extends CMTest_TestCase {
         $js = $gtm->getJs();
         $this->assertContains('"//www.googletagmanager.com/ns.html?id=GTM-123456"', $html);
         $this->assertContains('(window,document,\'script\',\'dataLayer\',\'GTM-123456\')', $html);
-        $this->assertContains('dataLayer.push({"event":"Page View","Splittest foo5":"bar5","Splittest foo6":"bar6"});', $html);
-        $this->assertSame('dataLayer.push({"event":"Page View","Splittest foo5":"bar5","Splittest foo6":"bar6"});', $js);
+        $this->assertContains('dataLayer.push({"event":"Page View","Splittest foo5":"bar5","Splittest foo6":"bar6","username":"user' . $userId .
+            '"});', $html);
+        $this->assertSame('dataLayer.push({"event":"Page View","Splittest foo5":"bar5","Splittest foo6":"bar6","username":"user' . $userId .
+            '"});', $js);
     }
 
 }
