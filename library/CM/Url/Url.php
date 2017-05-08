@@ -16,10 +16,16 @@ class Url extends Uri {
     /** @var string|null */
     protected $_prefix = null;
 
+    /**
+     * @return bool
+     */
     public function isRelative() {
         return '' === $this->getScheme() && '' === $this->getHost();
     }
 
+    /**
+     * @return string|null
+     */
     public function getPrefix() {
         if (null === $this->_prefix) {
             return null;
@@ -27,14 +33,23 @@ class Url extends Uri {
         return (string) $this->_prefix;
     }
 
+    /**
+     * @return array|null
+     */
     public function getParams() {
         return $this->_params;
     }
 
+    /**
+     * @return bool
+     */
     public function hasTrailingSlash() {
         return '/' === substr($this->getPath(), -1);
     }
 
+    /**
+     * @return static
+     */
     public function withTrailingSlash() {
         $new = clone $this;
         if (!$new->hasTrailingSlash()) {
@@ -43,6 +58,9 @@ class Url extends Uri {
         return $new;
     }
 
+    /**
+     * @return static
+     */
     public function withoutTrailingSlash() {
         $new = clone $this;
         if ($new->hasTrailingSlash()) {
@@ -61,6 +79,10 @@ class Url extends Uri {
         return $new;
     }
 
+    /**
+     * @param string $prefix
+     * @return static
+     */
     public function withPrefix($prefix) {
         if (null !== $prefix) {
             $prefix = trim($this->filterPath(UriResolver::removeDotSegments($prefix)), '/');
@@ -71,17 +93,26 @@ class Url extends Uri {
         return $url;
     }
 
+    /**
+     * @return static
+     */
     public function withoutPrefix() {
         $url = clone $this;
         $url->_prefix = null;
         return $url;
     }
 
+    /**
+     * @param array $params
+     * @return static
+     */
     public function withParams(array $params) {
         $this->_params = $params;
         $params = CM_Params::encode($this->getParams());
         $query = http_build_query($params);
-        return parent::withQuery($query);
+        /** @var Url $url */
+        $url = parent::withQuery($query);
+        return $url;
     }
 
     public function withQuery($queryString) {
@@ -92,6 +123,10 @@ class Url extends Uri {
         return parent::withQuery($queryString);
     }
 
+    /**
+     * @param $baseUrl
+     * @return static
+     */
     public function withBaseUrl($baseUrl) {
         if (!$baseUrl instanceof BaseUrl) {
             $baseUrl = BaseUrl::create((string) $baseUrl);
@@ -107,16 +142,25 @@ class Url extends Uri {
         return $url;
     }
 
-    public function withRelativeComponentsFrom($url) {
-        if (!$url instanceof UriInterface) {
-            $url = new Uri($url);
+    /**
+     * @param $uri
+     * @return static
+     */
+    public function withRelativeComponentsFrom($uri) {
+        if (!$uri instanceof UriInterface) {
+            $uri = new Uri($uri);
         }
-        return $this
-            ->withPath($url->getPath())
-            ->withQuery($url->getQuery())
-            ->withFragment($url->getFragment());
+        /** @var Url $url */
+        $url = $this
+            ->withPath($uri->getPath())
+            ->withQuery($uri->getQuery())
+            ->withFragment($uri->getFragment());
+        return $url;
     }
 
+    /**
+     * @return static
+     */
     public function withoutRelativeComponents() {
         $url = $this;
         $url->path = null;
@@ -125,6 +169,9 @@ class Url extends Uri {
         return $url;
     }
 
+    /**
+     * @return string
+     */
     public function getUriBaseComponents() {
         $baseUrl = sprintf('%s://%s', $this->getScheme(), $this->getAuthority());
         if ($prefix = $this->getPrefix()) {
@@ -200,6 +247,9 @@ class Url extends Uri {
         return $path;
     }
 
+    /**
+     * @param string $segment
+     */
     protected function _dropPathSegment($segment) {
         $filteredSegments = Functional\reject($this->getPathSegments(), function ($value) use ($segment) {
             return $segment === $value;
