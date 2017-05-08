@@ -3,15 +3,11 @@
 namespace CM\Url;
 
 use CM_Params;
-use CM_Site_Abstract;
-use CM_Frontend_Environment;
-use CM_Model_Language;
-
 use Psr\Http\Message\UriInterface;
 use GuzzleHttp\Psr7\UriResolver;
 use CM\Url\Vendor\Uri;
 
-class Url extends Uri implements UrlInterface {
+class Url extends Uri {
 
     /** @var array|null */
     protected $_params = null;
@@ -19,60 +15,8 @@ class Url extends Uri implements UrlInterface {
     /** @var string|null */
     protected $_prefix = null;
 
-    /** @var CM_Model_Language|null */
-    protected $_language = null;
-
-    /** @var CM_Site_Abstract|null */
-    protected $_site = null;
-
-    /** @var string|null */
-    protected $_deployVersion = null;
-
     public function isRelative() {
         return '' === $this->getScheme() && '' === $this->getHost();
-    }
-
-    public function getLanguage() {
-        return $this->_language;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getLanguageSegment() {
-        return null;
-    }
-
-    public function getSite() {
-        return $this->_site;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getSiteSegment() {
-        return null;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDeployVersion() {
-        return $this->_deployVersion;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDeployVersionSegment() {
-        return null;
-    }
-
-    /**
-     * @param string|null $deployVersion
-     */
-    public function setDeployVersion($deployVersion) {
-        $this->_deployVersion = $deployVersion;
     }
 
     public function getPrefix() {
@@ -114,18 +58,6 @@ class Url extends Uri implements UrlInterface {
         $new = clone $this;
         $new->path = UriResolver::removeDotSegments($path);
         return $new;
-    }
-
-    public function withSite(CM_Site_Abstract $site) {
-        $url = clone $this;
-        $url->_site = $site;
-        return $url->withBaseUrl($site->getUrl());
-    }
-
-    public function withLanguage(CM_Model_Language $language) {
-        $url = clone $this;
-        $url->_language = $language;
-        return $url;
     }
 
     public function withPrefix($prefix) {
@@ -192,14 +124,6 @@ class Url extends Uri implements UrlInterface {
         return $url;
     }
 
-    public function withEnvironment(CM_Frontend_Environment $environment) {
-        $url = clone $this;
-        if ($language = $environment->getLanguage()) {
-            $url = $url->withLanguage($language);
-        }
-        return $url->withSite($environment->getSite());
-    }
-
     public function getUriBaseComponents() {
         $baseUrl = sprintf('%s://%s', $this->getScheme(), $this->getAuthority());
         if ($prefix = $this->getPrefix()) {
@@ -232,26 +156,8 @@ class Url extends Uri implements UrlInterface {
         }
         return array_merge(
             $segments,
-            $this->_getParameterSegments(),
             explode('/', $this->path)
         );
-    }
-
-    /**
-     * @return array
-     */
-    protected function _getParameterSegments() {
-        $segments = [];
-        if ($languageSegment = $this->getLanguageSegment()) {
-            $segments[] = $languageSegment;
-        }
-        if ($siteSegment = $this->getSiteSegment()) {
-            $segments[] = $siteSegment;
-        }
-        if ($versionSegment = $this->getDeployVersionSegment()) {
-            $segments[] = $versionSegment;
-        }
-        return $segments;
     }
 
     /**
@@ -284,6 +190,14 @@ class Url extends Uri implements UrlInterface {
             $path .= '/';
         }
         return $path;
+    }
+
+    protected function _dropPathSegment($segment) {
+        $segments = $this->_filterPathSegments(explode($this->getPath(), '/'));
+        $filteredSegments = Functional\reject($segments, function ($value) use ($segment) {
+            return $segment === $value;
+        });
+        $this->_path = implode('/', $filteredSegments);
     }
 
     /**
@@ -344,18 +258,12 @@ class Url extends Uri implements UrlInterface {
     }
 
     /**
-     * @param string                       $url
-     * @param CM_Frontend_Environment|null $environment
-     * @param string|null                  $deployVersion
+     * @param string $url
      * @return Url
      */
-    public static function createWithEnvironment($url, CM_Frontend_Environment $environment = null, $deployVersion = null) {
+    public static function createFromString($url) {
         /** @var Url $url */
         $url = new static($url);
-        $url->setDeployVersion($deployVersion);
-        if ($environment) {
-            $url = $url->withEnvironment($environment);
-        }
         return $url;
     }
 }
