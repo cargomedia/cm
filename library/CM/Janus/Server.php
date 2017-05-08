@@ -41,8 +41,8 @@ class CM_Janus_Server implements JsonSerializable {
         }
         $this->_id = (int) $serverId;
         $this->_key = (string) $key;
-        $this->_httpAddress = Url::create((string) $httpAddress);
-        $this->_webSocketAddress = WsUrl::create((string) $webSocketAddress);
+        $this->_httpAddress = new Url((string) $httpAddress);
+        $this->_webSocketAddress = new WsUrl((string) $webSocketAddress);
         $this->_pluginList = array_map(function ($plugin) {
             return (string) $plugin;
         }, $pluginList);
