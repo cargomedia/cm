@@ -1,10 +1,9 @@
 <?php
 
 use CM\Url\Url;
-use CM\Url\RouteUrl;
+use CM\Url\AppUrl;
 use CM\Url\ServiceWorkerUrl;
 use CM\Url\ResourceUrl;
-use CM\Url\StaticUrl;
 
 class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
 
@@ -252,8 +251,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             'user'     => $mail->getRecipient()->getId(),
             'mailType' => $mail->getType(),
         ];
-        $url = RouteUrl::create('emailtracking', $params, $environment);
-        return (string) $url;
+        return (string) AppUrl::createWithEnvironment('emailtracking', $environment)->withParams($params);
     }
 
     /**
@@ -262,15 +260,17 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
      * @return string
      */
     public function getUrlStatic($path = null, CM_Site_Abstract $site = null) {
-        $deployVersion = null;
-        if (null !== $path) {
-            $deployVersion = CM_App::getInstance()->getDeployVersion();
-        }
         $environment = clone $this->getEnvironment();
         if (null !== $site) {
             $environment->setSite($site);
         }
-        return (string) StaticUrl::create((string) $path, $environment, $deployVersion);
+        $url = Url::createWithEnvironment($path, $environment)
+            ->withBaseUrl($environment->getSite()->getUrlCdn())
+            ->withPrefix('static');
+        if (null !== $path) {
+            $url = $url->withQuery(CM_App::getInstance()->getDeployVersion());
+        }
+        return (string) $url;
     }
 
     /**

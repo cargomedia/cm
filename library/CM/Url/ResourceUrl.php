@@ -5,7 +5,7 @@ namespace CM\Url;
 use CM_Site_Abstract;
 use CM_Frontend_Environment;
 
-class ResourceUrl extends Url {
+class ResourceUrl extends AppUrl {
 
     /** @var string */
     protected $_type;

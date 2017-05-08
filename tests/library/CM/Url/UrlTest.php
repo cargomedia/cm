@@ -8,7 +8,7 @@ use CM\Url\BaseUrl;
 use CM\Url\Url;
 use JsonSerializable;
 
-class AbstractUrlTest extends CMTest_TestCase {
+class UrlTest extends CMTest_TestCase {
 
     public function tearDown() {
         CMTest_TH::clearEnv();
@@ -51,19 +51,19 @@ class AbstractUrlTest extends CMTest_TestCase {
         $url = Url::createWithEnvironment('/bar?foobar=1', $environment);
         $this->assertSame(null, $url->getPrefix());
         $this->assertSame(null, $url->getLanguage());
-        $this->assertSame('http://www.example.com/site-42/bar?foobar=1', (string) $url);
+        $this->assertSame('http://www.example.com/bar?foobar=1', (string) $url);
 
         $environment = $this->createEnvironment(['url' => 'http://www.example.com/prefix?param']);
         $url = Url::createWithEnvironment('/bar?foobar=1', $environment);
         $this->assertSame('prefix', $url->getPrefix());
         $this->assertSame(null, $url->getLanguage());
-        $this->assertSame('http://www.example.com/prefix/site-43/bar?foobar=1', (string) $url);
+        $this->assertSame('http://www.example.com/prefix/bar?foobar=1', (string) $url);
 
         $environment = $this->createEnvironment(['url' => 'http://www.example.com/prefix?param'], null, 'de');
         $url = Url::createWithEnvironment('/bar?foobar=1', $environment);
         $this->assertSame('prefix', $url->getPrefix());
         $this->assertSame($environment->getLanguage(), $url->getLanguage());
-        $this->assertSame('http://www.example.com/prefix/language-de/site-44/bar?foobar=1', (string) $url);
+        $this->assertSame('http://www.example.com/prefix/bar?foobar=1', (string) $url);
     }
 
     public function testTrailingSlash() {
@@ -156,7 +156,7 @@ class AbstractUrlTest extends CMTest_TestCase {
         $this->assertSame(null, $url->getLanguage());
         $this->assertSame('/bar?foobar=1', (string) $url);
         $this->assertSame($language, $urlWithLanguage->getLanguage());
-        $this->assertSame('/language-de/bar?foobar=1', (string) $urlWithLanguage);
+        $this->assertSame('/bar?foobar=1', (string) $urlWithLanguage);
     }
 
     public function testWithBaseUrl() {
@@ -202,18 +202,18 @@ class AbstractUrlTest extends CMTest_TestCase {
         $this->assertSame('/bar?foobar=1', (string) $url);
         $this->assertSame($environment->getSite(), $urlWithEnvironment->getSite());
         $this->assertSame(null, $urlWithEnvironment->getLanguage());
-        $this->assertSame('http://www.example.com/site-42/bar?foobar=1', (string) $urlWithEnvironment);
+        $this->assertSame('http://www.example.com/bar?foobar=1', (string) $urlWithEnvironment);
 
         $environment = $this->createEnvironment(null, null, 'de');
         $urlWithEnvironmentAndLanguage = $url->withEnvironment($environment);
         $this->assertSame($environment->getSite(), $urlWithEnvironmentAndLanguage->getSite());
         $this->assertSame($environment->getLanguage(), $urlWithEnvironmentAndLanguage->getLanguage());
-        $this->assertSame('http://www.example.com/language-de/site-43/bar?foobar=1', (string) $urlWithEnvironmentAndLanguage);
+        $this->assertSame('http://www.example.com/bar?foobar=1', (string) $urlWithEnvironmentAndLanguage);
 
         $urlWithEnvironmentPreserved = $urlWithEnvironmentAndLanguage->withPath('/baz');
         $this->assertSame($environment->getSite(), $urlWithEnvironmentPreserved->getSite());
         $this->assertSame($environment->getLanguage(), $urlWithEnvironmentPreserved->getLanguage());
-        $this->assertSame('http://www.example.com/language-de/site-43/baz?foobar=1', (string) $urlWithEnvironmentPreserved);
+        $this->assertSame('http://www.example.com/baz?foobar=1', (string) $urlWithEnvironmentPreserved);
     }
 
     public function testWithRelativeComponentsFrom() {

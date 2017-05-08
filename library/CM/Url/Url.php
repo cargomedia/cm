@@ -40,8 +40,7 @@ class Url extends Uri implements UrlInterface {
      * @return null|string
      */
     public function getLanguageSegment() {
-        $language = $this->getLanguage();
-        return $language ? 'language-' . $language->getAbbreviation() : null;
+        return null;
     }
 
     public function getSite() {
@@ -52,8 +51,7 @@ class Url extends Uri implements UrlInterface {
      * @return null|string
      */
     public function getSiteSegment() {
-        $site = $this->getSite();
-        return $site ? 'site-' . $site->getId() : null;
+        return null;
     }
 
     /**
@@ -67,8 +65,7 @@ class Url extends Uri implements UrlInterface {
      * @return string|null
      */
     public function getDeployVersionSegment() {
-        $version = $this->getDeployVersion();
-        return $version ? 'version-' . $version : null;
+        return null;
     }
 
     /**
@@ -155,6 +152,7 @@ class Url extends Uri implements UrlInterface {
     }
 
     public function withQuery($queryString) {
+        $queryString = (string) $queryString;
         $params = [];
         parse_str($queryString, $params);
         $this->_params = $params;

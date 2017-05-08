@@ -1,6 +1,6 @@
 <?php
 
-use CM\Url\RouteUrl;
+use CM\Url\AppUrl;
 
 abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_Service_ManagerAwareInterface {
 
@@ -220,7 +220,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             'host' => $site->getHost(),
         ];
         $environment = new CM_Frontend_Environment($site);
-        $url = (string) RouteUrl::create('form', null, $environment);
+        $url = (string) AppUrl::createWithEnvironment('form', $environment);
         return $this->createRequest($url, $query, $headers, $scopeView, $scopeComponent);
     }
 
@@ -269,7 +269,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             'host' => $site->getHost(),
         ];
         $environment = new CM_Frontend_Environment($site);
-        $url = (string) RouteUrl::create('ajax', null, $environment);
+        $url = (string) AppUrl::createWithEnvironment('ajax', $environment);
         return $this->createRequest($url, $query, $headers, $viewResponse, $componentResponse);
     }
 
