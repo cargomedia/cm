@@ -3,7 +3,6 @@
 use CM\Url\Url;
 use CM\Url\AppUrl;
 use CM\Url\ServiceWorkerUrl;
-use CM\Url\ResourceUrl;
 
 class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_ManagerAwareInterface {
 
@@ -188,7 +187,8 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         if (null === $site) {
             $site = $this->getEnvironment()->getSite();
         }
-        return (string) Url::createWithEnvironment((string) $path)->withSite($site);
+        $url = new Url((string) $path);
+        return (string) $url->withBaseUrl($site->getUrl());
     }
 
     /**
@@ -225,7 +225,12 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         if (null !== $site) {
             $environment->setSite($site);
         }
-        return (string) ResourceUrl::create($path, $type, $environment, $deployVersion);
+        $url = new AppUrl($path);
+        $url->setDeployVersion($deployVersion);
+        return (string) $url
+            ->prependPath($type)
+            ->withSite($environment->getSite())
+            ->withBaseUrl($environment->getSite()->getUrlCdn());
     }
 
     /**
@@ -264,7 +269,8 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
         if (null !== $site) {
             $environment->setSite($site);
         }
-        $url = Url::createWithEnvironment($path, $environment)
+        $url = new Url($path);
+        $url = $url
             ->withBaseUrl($environment->getSite()->getUrlCdn())
             ->withPrefix('static');
         if (null !== $path) {

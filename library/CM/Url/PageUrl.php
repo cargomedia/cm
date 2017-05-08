@@ -2,7 +2,7 @@
 
 namespace CM\Url;
 
-class PageUrl extends Url {
+class PageUrl extends AppUrl {
 
     public function getLanguageSegment() {
         $language = $this->getLanguage();

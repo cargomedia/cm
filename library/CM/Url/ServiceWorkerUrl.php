@@ -5,7 +5,7 @@ namespace CM\Url;
 use CM_Http_Response_Resource_Javascript_ServiceWorker as HttpResponseServiceWorker;
 use CM_Frontend_Environment;
 
-class ServiceWorkerUrl extends Url {
+class ServiceWorkerUrl extends AppUrl {
 
     public function __construct() {
         parent::__construct('');
