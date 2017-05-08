@@ -31,4 +31,14 @@ class ServiceWorkerUrlTest extends CMTest_TestCase {
         $url = ServiceWorkerUrl::create($environment, 123);
         $this->assertSame('http://www.example.com/prefix/serviceworker-de-123.js', (string) $url);
     }
+
+    public function testMatchUri() {
+        $this->assertSame(true, ServiceWorkerUrl::matchUri('serviceworker.js'));
+        $this->assertSame(true, ServiceWorkerUrl::matchUri('serviceworker-foo-bar.js'));
+        $this->assertSame(true, ServiceWorkerUrl::matchUri('http://example.com/serviceworker.js?foo=bar#fragment'));
+        $this->assertSame(true, ServiceWorkerUrl::matchUri('http://example.com/prefix/serviceworker.js?foo=bar#fragment'));
+        $this->assertSame(false, ServiceWorkerUrl::matchUri('service.js'));
+        $this->assertSame(false, ServiceWorkerUrl::matchUri('serviceworker/foo.js'));
+        $this->assertSame(false, ServiceWorkerUrl::matchUri('serviceworker foo.js'));
+    }
 }

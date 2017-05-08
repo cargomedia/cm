@@ -40,4 +40,12 @@ class ServiceWorkerUrl extends AppUrl {
         $url = parent::createWithEnvironment('', $environment, $deployVersion);
         return $url;
     }
+
+    /**
+     * @param string $uri
+     * @return bool
+     */
+    public static function matchUri($uri) {
+        return !!preg_match('/' . HttpResponseServiceWorker::PATH_PREFIX_FILENAME . '([^ \.\/]+)?\.js/', $uri);
+    }
 }

@@ -21,7 +21,7 @@ class AppUrl extends Url {
 
     /**
      * @param CM_Frontend_Environment $environment
-     * @return AppUrl
+     * @return static
      */
     public function withEnvironment(CM_Frontend_Environment $environment) {
         $url = clone $this;
@@ -33,7 +33,7 @@ class AppUrl extends Url {
 
     /**
      * @param CM_Model_Language $language
-     * @return AppUrl
+     * @return static
      */
     public function withLanguage(CM_Model_Language $language) {
         $url = clone $this;
@@ -42,7 +42,7 @@ class AppUrl extends Url {
     }
 
     /**
-     * @return AppUrl
+     * @return static
      */
     public function parseParameters() {
         /** @var AppUrl $url */
@@ -53,7 +53,7 @@ class AppUrl extends Url {
     }
 
     /**
-     * @return AppUrl
+     * @return static
      */
     public function parseLanguage() {
         $language = null;
@@ -86,7 +86,7 @@ class AppUrl extends Url {
 
     /**
      * @param CM_Site_Abstract $site
-     * @return AppUrl
+     * @return static
      */
     public function withSite(CM_Site_Abstract $site) {
         $url = clone $this;
@@ -95,7 +95,7 @@ class AppUrl extends Url {
     }
 
     /**
-     * @return AppUrl
+     * @return static
      */
     public function parseSite() {
         $siteFactory = new CM_Site_SiteFactory();
@@ -137,7 +137,7 @@ class AppUrl extends Url {
     }
 
     /**
-     * @return AppUrl
+     * @return static
      */
     public function parseDeployVersion() {
         $version = null;
@@ -206,9 +206,16 @@ class AppUrl extends Url {
      * @return static
      */
     public static function createFromString($uri) {
-        /** @var Url $url */
-        $url = new self(CM_Util::sanitizeUtf((string) $uri));
+        $url = new static(CM_Util::sanitizeUtf((string) $uri));
         return $url->parseParameters();
+    }
+
+    /**
+     * @param string $uri
+     * @return bool
+     */
+    public static function matchUri($uri) {
+        return !!preg_match('/\/site-[0-9]+\//', $uri);
     }
 
     /**
