@@ -7,7 +7,6 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
 
   events: {
     'blur [contenteditable]': function() {
-      window.getSelection().removeAllRanges();
       this.trigger('blur');
     },
     'focus [contenteditable]': function() {
