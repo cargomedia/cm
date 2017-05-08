@@ -48,6 +48,9 @@ EOF;
                 $this->_setDataLayerVariable('Splittest ' . $variationData['splittest'], $variationData['variation']);
             }
         }
+        if ($viewer = $environment->getViewer()) {
+            $this->_setDataLayerVariable('username', $viewer->getDisplayName());
+        }
     }
 
     public function trackSplittest(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
