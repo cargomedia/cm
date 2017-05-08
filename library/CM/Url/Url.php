@@ -80,6 +80,28 @@ class Url extends Uri {
     }
 
     /**
+     * @param $path
+     * @return static
+     */
+    public function appendPath($path) {
+        $path = $this->filterPath($this->getPath() . '/' . $path);
+        $new = clone $this;
+        $new->path = UriResolver::removeDotSegments($path);
+        return $new;
+    }
+
+    /**
+     * @param $path
+     * @return static
+     */
+    public function prependPath($path) {
+        $path = $this->filterPath($path . '/' . $this->getPath());
+        $new = clone $this;
+        $new->path = UriResolver::removeDotSegments($path);
+        return $new;
+    }
+
+    /**
      * @param string $prefix
      * @return static
      */
@@ -186,6 +208,12 @@ class Url extends Uri {
 
     public function __toString() {
         return $this->getSchemeSpecificPart();
+    }
+
+    protected function filterPath($path) {
+        $path = parent::filterPath($path);
+        $segments = $this->_filterPathSegments(explode('/', $path));
+        return '/' . implode('/', $segments) . ('/' === substr($path, -1) ? '/' : '');
     }
 
     /**

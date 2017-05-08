@@ -53,6 +53,22 @@ class UrlTest extends CMTest_TestCase {
         $this->assertSame('/foo/?bar=1', (string) $url);
     }
 
+    public function testAppendPath() {
+        $url = new Url('foo');
+        $this->assertSame('/foo', $url->getPath());
+        $this->assertSame('/foo/bar', $url->appendPath('bar')->getPath());
+        $this->assertSame('/foo/bar', $url->appendPath('/.//bar')->getPath());
+        $this->assertSame('/bar/', $url->appendPath('/..//bar/')->getPath());
+    }
+
+    public function testPrependPath() {
+        $url = new Url('foo');
+        $this->assertSame('/foo', $url->getPath());
+        $this->assertSame('/bar/foo', $url->prependPath('bar')->getPath());
+        $this->assertSame('/bar/foo', $url->prependPath('/.//bar/.')->getPath());
+        $this->assertSame('/foo', $url->prependPath('/.//bar//../')->getPath());
+    }
+
     public function testWithPrefix() {
         $url = new Url('/path?foo=1#bar');
         $this->assertSame(null, $url->getPrefix());
