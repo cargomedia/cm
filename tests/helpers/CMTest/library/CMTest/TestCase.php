@@ -1,5 +1,7 @@
 <?php
 
+use CM\Url\RouteUrl;
+
 abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_Service_ManagerAwareInterface {
 
     use \Mocka\MockaTrait;
@@ -10,17 +12,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     protected $backupGlobalsBlacklist = ['bootloader'];
 
     public function runBare() {
-        if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
-            $siteDefault = $this->getMockSite(null, null, array(
-                'url'          => 'http://www.default.dev',
-                'urlCdn'       => 'http://cdn.default.dev',
-                'name'         => 'Default',
-                'emailAddress' => 'default@default.dev',
-            ));
-            CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
-        }
-
         $this->setServiceManager(CMTest_TH::getServiceManager());
+        $this->_createMockSiteDefault();
         parent::runBare();
     }
 
@@ -80,7 +73,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $methods = (array) $methods;
         $defaultConfiguration = array(
             'url'          => 'http://www.example.com',
-            'urlCdn'       => null,
+            'urlCdn'       => 'http://cdn.example.com',
             'name'         => 'Example site',
             'emailAddress' => 'hello@example.com',
         );
@@ -101,6 +94,51 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     }
 
     /**
+     * @param array|null                $siteConfig
+     * @param CM_Model_User|null        $viewer
+     * @param string|null               $languageAbbreviation
+     * @param DateTimeZone|null         $timeZone
+     * @param bool|null                 $debug
+     * @param CM_Model_Location|null    $location
+     * @param CM_Model_Currency|null    $currency
+     * @param CM_Http_ClientDevice|null $clientDevice
+     * @return CM_Frontend_Environment
+     */
+    public function createEnvironment(
+        array $siteConfig = null,
+        CM_Model_User $viewer = null,
+        $languageAbbreviation = null,
+        DateTimeZone $timeZone = null,
+        $debug = null,
+        CM_Model_Location $location = null,
+        CM_Model_Currency $currency = null,
+        CM_Http_ClientDevice $clientDevice = null
+    ) {
+
+        $siteArgs = [
+            'classname' => null,
+            'type'      => null,
+            'methods'   => null,
+        ];
+        foreach ($siteArgs as $name => $value) {
+            if (isset($siteConfig[$name])) {
+                $siteArgs[$name] = $siteConfig[$name];
+                unset($siteConfig[$name]);
+            }
+        }
+        $site = $this->getMockSite($siteArgs['classname'], $siteArgs['type'], (array) $siteConfig, $siteArgs['methods']);
+
+        $language = null;
+        if ($languageAbbreviation) {
+            $language = CM_Model_Language::findByAbbreviation($languageAbbreviation);
+            if (!$language) {
+                $language = CMTest_TH::createLanguage($languageAbbreviation);
+            }
+        }
+        return new CM_Frontend_Environment($site, $viewer, $language, $timeZone, $debug, $location, $currency, $clientDevice);
+    }
+
+    /**
      * @param string                        $url
      * @param array|null                    $query
      * @param array|null                    $headers
@@ -113,7 +151,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $url = (string) $url;
         $query = (array) $query;
         if (!$headers) {
-            $site = CM_Site_Abstract::factory();
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();
             $headers = array('host' => $site->getHost());
         }
         $getViewInfo = function (CM_Frontend_ViewResponse $viewResponse) {
@@ -176,12 +214,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
             'actionName' => $actionName,
         );
         if (null === $site) {
-            $site = CM_Site_Abstract::factory();
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();
         }
         $headers = [
             'host' => $site->getHost(),
         ];
-        return $this->createRequest($site->getUrl() . '/form', $query, $headers, $scopeView, $scopeComponent);
+        $environment = new CM_Frontend_Environment($site);
+        $url = (string) RouteUrl::create('form', null, $environment);
+        return $this->createRequest($url, $query, $headers, $scopeView, $scopeComponent);
     }
 
     /**
@@ -223,12 +263,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         );
 
         if (null === $site) {
-            $site = CM_Site_Abstract::factory();
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();;
         }
         $headers = [
             'host' => $site->getHost(),
         ];
-        return $this->createRequest($site->getUrl() . '/ajax', $query, $headers, $viewResponse, $componentResponse);
+        $environment = new CM_Frontend_Environment($site);
+        $url = (string) RouteUrl::create('ajax', null, $environment);
+        return $this->createRequest($url, $query, $headers, $viewResponse, $componentResponse);
     }
 
     /**
@@ -260,7 +302,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @return CM_Http_Response_View_Ajax
      */
     public function getResponseAjax(CM_View_Abstract $view, $methodName, array $params = null, CM_Frontend_Environment $environment = null) {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $request = $this->createRequestAjax($view, $methodName, $params, null, null, $site);
         if ($environment) {
             $request->mockMethod('getViewer')->set(function () use ($environment) {
@@ -279,7 +321,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @return CM_Http_Response_View_Form
      */
     public function getResponseFormAction(CM_FormAction_Abstract $action, array $data = null, CM_Frontend_ViewResponse $scopeComponent = null) {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $request = $this->createRequestFormAction($action, $data, $scopeComponent);
         $response = CM_Http_Response_View_Form::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
@@ -296,7 +338,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      */
     public function getResponsePage($path, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
         if (null === $site) {
-            $site = CM_Site_Abstract::factory();
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();
         }
         $request = new CM_Http_Request_Get($path, ['host' => $site->getHost()], null, $viewer);
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
@@ -319,6 +361,17 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $reflectionMethod = $reflectionClass->getMethod($methodName);
         $reflectionMethod->setAccessible(true);
         return $reflectionMethod->invokeArgs($context, $arguments);
+    }
+
+    protected function _createMockSiteDefault() {
+        $config = CM_Config::get();
+        $defaultSite = $this->getMockSite(null, null, [
+            'url'          => 'http://www.default.dev',
+            'urlCdn'       => 'http://cdn.default.dev',
+            'name'         => 'Default',
+            'emailAddress' => 'default@default.dev',
+        ]);
+        $config->CM_Site_Abstract->class = get_class($defaultSite);
     }
 
     /**
@@ -366,9 +419,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      */
     protected function _renderPage(CM_Page_Abstract $page, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
         if (null === $site) {
-            $site = CM_Site_Abstract::factory();
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();
         }
-        $host = parse_url($site->getUrl(), PHP_URL_HOST);
+        $host = $site->getUrl()->getHost();
         $request = new CM_Http_Request_Get('?' . http_build_query($page->getParams()->getParamsEncoded()), ['host' => $host], null, $viewer);
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
         $page->prepareResponse($response->getRender()->getEnvironment(), $response);
@@ -585,6 +638,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         }
         if ($actual instanceof CM_Paging_Abstract) {
             $actual = $actual->getItems();
+        }
+        if ($actual instanceof Traversable) {
+            $actual = iterator_to_array(new IteratorIterator($actual));
         }
         parent::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
     }

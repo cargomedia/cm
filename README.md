@@ -231,7 +231,6 @@ Options:
  --forks=<value>
 
 Commands:
- app deploy
  app fill-caches
  app generate-config-internal
  app set-config <filename> <config-json> [--merge]
@@ -240,8 +239,6 @@ Commands:
  console interactive
  db db-to-file <namespace>
  db file-to-db
- db run-update <version> [--namespace=<value>]
- db run-updates
  frontend generate-favicon
  frontend icon-refresh
  generator bootstrap-project [--project-name=<value>] [--domain=<value>] [--module-name=<value>]
@@ -253,7 +250,6 @@ Commands:
  location outdated [--verbose]
  location upgrade [--without-ip-blocks] [--verbose]
  maintenance start
- maintenance start-local
  media-streams import-archive <stream-channel-media-id> <archive-source>
  media-streams import-video-thumbnail <stream-channel-media-id> <thumbnail-source> <create-stamp>
  message-stream start-synchronization
@@ -262,7 +258,6 @@ Commands:
  search-index create [--index-name=<value>] [--skip-if-exist]
  search-index delete [--index-name=<value>]
  search-index optimize
- search-index start-maintenance
  search-index update [--index-name=<value>]
  ```
 

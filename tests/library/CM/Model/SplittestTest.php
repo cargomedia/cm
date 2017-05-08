@@ -160,6 +160,52 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $this->assertFalse($test->isVariationFixture($fixture, 'noVariation'));
     }
 
+    public function testSetVariationFixture() {
+        $user = CMTest_TH::createUser();
+        $fixture = new CM_Splittest_Fixture($user);
+
+        /** @var CM_Model_Splittest_Mock $test */
+        $test = CM_Model_Splittest_Mock::create('foo1', ['v1', 'v2']);
+        $variation1 = $test->getVariations()->findByName('v1');
+        $variation2 = $test->getVariations()->findByName('v2');
+
+        $test->setVariationFixture($fixture, $variation1);
+        $this->assertTrue($test->isVariationFixture($fixture, 'v1'));
+        $this->assertFalse($test->isVariationFixture($fixture, 'v2'));
+
+        $test->setVariationFixture($fixture, $variation2);
+        $this->assertFalse($test->isVariationFixture($fixture, 'v1'));
+        $this->assertTrue($test->isVariationFixture($fixture, 'v2'));
+    }
+
+    public function testGetVariationDataListFixture() {
+        $user = CMTest_TH::createUser();
+        $fixture = new CM_Splittest_Fixture($user);
+
+        $test1 = CM_Model_Splittest_Mock::create('foo1', ['v1', 'v2', 'v3']);
+        $test2 = CM_Model_Splittest_Mock::create('foo2', ['w1', 'w2', 'w3']);
+
+        $variationDataList = CM_Model_Splittest::getVariationDataListFixture($fixture);
+        $this->assertSame([], $variationDataList);
+
+        $test1->getVariations()->findByName('v2')->setEnabled(false);
+        $test1->getVariations()->findByName('v3')->setEnabled(false);
+        $test1->getVariationFixture($fixture);
+        $variationDataList = CM_Model_Splittest::getVariationDataListFixture($fixture);
+        $this->assertSame([
+            $test1->getId() => ['variation' => 'v1', 'splittest' => 'foo1', 'flushStamp' => time()],
+        ], $variationDataList);
+
+        $test2->getVariations()->findByName('w1')->setEnabled(false);
+        $test2->getVariations()->findByName('w3')->setEnabled(false);
+        $test2->getVariationFixture($fixture);
+        $variationDataList = CM_Model_Splittest::getVariationDataListFixture($fixture);
+        $this->assertSame([
+            $test1->getId() => ['variation' => 'v1', 'splittest' => 'foo1', 'flushStamp' => time()],
+            $test2->getId() => ['variation' => 'w2', 'splittest' => 'foo2', 'flushStamp' => time()],
+        ], $variationDataList);
+    }
+
     public function testTracking_RequestClient() {
         $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array(''), '', true, true, true, array('getClientId'));
         $request->expects($this->any())->method('getClientId')->will($this->returnValue(1));
@@ -396,6 +442,15 @@ class CM_Model_Splittest_Mock extends CM_Model_Splittest {
      */
     public function getVariationFixture(CM_Splittest_Fixture $fixture) {
         return $this->_getVariationFixture($fixture);
+    }
+
+    /**
+     * @param CM_Splittest_Fixture        $fixture
+     * @param CM_Model_SplittestVariation $variation
+     * @return bool
+     */
+    public function setVariationFixture(CM_Splittest_Fixture $fixture, CM_Model_SplittestVariation $variation) {
+        return $this->_setVariationFixture($fixture, $variation);
     }
 
     /**

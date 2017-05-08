@@ -19,6 +19,6 @@ class CM_FormField_Site extends CM_FormField_Set_Select {
      */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         $userInput = parent::validate($environment, $userInput);
-        return CM_Site_Abstract::factory($userInput);
+        return (new CM_Site_SiteFactory())->getSiteById($userInput);
     }
 }

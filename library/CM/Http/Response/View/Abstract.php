@@ -1,5 +1,7 @@
 <?php
 
+use CM\Url\Url;
+
 abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract {
 
     /**
@@ -15,7 +17,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $componentInfo = $this->_getViewInfo('CM_Component_Abstract');
         $componentId = $componentInfo['id'];
         $componentClassName = $componentInfo['className'];
-        $componentParams = CM_Params::factory($componentInfo['params']);
+        $componentParams = CM_Params::factory($componentInfo['params'], true);
 
         if ($additionalParams) {
             foreach ($additionalParams as $key => $value) {
@@ -62,18 +64,18 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
 
         $count = 0;
         $fragments = [];
+        $baseUrl = $this->getRender()->getSite()->getUrl()->withoutPrefix();
         do {
-            $fragment = CM_Util::link($request->getPath(), $request->getQuery());
+            $fragment = (string) Url::create($request->getPath())->withParams($request->getQuery());
             $fragments[] = $fragment;
-            $url = $this->getRender()->getSite()->getUrlBase() . $fragment;
+            $url = (string) Url::create($fragment)->withBaseUrl($baseUrl);
             if ($count++ > 10) {
                 throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $fragments) . ').');
             }
 
             $responsePage = $responseFactory->getResponse($request);
             if (!$responsePage->getSite()->equals($this->getSite())) {
-                $redirectExternalFragment = CM_Util::link($responsePage->getRequest()->getPath(), $responsePage->getRequest()->getQuery());
-                return array('redirectExternal' => $responsePage->getRender()->getUrl($redirectExternalFragment));
+                return array('redirectExternal' => (string) $responsePage->getUrl());
             }
 
             $responseEmbed = new CM_Http_Response_Page_Embed($responsePage->getRequest(), $responsePage->getSite(), $this->getServiceManager());
@@ -184,7 +186,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
         $this->_runWithCatching(function () use (&$output) {
             $output = $this->_processView($output);
         }, function (CM_Exception $e, array $errorOptions) use (&$output) {
-            $output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());
+            $output['error'] = $e->getClientData($this->getRender());
         });
         $output['deployVersion'] = CM_App::getInstance()->getDeployVersion();
 
@@ -285,12 +287,12 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      * @return bool
      */
     private function _isPageOnSameSite($url) {
-        $urlParser = new CM_Http_UrlParser($url);
-        if (!$this->_site->isUrlMatch($urlParser->getHost(), $urlParser->getPath())) {
+        $url = Url::create($url);
+        if (!$this->_site->isUrlMatch($url->getHost(), $url->getPath())) {
             return false;
         }
 
-        $request = $this->_createGetRequestWithUrl($url);
+        $request = $this->_createGetRequestWithUrl((string) $url);
         $responseFactory = new CM_Http_ResponseFactory($this->getServiceManager());
         $response = $responseFactory->getResponse($request);
         return $response->getSite()->equals($this->getSite());

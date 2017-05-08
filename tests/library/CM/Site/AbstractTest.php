@@ -1,5 +1,7 @@
 <?php
 
+use CM\Url\BaseUrl;
+
 class CM_Site_AbstractTest extends CMTest_TestCase {
 
     public static function setUpBeforeClass() {
@@ -37,13 +39,13 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
     public function testGetUrl() {
         /** @var CM_Site_Abstract $site */
         $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $this->assertEquals('http://www.foo.com', $site->getUrl());
+        $this->assertEquals('http://www.foo.com/', (string) $site->getUrl());
     }
 
     public function testGetUrlCdn() {
         /** @var CM_Site_Abstract $site */
         $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $this->assertEquals('http://www.cdn.com', $site->getUrlCdn());
+        $this->assertEquals('http://www.cdn.com/', (string) $site->getUrlCdn());
     }
 
     public function testGetWebFontLoaderConfig() {
@@ -78,16 +80,6 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertSame(false, $site->isUrlMatch('something.my-site.com', '/foo'));
     }
 
-    public function testFactory() {
-        try {
-            CM_Site_Abstract::factory(9999);
-            $this->fail('Factory returned non-configured site');
-        } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
-            $this->assertSame('Site with given type is not configured', $ex->getMessage());
-            $this->assertSame(['siteType' => 9999], $ex->getMetaInfo());
-        }
-    }
-
     public function testEquals() {
         $siteFoo = $this->mockClass('CM_Site_Abstract');
         /** @var CM_Site_Abstract $siteFoo1 */
@@ -112,11 +104,11 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 
         /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $site1 */
         $site1 = $siteClass->newInstance();
-        $site1->mockMethod('getUrl')->set('http://my-site1.com');
+        $site1->mockMethod('getUrl')->set(BaseUrl::create('http://my-site1.com'));
 
         /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $site2 */
         $site2 = $siteClass->newInstance();
-        $site2->mockMethod('getUrl')->set('http://my-site2.com');
+        $site2->mockMethod('getUrl')->set(BaseUrl::create('http://my-site2.com'));
 
         $this->assertSame(false, $site1->equals($site2));
     }

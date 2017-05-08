@@ -14,7 +14,6 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
         foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
             CM_Db_Db::runDump($databaseName, $dump);
         }
-        $this->_setInitialVersion();
         $this->_setInitialMigrationScripts();
     }
 
@@ -32,7 +31,7 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
             CM_Db_Db::delete($table);
         }
         CM_Db_Db::exec('SET foreign_key_checks = 1;');
-        $this->_setInitialVersion();
+        $this->_setInitialMigrationScripts();
     }
 
     public function getRunLevel() {
@@ -45,29 +44,23 @@ class CM_Db_SetupScript extends CM_Provision_Script_Abstract implements CM_Provi
         return (bool) $mysqlClient->createStatement('SHOW DATABASES LIKE ?')->execute(array($mysqlDbClient->getDatabaseName()))->fetch();
     }
 
-    private function _setInitialVersion() {
-        $app = CM_App::getInstance();
-        foreach (CM_App::getInstance()->getUpdateScriptPaths() as $namespace => $path) {
-            $updateFiles = CM_Util::rglob('*.php', $path);
-            $version = array_reduce($updateFiles, function ($initial, $path) {
-                $filename = basename($path);
-                return max($initial, (int) $filename);
-            }, 0);
-            $app->setVersion($version, $namespace);
+    /**
+     * @return CM_Migration_Loader
+     */
+    private function _getMigrationLoader() {
+        static $loader = null;
+        if (null === $loader) {
+            $loader = new CM_Migration_Loader($this->getServiceManager(), CM_Util::getMigrationPaths());
         }
+        return $loader;
     }
 
     private function _setInitialMigrationScripts() {
-        $modules = CM_Bootloader::getInstance()->getModules();
-        $manager = new CM_Migration_Manager($this->getServiceManager(), $modules);
-        $loader = $manager->getLoader();
-        foreach ($loader->getRunnerList() as $runner) {
+        foreach ($this->_getMigrationLoader()->getRunnerList() as $runner) {
             $name = $runner->getName();
-            $record = CM_Migration_Model::findByName($name);
-            if (!$record) {
-                $record = CM_Migration_Model::create($name);
+            if (0 === CM_Db_Db::count(CM_Migration_Model::getTableName(), ['name' => $name])) {
+                CM_Db_Db::insert(CM_Migration_Model::getTableName(), ['name' => $name, 'executedAt' => time()]);
             }
-            $record->setExecutedAt(new DateTime());
         }
     }
 }

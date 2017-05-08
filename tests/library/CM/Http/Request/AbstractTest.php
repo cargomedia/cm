@@ -50,6 +50,24 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertNull($mock->getCookie('asdkf'));
     }
 
+    public function testGetIp() {
+        $request = CM_Http_Request_Abstract::factory('get', '/foo', null, []);
+        $this->assertNull($request->getIp());
+        $this->assertNull($request->getIp(true));
+
+        $request = CM_Http_Request_Abstract::factory('get', '/foo', null, ['remote_addr' => '0']);
+        $this->assertNull($request->getIp());
+        $this->assertNull($request->getIp(true));
+
+        $request = CM_Http_Request_Abstract::factory('get', '/foo', null, ['remote_addr' => '500.500.500.500']);
+        $this->assertNull($request->getIp());
+        $this->assertNull($request->getIp(true));
+
+        $request = CM_Http_Request_Abstract::factory('get', '/foo', null, ['remote_addr' => '42.42.42.42']);
+        $this->assertSame('707406378', $request->getIp());
+        $this->assertSame('42.42.42.42', $request->getIp(true));
+    }
+
     public function testGetLanguageLoggedUser() {
         $user = CMTest_TH::createUser();
         $request = $this->_prepareRequest('/', null, $user);
@@ -197,7 +215,7 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=clientId=' . $id . ';');
         /** @var CM_Http_Request_Abstract $mock */
         $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
-        $this->assertFalse($mock->hasClientId());
+        $this->assertTrue($mock->hasClientId());
         $this->assertSame($id, $mock->getClientId());
         $this->assertTrue($mock->hasClientId());
     }

@@ -50,15 +50,14 @@ class CM_Janus_HttpApiClient {
         $context = CM_Service_Manager::getInstance()->getLogger()->getContext();
         $appContext = $this->_contextFormatter->formatAppContext($context);
 
-        $url = $server->getHttpAddress() . $path;
+        $query = ['context' => CM_Util::jsonEncode($appContext)];
         $body = (array) $body;
-
-        $options = [
-            'query'   => ['context' => CM_Util::jsonEncode($appContext)],
-            'body'    => $body,
-            'headers' => ['Server-Key' => $server->getKey()],
-        ];
-        $request = $this->_httpClient->createRequest($method, $url, $options);
+        $headers = ['Server-Key' => $server->getKey()];
+        $url = (string) $server
+            ->getHttpAddress()
+            ->withPath($path)
+            ->withParams($query);
+        $request = new \GuzzleHttp\Psr7\Request($method, $url, $headers, http_build_query($body));
         try {
             $response = $this->_httpClient->send($request);
         } catch (GuzzleHttp\Exception\TransferException $e) {
@@ -67,10 +66,10 @@ class CM_Janus_HttpApiClient {
                 'originalExceptionMessage' => $e->getMessage(),
             ]);
         }
-        $body = $response->getBody();
-        if (null === $body) {
+        $contents = $response->getBody()->getContents();
+        if ('' === $contents) {
             throw new CM_Exception_Invalid('Empty response body');
         }
-        return $body->getContents();
+        return $contents;
     }
 }

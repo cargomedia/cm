@@ -9,7 +9,7 @@ class CM_Usertext_UsertextTest extends CMTest_TestCase {
 
     public function testProcessEmoticon() {
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $siteType = CM_Site_Abstract::factory()->getType();
+        $siteType = (new CM_Site_SiteFactory())->getDefaultSite()->getType();
         $usertext = new CM_Usertext_Usertext();
 
         $expectedValuePlain = "<img src=\"http://cdn.default.dev/layout/" . $siteType . "/" . $deployVersion .

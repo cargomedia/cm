@@ -7,9 +7,8 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function run($name = null) {
-        $modules = CM_Bootloader::getInstance()->getModules();
-        $manager = new CM_Migration_Manager($this->getServiceManager(), $modules);
-        $loader = $manager->getLoader();
+        $migrationPaths = CM_Util::getMigrationPaths();
+        $loader = new CM_Migration_Loader($this->getServiceManager(), $migrationPaths);
         if (null === $name) {
             foreach ($loader->getRunnerList() as $runner) {
                 if ($runner->shouldBeLoaded()) {
@@ -33,10 +32,11 @@ class CM_Migration_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function add($namespace = null, $name = null) {
         if (null === $name) {
-            $defaultName = CM_Util::exec('git rev-parse --abbrev-ref HEAD');
+            $defaultName = trim(CM_Util::exec('git rev-parse --abbrev-ref HEAD'));
             $name = $this->_getStreamInput()->read(sprintf('Migration script name [%s]:', $defaultName), $defaultName);
         }
-        $adapter = new CM_File_Filesystem_Adapter_Local($this->_getMigrationPathByModule($namespace));
+        $migrationPath = CM_Util::getMigrationPathByModule($namespace);
+        $adapter = new CM_File_Filesystem_Adapter_Local($migrationPath);
         $filesystem = new CM_File_Filesystem($adapter);
         $generator = new CM_Migration_Generator($filesystem);
         $file = $generator->save($name);

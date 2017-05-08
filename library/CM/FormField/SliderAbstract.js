@@ -48,6 +48,10 @@ var CM_FormField_SliderAbstract = CM_FormField_Abstract.extend({
       field._onChange();
     });
 
+    slider.noUiSlider.on('slide', function(values, handle) {
+      field._onSlide();
+    });
+
     this.bindJquery($(window), 'keydown', this._onKeyDown);
   },
 
@@ -97,6 +101,10 @@ var CM_FormField_SliderAbstract = CM_FormField_Abstract.extend({
 
   _onChange: function() {
     this.trigger('change');
+  },
+
+  _onSlide: function() {
+    this.trigger('slide');
   },
 
   _onKeyDown: function(event) {

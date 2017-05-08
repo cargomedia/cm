@@ -72,7 +72,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
    * @returns {jQuery}
    */
   getInput: function() {
-    var $input = this.$('input:first, select:first, textarea:first');
+    var $input = this.$('input:first, select:first');
     if ($input.length === 0) {
       throw new CM_Exception('Can\'t find input for `' + this.getName() + '` field');
     }

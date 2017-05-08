@@ -1,6 +1,14 @@
 <?php
 
+use CM\Url\BaseUrl;
+
 abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed, CM_Comparable {
+
+    /** @var BaseUrl|null */
+    protected $_url = null;
+
+    /** @var BaseUrl|null */
+    protected $_urlCdn = null;
 
     /** @var string[] */
     protected $_themes = array();
@@ -40,7 +48,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return string
      */
     public function getEmailAddress() {
-        return self::_getConfig()->emailAddress;
+        return $this->getConfig()->emailAddress;
     }
 
     /**
@@ -93,7 +101,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      * @return string
      */
     public function getName() {
-        return self::_getConfig()->name;
+        return $this->getConfig()->name;
     }
 
     /**
@@ -111,28 +119,37 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @return string
+     * @return BaseUrl
      */
     public function getUrl() {
-        return (string) self::_getConfig()->url;
+        if (null === $this->_url) {
+            $this->_url = BaseUrl::create($this->getUrlString());
+        }
+        return $this->_url;
     }
 
     /**
-     * @return CM_Http_UrlParser
-     */
-    public function getUrlParser() {
-        return new CM_Http_UrlParser($this->getUrl());
-    }
-
-    /**
-     * @return string|null
+     * @return BaseUrl
      */
     public function getUrlCdn() {
-        $config = self::_getConfig();
-        if (!isset($config->urlCdn)) {
-            return null;
+        if (null === $this->_urlCdn) {
+            $this->_urlCdn = BaseUrl::create($this->getUrlCdnString());
         }
-        return (string) $config->urlCdn;
+        return $this->_urlCdn;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlString() {
+        return (string) $this->getConfig()->url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlCdnString() {
+        return (string) $this->getConfig()->urlCdn;
     }
 
     /**
@@ -148,25 +165,18 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     /**
      * @return string
+     * @deprecated use getUrl() directly
      */
     public function getHost() {
-        return $this->getUrlParser()->getHost();
+        return $this->getUrl()->getHost();
     }
 
     /**
      * @return string
+     * @deprecated
      */
     public function getPath() {
-        return $this->getUrlParser()->getPath();
-    }
-
-    /**
-     * @return string
-     * @throws CM_Exception
-     */
-    public function getUrlBase() {
-        $urlParser = $this->getUrlParser();
-        return $urlParser->getScheme() . '://' . $urlParser->getHost();
+        return $this->getUrl()->getUriRelativeComponents();
     }
 
     /**
@@ -236,10 +246,9 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         ];
 
         if ($this->getUrlCdn()) {
-            $urlCdn = new CM_Http_UrlParser($this->getUrlCdn());
             $matchList[] = [
-                'host' => $urlCdn->getHost(),
-                'path' => $urlCdn->getPath(),
+                'host' => $this->getUrlCdn()->getHost(),
+                'path' => $this->getUrlCdn()->getPath(),
             ];
         }
 
@@ -260,21 +269,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         if (get_class($other) !== get_class($this)) {
             return false;
         }
-        return $this->getUrl() === $other->getUrl();
-    }
-
-    /**
-     * @param int|null $type
-     * @return CM_Site_Abstract
-     * @throws CM_Class_Exception_TypeNotConfiguredException
-     */
-    public static function factory($type = null) {
-        try {
-            $class = self::_getClassName($type);
-        } catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
-            throw new CM_Class_Exception_TypeNotConfiguredException('Site with given type is not configured', CM_Exception::WARN, ['siteType' => $type]);
-        }
-        return new $class();
+        return (string) $this->getUrl() === (string) $other->getUrl();
     }
 
     /**
@@ -286,6 +281,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 
     public static function fromArray(array $array) {
         $type = (int) $array['type'];
-        return self::factory($type);
+        return (new CM_Site_SiteFactory())->getSiteById($type);
     }
 }

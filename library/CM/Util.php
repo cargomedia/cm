@@ -54,7 +54,7 @@ class CM_Util {
     public static function rglobLibraries($pattern, CM_Site_Abstract $site) {
         $paths = array();
         foreach ($site->getModules() as $moduleName) {
-            $libraryPath = CM_Util::getModulePath($moduleName) . 'library/' . $moduleName . '/';
+            $libraryPath = CM_Util::getModulePath($moduleName) . 'library/*/';
             $paths = array_merge($paths, CM_Util::rglob($pattern, $libraryPath));
         }
         return $paths;
@@ -99,10 +99,11 @@ class CM_Util {
      * @param array|null   $params
      * @param boolean|null $methodPost
      * @param int|null     $timeout
+     * @param array|null   $header
      * @throws CM_Exception_Invalid
      * @return string
      */
-    public static function getContents($url, array $params = null, $methodPost = null, $timeout = null) {
+    public static function getContents($url, array $params = null, $methodPost = null, $timeout = null, array $headers = null) {
         $url = (string) $url;
         if (!empty($params)) {
             $params = http_build_query($params);
@@ -126,6 +127,9 @@ class CM_Util {
             if (!empty($params)) {
                 $url .= '?' . $params;
             }
+        }
+        if ($headers) {
+            curl_setopt($curlConnection, CURLOPT_HTTPHEADER, $headers);
         }
         curl_setopt($curlConnection, CURLOPT_URL, $url);
 
@@ -164,33 +168,6 @@ class CM_Util {
         }
 
         return $xml;
-    }
-
-    /**
-     * @param string      $path
-     * @param array       $params Query parameters
-     * @param string|null $fragment
-     * @return string
-     */
-    public static function link($path, array $params = null, $fragment = null) {
-        $path = (string) $path;
-        $fragment = (string) $fragment;
-
-        $link = $path;
-
-        if (!empty($params)) {
-            $params = CM_Params::encode($params);
-            $query = http_build_query($params);
-            if (strlen($query) > 0) {
-                $link .= '?' . $query;
-            }
-        }
-
-        if ('' !== $fragment) {
-            $link .= '#' . $fragment;
-        }
-
-        return $link;
     }
 
     /**
@@ -275,6 +252,30 @@ class CM_Util {
             $path = DIR_ROOT . $path;
         }
         return $path;
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getMigrationPaths() {
+        $paths = [
+            CM_Util::getMigrationPathByModule(),
+        ];
+        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
+            $paths[] = CM_Util::getMigrationPathByModule($moduleName);
+        }
+        return array_unique($paths);
+    }
+
+    /**
+     * @param string|null $moduleName
+     * @return string
+     */
+    public static function getMigrationPathByModule($moduleName = null) {
+        $modulePath = null !== $moduleName ? CM_Util::getModulePath((string) $moduleName) : DIR_ROOT;
+        return CM_File_Filesystem::normalizePath(
+            join(DIRECTORY_SEPARATOR, [$modulePath, 'resources', 'migration'])
+        );
     }
 
     /**

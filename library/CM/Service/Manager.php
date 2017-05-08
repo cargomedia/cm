@@ -175,6 +175,17 @@ class CM_Service_Manager extends CM_Class_Abstract {
 
     /**
      * @param string|null $serviceName
+     * @return CM_Maintenance_Service
+     */
+    public function getMaintenance($serviceName = null) {
+        if (null === $serviceName) {
+            $serviceName = 'maintenance';
+        }
+        return $this->get($serviceName, CM_Maintenance_Service::class);
+    }
+
+    /**
+     * @param string|null $serviceName
      * @return CM_MongoDb_Client
      */
     public function getMongoDb($serviceName = null) {
@@ -304,6 +315,10 @@ class CM_Service_Manager extends CM_Class_Abstract {
             $method = $reflection->getMethod($config['method']['name']);
             $methodArguments = $this->_matchNamedArgs($serviceName, $method, $config['method']['arguments']);
             $instance = $method->invokeArgs($instance, $methodArguments);
+
+            if ($instance instanceof CM_Service_ManagerAwareInterface && !$instance instanceof $config['class']) {
+                $instance->setServiceManager($this);
+            }
         }
         return $instance;
     }

@@ -2,6 +2,10 @@
 
 class CM_Redis_ClientTest extends CMTest_TestCase {
 
+    public static function tearDownAfterClass() {
+        // To avoid issues that arise when forking a process with an established mongodb-connection. see https://jira.mongodb.org/browse/PHPC-433
+    }
+
     /** @var CM_Redis_Client */
     private $_client;
 
@@ -194,17 +198,18 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
      * @preserveGlobalState disabled
      */
     public function testPubSub() {
-        $process = CM_Process::getInstance();
-        $process->fork(function () {
+        if (0 === ($pid = pcntl_fork())) {
+            // Child process
             $redisClient = CM_Service_Manager::getInstance()->getRedis();
             $clientCallCount = 0;
             while (1 >= $clientCallCount) {
+                usleep(50 * 1000);
                 if (0 != $redisClient->publish('foo', 'bar' . $clientCallCount)) {
                     $clientCallCount++;
                 }
-                usleep(50 * 1000);
             }
-        });
+            exit;
+        }
 
         $messageList = [];
         $messageCount = 0;
@@ -216,7 +221,6 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
             return null;
         });
         $this->assertSame(['foo', ['bar0', 'bar1']], $response);
-        $process->waitForChildren();
     }
 
     /**
@@ -224,15 +228,16 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
      * @preserveGlobalState disabled
      */
     public function testPubSubWithClientUsedInSubClosure() {
-        $process = CM_Process::getInstance();
-        $process->fork(function () {
+        if (0 === ($pid = pcntl_fork())) {
+            // Child process
             $redisClient = CM_Service_Manager::getInstance()->getRedis();
             $clientCount = 0;
             while ($clientCount == 0) {
-                $clientCount = $redisClient->publish('foo', 'test');
                 usleep(50 * 1000);
+                $clientCount = $redisClient->publish('foo', 'test');
             }
-        });
+            exit;
+        }
 
         $this->_client->set('check', 'bar');
         $response = $this->_client->subscribe('foo', function ($channel, $message) {
@@ -243,6 +248,5 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
             }
         });
         $this->assertSame(['foo', 'test', 'bar'], $response);
-        $process->waitForChildren();
     }
 }
