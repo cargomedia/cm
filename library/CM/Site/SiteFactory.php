@@ -1,5 +1,7 @@
 <?php
 
+use CM\Url\Url;
+
 class CM_Site_SiteFactory {
 
     /** @var CM_Site_Abstract[] */
@@ -50,6 +52,19 @@ class CM_Site_SiteFactory {
             throw new CM_Exception('No suitable site found for request.', null, ['request' => $request]);
         }
         return $site;
+    }
+
+    /**
+     * @param Url $url
+     * @return CM_Site_Abstract|null
+     */
+    public function findSiteByUrl(Url $url) {
+        foreach ($this->_siteList as $site) {
+            if ($site->isUrlMatch($url->getHost(), $url->getPath())) {
+                return $site;
+            }
+        }
+        return null;
     }
 
     /**
