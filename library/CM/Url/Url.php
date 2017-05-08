@@ -225,7 +225,7 @@ class Url extends Uri implements UrlInterface {
     /**
      * @return array
      */
-    protected function _getSegments() {
+    public function getSegments() {
         $segments = [];
         if ($prefix = $this->getPrefix()) {
             $segments[] = $prefix;
@@ -274,7 +274,7 @@ class Url extends Uri implements UrlInterface {
      * @return string
      */
     protected function _getPathFromSegments() {
-        $segments = $this->_getSegments();
+        $segments = $this->getSegments();
         if (0 === count($segments) && '' === $this->path) {
             return '';
         }

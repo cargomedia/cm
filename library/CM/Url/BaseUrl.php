@@ -19,7 +19,7 @@ class BaseUrl extends Url {
         return $this->_getPathFromSegments();
     }
 
-    public function _getSegments() {
+    public function getSegments() {
         $segments = [];
         if ($prefix = $this->getPrefix()) {
             $segments[] = $prefix;

@@ -11,7 +11,7 @@ class ServiceWorkerUrl extends Url {
         parent::__construct('');
     }
 
-    public function _getSegments() {
+    public function getSegments() {
         $parts = [
             HttpResponseServiceWorker::PATH_PREFIX_FILENAME,
         ];
