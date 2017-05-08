@@ -14,13 +14,11 @@ class AppUrlTest extends CMTest_TestCase {
 
     public function testCreate() {
         $url = AppUrl::createWithEnvironment('bar');
-        $this->assertInstanceOf('CM\Url\Url', $url);
         $this->assertSame(null, $url->getPrefix());
         $this->assertSame(null, $url->getLanguage());
         $this->assertSame('/bar', (string) $url);
 
         $url = AppUrl::createWithEnvironment('/bar?foobar=1');
-        $this->assertInstanceOf('CM\Url\Url', $url);
         $this->assertSame(null, $url->getPrefix());
         $this->assertSame(null, $url->getLanguage());
         $this->assertSame('/bar?foobar=1', (string) $url);
@@ -42,6 +40,35 @@ class AppUrlTest extends CMTest_TestCase {
         $this->assertSame('prefix', $url->getPrefix());
         $this->assertSame($environment->getLanguage(), $url->getLanguage());
         $this->assertSame('http://www.example.com/prefix/language-de/site-44/bar?foobar=1', (string) $url);
+    }
+
+    public function testCreateFromString() {
+        $environment = $this->createEnvironment(null, null, 'de');
+        $site = $environment->getSite();
+        $language = $environment->getLanguage();
+
+        $url = AppUrl::createFromString('bar');
+        $this->assertSame(null, $url->getSite());
+        $this->assertSame(null, $url->getLanguage());
+        $this->assertSame('/bar', (string) $url);
+
+        $url = AppUrl::createFromString('/language-de/bar');
+        $this->assertSame(null, $url->getSite());
+        $this->assertEquals($language, $url->getLanguage());
+        $this->assertSame('/bar', $url->getPath());
+        $this->assertSame('/language-de/bar', (string) $url);
+
+        $url = AppUrl::createFromString('http://foo.com/language-de/site-42/bar');
+        $this->assertEquals($site, $url->getSite());
+        $this->assertEquals($language, $url->getLanguage());
+        $this->assertSame('/bar', $url->getPath());
+        $this->assertSame('http://www.example.com/language-de/site-42/bar', (string) $url);
+
+        $url = AppUrl::createFromString($site->getUrlString() . '/language-de/bar');
+        $this->assertEquals($site, $url->getSite());
+        $this->assertSame('de', $url->getLanguage()->getAbbreviation());
+        $this->assertSame('/bar', $url->getPath());
+        $this->assertSame('http://www.example.com/language-de/site-42/bar', (string) $url);
     }
 
     public function testWithLanguage() {

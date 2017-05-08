@@ -2,7 +2,9 @@
 
 namespace CM\Url;
 
+use CM_Util;
 use CM_Site_Abstract;
+use CM_Site_SiteFactory;
 use CM_Frontend_Environment;
 use CM_Model_Language;
 
@@ -40,6 +42,34 @@ class AppUrl extends Url {
     }
 
     /**
+     * @return AppUrl
+     */
+    public function parseParameters() {
+        /** @var AppUrl $url */
+        $url = $this->parseLanguage();
+        $url = $url->parseSite();
+        $url = $url->parseDeployVersion();
+        return $url;
+    }
+
+    /**
+     * @return AppUrl
+     */
+    public function parseLanguage() {
+        $language = null;
+        $segments = $this->getSegments();
+        foreach ($segments as $index => $segment) {
+            if (preg_match('/language-([a-z]+)/', $segment, $matches)) {
+                $language = CM_Model_Language::findByAbbreviation($matches[1]);
+                if ($language) {
+                    $this->_dropPathSegment($segment);
+                }
+            }
+        }
+        return $language ? $this->withLanguage($language) : $this;
+    }
+
+    /**
      * @return CM_Model_Language|null
      */
     public function getLanguage() {
@@ -65,6 +95,26 @@ class AppUrl extends Url {
     }
 
     /**
+     * @return AppUrl
+     */
+    public function parseSite() {
+        $siteFactory = new CM_Site_SiteFactory();
+        $site = $siteFactory->findSiteByUrl($this);
+        if (!$site) {
+            $segments = $this->getSegments();
+            foreach ($segments as $index => $segment) {
+                if (preg_match('/site-([0-9]+)/', $segment, $matches)) {
+                    $site = $siteFactory->getSiteById($matches[1]);
+                    if ($site) {
+                        $this->_dropPathSegment($segment);
+                    }
+                }
+            }
+        }
+        return $site ? $this->withSite($site) : $this;
+    }
+
+    /**
      * @return CM_Site_Abstract|null
      */
     public function getSite() {
@@ -84,6 +134,24 @@ class AppUrl extends Url {
      */
     public function setDeployVersion($deployVersion) {
         $this->_deployVersion = $deployVersion;
+    }
+
+    /**
+     * @return AppUrl
+     */
+    public function parseDeployVersion() {
+        $version = null;
+        $segments = $this->getSegments();
+        foreach ($segments as $index => $segment) {
+            if (preg_match('/version-([0-9]+)/', $segment, $matches)) {
+                $version = $matches[1];
+                if ($version) {
+                    $this->_dropPathSegment($segment);
+                }
+            }
+        }
+        $this->setDeployVersion($version);
+        return $this;
     }
 
     /**
@@ -131,6 +199,16 @@ class AppUrl extends Url {
             $segments[] = $versionSegment;
         }
         return $segments;
+    }
+
+    /**
+     * @param string $uri
+     * @return static
+     */
+    public static function createFromString($uri) {
+        /** @var Url $url */
+        $url = new self(CM_Util::sanitizeUtf((string) $uri));
+        return $url->parseParameters();
     }
 
     /**

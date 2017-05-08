@@ -2,6 +2,7 @@
 
 namespace CM\Url;
 
+use Functional;
 use CM_Params;
 use Psr\Http\Message\UriInterface;
 use GuzzleHttp\Psr7\UriResolver;
@@ -140,10 +141,11 @@ class Url extends Uri {
         return $this->getSchemeSpecificPart();
     }
 
-    protected function applyParts(array $parts) {
-        parent::applyParts($parts);
-        $this->_ensureAbsolutePath();
-        $this->path = UriResolver::removeDotSegments($this->path);
+    /**
+     * @return array
+     */
+    public function getPathSegments() {
+        return $this->_filterPathSegments(explode('/', $this->path));
     }
 
     /**
@@ -156,8 +158,14 @@ class Url extends Uri {
         }
         return array_merge(
             $segments,
-            explode('/', $this->path)
+            $this->getPathSegments()
         );
+    }
+
+    protected function applyParts(array $parts) {
+        parent::applyParts($parts);
+        $this->_ensureAbsolutePath();
+        $this->path = UriResolver::removeDotSegments($this->path);
     }
 
     /**
@@ -193,11 +201,11 @@ class Url extends Uri {
     }
 
     protected function _dropPathSegment($segment) {
-        $segments = $this->_filterPathSegments(explode($this->getPath(), '/'));
-        $filteredSegments = Functional\reject($segments, function ($value) use ($segment) {
+        $filteredSegments = Functional\reject($this->getPathSegments(), function ($value) use ($segment) {
             return $segment === $value;
         });
-        $this->_path = implode('/', $filteredSegments);
+        $this->path = implode('/', $filteredSegments);
+        $this->_ensureAbsolutePath();
     }
 
     /**
@@ -205,8 +213,8 @@ class Url extends Uri {
      * @return array
      */
     protected function _filterPathSegments(array $segments = null) {
-        return array_filter((array) $segments, function ($value) {
-            return null !== $value && '' !== $value;
+        return Functional\reject((array) $segments, function ($value) {
+            return null === $value || '' === $value;
         });
     }
 
