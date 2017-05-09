@@ -223,7 +223,7 @@ class Url extends Uri {
     protected function filterPath($path) {
         $path = parent::filterPath($path);
         $segments = $this->_filterPathSegments(explode('/', $path));
-        return '/' . implode('/', $segments) . ('/' === substr($path, -1) ? '/' : '');
+        return implode('/', $segments) . ('/' === substr($path, -1) ? '/' : '');
     }
 
     /**

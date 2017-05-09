@@ -20,6 +20,19 @@ class UrlTest extends CMTest_TestCase {
         $this->assertSame(null, $url->getPrefix());
         $this->assertSame('/bar?foobar=1', (string) $url);
 
+        $url = new Url('');
+        $this->assertSame('', $url->getPath());
+        $this->assertSame('', (string) $url);
+
+        $url = new Url('/');
+        $this->assertSame('/', $url->getPath());
+        $this->assertSame('/', (string) $url);
+
+        $url = new Url('?foo=bar');
+        $this->assertSame(['foo' => 'bar'], $url->getParams());
+        $this->assertSame('/', $url->getPath());
+        $this->assertSame('/?foo=bar', (string) $url);
+
         $url = new Url('//example.com');
         $this->assertInstanceOf('CM\Url\Url', $url);
         $this->assertSame('//example.com/', (string) $url);
