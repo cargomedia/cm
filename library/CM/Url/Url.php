@@ -3,6 +3,7 @@
 namespace CM\Url;
 
 use Functional;
+use CM_Util;
 use CM_Params;
 use Psr\Http\Message\UriInterface;
 use GuzzleHttp\Psr7\UriResolver;
@@ -84,7 +85,7 @@ class Url extends Uri {
             return $this;
         }
         $new = clone $this;
-        $new->path = UriResolver::removeDotSegments($path);
+        $new->_setPath($path);
         return $new;
     }
 
@@ -95,7 +96,7 @@ class Url extends Uri {
     public function appendPath($path) {
         $path = $this->filterPath($this->getPath() . '/' . $path);
         $new = clone $this;
-        $new->path = UriResolver::removeDotSegments($path);
+        $new->_setPath($path);
         return $new;
     }
 
@@ -106,7 +107,7 @@ class Url extends Uri {
     public function prependPath($path) {
         $path = $this->filterPath($path . '/' . $this->getPath());
         $new = clone $this;
-        $new->path = UriResolver::removeDotSegments($path);
+        $new->_setPath($path);
         return $new;
     }
 
@@ -138,7 +139,7 @@ class Url extends Uri {
      * @return static
      */
     public function withParams(array $params) {
-        $this->_params = $params;
+        $this->_setParams($params);
         $params = CM_Params::encode($this->getParams());
         $query = http_build_query($params);
         /** @var Url $url */
@@ -146,12 +147,9 @@ class Url extends Uri {
         return $url;
     }
 
-    public function withQuery($queryString) {
-        $queryString = (string) $queryString;
-        $params = [];
-        parse_str($queryString, $params);
-        $this->_params = $params;
-        return parent::withQuery($queryString);
+    public function withQuery($query) {
+        $this->_setParams($query);
+        return parent::withQuery($query);
     }
 
     /**
@@ -211,6 +209,9 @@ class Url extends Uri {
         return $baseUrl;
     }
 
+    /**
+     * @return string
+     */
     public function getUriRelativeComponents() {
         return $this->_getPathFromSegments() . $this->_getQueryComponent() . $this->_getFragmentComponent();
     }
@@ -248,8 +249,49 @@ class Url extends Uri {
 
     protected function applyParts(array $parts) {
         parent::applyParts($parts);
+        $this->_setPath($this->path);
+        $this->_setParams($this->getQuery());
+    }
+
+    /**
+     * @param string|array|null $query
+     */
+    protected function _setParams($query) {
+        $params = $query;
+        if (!is_array($params)) {
+            $query = (string) $query;
+            $params = [];
+            parse_str($query, $params);
+        }
+
+        $paramsSanitized = null;
+        if (0 !== count($params)) {
+            $paramsSanitized = [];
+            foreach ($params as $key => $value) {
+                $key = CM_Util::sanitizeUtf($key);
+
+                if (is_array($value)) {
+                    array_walk_recursive($value, function (&$innerValue) {
+                        if (is_string($innerValue)) {
+                            $innerValue = CM_Util::sanitizeUtf($innerValue);
+                        }
+                    });
+                } elseif (is_string($value)) {
+                    $value = CM_Util::sanitizeUtf($value);
+                }
+
+                $paramsSanitized[$key] = $value;
+            }
+        }
+        $this->_params = $paramsSanitized;
+    }
+
+    /**
+     * @param string $path
+     */
+    protected function _setPath($path) {
+        $this->path = UriResolver::removeDotSegments((string) $path);
         $this->_ensureAbsolutePath();
-        $this->path = UriResolver::removeDotSegments($this->path);
     }
 
     /**
@@ -291,8 +333,7 @@ class Url extends Uri {
         $filteredSegments = Functional\reject($this->getPathSegments(), function ($value) use ($segment) {
             return $segment === $value;
         });
-        $this->path = implode('/', $filteredSegments);
-        $this->_ensureAbsolutePath();
+        $this->_setPath(implode('/', $filteredSegments));
     }
 
     /**
@@ -300,9 +341,9 @@ class Url extends Uri {
      * @return array
      */
     protected function _filterPathSegments(array $segments = null) {
-        return Functional\reject((array) $segments, function ($value) {
+        return array_values(Functional\reject((array) $segments, function ($value) {
             return null === $value || '' === $value;
-        });
+        }));
     }
 
     protected function _ensureAbsolutePath() {

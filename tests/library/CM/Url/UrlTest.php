@@ -105,6 +105,11 @@ class UrlTest extends CMTest_TestCase {
         $this->assertSame('/foo', (string) $url);
         $this->assertSame(null, $url->getParams());
 
+        $url = new Url('bar?foo=42');
+        $this->assertSame('foo=42', $url->getQuery());
+        $this->assertSame(['foo' => '42'], $url->getParams());
+
+        $url = new Url('/foo');
         $urlWithParams = $url->withParams(['foo', 'foz' => null, 'bar' => 'baz', 'val' => 1, 'obj' => $object]);
         $this->assertSame('/foo?0=foo&bar=baz&val=1&obj[_class]=CM\Test\Url\CM_UrlAbstractMockSerializable&obj[foo]=bar', urldecode((string) $urlWithParams));
         $this->assertEquals(['foo', 'foz' => null, 'bar' => 'baz', 'val' => 1, 'obj' => $object], $urlWithParams->getParams());
@@ -115,11 +120,21 @@ class UrlTest extends CMTest_TestCase {
 
         $urlWithQuery = $url->withQuery('');
         $this->assertSame('/foo', (string) $urlWithQuery);
-        $this->assertSame([], $urlWithQuery->getParams());
+        $this->assertSame(null, $urlWithQuery->getParams());
 
         $urlWithQuery = $url->withQuery('0=foo&123&bar=baz&val=1');
         $this->assertSame('/foo?0=foo&123&bar=baz&val=1', (string) $urlWithQuery);
         $this->assertSame(['foo', 123 => '', 'bar' => 'baz', 'val' => '1'], $urlWithQuery->getParams());
+
+        $urlWithQuery = $url->withQuery('%%aff%%=quux&bar=%%AFF%%&baz[]=%%aff%%&baz[]=%%aff%%');
+        $this->assertSame([
+            '%?f%%' => 'quux',
+            'bar'   => '%?F%%',
+            'baz'   => [
+                '%?f%%',
+                '%?f%%',
+            ]
+        ], $urlWithQuery->getParams());
 
         $urlModified = $url->withQuery('foo[bar][val]=1&foo[baz][]=a&foo[baz][]=b&foo[baz][]=c');
         $this->assertSame('/foo?foo[bar][val]=1&foo[baz][]=a&foo[baz][]=b&foo[baz][]=c', urldecode((string) $urlModified));
