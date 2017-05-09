@@ -23,27 +23,27 @@ class AppUrlTest extends CMTest_TestCase {
         $this->assertSame(null, $url->getLanguage());
         $this->assertSame('/bar?foobar=1', (string) $url);
 
-        $environment = $this->createEnvironment();
+        $environment = $this->createEnvironment(['type' => 900]);
         $url = AppUrl::createWithEnvironment('/bar?foobar=1', $environment);
         $this->assertSame(null, $url->getPrefix());
         $this->assertSame(null, $url->getLanguage());
-        $this->assertSame('http://www.example.com/site-42/bar?foobar=1', (string) $url);
+        $this->assertSame('http://www.example.com/site-900/bar?foobar=1', (string) $url);
 
-        $environment = $this->createEnvironment(['url' => 'http://www.example.com/prefix?param']);
+        $environment = $this->createEnvironment(['type' => 901, 'url' => 'http://www.example.com/prefix?param']);
         $url = AppUrl::createWithEnvironment('/bar?foobar=1', $environment);
         $this->assertSame('prefix', $url->getPrefix());
         $this->assertSame(null, $url->getLanguage());
-        $this->assertSame('http://www.example.com/prefix/site-43/bar?foobar=1', (string) $url);
+        $this->assertSame('http://www.example.com/prefix/site-901/bar?foobar=1', (string) $url);
 
-        $environment = $this->createEnvironment(['url' => 'http://www.example.com/prefix?param'], null, 'de');
+        $environment = $this->createEnvironment(['type' => 902, 'url' => 'http://www.example.com/prefix?param'], null, 'de');
         $url = AppUrl::createWithEnvironment('/bar?foobar=1', $environment);
         $this->assertSame('prefix', $url->getPrefix());
         $this->assertSame($environment->getLanguage(), $url->getLanguage());
-        $this->assertSame('http://www.example.com/prefix/language-de/site-44/bar?foobar=1', (string) $url);
+        $this->assertSame('http://www.example.com/prefix/language-de/site-902/bar?foobar=1', (string) $url);
     }
 
     public function testCreateFromString() {
-        $environment = $this->createEnvironment(null, null, 'de');
+        $environment = $this->createEnvironment(['type' => 900], null, 'de');
         $site = $environment->getSite();
         $language = $environment->getLanguage();
 
@@ -58,17 +58,17 @@ class AppUrlTest extends CMTest_TestCase {
         $this->assertSame('/bar', $url->getPath());
         $this->assertSame('/language-de/bar', (string) $url);
 
-        $url = AppUrl::createFromString('http://foo.com/language-de/site-42/bar');
+        $url = AppUrl::createFromString('http://foo.com/language-de/site-900/bar');
         $this->assertEquals($site, $url->getSite());
         $this->assertEquals($language, $url->getLanguage());
         $this->assertSame('/bar', $url->getPath());
-        $this->assertSame('http://www.example.com/language-de/site-42/bar', (string) $url);
+        $this->assertSame('http://www.example.com/language-de/site-900/bar', (string) $url);
 
         $url = AppUrl::createFromString($site->getUrlString() . '/language-de/bar');
         $this->assertEquals($site, $url->getSite());
         $this->assertSame('de', $url->getLanguage()->getAbbreviation());
         $this->assertSame('/bar', $url->getPath());
-        $this->assertSame('http://www.example.com/language-de/site-42/bar', (string) $url);
+        $this->assertSame('http://www.example.com/language-de/site-900/bar', (string) $url);
     }
 
     public function testWithLanguage() {
@@ -87,26 +87,26 @@ class AppUrlTest extends CMTest_TestCase {
     public function testWithEnvironment() {
         $url = new AppUrl('/bar?foobar=1');
 
-        $environment = $this->createEnvironment();
+        $environment = $this->createEnvironment(['type' => 900]);
         $urlWithEnvironment = $url->withEnvironment($environment);
         $this->assertSame(null, $url->getLanguage());
         $this->assertSame('/bar?foobar=1', (string) $url);
         $this->assertSame($environment->getSite(), $urlWithEnvironment->getSite());
         $this->assertSame(null, $urlWithEnvironment->getLanguage());
         $this->assertSame('/bar', $urlWithEnvironment->getPath());
-        $this->assertSame('http://www.example.com/site-42/bar?foobar=1', (string) $urlWithEnvironment);
+        $this->assertSame('http://www.example.com/site-900/bar?foobar=1', (string) $urlWithEnvironment);
 
-        $environment = $this->createEnvironment(null, null, 'de');
+        $environment = $this->createEnvironment(['type' => 901], null, 'de');
         $urlWithEnvironmentAndLanguage = $url->withEnvironment($environment);
         $this->assertSame($environment->getSite(), $urlWithEnvironmentAndLanguage->getSite());
         $this->assertSame($environment->getLanguage(), $urlWithEnvironmentAndLanguage->getLanguage());
         $this->assertSame('/bar', $urlWithEnvironmentAndLanguage->getPath());
-        $this->assertSame('http://www.example.com/language-de/site-43/bar?foobar=1', (string) $urlWithEnvironmentAndLanguage);
+        $this->assertSame('http://www.example.com/language-de/site-901/bar?foobar=1', (string) $urlWithEnvironmentAndLanguage);
 
         $urlWithEnvironmentPreserved = $urlWithEnvironmentAndLanguage->withPath('/baz');
         $this->assertSame($environment->getSite(), $urlWithEnvironmentPreserved->getSite());
         $this->assertSame($environment->getLanguage(), $urlWithEnvironmentPreserved->getLanguage());
         $this->assertSame('/baz', $urlWithEnvironmentPreserved->getPath());
-        $this->assertSame('http://www.example.com/language-de/site-43/baz?foobar=1', (string) $urlWithEnvironmentPreserved);
+        $this->assertSame('http://www.example.com/language-de/site-901/baz?foobar=1', (string) $urlWithEnvironmentPreserved);
     }
 }
