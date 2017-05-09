@@ -41,6 +41,15 @@ class Url extends Uri {
     }
 
     /**
+     * @param string $path
+     * @return bool
+     */
+    public function matchPath($path) {
+        $path = (string) $path;
+        return false !== strpos($this->getPath(), $path);
+    }
+
+    /**
      * @return bool
      */
     public function hasTrailingSlash() {
@@ -165,12 +174,12 @@ class Url extends Uri {
     }
 
     /**
-     * @param $uri
+     * @param string|UriInterface $uri
      * @return static
      */
     public function withRelativeComponentsFrom($uri) {
         if (!$uri instanceof UriInterface) {
-            $uri = new Uri($uri);
+            $uri = new Uri((string) $uri);
         }
         /** @var Url $url */
         $url = $this
