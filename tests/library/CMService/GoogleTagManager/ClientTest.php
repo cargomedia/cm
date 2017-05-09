@@ -51,8 +51,8 @@ class CMService_GoogleTagManager_ClientTest extends CMTest_TestCase {
         $js = $gtm->getJs();
         $this->assertContains('"//www.googletagmanager.com/ns.html?id=GTM-123456"', $html);
         $this->assertContains('(window,document,\'script\',\'dataLayer\',\'GTM-123456\')', $html);
-        $this->assertContains('dataLayer.push({"event":"Page View","username":"user' . $userId . '"});', $html);
-        $this->assertSame('dataLayer.push({"event":"Page View","username":"user' . $userId . '"});', $js);
+        $this->assertContains('dataLayer.push({"event":"Page View","username":"user' . $userId . '","accountAge":0});', $html);
+        $this->assertSame('dataLayer.push({"event":"Page View","username":"user' . $userId . '","accountAge":0});', $js);
     }
 
     public function testTrackPageViewWithSplittest() {
@@ -76,6 +76,7 @@ class CMService_GoogleTagManager_ClientTest extends CMTest_TestCase {
     public function testTrackPageViewWithUserAndSplittest() {
         $gtm = new CMService_GoogleTagManager_Client('GTM-123456');
         $viewer = CMTest_TH::createUser();
+        CMTest_TH::timeForward(10);
         $userId = $viewer->getId();
         $environment = new CM_Frontend_Environment(null, $viewer);
         $splittest = CM_Model_Splittest_User::create('foo3', ['bar3']);
@@ -87,8 +88,9 @@ class CMService_GoogleTagManager_ClientTest extends CMTest_TestCase {
         $js = $gtm->getJs();
         $this->assertContains('"//www.googletagmanager.com/ns.html?id=GTM-123456"', $html);
         $this->assertContains('(window,document,\'script\',\'dataLayer\',\'GTM-123456\')', $html);
-        $this->assertContains('dataLayer.push({"event":"Page View","Splittest foo3":"bar3","username":"user' . $userId . '"});', $html);
-        $this->assertSame('dataLayer.push({"event":"Page View","Splittest foo3":"bar3","username":"user' . $userId . '"});', $js);
+        $this->assertContains('dataLayer.push({"event":"Page View","Splittest foo3":"bar3","username":"user' . $userId .
+            '","accountAge":10});', $html);
+        $this->assertSame('dataLayer.push({"event":"Page View","Splittest foo3":"bar3","username":"user' . $userId . '","accountAge":10});', $js);
     }
 
     public function testTrackPageViewWithUserAndSeveralSplittests() {
@@ -107,9 +109,9 @@ class CMService_GoogleTagManager_ClientTest extends CMTest_TestCase {
         $this->assertContains('"//www.googletagmanager.com/ns.html?id=GTM-123456"', $html);
         $this->assertContains('(window,document,\'script\',\'dataLayer\',\'GTM-123456\')', $html);
         $this->assertContains('dataLayer.push({"event":"Page View","Splittest foo5":"bar5","Splittest foo6":"bar6","username":"user' . $userId .
-            '"});', $html);
+            '","accountAge":0});', $html);
         $this->assertSame('dataLayer.push({"event":"Page View","Splittest foo5":"bar5","Splittest foo6":"bar6","username":"user' . $userId .
-            '"});', $js);
+            '","accountAge":0});', $js);
     }
 
 }
