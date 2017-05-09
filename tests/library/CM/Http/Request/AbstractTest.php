@@ -115,19 +115,19 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
         /** @var CM_Http_Request_Abstract $mock */
         $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
-        $this->assertEquals($language, $mock->popPathLanguage());
+        $this->assertEquals($language, $mock->getUrl()->getLanguage());
         $this->assertSame('/foo/bar', $mock->getPath());
-        $this->assertSame(array('foo', 'bar'), $mock->getPathParts());
-        $this->assertSame(array('foo1' => 'bar1'), $mock->getQuery());
+        $this->assertSame(array('foo', 'bar'), $mock->getUrl()->getSegments());
+        $this->assertSame(array('foo1' => 'bar1'), $mock->getUrl()->getParams());
         $this->assertEquals($language, $mock->getLanguageUrl());
-        $this->assertSame($uri, $mock->getUri());
+        $this->assertSame($uri, $mock->getUrl());
 
-        $mock->setUri('/foo1/bar1?foo=bar');
+        $mock->setUrlFromString('/foo1/bar1?foo=bar');
         $this->assertSame('/foo1/bar1', $mock->getPath());
-        $this->assertSame(array('foo1', 'bar1'), $mock->getPathParts());
-        $this->assertSame(array('foo' => 'bar'), $mock->getQuery());
+        $this->assertSame(array('foo1', 'bar1'), $mock->getUrl()->getSegments());
+        $this->assertSame(array('foo' => 'bar'), $mock->getUrl()->getParams());
         $this->assertNull($mock->getLanguageUrl());
-        $this->assertSame('/foo1/bar1?foo=bar', $mock->getUri());
+        $this->assertSame('/foo1/bar1?foo=bar', (string) $mock->getUrl());
     }
 
     public function testFindQuery() {
@@ -138,11 +138,11 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         /** @var \Mocka\AbstractClassTrait|CM_Http_Request_Abstract $requestMock */
         $requestMock = $requestMockClass->newInstance([$uri, $headers]);
 
-        $this->assertSame(['foo1' => 'bar1'], $requestMock->findQuery());
+        $this->assertSame(['foo1' => 'bar1'], $requestMock->getUrl()->getParams());
         $requestMock->mockMethod('getQuery')->set(function () {
             throw new CM_Exception_Invalid('error');
         });
-        $this->assertSame([], $requestMock->findQuery());
+        $this->assertSame([], $requestMock->getUrl()->getParams());
     }
 
     public function testSetUriNonUtf() {
@@ -152,7 +152,7 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $mock = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array($uri, $headers));
 
         $this->assertSame('/foo/bar', $mock->getPath());
-        $this->assertSame(array('foo', 'bar'), $mock->getPathParts());
+        $this->assertSame(array('foo', 'bar'), $mock->getUrl()->getSegments());
         $this->assertSame(
             array(
                 '%?f%%' => 'quux',
@@ -164,7 +164,7 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
             ),
             $mock->getQuery()
         );
-        $this->assertSame($uri, $mock->getUri());
+        $this->assertSame($uri, $mock->getUrl());
     }
 
     public function testSetUriRelativeAndColon() {
@@ -176,19 +176,16 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
     }
 
     public function testGetUri() {
-        $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array('/foo/bar?hello=world'));
         /** @var CM_Http_Request_Abstract $request */
+        $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array('/foo/bar?hello=world'));
 
-        $this->assertSame('/foo/bar?hello=world', $request->getUri());
+        $this->assertSame('/foo/bar?hello=world', (string) $request->getUrl());
 
-        $this->assertSame('foo', $request->popPathPart());
-        $this->assertSame('/foo/bar?hello=world', $request->getUri());
+        $request->rewriteUrl('/bar');
+        $this->assertSame('/bar', (string) $request->getUrl());
 
-        $request->setPath('/hello');
-        $this->assertSame('/foo/bar?hello=world', $request->getUri());
-
-        $request->setUri('/world');
-        $this->assertSame('/world', $request->getUri());
+        $request->setUrlFromString('/world');
+        $this->assertSame('/world', (string) $request->getUrl());
     }
 
     public function testGetClientId() {
@@ -370,40 +367,9 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
 
         $request = new CM_Http_Request_Get($malformedUri, null, ['baz' => pack("H*", 'c32e')]);
         $this->assertInstanceOf('CM_Http_Request_Get', $request);
-        $this->assertTrue(mb_check_encoding($request->getUri(), 'UTF-8'));
+        $this->assertTrue(mb_check_encoding($request->getUrl(), 'UTF-8'));
         $this->assertTrue(mb_check_encoding($request->getServer()['baz'], 'UTF-8'));
-        $this->assertNotEmpty(CM_Util::jsonEncode($request->getUri()));
-    }
-
-    public function testPopPathPart() {
-        $request = new CM_Http_Request_Get('/part0/part1/part2');
-        $this->assertSame('part1', $request->popPathPart(1));
-        $this->assertSame('part0', $request->popPathPart(0));
-        $this->assertSame('/part2', $request->getPath());
-    }
-
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot pop
-     */
-    public function testPopPathPartNoMatch() {
-        $request = new CM_Http_Request_Get('/part0/part1/part2');
-        $request->popPathPart(5);
-    }
-
-    public function testPopPathPrefix() {
-        $request = new CM_Http_Request_Get('/part0/part1/part2');
-        $request->popPathPrefix('/part0/part1/');
-        $this->assertSame('/part2', $request->getPath());
-    }
-
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot pop
-     */
-    public function testPopPathPrefixNoMatch() {
-        $request = new CM_Http_Request_Get('/part0/part1/part2');
-        $request->popPathPrefix('/foo');
+        $this->assertNotEmpty(CM_Util::jsonEncode($request->getUrl()));
     }
 
     /**

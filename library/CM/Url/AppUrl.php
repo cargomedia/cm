@@ -180,7 +180,7 @@ class AppUrl extends Url {
         return array_merge(
             $segments,
             $this->_getParameterSegments(),
-            explode('/', $this->path)
+            $this->getPathSegments()
         );
     }
 

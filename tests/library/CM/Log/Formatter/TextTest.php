@@ -31,7 +31,7 @@ class CM_Log_Formatter_TextTest extends CMTest_TestCase {
         ]]);
 
         // can't mock final getPath...
-        $mockHttpRequest->setPath('/foo/bar');
+        $mockHttpRequest->rewriteUrl('/foo/bar');
         $mockHttpRequest->mockMethod('getServer')->set(['REQUEST_METHOD' => 'GET', 'SERVER_PROTOCOL' => 'HTTP/1.1']);
         $mockHttpRequest->mockMethod('getHost')->set('foo.com');
         $mockHttpRequest->mockMethod('getIp')->set('10.10.0.1');
@@ -52,7 +52,7 @@ class CM_Log_Formatter_TextTest extends CMTest_TestCase {
         ]]);
 
         // can't mock final getPath...
-        $mockHttpRequest->setPath('/foo/bar');
+        $mockHttpRequest->rewriteUrl('/foo/bar');
         $mockHttpRequest->mockMethod('getServer')->set(['REQUEST_METHOD' => 'GET', 'SERVER_PROTOCOL' => 'HTTP/1.1']);
         $mockHttpRequest->mockMethod('getHost')->set('foo.com');
         $mockHttpRequest->mockMethod('getIp')->set('10.10.0.1');
