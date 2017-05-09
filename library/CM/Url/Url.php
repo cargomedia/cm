@@ -139,11 +139,15 @@ class Url extends Uri {
      * @return static
      */
     public function withParams(array $params) {
-        $this->_setParams($params);
-        $params = CM_Params::encode($this->getParams());
-        $query = http_build_query($params);
-        /** @var Url $url */
-        $url = parent::withQuery($query);
+        $url = clone $this;
+        $url->_setParams($params);
+
+        $params = $url->getParams();
+        if (count($params) > 0) {
+            $query = http_build_query(CM_Params::encode($params));
+            $query = $this->filterQueryAndFragment($query);
+            $url->query = $query;
+        }
         return $url;
     }
 

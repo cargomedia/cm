@@ -123,6 +123,10 @@ class UrlTest extends CMTest_TestCase {
         $this->assertSame(['foo' => '42'], $url->getParams());
 
         $url = new Url('/foo');
+        $urlWithParams = $url->withParams([]);
+        $this->assertSame('/foo', (string) $urlWithParams);
+        $this->assertSame(null, $urlWithParams->getParams());
+
         $urlWithParams = $url->withParams(['foo', 'foz' => null, 'bar' => 'baz', 'val' => 1, 'obj' => $object]);
         $this->assertSame('/foo?0=foo&bar=baz&val=1&obj[_class]=CM\Test\Url\CM_UrlAbstractMockSerializable&obj[foo]=bar', urldecode((string) $urlWithParams));
         $this->assertEquals(['foo', 'foz' => null, 'bar' => 'baz', 'val' => 1, 'obj' => $object], $urlWithParams->getParams());
