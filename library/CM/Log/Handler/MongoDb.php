@@ -85,12 +85,12 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
         if (null !== $request) {
             $formattedContext['httpRequest'] = [
                 'method'  => $request->getMethodName(),
-                'uri'     => $request->getUri(),
+                'uri'     => (string) $request->getUrl(),
                 'query'   => [],
                 'server'  => $request->getServer(),
                 'headers' => $request->getHeaders(),
             ];
-            $formattedContext['httpRequest']['query'] = $request->findQuery();
+            $formattedContext['httpRequest']['query'] = $request->getQuery();
             if ($request instanceof CM_Http_Request_Post) {
                 $formattedContext['httpRequest']['body'] = $request->getBody();
             }
