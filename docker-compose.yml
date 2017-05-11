@@ -6,7 +6,8 @@ services:
     command: '/docker-run-php5-fpm'
     volumes:
       - .:/app/cm:rw,cached
-      - ./docker/config/cm/test.docker.php:/app/cm/resources/config/test.docker.php
+      - ./resources/config/_test.docker.php:/app/cm/resources/config/test.docker.php
+      - ./resources/config/_local.docker.php:/app/cm/resources/config/local.docker.php
       - ./docker/config/php:/usr/local/etc/php
       - data-cm:/app/cm/data
     depends_on:
