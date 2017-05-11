@@ -1,0 +1,57 @@
+
+cm:
+  build:
+    image: cargomedia/cm-ci:v1
+    dockerfile: Dockerfile
+  cached: true
+  volumes:
+    - ./tmp/data/cm:/app/cm/data
+  links:
+    - mysql
+    - mongo
+    - memcached
+    - elasticsearch
+    - redis
+    - gearman
+
+mysql:
+  image: mysql:5.5.54
+  environment:
+    MYSQL_ROOT_PASSWORD: docker
+  volumes:
+    - ./tmp/data/mysql:/var/lib/mysql
+    - ./docker/config/mysql/conf.d:/etc/mysql/conf.d
+  ports:
+    - "3306:3306"
+
+mongo:
+  image: mongo:2.6.12
+  command: "--config /mongo/config/mongod.conf"
+  volumes:
+    - ./tmp/data/mongo:/data/db
+    - ./docker/config/mongo:/mongo/config
+  ports:
+    - "27017:27017"
+
+memcached:
+  image: memcached:1.4
+  command: "-p 11211 -m 2048 -u memcache -l 0.0.0.0 -c 10000 -v"
+
+elasticsearch:
+  image: elasticsearch:1.3.9
+  volumes:
+    - ./tmp/data/elasticsearch:/usr/share/elasticsearch/data
+    - ./docker/config/elasticsearch:/usr/share/elasticsearch/config
+
+redis:
+  image: redis:3.2.6
+  command: '/redis/config/redis.conf'
+  volumes:
+    - ./tmp/data/redis:/data
+    - ./docker/config/redis/redis.conf:/redis/config/redis.conf
+
+gearman:
+  image: pataquets/gearmand:latest
+  command: "--job-retries=25 -q libsqlite3 --libsqlite3-db=/gearman/data/db.sqlite3"
+  volumes:
+    - ./tmp/data/gearman:/gearman/data
