@@ -54,7 +54,7 @@ class Url extends Uri {
      * @return bool
      */
     public function hasTrailingSlash() {
-        return '/' === substr($this->getPath(), -1);
+        return strlen($this->getPath()) > 1 && '/' === substr($this->getPath(), -1);
     }
 
     /**
@@ -112,6 +112,20 @@ class Url extends Uri {
     }
 
     /**
+     * @param string   $segment
+     * @param int|null $atIndex
+     * @return static
+     */
+    public function dropPathSegment($segment, $atIndex = null) {
+        $url = clone $this;
+        $filteredSegments = Functional\reject($url->getPathSegments(), function ($value, $index) use ($atIndex, $segment) {
+            return $segment === $value && (null === $atIndex || $atIndex === $index);
+        });
+        $url->_setPath(implode('/', $filteredSegments));
+        return $url;
+    }
+
+    /**
      * @param string $prefix
      * @return static
      */
@@ -122,6 +136,9 @@ class Url extends Uri {
         $prefix = '' !== (string) $prefix ? $prefix : null;
         $url = clone $this;
         $url->_prefix = $prefix;
+        if (null !== $prefix) {
+            $url = $url->dropPathSegment($prefix, 0);
+        }
         return $url;
     }
 
@@ -331,13 +348,19 @@ class Url extends Uri {
     }
 
     /**
-     * @param string $segment
+     * @param  string    $pattern
+     * @param array|null $matches
+     * @return mixed|null
      */
-    protected function _dropPathSegment($segment) {
-        $filteredSegments = Functional\reject($this->getPathSegments(), function ($value) use ($segment) {
-            return $segment === $value;
-        });
-        $this->_setPath(implode('/', $filteredSegments));
+    protected function _getSegmentByPattern($pattern, array &$matches = null) {
+        $matches = (array) $matches;
+        $segments = $this->getSegments();
+        foreach ($segments as $index => $segment) {
+            if (preg_match($pattern, $segment, $matches)) {
+                return $segment;
+            }
+        }
+        return null;
     }
 
     /**

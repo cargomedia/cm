@@ -109,6 +109,14 @@ class UrlTest extends CMTest_TestCase {
         $urlWithPrefix = $url->withPrefix(null);
         $this->assertSame(null, $urlWithPrefix->getPrefix());
         $this->assertSame('/path?foo=1#bar', (string) $urlWithPrefix);
+
+        $url = new Url('/foo/bar');
+        $this->assertSame('/foo/bar', $url->getPath());
+        $this->assertSame(null, $url->getPrefix());
+        $urlWithPrefix = $url->withPrefix('foo');
+        $this->assertSame('foo', $urlWithPrefix->getPrefix());
+        $this->assertSame('/bar', $urlWithPrefix->getPath());
+        $this->assertSame('/foo/bar', (string) $urlWithPrefix);
     }
 
     public function testWithParams() {
@@ -176,7 +184,7 @@ class UrlTest extends CMTest_TestCase {
         $urlWithBaseUrlAndPrefix = $url->withBaseUrl($baseUrlWithPrefix);
 
         $this->assertSame('prefix', $baseUrlWithPrefix->getPrefix());
-        $this->assertSame('http://foo/prefix/', (string) $baseUrlWithPrefix);
+        $this->assertSame('http://foo/prefix', (string) $baseUrlWithPrefix);
         $this->assertSame('prefix', $urlWithBaseUrlAndPrefix->getPrefix());
         $this->assertSame('http://foo/prefix/bar?foobar=1', (string) $urlWithBaseUrlAndPrefix);
 
