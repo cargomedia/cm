@@ -274,7 +274,7 @@ class CM_Frontend_Render extends CM_Class_Abstract implements CM_Service_Manager
             ->withBaseUrl($environment->getSite()->getUrlCdn())
             ->withPrefix('static');
         if (null !== $path) {
-            $url = $url->withQuery(CM_App::getInstance()->getDeployVersion());
+            $url = $url->withQuery((string) CM_App::getInstance()->getDeployVersion());
         }
         return (string) $url;
     }
