@@ -69,6 +69,21 @@ class AppUrlTest extends CMTest_TestCase {
         $this->assertSame('de', $url->getLanguage()->getAbbreviation());
         $this->assertSame('/bar', $url->getPath());
         $this->assertSame('http://www.example.com/language-de/site-900/bar', (string) $url);
+
+        $siteFoo = $this->getMockSite(null, null, [
+            'url' => 'https://foo.com/',
+        ]);
+        $url = AppUrl::createFromString('http://foo.com/language-de/bar');
+        $this->assertEquals($siteFoo, $url->getSite());
+        $this->assertEquals($language, $url->getLanguage());
+        $this->assertSame('/bar', $url->getPath());
+        $this->assertSame('https://foo.com/language-de/site-' . $siteFoo->getId() . '/bar', (string) $url);
+
+        $url = AppUrl::createFromString('http://foo.com/language-de/site-900/bar');
+        $this->assertEquals($site, $url->getSite());
+        $this->assertEquals($language, $url->getLanguage());
+        $this->assertSame('/bar', $url->getPath());
+        $this->assertSame('http://www.example.com/language-de/site-900/bar', (string) $url);
     }
 
     public function testWithLanguage() {

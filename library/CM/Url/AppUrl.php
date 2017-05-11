@@ -106,16 +106,7 @@ class AppUrl extends Url {
         $matches = [];
         $segment = $url->_getSegmentByPattern('/site-(\d+)/', $matches);
         if ($segment && $matches) {
-            $siteFromParams = $siteFactory->getSiteById((int) $matches[1]);
-            if (!$site) {
-                $site = $siteFromParams;
-            } elseif ($siteFromParams && $site->getId() !== $siteFromParams->getId()) {
-                throw new CM_Exception_Invalid('Site url parameter does not match with the domain', null, [
-                    'siteFromDomain' => get_class($site),
-                    'siteFromParams' => get_class($siteFromParams),
-                    'url'            => (string) $url,
-                ]);
-            }
+            $site = $siteFactory->getSiteById((int) $matches[1]);
             $url = $url->dropPathSegment($segment);
         }
         return $site ? $url->withSite($site) : $url;
