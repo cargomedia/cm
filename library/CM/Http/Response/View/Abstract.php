@@ -64,11 +64,9 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
 
         $count = 0;
         $fragments = [];
-        $baseUrl = $this->getRender()->getSite()->getUrl()->withoutPrefix();
         do {
-            $fragment = (string) Url::createWithParams($request->getPath(), $request->getQuery());
-            $fragments[] = $fragment;
-            $url = (string) Url::createWithParams($fragment)->withBaseUrl($baseUrl);
+            $fragments[] = $request->getUrl()->getUriRelativeComponents();
+            $url = (string) $request->getUrl();
             if ($count++ > 10) {
                 throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $fragments) . ').');
             }
@@ -288,7 +286,7 @@ abstract class CM_Http_Response_View_Abstract extends CM_Http_Response_Abstract 
      */
     private function _isPageOnSameSite($url) {
         $url = new Url($url);
-        if (!$this->_site->isUrlMatch($url->getHost(), $url->getPath())) {
+        if (!$this->getSite()->isUrlMatch($url->getHost(), $url->getPath())) {
             return false;
         }
 

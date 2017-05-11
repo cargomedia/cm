@@ -88,11 +88,10 @@ abstract class CM_Http_Response_Abstract extends CM_Class_Abstract implements CM
      * @return AppUrl
      */
     public function getUrl() {
-        $request = $this->getRequest();
-        $url = AppUrl::createWithEnvironment($request->getPath(), $this->getRender()->getEnvironment());
-        /** @var AppUrl $url */
-        $url = $url->withParams($request->getQuery());
-        return $url;
+        return $this
+            ->getRequest()
+            ->getUrl()
+            ->withEnvironment($this->getRender()->getEnvironment());
     }
 
     /**
