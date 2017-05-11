@@ -2,6 +2,7 @@
 
 namespace CM\Url;
 
+use CM_Exception_Invalid;
 use CM_Util;
 use CM_Site_Abstract;
 use CM_Site_SiteFactory;
@@ -46,8 +47,8 @@ class AppUrl extends Url {
      */
     public function parseParameters() {
         /** @var AppUrl $url */
-        $url = $this->parseLanguage();
-        $url = $url->parseSite();
+        $url = $this->parseSite();
+        $url = $url->parseLanguage();
         $url = $url->parseDeployVersion();
         return $url;
     }
@@ -56,17 +57,17 @@ class AppUrl extends Url {
      * @return static
      */
     public function parseLanguage() {
+        $url = clone $this;
         $language = null;
-        $segments = $this->getSegments();
-        foreach ($segments as $index => $segment) {
-            if (preg_match('/language-([a-z]+)/', $segment, $matches)) {
-                $language = CM_Model_Language::findByAbbreviation($matches[1]);
-                if ($language) {
-                    $this->_dropPathSegment($segment);
-                }
+        $matches = [];
+        $segment = $this->_getSegmentByPattern('/language-([a-z]+)/', $matches);
+        if ($segment && $matches) {
+            $language = CM_Model_Language::findByAbbreviation($matches[1]);
+            if ($language) {
+                $url = $url->dropPathSegment($segment);
             }
         }
-        return $language ? $this->withLanguage($language) : $this;
+        return $language ? $url->withLanguage($language) : $url;
     }
 
     /**
@@ -96,22 +97,28 @@ class AppUrl extends Url {
 
     /**
      * @return static
+     * @throws CM_Exception_Invalid
      */
     public function parseSite() {
+        $url = clone $this;
         $siteFactory = new CM_Site_SiteFactory();
-        $site = $siteFactory->findSiteByUrl($this);
-        if (!$site) {
-            $segments = $this->getSegments();
-            foreach ($segments as $index => $segment) {
-                if (preg_match('/site-([0-9]+)/', $segment, $matches)) {
-                    $site = $siteFactory->getSiteById($matches[1]);
-                    if ($site) {
-                        $this->_dropPathSegment($segment);
-                    }
-                }
+        $site = $siteFactory->findSiteByUrl($url);
+        $matches = [];
+        $segment = $url->_getSegmentByPattern('/site-(\d+)/', $matches);
+        if ($segment && $matches) {
+            $siteFromParams = $siteFactory->getSiteById((int) $matches[1]);
+            if (!$site) {
+                $site = $siteFromParams;
+            } elseif ($siteFromParams && $site->getId() !== $siteFromParams->getId()) {
+                throw new CM_Exception_Invalid('Site url parameter does not match with the domain', null, [
+                    'siteFromDomain' => get_class($site),
+                    'siteFromParams' => get_class($siteFromParams),
+                    'url'            => (string) $url,
+                ]);
             }
+            $url = $url->dropPathSegment($segment);
         }
-        return $site ? $this->withSite($site) : $this;
+        return $site ? $url->withSite($site) : $url;
     }
 
     /**
@@ -140,18 +147,16 @@ class AppUrl extends Url {
      * @return static
      */
     public function parseDeployVersion() {
+        $url = clone $this;
         $version = null;
-        $segments = $this->getSegments();
-        foreach ($segments as $index => $segment) {
-            if (preg_match('/version-([0-9]+)/', $segment, $matches)) {
-                $version = $matches[1];
-                if ($version) {
-                    $this->_dropPathSegment($segment);
-                }
-            }
+        $matches = [];
+        $segment = $url->_getSegmentByPattern('/version-(\d+)/', $matches);
+        if ($segment && $matches) {
+            $version = (int) $matches[1];
+            $url = $url->dropPathSegment($segment);
         }
-        $this->setDeployVersion($version);
-        return $this;
+        $url->setDeployVersion($version);
+        return $url;
     }
 
     /**

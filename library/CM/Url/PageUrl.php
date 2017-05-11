@@ -7,15 +7,16 @@ use CM_Model_Language;
 class PageUrl extends AppUrl {
 
     public function parseLanguage() {
+        $url = clone $this;
         $language = null;
-        $segments = $this->getSegments();
+        $segments = $url->getPathSegments();
         if (0 < count($segments)) {
             $language = CM_Model_Language::findByAbbreviation($segments[0]);
             if ($language) {
-                $this->_dropPathSegment($segments[0]);
+                $url = $url->dropPathSegment($segments[0]);
             }
         }
-        return $language ? $this->withLanguage($language) : $this;
+        return $language ? $url->withLanguage($language) : $url;
     }
 
     public function getLanguageSegment() {
