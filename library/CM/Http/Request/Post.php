@@ -50,7 +50,7 @@ class CM_Http_Request_Post extends CM_Http_Request_Abstract {
                 $this->_bodyQuery = array();
             }
         }
-        return array_merge($this->_query, $this->_bodyQuery);
+        return array_merge(parent::getQuery(), $this->_bodyQuery);
     }
 
     /**

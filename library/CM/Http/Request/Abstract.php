@@ -1,18 +1,15 @@
 <?php
 
+use CM\Url\ServiceWorkerUrl;
+use CM\Url\Url;
+use CM\Url\AppUrl;
+use CM\Url\PageUrl;
+use Psr\Http\Message\UriInterface;
+
 abstract class CM_Http_Request_Abstract {
 
-    /** @var string */
-    protected $_uri;
-
-    /** @var string */
-    protected $_path;
-
-    /** @var array|null */
-    protected $_pathParts;
-
-    /** @var array */
-    protected $_query = array();
+    /** @var AppUrl */
+    protected $_url;
 
     /** @var array */
     protected $_headers = array();
@@ -28,9 +25,6 @@ abstract class CM_Http_Request_Abstract {
 
     /** @var CM_Session|null */
     private $_session;
-
-    /** @var CM_Model_Language|null */
-    private $_languageUrl;
 
     /** @var int|null */
     private $_clientId;
@@ -63,11 +57,8 @@ abstract class CM_Http_Request_Abstract {
             }
             $this->_server = array_change_key_case($server);
         }
-        $uri = (string) $uri;
-        $originalUri = $uri;
-        $uri = CM_Util::sanitizeUtf($uri);
 
-        $this->setUri($uri);
+        $this->setUrlFromString($uri);
 
         if ($sessionId = $this->getCookie('sessionId')) {
             $this->setSession(CM_Session::findById($sessionId));
@@ -122,10 +113,21 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @return CM_Site_Abstract|null
+     */
+    public function getSite() {
+        $site = $this->getUrl()->getSite();
+        if (null === $site) {
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();
+        }
+        return $site;
+    }
+
+    /**
      * @return string
      */
     public final function getPath() {
-        return $this->_path;
+        return $this->getUrl()->getPath();
     }
 
     /**
@@ -146,222 +148,55 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
-     * @param string $path
-     * @return CM_Http_Request_Abstract
-     */
-    public function setPath($path) {
-        $this->_path = (string) $path;
-        $this->_pathParts = null;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getPathParts() {
-        if ($this->_pathParts === null) {
-            $this->_pathParts = explode('/', $this->_path);
-            array_shift($this->_pathParts);
-        }
-        return $this->_pathParts;
-    }
-
-    /**
-     * @param int $position
-     * @return string|null
-     */
-    public function getPathPart($position) {
-        $position = (int) $position;
-        if (!array_key_exists($position, $this->getPathParts())) {
-            return null;
-        }
-        return $this->_pathParts[$position];
-    }
-
-    /**
-     * @param array $parts
-     */
-    public function setPathParts(array $parts) {
-        $this->_pathParts = $parts;
-        $this->_path = '/' . implode('/', $this->_pathParts);
-    }
-
-    /**
-     * @param string $prefix
-     * @return bool
-     */
-    public function hasPathPrefix($prefix) {
-        $prefix = (string) $prefix;
-        $path = new Stringy\Stringy($this->getPath());
-        return $path->startsWith($prefix);
-    }
-
-    /**
-     * @param int|null $position
-     * @return string
-     * @throws CM_Exception
-     */
-    public function popPathPart($position = null) {
-        $position = (int) $position;
-        if (!array_key_exists($position, $this->getPathParts())) {
-            throw new CM_Exception('Cannot pop request\'s path by position.', null, [
-                'path'     => $this->getPath(),
-                'position' => $position,
-            ]);
-        }
-        $value = array_splice($this->_pathParts, $position, 1);
-        $this->setPathParts($this->_pathParts);
-        return current($value);
-    }
-
-    /**
-     * @param string $prefix
-     * @throws CM_Exception
-     */
-    public function popPathPrefix($prefix) {
-        $path = new Stringy\Stringy($this->getPath());
-        if (!$path->startsWith($prefix)) {
-            throw new CM_Exception('Cannot pop request\'s path by prefix.', null, [
-                'path'   => $this->getPath(),
-                'prefix' => $prefix,
-            ]);
-        }
-        $path = $path->removeLeft($prefix);
-        $path = $path->ensureLeft('/');
-        $this->setPath((string) $path);
-    }
-
-    /**
-     * @return CM_Model_Language|null
-     */
-    public function popPathLanguage() {
-        if ($abbreviation = $this->getPathPart(0)) {
-            $languagePaging = new CM_Paging_Language_Enabled();
-            if ($language = $languagePaging->findByAbbreviation($abbreviation)) {
-                $this->setLanguageUrl($language);
-                $this->popPathPart(0);
-                return $language;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @return CM_Site_Abstract
-     */
-    public function popPathSite() {
-        $siteId = $this->popPathPart();
-        $siteFactory = new CM_Site_SiteFactory();
-        if ('null' === $siteId) {
-            return $siteFactory->getDefaultSite();
-        }
-        return $siteFactory->getSiteById($siteId);
-    }
-
-    /**
-     * @return CM_Site_Abstract
-     */
-    public function popPathSiteByMatch() {
-        $siteFactory = new CM_Site_SiteFactory();
-        $site = $siteFactory->findSite($this);
-        if (null === $site) {
-            $site = (new CM_Site_SiteFactory())->getDefaultSite();
-        }
-
-        $sitePath = $site->getUrl()->getUriRelativeComponents();
-        if ($this->hasPathPrefix($sitePath)) {
-            $this->popPathPrefix($sitePath);
-        }
-        return $site;
-    }
-
-    /**
      * @return array
      */
     public function getQuery() {
-        return $this->_query;
+        $params = $this->getUrl()->getParams();
+        return null !== $params ? $params : [];
     }
 
     /**
-     * @return array
+     * @param AppUrl $url
      */
-    public function findQuery() {
-        try {
-            return $this->getQuery();
-        } catch (CM_Exception_Invalid $e) {
-            return [];
-        }
+    public function setUrl(AppUrl $url) {
+        $this->_url = $url;
     }
 
     /**
-     * @param array $query
+     * @param string|UriInterface $uri
      */
-    public function setQuery(array $query) {
-        $this->_query = $query;
-    }
-
-    /**
-     * @param string $key
-     * @param string $value
-     */
-    public function setQueryParam($key, $value) {
-        $key = (string) $key;
-        $value = (string) $value;
-        $this->_query[$key] = $value;
+    public function rewriteUrl($uri) {
+        $rewrittenUrl = $this->getUrl()->withRelativeComponentsFrom($uri);
+        $this->setUrl($rewrittenUrl);
     }
 
     /**
      * @param string $uri
-     * @throws CM_Exception_Invalid
      */
-    public function setUri($uri) {
-        $uriWithHost = $uri;
-        if ('/' === substr($uriWithHost, 0, 1)) {
-            $uriWithHost = 'http://host' . $uri;
+    public function setUrlFromString($uri) {
+        $url = new Url($uri);
+        if ($this->hasHeader('host') && !$url->getHost()) {
+            $uri = (string) $url->withHost($this->getHost());
         }
-
-        if (false === ($path = parse_url($uriWithHost, PHP_URL_PATH))) {
-            throw new CM_Exception_Invalid('Cannot detect path from url.', null, ['url' => $uriWithHost]);
+        if (ServiceWorkerUrl::matchUri($uri)) {
+            $url = ServiceWorkerUrl::createFromString($uri);
+        } elseif (AppUrl::matchUri($uri)) {
+            $url = AppUrl::createFromString($uri);
+        } else {
+            $url = PageUrl::createFromString($uri);
         }
-        if (null === $path) {
-            $path = '/';
+        $site = $url->getSite();
+        if (null === $site) {
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();
         }
-        $this->setPath($path);
-
-        if (false === ($queryString = parse_url($uriWithHost, PHP_URL_QUERY))) {
-            throw new CM_Exception_Invalid('Cannot detect query from url.', null, ['url' => $uriWithHost]);
-        }
-        mb_parse_str($queryString, $query);
-
-        $querySanitized = [];
-        foreach ($query as $key => $value) {
-            $key = CM_Util::sanitizeUtf($key);
-
-            if (is_array($value)) {
-                array_walk_recursive($value, function (&$innerValue) {
-                    if (is_string($innerValue)) {
-                        $innerValue = CM_Util::sanitizeUtf($innerValue);
-                    }
-                });
-            } else {
-                $value = CM_Util::sanitizeUtf($value);
-            }
-
-            $querySanitized[$key] = $value;
-        }
-
-        $this->setQuery($querySanitized);
-
-        $this->setLanguageUrl(null);
-
-        $this->_uri = $uri;
+        $this->_url = $url->withSite($site);
     }
 
     /**
-     * @return string
+     * @return AppUrl
      */
-    public function getUri() {
-        return $this->_uri;
+    public function getUrl() {
+        return $this->_url;
     }
 
     /**
@@ -502,14 +337,7 @@ abstract class CM_Http_Request_Abstract {
      * @return CM_Model_Language|null
      */
     public function getLanguageUrl() {
-        return $this->_languageUrl;
-    }
-
-    /**
-     * @param CM_Model_Language|null $language
-     */
-    public function setLanguageUrl(CM_Model_Language $language = null) {
-        $this->_languageUrl = $language;
+        return $this->getUrl()->getLanguage();
     }
 
     /**
