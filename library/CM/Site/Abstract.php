@@ -190,7 +190,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      */
     public function rewrite(CM_Http_Request_Abstract $request) {
         if ($request->getPath() == '/') {
-            $request->setPath('/index');
+            $request->rewriteUrl('/index');
         }
     }
 

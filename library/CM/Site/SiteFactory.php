@@ -28,33 +28,6 @@ class CM_Site_SiteFactory {
     }
 
     /**
-     * @param CM_Http_Request_Abstract $request
-     * @return CM_Site_Abstract|null
-     */
-    public function findSite(CM_Http_Request_Abstract $request) {
-        $request = clone $request;
-        foreach ($this->_siteList as $site) {
-            if ($site->match($request)) {
-                return $site;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @param CM_Http_Request_Abstract $request
-     * @return CM_Site_Abstract
-     * @throws CM_Exception
-     */
-    public function getSite(CM_Http_Request_Abstract $request) {
-        $site = $this->findSite($request);
-        if (null === $site) {
-            throw new CM_Exception('No suitable site found for request.', null, ['request' => $request]);
-        }
-        return $site;
-    }
-
-    /**
      * @param Url $url
      * @return CM_Site_Abstract|null
      */
