@@ -33,12 +33,14 @@ class ServiceWorkerUrlTest extends CMTest_TestCase {
     }
 
     public function testMatchUri() {
-        $this->assertSame(true, ServiceWorkerUrl::matchUri('serviceworker.js'));
-        $this->assertSame(true, ServiceWorkerUrl::matchUri('serviceworker-foo-bar.js'));
+        $this->assertSame(true, ServiceWorkerUrl::matchUri('/serviceworker.js'));
+        $this->assertSame(true, ServiceWorkerUrl::matchUri('/serviceworker-foo-123.js'));
         $this->assertSame(true, ServiceWorkerUrl::matchUri('http://example.com/serviceworker.js?foo=bar#fragment'));
         $this->assertSame(true, ServiceWorkerUrl::matchUri('http://example.com/prefix/serviceworker.js?foo=bar#fragment'));
-        $this->assertSame(false, ServiceWorkerUrl::matchUri('service.js'));
-        $this->assertSame(false, ServiceWorkerUrl::matchUri('serviceworker/foo.js'));
-        $this->assertSame(false, ServiceWorkerUrl::matchUri('serviceworker foo.js'));
+        $this->assertSame(false, ServiceWorkerUrl::matchUri('serviceworker.js'));
+        $this->assertSame(false, ServiceWorkerUrl::matchUri('/serviceworker-123-foo.js'));
+        $this->assertSame(false, ServiceWorkerUrl::matchUri('/service.js'));
+        $this->assertSame(false, ServiceWorkerUrl::matchUri('/serviceworker/foo.js'));
+        $this->assertSame(false, ServiceWorkerUrl::matchUri('/serviceworker foo.js'));
     }
 }

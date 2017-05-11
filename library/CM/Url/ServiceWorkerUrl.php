@@ -2,10 +2,15 @@
 
 namespace CM\Url;
 
-use CM_Http_Response_Resource_Javascript_ServiceWorker as HttpResponseServiceWorker;
+use CM_Exception_Invalid;
+use CM_Model_Language;
 use CM_Frontend_Environment;
+use CM_Http_Response_Resource_Javascript_ServiceWorker as HttpResponseServiceWorker;
 
 class ServiceWorkerUrl extends AppUrl {
+
+    const PATTERN = '/\/(?P<service>' . HttpResponseServiceWorker::PATH_PREFIX_FILENAME .
+    ')(?:\-(?P<lang>[a-z]+))?(?:\-(?<version>\d+))?\.js(?:[?#].*)?$/i';
 
     public function __construct() {
         parent::__construct('');
@@ -31,6 +36,34 @@ class ServiceWorkerUrl extends AppUrl {
     }
 
     /**
+     * @param string $uri
+     * @return static
+     * @throws CM_Exception_Invalid
+     */
+    public static function createFromString($uri) {
+        $params = [];
+        if (!self::matchUri($uri, $params)) {
+            throw new CM_Exception_Invalid('Invalid serviceworker uri', null, [
+                'uri' => $uri,
+            ]);
+        }
+
+        /** @var ServiceWorkerUrl $url */
+        $url = new static();
+        $appUrl = AppUrl::createFromString($uri);
+        if ($site = $appUrl->getSite()) {
+            $url = $url->withSite($site);
+        }
+        if (isset($params['version'])) {
+            $url->setDeployVersion((int) $params['version']);
+        }
+        if (isset($params['lang']) && $language = CM_Model_Language::findByAbbreviation($params['lang'])) {
+            $url = $url->withLanguage($language);
+        }
+        return $url;
+    }
+
+    /**
      * @param CM_Frontend_Environment|null $environment
      * @param string|null                  $deployVersion
      * @return ServiceWorkerUrl
@@ -42,10 +75,12 @@ class ServiceWorkerUrl extends AppUrl {
     }
 
     /**
-     * @param string $uri
+     * @param string     $uri
+     * @param array|null $matches
      * @return bool
      */
-    public static function matchUri($uri) {
-        return !!preg_match('/' . HttpResponseServiceWorker::PATH_PREFIX_FILENAME . '([^ \.\/]+)?\.js/', $uri);
+    public static function matchUri($uri, array &$matches = null) {
+        $matches = (array) $matches;
+        return !!preg_match(self::PATTERN, $uri, $matches);
     }
 }
