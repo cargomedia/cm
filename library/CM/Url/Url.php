@@ -248,14 +248,23 @@ class Url extends Uri {
     }
 
     /**
-     * @return array
+     * @param $index
+     * @return string|null
+     */
+    public function getPathSegmentAt($index) {
+        $segments = $this->getPathSegments();
+        return isset($segments[$index]) ? $segments[$index] : null;
+    }
+
+    /**
+     * @return string[]
      */
     public function getPathSegments() {
         return $this->_filterPathSegments(explode('/', $this->path));
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getSegments() {
         $segments = [];
