@@ -78,9 +78,9 @@ class smarty_function_usertextTest extends CMTest_TestCase {
         $emoticon = CM_Emoticon::findByCode(':-)');
         $siteDefault = (new CM_Site_SiteFactory())->getDefaultSite();
         $this->_assertSame(
-            '<span class="usertext oneline">foo <img src="http://cdn.default.dev/layout/' . $siteDefault->getId() . '/' .
+            '<span class="usertext oneline">foo <img src="http://cdn.default.dev/site-' . $siteDefault->getId() . '/version-' .
             CM_App::getInstance()->getDeployVersion() .
-            '/img/emoticon/smiley.png" class="emoticon emoticon-' .
+            '/layout/img/emoticon/smiley.png" class="emoticon emoticon-' .
             $emoticon->getName() . '" title=":smiley:" height="16" /></span>',
             array('text' => 'foo :-)', 'mode' => 'oneline', 'isMail' => true));
     }

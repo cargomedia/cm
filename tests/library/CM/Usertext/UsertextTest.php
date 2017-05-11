@@ -12,9 +12,9 @@ class CM_Usertext_UsertextTest extends CMTest_TestCase {
         $siteType = (new CM_Site_SiteFactory())->getDefaultSite()->getType();
         $usertext = new CM_Usertext_Usertext();
 
-        $expectedValuePlain = "<img src=\"http://cdn.default.dev/layout/" . $siteType . "/" . $deployVersion .
+        $expectedValuePlain = "<img src=\"http://cdn.default.dev/site-" . $siteType . "/version-" . $deployVersion . "/layout" .
             "/img/emoticon/cold_sweat.png\" class=\"emoticon emoticon-cold_sweat\" title=\":cold_sweat:\" />";
-        $expectedValueMarkdown = "<p><img src=\"http://cdn.default.dev/layout/" . $siteType . "/" . $deployVersion .
+        $expectedValueMarkdown = "<p><img src=\"http://cdn.default.dev/site-" . $siteType . "/version-" . $deployVersion . "/layout" .
             "/img/emoticon/cold_sweat.png\" class=\"emoticon emoticon-cold_sweat\" title=\":cold_sweat:\" /></p>";
 
         $usertext->setMode('escape');

@@ -27,12 +27,12 @@ class smarty_function_resourceUrlTest extends CMTest_TestCase {
         /** @var Smarty_Internal_Template $template */
         $template = $smarty->createTemplate('string:');
         $template->assignGlobal('render', $render);
-        $this->assertSame(sprintf('http://cdn.other.com/layout/%s/%s/foo', $siteOther->getId(), CM_App::getInstance()->getDeployVersion()),
+        $this->assertSame(sprintf('http://cdn.other.com/site-%s/version-%s/layout/foo', $siteOther->getId(), CM_App::getInstance()->getDeployVersion()),
             smarty_function_resourceUrl(['path' => 'foo', 'type' => 'layout', 'site' => $siteOther], $template));
         $this->assertSame(sprintf('http://cdn.other.com/static/foo?%s', CM_App::getInstance()->getDeployVersion()),
             smarty_function_resourceUrl(['path' => 'foo', 'type' => 'static', 'site' => $siteOther], $template));
 
-        $this->assertSame(sprintf('http://www.example.com/layout/%s/%s/foo', $siteOther->getId(), CM_App::getInstance()->getDeployVersion()),
+        $this->assertSame(sprintf('http://www.example.com/site-%s/version-%s/layout/foo', $siteOther->getId(), CM_App::getInstance()->getDeployVersion()),
             smarty_function_resourceUrl(['path' => 'foo', 'type' => 'layout', 'site' => $siteOther, 'sameOrigin' => true], $template));
         $this->assertSame(sprintf('http://www.example.com/static/foo?%s', CM_App::getInstance()->getDeployVersion()),
             smarty_function_resourceUrl(['path' => 'foo', 'type' => 'static', 'site' => $siteOther, 'sameOrigin' => true], $template));

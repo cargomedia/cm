@@ -263,7 +263,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         );
 
         if (null === $site) {
-            $site = (new CM_Site_SiteFactory())->getDefaultSite();;
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();
         }
         $headers = [
             'host' => $site->getHost(),

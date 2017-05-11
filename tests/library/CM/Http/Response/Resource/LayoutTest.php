@@ -2,6 +2,10 @@
 
 class CM_Http_Response_Resource_LayoutTest extends CMTest_TestCase {
 
+    protected function tearDown() {
+        CMTest_TH::clearEnv();
+    }
+
     public function testProcess() {
         $site = $this->getMockSite();
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
@@ -54,14 +58,14 @@ class CM_Http_Response_Resource_LayoutTest extends CMTest_TestCase {
     public function testNonexistentFile() {
         $site = $this->getMockSite();
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-        $url = $render->getUrlResource('layout', 'nonExistent.css');
+        $url = $render->getUrlResource('layout', 'nonExistent.css', $site);
         $request = new CM_Http_Request_Get($url, ['host' => $site->getHost()]);
 
         try {
             $this->processRequest($request);
         } catch (CM_Exception_Nonexistent $ex) {
             $this->assertSame('Invalid filename', $ex->getMessage());
-            $this->assertSame(['path' => '/nonExistent.css'], $ex->getMetaInfo());
+            $this->assertSame(['path' => sprintf('/nonExistent.css')], $ex->getMetaInfo());
         }
     }
 

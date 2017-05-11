@@ -1,6 +1,6 @@
 <?php
 
-use CM\Url\Url;
+use CM\Url\PageUrl;
 
 class CM_Http_Response_PageTest extends CMTest_TestCase {
 
@@ -14,7 +14,8 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
 
         $response->process();
-        $this->assertContains('Location: ' . Url::create('/mock11?count=2')->withSite($response->getSite()), $response->getHeaders());
+        $this->assertContains('Location: ' .
+            PageUrl::createWithParams('/mock11', ['count' => 2])->withSite($response->getSite()), $response->getHeaders());
     }
 
     public function testProcessLanguageNoRedirect() {
@@ -58,7 +59,8 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
 
-        $this->assertContains('Location: ' . Url::create('/mock5?foo=bar')->withSite($response->getSite()), $response->getHeaders());
+        $this->assertContains('Location: ' .
+            PageUrl::createWithParams('/mock5', ['foo' => 'bar'])->withSite($response->getSite()), $response->getHeaders());
     }
 
     public function testProcessHostWithoutWww() {
@@ -67,7 +69,8 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
 
-        $this->assertContains('Location: ' . Url::create('/mock5?foo=bar')->withSite($response->getSite()), $response->getHeaders());
+        $this->assertContains('Location: ' .
+            PageUrl::createWithParams('/mock5', ['foo' => 'bar'])->withSite($response->getSite()), $response->getHeaders());
     }
 
     public function testProcessSiteMatchingByPath() {
