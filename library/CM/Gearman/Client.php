@@ -32,15 +32,10 @@ class CM_Gearman_Client {
      * @throws CM_Exception
      */
     public function runMultiple(array $jobs) {
-        
+
         $resultList = [];
         $this->_gearmanClient->setCompleteCallback(function (GearmanTask $task) use (&$resultList) {
             $resultList[] = $this->_serializer->unserializeJobResult($task->data());
-        });
-
-        $failureList = [];
-        $this->_gearmanClient->setFailCallback(function (GearmanTask $task) use (&$failureList) {
-            $failureList[] = $task;
         });
 
         \Functional\each($jobs, function (CM_Jobdistribution_Job_Abstract $job)  {
