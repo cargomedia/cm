@@ -1,4 +1,4 @@
-CM Framework  [![Build Status](https://travis-ci.org/cargomedia/cm.png)](https://travis-ci.org/cargomedia/cm) (codeship badge here soon!)
+CM Framework  [![Build Status](https://travis-ci.org/cargomedia/cm.png)](https://travis-ci.org/cargomedia/cm) [ ![Codeship Status for zazabe/cm](https://app.codeship.com/projects/b4eb9960-1921-0135-609e-1604c1889850/status?branch=ci-codefresh)](https://app.codeship.com/projects/219151)
 ============
 
 Major concepts
