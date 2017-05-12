@@ -20,25 +20,9 @@ class CM_Gearman_Factory {
      * @param CM_Jobdistribution_JobSerializer $serializer
      * @return CM_Gearman_Client
      */
-    protected function createClient(array $servers, CM_Jobdistribution_JobSerializer $serializer) {
-        $client = $this->createGearmanClient($servers);
+    public function createClient(array $servers, CM_Jobdistribution_JobSerializer $serializer) {
+        $client = $this->_createGearmanClient($servers);
         return new CM_Gearman_Client($client, $serializer);
-    }
-
-    /**
-     * @param array $servers
-     * @return GearmanClient
-     * @throws CM_Exception
-     */
-    public function createGearmanClient(array $servers) {
-        if (!extension_loaded('gearman')) {
-            throw new CM_Exception('Missing `gearman` extension');
-        }
-        $client = new GearmanClient();
-        foreach ($servers as $server) {
-            $client->addServer($server['host'], $server['port']);
-        }
-        return $client;
     }
 
     /**
@@ -48,7 +32,7 @@ class CM_Gearman_Factory {
      * @return CM_Gearman_Worker
      */
     public function createWorker(array $servers, CM_Jobdistribution_JobSerializer $serializer, $jobLimit) {
-        $worker = $this->createGearmanWorker($servers);
+        $worker = $this->_createGearmanWorker($servers);
         return new CM_Gearman_Worker($worker, $serializer, $jobLimit);
     }
 
@@ -57,7 +41,7 @@ class CM_Gearman_Factory {
      * @return GearmanWorker
      * @throws CM_Exception
      */
-    public function createGearmanWorker(array $servers) {
+    public function _createGearmanWorker(array $servers) {
         if (!extension_loaded('gearman')) {
             throw new CM_Exception('Missing `gearman` extension');
         }
@@ -66,6 +50,22 @@ class CM_Gearman_Factory {
             $worker->addServer($server['host'], $server['port']);
         }
         return $worker;
+    }
+
+    /**
+     * @param array $servers
+     * @return GearmanClient
+     * @throws CM_Exception
+     */
+    protected function _createGearmanClient(array $servers) {
+        if (!extension_loaded('gearman')) {
+            throw new CM_Exception('Missing `gearman` extension');
+        }
+        $client = new GearmanClient();
+        foreach ($servers as $server) {
+            $client->addServer($server['host'], $server['port']);
+        }
+        return $client;
     }
 
     /**
