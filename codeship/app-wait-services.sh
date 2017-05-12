@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 function test_mysql {
   mysqladmin -h "mysql" ping &>/dev/null
 }
