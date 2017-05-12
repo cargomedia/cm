@@ -7,7 +7,7 @@ class CM_Gearman_Factory {
      * @param int   $workerJobLimit
      * @return CM_Gearman_JobService
      */
-    protected function createJobService(array $servers, $workerJobLimit) {
+    public function createJobService(array $servers, $workerJobLimit) {
         $serializer = new CM_Serializer_ArrayConvertible();
         $jobSerializer = new CM_Jobdistribution_JobSerializer($serializer);
         $client = $this->createClient($servers, $jobSerializer);

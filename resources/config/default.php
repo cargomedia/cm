@@ -323,7 +323,7 @@ return function (CM_Config_Node $config) {
     $config->services[CM_Jobdistribution_QueueInterface::class] = [
         'class'  => CM_Gearman_Factory::class,
         'method' => [
-            'name'      => 'createJobQueue',
+            'name'      => 'createJobService',
             'arguments' => [
                 'servers'        => [
                     ['host' => 'localhost', 'port' => 4730],
