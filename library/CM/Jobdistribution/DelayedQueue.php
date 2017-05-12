@@ -54,20 +54,9 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
         $result = CM_Db_Db::select('cm_jobdistribution_delayedqueue', '*', '`executeAt` <= ' . $executeAtMax, '`executeAt` ASC');
         while ($row = $result->fetch()) {
             $jobName = $row['className'];
-            $job = $this->_instantiateJob($jobName);
+            $job = $this->_instantiateJob($jobName, $row['params']);
             if ($job) {
-                $params = null;
-                $paramsEncoded = $row['params'];
-                try {
-                    $params = CM_Params::decode($paramsEncoded, true);
-                } catch (Exception $ex) {
-                    $context = new CM_Log_Context();
-                    $context->setException($ex);
-                    $context->setExtra(['job' => $jobName, 'paramsEncoded' => $paramsEncoded]);
-                    $this->getServiceManager()->getLogger()->warning('Job-params could not be decoded', $context);
-                    continue;
-                }
-                $job->queue($params);
+                $this->getServiceManager()->getJobQueue()->queue($job);
             }
         }
         CM_Db_Db::delete('cm_jobdistribution_delayedqueue', '`executeAt` <= ' . $executeAtMax);
@@ -75,12 +64,24 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
 
     /**
      * @param string $className
+     * @param string $paramsEncoded
      * @return CM_Jobdistribution_Job_Abstract|null
      */
-    protected function _instantiateJob($className) {
+    protected function _instantiateJob($className, $paramsEncoded) {
+        $params = null;
+        try {
+            $params = CM_Params::decode($paramsEncoded, true);
+        } catch (Exception $ex) {
+            $context = new CM_Log_Context();
+            $context->setException($ex);
+            $context->setExtra(['job' => $className, 'paramsEncoded' => $paramsEncoded]);
+            $this->getServiceManager()->getLogger()->warning('Job-params could not be decoded', $context);
+            return null;
+        }
         try {
             /** @var CM_Jobdistribution_Job_Abstract $job */
-            $job = new $className();
+            $jobParams = CM_Params::factory($params);
+            $job = new $className($jobParams);
             if ($job instanceof CM_Service_ManagerAwareInterface) {
                 /** @var CM_Service_ManagerAwareInterface $job */
                 $job->setServiceManager($this->getServiceManager());
