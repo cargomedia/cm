@@ -1,6 +1,6 @@
 <?php
 
-class CM_Gearman_JobService implements CM_Jobdistribution_QueueInterface, CM_Jobdistribution_RPCInterface {
+class CM_Gearman_JobService implements CM_Jobdistribution_QueueInterface {
 
     /** @var CM_Gearman_Client */
     private $_client;
@@ -17,10 +17,6 @@ class CM_Gearman_JobService implements CM_Jobdistribution_QueueInterface, CM_Job
         $this->_worker = $worker;
     }
 
-    public function queue(CM_Jobdistribution_Job_Abstract $job) {
-        $this->_client->queue($job);
-    }
-
     public function consume() {
         foreach (CM_Jobdistribution_Job_Abstract::getClassChildren() as $jobClassName) {
             $this->_worker->registerJob($jobClassName);
@@ -28,11 +24,15 @@ class CM_Gearman_JobService implements CM_Jobdistribution_QueueInterface, CM_Job
         $this->_worker->run();
     }
 
-    public function run(CM_Jobdistribution_Job_Abstract $job) {
+    public function queue(CM_Jobdistribution_Job_Abstract $job) {
+        $this->_client->queue($job);
+    }
+
+    public function runSync(CM_Jobdistribution_Job_Abstract $job) {
         return $this->_client->run($job);
     }
 
-    public function runMultiple(array $jobs) {
+    public function runSyncMultiple(array $jobs) {
         return $this->_client->runMultiple($jobs);
     }
 
