@@ -280,14 +280,15 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
      * @param mixed $item
      */
     public static function updateItemWithJob($item) {
-        if (!CM_Service_Manager::getInstance()->getElasticsearch()->getEnabled()) {
+        $serviceManager = CM_Service_Manager::getInstance();
+        if (!$serviceManager->getElasticsearch()->getEnabled()) {
             return;
         }
-        $job = new CM_Elasticsearch_UpdateDocumentJob();
-        $job->queue(array(
+        $job = new CM_Elasticsearch_UpdateDocumentJob(CM_Params::factory([
             'indexClassName' => get_called_class(),
             'id'             => static::getIdForItem($item),
-        ));
+        ]));
+        $serviceManager->getJobQueue()->queue($job);
     }
 
     /**

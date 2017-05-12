@@ -11,8 +11,8 @@ class CMService_GoogleAnalytics_Client implements CM_Service_Tracking_ClientInte
     protected $_eventList = [], $_transactionList = [], $_pageViewList = [], $_fieldList = [], $_pluginList = [];
 
     /**
-     * @param string   $code
-     * @param int|null $ttl
+     * @param string                            $code
+     * @param int|null                          $ttl
      */
     public function __construct($code, $ttl = null) {
         $this->_code = (string) $code;

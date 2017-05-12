@@ -8,11 +8,19 @@ class CMService_KissMetrics_Client implements CM_Service_Tracking_ClientInterfac
     /** @var string[] */
     protected $_identityList = array();
 
+    /** @var CM_Jobdistribution_QueueInterface */
+    private $_jobQueue;
+
     /**
-     * @param string $code
+     * @param string                            $code
+     * @param CM_Jobdistribution_QueueInterface $jobQueue
      */
-    public function __construct($code) {
+    public function __construct($code, CM_Jobdistribution_QueueInterface $jobQueue = null) {
         $this->_code = (string) $code;
+        if (null === $jobQueue) {
+            $jobQueue = CM_Service_Manager::getInstance()->getJobQueue();
+        }
+        $this->_jobQueue = $jobQueue;
     }
 
     public function getHtml(CM_Frontend_Environment $environment) {
@@ -88,13 +96,13 @@ EOF;
         if (0 === count($this->_getIdentityList()) && $actor = $action->getActor()) {
             $this->setUserId($actor->getId());
         }
-        $trackEventJob = new CMService_KissMetrics_TrackEventJob();
-        $trackEventJob->queue(array(
+        $trackEventJob = new CMService_KissMetrics_TrackEventJob(CM_Params::factory([
             'code'         => $this->_getCode(),
             'identityList' => $this->_getIdentityList(),
             'eventName'    => $action->getLabel(),
             'propertyList' => $action->getTrackingPropertyList(),
-        ));
+        ]));
+        $this->_jobQueue->queue($trackEventJob);
     }
 
     /**
@@ -155,12 +163,12 @@ EOF;
                 $this->setUserId($fixture->getId());
                 break;
         }
-        $trackEventJob = new CMService_KissMetrics_TrackPropertyListJob();
-        $trackEventJob->queue(array(
+        $trackEventJob = new CMService_KissMetrics_TrackPropertyListJob(CM_Params::factory([
             'code'         => $this->_getCode(),
             'identityList' => $this->_getIdentityList(),
-            'propertyList' => array('Splittest ' . $nameSplittest => $nameVariation),
-        ));
+            'propertyList' => ['Splittest ' . $nameSplittest => $nameVariation],
+        ]));
+        $this->_jobQueue->queue($trackEventJob);
     }
 
     /**

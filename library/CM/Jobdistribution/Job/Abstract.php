@@ -46,4 +46,8 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     public function getJobName() {
         return get_class($this);
     }
+
+    public function queue() {
+        
+    }
 }
