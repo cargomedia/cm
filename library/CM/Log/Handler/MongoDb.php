@@ -90,7 +90,7 @@ class CM_Log_Handler_MongoDb extends CM_Log_Handler_Abstract {
                 'server'  => $request->getServer(),
                 'headers' => $request->getHeaders(),
             ];
-            $formattedContext['httpRequest']['query'] = $request->getQuery();
+            $formattedContext['httpRequest']['query'] = $request->findQuery();
             if ($request instanceof CM_Http_Request_Post) {
                 $formattedContext['httpRequest']['body'] = $request->getBody();
             }

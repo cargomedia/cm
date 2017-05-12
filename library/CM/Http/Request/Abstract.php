@@ -156,6 +156,17 @@ abstract class CM_Http_Request_Abstract {
     }
 
     /**
+     * @return array
+     */
+    public function findQuery() {
+        try {
+            return $this->getQuery();
+        } catch (CM_Exception_Invalid $e) {
+            return [];
+        }
+    }
+
+    /**
      * @param AppUrl $url
      */
     public function setUrl(AppUrl $url) {

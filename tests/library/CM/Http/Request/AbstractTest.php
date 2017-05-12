@@ -109,6 +109,20 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Http_Request_Post', CM_Http_Request_Abstract::factory('POST', '/test'));
     }
 
+    public function testFindQuery() {
+        $uri = '/foo/bar?foo1=bar1';
+        $headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
+        /** @var CM_Http_Request_Abstract $mock */
+        $requestMockClass = $this->mockClass('CM_Http_Request_Abstract');
+        /** @var \Mocka\AbstractClassTrait|CM_Http_Request_Abstract $requestMock */
+        $requestMock = $requestMockClass->newInstance([$uri, $headers]);
+        $this->assertSame(['foo1' => 'bar1'], $requestMock->findQuery());
+        $requestMock->mockMethod('getQuery')->set(function () {
+            throw new CM_Exception_Invalid('error');
+        });
+        $this->assertSame([], $requestMock->findQuery());
+    }
+
     public function testSetUrlFromString() {
         $language = CM_Model_Language::create('english', 'en', true);
         $site1 = $this->getMockSite(null, null, [
