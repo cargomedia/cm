@@ -1,4 +1,4 @@
-CM Framework  [![Build Status](https://travis-ci.org/cargomedia/cm.png)](https://travis-ci.org/cargomedia/cm)
+CM Framework  [![Build Status](https://travis-ci.org/cargomedia/cm.png)](https://travis-ci.org/cargomedia/cm) (codeship badge here soon!)
 ============
 
 Major concepts
