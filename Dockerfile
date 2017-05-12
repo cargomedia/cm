@@ -8,7 +8,6 @@ ADD codeship/app-setup.sh /app/cm/app-setup.sh
 ADD codeship/test.sh /app/cm/test.sh
 
 ADD composer.json /app/cm/composer.json
-ADD composer.lock /app/cm/composer.lock
 ADD vendor /app/cm/vendor
 RUN composer up
 
