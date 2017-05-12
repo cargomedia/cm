@@ -1,10 +1,10 @@
 <?php
 
 class CM_Gearman_JobService implements CM_Jobdistribution_QueueInterface, CM_Jobdistribution_RPCInterface {
-    
+
     /** @var CM_Gearman_Client */
     private $_client;
-    
+
     /** @var CM_Gearman_Worker */
     private $_worker;
 
@@ -17,10 +17,7 @@ class CM_Gearman_JobService implements CM_Jobdistribution_QueueInterface, CM_Job
         $this->_worker = $worker;
     }
 
-    /**
-     * @param CM_Jobdistribution_Job_Abstract $job
-     */
-    public function publish(CM_Jobdistribution_Job_Abstract $job) {
+    public function queue(CM_Jobdistribution_Job_Abstract $job) {
         $this->_client->queue($job);
     }
 
@@ -39,4 +36,4 @@ class CM_Gearman_JobService implements CM_Jobdistribution_QueueInterface, CM_Job
         return $this->_client->runMultiple($jobs);
     }
 
-} 
+}
