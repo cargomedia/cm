@@ -8,7 +8,6 @@ ADD codeship/app-setup.sh /app/cm/app-setup.sh
 ADD codeship/test.sh /app/cm/test.sh
 
 ADD composer.json /app/cm/composer.json
-ADD vendor /app/cm/vendor
 RUN composer up
 
 ADD phpunit.xml /app/cm/phpunit.xml
