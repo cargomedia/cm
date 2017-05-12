@@ -147,7 +147,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
 
     public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
         $request = clone $request;
-        return new self($request, $request->getSite(), $serviceManager);
+        return new self($request, $site, $serviceManager);
     }
 
     public static function catchAll() {

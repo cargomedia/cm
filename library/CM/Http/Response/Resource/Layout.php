@@ -36,7 +36,7 @@ class CM_Http_Response_Resource_Layout extends CM_Http_Response_Resource_Abstrac
             $request = clone $request;
             $url = $request->getUrl()->dropPathSegment('layout');
             $request->setUrl($url);
-            return new self($request, $request->getSite(), $serviceManager);
+            return new self($request, $site, $serviceManager);
         }
         return null;
     }

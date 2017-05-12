@@ -62,7 +62,7 @@ class CM_Http_Response_Upload extends CM_Http_Response_Abstract {
         if ($request->getUrl()->matchPath('upload') && $request instanceof CM_Http_Request_Post) {
             $request = clone $request;
             $request->setBodyEncoding(CM_Http_Request_Post::ENCODING_NONE);
-            return new self($request, $request->getSite(), $serviceManager);
+            return new self($request, $site, $serviceManager);
         }
         return null;
     }

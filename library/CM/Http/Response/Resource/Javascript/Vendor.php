@@ -34,7 +34,7 @@ class CM_Http_Response_Resource_Javascript_Vendor extends CM_Http_Response_Resou
     public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
         if ($request->getUrl()->matchPath('vendor-js')) {
             $request = clone $request;
-            return new self($request, $request->getSite(), $serviceManager);
+            return new self($request, $site, $serviceManager);
         }
         return null;
     }
