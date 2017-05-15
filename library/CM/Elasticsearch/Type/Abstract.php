@@ -287,7 +287,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
         $job = new CM_Elasticsearch_UpdateDocumentJob(CM_Params::factory([
             'indexClassName' => get_called_class(),
             'id'             => static::getIdForItem($item),
-        ]));
+        ], false));
         $serviceManager->getJobQueue()->queue($job);
     }
 

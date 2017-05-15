@@ -47,6 +47,7 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
     }
 
     public function testUpdateItemWithJob() {
+        $this->_setupQueueMock();
         $query = new CM_Elasticsearch_Query();
         $query->queryMatchMulti(array('name'), 'foo');
         $source = new CM_PagingSource_Elasticsearch($this->_type, $query);
