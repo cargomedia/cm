@@ -101,7 +101,7 @@ EOF;
             'identityList' => $this->_getIdentityList(),
             'eventName'    => $action->getLabel(),
             'propertyList' => $action->getTrackingPropertyList(),
-        ]));
+        ], false));
         $this->_jobQueue->queue($trackEventJob);
     }
 
@@ -167,7 +167,7 @@ EOF;
             'code'         => $this->_getCode(),
             'identityList' => $this->_getIdentityList(),
             'propertyList' => ['Splittest ' . $nameSplittest => $nameVariation],
-        ]));
+        ], false));
         $this->_jobQueue->queue($trackEventJob);
     }
 
