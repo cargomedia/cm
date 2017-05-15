@@ -15,37 +15,34 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
 
     /**
      * @param CM_Jobdistribution_Job_Abstract $job
-     * @param array                           $params
      * @param int                             $delay
      */
-    public function addJob(CM_Jobdistribution_Job_Abstract $job, array $params, $delay) {
+    public function addJob(CM_Jobdistribution_Job_Abstract $job, $delay) {
         CM_Db_Db::insert('cm_jobdistribution_delayedqueue', [
             'className' => get_class($job),
-            'params'    => CM_Params::encode($params, true),
+            'params'    => CM_Util::jsonEncode($job->getParams()->getParamsEncoded()),
             'executeAt' => time() + (int) $delay,
         ]);
     }
 
     /**
      * @param CM_Jobdistribution_Job_Abstract $job
-     * @param array                           $params
      */
-    public function cancelJob(CM_Jobdistribution_Job_Abstract $job, array $params) {
+    public function cancelJob(CM_Jobdistribution_Job_Abstract $job) {
         CM_Db_Db::delete('cm_jobdistribution_delayedqueue', [
             'className' => get_class($job),
-            'params'    => CM_Params::encode($params, true),
+            'params'    => CM_Util::jsonEncode($job->getParams()->getParamsEncoded()),
         ]);
     }
 
     /**
      * @param CM_Jobdistribution_Job_Abstract $job
-     * @param array                           $params
      * @return int
      */
-    public function countJob(CM_Jobdistribution_Job_Abstract $job, array $params) {
+    public function countJob(CM_Jobdistribution_Job_Abstract $job) {
         return CM_Db_Db::count('cm_jobdistribution_delayedqueue', [
             'className' => get_class($job),
-            'params'    => CM_Params::encode($params, true),
+            'params'    => CM_Util::jsonEncode($job->getParams()->getParamsEncoded()),
         ]);
     }
 
@@ -80,7 +77,7 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
         }
         try {
             /** @var CM_Jobdistribution_Job_Abstract $job */
-            $jobParams = CM_Params::factory($params);
+            $jobParams = CM_Params::factory($params, false);
             $job = new $className($jobParams);
             if ($job instanceof CM_Service_ManagerAwareInterface) {
                 /** @var CM_Service_ManagerAwareInterface $job */
