@@ -1,0 +1,2 @@
+FROM busybox:latest
+VOLUME ["/app/cm/data", "/usr/share/elasticsearch/data", "/gearman/data", "/data/redis/data/db", "/var/lib/mysql"]

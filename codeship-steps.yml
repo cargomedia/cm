@@ -1,6 +1,12 @@
-- type: serial
+- type: parallel
   services:
   - cm
   steps:
-  - command: ./app-setup.sh
-  - command: ./test.sh
+    - type: serial
+      steps:
+      - command: ./app-setup.sh
+      - command: ./test.sh --filter='^CM_[A-M]'
+    - type: serial
+      steps:
+      - command: ./app-setup.sh
+      - command: ./test.sh --filter='^CM_[N-Z]'

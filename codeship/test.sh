@@ -3,4 +3,4 @@
 set -e
 
 ./app-wait-services.sh
-./bin/phpunit
+./bin/phpunit $@
