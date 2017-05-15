@@ -1,62 +1,51 @@
+.menu-pills,
 .menu-tabs {
-  padding: 0 10px;
+  display: flex;
+  flex-wrap: wrap;
 
   > li {
-    display: inline-block;
-
     > a {
       .nowrap;
+      border-radius: @sizeButton*.5;
       display: block;
-      padding: 7px 10px;
-      border-radius: 10px;
-      font-weight: bold;
-      color: @colorFgSubtle;
-      transition: color 200ms;
+      line-height: @sizeButton;
+      padding-left: 12px;
+      padding-right: 12px;
 
       .icon {
         opacity: 0.8;
       }
     }
+
     &.hasIcon.hasLabel .label {
       margin-left: 5px;
     }
 
-    &.active a {
+    &.active > a {
       color: @fontColorHeading;
     }
   }
 }
 
 .menu-pills {
-  margin-bottom: 5px;
-  line-height: 0;
+  background-color: @colorBgButton;
   border: 1px solid @colorFgButtonBorder;
   border-radius: @borderRadiusInput;
-  background-color: @colorBgButton;
+  margin-bottom: 5px;
+  padding: 4px;
 
   > li {
-    display: inline-block;
-
     > a {
-      .nowrap;
-      display: block;
-      padding: 0 15px;
-      max-width: 150px;
       color: @fontColor;
-      line-height: @sizeButton;
-      transition: color 200ms;
-
-      .icon {
-        opacity: 0.8;
-      }
     }
+  }
+}
 
-    &.hasIcon.hasLabel .label {
-      margin-left: 5px;
-    }
-
-    &.active a {
-      color: @fontColorHeading;
+.menu-tabs {
+  > li {
+    > a {
+      color: @colorFgSubtle;
+      font-weight: bold;
     }
   }
 }
