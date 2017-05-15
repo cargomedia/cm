@@ -44,4 +44,28 @@ class CM_Maintenance_RunEventJobTest extends CMTest_TestCase {
         $this->assertSame('Foo', $exception->getMessage());
         $this->assertSame(2, $mockHandleClockworkEventResult->getCallCount());
     }
+
+    public function testExecuteSetResultHandlingExceptionSeverityFatal() {
+        $serviceManager = new CM_Service_Manager();
+        $job = new CM_Maintenance_RunEventJob();
+        $job->setServiceManager($serviceManager);
+
+        /** @var CM_Maintenance_Service|\Mocka\AbstractClassTrait $maintenance */
+        $maintenance = $this->mockClass(CM_Maintenance_Service::class)->newInstanceWithoutConstructor();
+        $mockHandleClockworkEventResult = $maintenance->mockMethod('handleClockworkEventResult')->set(function () {
+            throw new CM_Exception('Something terrible has happened.', CM_Exception::ERROR);
+        });
+        $maintenance->registerEvent('foo', '1 megaannus', function() {});
+        $serviceManager->replaceInstance('maintenance', $maintenance);
+
+        $this->assertSame(0, $mockHandleClockworkEventResult->getCallCount());
+        /** @var CM_Exception $exception */
+        $exception = $this->catchException(function () use ($job) {
+            $job->run(['event' => 'foo', 'lastRuntime' => null]);
+        });
+        $this->assertSame(1, $mockHandleClockworkEventResult->getCallCount());
+        $this->assertInstanceOf(CM_Exception::class, $exception);
+        $this->assertSame('Something terrible has happened.', $exception->getMessage());
+        $this->assertSame(CM_Exception::FATAL, $exception->getSeverity());
+    }
 }
