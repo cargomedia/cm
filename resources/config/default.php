@@ -70,8 +70,6 @@ return function (CM_Config_Node $config) {
 
     $config->CM_AdproviderAdapter_Abstract->class = CM_AdproviderAdapter_Revive::class;
 
-    $config->CM_Jobdistribution_JobWorker->servers = [['host' => 'localhost', 'port' => 4730]];
-
     $config->CMService_MaxMind->licenseKey = null;
 
     $config->services = [];

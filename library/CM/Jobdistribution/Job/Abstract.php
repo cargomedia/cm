@@ -47,7 +47,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
         return get_class($this);
     }
 
-    public function queue() {
-        
+    public function queue() { //TODO delete it
+
     }
 }
