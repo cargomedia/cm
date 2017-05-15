@@ -9,7 +9,7 @@ class CM_Gearman_Worker extends CM_Class_Abstract implements CM_Service_ManagerA
 
     /** @var int */
     private $_jobLimit;
-    
+
     /** @var CM_Jobdistribution_JobSerializer */
     private $_serializer;
 
@@ -57,7 +57,7 @@ class CM_Gearman_Worker extends CM_Class_Abstract implements CM_Service_ManagerA
      */
     public function runJob(GearmanJob $gearmanJob) {
         $job = $this->_convertGearmanJobToJob($gearmanJob);
-        $result = CM_Service_Manager::getInstance()->getNewrelic()->runAsTransaction('CM Job: ' . $this->_getClassName(), function() use ($job) {
+        $result = CM_Service_Manager::getInstance()->getNewrelic()->runAsTransaction('CM Job: ' . get_class($job), function() use ($job) {
             return $job->execute();
         });
         return $this->_serializer->serializeJobResult($result);

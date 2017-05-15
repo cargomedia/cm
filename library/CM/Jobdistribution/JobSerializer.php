@@ -38,11 +38,11 @@ class CM_Jobdistribution_JobSerializer {
             throw new CM_Exception_Nonexistent("Cannot decode workload `{$ex->getMessage()}`, workload: `${data}'", null, null, CM_Exception::WARN);
         }
         $jobClassName = $workloadParams['jobClassName'];
-        $params = $workloadParams['jobParams'];
+        $paramsEncoded = $workloadParams['jobParams'];
         if (!is_subclass_of($jobClassName, CM_Jobdistribution_Job_Abstract::class, true)) {
             throw new CM_Exception_Invalid('Not valid job class', null, ['className' => $jobClassName]);
         }
-        return new $jobClassName($params);
+        return new $jobClassName(CM_Params::factory($paramsEncoded, true));
     }
 
     /**
