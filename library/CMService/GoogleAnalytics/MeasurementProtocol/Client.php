@@ -76,7 +76,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      * @param array $parameterList
      */
     protected function _queueHit(array $parameterList) {
-        $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob(CM_Params::factory($parameterList));
+        $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob(CM_Params::factory($parameterList, false));
         $this->_jobQueue->queue($job);
     }
 
