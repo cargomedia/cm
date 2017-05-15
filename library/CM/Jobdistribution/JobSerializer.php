@@ -35,7 +35,10 @@ class CM_Jobdistribution_JobSerializer {
         try {
             $workloadParams = $this->_serializer->unserialize($data);
         } catch (CM_Exception_Nonexistent $ex) {
-            throw new CM_Exception_Nonexistent("Cannot decode workload `{$ex->getMessage()}`, workload: `${data}'", null, null, CM_Exception::WARN);
+            throw new CM_Exception_Nonexistent('Cannot decode workload', CM_Exception::WARN, [
+                'workload'                 => $data,
+                'originalExceptionMessage' => $ex->getMessage(),
+            ]);
         }
         $jobClassName = $workloadParams['jobClassName'];
         $paramsEncoded = $workloadParams['jobParams'];
@@ -72,7 +75,9 @@ class CM_Jobdistribution_JobSerializer {
             });
         }
         if (is_object($value) && !$value instanceof CM_ArrayConvertible) {
-            throw new CM_Exception_InvalidParam('Object of class `' . get_class($value) . '` is not an instance of CM_ArrayConvertible');
+            throw new CM_Exception_InvalidParam('Object is not an instance of CM_ArrayConvertible', null, [
+                'className' => get_class($value),
+            ]);
         }
     }
 }
