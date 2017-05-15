@@ -8,10 +8,10 @@ final class CM_EventHandler_EventHandler implements CM_EventHandler_EventHandler
     private $_jobQueue;
 
     /**
-     * @param CM_Jobdistribution_QueueInterface $jobQueue
+     * @param CM_Jobdistribution_QueueInterface|null $jobQueue
      */
     public function __construct(CM_Jobdistribution_QueueInterface $jobQueue = null) {
-        if (null !== $jobQueue) {
+        if (null === $jobQueue) {
             $jobQueue = CM_Service_Manager::getInstance()->getJobQueue();
         }
         $this->_jobQueue = $jobQueue;
@@ -34,7 +34,7 @@ final class CM_EventHandler_EventHandler implements CM_EventHandler_EventHandler
             $jobParams = (array) $jobParams;
             $jobParams = array_merge($defaultJobParams, $jobParams);
             /** @var CM_Jobdistribution_Job_Abstract $job */
-            $job = $reflectionClass->newInstanceArgs([CM_Params::factory($jobParams)]);
+            $job = $reflectionClass->newInstanceArgs([CM_Params::factory($jobParams, false)]);
             $this->_jobQueue->queue($job);
         });
     }
