@@ -38,7 +38,7 @@ class CM_Gearman_Client {
             $resultList[] = $this->_serializer->unserializeJobResult($task->data());
         });
 
-        \Functional\each($jobs, function (CM_Jobdistribution_Job_Abstract $job)  {
+        \Functional\each($jobs, function (CM_Jobdistribution_Job_Abstract $job) {
             $workload = $this->_serializer->serializeJob($job);
             $task = $this->_gearmanClient->addTaskHigh($job->getJobName(), $workload);
             if (false === $task) {
@@ -49,7 +49,7 @@ class CM_Gearman_Client {
 
         if (count($resultList) != count($jobs)) {
             throw new CM_Exception('Job failed. Invalid results', null, [
-                'jobName'         => \Functional\map($jobs, function (CM_Jobdistribution_Job_Abstract $job) {
+                'jobNameList'     => \Functional\map($jobs, function (CM_Jobdistribution_Job_Abstract $job) {
                     return $job->getJobName();
                 }),
                 'countResultList' => count($resultList),
