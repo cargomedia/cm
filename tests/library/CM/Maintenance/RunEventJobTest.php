@@ -3,9 +3,10 @@
 class CM_Maintenance_RunEventJobTest extends CMTest_TestCase {
 
     public function testExecute() {
-        $serviceManager = new CM_Service_Manager();
-        $job = new CM_Maintenance_RunEventJob();
-        $job->setServiceManager($serviceManager);
+        $this->_setupQueueMock();
+        $serviceManager = $this->getServiceManager();
+        $job1 = new CM_Maintenance_RunEventJob(CM_Params::factory(['event' => 'foo', 'lastRuntime' => null], false));
+        $job2 = new CM_Maintenance_RunEventJob(CM_Params::factory(['event' => 'bar', 'lastRuntime' => null], false));
 
         /** @var CM_Maintenance_Service|\Mocka\AbstractClassTrait $maintenance */
         $maintenance = $this->mockClass(CM_Maintenance_Service::class)->newInstanceWithoutConstructor();
@@ -30,12 +31,12 @@ class CM_Maintenance_RunEventJobTest extends CMTest_TestCase {
 
         $this->assertSame(0, $fooCounter);
         $this->assertSame(0, $mockHandleClockworkEventResult->getCallCount());
-        $job->run(['event' => 'foo', 'lastRuntime' => null]);
+        $serviceManager->getJobQueue()->runSync($job1);
         $this->assertSame(1, $fooCounter);
         $this->assertSame(1, $mockHandleClockworkEventResult->getCallCount());
 
-        $exception = $this->catchException(function () use ($job) {
-            $job->run(['event' => 'bar', 'lastRuntime' => null]);
+        $exception = $this->catchException(function () use ($job2) {
+            $this->getServiceManager()->getJobQueue()->runSync($job2);
         });
         $this->assertInstanceOf(Exception::class, $exception);
         $this->assertSame('Foo', $exception->getMessage());
