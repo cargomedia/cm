@@ -12,8 +12,8 @@ class CMService_KissMetrics_Client implements CM_Service_Tracking_ClientInterfac
     private $_jobQueue;
 
     /**
-     * @param string                            $code
-     * @param CM_Jobdistribution_QueueInterface $jobQueue
+     * @param string                                 $code
+     * @param CM_Jobdistribution_QueueInterface|null $jobQueue
      */
     public function __construct($code, CM_Jobdistribution_QueueInterface $jobQueue = null) {
         $this->_code = (string) $code;
