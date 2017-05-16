@@ -3,7 +3,6 @@
 class CM_Maintenance_RunEventJobTest extends CMTest_TestCase {
 
     public function testExecute() {
-        $this->_setupQueueMock();
         $serviceManager = $this->getServiceManager();
         $job1 = new CM_Maintenance_RunEventJob(CM_Params::factory(['event' => 'foo', 'lastRuntime' => null], false));
         $job2 = new CM_Maintenance_RunEventJob(CM_Params::factory(['event' => 'bar', 'lastRuntime' => null], false));

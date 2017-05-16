@@ -429,24 +429,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $html = $renderAdapter->fetch();
         return new CM_Dom_NodeList($html, true);
     }
-
-    protected function _setupQueueMock() {
-        $queueMockClass = $this->mockInterface(CM_Jobdistribution_QueueInterface::class);
-        $queueMockClass->mockMethod('queue')->set(function (CM_Jobdistribution_Job_Abstract $job) {
-            $job->execute();
-        });
-        $queueMockClass->mockMethod('runSync')->set(function (CM_Jobdistribution_Job_Abstract $job) {
-            return $job->execute();
-        });
-        $queueMockClass->mockMethod('runSyncMultiple')->set(function (array $jobList) {
-            return \Functional\map($jobList, function (CM_Jobdistribution_Job_Abstract $job) {
-                return $job->execute();
-            });
-        });
-        $queueMock = $queueMockClass->newInstanceWithoutConstructor();
-        $this->getServiceManager()->replaceInstance(CM_Jobdistribution_QueueInterface::class, $queueMock);
-    }
-
+    
     /**
      * @param CM_Model_Abstract $model
      * @param string|null       $message

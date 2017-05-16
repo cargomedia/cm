@@ -3,7 +3,6 @@
 class CM_User_OfflineJobTest extends CMTest_TestCase {
 
     public function testExecute() {
-        $this->_setupQueueMock();
         $user = CMTest_TH::createUser();
         $user->setOnline();
 
