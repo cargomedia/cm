@@ -107,7 +107,8 @@ class CM_Mail_MailableTest extends CMTest_TestCase {
         $this->assertSame('foo', $message->getHeaders()->get('X-Foo', 1)->getFieldBody());
 
         $mail->send();
-        //$this->assertSame(1, $sendMethod->getCallCount());
+        // TODO: https://github.com/cargomedia/cm/pull/2305 needed
+        // $this->assertSame(1, $sendMethod->getCallCount());
     }
 
     public function testGetRender() {

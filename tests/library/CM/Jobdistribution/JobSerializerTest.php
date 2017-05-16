@@ -7,27 +7,33 @@ class CM_JobDistribution_JobSerializerTest extends CMTest_TestCase {
     }
 
     public function testSerialize() {
+        $jobClassMock = $this->mockClass(CM_Jobdistribution_Job_Abstract::class);
+        $jobMock = $jobClassMock->newInstance([CM_Params::factory(['foo' => 'bar', 'bar' => 'baz'], false)]);
+        $jobMock->mockMethod('getJobName')->set('CM_Job_Mock');
+
         $mockSerializer = $this->mockInterface(CM_Serializer_SerializerInterface::class)->newInstanceWithoutConstructor();
         $serializeMock = $mockSerializer->mockMethod('serialize')->set(function ($workload) {
             $this->assertSame([
-                'jobClassName' => 'CM_JobMock_6',
+                'jobClassName' => 'CM_Job_Mock',
                 'jobParams'    => ['foo' => 'bar', 'bar' => 'baz'],
             ], $workload
             );
         });
         $jobSerializer = new CM_Jobdistribution_JobSerializer($mockSerializer);
-        $jobSerializer->serializeJob(new CM_JobMock_6(CM_Params::factory(['foo' => 'bar', 'bar' => 'baz'], false)));
+        $jobSerializer->serializeJob($jobMock);
         $this->assertSame(1, $serializeMock->getCallCount());
     }
 
     public function testUnserialize() {
         $jobSerializer = new CM_Jobdistribution_JobSerializer(new CM_Serializer_ArrayConvertible());
-        $job = new CM_JobMock_6(CM_Params::factory(['foo' => 'bar'], false));
 
-        $serializedJob = $jobSerializer->serializeJob($job);
+        $jobClassMock = $this->mockClass(CM_Jobdistribution_Job_Abstract::class);
+        $jobMock = $jobClassMock->newInstance([CM_Params::factory(['foo' => 'bar'], false)]);
+
+        $serializedJob = $jobSerializer->serializeJob($jobMock);
         $result = $jobSerializer->unserializeJob($serializedJob);
-        $this->assertInstanceOf(CM_JobMock_6::class, $result );
-        $this->assertSame($job->getParams()->getParamsDecoded(), $result->getParams()->getParamsDecoded());
+        $this->assertInstanceOf(CM_Jobdistribution_Job_Abstract::class, $result);
+        $this->assertSame(['foo' => 'bar'], $result->getParams()->getParamsDecoded());
     }
 
     public function testUnserializeThrows() {
@@ -93,10 +99,4 @@ class CM_JobDistribution_JobSerializerTest extends CMTest_TestCase {
         $this->assertSame(['className' => 'stdClass'], $exception->getMetaInfo());
     }
 
-}
-
-class CM_JobMock_6 extends CM_Jobdistribution_Job_Abstract {
-
-    protected function _execute(CM_Params $params) {
-    }
 }
