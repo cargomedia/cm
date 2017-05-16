@@ -6,9 +6,12 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     private $_params;
 
     /**
-     * @param CM_Params $params
+     * @param CM_Params|null $params
      */
-    public function __construct(CM_Params $params) {
+    public function __construct(CM_Params $params = null) {
+        if (null === $params) {
+            $params = CM_Params::factory();
+        }
         $this->_params = $params;
     }
 
@@ -48,6 +51,10 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     }
 
     public function queue() { //TODO delete it
+
+    }
+
+    public function run() { //TODO delete it
 
     }
 }
