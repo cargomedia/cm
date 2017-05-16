@@ -248,6 +248,39 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $model->commit();
     }
 
+    public function testCommitModelEventsCreated() {
+        $modelClass = $this->mockClass(CM_Model_Abstract::class);
+        $modelClass->mockMethod('getType')->set(1);
+        $modelClass->mockMethod('_getCache')->set(null);
+        $persistence = $this->mockObject(CM_Model_StorageAdapter_AbstractAdapter::class);
+        $persistence->mockMethod('create')->set(['id' => 1]);
+        $persistence->mockMethod('save');
+        $persistence->mockMethod('load')->set([]);
+        $modelClass->mockMethod('_getPersistence')->set($persistence);
+        $modelClass->mockMethod('_getSchema')->set(new CM_Model_Schema_Definition(['foo' => ['type' => 'string']]));
+
+        /** @var CM_Model_Abstract|\Mocka\AbstractClassTrait $model */
+        $model = $modelClass->newInstance();
+        $mockClassname = get_class($model);
+
+        $eventHandler = new CM_EventHandler_EventHandler();
+        $binding = new CM_ModelEvents_Binding();
+        $counter = 0;
+        $binding->bindModelCreated($eventHandler, $mockClassname, function (CM_Model_Abstract $object, array $data) use ($model, &$counter) {
+            $this->assertEquals($model, $object);
+            $this->assertSame([], $data);
+            $counter++;
+        });
+        $this->getServiceManager()->replaceInstance('events-global', $eventHandler);
+
+        $model->_set(['foo' => 'baz']);
+        $this->assertSame(0, $counter);
+        $model->commit();
+        $this->assertSame(1, $counter);
+        $model->commit();
+        $this->assertSame(1, $counter);
+    }
+
     public function testCreate() {
         $data = array('foo' => 11, 'bar' => 'foo');
         $type = 12;
@@ -338,6 +371,20 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
         $methodCreate->invoke($model);
         $this->assertSame($idRaw2, $model->getIdRaw());
+    }
+
+    public function testCreateStaticModelEventsCreated() {
+        $eventHandler = new CM_EventHandler_EventHandler();
+        $binding = new CM_ModelEvents_Binding();
+        $counter = 0;
+        $binding->bindModelCreated($eventHandler, CM_ModelMock::class, function(CM_Model_Abstract $object, array $data) use (&$counter) {
+            $this->assertInstanceOf(CM_ModelMock::class, $object);
+            $this->assertSame([], $data);
+            $counter++;
+        });
+        $this->getServiceManager()->replaceInstance('events-global', $eventHandler);
+        CM_ModelMock::createStatic(['foo' => 'bar']);
+        $this->assertSame(1, $counter);
     }
 
     /**
@@ -1031,6 +1078,71 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $modelMock->_set(array('foo' => 12));
     }
 
+    public function testSetModelEventsChanged() {
+        $modelClass = $this->mockClass(CM_Model_Abstract::class);
+        $modelClass->mockMethod('getType')->set(1);
+        $modelClass->mockMethod('_getCache')->set(null);
+        $persistence = $this->mockObject(CM_Model_StorageAdapter_AbstractAdapter::class);
+        $persistence->mockMethod('save');
+        $persistence->mockMethod('load')->set(['foo' => 'bar', 'bar' => null]);
+        $modelClass->mockMethod('_getPersistence')->set($persistence);
+        $modelClass->mockMethod('_getSchema')->set(new CM_Model_Schema_Definition([
+                'foo' => ['type' => 'string'],
+                'bar' => ['type' => 'string', 'optional' => true]
+            ]
+        ));
+
+        /** @var CM_Model_Abstract|\Mocka\AbstractClassTrait $model */
+        $model = $modelClass->newInstance([1]);
+        $mockClassname = get_class($model);
+
+        $eventHandler = new CM_EventHandler_EventHandler();
+        $binding = new CM_ModelEvents_Binding();
+        $counterFoo = 0;
+        $counterBar = 0;
+        $counterChange = 0;
+
+        $binding->bindModelChanged($eventHandler, $mockClassname, function (CM_Model_Abstract $object, array $data) use ($model, $mockClassname, &$counterFoo) {
+            $this->assertEquals($model, $object);
+            $this->assertSame(['valueOld' => 'bar', 'valueNew' => 'baz'], $data);
+            $counterFoo++;
+        }, 'foo');
+        $binding->bindModelChanged($eventHandler, $mockClassname, function (CM_Model_Abstract $object, array $data) use ($model, $mockClassname, &$counterChange) {
+            $this->assertEquals($model, $object);
+            $this->assertSame([], $data);
+            $counterChange++;
+        });
+        $this->getServiceManager()->replaceInstance('events-global', $eventHandler);
+
+        $this->assertSame(0, $counterChange);
+        $this->assertSame(0, $counterFoo);
+        $model->_set(['foo' => 'baz']);
+        $this->assertSame(1, $counterChange);
+        $this->assertSame(1, $counterFoo);
+
+        $eventHandler = new CM_EventHandler_EventHandler();
+        $this->getServiceManager()->replaceInstance('events-global', $eventHandler);
+        $binding->bindModelChanged($eventHandler, $mockClassname, function (CM_Model_Abstract $object, array $data) use ($model, $mockClassname, &$counterFoo) {
+            $this->assertEquals($model, $object);
+            $this->assertSame(['valueOld' => 'baz', 'valueNew' => 'bar'], $data);
+            $counterFoo++;
+        }, 'foo');
+        $binding->bindModelChanged($eventHandler, $mockClassname, function (CM_Model_Abstract $object, array $data) use ($model, $mockClassname, &$counterBar) {
+            $this->assertEquals($model, $object);
+            $this->assertSame(['valueOld' => null, 'valueNew' => 'foo'], $data);
+            $counterBar++;
+        }, 'bar');
+        $binding->bindModelChanged($eventHandler, $mockClassname, function (CM_Model_Abstract $object, array $data) use ($model, $mockClassname, &$counterChange) {
+            $this->assertEquals($model, $object);
+            $this->assertSame([], $data);
+            $counterChange++;
+        });
+        $model->_set(['foo' => 'bar', 'bar' => 'foo']);
+        $this->assertSame(2, $counterChange);
+        $this->assertSame(2, $counterFoo);
+        $this->assertSame(1, $counterBar);
+    }
+
     public function testSetData() {
         $data = array('bar' => '23', 'foo' => 'bar');
         $dataNew = array('baar' => '23', 'fooo' => 'bar');
@@ -1058,6 +1170,40 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         } catch (CM_Exception_Nonexistent $ex) {
             $this->assertTrue(true);
         }
+    }
+
+    public function testDeleteModelEventsDeleted() {
+        $modelClass = $this->mockClass(CM_Model_Abstract::class);
+        $modelClass->mockMethod('getType')->set(1);
+        $modelClass->mockMethod('_getCache')->set(null);
+        $persistence = $this->mockObject(CM_Model_StorageAdapter_AbstractAdapter::class);
+        $persistence->mockMethod('save');
+        $persistence->mockMethod('load')->set(['foo' => 'bar', 'bar' => null]);
+        $modelClass->mockMethod('_getPersistence')->set($persistence);
+        $modelClass->mockMethod('_getSchema')->set(new CM_Model_Schema_Definition([
+                'foo' => ['type' => 'string'],
+                'bar' => ['type' => 'string', 'optional' => true]
+            ]
+        ));
+
+        $eventHandler = $this->mockInterface(CM_EventHandler_EventHandlerInterface::class)->newInstanceWithoutConstructor();
+        $counter = 0;
+
+        /** @var CM_Model_Abstract $model */
+        $model = $modelClass->newInstance([1]);
+        $mockClassname = get_class($model);
+        $mockTrigger = $eventHandler->mockMethod('trigger');
+        $mockTrigger->at(0, function ($event, CM_Model_Abstract $object, array $data) use ($model, $mockClassname, &$counter) {
+            $this->assertSame("model-{$mockClassname}-deleted", $event);
+            $this->assertEquals($model, $object);
+            $this->assertSame([], $data);
+            $counter++;
+        });
+        $this->getServiceManager()->replaceInstance('events-global', $eventHandler);
+
+        $this->assertSame(0, $counter);
+        $model->delete();
+        $this->assertSame(1, $counter);
     }
 
     public function testOnChange() {
@@ -1192,21 +1338,21 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $model->mockMethod('getType')->set(1);
         $model->mockMethod('_validateFields');
         $model->mockMethod('_getData')->set([]);
-        
+
         $persistence = $this->mockObject(CM_Model_StorageAdapter_AbstractAdapter::class);
         $persistence->mockMethod('create')->set([]);
         $persistenceDelete = $persistence->mockMethod('delete');
         $model->mockMethod('_getPersistence')->set($persistence);
-        
+
         $cache = $this->mockObject(CM_Model_StorageAdapter_AbstractAdapter::class);
         $cacheDelete = $cache->mockMethod('delete');
         $model->mockMethod('_getCache')->set($cache);
-        
+
         $exception = new Exception('Cannot perform on create callback');
-        $model->mockMethod('_onCreate')->set(function() use ($exception) {
+        $model->mockMethod('_onCreate')->set(function () use ($exception) {
             throw $exception;
         });
-        
+
         try {
             /** @var CM_Model_Abstract $model */
             $model->commit();
