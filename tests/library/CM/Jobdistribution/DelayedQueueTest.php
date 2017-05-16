@@ -27,8 +27,11 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
         $this->getServiceManager()->replaceInstance(CM_Jobdistribution_QueueInterface::class, $queueMockClass->newInstanceWithoutConstructor());
 
         $jobClassMock = $this->mockClass(CM_Jobdistribution_Job_Abstract::class);
+        /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait $jobMock1 */
         $jobMock1 = $jobClassMock->newInstance([CM_Params::factory($params1, false)]);
+        /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait $jobMock2 */
         $jobMock2 = $jobClassMock->newInstance([CM_Params::factory($params2, false)]);
+        /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait $jobMock3 */
         $jobMock3 = $jobClassMock->newInstance([CM_Params::factory([], false)]);
 
         /** @var CM_Jobdistribution_DelayedQueue|\Mocka\AbstractClassTrait $delayedQueue */
@@ -36,11 +39,11 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
         /** @var \Mocka\FunctionMock $instantiateMethod */
         $instantiateMethod = $delayedQueue->mockMethod('_instantiateJob')
             ->at(0, function ($className) use ($jobMock2) {
-                $this->assertSame(get_class($jobMock2), $className);
+                $this->assertSame($jobMock2->getJobName(), $className);
                 return $jobMock2;
             })
             ->at(1, function ($className) use ($jobMock1) {
-                $this->assertSame(get_class($jobMock1), $className);
+                $this->assertSame($jobMock1->getJobName(), $className);
                 return $jobMock1;
             })
             ->at(2, null);
@@ -68,6 +71,7 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
         $delayedQueue = new CM_Jobdistribution_DelayedQueue($this->getServiceManager());
         $user = CMTest_TH::createUser();
         $jobParams = ['user' => $user];
+        /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait $jobMock */
         $jobMock = $jobClassMock->newInstance([CM_Params::factory($jobParams, false)]);
         $delayedQueue->addJob($jobMock, 0);
         $paramsEncoded = CM_Params::encode($jobParams, true);
@@ -75,7 +79,7 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
         $logger = $this->mockObject(CM_Log_Logger::class);
         $this->getServiceManager()->replaceInstance('logger', $logger);
 
-        $jobName = get_class($jobMock);
+        $jobName = $jobMock->getJobName();
         $addMessageMock = $logger->mockMethod('addMessage')->set(function ($message, $level, CM_Log_Context $context = null) use ($jobName, $paramsEncoded) {
             $this->assertSame('Job-params could not be decoded', $message);
             $this->assertSame(CM_Log_Logger::WARNING, $level);
@@ -88,29 +92,29 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
 
     public function testCancelJob() {
         $user = CMTest_TH::createUser();
-        $params1 = ['foo' => 1, 'bar' => $user];
-        $params2 = ['foo' => 2, 'bar' => $user];
+        $paramsExec = ['foo' => 1, 'bar' => $user];
+        $paramsCancel = ['foo' => 2, 'bar' => $user];
 
         $jobClassMock = $this->mockClass(CM_Jobdistribution_Job_Abstract::class);
         /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait $job */
-        $jobToExec = $jobClassMock->newInstance([CM_Params::factory($params1, false)]);
+        $jobToExec = $jobClassMock->newInstance([CM_Params::factory($paramsExec, false)]);
         /** @var CM_Jobdistribution_Job_Abstract|\Mocka\AbstractClassTrait $job */
-        $jobToCancel = $jobClassMock->newInstance([CM_Params::factory($params2, false)]);
+        $jobToCancel = $jobClassMock->newInstance([CM_Params::factory($paramsCancel, false)]);
 
         $queueMockClass = $this->mockInterface(CM_Jobdistribution_QueueInterface::class);
-        $queueExecMethod = $queueMockClass->mockMethod('queue')->at(0, function (CM_Jobdistribution_Job_Abstract $job) use ($params1) {
-            $this->assertEquals($params1, $job->getParams()->getParamsDecoded());
+        $queueExecMethod = $queueMockClass->mockMethod('queue')->at(0, function (CM_Jobdistribution_Job_Abstract $job) use ($paramsExec) {
+            $this->assertEquals($paramsExec, $job->getParams()->getParamsDecoded());
         });
         $this->getServiceManager()->replaceInstance(CM_Jobdistribution_QueueInterface::class, $queueMockClass->newInstanceWithoutConstructor());
 
         /** @var CM_Jobdistribution_DelayedQueue|\Mocka\AbstractClassTrait $delayedQueue */
         $delayedQueue = $this->mockObject(CM_Jobdistribution_DelayedQueue::class, [$this->getServiceManager()]);
         /** @var \Mocka\FunctionMock $instantiateMethod */
-        $instantiateMethod = $delayedQueue->mockMethod('_instantiateJob')->set(function ($className) use ($jobToExec, $jobToCancel) {
+        $instantiateMethod = $delayedQueue->mockMethod('_instantiateJob')->set(function ($className, $paramsEncoded) use ($jobToExec, $jobToCancel, $paramsExec, $paramsCancel) {
             $job = null;
-            if ($className === get_class($jobToExec)) {
+            if ($paramsEncoded === CM_Params::encode($paramsExec, true)) {
                 $job = $jobToExec;
-            } elseif ($className === get_class($jobToCancel)) {
+            } elseif ($paramsEncoded === CM_Params::encode($paramsCancel, true)) {
                 $job = $jobToCancel;
             }
             $this->assertNotNull($job);
@@ -175,7 +179,7 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
         $job = $this->mockClass(CM_Jobdistribution_Job_Abstract::class, ['CM_Service_ManagerAwareInterface'], ['CM_Service_ManagerAwareTrait'])->newInstanceWithoutConstructor();
 
         $queue = new CM_Jobdistribution_DelayedQueue($this->getServiceManager());
-        $job = CMTest_TH::callProtectedMethod($queue, '_instantiateJob', [get_class($job), CM_Params::encode(['foo' => 'bar'], true)]);
+        $job = CMTest_TH::callProtectedMethod($queue, '_instantiateJob', [$job->getJobName(), CM_Params::encode(['foo' => 'bar'], true)]);
         $this->assertEquals($this->getServiceManager(), $job->getServiceManager());
     }
 
