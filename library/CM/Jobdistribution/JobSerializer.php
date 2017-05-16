@@ -19,7 +19,7 @@ class CM_Jobdistribution_JobSerializer {
     public function serializeJob(CM_Jobdistribution_Job_Abstract $job) {
         $this->_verifyParams($job->getParams()->getParamsDecoded());
         $workloadParams = [
-            'jobClassName' => get_class($job),
+            'jobClassName' => $job->getJobName(),
             'jobParams'    => $job->getParams()->getParamsEncoded(),
         ];
         return $this->_serializer->serialize($workloadParams);

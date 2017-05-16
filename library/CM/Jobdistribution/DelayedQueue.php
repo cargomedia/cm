@@ -19,7 +19,7 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
      */
     public function addJob(CM_Jobdistribution_Job_Abstract $job, $delay) {
         CM_Db_Db::insert('cm_jobdistribution_delayedqueue', [
-            'className' => get_class($job),
+            'className' => $job->getJobName(),
             'params'    => CM_Util::jsonEncode($job->getParams()->getParamsEncoded()),
             'executeAt' => time() + (int) $delay,
         ]);
@@ -30,7 +30,7 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
      */
     public function cancelJob(CM_Jobdistribution_Job_Abstract $job) {
         CM_Db_Db::delete('cm_jobdistribution_delayedqueue', [
-            'className' => get_class($job),
+            'className' => $job->getJobName(),
             'params'    => CM_Util::jsonEncode($job->getParams()->getParamsEncoded()),
         ]);
     }
@@ -41,7 +41,7 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
      */
     public function countJob(CM_Jobdistribution_Job_Abstract $job) {
         return CM_Db_Db::count('cm_jobdistribution_delayedqueue', [
-            'className' => get_class($job),
+            'className' => $job->getJobName(),
             'params'    => CM_Util::jsonEncode($job->getParams()->getParamsEncoded()),
         ]);
     }
