@@ -13,13 +13,20 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      */
     public function __construct(array $config) {
         $defaults = [
-            'options'       => [],
-            'driverOptions' =>
-                [
-                    'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
-                ],
+            'server'           => null,
+            'db'               => null,
+            'options'          => [],
+            'driverOptions'    => [],
+            'defaultBatchSize' => null,
         ];
         $config = array_merge($defaults, $config);
+        if (empty($config['driverOptions']['typeMap'])) {
+            $config['driverOptions']['typeMap'] = [
+                'root'     => 'array',
+                'document' => 'array',
+                'array'    => 'array',
+            ];
+        }
         $this->_config = $config;
     }
 
@@ -195,10 +202,9 @@ class CM_MongoDb_Client extends CM_Class_Abstract {
      * function as `$match` and `$project` operator respectively at the front of the pipeline
      */
     public function find($collection, array $criteria = null, array $projection = null, array $aggregation = null, array $options = null) {
-        $batchSize = null;
         $defaultOptions = [];
-        if (isset(self::_getConfig()->batchSize)) {
-            $batchSize = (int) self::_getConfig()->batchSize;
+        if (!empty($this->_config['defaultBatchSize'])) {
+            $batchSize = (int) $this->_config['defaultBatchSize'];
             $defaultOptions = ['batchSize' => $batchSize];
         }
         $options = array_merge($defaultOptions, (array) $options);

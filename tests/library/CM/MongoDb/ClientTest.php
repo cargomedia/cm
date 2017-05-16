@@ -220,7 +220,7 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
         // sort
         $expected = [$doc3, $doc1, $doc2];
-        $this->assertEquals($expected, $mongoDb->find($collectionName, null, ['_id' => 0], null, ['sort' => ['groupId' => 1, 'userId'  => -1]]));
+        $this->assertEquals($expected, $mongoDb->find($collectionName, null, ['_id' => 0], null, ['sort' => ['groupId' => 1, 'userId' => -1]]));
 
         // aggregation
         $result = $mongoDb->find($collectionName, ['groupId' => 1], ['_id' => 0, 'foo' => 1], [['$unwind' => '$foo']]);
@@ -229,29 +229,36 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
     public function testFindBatchSize() {
         $collectionName = 'findBatchSize';
-        CM_Config::get()->CM_MongoDb_Client->batchSize = null;
 
         /** @var CM_MongoDb_Client|\Mocka\AbstractClassTrait $mongoDb */
-        $mongoDb = $this->mockClass('CM_MongoDb_Client')->newInstanceWithoutConstructor();
+        $mongoDb = $this->mockObject('CM_MongoDb_Client', [[
+            'db'     => 'cm',
+            'server' => 'mongodb://localhost:27017',
+        ]]);
         $collection = $this->mockClass('MongoDB\Collection')->newInstanceWithoutConstructor();
         $mongoDb->mockMethod('_getCollection')->set($collection);
 
-        $mockFind = $collection->mockMethod('find')->set(function($criteria, $options) {
+        $mockFind = $collection->mockMethod('find')->set(function ($criteria, $options) {
             $this->assertArrayNotHasKey('batchSize', $options);
             return new ArrayIterator([]);
         });
         $mongoDb->find($collectionName);
         $this->assertSame(1, $mockFind->getCallCount());
 
-        CM_Config::get()->CM_MongoDb_Client->batchSize = 10;
-        $mockFind = $collection->mockMethod('find')->set(function($criteria, $options) {
+        $mongoDb = $this->mockObject('CM_MongoDb_Client', [[
+            'db'               => 'cm',
+            'server'           => 'mongodb://localhost:27017',
+            'defaultBatchSize' => 10,
+        ]]);
+        $mongoDb->mockMethod('_getCollection')->set($collection);
+        $mockFind = $collection->mockMethod('find')->set(function ($criteria, $options) {
             $this->assertSame(10, $options['batchSize']);
             return new ArrayIterator([]);
         });
         $mongoDb->find($collectionName);
         $this->assertSame(2, $mockFind->getCallCount());
 
-        $mockFind = $collection->mockMethod('find')->set(function($criteria, $options) {
+        $mockFind = $collection->mockMethod('find')->set(function ($criteria, $options) {
             $this->assertSame(15, $options['batchSize']);
             return new ArrayIterator([]);
         });
@@ -265,7 +272,8 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
         $this->assertNull($mongoDb->findOne($collectionName, ['userId' => 1]));
         $options = ['returnDocument' => \MongoDB\Operation\FindOneAndUpdate::RETURN_DOCUMENT_AFTER];
-        $result = $mongoDb->findOneAndUpdate($collectionName, ['userId' => 1], ['$inc' => ['score' => 1]], ['_id' => 0], $options + ['upsert' => true]);
+        $result = $mongoDb->findOneAndUpdate($collectionName, ['userId' => 1], ['$inc' => ['score' => 1]], ['_id' => 0], $options +
+            ['upsert' => true]);
         $this->assertSame(['userId' => 1, 'score' => 1], $result);
         $this->assertSame($mongoDb->findOne($collectionName, ['userId' => 1], ['_id' => 0]), $result);
 
@@ -289,7 +297,8 @@ class CM_MongoDb_ClientTest extends CMTest_TestCase {
 
         $this->assertNull($mongoDb->findOne($collectionName, ['userId' => 1]));
         $options = ['returnDocument' => \MongoDB\Operation\FindOneAndReplace::RETURN_DOCUMENT_AFTER];
-        $result = $mongoDb->findOneAndReplace($collectionName, ['userId' => 1], ['userId' => 1, 'score' => 1], ['_id' => 0], $options + ['upsert' => true]);
+        $result = $mongoDb->findOneAndReplace($collectionName, ['userId' => 1], ['userId' => 1, 'score' => 1], ['_id' => 0], $options +
+            ['upsert' => true]);
         $this->assertSame(['userId' => 1, 'score' => 1], $result);
         $this->assertSame($mongoDb->findOne($collectionName, ['userId' => 1], ['_id' => 0]), $result);
 
