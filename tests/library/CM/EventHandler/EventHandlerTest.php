@@ -6,7 +6,6 @@ class CM_EventHandler_EventHandlerTest extends CMTest_TestCase {
     public static $_counter;
 
     public function testBindJob() {
-        $this->_setupQueueMock();
         $eventHandler = new CM_EventHandler_EventHandler();
         self::$_foo = '';
         $eventHandler->bindJob('foo', CM_JobMock_1::class, array('text' => 'bar'));

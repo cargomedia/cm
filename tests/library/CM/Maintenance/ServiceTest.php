@@ -90,7 +90,6 @@ class CM_Maintenance_ServiceTest extends CMTest_TestCase {
     }
 
     public function testMaintenance() {
-        $this->_setupQueueMock();
         $maintenance = new CM_Maintenance_Service();
         $serviceManager = $this->getServiceManager();
         $serviceManager->replaceInstance('maintenance', $maintenance);
