@@ -95,9 +95,9 @@ class CM_Maintenance_Service implements CM_Service_ManagerAwareInterface {
                     $lastRuntime = $lastRuntime->getTimestamp();
                 }
                 $job = new CM_Maintenance_RunEventJob(CM_Params::factory([
-                    'event' => $event->getName(), 
+                    'event' => $event->getName(),
                     'lastRuntime' => $lastRuntime
-                ]));
+                ], false));
                 $this->getServiceManager()->getJobQueue()->queue($job);
             });
         }

@@ -2,6 +2,10 @@
 
 class CM_Maintenance_ServiceTest extends CMTest_TestCase {
 
+    protected function tearDown() {
+        CMTest_TH::clearEnv();
+    }
+
     public function testHandleClockworkEventResult() {
         $clockworkManager = $this->mockClass('CM_Clockwork_Manager')->newInstanceWithoutConstructor();
         $mockHandleEventResult = $clockworkManager->mockMethod('handleEventResult');
@@ -86,8 +90,9 @@ class CM_Maintenance_ServiceTest extends CMTest_TestCase {
     }
 
     public function testMaintenance() {
+        $this->_setupQueueMock();
         $maintenance = new CM_Maintenance_Service();
-        $serviceManager = new CM_Service_Manager();
+        $serviceManager = $this->getServiceManager();
         $serviceManager->replaceInstance('maintenance', $maintenance);
         $maintenance->setServiceManager($serviceManager);
 
