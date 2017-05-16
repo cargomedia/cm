@@ -77,6 +77,7 @@ class CM_Mail_MailableTest extends CMTest_TestCase {
     }
 
     public function testSend() {
+        $this->_setupQueueMock();
         $transport = $this->mockInterface('Swift_Transport')->newInstance();
         $sendMethod = $transport->mockMethod('send')->set(1);
         $mailer = new CM_Mail_Mailer($transport);
@@ -106,8 +107,7 @@ class CM_Mail_MailableTest extends CMTest_TestCase {
         $this->assertSame('foo', $message->getHeaders()->get('X-Foo', 1)->getFieldBody());
 
         $mail->send();
-        // TODO: https://github.com/cargomedia/cm/pull/2305 needed
-        // $this->assertSame(1, $sendMethod->getCallCount());
+        //$this->assertSame(1, $sendMethod->getCallCount());
     }
 
     public function testGetRender() {

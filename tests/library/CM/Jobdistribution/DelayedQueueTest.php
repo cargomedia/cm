@@ -136,6 +136,7 @@ class CM_JobDistribution_DelayedQueueTest extends CMTest_TestCase {
     }
 
     public function testCountJob() {
+        $this->_setupQueueMock();
         /** @var CM_Jobdistribution_DelayedQueue|\Mocka\AbstractClassTrait $delayedQueue */
         $delayedQueue = $this->mockObject(CM_Jobdistribution_DelayedQueue::class, [$this->getServiceManager()]);
 
