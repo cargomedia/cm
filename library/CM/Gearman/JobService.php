@@ -1,8 +1,6 @@
 <?php
 
-class CM_Gearman_JobService implements CM_Jobdistribution_QueueInterface, CM_Service_ManagerAwareInterface {
-
-    use CM_Service_ManagerAwareTrait;
+class CM_Gearman_JobService implements CM_Jobdistribution_QueueInterface {
 
     /** @var CM_Gearman_Client */
     private $_client;
@@ -42,7 +40,6 @@ class CM_Gearman_JobService implements CM_Jobdistribution_QueueInterface, CM_Ser
      * @return CM_Gearman_Worker
      */
     protected function _getWorker() {
-        $this->_worker->setServiceManager($this->getServiceManager());
         return $this->_worker;
     }
 

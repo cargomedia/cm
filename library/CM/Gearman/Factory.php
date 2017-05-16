@@ -1,6 +1,8 @@
 <?php
 
-class CM_Gearman_Factory {
+class CM_Gearman_Factory implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     /**
      * @param array $servers
@@ -32,8 +34,10 @@ class CM_Gearman_Factory {
      * @return CM_Gearman_Worker
      */
     public function createWorker(array $servers, CM_Jobdistribution_JobSerializer $serializer, $jobLimit) {
-        $worker = $this->_createGearmanWorker($servers);
-        return new CM_Gearman_Worker($worker, $serializer, $jobLimit);
+        $gearmanWorker = $this->_createGearmanWorker($servers);
+        $worker = new CM_Gearman_Worker($gearmanWorker, $serializer, $jobLimit);
+        $worker->setServiceManager($this->getServiceManager());
+        return $worker;
     }
 
     /**
