@@ -98,6 +98,7 @@ class CM_Maintenance_Service implements CM_Service_ManagerAwareInterface {
                     'event' => $event->getName(),
                     'lastRuntime' => $lastRuntime
                 ], false));
+                $job->setServiceManager($this->getServiceManager());
                 $this->getServiceManager()->getJobQueue()->queue($job);
             });
         }

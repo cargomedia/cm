@@ -5,8 +5,7 @@ class CM_Maintenance_RunEventJob extends CM_Jobdistribution_Job_Abstract impleme
     use CM_Service_ManagerAwareTrait;
 
     protected function _execute(CM_Params $params) {
-        //$serviceManager = $this->getServiceManager();
-        $serviceManager = CM_Service_Manager::getInstance(); //TODO maybe remove CM_Service_ManagerAwareInterface
+        $serviceManager = $this->getServiceManager();
 
         $eventName = $params->getString('event');
         $lastRuntime = $params->has('lastRuntime') ? DateTime::createFromFormat('U', $params->getInt('lastRuntime')) : null;

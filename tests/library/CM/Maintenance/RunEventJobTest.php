@@ -8,6 +8,9 @@ class CM_Maintenance_RunEventJobTest extends CMTest_TestCase {
         $job1 = new CM_Maintenance_RunEventJob(CM_Params::factory(['event' => 'foo', 'lastRuntime' => null], false));
         $job2 = new CM_Maintenance_RunEventJob(CM_Params::factory(['event' => 'bar', 'lastRuntime' => null], false));
 
+        $job1->setServiceManager($this->getServiceManager());
+        $job2->setServiceManager($this->getServiceManager());
+
         /** @var CM_Maintenance_Service|\Mocka\AbstractClassTrait $maintenance */
         $maintenance = $this->mockClass(CM_Maintenance_Service::class)->newInstanceWithoutConstructor();
         $mockHandleClockworkEventResult = $maintenance->mockMethod('handleClockworkEventResult')
