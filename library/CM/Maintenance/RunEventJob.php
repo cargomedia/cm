@@ -23,7 +23,12 @@ class CM_Maintenance_RunEventJob extends CM_Jobdistribution_Job_Abstract impleme
             throw $e;
         } finally {
             $newRelic->endTransaction();
-            $maintenance->handleClockworkEventResult($eventName, $result);
+            try {
+                $maintenance->handleClockworkEventResult($eventName, $result);
+            } catch (CM_Exception $e) {
+                $e->setSeverity(CM_Exception::FATAL);
+                throw $e;
+            }
         }
     }
 

@@ -50,6 +50,7 @@ EOF;
         }
         if ($viewer = $environment->getViewer()) {
             $this->_setDataLayerVariable('username', $viewer->getDisplayName());
+            $this->_setDataLayerVariable('accountAge', time() - $viewer->getCreated());
         }
     }
 
@@ -63,7 +64,6 @@ EOF;
      */
     protected function _setDataLayerVariable($name, $value) {
         $name = (string) $name;
-        $value = (string) $value;
         $this->_dataLayer[$name] = $value;
         return $this;
     }
