@@ -12,13 +12,13 @@ class CMTest_SplittedUnitTest {
             throw new CM_Exception_Invalid('PHPUNIT_TEST_RANGE environment variable must be set');
         }
 
-        $facade = new File_Iterator_Facade;
+        $facade = new File_Iterator_Facade();
         $files = $facade->getFilesAsArray(
             DIR_ROOT . '/tests',
             'Test.php'
         );
         $filesChunks = array_chunk($files, ceil(count($files) / $parts));
-        $suite = new PHPUnit_Framework_TestSuite('CMTest_SplittedUnitTest');
+        $suite = new PHPUnit_Framework_TestSuite('SplittedUnitTest');
         $suite->addTestFiles(isset($filesChunks[$chunk]) ? $filesChunks[$chunk] : []);
         return $suite;
     }
