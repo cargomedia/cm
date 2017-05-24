@@ -13,16 +13,15 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         $this->assertTrue(CM_Model_LanguageKey::exists('foo'));
         $this->assertCount(1, $language->getTranslations());
         $this->assertSame(['bar'], $languageKey->getVariables());
+        $this->assertSame('0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', $languageKey->getNameHash());
     }
 
-    public function testCreateRemoveDuplicates() {
+    public function testCreateDuplicate() {
         $languageKeyFirst = CM_Model_LanguageKey::create('foo', ['bar']);
         $languageKeySecond = CM_Model_LanguageKey::create('foo', ['foo']);
 
         $this->assertEquals($languageKeyFirst, $languageKeySecond);
         $this->assertEquals(['bar'], $languageKeySecond->getVariables());
-
-        $this->assertSame(1, CM_Db_Db::count('cm_model_languagekey', ['name' => 'foo']));
     }
 
     public function testSetGetVariables() {
@@ -146,5 +145,13 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         $this->assertTrue(Functional\some($language->getTranslations()->getItems(), function ($translation) {
             return $translation['key'] === 'bar';
         }));
+    }
+
+    public function testSetNameHash() {
+        $key = CM_Model_LanguageKey::create('foo');
+        $this->assertSame('0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', $key->getNameHash());
+
+        $key->setNameHash('62cdb7020ff920e5aa642c3d4066950dd1f01f4d');
+        $this->assertSame('62cdb7020ff920e5aa642c3d4066950dd1f01f4d', $key->getNameHash());
     }
 }
