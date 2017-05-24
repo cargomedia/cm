@@ -183,7 +183,9 @@ CREATE TABLE `cm_model_languagekey` (
   `updateCountResetVersion` int(10) unsigned DEFAULT NULL,
   `updateCount` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `javascript` tinyint(3) unsigned NOT NULL,
+  `nameHash` varchar(40) NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `nameHash` (`nameHash`),
   KEY `javascript` (`javascript`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
