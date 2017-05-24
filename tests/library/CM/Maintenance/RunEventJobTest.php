@@ -46,8 +46,9 @@ class CM_Maintenance_RunEventJobTest extends CMTest_TestCase {
     }
 
     public function testExecuteSetResultHandlingExceptionSeverityFatal() {
-        $serviceManager = new CM_Service_Manager();
-        $job = new CM_Maintenance_RunEventJob();
+        $serviceManager = $this->getServiceManager();
+        $jobQueue = $serviceManager->getJobQueue();
+        $job = new CM_Maintenance_RunEventJob(CM_Params::factory(['event' => 'foo', 'lastRuntime' => null], false));
         $job->setServiceManager($serviceManager);
 
         /** @var CM_Maintenance_Service|\Mocka\AbstractClassTrait $maintenance */
@@ -60,8 +61,8 @@ class CM_Maintenance_RunEventJobTest extends CMTest_TestCase {
 
         $this->assertSame(0, $mockHandleClockworkEventResult->getCallCount());
         /** @var CM_Exception $exception */
-        $exception = $this->catchException(function () use ($job) {
-            $job->run(['event' => 'foo', 'lastRuntime' => null]);
+        $exception = $this->catchException(function () use ($job, $jobQueue) {
+            $jobQueue->runSync($job);
         });
         $this->assertSame(1, $mockHandleClockworkEventResult->getCallCount());
         $this->assertInstanceOf(CM_Exception::class, $exception);
