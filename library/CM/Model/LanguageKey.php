@@ -193,7 +193,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      */
     public static function findByName($name) {
         $name = (string) $name;
-        $languageKeyId = CM_Db_Db::select('cm_model_languagekey', 'id', ['name' => $name], 'id ASC')->fetchColumn();
+        $languageKeyId = CM_Db_Db::select('cm_model_languagekey', 'id', ['name' => $name])->fetchColumn();
         if (!$languageKeyId) {
             return null;
         }
