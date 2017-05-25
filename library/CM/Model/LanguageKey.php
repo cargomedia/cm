@@ -5,6 +5,27 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     const MAX_UPDATE_COUNT = 50;
 
     /**
+     * @param string $name
+     * @throws CM_Exception_Invalid
+     */
+    public function changeName($name) {
+        $transaction = new \CM\Transactions\Transaction();
+        $oldName = $this->getName();
+        $oldHash = $this->getNameHash();
+        $this->setName($name);
+        $transaction->addRollback(function() use ($oldName, $oldHash) {
+            $this->setNameHash($oldHash);
+            $this->setName($oldName);
+        });
+        try {
+            $this->setNameHash(self::calculateHash($name));
+        } catch (CM_Exception_Invalid $e) {
+            $transaction->rollback();
+            throw $e;
+        }
+    }
+
+    /**
      * @return string
      */
     public function getName() {
@@ -28,9 +49,14 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
 
     /**
      * @param string $hash
+     * @throws CM_Exception_Invalid
      */
     public function setNameHash($hash) {
-        return $this->_set('nameHash', $hash);
+        try {
+            return $this->_set('nameHash', $hash);
+        } catch (CM_Db_Exception $e) {
+            throw new CM_Exception_Invalid('Duplicate languageKey name-hash', null, ['hash' => $hash]);
+        }
     }
 
     /**
@@ -147,7 +173,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
             'updateCountResetVersion' => 0,
             'javascript'              => false,
             'variables'               => CM_Util::jsonEncode($variables),
-            'nameHash'                => hash('sha1', $name),
+            'nameHash'                => self::calculateHash($name),
         ]);
         try {
             $languageKey->commit();
@@ -223,5 +249,13 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
             $cache->set($cacheKey, $tree);
         }
         return $tree;
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    public static function calculateHash($name) {
+        return hash('sha1', (string) $name);
     }
 }

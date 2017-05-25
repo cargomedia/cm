@@ -6,6 +6,27 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         CMTest_TH::clearEnv();
     }
 
+    public function testChangeName() {
+        $key = CM_Model_LanguageKey::create('foo');
+        $this->assertSame('0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', $key->getNameHash());
+        $this->assertSame('foo', $key->getName());
+
+        $key->changeName('bar');
+        $this->assertSame('bar', $key->getName());
+        $this->assertSame('62cdb7020ff920e5aa642c3d4066950dd1f01f4d', $key->getNameHash());
+
+        $existingKey = CM_Model_LanguageKey::create('baz');
+        /** @var CM_Exception_Invalid $exception */
+        $exception = $this->catchException(function () use ($key) {
+            $key->changeName('baz');
+        });
+        $this->assertInstanceOf(CM_Exception_Invalid::class, $exception);
+        $this->assertSame('Duplicate languageKey name-hash', $exception->getMessage());
+        $this->assertSame(['hash' => 'bbe960a25ea311d21d40669e93df2003ba9b90a2'], $exception->getMetaInfo());
+        $this->assertSame('bar', $key->getName());
+        $this->assertSame('62cdb7020ff920e5aa642c3d4066950dd1f01f4d', $key->getNameHash());
+    }
+
     public function testCreate() {
         $language = CMTest_TH::createLanguage('foo');
         $this->assertCount(0, $language->getTranslations());
