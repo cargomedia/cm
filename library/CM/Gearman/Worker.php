@@ -71,10 +71,11 @@ class CM_Gearman_Worker extends CM_Class_Abstract implements CM_Service_ManagerA
      */
     protected function _convertGearmanJobToJob(GearmanJob $gearmanJob) {
         $workload = $gearmanJob->workload();
-        $params = CM_Params::factory(CM_Params::jsonDecode($workload), true);
-        if ($params->has('jobClassName')) {
+        $paramsArray = CM_Util::jsonDecode($workload);
+        if (is_array($paramsArray) && array_key_exists('jobClassName', $paramsArray)) {
             $job = $this->_serializer->unserializeJob($workload);
         } else {
+            $params = CM_Params::factory(CM_Params::jsonDecode($workload), true);
             $jobClassName = $gearmanJob->functionName();
             $job = new $jobClassName($params);
         }
