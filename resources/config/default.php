@@ -33,8 +33,6 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Db_Db->delayedEnabled = true;
 
-    $config->CM_MongoDb_Client->batchSize = null;
-
     $config->CM_Model_User->class = CM_Model_User::class;
 
     $config->CM_Params->class = CM_Params::class;
