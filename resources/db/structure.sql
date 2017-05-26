@@ -343,6 +343,7 @@ CREATE TABLE `cm_splittestVariation` (
   `splittestId` int(10) unsigned NOT NULL,
   `name` varchar(100) NOT NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT '1',
+  `frequency` decimal(10,2) NOT NULL DEFAULT '1.00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `splittestId_name` (`splittestId`,`name`),
   KEY `splittestId` (`splittestId`),

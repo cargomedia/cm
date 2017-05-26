@@ -33,7 +33,7 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         /** @var CM_Model_SplittestVariation $variation */
         foreach ($this->_test->getVariations() as $variation) {
             $this->assertInternalType('string', $variation->getName());
-            $this->assertContains($variation->getName(), array('v1', 'v2'));
+            $this->assertContains($variation->getName(), ['v1', 'v2']);
         }
     }
 
@@ -45,10 +45,8 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
     }
 
     public function testGetSetEnabled() {
-        /** @var CM_Model_SplittestVariation $variation1 */
-        $variation1 = $this->_test->getVariations()->getItem(0);
-        /** @var CM_Model_SplittestVariation $variation2 */
-        $variation2 = $this->_test->getVariations()->getItem(0);
+        $variation1 = $this->_test->getVariations()->getByName('v1');
+        $variation2 = $this->_test->getVariations()->getByName('v2');
 
         $this->assertTrue($variation1->getEnabled());
         $this->assertTrue($variation2->getEnabled());
@@ -67,13 +65,36 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         }
     }
 
+    public function testGetSetFrequency() {
+        $variation1 = $this->_test->getVariations()->getByName('v1');
+        $variation2 = $this->_test->getVariations()->getByName('v2');
+
+        $this->assertSame(1., $variation1->getFrequency());
+        $this->assertSame(1., $variation2->getFrequency());
+
+        $variation1->setFrequency(1 / 3);
+        $this->assertSame(0.33, $variation1->getFrequency());
+        $variation1->setFrequency(66);
+        $this->assertSame(66., $variation1->getFrequency());
+
+        $exception = $this->catchException(function () use ($variation1) {
+            $variation1->setFrequency(0);
+        });
+        $this->assertInstanceOf(CM_Exception_Invalid::class, $exception);
+        $this->assertSame('Frequency must be positive', $exception->getMessage());
+
+        $exception = $this->catchException(function () use ($variation1) {
+            $variation1->setFrequency(-1);
+        });
+        $this->assertInstanceOf(CM_Exception_Invalid::class, $exception);
+        $this->assertSame('Frequency must be positive', $exception->getMessage());
+    }
+
     public function testGetConversionCount() {
         $user = CMTest_TH::createUser();
 
-        /** @var CM_Model_Splittest_User $test */
         $test = CM_Model_Splittest_User::create('bar', ['v1']);
-        /** @var CM_Model_SplittestVariation $variation */
-        $variation = $test->getVariations()->getItem(0);
+        $variation = $test->getVariations()->getByName('v1');
 
         $test->isVariationFixture($user, 'v1');
         $this->assertSame(0, $variation->getConversionCount());
@@ -89,10 +110,8 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $user2 = CMTest_TH::createUser();
         $user3 = CMTest_TH::createUser();
 
-        /** @var CM_Model_Splittest_User $test */
         $test = CM_Model_Splittest_User::create('bar', ['v1']);
-        /** @var CM_Model_SplittestVariation $variation */
-        $variation = $test->getVariations()->getItem(0);
+        $variation = $test->getVariations()->getByName('v1');
 
         $test->isVariationFixture($user, 'v1');
         $test->isVariationFixture($user2, 'v1');
@@ -117,10 +136,8 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
     public function testGetConversionWeight_SingleConversion() {
         $user = CMTest_TH::createUser();
 
-        /** @var CM_Model_Splittest_User $test */
         $test = CM_Model_Splittest_User::create('bar', ['v1']);
-        /** @var CM_Model_SplittestVariation $variation */
-        $variation = $test->getVariations()->getItem(0);
+        $variation = $test->getVariations()->getByName('v1');
 
         $test->isVariationFixture($user, 'v1');
         $this->assertSame(0, $variation->getConversionCount());
@@ -142,10 +159,8 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
     public function testGetConversionWeight_MultipleConversions() {
         $user = CMTest_TH::createUser();
 
-        /** @var CM_Model_Splittest_User $test */
         $test = CM_Model_Splittest_User::create('bar', ['v1']);
-        /** @var CM_Model_SplittestVariation $variation */
-        $variation = $test->getVariations()->getItem(0);
+        $variation = $test->getVariations()->getByName('v1');
 
         $test->isVariationFixture($user, 'v1');
         $this->assertSame(0, $variation->getConversionCount());
@@ -168,10 +183,8 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $user1 = CMTest_TH::createUser();
         $user2 = CMTest_TH::createUser();
 
-        /** @var CM_Model_Splittest_User $test */
         $test = CM_Model_Splittest_User::create('bar', ['v1']);
-        /** @var CM_Model_SplittestVariation $variation */
-        $variation = $test->getVariations()->getItem(0);
+        $variation = $test->getVariations()->getByName('v1');
 
         $this->assertSame(0., $variation->getConversionWeightSquared());
 
@@ -198,10 +211,8 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $user1 = CMTest_TH::createUser();
         $user2 = CMTest_TH::createUser();
 
-        /** @var CM_Model_Splittest_User $test */
         $test = CM_Model_Splittest_User::create('bar', ['v1']);
-        /** @var CM_Model_SplittestVariation $variation */
-        $variation = $test->getVariations()->getItem(0);
+        $variation = $test->getVariations()->getByName('v1');
 
         $this->assertSame(0., $variation->getStandardDeviation());
 
@@ -228,10 +239,8 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $user1 = CMTest_TH::createUser();
         $user2 = CMTest_TH::createUser();
 
-        /** @var CM_Model_Splittest_User $test */
         $test = CM_Model_Splittest_User::create('bar', ['v1']);
-        /** @var CM_Model_SplittestVariation $variation */
-        $variation = $test->getVariations()->getItem(0);
+        $variation = $test->getVariations()->getByName('v1');
 
         $this->assertSame(0., $variation->getUpperConfidenceBound());
 
@@ -258,11 +267,8 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $user1 = CMTest_TH::createUser();
         $user2 = CMTest_TH::createUser();
 
-        /** @var CM_Model_Splittest_User $test */
         $test = CM_Model_Splittest_User::create('bar', ['v1']);
-
-        /** @var CM_Model_SplittestVariation $variation */
-        $variation = $test->getVariations()->getItem(0);
+        $variation = $test->getVariations()->getByName('v1');
 
         $this->assertSame(0, $variation->getFixtureCount());
 
@@ -280,7 +286,6 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
     }
 
     public function testOptimized() {
-        /** @var CM_Model_Splittest_User $test */
         $test = CM_Model_Splittest_User::create('testOptimized', ['v1', 'v2'], true);
 
         foreach ([
@@ -437,6 +442,7 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
         $variation->expects($this->any())->method('getFixtureCount')->will($this->returnValue($fixture));
         $variation->expects($this->any())->method('getConversionCount')->will($this->returnValue($conversion));
         $variation->expects($this->any())->method('getConversionWeight')->will($this->returnValue($weight));
+        /** @var CM_Model_SplittestVariation $variation */
         return $variation;
     }
 }

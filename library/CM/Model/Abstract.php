@@ -114,7 +114,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         $this->_autoCommit = true;
     }
 
-
     public function delete() {
         $containingCacheables = $this->_getContainingCacheables();
         $this->_onDeleteBefore();
@@ -206,7 +205,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
     }
 
     /**
-     * @return CM_Model_Abstract
+     * @return $this
      */
     final public function _change() {
         if ($cache = $this->_getCache()) {
@@ -516,7 +515,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
                 $data = [];
             }
             $model = static::_createStatic($data);
-            $transaction->addRollback(function() use ($model) {
+            $transaction->addRollback(function () use ($model) {
                 $model->delete();
             });
             $model->_changeContainingCacheables();
