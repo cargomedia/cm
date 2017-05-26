@@ -4,9 +4,6 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
 
     use CM_Service_ManagerAwareTrait;
 
-    /** @var array|null */
-    private $_variationWeightList;
-
     /**
      * @param string             $name
      * @param CM_Service_Manager $serviceManager
@@ -116,38 +113,6 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
             throw new CM_Exception('Splittest has no variations', null, ['splitTestId' => $this->getId()]);
         }
         return $variationBest;
-    }
-
-    /**
-     * @param array $variationWeightList
-     * @throws CM_Exception_Invalid
-     */
-    public function setVariationWeightList(array $variationWeightList) {
-        if (empty($variationWeightList)) {
-            throw new CM_Exception_Invalid('Empty variation weight list');
-        }
-        $variationList = $this->getVariations();
-        $this->_variationWeightList = [];
-        foreach ($variationWeightList as $variationName => $variationWeight) {
-            $variationName = (string) $variationName;
-            $variationWeight = (float) $variationWeight;
-            $variation = $variationList->findByName($variationName);
-            if (!$variation) {
-                throw new CM_Exception_Invalid('There is no variation in split test', null, [
-                    'variation' => $variationName,
-                    'splitTest' => $this->getName(),
-                ]);
-            }
-            if ($variationWeight < 0) {
-                throw new CM_Exception_Invalid('Split test variation weight. It should be positive', null, ['variationWeight' => $variationWeight]);
-            }
-            if ($variation->getEnabled() && ($variationWeight > 0)) {
-                $this->_variationWeightList[$variationName] = $variationWeight;
-            }
-        }
-        if (empty($this->_variationWeightList)) {
-            throw new CM_Exception_Invalid('At least one enabled split test variation should have a positive weight');
-        }
     }
 
     public function flush() {
@@ -334,12 +299,10 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
      * @return CM_Model_SplittestVariation
      */
     protected function _getVariationRandom() {
-        if (isset($this->_variationWeightList)) {
-            $variation = $this->_getVariationWithFixedWeightPolicy();
-        } elseif ($this->getOptimized()) {
+        if ($this->getOptimized()) {
             $variation = $this->_getVariationWithUpperConfidenceBoundPolicy();
         } else {
-            $variation = $this->_getVariationWithUniformPolicy();
+            $variation = $this->_getVariationWithFixedWeightPolicy();
         }
         if (!$variation) {
             throw new CM_Exception_Invalid('Splittest has no enabled variations.', null, ['splitTestId' => $this->getId(),]);
@@ -355,25 +318,14 @@ class CM_Model_Splittest extends CM_Model_Abstract implements CM_Service_Manager
         $variationWeightList = [];
         /** @var CM_Model_SplittestVariation $variation */
         foreach ($this->getVariationsEnabled()->getItems() as $variation) {
-            $variationName = $variation->getName();
-            if (isset($this->_variationWeightList[$variationName])) {
-                $variationList[] = $variation;
-                $variationWeightList[] = $this->_variationWeightList[$variationName];
-            }
+            $variationList[] = $variation;
+            $variationWeightList[] = $variation->getFrequency();
         }
         if (empty($variationList)) {
             return null;
         }
         $weightedRandom = new CM_WeightedRandom($variationList, $variationWeightList);
         return $weightedRandom->lookup();
-    }
-
-    /**
-     * @return CM_Model_SplittestVariation|null
-     */
-    protected function _getVariationWithUniformPolicy() {
-        $variationList = $this->getVariationsEnabled();
-        return $variationList->getItemRand();
     }
 
     /**
