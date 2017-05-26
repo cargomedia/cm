@@ -8,5 +8,6 @@ class Migration_1495786897_AddVariationFrequency implements \CM_Migration_Upgrad
         if (!CM_Db_Db::existsColumn('cm_splittestVariation', 'frequency')) {
             CM_Db_Db::exec("ALTER TABLE `cm_splittestVariation` ADD COLUMN `frequency` decimal(10,2) NOT NULL DEFAULT '1.00'");
         }
+        CM_Cache_Shared::getInstance()->flush();
     }
 }
