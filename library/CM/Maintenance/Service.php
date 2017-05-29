@@ -90,13 +90,16 @@ class CM_Maintenance_Service implements CM_Service_ManagerAwareInterface {
         foreach ($this->_eventMap as $name => $event) {
             $this->_clockworkManager->registerEvent($event->getClockworkEvent());
             $this->_eventHandler->bind($event->getName(), function (CM_Clockwork_Event $event, CM_Clockwork_Event_Status $status) {
-                $job = new CM_Maintenance_RunEventJob();
-                $job->setServiceManager($this->getServiceManager());
                 $lastRuntime = $status->getLastRuntime();
                 if (null !== $lastRuntime) {
                     $lastRuntime = $lastRuntime->getTimestamp();
                 }
-                $job->queue(['event' => $event->getName(), 'lastRuntime' => $lastRuntime]);
+                $job = new CM_Maintenance_RunEventJob(CM_Params::factory([
+                    'event' => $event->getName(),
+                    'lastRuntime' => $lastRuntime
+                ], false));
+                $job->setServiceManager($this->getServiceManager());
+                $this->getServiceManager()->getJobQueue()->queue($job);
             });
         }
     }

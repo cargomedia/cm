@@ -70,11 +70,6 @@ return function (CM_Config_Node $config) {
 
     $config->CM_AdproviderAdapter_Abstract->class = CM_AdproviderAdapter_Revive::class;
 
-    $config->CM_Jobdistribution_JobWorker->servers = [['host' => 'localhost', 'port' => 4730]];
-
-    $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
-    $config->CM_Jobdistribution_Job_Abstract->servers = [['host' => 'localhost', 'port' => 4730]];
-
     $config->CMService_MaxMind->licenseKey = null;
 
     $config->services = [];
@@ -320,6 +315,19 @@ return function (CM_Config_Node $config) {
             'arguments' => [
                 'clockworkStorage' => new CM_Clockwork_Storage_MongoDB('maintenance'),
             ]
+        ],
+    ];
+
+    $config->services[CM_Jobdistribution_QueueInterface::class] = [
+        'class'  => CM_Gearman_Factory::class,
+        'method' => [
+            'name'      => 'createJobService',
+            'arguments' => [
+                'servers'        => [
+                    ['host' => 'localhost', 'port' => 4730],
+                ],
+                'workerJobLimit' => 1000,
+            ],
         ],
     ];
 };
