@@ -5,27 +5,6 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     const MAX_UPDATE_COUNT = 50;
 
     /**
-     * @param string $name
-     * @throws CM_Exception_Invalid
-     */
-    public function changeName($name) {
-        $transaction = new \CM\Transactions\Transaction();
-        $oldName = $this->getName();
-        $oldHash = $this->getNameHash();
-        $this->setName($name);
-        $transaction->addRollback(function() use ($oldName, $oldHash) {
-            $this->setNameHash($oldHash);
-            $this->setName($oldName);
-        });
-        try {
-            $this->setNameHash(self::calculateHash($name));
-        } catch (CM_Exception_Invalid $e) {
-            $transaction->rollback();
-            throw $e;
-        }
-    }
-
-    /**
      * @return string
      */
     public function getName() {
@@ -33,9 +12,16 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     }
 
     /**
-     * @return string $name
+     * @param string $name
+     * @throws CM_Exception_Invalid
      */
     public function setName($name) {
+        $hash = self::calculateHash($name);
+        try {
+            $this->_set('nameHash', $hash);
+        } catch (CM_Db_Exception $e) {
+            throw new CM_Exception_Invalid('Duplicate languageKey name', null, ['name' => $name, 'hash' => $hash]);
+        }
         $this->_set('name', $name);
         $this->_changeContainingCacheables();
     }
@@ -45,18 +31,6 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      */
     public function getNameHash() {
         return $this->_get('nameHash');
-    }
-
-    /**
-     * @param string $hash
-     * @throws CM_Exception_Invalid
-     */
-    public function setNameHash($hash) {
-        try {
-            return $this->_set('nameHash', $hash);
-        } catch (CM_Db_Exception $e) {
-            throw new CM_Exception_Invalid('Duplicate languageKey name-hash', null, ['hash' => $hash]);
-        }
     }
 
     /**
@@ -162,7 +136,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      * @param string     $name
      * @param array|null $variables
      * @return CM_Model_LanguageKey
-     * @throws CM_Exception_Invalid
+     * @throws CM_Db_Exception
      */
     public static function create($name, array $variables = null) {
         $languageKey = new self();
@@ -180,7 +154,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
         } catch (CM_Db_Exception $e) {
             $languageKey = self::findByName($name);
             if (null === $languageKey) {
-                throw new CM_Exception_Invalid('Unable to create new language key', $e->getSeverity(), $e->getMetaInfo());
+                throw $e;
             }
         }
 
